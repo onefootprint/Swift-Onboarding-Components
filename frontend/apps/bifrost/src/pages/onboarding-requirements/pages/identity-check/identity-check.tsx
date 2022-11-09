@@ -6,7 +6,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { KycStatus } from '@onefootprint/types';
 import { LoadingIndicator, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { OnboardingRequirementsMachineContext } from 'src/utils/state-machine/onboarding-requirements';
+import { MachineContext } from 'src/utils/state-machine/onboarding-requirements';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -20,7 +20,7 @@ const IdentityCheck = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { tenant, authToken },
-  }: OnboardingRequirementsMachineContext = state.context;
+  }: MachineContext = state.context;
   const startKycMutation = useOnboardingSubmit();
   const toast = useToast();
 

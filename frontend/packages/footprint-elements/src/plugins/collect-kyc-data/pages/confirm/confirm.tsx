@@ -7,6 +7,7 @@ import { HeaderTitle } from '../../../../components';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine, {
   Events,
+  MachineContext,
 } from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import AddressSection from './components/address-section';
@@ -17,7 +18,7 @@ import IdentitySection from './components/identity-section';
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, device } = state.context;
+  const { authToken, data, device }: MachineContext = state.context;
   const isMobile = device?.type === 'mobile';
   const [editContent, setEditContent] = useState<EditSection | undefined>();
   const { mutation, syncData } = useSyncData();

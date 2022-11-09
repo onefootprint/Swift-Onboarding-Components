@@ -11,9 +11,11 @@ import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import HeaderTitle from '../../../../components/header-title';
-import { useIdDocMachine } from '../../components/machine-provider';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { Events } from '../../utils/state-machine/types';
+import useIdDocMachine, {
+  Events,
+  MachineContext,
+} from '../../hooks/use-id-doc-machine';
 import useGetDocStatus from './hooks/use-get-doc-status';
 import useSubmitDoc from './hooks/use-submit-doc';
 
@@ -28,8 +30,14 @@ const TRANSITION_DELAY = 3000;
 const ProcessingPhoto = () => {
   const { t } = useTranslation('pages.processing-photo');
   const [state, send] = useIdDocMachine();
-  const { type, tenant, country, authToken, frontImage, backImage } =
-    state.context;
+  const {
+    type,
+    tenant,
+    country,
+    authToken,
+    frontImage,
+    backImage,
+  }: MachineContext = state.context;
   const docType = type ? IdDocTypeToLabel[type] : t('default-document-label');
   const [displayStatus, setDisplayStatus] = useState<DisplayStatus>(
     DisplayStatus.loading,

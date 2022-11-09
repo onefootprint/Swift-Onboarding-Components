@@ -5,14 +5,16 @@ import styled, { css } from 'styled-components';
 
 import { useSkipLiveness } from '../../../../hooks';
 import HeaderTitle from '../../components/header-title';
-import { useLivenessMachine } from '../../components/machine-provider';
+import useLivenessMachine, {
+  Events,
+  MachineContext,
+} from '../../hooks/use-liveness-machine';
 import useBiometricInit from '../../hooks/use-register-biometric';
-import { Events } from '../../utils/state-machine/types';
 
 const Retry = () => {
   const { t } = useTranslation('pages.retry');
   const [state, send] = useLivenessMachine();
-  const { authToken, tenant } = state.context;
+  const { authToken, tenant }: MachineContext = state.context;
   const biometricInitMutation = useBiometricInit();
   const skipLivenessMutation = useSkipLiveness();
 

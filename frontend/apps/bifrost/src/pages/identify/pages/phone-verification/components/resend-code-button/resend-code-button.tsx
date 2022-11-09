@@ -18,19 +18,23 @@ import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '../../../../hooks/use-identify-machine';
+import useIdentifyMachine, {
+  MachineContext,
+} from '../../../../hooks/use-identify-machine';
 
 const ResendCodeButton = () => {
   const toast = useToast();
   const { t } = useTranslation('pages.phone-verification.form.resend-code');
   const [state, send] = useIdentifyMachine();
+  const { phone, email, identifyType, challengeData }: MachineContext =
+    state.context;
   const identifyChallengeMutation = useIdentifyChallenge();
   const identifyMutation = useIdentify();
   const showRequestErrorToast = useRequestErrorToast();
   const { setDate, countdown } = useCountdown();
 
   useEffect(() => {
-    const retryDisabledUntil = state.context.challengeData?.retryDisabledUntil;
+    const retryDisabledUntil = challengeData?.retryDisabledUntil;
     if (retryDisabledUntil) {
       setDate(retryDisabledUntil);
     }
@@ -45,7 +49,6 @@ const ResendCodeButton = () => {
   }
 
   const sendIdentifyChallenge = (phoneNumber: string) => {
-    const { identifyType } = state.context;
     identifyChallengeMutation.mutate(
       { phoneNumber, identifyType },
       {
@@ -77,8 +80,10 @@ const ResendCodeButton = () => {
     );
   };
 
-  const sendIdentify = (email: string) => {
-    const { identifyType } = state.context;
+  const sendEmailIdentify = () => {
+    if (!email) {
+      return;
+    }
     identifyMutation.mutate(
       {
         identifier: { email },
@@ -86,18 +91,18 @@ const ResendCodeButton = () => {
         identifyType,
       },
       {
-        onSuccess({ challengeData }: IdentifyResponse) {
-          if (!challengeData) {
+        onSuccess({ challengeData: newChallengedata }: IdentifyResponse) {
+          if (!newChallengedata) {
             return;
           }
-          const disabledUntil = challengeData.retryDisabledUntil;
+          const disabledUntil = newChallengedata.retryDisabledUntil;
           if (disabledUntil) {
             setDate(disabledUntil);
           }
           send({
             type: Events.smsChallengeResent,
             payload: {
-              challengeData,
+              challengeData: newChallengedata,
             },
           });
         },
@@ -107,13 +112,12 @@ const ResendCodeButton = () => {
   };
 
   const handleResend = () => {
-    const { phone, email } = state.context;
     // Depending on if the user's phone is known (if this is a new user who went
     // through the phone-registration page) handle resending differently
     if (phone) {
       sendIdentifyChallenge(phone);
     } else {
-      sendIdentify(email);
+      sendEmailIdentify();
     }
   };
 

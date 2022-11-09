@@ -9,12 +9,13 @@ import { createHandoffUrl } from '../../../../../utils/handoff-url';
 import useGenerateScopedAuthToken from '../../../hooks/mobile/use-generate-scoped-auth-token';
 import useMobileMachine, {
   Events,
+  MachineContext,
 } from '../../../hooks/mobile/use-mobile-machine';
 
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.mobile.new-tab-requested');
   const [state, send] = useMobileMachine();
-  const { authToken, scopedAuthToken, tenant } = state.context;
+  const { authToken, scopedAuthToken, tenant }: MachineContext = state.context;
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken();
 
   useEffect(() => {

@@ -12,13 +12,16 @@ import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '../../hooks/use-identify-machine';
+import useIdentifyMachine, {
+  MachineContext,
+} from '../../hooks/use-identify-machine';
 import PhoneRegistrationForm from './components/phone-registration-form';
 
 const PhoneRegistration = () => {
+  const { t } = useTranslation('pages.phone-registration');
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
-  const { t } = useTranslation('pages.phone-registration');
+  const { identifyType, email }: MachineContext = state.context;
 
   const identifyMutation = useIdentify();
   const identifyChallengeMutation = useIdentifyChallenge();
@@ -28,7 +31,6 @@ const PhoneRegistration = () => {
   };
 
   const getNewPhoneChallenge = (phone: string, userFound: boolean) => {
-    const { identifyType } = state.context;
     identifyChallengeMutation.mutate(
       { phoneNumber: phone, identifyType },
       {
@@ -58,7 +60,7 @@ const PhoneRegistration = () => {
     identifyMutation.mutate(
       {
         identifier: { phoneNumber: phone },
-        identifyType: state.context.identifyType,
+        identifyType,
         preferredChallengeKind: ChallengeKind.sms,
       },
       {
@@ -101,7 +103,7 @@ const PhoneRegistration = () => {
             <StyledIcoEmail24 />
           </Box>
           <Typography variant="label-3" color="primary">
-            {state.context.email}
+            {email}
           </Typography>
         </EmailCardContent>
         <LinkButton size="compact" onClick={handleChangeEmail}>

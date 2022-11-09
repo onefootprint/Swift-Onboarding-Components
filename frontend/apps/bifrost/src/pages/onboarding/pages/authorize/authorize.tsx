@@ -25,7 +25,9 @@ import {
 } from '@onefootprint/ui';
 import { useIsMutating } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
+import useOnboardingMachine, {
+  MachineContext,
+} from 'src/hooks/use-onboarding-machine';
 import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
 
@@ -58,8 +60,8 @@ const Authorize = () => {
   const [collectedDocs, setCollectedDocs] = useState<IdDocType[]>();
   const {
     authToken,
-    tenant: { pk: tenantPk },
-  } = state.context;
+    tenant: { pk: tenantPk, canAccessData, name: tenantName },
+  }: MachineContext = state.context;
 
   const statusQuery = useGetOnboardingStatus(authToken, tenantPk, {
     onSuccess: ({ fieldsToAuthorize }) => {
@@ -98,7 +100,6 @@ const Authorize = () => {
     );
   };
 
-  const { canAccessData } = state.context.tenant;
   const requiredCategories = canAccessData;
 
   const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
@@ -124,7 +125,7 @@ const Authorize = () => {
       <Container>
         <HeaderTitle
           title={t('title')}
-          subtitle={t('subtitle', { tenantName: state.context.tenant.name })}
+          subtitle={t('subtitle', { tenantName })}
         />
         <CategoriesContainer>
           {requiredCategories.map((kycDataOpt: CollectedKycDataOption) => (

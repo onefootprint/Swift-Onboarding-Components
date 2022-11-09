@@ -3,7 +3,9 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { useCollectKycDataMachine } from '../../../../components/machine-provider';
+import useCollectKycDataMachine, {
+  MachineContext,
+} from '../../../../hooks/use-collect-kyc-data-machine';
 import { NameInformation } from '../../../../utils/data-types';
 import CtaButton from '../cta-button';
 import NameFields from '../name-fields';
@@ -18,7 +20,7 @@ type NameFormProps = {
 
 const NameForm = ({ isLoading, ctaLabel, onSubmit }: NameFormProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data } = state.context;
+  const { data }: MachineContext = state.context;
 
   const methods = useForm<FormData>({
     defaultValues: {

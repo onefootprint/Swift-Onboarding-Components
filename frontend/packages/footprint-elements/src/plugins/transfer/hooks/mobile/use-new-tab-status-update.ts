@@ -1,11 +1,11 @@
 import { D2PStatus, GetD2PResponse } from '@onefootprint/types';
 
 import { useGetD2PStatus } from '../../../../hooks';
-import useMobileMachine, { Events } from './use-mobile-machine';
+import useMobileMachine, { Events, MachineContext } from './use-mobile-machine';
 
 const useNewTabStatusUpdate = () => {
   const [state, send] = useMobileMachine();
-  const { scopedAuthToken, tab } = state.context;
+  const { scopedAuthToken, tab }: MachineContext = state.context;
 
   const handleSuccess = (response: GetD2PResponse) => {
     const { status } = response;

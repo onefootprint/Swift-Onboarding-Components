@@ -23,7 +23,7 @@ export type Requirements = {
   kycData: readonly CollectedKycDataOption[];
 };
 
-export type OnboardingRequirementsMachineContext = {
+export type MachineContext = {
   onboardingContext: {
     userFound: boolean;
     tenant: TenantInfo;

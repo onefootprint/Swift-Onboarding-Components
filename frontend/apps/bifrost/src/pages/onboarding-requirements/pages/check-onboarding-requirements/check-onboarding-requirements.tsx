@@ -11,7 +11,7 @@ import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import {
   Events,
-  OnboardingRequirementsMachineContext,
+  MachineContext,
 } from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
@@ -22,7 +22,7 @@ const CheckOnboardingRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, tenant },
-  }: OnboardingRequirementsMachineContext = state.context;
+  }: MachineContext = state.context;
   const [error, setError] = useState(false);
 
   const handleSuccess = (response: OnboardingStatusResponse) => {

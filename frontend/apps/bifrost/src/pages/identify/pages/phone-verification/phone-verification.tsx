@@ -12,7 +12,9 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Events } from '../../../../utils/state-machine/identify/types';
-import useIdentifyMachine from '../../hooks/use-identify-machine';
+import useIdentifyMachine, {
+  MachineContext,
+} from '../../hooks/use-identify-machine';
 import PhoneVerificationLoading from './components/phone-verification-loading';
 import PhoneVerificationPinForm from './components/phone-verification-pin-form';
 import PhoneVerificationSuccess from './components/phone-verification-success';
@@ -20,19 +22,19 @@ import PhoneVerificationSuccess from './components/phone-verification-success';
 const PhoneVerification = () => {
   const { t } = useTranslation('pages.phone-verification');
   const [state, send] = useIdentifyMachine();
+  const context = state.context as MachineContext;
+  const { phone, challengeData, userFound } = context;
 
   let phoneCountryCode = '';
-  const filteredPhone = state.context.phone?.split('#')[0]; // Filter out sandbox suffixes
-  if (state.context.challengeData?.phoneCountry) {
-    phoneCountryCode = getNumberByCountryValue(
-      state.context.challengeData?.phoneCountry,
-    );
-  } else if (state.context.phone) {
+  const filteredPhone = phone?.split('#')[0] ?? ''; // Filter out sandbox suffixes
+  if (challengeData?.phoneCountry) {
+    phoneCountryCode = getNumberByCountryValue(challengeData?.phoneCountry);
+  } else if (phone) {
     const phoneCountryVal = getCountryByNumber(filteredPhone).value;
     phoneCountryCode = getNumberByCountryValue(phoneCountryVal);
   }
   const phoneNumberLastTwo =
-    state.context.challengeData?.phoneNumberLastTwo ?? filteredPhone.slice(-2);
+    challengeData?.phoneNumberLastTwo ?? filteredPhone.slice(-2);
 
   return (
     <>
@@ -47,11 +49,7 @@ const PhoneVerification = () => {
       <Form autoComplete="off" role="presentation">
         <Box>
           <HeaderTitle
-            title={
-              state.context.userFound
-                ? t('title.existing-user')
-                : t('title.new-user')
-            }
+            title={userFound ? t('title.existing-user') : t('title.new-user')}
             subtitle={t('subtitle', {
               phoneCountryCode,
               phoneNumberLastTwo,

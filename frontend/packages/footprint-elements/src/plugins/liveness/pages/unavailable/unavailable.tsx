@@ -4,15 +4,17 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { useSkipLiveness } from '../../../../hooks';
 import HeaderTitle from '../../components/header-title';
-import { useLivenessMachine } from '../../components/machine-provider';
-import { Events } from '../../utils/state-machine/types';
+import useLivenessMachine, {
+  Events,
+  MachineContext,
+} from '../../hooks/use-liveness-machine';
 
 const TRANSITION_DELAY = 6000;
 
 const Unavailable = () => {
   const { t } = useTranslation('pages.unavailable');
   const [state, send] = useLivenessMachine();
-  const { authToken, tenant } = state.context;
+  const { authToken, tenant }: MachineContext = state.context;
   const skipLivenessMutation = useSkipLiveness();
   const handleLivenessSkipped = () => {
     setTimeout(() => {

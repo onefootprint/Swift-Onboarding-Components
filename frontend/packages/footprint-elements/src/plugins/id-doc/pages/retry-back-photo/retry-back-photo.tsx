@@ -1,16 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import { useIdDocMachine } from '../../components/machine-provider';
 import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { Events } from '../../utils/state-machine/types';
+import useIdDocMachine, {
+  Events,
+  MachineContext,
+} from '../../hooks/use-id-doc-machine';
 
 const RetryBackPhoto = () => {
   const [state, send] = useIdDocMachine();
   const { t } = useTranslation('pages.retry-photo.back');
-  const { backImageError, type } = state.context;
+  const { backImageError, type }: MachineContext = state.context;
   if (!backImageError || !type) {
     return null;
   }

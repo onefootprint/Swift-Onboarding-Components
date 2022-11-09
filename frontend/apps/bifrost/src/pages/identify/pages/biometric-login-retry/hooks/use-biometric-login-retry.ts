@@ -11,18 +11,21 @@ import {
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import { Events } from 'src/utils/state-machine/identify/types';
 
-import useIdentifyMachine from '../../../hooks/use-identify-machine';
+import useIdentifyMachine, {
+  MachineContext,
+} from '../../../hooks/use-identify-machine';
 
 const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
+  const { identifyType, email }: MachineContext = state.context;
   const identifyMutation = useIdentify();
   const identityVerifyMutation = useIdentifyVerify();
 
   const requestBiometricChallenge = () => {
     identifyMutation.mutate(
       {
-        identifier: { email: state.context.email },
-        identifyType: state.context.identifyType,
+        identifier: { email },
+        identifyType,
         preferredChallengeKind: ChallengeKind.biometric,
       },
       {
@@ -40,8 +43,8 @@ const useBiometricLoginRetry = () => {
   const requestPhoneChallenge = () => {
     identifyMutation.mutate(
       {
-        identifier: { email: state.context.email },
-        identifyType: state.context.identifyType,
+        identifier: { email },
+        identifyType,
         preferredChallengeKind: ChallengeKind.sms,
       },
       {

@@ -2,11 +2,11 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetDocStatusRequest, GetDocStatusResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { useIdDocMachine } from '../../../components/machine-provider';
 import {
   AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
 } from '../../../config/constants';
+import useIdDocMachine from '../../../hooks/use-id-doc-machine';
 
 const DOC_STATUS_FETCH_INTERVAL = 1000;
 

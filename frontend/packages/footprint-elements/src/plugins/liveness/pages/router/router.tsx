@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useLivenessMachine } from '../../components/machine-provider';
+import useLivenessMachine from '../../hooks/use-liveness-machine';
 import { States } from '../../utils/state-machine/types';
 import Register from '../register';
 import Retry from '../retry';

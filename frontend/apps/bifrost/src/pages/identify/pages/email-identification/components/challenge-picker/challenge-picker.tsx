@@ -9,8 +9,11 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import styled, { css } from 'styled-components';
+
+import useIdentifyMachine, {
+  MachineContext,
+} from '../../../../hooks/use-identify-machine';
 
 const iOSPlatforms = [
   'iPad Simulator',
@@ -36,9 +39,7 @@ const ChallengePicker = ({
 }: ChallengePickerProps) => {
   const { t } = useTranslation('pages.email-identification.challenge-picker');
   const [state] = useIdentifyMachine();
-  const {
-    context: { device },
-  } = state;
+  const { device }: MachineContext = state.context;
 
   const supportsBiometric =
     device.hasSupportForWebauthn && device.type === 'mobile';

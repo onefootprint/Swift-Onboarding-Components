@@ -2,15 +2,15 @@ import { TransitionsConfig } from 'xstate';
 
 import {
   Events,
+  MachineContext,
   MachineEvents,
-  OnboardingRequirementsMachineContext,
   Requirements,
   States,
 } from './types';
 
 type MachineTarget = {
   target: States;
-  cond: (context: OnboardingRequirementsMachineContext) => boolean;
+  cond: (context: MachineContext) => boolean;
 };
 
 export const RequirementTargets: MachineTarget[] = [
@@ -33,7 +33,7 @@ export const RequirementTargets: MachineTarget[] = [
 ];
 
 export const RequirementCompletedTransitions: TransitionsConfig<
-  OnboardingRequirementsMachineContext,
+  MachineContext,
   MachineEvents
 > = {
   [Events.requirementCompleted]: [
@@ -49,11 +49,10 @@ export const areRequirementsEmpty = (requirements: Requirements) => {
   return kycData.length === 0 && !liveness && !idDoc && !identityCheck;
 };
 
-const shouldRunCollectKycData = (
-  context: OnboardingRequirementsMachineContext,
-) => context.requirements.kycData.length > 0;
+const shouldRunCollectKycData = (context: MachineContext) =>
+  context.requirements.kycData.length > 0;
 
-const shouldRunIdDoc = (context: OnboardingRequirementsMachineContext) => {
+const shouldRunIdDoc = (context: MachineContext) => {
   const {
     requirements: { idDoc },
     onboardingContext: {
@@ -63,7 +62,7 @@ const shouldRunIdDoc = (context: OnboardingRequirementsMachineContext) => {
   return idDoc && type === 'mobile';
 };
 
-const shouldRunTransfer = (context: OnboardingRequirementsMachineContext) => {
+const shouldRunTransfer = (context: MachineContext) => {
   const {
     requirements: { idDoc, liveness },
     onboardingContext: {
@@ -76,9 +75,7 @@ const shouldRunTransfer = (context: OnboardingRequirementsMachineContext) => {
   return idDoc || liveness;
 };
 
-export const requiresAdditionalInfo = (
-  context: OnboardingRequirementsMachineContext,
-) => {
+export const requiresAdditionalInfo = (context: MachineContext) => {
   const {
     onboardingContext: { userFound },
     requirements: { kycData, idDoc },
@@ -86,6 +83,5 @@ export const requiresAdditionalInfo = (
   return userFound && (kycData.length > 0 || idDoc);
 };
 
-const shouldRunIdentityCheck = (
-  context: OnboardingRequirementsMachineContext,
-) => !!context.requirements.identityCheck;
+const shouldRunIdentityCheck = (context: MachineContext) =>
+  !!context.requirements.identityCheck;

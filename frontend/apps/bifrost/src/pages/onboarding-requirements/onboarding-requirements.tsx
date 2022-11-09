@@ -5,14 +5,13 @@ import {
   withProvider,
 } from '@onefootprint/footprint-elements';
 import React from 'react';
-import {
-  Events,
-  OnboardingRequirementsMachineContext,
-  States,
-} from 'src/utils/state-machine/onboarding-requirements';
 
 import MachineProvider from './components/machine-provider';
-import useOnboardingRequirementsMachine from './hooks/use-onboarding-requirements-machine';
+import useOnboardingRequirementsMachine, {
+  Events,
+  MachineContext,
+  States,
+} from './hooks/use-onboarding-requirements-machine';
 import AdditionalInfoRequired from './pages/additional-info-required';
 import CheckOnboardingRequirements from './pages/check-onboarding-requirements';
 import IdentityCheck from './pages/identity-check';
@@ -22,7 +21,7 @@ const OnboardingRequirements = () => {
   const {
     onboardingContext: { authToken, device, tenant, userFound },
     receivedRequirements: { kycData, liveness, idDoc },
-  }: OnboardingRequirementsMachineContext = state.context;
+  }: MachineContext = state.context;
 
   const handleRequirementCompleted = () => {
     send({

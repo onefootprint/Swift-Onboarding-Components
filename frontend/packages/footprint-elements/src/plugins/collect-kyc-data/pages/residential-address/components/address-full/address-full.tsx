@@ -16,8 +16,10 @@ import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/header-title';
-import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header';
+import useCollectKycDataMachine, {
+  MachineContext,
+} from '../../../../hooks/use-collect-kyc-data-machine';
 import { ResidentialAddressFull } from '../../../../utils/data-types';
 import useInputValidations from '../../hooks/use-input-validations';
 import getAddressComponent from '../../utils/get-address-components/get-address-components';
@@ -49,7 +51,7 @@ const AddressFull = ({
   hideNavHeader,
 }: AddressFullProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data } = state.context;
+  const { data }: MachineContext = state.context;
   const { t } = useTranslation('pages.residential-address.full');
   const { t: cta } = useTranslation('pages.cta');
   const {

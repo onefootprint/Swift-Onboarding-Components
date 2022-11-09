@@ -1,15 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import { useIdDocMachine } from '../../components/machine-provider';
 import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { Events } from '../../utils/state-machine/types';
+import useIdDocMachine, {
+  Events,
+  MachineContext,
+} from '../../hooks/use-id-doc-machine';
 
 const TakeOrUploadBackPhoto = () => {
   const { t } = useTranslation('pages.take-or-upload-photo.back');
   const [state, send] = useIdDocMachine();
-  const { type } = state.context;
+  const { type }: MachineContext = state.context;
+
   if (!type) {
     return null;
   }

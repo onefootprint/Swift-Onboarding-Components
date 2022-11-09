@@ -4,14 +4,16 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
-import { useLivenessMachine } from '../../components/machine-provider';
+import useLivenessMachine, {
+  Events,
+  MachineContext,
+} from '../../hooks/use-liveness-machine';
 import useBiometricInit from '../../hooks/use-register-biometric';
-import { Events } from '../../utils/state-machine/types';
 
 const Register = () => {
   const { t } = useTranslation('pages.register');
   const [state, send] = useLivenessMachine();
-  const { authToken } = state.context;
+  const { authToken }: MachineContext = state.context;
   const biometricInitMutation = useBiometricInit();
 
   const handleClick = () => {

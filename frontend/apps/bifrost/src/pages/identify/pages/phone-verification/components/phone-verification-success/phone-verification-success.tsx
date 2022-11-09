@@ -5,11 +5,13 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '../../../../hooks/use-identify-machine';
+import useIdentifyMachine, {
+  MachineContext,
+} from '../../../../hooks/use-identify-machine';
 
 const PhoneVerificationSuccess = () => {
   const [state] = useIdentifyMachine();
-  const { identifyType } = state.context;
+  const { identifyType }: MachineContext = state.context;
   const { t } = useTranslation('pages.phone-verification.form.success');
   return (
     <PhoneVerificationSuccessContainer>

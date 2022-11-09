@@ -4,7 +4,9 @@ import { IcoBuilding24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
-import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine, {
+  MachineContext,
+} from '../../../../hooks/use-collect-kyc-data-machine';
 import Section from '../section';
 import createAddressLine from './utils/create-address-line';
 
@@ -15,7 +17,7 @@ type AddressSectionProps = {
 const AddressSection = ({ onEdit }: AddressSectionProps) => {
   const { t } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
-  const { data } = state.context;
+  const { data }: MachineContext = state.context;
 
   const address = [];
   const addressLine1 = data[UserDataAttribute.addressLine1];

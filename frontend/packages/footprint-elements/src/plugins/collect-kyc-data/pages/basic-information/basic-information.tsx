@@ -4,11 +4,13 @@ import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/header-title';
-import { useCollectKycDataMachine } from '../../components/machine-provider';
 import NavigationHeader from '../../components/navigation-header';
+import useCollectKycDataMachine, {
+  Events,
+  MachineContext,
+} from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { BasicInformation as BasicInformationData } from '../../utils/data-types';
-import { Events } from '../../utils/state-machine/types';
 import DobForm from './components/dob-form';
 import NameAndDobForm from './components/name-and-dob-form';
 import NameForm from './components/name-form';
@@ -25,7 +27,7 @@ const BasicInformation = ({
   onComplete,
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, missingAttributes } = state.context;
+  const { authToken, missingAttributes }: MachineContext = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { t } = useTranslation('pages.basic-information');

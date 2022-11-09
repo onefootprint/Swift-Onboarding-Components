@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useIdDocMachine } from '../../components/machine-provider';
+import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import { States } from '../../utils/state-machine/types';
 import CountryAndTypeSelection from '../country-and-type-selection';
 import Failure from '../failure';

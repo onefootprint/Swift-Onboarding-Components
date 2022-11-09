@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useCollectKycDataMachine } from '../../components/machine-provider';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import { States } from '../../utils/state-machine/types';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';

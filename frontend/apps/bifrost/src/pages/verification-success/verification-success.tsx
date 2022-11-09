@@ -18,10 +18,11 @@ const VerificationSuccess = () => {
   const { t } = useTranslation('pages.verification-success');
   const footprint = useFootprintJs();
   const [state] = useBifrostMachine();
+  const { validationToken } = state.context;
+
   const { running, width, height } = useConfettiState();
 
   useEffect(() => {
-    const { validationToken } = state.context;
     if (!validationToken) {
       return () => {};
     }

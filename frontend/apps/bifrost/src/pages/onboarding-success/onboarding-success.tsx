@@ -20,9 +20,9 @@ const OnboardingSuccess = () => {
   const { running, width, height } = useConfettiState();
   const footprint = useFootprintJs();
   const [state] = useBifrostMachine();
+  const { validationToken } = state.context;
 
   useEffect(() => {
-    const { validationToken } = state.context;
     if (!validationToken) {
       return () => {};
     }

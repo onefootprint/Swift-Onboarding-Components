@@ -7,7 +7,7 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import {
   Events,
-  OnboardingRequirementsMachineContext,
+  MachineContext,
 } from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
@@ -20,7 +20,7 @@ const AdditionalInfoRequired = () => {
     onboardingContext: {
       tenant: { name },
     },
-  }: OnboardingRequirementsMachineContext = state.context;
+  }: MachineContext = state.context;
   const handleClick = () => {
     send({
       type: Events.additionalInfoRequired,

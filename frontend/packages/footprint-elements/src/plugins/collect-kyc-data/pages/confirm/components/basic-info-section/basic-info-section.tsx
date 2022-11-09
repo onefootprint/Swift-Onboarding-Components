@@ -3,7 +3,9 @@ import { IcoFileText24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
-import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine, {
+  MachineContext,
+} from '../../../../hooks/use-collect-kyc-data-machine';
 import Section from '../section';
 
 type BasicInfoSectionProps = {
@@ -13,7 +15,7 @@ type BasicInfoSectionProps = {
 const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
   const { t } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
-  const { data } = state.context;
+  const { data }: MachineContext = state.context;
 
   const basicInfo = [];
 

@@ -11,8 +11,8 @@ import {
 import {
   Actions,
   Events,
+  MachineContext,
   MachineEvents,
-  OnboardingRequirementsMachineContext,
   Requirements,
   States,
 } from './types';
@@ -37,7 +37,7 @@ const createOnboardingRequirementsMachine = ({
   authToken,
   tenant,
 }: OnboardingRequirementsMachineArgs) =>
-  createMachine<OnboardingRequirementsMachineContext, MachineEvents>(
+  createMachine<MachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
       id: 'onboarding-requirements',
