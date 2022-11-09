@@ -7,6 +7,7 @@ export * from './get-d2p-status';
 export * from './get-doc-status';
 export * from './get-kyc-status';
 export * from './get-onboarding-config';
+export * from './get-org-members';
 export * from './get-risk-signal-details';
 export * from './get-risk-signals';
 export * from './identify';

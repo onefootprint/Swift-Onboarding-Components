@@ -1,23 +1,29 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { DateRange, OnboardingStatus } from '@onefootprint/types';
+import { DateRange, OrgRolePermission } from '@onefootprint/types';
 import { Box, Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { getDateRange } from 'src/utils/date-range';
 
-import useFilters from '../../hooks/user-users-filters';
-import Form, { FormData } from './components/form';
-import { NEXT_WEEK, TODAY } from './filters.constants';
+import useOrgMembersFilters from '../../hooks/use-org-members-filters';
+import MemberFiltersForm, {
+  MemberFiltersFormData,
+} from './components/member-filters-form/member-filters-form';
+import { NEXT_WEEK, TODAY } from './member-filters.constants';
 
-type FiltersProps = {
-  renderCta: (options: {
-    onClick: () => void;
-    filtersCount: number;
-  }) => React.ReactNode;
+type CtaOptions = {
+  onClick: () => void;
+  filtersCount: number;
 };
 
-const Filters = ({ renderCta }: FiltersProps) => {
-  const { t } = useTranslation('pages.users.filters.dialog');
-  const { setFilter, filtersCount, filters } = useFilters();
+type MemberFiltersProps = {
+  renderCta: (options: CtaOptions) => React.ReactNode;
+};
+
+const MemberFilters = ({ renderCta }: MemberFiltersProps) => {
+  const { t } = useTranslation(
+    'pages.settings.team-roles.people.filters.dialog',
+  );
+  const { setFilter, filtersCount, filters } = useOrgMembersFilters();
   const [open, setOpen] = useState(false);
   const [dateRange, from, to] = getDateRange(filters);
 
@@ -29,10 +35,11 @@ const Filters = ({ renderCta }: FiltersProps) => {
     setOpen(false);
   };
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = (formData: MemberFiltersFormData) => {
     setFilter({
       dateRange: formData.dateRange,
-      statuses: formData.statuses.toString(),
+      roles: formData.roles.toString(),
+      permissions: formData.permissions.toString(),
     });
     handleClose();
   };
@@ -55,7 +62,7 @@ const Filters = ({ renderCta }: FiltersProps) => {
         onClose={handleClose}
         open={open}
       >
-        <Form
+        <MemberFiltersForm
           onSubmit={handleSubmit}
           defaultValues={{
             customDate: {
@@ -63,9 +70,9 @@ const Filters = ({ renderCta }: FiltersProps) => {
               to: to ? new Date(to) : NEXT_WEEK,
             },
             dateRange: (dateRange as DateRange) || DateRange.allTime,
-            statuses: (filters.statuses
-              ? filters.statuses.split(',')
-              : []) as OnboardingStatus[],
+            roles: filters.roles?.split(',') ?? [],
+            permissions: (filters.permissions?.split(',') ??
+              []) as OrgRolePermission[],
           }}
         />
       </Dialog>
@@ -74,4 +81,4 @@ const Filters = ({ renderCta }: FiltersProps) => {
   );
 };
 
-export default Filters;
+export default MemberFilters;

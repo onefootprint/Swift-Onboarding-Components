@@ -12,13 +12,13 @@ import omit from 'lodash/omit';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import useUserFilters, {
   getCursors,
-  ScopedUsersListQuerystring,
+  ScopedUsersListQueryString,
 } from 'src/pages/users/hooks/user-users-filters';
 import { dateRangeToFilterParams } from 'src/utils/date-range';
 
 type ScopedUsersListQueryKey = [
   string,
-  ScopedUsersListQuerystring,
+  ScopedUsersListQueryString,
   AuthHeaders,
   number,
 ];

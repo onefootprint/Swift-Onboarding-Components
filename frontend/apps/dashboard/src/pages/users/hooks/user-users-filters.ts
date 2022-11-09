@@ -13,13 +13,13 @@ export type ScopedUserListFilters = {
   dateRange?: string;
 };
 
-export type ScopedUsersListQuerystring = ScopedUserListFilters & {
+export type ScopedUsersListQueryString = ScopedUserListFilters & {
   // JSON serialized list of the cursors for all of the previous pages that have been visited.
   // When asking the backend for results, we use the cursor most recently put on the stack
   cursors?: string;
 };
 
-export const getCursors = (req: ScopedUsersListQuerystring) =>
+export const getCursors = (req: ScopedUsersListQueryString) =>
   req.cursors ? req.cursors.split(',') : [];
 
 const useUserFilters = () => {
@@ -38,7 +38,7 @@ const useUserFilters = () => {
     return getDateFiltersCount() + getStatusFiltersCount();
   };
 
-  const setQuerystring = (query: ScopedUsersListQuerystring) => {
+  const setQueryString = (query: ScopedUsersListQueryString) => {
     // Also clean up query params if values are empty
     router.push({ query: omitBy(query, x => !x) }, undefined, {
       shallow: true,
@@ -47,16 +47,16 @@ const useUserFilters = () => {
   const setFilter = (newQuery: ScopedUserListFilters) => {
     // Merge newQuery with the existing filters extracted from the current router querystring.
     // When we adjust filters, the result set will change, so we want to start on the first page.
-    setQuerystring({ ...omit(router.query, 'cursors'), ...newQuery });
+    setQueryString({ ...omit(router.query, 'cursors'), ...newQuery });
   };
   const setCursors = (cursors: string[]) => {
     // When we set the cursors, keep the previous filter params and only replace the cursors
-    setQuerystring({ ...router.query, cursors: cursors.join(',') });
+    setQueryString({ ...router.query, cursors: cursors.join(',') });
   };
 
   return {
     filtersCount: getFiltersCount(),
-    filters: router.query as ScopedUsersListQuerystring,
+    filters: router.query as ScopedUsersListQueryString,
     setFilter,
     setCursors,
   };

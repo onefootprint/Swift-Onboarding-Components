@@ -24,6 +24,7 @@ export * from './onboarding';
 export * from './onboarding-config';
 export * from './onboarding-decision';
 export { default as OnboardingStatus } from './onboarding-status';
+export * from './org-member';
 export { default as OrgRolePermission } from './org-role-permission';
 export * from './risk-signal';
 export * from './scoped-user';
