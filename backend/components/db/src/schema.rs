@@ -21,6 +21,22 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    annotation (id) {
+        id -> Text,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        scoped_user_id -> Text,
+        tenant_user_id -> Nullable<Text>,
+        note -> Text,
+        is_pinned -> Bool,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     audit_trail (id) {
         id -> Uuid,
         user_vault_id -> Text,
@@ -508,6 +524,8 @@ table! {
 
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_user (scoped_user_id));
+joinable!(annotation -> scoped_user (scoped_user_id));
+joinable!(annotation -> tenant_user (tenant_user_id));
 joinable!(audit_trail -> tenant (tenant_id));
 joinable!(audit_trail -> user_vault (user_vault_id));
 joinable!(audit_trail -> verification_result (verification_result_id));
@@ -555,6 +573,7 @@ joinable!(webauthn_credential -> user_vault (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
     access_event,
+    annotation,
     audit_trail,
     document_request,
     email,

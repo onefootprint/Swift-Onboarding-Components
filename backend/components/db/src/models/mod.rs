@@ -1,4 +1,5 @@
 pub mod access_event;
+pub mod annotation;
 pub mod audit_trail;
 pub mod document_request;
 pub mod email;
@@ -7,6 +8,7 @@ pub mod identity_data;
 pub mod identity_document;
 pub mod insight_event;
 pub mod kv_data;
+pub mod liveness_event;
 pub mod ob_configuration;
 pub mod onboarding;
 pub mod onboarding_decision;
@@ -24,4 +26,3 @@ pub mod user_vault;
 pub mod verification_request;
 pub mod verification_result;
 pub mod webauthn_credential;
-pub mod liveness_event;
