@@ -1,11 +1,15 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use crate::schema::identity_document;
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{DocumentRequestId, IdentityDocumentId, OnboardingId, SealedVaultBytes, UserVaultId};
+use newtypes::{
+    Base64Data, DocumentRequestId, IdentityDocumentId, OnboardingId, SealedVaultBytes, UserVaultId,
+    VaultPublicKey,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -22,6 +26,39 @@ pub struct IdentityDocument {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub onboarding_id: Option<OnboardingId>,
+}
+
+impl IdentityDocument {
+    pub fn vault_seal_from_base64_string(
+        image_str: &str,
+        document_type: String,
+        vault_public_key: &VaultPublicKey,
+    ) -> Result<SealedVaultBytes, crypto::Error> {
+        let b64_data = Base64Data::from_str(image_str)?;
+        let before_sealing = chrono::Utc::now().timestamp_millis();
+        // Seal!
+        let sealed = vault_public_key.seal_bytes(&b64_data.0)?;
+        let after_sealing = chrono::Utc::now().timestamp_millis();
+
+        tracing::info!(
+            msg = "sealed identity document image",
+            time_in_ms = before_sealing - after_sealing,
+            document_type = document_type,
+        );
+        Ok(sealed)
+    }
+
+    pub fn s3_path_for_document_image(
+        image_type: &str,
+        document_request_id: DocumentRequestId,
+        user_vault_id: UserVaultId,
+    ) -> String {
+        // Store documents in a path like "documents/encrypted/uv_1234/front/dr_1234"
+        format!(
+            "documents/encrypted/{}/{}/{}",
+            user_vault_id, image_type, document_request_id
+        )
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]

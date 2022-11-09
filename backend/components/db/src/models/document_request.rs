@@ -43,8 +43,26 @@ impl DocumentRequest {
 
         Ok(results)
     }
+
+    pub fn get(
+        conn: &mut PgConnection,
+        onboarding_id: OnboardingId,
+        request_id: DocumentRequestId,
+    ) -> DbResult<Self> {
+        let result = document_request::table
+            .filter(document_request::onboarding_id.eq(onboarding_id))
+            .filter(document_request::id.eq(request_id))
+            .first(conn)?;
+
+        Ok(result)
+    }
 }
 
+impl DocumentRequest {
+    pub fn is_pending(&self) -> bool {
+        self.status == DocumentRequestStatus::Pending
+    }
+}
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct NewDocumentRequest {

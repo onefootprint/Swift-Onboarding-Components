@@ -1,5 +1,4 @@
 pub mod audit_trail;
-pub mod document;
 pub mod error;
 pub mod identity_data_request;
 

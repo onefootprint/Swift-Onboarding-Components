@@ -167,6 +167,30 @@ def create_basic_user(twilio, suffix=None):
         real_phone_number=phone_number,
     )
 
+def create_inherited_non_sandbox_user(twilio):
+    identifier = {"email": EMAIL}
+    data = dict(
+        identifier=identifier,
+        preferred_challenge_kind="sms",
+        identify_type="onboarding",
+    )
+
+    def identify():
+        body = post("hosted/identify", data)
+        assert body["user_found"]
+        assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
+        assert body["challenge_data"]["challenge_kind"] == "sms"
+        return body["challenge_data"]["challenge_token"]
+
+    challenge_token = try_until_success(identify, 20)
+
+    # Log in as the user
+    return try_until_success(
+        lambda: identify_verify(
+            twilio, PHONE_NUMBER, challenge_token, expected_kind="user_inherited"
+        ),
+        5,
+    )
 
 def create_tenant(org_data, ob_conf_data, ob_conf_name="default"):
     body = post("private/tenant", org_data, CUSTODIAN_AUTH)
@@ -230,6 +254,13 @@ def clean_up_user(phone_number, email):
     body = post("hosted/identify", data)
     assert not body["user_found"]
     assert not body.get("challenge_data", dict())
+
+def get_requirement_from_requirements(kind, requirements):
+    f = lambda kind, requirements: next(r for r in requirements if r["kind"] == kind)
+    try: 
+        return f(kind, requirements)
+    except StopIteration:
+        return None
 
 
 def _gen_random_n_digit_number(n):

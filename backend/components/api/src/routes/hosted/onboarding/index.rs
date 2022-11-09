@@ -11,6 +11,7 @@ use crate::types::response::ResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
+use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 
 use db::models::onboarding::Onboarding;
@@ -75,9 +76,17 @@ pub async fn post(
             user_auth.update_session(conn, &session_key, data)?;
 
             // If the user has already onboarded onto this same ob config, return a validation token
-            let validation_token =
-                ob.is_authorized
-                    .then_some(create_onboarding_validation_token(conn, &session_key, ob.id)?);
+            let validation_token = ob.is_authorized.then_some(create_onboarding_validation_token(
+                conn,
+                &session_key,
+                ob.id.clone(),
+            )?);
+
+            // Create a `DocumentRequest` if specified in the ob config
+            if onboarding_context.ob_config().must_collect_identity_document {
+                DocumentRequest::create(conn, ob.id, None)?;
+            }
+
             Ok(validation_token)
         })
         .await?;

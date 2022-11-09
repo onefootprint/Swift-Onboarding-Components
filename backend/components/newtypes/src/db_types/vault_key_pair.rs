@@ -37,8 +37,12 @@ impl VaultPublicKey {
     }
 
     pub(crate) fn seal_data(&self, data: &str) -> Result<SealedVaultBytes, crypto::Error> {
-        let result =
-            crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&self.0, data.as_bytes().to_vec())?.to_vec()?;
+        let result = self.seal_bytes(data.as_bytes())?;
+        Ok(result)
+    }
+
+    pub fn seal_bytes(&self, bytes: &[u8]) -> Result<SealedVaultBytes, crypto::Error> {
+        let result = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&self.0, bytes.to_vec())?.to_vec()?;
         Ok(SealedVaultBytes(result))
     }
 }

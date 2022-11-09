@@ -1,4 +1,4 @@
-use newtypes::{CollectedDataOption, OnboardingStatus};
+use newtypes::{CollectedDataOption, DocumentRequestId, OnboardingStatus};
 use thiserror::Error;
 
 use crate::types::onboarding_requirement::OnboardingRequirementDiscriminant;
@@ -25,4 +25,6 @@ pub enum OnboardingError {
     MissingAttributes(Vec<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state: {0:?}")]
     NonTerminalState(OnboardingStatus),
+    #[error("No pending document request found: {0}")]
+    NoPendingDocumentRequestFound(DocumentRequestId),
 }

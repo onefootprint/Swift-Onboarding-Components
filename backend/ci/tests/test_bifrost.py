@@ -18,7 +18,10 @@ from tests.utils import (
     create_basic_user,
     build_user_data,
     identify_verify,
+    create_inherited_non_sandbox_user, 
+    get_requirement_from_requirements,
 )
+
 from tests.webauthn_simulator import SoftWebauthnDevice
 
 
@@ -63,6 +66,22 @@ def bar_tenant(must_collect_data, can_access_data):
         "name": "Bar Insurance",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
+    }
+
+    return create_tenant(org_data, ob_data)
+
+@pytest.fixture(scope="session")
+def document_requesting_tenant(must_collect_data, can_access_data):
+    org_data = {
+        "name": "document tenant",
+        "is_live": True,
+    }
+
+    ob_data = {
+        "name": "Bar Insurance",
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
+        "must_collect_identity_document": True
     }
 
     return create_tenant(org_data, ob_data)
@@ -362,30 +381,9 @@ class TestBifrost:
     def test_identify_repeat_customer(self, foo_tenant, bar_tenant, twilio, auth_token):
         # Not used in test, but want to make sure the user has been created before running this test
         auth_token
-        # Identify the user by email
-        identifier = {"email": EMAIL}
-        data = dict(
-            identifier=identifier,
-            preferred_challenge_kind="sms",
-            identify_type="onboarding",
-        )
-
-        def identify():
-            body = post("hosted/identify", data)
-            assert body["user_found"]
-            assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-            assert body["challenge_data"]["challenge_kind"] == "sms"
-            return body["challenge_data"]["challenge_token"]
-
-        challenge_token = try_until_success(identify, 20)
-
+        
         # Log in as the user
-        auth_token = try_until_success(
-            lambda: identify_verify(
-                twilio, PHONE_NUMBER, challenge_token, expected_kind="user_inherited"
-            ),
-            5,
-        )
+        auth_token = create_inherited_non_sandbox_user(twilio)
 
         def onboard_onto_tenant(tenant):
             # Start onboarding for user
@@ -411,31 +409,52 @@ class TestBifrost:
             foo_fp_user_id != bar_fp_user_id
         ), "Onboarding onto different tenants should give different fp_user_id"
 
-    def test_document_request(self, auth_token, workos_tenant):
-        assert auth_token is not None
+
+    # In this test we 
+    #   - Create a live user by re-using a previously challenged phone number
+    #   - onboard this user onto a tenant, with an ob_config that asks for a document
+    #   - submit a document
+    #   - expect the status of the document request to be pending
+    # Other steps we should test (see TODOs on the API route)
+    #   - document request moves into UPLOADED after post
+    #   - after document request gets moved out of PENDING, requirement is no longer there
+    def test_onboarding_requiring_document(self, twilio, auth_token, document_requesting_tenant):
+        from .image_fixtures import hello_world
+        # This user is inherited because all integration tests use the same PHONE_NUMBER
+        # At some point we'll revisit this
+        user_auth_token = create_inherited_non_sandbox_user(twilio)
+
+        # Onboard a user onto a tenant that requests a document
+        post("hosted/onboarding", None, document_requesting_tenant.ob_config().key, user_auth_token)
+        
+        body = get("hosted/onboarding/status", None, document_requesting_tenant.ob_config().key, user_auth_token)
+        # We have a requirement
+        req = get_requirement_from_requirements('collect_document', body['requirements'])
+        assert req
+        # stash the request id
+        document_request_id = req['document_request_id']
+
+        # Submit the document
         data = {
-            "front_image": "b64_123",
-            "back_image": "b64_345",
+            "front_image": hello_world,
+            "back_image": hello_world,
             "document_type": "passport",
             "country_code": "USA",
         }
-        body = post(
-            f"hosted/user/document/", data, auth_token, workos_tenant.ob_config().key
-        )
-        assert body == {}
-
-        # Temporary
+        post_body = post(
+            f"hosted/user/document/{document_request_id}", data, user_auth_token, document_requesting_tenant.ob_config().key
+        ) 
+        
+        assert post_body == {}
+       
+        # get status
         expected = {
-            "status": {"kind": "error"},
+            "status": {"kind": "pending"},
             "front_image_error": None,
-            "back_image_error": "blurry",
+            "back_image_error": None,
         }
-        get_body = get(
-            f"hosted/user/document/back_error",
-            data,
-            auth_token,
-            workos_tenant.ob_config().key,
-        )
+        get_body = get(f"hosted/user/document/{document_request_id}/status",data,user_auth_token,document_requesting_tenant.ob_config().key,
+)
         assert get_body == expected
 
 

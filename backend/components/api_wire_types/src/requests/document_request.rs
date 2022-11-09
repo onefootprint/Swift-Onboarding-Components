@@ -1,3 +1,4 @@
+use newtypes::DocumentRequestStatus;
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -20,6 +21,17 @@ pub enum DocumentResponseStatus {
     Complete,
     Error,
     RetryLimitExceeded,
+}
+
+// This is temporary
+impl From<DocumentRequestStatus> for DocumentResponseStatus {
+    fn from(document_request_status: DocumentRequestStatus) -> Self {
+        match document_request_status {
+            DocumentRequestStatus::Pending => Self::Pending,
+            DocumentRequestStatus::Failed => Self::Error,
+            DocumentRequestStatus::Complete => Self::Complete,
+        }
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
