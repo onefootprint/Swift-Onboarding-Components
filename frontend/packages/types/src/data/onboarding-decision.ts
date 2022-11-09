@@ -1,6 +1,5 @@
 import { CollectedKycDataOption } from './collected-kyc-data-option';
 import ComplianceStatus from './compliance-status';
-import IdScanDocType from './id-scan-doc-type';
 import Vendor from './vendor';
 import VerificationStatus from './verification-status';
 
@@ -11,7 +10,6 @@ export enum DecisionSourceKind {
 
 export type DecisionSourceFootprint = {
   kind: DecisionSourceKind.footprint;
-  vendors: Vendor[];
 };
 
 export type DecisionSourceOrganization = {
@@ -34,6 +32,12 @@ export type OnboardingDecision = {
   complianceStatus: ComplianceStatus;
   timestamp: Date;
   source: DecisionSource;
-  mustCollectData: CollectedKycDataOption[];
-  collectedIdDocuments: IdScanDocType[];
+  obConfiguration: {
+    mustCollectData: CollectedKycDataOption[];
+    mustCollectIdentityDocument: boolean;
+    // TODO: replace with the following
+    // TODO: https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to
+    // collectedIdDocuments: IdScanDocType[];
+  };
+  vendors: Vendor[];
 };

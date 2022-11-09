@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   DecisionSourceKind,
-  OnboardingDecisionEvent,
+  OnboardingDecisionEventData,
   VerificationStatus,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
@@ -12,7 +12,7 @@ import createTagList from '../../utils/create-tag-list';
 import EventBodyEntry from '../event-body-entry';
 
 type OnboardingDecisionEventBodyProps = {
-  data: OnboardingDecisionEvent;
+  data: OnboardingDecisionEventData;
 };
 
 const OnboardingDecisionEventBody = ({
@@ -21,8 +21,12 @@ const OnboardingDecisionEventBody = ({
   const { t, allT } = useTranslation(
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
-  const { source, verificationStatus, mustCollectData, collectedIdDocuments } =
-    data;
+  const {
+    source,
+    vendors,
+    verificationStatus,
+    obConfiguration: { mustCollectData, mustCollectIdentityDocument },
+  } = data;
   const status = t(`verification-status.${verificationStatus}`);
 
   if (source.kind !== DecisionSourceKind.footprint) {
@@ -30,13 +34,23 @@ const OnboardingDecisionEventBody = ({
   }
 
   if (verificationStatus === VerificationStatus.verified) {
-    const vendors = source.vendors.map(vendor => allT(`vendors.${vendor}`));
+    const vendorsList = createStringList(
+      vendors?.map(vendor => allT(`vendors.${vendor}`)) ?? [],
+    );
+
     const collectedDataLabels = [
       ...mustCollectData.map(attr =>
         allT(`collected-kyc-data-options.${attr}`),
       ),
-      ...collectedIdDocuments.map(idDoc => allT(`id-doc-type.${idDoc}`)),
+      // TODO: Add collected id document types here
+      // https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to
+      // ...collectedIdDocuments.map(idDoc => allT(`id-doc-type.${idDoc}`)),
     ];
+
+    if (mustCollectIdentityDocument) {
+      collectedDataLabels.push(allT('id-doc-type.id_card'));
+    }
+
     return (
       <EventBodyEntry
         content={
@@ -47,14 +61,19 @@ const OnboardingDecisionEventBody = ({
             <Typography variant="body-3" as="span">
               {createTagList(collectedDataLabels)}
             </Typography>
-            <Typography variant="body-3" as="span">
-              {t('with')}
-            </Typography>
-            <Typography variant="body-3" as="span">
-              {createStringList(vendors)}
-            </Typography>
+            {vendors && (
+              <>
+                <Typography variant="body-3" as="span">
+                  {t('with')}
+                </Typography>
+                <Typography variant="body-3" as="span">
+                  {vendorsList}
+                </Typography>
+              </>
+            )}
           </>
         }
+        testID="onboarding-decision-event-body"
       />
     );
   }
@@ -64,7 +83,12 @@ const OnboardingDecisionEventBody = ({
     verificationStatus === VerificationStatus.manualReview ||
     verificationStatus === VerificationStatus.informationRequired
   ) {
-    return <EventBodyEntry content={status} />;
+    return (
+      <EventBodyEntry
+        content={status}
+        testID="onboarding-decision-event-body"
+      />
+    );
   }
 
   return null;

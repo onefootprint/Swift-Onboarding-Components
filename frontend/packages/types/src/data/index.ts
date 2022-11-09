@@ -18,6 +18,7 @@ export { default as IdScanDocType } from './id-scan-doc-type';
 export { default as IdentifyType } from './identify-type';
 export { default as IdentifyUserKind } from './identify-user-kind';
 export * from './insight-event';
+export * from './liveness';
 export * from './liveness-check-info';
 export * from './onboarding';
 export * from './onboarding-config';

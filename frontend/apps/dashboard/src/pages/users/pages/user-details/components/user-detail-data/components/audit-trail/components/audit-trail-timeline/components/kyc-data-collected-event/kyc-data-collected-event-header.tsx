@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  CollectedKycDataEvent,
+  CollectedKycDataEventData,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
@@ -9,7 +9,7 @@ import React from 'react';
 import createTagList from '../../utils/create-tag-list';
 
 type KycDataCollectedEventHeaderProps = {
-  data: CollectedKycDataEvent;
+  data: CollectedKycDataEventData;
 };
 
 const KycDataCollectedEventHeader = ({
@@ -24,7 +24,7 @@ const KycDataCollectedEventHeader = ({
   );
 
   return (
-    <Typography variant="label-3">
+    <Typography variant="label-3" testID="kyc-data-collected-event-header">
       {t('title')}
       {createTagList(attributeLabels)}
     </Typography>

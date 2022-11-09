@@ -320,8 +320,9 @@
         "title": "Audit trail",
         "empty": "No audit trail entries",
         "timeline": {
-          "biometric-registered-event": {
-            "title": "Liveness check succeeded",
+          "liveness-event": {
+            "success-title": "Liveness check succeeded",
+            "skipped-title": "Liveness check skipped",
             "attested-by": "Attested by {{attestations}}",
             "ip-address": "{{ipAddress}} (IP Address)"
           },

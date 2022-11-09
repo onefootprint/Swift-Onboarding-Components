@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   DecisionSourceKind,
-  OnboardingDecisionEvent,
+  OnboardingDecisionEventData,
   VerificationStatus,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import OrgOverwriteDetails from './components/org-overwrite-details';
 
 type OnboardingDecisionEventHeaderProps = {
-  data: OnboardingDecisionEvent;
+  data: OnboardingDecisionEventData;
 };
 
 const OnboardingDecisionEventHeader = ({
@@ -26,7 +26,11 @@ const OnboardingDecisionEventHeader = ({
 
   if (source.kind === DecisionSourceKind.footprint) {
     return (
-      <Typography variant="label-3" color={color}>
+      <Typography
+        variant="label-3"
+        color={color}
+        testID="onboarding-decision-event-header"
+      >
         {isVerified
           ? t('verified-by-footprint')
           : t('not-verified-by-footprint')}
@@ -38,7 +42,7 @@ const OnboardingDecisionEventHeader = ({
     const decision = t(`verification-status.${verificationStatus}`);
 
     return (
-      <OrgDecisionContainer>
+      <OrgDecisionContainer data-test-id="onboarding-decision-event-header">
         <Typography variant="label-3" color={color}>
           {t('org-overwrite.title', { decision, user: source.member.email })}
         </Typography>

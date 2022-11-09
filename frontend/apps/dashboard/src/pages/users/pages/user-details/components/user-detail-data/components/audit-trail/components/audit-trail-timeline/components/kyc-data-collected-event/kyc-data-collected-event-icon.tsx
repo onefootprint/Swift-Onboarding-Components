@@ -5,13 +5,13 @@ import {
   IcoUserCircle16,
 } from '@onefootprint/icons';
 import {
-  CollectedKycDataEvent,
+  CollectedKycDataEventData,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 import React from 'react';
 
 type KycDataCollectedEventIconProps = {
-  data: CollectedKycDataEvent;
+  data: CollectedKycDataEventData;
 };
 
 const iconForAttribute: Record<CollectedKycDataOption, Icon> = {

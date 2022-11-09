@@ -1,5 +1,5 @@
 import { IcoCar16, IcoIdCard16, IcoPassport16 } from '@onefootprint/icons';
-import { IdDocUploadedEvent, IdScanDocType } from '@onefootprint/types';
+import { IdDocUploadedEventData, IdScanDocType } from '@onefootprint/types';
 import React from 'react';
 
 const IconByIdDocType: Record<IdScanDocType, JSX.Element> = {
@@ -9,7 +9,7 @@ const IconByIdDocType: Record<IdScanDocType, JSX.Element> = {
 };
 
 type IdDocUploadedEventIconProps = {
-  data: IdDocUploadedEvent;
+  data: IdDocUploadedEventData;
 };
 
 const IdDocUploadedEventIcon = ({ data }: IdDocUploadedEventIconProps) =>

@@ -5,10 +5,11 @@ import styled, { css } from 'styled-components';
 
 type EventBodyEntryProps = {
   content: string | JSX.Element;
+  testID?: string;
 };
 
-const EventBodyEntry = ({ content }: EventBodyEntryProps) => (
-  <Container>
+const EventBodyEntry = ({ content, testID }: EventBodyEntryProps) => (
+  <Container data-testid={testID}>
     <IcoCheck16 />
     <Typography variant="body-3" color="secondary" sx={{ marginLeft: 2 }}>
       {content}

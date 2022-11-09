@@ -1,29 +1,28 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BiometricRegisteredEvent } from '@onefootprint/types';
+import { LivenessEventData } from '@onefootprint/types';
 import React from 'react';
 
 import createStringList from '../../utils/create-string-list';
 import EventBodyEntry from '../event-body-entry';
 
-type BiometricRegisteredEventBodyProps = {
-  data: BiometricRegisteredEvent;
+type LivenessEventBodyProps = {
+  data: LivenessEventData;
 };
 
-const BiometricRegisteredEventBody = ({
-  data,
-}: BiometricRegisteredEventBodyProps) => {
+const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
   const { t } = useTranslation(
-    'pages.user-details.audit-trail.timeline.biometric-registered-event',
+    'pages.user-details.audit-trail.timeline.liveness-event',
   );
   const {
     insightEvent: { ipAddress },
-    webauthnCredential,
+    attributes,
   } = data;
-  const attestations = webauthnCredential?.attestations.join(' & ');
-  const { device, os, location } = webauthnCredential ?? {};
+  const { issuers, device, os } = attributes ?? {};
+  const attestations =
+    issuers?.map(issuer => issuer.toUpperCase()).join(' & ') ?? '';
 
   return (
-    <>
+    <div data-test-id="liveness-event-body">
       {attestations && (
         <EventBodyEntry content={t('attested-by', { attestations })} />
       )}
@@ -33,9 +32,8 @@ const BiometricRegisteredEventBody = ({
         />
       )}
       {ipAddress && <EventBodyEntry content={t('ip-address', { ipAddress })} />}
-      {location && <EventBodyEntry content={location} />}
-    </>
+    </div>
   );
 };
 
-export default BiometricRegisteredEventBody;
+export default LivenessEventBody;
