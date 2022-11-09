@@ -1,7 +1,7 @@
+import { FootprintFooter } from '@onefootprint/footprint-elements';
 import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton } from '@onefootprint/ui';
 import FocusTrap from 'focus-trap-react';
-import { FootprintFooter } from 'footprint-elements';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEventListener, useLockedBody } from 'usehooks-ts';

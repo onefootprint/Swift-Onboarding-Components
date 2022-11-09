@@ -1,3 +1,9 @@
+import {
+  HeaderTitle,
+  NavigationHeader,
+  useGetOnboardingStatus,
+  useOnboardingAuthorize,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoBuilding24,
@@ -18,12 +24,6 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import { useIsMutating } from '@tanstack/react-query';
-import {
-  HeaderTitle,
-  NavigationHeader,
-  useGetOnboardingStatus,
-  useOnboardingAuthorize,
-} from 'footprint-elements';
 import React, { useState } from 'react';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import { Events } from 'src/utils/state-machine/onboarding/types';

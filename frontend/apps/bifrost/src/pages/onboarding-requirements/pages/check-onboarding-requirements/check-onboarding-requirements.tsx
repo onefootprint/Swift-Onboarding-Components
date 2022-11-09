@@ -1,3 +1,4 @@
+import { useGetOnboardingStatus } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import {
@@ -7,7 +8,6 @@ import {
   OnboardingStatusResponse,
 } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
-import { useGetOnboardingStatus } from 'footprint-elements';
 import React, { useState } from 'react';
 import {
   Events,

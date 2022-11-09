@@ -24,11 +24,19 @@
         "$NODE_ENV",
         "$REVALIDATE_SECRET_TOKEN"
       ],
-      "outputs": ["dist/**", ".next/**", "public/dist/**"]
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "public/dist/**"
+      ]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
     },
     "start": {
       "dependsOn": [],
@@ -39,16 +47,24 @@
       "outputs": []
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "build:storybook": {
-      "dependsOn": ["^build"],
-      "outputs": ["storybook-static/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "storybook-static/**"
+      ]
     },
     "format": {
       "outputs": []
@@ -63,5 +79,9 @@
       "cache": false
     }
   },
-  "globalDependencies": ["$GITHUB_TOKEN", "tsconfig.json", ".env.*"]
+  "globalDependencies": [
+    "$GITHUB_TOKEN",
+    "tsconfig.json",
+    ".env.*"
+  ]
 }

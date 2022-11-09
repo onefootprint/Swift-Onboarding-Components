@@ -1,6 +1,9 @@
+import {
+  createHandoffUrl,
+  HeaderTitle,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
-import { createHandoffUrl, HeaderTitle } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import { Events } from 'src/utils/state-machine/liveness-check';

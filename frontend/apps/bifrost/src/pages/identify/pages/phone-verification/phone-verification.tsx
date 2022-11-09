@@ -1,10 +1,13 @@
+import {
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   Box,
   getCountryByNumber,
   getNumberByCountryValue,
 } from '@onefootprint/ui';
-import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

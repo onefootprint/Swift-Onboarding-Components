@@ -1,13 +1,13 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { IcoEmail24 } from '@onefootprint/icons';
-import { ChallengeKind } from '@onefootprint/types';
-import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import {
   HeaderTitle,
   NavigationHeader,
   useIdentify,
   useIdentifyChallenge,
-} from 'footprint-elements';
+} from '@onefootprint/footprint-elements';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { IcoEmail24 } from '@onefootprint/icons';
+import { ChallengeKind } from '@onefootprint/types';
+import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';

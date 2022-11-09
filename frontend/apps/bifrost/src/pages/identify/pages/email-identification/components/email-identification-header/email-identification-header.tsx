@@ -1,5 +1,8 @@
+import {
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
-import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
 
 const EmailIdentificationHeader = () => {

@@ -1,3 +1,4 @@
+import { useUserData } from '@onefootprint/footprint-elements';
 import { RequestError } from '@onefootprint/request';
 import {
   UserData,
@@ -5,7 +6,6 @@ import {
   UserDataObj,
   UserDataResponse,
 } from '@onefootprint/types';
-import { useUserData } from 'footprint-elements';
 
 const dataHasName = (data: UserData) =>
   data[UserDataAttribute.firstName] || data[UserDataAttribute.lastName];

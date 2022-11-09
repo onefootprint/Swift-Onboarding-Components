@@ -1,5 +1,5 @@
+import { useFootprintJs } from '@onefootprint/footprint-elements';
 import { LoadingIndicator } from '@onefootprint/ui';
-import { useFootprintJs } from 'footprint-elements';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 

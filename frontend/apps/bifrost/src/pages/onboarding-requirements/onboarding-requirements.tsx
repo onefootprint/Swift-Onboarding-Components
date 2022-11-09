@@ -3,7 +3,7 @@ import {
   IdScan,
   Transfer,
   withProvider,
-} from 'footprint-elements';
+} from '@onefootprint/footprint-elements';
 import React from 'react';
 import {
   Events,

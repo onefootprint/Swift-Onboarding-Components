@@ -17,7 +17,7 @@
     "demo",
     "docs",
     "@onefootprint/global-constants",
-    "footprint-elements",
+    "@onefootprint/footprint-elements",
     "@onefootprint/ui",
     "@onefootprint/icons",
     "@onefootprint/hooks",

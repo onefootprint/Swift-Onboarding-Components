@@ -1,7 +1,10 @@
+import {
+  useIdentifyVerify,
+  useUserEmail,
+} from '@onefootprint/footprint-elements';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IdentifyVerifyResponse } from '@onefootprint/types';
 import { PinInput } from '@onefootprint/ui';
-import { useIdentifyVerify, useUserEmail } from 'footprint-elements';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 

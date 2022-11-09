@@ -1,9 +1,9 @@
 import '@onefootprint/design-tokens/src/output/theme.css';
 
 import theme from '@onefootprint/design-tokens';
+import { FootprintJsProvider } from '@onefootprint/footprint-elements';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { FootprintJsProvider } from 'footprint-elements';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';

@@ -1,5 +1,9 @@
+import {
+  IdScan,
+  Liveness,
+  useGetD2PStatus,
+} from '@onefootprint/footprint-elements';
 import { GetD2PResponse } from '@onefootprint/types';
-import { IdScan, Liveness, useGetD2PStatus } from 'footprint-elements';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events, States } from 'src/utils/state-machine';

@@ -1,5 +1,5 @@
+import { FootprintFooter } from '@onefootprint/footprint-elements';
 import { media } from '@onefootprint/ui';
-import { FootprintFooter } from 'footprint-elements';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

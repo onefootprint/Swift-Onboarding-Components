@@ -1,7 +1,10 @@
+import {
+  HeaderTitle,
+  useUpdateD2PStatus,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
-import { HeaderTitle, useUpdateD2PStatus } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/liveness-check';
 import styled, { css } from 'styled-components';

@@ -1,7 +1,10 @@
+import {
+  createHandoffUrl,
+  HeaderTitle,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatus } from '@onefootprint/types';
 import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
-import { createHandoffUrl, HeaderTitle } from 'footprint-elements';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';

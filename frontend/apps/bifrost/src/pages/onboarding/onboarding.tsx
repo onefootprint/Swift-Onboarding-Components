@@ -1,4 +1,4 @@
-import { withProvider } from 'footprint-elements';
+import { withProvider } from '@onefootprint/footprint-elements';
 import React from 'react';
 import { States } from 'src/utils/state-machine/onboarding';
 

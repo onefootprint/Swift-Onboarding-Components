@@ -1,6 +1,6 @@
+import { useUpdateD2PStatus } from '@onefootprint/footprint-elements';
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import { D2PStatusUpdate } from '@onefootprint/types';
-import { useUpdateD2PStatus } from 'footprint-elements';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 

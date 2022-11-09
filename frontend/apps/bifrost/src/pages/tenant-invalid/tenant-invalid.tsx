@@ -1,6 +1,6 @@
+import { NavigationHeader } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { Typography } from '@onefootprint/ui';
-import { NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import styled from 'styled-components';
 

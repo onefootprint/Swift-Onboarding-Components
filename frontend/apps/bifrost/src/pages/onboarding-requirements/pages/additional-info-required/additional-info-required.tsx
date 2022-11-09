@@ -1,6 +1,9 @@
+import {
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
-import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import {
   Events,

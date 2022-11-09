@@ -1,8 +1,11 @@
+import {
+  NavigationHeader,
+  useFootprintJs,
+} from '@onefootprint/footprint-elements';
 import { MY1FP_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
-import { NavigationHeader, useFootprintJs } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import Confetti from 'react-confetti';
 import useConfettiState from 'src/hooks/use-confetti-state';

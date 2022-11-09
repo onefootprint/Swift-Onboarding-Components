@@ -1,3 +1,7 @@
+import {
+  useIdentify,
+  useIdentifyVerify,
+} from '@onefootprint/footprint-elements';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import {
   ChallengeData,
@@ -8,7 +12,6 @@ import {
   UserDataAttribute,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
-import { useIdentify, useIdentifyVerify } from 'footprint-elements';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';

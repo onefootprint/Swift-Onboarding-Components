@@ -1,3 +1,9 @@
+import {
+  HandoffUrlQuery,
+  useGetOnboardingConfig,
+  useParseHandoffUrl,
+  useUpdateD2PStatus,
+} from '@onefootprint/footprint-elements';
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedKycDataOptionLabels,
@@ -6,12 +12,6 @@ import {
   TenantInfo,
 } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
-import {
-  HandoffUrlQuery,
-  useGetOnboardingConfig,
-  useParseHandoffUrl,
-  useUpdateD2PStatus,
-} from 'footprint-elements';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events } from 'src/utils/state-machine';

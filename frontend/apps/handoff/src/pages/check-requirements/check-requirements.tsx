@@ -1,10 +1,10 @@
+import { useGetOnboardingStatus } from '@onefootprint/footprint-elements';
 import {
   OnboardingRequirement,
   OnboardingRequirementKind,
   OnboardingStatusResponse,
 } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
-import { useGetOnboardingStatus } from 'footprint-elements';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events } from 'src/utils/state-machine';

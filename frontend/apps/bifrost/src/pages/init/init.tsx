@@ -1,7 +1,7 @@
+import { useGetOnboardingConfig } from '@onefootprint/footprint-elements';
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import { CollectedKycDataOptionLabels } from '@onefootprint/types';
 import { Box, Portal, Shimmer } from '@onefootprint/ui';
-import { useGetOnboardingConfig } from 'footprint-elements';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';

@@ -1,10 +1,13 @@
 import {
+  useIdentify,
+  useIdentifyVerify,
+} from '@onefootprint/footprint-elements';
+import {
   ChallengeData,
   ChallengeKind,
   IdentifyResponse,
   IdentifyVerifyResponse,
 } from '@onefootprint/types';
-import { useIdentify, useIdentifyVerify } from 'footprint-elements';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import { Events } from 'src/utils/state-machine/identify/types';
 

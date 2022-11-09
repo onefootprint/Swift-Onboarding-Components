@@ -1,4 +1,8 @@
 import {
+  useIdentify,
+  useIdentifyChallenge,
+} from '@onefootprint/footprint-elements';
+import {
   useCountdown,
   useRequestErrorToast,
   useTranslation,
@@ -10,7 +14,6 @@ import {
   Typography,
   useToast,
 } from '@onefootprint/ui';
-import { useIdentify, useIdentifyChallenge } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
