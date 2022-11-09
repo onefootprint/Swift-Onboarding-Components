@@ -17,9 +17,7 @@ import React, { useState } from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
-import useIdentifyMachine, {
-  MachineContext,
-} from '../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 import ChallengePicker from './components/challenge-picker';
 import EmailIdentificationForm from './components/email-identification-form';
 import EmailIdentificationHeader from './components/email-identification-header';
@@ -33,7 +31,7 @@ const EmailIdentification = () => {
 
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
-  const { device, identifyType }: MachineContext = state.context;
+  const { device, identifyType } = state.context;
 
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';

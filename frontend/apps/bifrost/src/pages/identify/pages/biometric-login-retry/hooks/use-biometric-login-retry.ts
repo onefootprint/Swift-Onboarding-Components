@@ -11,13 +11,11 @@ import {
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import { Events } from 'src/utils/state-machine/identify/types';
 
-import useIdentifyMachine, {
-  MachineContext,
-} from '../../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../../hooks/use-identify-machine';
 
 const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
-  const { identifyType, email }: MachineContext = state.context;
+  const { identifyType, email } = state.context;
   const identifyMutation = useIdentify();
   const identityVerifyMutation = useIdentifyVerify();
 

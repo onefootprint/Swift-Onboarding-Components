@@ -7,9 +7,7 @@ import { Events } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useOnboardingMachine, {
-  MachineContext,
-} from '../../../../hooks/use-onboarding-machine';
+import useOnboardingMachine from '../../../../hooks/use-onboarding-machine';
 
 const InitOnboarding = () => {
   const { t } = useTranslation('pages.init-onboarding');
@@ -17,7 +15,7 @@ const InitOnboarding = () => {
   const {
     tenant: { pk },
     authToken,
-  }: MachineContext = state.context;
+  } = state.context;
   const onboardingMutation = useOnboarding();
 
   useEffectOnce(() => {

@@ -25,9 +25,7 @@ import {
 } from '@onefootprint/ui';
 import { useIsMutating } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import useOnboardingMachine, {
-  MachineContext,
-} from 'src/hooks/use-onboarding-machine';
+import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
 
@@ -61,7 +59,7 @@ const Authorize = () => {
   const {
     authToken,
     tenant: { pk: tenantPk, canAccessData, name: tenantName },
-  }: MachineContext = state.context;
+  } = state.context;
 
   const statusQuery = useGetOnboardingStatus(authToken, tenantPk, {
     onSuccess: ({ fieldsToAuthorize }) => {

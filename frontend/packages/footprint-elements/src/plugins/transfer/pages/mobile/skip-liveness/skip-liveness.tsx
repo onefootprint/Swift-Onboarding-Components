@@ -7,12 +7,11 @@ import NavigationHeader from '../../../../../components/navigation-header';
 import { useSkipLiveness } from '../../../../../hooks';
 import useMobileMachine, {
   Events,
-  MachineContext,
 } from '../../../hooks/mobile/use-mobile-machine';
 
 const SkipLiveness = () => {
   const [state, send] = useMobileMachine();
-  const { authToken, tenant }: MachineContext = state.context;
+  const { authToken, tenant } = state.context;
   const skipLivenessMutation = useSkipLiveness();
 
   useEffectOnce(() => {

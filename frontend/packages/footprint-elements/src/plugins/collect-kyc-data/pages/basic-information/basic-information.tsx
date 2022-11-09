@@ -7,7 +7,6 @@ import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine, {
   Events,
-  MachineContext,
 } from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { BasicInformation as BasicInformationData } from '../../utils/data-types';
@@ -27,7 +26,7 @@ const BasicInformation = ({
   onComplete,
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, missingAttributes }: MachineContext = state.context;
+  const { authToken, missingAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { t } = useTranslation('pages.basic-information');

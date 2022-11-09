@@ -5,10 +5,7 @@ import {
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
-import {
-  Events,
-  MachineContext,
-} from 'src/utils/state-machine/onboarding-requirements';
+import { Events } from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
@@ -20,7 +17,7 @@ const AdditionalInfoRequired = () => {
     onboardingContext: {
       tenant: { name },
     },
-  }: MachineContext = state.context;
+  } = state.context;
   const handleClick = () => {
     send({
       type: Events.additionalInfoRequired,

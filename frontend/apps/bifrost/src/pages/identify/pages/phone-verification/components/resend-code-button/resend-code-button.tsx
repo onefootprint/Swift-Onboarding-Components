@@ -18,16 +18,13 @@ import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine, {
-  MachineContext,
-} from '../../../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const ResendCodeButton = () => {
   const toast = useToast();
   const { t } = useTranslation('pages.phone-verification.form.resend-code');
   const [state, send] = useIdentifyMachine();
-  const { phone, email, identifyType, challengeData }: MachineContext =
-    state.context;
+  const { phone, email, identifyType, challengeData } = state.context;
   const identifyChallengeMutation = useIdentifyChallenge();
   const identifyMutation = useIdentify();
   const showRequestErrorToast = useRequestErrorToast();

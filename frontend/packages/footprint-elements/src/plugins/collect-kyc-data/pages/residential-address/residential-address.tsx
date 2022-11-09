@@ -3,9 +3,7 @@ import { CollectedKycDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
-import useCollectKycDataMachine, {
-  MachineContext,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { ResidentialAddress as ResidentialAddressData } from '../../utils/data-types';
 import { Events } from '../../utils/state-machine/types';
@@ -27,7 +25,7 @@ const ResidentialAddress = ({
 }: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
   const [state, send] = useCollectKycDataMachine();
-  const { missingAttributes, authToken }: MachineContext = state.context;
+  const { missingAttributes, authToken } = state.context;
   const toast = useToast();
   const { mutation, syncData } = useSyncData();
 

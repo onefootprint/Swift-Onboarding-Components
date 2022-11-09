@@ -12,9 +12,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Events } from '../../../../utils/state-machine/identify/types';
-import useIdentifyMachine, {
-  MachineContext,
-} from '../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 import PhoneVerificationLoading from './components/phone-verification-loading';
 import PhoneVerificationPinForm from './components/phone-verification-pin-form';
 import PhoneVerificationSuccess from './components/phone-verification-success';
@@ -22,7 +20,7 @@ import PhoneVerificationSuccess from './components/phone-verification-success';
 const PhoneVerification = () => {
   const { t } = useTranslation('pages.phone-verification');
   const [state, send] = useIdentifyMachine();
-  const context = state.context as MachineContext;
+  const { context } = state;
   const { phone, challengeData, userFound } = context;
 
   let phoneCountryCode = '';

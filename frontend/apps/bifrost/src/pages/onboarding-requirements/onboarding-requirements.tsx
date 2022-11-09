@@ -9,7 +9,6 @@ import React from 'react';
 import MachineProvider from './components/machine-provider';
 import useOnboardingRequirementsMachine, {
   Events,
-  MachineContext,
   States,
 } from './hooks/use-onboarding-requirements-machine';
 import AdditionalInfoRequired from './pages/additional-info-required';
@@ -21,7 +20,7 @@ const OnboardingRequirements = () => {
   const {
     onboardingContext: { authToken, device, tenant, userFound },
     receivedRequirements: { kycData, liveness, idDoc },
-  }: MachineContext = state.context;
+  } = state.context;
 
   const handleRequirementCompleted = () => {
     send({

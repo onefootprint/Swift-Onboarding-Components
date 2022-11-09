@@ -4,15 +4,12 @@ import React from 'react';
 import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import useIdDocMachine, {
-  Events,
-  MachineContext,
-} from '../../hooks/use-id-doc-machine';
+import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
 const RetryBackPhoto = () => {
   const [state, send] = useIdDocMachine();
   const { t } = useTranslation('pages.retry-photo.back');
-  const { backImageError, type }: MachineContext = state.context;
+  const { backImageError, type } = state.context;
   if (!backImageError || !type) {
     return null;
   }

@@ -7,9 +7,7 @@ import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
 import { useGetD2PStatus } from '../../../../../hooks';
 import useCancelD2P from '../../../hooks/desktop/use-cancel-d2p';
-import useDesktopMachine, {
-  MachineContext,
-} from '../../../hooks/desktop/use-desktop-machine';
+import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
 
@@ -17,7 +15,7 @@ const QRCodeSent = () => {
   const { t } = useTranslation('pages.desktop.qr-code-sent');
   const translationSource = useTranslationSourceForRequirements();
   const [state] = useDesktopMachine();
-  const { scopedAuthToken }: MachineContext = state.context;
+  const { scopedAuthToken } = state.context;
   const cancelD2P = useCancelD2P();
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
   useGetD2PStatus(true, scopedAuthToken ?? '', {

@@ -3,9 +3,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import useCollectKycDataMachine, {
-  MachineContext,
-} from '../../../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { NameAndDobInformation } from '../../../../utils/data-types';
 import CtaButton from '../cta-button';
 import DobField from '../dob-field';
@@ -25,7 +23,7 @@ const NameAndDobForm = ({
   ctaLabel,
 }: NameAndDobFormProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data }: MachineContext = state.context;
+  const { data } = state.context;
 
   const methods = useForm<FormData>({
     defaultValues: {

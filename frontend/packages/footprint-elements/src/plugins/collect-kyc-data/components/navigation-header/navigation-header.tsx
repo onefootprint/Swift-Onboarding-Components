@@ -3,14 +3,13 @@ import React from 'react';
 import FootprintNavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine, {
   Events,
-  MachineContext,
   States,
 } from '../../hooks/use-collect-kyc-data-machine';
 import getCurrentStepFromMissingAttributes from './utils/current-step-from-missing-attributes';
 
 const NavigationHeader = () => {
   const [state, send] = useCollectKycDataMachine();
-  const { missingAttributes }: MachineContext = state.context;
+  const { missingAttributes } = state.context;
   const value = getCurrentStepFromMissingAttributes(
     missingAttributes,
     state.value as States,

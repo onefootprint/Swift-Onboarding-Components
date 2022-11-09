@@ -11,9 +11,7 @@ import {
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine, {
-  MachineContext,
-} from '../../../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const iOSPlatforms = [
   'iPad Simulator',
@@ -39,7 +37,7 @@ const ChallengePicker = ({
 }: ChallengePickerProps) => {
   const { t } = useTranslation('pages.email-identification.challenge-picker');
   const [state] = useIdentifyMachine();
-  const { device }: MachineContext = state.context;
+  const { device } = state.context;
 
   const supportsBiometric =
     device.hasSupportForWebauthn && device.type === 'mobile';

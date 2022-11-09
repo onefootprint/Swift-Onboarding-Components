@@ -8,9 +8,7 @@ import { PinInput } from '@onefootprint/ui';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 
-import useIdentifyMachine, {
-  MachineContext,
-} from '../../../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import ResendCodeButton from '../resend-code-button/resend-code-button';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
@@ -28,7 +26,7 @@ const PhoneVerificationPinForm = ({
   const { t } = useTranslation('pages.phone-verification.form');
 
   const [state, send] = useIdentifyMachine();
-  const { email, userFound, challengeData }: MachineContext = state.context;
+  const { email, userFound, challengeData } = state.context;
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
 

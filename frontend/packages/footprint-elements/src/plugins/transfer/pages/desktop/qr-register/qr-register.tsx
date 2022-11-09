@@ -10,7 +10,6 @@ import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
 import { createHandoffUrl } from '../../../../../utils/handoff-url';
 import useDesktopMachine, {
   Events,
-  MachineContext,
 } from '../../../hooks/desktop/use-desktop-machine';
 import useGenerateScopedAuthToken from '../../../hooks/desktop/use-generate-scoped-auth-token';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
@@ -20,8 +19,7 @@ const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
-  const { authToken, scopedAuthToken, tenant, device }: MachineContext =
-    state.context;
+  const { authToken, scopedAuthToken, tenant, device } = state.context;
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken();
   useEffect(() => {

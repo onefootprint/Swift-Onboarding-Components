@@ -12,16 +12,14 @@ import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine, {
-  MachineContext,
-} from '../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 import PhoneRegistrationForm from './components/phone-registration-form';
 
 const PhoneRegistration = () => {
   const { t } = useTranslation('pages.phone-registration');
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
-  const { identifyType, email }: MachineContext = state.context;
+  const { identifyType, email } = state.context;
 
   const identifyMutation = useIdentify();
   const identifyChallengeMutation = useIdentifyChallenge();
