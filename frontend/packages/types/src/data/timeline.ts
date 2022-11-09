@@ -1,5 +1,5 @@
 import { CollectedKycDataOption } from './collected-kyc-data-option';
-import IdScanDocType from './id-scan-doc-type';
+import IdDocType from './id-doc-type';
 import { InsightEvent } from './insight-event';
 import { LivenessAttribute, LivenessSource } from './liveness';
 import { OnboardingDecision } from './onboarding-decision';
@@ -38,7 +38,7 @@ export type IdDocUploadedEvent = {
 
 export type IdDocUploadedEventData = {
   // TODO: https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to
-  idDocKind: IdScanDocType;
+  idDocKind: IdDocType;
 };
 
 export type OnboardingDecisionEvent = {

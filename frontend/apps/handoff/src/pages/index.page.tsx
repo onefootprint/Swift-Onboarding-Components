@@ -1,5 +1,5 @@
 import {
-  IdScan,
+  IdDoc,
   Liveness,
   useGetD2PStatus,
 } from '@onefootprint/footprint-elements';
@@ -74,19 +74,19 @@ const Root = () => {
       />
     );
   }
-  if (state.matches(States.idScan)) {
+  if (state.matches(States.idDoc)) {
     if (!authToken || !device || !tenant) {
       return null;
     }
     return (
-      <IdScan
+      <IdDoc
         context={{
           authToken,
           device,
           tenant,
         }}
         onDone={() => {
-          send({ type: Events.idScanCompleted });
+          send({ type: Events.idDocCompleted });
         }}
       />
     );

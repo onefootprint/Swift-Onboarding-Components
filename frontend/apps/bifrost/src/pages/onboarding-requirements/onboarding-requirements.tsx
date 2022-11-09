@@ -1,6 +1,6 @@
 import {
   CollectKycData,
-  IdScan,
+  IdDoc,
   Transfer,
   withProvider,
 } from '@onefootprint/footprint-elements';
@@ -70,9 +70,9 @@ const OnboardingRequirements = () => {
       />
     );
   }
-  if (state.matches(States.idScan)) {
+  if (state.matches(States.idDoc)) {
     return (
-      <IdScan
+      <IdDoc
         context={{
           authToken,
           device,

@@ -37,7 +37,7 @@ export type OnboardingDecision = {
     mustCollectIdentityDocument: boolean;
     // TODO: replace with the following
     // TODO: https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to
-    // collectedIdDocuments: IdScanDocType[];
+    // collectedIdDocuments: IdDocType[];
   };
   vendors: Vendor[];
 };

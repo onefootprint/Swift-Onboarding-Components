@@ -1,4 +1,4 @@
-import { IdScanBadImageError } from '../data';
+import { IdDocBadImageError } from '../data';
 
 export type GetDocStatusRequest = {
   authToken: string;
@@ -14,6 +14,6 @@ export enum DocStatusType {
 
 export type GetDocStatusResponse = {
   status: DocStatusType;
-  frontImageError?: IdScanBadImageError;
-  backImageError?: IdScanBadImageError;
+  frontImageError?: IdDocBadImageError;
+  backImageError?: IdDocBadImageError;
 };

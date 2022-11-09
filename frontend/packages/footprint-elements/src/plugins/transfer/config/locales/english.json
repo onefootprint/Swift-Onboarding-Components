@@ -23,12 +23,12 @@
           "subtitle": "We need to verify that you're a real person.",
           "instructions": "Use your camera app or QR code reader on your mobile device and we'll use biometrics to verify it."
         },
-        "id-scan": {
+        "id-doc": {
           "title": "Scan or upload your ID",
           "subtitle": "We need to some more information about your identity.",
           "instructions": "Use your camera app or QR code reader on your mobile device, so you can use it take a photo of your ID."
         },
-        "liveness-with-id-scan": {
+        "liveness-with-id-doc": {
           "title": "Liveness check & ID document",
           "subtitle": "We need to use your mobile device to verify that you're a real person and check an ID document.",
           "instructions": "Use your camera app or QR code reader on your mobile device and we'll continue from there."
@@ -45,10 +45,10 @@
         "liveness": {
           "title": "Liveness check"
         },
-        "id-scan": {
+        "id-doc": {
           "title": "Scan or upload your ID"
         },
-        "liveness-with-id-scan": {
+        "liveness-with-id-doc": {
           "title": "Liveness check & ID document"
         },
         "subtitle": "QR code scanned. Please continue on your phone.",
@@ -58,10 +58,10 @@
         "liveness": {
           "title": "Liveness check"
         },
-        "id-scan": {
+        "id-doc": {
           "title": "Scan or upload your ID"
         },
-        "liveness-with-id-scan": {
+        "liveness-with-id-doc": {
           "title": "Liveness check & ID document"
         },
         "subtitle": "Link sent to phone. Please continue from there.",

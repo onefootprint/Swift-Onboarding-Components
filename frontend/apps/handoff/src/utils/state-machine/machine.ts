@@ -66,7 +66,7 @@ export const createHandoffMachine = () =>
                 cond: (context, event) => !!event.payload.missingLiveness,
               },
               {
-                target: States.idScan,
+                target: States.idDoc,
                 actions: [Actions.assignRequirements],
                 cond: (context, event) => !!event.payload.missingIdDocument,
               },
@@ -81,7 +81,7 @@ export const createHandoffMachine = () =>
           on: {
             [Events.livenessCompleted]: [
               {
-                target: States.idScan,
+                target: States.idDoc,
                 cond: context => !!context.requirements?.missingIdDocument,
               },
               {
@@ -91,9 +91,9 @@ export const createHandoffMachine = () =>
             ...StatusReceivedTransitions,
           },
         },
-        [States.idScan]: {
+        [States.idDoc]: {
           on: {
-            [Events.idScanCompleted]: {
+            [Events.idDocCompleted]: {
               target: States.complete,
             },
             ...StatusReceivedTransitions,

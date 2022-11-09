@@ -1,5 +1,5 @@
 import { CollectedKycDataOption } from '../data/collected-kyc-data-option';
-import IdScanDocType from '../data/id-scan-doc-type';
+import IdDocType from '../data/id-doc-type';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',
@@ -38,7 +38,7 @@ export type OnboardingStatusRequest = {
 
 export type AuthorizeFields = {
   collectedData: CollectedKycDataOption[];
-  identityDocumentType: IdScanDocType[];
+  identityDocumentType: IdDocType[];
 };
 
 export type OnboardingStatusResponse = {

@@ -16,7 +16,7 @@ import {
   IcoPhone24,
   IcoUserCircle24,
 } from '@onefootprint/icons';
-import { CollectedKycDataOption, IdScanDocType } from '@onefootprint/types';
+import { CollectedKycDataOption, IdDocType } from '@onefootprint/types';
 import {
   FootprintButton,
   LoadingIndicator,
@@ -43,10 +43,10 @@ const IconByCollectedKycDataOption: Record<
   [CollectedKycDataOption.partialAddress]: <IcoBuilding24 />,
 };
 
-const IconByIdDocType: Record<IdScanDocType, JSX.Element> = {
-  [IdScanDocType.idCard]: <IcoIdCard24 />,
-  [IdScanDocType.driversLicense]: <IcoCar24 />,
-  [IdScanDocType.passport]: <IcoPassport24 />,
+const IconByIdDocType: Record<IdDocType, JSX.Element> = {
+  [IdDocType.idCard]: <IcoIdCard24 />,
+  [IdDocType.driversLicense]: <IcoCar24 />,
+  [IdDocType.passport]: <IcoPassport24 />,
 };
 
 const Authorize = () => {
@@ -55,7 +55,7 @@ const Authorize = () => {
   const { t } = useTranslation('pages.authorize');
   const isMutating = useIsMutating();
   const [state, send] = useOnboardingMachine();
-  const [collectedDocs, setCollectedDocs] = useState<IdScanDocType[]>();
+  const [collectedDocs, setCollectedDocs] = useState<IdDocType[]>();
   const {
     authToken,
     tenant: { pk: tenantPk },
@@ -112,10 +112,10 @@ const Authorize = () => {
     [CollectedKycDataOption.partialAddress]: t('data-labels.address-partial'),
   };
 
-  const docTypeLabels: Record<IdScanDocType, string> = {
-    [IdScanDocType.idCard]: t('data-labels.id-card'),
-    [IdScanDocType.driversLicense]: t('data-labels.passport'),
-    [IdScanDocType.passport]: t('data-labels.driversLicense'),
+  const docTypeLabels: Record<IdDocType, string> = {
+    [IdDocType.idCard]: t('data-labels.id-card'),
+    [IdDocType.driversLicense]: t('data-labels.passport'),
+    [IdDocType.passport]: t('data-labels.driversLicense'),
   };
 
   return (
@@ -137,7 +137,7 @@ const Authorize = () => {
               </Typography>
             </Category>
           ))}
-          {collectedDocs?.map((collectedDoc: IdScanDocType) => (
+          {collectedDocs?.map((collectedDoc: IdDocType) => (
             <Category key={collectedDoc}>
               <IconContainer>{IconByIdDocType[collectedDoc]}</IconContainer>
               <Typography variant="label-3">

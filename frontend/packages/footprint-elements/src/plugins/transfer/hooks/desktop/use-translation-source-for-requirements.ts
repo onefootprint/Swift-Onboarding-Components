@@ -7,11 +7,11 @@ const useTranslationSourceForRequirements = () => {
 
   let translationSource = '';
   if (liveness && idDoc) {
-    translationSource = 'liveness-with-id-scan';
+    translationSource = 'liveness-with-id-doc';
   } else if (liveness) {
     translationSource = 'liveness';
   } else {
-    translationSource = 'id-scan';
+    translationSource = 'id-doc';
   }
 
   return translationSource;

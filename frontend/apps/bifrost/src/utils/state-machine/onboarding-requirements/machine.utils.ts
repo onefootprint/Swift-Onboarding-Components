@@ -23,8 +23,8 @@ export const RequirementTargets: MachineTarget[] = [
     cond: context => shouldRunTransfer(context),
   },
   {
-    target: States.idScan,
-    cond: context => shouldRunIdScan(context),
+    target: States.idDoc,
+    cond: context => shouldRunIdDoc(context),
   },
   {
     target: States.identityCheck,
@@ -53,7 +53,7 @@ const shouldRunCollectKycData = (
   context: OnboardingRequirementsMachineContext,
 ) => context.requirements.kycData.length > 0;
 
-const shouldRunIdScan = (context: OnboardingRequirementsMachineContext) => {
+const shouldRunIdDoc = (context: OnboardingRequirementsMachineContext) => {
   const {
     requirements: { idDoc },
     onboardingContext: {

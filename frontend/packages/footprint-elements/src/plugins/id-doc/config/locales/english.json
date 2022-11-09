@@ -1,0 +1,97 @@
+{
+  "global": {
+    "errors": {}
+  },
+  "components": {
+    "missing-permissions": {
+      "title": "Allow access to your {{permissionName}}",
+      "subtitle": "This lets you submit photos of your document, and we can use them to properly verify your ID.",
+      "action-required": "Open settings to update {{permissionName}} permissions."
+    },
+    "scan-guidelines": {
+      "check-lighting": {
+        "title": "Check your lighting",
+        "description": "It can't be too bright or too dark."
+      },
+      "device-steady": {
+        "title": "Hold your device steady",
+        "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+      },
+      "whole-document": {
+        "title": "Get the whole document in the photo",
+        "description": "We recommend that you place your document on a flat surface."
+      }
+    },
+    "take-or-upload-photo": {
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
+      "take-photo": {
+        "title": "Take photo",
+        "take": "Take photo",
+        "retake": "Take another photo"
+      },
+      "upload-photo": {
+        "title": "Upload photo",
+        "reupload": "Upload another photo"
+      },
+      "continue": "Continue"
+    }
+  },
+  "pages": {
+    "country-and-type-selection": {
+      "title": "Scan or upload your ID",
+      "subtitle": "We need some more information about your identity.",
+      "form": {
+        "country": "Issuing country",
+        "type": {
+          "passport": {
+            "title": "Passport",
+            "description": "Photo page",
+            "value": "passport"
+          },
+          "idCard": {
+            "title": "Identity card",
+            "description": "Front & Back",
+            "value": "idCard"
+          },
+          "driversLicense": {
+            "title": "Driver's license",
+            "description": "Front & Back",
+            "value": "driversLicense"
+          }
+        },
+        "cta": "Continue"
+      }
+    },
+    "take-or-upload-photo": {
+      "front": {
+        "title": "Submit your {{type}} (FRONT)",
+        "subtitle": "Upload or take a photo of the front of your {{type}}."
+      },
+      "back": {
+        "title": "Submit your {{type}} (BACK)",
+        "subtitle": "Upload or take a photo of the back of your {{type}}."
+      }
+    },
+    "processing-photo": {
+      "title": "Processing your {{type}}.",
+      "subtitle": "This should only take a few seconds.",
+      "default-document-label": "document",
+      "loading": "Analyzing...",
+      "success": "Document successfully verified!",
+      "error": "An error occurred."
+    },
+    "retry-photo": {
+      "front": {
+        "title": "Resubmit your {{type}} (FRONT)"
+      },
+      "back": {
+        "title": "Resubmit your {{type}} (BACK)"
+      }
+    },
+    "failure": {
+      "title": "Document couldn't be verified",
+      "subtitle": "We'll review your identity and reach out to you shortly."
+    }
+  }
+}

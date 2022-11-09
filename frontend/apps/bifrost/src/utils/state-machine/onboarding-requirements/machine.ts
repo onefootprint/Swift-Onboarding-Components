@@ -97,8 +97,8 @@ const createOnboardingRequirementsMachine = ({
             ...RequirementCompletedTransitions,
           },
         },
-        [States.idScan]: {
-          entry: [Actions.startIdScan],
+        [States.idDoc]: {
+          entry: [Actions.startIdDoc],
           on: {
             ...RequirementCompletedTransitions,
           },
@@ -129,13 +129,13 @@ const createOnboardingRequirementsMachine = ({
         }),
         [Actions.startTransfer]: assign(context => {
           context.requirements.liveness = false;
-          // If we are on mobile, idScan plugin will run separately
+          // If we are on mobile, idDoc plugin will run separately
           if (context.onboardingContext.device.type !== 'mobile') {
             context.requirements.idDoc = false;
           }
           return context;
         }),
-        [Actions.startIdScan]: assign(context => {
+        [Actions.startIdDoc]: assign(context => {
           context.requirements.idDoc = false;
           return context;
         }),

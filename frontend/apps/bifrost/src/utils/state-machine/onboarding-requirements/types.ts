@@ -11,7 +11,7 @@ export enum States {
   additionalInfoRequired = 'additionalInfoRequired',
   kycData = 'kycData',
   transfer = 'transfer',
-  idScan = 'idScan',
+  idDoc = 'idDoc',
   identityCheck = 'identityCheck',
   success = 'success',
 }
@@ -45,7 +45,7 @@ export enum Actions {
   assignRequirements = 'assignRequirements',
   startKycData = 'startKycData',
   startTransfer = 'startTransfer',
-  startIdScan = 'startIdScan',
+  startIdDoc = 'startIdDoc',
   startIdentityCheck = 'startIdentityCheckRequirement',
 }
 

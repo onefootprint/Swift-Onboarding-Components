@@ -5,7 +5,7 @@ export enum States {
   init = 'init',
   checkRequirements = 'checkRequirements',
   liveness = 'liveness',
-  idScan = 'idScan',
+  idDoc = 'idDoc',
   canceled = 'canceled',
   expired = 'expired',
   complete = 'complete',
@@ -17,7 +17,7 @@ export enum Events {
   deviceInfoIdentified = 'deviceInfoIdentified',
   requirementsReceived = 'requirementsReceived', // Fetching onboarding requirements is complete
   livenessCompleted = 'livenessCompleted',
-  idScanCompleted = 'idScanCompleted',
+  idDocCompleted = 'idDocCompleted',
   statusReceived = 'statusReceived', // Fetching d2p status is complete
   d2pAlreadyCompleted = 'd2pAlreadyCompleted',
 }
@@ -80,5 +80,5 @@ export type MachineEvents =
       type: Events.livenessCompleted;
     }
   | {
-      type: Events.idScanCompleted;
+      type: Events.idDocCompleted;
     };
