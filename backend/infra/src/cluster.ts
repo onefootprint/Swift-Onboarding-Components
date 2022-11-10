@@ -127,6 +127,12 @@ export async function CreateCluster(
     {
       name: clusterName,
       vpc,
+      settings: [
+        {
+          name: 'containerInsights',
+          value: 'enabled',
+        },
+      ],
     },
     { provider },
   );

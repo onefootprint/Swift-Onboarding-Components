@@ -139,6 +139,7 @@ export async function Create(
         enable: true,
         rollback: true,
       },
+      waitForSteadyState: true,
       deploymentMinimumHealthyPercent: 100,
       loadBalancers: [
         {
@@ -148,7 +149,10 @@ export async function Create(
         },
       ],
     },
-    { provider, dependsOn: [loadBalancerTargetGroup, database.db] },
+    {
+      provider,
+      dependsOn: [loadBalancerTargetGroup, database.db, ...database.instances],
+    },
   );
 
   return { lb: loadBalancerTargetGroup.loadBalancer };

@@ -17,6 +17,7 @@ export type DbOutput = {
   databaseUrl: pulumi.Output<string>;
   databaseUrlSecretParam: aws.ssm.Parameter;
   db: aws.rds.Cluster;
+  instances: aws.rds.ClusterInstance[];
 };
 
 export async function CreateDB(
@@ -118,6 +119,7 @@ export async function CreateDB(
     databaseUrl,
     db,
     databaseUrlSecretParam,
+    instances: [_dbInstance, _dbInstance2],
   };
 }
 
