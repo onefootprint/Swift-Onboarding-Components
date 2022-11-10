@@ -7,7 +7,7 @@ use db::{
     },
     DbError, PgConnection,
 };
-use newtypes::{CollectedDataOption, OnboardingId, OnboardingStatus, SessionAuthToken, UserVaultId};
+use newtypes::{CollectedDataOption, OnboardingId, SessionAuthToken, UserVaultId};
 use paperclip::actix::web;
 
 use crate::{
@@ -82,7 +82,7 @@ pub fn get_requirements(
         liveness_events
             .is_empty()
             .then_some(OnboardingRequirement::Liveness),
-        (onboarding.status == OnboardingStatus::New).then_some(OnboardingRequirement::IdentityCheck),
+        (!onboarding.idv_reqs_initiated).then_some(OnboardingRequirement::IdentityCheck),
     ]
     .into_iter()
     .flatten()

@@ -29,6 +29,7 @@ pub struct Onboarding {
     pub insight_event_id: InsightEventId,
     pub status: OnboardingStatus,
     pub is_authorized: bool,
+    pub idv_reqs_initiated: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -40,6 +41,7 @@ struct NewOnboarding {
     insight_event_id: InsightEventId,
     status: OnboardingStatus,
     is_authorized: bool,
+    idv_reqs_initiated: bool,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -47,6 +49,7 @@ struct NewOnboarding {
 pub struct OnboardingUpdate {
     pub status: Option<OnboardingStatus>,
     pub is_authorized: Option<bool>,
+    pub idv_reqs_initiated: Option<bool>,
 }
 
 impl OnboardingUpdate {
@@ -60,6 +63,13 @@ impl OnboardingUpdate {
     pub fn is_authorized(is_authorized: bool) -> Self {
         Self {
             is_authorized: Some(is_authorized),
+            ..Self::default()
+        }
+    }
+
+    pub fn idv_reqs_initiated(idv_reqs_initiated: bool) -> Self {
+        Self {
+            idv_reqs_initiated: Some(idv_reqs_initiated),
             ..Self::default()
         }
     }
@@ -229,8 +239,9 @@ impl Onboarding {
             ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
-            status: OnboardingStatus::New,
+            status: OnboardingStatus::Processing,
             is_authorized: false,
+            idv_reqs_initiated: false,
         };
         let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)

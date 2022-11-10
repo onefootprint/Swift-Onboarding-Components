@@ -5,7 +5,7 @@ use crate::{
 };
 
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use newtypes::{OnboardingId, OnboardingStatus, UserVaultId};
+use newtypes::{OnboardingId, UserVaultId};
 
 use super::{vendor_result::VendorResult, *};
 /// The Engine module is the main entry point into running our verification logic
@@ -86,26 +86,15 @@ pub async fn perform_pre_run_operations(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            // TODO: Once we set the new OB KYC status to !new below, this lock will make sure we can't save multiple sets of VerificationRequests
-            // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
-            let ob = Onboarding::lock(conn, &ob_id)?;
-
             // Can only start KYC checks for onboarding that has all required fields
             // Document Collection is handled synchronously in the frontend (to surface errors)
             let missing_attributes = uvw.missing_fields(&ob_config);
             if !missing_attributes.is_empty() {
                 return Err(OnboardingError::MissingAttributes(missing_attributes).into());
             }
-            // Can only start KYC checks for onboardings whose KYC checks have not yet been started
-            if ob.status != OnboardingStatus::New {
-                return Err(OnboardingError::WrongKycState(ob.status).into());
-            }
 
             // Checkpoint and create VerificationRequests
-            verification_request::build_verification_requests_and_checkpoint(conn, ob, &uvw)?;
-
-            // TODO: Move KYC status to `initiated`
-            // See https://www.notion.so/Statuses-v2-461c189437c148b085bc666c596546a9
+            verification_request::build_verification_requests_and_checkpoint(conn, &ob_id, &uvw)?;
 
             Ok(true)
         })

@@ -30,7 +30,7 @@ use crate::RequirementStatus;
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum OnboardingStatus {
-    New,
+    // TODO remove Processing too
     Processing,
     ManualReview,
     StepUpRequired,
@@ -42,7 +42,6 @@ impl OnboardingStatus {
     /// Api-visible status that hides KYC failures from the client side.
     pub fn public_status(&self) -> RequirementStatus {
         match self {
-            Self::New => RequirementStatus::Pending,
             Self::Processing => RequirementStatus::Pending,
             Self::ManualReview => RequirementStatus::Complete,
             Self::StepUpRequired => RequirementStatus::Complete,
@@ -62,7 +61,6 @@ mod tests {
     use super::OnboardingStatus;
     use super::OnboardingStatus::*;
 
-    #[test_case(New, Processing => Ordering::Less)]
     #[test_case(Processing, ManualReview => Ordering::Less)]
     #[test_case(Processing, StepUpRequired => Ordering::Less)]
     #[test_case(Processing, Failed => Ordering::Less)]

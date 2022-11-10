@@ -42,7 +42,6 @@ crate::util::impl_enum_str_diesel!(VerificationStatus);
 impl From<OnboardingStatus> for VerificationStatus {
     fn from(ob_status: OnboardingStatus) -> Self {
         match ob_status {
-            OnboardingStatus::New => Self::InformationRequired,
             OnboardingStatus::Processing => Self::InformationRequired,
             OnboardingStatus::ManualReview => Self::ManualReview,
             // Temp, this will need to change.

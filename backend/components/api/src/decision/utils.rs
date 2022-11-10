@@ -58,9 +58,10 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &ob_id)?;
-            if ob.status != OnboardingStatus::New {
-                return Err(OnboardingError::WrongKycState(ob.status).into());
+            if ob.idv_reqs_initiated {
+                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
+            ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
             // Update the Onboarding's status with the desired testing status
             Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(desired_status))?;
 

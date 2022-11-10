@@ -15,8 +15,8 @@ pub enum OnboardingError {
     InvalidSandboxState,
     #[error("Onboarding does not exist")]
     NoOnboarding,
-    #[error("Onboarding is in wrong KYC state: {0}")]
-    WrongKycState(OnboardingStatus),
+    #[error("IDV reqs have already been initiated")]
+    IdvReqsAlreadyInitiated,
     #[error("Tenant does not match")]
     TenantMismatch,
     #[error("Unmet onboarding requirements: {0:?}")]

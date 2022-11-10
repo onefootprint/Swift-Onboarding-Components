@@ -36,7 +36,7 @@ impl TryFrom<OnboardingStatus> for TerminalOnboardingStatus {
 
     fn try_from(value: OnboardingStatus) -> Result<Self, Self::Error> {
         match value {
-            OnboardingStatus::New | OnboardingStatus::Processing | OnboardingStatus::StepUpRequired => {
+            OnboardingStatus::Processing | OnboardingStatus::StepUpRequired => {
                 Err(crate::Error::ConversionError)
             }
             OnboardingStatus::Failed => Ok(Self::Failed),

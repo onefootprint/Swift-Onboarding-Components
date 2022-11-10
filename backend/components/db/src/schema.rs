@@ -215,6 +215,7 @@ table! {
         insight_event_id -> Uuid,
         status -> Text,
         is_authorized -> Bool,
+        idv_reqs_initiated -> Bool,
     }
 }
 
