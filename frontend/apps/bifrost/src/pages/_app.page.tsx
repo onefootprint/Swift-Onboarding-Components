@@ -1,7 +1,10 @@
 import '@onefootprint/design-tokens/src/output/theme.css';
 
 import theme from '@onefootprint/design-tokens';
-import { FootprintJsProvider } from '@onefootprint/footprint-elements';
+import {
+  configureFootprint,
+  FootprintProvider,
+} from '@onefootprint/footprint-elements';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
@@ -17,6 +20,7 @@ import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
 import useExtendedAppearance from '../hooks/use-extended-appearance';
 
+const footprint = configureFootprint();
 configureSentry();
 configureReactI18next();
 
@@ -40,11 +44,11 @@ const App = ({ Component, pageProps }: AppProps) => {
         <BifrostMachineProvider>
           <DesignSystemProvider theme={theme.light}>
             <GlobalStyle />
-            <FootprintJsProvider>
+            <FootprintProvider client={footprint}>
               <Layout>
                 <Component {...pageProps} />
               </Layout>
-            </FootprintJsProvider>
+            </FootprintProvider>
           </DesignSystemProvider>
         </BifrostMachineProvider>
       </QueryClientProvider>

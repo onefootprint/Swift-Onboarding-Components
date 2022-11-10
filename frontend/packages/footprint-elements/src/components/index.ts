@@ -1,6 +1,7 @@
 export { default as FootprintFooter } from './footprint-footer';
-export { default as FootprintJsProvider } from './footprint-js-provider';
-export * from './footprint-js-provider';
+export { default as FootprintProvider } from './footprint-provider';
+export * from './footprint-provider';
+export { default as configureFootprint } from './footprint-provider/adapters';
 export { default as HeaderTitle } from './header-title';
 export * from './header-title';
 export * from './info-box';

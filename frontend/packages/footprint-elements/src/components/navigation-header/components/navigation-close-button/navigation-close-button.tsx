@@ -2,7 +2,7 @@ import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 
-import { useFootprintJs } from '../../../footprint-js-provider';
+import { useFootprintProvider } from '../../../footprint-provider';
 
 export type NavigationCloseButtonProps = {
   confirm?: boolean;
@@ -13,7 +13,7 @@ const NavigationCloseButton = ({
   confirm,
   onClick,
 }: NavigationCloseButtonProps) => {
-  const footprint = useFootprintJs();
+  const footprint = useFootprintProvider();
   const confirmationDialog = useConfirmationDialog();
 
   const showConfirmation = (callback: () => void) => {

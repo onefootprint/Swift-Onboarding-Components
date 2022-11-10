@@ -1,13 +1,14 @@
 import {
   NavigationHeader,
-  useFootprintJs,
+  useFootprintProvider,
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Confetti from 'react-confetti';
 import styled from 'styled-components';
+import { useEffectOnce } from 'usehooks-ts';
 
 import useBifrostMachine from '../../hooks/use-bifrost-machine/use-bifrost-machine';
 import useConfettiState from '../../hooks/use-confetti-state';
@@ -16,26 +17,19 @@ const CLOSE_DELAY = 6000;
 
 const VerificationSuccess = () => {
   const { t } = useTranslation('pages.verification-success');
-  const footprint = useFootprintJs();
+  const footprint = useFootprintProvider();
   const [state] = useBifrostMachine();
   const { validationToken } = state.context;
-
   const { running, width, height } = useConfettiState();
 
-  useEffect(() => {
-    if (!validationToken) {
-      return () => {};
+  useEffectOnce(() => {
+    if (validationToken) {
+      footprint.complete({
+        validationToken,
+        closeDelay: CLOSE_DELAY,
+      });
     }
-    footprint.complete(validationToken);
-    const timer = setTimeout(() => {
-      footprint.close();
-    }, CLOSE_DELAY);
-
-    return () => {
-      clearTimeout(timer);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleClose = () => {
     footprint.close();

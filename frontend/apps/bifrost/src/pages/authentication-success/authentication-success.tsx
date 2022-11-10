@@ -1,16 +1,15 @@
-import { useFootprintJs } from '@onefootprint/footprint-elements';
+import { useFootprintProvider } from '@onefootprint/footprint-elements';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
 const AuthenticationSuccess = () => {
-  const footprint = useFootprintJs();
+  const footprint = useFootprintProvider();
   const [state] = useBifrostMachine();
   const { authToken } = state.context;
 
-  const emitTokenAndClose = (vtok: string) => {
-    footprint.complete(vtok);
-    footprint.close();
+  const emitTokenAndClose = (validationToken: string) => {
+    footprint.complete({ validationToken });
   };
 
   if (authToken) {

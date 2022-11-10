@@ -99,7 +99,6 @@ const Authorize = () => {
   };
 
   const requiredCategories = canAccessData;
-
   const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
     [CollectedKycDataOption.name]: t('data-labels.name'),
     [CollectedKycDataOption.email]: t('data-labels.email'),
@@ -110,7 +109,6 @@ const Authorize = () => {
     [CollectedKycDataOption.fullAddress]: t('data-labels.address-full'),
     [CollectedKycDataOption.partialAddress]: t('data-labels.address-partial'),
   };
-
   const docTypeLabels: Record<IdDocType, string> = {
     [IdDocType.idCard]: t('data-labels.id-card'),
     [IdDocType.driversLicense]: t('data-labels.passport'),
