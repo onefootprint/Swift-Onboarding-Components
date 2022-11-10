@@ -44,7 +44,7 @@ pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonAp
         .await??;
 
     // Check we can proceed
-    decision::engine::can_decide(
+    let should_make_idv_requests_and_decision = decision::engine::perform_pre_run_operations(
         &state,
         ob_info.user_vault_id.clone(),
         ob_info.onboarding.id.clone(),
@@ -53,7 +53,9 @@ pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonAp
     .await?;
 
     // produce our decision
-    decision::engine::decide(&state, ob_info.user_vault_id, ob_info.onboarding).await?;
+    if should_make_idv_requests_and_decision {
+        decision::engine::run(&state, ob_info.onboarding).await?;
+    }
 
     EmptyResponse::ok().json()
 }

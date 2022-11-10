@@ -27,6 +27,31 @@ pub fn test_idology_expectid_response() -> serde_json::Value {
     )
 }
 
+pub fn idology_fake_data_expectid_response() -> serde_json::Value {
+    serde_json::json!({"response": {
+            "id-number": 3010453,
+            "summary-result": {
+                "key": "id.success",
+                "message": "Pass"
+            },
+            "results": {
+                "key": "result.match",
+                "message": "ID Located"
+            },
+            "qualifiers": {
+                "qualifier": [
+                    {
+                        "key": "idphone.wireless",
+                        "message": "Possible Wireless Number"
+                    },
+                    {
+                        "key": "resultcode.corporate.email.domain",
+                        "message": "Indicates that the domain of the email address has been identified as belonging to a corporate entity.",
+                    },
+                ]
+            }
+    }})
+}
 pub fn test_twilio_lookupv2_response() -> serde_json::Value {
     serde_json::json!({
       "country_code": "GB",

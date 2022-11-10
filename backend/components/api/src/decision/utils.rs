@@ -37,6 +37,7 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
     let desired_status = if let Some(decrypted_phone) = decrypted_phone {
         // This is a sandbox user vault. Check for pre-set validation cases
         if decrypted_phone.suffix.starts_with("idv") {
+            // ALERT ALERT
             // This is the only case that actually triggers the production flow that talks to data vendors
             // All other cases (ironically including non-sandbox users) end up triggering the fixture code path
             return Ok(true);
@@ -53,86 +54,66 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
     };
 
     // Create the test fixture data
-    state.db_pool.db_transaction(move |conn| -> ApiResult<_> {
-        let ob = Onboarding::lock(conn, &ob_id)?;
-        if ob.status != OnboardingStatus::New {
-            return Err(OnboardingError::WrongKycState(ob.status).into());
-        }
-        // Update the Onboarding's status with the desired testing status
-        Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(desired_status))?;
-
-        // Create some mock verification request and results
-        let request = build_request::build_verification_request(&uvw, ob_id.clone(), VendorAPI::IdologyExpectID);
-        let request = VerificationRequest::bulk_save(conn, vec![request])?
-            .pop()
-            .ok_or(ApiError::ResourceNotFound)?;
-        let raw_response = serde_json::json!({
-            "response": {
-                "id-number": 3010453,
-                "summary-result": {
-                    "key": "id.success",
-                    "message": "Pass"
-                },
-                "results": {
-                    "key": "result.match",
-                    "message": "ID Located"
-                },
-                "qualifiers": {
-                    "qualifier": [
-                        {
-                            "key": "idphone.wireless",
-                            "message": "Possible Wireless Number"
-                        },
-                        {
-                            "key": "resultcode.corporate.email.domain",
-                            "message": "Indicates that the domain of the email address has been identified as belonging to a corporate entity.",
-                        },
-                    ]
-                }
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let ob = Onboarding::lock(conn, &ob_id)?;
+            if ob.status != OnboardingStatus::New {
+                return Err(OnboardingError::WrongKycState(ob.status).into());
             }
-        });
-        // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
-        let result = VerificationResult::create(conn, request.id, raw_response)?;
-        // Create the decision itself
-        let decision_status = match desired_status {
-            OnboardingStatus::Verified => VerificationStatus::Verified,
-            OnboardingStatus::Failed => VerificationStatus::Failed,
-            OnboardingStatus::ManualReview => VerificationStatus::ManualReview,
-            _ => VerificationStatus::Failed,
-        };
-        let new_decision = NewOnboardingDecision {
-            user_vault_id: uvw.user_vault.id.clone(),
-            onboarding_id: ob_id,
-            logic_git_hash: crate::GIT_HASH.to_string(),
-            tenant_user_id: None,
-            verification_status: decision_status,
-            compliance_status: ComplianceStatus::NoFlagsFound,
-            result_ids: vec![result.id],
-        };
-        let decision = OnboardingDecision::create(conn, new_decision)?;
+            // Update the Onboarding's status with the desired testing status
+            Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(desired_status))?;
 
-        // Create some risk signals
-        let reason_codes = match desired_status {
-            OnboardingStatus::Failed => vec![
-                FootprintReasonCode::SubjectDeceased,
-                FootprintReasonCode::SsnIssuedPriorToDob,
-            ],
-            OnboardingStatus::Verified => vec![
-                FootprintReasonCode::MobileNumber,
-                FootprintReasonCode::CorporateEmailDomain,
-            ],
-            OnboardingStatus::ManualReview => vec![
-                FootprintReasonCode::SsnDoesNotMatchWithinTolerance,
-                FootprintReasonCode::LastNameDoesNotMatch,
-            ],
-            _ => vec![],
-        };
-        let signals = reason_codes
-            .into_iter()
-            .map(|r| (r, vec![Vendor::Idology]))
-            .collect();
-        RiskSignal::bulk_create(conn, decision.id, signals)?;
-        Ok(())
-    }).await?;
+            // Create some mock verification request and results
+            let request =
+                build_request::build_verification_request(&uvw, ob_id.clone(), VendorAPI::IdologyExpectID);
+            let request = VerificationRequest::bulk_save(conn, vec![request])?
+                .pop()
+                .ok_or(ApiError::ResourceNotFound)?;
+            let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
+            // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
+            let result = VerificationResult::create(conn, request.id, raw_response)?;
+            // Create the decision itself
+            let decision_status = match desired_status {
+                OnboardingStatus::Verified => VerificationStatus::Verified,
+                OnboardingStatus::Failed => VerificationStatus::Failed,
+                OnboardingStatus::ManualReview => VerificationStatus::ManualReview,
+                _ => VerificationStatus::Failed,
+            };
+            let new_decision = NewOnboardingDecision {
+                user_vault_id: uvw.user_vault.id.clone(),
+                onboarding_id: ob_id,
+                logic_git_hash: crate::GIT_HASH.to_string(),
+                tenant_user_id: None,
+                verification_status: decision_status,
+                compliance_status: ComplianceStatus::NoFlagsFound,
+                result_ids: vec![result.id],
+            };
+            let decision = OnboardingDecision::create(conn, new_decision)?;
+
+            // Create some risk signals
+            let reason_codes = match desired_status {
+                OnboardingStatus::Failed => vec![
+                    FootprintReasonCode::SubjectDeceased,
+                    FootprintReasonCode::SsnIssuedPriorToDob,
+                ],
+                OnboardingStatus::Verified => vec![
+                    FootprintReasonCode::MobileNumber,
+                    FootprintReasonCode::CorporateEmailDomain,
+                ],
+                OnboardingStatus::ManualReview => vec![
+                    FootprintReasonCode::SsnDoesNotMatchWithinTolerance,
+                    FootprintReasonCode::LastNameDoesNotMatch,
+                ],
+                _ => vec![],
+            };
+            let signals = reason_codes
+                .into_iter()
+                .map(|r| (r, vec![Vendor::Idology]))
+                .collect();
+            RiskSignal::bulk_create(conn, decision.id, signals)?;
+            Ok(())
+        })
+        .await?;
     Ok(false)
 }

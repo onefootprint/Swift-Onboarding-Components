@@ -11,49 +11,33 @@ use super::{vendor_result::VendorResult, *};
 /// The Engine module is the main entry point into running our verification logic
 ///
 ///
-/// It's an assemblage of several pieces
-/// - converting UVW (and other) data into VerificationRequests
-///    - checkpointing these to the database
-/// - routing and sending those VRs to vendors
-/// - Processing the results
-/// - Emitting UserTimeline events
-/// - test/demo data
-/// - producing decisions
-pub async fn decide(state: &State, uv_id: UserVaultId, ob: Onboarding) -> Result<(), ApiError> {
-    // initialize some variables since we have a lot of closures that move ownership below
-    let uvwid = uv_id.clone();
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| UserVaultWrapper::get(conn, &uvwid))
-        .await??;
+/// Run loads saved VerificationRequests and (potentially) VerificationResults and produces a Decision
+pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
+    // TODO: Move check `initiated`
+    // See https://www.notion.so/Statuses-v2-461c189437c148b085bc666c596546a9
 
-    // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
-    // phone number's sandbox suffix
-    let should_initiate_verification_requests =
-        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob.id.clone()).await?;
-    if !should_initiate_verification_requests {
-        return Ok(());
-    }
-
-    // Build our VerificationRequests and save outputs
     let (requests, ob_id, previous_results) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let ob_id = ob.id.clone();
-
-            // Unconditionally set the onboarding status to Pending to checkpoint and create VerificationRequests
-            let requests = verification_request::build_verification_requests_and_checkpoint(conn, ob, &uvw)?;
-
             // Load our requests and results
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
             let requests_and_results =
-                VerificationRequest::get_requests_and_results_for_onboarding(conn, ob_id.clone())?;
-            // TODO: we should run any dangling VerificationRequests here
+                VerificationRequest::get_requests_and_results_for_onboarding(conn, ob.id.clone())?;
             // In the case we have already run some verifications for this onboarding, create our previous VendorResults
             let previous_results =
-                VendorResult::from_verification_results_for_onboarding(requests_and_results)?;
-
-            Ok((requests, ob_id, previous_results))
+                VendorResult::from_verification_results_for_onboarding(requests_and_results.clone())?;
+            let requests: Vec<VerificationRequest> = requests_and_results
+                .into_iter()
+                .filter_map(|(request, result)| {
+                    // Only send requests for which we don't already have a result
+                    if result.is_none() {
+                        Some(request)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            Ok((requests, ob.id, previous_results))
         })
         .await?;
 
@@ -77,19 +61,33 @@ pub async fn decide(state: &State, uv_id: UserVaultId, ob: Onboarding) -> Result
     Ok(())
 }
 
-/// Determine if we are in a position to produce a decision.
-/// This is intimately tied to how the frontend is rendered
-pub async fn can_decide(
+type ShouldRunDecisionEngine = bool;
+
+/// Determine if we are in a position to run IDV checks and produce a Decision. Otherwise, set up some testing data
+pub async fn perform_pre_run_operations(
     state: &State,
     uvw_id: UserVaultId,
     ob_id: OnboardingId,
     ob_config: ObConfiguration,
-) -> Result<(), ApiError> {
+) -> Result<ShouldRunDecisionEngine, ApiError> {
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::get(conn, &uvw_id))
+        .await??;
+
+    // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
+    // phone number's sandbox suffix
+    let should_initiate_verification_requests =
+        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob_id.clone()).await?;
+    if !should_initiate_verification_requests {
+        return Ok(false);
+    }
+
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let uvw = UserVaultWrapper::get(conn, &uvw_id)?;
-            // TODO this lock doesn't do anything right now. Fix race condition
+            // TODO: Once we set the new OB KYC status to !new below, this lock will make sure we can't save multiple sets of VerificationRequests
+            // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
             let ob = Onboarding::lock(conn, &ob_id)?;
 
             // Can only start KYC checks for onboarding that has all required fields
@@ -102,11 +100,18 @@ pub async fn can_decide(
             if ob.status != OnboardingStatus::New {
                 return Err(OnboardingError::WrongKycState(ob.status).into());
             }
-            Ok(())
+
+            // Checkpoint and create VerificationRequests
+            verification_request::build_verification_requests_and_checkpoint(conn, ob, &uvw)?;
+
+            // TODO: Move KYC status to `initiated`
+            // See https://www.notion.so/Statuses-v2-461c189437c148b085bc666c596546a9
+
+            Ok(true)
         })
         .await?;
 
-    Ok(())
+    Ok(true)
 }
 
 /// Make our requests to a vendor, building data from the cached VerificationRequest
