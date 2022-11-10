@@ -16,7 +16,20 @@ pub struct DocumentRequest {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
 }
+#[derive(Debug, AsChangeset, Default)]
+#[diesel(table_name = document_request)]
+pub struct DocumentRequestUpdate {
+    pub status: Option<DocumentRequestStatus>,
+}
 
+impl DocumentRequestUpdate {
+    pub fn status(status: DocumentRequestStatus) -> Self {
+        Self {
+            status: Some(status),
+            ..Self::default()
+        }
+    }
+}
 impl DocumentRequest {
     pub fn create(
         conn: &mut PgConnection,
@@ -54,6 +67,24 @@ impl DocumentRequest {
             .filter(document_request::id.eq(request_id))
             .first(conn)?;
 
+        Ok(result)
+    }
+
+    pub fn update(self, conn: &mut PgConnection, update: DocumentRequestUpdate) -> DbResult<Self> {
+        // Intentionally consume self so the stale version is not used
+        let result = Self::update_by_id(conn, &self.id, update)?;
+        Ok(result)
+    }
+
+    pub fn update_by_id(
+        conn: &mut PgConnection,
+        id: &DocumentRequestId,
+        update: DocumentRequestUpdate,
+    ) -> DbResult<Self> {
+        let result = diesel::update(document_request::table)
+            .filter(document_request::id.eq(id))
+            .set(update)
+            .get_result(conn)?;
         Ok(result)
     }
 }

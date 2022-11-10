@@ -475,19 +475,10 @@ class TestBifrost:
 
         assert post_body == {}
 
-        # Submit again with no back
-        # TODO: In the future this will break when we update document request status to not be pending
-        data['back_image'] = None
-        post(
-            f"hosted/user/document/{document_request_id}",
-            data,
-            user_auth_token,
-            document_requesting_tenant.ob_config().key,
-        )
-
-        # get status
+        # get status. 
+        # We always move to complete now, this will change once we have vendor integrations
         expected = {
-            "status": {"kind": "pending"},
+            "status": {"kind": "complete"},
             "front_image_error": None,
             "back_image_error": None,
         }

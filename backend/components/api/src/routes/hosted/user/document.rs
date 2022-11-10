@@ -43,9 +43,9 @@ use actix_web::web::Path;
 use api_wire_types::document_request::{
     DocumentErrorReason, DocumentRequest, DocumentResponse, DocumentResponseStatus,
 };
-use db::models::document_request::DocumentRequest as DbDocumentRequest;
+use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
-use newtypes::DocumentRequestId;
+use newtypes::{DocumentRequestId, DocumentRequestStatus};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
@@ -131,6 +131,19 @@ pub async fn post(
         )
         .await?;
     // TODO::1, TODO::2, TODO::3
+    state
+        .db_pool
+        .db_transaction(move |conn| -> Result<(), ApiError> {
+            // For now, just move this to Uploaded here to clear the requirement
+            db_document_request.update(
+                conn,
+                DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded),
+            )?;
+
+            Ok(())
+        })
+        .await?;
+
     EmptyResponse::ok().json()
 }
 

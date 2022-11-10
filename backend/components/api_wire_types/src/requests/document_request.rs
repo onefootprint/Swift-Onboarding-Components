@@ -31,6 +31,8 @@ impl From<DocumentRequestStatus> for DocumentResponseStatus {
             DocumentRequestStatus::Pending => Self::Pending,
             DocumentRequestStatus::Failed => Self::Error,
             DocumentRequestStatus::Complete => Self::Complete,
+            // We still are waiting for vendor when in Uploaded, but for now just map to Complete
+            DocumentRequestStatus::Uploaded => Self::Complete,
         }
     }
 }
