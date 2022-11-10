@@ -1,4 +1,4 @@
-use aws_sdk_s3::model::{Bucket, Delete, ObjectIdentifier};
+use aws_sdk_s3::model::{Delete, ObjectIdentifier};
 use aws_sdk_s3::types::ByteStream;
 use thiserror::Error;
 
@@ -21,14 +21,6 @@ pub struct S3Client {
 ///   - Overview of S3 architecture: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
 ///   - Actions that can be performed in S3 https://docs.aws.amazon.com/AmazonS3/latest/API/API_Operations_Amazon_Simple_Storage_Service.html
 impl S3Client {
-    /// List buckets
-    pub async fn list_buckets(&self) -> Result<Vec<Bucket>, S3Error> {
-        let resp = self.client.list_buckets().send().await?;
-        let buckets = resp.buckets().unwrap_or_default().to_vec();
-
-        Ok(buckets)
-    }
-
     #[allow(unused)]
     /// Delete a set of objects by keys in a particular S3 bucket
     pub async fn delete_objects(&self, bucket: &str, keys: Vec<String>) -> Result<(), S3Error> {

@@ -72,7 +72,7 @@ pub async fn post(
 
                 // TODO::9
                 // This will error if no doc request is found
-                let db_document_request = DbDocumentRequest::get(conn, ob_id, request_id.clone())?;
+                let db_document_request = DbDocumentRequest::get(conn, ob_id, request_id)?;
 
                 Ok((uvw, db_document_request))
             },
@@ -92,11 +92,6 @@ pub async fn post(
         request.document_type.clone(),
         &uvw.user_vault.public_key,
     )?;
-    let sealed_back = IdentityDocument::vault_seal_from_base64_string(
-        &request.back_image,
-        request.document_type.clone(),
-        &uvw.user_vault.public_key,
-    )?;
 
     // Save to s3
     let bucket = &state.config.document_s3_bucket.clone();
@@ -113,6 +108,16 @@ pub async fn post(
         )
         .await?;
 
+    // Not all documents have backs
+    let Some(back_image) = &request.back_image else {
+        return EmptyResponse::ok().json()
+    };
+
+    let sealed_back = IdentityDocument::vault_seal_from_base64_string(
+        back_image,
+        request.document_type.clone(),
+        &uvw.user_vault.public_key,
+    )?;
     let _s3_path_back_image = state
         .s3_client
         .put_object(

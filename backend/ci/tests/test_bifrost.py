@@ -431,7 +431,7 @@ class TestBifrost:
     def test_onboarding_requiring_document(
         self, twilio, auth_token, document_requesting_tenant
     ):
-        from .image_fixtures import hello_world
+        from .image_fixtures import test_image
 
         # This user is inherited because all integration tests use the same PHONE_NUMBER
         # At some point we'll revisit this
@@ -461,8 +461,8 @@ class TestBifrost:
 
         # Submit the document
         data = {
-            "front_image": hello_world,
-            "back_image": hello_world,
+            "front_image": test_image,
+            "back_image": test_image,
             "document_type": "passport",
             "country_code": "USA",
         }
@@ -475,18 +475,25 @@ class TestBifrost:
 
         assert post_body == {}
 
+        # Submit again with no back
+        # TODO: In the future this will break when we update document request status to not be pending
+        data['back_image'] = None
+        post(
+            f"hosted/user/document/{document_request_id}",
+            data,
+            user_auth_token,
+            document_requesting_tenant.ob_config().key,
+        )
+
         # get status
         expected = {
             "status": {"kind": "pending"},
             "front_image_error": None,
             "back_image_error": None,
         }
-        get_body = get(
-            f"hosted/user/document/{document_request_id}/status",
-            data,
-            user_auth_token,
-            document_requesting_tenant.ob_config().key,
-        )
+        
+        get_body = get(f"hosted/user/document/{document_request_id}/status", None,user_auth_token,document_requesting_tenant.ob_config().key)
+
         assert get_body == expected
 
 

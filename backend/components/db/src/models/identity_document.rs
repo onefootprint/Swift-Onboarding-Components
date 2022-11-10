@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::str::FromStr;
 
 use crate::schema::identity_document;
 use crate::DbResult;
@@ -34,7 +33,7 @@ impl IdentityDocument {
         document_type: String,
         vault_public_key: &VaultPublicKey,
     ) -> Result<SealedVaultBytes, crypto::Error> {
-        let b64_data = Base64Data::from_str(image_str)?;
+        let b64_data = Base64Data::from_str_standard(image_str)?;
         let before_sealing = chrono::Utc::now().timestamp_millis();
         // Seal!
         let sealed = vault_public_key.seal_bytes(&b64_data.0)?;

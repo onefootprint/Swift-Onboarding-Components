@@ -3,10 +3,11 @@ use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct DocumentRequest {
-    // base64 encoded image bytes
+    // base64 encoded image bytes (padded!)
     pub front_image: String,
-    // base64 encoded image bytes
-    pub back_image: String,
+    // base64 encoded image bytes (padded!)
+    // Not all documents have backs
+    pub back_image: Option<String>,
     // type of document
     pub document_type: String,
     // country of document

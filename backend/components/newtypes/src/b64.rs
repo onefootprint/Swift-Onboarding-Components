@@ -8,6 +8,12 @@ const B64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Apiv2Schema)]
 pub struct Base64Data(pub Vec<u8>);
 
+impl Base64Data {
+    pub fn from_str_standard(s: &str) -> Result<Self, base64::DecodeError> {
+        base64::decode_config(s, base64::STANDARD).map(Self)
+    }
+}
+
 impl AsRef<[u8]> for Base64Data {
     fn as_ref(&self) -> &[u8] {
         self.0.as_slice()
