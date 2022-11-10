@@ -92,7 +92,10 @@ const createOnboardingMachine = ({
     {
       actions: {
         [Actions.assignValidationToken]: assign((context, event) => {
-          if (event.type === Events.onboardingInitialized) {
+          if (
+            event.type === Events.onboardingInitialized ||
+            event.type === Events.authorized
+          ) {
             context.validationToken = event.payload.validationToken;
           }
           return context;
