@@ -26,7 +26,7 @@ const CheckOnboardingRequirements = () => {
     const { requirements } = response;
 
     let liveness = false;
-    let idDoc = false;
+    let idDocRequestId;
     let kycData: CollectedKycDataOption[] = [];
     let identityCheck = false;
     requirements.forEach((req: OnboardingRequirement) => {
@@ -37,7 +37,7 @@ const CheckOnboardingRequirements = () => {
         liveness = true;
       }
       if (req.kind === OnboardingRequirementKind.idDoc) {
-        idDoc = true;
+        idDocRequestId = req.documentRequestId;
       }
       if (req.kind === OnboardingRequirementKind.identityCheck) {
         identityCheck = true;
@@ -48,7 +48,7 @@ const CheckOnboardingRequirements = () => {
       type: Events.onboardingRequirementsReceived,
       payload: {
         liveness,
-        idDoc,
+        idDocRequestId,
         kycData,
         identityCheck,
       },

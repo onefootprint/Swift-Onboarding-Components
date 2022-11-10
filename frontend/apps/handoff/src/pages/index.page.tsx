@@ -16,7 +16,7 @@ import Init from './init';
 
 const Root = () => {
   const [state, send] = useHandoffMachine();
-  const { authToken, device, tenant } = state.context;
+  const { authToken, device, tenant, requirements } = state.context;
 
   const handleSuccess = (data: GetD2PResponse) => {
     send({
@@ -84,6 +84,9 @@ const Root = () => {
           authToken,
           device,
           tenant,
+          customData: {
+            documentRequestId: requirements?.idDocRequestId ?? '',
+          },
         }}
         onDone={() => {
           send({ type: Events.idDocCompleted });

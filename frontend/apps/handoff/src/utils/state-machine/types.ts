@@ -36,7 +36,7 @@ export type MachineContext = {
   tenantPk?: string;
   authToken?: string;
   requirements?: {
-    missingIdDocument?: boolean;
+    idDocRequestId?: string;
     missingLiveness?: boolean;
   };
 };
@@ -72,7 +72,7 @@ export type MachineEvents =
   | {
       type: Events.requirementsReceived;
       payload: {
-        missingIdDocument?: boolean;
+        idDocRequestId?: string;
         missingLiveness?: boolean;
       };
     }

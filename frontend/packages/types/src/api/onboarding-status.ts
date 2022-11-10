@@ -15,6 +15,7 @@ export type CollectKycDataRequirement = {
 
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
+  documentRequestId: string;
 };
 
 export type LivenessRequirement = {

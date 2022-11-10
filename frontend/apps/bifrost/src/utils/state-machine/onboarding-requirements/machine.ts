@@ -25,7 +25,7 @@ export type OnboardingRequirementsMachineArgs = {
 };
 
 const defaultRequirements: Requirements = {
-  idDoc: false,
+  idDocRequestId: undefined,
   liveness: false,
   kycData: [],
   identityCheck: false,
@@ -131,12 +131,12 @@ const createOnboardingRequirementsMachine = ({
           context.requirements.liveness = false;
           // If we are on mobile, idDoc plugin will run separately
           if (context.onboardingContext.device.type !== 'mobile') {
-            context.requirements.idDoc = false;
+            context.requirements.idDocRequestId = undefined;
           }
           return context;
         }),
         [Actions.startIdDoc]: assign(context => {
-          context.requirements.idDoc = false;
+          context.requirements.idDocRequestId = undefined;
           return context;
         }),
         [Actions.startIdentityCheck]: assign(context => {

@@ -41,6 +41,7 @@ export type MachineContext = {
   authToken?: string;
   device?: DeviceInfo;
   tenant?: TenantInfo;
+  documentRequestId?: string;
   // Machine generated
   type?: IdDocType;
   country?: CountryCode3;
@@ -57,6 +58,7 @@ export type MachineEvents =
         authToken: string;
         device: DeviceInfo;
         tenant: TenantInfo;
+        documentRequestId: string;
       };
     }
   | {

@@ -17,20 +17,20 @@ const CheckRequirements = () => {
     onSuccess: (response: OnboardingStatusResponse) => {
       const { requirements } = response;
       let missingLiveness = false;
-      let missingIdDocument = false;
+      let idDocRequestId;
 
       requirements.forEach((req: OnboardingRequirement) => {
         if (req.kind === OnboardingRequirementKind.liveness) {
           missingLiveness = true;
         }
         if (req.kind === OnboardingRequirementKind.idDoc) {
-          missingIdDocument = true;
+          idDocRequestId = req.documentRequestId;
         }
       });
       send({
         type: Events.requirementsReceived,
         payload: {
-          missingIdDocument,
+          idDocRequestId,
           missingLiveness,
         },
       });

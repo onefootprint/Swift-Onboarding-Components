@@ -19,7 +19,7 @@ export enum States {
 export type Requirements = {
   identityCheck: boolean;
   liveness: boolean;
-  idDoc: boolean;
+  idDocRequestId?: string;
   kycData: readonly CollectedKycDataOption[];
 };
 
@@ -37,7 +37,6 @@ export type MachineContext = {
 
 export enum Events {
   onboardingRequirementsReceived = 'onboardingRequirementsReceived',
-  additionalInfoRequired = 'additionalInfoRequired',
   requirementCompleted = 'requirementCompleted',
 }
 
@@ -50,7 +49,6 @@ export enum Actions {
 }
 
 export type MachineEvents =
-  | { type: Events.additionalInfoRequired }
   | {
       type: Events.requirementCompleted;
     }

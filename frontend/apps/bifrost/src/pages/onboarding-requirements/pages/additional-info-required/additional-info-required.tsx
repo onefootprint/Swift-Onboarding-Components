@@ -20,7 +20,7 @@ const AdditionalInfoRequired = () => {
   } = state.context;
   const handleClick = () => {
     send({
-      type: Events.additionalInfoRequired,
+      type: Events.requirementCompleted,
     });
   };
 

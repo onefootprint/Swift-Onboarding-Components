@@ -11,10 +11,10 @@ import useIdDocMachine from '../../../hooks/use-id-doc-machine';
 const DOC_STATUS_FETCH_INTERVAL = 1000;
 
 const getDocStatus = async (payload: GetDocStatusRequest) => {
-  const { authToken, tenantPk } = payload;
+  const { authToken, tenantPk, documentRequestId } = payload;
   const response = await request<GetDocStatusResponse>({
     method: 'GET',
-    url: `/hosted/user/document`,
+    url: `/hosted/user/document/${documentRequestId}/status`,
     headers: {
       [AUTH_HEADER]: authToken,
       [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
@@ -32,10 +32,11 @@ const useGetDocStatus = (
   const [state] = useIdDocMachine();
   const authToken = state.context.authToken ?? '';
   const tenantPk = state.context.tenant?.pk ?? '';
+  const documentRequestId = state.context.documentRequestId ?? '';
 
   return useQuery<GetDocStatusResponse, RequestError>(
     ['doc-status', authToken],
-    () => getDocStatus({ tenantPk, authToken }),
+    () => getDocStatus({ tenantPk, authToken, documentRequestId }),
     {
       refetchInterval: DOC_STATUS_FETCH_INTERVAL,
       enabled: !!authToken && !!tenantPk,

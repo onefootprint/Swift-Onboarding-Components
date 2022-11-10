@@ -45,8 +45,8 @@ export const RequirementCompletedTransitions: TransitionsConfig<
 };
 
 export const areRequirementsEmpty = (requirements: Requirements) => {
-  const { kycData, liveness, idDoc, identityCheck } = requirements;
-  return kycData.length === 0 && !liveness && !idDoc && !identityCheck;
+  const { kycData, liveness, idDocRequestId, identityCheck } = requirements;
+  return kycData.length === 0 && !liveness && !idDocRequestId && !identityCheck;
 };
 
 const shouldRunCollectKycData = (context: MachineContext) =>
@@ -54,33 +54,33 @@ const shouldRunCollectKycData = (context: MachineContext) =>
 
 const shouldRunIdDoc = (context: MachineContext) => {
   const {
-    requirements: { idDoc },
+    requirements: { idDocRequestId },
     onboardingContext: {
       device: { type },
     },
   } = context;
-  return idDoc && type === 'mobile';
+  return !!idDocRequestId && type === 'mobile';
 };
 
 const shouldRunTransfer = (context: MachineContext) => {
   const {
-    requirements: { idDoc, liveness },
+    requirements: { idDocRequestId, liveness },
     onboardingContext: {
       device: { type },
     },
   } = context;
   if (type === 'mobile') {
-    return liveness;
+    return !!liveness;
   }
-  return idDoc || liveness;
+  return !!idDocRequestId || !!liveness;
 };
 
 export const requiresAdditionalInfo = (context: MachineContext) => {
   const {
     onboardingContext: { userFound },
-    requirements: { kycData, idDoc },
+    requirements: { kycData, idDocRequestId },
   } = context;
-  return userFound && (kycData.length > 0 || idDoc);
+  return userFound && (kycData.length > 0 || !!idDocRequestId);
 };
 
 const shouldRunIdentityCheck = (context: MachineContext) =>
