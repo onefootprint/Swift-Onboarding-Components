@@ -228,6 +228,43 @@
           }
         }
       },
+      "manual-review": {
+        "status": {
+          "do_not_onboard": "Do not onboard",
+          "verified": "Verified",
+          "not_verified": "Not verified"
+        },
+        "button": {
+          "label": "Review"
+        },
+        "dialog": {
+          "title": "Review",
+          "complete": "Complete",
+          "cancel": "Cancel",
+          "form": {
+            "prompt": "Why are you marking this user as {{status}}?",
+            "reason": {
+              "label": "Reason",
+              "placeholder": "Select one...",
+              "options": {
+                "identity-theft": "Identity theft",
+                "could-not-verify-identity": "Could not verify identity"
+              },
+              "errors": {
+                "required": "A reason is needed"
+              }
+            },
+            "note": {
+              "label": "Note (Optional)",
+              "placeholder": "Type here..."
+            },
+            "toggle": {
+              "label": "Pin note to the top of the page"
+            },
+            "disclaimer": "Please note that this action will be logged for security reasons."
+          }
+        }
+      },
       "decrypt": {
         "errors": {
           "min-selected": {

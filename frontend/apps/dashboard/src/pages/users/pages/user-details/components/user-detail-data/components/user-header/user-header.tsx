@@ -8,6 +8,7 @@ import { User } from 'src/pages/users/types/user.types';
 import styled, { css } from 'styled-components';
 
 import DecryptControls from './components/decrypt-controls';
+import ManualReview from './components/manual-review';
 
 type UserHeaderProps = {
   user: User;
@@ -40,7 +41,10 @@ const UserHeader = ({ user }: UserHeaderProps) => {
           </Typography>
           <CodeInline>{footprintUserId}</CodeInline>
         </RowContainer>
-        <DecryptControls />
+        <RowContainer>
+          <ManualReview />
+          <DecryptControls />
+        </RowContainer>
       </SplitRow>
     </HeaderContainer>
   );

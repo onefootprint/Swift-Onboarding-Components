@@ -26,6 +26,7 @@ export * from './org-onboarding-configs-create';
 export * from './org-onboarding-configs-update';
 export * from './skip-liveness';
 export * from './submit-doc';
+export * from './submit-review';
 export * from './update-d2p-status';
 export * from './user-data-identity';
 export * from './user-decrypt';
