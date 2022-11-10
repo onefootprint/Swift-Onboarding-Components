@@ -2,24 +2,11 @@ use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
 use idology::verification::IDologyResponse;
-use newtypes::{AuditTrailEvent, OnboardingStatus, Signal, SignalScope, Vendor};
+use newtypes::Vendor;
 
 pub mod idology;
 pub mod test_fixtures;
 pub mod twilio;
-
-#[derive(Debug, Clone)]
-pub struct IdvResponse {
-    pub vendor: Vendor,
-    pub status: Option<OnboardingStatus>,
-    pub audit_events: Vec<AuditTrailEvent>,
-    pub raw_response: serde_json::Value,
-    // We parse the verification responses into signals our risk engine can use
-    pub signals: Vec<Signal>,
-    // These are the SignalScopes that this verification could potentially have verified
-    // This is based on the data sent to the vendor
-    pub verification_attributes: Vec<SignalScope>,
-}
 
 #[derive(Clone)]
 pub enum ParsedResponse {

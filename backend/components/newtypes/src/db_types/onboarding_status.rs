@@ -5,7 +5,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
-use crate::{RequirementStatus, VerificationInfoStatus};
+use crate::RequirementStatus;
 
 /// The status of the onboarding. This includes in-progress statuses
 #[derive(
@@ -39,18 +39,6 @@ pub enum OnboardingStatus {
 }
 
 impl OnboardingStatus {
-    pub fn audit_status(&self) -> Option<VerificationInfoStatus> {
-        // Based on the Status of the onboarding, infer the status to use for the final audit trail event
-        match self {
-            Self::New => None,
-            Self::Processing => None,
-            Self::ManualReview => Some(VerificationInfoStatus::Failed),
-            Self::StepUpRequired => Some(VerificationInfoStatus::Failed),
-            Self::Verified => Some(VerificationInfoStatus::Verified),
-            Self::Failed => Some(VerificationInfoStatus::Failed),
-        }
-    }
-
     /// Api-visible status that hides KYC failures from the client side.
     pub fn public_status(&self) -> RequirementStatus {
         match self {

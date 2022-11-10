@@ -1,10 +1,6 @@
-use newtypes::{
-    AuditTrailEvent, ComplianceStatus, OnboardingId, OnboardingStatus, Vendor, VerificationInfo,
-    VerificationStatus,
-};
+use newtypes::{ComplianceStatus, OnboardingId, OnboardingStatus, VerificationStatus};
 
 use db::models::{
-    audit_trail::AuditTrail,
     onboarding::{Onboarding, OnboardingUpdate},
     onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
 };
@@ -42,21 +38,6 @@ pub async fn create_final_decision(
                 result_ids: features.verification_results(),
             };
             OnboardingDecision::create(conn, onboarding_decision)?;
-
-            if let Some(status) = decision.onboarding_status.audit_status() {
-                // TODO: create timeline
-                AuditTrail::create(
-                    conn,
-                    AuditTrailEvent::Verification(VerificationInfo {
-                        attributes: vec![],
-                        vendor: Vendor::Footprint,
-                        status,
-                    }),
-                    scoped_user.user_vault_id,
-                    Some(scoped_user.tenant_id),
-                    None,
-                )?;
-            }
 
             // TODO: uncomment this shortly
             // Action decision, if applicable

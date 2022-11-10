@@ -30,7 +30,6 @@ pub enum TenantPermission {
     Admin,
     OnboardingConfiguration,
     ApiKeys,
-    AuditTrail,
     OrgSettings,
     SecurityLogs,
     Users,

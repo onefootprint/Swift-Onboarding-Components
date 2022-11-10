@@ -16,7 +16,6 @@ export type CreateRoleFormData = {
   [OrgRolePermission.admin]: boolean;
   [OrgRolePermission.onboardingConfiguration]: boolean;
   [OrgRolePermission.apiKeys]: boolean;
-  [OrgRolePermission.auditTrail]: boolean;
   [OrgRolePermission.orgSettings]: boolean;
   [OrgRolePermission.securityLogs]: boolean;
   [OrgRolePermission.users]: boolean;
@@ -29,7 +28,6 @@ const DefaultFormValues: CreateRoleFormData = {
   [OrgRolePermission.admin]: false,
   [OrgRolePermission.onboardingConfiguration]: false,
   [OrgRolePermission.apiKeys]: false,
-  [OrgRolePermission.auditTrail]: false,
   [OrgRolePermission.orgSettings]: false,
   [OrgRolePermission.securityLogs]: false,
   [OrgRolePermission.users]: false,
@@ -119,20 +117,6 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
         render={({ field }) => (
           <Toggle
             label={t('form.permissions.api-keys')}
-            checked={field.value}
-            onChange={nextValue => {
-              field.onChange(nextValue);
-            }}
-            sx={toggleStyle}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name={OrgRolePermission.auditTrail}
-        render={({ field }) => (
-          <Toggle
-            label={t('form.permissions.audit-trail')}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);

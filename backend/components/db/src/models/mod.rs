@@ -1,6 +1,5 @@
 pub mod access_event;
 pub mod annotation;
-pub mod audit_trail;
 pub mod document_request;
 pub mod email;
 pub mod fingerprint;

@@ -16,7 +16,7 @@ use super::{vendor_result::VendorResult, *};
 ///    - checkpointing these to the database
 /// - routing and sending those VRs to vendors
 /// - Processing the results
-/// - Emitting AuditTrail events
+/// - Emitting UserTimeline events
 /// - test/demo data
 /// - producing decisions
 pub async fn decide(state: &State, uv_id: UserVaultId, ob: Onboarding) -> Result<(), ApiError> {
