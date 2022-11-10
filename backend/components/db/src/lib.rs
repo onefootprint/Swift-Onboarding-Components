@@ -197,8 +197,8 @@ pub async fn private_cleanup_integration_tests(
     let deleted_rows = pool
         .db_transaction(move |conn| -> Result<usize, DbError> {
             use schema::{
-                access_event, audit_trail, document_request, email, fingerprint, identity_data,
-                identity_document, liveness_event, onboarding, onboarding_decision,
+                access_event, document_request, email, fingerprint, identity_data, identity_document,
+                liveness_event, onboarding, onboarding_decision,
                 onboarding_decision_verification_result_junction, phone_number, requirement, risk_signal,
                 scoped_user, user_timeline, user_vault, verification_request, verification_result,
                 webauthn_credential,
@@ -212,10 +212,6 @@ pub async fn private_cleanup_integration_tests(
 
             deleted_rows += diesel::delete(webauthn_credential::table)
                 .filter(webauthn_credential::user_vault_id.eq(&uv.id))
-                .execute(conn.conn())?;
-
-            deleted_rows += diesel::delete(audit_trail::table)
-                .filter(audit_trail::user_vault_id.eq(&uv.id))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(user_timeline::table)
