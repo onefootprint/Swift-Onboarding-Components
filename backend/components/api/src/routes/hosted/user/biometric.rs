@@ -187,7 +187,7 @@ pub async fn complete_post(
 
                             let attributes = LivenessAttributes {
                                 issuers: vec![LivenessIssuer::Apple, LivenessIssuer::Footprint],
-                                metadata: serde_json::to_value(&metadata).ok(),
+                                metadata: serde_json::to_value(metadata).ok(),
                                 os: metadata.os.clone(),
                                 device: metadata.model.clone(),
                             };
@@ -242,7 +242,7 @@ pub async fn complete_post(
                     // we should update this such that liveness is skipped via API call
                     NewLivenessEvent {
                         onboarding_id: ob_info.onboarding.id.clone(),
-                        liveness_source: newtypes::LivenessSource::Skipped,
+                        liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: None,
                         insight_event_id: insight_event.id.clone(),
                     }
