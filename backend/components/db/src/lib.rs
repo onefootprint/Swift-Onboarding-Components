@@ -197,8 +197,8 @@ pub async fn private_cleanup_integration_tests(
     let deleted_rows = pool
         .db_transaction(move |conn| -> Result<usize, DbError> {
             use schema::{
-                access_event, document_request, email, fingerprint, identity_data, identity_document,
-                liveness_event, onboarding, onboarding_decision,
+                access_event, annotation, document_request, email, fingerprint, identity_data,
+                identity_document, liveness_event, manual_review, onboarding, onboarding_decision,
                 onboarding_decision_verification_result_junction, phone_number, requirement, risk_signal,
                 scoped_user, user_timeline, user_vault, verification_request, verification_result,
                 webauthn_credential,
@@ -228,6 +228,10 @@ pub async fn private_cleanup_integration_tests(
                     .filter(access_event::scoped_user_id.eq_any(su_ids))
                     .execute(conn.conn())?;
 
+                deleted_rows += diesel::delete(annotation::table)
+                    .filter(annotation::scoped_user_id.eq_any(su_ids))
+                    .execute(conn.conn())?;
+
                 // Onboardings
                 {
                     let ob_ids = onboarding::table
@@ -236,6 +240,10 @@ pub async fn private_cleanup_integration_tests(
 
                     deleted_rows += diesel::delete(liveness_event::table)
                         .filter(liveness_event::onboarding_id.eq_any(ob_ids))
+                        .execute(conn.conn())?;
+
+                    deleted_rows += diesel::delete(manual_review::table)
+                        .filter(manual_review::onboarding_id.eq_any(ob_ids))
                         .execute(conn.conn())?;
 
                     // Onboarding decisions
