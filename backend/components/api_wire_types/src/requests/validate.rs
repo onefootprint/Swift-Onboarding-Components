@@ -14,7 +14,7 @@ pub struct ValidateResponse {
     pub onboarding_configuration_id: ObConfigurationId,
     pub footprint_user_id: FootprintUserId,
     pub requires_manual_review: bool,
-    pub status: VisibleOnboardingStatus,
+    pub status: OnboardingStatus,
     pub timestamp: DateTime<Utc>,
 }
 

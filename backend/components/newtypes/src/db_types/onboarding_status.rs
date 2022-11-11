@@ -24,30 +24,28 @@ use crate::DecisionStatus;
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 // This is a dynamically computed status enum that is never saved in the DB.
-// It is called "Visible" OnboardingStatus because these are the only API-visible states of an
-// onboarding
-pub enum VisibleOnboardingStatus {
+pub enum OnboardingStatus {
     Pass,
     Fail,
 }
 
-impl From<DecisionStatus> for Option<VisibleOnboardingStatus> {
+impl From<DecisionStatus> for Option<OnboardingStatus> {
     fn from(s: DecisionStatus) -> Self {
         match s {
-            DecisionStatus::Fail => Some(VisibleOnboardingStatus::Fail),
-            DecisionStatus::Pass => Some(VisibleOnboardingStatus::Pass),
-            // VisibleOnboardingStatus has no way of representing in-progress onboardings
+            DecisionStatus::Fail => Some(OnboardingStatus::Fail),
+            DecisionStatus::Pass => Some(OnboardingStatus::Pass),
+            // OnboardingStatus has no way of representing in-progress onboardings
             // since we hide in-progress onboardings from the API
             DecisionStatus::StepUpRequired => None,
         }
     }
 }
 
-impl From<VisibleOnboardingStatus> for DecisionStatus {
-    fn from(s: VisibleOnboardingStatus) -> Self {
+impl From<OnboardingStatus> for DecisionStatus {
+    fn from(s: OnboardingStatus) -> Self {
         match s {
-            VisibleOnboardingStatus::Fail => Self::Fail,
-            VisibleOnboardingStatus::Pass => Self::Pass,
+            OnboardingStatus::Fail => Self::Fail,
+            OnboardingStatus::Pass => Self::Pass,
         }
     }
 }

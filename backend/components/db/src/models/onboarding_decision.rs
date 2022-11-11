@@ -9,8 +9,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId, TenantUserId, UserVaultId,
-    VerificationResultId, VisibleOnboardingStatus,
+    DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId, OnboardingStatus,
+    TenantUserId, UserVaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -68,7 +68,7 @@ pub type SaturatedOnboardingDecisionInfo = (
 );
 
 impl OnboardingDecision {
-    pub fn visible_status(&self) -> Option<VisibleOnboardingStatus> {
+    pub fn visible_status(&self) -> Option<OnboardingStatus> {
         self.status.into()
     }
 

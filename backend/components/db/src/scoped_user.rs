@@ -4,13 +4,13 @@ use crate::{errors::DbError, schema::scoped_user::BoxedQuery};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, TenantId, VisibleOnboardingStatus};
+use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, OnboardingStatus, TenantId};
 
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
     pub tenant_id: TenantId,
     pub is_live: bool,
-    pub statuses: Vec<VisibleOnboardingStatus>,
+    pub statuses: Vec<OnboardingStatus>,
     pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<DateTime<Utc>>,

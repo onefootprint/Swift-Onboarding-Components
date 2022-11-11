@@ -7,7 +7,7 @@ use crate::*;
 pub struct ListUsersRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
-    pub statuses: Vec<VisibleOnboardingStatus>,
+    pub statuses: Vec<OnboardingStatus>,
     pub requires_manual_review: Option<bool>,
     pub fingerprint: Option<PiiString>,
     pub footprint_user_id: Option<FootprintUserId>,
