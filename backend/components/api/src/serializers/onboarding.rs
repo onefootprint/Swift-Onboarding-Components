@@ -8,7 +8,7 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
         (onboarding, config, liveness_event, insight, manual_review, latest_decision): SerializableOnboardingInfo,
     ) -> Self {
         let Onboarding { start_timestamp, .. } = onboarding;
-        let ob_status = Onboarding::status(latest_decision.as_ref().map(|d| &d.0), manual_review.as_ref());
+        let status = latest_decision.as_ref().and_then(|d| d.0.visible_status());
         let db::models::ob_configuration::ObConfiguration {
             name,
             can_access_data,
@@ -21,7 +21,8 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
             id: onboarding.id,
             name,
             config_id: config.id,
-            status: ob_status,
+            requires_manual_review: manual_review.is_some(),
+            status,
             timestamp: start_timestamp,
             is_liveness_skipped: liveness_event
                 .map(|s| matches!(s.liveness_source, LivenessSource::Skipped))

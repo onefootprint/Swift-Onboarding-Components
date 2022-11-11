@@ -12,10 +12,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{
-    InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, UserVaultId,
-    VisibleOnboardingStatus,
-};
+use newtypes::{InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -279,23 +276,5 @@ impl Onboarding {
             .set(update)
             .get_result(conn)?;
         Ok(result)
-    }
-
-    /// Given an optional decision and manual review for an onboarding, determines publicly visible
-    /// status of the onboarding
-    pub fn status(
-        decision: Option<&OnboardingDecision>,
-        manual_review: Option<&ManualReview>,
-    ) -> Option<VisibleOnboardingStatus> {
-        if manual_review.is_some() {
-            Some(VisibleOnboardingStatus::ManualReview)
-        } else {
-            match decision.map(|d| d.status) {
-                Some(newtypes::DecisionStatus::Fail) => Some(VisibleOnboardingStatus::Fail),
-                Some(newtypes::DecisionStatus::Pass) => Some(VisibleOnboardingStatus::Pass),
-                // A None status means the onboarding is still in progress
-                None | Some(newtypes::DecisionStatus::StepUpRequired) => None,
-            }
-        }
     }
 }

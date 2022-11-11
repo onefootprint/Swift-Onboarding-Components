@@ -8,6 +8,7 @@ pub struct ListUsersRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     pub statuses: Vec<VisibleOnboardingStatus>,
+    pub requires_manual_review: Option<bool>,
     pub fingerprint: Option<PiiString>,
     pub footprint_user_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<DateTime<Utc>>,

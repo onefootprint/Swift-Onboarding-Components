@@ -21,6 +21,9 @@ const useJoinUsers = (
         const maxStatus = scopedUser.onboardings.sort(
           (a, b) => statusToPriority[b.status] - statusToPriority[a.status],
         )[0]?.status;
+        const requiresManualReview = scopedUser.onboardings.some(
+          o => o.requiresManualReview,
+        );
 
         // Copy over the decrypted values, for remaining encrypted identityDataAttributes, add null entries
         const vaultData = decryptedUsers.get(scopedUser.id) || {
@@ -34,6 +37,7 @@ const useJoinUsers = (
         });
 
         return {
+          requiresManualReview,
           status: maxStatus || OnboardingStatus.vaultOnly,
           vaultData,
           ...scopedUser,

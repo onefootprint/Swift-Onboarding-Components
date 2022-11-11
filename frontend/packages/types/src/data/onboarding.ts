@@ -8,6 +8,7 @@ export type Onboarding = {
   id: string;
   name: string;
   configId: string;
+  requiresManualReview: boolean;
   status: OnboardingStatus;
   timestamp: string;
   isLivenessSkipped: boolean;

@@ -10,7 +10,7 @@ use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId, TenantUserId, UserVaultId,
-    VerificationResultId,
+    VerificationResultId, VisibleOnboardingStatus,
 };
 use serde::{Deserialize, Serialize};
 
@@ -68,6 +68,10 @@ pub type SaturatedOnboardingDecisionInfo = (
 );
 
 impl OnboardingDecision {
+    pub fn visible_status(&self) -> Option<VisibleOnboardingStatus> {
+        self.status.into()
+    }
+
     pub fn create(conn: &mut TxnPgConnection, decision: NewOnboardingDecision) -> DbResult<Self> {
         // Lock Onboarding so a new decision isn't added while we deactivate the old
         Onboarding::lock(conn, &decision.onboarding_id)?;

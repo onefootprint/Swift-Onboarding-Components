@@ -23,6 +23,10 @@ const UserHeader = ({ user }: UserHeaderProps) => {
         <Badge variant={statusToBadgeVariant[user.status]}>
           {statusToDisplayText[user.status]}
         </Badge>
+        {/* TODO display manual review better */}
+        {user.requiresManualReview && (
+          <Badge variant="error">Manual review</Badge>
+        )}
       </RowContainer>
       <SplitRow>
         <RowContainer>

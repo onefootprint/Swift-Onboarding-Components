@@ -41,12 +41,14 @@ pub async fn post(
     if scoped_user.is_live != auth.is_live()? {
         return Err(OnboardingError::InvalidSandboxState.into());
     }
-    let ob_status = Onboarding::status(latest_decision.as_ref(), manual_review.as_ref());
-    let terminal_status = ob_status.ok_or(OnboardingError::NonTerminalState)?;
+    let terminal_status = latest_decision
+        .and_then(|d| d.visible_status())
+        .ok_or(OnboardingError::NonTerminalState)?;
 
     Ok(Json(ResponseData::ok(ValidateResponse {
         onboarding_configuration_id: ob.ob_configuration_id,
         footprint_user_id: scoped_user.fp_user_id,
+        requires_manual_review: manual_review.is_some(),
         status: terminal_status,
         timestamp: scoped_user.start_timestamp,
     })))

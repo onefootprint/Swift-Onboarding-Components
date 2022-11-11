@@ -46,6 +46,7 @@ pub async fn get(
     let page_size = request.page_size(&state);
     let ListUsersRequest {
         statuses,
+        requires_manual_review,
         fingerprint,
         footprint_user_id,
         timestamp_lte,
@@ -68,6 +69,7 @@ pub async fn get(
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
+        requires_manual_review,
         statuses,
         fingerprints,
         footprint_user_id,
@@ -139,6 +141,7 @@ pub async fn get_detail(
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
+        requires_manual_review: None,
         statuses: vec![],
         fingerprints: None,
         footprint_user_id: Some(footprint_user_id.into_inner()),

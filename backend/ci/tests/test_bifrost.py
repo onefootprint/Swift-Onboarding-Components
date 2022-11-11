@@ -495,15 +495,20 @@ class TestBifrost:
 
 class TestBifrostSandbox:
     @pytest.mark.parametrize(
-        "suffix,expected_status",
+        "suffix,expected_status,expected_requires_manual_review",
         [
-            ("fail", "fail"),
-            ("blah_123", "pass"),
-            ("manualreview", "manual_review"),
+            ("fail", "fail", False),
+            ("blah_123", "pass", False),
+            ("manualreview", "fail", True),
         ],
     )
     def test_deterministic_onboarding(
-        self, twilio, workos_sandbox_tenant, suffix, expected_status
+        self,
+        twilio,
+        workos_sandbox_tenant,
+        suffix,
+        expected_status,
+        expected_requires_manual_review,
     ):
         basic_user = create_basic_user(twilio, suffix)
         user_data = build_user_data()
@@ -544,3 +549,4 @@ class TestBifrostSandbox:
             workos_sandbox_tenant.sk.key,
         )
         assert body["status"] == expected_status
+        assert body["requires_manual_review"] == expected_requires_manual_review

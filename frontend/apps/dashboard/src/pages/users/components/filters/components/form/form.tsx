@@ -58,16 +58,12 @@ const Form = ({ defaultValues, onSubmit }: FormProps) => {
       onReset={handleReset}
       onSubmit={handleSubmit(handleBeforeSubmit)}
     >
+      {/* TODO add manual review filter */}
       <Fieldset title={t('status.title')}>
         <Checkbox
           {...register('statuses')}
           label={t('status.verified')}
           value={OnboardingStatus.verified}
-        />
-        <Checkbox
-          {...register('statuses')}
-          label={t('status.manual-review')}
-          value={OnboardingStatus.manualReview}
         />
         <Checkbox
           {...register('statuses')}

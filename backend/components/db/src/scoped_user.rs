@@ -15,6 +15,7 @@ pub struct OnboardingListQueryParams {
     pub footprint_user_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
+    pub requires_manual_review: Option<bool>,
 }
 
 pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {
@@ -33,39 +34,28 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
         .filter(scoped_user::id.eq_any(authorized_ids))
         .into_boxed();
 
-    if !params.statuses.is_empty() {
-        // Find all onboardings with a manual review if selected
-        let mut ob_query = onboarding::table.into_boxed();
-        if params.statuses.contains(&VisibleOnboardingStatus::ManualReview) {
-            let matching_ob_ids = manual_review::table
-                .filter(manual_review::completed_at.is_null())
-                .select(manual_review::onboarding_id)
-                .distinct();
-            ob_query = ob_query.or_filter(onboarding::id.eq_any(matching_ob_ids));
+    // Filter on whether user is in manual review
+    if let Some(requires_manual_review) = params.requires_manual_review {
+        let matching_ids = manual_review::table
+            .inner_join(onboarding::table)
+            .filter(manual_review::completed_at.is_null())
+            .select(onboarding::scoped_user_id)
+            .distinct();
+        if requires_manual_review {
+            query = query.filter(scoped_user::id.eq_any(matching_ids))
+        } else {
+            query = query.filter(diesel::dsl::not(scoped_user::id.eq_any(matching_ids)))
         }
+    }
 
-        // Find all onboardings with a pass/fail decision if selected
-        let decision_statuses: Vec<_> = [
-            params
-                .statuses
-                .contains(&VisibleOnboardingStatus::Pass)
-                .then_some(DecisionStatus::Pass),
-            params
-                .statuses
-                .contains(&VisibleOnboardingStatus::Fail)
-                .then_some(DecisionStatus::Fail),
-        ]
-        .into_iter()
-        .flatten()
-        .collect();
-        if !decision_statuses.is_empty() {
-            let matching_ob_ids = onboarding_decision::table
-                .filter(onboarding_decision::status.eq_any(decision_statuses))
-                .filter(onboarding_decision::deactivated_at.is_null())
-                .select(onboarding_decision::onboarding_id);
-            ob_query = ob_query.or_filter(onboarding::id.eq_any(matching_ob_ids));
-        }
-        let matching_ids = ob_query.select(onboarding::scoped_user_id).distinct();
+    // Filter on whether user has passed or failed
+    if !params.statuses.is_empty() {
+        let decision_statuses: Vec<_> = params.statuses.into_iter().map(DecisionStatus::from).collect();
+        let matching_ids = onboarding_decision::table
+            .inner_join(onboarding::table)
+            .filter(onboarding_decision::status.eq_any(decision_statuses))
+            .filter(onboarding_decision::deactivated_at.is_null())
+            .select(onboarding::scoped_user_id);
         query = query.filter(scoped_user::id.eq_any(matching_ids))
     }
 
