@@ -27,4 +27,6 @@ pub enum OnboardingError {
     NonTerminalState(OnboardingStatus),
     #[error("No pending document request found: {0}")]
     NoPendingDocumentRequestFound(DocumentRequestId),
+    #[error("No decision can be made from decision engine")]
+    NoDecisionMade,
 }

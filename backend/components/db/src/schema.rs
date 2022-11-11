@@ -244,12 +244,11 @@ table! {
         onboarding_id -> Uuid,
         logic_git_hash -> Text,
         tenant_user_id -> Nullable<Text>,
-        verification_status -> Text,
-        compliance_status -> Text,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
+        status -> Text,
     }
 }
 

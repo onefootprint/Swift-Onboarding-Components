@@ -6,8 +6,7 @@ use crate::*;
 
 pub struct OnboardingDecision {
     pub id: OnboardingDecisionId,
-    pub verification_status: VerificationStatus,
-    pub compliance_status: ComplianceStatus,
+    pub status: DecisionStatus,
     pub timestamp: DateTime<Utc>,
     pub source: DecisionSource,
     #[serde(skip_serializing_if = "Option::is_none")]

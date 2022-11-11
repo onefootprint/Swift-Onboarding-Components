@@ -2,14 +2,14 @@
 /// we can use to make decisions
 use idv::{idology::verification::IDologySuccess, ParsedResponse};
 
-use newtypes::{OnboardingStatus, Signal, VerificationResultId};
+use newtypes::{DecisionStatus, Signal, VerificationResultId};
 
 use super::vendor_result::VendorResult;
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IDologyFeatures {
-    pub status: OnboardingStatus,
+    pub status: DecisionStatus,
     pub signals: Vec<Signal>,
     pub id_located: bool,
     pub id_number_for_scan_required: Option<u64>,
@@ -54,7 +54,7 @@ impl FeatureVector {
 
 impl FeatureVector {
     // A helper to expose all the top level statuses from the individual vendors
-    pub fn statuses(&self) -> Vec<Option<OnboardingStatus>> {
+    pub fn statuses(&self) -> Vec<Option<DecisionStatus>> {
         let idology_status = self.idology_features.as_ref().map(|i| i.status);
 
         vec![idology_status]
@@ -195,7 +195,7 @@ mod tests {
 
         let feature_vector = create_features(vendor_results);
         let expected_idology_features = IDologyFeatures {
-            status: OnboardingStatus::Verified,
+            status: DecisionStatus::Pass,
             create_manual_review: false,
             id_located: true,
             is_id_scan_required: false,

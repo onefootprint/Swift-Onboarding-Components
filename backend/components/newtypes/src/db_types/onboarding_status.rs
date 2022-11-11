@@ -5,7 +5,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
-use crate::RequirementStatus;
+use crate::{DecisionStatus, RequirementStatus};
 
 /// The status of the onboarding. This includes in-progress statuses
 #[derive(
@@ -45,6 +45,16 @@ impl OnboardingStatus {
             Self::StepUpRequired => RequirementStatus::Complete,
             Self::Verified => RequirementStatus::Complete,
             Self::Failed => RequirementStatus::Complete,
+        }
+    }
+}
+
+impl From<DecisionStatus> for OnboardingStatus {
+    fn from(s: DecisionStatus) -> Self {
+        match s {
+            DecisionStatus::Fail => OnboardingStatus::Failed,
+            DecisionStatus::Pass => OnboardingStatus::Verified,
+            DecisionStatus::StepUpRequired => OnboardingStatus::StepUpRequired,
         }
     }
 }

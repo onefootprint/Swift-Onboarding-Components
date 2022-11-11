@@ -6,10 +6,7 @@ use db::models::{
     verification_request::VerificationRequest,
     verification_result::VerificationResult,
 };
-use newtypes::{
-    ComplianceStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, Vendor, VendorAPI,
-    VerificationStatus,
-};
+use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId, Vendor, VendorAPI};
 
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
@@ -35,7 +32,7 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
         None
     };
 
-    let (desired_status, create_manual_review) = if let Some(decrypted_phone) = decrypted_phone {
+    let (decision_status, create_manual_review) = if let Some(decrypted_phone) = decrypted_phone {
         // This is a sandbox user vault. Check for pre-set validation cases
         if decrypted_phone.suffix.starts_with("idv") {
             // ALERT ALERT
@@ -43,15 +40,15 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             // All other cases (ironically including non-sandbox users) end up triggering the fixture code path
             return Ok(true);
         } else if decrypted_phone.suffix.starts_with("fail") {
-            (OnboardingStatus::Failed, false)
+            (DecisionStatus::Fail, false)
         } else if decrypted_phone.suffix.starts_with("manualreview") {
-            (OnboardingStatus::Failed, true)
+            (DecisionStatus::Fail, true)
         } else {
-            (OnboardingStatus::Verified, false)
+            (DecisionStatus::Pass, false)
         }
     } else {
         // BIG TODO: This controls whether or not we send actual verification requests, we need to revisit
-        (OnboardingStatus::Verified, false)
+        (DecisionStatus::Pass, false)
     };
 
     // Create the test fixture data
@@ -62,9 +59,8 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             if ob.idv_reqs_initiated {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
-            ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
-            // Update the Onboarding's status with the desired testing status
-            Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(desired_status))?;
+            let ob = ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
+            ob.update(conn, OnboardingUpdate::status(decision_status.into()))?;
 
             // Create ManualReview row if requested
             if create_manual_review {
@@ -81,36 +77,30 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
             let result = VerificationResult::create(conn, request.id, raw_response)?;
             // Create the decision itself
-            let decision_status = match desired_status {
-                OnboardingStatus::Verified => VerificationStatus::Verified,
-                OnboardingStatus::Failed => VerificationStatus::Failed,
-                _ => VerificationStatus::Failed,
-            };
             let new_decision = NewOnboardingDecision {
                 user_vault_id: uvw.user_vault.id.clone(),
                 onboarding_id: ob_id,
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 tenant_user_id: None,
-                verification_status: decision_status,
-                compliance_status: ComplianceStatus::NoFlagsFound,
+                status: decision_status,
                 result_ids: vec![result.id],
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 
             // Create some mock risk signals that are somewhat consistent with the mock decision
-            let reason_codes = match (desired_status, create_manual_review) {
+            let reason_codes = match (decision_status, create_manual_review) {
                 // Straight out rejection
-                (OnboardingStatus::Failed, false) => vec![
+                (DecisionStatus::Fail, false) => vec![
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SsnIssuedPriorToDob,
                 ],
                 // Manual review
-                (OnboardingStatus::Failed, true) => vec![
+                (DecisionStatus::Fail, true) => vec![
                     FootprintReasonCode::SsnDoesNotMatchWithinTolerance,
                     FootprintReasonCode::LastNameDoesNotMatch,
                 ],
                 // Approved
-                (OnboardingStatus::Verified, _) => vec![
+                (DecisionStatus::Pass, _) => vec![
                     FootprintReasonCode::MobileNumber,
                     FootprintReasonCode::CorporateEmailDomain,
                 ],

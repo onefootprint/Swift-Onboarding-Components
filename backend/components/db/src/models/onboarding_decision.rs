@@ -9,8 +9,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    ComplianceStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId, TenantUserId, UserVaultId,
-    VerificationResultId, VerificationStatus,
+    DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId, TenantUserId, UserVaultId,
+    VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -26,12 +26,11 @@ pub struct OnboardingDecision {
     pub onboarding_id: OnboardingId,
     pub logic_git_hash: String,
     pub tenant_user_id: Option<TenantUserId>,
-    pub verification_status: VerificationStatus,
-    pub compliance_status: ComplianceStatus,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
+    pub status: DecisionStatus,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -40,9 +39,8 @@ struct NewOnboardingDecisionRow {
     onboarding_id: OnboardingId,
     logic_git_hash: String,
     tenant_user_id: Option<TenantUserId>,
-    verification_status: VerificationStatus,
-    compliance_status: ComplianceStatus,
     created_at: DateTime<Utc>,
+    status: DecisionStatus,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -58,8 +56,7 @@ pub struct NewOnboardingDecision {
     pub onboarding_id: OnboardingId,
     pub logic_git_hash: String,
     pub tenant_user_id: Option<TenantUserId>,
-    pub verification_status: VerificationStatus,
-    pub compliance_status: ComplianceStatus,
+    pub status: DecisionStatus,
     pub result_ids: Vec<VerificationResultId>,
 }
 
@@ -87,9 +84,8 @@ impl OnboardingDecision {
             onboarding_id: decision.onboarding_id.clone(),
             logic_git_hash: decision.logic_git_hash,
             tenant_user_id: decision.tenant_user_id,
-            verification_status: decision.verification_status,
-            compliance_status: decision.compliance_status,
             created_at: Utc::now(),
+            status: decision.status,
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)

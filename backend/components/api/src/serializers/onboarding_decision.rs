@@ -23,8 +23,7 @@ impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
     fn from_db((decision, ob_configuration, vrs, tenant_user): OnboardingDecisionInfo) -> Self {
         let OnboardingDecision {
             id,
-            verification_status,
-            compliance_status,
+            status,
             created_at,
             ..
         } = decision;
@@ -38,8 +37,7 @@ impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
         let vendors = vrs.map(|vrs| vrs.into_iter().map(|vr| vr.vendor).collect());
         api_wire_types::OnboardingDecision {
             id,
-            verification_status,
-            compliance_status,
+            status,
             timestamp: created_at,
             source,
             ob_configuration: ob_configuration.map(api_wire_types::LiteObConfiguration::from_db),

@@ -1,4 +1,4 @@
-use newtypes::{OnboardingStatus, ReasonCode};
+use newtypes::{DecisionStatus, ReasonCode};
 use std::str::FromStr;
 
 // Given a raw response, deserialize
@@ -30,11 +30,11 @@ type CreateManualReview = bool;
 
 impl IDologySuccess {
     /// IDology-determined status for verifying the customer
-    pub fn status(&self) -> (OnboardingStatus, CreateManualReview) {
+    pub fn status(&self) -> (DecisionStatus, CreateManualReview) {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
-            Some("id.success") => (OnboardingStatus::Verified, false),
-            Some("id.failure") => (OnboardingStatus::Failed, false),
-            _ => (OnboardingStatus::Failed, true),
+            Some("id.success") => (DecisionStatus::Pass, false),
+            Some("id.failure") => (DecisionStatus::Fail, false),
+            _ => (DecisionStatus::Fail, true),
         }
     }
 

@@ -475,15 +475,20 @@ class TestBifrost:
 
         assert post_body == {}
 
-        # get status. 
+        # get status.
         # We always move to complete now, this will change once we have vendor integrations
         expected = {
             "status": {"kind": "complete"},
             "front_image_error": None,
             "back_image_error": None,
         }
-        
-        get_body = get(f"hosted/user/document/{document_request_id}/status", None,user_auth_token,document_requesting_tenant.ob_config().key)
+
+        get_body = get(
+            f"hosted/user/document/{document_request_id}/status",
+            None,
+            user_auth_token,
+            document_requesting_tenant.ob_config().key,
+        )
 
         assert get_body == expected
 
