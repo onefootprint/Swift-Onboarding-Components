@@ -184,6 +184,22 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    manual_review (id) {
+        id -> Text,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        onboarding_id -> Uuid,
+        completed_at -> Nullable<Timestamptz>,
+        completed_by_decision_id -> Nullable<Text>,
+        completed_by_tenant_user_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     ob_configuration (id) {
         id -> Text,
         key -> Text,
@@ -521,6 +537,9 @@ joinable!(kv_data -> tenant (tenant_id));
 joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> onboarding (onboarding_id));
+joinable!(manual_review -> onboarding (onboarding_id));
+joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
+joinable!(manual_review -> tenant_user (completed_by_tenant_user_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
@@ -564,6 +583,7 @@ allow_tables_to_appear_in_same_query!(
     insight_event,
     kv_data,
     liveness_event,
+    manual_review,
     ob_configuration,
     onboarding,
     onboarding_decision,

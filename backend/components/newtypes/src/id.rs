@@ -108,6 +108,7 @@ define_newtype_id!(OnboardingDecisionId, String, "Identifier for a decision");
 define_newtype_id!(RiskSignalId, String, "Identifier for a risk signal");
 define_newtype_id!(LivenessEventId, String, "Identifier for a liveness event");
 define_newtype_id!(AnnotationId, String, "Identifier for an annotation");
+define_newtype_id!(ManualReviewId, String, "Identifier for a manual review");
 
 impl ObConfigurationKey {
     /// prefixed on LIVE keys
