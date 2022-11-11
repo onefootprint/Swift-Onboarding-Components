@@ -61,18 +61,13 @@ const Form = ({ defaultValues, onSubmit }: FormProps) => {
       <Fieldset title={t('status.title')}>
         <Checkbox
           {...register('statuses')}
-          label={t('status.new')}
+          label={t('status.verified')}
           value={OnboardingStatus.verified}
         />
         <Checkbox
           {...register('statuses')}
           label={t('status.manual-review')}
           value={OnboardingStatus.manualReview}
-        />
-        <Checkbox
-          {...register('statuses')}
-          label={t('status.processing')}
-          value={OnboardingStatus.processing}
         />
         <Checkbox
           {...register('statuses')}

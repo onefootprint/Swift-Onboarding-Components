@@ -13,7 +13,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    InsightEventId, ObConfigurationId, OnboardingId, OnboardingStatus, ScopedUserId, TenantId, UserVaultId,
+    InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, UserVaultId,
+    VisibleOnboardingStatus,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -28,7 +29,6 @@ pub struct Onboarding {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
-    pub status: OnboardingStatus,
     pub is_authorized: bool,
     pub idv_reqs_initiated: bool,
 }
@@ -40,7 +40,6 @@ struct NewOnboarding {
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
-    status: OnboardingStatus,
     is_authorized: bool,
     idv_reqs_initiated: bool,
 }
@@ -48,19 +47,11 @@ struct NewOnboarding {
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = onboarding)]
 pub struct OnboardingUpdate {
-    pub status: Option<OnboardingStatus>,
     pub is_authorized: Option<bool>,
     pub idv_reqs_initiated: Option<bool>,
 }
 
 impl OnboardingUpdate {
-    pub fn status(status: OnboardingStatus) -> Self {
-        Self {
-            status: Some(status),
-            ..Self::default()
-        }
-    }
-
     pub fn is_authorized(is_authorized: bool) -> Self {
         Self {
             is_authorized: Some(is_authorized),
@@ -120,31 +111,37 @@ impl<'a> From<(&'a UserVaultId, &'a ObConfigurationId)> for OnboardingIdentifier
     }
 }
 
-pub type OnboardingInfo = (
+pub type SerializableOnboardingInfo = (
     Onboarding,
     ObConfiguration,
     Option<LivenessEvent>,
     InsightEvent,
+    Option<ManualReview>,
     Option<(OnboardingDecision, Option<TenantUser>)>,
 );
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
-pub type BasicOnboardingInfo = (Onboarding, ScopedUser, Option<ManualReview>);
+pub type BasicOnboardingInfo = (
+    Onboarding,
+    ScopedUser,
+    Option<ManualReview>,
+    Option<OnboardingDecision>,
+);
 
 impl Onboarding {
     pub fn get<'a, T>(conn: &'a mut PgConnection, id: T) -> DbResult<BasicOnboardingInfo>
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
-        use crate::schema::manual_review;
+        use crate::schema::{manual_review, onboarding_decision};
         let mut query = onboarding::table
             .inner_join(scoped_user::table)
-            .left_join(
-                // Only fetch active manual review for this onboarding
-                manual_review::table.on(manual_review::onboarding_id
-                    .eq(onboarding::id)
-                    .and(manual_review::completed_at.is_null())),
-            )
+            // Only fetch active manual review for this onboarding
+            .left_join(manual_review::table)
+            .filter(manual_review::completed_at.is_null())
+            // Only fetch active onboarding decisions for this onboarding
+            .left_join(onboarding_decision::table)
+            .filter(onboarding_decision::deactivated_at.is_null())
             .into_boxed();
 
         match id.into() {
@@ -202,21 +199,25 @@ impl Onboarding {
     pub fn get_for_scoped_users(
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,
-    ) -> DbResult<HashMap<ScopedUserId, Vec<OnboardingInfo>>> {
+    ) -> DbResult<HashMap<ScopedUserId, Vec<SerializableOnboardingInfo>>> {
         use crate::schema::{
-            insight_event, liveness_event, ob_configuration, onboarding_decision, tenant_user,
+            insight_event, liveness_event, manual_review, ob_configuration, onboarding_decision, tenant_user,
         };
-        let obs: Vec<OnboardingInfo> = onboarding::table
+        let obs: Vec<SerializableOnboardingInfo> = onboarding::table
             .inner_join(ob_configuration::table)
             // TODO return all liveness events
             .left_join(liveness_event::table)
             .inner_join(insight_event::table)
+            // Only fetch active manual review for this onboarding
+            .left_join(manual_review::table)
+            .filter(manual_review::completed_at.is_null())
             // Get the active decision and its tenant_user, if any
             .left_join(
                 onboarding_decision::table.left_join(tenant_user::table)
             )
-            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
             .filter(onboarding_decision::deactivated_at.is_null())
+
+            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
             .order_by(onboarding::scoped_user_id)
             .load(conn)?;
 
@@ -224,7 +225,7 @@ impl Onboarding {
         // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_user_id
         let result = obs
             .into_iter()
-            .group_by(|(link, _, _, _, _)| link.scoped_user_id.clone())
+            .group_by(|(link, _, _, _, _, _)| link.scoped_user_id.clone())
             .into_iter()
             .map(|g| (g.0, g.1.collect()))
             .collect();
@@ -252,7 +253,6 @@ impl Onboarding {
             ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
-            status: OnboardingStatus::Processing,
             is_authorized: false,
             idv_reqs_initiated: false,
         };
@@ -279,5 +279,23 @@ impl Onboarding {
             .set(update)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    /// Given an optional decision and manual review for an onboarding, determines publicly visible
+    /// status of the onboarding
+    pub fn status(
+        decision: Option<&OnboardingDecision>,
+        manual_review: Option<&ManualReview>,
+    ) -> Option<VisibleOnboardingStatus> {
+        if manual_review.is_some() {
+            Some(VisibleOnboardingStatus::ManualReview)
+        } else {
+            match decision.map(|d| d.status) {
+                Some(newtypes::DecisionStatus::Fail) => Some(VisibleOnboardingStatus::Fail),
+                Some(newtypes::DecisionStatus::Pass) => Some(VisibleOnboardingStatus::Pass),
+                // A None status means the onboarding is still in progress
+                None | Some(newtypes::DecisionStatus::StepUpRequired) => None,
+            }
+        }
     }
 }

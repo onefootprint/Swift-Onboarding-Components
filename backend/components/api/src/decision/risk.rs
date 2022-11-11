@@ -2,7 +2,7 @@ use newtypes::{DecisionStatus, OnboardingId};
 
 use db::models::{
     manual_review::ManualReview,
-    onboarding::{Onboarding, OnboardingUpdate},
+    onboarding::Onboarding,
     onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
 };
 
@@ -25,13 +25,8 @@ pub async fn create_final_decision(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             Onboarding::lock(conn, &ob_id)?;
-            let (current_ob, scoped_user, _) = Onboarding::get(conn, &ob_id)?;
-            let current_ob_status = current_ob.status;
+            let (current_ob, scoped_user, _, _) = Onboarding::get(conn, &ob_id)?;
             let decision = final_decision(&features, current_ob)?;
-            let new_ob_status = decision.decision_status.into();
-            if new_ob_status != current_ob_status {
-                Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(new_ob_status))?;
-            }
 
             // Create decision
             let onboarding_decision = NewOnboardingDecision {

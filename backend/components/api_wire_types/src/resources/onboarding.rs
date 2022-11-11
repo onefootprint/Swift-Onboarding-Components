@@ -8,7 +8,8 @@ pub struct Onboarding {
     pub id: OnboardingId,
     pub name: String,
     pub config_id: ObConfigurationId,
-    pub status: OnboardingStatus,
+    // incomplete onboardings will show as null here. There is no codepath that does this today
+    pub status: Option<VisibleOnboardingStatus>,
     pub timestamp: DateTime<Utc>,
     pub is_liveness_skipped: bool,
     pub insight_event: InsightEvent,

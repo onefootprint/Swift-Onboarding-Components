@@ -31,7 +31,7 @@ pub async fn post(
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
     };
 
-    let (ob, scoped_user, manual_review) = state
+    let (ob, scoped_user, manual_review, latest_decision) = state
         .db_pool
         .db_query(move |conn| Onboarding::get(conn, &ob_id))
         .await??;
@@ -41,9 +41,8 @@ pub async fn post(
     if scoped_user.is_live != auth.is_live()? {
         return Err(OnboardingError::InvalidSandboxState.into());
     }
-    let terminal_status = (ob.status, manual_review.is_some())
-        .try_into()
-        .map_err(|_| OnboardingError::NonTerminalState(ob.status))?;
+    let ob_status = Onboarding::status(latest_decision.as_ref(), manual_review.as_ref());
+    let terminal_status = ob_status.ok_or(OnboardingError::NonTerminalState)?;
 
     Ok(Json(ResponseData::ok(ValidateResponse {
         onboarding_configuration_id: ob.ob_configuration_id,

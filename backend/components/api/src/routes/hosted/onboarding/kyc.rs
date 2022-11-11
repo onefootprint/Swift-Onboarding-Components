@@ -16,18 +16,23 @@ pub struct StatusResponse {
 #[actix::get("/hosted/onboarding/kyc")]
 pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> JsonApiResponse<StatusResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
-    let ob = state
+    let (_, _, _, latest_decision) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let (ob, _, _) = Onboarding::get(conn, (&ob_info.onboarding.id, &ob_info.user_vault_id))?;
+            let ob = Onboarding::get(conn, (&ob_info.onboarding.id, &ob_info.user_vault_id))?;
             Ok(ob)
         })
         .await??;
 
-    let response = StatusResponse {
-        status: ob.status.public_status(),
+    // The identity_check requirement is done as soon as the decision engine makes a decision,
+    // regardless of what the decision is
+    let status = if latest_decision.is_some() {
+        RequirementStatus::Complete
+    } else {
+        RequirementStatus::Pending
     };
+    let response = StatusResponse { status };
     ResponseData::ok(response).json()
 }
 

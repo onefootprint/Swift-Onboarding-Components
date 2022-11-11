@@ -497,7 +497,8 @@ class TestBifrostSandbox:
     @pytest.mark.parametrize(
         "suffix,expected_status",
         [
-            ("fail", "failed"),
+            ("fail", "fail"),
+            ("blah_123", "pass"),
             ("manualreview", "manual_review"),
         ],
     )

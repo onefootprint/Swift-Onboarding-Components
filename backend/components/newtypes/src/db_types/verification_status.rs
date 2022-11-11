@@ -4,8 +4,6 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
-use crate::OnboardingStatus;
-
 /// The type of requirement
 #[derive(
     Debug,
@@ -37,15 +35,3 @@ pub enum VerificationStatus {
     NeedsIdDocument,
 }
 crate::util::impl_enum_str_diesel!(VerificationStatus);
-
-impl From<OnboardingStatus> for VerificationStatus {
-    fn from(ob_status: OnboardingStatus) -> Self {
-        match ob_status {
-            OnboardingStatus::Processing => Self::InformationRequired,
-            // Temp, this will need to change.
-            OnboardingStatus::StepUpRequired => Self::NeedsIdDocument,
-            OnboardingStatus::Verified => Self::Verified,
-            OnboardingStatus::Failed => Self::Failed,
-        }
-    }
-}

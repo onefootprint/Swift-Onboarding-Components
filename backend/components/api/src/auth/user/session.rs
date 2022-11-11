@@ -90,7 +90,8 @@ impl SessionContext<UserSession> {
         };
 
         // Confirm that the onboarding in the auth token belongs to the user
-        let (onboarding, scoped_user, _) = Onboarding::get(conn, (&onboarding_id, &self.data.user_vault_id))?;
+        let (onboarding, scoped_user, _, _) =
+            Onboarding::get(conn, (&onboarding_id, &self.data.user_vault_id))?;
         // Confirm that the ob config is active
         let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &onboarding.ob_configuration_id)?;
         let info = AuthedOnboardingInfo {

@@ -1,11 +1,8 @@
 enum OnboardingStatus {
-  new = 'new',
-  verified = 'verified',
+  verified = 'pass',
   manualReview = 'manual_review',
-  stepUpRequired = 'step_up_required',
-  processing = 'processing',
-  failed = 'failed',
-  vaultOnly = 'vault-only',
+  failed = 'fail',
+  vaultOnly = 'vault-only', // Doesn't actually exist on the backend
 }
 
 export default OnboardingStatus;

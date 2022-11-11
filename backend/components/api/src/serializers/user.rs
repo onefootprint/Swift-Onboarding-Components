@@ -1,9 +1,14 @@
-use db::models::{onboarding::OnboardingInfo, scoped_user::ScopedUser};
+use db::models::{onboarding::SerializableOnboardingInfo, scoped_user::ScopedUser};
 use newtypes::DataAttribute;
 
 use crate::utils::db2api::DbToApi;
 
-pub type UserDetail<'a> = (Vec<DataAttribute>, &'a [OnboardingInfo], ScopedUser, bool);
+pub type UserDetail<'a> = (
+    Vec<DataAttribute>,
+    &'a [SerializableOnboardingInfo],
+    ScopedUser,
+    bool,
+);
 
 impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
     fn from_db((identity_data_attributes, onboarding_info, scoped_user, is_portable): UserDetail) -> Self {
