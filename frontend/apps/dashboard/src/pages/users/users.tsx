@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
 import {
   Badge,
-  Box,
   Button,
   CodeInline,
   Pagination,
