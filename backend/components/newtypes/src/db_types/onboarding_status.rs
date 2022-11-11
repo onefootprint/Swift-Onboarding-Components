@@ -32,7 +32,6 @@ use crate::RequirementStatus;
 pub enum OnboardingStatus {
     // TODO remove Processing too
     Processing,
-    ManualReview,
     StepUpRequired,
     Verified,
     Failed,
@@ -43,7 +42,6 @@ impl OnboardingStatus {
     pub fn public_status(&self) -> RequirementStatus {
         match self {
             Self::Processing => RequirementStatus::Pending,
-            Self::ManualReview => RequirementStatus::Complete,
             Self::StepUpRequired => RequirementStatus::Complete,
             Self::Verified => RequirementStatus::Complete,
             Self::Failed => RequirementStatus::Complete,
@@ -61,11 +59,8 @@ mod tests {
     use super::OnboardingStatus;
     use super::OnboardingStatus::*;
 
-    #[test_case(Processing, ManualReview => Ordering::Less)]
     #[test_case(Processing, StepUpRequired => Ordering::Less)]
     #[test_case(Processing, Failed => Ordering::Less)]
-    #[test_case(ManualReview, Failed => Ordering::Less)]
-    #[test_case(ManualReview, Verified => Ordering::Less)]
     #[test_case(StepUpRequired, Failed=> Ordering::Less)]
     #[test_case(StepUpRequired, Verified=> Ordering::Less)]
     fn test_cmp(a: OnboardingStatus, b: OnboardingStatus) -> Ordering {

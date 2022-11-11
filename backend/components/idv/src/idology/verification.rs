@@ -26,13 +26,15 @@ pub struct IDologySuccess {
     pub id_scan: Option<String>,
 }
 
+type CreateManualReview = bool;
+
 impl IDologySuccess {
     /// IDology-determined status for verifying the customer
-    pub fn status(&self) -> OnboardingStatus {
+    pub fn status(&self) -> (OnboardingStatus, CreateManualReview) {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
-            Some("id.success") => OnboardingStatus::Verified,
-            Some("id.failure") => OnboardingStatus::Failed,
-            _ => OnboardingStatus::ManualReview,
+            Some("id.success") => (OnboardingStatus::Verified, false),
+            Some("id.failure") => (OnboardingStatus::Failed, false),
+            _ => (OnboardingStatus::Failed, true),
         }
     }
 

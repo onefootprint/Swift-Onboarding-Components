@@ -33,7 +33,6 @@ use crate::OnboardingStatus;
 pub enum VerificationStatus {
     InformationRequired,
     Failed,
-    ManualReview,
     Verified,
     NeedsIdDocument,
 }
@@ -43,7 +42,6 @@ impl From<OnboardingStatus> for VerificationStatus {
     fn from(ob_status: OnboardingStatus) -> Self {
         match ob_status {
             OnboardingStatus::Processing => Self::InformationRequired,
-            OnboardingStatus::ManualReview => Self::ManualReview,
             // Temp, this will need to change.
             OnboardingStatus::StepUpRequired => Self::NeedsIdDocument,
             OnboardingStatus::Verified => Self::Verified,

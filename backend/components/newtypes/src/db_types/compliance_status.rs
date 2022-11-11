@@ -32,8 +32,6 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 pub enum ComplianceStatus {
     // "we screened the user and it came back with no red flags"
     NoFlagsFound,
-    // "potential compliance issue"
-    NeedsReview,
     // "this check wasn't requested to be performed or it's not functionality built"
     // 2022-10-26 This is the default value until we start screen with ExpectID PA or other vendors
     #[default]

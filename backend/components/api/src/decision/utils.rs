@@ -1,4 +1,5 @@
 use db::models::{
+    manual_review::ManualReview,
     onboarding::{Onboarding, OnboardingUpdate},
     onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
     risk_signal::RiskSignal,
@@ -34,7 +35,7 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
         None
     };
 
-    let desired_status = if let Some(decrypted_phone) = decrypted_phone {
+    let (desired_status, create_manual_review) = if let Some(decrypted_phone) = decrypted_phone {
         // This is a sandbox user vault. Check for pre-set validation cases
         if decrypted_phone.suffix.starts_with("idv") {
             // ALERT ALERT
@@ -42,15 +43,15 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             // All other cases (ironically including non-sandbox users) end up triggering the fixture code path
             return Ok(true);
         } else if decrypted_phone.suffix.starts_with("fail") {
-            OnboardingStatus::Failed
+            (OnboardingStatus::Failed, false)
         } else if decrypted_phone.suffix.starts_with("manualreview") {
-            OnboardingStatus::ManualReview
+            (OnboardingStatus::Failed, true)
         } else {
-            OnboardingStatus::Verified
+            (OnboardingStatus::Verified, false)
         }
     } else {
         // BIG TODO: This controls whether or not we send actual verification requests, we need to revisit
-        OnboardingStatus::Verified
+        (OnboardingStatus::Verified, false)
     };
 
     // Create the test fixture data
@@ -65,6 +66,11 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             // Update the Onboarding's status with the desired testing status
             Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(desired_status))?;
 
+            // Create ManualReview row if requested
+            if create_manual_review {
+                ManualReview::create(conn, ob_id.clone())?;
+            }
+
             // Create some mock verification request and results
             let request =
                 build_request::build_verification_request(&uvw, ob_id.clone(), VendorAPI::IdologyExpectID);
@@ -78,7 +84,6 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             let decision_status = match desired_status {
                 OnboardingStatus::Verified => VerificationStatus::Verified,
                 OnboardingStatus::Failed => VerificationStatus::Failed,
-                OnboardingStatus::ManualReview => VerificationStatus::ManualReview,
                 _ => VerificationStatus::Failed,
             };
             let new_decision = NewOnboardingDecision {
@@ -92,19 +97,22 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 
-            // Create some risk signals
-            let reason_codes = match desired_status {
-                OnboardingStatus::Failed => vec![
+            // Create some mock risk signals that are somewhat consistent with the mock decision
+            let reason_codes = match (desired_status, create_manual_review) {
+                // Straight out rejection
+                (OnboardingStatus::Failed, false) => vec![
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SsnIssuedPriorToDob,
                 ],
-                OnboardingStatus::Verified => vec![
-                    FootprintReasonCode::MobileNumber,
-                    FootprintReasonCode::CorporateEmailDomain,
-                ],
-                OnboardingStatus::ManualReview => vec![
+                // Manual review
+                (OnboardingStatus::Failed, true) => vec![
                     FootprintReasonCode::SsnDoesNotMatchWithinTolerance,
                     FootprintReasonCode::LastNameDoesNotMatch,
+                ],
+                // Approved
+                (OnboardingStatus::Verified, _) => vec![
+                    FootprintReasonCode::MobileNumber,
+                    FootprintReasonCode::CorporateEmailDomain,
                 ],
                 _ => vec![],
             };

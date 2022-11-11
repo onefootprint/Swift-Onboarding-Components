@@ -60,7 +60,7 @@ pub fn get_requirements(
     ob_config: &ObConfiguration,
 ) -> ApiResult<(Vec<OnboardingRequirement>, Onboarding)> {
     let uvw = UserVaultWrapper::get(conn, user_vault_id)?;
-    let (onboarding, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
+    let (onboarding, _, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
     let missing_attributes = uvw.missing_fields(ob_config);
     // Document requirements are determined by the presence of DocumentRequest database objects.
     // In various places in the codebase, we will determine if a DocumentRequest should be created
@@ -105,7 +105,7 @@ pub fn get_fields_to_authorize(
     user_vault_id: &UserVaultId,
     ob_config: &ObConfiguration,
 ) -> ApiResult<AuthorizeFields> {
-    let (onboarding, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
+    let (onboarding, _, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
 
     let mut identity_documents: Vec<String> = vec![];
     if ob_config.can_access_identity_document_images {

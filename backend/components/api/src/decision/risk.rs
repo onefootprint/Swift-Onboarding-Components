@@ -1,6 +1,7 @@
 use newtypes::{ComplianceStatus, OnboardingId, OnboardingStatus, VerificationStatus};
 
 use db::models::{
+    manual_review::ManualReview,
     onboarding::{Onboarding, OnboardingUpdate},
     onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
 };
@@ -20,7 +21,7 @@ pub async fn create_final_decision(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (current_ob, scoped_user) = Onboarding::get(conn, &ob_id)?;
+            let (current_ob, scoped_user, _) = Onboarding::get(conn, &ob_id)?;
             let current_status = current_ob.status;
             let decision = final_decision(&features, current_ob);
             if decision.onboarding_status != current_status {
@@ -30,7 +31,7 @@ pub async fn create_final_decision(
             // Create decision
             let onboarding_decision = NewOnboardingDecision {
                 user_vault_id: scoped_user.user_vault_id.clone(),
-                onboarding_id: ob_id,
+                onboarding_id: ob_id.clone(),
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 tenant_user_id: None,
                 verification_status: decision.verification_status,
@@ -38,6 +39,11 @@ pub async fn create_final_decision(
                 result_ids: features.verification_results(),
             };
             OnboardingDecision::create(conn, onboarding_decision)?;
+
+            // Create ManualReview row if requested
+            if decision.create_manual_review {
+                ManualReview::create(conn, ob_id)?;
+            }
 
             // TODO: uncomment this shortly
             // Action decision, if applicable
@@ -55,6 +61,7 @@ pub struct DecisionOutput {
     pub onboarding_status: OnboardingStatus,
     pub id_number: Option<u64>,
     pub onboarding_id: OnboardingId,
+    pub create_manual_review: bool,
 }
 fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> DecisionOutput {
     let result_statuses: Vec<Option<OnboardingStatus>> = features.statuses();
@@ -85,6 +92,7 @@ fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> D
         onboarding_status,
         id_number: maybe_id_doc_number,
         onboarding_id: current_onboarding.id,
+        create_manual_review: features.create_manual_review(),
     }
 }
 

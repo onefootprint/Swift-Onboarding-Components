@@ -1,5 +1,6 @@
 use super::insight_event::CreateInsightEvent;
 use super::liveness_event::LivenessEvent;
+use super::manual_review::ManualReview;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_user::ScopedUser;
 use super::tenant_user::TenantUser;
@@ -127,12 +128,24 @@ pub type OnboardingInfo = (
     Option<(OnboardingDecision, Option<TenantUser>)>,
 );
 
+/// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
+pub type BasicOnboardingInfo = (Onboarding, ScopedUser, Option<ManualReview>);
+
 impl Onboarding {
-    pub fn get<'a, T>(conn: &'a mut PgConnection, id: T) -> DbResult<(Onboarding, ScopedUser)>
+    pub fn get<'a, T>(conn: &'a mut PgConnection, id: T) -> DbResult<BasicOnboardingInfo>
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
-        let mut query = onboarding::table.inner_join(scoped_user::table).into_boxed();
+        use crate::schema::manual_review;
+        let mut query = onboarding::table
+            .inner_join(scoped_user::table)
+            .left_join(
+                // Only fetch active manual review for this onboarding
+                manual_review::table.on(manual_review::onboarding_id
+                    .eq(onboarding::id)
+                    .and(manual_review::completed_at.is_null())),
+            )
+            .into_boxed();
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),

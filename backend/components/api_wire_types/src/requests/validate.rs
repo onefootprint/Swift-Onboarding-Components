@@ -31,17 +31,19 @@ pub enum TerminalOnboardingStatus {
 }
 export_schema!(TerminalOnboardingStatus);
 
-impl TryFrom<OnboardingStatus> for TerminalOnboardingStatus {
+impl TryFrom<(OnboardingStatus, bool)> for TerminalOnboardingStatus {
     type Error = crate::Error;
 
-    fn try_from(value: OnboardingStatus) -> Result<Self, Self::Error> {
-        match value {
-            OnboardingStatus::Processing | OnboardingStatus::StepUpRequired => {
+    fn try_from((status, is_manual_review): (OnboardingStatus, bool)) -> Result<Self, Self::Error> {
+        // TODO this is messy, but will clean up after the end of OnboardingStatus v2 migration
+        // https://linear.app/footprint/issue/FP-1856/update-externally-visible-onboarding-status
+        match (status, is_manual_review) {
+            (_, true) => Ok(Self::ManualReview),
+            (OnboardingStatus::Failed, false) => Ok(Self::Failed),
+            (OnboardingStatus::Verified, false) => Ok(Self::Verified),
+            (OnboardingStatus::Processing, _) | (OnboardingStatus::StepUpRequired, _) => {
                 Err(crate::Error::ConversionError)
             }
-            OnboardingStatus::Failed => Ok(Self::Failed),
-            OnboardingStatus::ManualReview => Ok(Self::ManualReview),
-            OnboardingStatus::Verified => Ok(Self::Verified),
         }
     }
 }

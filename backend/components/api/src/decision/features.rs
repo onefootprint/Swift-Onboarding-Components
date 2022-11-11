@@ -15,6 +15,7 @@ pub struct IDologyFeatures {
     pub id_number_for_scan_required: Option<u64>,
     pub is_id_scan_required: bool,
     pub verification_result: VerificationResultId,
+    pub create_manual_review: bool,
 }
 
 impl IDologyFeatures {
@@ -59,6 +60,14 @@ impl FeatureVector {
         vec![idology_status]
     }
 
+    pub fn create_manual_review(&self) -> bool {
+        if let Some(ref idology_features) = self.idology_features {
+            idology_features.create_manual_review
+        } else {
+            false
+        }
+    }
+
     // A helper to expose all the verification_results
     pub fn verification_results(&self) -> Vec<VerificationResultId> {
         let idology_verification_result = self
@@ -85,8 +94,10 @@ impl From<VendorResult> for FeatureVector {
             ParsedResponse::IDology(resp) => {
                 let r = resp.response;
 
+                let (status, create_manual_review) = r.status();
                 let idology_features = IDologyFeatures {
-                    status: r.status(),
+                    status,
+                    create_manual_review,
                     id_located: r.id_located(),
                     is_id_scan_required: r.is_id_scan_required(),
                     id_number_for_scan_required: r.id_number,
@@ -185,6 +196,7 @@ mod tests {
         let feature_vector = create_features(vendor_results);
         let expected_idology_features = IDologyFeatures {
             status: OnboardingStatus::Verified,
+            create_manual_review: false,
             id_located: true,
             is_id_scan_required: false,
             id_number_for_scan_required: Some(3010453),

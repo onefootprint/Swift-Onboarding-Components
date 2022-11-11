@@ -135,7 +135,7 @@ impl UserVaultWrapper {
         conn: &mut PgConnection,
         request: VerificationRequest,
     ) -> Result<Self, DbError> {
-        let (_, scoped_user) = Onboarding::get(conn, &request.onboarding_id)?;
+        let (_, scoped_user, _) = Onboarding::get(conn, &request.onboarding_id)?;
         let user_vault = UserVault::get(conn, &scoped_user.user_vault_id)?;
         let email = request
             .email_id
