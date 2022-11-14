@@ -1,20 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   DecisionSourceOrganization,
-  VerificationStatus,
+  DecisionStatus,
 } from '@onefootprint/types';
 import { Drawer, LinkButton, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 type OrgOverwriteDetailsProps = {
-  verificationStatus: VerificationStatus;
+  status: DecisionStatus;
   timestamp: Date;
   source: DecisionSourceOrganization;
 };
 
 const OrgOverwriteDetails = ({
-  verificationStatus,
+  status,
   timestamp,
   source,
 }: OrgOverwriteDetailsProps) => {
@@ -51,13 +51,9 @@ const OrgOverwriteDetails = ({
             </Typography>
             <Typography
               variant="body-3"
-              color={
-                verificationStatus === VerificationStatus.verified
-                  ? undefined
-                  : 'error'
-              }
+              color={status === DecisionStatus.pass ? undefined : 'error'}
             >
-              {t(`verification-status.${verificationStatus}`)}
+              {t(`decision-status.${status}`)}
             </Typography>
           </ItemContainer>
           <ItemContainer>

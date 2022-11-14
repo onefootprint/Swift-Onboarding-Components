@@ -12,6 +12,7 @@ export * from './countries';
 export { default as D2PStatus } from './d2p-status';
 export { default as D2PStatusUpdate } from './d2p-status-update';
 export * from './date-range';
+export { default as DecisionStatus } from './decision-status';
 export * from './decrypted-user-data-attributes';
 export { default as IdDocBadImageError } from './id-doc-bad-image-error';
 export { default as IdDocType } from './id-doc-type';

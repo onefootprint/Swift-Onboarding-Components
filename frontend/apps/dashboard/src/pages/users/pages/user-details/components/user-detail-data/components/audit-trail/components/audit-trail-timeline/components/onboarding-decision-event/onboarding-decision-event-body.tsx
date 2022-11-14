@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   DecisionSourceKind,
+  DecisionStatus,
   OnboardingDecisionEventData,
-  VerificationStatus,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -24,16 +24,16 @@ const OnboardingDecisionEventBody = ({
   const {
     source,
     vendors,
-    verificationStatus,
+    status,
     obConfiguration: { mustCollectData, mustCollectIdentityDocument },
   } = data;
-  const status = t(`verification-status.${verificationStatus}`);
+  const statusStr = t(`decision-status.${status}`);
 
   if (source.kind !== DecisionSourceKind.footprint) {
     return null;
   }
 
-  if (verificationStatus === VerificationStatus.verified) {
+  if (status === DecisionStatus.pass) {
     const vendorsList = createStringList(
       vendors?.map(vendor => allT(`vendors.${vendor}`)) ?? [],
     );
@@ -56,7 +56,7 @@ const OnboardingDecisionEventBody = ({
         content={
           <>
             <Typography variant="body-3" as="span">
-              {status}
+              {statusStr}
             </Typography>
             <Typography variant="body-3" as="span">
               {createTagList(collectedDataLabels)}
@@ -78,14 +78,10 @@ const OnboardingDecisionEventBody = ({
     );
   }
 
-  if (
-    verificationStatus === VerificationStatus.needsIdDocument ||
-    verificationStatus === VerificationStatus.manualReview ||
-    verificationStatus === VerificationStatus.informationRequired
-  ) {
+  if (status === DecisionStatus.stepUpRequired) {
     return (
       <EventBodyEntry
-        content={status}
+        content={statusStr}
         testID="onboarding-decision-event-body"
       />
     );

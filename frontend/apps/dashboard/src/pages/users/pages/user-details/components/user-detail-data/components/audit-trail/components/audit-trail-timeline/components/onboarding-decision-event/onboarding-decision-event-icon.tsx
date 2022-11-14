@@ -1,7 +1,7 @@
 import { IcoClose16, IcoFootprint16 } from '@onefootprint/icons';
 import {
+  DecisionStatus,
   OnboardingDecisionEventData,
-  VerificationStatus,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -12,9 +12,9 @@ type OnboardingDecisionEventIconProps = {
 const OnboardingDecisionEventIcon = ({
   data,
 }: OnboardingDecisionEventIconProps) => {
-  const { verificationStatus } = data;
+  const { status } = data;
 
-  if (verificationStatus === VerificationStatus.verified) {
+  if (status === DecisionStatus.pass) {
     return <IcoFootprint16 />;
   }
   return <IcoClose16 />;

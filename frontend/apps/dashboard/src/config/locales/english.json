@@ -380,6 +380,11 @@
               "verified": "Verified ",
               "needs_id_document": "Step up with ID document required"
             },
+            "decision-status": {
+              "pass": "Verified",
+              "fail": "Failed",
+              "step_up_required": "Step up required"
+            },
             "with": " with ",
             "org-overwrite": {
               "title": "Marked as {{decision}} by {{user}}",

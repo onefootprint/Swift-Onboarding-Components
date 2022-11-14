@@ -1,13 +1,12 @@
 import {
   CollectedKycDataOption,
-  ComplianceStatus,
   DecisionSourceKind,
+  DecisionStatus,
   LivenessIssuer,
   LivenessSource,
   Timeline,
   TimelineEventKind,
   Vendor,
-  VerificationStatus,
 } from '@onefootprint/types';
 
 const TimelineFixture: Timeline = [
@@ -61,8 +60,7 @@ const TimelineFixture: Timeline = [
       kind: TimelineEventKind.onboardingDecision,
       data: {
         id: 'decision_mxioMGjVUQJhbemA20OFi3',
-        verificationStatus: VerificationStatus.verified,
-        complianceStatus: ComplianceStatus.noFlagsFound,
+        status: DecisionStatus.pass,
         timestamp: new Date('2022-11-08T20:21:53.750904Z'),
         source: {
           kind: DecisionSourceKind.footprint,
@@ -88,8 +86,7 @@ const TimelineFixture: Timeline = [
       kind: TimelineEventKind.onboardingDecision,
       data: {
         id: 'decision_kaI2ycxFAND4MpzdsYw64I',
-        verificationStatus: VerificationStatus.needsIdDocument,
-        complianceStatus: ComplianceStatus.notApplicable,
+        status: DecisionStatus.stepUpRequired,
         timestamp: new Date('2022-11-08T20:21:53.769699Z'),
         source: {
           kind: DecisionSourceKind.footprint,

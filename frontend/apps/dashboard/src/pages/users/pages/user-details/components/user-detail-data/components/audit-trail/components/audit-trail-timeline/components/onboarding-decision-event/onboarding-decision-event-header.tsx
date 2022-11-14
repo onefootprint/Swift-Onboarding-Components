@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   DecisionSourceKind,
+  DecisionStatus,
   OnboardingDecisionEventData,
-  VerificationStatus,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -20,8 +20,8 @@ const OnboardingDecisionEventHeader = ({
   const { t } = useTranslation(
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
-  const { source, verificationStatus } = data;
-  const isVerified = verificationStatus === VerificationStatus.verified;
+  const { source, status } = data;
+  const isVerified = status === DecisionStatus.pass;
   const color = isVerified ? 'success' : 'error';
 
   if (source.kind === DecisionSourceKind.footprint) {
@@ -39,7 +39,7 @@ const OnboardingDecisionEventHeader = ({
   }
 
   if (source.kind === DecisionSourceKind.organization) {
-    const decision = t(`verification-status.${verificationStatus}`);
+    const decision = t(`decision-status.${status}`);
 
     return (
       <OrgDecisionContainer data-test-id="onboarding-decision-event-header">
@@ -52,7 +52,7 @@ const OnboardingDecisionEventHeader = ({
         <OrgOverwriteDetails
           source={source}
           timestamp={data.timestamp}
-          verificationStatus={verificationStatus}
+          status={status}
         />
       </OrgDecisionContainer>
     );

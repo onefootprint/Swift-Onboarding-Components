@@ -57,9 +57,7 @@ describe('<AuditTrailTimeline />', () => {
       expect(bodies.length).toEqual(2);
 
       const body = bodies[1];
-      expect(
-        within(body).getByText('Step up with ID document required'),
-      ).toBeInTheDocument();
+      expect(within(body).getByText('Step up required')).toBeInTheDocument();
     });
 
     it('should render verified onboarding decision event correctly', () => {

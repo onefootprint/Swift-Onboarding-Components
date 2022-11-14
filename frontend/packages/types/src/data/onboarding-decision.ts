@@ -1,7 +1,6 @@
 import { CollectedKycDataOption } from './collected-kyc-data-option';
-import ComplianceStatus from './compliance-status';
+import DecisionStatus from './decision-status';
 import Vendor from './vendor';
-import VerificationStatus from './verification-status';
 
 export enum DecisionSourceKind {
   footprint = 'footprint',
@@ -28,8 +27,7 @@ export type DecisionSource =
 
 export type OnboardingDecision = {
   id: string;
-  verificationStatus: VerificationStatus;
-  complianceStatus: ComplianceStatus;
+  status: DecisionStatus;
   timestamp: Date;
   source: DecisionSource;
   obConfiguration: {
