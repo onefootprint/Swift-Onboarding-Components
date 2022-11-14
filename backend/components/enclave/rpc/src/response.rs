@@ -18,7 +18,7 @@ pub struct EnclaveResponse {
 pub enum EnclavePayload {
     Pong(String),
     GenerateDataKeyPair(GeneratedDataKeyPair),
-    GenerateSymmetricDataKey(GeneratedSealedDataKeyWithPlaintext),
+    GenerateSymmetricDataKey(GeneratedSealedDataKey),
     FnDecryption(FnDecryption),
     HmacSignature(HmacSignature),
     Ok,
@@ -74,7 +74,7 @@ impl TryFrom<EnclavePayload> for GeneratedDataKeyPair {
     }
 }
 
-impl TryFrom<EnclavePayload> for GeneratedSealedDataKeyWithPlaintext {
+impl TryFrom<EnclavePayload> for GeneratedSealedDataKey {
     type Error = crate::Error;
 
     fn try_from(value: EnclavePayload) -> Result<Self, Self::Error> {
@@ -130,12 +130,12 @@ impl Debug for HmacSignature {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub struct GeneratedSealedDataKeyWithPlaintext {
-    pub sealed_key_with_plaintext: SealedChaCha20Poly1305DataKey,
+pub struct GeneratedSealedDataKey {
+    pub sealed_key: SealedChaCha20Poly1305DataKey,
 }
 
-impl Debug for GeneratedSealedDataKeyWithPlaintext {
+impl Debug for GeneratedSealedDataKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("GeneratedSealedDataKeyWithPlaintext { omitted }")
+        f.write_str("GeneratedSealedDataKey { omitted }")
     }
 }

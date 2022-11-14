@@ -8,9 +8,7 @@ use sha2::{Digest, Sha256};
 use std::fmt::Debug;
 use std::str::FromStr;
 
-use crate::aead::{
-    generate_chacha20_poly1305_key_bytes, AeadSealedBytes, ChaCha20Poly1305KeyBytes, ScopedSealingKey,
-};
+use crate::aead::{generate_chacha20_poly1305_key_bytes, AeadSealedBytes, ScopedSealingKey};
 
 pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
@@ -203,7 +201,6 @@ impl ScopedSealingKey {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SealedChaCha20Poly1305DataKey {
     pub sealed_key: EciesP256Sha256AesGcmSealed,
-    pub key: ChaCha20Poly1305KeyBytes,
 }
 
 impl Debug for SealedChaCha20Poly1305DataKey {
@@ -220,7 +217,7 @@ impl SealedChaCha20Poly1305DataKey {
         let key = generate_chacha20_poly1305_key_bytes();
         let sealed_key = seal::seal_ecies_p256_x963_sha256_aes_gcm(public_key, key.to_vec())?;
 
-        Ok(SealedChaCha20Poly1305DataKey { sealed_key, key })
+        Ok(SealedChaCha20Poly1305DataKey { sealed_key })
     }
 }
 

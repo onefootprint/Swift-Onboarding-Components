@@ -45,6 +45,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        e_data_key -> Bytea,
     }
 }
 

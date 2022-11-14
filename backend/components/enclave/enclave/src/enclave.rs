@@ -2,7 +2,7 @@ use crypto::{aead::ScopedSealingKey, seal::SealedChaCha20Poly1305DataKey};
 use once_cell::sync::Lazy;
 use rpc::{
     EnvelopeHmacSignRequest, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair, GeneratedSealedDataKeyWithPlaintext, HmacSignature, SealedIkek, SealedIkekId,
+    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, SealedIkek, SealedIkekId,
 };
 use std::collections::HashMap;
 use thiserror::Error;
@@ -137,12 +137,11 @@ pub async fn handle_generate_data_keypair(
 
 pub async fn handle_generate_symmetric_data_key(
     request: GenerateSymmetricDataKeyRequest,
-) -> Result<GeneratedSealedDataKeyWithPlaintext, Error> {
+) -> Result<GeneratedSealedDataKey, Error> {
     let GenerateSymmetricDataKeyRequest { public_key_bytes } = request;
-    let key = SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key(&public_key_bytes)?;
-    Ok(GeneratedSealedDataKeyWithPlaintext {
-        sealed_key_with_plaintext: key,
-    })
+    let sealed_key =
+        SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key(&public_key_bytes)?;
+    Ok(GeneratedSealedDataKey { sealed_key })
 }
 
 pub async fn handle_fn_decrypt(request: EnvelopeDecryptRequest) -> Result<FnDecryption, Error> {

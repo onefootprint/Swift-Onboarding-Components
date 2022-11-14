@@ -9,8 +9,8 @@ use rpc::WireMessage;
 pub use rpc::{
     DataTransform, DecryptRequest, EnclavePayload, EnclaveResponse, EnvelopeDecryptRequest,
     EnvelopeHmacSignRequest, FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair, GeneratedSealedDataKeyWithPlaintext, HmacSignature, KmsCredentials, RpcPayload,
-    RpcRequest, SealedIkek,
+    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest,
+    SealedIkek,
 };
 
 use pool::{Stream, StreamConnection};

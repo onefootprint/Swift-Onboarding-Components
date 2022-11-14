@@ -15,9 +15,10 @@ use actix_web::web::Path;
 use api_wire_types::document_request::{
     DocumentErrorReason, DocumentRequest, DocumentResponse, DocumentResponseStatus,
 };
+use crypto::aead::AeadSealedBytes;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
-use newtypes::{DocumentRequestId, DocumentRequestStatus};
+use newtypes::{Base64Data, DocumentRequestId, DocumentRequestStatus};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
@@ -57,13 +58,23 @@ pub async fn post(
         )));
     }
 
+    let data_key = state
+        .enclave_client
+        .decrypt_sealed_vault_data_key(
+            db_document_request.e_data_key.clone(),
+            &uvw.user_vault.e_private_key,
+            db::models::document_request::DocumentRequest::DATA_KEY_SCOPE,
+        )
+        .await?;
+
+    let seal_helper = |b64_image: &str| -> Result<AeadSealedBytes, crypto::Error> {
+        let b64_data = Base64Data::from_str_standard(b64_image)?;
+        data_key.seal_bytes(&b64_data.0)
+    };
+
     // Encrypt the image using the UserVault
     // TODO::8
-    let sealed_front = IdentityDocument::vault_seal_from_base64_string(
-        &request.front_image,
-        request.document_type.clone(),
-        &uvw.user_vault.public_key,
-    )?;
+    let sealed_front = seal_helper(&request.front_image)?;
 
     // Save to s3
     let bucket = &state.config.document_s3_bucket.clone();
@@ -82,11 +93,8 @@ pub async fn post(
 
     // Not all documents have backs
     if let Some(back_image) = &request.back_image {
-        let sealed_back = IdentityDocument::vault_seal_from_base64_string(
-            back_image,
-            request.document_type.clone(),
-            &uvw.user_vault.public_key,
-        )?;
+        let sealed_back = seal_helper(&back_image)?;
+
         let _s3_path_back_image = state
             .s3_client
             .put_object(
@@ -100,15 +108,17 @@ pub async fn post(
             )
             .await?;
     }
+
+    let update = DocumentRequestUpdate {
+        // For now, just move this to Uploaded here to clear the requirement
+        status: Some(DocumentRequestStatus::Uploaded),
+    };
+
     // TODO::1, TODO::2, TODO::3
     state
         .db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
-            // For now, just move this to Uploaded here to clear the requirement
-            db_document_request.update(
-                conn,
-                DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded),
-            )?;
+            db_document_request.update(conn, update)?;
 
             Ok(())
         })

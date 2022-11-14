@@ -42,11 +42,28 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
     let mut user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
 
+    let uv_id = user_auth.user_vault_id();
+    
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::get(conn, &uv_id))
+        .await??;
+
+    let must_collect_document_e_data_key = if onboarding_context.ob_config().must_collect_identity_document {
+        Some(
+            state
+                .enclave_client
+                .generated_sealed_data_key(&uvw.user_vault.public_key)
+                .await?,
+        )
+    } else {
+        None
+    };
+
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let uvw = UserVaultWrapper::get(conn, &user_auth.user_vault_id())?;
             if onboarding_context.ob_config().is_live != uvw.user_vault.is_live {
                 return Err(OnboardingError::InvalidSandboxState.into());
             }
@@ -82,9 +99,9 @@ pub async fn post(
                 ob.id.clone(),
             )?);
 
-            // Create a `DocumentRequest` if specified in the ob config
-            if onboarding_context.ob_config().must_collect_identity_document {
-                DocumentRequest::create(conn, ob.id, None)?;
+            // Create a `DocumentRequest` if specified in the ob config and the user has not already passed onboarding
+            if let Some(e_data_key) = must_collect_document_e_data_key {
+                DocumentRequest::create(conn, ob.id, None, e_data_key)?;
             }
 
             Ok(validation_token)

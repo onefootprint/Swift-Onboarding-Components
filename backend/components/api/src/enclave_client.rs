@@ -3,7 +3,7 @@ use enclave_proxy::{
     bb8::{self, ErrorSink},
     pool, DataTransform, DecryptRequest, EnclavePayload, EnvelopeDecryptRequest, FnDecryption,
     GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
-    GeneratedSealedDataKeyWithPlaintext, KmsCredentials, RpcPayload, SealedIkek, StreamManager,
+    GeneratedSealedDataKey, KmsCredentials, RpcPayload, SealedIkek, StreamManager,
 };
 use newtypes::{EncryptedVaultPrivateKey, PiiString, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey};
 
@@ -106,13 +106,11 @@ impl EnclaveClient {
         Ok((public_key, encrypted_private_key))
     }
 
-    #[allow(unused)]
     /// generates a new sealed data key with the plaintext key
-    pub async fn generated_sealed_data_key_with_plaintext(
+    pub async fn generated_sealed_data_key(
         &self,
-        scope: &'static str,
         vault_public_key: &VaultPublicKey,
-    ) -> Result<(ScopedSealingKey, SealedVaultDataKey), EnclaveError> {
+    ) -> Result<SealedVaultDataKey, EnclaveError> {
         let mut conn = self.pool.get().await?;
 
         let req = enclave_proxy::RpcRequest::new(RpcPayload::GenerateSymmetricDataKey(
@@ -125,13 +123,11 @@ impl EnclaveClient {
         let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
         tracing::info!("got enclave response");
 
-        let response = GeneratedSealedDataKeyWithPlaintext::try_from(response)?;
+        let response = GeneratedSealedDataKey::try_from(response)?;
 
-        let scoped_sealing_key =
-            ScopedSealingKey::new_from_key(response.sealed_key_with_plaintext.key, scope);
-        let encrypted_data_key = SealedVaultDataKey::try_from(response.sealed_key_with_plaintext.sealed_key)?;
+        let encrypted_data_key = SealedVaultDataKey::try_from(response.sealed_key.sealed_key)?;
 
-        Ok((scoped_sealing_key, encrypted_data_key))
+        Ok(encrypted_data_key)
     }
 
     #[allow(unused)]
