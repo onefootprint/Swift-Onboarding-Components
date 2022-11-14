@@ -3,6 +3,7 @@ import * as CSS from 'csstype';
 import type {
   Bifrost,
   Button,
+  Dropdown,
   Input,
   InputHint,
   InputLabel,
@@ -221,12 +222,13 @@ export type Theme = {
   typography: Typographies;
   zIndex: ZIndexes;
   components: {
+    bifrost: Bifrost;
     button: Button;
+    dropdown: Dropdown;
     input: Input;
     inputHint: InputHint;
     inputLabel: InputLabel;
     linkButton: LinkButton;
-    bifrost: Bifrost;
   };
 };
 

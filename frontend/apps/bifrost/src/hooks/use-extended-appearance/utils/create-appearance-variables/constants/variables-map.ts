@@ -1,4 +1,5 @@
 import buttonVariables from './button-variables';
+import dropdownVariables from './dropdown-variables';
 import hintVariables from './hint-variables';
 import inputVariables from './input-variables';
 import labelVariables from './label-variables';
@@ -15,6 +16,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
           'buttonBorderRadius',
           'dialogBorderRadius',
           'inputBorderRadius',
+          'dropdownBorderRadius',
         ],
       },
     ],
@@ -93,6 +95,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
     ...inputVariables,
     ...hintVariables,
     ...typographyVariables,
+    ...dropdownVariables,
   ],
 );
 

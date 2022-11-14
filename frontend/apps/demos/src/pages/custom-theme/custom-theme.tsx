@@ -76,6 +76,12 @@ const Demo = () => {
                       inputErrorFocusElevation: 'none',
                       hintColor: '#101010',
                       hintFont: '400 13px/20px "Inter"',
+
+                      dropdownBorderColor: '#B5B5B5',
+                      dropdownBorderRadius: '8px',
+                      dropdownElevation: 'unset',
+                      dropdownBg: '#FFF',
+                      dropdownHoverBg: '#F9F9F9',
                     },
                     rules: {
                       button: {

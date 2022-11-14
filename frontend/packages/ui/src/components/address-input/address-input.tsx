@@ -156,17 +156,21 @@ const Container = styled.div`
 `;
 
 const Dropdown = styled.ul`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    box-shadow: ${theme.elevation[2]};
-    max-height: 330px;
-    outline: none;
-    padding: ${theme.spacing[3]} 0 0;
-    width: 100%;
-    z-index: ${theme.zIndex.dropdown};
-  `}
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
+
+    return css`
+      background: ${dropdown.bg};
+      border-radius: ${dropdown.borderRadius};
+      border: ${dropdown.borderWidth} solid ${dropdown.borderColor};
+      box-shadow: ${dropdown.elevation};
+      max-height: 332px;
+      outline: none;
+      padding: ${theme.spacing[3]} 0 0;
+      width: 100%;
+      z-index: ${theme.zIndex.dropdown};
+    `;
+  }}
 `;
 
 export default AddressInput;

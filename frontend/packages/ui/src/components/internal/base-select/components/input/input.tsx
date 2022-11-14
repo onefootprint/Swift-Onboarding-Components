@@ -61,7 +61,7 @@ const InputContainer = styled.div`
 const SearchInput = styled.input`
   ${({ theme }) => css`
     ${createFontStyles('body-3')};
-    color: ${theme.color.primary};
+    color: ${theme.components.input.global.color};
     border: none;
     outline: none;
     height: 100%;

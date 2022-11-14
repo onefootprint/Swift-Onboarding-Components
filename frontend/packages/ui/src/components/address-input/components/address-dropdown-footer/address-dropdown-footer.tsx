@@ -13,15 +13,20 @@ const AddressDropdownFooter = () => (
 );
 
 const Container = styled.li`
-  ${({ theme }) => css`
-    align-items: center;
-    background: ${theme.backgroundColor.secondary};
-    display: flex;
-    justify-content: center;
-    margin-top: ${theme.spacing[3]};
-    padding: ${theme.spacing[4]} 0;
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-  `}
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
+
+    return css`
+      align-items: center;
+      background: ${dropdown.footer.bg};
+      border-radius: 0 0 ${dropdown.borderRadius} ${dropdown.borderRadius};
+      border-top: ${dropdown.borderWidth} solid ${dropdown.borderColor};
+      display: flex;
+      justify-content: center;
+      margin-top: ${theme.spacing[3]};
+      padding: ${theme.spacing[4]} 0;
+    `;
+  }}
 `;
 
 export default AddressDropdownFooter;

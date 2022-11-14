@@ -95,6 +95,17 @@ export type FootprintMainStyles = Partial<{
   buttonSecondaryDisabledBorderColor: CSS.Property.BorderColor;
   buttonSecondaryLoadingBg: CSS.Property.Background;
   buttonSecondaryLoadingColor: CSS.Property.Color;
+
+  // Dropdown
+  dropdownBg: CSS.Property.Background;
+  dropdownHoverBg: CSS.Property.Background;
+  dropdownBorderColor: CSS.Property.BorderColor;
+  dropdownBorderWidth: CSS.Property.BorderWidth;
+  dropdownBorderRadius: CSS.Property.BorderRadius;
+  dropdownElevation: CSS.Property.BoxShadow;
+  dropdownColorPrimary: CSS.Property.Color;
+  dropdownColorSecondary: CSS.Property.Color;
+  dropdownFooterBg: CSS.Property.Background;
 }>;
 
 export type FootprintExternalStyles = Partial<{

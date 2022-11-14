@@ -2,12 +2,9 @@ import { IcoCheck16 } from '@onefootprint/icons';
 import React from 'react';
 import Highlighter from 'react-highlight-words';
 import type { CommonPropsAndClassName, GroupBase } from 'react-select';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import {
-  createFontStyles,
-  createOverlayBackground,
-} from '../../../../../utils/mixins';
+import { createFontStyles } from '../../../../../utils/mixins';
 
 export type OptionProps<
   Option = unknown,
@@ -31,12 +28,11 @@ const Option = <
   innerProps,
   label,
 }: OptionProps<Option, IsMulti, Group>) => {
-  const theme = useTheme();
   const { inputValue } = selectProps;
 
   return (
     <OptionContainer
-      highlighted={isFocused}
+      data-highlighted={isFocused}
       id={innerProps.id}
       onClick={innerProps.onClick}
       onMouseMove={innerProps.onMouseMove}
@@ -50,7 +46,6 @@ const Option = <
           textToHighlight={label}
           highlightStyle={{
             background: 'none',
-            color: theme.color.primary,
             fontWeight: 600,
           }}
         >
@@ -62,28 +57,29 @@ const Option = <
   );
 };
 
-const OptionContainer = styled.div<{
-  highlighted: boolean;
-}>`
-  ${({ theme, highlighted }) => css`
-    ${createFontStyles('body-3')};
-    align-items: center;
-    background: ${theme.backgroundColor.primary};
-    color: ${theme.color.secondary};
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    left: 0;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-    position: absolute;
-    top: 0;
-    width: 100%;
+const OptionContainer = styled.div`
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
 
-    ${highlighted &&
-    css`
-      ${createOverlayBackground('darken-1', 'primary')};
-    `}
-  `}
+    return css`
+      ${createFontStyles('body-3')};
+      align-items: center;
+      background: ${dropdown.bg};
+      color: ${dropdown.colorPrimary};
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      left: 0;
+      padding: ${theme.spacing[3]} ${theme.spacing[5]};
+      position: absolute;
+      top: 0;
+      width: 100%;
+
+      &[data-highlighted] {
+        background: ${dropdown.hover.bg};
+      }
+    `;
+  }}
 `;
 
 const Content = styled.div`

@@ -1,9 +1,8 @@
 import React, { forwardRef } from 'react';
 import Highlighter from 'react-highlight-words';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { createOverlayBackground } from '../../../../utils/mixins';
-import Typography from '../../../typography';
+import { createFontStyles } from '../../../../utils/mixins';
 
 export type AddressDropdownItemProps = {
   ariaSelected: boolean;
@@ -33,67 +32,82 @@ const AddressDropdownItem = forwardRef<HTMLLIElement, AddressDropdownItemProps>(
       title,
     }: AddressDropdownItemProps,
     ref,
-  ) => {
-    const theme = useTheme();
-    return (
-      <Container
-        aria-selected={ariaSelected}
-        disableHoverStyles={disableHoverStyles}
-        highlighted={highlighted}
-        id={id}
-        onClick={onClick}
-        onKeyDown={onKeyDown}
-        onMouseMove={onMouseMove}
-        ref={ref}
-        role="option"
-      >
-        <Typography variant="body-3" color="primary">
-          <Highlighter
-            searchWords={searchWords}
-            textToHighlight={title}
-            highlightStyle={{
-              background: 'none',
-              color: theme.color.primary,
-              fontWeight: 600,
-            }}
-          />
-        </Typography>
-        <Typography variant="body-3" color="tertiary">
-          {subtitle}
-        </Typography>
-      </Container>
-    );
-  },
+  ) => (
+    <AddressDropdownItemContainer
+      aria-selected={ariaSelected}
+      data-disable-hover-styles={disableHoverStyles}
+      data-highlighted={highlighted}
+      id={id}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onMouseMove={onMouseMove}
+      ref={ref}
+      role="option"
+    >
+      <Title>
+        <Highlighter
+          searchWords={searchWords}
+          textToHighlight={title}
+          highlightStyle={{
+            background: 'none',
+            fontWeight: 600,
+          }}
+        />
+      </Title>
+      <Subtitle>{subtitle}</Subtitle>
+    </AddressDropdownItemContainer>
+  ),
 );
 
-const Container = styled.li<{
-  highlighted: boolean;
-  disableHoverStyles: boolean;
-}>`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    cursor: pointer;
-    margin-bottom: ${theme.spacing[2]};
-    padding: ${theme.spacing[2]} ${theme.spacing[5]};
+const AddressDropdownItemContainer = styled.li`
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
 
-    > p:first-child {
+    return css`
+      background: ${dropdown.bg};
+      cursor: pointer;
       margin-bottom: ${theme.spacing[2]};
-    }
-  `}
+      padding: ${theme.spacing[2]} ${theme.spacing[5]};
 
-  ${({ disableHoverStyles }) =>
-    !disableHoverStyles &&
-    css`
-      &:hover {
-        ${createOverlayBackground('darken-1', 'primary')};
+      > p:first-child {
+        margin-bottom: ${theme.spacing[2]};
       }
-    `}
 
-  ${({ highlighted }) =>
-    highlighted &&
-    css`
-      ${createOverlayBackground('darken-1', 'primary')};
-    `}
+      &[data-disable-hover-styles='false'] {
+        &:hover {
+          background: ${dropdown.hover.bg};
+        }
+      }
+
+      &[data-highlighted='true'] {
+        background: ${dropdown.hover.bg};
+      }
+    `;
+  }}
+`;
+
+const Title = styled.div`
+  ${createFontStyles('body-3')};
+
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
+
+    return css`
+      color: ${dropdown.colorPrimary};
+    `;
+  }}
+`;
+
+const Subtitle = styled.div`
+  ${createFontStyles('body-3')};
+
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
+
+    return css`
+      color: ${dropdown.colorSecondary};
+    `;
+  }}
 `;
 
 export default AddressDropdownItem;

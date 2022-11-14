@@ -11,7 +11,6 @@ import EmptyState from './components/empty-state';
 import Input from './components/input';
 import MenuList from './components/menu-list';
 import Option from './components/option';
-import useStyles from './hooks/use-styles';
 
 export type BaseSelectProps<Option extends BaseSelectOption> = {
   disabled?: boolean;
@@ -60,7 +59,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const selectRef = useRef<HTMLInputElement>(null);
   const theme = useTheme();
-  const styles = useStyles();
+  const { dropdown } = theme.components;
 
   const closeDropdown = () => {
     setOpen(false);
@@ -123,7 +122,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
           selectedOption: value,
         })}
         {isOpen && (
-          <DropdownMenu>
+          <DropdownMenu className="fp-dropdown">
             <ReactSelect
               isSearchable={isSearchable}
               maxMenuHeight={180}
@@ -151,7 +150,25 @@ const BaseSelect = <Option extends BaseSelectOption>({
               onChange={handleChange}
               options={options}
               placeholder={searchPlaceholder}
-              styles={styles}
+              styles={{
+                control: () => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  borderBottom: `${dropdown.borderWidth} solid ${dropdown.borderColor}`,
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                  outline: 0,
+                  position: 'relative',
+                  transition: 'all 100ms',
+                  borderRadius: `${dropdown.borderRadius} ${dropdown.borderRadius} 0 0`,
+                  background: dropdown.bg,
+                  height: 40,
+                  '&:hover': {
+                    borderColor: dropdown.borderColor,
+                  },
+                }),
+                menu: () => ({}),
+              }}
               value={value}
               theme={{
                 ...defaultTheme,
@@ -182,16 +199,20 @@ const Dropdown = styled.div`
 `;
 
 const DropdownMenu = styled.div`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    box-shadow: ${theme.elevation[2]};
-    margin-top: ${theme.spacing[3]};
-    position: absolute;
-    width: 100%;
-    z-index: ${theme.zIndex.dropdown};
-  `}
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
+
+    return css`
+      background: ${dropdown.bg};
+      border-radius: ${dropdown.borderRadius};
+      border: ${dropdown.borderWidth} solid ${dropdown.borderColor};
+      box-shadow: ${dropdown.elevation};
+      margin-top: ${theme.spacing[3]};
+      position: absolute;
+      width: 100%;
+      z-index: ${theme.zIndex.dropdown};
+    `;
+  }}
 `;
 
 const HiddenSelect = styled.input`
