@@ -4,35 +4,7 @@
 /// checkpointing the work here with some TODOs.
 ///
 /// TODOs:
-/// 1. Update DocumentRequest.status to UPLOADED
-///    - This will only happen AFTER we create a VerificationRequest. See comment on DocumentRequestStatus
-/// 2. Save an IdentityDocument
-///     - Should document_type be based on vendor response? argoff thinks probably
-///     - Should country_code be based on vendor response? argoff thinks probably
-///     - Should we save both the self reported fields as well? might be good for features
-/// 3. Make actual request to vendors
-///     - create a VerificationRequest.
-///     - Involves decision engine work (without making a OnboardingDecision?) or should it make a DocumentDecision?
-/// 4. Parse VerificationResult and return a DocumentResponse
-///     -  DocumentRequest -> IdentityDocument -> VerificationRequest -> VerificationResult parsing
-///     - Involves decision engine work (without making a OnboardingDecision?) or should it make a DocumentDecision?
-/// 5. Remove the temporary testing things
-/// 6. Figure out the size limits for API reqs in main.rs - currently we limit to 5MB, but that's arbitary and we'll need to do some frontend work to limit or resize
-/// 7. Should add some actual images to the test_fixtures in the integration tests
-/// 8. Should wrap request b64 data in something like PiiString so that any errors don't leak the b64 string
-/// 9. Portability
-///    - In terms of initial collection (DocumentRequests)
-///       - Right now, DocumentRequests are tied to specific onboardings. In a portable world, this needs to be at a UV level so any Tenant can satisfy it
-///    - "inherited"/not recollecting - the documents right now aren’t really portable across tenants. if you already have a drivers license that you uploaded while onboarding onto tenant A,
-///         we don’t have any logic that goes and finds that while you’re onboarding onto tenant B
-/// 10. create a UserTimeline event to show when a document has been uploaded
-/// 11. Just a noodle: but I wonder if we want to perhaps handle image upload a different way. Here's one way:
-///     - BE generates a symmetric key K and sends to FE (along with short-lived S3 credentials)
-///     - encrypts image with K
-///     - uploads encrypted image directly to S3
-///     - BE pulls, decrypts,
-///     This is an optimization I think we can do later, but imagine this will be significantly more performant as we won't need to handle large bytes going from frontend -> CF, ALB, container, etc.
-///     AWS S3 clients exist for JS/web that handle a bunch of edge cases around large file uploads.
+/// Notion: https://www.notion.so/onefootprint/Document-Request-TODOs-75f3131f609d4010a4e52799d9700525
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -109,27 +81,25 @@ pub async fn post(
         .await?;
 
     // Not all documents have backs
-    let Some(back_image) = &request.back_image else {
-        return EmptyResponse::ok().json()
-    };
-
-    let sealed_back = IdentityDocument::vault_seal_from_base64_string(
-        back_image,
-        request.document_type.clone(),
-        &uvw.user_vault.public_key,
-    )?;
-    let _s3_path_back_image = state
-        .s3_client
-        .put_object(
-            bucket,
-            &IdentityDocument::s3_path_for_document_image(
-                "back",
-                db_document_request.id.clone(),
-                uvw.user_vault.id.clone(),
-            ),
-            sealed_back.0,
-        )
-        .await?;
+    if let Some(back_image) = &request.back_image {
+        let sealed_back = IdentityDocument::vault_seal_from_base64_string(
+            back_image,
+            request.document_type.clone(),
+            &uvw.user_vault.public_key,
+        )?;
+        let _s3_path_back_image = state
+            .s3_client
+            .put_object(
+                bucket,
+                &IdentityDocument::s3_path_for_document_image(
+                    "back",
+                    db_document_request.id.clone(),
+                    uvw.user_vault.id.clone(),
+                ),
+                sealed_back.0,
+            )
+            .await?;
+    }
     // TODO::1, TODO::2, TODO::3
     state
         .db_pool

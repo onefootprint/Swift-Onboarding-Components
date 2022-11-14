@@ -421,9 +421,10 @@ class TestBifrost:
         ), "Onboarding onto different tenants should give different fp_user_id"
 
     # In this test we
-    #   - Create a live user by re-using a previously challenged phone number
-    #   - onboard this user onto a tenant, with an ob_config that asks for a document
+    #   - Create 2 live users by re-using a previously challenged phone number
+    #   - onboard users onto a tenant, with an ob_config that asks for a document
     #   - submit a document
+    #       - Since not all documents have backs, we check a submission with front/back and only front
     #   - expect the status of the document request to be pending
     # Other steps we should test (see TODOs on the API route)
     #   - document request moves into UPLOADED after post
@@ -433,64 +434,86 @@ class TestBifrost:
     ):
         from .image_fixtures import test_image
 
-        # This user is inherited because all integration tests use the same PHONE_NUMBER
-        # At some point we'll revisit this
-        user_auth_token = create_inherited_non_sandbox_user(twilio)
-
-        # Onboard a user onto a tenant that requests a document
-        post(
-            "hosted/onboarding",
-            None,
-            document_requesting_tenant.ob_config().key,
-            user_auth_token,
-        )
-
-        body = get(
-            "hosted/onboarding/status",
-            None,
-            document_requesting_tenant.ob_config().key,
-            user_auth_token,
-        )
-        # We have a requirement
-        req = get_requirement_from_requirements(
-            "collect_document", body["requirements"]
-        )
-        assert req
-        # stash the request id
-        document_request_id = req["document_request_id"]
-
-        # Submit the document
-        data = {
+        
+        doc_data_both = {
             "front_image": test_image,
             "back_image": test_image,
             "document_type": "passport",
             "country_code": "USA",
         }
-        post_body = post(
-            f"hosted/user/document/{document_request_id}",
-            data,
-            user_auth_token,
-            document_requesting_tenant.ob_config().key,
-        )
-
-        assert post_body == {}
-
-        # get status.
-        # We always move to complete now, this will change once we have vendor integrations
-        expected = {
-            "status": {"kind": "complete"},
-            "front_image_error": None,
-            "back_image_error": None,
+        doc_data_only_front = {
+            "front_image": test_image,
+            "back_image": None,
+            "document_type": "passport",
+            "country_code": "USA",
         }
 
-        get_body = get(
-            f"hosted/user/document/{document_request_id}/status",
-            None,
-            user_auth_token,
-            document_requesting_tenant.ob_config().key,
-        )
+        # These users are inherited because all integration tests use the same PHONE_NUMBER
+        # At some point we'll revisit this
+        users = [
+            {
+                "user_auth": create_inherited_non_sandbox_user(twilio),
+                "data": doc_data_both,
+            },
+            {
+                "user_auth": create_inherited_non_sandbox_user(twilio),
+                "data": doc_data_only_front,
+            },        
+        ]
+        
+        # We test both back and front and only front
+        for user in users:
+            # Onboard a user onto a tenant that requests a document
+            user_auth_token = user['user_auth']
 
-        assert get_body == expected
+            post(
+                "hosted/onboarding",
+                None,
+                document_requesting_tenant.ob_config().key,
+                user_auth_token,
+            )
+
+            body = get(
+                "hosted/onboarding/status",
+                None,
+                document_requesting_tenant.ob_config().key,
+                user_auth_token,
+            )
+            # We have a requirement
+            req = get_requirement_from_requirements(
+                "collect_document", body["requirements"]
+            )
+            assert req
+            # stash the request id
+            document_request_id = req["document_request_id"]
+
+            # Submit the document
+            data = user['data']
+            post_body = post(
+                f"hosted/user/document/{document_request_id}",
+                data,
+                user_auth_token,
+                document_requesting_tenant.ob_config().key,
+            )
+
+            assert post_body == {}
+
+            # get status.
+            # We always move to complete now, this will change once we have vendor integrations
+            expected = {
+                "status": {"kind": "complete"},
+                "front_image_error": None,
+                "back_image_error": None,
+            }
+
+            get_body = get(
+                f"hosted/user/document/{document_request_id}/status",
+                None,
+                user_auth_token,
+                document_requesting_tenant.ob_config().key,
+            )
+
+            assert get_body == expected
 
 
 class TestBifrostSandbox:
