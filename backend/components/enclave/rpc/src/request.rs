@@ -27,6 +27,7 @@ impl RpcRequest {
 pub enum RpcPayload {
     Ping(String),
     GenerateDataKeypair(GenerateDataKeypairRequest),
+    GenerateSymmetricDataKey(GenerateSymmetricDataKeyRequest),
     FnDecrypt(EnvelopeDecryptRequest),
     HmacSign(EnvelopeHmacSignRequest),
 }
@@ -113,4 +114,10 @@ impl Debug for EnvelopeHmacSignRequest {
             .field("scope", &self.scope)
             .finish()
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct GenerateSymmetricDataKeyRequest {
+    pub public_key_bytes: Vec<u8>,
 }

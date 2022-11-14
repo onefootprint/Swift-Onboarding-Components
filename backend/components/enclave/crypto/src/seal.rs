@@ -5,9 +5,12 @@ use p256::{ecdh::EphemeralSecret, EncodedPoint};
 use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use std::fmt::Debug;
 use std::str::FromStr;
 
-use crate::aead::{AeadSealedBytes, ScopedSealingKey};
+use crate::aead::{
+    generate_chacha20_poly1305_key_bytes, AeadSealedBytes, ChaCha20Poly1305KeyBytes, ScopedSealingKey,
+};
 
 pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
@@ -71,7 +74,7 @@ fn x963_kdf_sha256_32(shared_key: &[u8], shared_info: &[u8]) -> [u8; 32] {
 
 #[allow(clippy::module_inception)]
 pub mod seal {
-    use aes_gcm::{aes::Aes256, KeyInit, aead::Aead};
+    use aes_gcm::{aead::Aead, aes::Aes256, KeyInit};
 
     use super::*;
 
@@ -131,7 +134,7 @@ pub mod seal {
 
 pub mod unseal {
     use super::*;
-    use aes_gcm::{aead::Aead, KeyInit, aes::Aes256};
+    use aes_gcm::{aead::Aead, aes::Aes256, KeyInit};
     use elliptic_curve::{ecdh::diffie_hellman, sec1::ToEncodedPoint};
     pub struct Unsealed(pub Vec<u8>);
 
@@ -194,6 +197,30 @@ impl ScopedSealingKey {
             public_key_bytes,
             sealed_private_key,
         })
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct SealedChaCha20Poly1305DataKey {
+    pub sealed_key: EciesP256Sha256AesGcmSealed,
+    pub key: ChaCha20Poly1305KeyBytes,
+}
+
+impl Debug for SealedChaCha20Poly1305DataKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("SealedChaCha20Poly1305DataKey { omitted }")
+    }
+}
+
+impl SealedChaCha20Poly1305DataKey {
+    /// generate a symmetric (ChaCha20Poly1305) sealing AEAD key
+    pub fn generate_sealed_random_chacha20_poly1305_key(
+        public_key: &[u8],
+    ) -> Result<SealedChaCha20Poly1305DataKey, crate::Error> {
+        let key = generate_chacha20_poly1305_key_bytes();
+        let sealed_key = seal::seal_ecies_p256_x963_sha256_aes_gcm(public_key, key.to_vec())?;
+
+        Ok(SealedChaCha20Poly1305DataKey { sealed_key, key })
     }
 }
 

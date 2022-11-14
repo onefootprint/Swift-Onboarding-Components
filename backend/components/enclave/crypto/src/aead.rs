@@ -7,10 +7,13 @@ use rand_core::{OsRng, RngCore};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
+pub const CHA_CHA20_POLY1305_KEY_BYTES_LENGTH: usize = 32;
+pub type ChaCha20Poly1305KeyBytes = [u8; CHA_CHA20_POLY1305_KEY_BYTES_LENGTH];
+
 #[derive(Clone)]
 pub struct ScopedSealingKey {
     scope: &'static str,
-    key: Vec<u8>,
+    key: ChaCha20Poly1305KeyBytes,
 }
 
 // hide the key from debug prints
@@ -20,19 +23,40 @@ impl Debug for ScopedSealingKey {
     }
 }
 
+/// generate symmetrick key bytes to use with ChaCha20Poly1305 AEAD
+pub fn generate_chacha20_poly1305_key_bytes() -> ChaCha20Poly1305KeyBytes {
+    let mut key = [0u8; CHA_CHA20_POLY1305_KEY_BYTES_LENGTH];
+    OsRng.fill_bytes(&mut key);
+    key
+}
+
 impl ScopedSealingKey {
+    pub fn generate(scope: &'static str) -> Result<Self, crate::Error> {
+        Ok(Self {
+            key: generate_chacha20_poly1305_key_bytes(),
+            scope,
+        })
+    }
+
+    pub fn new_from_key(key: ChaCha20Poly1305KeyBytes, scope: &'static str) -> Self {
+        Self { key, scope }
+    }
+
     pub fn new(mut bytes: Vec<u8>, scope: &'static str) -> Result<Self, crate::Error> {
         // reject keys with too little entropy
-        if bytes.len() < 32 {
+        if bytes.len() < CHA_CHA20_POLY1305_KEY_BYTES_LENGTH {
             return Err(crate::Error::InvalidKey);
         }
 
         // accept longer keys, but shorten them via sha256 to 32 bytes
-        if bytes.len() > 32 {
+        if bytes.len() > CHA_CHA20_POLY1305_KEY_BYTES_LENGTH {
             bytes = crate::sha256(&bytes).to_vec();
         }
 
-        Ok(Self { key: bytes, scope })
+        let mut key = ChaCha20Poly1305KeyBytes::default();
+        key.copy_from_slice(&bytes[0..CHA_CHA20_POLY1305_KEY_BYTES_LENGTH]);
+
+        Ok(Self::new_from_key(key, scope))
     }
 }
 

@@ -3,7 +3,7 @@ mod config;
 use config::Config;
 use enclave::{
     enclave::handle_fn_decrypt,
-    enclave::init as init_enclave_sdk,
+    enclave::{init as init_enclave_sdk, handle_generate_symmetric_data_key},
     enclave::{handle_generate_data_keypair, handle_hmac_sign},
     EnclavePayload, EnclaveResponse, RpcPayload, WireMessage,
 };
@@ -128,6 +128,9 @@ async fn handle_request(request: RpcPayload) -> Result<EnclavePayload, Box<dyn s
         RpcPayload::Ping(m) => EnclavePayload::Pong(m),
         RpcPayload::GenerateDataKeypair(generate_request) => {
             EnclavePayload::GenerateDataKeyPair(handle_generate_data_keypair(generate_request).await?)
+        }
+        RpcPayload::GenerateSymmetricDataKey(generate_sym_request) => {
+            EnclavePayload::GenerateSymmetricDataKey(handle_generate_symmetric_data_key(generate_sym_request).await?)
         }
         RpcPayload::HmacSign(sign_request) => {
             EnclavePayload::HmacSignature(handle_hmac_sign(sign_request).await?)

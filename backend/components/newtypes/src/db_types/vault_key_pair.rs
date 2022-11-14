@@ -1,3 +1,4 @@
+use crypto::seal::EciesP256Sha256AesGcmSealed;
 pub use derive_more::{Add, Display, From, Into};
 use serde::{Deserialize, Serialize};
 
@@ -51,3 +52,16 @@ impl VaultPublicKey {
 #[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct EncryptedVaultPrivateKey(pub Vec<u8>);
+
+/// Bytes of a sealed vault private key
+#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[serde(transparent)]
+pub struct SealedVaultDataKey(pub Vec<u8>);
+
+impl TryFrom<EciesP256Sha256AesGcmSealed> for SealedVaultDataKey {
+    type Error = crypto::Error;
+
+    fn try_from(value: EciesP256Sha256AesGcmSealed) -> Result<Self, Self::Error> {
+        Ok(Self(value.to_vec()?))
+    }
+}
