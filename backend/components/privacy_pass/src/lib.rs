@@ -70,7 +70,7 @@ impl TokenChallenge {
 
         // redemption context
         result.write_u8(32)?;
-        result.extend(&self.redemption_context);
+        result.extend(self.redemption_context);
 
         // redemption context
         result.write_u16::<BigEndian>(self.origin_info.len() as u16)?;

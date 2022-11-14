@@ -60,7 +60,7 @@ pub fn safe_compare(a: &[u8], b: &[u8]) -> bool {
 
 pub fn sha256(input: &[u8]) -> [u8; 32] {
     let mut hasher = Sha256::new();
-    hasher.update(&input);
+    hasher.update(input);
     let output = hasher.finalize();
     output.into()
 }

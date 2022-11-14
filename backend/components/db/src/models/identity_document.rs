@@ -74,6 +74,7 @@ pub struct NewIdentityDocument {
 }
 
 impl IdentityDocument {
+    #[allow(clippy::too_many_arguments)]
     pub fn create(
         conn: &mut PgConnection,
         request_id: DocumentRequestId,

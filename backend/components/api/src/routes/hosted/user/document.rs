@@ -93,7 +93,7 @@ pub async fn post(
 
     // Not all documents have backs
     if let Some(back_image) = &request.back_image {
-        let sealed_back = seal_helper(&back_image)?;
+        let sealed_back = seal_helper(back_image)?;
 
         let _s3_path_back_image = state
             .s3_client
@@ -149,7 +149,7 @@ pub async fn get(
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
                 };
                 // This will error if no doc request is found
-                let db_document_request = DbDocumentRequest::get(conn, ob_id, document_request_id.clone())?;
+                let db_document_request = DbDocumentRequest::get(conn, ob_id, document_request_id)?;
 
                 Ok(db_document_request)
             })

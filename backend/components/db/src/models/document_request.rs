@@ -25,10 +25,7 @@ pub struct DocumentRequestUpdate {
 
 impl DocumentRequestUpdate {
     pub fn status(status: DocumentRequestStatus) -> Self {
-        Self {
-            status: Some(status),
-            ..Self::default()
-        }
+        Self { status: Some(status) }
     }
 }
 

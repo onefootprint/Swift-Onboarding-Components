@@ -8,6 +8,7 @@ pub mod idology;
 pub mod test_fixtures;
 pub mod twilio;
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum ParsedResponse {
     IDology(IDologyResponse),

@@ -40,7 +40,7 @@ fn test_att_matches_iphone() {
     };
 
     let cdh = sha256(&client_data);
-    assert_eq!(&base64::encode(&cdh), test_vectors::CDH_1);
+    assert_eq!(&base64::encode(cdh), test_vectors::CDH_1);
 
     let app_attestation = base64::decode_config(test_vectors::APP_ATTEST_1, base64::URL_SAFE_NO_PAD).unwrap();
 

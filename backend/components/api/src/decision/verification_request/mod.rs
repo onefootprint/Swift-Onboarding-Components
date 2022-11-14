@@ -24,7 +24,7 @@ pub fn build_verification_requests_and_checkpoint(
     ob_id: &OnboardingId,
     uvw: &UserVaultWrapper,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
-    let ob = Onboarding::lock(conn, &ob_id)?;
+    let ob = Onboarding::lock(conn, ob_id)?;
     // Can only initiate IDV reqs one time for an onboarding
     // Once we set idv_reqs_initiated below, this lock will make sure we can't save multiple sets of VerificationRequests
     // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)

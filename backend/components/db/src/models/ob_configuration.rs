@@ -166,6 +166,7 @@ impl ObConfiguration {
         Ok(result)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn create(
         pool: &DbPool,
         name: String,

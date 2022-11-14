@@ -34,6 +34,7 @@ pub struct NewUserTimeline {
     pub timestamp: DateTime<Utc>,
 }
 
+#[allow(clippy::large_enum_variant)]
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than identifiers
 pub enum SaturatedTimelineEvent {
     DataCollected(newtypes::DataCollectedInfo),
