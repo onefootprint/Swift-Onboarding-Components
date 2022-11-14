@@ -6,4 +6,6 @@ pub enum TenantError {
     ValidationError(String),
     #[error("Cannot deactivate the currently logged-in user")]
     CannotDeactivateCurrentUser,
+    #[error("Tenant user does not exist")]
+    TenantUserDoesNotExist,
 }

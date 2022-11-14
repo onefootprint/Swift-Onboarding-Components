@@ -4,8 +4,8 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    CollectedDataOption, IdentityDocumentId, LivenessEventId,
-    OnboardingDecisionId, WebauthnCredentialId,
+    AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId, OnboardingDecisionId,
+    WebauthnCredentialId,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
@@ -23,7 +23,6 @@ impl From<DataCollectedInfo> for DbUserTimelineEvent {
         Self::DataCollected(s)
     }
 }
-
 
 impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
     fn from(s: DocumentUploadedInfo) -> Self {
@@ -61,6 +60,7 @@ pub struct DocumentUploadedInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OnboardingDecisionInfo {
     pub id: OnboardingDecisionId,
+    pub annotation_id: Option<AnnotationId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

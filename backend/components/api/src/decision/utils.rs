@@ -1,7 +1,7 @@
 use db::models::{
     manual_review::ManualReview,
     onboarding::{Onboarding, OnboardingUpdate},
-    onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
+    onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
     risk_signal::RiskSignal,
     verification_request::VerificationRequest,
     verification_result::VerificationResult,
@@ -76,13 +76,14 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
             let result = VerificationResult::create(conn, request.id, raw_response)?;
             // Create the decision itself
-            let new_decision = NewOnboardingDecision {
+            let new_decision = OnboardingDecisionCreateArgs {
                 user_vault_id: uvw.user_vault.id.clone(),
                 onboarding_id: ob_id,
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 tenant_user_id: None,
                 status: decision_status,
                 result_ids: vec![result.id],
+                annotation_id: None,
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 

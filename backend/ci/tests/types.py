@@ -41,7 +41,7 @@ class ObConfiguration(NamedTuple):
 
 
 class Tenant(NamedTuple):
-    ob_configs: dict 
+    ob_configs: dict
     sk: SecretApiKey
     auth_token: DashboardAuth
 

@@ -3,7 +3,7 @@ use newtypes::{DecisionStatus, OnboardingId};
 use db::models::{
     manual_review::ManualReview,
     onboarding::Onboarding,
-    onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
+    onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
 };
 
 use super::features::*;
@@ -29,13 +29,14 @@ pub async fn create_final_decision(
             let decision = final_decision(&features, current_ob)?;
 
             // Create decision
-            let onboarding_decision = NewOnboardingDecision {
+            let onboarding_decision = OnboardingDecisionCreateArgs {
                 user_vault_id: scoped_user.user_vault_id,
                 onboarding_id: ob_id.clone(),
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 tenant_user_id: None,
                 status: decision.decision_status,
                 result_ids: features.verification_results(),
+                annotation_id: None,
             };
             OnboardingDecision::create(conn, onboarding_decision)?;
 

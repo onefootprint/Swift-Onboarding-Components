@@ -39,6 +39,7 @@ pub enum TenantPermission {
     // Similarly to how we store permissions on an OnboardingConfiguration, we denote the set of
     // decryptable fields with CollectedDataOption
     Decrypt { attributes: Vec<CollectedDataOption> },
+    ManualReview,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, PartialEq, Eq, Serialize, Deserialize, AsJsonb, JsonSchema)]

@@ -28,7 +28,7 @@ def ob_configuration(workos_sandbox_tenant, must_collect_data, can_access_data):
     return ObConfiguration.from_response(body)
 
 
-class TestDashboard:
+class TestDashboardOnboardings:
     def test_tenant_decrypt(self, user):
         tenant = user.tenant
         expected_data = dict(
@@ -136,6 +136,60 @@ class TestDashboard:
         body = get("org/access_events", params, tenant.sk.key)
         assert not body["data"]
 
+    def test_portable_failed_data_write(self, user):
+        data = dict(reason="test", fields=["first_name", "ssn9"])
+        body = post(
+            f"users/{user.fp_user_id}/vault/identity/decrypt", data, user.tenant.sk.key
+        )
+        print(body)
+        assert body["first_name"]
+
+        data = {
+            "dob": {
+                "month": 1,
+                "day": 1,
+                "year": 1970,
+            },
+            "ssn9": _gen_random_ssn(),
+        }
+
+        # ensure we cannot change data in a portable vault
+        put(
+            f"users/{user.fp_user_id}/vault/identity",
+            data,
+            user.tenant.sk.key,
+            status_code=401,
+        )
+
+    def test_override_onboarding_decision(self, user):
+        tenant = user.tenant
+
+        # TODO This will get simpler with the onboarding-scoped dashboard
+        scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        onboarding = next(i for i in scoped_user["onboardings"])
+        assert onboarding["status"] == "pass"
+        latest_decision = onboarding["latest_decision"]
+        assert latest_decision["status"] == onboarding["status"]
+        assert latest_decision["source"]["kind"] == "footprint"
+
+        # TODO test annotation when we have more annotation visibility endpoints
+        ob_id = onboarding["id"]
+        decision_data = dict(
+            status="fail",
+        )
+        post(f"onboardings/{ob_id}/decisions", decision_data, tenant.auth_token)
+
+        scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        onboarding = next(i for i in scoped_user["onboardings"])
+        assert onboarding["status"] == "fail"
+        # Assert the latest decision is a manual decision
+        latest_decision = onboarding["latest_decision"]
+        assert latest_decision["status"] == onboarding["status"]
+        assert latest_decision["source"]["kind"] == "organization"
+        assert "@onefootprint.com" in latest_decision["source"]["member"]
+
+
+class TestDashboardObConfigs:
     def test_config_list(self, workos_sandbox_tenant, ob_configuration):
         body = get("org/onboarding_configs", None, workos_sandbox_tenant.sk.key)
         config = next(
@@ -229,6 +283,8 @@ class TestDashboard:
         # Verify we can't use the disabled ob config for anything anymore
         get("org/onboarding_config", None, ob_configuration.key, status_code=401)
 
+
+class TestDashboardApiKeys:
     def test_api_key_check(self, secret_key):
         body = get("org/api_keys/check", None, secret_key.key)
         assert body["id"] == secret_key.id
@@ -276,31 +332,6 @@ class TestDashboard:
             status_code=401,
         )
 
-    def test_portable_failed_data_write(self, user):
-        data = dict(reason="test", fields=["first_name", "ssn9"])
-        body = post(
-            f"users/{user.fp_user_id}/vault/identity/decrypt", data, user.tenant.sk.key
-        )
-        print(body)
-        assert body["first_name"]
-
-        data = {
-            "dob": {
-                "month": 1,
-                "day": 1,
-                "year": 1970,
-            },
-            "ssn9": _gen_random_ssn(),
-        }
-
-        # ensure we cannot change data in a portable vault
-        put(
-            f"users/{user.fp_user_id}/vault/identity",
-            data,
-            user.tenant.sk.key,
-            status_code=401,
-        )
-
 
 @pytest.fixture(scope="session")
 def limited_role(workos_sandbox_tenant):
@@ -336,7 +367,7 @@ def tenant_user(workos_sandbox_tenant, admin_role):
     return body
 
 
-class TestDashboardUsers:
+class TestDashboardAdminUsers:
     def test_update_roles(self, workos_sandbox_tenant, limited_role, admin_role):
         role_id = limited_role["id"]
         patch_data = dict(
