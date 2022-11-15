@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-
+use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_user::ScopedUser;
 use crate::DbError;
@@ -38,7 +37,7 @@ pub struct NewUserTimeline {
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than identifiers
 pub enum SaturatedTimelineEvent {
     DataCollected(newtypes::DataCollectedInfo),
-    OnboardingDecision(SaturatedOnboardingDecisionInfo),
+    OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<Annotation>),
     DocumentUploaded(newtypes::DocumentUploadedInfo), // TODO
     Liveness(LivenessEvent, InsightEvent),
 }
@@ -99,20 +98,18 @@ impl UserTimeline {
             DbUserTimelineEvent::OnboardingDecision(ref e) => Some(&e.id),
             _ => None,
         });
+        let annotation_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::OnboardingDecision(ref e) => e.annotation_id.as_ref(),
+            _ => None,
+        });
         let liveness_event_ids = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::Liveness(ref e) => Some(&e.id),
             _ => None,
         });
 
-        let mut decisions: HashMap<_, _> = OnboardingDecision::get_bulk(conn, decision_ids.collect())?
-            .into_iter()
-            .map(|d| (d.0.id.clone(), d))
-            .collect();
-
-        let mut liveness_events: HashMap<_, _> = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?
-            .into_iter()
-            .map(|c| (c.0.id.clone(), c))
-            .collect();
+        let mut decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
+        let mut annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
+        let mut liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -125,6 +122,10 @@ impl UserTimeline {
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
                         SaturatedTimelineEvent::OnboardingDecision(
                             decisions.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
+                            e.annotation_id
+                                .as_ref()
+                                .map(|a_id| annotations.remove(a_id).ok_or(DbError::RelatedObjectNotFound))
+                                .transpose()?,
                         )
                     }
                     DbUserTimelineEvent::DocumentUploaded(ref e) => {

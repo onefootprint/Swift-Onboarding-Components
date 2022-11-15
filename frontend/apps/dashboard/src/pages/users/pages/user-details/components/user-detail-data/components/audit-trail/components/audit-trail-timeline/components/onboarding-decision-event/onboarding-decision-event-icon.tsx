@@ -12,7 +12,9 @@ type OnboardingDecisionEventIconProps = {
 const OnboardingDecisionEventIcon = ({
   data,
 }: OnboardingDecisionEventIconProps) => {
-  const { status } = data;
+  const {
+    decision: { status },
+  } = data;
 
   if (status === DecisionStatus.pass) {
     return <IcoFootprint16 />;

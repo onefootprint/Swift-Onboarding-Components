@@ -23,14 +23,18 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 Self::Liveness(api_wire_types::LivenessEvent::from_db((l, i)))
             }
             SaturatedTimelineEvent::DocumentUploaded(_) => Self::DocumentUploaded(), // TODO
-            SaturatedTimelineEvent::OnboardingDecision((decision, ob_config, vrs, tenant_user)) => {
-                Self::OnboardingDecision(api_wire_types::OnboardingDecision::from_db((
+            SaturatedTimelineEvent::OnboardingDecision(
+                (decision, ob_config, vrs, tenant_user),
+                annotation,
+            ) => Self::OnboardingDecision {
+                decision: api_wire_types::OnboardingDecision::from_db((
                     decision,
                     Some(ob_config),
                     Some(vrs),
                     tenant_user,
-                )))
-            }
+                )),
+                annotation: annotation.map(api_wire_types::Annotation::from_db),
+            },
         }
     }
 }

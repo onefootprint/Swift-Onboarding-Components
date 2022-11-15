@@ -1,8 +1,8 @@
 use newtypes::CollectedDataOption;
 
 use crate::{
-    export_schema, Apiv2Schema, DateTime, Deserialize, JsonSchema, LivenessEvent, OnboardingDecision,
-    Serialize, Utc,
+    export_schema, Annotation, Apiv2Schema, DateTime, Deserialize, JsonSchema, LivenessEvent,
+    OnboardingDecision, Serialize, Utc,
 };
 
 /// Describes a liveness event that took place
@@ -24,7 +24,10 @@ pub enum UserTimelineEvent {
     DataCollected(DataCollectedInfo),
     Liveness(LivenessEvent),
     DocumentUploaded(), // TODO
-    OnboardingDecision(OnboardingDecision),
+    OnboardingDecision {
+        decision: OnboardingDecision,
+        annotation: Option<Annotation>,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

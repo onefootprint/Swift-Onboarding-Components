@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{schema::annotation, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -46,5 +48,19 @@ impl Annotation {
             .values(new)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    pub fn get_bulk(
+        conn: &mut PgConnection,
+        ids: Vec<&AnnotationId>,
+    ) -> DbResult<HashMap<AnnotationId, Self>> {
+        let results = annotation::table
+            .filter(annotation::id.eq_any(ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|a| (a.id.clone(), a))
+            .collect();
+
+        Ok(results)
     }
 }

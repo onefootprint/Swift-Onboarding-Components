@@ -1,3 +1,4 @@
+import { Annotation } from './annotation';
 import { CollectedKycDataOption } from './collected-kyc-data-option';
 import IdDocType from './id-doc-type';
 import { InsightEvent } from './insight-event';
@@ -46,7 +47,10 @@ export type OnboardingDecisionEvent = {
   data: OnboardingDecisionEventData;
 };
 
-export type OnboardingDecisionEventData = OnboardingDecision;
+export type OnboardingDecisionEventData = {
+  decision: OnboardingDecision;
+  annotation?: Annotation;
+};
 
 export type TimelineEvent = {
   event:

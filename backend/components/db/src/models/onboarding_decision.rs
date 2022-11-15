@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::models::verification_request::VerificationRequest;
 use crate::TxnPgConnection;
 use crate::{
@@ -125,7 +127,7 @@ impl OnboardingDecision {
     pub fn get_bulk(
         conn: &mut PgConnection,
         ids: Vec<&OnboardingDecisionId>,
-    ) -> DbResult<Vec<SaturatedOnboardingDecisionInfo>> {
+    ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
         use crate::schema::{
             ob_configuration, onboarding, tenant_user, verification_request, verification_result,
         };
@@ -162,6 +164,7 @@ impl OnboardingDecision {
                     tenant_user,
                 )
             })
+            .map(|d| (d.0.id.clone(), d))
             .collect();
 
         Ok(results)

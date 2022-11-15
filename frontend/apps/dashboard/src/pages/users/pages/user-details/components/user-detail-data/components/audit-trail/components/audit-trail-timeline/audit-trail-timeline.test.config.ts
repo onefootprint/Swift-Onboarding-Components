@@ -59,24 +59,26 @@ const TimelineFixture: Timeline = [
     event: {
       kind: TimelineEventKind.onboardingDecision,
       data: {
-        id: 'decision_mxioMGjVUQJhbemA20OFi3',
-        status: DecisionStatus.pass,
-        timestamp: new Date('2022-11-08T20:21:53.750904Z'),
-        source: {
-          kind: DecisionSourceKind.footprint,
+        decision: {
+          id: 'decision_mxioMGjVUQJhbemA20OFi3',
+          status: DecisionStatus.pass,
+          timestamp: new Date('2022-11-08T20:21:53.750904Z'),
+          source: {
+            kind: DecisionSourceKind.footprint,
+          },
+          obConfiguration: {
+            mustCollectData: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+              CollectedKycDataOption.fullAddress,
+              CollectedKycDataOption.email,
+              CollectedKycDataOption.phoneNumber,
+            ],
+            mustCollectIdentityDocument: false,
+          },
+          vendors: [Vendor.idology],
         },
-        obConfiguration: {
-          mustCollectData: [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.dob,
-            CollectedKycDataOption.ssn9,
-            CollectedKycDataOption.fullAddress,
-            CollectedKycDataOption.email,
-            CollectedKycDataOption.phoneNumber,
-          ],
-          mustCollectIdentityDocument: false,
-        },
-        vendors: [Vendor.idology],
       },
     },
     timestamp: '2022-11-08T20:21:53.752388Z',
@@ -85,24 +87,26 @@ const TimelineFixture: Timeline = [
     event: {
       kind: TimelineEventKind.onboardingDecision,
       data: {
-        id: 'decision_kaI2ycxFAND4MpzdsYw64I',
-        status: DecisionStatus.stepUpRequired,
-        timestamp: new Date('2022-11-08T20:21:53.769699Z'),
-        source: {
-          kind: DecisionSourceKind.footprint,
+        decision: {
+          id: 'decision_kaI2ycxFAND4MpzdsYw64I',
+          status: DecisionStatus.stepUpRequired,
+          timestamp: new Date('2022-11-08T20:21:53.769699Z'),
+          source: {
+            kind: DecisionSourceKind.footprint,
+          },
+          obConfiguration: {
+            mustCollectData: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+              CollectedKycDataOption.fullAddress,
+              CollectedKycDataOption.email,
+              CollectedKycDataOption.phoneNumber,
+            ],
+            mustCollectIdentityDocument: false,
+          },
+          vendors: [Vendor.idology],
         },
-        obConfiguration: {
-          mustCollectData: [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.dob,
-            CollectedKycDataOption.ssn9,
-            CollectedKycDataOption.fullAddress,
-            CollectedKycDataOption.email,
-            CollectedKycDataOption.phoneNumber,
-          ],
-          mustCollectIdentityDocument: false,
-        },
-        vendors: [Vendor.idology],
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',

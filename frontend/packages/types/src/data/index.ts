@@ -1,5 +1,6 @@
 export * from './access-event';
 export * from './access-log';
+export * from './annotation';
 export * from './api-key';
 export * from './authorized-org';
 export * from './biometric-login-challenge-json';

@@ -22,10 +22,12 @@ const OnboardingDecisionEventBody = ({
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
   const {
-    source,
-    vendors,
-    status,
-    obConfiguration: { mustCollectData, mustCollectIdentityDocument },
+    decision: {
+      source,
+      vendors,
+      status,
+      obConfiguration: { mustCollectData, mustCollectIdentityDocument },
+    },
   } = data;
   const statusStr = t(`decision-status.${status}`);
 

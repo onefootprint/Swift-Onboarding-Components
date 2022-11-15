@@ -373,13 +373,6 @@
             "not-verified-by-footprint": "Could not be verified by Footprint",
             "verified": "Verified",
             "not-verified": "Not Verified",
-            "verification-status": {
-              "information_required": "Step up with additional information required",
-              "failed": "Failed",
-              "manual_review": "Manual review required",
-              "verified": "Verified ",
-              "needs_id_document": "Step up with ID document required"
-            },
             "decision-status": {
               "pass": "Verified",
               "fail": "Failed",

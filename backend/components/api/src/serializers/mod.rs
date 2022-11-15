@@ -1,4 +1,5 @@
 mod access_event;
+mod annotation;
 mod insight_event;
 mod liveness_event;
 mod onboarding;

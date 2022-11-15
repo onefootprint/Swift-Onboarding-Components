@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::schema;
 
 use crate::schema::liveness_event;
@@ -88,11 +90,14 @@ impl LivenessEvent {
     pub fn get_bulk(
         conn: &mut PgConnection,
         ids: Vec<&LivenessEventId>,
-    ) -> DbResult<Vec<(Self, InsightEvent)>> {
+    ) -> DbResult<HashMap<LivenessEventId, (Self, InsightEvent)>> {
         let results = liveness_event::table
             .inner_join(schema::insight_event::table)
             .filter(liveness_event::id.eq_any(ids))
-            .get_results::<(Self, InsightEvent)>(conn)?;
+            .get_results::<(Self, InsightEvent)>(conn)?
+            .into_iter()
+            .map(|e| (e.0.id.clone(), e))
+            .collect();
 
         Ok(results)
     }

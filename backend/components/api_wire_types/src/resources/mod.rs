@@ -39,3 +39,6 @@ pub use self::org_role::*;
 
 pub mod user_timeline;
 pub use self::user_timeline::*;
+
+pub mod annotation;
+pub use self::annotation::*;

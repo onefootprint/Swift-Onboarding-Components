@@ -20,7 +20,9 @@ const OnboardingDecisionEventHeader = ({
   const { t } = useTranslation(
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
-  const { source, status } = data;
+  const {
+    decision: { source, status },
+  } = data;
   const isVerified = status === DecisionStatus.pass;
   const color = isVerified ? 'success' : 'error';
 
@@ -44,16 +46,12 @@ const OnboardingDecisionEventHeader = ({
     return (
       <OrgDecisionContainer data-test-id="onboarding-decision-event-header">
         <Typography variant="label-3" color={color}>
-          {t('org-overwrite.title', { decision, user: source.member.email })}
+          {t('org-overwrite.title', { decision, user: source.member })}
         </Typography>
         <Typography variant="label-3" sx={{ marginLeft: 2, marginRight: 2 }}>
           •
         </Typography>
-        <OrgOverwriteDetails
-          source={source}
-          timestamp={data.timestamp}
-          status={status}
-        />
+        <OrgOverwriteDetails data={data} source={source} />
       </OrgDecisionContainer>
     );
   }

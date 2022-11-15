@@ -2,27 +2,27 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   DecisionSourceOrganization,
   DecisionStatus,
+  OnboardingDecisionEventData,
 } from '@onefootprint/types';
 import { Drawer, LinkButton, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 type OrgOverwriteDetailsProps = {
-  status: DecisionStatus;
-  timestamp: Date;
+  data: OnboardingDecisionEventData;
   source: DecisionSourceOrganization;
 };
 
-const OrgOverwriteDetails = ({
-  status,
-  timestamp,
-  source,
-}: OrgOverwriteDetailsProps) => {
+const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
   const { t } = useTranslation(
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
+  const {
+    decision: { timestamp, status },
+  } = data;
+  const { note, isPinned } = data.annotation!;
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [isNotePinned, setIsNotePinned] = useState(source.notePinned);
+  const [isNotePinned, setIsNotePinned] = useState(isPinned);
   const handlePinNoteChange = () => {
     // TODO: https://linear.app/footprint/issue/FP-1814/make-an-api-call-to-pin-manual-overwrite-note
     setIsNotePinned(!isNotePinned);
@@ -60,7 +60,7 @@ const OrgOverwriteDetails = ({
             <Typography variant="label-3" color="tertiary">
               {t('org-overwrite.drawer.reviewer')}
             </Typography>
-            <Typography variant="body-3">{source.member.email}</Typography>
+            <Typography variant="body-3">{source.member}</Typography>
           </ItemContainer>
           <ItemContainer>
             <Typography variant="label-3" color="tertiary">
@@ -76,12 +76,6 @@ const OrgOverwriteDetails = ({
               })}
             </Typography>
           </ItemContainer>
-          <ItemContainer>
-            <Typography variant="label-3" color="tertiary">
-              {t('org-overwrite.drawer.reason')}
-            </Typography>
-            <Typography variant="body-3">{source.reason}</Typography>
-          </ItemContainer>
         </GridContainer>
         <NoteContainer>
           <Typography
@@ -92,7 +86,7 @@ const OrgOverwriteDetails = ({
             {t('org-overwrite.drawer.note')}
           </Typography>
           <Typography variant="body-3" sx={{ marginBottom: 6 }}>
-            {source.note}
+            {note}
           </Typography>
           <Toggle
             checked={isNotePinned}

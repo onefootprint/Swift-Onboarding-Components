@@ -13,12 +13,7 @@ export type DecisionSourceFootprint = {
 
 export type DecisionSourceOrganization = {
   kind: DecisionSourceKind.organization;
-  member: {
-    email: string;
-  };
-  reason: string;
-  note: string;
-  notePinned: boolean;
+  member: string;
 };
 
 export type DecisionSource =
