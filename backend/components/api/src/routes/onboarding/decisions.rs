@@ -15,7 +15,7 @@ use newtypes::{OnboardingId, TenantPermission};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Creates a new manual decision for an onboarding, overriding any previous decision.",
+    description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
     tags(Users)
 )]
 #[post("/onboardings/{id}/decisions")]
@@ -33,31 +33,54 @@ pub async fn post(
         .id
         .clone();
     let is_live = auth.is_live()?;
+    let onboarding_id = onboarding_id.into_inner();
 
-    let DecisionRequest { annotation, status } = request.into_inner();
+    let DecisionRequest {
+        annotation: CreateAnnotationRequest { note, is_pinned },
+        status,
+    } = request.into_inner();
 
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (ob, su, _, _) = Onboarding::get(conn, (&onboarding_id.into_inner(), &tenant_id, is_live))?;
-            let annotation = if let Some(annotation) = annotation {
-                let CreateAnnotationRequest { note, is_pinned } = annotation;
-                let annotation =
-                    Annotation::create(conn, note, is_pinned, su.id, Some(tenant_user_id.clone()))?;
-                Some(annotation)
+            let (ob, su, manual_review, decision) =
+                Onboarding::lock_for_tenant(conn, &onboarding_id, &tenant_id, is_live)?;
+
+            let need_to_clear_manual_review = manual_review.is_some();
+            // The status changed if either there is no current decision OR the status of the existing decision is different
+            let status_changed = decision.map(|d| d.status != status.into()).unwrap_or(true);
+
+            if !need_to_clear_manual_review && !status_changed {
+                // The operation is a no-op
+                return Ok(());
+            }
+            // If a manual review will be cleared or we will create a new decision, the operation
+            // is not a no-op and we should create an annotation in the DB
+            let annotation = Annotation::create(conn, note, is_pinned, su.id, Some(tenant_user_id.clone()))?;
+
+            let decision = if status_changed {
+                // Create a new decision if the status is different
+                let new_decision = OnboardingDecisionCreateArgs {
+                    user_vault_id: su.user_vault_id,
+                    onboarding_id: ob.id,
+                    logic_git_hash: crate::GIT_HASH.to_string(),
+                    tenant_user_id: Some(tenant_user_id.clone()),
+                    result_ids: vec![],
+                    status: status.into(),
+                    annotation_id: Some(annotation.id),
+                };
+                let decision = OnboardingDecision::create(conn, new_decision)?;
+                Some(decision)
             } else {
+                // TODO should create some kind of UserTimeline event here since we are clearing a manual review
                 None
             };
-            let new_decision = OnboardingDecisionCreateArgs {
-                user_vault_id: su.user_vault_id,
-                onboarding_id: ob.id,
-                logic_git_hash: crate::GIT_HASH.to_string(),
-                tenant_user_id: Some(tenant_user_id),
-                result_ids: vec![],
-                status: status.into(),
-                annotation_id: annotation.map(|a| a.id),
-            };
-            OnboardingDecision::create(conn, new_decision)?;
+
+            // If there is an outstanding review, creating this override decision clears it
+            if let Some(manual_review) = manual_review {
+                manual_review.complete(conn, tenant_user_id, decision.map(|d| d.id))?;
+            }
+
             Ok(())
         })
         .await?;

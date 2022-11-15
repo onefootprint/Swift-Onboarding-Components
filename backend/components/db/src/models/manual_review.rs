@@ -1,4 +1,5 @@
 use crate::{schema::manual_review, DbResult};
+use crate::{DbError, TxnPgConnection};
 
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -29,6 +30,14 @@ struct NewManualReview {
     onboarding_id: OnboardingId,
 }
 
+#[derive(Debug, AsChangeset, Default)]
+#[diesel(table_name = manual_review)]
+struct ManualReviewUpdate {
+    completed_at: Option<Option<DateTime<Utc>>>,
+    completed_by_decision_id: Option<Option<OnboardingDecisionId>>,
+    completed_by_tenant_user_id: Option<Option<TenantUserId>>,
+}
+
 impl ManualReview {
     pub fn create(conn: &mut PgConnection, onboarding_id: OnboardingId) -> DbResult<Self> {
         // NOTE: We have a uniqueness constraint that won't allow us to create multiple active
@@ -41,5 +50,28 @@ impl ManualReview {
             .values(new)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    /// Used to mark the manual review as complete
+    pub fn complete(
+        self,
+        conn: &mut TxnPgConnection,
+        tenant_user_id: TenantUserId,
+        decision_id: Option<OnboardingDecisionId>,
+    ) -> DbResult<()> {
+        let update = ManualReviewUpdate {
+            completed_at: Some(Some(Utc::now())),
+            completed_by_decision_id: Some(decision_id),
+            completed_by_tenant_user_id: Some(Some(tenant_user_id)),
+        };
+        let results = diesel::update(manual_review::table)
+            .filter(manual_review::id.eq(self.id))
+            .filter(manual_review::completed_at.is_null())
+            .set(update)
+            .get_results::<Self>(conn.conn())?;
+        if results.len() != 1 {
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
+        }
+        Ok(())
     }
 }

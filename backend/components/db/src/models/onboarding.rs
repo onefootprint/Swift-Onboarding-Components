@@ -195,6 +195,17 @@ impl Onboarding {
         Ok(result)
     }
 
+    pub fn lock_for_tenant(
+        conn: &mut TxnPgConnection,
+        id: &OnboardingId,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> DbResult<BasicOnboardingInfo> {
+        Self::lock(conn, id)?;
+        // It's a bit precarious to make a FOR UPDATE statement with joins
+        Self::get(conn, (id, tenant_id, is_live))
+    }
+
     pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> DbResult<Self> {
         let result = onboarding::table
             .filter(onboarding::id.eq(id))
