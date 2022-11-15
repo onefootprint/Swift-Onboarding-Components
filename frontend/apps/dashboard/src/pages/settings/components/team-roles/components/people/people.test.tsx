@@ -38,7 +38,7 @@ describe('<People />', () => {
     });
 
     describe('when typing on the table search', () => {
-      it('should append role to query', async () => {
+      it('should append email to query', async () => {
         const pushMockFn = jest.fn();
         useRouterSpy({
           pathname: '/settings',
@@ -53,7 +53,7 @@ describe('<People />', () => {
           expect(pushMockFn).toHaveBeenCalledWith(
             {
               query: {
-                roles: 'lorem',
+                emails: 'lorem',
               },
             },
             undefined,

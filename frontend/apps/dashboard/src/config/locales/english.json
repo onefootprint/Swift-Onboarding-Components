@@ -605,9 +605,9 @@
           "table": {
             "aria-label": "Table of organization members",
             "header": {
-              "role": "Role",
-              "created": "Created",
-              "permissions": "Permissions"
+              "email": "Email",
+              "lastActive": "Last Active",
+              "role": "Role"
             },
             "empty-state": "No members found"
           },

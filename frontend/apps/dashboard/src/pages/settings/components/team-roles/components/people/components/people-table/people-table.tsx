@@ -20,9 +20,9 @@ const PeopleTable = ({
 }: PeopleTableProps) => {
   const { t } = useTranslation('pages.settings.team-roles.people');
   const columns = [
-    { id: 'role', text: t('table.header.role'), width: '25%' },
-    { id: 'created', text: t('table.header.created'), width: '15%' },
-    { id: 'permissions', text: t('table.header.permissions'), width: '50%' },
+    { id: 'email', text: t('table.header.email'), width: '25%' },
+    { id: 'lastActive', text: t('table.header.lastActive'), width: '15%' },
+    { id: 'role', text: t('table.header.role'), width: '50%' },
   ];
 
   return (

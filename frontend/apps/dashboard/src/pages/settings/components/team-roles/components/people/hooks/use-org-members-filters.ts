@@ -1,7 +1,7 @@
 import useFilters, { countString, stringToArray } from 'src/hooks/use-filters';
 
 export type OrgMembersFilters = {
-  permissions?: string;
+  emails?: string;
   roles?: string;
   dateRange?: string;
 };
@@ -19,10 +19,8 @@ const useOrgMembersFilters = () => {
   const { query, push } = useFilters<OrgMembersQueryString>({});
 
   const getFiltersCount = () => {
-    const { dateRange, permissions, roles } = query;
-    return (
-      countString(dateRange) + countString(permissions) + countString(roles)
-    );
+    const { dateRange, emails, roles } = query;
+    return countString(dateRange) + countString(emails) + countString(roles);
   };
 
   const setCursors = (cursors: string[]) => {

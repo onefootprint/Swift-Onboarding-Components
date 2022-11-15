@@ -45,15 +45,15 @@ const getOrgMembersRequest = async ({
 
 const useGetOrgMembers = (pageSize: number) => {
   const { authHeaders } = useSessionUser();
-  const { formatDateWithTime } = useIntl();
+  const { formatRelativeDate } = useIntl();
   const { filters } = useOrgMembersFilters();
 
   const query: Record<string, any> = {};
   if (filters.roles) {
     query.roles = filters.roles;
   }
-  if (filters.permissions) {
-    query.permissions = filters.permissions;
+  if (filters.emails) {
+    query.emails = filters.emails;
   }
   if (filters.dateRange) {
     query.dateRange = filters.dateRange;
@@ -68,7 +68,9 @@ const useGetOrgMembers = (pageSize: number) => {
         ...response,
         data: response.data.map((member: OrgMember) => ({
           ...member,
-          createdAt: formatDateWithTime(new Date(member.createdAt)),
+          lastLoginAt: member.lastLoginAt
+            ? formatRelativeDate(new Date(member.lastLoginAt))
+            : null,
         })),
       }),
     },

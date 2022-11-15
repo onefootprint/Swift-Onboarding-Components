@@ -38,7 +38,7 @@ const People = () => {
       <PeopleTable
         members={members}
         isLoading={isLoading}
-        onFilter={roles => setFilter({ roles })}
+        onFilter={emails => setFilter({ emails })}
         renderActions={renderTableActions}
       />
       {totalNumResults > 0 && (

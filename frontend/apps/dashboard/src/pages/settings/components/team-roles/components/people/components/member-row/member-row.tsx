@@ -6,18 +6,17 @@ type MemberRowProps = {
   member: OrgMember;
 };
 
+// TODO: https://linear.app/footprint/issue/FP-1877/add-dropdown-to-member-row-to-change-role-only-if-logged-in-user-is
 const MemberRow = ({ member }: MemberRowProps) => (
-  // TODO: https://linear.app/footprint/issue/FP-1747/translate-role-id-in-people-table-to-a-list-of-permissions
-  // TODO: https://linear.app/footprint/issue/FP-1748/add-tests-for-people-table-when-roleid-permissions-mapping-is
   <>
     <td>
+      <Typography variant="body-3">{member.email}</Typography>
+    </td>
+    <td>
+      <Typography variant="body-3">{member.lastLoginAt ?? '-'}</Typography>
+    </td>
+    <td>
       <Typography variant="body-3">{member.roleName}</Typography>
-    </td>
-    <td>
-      <Typography variant="body-3">{member.createdAt}</Typography>
-    </td>
-    <td>
-      <Typography variant="body-3">{member.roleId}</Typography>
     </td>
   </>
 );

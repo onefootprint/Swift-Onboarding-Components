@@ -48,18 +48,18 @@ describe('<PeopleTable />', () => {
       const row1 = screen.getByTestId('orguser_0WFrWMZwP0C65s21w9lBBy');
       expect(row1).toBeInTheDocument();
       expect(within(row1).getByText('Admin')).toBeInTheDocument();
-      expect(within(row1).getByText('11/3/22, 11:45 AM')).toBeInTheDocument();
+      expect(within(row1).getByText('1 month ago')).toBeInTheDocument();
 
       const row2 = screen.getByTestId('orguser_034lwekfnwefwo3rBy');
       expect(row2).toBeInTheDocument();
-      expect(within(row1).getByText('Admin')).toBeInTheDocument();
-      expect(within(row1).getByText('11/3/22, 11:45 AM')).toBeInTheDocument();
+      expect(within(row2).getByText('Admin')).toBeInTheDocument();
+      expect(within(row2).getByText('2 days ago')).toBeInTheDocument();
     });
   });
 
   describe('when filtering', () => {
     describe('when typing on the table search', () => {
-      it('should call onFilter with role', async () => {
+      it('should call onFilter with emails', async () => {
         const filterMockFn = jest.fn();
 
         renderPeopleTable(OrgMembersFixture, false, filterMockFn);

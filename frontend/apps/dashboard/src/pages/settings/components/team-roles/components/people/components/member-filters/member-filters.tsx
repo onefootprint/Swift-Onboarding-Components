@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { DateRange, OrgRolePermissionKind } from '@onefootprint/types';
+import { DateRange } from '@onefootprint/types';
 import { Box, Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { getDateRange } from 'src/utils/date-range';
@@ -39,7 +39,7 @@ const MemberFilters = ({ renderCta }: MemberFiltersProps) => {
     setFilter({
       dateRange: formData.dateRange,
       roles: formData.roles.toString(),
-      permissions: formData.permissions.toString(),
+      emails: formData.emails.toString(),
     });
     handleClose();
   };
@@ -71,8 +71,7 @@ const MemberFilters = ({ renderCta }: MemberFiltersProps) => {
             },
             dateRange: (dateRange as DateRange) || DateRange.allTime,
             roles: filters.roles?.split(',') ?? [],
-            permissions: (filters.permissions?.split(',') ??
-              []) as OrgRolePermissionKind[],
+            emails: filters.emails?.split(',') ?? [],
           }}
         />
       </Dialog>
