@@ -1,5 +1,6 @@
 use paperclip::actix::web;
 
+pub mod annotations;
 pub mod index;
 pub mod liveness;
 pub mod risk_signals;
@@ -11,6 +12,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(index::get)
         .service(index::get_detail)
         .service(index::post)
+        .service(annotations::get)
         .service(liveness::get)
         .service(timeline::get)
         .service(risk_signals::get)

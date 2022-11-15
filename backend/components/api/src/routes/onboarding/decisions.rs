@@ -5,7 +5,7 @@ use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::State;
-use api_wire_types::AnnotationRequest;
+use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
 use db::models::annotation::Annotation;
 use db::models::onboarding::Onboarding;
@@ -45,7 +45,7 @@ pub async fn post(
             };
             let (ob, su, _, _) = Onboarding::get(conn, identifier)?;
             let annotation = if let Some(annotation) = annotation {
-                let AnnotationRequest { note, is_pinned } = annotation;
+                let CreateAnnotationRequest { note, is_pinned } = annotation;
                 let annotation =
                     Annotation::create(conn, note, is_pinned, su.id, Some(tenant_user_id.clone()))?;
                 Some(annotation)

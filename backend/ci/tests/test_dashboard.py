@@ -172,9 +172,10 @@ class TestDashboardOnboardings:
         assert latest_decision["status"] == onboarding["status"]
         assert latest_decision["source"]["kind"] == "footprint"
 
-        # TODO test annotation when we have more annotation visibility endpoints
         ob_id = onboarding["id"]
+        test_note = "This is a test note. Flerp derp"
         decision_data = dict(
+            annotation=dict(note=test_note, is_pinned=True),
             status="fail",
         )
         post(f"onboardings/{ob_id}/decisions", decision_data, tenant.auth_token)
@@ -187,6 +188,17 @@ class TestDashboardOnboardings:
         assert latest_decision["status"] == onboarding["status"]
         assert latest_decision["source"]["kind"] == "organization"
         assert "@onefootprint.com" in latest_decision["source"]["member"]
+
+        # Assert that the annotation is pinned
+        pinned_annotations = get(
+            f"users/{user.fp_user_id}/annotations",
+            dict(is_pinned="true"),
+            tenant.sk.key,
+        )
+        annotation = pinned_annotations[0]
+        assert annotation["is_pinned"]
+        assert annotation["note"] == test_note
+        # TODO actor
 
 
 class TestDashboardObConfigs:

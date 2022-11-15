@@ -3,7 +3,7 @@ use crate::*;
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct DecisionRequest {
-    pub annotation: Option<AnnotationRequest>,
+    pub annotation: Option<CreateAnnotationRequest>,
     pub status: TerminalDecisionStatus,
 }
 

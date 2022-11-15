@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{schema::annotation, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AnnotationId, ScopedUserId, TenantUserId};
+use newtypes::{AnnotationId, FootprintUserId, ScopedUserId, TenantId, TenantUserId};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = annotation)]
@@ -60,6 +60,29 @@ impl Annotation {
             .into_iter()
             .map(|a| (a.id.clone(), a))
             .collect();
+
+        Ok(results)
+    }
+
+    pub fn list(
+        conn: &mut PgConnection,
+        fp_user_id: FootprintUserId,
+        tenant_id: TenantId,
+        is_live: bool,
+        is_pinned: Option<bool>,
+    ) -> DbResult<Vec<Self>> {
+        use crate::schema::scoped_user;
+        let mut query = annotation::table
+            .inner_join(scoped_user::table)
+            .filter(scoped_user::fp_user_id.eq(fp_user_id))
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(is_live))
+            .select(annotation::all_columns)
+            .into_boxed();
+        if let Some(is_pinned) = is_pinned {
+            query = query.filter(annotation::is_pinned.eq(is_pinned));
+        }
+        let results = query.get_results::<Self>(conn)?;
 
         Ok(results)
     }
