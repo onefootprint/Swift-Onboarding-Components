@@ -1,8 +1,8 @@
 class BaseAuth:
     HEADER_NAME: str = None
 
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, value):
+        self.value = value
         assert self.HEADER_NAME, "Auth class doesn't have HEADER_NAME set"
 
 
@@ -28,3 +28,11 @@ class CustodianAuth(BaseAuth):
 
 class DashboardAuth(BaseAuth):
     HEADER_NAME = "x-fp-dashboard-authorization"
+
+
+class DashboardAuthIsLive(BaseAuth):
+    """
+    Allows specifying whether a request made with the DashboardAuth should be for live or sandbox data
+    """
+
+    HEADER_NAME = "x-is-live"

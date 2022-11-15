@@ -29,7 +29,7 @@ class IncorrectServerVersion(Exception):
 
 
 def _make_request(method, path, data, params, status_code, auths):
-    headers = {auth.HEADER_NAME: auth.token for auth in auths}
+    headers = {auth.HEADER_NAME: auth.value for auth in auths}
     response = method(
         url(path),
         headers=headers,
@@ -167,6 +167,7 @@ def create_basic_user(twilio, suffix=None):
         real_phone_number=phone_number,
     )
 
+
 def create_inherited_non_sandbox_user(twilio):
     identifier = {"email": EMAIL}
     data = dict(
@@ -192,6 +193,7 @@ def create_inherited_non_sandbox_user(twilio):
         5,
     )
 
+
 def create_tenant(org_data, ob_conf_data, ob_conf_name="default"):
     body = post("private/tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])
@@ -207,6 +209,7 @@ def create_tenant(org_data, ob_conf_data, ob_conf_name="default"):
 
     return tenant
 
+
 def create_ob_config_for_tenant(tenant, ob_conf_data, ob_conf_name="default"):
     body = post("org/onboarding_configs", ob_conf_data, tenant.sk.key)
     ob_config = ObConfiguration.from_response(body)
@@ -216,6 +219,7 @@ def create_ob_config_for_tenant(tenant, ob_conf_data, ob_conf_name="default"):
     tenant.ob_configs[ob_conf_name] = ob_config
 
     return tenant
+
 
 def build_user_data():
     ssn = _gen_random_ssn()
@@ -255,9 +259,10 @@ def clean_up_user(phone_number, email):
     assert not body["user_found"]
     assert not body.get("challenge_data", dict())
 
+
 def get_requirement_from_requirements(kind, requirements):
     f = lambda kind, requirements: next(r for r in requirements if r["kind"] == kind)
-    try: 
+    try:
         return f(kind, requirements)
     except StopIteration:
         return None

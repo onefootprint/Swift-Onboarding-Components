@@ -199,6 +199,6 @@ class TestApiFormats:
     def test_basic_auth(self, workos_sandbox_tenant):
         response = requests.get(
             url("org/api_keys/check"),
-            auth=HTTPBasicAuth(workos_sandbox_tenant.sk.key.token, ""),
+            auth=HTTPBasicAuth(workos_sandbox_tenant.sk.key.value, ""),
         )
         assert response.status_code == 200

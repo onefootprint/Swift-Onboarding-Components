@@ -70,6 +70,7 @@ pub enum OnboardingIdentifier<'a> {
     TenantId {
         id: &'a OnboardingId,
         tenant_id: &'a TenantId,
+        is_live: bool,
     },
     UserId {
         id: &'a OnboardingId,
@@ -87,9 +88,13 @@ impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a OnboardingId, &'a TenantId)> for OnboardingIdentifier<'a> {
-    fn from((id, tenant_id): (&'a OnboardingId, &'a TenantId)) -> Self {
-        Self::TenantId { id, tenant_id }
+impl<'a> From<(&'a OnboardingId, &'a TenantId, bool)> for OnboardingIdentifier<'a> {
+    fn from((id, tenant_id, is_live): (&'a OnboardingId, &'a TenantId, bool)) -> Self {
+        Self::TenantId {
+            id,
+            tenant_id,
+            is_live,
+        }
     }
 }
 
@@ -143,10 +148,15 @@ impl Onboarding {
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::TenantId { id, tenant_id } => {
+            OnboardingIdentifier::TenantId {
+                id,
+                tenant_id,
+                is_live,
+            } => {
                 query = query
                     .filter(onboarding::id.eq(id))
                     .filter(scoped_user::tenant_id.eq(tenant_id))
+                    .filter(scoped_user::is_live.eq(is_live))
             }
             OnboardingIdentifier::UserId { id, user_vault_id } => {
                 query = query

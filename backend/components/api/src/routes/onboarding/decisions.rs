@@ -9,7 +9,6 @@ use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
 use db::models::annotation::Annotation;
 use db::models::onboarding::Onboarding;
-use db::models::onboarding::OnboardingIdentifier;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use newtypes::{OnboardingId, TenantPermission};
@@ -33,17 +32,14 @@ pub async fn post(
         .ok_or(TenantError::TenantUserDoesNotExist)?
         .id
         .clone();
+    let is_live = auth.is_live()?;
 
     let DecisionRequest { annotation, status } = request.into_inner();
 
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let identifier = OnboardingIdentifier::TenantId {
-                id: &onboarding_id.into_inner(),
-                tenant_id: &tenant_id,
-            };
-            let (ob, su, _, _) = Onboarding::get(conn, identifier)?;
+            let (ob, su, _, _) = Onboarding::get(conn, (&onboarding_id.into_inner(), &tenant_id, is_live))?;
             let annotation = if let Some(annotation) = annotation {
                 let CreateAnnotationRequest { note, is_pinned } = annotation;
                 let annotation =

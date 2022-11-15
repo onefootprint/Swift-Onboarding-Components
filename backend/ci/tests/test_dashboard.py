@@ -7,6 +7,7 @@ from tests.utils import get, put, post, patch, _gen_random_ssn
 from tests.types import SecretApiKey, ObConfiguration
 from .auth import (
     PublishableOnboardingKey,
+    DashboardAuthIsLive,
 )
 
 
@@ -178,7 +179,12 @@ class TestDashboardOnboardings:
             annotation=dict(note=test_note, is_pinned=True),
             status="fail",
         )
-        post(f"onboardings/{ob_id}/decisions", decision_data, tenant.auth_token)
+        post(
+            f"onboardings/{ob_id}/decisions",
+            decision_data,
+            tenant.auth_token,
+            DashboardAuthIsLive("false"),
+        )
 
         scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
         onboarding = next(i for i in scoped_user["onboardings"])
@@ -207,7 +213,7 @@ class TestDashboardObConfigs:
         config = next(
             config for config in body["data"] if config["id"] == ob_configuration.id
         )
-        assert config["key"] == ob_configuration.key.token
+        assert config["key"] == ob_configuration.key.value
         assert config["name"] == ob_configuration.name
         assert config["must_collect_data"] == ob_configuration.must_collect_data
         assert config["can_access_data"] == ob_configuration.can_access_data
@@ -313,7 +319,7 @@ class TestDashboardApiKeys:
     def test_api_key_reveal(self, secret_key):
         body = get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
         key = body
-        assert key["key"] == secret_key.key.token
+        assert key["key"] == secret_key.key.value
         assert key["status"] == "enabled"
         assert key["name"] == "Test secret key"
 
