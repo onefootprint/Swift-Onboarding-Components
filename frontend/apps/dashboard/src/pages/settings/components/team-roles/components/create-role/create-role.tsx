@@ -33,7 +33,9 @@ const CreateRole = ({ open, onClose }: CreateRoleProps) => {
       })
       .map(entry => {
         const permissionName = entry[0];
-        return permissionName;
+        return {
+          kind: permissionName,
+        };
       }) as OrgRolePermission[];
 
     orgRoleMutation.mutate(

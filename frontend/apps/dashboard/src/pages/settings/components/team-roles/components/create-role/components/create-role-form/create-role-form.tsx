@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgRolePermission } from '@onefootprint/types';
+import { OrgRolePermissionKind } from '@onefootprint/types';
 import {
   createFontStyles,
   SXStyleProps,
@@ -13,26 +13,26 @@ import styled from 'styled-components';
 
 export type CreateRoleFormData = {
   name: string;
-  [OrgRolePermission.admin]: boolean;
-  [OrgRolePermission.onboardingConfiguration]: boolean;
-  [OrgRolePermission.apiKeys]: boolean;
-  [OrgRolePermission.orgSettings]: boolean;
-  [OrgRolePermission.securityLogs]: boolean;
-  [OrgRolePermission.users]: boolean;
-  [OrgRolePermission.decryptCustom]: boolean;
-  [OrgRolePermission.decrypt]: boolean; // TODO: https://linear.app/footprint/issue/FP-1717/enable-user-to-select-specific-attributes-to-decrypt-while-creating-a
+  [OrgRolePermissionKind.admin]: boolean;
+  [OrgRolePermissionKind.onboardingConfiguration]: boolean;
+  [OrgRolePermissionKind.apiKeys]: boolean;
+  [OrgRolePermissionKind.orgSettings]: boolean;
+  [OrgRolePermissionKind.securityLogs]: boolean;
+  [OrgRolePermissionKind.users]: boolean;
+  [OrgRolePermissionKind.decryptCustom]: boolean;
+  [OrgRolePermissionKind.decrypt]: boolean; // TODO: https://linear.app/footprint/issue/FP-1717/enable-user-to-select-specific-attributes-to-decrypt-while-creating-a
 };
 
 const DefaultFormValues: CreateRoleFormData = {
   name: '',
-  [OrgRolePermission.admin]: false,
-  [OrgRolePermission.onboardingConfiguration]: false,
-  [OrgRolePermission.apiKeys]: false,
-  [OrgRolePermission.orgSettings]: false,
-  [OrgRolePermission.securityLogs]: false,
-  [OrgRolePermission.users]: false,
-  [OrgRolePermission.decryptCustom]: false,
-  [OrgRolePermission.decrypt]: false,
+  [OrgRolePermissionKind.admin]: false,
+  [OrgRolePermissionKind.onboardingConfiguration]: false,
+  [OrgRolePermissionKind.apiKeys]: false,
+  [OrgRolePermissionKind.orgSettings]: false,
+  [OrgRolePermissionKind.securityLogs]: false,
+  [OrgRolePermissionKind.users]: false,
+  [OrgRolePermissionKind.decryptCustom]: false,
+  [OrgRolePermissionKind.decrypt]: false,
 };
 
 type CreateRoleFormProps = {
@@ -40,7 +40,7 @@ type CreateRoleFormProps = {
 };
 
 const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
-  const { t } = useTranslation('pages.settings.team-roles.create-role');
+  const { t, allT } = useTranslation('pages.settings.team-roles.create-role');
   const {
     register,
     formState: { errors },
@@ -81,14 +81,14 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
         })}
       />
       <Typography variant="label-2" sx={{ marginTop: 9, marginBottom: 5 }}>
-        {t('form.permissions.label')}
+        {t('form.permissions')}
       </Typography>
       <Controller
         control={control}
-        name={OrgRolePermission.admin}
+        name={OrgRolePermissionKind.admin}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.admin')}
+            label={allT(`org-role-permissions.${OrgRolePermissionKind.admin}`)}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);
@@ -99,10 +99,12 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
       />
       <Controller
         control={control}
-        name={OrgRolePermission.onboardingConfiguration}
+        name={OrgRolePermissionKind.onboardingConfiguration}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.onboarding-configuration')}
+            label={allT(
+              `org-role-permissions.${OrgRolePermissionKind.onboardingConfiguration}`,
+            )}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);
@@ -113,10 +115,12 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
       />
       <Controller
         control={control}
-        name={OrgRolePermission.apiKeys}
+        name={OrgRolePermissionKind.apiKeys}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.api-keys')}
+            label={allT(
+              `org-role-permissions.${OrgRolePermissionKind.apiKeys}`,
+            )}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);
@@ -127,10 +131,12 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
       />
       <Controller
         control={control}
-        name={OrgRolePermission.orgSettings}
+        name={OrgRolePermissionKind.orgSettings}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.org-settings')}
+            label={allT(
+              `org-role-permissions.${OrgRolePermissionKind.orgSettings}`,
+            )}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);
@@ -141,10 +147,12 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
       />
       <Controller
         control={control}
-        name={OrgRolePermission.securityLogs}
+        name={OrgRolePermissionKind.securityLogs}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.security-logs')}
+            label={allT(
+              `org-role-permissions.${OrgRolePermissionKind.securityLogs}`,
+            )}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);
@@ -155,10 +163,10 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
       />
       <Controller
         control={control}
-        name={OrgRolePermission.users}
+        name={OrgRolePermissionKind.users}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.users')}
+            label={allT(`org-role-permissions.${OrgRolePermissionKind.users}`)}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);
@@ -169,10 +177,12 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
       />
       <Controller
         control={control}
-        name={OrgRolePermission.decryptCustom}
+        name={OrgRolePermissionKind.decryptCustom}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.decrypt-custom')}
+            label={allT(
+              `org-role-permissions.${OrgRolePermissionKind.decryptCustom}`,
+            )}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);
@@ -184,10 +194,12 @@ const CreateRoleForm = ({ onSubmit }: CreateRoleFormProps) => {
       {/* TODO: https://linear.app/footprint/issue/FP-1717/enable-user-to-select-specific-attributes-to-decrypt-while-creating-a */}
       <Controller
         control={control}
-        name={OrgRolePermission.decrypt}
+        name={OrgRolePermissionKind.decrypt}
         render={({ field }) => (
           <Toggle
-            label={t('form.permissions.decrypt')}
+            label={allT(
+              `org-role-permissions.${OrgRolePermissionKind.decrypt}`,
+            )}
             checked={field.value}
             onChange={nextValue => {
               field.onChange(nextValue);

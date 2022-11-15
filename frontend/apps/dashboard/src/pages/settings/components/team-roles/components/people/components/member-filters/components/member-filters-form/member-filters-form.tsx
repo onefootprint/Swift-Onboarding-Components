@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import { DateRange, OrgRolePermission } from '@onefootprint/types';
+import { DateRange, OrgRolePermissionKind } from '@onefootprint/types';
 import { Box, InputDateRangePicker, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -10,7 +10,7 @@ export type MemberFiltersFormData = {
   customDate: { from: Date; to: Date };
   dateRange?: DateRange | `${DateRange}(${string},${string})`;
   roles: string[];
-  permissions: OrgRolePermission[];
+  permissions: OrgRolePermissionKind[];
 };
 
 type MemberFiltersFormProps = {
@@ -19,7 +19,7 @@ type MemberFiltersFormProps = {
     customDate: { from: Date; to: Date };
     dateRange: DateRange;
     roles: string[];
-    permissions: OrgRolePermission[];
+    permissions: OrgRolePermissionKind[];
   };
 };
 

@@ -77,6 +77,16 @@
     "ip_address": "IP Address",
     "document": "Document"
   },
+  "org-role-permissions": {
+    "admin": "Admin",
+    "onboarding_configuration": "Onboarding configuration",
+    "api_keys": "API keys",
+    "org_settings": "Modify organization settings",
+    "security_logs": "View security logs",
+    "users": "View user list & details",
+    "decrypt": "Decrypt certain attributes",
+    "decrypt_custom": "Decrypt all data"
+  },
   "components": {
     "private-layout": {
       "nav-dropdown": {
@@ -630,7 +640,28 @@
             }
           }
         },
-        "access-control": {},
+        "access-control": {
+          "aria-label": "Table of organization roles",
+          "table": {
+            "header": {
+              "role": "Role",
+              "created": "Created at",
+              "permissions": "Permissions"
+            },
+            "empty-state": "No roles found"
+          },
+          "filters": {
+            "cta_zero": "Filters",
+            "cta_one": "Filters · {{count}}",
+            "cta_other": "Filters · {{count}}",
+            "dialog": {
+              "title": "Filters",
+              "clear": "Clear",
+              "cta": "Apply",
+              "form": {}
+            }
+          }
+        },
         "tabs": {
           "people": "People",
           "access-control": "Access control"
@@ -647,18 +678,7 @@
                 "required": "The role name is required."
               }
             },
-            "permissions": {
-              "label": "Permissions",
-              "admin": "Admin",
-              "onboarding-configuration": "Onboarding configuration",
-              "api-keys": "API keys",
-              "audit-trail": "Audit trail",
-              "org-settings": "Modify organization settings",
-              "security-logs": "View security logs",
-              "users": "View user list & details",
-              "decrypt": "Decrypt certain attributes",
-              "decrypt-custom": "Decrypt all data"
-            }
+            "permissions": "Permissions"
           },
           "toast": {
             "success": {

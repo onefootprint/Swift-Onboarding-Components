@@ -1,14 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { DateRange, OrgRolePermission } from '@onefootprint/types';
+import { DateRange, OrgRolePermissionKind } from '@onefootprint/types';
 import { Box, Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { getDateRange } from 'src/utils/date-range';
 
+import { NEXT_WEEK, TODAY } from '../../../../table-filters-constants';
 import useOrgMembersFilters from '../../hooks/use-org-members-filters';
 import MemberFiltersForm, {
   MemberFiltersFormData,
 } from './components/member-filters-form/member-filters-form';
-import { NEXT_WEEK, TODAY } from './member-filters.constants';
 
 type CtaOptions = {
   onClick: () => void;
@@ -72,7 +72,7 @@ const MemberFilters = ({ renderCta }: MemberFiltersProps) => {
             dateRange: (dateRange as DateRange) || DateRange.allTime,
             roles: filters.roles?.split(',') ?? [],
             permissions: (filters.permissions?.split(',') ??
-              []) as OrgRolePermission[],
+              []) as OrgRolePermissionKind[],
           }}
         />
       </Dialog>
