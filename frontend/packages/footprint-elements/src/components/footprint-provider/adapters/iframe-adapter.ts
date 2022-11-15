@@ -1,4 +1,4 @@
-import { FootprintEvents } from '@onefootprint/footprint-js';
+import { FootprintEvents } from '@onefootprint/footprint-core';
 import Postmate from 'postmate';
 
 import {
