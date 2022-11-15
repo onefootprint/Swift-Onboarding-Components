@@ -1,8 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCode16,
   IcoFileText16,
-  IcoSettings16,
   IcoUsers16,
   LogoFpCompact,
 } from '@onefootprint/icons';
@@ -16,6 +14,12 @@ import styled, { css } from 'styled-components';
 import NavDropdown from './components/nav-dropdown';
 import SandboxBanner from './components/sandbox-banner';
 
+const routes = [
+  { href: '/users', Icon: IcoUsers16, text: 'Users' },
+  { href: '/security-logs', Icon: IcoFileText16, text: 'Security logs' },
+  { href: '/developers', Icon: IcoCode16, text: 'Developers' },
+];
+
 type PrivateLayoutProps = {
   children: React.ReactNode;
 };
@@ -23,14 +27,6 @@ type PrivateLayoutProps = {
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const router = useRouter();
   const { data } = useSessionUser();
-  const { t } = useTranslation('components.private-layout.tabs');
-
-  const routes = [
-    { href: '/users', Icon: IcoUsers16, text: t('users') },
-    { href: '/security-logs', Icon: IcoFileText16, text: t('security-logs') },
-    { href: '/developers', Icon: IcoCode16, text: t('developers') },
-    { href: '/settings', Icon: IcoSettings16, text: t('settings') },
-  ];
 
   return (
     <>
