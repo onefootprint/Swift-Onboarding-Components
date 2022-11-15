@@ -198,7 +198,7 @@ class TestDashboardOnboardings:
         annotation = pinned_annotations[0]
         assert annotation["is_pinned"]
         assert annotation["note"] == test_note
-        # TODO actor
+        assert "@onefootprint.com" in annotation["source"]["member"]
 
 
 class TestDashboardObConfigs:

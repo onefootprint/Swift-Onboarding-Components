@@ -1,4 +1,4 @@
-use crate::{export_schema, Apiv2Schema, DateTime, Deserialize, JsonSchema, Serialize, Utc};
+use crate::{export_schema, Actor, Apiv2Schema, DateTime, Deserialize, JsonSchema, Serialize, Utc};
 use newtypes::AnnotationId;
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Apiv2Schema)]
@@ -7,7 +7,7 @@ pub struct Annotation {
     pub timestamp: DateTime<Utc>,
     pub note: String,
     pub is_pinned: bool,
-    // TODO source? tenant_user
+    pub source: Actor,
 }
 
 export_schema!(Annotation);

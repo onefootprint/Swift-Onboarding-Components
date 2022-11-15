@@ -42,3 +42,6 @@ pub use self::user_timeline::*;
 
 pub mod annotation;
 pub use self::annotation::*;
+
+pub mod actor;
+pub use self::actor::*;

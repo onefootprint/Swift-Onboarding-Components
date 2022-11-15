@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 
-use crate::{schema::annotation, DbResult};
+use crate::{models::scoped_user::ScopedUser, schema::annotation, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{AnnotationId, FootprintUserId, ScopedUserId, TenantId, TenantUserId};
+
+use super::tenant_user::TenantUser;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = annotation)]
@@ -29,6 +31,8 @@ struct NewAnnotation {
     is_pinned: bool,
 }
 
+pub type AnnotationInfo = (Annotation, Option<TenantUser>);
+
 impl Annotation {
     pub fn create(
         conn: &mut PgConnection,
@@ -53,12 +57,14 @@ impl Annotation {
     pub fn get_bulk(
         conn: &mut PgConnection,
         ids: Vec<&AnnotationId>,
-    ) -> DbResult<HashMap<AnnotationId, Self>> {
+    ) -> DbResult<HashMap<AnnotationId, AnnotationInfo>> {
+        use crate::schema::tenant_user;
         let results = annotation::table
             .filter(annotation::id.eq_any(ids))
-            .get_results::<Self>(conn)?
+            .left_join(tenant_user::table)
+            .get_results::<AnnotationInfo>(conn)?
             .into_iter()
-            .map(|a| (a.id.clone(), a))
+            .map(|a| (a.0.id.clone(), a))
             .collect();
 
         Ok(results)
@@ -70,19 +76,25 @@ impl Annotation {
         tenant_id: TenantId,
         is_live: bool,
         is_pinned: Option<bool>,
-    ) -> DbResult<Vec<Self>> {
-        use crate::schema::scoped_user;
+    ) -> DbResult<Vec<AnnotationInfo>> {
+        use crate::schema::{scoped_user, tenant_user};
         let mut query = annotation::table
             .inner_join(scoped_user::table)
+            .left_join(tenant_user::table)
             .filter(scoped_user::fp_user_id.eq(fp_user_id))
             .filter(scoped_user::tenant_id.eq(tenant_id))
             .filter(scoped_user::is_live.eq(is_live))
-            .select(annotation::all_columns)
             .into_boxed();
         if let Some(is_pinned) = is_pinned {
             query = query.filter(annotation::is_pinned.eq(is_pinned));
         }
-        let results = query.get_results::<Self>(conn)?;
+        let results = query
+            .get_results::<(Self, ScopedUser, Option<TenantUser>)>(conn)?
+            .into_iter()
+            // It's really difficult to box a query in diesel with a left_join and a select(),
+            // so we fetch all three tables even though we don't need the scoped user
+            .map(|(annotation, _, tu)| (annotation, tu))
+            .collect();
 
         Ok(results)
     }

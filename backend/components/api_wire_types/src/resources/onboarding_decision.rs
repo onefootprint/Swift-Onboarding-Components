@@ -8,7 +8,7 @@ pub struct OnboardingDecision {
     pub id: OnboardingDecisionId,
     pub status: DecisionStatus,
     pub timestamp: DateTime<Utc>,
-    pub source: DecisionSource,
+    pub source: Actor,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ob_configuration: Option<LiteObConfiguration>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -23,15 +23,3 @@ pub struct LiteObConfiguration {
     pub must_collect_data: Vec<CollectedDataOption>,
     pub must_collect_identity_document: bool,
 }
-
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-#[serde(tag = "kind")]
-pub enum DecisionSource {
-    // TODO vendors for FootprintDecision
-    Footprint,
-    Organization { member: OrgMemberEmail },
-}
-
-export_schema!(OnboardingDecision);
-export_schema!(DecisionSource);

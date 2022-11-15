@@ -9,6 +9,7 @@ use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{DbUserTimelineEvent, FootprintUserId, OnboardingId, TenantId, UserTimelineId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
+use super::annotation::AnnotationInfo;
 use super::insight_event::InsightEvent;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
 
@@ -37,7 +38,7 @@ pub struct NewUserTimeline {
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than identifiers
 pub enum SaturatedTimelineEvent {
     DataCollected(newtypes::DataCollectedInfo),
-    OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<Annotation>),
+    OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
     DocumentUploaded(newtypes::DocumentUploadedInfo), // TODO
     Liveness(LivenessEvent, InsightEvent),
 }

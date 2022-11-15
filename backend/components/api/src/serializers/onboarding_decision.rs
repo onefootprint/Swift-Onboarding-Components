@@ -1,4 +1,4 @@
-use api_wire_types::DecisionSource;
+use api_wire_types::Actor;
 use db::models::{
     ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, tenant_user::TenantUser,
     verification_request::VerificationRequest,
@@ -27,19 +27,12 @@ impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
             created_at,
             ..
         } = decision;
-        let source = if let Some(tenant_user) = tenant_user {
-            DecisionSource::Organization {
-                member: tenant_user.email,
-            }
-        } else {
-            DecisionSource::Footprint
-        };
         let vendors = vrs.map(|vrs| vrs.into_iter().map(|vr| vr.vendor).collect());
         api_wire_types::OnboardingDecision {
             id,
             status,
             timestamp: created_at,
-            source,
+            source: Actor::from_db(tenant_user),
             ob_configuration: ob_configuration.map(api_wire_types::LiteObConfiguration::from_db),
             vendors,
         }
