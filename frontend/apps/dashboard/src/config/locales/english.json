@@ -89,6 +89,12 @@
   },
   "components": {
     "private-layout": {
+      "tabs": {
+        "users": "Users",
+        "security-logs": "Security logs",
+        "developers": "Developers",
+        "settings": "Settings"
+      },
       "nav-dropdown": {
         "log-out": "Log out"
       },
