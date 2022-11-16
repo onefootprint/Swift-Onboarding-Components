@@ -40,13 +40,21 @@ class ObConfiguration(NamedTuple):
         )
 
 
+class GetObConfigError(Exception):
+    pass
 class Tenant(NamedTuple):
     ob_configs: dict
     sk: SecretApiKey
     auth_token: DashboardAuth
 
-    def ob_config(self):
-        return self.ob_configs["default"]
+    def ob_config(self, name=None):
+        if name:
+            return self.ob_configs[name]
+        configs = list(self.ob_configs.keys())
+        if len(configs) == 1:
+            return self.ob_configs[configs[0]]
+        else:
+            raise GetObConfigError(f"There are {len(configs)} defined for this Tenant. Please specify which one you want!")
 
 
 class BasicUser(NamedTuple):

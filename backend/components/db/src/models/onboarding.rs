@@ -1,3 +1,4 @@
+use super::document_request::DocumentRequest;
 use super::insight_event::CreateInsightEvent;
 use super::liveness_event::LivenessEvent;
 use super::manual_review::ManualReview;
@@ -12,7 +13,9 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, UserVaultId};
+use newtypes::{
+    InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, SealedVaultDataKey, TenantId, UserVaultId,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -46,6 +49,14 @@ struct NewOnboarding {
 pub struct OnboardingUpdate {
     pub is_authorized: Option<bool>,
     pub idv_reqs_initiated: Option<bool>,
+}
+
+pub struct OnboardingCreateArgs {
+    pub scoped_user_id: ScopedUserId,
+    pub ob_configuration_id: ObConfigurationId,
+    pub insight_event: CreateInsightEvent,
+    pub should_create_document_request: bool,
+    pub must_collect_document_e_data_key: Option<SealedVaultDataKey>,
 }
 
 impl OnboardingUpdate {
@@ -250,25 +261,20 @@ impl Onboarding {
         Ok(result)
     }
 
-    pub fn get_or_create(
-        conn: &mut PgConnection,
-        scoped_user_id: ScopedUserId,
-        ob_configuration_id: ObConfigurationId,
-        insight_event: CreateInsightEvent,
-    ) -> DbResult<Onboarding> {
+    pub fn get_or_create(conn: &mut TxnPgConnection, args: OnboardingCreateArgs) -> DbResult<Onboarding> {
         let ob = onboarding::table
-            .filter(onboarding::scoped_user_id.eq(&scoped_user_id))
-            .filter(onboarding::ob_configuration_id.eq(&ob_configuration_id))
-            .first(conn)
+            .filter(onboarding::scoped_user_id.eq(&args.scoped_user_id))
+            .filter(onboarding::ob_configuration_id.eq(&args.ob_configuration_id))
+            .first(conn.conn())
             .optional()?;
         if let Some(ob) = ob {
             return Ok(ob);
         }
         // Row doesn't exist for scoped_user_id, ob_configuration_id - create a new one
-        let insight_event = insight_event.insert_with_conn(conn)?;
+        let insight_event = args.insight_event.insert_with_conn(conn)?;
         let new_ob = NewOnboarding {
-            scoped_user_id,
-            ob_configuration_id,
+            scoped_user_id: args.scoped_user_id,
+            ob_configuration_id: args.ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
             is_authorized: false,
@@ -276,7 +282,18 @@ impl Onboarding {
         };
         let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)
-            .get_result::<Onboarding>(conn)?;
+            .get_result::<Onboarding>(conn.conn())?;
+
+        // To prevent duplicate document requests, only create a doc request if the onboarding is new
+        if args.should_create_document_request && args.must_collect_document_e_data_key.is_some() {
+            DocumentRequest::create(
+                conn,
+                ob.id.clone(),
+                None,
+                args.must_collect_document_e_data_key.unwrap(),
+            )?;
+        }
+
         Ok(ob)
     }
 

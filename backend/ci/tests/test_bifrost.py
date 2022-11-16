@@ -20,6 +20,7 @@ from tests.utils import (
     identify_verify,
     create_inherited_non_sandbox_user,
     get_requirement_from_requirements,
+    create_ob_config_for_tenant
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -79,7 +80,7 @@ def document_requesting_tenant(must_collect_data, can_access_data):
     }
 
     ob_data = {
-        "name": "Bar Insurance",
+        "name": "default",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
         "must_collect_identity_document": True,
@@ -421,20 +422,28 @@ class TestBifrost:
         ), "Onboarding onto different tenants should give different fp_user_id"
 
     # In this test we
-    #   - Create 2 live users by re-using a previously challenged phone number
-    #   - onboard users onto a tenant, with an ob_config that asks for a document
-    #   - submit a document
+    #   - Create a live user by re-using a previously challenged phone number
+    #   - onboard users onto a tenant, with an 2 separate ob_configs that asks for a document
+    #   - submit documents
     #       - Since not all documents have backs, we check a submission with front/back and only front
     #   - expect the status of the document request to be pending
     # Other steps we should test (see TODOs on the API route)
     #   - document request moves into UPLOADED after post
     #   - after document request gets moved out of PENDING, requirement is no longer there
     def test_onboarding_requiring_document(
-        self, twilio, auth_token, document_requesting_tenant
+        self, twilio, document_requesting_tenant, must_collect_data, can_access_data
     ):
         from .image_fixtures import test_image
-
-        
+        # This is non-ideal, but creating new users integration tests is a little tricky at the moment
+        # so we create multiple onboarding configurations/onboardings to test what we are trying to test
+        second_ob_conf_name = "second_ob_config"
+        ob_conf_data = {
+            "name": second_ob_conf_name,
+            "must_collect_data": must_collect_data,
+            "can_access_data": can_access_data,
+            "must_collect_identity_document": True,
+        }
+        document_requesting_tenant = create_ob_config_for_tenant(document_requesting_tenant, ob_conf_data)
         doc_data_both = {
             "front_image": test_image,
             "back_image": test_image,
@@ -447,36 +456,36 @@ class TestBifrost:
             "document_type": "passport",
             "country_code": "USA",
         }
+        user_auth_token = create_inherited_non_sandbox_user(twilio)
 
         # These users are inherited because all integration tests use the same PHONE_NUMBER
         # At some point we'll revisit this
-        users = [
+        configs = [
             {
-                "user_auth": create_inherited_non_sandbox_user(twilio),
+                "ob_config": "default",
                 "data": doc_data_both,
             },
             {
-                "user_auth": create_inherited_non_sandbox_user(twilio),
+                "ob_config": second_ob_conf_name,
                 "data": doc_data_only_front,
             },        
         ]
         
         # We test both back and front and only front
-        for user in users:
+        for c in configs:
+            ob_config_name = c["ob_config"]
             # Onboard a user onto a tenant that requests a document
-            user_auth_token = user['user_auth']
-
             post(
                 "hosted/onboarding",
                 None,
-                document_requesting_tenant.ob_config().key,
+                document_requesting_tenant.ob_configs[ob_config_name].key,
                 user_auth_token,
             )
 
             body = get(
                 "hosted/onboarding/status",
                 None,
-                document_requesting_tenant.ob_config().key,
+                document_requesting_tenant.ob_configs[ob_config_name].key,
                 user_auth_token,
             )
             # We have a requirement
@@ -488,12 +497,12 @@ class TestBifrost:
             document_request_id = req["document_request_id"]
 
             # Submit the document
-            data = user['data']
+            data = c['data']
             post_body = post(
                 f"hosted/user/document/{document_request_id}",
                 data,
                 user_auth_token,
-                document_requesting_tenant.ob_config().key,
+                document_requesting_tenant.ob_configs[ob_config_name].key,
             )
 
             assert post_body == {}
@@ -510,7 +519,7 @@ class TestBifrost:
                 f"hosted/user/document/{document_request_id}/status",
                 None,
                 user_auth_token,
-                document_requesting_tenant.ob_config().key,
+                document_requesting_tenant.ob_configs[ob_config_name].key,
             )
 
             assert get_body == expected

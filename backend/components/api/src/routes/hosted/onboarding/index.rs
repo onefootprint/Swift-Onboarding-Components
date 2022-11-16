@@ -11,11 +11,11 @@ use crate::types::response::ResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 
 use db::models::onboarding::Onboarding;
 
+use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_user::ScopedUser;
 
 use newtypes::SessionAuthToken;
@@ -43,13 +43,17 @@ pub async fn post(
     let mut user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
 
     let uv_id = user_auth.user_vault_id();
-    
+
     let uvw = state
         .db_pool
         .db_query(move |conn| UserVaultWrapper::get(conn, &uv_id))
         .await??;
+    let should_create_document_request = onboarding_context.ob_config().must_collect_identity_document;
 
-    let must_collect_document_e_data_key = if onboarding_context.ob_config().must_collect_identity_document {
+    // very minor TODO: we only actually need this when we are creating a doc request, which only occurs if we hit this endpoint
+    // when creating a new onboarding. we could save a vault rpc if we did this inside ob::get_or_create, but that requires
+    // introducing deps to db crate, so let's just not do that
+    let must_collect_document_e_data_key = if should_create_document_request {
         Some(
             state
                 .enclave_client
@@ -77,12 +81,16 @@ pub async fn post(
 
             let insight_event = CreateInsightEvent::from(insights);
 
-            let ob = Onboarding::get_or_create(
-                conn,
-                scoped_user.id,
-                onboarding_context.ob_config().id.clone(),
+            let ob_create_args = OnboardingCreateArgs {
+                scoped_user_id: scoped_user.id,
+                ob_configuration_id: onboarding_context.ob_config().id.clone(),
                 insight_event,
-            )?;
+                // Create a `DocumentRequest` if specified in the ob config.
+                // We do this inside the OB creation to make this route more idempotent
+                should_create_document_request,
+                must_collect_document_e_data_key,
+            };
+            let ob = Onboarding::get_or_create(conn, ob_create_args)?;
             // Update the auth session in the DB to have the OrgOnboarding scope tied to this onboarding
             // Even though the OrgOnboardingInit scope is only used by this endpoint, we notably don't remove
             // it since we want this endpoint to be idempotent (in case the client needs to retry)
@@ -98,11 +106,6 @@ pub async fn post(
                 &session_key,
                 ob.id.clone(),
             )?);
-
-            // Create a `DocumentRequest` if specified in the ob config and the user has not already passed onboarding
-            if let Some(e_data_key) = must_collect_document_e_data_key {
-                DocumentRequest::create(conn, ob.id, None, e_data_key)?;
-            }
 
             Ok(validation_token)
         })

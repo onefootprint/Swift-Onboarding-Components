@@ -193,8 +193,7 @@ def create_inherited_non_sandbox_user(twilio):
         5,
     )
 
-
-def create_tenant(org_data, ob_conf_data, ob_conf_name="default"):
+def create_tenant(org_data, ob_conf_data):
     body = post("private/tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])
     auth_token = DashboardAuth(body["auth_token"])
@@ -209,15 +208,14 @@ def create_tenant(org_data, ob_conf_data, ob_conf_name="default"):
 
     return tenant
 
-
-def create_ob_config_for_tenant(tenant, ob_conf_data, ob_conf_name="default"):
+def create_ob_config_for_tenant(tenant, ob_conf_data):
     body = post("org/onboarding_configs", ob_conf_data, tenant.sk.key)
     ob_config = ObConfiguration.from_response(body)
     print("\n======org onboarding info======")
     print(body)
-
-    tenant.ob_configs[ob_conf_name] = ob_config
-
+    
+    tenant.ob_configs[ob_conf_data['name']] = ob_config
+    
     return tenant
 
 
