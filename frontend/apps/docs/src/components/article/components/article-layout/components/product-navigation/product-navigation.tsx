@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
+// import { useTranslation } from '@onefootprint/hooks';
 import {
   Box,
   createFontStyles,
   media,
-  Toggle,
+  // Toggle,
   Typography,
 } from '@onefootprint/ui';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import SupportList from 'src/components/support-list';
 import styled, { css } from 'styled-components';
-import { useDarkMode } from 'usehooks-ts';
+// import { useDarkMode } from 'usehooks-ts';
 
 type ProductNavigationProps = {
   name: string;
@@ -19,8 +19,9 @@ type ProductNavigationProps = {
 };
 
 const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
-  const { t } = useTranslation('components.product-navigation');
-  const { isDarkMode, toggle } = useDarkMode();
+  // TODO: https://linear.app/footprint/issue/FP-1890/bring-dark-theme-back-again
+  // const { t } = useTranslation('components.product-navigation');
+  // const { isDarkMode, toggle } = useDarkMode();
   const router = useRouter();
 
   return (
@@ -39,14 +40,14 @@ const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
       </Box>
       <Box>
         <SupportList />
-        <ThemeControl>
+        {/* <ThemeControl>
           <Toggle
             label={t('dark-mode')}
             checked={isDarkMode}
             onChange={toggle}
             sx={{ justifyContent: 'space-between' }}
           />
-        </ThemeControl>
+        </ThemeControl> */}
       </Box>
     </Container>
   );
@@ -64,10 +65,10 @@ const Container = styled.aside`
       height: calc(100vh - var(--header-height));
       justify-content: space-between;
       left: 0;
-      padding: ${theme.spacing[7]} 0 0;
       position: fixed;
       top: var(--header-height);
       width: var(--product-aside-nav-width);
+      padding: ${theme.spacing[7]} ${theme.spacing[5]} 0;
     `};
   `}
 `;
@@ -103,13 +104,13 @@ const StyledLink = styled(Link)`
   `}
 `;
 
-const ThemeControl = styled.div`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    margin: 0 -${theme.spacing[5]} -${theme.spacing[7]};
-    padding: ${theme.spacing[4]} ${theme.spacing[7]};
-  `}
-`;
+// const ThemeControl = styled.div`
+//   ${({ theme }) => css`
+//     background: ${theme.backgroundColor.secondary};
+//     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+//     margin: 0 calc(${theme.spacing[5]} * -1);
+//     padding: ${theme.spacing[4]} ${theme.spacing[7]};
+//   `}
+// `;
 
 export default ProductNavigation;

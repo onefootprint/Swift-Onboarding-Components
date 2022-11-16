@@ -68,12 +68,10 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
       <Nav>
         <Tabs variant="pill">
           {navItems.map(({ baseHref, href, Icon, text }) => (
-            <Link href={href} key={text} passHref>
-              <Tab selected={href.startsWith(baseHref)}>
-                <Icon />
-                {text}
-              </Tab>
-            </Link>
+            <Tab selected={href.startsWith(baseHref)} href={href} as={Link}>
+              <Icon />
+              {text}
+            </Tab>
           ))}
         </Tabs>
       </Nav>

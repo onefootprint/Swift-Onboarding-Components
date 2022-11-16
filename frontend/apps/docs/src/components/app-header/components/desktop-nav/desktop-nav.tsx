@@ -21,17 +21,19 @@ const DesktopNav = ({ navItems, links }: DesktopNavProps) => {
     <Container>
       <Nav>
         <InternalNavContainer>
-          <Link href="/" aria-label={t('nav.home')}>
+          <LogoLink href="/" aria-label={t('nav.home')}>
             <LogoFpdocsDefault />
-          </Link>
+          </LogoLink>
           <Tabs variant="pill">
             {navItems.map(({ baseHref, href, Icon, text }) => (
-              <Link href={href} key={text} passHref>
-                <Tab selected={router.asPath.startsWith(baseHref)}>
-                  <Icon />
-                  {text}
-                </Tab>
-              </Link>
+              <Tab
+                as={Link}
+                href={href}
+                selected={router.asPath.startsWith(baseHref)}
+              >
+                <Icon />
+                {text}
+              </Tab>
             ))}
           </Tabs>
         </InternalNavContainer>
@@ -61,6 +63,10 @@ const InternalNavContainer = styled.div`
     display: flex;
     gap: ${theme.spacing[8]};
   `};
+`;
+
+const LogoLink = styled(Link)`
+  display: flex;
 `;
 
 const Container = styled.div`
