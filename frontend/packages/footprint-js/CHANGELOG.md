@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 0.1.0
+
+### Minor Changes
+
+- 99fcb4ad: Add support to customize the appearance
+
 ## 0.3.0
 
 ### Minor Changes
