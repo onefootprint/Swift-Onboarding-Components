@@ -2,19 +2,19 @@
   "name": "@onefootprint/footprint-js",
   "private": false,
   "type": "module",
-  "version": "0.0.6",
-  "main": "./dist/footprint-js.umd.cjs",
+  "version": "0.0.9",
+  "main": "./dist/footprint-js.umd.js",
   "module": "./dist/footprint-js.js",
   "types": "./dist/footprint-js.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/footprint-js.umd.cjs",
+      "require": "./dist/footprint-js.umd.js",
       "import": "./dist/footprint-js.js",
       "types": "./dist/footprint-js.d.ts"
     },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
+    "./dist/footprint-js.css": {
+      "import": "./dist/footprint-js.css",
+      "require": "./dist/footprint-js.css"
     }
   },
   "sideEffects": false,
@@ -23,24 +23,21 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite build --watch --mode development",
-    "build": "yarn typecheck && vite build",
+    "dev": "tsup --watch",
+    "build": "tsup",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@onefootprint/design-tokens": "*",
     "@onefootprint/jest-presets": "*",
-    "@onefootprint/types": "*",
     "@types/postmate": "^1.5.2",
     "csstype": "^3.1.1",
     "eslint-config-footprint": "*",
     "postmate": "^1.5.2",
     "tsconfig": "*",
-    "typescript": "4.8.4",
-    "vite": "^3.1.7",
-    "vite-plugin-dts": "^1.6.5"
+    "tsup": "^6.5.0",
+    "typescript": "4.8.4"
   },
   "publishConfig": {
     "access": "public"

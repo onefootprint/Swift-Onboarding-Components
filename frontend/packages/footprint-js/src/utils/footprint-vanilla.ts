@@ -1,5 +1,5 @@
-import { Footprint } from '../types/footprint.types';
-import { createButton } from './ui-manager';
+import type { Footprint } from '../footprint-js.types';
+import { createButton } from './footprint-ui';
 
 const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
@@ -8,8 +8,8 @@ const defer = (callback: () => void) => {
 const startVanillaIntegration = (footprint: Footprint) => {
   if (typeof window === 'undefined') return;
 
-  const handleButtonClicked = async (publicKey: string) => {
-    await footprint.show({
+  const handleButtonClicked = (publicKey: string) => {
+    footprint.show({
       publicKey,
       onCanceled: () => {
         window.onFootprintCanceled?.();

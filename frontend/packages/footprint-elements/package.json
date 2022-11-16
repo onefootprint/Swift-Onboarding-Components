@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@onefootprint/design-tokens": "*",
-    "@onefootprint/footprint-core": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",

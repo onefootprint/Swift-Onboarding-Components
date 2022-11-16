@@ -1,4 +1,4 @@
-import type { FootprintAppearance } from '../types/footprint.types';
+import type { FootprintAppearance } from '../footprint-js.types';
 
 const CONTAINER_ID = 'footprint-container';
 const OVERLAY_ID = 'footprint-overlay';

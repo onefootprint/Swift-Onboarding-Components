@@ -1,19 +1,18 @@
 import Postmate from 'postmate';
 
-import { FootprintEvents } from '../types/footprint.types';
+import { FootprintEvents } from '../footprint-js.types';
 import {
   createContainer,
   createFootprintButton,
   hideOverlay,
   removeLoader,
   showOverlay,
-} from './ui-manager';
+} from './footprint-ui';
 
-class IframeManager {
+class FootprintIframe {
   private child: Postmate.ParentAPI | null = null;
 
-  async show(options: { url: string }) {
-    const { url } = options;
+  async show(url: string) {
     const handleOnIframeLoaded = () => {
       removeLoader();
     };
@@ -56,4 +55,4 @@ class IframeManager {
   }
 }
 
-export default IframeManager;
+export default FootprintIframe;

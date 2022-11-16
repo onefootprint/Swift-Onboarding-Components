@@ -1,5 +1,5 @@
 import footprint, { FootprintAppearance } from '@onefootprint/footprint-js';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 export type FootprintButtonProps = {
   appearance?: FootprintAppearance;
@@ -20,15 +20,10 @@ const FootprintButton = ({
   publicKey,
   testID,
 }: FootprintButtonProps) => {
-  useEffect(() => {
-    if (appearance) {
-      footprint.setAppearance(appearance);
-    }
-  }, [appearance]);
-
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     footprint.show({
+      appearance,
       publicKey,
       onCompleted,
       onCanceled,

@@ -1,34 +1,21 @@
 import './footprint-styles.css';
 
-import type { FootprintAppearance } from './types/footprint.types';
-import { FootprintEvents, ShowFootprint } from './types/footprint.types';
-import IframeManager from './utils/iframe-manager';
-import { injectStyles } from './utils/ui-manager';
+import {
+  FootprintAppearance,
+  FootprintEvents,
+  ShowFootprint,
+} from './footprint-js.types';
+import IframeManager from './utils/footprint-iframe';
+import { injectStyles } from './utils/footprint-ui';
+import { getAppearanceStyles, getURL } from './utils/footprint-utils';
 
 const iframeManager = new IframeManager();
-const appearanceParams = {
-  variables: '',
-  rules: '',
-  fontSrc: '',
-};
 
-const footprint = (url: string) => {
-  const handleOnCompleted = (callback: (validationToken: string) => void) =>
-    iframeManager.on(FootprintEvents.completed, (data: any) => {
-      if (data && typeof data === 'string') {
-        callback(data);
-      }
-    });
-
-  const handleOnCanceled = (callback: () => void) =>
-    iframeManager.on(FootprintEvents.canceled, callback);
-
-  const setAppearance = ({
-    fontSrc,
+const footprint = () => {
+  const setDialogStyles = ({
     theme = 'light',
     variables = {},
-    rules = {},
-  }: FootprintAppearance) => {
+  }: FootprintAppearance = {}) => {
     const {
       fpButtonBorderRadius,
       fpButtonHeight,
@@ -37,19 +24,7 @@ const footprint = (url: string) => {
       loadingColor,
       loadingPadding,
       overlayBg,
-      ...remainingStyles
     } = variables;
-    if (Object.keys(remainingStyles).length) {
-      appearanceParams.variables = encodeURIComponent(
-        JSON.stringify(remainingStyles),
-      );
-    }
-    if (Object.keys(rules).length) {
-      appearanceParams.rules = encodeURIComponent(JSON.stringify(rules));
-    }
-    if (fontSrc) {
-      appearanceParams.fontSrc = fontSrc;
-    }
     injectStyles({
       theme,
       variables: {
@@ -64,41 +39,26 @@ const footprint = (url: string) => {
     });
   };
 
-  const getSearchParams = (params: {
-    fontSrc?: string;
-    publicKey?: string;
-    rules?: string;
-    variables?: string;
-  }) => {
-    const { publicKey, variables, rules, fontSrc } = params;
-    const searchParams = new URLSearchParams();
-    if (publicKey) {
-      searchParams.append('public_key', publicKey);
-    }
-    if (variables) {
-      searchParams.append('tokens', variables);
-    }
-    if (rules) {
-      searchParams.append('rules', rules);
-    }
-    if (fontSrc) {
-      searchParams.append('font_src', fontSrc);
-    }
-    return searchParams.toString();
-  };
+  const handleOnCompleted = (callback: (validationToken: string) => void) =>
+    iframeManager.on(FootprintEvents.completed, (data: any) => {
+      if (data && typeof data === 'string') {
+        callback(data);
+      }
+    });
+
+  const handleOnCanceled = (callback: () => void) =>
+    iframeManager.on(FootprintEvents.canceled, callback);
 
   const show = async ({
+    appearance,
     publicKey,
     onCompleted,
     onCanceled,
   }: ShowFootprint) => {
-    const searchParams = getSearchParams({
-      fontSrc: appearanceParams.fontSrc,
-      publicKey,
-      rules: appearanceParams.rules,
-      variables: appearanceParams.variables,
-    });
-    await iframeManager.show({ url: `${url}?${searchParams}` });
+    setDialogStyles(appearance);
+    const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
+    const url = getURL({ fontSrc, publicKey, rules, variables });
+    await iframeManager.show(url);
     if (onCompleted) {
       handleOnCompleted(onCompleted);
     }
@@ -108,7 +68,6 @@ const footprint = (url: string) => {
   };
 
   return {
-    setAppearance,
     show,
   };
 };

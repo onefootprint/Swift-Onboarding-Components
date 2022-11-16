@@ -1,22 +1,21 @@
 import initFootprint from './footprint';
-import vanillaIntegration from './utils/vanilla-integration';
+import vanillaIntegration from './utils/footprint-vanilla';
 
-const getUrl = () => {
-  if (process.env.IS_LOCAL) {
-    return 'url:local';
-  }
-  if (process.env.IS_VERCEL_ENV_DEV) {
-    return 'url:dev';
-  }
-  if (process.env.IS_VERCEL_ENV_PREV) {
-    return 'url:preview';
-  }
-  return 'url:prod';
-};
-
-const url = getUrl();
-const footprint = initFootprint(url);
+const footprint = initFootprint();
 vanillaIntegration(footprint);
 
-export * from './types/footprint.types';
+export type {
+  Footprint,
+  FootprintAppearance,
+  FootprintAppearanceParams,
+  FootprintAppearanceRules,
+  FootprintAppearanceTheme,
+  FootprintAppearanceVariables,
+  FootprintExternalStyles,
+  FootprintMainStyles,
+  FootprintShowParams,
+  ShowFootprint,
+} from './footprint-js.types';
+export { FootprintEvents } from './footprint-js.types';
+
 export default footprint;
