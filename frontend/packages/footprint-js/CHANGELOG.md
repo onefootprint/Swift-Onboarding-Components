@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 0.5.0
+
+### Minor Changes
+
+- eba9e81e: Update dependencies
+
 ## 0.1.0
 
 ### Minor Changes
