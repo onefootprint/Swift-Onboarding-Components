@@ -23,8 +23,6 @@ export enum Events {
 
 export enum Actions {
   assignIdentifyType = 'assignIdentifyType',
-  assignEmail = 'assignEmail',
-  assignPhone = 'assignPhone',
   assignUserFound = 'assignUserFound',
   assignAuthToken = 'assignAuthToken',
   assignDeviceInfo = 'assignDeviceInfo',
@@ -35,9 +33,7 @@ export enum Actions {
 export type BifrostContext = {
   authToken?: string;
   device?: DeviceInfo;
-  email: string;
   identifyType: IdentifyType;
-  phone?: string;
   tenant?: TenantInfo;
   userFound: boolean;
   validationToken?: string;
@@ -56,8 +52,6 @@ export type BifrostEvent =
       type: Events.identifyCompleted;
       data: {
         authToken: string;
-        email: string;
-        phone?: string;
         userFound: boolean;
       };
     }

@@ -7,8 +7,6 @@ import { Actions, BifrostContext, BifrostEvent, Events, States } from './types';
 
 const initialContext: BifrostContext = {
   identifyType: IdentifyType.onboarding,
-  email: '',
-  phone: undefined,
   authToken: undefined,
   userFound: false,
 };
@@ -49,24 +47,14 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           onDone: [
             {
               target: States.onboarding,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignEmail,
-                Actions.assignPhone,
-                Actions.assignUserFound,
-              ],
+              actions: [Actions.assignAuthToken, Actions.assignUserFound],
               cond: context =>
                 !!context.tenant &&
                 context.identifyType === IdentifyType.onboarding,
             },
             {
               target: States.authenticationSuccess,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignEmail,
-                Actions.assignPhone,
-                Actions.assignUserFound,
-              ],
+              actions: [Actions.assignAuthToken, Actions.assignUserFound],
             },
           ],
         },
@@ -109,18 +97,6 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignIdentifyType]: assign((context, event) => {
         if (event.type === Events.authenticationFlowStarted) {
           context.identifyType = IdentifyType.my1fp;
-        }
-        return context;
-      }),
-      [Actions.assignEmail]: assign((context, event) => {
-        if (event.type === Events.identifyCompleted && event.data.email) {
-          context.email = event.data.email;
-        }
-        return context;
-      }),
-      [Actions.assignPhone]: assign((context, event) => {
-        if (event.type === Events.identifyCompleted && event.data.phone) {
-          context.phone = event.data.phone;
         }
         return context;
       }),

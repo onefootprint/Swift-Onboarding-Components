@@ -132,8 +132,6 @@ const createIdentifyMachine = ({ identifyType, device }: IdentifyMachineArgs) =>
           type: 'final',
           data: {
             authToken: (context: MachineContext) => context.authToken,
-            email: (context: MachineContext) => context.email,
-            phone: (context: MachineContext) => context.phone,
             userFound: (context: MachineContext) => context.userFound,
           },
         },
