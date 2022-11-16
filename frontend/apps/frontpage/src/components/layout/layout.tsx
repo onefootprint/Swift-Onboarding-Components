@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { media } from '@onefootprint/ui';
 import { createPopup } from '@typeform/embed';
+import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -18,6 +19,9 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps) => {
   const { t } = useTranslation('components');
 
+  const router = useRouter();
+  const variant = router.asPath === '/' ? 'large' : 'default';
+
   return (
     <>
       <Navbar
@@ -27,20 +31,25 @@ const Layout = ({ children }: LayoutProps) => {
         }}
       />
       <Content>{children}</Content>
-      <FooterContainer>
-        <InvestorsSection
-          imgAlt={t('investors.img-alt')}
-          imgSrc="/footer/investors.png"
-          subtitle={t('investors.subtitle')}
-          title={t('investors.title')}
-        />
-        <GetStartedSection
-          cta={t('get-started.cta')}
-          onCtaClick={toggleTypeform}
-          subtitle={t('get-started.subtitle')}
-          title={t('get-started.title')}
-        />
+      <FooterContainer data-variant={variant}>
+        {variant === 'default' ? null : (
+          <>
+            <InvestorsSection
+              imgAlt={t('investors.img-alt')}
+              imgSrc="/footer/investors.png"
+              subtitle={t('investors.subtitle')}
+              title={t('investors.title')}
+            />
+            <GetStartedSection
+              cta={t('get-started.cta')}
+              onCtaClick={toggleTypeform}
+              subtitle={t('get-started.subtitle')}
+              title={t('get-started.title')}
+            />
+          </>
+        )}
         <Footer
+          variant={variant}
           copyright={t('footer.copyright')}
           links={[
             {
@@ -97,8 +106,17 @@ const FooterContainer = styled.section`
     padding-top: ${theme.spacing[10]};
     background: ${theme.backgroundColor.tertiary};
 
+    &[data-variant='default'] {
+      background: ${theme.backgroundColor.primary};
+      padding-top: 0;
+    }
+
     ${media.greaterThan('lg')`
-      padding-top: ${theme.spacing[14]};
+      padding-top: ${theme.spacing[10]};
+
+      &[data-variant='default'] {
+        padding-top: 0;
+      }
     `}
   `}
 `;

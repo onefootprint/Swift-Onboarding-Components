@@ -7,14 +7,18 @@ import styled, { css } from 'styled-components';
 const currentYear = new Date().getFullYear();
 
 type FooterProps = {
+  variant: 'default' | 'large';
   copyright: string;
   links: { text: string; href: string; newWindow: boolean }[];
 };
 
-const Footer = ({ copyright, links }: FooterProps) => (
+const Footer = ({ copyright, links, variant }: FooterProps) => (
   <Container as="footer">
-    <Inner>
-      <Typography variant="body-3" color="senary">
+    <Inner data-variant={variant}>
+      <Typography
+        variant="body-3"
+        color={variant === 'default' ? 'primary' : 'senary'}
+      >
         © {currentYear} {copyright}
       </Typography>
       <NavContainer>
@@ -26,7 +30,10 @@ const Footer = ({ copyright, links }: FooterProps) => (
                 rel="noopener noreferrer"
                 target={link.newWindow ? '_blank' : undefined}
               >
-                <Typography variant="body-3" color="senary">
+                <Typography
+                  variant="body-3"
+                  color={variant === 'default' ? 'primary' : 'senary'}
+                >
                   {link.text}
                 </Typography>
               </Link>
@@ -49,10 +56,14 @@ const Inner = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
-    margin-top: ${theme.spacing[10]};
+    margin-top: 0;
     padding: ${theme.spacing[6]} 0 ${theme.spacing[9]};
     text-align: center;
     align-items: center;
+
+    &[variant='large'] {
+      margin-top: ${theme.spacing[10]};
+    }
 
     ${media.greaterThan('md')`
       flex-direction: row;
@@ -60,6 +71,10 @@ const Inner = styled.div`
       margin-top: ${theme.spacing[14]};
       padding: ${theme.spacing[6]} 0;
       text-align: unset;
+
+      &[data-variant = 'default'] {
+        margin-top: 0;
+      }
     `}
   `}
 `;

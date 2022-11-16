@@ -1,5 +1,6 @@
 import '@onefootprint/design-tokens/src/output/theme.css';
 import '@typeform/embed/build/css/popup.css';
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
