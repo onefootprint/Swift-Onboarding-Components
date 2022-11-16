@@ -49,5 +49,5 @@ jobs:
         with:
           cwd: ./frontend
           publish: yarn release
-          title: Bump footprint-js version
-          commit: Bump footprint-js version
+          title: Bump frontend public packages
+          commit: Bump frontend public packages
