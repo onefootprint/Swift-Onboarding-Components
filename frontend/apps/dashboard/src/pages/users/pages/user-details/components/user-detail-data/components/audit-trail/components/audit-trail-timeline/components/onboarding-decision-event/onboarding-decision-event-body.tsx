@@ -58,7 +58,7 @@ const OnboardingDecisionEventBody = ({
         content={
           <>
             <Typography variant="body-3" as="span">
-              {statusStr}
+              {statusStr}{' '}
             </Typography>
             <Typography variant="body-3" as="span">
               {createTagList(collectedDataLabels)}
