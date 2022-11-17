@@ -1,10 +1,5 @@
 {
     "recommendations": [
-        "rust-lang.rust-analyzer",
-        "panicbit.cargo",
-        "bungcip.better-toml",
-        "serayuzgur.crates",
-        "vadimcn.vscode-lldb",
         "ms-vscode.vscode-typescript-next",
         "steoates.autoimport",
         "formulahendry.auto-rename-tag",
@@ -13,6 +8,7 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "wayou.vscode-todo-highlight",
-        "edonet.vscode-command-runner"
+        "edonet.vscode-command-runner",
+        "styled-components.vscode-styled-components"
     ]
 }
