@@ -11,6 +11,7 @@ import * as db from './db';
 import * as vpcUtil from './vpc';
 import * as hmacSigningKey from './hmac_key';
 import * as s3 from './s3';
+import * as crypto from 'crypto';
 
 /**
  * Main infra entry point
@@ -45,10 +46,16 @@ export default async function main() {
   // setup or secrets param store
   const secretsStore = await secrets.LoadSecrets(config, enclaveKeyConfig);
 
+  const pulumiStackHash = crypto
+    .createHash('sha256')
+    .update(`${pulumi.getStack()}`)
+    .digest('hex')
+    .substring(0, 16);
+
   // setup database
   const database = await db.CreateDB(
     UsEast1vpcProvider,
-    `db-${pulumi.getStack()}`,
+    `db-${pulumiStackHash}`,
     constants,
     secretsStore,
     {
