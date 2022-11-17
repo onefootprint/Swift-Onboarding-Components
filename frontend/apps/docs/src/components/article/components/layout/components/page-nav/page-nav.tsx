@@ -10,34 +10,39 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import SupportList from 'src/components/support-list';
+import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
 // import { useDarkMode } from 'usehooks-ts';
 
-type ProductNavigationProps = {
-  name: string;
-  articles: { title: string; slug: string }[];
+type PageNavProps = {
+  navigation: PageNavigation;
 };
 
-const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
+const PageNav = ({ navigation }: PageNavProps) => {
+  const router = useRouter();
+
   // TODO: https://linear.app/footprint/issue/FP-1890/bring-dark-theme-back-again
   // const { t } = useTranslation('components.product-navigation');
   // const { isDarkMode, toggle } = useDarkMode();
-  const router = useRouter();
 
   return (
-    <Container>
-      <Box>
-        <Header>
-          <Typography variant="caption-1">{name}</Typography>
-        </Header>
-        <nav>
-          {articles.map(({ title, slug }) => (
-            <StyledLink href={slug} data-selected={router.asPath === slug}>
-              {title}
-            </StyledLink>
-          ))}
-        </nav>
-      </Box>
+    <PageNavContainer>
+      <NavContainer>
+        {navigation.map(({ name, items }) => (
+          <Box>
+            <Header>
+              <Typography variant="caption-1">{name}</Typography>
+            </Header>
+            <nav>
+              {items.map(({ title, slug }) => (
+                <StyledLink href={slug} data-selected={router.asPath === slug}>
+                  {title}
+                </StyledLink>
+              ))}
+            </nav>
+          </Box>
+        ))}
+      </NavContainer>
       <Box>
         <SupportList />
         {/* <ThemeControl>
@@ -49,27 +54,35 @@ const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
           />
         </ThemeControl> */}
       </Box>
-    </Container>
+    </PageNavContainer>
   );
 };
 
-const Container = styled.aside`
+const PageNavContainer = styled.aside`
   ${({ theme }) => css`
     display: none;
 
     ${media.greaterThan('sm')`
-      background: ${theme.backgroundColor.primary};
-      border-right: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
       display: flex;
       flex-direction: column;
-      height: calc(100vh - var(--header-height));
       justify-content: space-between;
+      background: ${theme.backgroundColor.primary};
+      border-right: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      height: calc(100vh - var(--header-height));
       left: 0;
+      padding: ${theme.spacing[7]} ${theme.spacing[5]} 0;
       position: fixed;
       top: var(--header-height);
-      width: var(--product-aside-nav-width);
-      padding: ${theme.spacing[7]} ${theme.spacing[5]} 0;
+      width: var(--page-aside-nav-width);
     `};
+  `}
+`;
+
+const NavContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[9]};
   `}
 `;
 
@@ -113,4 +126,4 @@ const StyledLink = styled(Link)`
 //   `}
 // `;
 
-export default ProductNavigation;
+export default PageNav;

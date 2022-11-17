@@ -2,11 +2,12 @@ import { createFontStyles } from '@onefootprint/ui';
 import Markdown, { MarkdownToJSX } from 'markdown-to-jsx';
 import React from 'react';
 import SEO from 'src/components/seo';
-import type { Article } from 'src/types/article';
 import styled, { css } from 'styled-components';
 
+import type { Article } from '../../types/article';
+import type { Page } from '../../types/page';
 import ArticleHeader from './components/article-header';
-import Layout from './components/article-layout';
+import Layout from './components/layout';
 import A from './components/markdown-components/a';
 import Code from './components/markdown-components/code';
 import DocsInlineAlert from './components/markdown-components/docs-inline-alert';
@@ -16,7 +17,7 @@ import H3 from './components/markdown-components/h3';
 import Strong from './components/markdown-components/strong';
 
 type ArticleProps = {
-  product: any;
+  page: Page;
   article: Article;
 };
 
@@ -44,14 +45,14 @@ const overrides: MarkdownToJSX.Overrides = {
   },
 };
 
-const ArticlePage = ({ product, article }: ArticleProps) => (
+const ArticlePage = ({ page, article }: ArticleProps) => (
   <>
     <SEO
       description={article.data.meta.description}
       slug={article.data.slug}
       title={article.data.meta.title}
     />
-    <Layout product={product} article={article}>
+    <Layout page={page} article={article}>
       <ArticleHeader
         title={article.data.title}
         subtitle={article.data.readingTime.text}

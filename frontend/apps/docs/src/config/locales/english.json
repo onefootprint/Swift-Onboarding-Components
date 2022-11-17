@@ -3,7 +3,7 @@
     "errors": {}
   },
   "components": {
-    "product-navigation": {
+    "page-navigation": {
       "feedback": "Send Feedback",
       "help": "Need help?",
       "dark-mode": "Dark mode"

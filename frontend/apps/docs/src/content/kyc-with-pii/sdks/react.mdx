@@ -1,8 +1,9 @@
 ---
-product: KYC + PII Vault
-title: React Integration
+page: KYC + PII Vault
 slug: /kyc-with-pii/react
-position: 2
+category: SDKs
+title: React
+position: 1
 meta:
   {
     title: KYC + PII Vault - React Integration,
@@ -10,13 +11,9 @@ meta:
   }
 ---
 
-## Add Footprint.js to your app
+## Install footprint
 
-1. If your codebase is in React, you should use our React integration.
-
-2. Grab the Onboarding Publishable Key, for example `ob_test_WNgSBRR7uxoT8JRDBBflgw`.
-
-3. Install footprint-js and footprint-react:
+1. Install `footprint-js` and `footprint-react`:
 
 ```bash
 # With NPM
@@ -28,7 +25,11 @@ yarn add @onefootprint/footprint-js
 yarn add @onefootprint/footprint-react
 ```
 
-4. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
+## Integrate footprint
+
+1. Grab the Onboarding Publishable Key, for example `ob_test_WNgSBRR7uxoT8JRDBBflgw`.
+
+2. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
 
 ```typescript
 import "@onefootprint/footprint-js/dist/footprint-js.css";
@@ -45,7 +46,7 @@ const Page = () => {
   }
 
   return (
-    <main className={styles.main}>
+    <main>
       <FootprintButton
         publicKey="ob_test_WNgSBRR7uxoT8JRDBBflgw"
         onCompleted={handleCompleted}

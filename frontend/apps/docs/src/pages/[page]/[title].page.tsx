@@ -2,14 +2,13 @@ import type { GetStaticProps } from 'next';
 import type { ParsedUrlQuery } from 'querystring';
 
 import {
-  DocsPage,
+  getAllArticles,
   getArticleBySlug,
-  getArticlesForPage,
-  getNavigation,
+  getNavigationByPage,
 } from '../../utils/articles';
 
 export async function getStaticPaths() {
-  const pages = await getArticlesForPage(DocsPage.kycWithPii);
+  const pages = await getAllArticles();
   const paths = pages.map(({ data }) => data.slug);
   return { paths, fallback: 'blocking' };
 }
@@ -19,18 +18,21 @@ type Params = ParsedUrlQuery & {
 };
 
 export const getStaticProps: GetStaticProps<any, Params> = async context => {
-  const { slug } = context.params!;
-  const article = await getArticleBySlug(DocsPage.kycWithPii, slug);
-  const navigation = await getNavigation(DocsPage.kycWithPii);
+  const { page, title } = context.params!;
+  if (!page || !title) {
+    return { notFound: true };
+  }
+  const slug = `/${page}/${title}`;
+  const article = await getArticleBySlug(slug);
   if (!article) {
     return { notFound: true };
   }
-  const items = navigation.get(article.data.product) || new Set();
+  const navigation = await getNavigationByPage(article.data.page);
   return {
     props: {
-      product: {
-        name: article.data.product,
-        articles: Array.from(items).sort((a, b) => a.position - b.position),
+      page: {
+        name: article.data.page,
+        navigation,
       },
       article: {
         data: article.data,

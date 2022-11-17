@@ -20,9 +20,10 @@ export type ArticleMeta = {
 export type Article = {
   content: string;
   data: {
+    category: string;
     meta: ArticleMeta;
+    page: string;
     position: number;
-    product: string;
     readingTime: ArticleReadingTime;
     sections: ArticleSection[];
     slug: string;

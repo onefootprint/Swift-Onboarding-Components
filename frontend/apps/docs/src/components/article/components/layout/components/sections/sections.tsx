@@ -7,11 +7,11 @@ import styled, { css } from 'styled-components';
 
 import scrollSpy from './utils/scroll-spy';
 
-type ArticleSectionsProps = {
+type SectionsProps = {
   sections: ArticleSection[];
 };
 
-const ArticleSections = ({ sections }: ArticleSectionsProps) => {
+const Sections = ({ sections }: SectionsProps) => {
   const { t } = useTranslation('components.article-sections');
   useEffect(() => {
     scrollSpy();
@@ -137,4 +137,4 @@ const Header = styled.div`
   `};
 `;
 
-export default ArticleSections;
+export default Sections;

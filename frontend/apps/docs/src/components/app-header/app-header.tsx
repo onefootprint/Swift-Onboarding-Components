@@ -5,17 +5,17 @@ import {
   IcoShield16,
 } from '@onefootprint/icons';
 import React from 'react';
-import type { ProductArticle } from 'src/types/product';
+import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
 
-type PageHeaderProps = {
-  articles?: ProductArticle[];
+type AppHeaderProps = {
+  navigation?: PageNavigation;
 };
 
-const PageHeader = ({ articles }: PageHeaderProps) => {
+const AppHeader = ({ navigation }: AppHeaderProps) => {
   const { t } = useTranslation('components.header');
   const navItems = [
     {
@@ -51,7 +51,11 @@ const PageHeader = ({ articles }: PageHeaderProps) => {
   return (
     <Header>
       <DesktopNav navItems={navItems} links={desktopLinks} />
-      <MobileNav navItems={navItems} articles={articles} links={mobileLinks} />
+      <MobileNav
+        navItems={navItems}
+        links={mobileLinks}
+        navigation={navigation}
+      />
     </Header>
   );
 };
@@ -67,4 +71,4 @@ const Header = styled.header`
   `}
 `;
 
-export default PageHeader;
+export default AppHeader;

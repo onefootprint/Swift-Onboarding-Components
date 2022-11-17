@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
-import { SupportFormData } from '../../types';
+import type { SupportFormData } from '../../support-list.types';
 
 export type SupportFormRequest = {
   data: SupportFormData;

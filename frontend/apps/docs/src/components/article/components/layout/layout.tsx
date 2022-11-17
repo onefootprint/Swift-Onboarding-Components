@@ -1,38 +1,35 @@
 import { media } from '@onefootprint/ui';
 import React from 'react';
 import type { Article } from 'src/types/article';
-import type { ProductArticle } from 'src/types/product';
+import type { Page } from 'src/types/page';
 import styled, { css } from 'styled-components';
 
-import ArticleSections from './components/article-sections';
-import ProductNavigation from './components/product-navigation';
+import PageNav from './components/page-nav';
+import Sections from './components/sections';
 
-export type ArticleLayoutProps = {
+export type LayoutProps = {
   children: React.ReactNode;
-  product: {
-    name: string;
-    articles: ProductArticle[];
-  };
+  page: Page;
   article: Article;
 };
 
-const ArticleLayout = ({ children, article, product }: ArticleLayoutProps) => (
-  <Content>
-    <ProductNavigation articles={product.articles} name={product.name} />
+const Layout = ({ children, article, page }: LayoutProps) => (
+  <LayoutContainer>
+    <PageNav navigation={page.navigation} />
     <Main>
-      <ArticleContent>{children}</ArticleContent>
-      <ArticleSections sections={article.data.sections} />
+      <Content>{children}</Content>
+      <Sections sections={article.data.sections} />
     </Main>
-  </Content>
+  </LayoutContainer>
 );
 
-const Content = styled.div`
+const LayoutContainer = styled.div`
   display: flex;
   margin-top: var(--header-height);
   width: 100%;
 
   ${media.greaterThan('sm')`
-    padding-left: var(--product-aside-nav-width);
+    padding-left: var(--page-aside-nav-width);
   `}
 `;
 
@@ -55,7 +52,7 @@ const Main = styled.main`
   `};
 `;
 
-const ArticleContent = styled.article`
+const Content = styled.article`
   max-width: 720px;
   width: 100%;
 
@@ -64,4 +61,4 @@ const ArticleContent = styled.article`
   `}
 `;
 
-export default ArticleLayout;
+export default Layout;

@@ -3,22 +3,24 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from '@onefootprint/icons';
 import { Box, LinkButton, media, Tab, Tabs } from '@onefootprint/ui';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import type { ProductArticle } from 'src/types/product';
+import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
 import type { LinkItem, NavItem } from '../../app-header.types';
-import ProductNavigation from './components/product-navigation';
+import PageNav from './components/page-nav';
 
 type MobileNavProps = {
   navItems: NavItem[];
-  articles?: ProductArticle[];
+  navigation?: PageNavigation;
   links: LinkItem[];
 };
 
-const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
+const MobileNav = ({ navItems, navigation, links }: MobileNavProps) => {
   const { t } = useTranslation('components.header');
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [animateNavMenu] = useAutoAnimate<HTMLDivElement>();
   useLockedBody(isExpanded);
@@ -31,7 +33,7 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
     <Container>
       <Header>
         <InternalNavContainer>
-          {articles && (
+          {navigation && (
             <NavTriggerButton
               type="button"
               onClick={handleToggleNav}
@@ -68,7 +70,11 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
       <Nav>
         <Tabs variant="pill">
           {navItems.map(({ baseHref, href, Icon, text }) => (
-            <Tab selected={href.startsWith(baseHref)} href={href} as={Link}>
+            <Tab
+              as={Link}
+              href={href}
+              selected={router.asPath.startsWith(baseHref)}
+            >
               <Icon />
               {text}
             </Tab>
@@ -76,9 +82,9 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
         </Tabs>
       </Nav>
       <Box ref={animateNavMenu}>
-        {isExpanded && articles && (
+        {isExpanded && navigation && (
           <NavMenu>
-            <ProductNavigation articles={articles} />
+            <PageNav navigation={navigation} />
           </NavMenu>
         )}
       </Box>
@@ -140,7 +146,7 @@ const NavMenu = styled.div`
     --mobile-nav-height: 48px;
 
     background: ${theme.backgroundColor.primary};
-    padding: ${theme.spacing[7]} ${theme.spacing[5]};
+    padding: ${theme.spacing[7]} ${theme.spacing[5]} ${theme.spacing[4]};
     height: calc(
       100vh - var(--mobile-header-height) - var(--mobile-nav-height)
     );

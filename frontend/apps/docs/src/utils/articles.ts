@@ -2,15 +2,10 @@ import fs from 'fs';
 import glob from 'glob';
 import matter from 'gray-matter';
 import kebabCase from 'lodash/kebabCase';
-import path from 'path';
 import readingTime from 'reading-time';
 
 import type { Article } from '../types/article';
-
-export enum DocsPage {
-  kycWithPii = 'kyc-with-pii',
-  pii = 'pii',
-}
+import type { PageNavigationCategory } from '../types/page';
 
 const getFilesPath = (filesPath: string): Promise<string[]> =>
   new Promise((resolve, reject) => {
@@ -61,40 +56,45 @@ const getAllMarkdownFiles = (contentPaths: string[]) =>
     }),
   );
 
-const generatePathForPage = (page: DocsPage) => {
-  const pathString = `src/content/${page}/**.mdx`;
-  return path.join(process.cwd(), pathString);
+export const getAllArticles = async () => {
+  const filesPath = await getFilesPath('src/content/**/**.mdx');
+  return getAllMarkdownFiles(filesPath);
 };
 
-export const getArticlesForPage = async (page: DocsPage) => {
-  const docsPath = generatePathForPage(page);
-  const filesPath = await getFilesPath(docsPath);
-  const articles = getAllMarkdownFiles(filesPath);
-  return articles;
+export const getArticlesByPage = async (page: string) => {
+  const filesPath = await getFilesPath('src/content/**/**.mdx');
+  const articles = await getAllMarkdownFiles(filesPath);
+  return articles.filter(article => article.data.page === page);
 };
 
-export const getArticleBySlug = async (page: DocsPage, slug: string) => {
-  const articles = await getArticlesForPage(page);
-  return articles.find(article => article.data.slug === `/${page}/${slug}`);
+export const getArticleBySlug = async (slug: string) => {
+  const articles = await getAllArticles();
+  return articles.find(article => article.data.slug === slug);
 };
 
-export const getNavigation = async (page: DocsPage) => {
-  const navigation = new Map<
-    string,
-    Set<{ title: string; position: number; slug: string }>
-  >();
-  const articles = await getArticlesForPage(page);
-  articles.forEach(({ data: { product, title, position, slug } }) => {
-    if (navigation.has(product)) {
-      const set = navigation.get(product);
-      if (set) {
-        set.add({ title, position, slug });
-      }
-    } else {
-      const set = new Set<{ title: string; position: number; slug: string }>();
-      set.add({ title, position, slug });
-      navigation.set(product, set);
+export const getNavigationByPage = async (page: string) => {
+  const navigation = new Map<string, PageNavigationCategory>();
+  const articles = await getArticlesByPage(page);
+
+  const findOrCreateCategory = (name: string) => {
+    if (!navigation.has(name)) {
+      navigation.set(name, { name, items: [] });
+    }
+    return navigation.get(name);
+  };
+
+  articles.forEach(({ data: { category, title, position, slug } }) => {
+    const navigationCategory = findOrCreateCategory(category);
+    if (navigationCategory) {
+      navigationCategory.items.push({
+        title,
+        position,
+        slug,
+      });
     }
   });
-  return navigation;
+  return Array.from(navigation).map(([, { name, items }]) => ({
+    name,
+    items: items.sort((a, b) => a.position - b.position),
+  }));
 };

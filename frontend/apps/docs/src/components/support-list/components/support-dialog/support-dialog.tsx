@@ -10,11 +10,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import useSupportForm from '../../../article/components/article-layout/components/product-navigation/hooks/submit-support-form/use-support-form';
-import {
-  FormField,
-  SupportFormData,
-} from '../../../article/components/article-layout/components/product-navigation/types';
+import useSupportForm from '../../hooks/use-support-form';
+import { FormField, SupportFormData } from '../../support-list.types';
 
 type SupportDialogProps = {
   url: string;
