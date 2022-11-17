@@ -13,7 +13,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, SealedVaultDataKey, TenantId, UserVaultId,
+    FootprintUserId, InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, SealedVaultDataKey,
+    TenantId, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -77,8 +78,8 @@ impl OnboardingUpdate {
 #[derive(Debug)]
 pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
-    TenantId {
-        id: &'a OnboardingId,
+    FpUserId {
+        fp_user_id: &'a FootprintUserId,
         tenant_id: &'a TenantId,
         is_live: bool,
     },
@@ -98,10 +99,10 @@ impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a OnboardingId, &'a TenantId, bool)> for OnboardingIdentifier<'a> {
-    fn from((id, tenant_id, is_live): (&'a OnboardingId, &'a TenantId, bool)) -> Self {
-        Self::TenantId {
-            id,
+impl<'a> From<(&'a FootprintUserId, &'a TenantId, bool)> for OnboardingIdentifier<'a> {
+    fn from((fp_user_id, tenant_id, is_live): (&'a FootprintUserId, &'a TenantId, bool)) -> Self {
+        Self::FpUserId {
+            fp_user_id,
             tenant_id,
             is_live,
         }
@@ -158,13 +159,13 @@ impl Onboarding {
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::TenantId {
-                id,
+            OnboardingIdentifier::FpUserId {
+                fp_user_id,
                 tenant_id,
                 is_live,
             } => {
                 query = query
-                    .filter(onboarding::id.eq(id))
+                    .filter(scoped_user::fp_user_id.eq(fp_user_id))
                     .filter(scoped_user::tenant_id.eq(tenant_id))
                     .filter(scoped_user::is_live.eq(is_live))
             }
@@ -207,13 +208,20 @@ impl Onboarding {
 
     pub fn lock_for_tenant(
         conn: &mut TxnPgConnection,
-        id: &OnboardingId,
+        fp_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<BasicOnboardingInfo> {
-        Self::lock(conn, id)?;
+        let scoped_user_ids = scoped_user::table
+            .filter(scoped_user::fp_user_id.eq(fp_user_id))
+            .select(scoped_user::id);
+        onboarding::table
+            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
+            .for_no_key_update()
+            .load::<Onboarding>(conn.conn())?;
+
         // It's a bit precarious to make a FOR UPDATE statement with joins
-        Self::get(conn, (id, tenant_id, is_live))
+        Self::get(conn, (fp_user_id, tenant_id, is_live))
     }
 
     pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> DbResult<Self> {

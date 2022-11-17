@@ -173,14 +173,13 @@ class TestDashboardOnboardings:
         assert latest_decision["status"] == onboarding["status"]
         assert latest_decision["source"]["kind"] == "footprint"
 
-        ob_id = onboarding["id"]
         test_note = "This is a test note. Flerp derp"
         decision_data = dict(
             annotation=dict(note=test_note, is_pinned=True),
             status="fail",
         )
         post(
-            f"onboardings/{ob_id}/decisions",
+            f"users/{user.fp_user_id}/decisions",
             decision_data,
             tenant.auth_token,
             DashboardAuthIsLive("false"),

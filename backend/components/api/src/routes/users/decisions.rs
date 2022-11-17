@@ -11,17 +11,18 @@ use db::models::annotation::Annotation;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
-use newtypes::{OnboardingId, TenantPermission};
+use newtypes::FootprintUserId;
+use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
     tags(Users)
 )]
-#[post("/onboardings/{id}/decisions")]
+#[post("/users/{fp_user_id}/decisions")]
 pub async fn post(
     state: web::Data<State>,
-    onboarding_id: web::Path<OnboardingId>,
+    fp_user_id: web::Path<FootprintUserId>,
     request: web::Json<DecisionRequest>,
     auth: WorkOsAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -33,7 +34,7 @@ pub async fn post(
         .id
         .clone();
     let is_live = auth.is_live()?;
-    let onboarding_id = onboarding_id.into_inner();
+    let fp_user_id = fp_user_id.into_inner();
 
     let DecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },
@@ -44,7 +45,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (ob, su, manual_review, decision) =
-                Onboarding::lock_for_tenant(conn, &onboarding_id, &tenant_id, is_live)?;
+                Onboarding::lock_for_tenant(conn, &fp_user_id, &tenant_id, is_live)?;
 
             let need_to_clear_manual_review = manual_review.is_some();
             // The status changed if either there is no current decision OR the status of the existing decision is different
