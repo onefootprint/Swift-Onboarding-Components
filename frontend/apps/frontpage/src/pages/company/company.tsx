@@ -72,6 +72,13 @@ const Company = () => {
       twitter: 'https://twitter.com/belce_dogru',
     },
     {
+      name: 'Claudio Angrigiani',
+      avatarSrc: '/team/member-claudio.png',
+      role: 'Design Engineering',
+      linkedin: 'https://www.linkedin.com/in/claudioangrigiani/',
+      twitter: 'https://twitter.com/clodoan',
+    },
+    {
       name: 'Dave Argoff',
       avatarSrc: '/team/member-dave.png',
       role: 'Engineering',
@@ -98,6 +105,12 @@ const Company = () => {
       role: 'Chief of Staff',
       linkedin: 'https://www.linkedin.com/in/karenjmok/',
       twitter: 'https://twitter.com/themokstories',
+    },
+    {
+      name: 'Keagan Long',
+      avatarSrc: '/team/member-keagan.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/keagan-long-50597769/',
     },
     {
       name: 'Omar Cameron',
