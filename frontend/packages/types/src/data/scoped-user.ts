@@ -6,6 +6,6 @@ export type ScopedUser = {
   isPortable: boolean;
   identityDataAttributes: UserDataAttribute[];
   startTimestamp: string;
-  onboardings: Onboarding[];
+  onboarding?: Onboarding;
   orderingId: string;
 };

@@ -76,7 +76,7 @@ pub async fn get(
         timestamp_lte,
         timestamp_gte,
     };
-    let (scoped_users, obs, uvws, count) = state
+    let (scoped_users, mut obs, uvws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_users = db::scoped_user::list_authorized_for_tenant(
@@ -99,7 +99,6 @@ pub async fn get(
     let cursor = request
         .cursor_item(&state, &scoped_users)
         .map(|su| su.ordering_id);
-    let empty_vec = vec![];
 
     // Since we zip these Vecs together, we should ensure they are in the same order.
     // scoped_users.sort_by_key(|su| su.user_vault_id.clone());
@@ -115,7 +114,7 @@ pub async fn get(
             let uvw = uvw_map.remove(&su.user_vault_id).unwrap();
             <api_wire_types::User as DbToApi<UserDetail>>::from_db((
                 uvw.get_populated_fields(),
-                obs.get(&su.id).unwrap_or(&empty_vec),
+                obs.remove(&su.id),
                 su,
                 uvw.user_vault.is_portable,
             ))
@@ -148,24 +147,24 @@ pub async fn get_detail(
         timestamp_lte: None,
         timestamp_gte: None,
     };
-    let (su, obs, uvw) = state
+    let (su, ob, uvw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let su = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
             let uvw = UserVaultWrapper::get(conn, &su.user_vault_id)?;
-            let obs = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
+            let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
                 .remove(&su.id)
                 .ok_or(ApiError::ResourceNotFound)?;
 
-            Ok((su, obs, uvw))
+            Ok((su, ob, uvw))
         })
         .await??;
 
     let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
         uvw.get_populated_fields(),
-        &obs,
+        Some(ob),
         su,
         uvw.user_vault.is_portable,
     ));

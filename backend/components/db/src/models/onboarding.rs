@@ -12,7 +12,6 @@ use crate::{DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use itertools::Itertools;
 use newtypes::{
     InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, SealedVaultDataKey, TenantId, UserVaultId,
 };
@@ -228,7 +227,7 @@ impl Onboarding {
     pub fn get_for_scoped_users(
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,
-    ) -> DbResult<HashMap<ScopedUserId, Vec<SerializableOnboardingInfo>>> {
+    ) -> DbResult<HashMap<ScopedUserId, SerializableOnboardingInfo>> {
         use crate::schema::{
             insight_event, liveness_event, manual_review, ob_configuration, onboarding_decision, tenant_user,
         };
@@ -254,9 +253,7 @@ impl Onboarding {
         // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_user_id
         let result = obs
             .into_iter()
-            .group_by(|(link, _, _, _, _, _)| link.scoped_user_id.clone())
-            .into_iter()
-            .map(|g| (g.0, g.1.collect()))
+            .map(|ob| (ob.0.scoped_user_id.clone(), ob))
             .collect();
         Ok(result)
     }

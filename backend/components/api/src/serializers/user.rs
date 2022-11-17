@@ -3,14 +3,14 @@ use newtypes::DataAttribute;
 
 use crate::utils::db2api::DbToApi;
 
-pub type UserDetail<'a> = (
+pub type UserDetail = (
     Vec<DataAttribute>,
-    &'a [SerializableOnboardingInfo],
+    Option<SerializableOnboardingInfo>,
     ScopedUser,
     bool,
 );
 
-impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
+impl DbToApi<UserDetail> for api_wire_types::User {
     fn from_db((identity_data_attributes, onboarding_info, scoped_user, is_portable): UserDetail) -> Self {
         let ScopedUser {
             fp_user_id,
@@ -24,10 +24,7 @@ impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
             is_portable,
             identity_data_attributes,
             start_timestamp,
-            onboardings: onboarding_info
-                .iter()
-                .map(|x| api_wire_types::Onboarding::from_db(x.clone()))
-                .collect(),
+            onboarding: onboarding_info.map(|x| api_wire_types::Onboarding::from_db(x.clone())),
             ordering_id,
         }
     }
@@ -52,7 +49,7 @@ impl DbToApi<ScopedUser> for api_wire_types::User {
             is_portable: false,
             identity_data_attributes: vec![],
             start_timestamp,
-            onboardings: vec![],
+            onboarding: None,
             ordering_id,
         }
     }

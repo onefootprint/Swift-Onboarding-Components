@@ -20,7 +20,6 @@ from tests.utils import (
     identify_verify,
     create_inherited_non_sandbox_user,
     get_requirement_from_requirements,
-    create_ob_config_for_tenant
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -72,7 +71,7 @@ def bar_tenant(must_collect_data, can_access_data):
     return create_tenant(org_data, ob_data)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def document_requesting_tenant(must_collect_data, can_access_data):
     org_data = {
         "name": "document tenant",
@@ -430,20 +429,20 @@ class TestBifrost:
     # Other steps we should test (see TODOs on the API route)
     #   - document request moves into UPLOADED after post
     #   - after document request gets moved out of PENDING, requirement is no longer there
+    @pytest.mark.parametrize(
+        "test_name",
+        [("both"), ("front_only")],
+    )
     def test_onboarding_requiring_document(
-        self, twilio, document_requesting_tenant, must_collect_data, can_access_data
+        self,
+        document_requesting_tenant,
+        auth_token,
+        test_name,
     ):
         from .image_fixtures import test_image
+
         # This is non-ideal, but creating new users integration tests is a little tricky at the moment
         # so we create multiple onboarding configurations/onboardings to test what we are trying to test
-        second_ob_conf_name = "second_ob_config"
-        ob_conf_data = {
-            "name": second_ob_conf_name,
-            "must_collect_data": must_collect_data,
-            "can_access_data": can_access_data,
-            "must_collect_identity_document": True,
-        }
-        document_requesting_tenant = create_ob_config_for_tenant(document_requesting_tenant, ob_conf_data)
         doc_data_both = {
             "front_image": test_image,
             "back_image": test_image,
@@ -456,73 +455,61 @@ class TestBifrost:
             "document_type": "passport",
             "country_code": "USA",
         }
-        user_auth_token = create_inherited_non_sandbox_user(twilio)
 
-        # These users are inherited because all integration tests use the same PHONE_NUMBER
-        # At some point we'll revisit this
-        configs = [
-            {
-                "ob_config": "default",
-                "data": doc_data_both,
-            },
-            {
-                "ob_config": second_ob_conf_name,
-                "data": doc_data_only_front,
-            },        
-        ]
-        
-        # We test both back and front and only front
-        for c in configs:
-            ob_config_name = c["ob_config"]
-            # Onboard a user onto a tenant that requests a document
-            post(
-                "hosted/onboarding",
-                None,
-                document_requesting_tenant.ob_configs[ob_config_name].key,
-                user_auth_token,
-            )
+        data = {
+            "both": doc_data_both,
+            "front_only": doc_data_only_front,
+        }[test_name]
+        ob_config_key = document_requesting_tenant.ob_config().key
 
-            body = get(
-                "hosted/onboarding/status",
-                None,
-                document_requesting_tenant.ob_configs[ob_config_name].key,
-                user_auth_token,
-            )
-            # We have a requirement
-            req = get_requirement_from_requirements(
-                "collect_document", body["requirements"]
-            )
-            assert req
-            # stash the request id
-            document_request_id = req["document_request_id"]
+        # Onboard a user onto a tenant that requests a document
+        post(
+            "hosted/onboarding",
+            None,
+            ob_config_key,
+            auth_token,
+        )
 
-            # Submit the document
-            data = c['data']
-            post_body = post(
-                f"hosted/user/document/{document_request_id}",
-                data,
-                user_auth_token,
-                document_requesting_tenant.ob_configs[ob_config_name].key,
-            )
+        body = get(
+            "hosted/onboarding/status",
+            None,
+            ob_config_key,
+            auth_token,
+        )
+        # We have a requirement
+        req = get_requirement_from_requirements(
+            "collect_document", body["requirements"]
+        )
+        assert req
+        # stash the request id
+        document_request_id = req["document_request_id"]
 
-            assert post_body == {}
+        # Submit the document
+        post_body = post(
+            f"hosted/user/document/{document_request_id}",
+            data,
+            auth_token,
+            ob_config_key,
+        )
 
-            # get status.
-            # We always move to complete now, this will change once we have vendor integrations
-            expected = {
-                "status": {"kind": "complete"},
-                "front_image_error": None,
-                "back_image_error": None,
-            }
+        assert post_body == {}
 
-            get_body = get(
-                f"hosted/user/document/{document_request_id}/status",
-                None,
-                user_auth_token,
-                document_requesting_tenant.ob_configs[ob_config_name].key,
-            )
+        # get status.
+        # We always move to complete now, this will change once we have vendor integrations
+        expected = {
+            "status": {"kind": "complete"},
+            "front_image_error": None,
+            "back_image_error": None,
+        }
 
-            assert get_body == expected
+        get_body = get(
+            f"hosted/user/document/{document_request_id}/status",
+            None,
+            auth_token,
+            ob_config_key,
+        )
+
+        assert get_body == expected
 
 
 class TestBifrostSandbox:

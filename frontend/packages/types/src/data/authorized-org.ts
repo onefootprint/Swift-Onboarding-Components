@@ -13,6 +13,6 @@ export type AuthorizedOrg = {
   id: string;
   logoUrl: string;
   name: string;
-  onboardings: AuthorizedOrgOnboarding[];
+  onboarding: AuthorizedOrgOnboarding;
   tenantId: string;
 };

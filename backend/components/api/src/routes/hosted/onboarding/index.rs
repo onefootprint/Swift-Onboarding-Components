@@ -90,6 +90,8 @@ pub async fn post(
                 should_create_document_request,
                 must_collect_document_e_data_key,
             };
+            // TODO this could fail if we create an second onboarding for the same scoped user
+            // Maybe we should show a nice error message in that case
             let ob = Onboarding::get_or_create(conn, ob_create_args)?;
             // Update the auth session in the DB to have the OrgOnboarding scope tied to this onboarding
             // Even though the OrgOnboardingInit scope is only used by this endpoint, we notably don't remove
@@ -101,11 +103,9 @@ pub async fn post(
             user_auth.update_session(conn, &session_key, data)?;
 
             // If the user has already onboarded onto this same ob config, return a validation token
-            let validation_token = ob.is_authorized.then_some(create_onboarding_validation_token(
-                conn,
-                &session_key,
-                ob.id.clone(),
-            )?);
+            let validation_token =
+                ob.is_authorized
+                    .then_some(create_onboarding_validation_token(conn, &session_key, ob.id)?);
 
             Ok(validation_token)
         })

@@ -8,7 +8,7 @@ pub struct HostedAuthorizedOrgs {
     pub name: String,
     pub logo_url: Option<String>,
     pub timestamp: DateTime<Utc>,
-    pub onboardings: Vec<HostedUserOnboardingInfo>,
+    pub onboarding: HostedUserOnboardingInfo,
 }
 
 export_schema!(HostedAuthorizedOrgs);

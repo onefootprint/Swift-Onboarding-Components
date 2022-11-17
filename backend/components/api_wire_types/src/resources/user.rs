@@ -8,7 +8,7 @@ pub struct User {
     pub is_portable: bool,
     pub identity_data_attributes: Vec<DataAttribute>,
     pub start_timestamp: DateTime<Utc>,
-    pub onboardings: Vec<Onboarding>,
+    pub onboarding: Option<Onboarding>,
     pub ordering_id: i64,
 }
 

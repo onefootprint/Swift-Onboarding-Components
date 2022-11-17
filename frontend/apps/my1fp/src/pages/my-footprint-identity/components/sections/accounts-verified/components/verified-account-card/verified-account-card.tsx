@@ -1,4 +1,4 @@
-import { AuthorizedOrg, AuthorizedOrgOnboarding } from '@onefootprint/types';
+import { AuthorizedOrg } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
@@ -9,16 +9,7 @@ type VerifiedAccountCardProps = {
 };
 
 const VerifiedAccountCard = ({ org }: VerifiedAccountCardProps) => {
-  if (!org.onboardings.length) {
-    return null;
-  }
-
-  const sortedOnboardingTimes = org.onboardings
-    .map((onboarding: AuthorizedOrgOnboarding) => onboarding.timestamp)
-    .sort();
-  const latestOnboarding =
-    sortedOnboardingTimes[sortedOnboardingTimes.length - 1];
-  const date = new Date(latestOnboarding);
+  const date = new Date(org.onboarding.timestamp);
   const dateString = [date.getMonth(), date.getDay(), date.getFullYear()].join(
     '\\',
   );

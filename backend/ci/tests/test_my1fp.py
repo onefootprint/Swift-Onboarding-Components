@@ -75,7 +75,7 @@ class TestMy1fp:
         body = get("hosted/user/authorized_orgs", None, my1fp_authed_user.auth_token)
         authorized_orgs = body
 
-        onboarding_info = authorized_orgs[0]["onboardings"][0]
+        onboarding_info = authorized_orgs[0]["onboarding"]
         assert onboarding_info["name"] == "Acme Bank Card"
         assert onboarding_info["insight_event"]
         assert set(onboarding_info["can_access_data"]) == set(can_access_data)

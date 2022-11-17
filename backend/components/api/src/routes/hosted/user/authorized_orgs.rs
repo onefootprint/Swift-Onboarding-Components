@@ -1,5 +1,5 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
-use crate::errors::ApiError;
+use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 
 use crate::utils::db2api::DbToApi;
@@ -26,7 +26,7 @@ pub async fn get(
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 
     let user_vault_id = user_auth.user_vault_id();
-    let (scoped_users, obs) = state
+    let (scoped_users, mut obs) = state
         .db_pool
         .db_query(move |conn| -> Result<_, db::DbError> {
             let scoped_users = ScopedUser::list_for_user_vault(conn, &user_vault_id)?;
@@ -37,24 +37,26 @@ pub async fn get(
         .await??;
     let results = scoped_users
         .into_iter()
-        .map(|(scoped_user, tenant)| HostedAuthorizedOrgs {
-            tenant_id: scoped_user.tenant_id,
-            name: tenant.name,
-            logo_url: tenant.logo_url,
-            timestamp: scoped_user.start_timestamp,
-            onboardings: obs
-                .get(&scoped_user.id)
-                .unwrap_or(&vec![])
-                .iter()
+        .map(|(scoped_user, tenant)| -> ApiResult<_> {
+            let result = HostedAuthorizedOrgs {
+                tenant_id: scoped_user.tenant_id,
+                name: tenant.name,
+                logo_url: tenant.logo_url,
+                timestamp: scoped_user.start_timestamp,
+                onboarding: obs
+                .remove(&scoped_user.id)
                 .map(|(ob, conf, _, insight, _, _)| HostedUserOnboardingInfo {
                     name: conf.name.clone(),
                     insight_event: InsightEvent::from_db(insight.clone()),
                     timestamp: ob.start_timestamp,
                     can_access_data: conf.can_access_data.clone(),
                 })
-                .collect(),
-            id: scoped_user.id,
+                // Should never hit this
+                .ok_or(ApiError::ResourceNotFound)?,
+                id: scoped_user.id,
+            };
+            Ok(result)
         })
-        .collect();
+        .collect::<ApiResult<_>>()?;
     Ok(Json(ResponseData::ok(results)))
 }

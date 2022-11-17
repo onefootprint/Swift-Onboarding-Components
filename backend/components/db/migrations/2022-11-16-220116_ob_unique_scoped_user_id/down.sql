@@ -1,0 +1,1 @@
+ALTER TABLE onboarding DROP CONSTRAINT onboarding_unique_scoped_user_id;

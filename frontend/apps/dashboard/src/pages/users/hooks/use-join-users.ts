@@ -1,6 +1,5 @@
 import { OnboardingStatus, ScopedUser } from '@onefootprint/types';
 import { useMemo } from 'react';
-import { statusToPriority } from 'src/constants/onboarding-status-display';
 
 import { User } from '../types/user.types';
 import { UserVaultData } from '../types/vault-data.types';
@@ -17,14 +16,6 @@ const useJoinUsers = (
   useMemo<User[] | undefined>(
     () =>
       scopedUsers?.map((scopedUser: ScopedUser) => {
-        // The status we display for the user is the maximum status of all the onboardings
-        const maxStatus = scopedUser.onboardings.sort(
-          (a, b) => statusToPriority[b.status] - statusToPriority[a.status],
-        )[0]?.status;
-        const requiresManualReview = scopedUser.onboardings.some(
-          o => o.requiresManualReview,
-        );
-
         // Copy over the decrypted values, for remaining encrypted identityDataAttributes, add null entries
         const vaultData = decryptedUsers.get(scopedUser.id) || {
           kycData: {},
@@ -37,8 +28,9 @@ const useJoinUsers = (
         });
 
         return {
-          requiresManualReview,
-          status: maxStatus || OnboardingStatus.vaultOnly,
+          requiresManualReview:
+            scopedUser.onboarding?.requiresManualReview || false,
+          status: scopedUser.onboarding?.status || OnboardingStatus.vaultOnly,
           vaultData,
           ...scopedUser,
         } as User;

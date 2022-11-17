@@ -129,6 +129,7 @@ impl ObConfiguration {
         conn: &mut PgConnection,
         scoped_user_id: ScopedUserId,
     ) -> DbResult<Vec<Self>> {
+        // For now, this will be either 0 or 1 result
         let obcs = ob_configuration::table
             .inner_join(onboarding::table)
             .filter(onboarding::scoped_user_id.eq(scoped_user_id))

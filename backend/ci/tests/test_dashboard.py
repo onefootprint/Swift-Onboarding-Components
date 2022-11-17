@@ -167,7 +167,7 @@ class TestDashboardOnboardings:
 
         # TODO This will get simpler with the onboarding-scoped dashboard
         scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
-        onboarding = next(i for i in scoped_user["onboardings"])
+        onboarding = scoped_user["onboarding"]
         assert onboarding["status"] == "pass"
         latest_decision = onboarding["latest_decision"]
         assert latest_decision["status"] == onboarding["status"]
@@ -187,7 +187,7 @@ class TestDashboardOnboardings:
         )
 
         scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
-        onboarding = next(i for i in scoped_user["onboardings"])
+        onboarding = scoped_user["onboarding"]
         assert onboarding["status"] == "fail"
         # Assert the latest decision is a manual decision
         latest_decision = onboarding["latest_decision"]
