@@ -1,6 +1,9 @@
 import { useGetOnboardingConfig } from '@onefootprint/footprint-elements';
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
-import { CollectedKycDataOptionLabels } from '@onefootprint/types';
+import {
+  CollectedKycDataOptionLabels,
+  IdentifyType,
+} from '@onefootprint/types';
 import { Box, Portal, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
@@ -13,28 +16,33 @@ import useTenantPublicKey from './hooks/use-tenant-public-key';
 const Init = () => {
   const tenantPk = useTenantPublicKey();
   const [, send] = useBifrostMachine();
-  useDeviceInfo((info: DeviceInfo) => {
+
+  useDeviceInfo((device: DeviceInfo) => {
     send({
-      type: Events.deviceInfoIdentified,
-      payload: info,
+      type: Events.initContextUpdated,
+      payload: {
+        device,
+      },
     });
   });
 
   useGetOnboardingConfig(tenantPk, {
     onSuccess: ({ orgName, name, isLive, mustCollectData, canAccessData }) => {
       send({
-        type: Events.tenantInfoRequestSucceeded,
+        type: Events.initContextUpdated,
         payload: {
-          pk: tenantPk,
-          orgName,
-          name,
-          isLive,
-          mustCollectData: mustCollectData.map(
-            (attr: string) => CollectedKycDataOptionLabels[attr],
-          ),
-          canAccessData: canAccessData.map(
-            (attr: string) => CollectedKycDataOptionLabels[attr],
-          ),
+          tenant: {
+            pk: tenantPk,
+            orgName,
+            name,
+            isLive,
+            mustCollectData: mustCollectData.map(
+              (attr: string) => CollectedKycDataOptionLabels[attr],
+            ),
+            canAccessData: canAccessData.map(
+              (attr: string) => CollectedKycDataOptionLabels[attr],
+            ),
+          },
         },
       });
     },
@@ -44,7 +52,17 @@ const Init = () => {
       });
     },
   });
-  useAuthenticationFlow();
+
+  useAuthenticationFlow((isAuthenticationFlow: boolean) => {
+    send({
+      type: Events.initContextUpdated,
+      payload: {
+        identifyType: isAuthenticationFlow
+          ? IdentifyType.my1fp
+          : IdentifyType.onboarding,
+      },
+    });
+  });
 
   return (
     <Box>

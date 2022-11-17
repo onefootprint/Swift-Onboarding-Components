@@ -12,38 +12,37 @@ export enum States {
 }
 
 export enum Events {
-  tenantInfoRequestSucceeded = 'tenantInfoRequestSucceeded',
+  initContextUpdated = 'initContextUpdated',
   tenantInfoRequestFailed = 'tenantInfoRequestFailed',
-  authenticationFlowStarted = 'authenticationFlowStarted',
   authenticationSucceeded = 'authenticationSucceeded',
-  deviceInfoIdentified = 'deviceInfoIdentified',
   identifyCompleted = 'done.invoke.identify',
   onboardingCompleted = 'done.invoke.onboarding',
 }
 
 export enum Actions {
-  assignIdentifyType = 'assignIdentifyType',
+  assignInitContext = 'assignInitContext',
   assignUserFound = 'assignUserFound',
   assignAuthToken = 'assignAuthToken',
-  assignDeviceInfo = 'assignDeviceInfo',
-  assignTenantInfo = 'assignTenantInfo',
   assignValidationToken = 'assignValidationToken',
 }
 
 export type BifrostContext = {
   authToken?: string;
   device?: DeviceInfo;
-  identifyType: IdentifyType;
+  identifyType?: IdentifyType;
   tenant?: TenantInfo;
-  userFound: boolean;
+  userFound?: boolean;
   validationToken?: string;
 };
 
 export type BifrostEvent =
-  | { type: Events.authenticationFlowStarted }
   | {
-      type: Events.tenantInfoRequestSucceeded;
-      payload: TenantInfo;
+      type: Events.initContextUpdated;
+      payload: {
+        tenant?: TenantInfo;
+        device?: DeviceInfo;
+        identifyType?: IdentifyType;
+      };
     }
   | {
       type: Events.tenantInfoRequestFailed;
@@ -60,8 +59,4 @@ export type BifrostEvent =
       data: {
         validationToken?: string;
       };
-    }
-  | {
-      type: Events.deviceInfoIdentified;
-      payload: DeviceInfo;
     };

@@ -4,36 +4,32 @@ import { assign, createMachine } from 'xstate';
 import createIdentifyMachine from '../identify';
 import createOnboardingMachine from '../onboarding';
 import { Actions, BifrostContext, BifrostEvent, Events, States } from './types';
-
-const initialContext: BifrostContext = {
-  identifyType: IdentifyType.onboarding,
-  authToken: undefined,
-  userFound: false,
-};
+import initContextComplete from './utils/init-context-complete';
 
 const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
   {
     predictableActionArguments: true,
     id: 'bifrostMachine',
     initial: States.init,
-    context: initialContext,
+    context: {},
     states: {
       [States.init]: {
         on: {
-          [Events.deviceInfoIdentified]: {
-            actions: [Actions.assignDeviceInfo],
-          },
-          [Events.authenticationFlowStarted]: {
-            target: States.identify,
-            actions: [Actions.assignIdentifyType],
-          },
-          [Events.tenantInfoRequestSucceeded]: {
-            target: States.identify,
-            actions: [Actions.assignTenantInfo],
-          },
           [Events.tenantInfoRequestFailed]: {
             target: States.tenantInvalid,
           },
+          [Events.initContextUpdated]: [
+            {
+              description:
+                'Only transition to next state if all required info is collected',
+              actions: [Actions.assignInitContext],
+              target: States.identify,
+              cond: (context, event) => initContextComplete(context, event),
+            },
+            {
+              actions: [Actions.assignInitContext],
+            },
+          ],
         },
       },
       [States.identify]: {
@@ -42,7 +38,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           src: context =>
             createIdentifyMachine({
               device: { ...context.device! },
-              identifyType: context.identifyType,
+              identifyType: context.identifyType!,
             }),
           onDone: [
             {
@@ -64,7 +60,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           id: 'onboarding',
           src: context =>
             createOnboardingMachine({
-              userFound: context.userFound,
+              userFound: context.userFound!,
               device: context.device!,
               authToken: context.authToken!,
               tenant: context.tenant!,
@@ -94,10 +90,16 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
   },
   {
     actions: {
-      [Actions.assignIdentifyType]: assign((context, event) => {
-        if (event.type === Events.authenticationFlowStarted) {
-          context.identifyType = IdentifyType.my1fp;
+      [Actions.assignInitContext]: assign((context, event) => {
+        if (event.type !== Events.initContextUpdated) {
+          return context;
         }
+        const { identifyType, device, tenant } = event.payload;
+        context.identifyType =
+          identifyType !== undefined ? identifyType : context.identifyType;
+        context.device = device !== undefined ? device : context.device;
+        context.tenant = tenant !== undefined ? tenant : context.tenant;
+
         return context;
       }),
       [Actions.assignUserFound]: assign((context, event) => {
@@ -109,28 +111,6 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignAuthToken]: assign((context, event) => {
         if (event.type === Events.identifyCompleted) {
           context.authToken = event.data.authToken;
-        }
-        return context;
-      }),
-      [Actions.assignDeviceInfo]: assign((context, event) => {
-        if (event.type === Events.deviceInfoIdentified) {
-          context.device = {
-            type: event.payload.type,
-            hasSupportForWebauthn: event.payload.hasSupportForWebauthn,
-          };
-        }
-        return context;
-      }),
-      [Actions.assignTenantInfo]: assign((context, event) => {
-        if (event.type === Events.tenantInfoRequestSucceeded) {
-          context.tenant = {
-            canAccessData: [...event.payload.canAccessData],
-            isLive: event.payload.isLive,
-            mustCollectData: [...event.payload.mustCollectData],
-            name: event.payload.name,
-            orgName: event.payload.orgName,
-            pk: event.payload.pk,
-          };
         }
         return context;
       }),
