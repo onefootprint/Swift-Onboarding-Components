@@ -90,9 +90,15 @@ pub async fn post(
                 should_create_document_request,
                 must_collect_document_e_data_key,
             };
-            // TODO this could fail if we create an second onboarding for the same scoped user
-            // Maybe we should show a nice error message in that case
-            let ob = Onboarding::get_or_create(conn, ob_create_args)?;
+            let ob = Onboarding::get_or_create(conn, ob_create_args).map_err(|e| -> ApiError {
+                if e.is_constraint_violation() {
+                    // We will eventually support this use case - for now, just display a nice error
+                    // message in case tenants hit this branch
+                    OnboardingError::UserOnboardedOntoTenant.into()
+                } else {
+                    e.into()
+                }
+            })?;
             // Update the auth session in the DB to have the OrgOnboarding scope tied to this onboarding
             // Even though the OrgOnboardingInit scope is only used by this endpoint, we notably don't remove
             // it since we want this endpoint to be idempotent (in case the client needs to retry)
