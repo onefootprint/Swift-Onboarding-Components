@@ -7,8 +7,7 @@ export enum States {
   tenantInvalid = 'tenantInvalid',
   authenticationSuccess = 'authenticationSuccess',
   onboarding = 'onboarding',
-  onboardingSuccess = 'onboardingSuccess',
-  verificationSuccess = 'verificationSuccess',
+  success = 'success',
 }
 
 export enum Events {

@@ -16,21 +16,25 @@ import useBifrostMachine from '../../hooks/use-bifrost-machine/use-bifrost-machi
 
 const CLOSE_DELAY = 6000;
 
-const OnboardingSuccess = () => {
-  const { t } = useTranslation('pages.onboarding-success');
+const Success = () => {
+  const { t } = useTranslation('pages.success');
   const footprint = useFootprintProvider();
   const [state] = useBifrostMachine();
-  const { validationToken } = state.context;
+  const { validationToken, userFound } = state.context;
   const { running, width, height } = useConfettiState();
 
   useEffectOnce(() => {
+    handleClose(CLOSE_DELAY);
+  });
+
+  const handleClose = (closeDelay?: number) => {
     if (validationToken) {
       footprint.complete({
         validationToken,
-        closeDelay: CLOSE_DELAY,
+        closeDelay,
       });
     }
-  });
+  };
 
   return (
     <>
@@ -50,17 +54,42 @@ const OnboardingSuccess = () => {
           <IcoCheckCircle40 color="success" />
         </Box>
         <Typography variant="heading-3" sx={{ marginBottom: 7 }}>
-          {t('title')}
+          {userFound ? t('existing-user.title') : t('new-user.title')}
         </Typography>
-        <Typography variant="body-2" sx={{ marginBottom: 7 }} color="secondary">
-          {t('body.view-on-my-footprint')}&nbsp;
-          <LinkButton href={MY1FP_URL} target="_blank">
-            my.onefootprint.com
-          </LinkButton>
-        </Typography>
-        <Typography variant="body-2" color="secondary">
-          {t('body.one-click')}
-        </Typography>
+        {userFound ? (
+          <>
+            <Typography
+              variant="body-2"
+              sx={{ marginBottom: 7 }}
+              color="secondary"
+            >
+              {t('existing-user.description')}
+            </Typography>
+            <LinkButton
+              onClick={() => {
+                handleClose();
+              }}
+            >
+              {t('existing-user.cta')}
+            </LinkButton>
+          </>
+        ) : (
+          <>
+            <Typography
+              variant="body-2"
+              sx={{ marginBottom: 7 }}
+              color="secondary"
+            >
+              {t('new-user.body.view-on-my-footprint')}&nbsp;
+              <LinkButton href={MY1FP_URL} target="_blank">
+                my.onefootprint.com
+              </LinkButton>
+            </Typography>
+            <Typography variant="body-2" color="secondary">
+              {t('new-user.body.one-click')}
+            </Typography>
+          </>
+        )}
       </Container>
     </>
   );
@@ -73,4 +102,4 @@ const Container = styled.div`
   text-align: center;
 `;
 
-export default OnboardingSuccess;
+export default Success;

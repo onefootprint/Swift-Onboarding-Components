@@ -65,12 +65,10 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               authToken: context.authToken!,
               tenant: context.tenant!,
             }),
-          onDone: [
-            {
-              target: States.onboardingSuccess,
-              actions: [Actions.assignValidationToken],
-            },
-          ],
+          onDone: {
+            target: States.success,
+            actions: [Actions.assignValidationToken],
+          },
         },
       },
       [States.tenantInvalid]: {
@@ -79,11 +77,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [States.authenticationSuccess]: {
         type: 'final',
       },
-      [States.onboardingSuccess]: {
-        type: 'final',
-      },
-      // TODO: when do we go to verification success
-      [States.verificationSuccess]: {
+      [States.success]: {
         type: 'final',
       },
     },

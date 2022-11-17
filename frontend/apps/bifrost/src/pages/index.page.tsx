@@ -6,9 +6,8 @@ import AuthenticationSuccess from './authentication-success';
 import Identify from './identify';
 import Init from './init';
 import Onboarding from './onboarding';
-import OnboardingSuccess from './onboarding-success/onboarding-success';
+import Success from './success';
 import TenantInvalid from './tenant-invalid';
-import VerificationSuccess from './verification-success';
 
 const Root = () => {
   const [state] = useBifrostMachine();
@@ -21,11 +20,8 @@ const Root = () => {
   if (state.matches(States.identify)) {
     return <Identify />;
   }
-  if (state.matches(States.verificationSuccess)) {
-    return <VerificationSuccess />;
-  }
-  if (state.matches(States.onboardingSuccess)) {
-    return <OnboardingSuccess />;
+  if (state.matches(States.success)) {
+    return <Success />;
   }
   if (state.matches(States.onboarding)) {
     return <Onboarding />;

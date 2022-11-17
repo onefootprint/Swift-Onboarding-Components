@@ -140,22 +140,24 @@
       "title": "Integration incorrectly configured",
       "subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this website."
     },
-    "verification-success": {
-      "title": "You're all set! 🎉",
-      "description": "Your identity has been successfully verified.",
-      "cta": "Return to site"
-    },
     "init-onboarding": {
       "error": {
         "title": "Uh-oh!",
         "description": "There was an error while completing this request. Please contact the site admin."
       }
     },
-    "onboarding-success": {
-      "title": "You're verified!  🎉",
-      "body": {
-        "view-on-my-footprint": "You can view your personal data and the companies that have access to it on",
-        "one-click": "Next time, you can just sign in using Footprint with one-click!"
+    "success": {
+      "new-user": {
+        "title": "You're verified!  🎉",
+        "body": {
+          "view-on-my-footprint": "You can view your personal data and the companies that have access to it on",
+          "one-click": "Next time, you can just sign in using Footprint with one-click!"
+        }
+      },
+      "existing-user": {
+        "title": "You're all set! 🎉",
+        "description": "Your identity has been successfully verified.",
+        "cta": "Return to site"
       }
     }
   }
