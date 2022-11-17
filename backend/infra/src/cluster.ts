@@ -92,7 +92,6 @@ export async function CreateCluster(
         version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`),
       },
       healthCheckGracePeriod: 60,
-      targetGroupArns: [targetGroup.targetGroup.arn],
       vpcZoneIdentifiers: vpcProvider.privateSubnetIds,
       protectFromScaleIn: false,
       healthCheckType: 'EC2',
