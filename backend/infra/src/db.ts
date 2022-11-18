@@ -66,7 +66,7 @@ export async function CreateDB(
     masterPassword: secretsStore.dbPassword,
     masterUsername: user,
     applyImmediately: true,
-    snapshotIdentifier: await getSnapshotIdIfNeeded(),
+    snapshotIdentifier: await getSnapshotIdIfNeeded(clusterIdentifier),
     vpcSecurityGroupIds: [vpcSecurityGroup.id],
     skipFinalSnapshot: !dbConfig.protectDeletion,
     deletionProtection: dbConfig.protectDeletion,
@@ -123,9 +123,9 @@ export async function CreateDB(
   };
 }
 
-async function getSnapshotIdIfNeeded(): Promise<
-  pulumi.Output<string> | undefined
-> {
+async function getSnapshotIdIfNeeded(
+  clusterIdentifier: string,
+): Promise<pulumi.Output<string> | undefined> {
   let config = new pulumi.Config();
   let clusterId = config.get('restoreSnapshotFromClusterNamed');
   if (clusterId === undefined) {
@@ -149,7 +149,7 @@ async function getSnapshotIdIfNeeded(): Promise<
 
   const snapshot = new aws.rds.ClusterSnapshot(`branch-snapshot-${clusterId}`, {
     dbClusterIdentifier: parentCluster.clusterIdentifier,
-    dbClusterSnapshotIdentifier: `branch-${clusterId}-${pulumi.getStack()}`,
+    dbClusterSnapshotIdentifier: `branch-${clusterId}`,
   });
 
   return snapshot.id;
@@ -167,7 +167,7 @@ async function getRestorePointIfNeeded(): Promise<
   let parentCluster;
   try {
     parentCluster = await aws.rds.getCluster({
-      clusterIdentifier: `db-${clusterId}`,
+      clusterIdentifier: clusterId,
     });
   } catch (error) {
     console.log(`error getting DB cluster snapshot: ${error}`);

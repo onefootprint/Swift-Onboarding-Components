@@ -1,3 +1,4 @@
+import { StackEnvironment, StackMetadata } from './stack_metadata';
 import { Config } from './config';
 import {
   ec2,
@@ -9,6 +10,7 @@ import {
 import * as awsx from '@pulumi/awsx';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
+import * as crypto from 'crypto';
 
 export type Vpc = awsx.ec2.Vpc;
 
@@ -28,6 +30,7 @@ const PROD_CIDR_BLOCK = '10.2.0.0/16';
 const STACK_CIDR_BLOCK = '10.3.0.0/16';
 
 export async function CreateRegionalVPC(
+  stackMetadata: StackMetadata,
   region: Region,
   config: Config,
 ): Promise<FootprintVpc> {
@@ -38,7 +41,7 @@ export async function CreateRegionalVPC(
   });
 
   // use default dev-ephemeral VPC for ephemeral environments (this is fixed to footprint dev account)
-  if (stack.startsWith('dev-')) {
+  if (stackMetadata.environment === StackEnvironment.DevEphemeral) {
     const vpc = awsx.ec2.Vpc.fromExistingIds(
       'dev-ephemeral',
       {

@@ -1,3 +1,4 @@
+import { StackMetadata } from './stack_metadata';
 import * as pulumi from '@pulumi/pulumi';
 import * as random from '@pulumi/random';
 import * as awsx from '@pulumi/awsx';
@@ -66,11 +67,12 @@ interface Grafana {
 export async function LoadSecrets(
   config: pulumi.Config,
   enclaveKeyDescriptor: EnclaveKeyDescriptor,
+  stackMetadata: StackMetadata,
 ): Promise<StaticSecrets> {
   const cloudfrontSecret = new random.RandomString('cf-alb-pass', {
     length: 44,
   }).result;
-  const stack = pulumi.getStack();
+  const stack = stackMetadata.shortStackName;
 
   const sessionKey = new random.RandomId('api-session-key', {
     byteLength: 64,

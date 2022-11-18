@@ -1,3 +1,4 @@
+import { StackMetadata } from './stack_metadata';
 import { ec2, Region, route53 } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
 import * as aws from '@pulumi/aws';
@@ -13,6 +14,7 @@ import { FootprintVpc, Vpc } from './vpc';
 import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as s3 from './s3';
 import { metrics } from '@pulumi/awsx/cloudwatch';
+import { GetStackMetadata } from './stack_metadata';
 
 export type ServiceLoadBalancer = {
   lb: awsx.lb.LoadBalancer;
@@ -23,7 +25,6 @@ export type ServiceConfig = {
   instanceCount: number;
   memoryMB: number;
   cpuUnits: number;
-  serviceName: string;
   hostedZoneId: string;
   domain: string;
 };
@@ -51,12 +52,8 @@ export async function Create(
   s3Buckets: s3.S3Buckets,
 ): Promise<ServiceLoadBalancer> {
   const region = vpcProvider.region;
-  const serviceName = crypto
-    .createHash('sha256')
-    .update(`${config.serviceName}-${pulumi.getStack()}-${region}`)
-    .digest('hex')
-    .substring(0, 16);
 
+  const stackMetadata = GetStackMetadata();
   const vpc = vpcProvider.vpc;
   const provider = vpcProvider.provider;
 
@@ -65,13 +62,14 @@ export async function Create(
   const loadBalancerTargetGroup = await createCdnFrontedLoadBalancer(
     vpcProvider,
     secretsStore,
-    config,
     metricsEndpointPath,
+    config,
+    stackMetadata,
   );
 
   // init our cluster
   const cluster = await CreateCluster(
-    `cluster-${serviceName}`,
+    stackMetadata.shortStackName,
     vpcProvider,
     loadBalancerTargetGroup,
     constants,
@@ -99,18 +97,21 @@ export async function Create(
   // setup the task
   const current = await aws.getCallerIdentity({});
 
-  const execRole = createTaskExecutionRole(secretsStore, serviceName);
+  const execRole = createTaskExecutionRole(
+    secretsStore,
+    stackMetadata.shortStackName,
+  );
 
   const taskRoleRole = createTaskContainerRole(
     current.accountId,
-    serviceName,
+    stackMetadata.shortStackName,
     enclaveKeyDescriptor,
     signingKeyDescriptor,
     s3Buckets,
   );
 
   const taskDefinition = new aws.ecs.TaskDefinition(
-    `task-${serviceName}`,
+    `task-${stackMetadata.shortStackName}`,
     {
       memory: `${config.memoryMB}`,
       cpu: `${config.cpuUnits}`,
@@ -118,7 +119,7 @@ export async function Create(
       requiresCompatibilities: ['EC2'],
       executionRoleArn: execRole.arn,
       taskRoleArn: taskRoleRole.arn,
-      family: `${config.serviceName}-task-family`,
+      family: `fpc-task-family`,
       containerDefinitions,
     },
     { provider, dependsOn: [cluster] },
@@ -126,7 +127,7 @@ export async function Create(
 
   // build the cluster service
   const service = new aws.ecs.Service(
-    `svc-${serviceName}`,
+    `svc-${stackMetadata.shortStackName}`,
     {
       cluster: cluster.cluster.arn,
       launchType: 'EC2',
@@ -143,7 +144,7 @@ export async function Create(
       deploymentMinimumHealthyPercent: 100,
       loadBalancers: [
         {
-          containerName: config.serviceName,
+          containerName: 'fpc',
           containerPort: ServicePort,
           targetGroupArn: loadBalancerTargetGroup.targetGroup.arn,
         },
@@ -165,14 +166,15 @@ export async function Create(
 async function createCdnFrontedLoadBalancer(
   vpcProvider: FootprintVpc,
   secretsStore: StaticSecrets,
-  config: ServiceConfig,
   metricsEndpointPath: string,
+  config: ServiceConfig,
+  stackMetadata: StackMetadata,
 ): Promise<awsx.lb.TargetGroup> {
   const region = vpcProvider.region;
   const vpc = vpcProvider.vpc;
   const provider = vpcProvider.provider;
 
-  const serviceName = `${config.serviceName}-${pulumi.getStack()}-${region}`;
+  const serviceName = stackMetadata.shortStackName;
 
   // init our ALB
   const loadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(
@@ -194,15 +196,8 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  // some names must be < 32 chars, so we hash the srvice name, take 8
-  const serviceNameHash = crypto
-    .createHash('sha256')
-    .update(serviceName)
-    .digest('hex')
-    .substring(0, 8);
-
   const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
-    `app-lb-${serviceNameHash}`,
+    `app-lb-${serviceName}`,
     {
       vpc,
       securityGroups: [loadBalancerSecurityGroup],
@@ -211,22 +206,27 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  const targetGroup = new aws.lb.TargetGroup(`app-lb-tg-${serviceNameHash}`, {
-    vpcId: vpc.vpc.id,
-    targetType: 'instance',
-    port: ServicePort,
-    protocol: 'HTTP',
-    healthCheck: {
-      port: 'traffic-port',
-      path: '/health',
+  const targetGroup = new aws.lb.TargetGroup(
+    `app-lb-tg-${serviceName}`,
+    {
+      vpcId: vpc.vpc.id,
+      targetType: 'instance',
+      port: ServicePort,
+      protocol: 'HTTP',
+      healthCheck: {
+        port: 'traffic-port',
+        path: '/health',
+      },
     },
-  });
+    { provider },
+  );
 
   const loadBalancerTargetGroup = loadBalancer.createTargetGroup(
-    `lb-tg-${serviceNameHash}`,
+    `lb-tg-${serviceName}`,
     {
       targetGroup,
     },
+    { provider },
   );
 
   const web = loadBalancerTargetGroup.createListener(
@@ -314,20 +314,24 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  const record = new route53.Record(`dns-alb-${serviceName}`, {
-    zoneId: config.hostedZoneId,
-    type: 'A',
-    name: config.domain,
-    setIdentifier: `app-record-setid-${serviceName}`,
-    latencyRoutingPolicies: [{ region: region }],
-    aliases: [
-      {
-        name: web.loadBalancer.loadBalancer.dnsName,
-        zoneId: web.loadBalancer.loadBalancer.zoneId,
-        evaluateTargetHealth: true,
-      },
-    ],
-  });
+  const record = new route53.Record(
+    `dns-alb-${serviceName}-${region}`,
+    {
+      zoneId: config.hostedZoneId,
+      type: 'A',
+      name: config.domain,
+      setIdentifier: `app-record-setid-${serviceName}-${region}`,
+      latencyRoutingPolicies: [{ region: region }],
+      aliases: [
+        {
+          name: web.loadBalancer.loadBalancer.dnsName,
+          zoneId: web.loadBalancer.loadBalancer.zoneId,
+          evaluateTargetHealth: true,
+        },
+      ],
+    },
+    { provider },
+  );
 
   return loadBalancerTargetGroup;
 }
@@ -451,48 +455,6 @@ function createTaskContainerRole(
                   Action: ['kms:GenerateMac', 'kms:VerifyMac'],
                   Effect: 'Allow',
                   Resource: signingRootKeyArn,
-                },
-              ],
-            }),
-          },
-          {
-            name: 'pinpoint_sms_send_push',
-            policy: JSON.stringify({
-              Version: '2012-10-17',
-              Statement: [
-                {
-                  Effect: 'Allow',
-                  Action: [
-                    'sms-voice:SendVoiceMessage',
-                    'sms-voice:SendTextMessage',
-                  ],
-                  Resource: '*',
-                },
-              ],
-            }),
-          },
-          {
-            name: 'pinpoint_send_email',
-            policy: JSON.stringify({
-              Version: '2012-10-17',
-              Statement: [
-                {
-                  Effect: 'Allow',
-                  Action: 'ses:SendEmail',
-                  Resource: '*',
-                },
-              ],
-            }),
-          },
-          {
-            name: 'pinpoint_validate_phone_number',
-            policy: JSON.stringify({
-              Version: '2012-10-17',
-              Statement: [
-                {
-                  Effect: 'Allow',
-                  Action: 'mobiletargeting:PhoneNumberValidate',
-                  Resource: '*',
                 },
               ],
             }),

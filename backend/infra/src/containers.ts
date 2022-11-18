@@ -7,6 +7,7 @@ import { EnclaveKeyDescriptor } from './enclave_key';
 import { Region } from '@pulumi/aws';
 import { DbOutput } from './db';
 import * as s3 from './s3';
+import { GetStackMetadata, StackEnvironment } from './stack_metadata';
 
 export abstract class ServiceContainers {
   static async apiMain(
@@ -101,17 +102,29 @@ export abstract class ServiceContainers {
     metricsEndpointPath: string,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
     let serviceEnvironment: string;
-    if (pulumi.getStack().startsWith('dev-')) {
-      serviceEnvironment = 'preview';
-    } else if (pulumi.getStack() === 'dev') {
-      serviceEnvironment = 'development';
-    } else if (pulumi.getStack() === 'prod') {
-      serviceEnvironment = 'production';
-    } else {
-      serviceEnvironment = pulumi.getStack();
+
+    const metadata = GetStackMetadata();
+
+    switch (metadata.environment) {
+      case StackEnvironment.DevEphemeral: {
+        serviceEnvironment = 'preview';
+        break;
+      }
+      case StackEnvironment.Dev: {
+        serviceEnvironment = 'development';
+        break;
+      }
+      case StackEnvironment.Prod: {
+        serviceEnvironment = 'production';
+        break;
+      }
+      default:
+        serviceEnvironment = metadata.shortStackName;
+        break;
     }
 
     const current = await aws.getCallerIdentity({});
+
     const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/api:${constants.containers.apiVersion}`;
     return pulumi
       .all([

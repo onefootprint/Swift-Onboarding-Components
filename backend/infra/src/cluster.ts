@@ -74,7 +74,6 @@ export async function CreateCluster(
       iamInstanceProfile: {
         arn: instanceProfile.arn,
       },
-      // keyName: pulumi.getStack().startsWith("dev") ? jumpKeypairName : undefined,
       updateDefaultVersion: true,
       vpcSecurityGroupIds: [instanceSecurityGroup.id],
     },

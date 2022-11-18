@@ -1,3 +1,4 @@
+import { StackMetadata } from './stack_metadata';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { FootprintVpc, Vpc } from './vpc';
@@ -8,6 +9,7 @@ import * as crypto from 'crypto';
 export function CreateBuckets(
   vpcProvider: FootprintVpc,
   config: Config,
+  stackMetadata: StackMetadata,
 ): S3Buckets {
   const provider = vpcProvider.provider;
   //////////////////////////////
@@ -16,13 +18,7 @@ export function CreateBuckets(
   // If adding more bucket creation, copy and update the below code!
   //////////////////////////////
 
-  const pulumiStackHash = crypto
-    .createHash('sha256')
-    .update(`${pulumi.getStack()}`)
-    .digest('hex')
-    .substring(0, 16);
-
-  const bucketName = `${config.s3.documentImagesBucket.prefix}-${pulumiStackHash}`;
+  const bucketName = `${config.s3.documentImagesBucket.prefix}-${stackMetadata.shortStackName}`;
   const bucket = new aws.s3.Bucket(
     bucketName,
     {

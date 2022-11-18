@@ -11,14 +11,15 @@ import * as db from './db';
 import * as vpcUtil from './vpc';
 import * as hmacSigningKey from './hmac_key';
 import * as s3 from './s3';
-
+import { GetStackMetadata } from './stack_metadata';
 /**
  * Main infra entry point
  */
 export default async function main() {
   let config = new pulumi.Config();
   let constants = config.requireObject<Config>('constants');
-  const stack = pulumi.getStack();
+
+  const stackMetadata = GetStackMetadata();
 
   const primaryRegion = Region.USEast1;
   const otherRegions: Region[] = []; // [Region.USWest1];
@@ -27,7 +28,7 @@ export default async function main() {
   // setup our vpcs and region providers
   const vpcProviders = await Promise.all(
     regions.map(region => {
-      return vpcUtil.CreateRegionalVPC(region, constants);
+      return vpcUtil.CreateRegionalVPC(stackMetadata, region, constants);
     }),
   );
   // 2022-10-03 - we use one region (us-east-1)
@@ -43,12 +44,16 @@ export default async function main() {
   );
 
   // setup or secrets param store
-  const secretsStore = await secrets.LoadSecrets(config, enclaveKeyConfig);
+  const secretsStore = await secrets.LoadSecrets(
+    config,
+    enclaveKeyConfig,
+    stackMetadata,
+  );
 
   // setup database
   const database = await db.CreateDB(
     UsEast1vpcProvider,
-    `db-${pulumi.getStack()}`,
+    `db-${stackMetadata.shortStackName}`,
     constants,
     secretsStore,
     {
@@ -61,7 +66,11 @@ export default async function main() {
   const internalApiDomain = `internal.${apiDomain}`;
 
   // Create our s3 buckets
-  const s3Buckets = s3.CreateBuckets(UsEast1vpcProvider, constants);
+  const s3Buckets = s3.CreateBuckets(
+    UsEast1vpcProvider,
+    constants,
+    stackMetadata,
+  );
 
   // launch of core service
   const services = await Promise.all(
@@ -82,7 +91,6 @@ export default async function main() {
           instanceCount: constants.resources.instances,
           certArn: cert,
           domain: internalApiDomain,
-          serviceName: 'fpc',
           hostedZoneId: hostedZone.zoneId,
         },
         constants,
