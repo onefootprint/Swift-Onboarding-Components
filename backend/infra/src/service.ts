@@ -320,7 +320,7 @@ async function createCdnFrontedLoadBalancer(
       zoneId: config.hostedZoneId,
       type: 'A',
       name: config.domain,
-      setIdentifier: `app-record-setid-${serviceName}-${region}`,
+      setIdentifier: `app-record-region-${serviceName}-${region}`,
       latencyRoutingPolicies: [{ region: region }],
       aliases: [
         {
