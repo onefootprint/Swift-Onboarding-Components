@@ -153,6 +153,12 @@ const TableContainer = styled.table`
       height: 46px;
       padding: 0 ${theme.spacing[6]};
       vertical-align: middle;
+
+      p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
     }
 
     tbody tr {
