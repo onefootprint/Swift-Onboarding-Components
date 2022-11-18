@@ -12,6 +12,7 @@ import A from './components/markdown-components/a';
 import Code from './components/markdown-components/code';
 import CustomizationPreview from './components/markdown-components/customization-preview';
 import DocsInlineAlert from './components/markdown-components/docs-inline-alert';
+import Examples from './components/markdown-components/examples';
 import H1 from './components/markdown-components/h1';
 import H2 from './components/markdown-components/h2';
 import H3 from './components/markdown-components/h3';
@@ -50,6 +51,9 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   'customization-preview': {
     component: CustomizationPreview,
+  },
+  examples: {
+    component: Examples,
   },
 };
 
