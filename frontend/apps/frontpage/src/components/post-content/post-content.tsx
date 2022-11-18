@@ -27,7 +27,6 @@ const Content = styled.div`
     img {
       margin-bottom: ${theme.spacing[9]};
       max-width: 100%;
-
       object-fit: cover;
       object-position: left;
       height: auto;
@@ -138,6 +137,17 @@ const Content = styled.div`
       margin: -${theme.spacing[9]} 0 ${theme.spacing[9]} 0;
       color: ${theme.color.quaternary};
       text-align: center;
+    }
+    blockquote {
+      em {
+        ${createFontStyles('body-1')};
+        color: ${theme.color.primary};
+        padding-left: ${theme.spacing[5]};
+        margin-left: ${theme.spacing[1]};
+        display: block;
+        border-left: 1px solid ${theme.color.quaternary};
+        font-style: italic;
+      }
     }
   `}
 `;
