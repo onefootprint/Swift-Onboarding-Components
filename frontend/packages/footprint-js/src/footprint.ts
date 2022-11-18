@@ -10,6 +10,7 @@ import { injectStyles } from './utils/footprint-ui';
 import { getAppearanceStyles, getURL } from './utils/footprint-utils';
 
 const iframeManager = new IframeManager();
+let hasIframe = false;
 
 const footprint = () => {
   const setDialogStyles = ({
@@ -55,6 +56,8 @@ const footprint = () => {
     onCompleted,
     onCanceled,
   }: ShowFootprint) => {
+    if (hasIframe) return;
+    hasIframe = true;
     setDialogStyles(appearance);
     const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
     const url = getURL({ fontSrc, publicKey, rules, variables });
@@ -67,8 +70,14 @@ const footprint = () => {
     }
   };
 
+  const hide = async () => {
+    await iframeManager.hide();
+    hasIframe = false;
+  };
+
   return {
     show,
+    hide,
   };
 };
 

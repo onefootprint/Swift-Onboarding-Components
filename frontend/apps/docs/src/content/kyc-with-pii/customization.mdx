@@ -1,0 +1,312 @@
+---
+page: KYC + PII Vault
+slug: /kyc-with-pii/customization
+category: KYC + PII Vault
+title: Customization
+position: 2
+meta: { title: KYC + PII Vault - Customization, description: How to customize }
+---
+
+## Introduction
+
+Footprint supports visual customization, allowing you to match the design of your product with the `appearance` option. It's available in all SDKs (`javascript`, `react` and `react-native`).
+
+<customization-preview></customization-preview>
+
+<br />
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-vanilla)
+to checkout a project example.
+
+## Themes
+
+You'll need to pick one theme to extend it. We offer two themes: `light` and `dark`. If you don't
+provide any themes, the `light` theme will be used by default.
+
+```typescript
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const appearance = {
+  theme: 'dark',
+};
+
+footprint.show({ publicKey, appearance });
+```
+
+## Variables
+
+The easiest way to create custom themes is by extending the theme variables. Under the hood, they are just CSS variables, so you can inspect
+the resulting DOM using the DOM explorer in your browser. Scroll down to see the full list of variables.
+
+Properties can be set using the unit that you prefer: pixels, rem, hex, rgb, etc.
+
+```typescript
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const appearance = {
+  theme: 'dark',
+  variables: {
+    borderRadius: '0px',
+    buttonPrimaryBg: '#315E4C',
+    buttonPrimaryHoverBg: '#46866c',
+    buttonPrimaryColor: '#FFF',
+  },
+};
+
+footprint.show({ publicKey, appearance });
+```
+
+### Global variables
+
+As the name says, global variables are the easiest way to set a specific property to all elements. For example,
+setting `borderRadius` to `4px` is the equivalent of adding the same `4px` to the variables `dialogBorderRadius`,
+`inputBorderRadius`, `buttonBorderRadius` and `dropdownBorderRadius`.
+
+| Variable           | Description                                                             |
+| ------------------ | ----------------------------------------------------------------------- |
+| `borderRadius`     | The border radius used for the dialog, inputs, button and dropdown      |
+| `colorError`       | The color used to indicate errors or destructive actions in the element |
+| `colorWarning`     | The color used to indicate warnings in the element                      |
+| `colorSuccess`     | The color user to indicate success in the element                       |
+| `colorAccent`      | TThe color to add emphasis, but without a specific intent               |
+| `borderColorError` | The border color of the elements with an error state                    |
+| `fontFamily`       | The font family. Make sure to load the font first with `fontSrc`        |
+
+### Link
+
+Links are just regular anchors. One example is the `Terms of Service` link. If you need to apply more
+propeties or different states, use custom rules.
+
+<img
+  alt="Link"
+  height={250}
+  src="/customization/component-link.png"
+  width={720}
+/>
+
+| Variable    | Description           |
+| ----------- | --------------------- |
+| `linkColor` | The color of the link |
+
+### Dialog
+
+The dialog that wraps our flow.
+
+<img
+  src="/customization/component-dialog.png"
+  width={720}
+  height={250}
+  alt="Dialog"
+/>
+
+| Variable             | Description                      |
+| -------------------- | -------------------------------- |
+| `dialogBg`           | The dialog body background color |
+| `dialogBoxShadow`    | The dialog shadow                |
+| `dialogBorderRadius` | The dialog border radius         |
+
+### Label
+
+It refers to the native label element, the one that will be used to link with its input field.
+
+<img
+  alt="Label"
+  height={250}
+  src="/customization/component-label.png"
+  width={720}
+/>
+
+| Variable     | Description     |
+| ------------ | --------------- |
+| `labelColor` | The label color |
+| `labelFont`  | The label font  |
+
+### Input
+
+This refers to all the inputs in the platform, including Pin Inputs, Phone Inputs and Address Inputs.
+
+<img
+  alt="Input"
+  height={250}
+  src="/customization/component-input.png"
+  width={720}
+/>
+
+| Variable                     | Description                                                       |
+| ---------------------------- | ----------------------------------------------------------------- |
+| `inputBorderRadius`          | The input border radius                                           |
+| `inputBorderWidth`           | The input border width                                            |
+| `inputFont`                  | The input font                                                    |
+| `inputHeight`                | The input height                                                  |
+| `inputPlaceholderColor`      | The input placeholder color                                       |
+| `inputColor`                 | The input color                                                   |
+| `inputBg`                    | The input background color                                        |
+| `inputBorderColor`           | The input border color                                            |
+| `inputHoverBg`               | The input background color, when it's hovered                     |
+| `inputHoverBorderColor`      | The input border color, when it's hovered                         |
+| `inputFocusBg`               | The input background color, when it's focused                     |
+| `inputFocusBorderColor`      | The input border color, when it's focused                         |
+| `inputFocusElevation`        | The input box shadow, when it's focused                           |
+| `inputErrorBg`               | The input background color, when it has an error                  |
+| `inputErrorBorderColor`      | The input border color, when it has an error                      |
+| `inputErrorHoverBg`          | The input background color, when it has an error and it's hovered |
+| `inputErrorHoverBorderColor` | The input border color, when it has an error and it's hovered     |
+| `inputErrorFocusBg`          | The input background color, when it has an error and it's focused |
+| `inputErrorFocusBorderColor` | The input border color, when it has an error and it's focused     |
+| `inputErrorFocusElevation`   | The input box shadow, when it has an error and it's focused       |
+
+### Hint
+
+The text below the input field, which gives some extra information about the input. It can be used to indicate an error.
+
+<img
+  alt="Hint"
+  height={250}
+  src="/customization/component-hint.png"
+  width={720}
+/>
+
+| Variable         | Description                                      |
+| ---------------- | ------------------------------------------------ |
+| `hintColor`      | The hint color                                   |
+| `hintErrorColor` | The hint color when the input has an error state |
+| `hintFont`       | The hint font                                    |
+
+### LinkButton
+
+It's a variant of of our buttons, but without any backgrounds.
+
+<img
+  alt="LinkButton"
+  height={250}
+  src="/customization/component-link-button.png"
+  width={720}
+/>
+
+| Variable                           | Description                                                      |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `linkButtonColor`                  | The button color                                                 |
+| `linkButtonHoverColor`             | The button color, when it is hovered                             |
+| `linkButtonActiveColor`            | The button color, when it is pressed                             |
+| `linkButtonDestructiveColor`       | The button color when it has a destrucive intent                 |
+| `linkButtonDestructiveHoverColor`  | The button color when it has a destrucive intent and is horeverd |
+| `linkButtonDestructiveActiveColor` | The button color when it has a destrucive intent and is pressed  |
+
+### Button
+
+<img
+  alt="Button"
+  height={250}
+  src="/customization/component-button.png"
+  width={720}
+/>
+
+| Variable                             | Description                                                |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `buttonBorderRadius`                 | The button border radius                                   |
+| `buttonBorderWidth`                  | The button border width                                    |
+| `buttonElevation`                    | The button box shadow                                      |
+| `buttonElevationHover`               | The button box shadow, when it's hovered                   |
+| `buttonElevationActive`              | The button box shadow, when it's activated                 |
+| `buttonOutlineOffset`                | The button outline offset                                  |
+| `buttonPrimaryBg`                    | The primary button background color                        |
+| `buttonPrimaryColor`                 | The primary button color                                   |
+| `buttonPrimaryBorderColor`           | The primary button border color                            |
+| `buttonPrimaryHoverBg`               | The primary button background color, when it's hovered     |
+| `buttonPrimaryHoverColor`            | The primary button color, when it's hovered                |
+| `buttonPrimaryHoverBorderColor`      | The primary button border color, when it's hovered         |
+| `buttonPrimaryActiveBg`              | The primary button background color, when it's activated   |
+| `buttonPrimaryActiveColor`           | The primary button color, when it's activated              |
+| `buttonPrimaryActiveBorderColor`     | The primary button border color, when it's activated       |
+| `buttonPrimaryDisabledBg`            | The primary button background color, when it's disabled    |
+| `buttonPrimaryDisabledColor`         | The primary button color, when it's disabled               |
+| `buttonPrimaryDisabledBorderColor`   | The primary button border color, when it's disabled        |
+| `buttonPrimaryLoadingBg`             | The primary button background color, when it's loading     |
+| `buttonPrimaryLoadingColor`          | The primary button color, when it's loading                |
+| `buttonSecondaryBg`                  | The secondary button background color                      |
+| `buttonSecondaryColor`               | The secondary button color                                 |
+| `buttonSecondaryBorderColor`         | The secondary button border color                          |
+| `buttonSecondaryHoverBg`             | The secondary button background color, when it's hovered   |
+| `buttonSecondaryHoverColor`          | The secondary button color, when it's hovered              |
+| `buttonSecondaryHoverBorderColor`    | The secondary button border color, when it's hovered       |
+| `buttonSecondaryActiveBg`            | The secondary button background color, when it's activated |
+| `buttonSecondaryActiveColor`         | The secondary button color, when it's activated            |
+| `buttonSecondaryActiveBorderColor`   | The secondary button border color, when it's activated     |
+| `buttonSecondaryDisabledBg`          | The secondary button background color, when it's disabled  |
+| `buttonSecondaryDisabledColor`       | The secondary button color, when it's disabled             |
+| `buttonSecondaryDisabledBorderColor` | The secondary button border color, when it's disabled      |
+| `buttonSecondaryLoadingBg`           | The secondary button background color, when it's loading   |
+| `buttonSecondaryLoadingColor`        | The secondary button color, when it's loading              |
+
+### Dropdown
+
+Dropdowns are used with input fields. When it's a phone input, it's used to display the list of countries.
+When it's an address input, it's used to display the list of results.
+
+<img
+  alt="Dropdown"
+  height={250}
+  src="/customization/component-dropdown.png"
+  width={720}
+/>
+
+| Variable                 | Description                                        |
+| ------------------------ | -------------------------------------------------- |
+| `dropdownBg`             | The dropdown background color                      |
+| `dropdownHoverBg`        | The dropdown background color, when it's hovered   |
+| `dropdownBorderColor`    | The dropdown background color, when it's activated |
+| `dropdownBorderWidth`    | The dropdown border width                          |
+| `dropdownBorderRadius`   | The dropdown border radius                         |
+| `dropdownElevation`      | The dropdown box shadow                            |
+| `dropdownColorPrimary`   | The dropdown color primary                         |
+| `dropdownColorSecondary` | The dropdown color secondary                       |
+| `dropdownFooterBg`       | The dropdown footer background                     |
+
+## Rules
+
+If you want to add styles that are not supported by these variables, you can use `rules`. With `rules`, you can use CSS to arbitrarily style the elements.
+
+```typescript
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const appearance = {
+  theme: 'light',
+  rules: {
+    button: {
+      transition: 'all .2s linear',
+    },
+    `button:hover`: {},
+    `button:focus`: {},
+    `button:active`: {},
+    `input`: {},
+    `input:hover`: {},
+    `input:focus`: {},
+    `input:active`: {},
+    `label`: {},
+    `hint`: {},
+    `link`: {},
+    `link:hover`: {},
+    `link:active`: {},
+  }
+};
+
+footprint.show({ publicKey, appearance });
+```
+
+### Available rules
+
+| Variable        | Description                     |
+| --------------- | ------------------------------- |
+| `button`        | The button                      |
+| `button:hover`  | The button, when it's hovered   |
+| `button:active` | The button, when it's activated |
+| `input`         | The input                       |
+| `input:hover`   | The input, when it's hovered    |
+| `input:focus`   | The input, when it's focused    |
+| `label`         | The input label                 |
+| `hint`          | The hint                        |
+| `link`          | The link                        |
+| `link:hover`    | The link, when it's hovered     |
+| `link:active`   | The link, when it's activated   |

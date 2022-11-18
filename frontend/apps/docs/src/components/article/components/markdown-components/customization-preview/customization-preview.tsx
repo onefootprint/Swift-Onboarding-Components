@@ -1,0 +1,91 @@
+import { Box, CodeBlock, Typography } from '@onefootprint/ui';
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
+
+import Iframe from './components/iframe';
+import Option from './components/option';
+import { defaultTheme, themes } from './constants/themes';
+import type { Theme } from './customization-preview.types';
+
+const CustomizationPreview = () => {
+  const [selectedTheme, setTheme] = useState<Theme>(defaultTheme);
+
+  return (
+    <Box>
+      <IframeContainer>
+        {themes.map(theme => (
+          <Iframe
+            key={theme.name}
+            name={theme.name}
+            selected={theme.name === selectedTheme.name}
+            src={theme.src}
+          />
+        ))}
+      </IframeContainer>
+      <Content>
+        <Typography variant="label-2" sx={{ marginBottom: 7 }}>
+          Customize it
+        </Typography>
+
+        <SelectContainer>
+          <Select>
+            {themes.map(theme => (
+              <Option
+                image={theme.image}
+                key={theme.name}
+                name={theme.name}
+                onClick={() => setTheme(theme)}
+                selected={theme.name === selectedTheme.name}
+              />
+            ))}
+          </Select>
+        </SelectContainer>
+        <CodeBlock language="javascript">{selectedTheme.code}</CodeBlock>
+      </Content>
+    </Box>
+  );
+};
+
+const IframeContainer = styled.div`
+  ${({ theme }) => css`
+    width: 720px;
+    height: 620px;
+    border-top-left-radius: ${theme.borderRadius.default};
+    border-top-right-radius: ${theme.borderRadius.default};
+    background: rgba(14, 20, 56, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    iframe {
+      width: 500px;
+      min-height: 480px;
+    }
+  `}
+`;
+
+const Content = styled.div`
+  ${({ theme }) => css`
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    border-bottom-left-radius: ${theme.borderRadius.default};
+    border-bottom-right-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[7]};
+  `}
+`;
+
+const SelectContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[7]};
+  `}
+`;
+
+const Select = styled.div`
+  ${({ theme }) => css`
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom-left-radius: ${theme.borderRadius.default};
+    gap: ${theme.spacing[7]};
+  `}
+`;
+
+export default CustomizationPreview;

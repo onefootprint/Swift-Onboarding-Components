@@ -114,6 +114,14 @@ const Container = styled.aside`
         }
       }
 
+      &[data-level='3'] {
+        padding-left: ${theme.spacing[6]};
+
+        a {
+          ${createFontStyles('caption-2')};
+        }
+      }
+
       &[data-active='true'] {
         a {
           color: ${theme.color.primary};

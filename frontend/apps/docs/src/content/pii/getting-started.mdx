@@ -4,17 +4,16 @@ category: Overview
 title: Getting started
 slug: /pii/getting-started
 position: 1
-meta: {
-   title: PII Vault - Getting started,
-   description: Footprint's standalone PII vaulting APIs work seamlessly with and without our KYC APIs.
-}
+meta:
+  {
+    title: PII Vault - Getting started,
+    description: Footprint's standalone PII vaulting APIs work seamlessly with and without our KYC APIs.,
+  }
 ---
-
-
 
 ## Setup and authentication
 
-The Footprint API uses API keys to authenticate requests. You can view and manage your API keys in the developer dashboard. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. Test mode secret keys have the prefix `sk_test` and live mode secret keys have the prefix `sk_live`. 
+The Footprint API uses API keys to authenticate requests. You can view and manage your API keys in the developer dashboard. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. Test mode secret keys have the prefix `sk_test` and live mode secret keys have the prefix `sk_live`.
 
 <inline-alert variant='warning'>Treat this key like a sensitive password! Your API keys carry many privileges, so be sure to keep them secure! Do not post your secret keys in publicly accessible places like GitHub or client-side code like web front-ends.</inline-alert>
 
@@ -29,7 +28,7 @@ You can check that your API key is working as expected:
 
 ```bash
 curl https://api.onefootprint.com/org/api_keys/check \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: 
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```
 
 ## Create a user vault
@@ -39,15 +38,14 @@ The first step is to create a new vault for one of your users:
 ```bash
 curl https://api.onefootprint.com/users \
 	-X POST \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: 
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```
-
 
 ```json
 {
   "footprint_user_id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr",
-  "start_timestamp": "2022-08-26T14:05:35.200031Z",  
-  "is_portable": false	
+  "start_timestamp": "2022-08-26T14:05:35.200031Z",
+  "is_portable": false
 }
 ```
 
@@ -93,12 +91,12 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 
 ```json
 {
-	"identity": {
-		"ssn9": true
-	},
-	"custom": {
-		"ach_account": true
-	}	
+  "identity": {
+    "ssn9": true
+  },
+  "custom": {
+    "ach_account": true
+  }
 }
 ```
 
@@ -110,8 +108,8 @@ Footprint’s API provides attribute-level decryption. API keys are configurable
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/decrypt \
 	-X POST \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-	-d '{ 
-			"fields": ["identity.last_name", "identity.dob", "identity.ssn9", "custom.ach_account"], 
+	-d '{
+			"fields": ["identity.last_name", "identity.dob", "identity.ssn9", "custom.ach_account"],
 			"reason": "direct deposit verification"
 		}'
 ```

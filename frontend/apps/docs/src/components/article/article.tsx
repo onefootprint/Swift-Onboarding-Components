@@ -10,10 +10,12 @@ import ArticleHeader from './components/article-header';
 import Layout from './components/layout';
 import A from './components/markdown-components/a';
 import Code from './components/markdown-components/code';
+import CustomizationPreview from './components/markdown-components/customization-preview';
 import DocsInlineAlert from './components/markdown-components/docs-inline-alert';
 import H1 from './components/markdown-components/h1';
 import H2 from './components/markdown-components/h2';
 import H3 from './components/markdown-components/h3';
+import Img from './components/markdown-components/img';
 import Strong from './components/markdown-components/strong';
 
 type ArticleProps = {
@@ -37,11 +39,17 @@ const overrides: MarkdownToJSX.Overrides = {
   h3: {
     component: H3,
   },
+  img: {
+    component: Img,
+  },
   strong: {
     component: Strong,
   },
   'inline-alert': {
     component: DocsInlineAlert,
+  },
+  'customization-preview': {
+    component: CustomizationPreview,
   },
 };
 
@@ -109,6 +117,38 @@ const Container = styled(Markdown)`
 
     pre > div {
       margin-bottom: ${theme.spacing[7]};
+    }
+
+    table {
+      border-collapse: separate;
+      border-radius: ${theme.borderRadius.default};
+      border: 1px solid ${theme.borderColor.tertiary};
+      margin-bottom: ${theme.spacing[9]};
+      width: 100%;
+
+      tr:not(:last-child) td {
+        border-bottom: 1px solid ${theme.borderColor.tertiary};
+      }
+
+      th,
+      td {
+        padding: ${theme.spacing[5]} ${theme.spacing[6]};
+      }
+
+      th {
+        ${createFontStyles('caption-1')};
+        background: ${theme.backgroundColor.secondary};
+        border-bottom: 1px solid ${theme.borderColor.tertiary};
+        border-radius: ${theme.borderRadius.default}
+          ${theme.borderRadius.default} 0 0;
+        color: ${theme.color.primary};
+        text-align: left;
+        text-transform: uppercase;
+      }
+
+      tbody {
+        ${createFontStyles('body-3')};
+      }
     }
   `};
 `;

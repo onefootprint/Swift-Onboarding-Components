@@ -27,37 +27,34 @@ yarn add @onefootprint/footprint-react
 
 ## Integrate footprint
 
-1. Grab the Onboarding Publishable Key, for example `ob_test_WNgSBRR7uxoT8JRDBBflgw`.
+1. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
 2. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
 
 ```typescript
-import "@onefootprint/footprint-js/dist/footprint-js.css";
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import { FootprintButton } from '@onefooprint/footprint-react';
 
 const Page = () => {
   const handleCompleted = (validationToken: string) => {
-    console.log(validationToken)
-  }
+    console.log(validationToken);
+  };
 
   const handleCanceled = () => {
-    console.log('user canceled')
-  }
+    console.log('user canceled');
+  };
 
   return (
     <main>
       <FootprintButton
-        publicKey="ob_test_WNgSBRR7uxoT8JRDBBflgw"
+        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
         onCompleted={handleCompleted}
         onCanceled={handleCanceled}
       />
     </main>
-  )
-}
+  );
+};
 ```
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-cra) to check out a full example. We also have some examples using [Next.js](https://github.com/onefootprint/examples/tree/master/frontend-react-typescript-next)
-
-
-

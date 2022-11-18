@@ -73,6 +73,7 @@ const MobileNav = ({ navItems, navigation, links }: MobileNavProps) => {
             <Tab
               as={Link}
               href={href}
+              key={text}
               selected={router.asPath.startsWith(baseHref)}
             >
               <Icon />

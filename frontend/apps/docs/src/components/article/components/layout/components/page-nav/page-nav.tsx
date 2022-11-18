@@ -29,13 +29,17 @@ const PageNav = ({ navigation }: PageNavProps) => {
     <PageNavContainer>
       <NavContainer>
         {navigation.map(({ name, items }) => (
-          <Box>
+          <Box key={name}>
             <Header>
               <Typography variant="caption-1">{name}</Typography>
             </Header>
             <nav>
               {items.map(({ title, slug }) => (
-                <StyledLink href={slug} data-selected={router.asPath === slug}>
+                <StyledLink
+                  key={slug}
+                  href={slug}
+                  data-selected={router.asPath === slug}
+                >
                   {title}
                 </StyledLink>
               ))}
@@ -99,6 +103,7 @@ const StyledLink = styled(Link)`
     ${createFontStyles('label-3')};
     border-radius: ${theme.borderRadius.default};
     display: block;
+    margin-bottom: ${theme.spacing[2]};
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     text-decoration: none;
 

@@ -2,16 +2,16 @@
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.usefathom.com *.ingest.sentry.io www.youtube.com getform.io; 
+  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.ingest.sentry.io getform.io; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' vercel.live www.youtube.com form.typeform.com;
+  frame-src 'self' *.onefootprint.com vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live *.usefathom.com vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com;
-  style-src 'self' 'unsafe-inline' tagmanager.google.com fonts.googleapis.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com;
   worker-src 'self' blob:;
 `;
 

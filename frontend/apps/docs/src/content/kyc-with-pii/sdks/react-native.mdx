@@ -37,7 +37,7 @@ pod install
 
 ## Integrate footprint
 
-1. Grab the Onboarding Publishable Key, for example `ob_test_WNgSBRR7uxoT8JRDBBflgw`.
+1. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
 2. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
 
@@ -48,23 +48,23 @@ import { View } from 'react-native';
 
 const Screen = () => {
   const handleCompleted = (validationToken: string) => {
-    console.log(validationToken)
-  }
+    console.log(validationToken);
+  };
 
   const handleCanceled = () => {
-    console.log('user canceled')
-  }
+    console.log('user canceled');
+  };
 
   return (
     <View>
       <FootprintButton
-        publicKey="ob_test_WNgSBRR7uxoT8JRDBBflgw"
+        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
         onCompleted={handleCompleted}
         onCanceled={handleCanceled}
       />
     </View>
-  )
-}
+  );
+};
 ```
 
 ## Custom button
@@ -79,25 +79,22 @@ import { View, Button } from 'react-native';
 const Screen = () => {
   const handlePress = () => {
     footprint.show({
-      publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
+      publicKey: 'ob_test_VMooXd04EUlnu3AvMYKjMW',
       onCanceled: () => {
-        console.log('user canceled')
+        console.log('user canceled');
       },
       onCompleted: (validationToken: string) => {
-        console.log(validationToken)
-      }
-    })
-  }
+        console.log(validationToken);
+      },
+    });
+  };
 
   return (
     <View>
       <Button title="Verify identity" onPress={handlePress} />
     </View>
-  )
-}
+  );
+};
 ```
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-native) to check out a full example.
-
-
-

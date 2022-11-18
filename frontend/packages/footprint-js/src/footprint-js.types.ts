@@ -37,7 +37,6 @@ export type FootprintAppearanceRules = Partial<{
 export type FootprintMainStyles = Partial<{
   // globals
   borderRadius: CSS.Property.BorderRadius;
-  colorInfo: CSS.Property.Color;
   colorError: CSS.Property.Color;
   colorWarning: CSS.Property.Color;
   colorSuccess: CSS.Property.Color;
@@ -172,6 +171,7 @@ export type Footprint = {
     onCompleted,
     onCanceled,
   }: ShowFootprint) => Promise<void>;
+  hide: () => Promise<void>;
 };
 
 export enum FootprintEvents {
