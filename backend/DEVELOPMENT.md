@@ -133,7 +133,8 @@ $ pulumi --stack footprint/prod config set --secret <SECRET_NAME> <SECRET_VALUE?
 ## Database Schema + Migrations
 
 First, install diesel CLI:
-`$ cargo install diesel_cli --no-default-features --features postgres`
+  - Note that we specifically need version 1.4.1. Newer versions will make strange changes to some of the postgres types. 
+`$ cargo install diesel_cli --no-default-features --features postgres --version 1.4.1` 
 
 Next, to generate a new migration:
 
