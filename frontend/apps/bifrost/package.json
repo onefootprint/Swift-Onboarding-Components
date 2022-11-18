@@ -37,7 +37,7 @@
     "@next/bundle-analyzer": "^12.1.6",
     "@onefootprint/jest-presets": "*",
     "@tanstack/react-query": "^4.14.5",
-    "@types/lodash": "^4.14.182",
+    "@types/lodash": "^4.14.189",
     "@types/node": "^17.0.31",
     "@types/react-dom": "^18.0.6",
     "@types/styled-components": "^5.1.25",
