@@ -13,7 +13,7 @@
     "set:dot-env": "vercel env pull"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^1.0.0-beta.3",
+    "@formkit/auto-animate": "^1.0.0-beta.5",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",

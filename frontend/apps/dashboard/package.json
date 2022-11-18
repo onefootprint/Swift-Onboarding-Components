@@ -15,7 +15,7 @@
     "set:dot-env": "vercel env pull"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^1.0.0-beta.1",
+    "@formkit/auto-animate": "^1.0.0-beta.5",
     "@hookform/resolvers": "^2.9.2",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/global-constants": "*",
