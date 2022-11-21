@@ -12,9 +12,3 @@ export const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
   [OnboardingStatus.failed]: 'error',
   [OnboardingStatus.vaultOnly]: 'neutral',
 };
-
-export const statusToDisplayText: Record<OnboardingStatus, string> = {
-  [OnboardingStatus.verified]: 'Verified',
-  [OnboardingStatus.failed]: 'Failed',
-  [OnboardingStatus.vaultOnly]: 'Vault',
-};

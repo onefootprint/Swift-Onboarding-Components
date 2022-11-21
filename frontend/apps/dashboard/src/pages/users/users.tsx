@@ -12,10 +12,7 @@ import {
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
-import {
-  statusToBadgeVariant,
-  statusToDisplayText,
-} from 'src/constants/onboarding-status-display';
+import { statusToBadgeVariant } from 'src/constants/onboarding-status-display';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
 import Filters from './components/filters';
@@ -94,12 +91,13 @@ const Users = () => {
             </td>
 
             <td>
-              <Badge variant={statusToBadgeVariant[item.status!]}>
-                {statusToDisplayText[item.status!]}
+              <Badge variant={statusToBadgeVariant[item.status]}>
+                {allT(`pages.user-details.user-header.status.${item.status}`)}
               </Badge>
-              {/* TODO display manual review better */}
               {item.requiresManualReview && (
-                <Badge variant="error">Manual review</Badge>
+                <Badge variant="error">
+                  {allT('pages.user-details.user-header.status.manual-review')}
+                </Badge>
               )}
             </td>
             <td>

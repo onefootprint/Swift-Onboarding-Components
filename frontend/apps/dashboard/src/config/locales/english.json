@@ -201,6 +201,14 @@
         "title": "Pinned note",
         "title-by-author": " by {{author}}"
       },
+      "user-header": {
+        "status": {
+          "pass": "Verified",
+          "fail": "Failed",
+          "vault-only": "Vault",
+          "manual-review": "Manual Review"
+        }
+      },
       "user-info": {
         "cta": {
           "select-all": "Select all",

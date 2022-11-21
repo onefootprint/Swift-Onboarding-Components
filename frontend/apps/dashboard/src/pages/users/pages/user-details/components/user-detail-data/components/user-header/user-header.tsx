@@ -1,9 +1,7 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
-import {
-  statusToBadgeVariant,
-  statusToDisplayText,
-} from 'src/constants/onboarding-status-display';
+import { statusToBadgeVariant } from 'src/constants/onboarding-status-display';
 import { User } from 'src/pages/users/types/user.types';
 import styled, { css } from 'styled-components';
 
@@ -16,16 +14,17 @@ type UserHeaderProps = {
 
 const UserHeader = ({ user }: UserHeaderProps) => {
   const { id: footprintUserId } = user;
+  const { t } = useTranslation('pages.user-details.user-header.status');
+
   return (
     <HeaderContainer>
       <RowContainer>
         <Typography variant="label-1">User info</Typography>
         <Badge variant={statusToBadgeVariant[user.status]}>
-          {statusToDisplayText[user.status]}
+          {t(user.status)}
         </Badge>
-        {/* TODO display manual review better */}
         {user.requiresManualReview && (
-          <Badge variant="error">Manual review</Badge>
+          <Badge variant="error">{t('manual-review')}</Badge>
         )}
       </RowContainer>
       <SplitRow>
