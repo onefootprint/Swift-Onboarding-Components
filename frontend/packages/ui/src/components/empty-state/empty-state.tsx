@@ -46,10 +46,10 @@ const EmptyState = ({
       </Box>
     )}
     {renderHeader && <Box sx={{ marginBottom: 9 }}>{renderHeader()}</Box>}
-    <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
+    <Typography variant="label-1" sx={{ marginBottom: 4 }}>
       {title}
     </Typography>
-    <Typography variant="body-1" color="secondary">
+    <Typography variant="body-2" color="secondary">
       {description}
     </Typography>
     {cta && (
