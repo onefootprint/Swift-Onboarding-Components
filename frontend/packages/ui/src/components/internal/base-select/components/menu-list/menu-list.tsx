@@ -4,7 +4,7 @@ import { FixedSizeList as List } from 'react-window';
 import styled, { css } from 'styled-components';
 
 const OPTION_HEIGHT = 36;
-const ROWS = 6;
+const ROWS = 5.5;
 
 export type MenuListProps<
   Option = unknown,
@@ -60,7 +60,7 @@ const MenuList = <
 
 const StyledList = styled(List)`
   ${({ theme }) => css`
-    margin: ${theme.spacing[3]} 0;
+    margin: ${theme.spacing[3]} 0 0 0;
   `}
 `;
 
