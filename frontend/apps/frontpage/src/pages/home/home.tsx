@@ -33,7 +33,7 @@ const Home = () => {
         />
       </HeaderContainer>
       <DemoVideo
-        link="https://www.youtube.com/embed/VYNY7ZvxKQs?autoplay=1"
+        link="https://www.youtube.com/embed/ylHZgcW3fyI?autoplay=1"
         onClose={toggleDemo}
         title="Footprint Demo"
         open={isDemoVisible}
