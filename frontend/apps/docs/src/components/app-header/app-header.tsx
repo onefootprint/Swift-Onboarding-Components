@@ -34,7 +34,7 @@ const AppHeader = ({ navigation }: AppHeaderProps) => {
 
   const desktopLinks = [
     {
-      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs/1f6bffaf405b1-org',
+      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs',
       Icon: IcoArrowUpRight16,
       text: t('nav.docs.desktop'),
     },
@@ -42,7 +42,7 @@ const AppHeader = ({ navigation }: AppHeaderProps) => {
 
   const mobileLinks = [
     {
-      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs/1f6bffaf405b1-org',
+      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs',
       Icon: IcoArrowUpRight16,
       text: t('nav.docs.mobile'),
     },
