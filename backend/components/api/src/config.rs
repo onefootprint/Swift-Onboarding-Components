@@ -148,6 +148,12 @@ pub struct EnclaveConfig {
 
     #[envconfig(from = "ENCLAVE_SEALED_IKEK_HEX")]
     pub enclave_sealed_ikek_hex: String,
+
+    #[envconfig(from = "ENCLAVE_PROXY_ENDPOINT", default = "http://localhost:3668")]
+    pub enclave_proxy_endpoint: String,
+
+    #[envconfig(from = "ENCLAVE_PROXY_SECRET", default = "onefootprint")]
+    pub enclave_proxy_secret: String,
 }
 
 /// separate service config struct to load minimal memory footprint for sensitive values

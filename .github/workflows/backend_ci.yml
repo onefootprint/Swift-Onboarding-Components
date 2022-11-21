@@ -141,6 +141,7 @@ jobs:
         working-directory: ./backend
         run: |
           cargo build -p enclave
+          cargo build -p enclave_proxy
           cargo build -p footprint-core
                     
           make run-local &

@@ -1,3 +1,4 @@
+import { NitroServiceOutput } from './nitro_service';
 import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
@@ -8,6 +9,8 @@ import { Region } from '@pulumi/aws';
 import { DbOutput } from './db';
 import * as s3 from './s3';
 import { GetStackMetadata, StackEnvironment } from './stack_metadata';
+
+const OTEL_PORT = 4317;
 
 export abstract class ServiceContainers {
   static async apiMain(
@@ -21,30 +24,17 @@ export abstract class ServiceContainers {
     database: DbOutput,
     s3Buckets: s3.S3Buckets,
     metricsEndpointPath: string,
+    nitroService: NitroServiceOutput,
   ): Promise<pulumi.Output<string>> {
     const traceOtelCollecterContainerName = 'otelcollect-trace';
-    const promOtelCollecterContainerName = 'otelcollect-prom';
     const serverContainerName = 'fpc';
 
-    // We strangely have two otel collector sidecars for each server process.
-    // Traces are push-based (the API server tells the otel collector about traces as they happen)
-    // while metrics are pull-based (the otel collector scrapes the /metrics endpoint on the API
-    // server). AWS ECS won't allow us to create a cyclical dependency of networking `links`
-    // containers sadly
     const traceOtelCollector = ServiceContainers.createTraceOtelCollector(
       traceOtelCollecterContainerName,
       secretsStore,
       constants,
       region,
-    );
-
-    const promOtelCollector = ServiceContainers.createPrometheusOtelCollector(
-      promOtelCollecterContainerName,
-      serverContainerName,
       appPort,
-      secretsStore,
-      constants,
-      region,
       metricsEndpointPath,
     );
 
@@ -67,26 +57,20 @@ export abstract class ServiceContainers {
       database,
       s3Buckets,
       metricsEndpointPath,
+      nitroService,
     );
 
     const containerDef = pulumi
-      .all([traceOtelCollector, promOtelCollector, hearbeats, apiServer])
-      .apply(
-        ([traceOtelCollector, promOtelCollector, hearbeats, apiServer]) => {
-          const def = [
-            apiServer,
-            traceOtelCollector,
-            promOtelCollector,
-            hearbeats,
-          ];
-          return JSON.stringify(def);
-        },
-      );
+      .all([traceOtelCollector, hearbeats, apiServer])
+      .apply(([traceOtelCollector, hearbeats, apiServer]) => {
+        const def = [apiServer, traceOtelCollector, hearbeats];
+        return JSON.stringify(def);
+      });
     return containerDef;
   }
 
   /**
-   * API server
+   * Our man API server contianer
    */
   static async createApiServer(
     name: string,
@@ -100,6 +84,7 @@ export abstract class ServiceContainers {
     database: DbOutput,
     s3Buckets: s3.S3Buckets,
     metricsEndpointPath: string,
+    nitroService: NitroServiceOutput,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
     let serviceEnvironment: string;
 
@@ -141,6 +126,7 @@ export abstract class ServiceContainers {
         secretsStore.sendgridApiKey.arn,
         secretsStore.idologyUsername.arn,
         secretsStore.idologyPassword.arn,
+        secretsStore.enclaveProxySecret.arn,
       ])
       .apply(
         ([
@@ -157,6 +143,7 @@ export abstract class ServiceContainers {
           sendgridApiKey,
           idologyUsername,
           idologyPassword,
+          enclaveProxySecret,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -203,6 +190,10 @@ export abstract class ServiceContainers {
                 name: 'IDOLOGY_PASSWORD',
                 valueFrom: idologyPassword,
               },
+              {
+                name: 'ENCLAVE_PROXY_SECRET',
+                valueFrom: enclaveProxySecret,
+              },
             ],
             environment: [
               {
@@ -231,7 +222,7 @@ export abstract class ServiceContainers {
               },
               {
                 name: 'OTEL_ENDPOINT',
-                value: `http://${traceOtelCollectorContainerName}:4317`,
+                value: `http://localhost:${OTEL_PORT}`,
               },
               {
                 name: 'RELYING_PARTY_ID',
@@ -285,9 +276,10 @@ export abstract class ServiceContainers {
                 name: 'METRICS_ENDPOINT_PATH',
                 value: `${metricsEndpointPath}`,
               },
-            ],
-            links: [
-              `${traceOtelCollectorContainerName}:${traceOtelCollectorContainerName}`,
+              {
+                name: 'ENCLAVE_PROXY_ENDPOINT',
+                value: nitroService.serviceEndpoint,
+              },
             ],
             dependsOn: [
               {
@@ -298,7 +290,7 @@ export abstract class ServiceContainers {
             portMappings: [
               {
                 containerPort: appPort,
-                hostPort: 0,
+                hostPort: appPort,
                 protocol: 'tcp',
               },
             ],
@@ -318,13 +310,15 @@ export abstract class ServiceContainers {
   }
 
   /**
-   * OpenTelemetry Collector agent for traces
+   * OpenTelemetryCollector Agent for traces & prometheus
    */
   static createTraceOtelCollector(
     name: string,
     secrets: StaticSecrets,
     constants: Config,
     region: Region,
+    serverContainerPort: number,
+    metricsEndpointPath: string,
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const out = pulumi
       .all([secrets.traceOtelConfig.arn, secrets.elasticApmAgentKey.arn])
@@ -346,8 +340,8 @@ export abstract class ServiceContainers {
           secrets,
           portMappings: [
             {
-              containerPort: 4317,
-              hostPort: 0,
+              containerPort: OTEL_PORT,
+              hostPort: OTEL_PORT,
               protocol: 'tcp',
             },
           ],
@@ -355,6 +349,14 @@ export abstract class ServiceContainers {
             {
               name: 'ELASTIC_APM_SERVER_ENDPOINT',
               value: constants.elastic.apmEndpoint,
+            },
+            {
+              name: 'API_SERVER_TARGET',
+              value: `localhost:${serverContainerPort}`,
+            },
+            {
+              name: 'API_SERVER_METRICS_ENDPOINT_PATH',
+              value: `${metricsEndpointPath}`,
             },
           ],
           logConfiguration: {
@@ -375,80 +377,7 @@ export abstract class ServiceContainers {
   }
 
   /**
-   * OpenTelemetry Collector agent for prometheus
-   */
-  static createPrometheusOtelCollector(
-    name: string,
-    serverContainerName: string,
-    serverContainerPort: number,
-    secrets: StaticSecrets,
-    constants: Config,
-    region: Region,
-    metricsEndpointPath: string,
-  ): pulumi.Output<aws.ecs.ContainerDefinition> {
-    const out = pulumi
-      .all([
-        secrets.promOtelConfig.arn,
-        secrets.grafanaPrometheusPushAuth.arn,
-        secrets.elasticApmAgentKey.arn,
-      ])
-      .apply(([config, grafanaPrometheusPushAuth, elasticApiKey]) => [
-        {
-          name: 'AOT_CONFIG_CONTENT',
-          valueFrom: config,
-        },
-        {
-          name: 'GRAFANA_PROMETHEUS_PUSH_AUTH',
-          valueFrom: grafanaPrometheusPushAuth,
-        },
-        {
-          name: 'ELASTIC_APM_API_KEY',
-          valueFrom: elasticApiKey,
-        },
-      ])
-      .apply(secrets => {
-        let def: aws.ecs.ContainerDefinition = {
-          name,
-          image: 'amazon/aws-otel-collector:latest',
-          essential: true,
-          secrets,
-          links: [`${serverContainerName}:${serverContainerName}`],
-          dependsOn: [
-            { containerName: serverContainerName, condition: 'START' },
-          ],
-          environment: [
-            {
-              name: 'ELASTIC_APM_SERVER_ENDPOINT',
-              value: constants.elastic.apmEndpoint,
-            },
-            {
-              name: 'API_SERVER_TARGET',
-              value: `${serverContainerName}:${serverContainerPort}`,
-            },
-            {
-              name: 'API_SERVER_METRICS_ENDPOINT_PATH',
-              value: `${metricsEndpointPath}`,
-            },
-          ],
-          logConfiguration: {
-            logDriver: 'awslogs',
-            options: {
-              'awslogs-group': `/ecs/otelcollect_prom_logs`,
-              'awslogs-region': `${region}`,
-              'awslogs-create-group': 'true',
-              'awslogs-stream-prefix': 'ecs',
-            },
-          },
-        };
-
-        return def;
-      });
-
-    return out;
-  }
-
-  /**
-   * Heartbeat agent
+   * A Heartbeat agent to ping /status
    */
   static createHeartbeatContainer(
     appName: string,
@@ -473,17 +402,11 @@ export abstract class ServiceContainers {
             'ghcr.io/onefootprint/heartbeat@sha256:56773827f9fb79264e46b95d128f448c0a4e49b9692ae3dd5bb408812e0efe82',
           essential: true,
           secrets,
-          links: [`${appName}:${appName}`],
           dependsOn: [{ containerName: appName, condition: 'START' }],
-          linuxParameters: {
-            capabilities: {
-              add: ['NET_RAW'],
-            },
-          },
           environment: [
             {
               name: 'FPC_MONITOR_URL',
-              value: `http://${appName}:${appPort}/status`,
+              value: `http://localhost:${appPort}/status`,
             },
             {
               name: 'FPC_ENV',

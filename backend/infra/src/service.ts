@@ -1,11 +1,12 @@
+import { DnsConfig } from './dns';
+import { NitroServiceOutput } from './nitro_service';
 import { StackMetadata } from './stack_metadata';
 import { ec2, Region, route53 } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { StaticSecrets } from './secrets';
-import { CDN_PROTECTION_HEADER_NAME, Config } from './config';
-import { CreateCluster } from './cluster';
+import { Config } from './config';
 import { ServiceContainers } from './containers';
 import { EnclaveKeyDescriptor } from './enclave_key';
 import * as crypto from 'crypto';
@@ -15,41 +16,53 @@ import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as s3 from './s3';
 import { metrics } from '@pulumi/awsx/cloudwatch';
 import { GetStackMetadata } from './stack_metadata';
+import * as certs from './certs';
+import * as cdn from './cdn';
 
 export type ServiceLoadBalancer = {
   lb: awsx.lb.LoadBalancer;
+  targetGroup: aws.lb.TargetGroup;
+  cert: aws.acm.Certificate;
+  cdnDomain: string;
+  lbCname: string;
+  distribution: aws.cloudfront.Distribution;
 };
 
 export type ServiceConfig = {
-  certArn: pulumi.Output<string>;
   instanceCount: number;
   memoryMB: number;
   cpuUnits: number;
-  hostedZoneId: string;
-  domain: string;
 };
 
 export type AWSPolicyConfig = {
   name: string;
   policy: string;
 };
+
 /**
- * The service port container
+ * Constants
  */
-const ServicePort = 8000;
+// The service port for our main `api` container
+const FPC_SERVICE_PORT = 8000;
+// The path at which metrics are served.
+const METRICS_ENDPOINT_PATH = 'metrics';
+// Our header name for securing auth between cloudfront and internal load balancers
+const CDN_PROTECTION_HEADER_NAME: string = 'X-Token-From-CloudFront';
 
 /**
  * Create our service on ECS
  */
-export async function Create(
+export async function CreateApiService(
   vpcProvider: FootprintVpc,
-  config: ServiceConfig,
+  serviceConfig: ServiceConfig,
+  dnsConfig: DnsConfig,
   constants: Config,
   secretsStore: StaticSecrets,
   enclaveKeyDescriptor: EnclaveKeyDescriptor,
   signingKeyDescriptor: HmacSigningKeyDescriptor,
   database: DbOutput,
   s3Buckets: s3.S3Buckets,
+  nitroService: NitroServiceOutput,
 ): Promise<ServiceLoadBalancer> {
   const region = vpcProvider.region;
 
@@ -58,31 +71,35 @@ export async function Create(
   const provider = vpcProvider.provider;
 
   // setup our load balancer and cloudfront CDN
-  const metricsEndpointPath = 'metrics';
-  const loadBalancerTargetGroup = await createCdnFrontedLoadBalancer(
+  const lb = await createCdnFrontedLoadBalancer(
     vpcProvider,
     secretsStore,
-    metricsEndpointPath,
-    config,
+    dnsConfig,
+    METRICS_ENDPOINT_PATH,
+    serviceConfig,
     stackMetadata,
   );
 
   // init our cluster
-  const cluster = await CreateCluster(
-    stackMetadata.shortStackName,
-    vpcProvider,
-    loadBalancerTargetGroup,
-    constants,
+
+  const cluster = new awsx.ecs.Cluster(
+    `cluster-${stackMetadata.shortStackName}`,
     {
-      cid: 16,
-      memory: 256,
-      cpus: 2,
+      name: `cluster-${stackMetadata.shortStackName}`,
+      vpc,
+      settings: [
+        {
+          name: 'containerInsights',
+          value: 'enabled',
+        },
+      ],
     },
+    { provider },
   );
 
   // declare the containers we want to run
   const containerDefinitions = await ServiceContainers.apiMain(
-    ServicePort,
+    FPC_SERVICE_PORT,
     constants,
     secretsStore,
     enclaveKeyDescriptor,
@@ -91,7 +108,8 @@ export async function Create(
     cluster,
     database,
     s3Buckets,
-    metricsEndpointPath,
+    METRICS_ENDPOINT_PATH,
+    nitroService,
   );
 
   // setup the task
@@ -103,7 +121,7 @@ export async function Create(
   );
 
   const taskRoleRole = createTaskContainerRole(
-    current.accountId,
+    (await aws.getCallerIdentity({})).accountId,
     stackMetadata.shortStackName,
     enclaveKeyDescriptor,
     signingKeyDescriptor,
@@ -113,10 +131,10 @@ export async function Create(
   const taskDefinition = new aws.ecs.TaskDefinition(
     `task-${stackMetadata.shortStackName}`,
     {
-      memory: `${config.memoryMB}`,
-      cpu: `${config.cpuUnits}`,
-      networkMode: 'bridge',
-      requiresCompatibilities: ['EC2'],
+      memory: `${serviceConfig.memoryMB}`,
+      cpu: `${serviceConfig.cpuUnits}`,
+      networkMode: 'awsvpc',
+      requiresCompatibilities: ['FARGATE'],
       executionRoleArn: execRole.arn,
       taskRoleArn: taskRoleRole.arn,
       family: `fpc-task-family`,
@@ -126,12 +144,31 @@ export async function Create(
   );
 
   // build the cluster service
+  const serviceSg = new awsx.ec2.SecurityGroup(
+    `fpc-svc-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc,
+      ingress: [
+        {
+          protocol: 'tcp',
+          fromPort: FPC_SERVICE_PORT,
+          toPort: FPC_SERVICE_PORT,
+          cidrBlocks: [vpc.vpc.cidrBlock],
+        },
+      ],
+      egress: [
+        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+      ],
+    },
+    { provider },
+  );
+
   const service = new aws.ecs.Service(
     `svc-${stackMetadata.shortStackName}`,
     {
       cluster: cluster.cluster.arn,
-      launchType: 'EC2',
-      desiredCount: config.instanceCount,
+      launchType: 'FARGATE',
+      desiredCount: serviceConfig.instanceCount,
       taskDefinition: taskDefinition.arn,
       deploymentController: {
         type: 'ECS',
@@ -142,21 +179,26 @@ export async function Create(
       },
       waitForSteadyState: true,
       deploymentMinimumHealthyPercent: 100,
+      networkConfiguration: {
+        assignPublicIp: false,
+        subnets: vpc.privateSubnetIds,
+        securityGroups: [serviceSg.id],
+      },
       loadBalancers: [
         {
           containerName: 'fpc',
-          containerPort: ServicePort,
-          targetGroupArn: loadBalancerTargetGroup.targetGroup.arn,
+          containerPort: FPC_SERVICE_PORT,
+          targetGroupArn: lb.targetGroup.arn,
         },
       ],
     },
     {
       provider,
-      dependsOn: [loadBalancerTargetGroup, database.db, ...database.instances],
+      dependsOn: [lb.targetGroup, lb.lb, database.db, ...database.instances],
     },
   );
 
-  return { lb: loadBalancerTargetGroup.loadBalancer };
+  return lb;
 }
 
 /**
@@ -166,29 +208,38 @@ export async function Create(
 async function createCdnFrontedLoadBalancer(
   vpcProvider: FootprintVpc,
   secretsStore: StaticSecrets,
+  dnsConfig: DnsConfig,
   metricsEndpointPath: string,
   config: ServiceConfig,
   stackMetadata: StackMetadata,
-): Promise<awsx.lb.TargetGroup> {
+): Promise<ServiceLoadBalancer> {
   const region = vpcProvider.region;
   const vpc = vpcProvider.vpc;
   const provider = vpcProvider.provider;
-
   const serviceName = stackMetadata.shortStackName;
 
+  // Create a certificate for this service
+  const domain = `${dnsConfig.apiPrefixHost}${dnsConfig.domainBaseName}`;
+
+  const cert = await certs.CreateWildcardCertificate({
+    domain: domain,
+    region: vpcProvider.region,
+    hostedZoneId: dnsConfig.hostedZone.id,
+  });
+
   // init our ALB
-  const loadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(
-    `app-lb-sg-${serviceName}`,
+  const securityGroup = new awsx.ec2.SecurityGroup(
+    `fpc-lb-sg-${stackMetadata.shortStackName}`,
     {
       vpc,
       ingress: [
-        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+        { protocol: 'tcp', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
       ],
       egress: [
         {
-          protocol: '-1',
-          fromPort: ServicePort,
-          toPort: ServicePort,
+          protocol: 'tcp',
+          fromPort: 0,
+          toPort: FPC_SERVICE_PORT,
           cidrBlocks: [vpc.vpc.cidrBlock],
         },
       ],
@@ -197,21 +248,22 @@ async function createCdnFrontedLoadBalancer(
   );
 
   const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
-    `app-lb-${serviceName}`,
+    `fpc-lb-${serviceName}`,
     {
       vpc,
-      securityGroups: [loadBalancerSecurityGroup],
-      subnets: vpcProvider.publicSubnetIds,
+      external: true,
+      securityGroups: [securityGroup],
+      subnets: vpc.publicSubnetIds,
     },
     { provider },
   );
 
   const targetGroup = new aws.lb.TargetGroup(
-    `app-lb-tg-${serviceName}`,
+    `fpc-tg-${serviceName}`,
     {
       vpcId: vpc.vpc.id,
-      targetType: 'instance',
-      port: ServicePort,
+      targetType: 'ip',
+      port: FPC_SERVICE_PORT,
       protocol: 'HTTP',
       healthCheck: {
         port: 'traffic-port',
@@ -221,19 +273,11 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  const loadBalancerTargetGroup = loadBalancer.createTargetGroup(
-    `lb-tg-${serviceName}`,
-    {
-      targetGroup,
-    },
-    { provider },
-  );
-
-  const web = loadBalancerTargetGroup.createListener(
-    `app-lb-https-${serviceName}`,
+  const web = loadBalancer.createListener(
+    `fpc-https-${serviceName}`,
     {
       external: true,
-      certificateArn: config.certArn,
+      certificateArn: cert.arn,
       protocol: 'HTTPS',
       sslPolicy: 'ELBSecurityPolicy-2016-08',
       // ensure the default is an error
@@ -251,7 +295,7 @@ async function createCdnFrontedLoadBalancer(
 
   // dont't allow external traffic to hit the /metrics endpoint
   web.addListenerRule(
-    `lb-cdntoken-metrics-rule-${serviceName}`,
+    `fpc-lb-metrics-rule-${serviceName}`,
     {
       priority: 1,
       actions: [
@@ -277,13 +321,13 @@ async function createCdnFrontedLoadBalancer(
 
   // ensure ALB requests are only coming from cloudfront
   web.addListenerRule(
-    `lb-cdntoken-rule-${serviceName}`,
+    `fpc-lb-cdntoken-rule-${serviceName}`,
     {
       priority: 2,
       actions: [
         {
           type: 'forward',
-          targetGroupArn: loadBalancerTargetGroup.targetGroup.arn,
+          targetGroupArn: targetGroup.arn,
         },
       ],
       conditions: [
@@ -300,7 +344,7 @@ async function createCdnFrontedLoadBalancer(
 
   // redirect http to https
   loadBalancer.createListener(
-    `lb-httpredir-${serviceName}`,
+    `fpc-lb-httpredir-${serviceName}`,
     {
       protocol: 'HTTP',
       defaultAction: {
@@ -314,13 +358,14 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
+  const albDomainName = `internal.${domain}`;
   const record = new route53.Record(
     `dns-alb-${serviceName}-${region}`,
     {
-      zoneId: config.hostedZoneId,
+      zoneId: dnsConfig.hostedZone.id,
       type: 'A',
-      name: config.domain,
-      setIdentifier: `app-record-region-${serviceName}-${region}`,
+      name: albDomainName,
+      setIdentifier: `app-record-setid-${serviceName}-${region}`,
       latencyRoutingPolicies: [{ region: region }],
       aliases: [
         {
@@ -333,7 +378,23 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  return loadBalancerTargetGroup;
+  const distribution = await cdn.CreateCloudfrontDistribution({
+    certArn: cert.arn,
+    cdnToAlbSecret: secretsStore.cloudfrontSecret,
+    cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
+    domain: domain,
+    origin: albDomainName,
+    hostedZoneId: dnsConfig.hostedZone.id,
+  });
+
+  return {
+    lb: loadBalancer,
+    targetGroup: targetGroup,
+    cdnDomain: domain,
+    lbCname: albDomainName,
+    cert,
+    distribution,
+  };
 }
 
 /**
@@ -402,8 +463,7 @@ function createTaskExecutionRole(
 }
 
 /**
- * Create the task execution role we need to setup the tasks in our ECS service
- * needs to create logs, assume ecs-tasks service, and access static secrets for the containers
+ * Create the task container role we need to run the tasks in our ECS service
  */
 function createTaskContainerRole(
   account: string,

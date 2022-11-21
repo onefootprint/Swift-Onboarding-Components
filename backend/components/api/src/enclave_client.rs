@@ -1,35 +1,18 @@
 use crypto::{aead::ScopedSealingKey, hex, seal::EciesP256Sha256AesGcmSealed};
 use enclave_proxy::{
-    bb8::{self, ErrorSink},
-    pool, DataTransform, DecryptRequest, EnclavePayload, EnvelopeDecryptRequest, FnDecryption,
-    GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
-    GeneratedSealedDataKey, KmsCredentials, RpcPayload, SealedIkek, StreamManager,
+    http_proxy::ProxyHttpClient, DataTransform, DecryptRequest, EnclavePayload, EnvelopeDecryptRequest,
+    FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
+    GeneratedSealedDataKey, KmsCredentials, RpcPayload, RpcRequest, SealedIkek,
 };
 use newtypes::{EncryptedVaultPrivateKey, PiiString, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey};
 
-use crate::{
-    config::{Config, EnclaveConfig},
-    errors::enclave::EnclaveError,
-};
+use crate::{config::Config, errors::enclave::EnclaveError};
 
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
-    pool: bb8::Pool<pool::StreamManager<StreamManager<EnclaveConfig>>>,
+    client: ProxyHttpClient,
     sealed_ikek: SealedIkek,
     kms_creds: KmsCredentials,
-}
-
-/// Record errors that occur from enclave pool connections
-#[derive(Debug, Clone)]
-struct EnclavePoolErrorSink;
-impl ErrorSink<enclave_proxy::Error> for EnclavePoolErrorSink {
-    fn sink(&self, error: enclave_proxy::Error) {
-        tracing::error!(target: "enclave_pool_error", error=?error, "enclave connection pool error");
-    }
-
-    fn boxed_clone(&self) -> Box<(dyn ErrorSink<enclave_proxy::Error> + 'static)> {
-        Box::new(self.clone())
-    }
 }
 
 impl EnclaveClient {
@@ -45,34 +28,33 @@ impl EnclaveClient {
             session_token: None,
         };
 
-        let manager = StreamManager {
-            config: config.enclave_config,
-        };
-        let pool = bb8::Pool::builder()
-            .min_idle(Some(3))
-            .max_size(50)
-            .connection_timeout(std::time::Duration::from_secs(4))
-            .test_on_check_out(false)
-            .error_sink(Box::new(EnclavePoolErrorSink))
-            .build(pool::StreamManager(manager))
-            .await
-            .expect("could not create enclave conn pool");
+        let client = ProxyHttpClient::new(
+            &config.enclave_config.enclave_proxy_endpoint,
+            &config.enclave_config.enclave_proxy_secret,
+        )
+        .expect("failed to build enclave http proxy client");
 
         Self {
-            pool,
+            client,
             sealed_ikek: SealedIkek(sealed_ikek),
             kms_creds,
         }
     }
 
+    /// send the request to the enclave
+    async fn send(&self, req: RpcRequest) -> Result<EnclavePayload, EnclaveError> {
+        tracing::info!("sending enclave request");
+        let response = self.client.send_request(req).await?;
+        tracing::info!("got enclave response");
+
+        Ok(response)
+    }
+
     /// play ping-pong
     #[allow(dead_code)]
     pub async fn pong(&self) -> Result<String, EnclaveError> {
-        let mut conn = self.pool.get().await?;
         let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));
-
-        tracing::info!("sending request");
-        let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
+        let response = self.send(req).await?;
 
         if let EnclavePayload::Pong(response) = response {
             Ok(response)
@@ -85,17 +67,13 @@ impl EnclaveClient {
     pub async fn generate_sealed_keypair(
         &self,
     ) -> Result<(VaultPublicKey, EncryptedVaultPrivateKey), EnclaveError> {
-        let mut conn = self.pool.get().await?;
-
         let req =
             enclave_proxy::RpcRequest::new(RpcPayload::GenerateDataKeypair(GenerateDataKeypairRequest {
                 kms_creds: self.kms_creds.clone(),
                 sealed_ikek: self.sealed_ikek.clone(),
             }));
 
-        tracing::info!("sending enclave request");
-        let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
-        tracing::info!("got enclave response");
+        let response = self.send(req).await?;
 
         let response = GeneratedDataKeyPair::try_from(response)?;
 
@@ -111,18 +89,13 @@ impl EnclaveClient {
         &self,
         vault_public_key: &VaultPublicKey,
     ) -> Result<SealedVaultDataKey, EnclaveError> {
-        let mut conn = self.pool.get().await?;
-
         let req = enclave_proxy::RpcRequest::new(RpcPayload::GenerateSymmetricDataKey(
             GenerateSymmetricDataKeyRequest {
                 public_key_bytes: vault_public_key.as_ref().to_vec(),
             },
         ));
 
-        tracing::info!("sending enclave request");
-        let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
-        tracing::info!("got enclave response");
-
+        let response = self.send(req).await?;
         let response = GeneratedSealedDataKey::try_from(response)?;
 
         let encrypted_data_key = SealedVaultDataKey::try_from(response.sealed_key.sealed_key)?;
@@ -138,8 +111,6 @@ impl EnclaveClient {
         sealed_key: &EncryptedVaultPrivateKey,
         scope: &'static str,
     ) -> Result<ScopedSealingKey, EnclaveError> {
-        let mut conn = self.pool.get().await?;
-
         let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecryptRequest {
             kms_creds: self.kms_creds.clone(),
             sealed_ikek: self.sealed_ikek.clone(),
@@ -150,9 +121,7 @@ impl EnclaveClient {
             }],
         }));
 
-        tracing::info!("sending enclave request");
-        let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
-        tracing::info!("got enclave response");
+        let response = self.send(req).await?;
 
         let response = FnDecryption::try_from(response)?;
         let response = response
@@ -202,8 +171,6 @@ impl EnclaveClient {
         requests: Vec<DecryptRequest>,
         sealed_key: &EncryptedVaultPrivateKey,
     ) -> Result<Vec<PiiString>, EnclaveError> {
-        let mut conn = self.pool.get().await?;
-
         let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecryptRequest {
             kms_creds: self.kms_creds.clone(),
             sealed_ikek: self.sealed_ikek.clone(),
@@ -211,9 +178,7 @@ impl EnclaveClient {
             requests: requests.clone(),
         }));
 
-        tracing::info!("sending enclave request");
-        let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
-        tracing::info!("got enclave response");
+        let response = self.send(req).await?;
 
         let response = FnDecryption::try_from(response)?;
         let decrypted_results = response

@@ -2,7 +2,7 @@ use envconfig::Envconfig;
 
 #[derive(Envconfig, Clone)]
 pub struct Config {
-    #[envconfig(from = "PORT", default = "8000")]
+    #[envconfig(from = "ENCLAVE_PROXY_PORT", default = "3668")]
     pub port: u16,
 
     #[envconfig(from = "ENCLAVE_PORT", default = "5000")]
@@ -13,6 +13,9 @@ pub struct Config {
 
     #[envconfig(from = "LOCAL")]
     pub use_local: Option<String>,
+
+    #[envconfig(from = "ENCLAVE_PROXY_SECRET", default = "onefootprint")]
+    pub proxy_secret: String,
 }
 
 impl Config {

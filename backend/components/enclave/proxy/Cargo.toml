@@ -12,6 +12,7 @@ vsock = ["tokio-vsock"]
 [dependencies]
 tokio = { workspace = true }
 tokio-vsock = { version = "0.3", optional = true }
+reqwest = { workspace = true }
 
 futures = { workspace = true }
 libc = "0.2"
@@ -21,8 +22,10 @@ serde = { workspace = true }
 serde_cbor = { workspace = true }
 byteorder = "1.4"
 rpc = { path = "../rpc" }
+crypto = { path = "../crypto"}
 
 actix-web = "4.0.1"
+actix-web-httpauth = "0.8.0"
 env_logger = "0.9.0"
 tracing = "0.1.30"
 uuid = { workspace = true }

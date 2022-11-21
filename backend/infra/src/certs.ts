@@ -9,9 +9,9 @@ export type CertConfig = {
   region: Region;
 };
 
-export async function CreateCertificate(
+export async function CreateWildcardCertificate(
   config: CertConfig,
-): Promise<pulumi.Output<string>> {
+): Promise<aws.acm.Certificate> {
   const nameSuffix = `${config.domain}-cert-${config.region}`;
   const provider = new aws.Provider(`provider-${nameSuffix}`, {
     region: config.region,
@@ -23,7 +23,10 @@ export async function CreateCertificate(
       domainName: `*.${config.domain}`,
       subjectAlternativeNames: [config.domain],
       validationMethod: 'DNS',
-    },
+      // TODO update pulumi to officially support this
+      key_algorithm: 'EC_secp384r1',
+      keyAlgorithm: 'EC_secp384r1',
+    } as aws.acm.CertificateArgs,
     { provider },
   );
 
@@ -63,5 +66,5 @@ export async function CreateCertificate(
     { provider },
   );
 
-  return certValidation.certificateArn;
+  return cert;
 }

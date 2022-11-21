@@ -12,6 +12,15 @@ receivers:
       http:
         endpoint: 0.0.0.0:55681
 
+  awsecscontainermetrics:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'prometheus-metrics'
+          scrape_interval: 60s
+          metrics_path: '/${API_SERVER_METRICS_ENDPOINT_PATH}'
+          static_configs:
+            - targets: ['${API_SERVER_TARGET}']
 
 processors:
   batch/traces:
@@ -20,6 +29,21 @@ processors:
 
   batch/metrics:
     timeout: 30s
+
+  filter:
+    metrics:
+      include:
+        match_type: strict
+        metric_names:
+          - ecs.task.memory.reserved
+          - ecs.task.memory.utilized
+          - ecs.task.cpu.reserved
+          - ecs.task.cpu.utilized
+          - ecs.task.network.rate.rx
+          - ecs.task.network.rate.tx
+          - ecs.task.storage.read_bytes
+          - ecs.task.storage.write_bytes
+          - container.duration
 
 exporters:
   logging:
@@ -37,6 +61,16 @@ exporters:
     headers:
       'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
 
+  prometheusremotewrite:
+    endpoint: 'https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push'
+    headers:
+      'Authorization': 'Basic ${GRAFANA_PROMETHEUS_PUSH_AUTH}'
+
+  prometheusremotewrite/observe:
+    endpoint: 'https://collect.observeinc.com/v1/prometheus'
+    headers:
+      'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
+
 service:
   pipelines:
     traces:
@@ -44,7 +78,24 @@ service:
       processors: [batch/traces]
       exporters: [logging, otlp/elastic, otlphttp]
     metrics/application:
-      receivers: [otlp]
-      processors: [batch/metrics]
-      exporters: [logging, otlp/elastic]
+      receivers: [otlp, prometheus]
+      processors: []
+      exporters:
+        [
+          logging,
+          prometheusremotewrite,
+          prometheusremotewrite/observe,
+          otlp/elastic,
+        ]
+    metrics/performance:
+      receivers: [awsecscontainermetrics]
+      processors: [filter]
+      exporters:
+        [
+          logging,
+          prometheusremotewrite,
+          prometheusremotewrite/observe,
+          otlp/elastic,
+        ]
+
   extensions: [health_check]

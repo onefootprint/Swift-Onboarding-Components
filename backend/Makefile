@@ -58,12 +58,18 @@ run-enclave:
 	@echo "running enclave"	
 	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16
 
+# Builds our enclave_proxy_binary
+build-enclave-proxy-release:
+	@echo "[release] building enclave-proxy"
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p enclave_proxy --features vsock --release
+	@sudo chown -R ec2-user target
+	@cp ./target/x86_64-unknown-linux-musl/release/enclave_proxy ./out/enclave_proxy
+
 get-named-commit:
 	@echo "$(commit)"
 
 get-friendly-branch-name:
 	@echo "$(branch)"
-
 	
 set-enclave-version:
 	@pulumi --cwd infra config set --path constants.containers.enclaveVersion $(commit)	
@@ -98,10 +104,12 @@ stop-local:
 
 run-local: stop-local
 	@cargo run -p enclave --features simulate & echo "starting enclave..."
+	@cargo run -p enclave_proxy & echo "starting enclave proxy.."
 	@cargo run -p footprint-core
 
 watch-local: stop-local
 	@cargo run -p enclave --features simulate & echo "starting enclave..."
+	@cargo run -p enclave_proxy & echo "starting enclave proxy.."
 	@cargo watch -x 'run -p footprint-core' -i ci
 
 watch: watch-local

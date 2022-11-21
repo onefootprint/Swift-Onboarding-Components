@@ -1,4 +1,5 @@
 pub mod config;
+pub mod http_proxy;
 pub mod pool;
 
 use async_trait::async_trait;
@@ -35,6 +36,8 @@ pub enum Error {
     MissingEnclaveResponse,
     #[error("no enclave response")]
     InvalidEnclaveResponse,
+    #[error("http reqwest: {0}")]
+    HttpClient(#[from] reqwest::Error),
 }
 
 #[derive(Debug, Clone)]

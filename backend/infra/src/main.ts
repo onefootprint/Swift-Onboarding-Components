@@ -4,7 +4,7 @@ import * as certs from './certs';
 import * as pulumi from '@pulumi/pulumi';
 import * as cdn from './cdn';
 import * as secrets from './secrets';
-import { CDN_PROTECTION_HEADER_NAME, Config } from './config';
+import { Config } from './config';
 import * as svc from './service';
 import * as enclaveKey from './enclave_key';
 import * as db from './db';
@@ -12,6 +12,9 @@ import * as vpcUtil from './vpc';
 import * as hmacSigningKey from './hmac_key';
 import * as s3 from './s3';
 import { GetStackMetadata } from './stack_metadata';
+import * as nitroService from './nitro_service';
+import * as dns from './dns';
+
 /**
  * Main infra entry point
  */
@@ -31,10 +34,10 @@ export default async function main() {
       return vpcUtil.CreateRegionalVPC(stackMetadata, region, constants);
     }),
   );
-  // 2022-10-03 - we use one region (us-east-1)
-  const UsEast1vpcProvider = vpcProviders[0];
 
-  const hostedZone = await aws.route53.getZone({ name: constants.domain.base });
+  // 2022-10-03 - we use one region (us-east-1)
+  // some resources will always be in the default region
+  const defaultVpcProvider = vpcProviders[0];
 
   // init the enclave key
   const enclaveKeyConfig = await enclaveKey.Initialize(constants, otherRegions);
@@ -50,9 +53,9 @@ export default async function main() {
     stackMetadata,
   );
 
-  // setup database
+  // Setup database
   const database = await db.CreateDB(
-    UsEast1vpcProvider,
+    defaultVpcProvider,
     `db-${stackMetadata.shortStackName}`,
     constants,
     secretsStore,
@@ -61,13 +64,12 @@ export default async function main() {
     },
   );
 
-  // extract our api domain
-  const apiDomain = `${constants.domain.prefix}${constants.domain.base}`;
-  const internalApiDomain = `internal.${apiDomain}`;
+  // Setup our DNS config
+  const dnsConfig = await dns.LoadDnsConfig(constants);
 
   // Create our s3 buckets
   const s3Buckets = s3.CreateBuckets(
-    UsEast1vpcProvider,
+    defaultVpcProvider,
     constants,
     stackMetadata,
   );
@@ -75,51 +77,56 @@ export default async function main() {
   // launch of core service
   const services = await Promise.all(
     vpcProviders.map(async vpcAndProvider => {
-      // mint a cert for this property
-      const cert = await certs.CreateCertificate({
-        domain: `${constants.domain.base}`,
-        region: vpcAndProvider.region,
-        hostedZoneId: hostedZone.id,
-      });
+      // create the nitro service
+      const nitroServiceOutput = await nitroService.CreateNitroService(
+        vpcAndProvider,
+        {
+          cid: 16,
+          memory: 256,
+          cpus: 2,
+        },
+        dnsConfig,
+        constants,
+        secretsStore,
+        enclaveKeyConfig,
+      );
 
-      // create our ecs service
-      const service = await svc.Create(
+      // create our ecs api service
+      const service = await svc.CreateApiService(
         vpcAndProvider,
         {
           cpuUnits: constants.resources.cpuUnits,
           memoryMB: constants.resources.memoryMB,
           instanceCount: constants.resources.instances,
-          certArn: cert,
-          domain: internalApiDomain,
-          hostedZoneId: hostedZone.zoneId,
         },
+        dnsConfig,
         constants,
         secretsStore,
         enclaveKeyConfig,
         hmacSigningKeyConfig,
         database,
         s3Buckets,
+        nitroServiceOutput,
       );
 
-      return { service, cert, region: vpcAndProvider.region };
+      return {
+        service,
+        region: vpcAndProvider.region,
+        nitroServiceOutput,
+      };
     }),
   );
 
-  const distribution = await cdn.Create({
-    certArn: services[0].cert, // needs US-East-1 cert
-    cdnToAlbSecret: secretsStore.cloudfrontSecret,
-    cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
-    domain: apiDomain,
-    origin: internalApiDomain,
-    hostedZoneId: hostedZone.zoneId,
-  });
-
   return {
-    domain: apiDomain,
-    internal: internalApiDomain,
-    cdn: distribution.domainName,
-    appLBs: services.map(svc => {
-      svc.service.lb.loadBalancer.dnsName;
+    regions: services.map(svc => {
+      return {
+        region: svc.region,
+        cdnDomainName: svc.service.distribution.domainName,
+        externalDomain: svc.service.cdnDomain,
+        loadBalancerCname: svc.service.lbCname,
+        internalLoadBalancerDnsName: svc.service.lb.loadBalancer.dnsName,
+        nitroServiceEndpoint: svc.nitroServiceOutput.serviceEndpoint,
+      };
     }),
     databaseUrl: database.databaseUrl,
   };

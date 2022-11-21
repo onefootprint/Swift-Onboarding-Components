@@ -10,11 +10,12 @@ import { ApplicationSubComponentTypeConfigurationSubComponentType } from '@pulum
 
 export interface StaticSecrets {
   cloudfrontSecret: pulumi.Output<string>;
+  enclaveProxySecret: aws.ssm.Parameter;
+  enclaveProxySecretName: string;
   secretsPolicyArn: pulumi.Output<string>;
   elasticApiKey: aws.ssm.Parameter;
   elasticApmAgentKey: aws.ssm.Parameter;
   traceOtelConfig: aws.ssm.Parameter;
-  promOtelConfig: aws.ssm.Parameter;
   enclaveUserSecretKey: aws.ssm.Parameter;
   enclaveSealedIkek: aws.ssm.Parameter;
   dbPassword: pulumi.Output<string>;
@@ -72,6 +73,12 @@ export async function LoadSecrets(
   const cloudfrontSecret = new random.RandomString('cf-alb-pass', {
     length: 44,
   }).result;
+
+  const nitroProxySecret = new random.RandomString('enclave-proxy-secret', {
+    length: 44,
+    special: false,
+  }).result;
+
   const stack = stackMetadata.shortStackName;
 
   const sessionKey = new random.RandomId('api-session-key', {
@@ -99,9 +106,16 @@ export async function LoadSecrets(
   const secretConstants =
     config.requireSecretObject<SecretConstants>('constants');
 
+  const enclaveProxySecretName = `enclaveProxySecret-${stack}`;
+
   return {
     secretsPolicyArn: secretsPolicy.arn,
     cloudfrontSecret: pulumi.secret(cloudfrontSecret),
+    enclaveProxySecretName: enclaveProxySecretName,
+    enclaveProxySecret: createSecretParameter(
+      enclaveProxySecretName,
+      pulumi.secret(nitroProxySecret),
+    ),
     elasticApiKey: createSecretParameter(
       `elasticApiKey-${stack}`,
       secretConstants.elastic.apiKey,
@@ -121,11 +135,6 @@ export async function LoadSecrets(
       type: 'SecureString',
       value: fs.readFileSync('./monitoring/otel.yml', 'utf8'),
       name: `/static_secrets/trace-otelconfig-${stack}`,
-    }),
-    promOtelConfig: new aws.ssm.Parameter(`ssm-param-prom-otelconfig`, {
-      type: 'SecureString',
-      value: fs.readFileSync('./monitoring/prom-otel.yml', 'utf8'),
-      name: `/static_secrets/prom-otelconfig-${stack}`,
     }),
     dbPassword: pulumi.secret(auroraDbPassword.result),
     cookieSessionKey: new aws.ssm.Parameter(

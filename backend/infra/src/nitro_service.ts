@@ -1,28 +1,52 @@
+import { DnsConfig } from './dns';
+import { EnclaveKeyDescriptor } from './enclave_key';
+import { StaticSecrets } from './secrets';
 import { FootprintVpc } from './vpc';
 import * as aws from '@pulumi/aws';
 import { Region } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
 import * as pulumi from '@pulumi/pulumi';
 import { Config } from './config';
+import { StackMetadata, GetStackMetadata } from './stack_metadata';
+import * as certs from './certs';
 
-export type NitroEnclaveConfig = {
+export type NitroConfig = {
   cpus: number;
   memory: number;
   cid: number;
 };
 
-export async function CreateCluster(
-  clusterName: string,
+export type NitroServiceOutput = {
+  serviceEndpoint: string;
+  loadBalancer: awsx.lb.ApplicationLoadBalancer;
+  targetGroup: aws.lb.TargetGroup;
+};
+
+// the default port for the nitro proxy
+const PROXY_LB_PORT = 3668;
+
+/**
+ * Create the nitro service
+ * ALB -> ASG( EC2[proxy --> nitro_enclave])
+ */
+export async function CreateNitroService(
   vpcProvider: FootprintVpc,
-  targetGroup: awsx.lb.TargetGroup,
+  nitroConfig: NitroConfig,
+  dnsConfig: DnsConfig,
   constants: Config,
-  nitroConfig: NitroEnclaveConfig,
-): Promise<awsx.ecs.Cluster> {
+  secretsStore: StaticSecrets,
+  enclaveKeyDescriptor: EnclaveKeyDescriptor,
+): Promise<NitroServiceOutput> {
+  const stackMetadata = GetStackMetadata();
+  const serviceName = `nitro-service-${stackMetadata.shortStackName}`;
+
   const vpc = vpcProvider.vpc;
   const provider = vpcProvider.provider;
   const region = vpcProvider.region;
 
-  const instanceProfile = createInstanceRole(region, provider);
+  const instanceProfile = createInstanceRole(region, provider, [
+    secretsStore.enclaveProxySecretName,
+  ]);
 
   // get our base image AMI
   const instanceAmi = await aws.ec2.getAmi(
@@ -40,7 +64,7 @@ export async function CreateCluster(
   );
 
   const instanceSecurityGroup = new awsx.ec2.SecurityGroup(
-    `c-sg-${clusterName}`,
+    `${serviceName}-sg`,
     {
       vpc,
       ingress: [
@@ -53,6 +77,14 @@ export async function CreateCluster(
         { protocol: '-1', fromPort: 0, toPort: 0, self: true },
       ],
       egress: [
+        {
+          protocol: '-1',
+          fromPort: 0,
+          toPort: 0,
+          cidrBlocks: [vpc.vpc.cidrBlock],
+        },
+
+        // TODO: lockdown just to AWS KMS
         { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
       ],
     },
@@ -60,12 +92,12 @@ export async function CreateCluster(
   );
 
   const launchTemplate = new aws.ec2.LaunchTemplate(
-    `template-ec2-${clusterName}`,
+    `launch-template-${serviceName}`,
     {
-      namePrefix: `instance-${clusterName}`,
+      namePrefix: `i-${serviceName}`,
       instanceType: 'c5a.xlarge',
       userData: Buffer.from(
-        await userData(clusterName, constants, nitroConfig),
+        await userData(constants, nitroConfig, secretsStore),
       ).toString('base64'),
       enclaveOptions: {
         enabled: true,
@@ -80,8 +112,15 @@ export async function CreateCluster(
     { provider },
   );
 
+  let nitroServiceOutput = await createLoadBalancer(
+    vpcProvider,
+    stackMetadata,
+    instanceSecurityGroup,
+    dnsConfig,
+  );
+
   const autoScaling = new aws.autoscaling.Group(
-    `autoscale-group-${clusterName}`,
+    `asg-${serviceName}`,
     {
       minSize: 2,
       maxSize: 4,
@@ -94,6 +133,7 @@ export async function CreateCluster(
       vpcZoneIdentifiers: vpcProvider.privateSubnetIds,
       protectFromScaleIn: false,
       healthCheckType: 'EC2',
+      targetGroupArns: [nitroServiceOutput.targetGroup.arn],
       instanceRefresh: {
         strategy: 'Rolling',
         preferences: {
@@ -105,57 +145,116 @@ export async function CreateCluster(
     { provider, dependsOn: [launchTemplate] },
   );
 
-  const capacityProvider = new aws.ecs.CapacityProvider(
-    `capacity-${clusterName}`,
+  return nitroServiceOutput;
+}
+
+/**
+ * Create Nitro LB for the ASG
+ */
+async function createLoadBalancer(
+  vpcProvider: FootprintVpc,
+  stackMetadata: StackMetadata,
+  securityGroup: awsx.ec2.SecurityGroup,
+  dnsConfig: DnsConfig,
+): Promise<NitroServiceOutput> {
+  const vpc = vpcProvider.vpc;
+  const region = vpcProvider.region;
+  const provider = vpcProvider.provider;
+  const serviceName = `ns-${stackMetadata.shortStackName}`;
+
+  // Create a certificate for this service
+  const domain = `enclave-proxy.${dnsConfig.apiPrefixHost}${dnsConfig.domainBaseName}`;
+
+  const cert = await certs.CreateWildcardCertificate({
+    domain: domain,
+    region: vpcProvider.region,
+    hostedZoneId: dnsConfig.hostedZone.id,
+  });
+
+  const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
+    `alb-${serviceName}`,
     {
-      autoScalingGroupProvider: {
-        autoScalingGroupArn: autoScaling.arn,
-        managedTerminationProtection: 'DISABLED',
-        managedScaling: {
-          status: 'DISABLED',
-        },
+      vpc,
+      securityGroups: [securityGroup.id],
+      external: false,
+
+      // private subnets as this is an internal service
+      subnets: vpcProvider.privateSubnetIds,
+    },
+    { provider },
+  );
+
+  const targetGroup = new aws.lb.TargetGroup(
+    `albtg-${serviceName}`,
+    {
+      vpcId: vpc.vpc.id,
+      targetType: 'instance',
+      port: PROXY_LB_PORT,
+      protocol: 'HTTP',
+      healthCheck: {
+        port: 'traffic-port',
+        path: '/health',
       },
     },
     { provider },
   );
 
-  // create the cluster
-  const cluster = new awsx.ecs.Cluster(
-    `${clusterName}`,
+  const loadBalancerTargetGroup = loadBalancer.createTargetGroup(
+    `lbtg-${serviceName}`,
     {
-      name: clusterName,
-      vpc,
-      settings: [
+      targetGroup,
+    },
+    { provider },
+  );
+
+  const http = loadBalancer.createListener(
+    `alb-https-${serviceName}`,
+    {
+      external: false,
+      certificateArn: cert.arn,
+      protocol: 'HTTPS',
+      sslPolicy: 'ELBSecurityPolicy-2016-08',
+
+      defaultAction: {
+        type: 'forward',
+        targetGroupArn: loadBalancerTargetGroup.targetGroup.arn,
+      },
+    },
+    { provider },
+  );
+
+  const record = new aws.route53.Record(
+    `dns-alb-${serviceName}-${region}`,
+    {
+      zoneId: dnsConfig.hostedZone.id,
+      type: 'A',
+      name: domain,
+      aliases: [
         {
-          name: 'containerInsights',
-          value: 'enabled',
+          name: loadBalancer.loadBalancer.dnsName,
+          zoneId: loadBalancer.loadBalancer.zoneId,
+          evaluateTargetHealth: false,
         },
       ],
     },
     { provider },
   );
 
-  // this is used to tear down
-  const clusterCapacityProviders = new aws.ecs.ClusterCapacityProviders(
-    `cluster-capacity-${clusterName}`,
-    {
-      clusterName: cluster.cluster.name,
-      capacityProviders: [capacityProvider.name],
-    },
-    { provider },
-  );
-
-  return cluster;
+  return {
+    serviceEndpoint: `https://${domain}`,
+    loadBalancer,
+    targetGroup,
+  };
 }
-
 /**
- * the role for our cluster ec2 instances to run as
+ * The role for the EC2 instance to run as
  */
 function createInstanceRole(
   region: Region,
   provider: pulumi.ProviderResource,
+  staticSecretNames: string[],
 ): aws.iam.InstanceProfile {
-  const ecsInstanceRole = new aws.iam.Role(`ecs-instance-role-${region}`, {
+  const instanceRole = new aws.iam.Role(`nitro-instance-role-${region}`, {
     assumeRolePolicy: {
       Version: '2012-10-17',
       Statement: [
@@ -181,6 +280,8 @@ function createInstanceRole(
                 'ecr:BatchGetImage',
                 'ecr:BatchCheckLayerAvailability',
                 'ecr:GetDownloadUrlForLayer',
+                'ec2:DescribeTags',
+                'ecr:GetAuthorizationToken',
               ],
               Effect: 'Allow',
               Resource: '*',
@@ -207,35 +308,40 @@ function createInstanceRole(
           ],
         }),
       },
+      {
+        name: 'enclave_proxy_secret',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: ['ssm:GetParameters', 'ssm:GetParameter'],
+              Effect: 'Allow',
+              Resource: staticSecretNames.map(name => {
+                return `arn:aws:ssm:*:*:parameter/static_secrets/${name}`;
+              }),
+            },
+          ],
+        }),
+      },
     ],
   });
 
-  const _ecsInstanceRolePolicyAttachment = new aws.iam.RolePolicyAttachment(
-    `ecs-instance-role-policy-${region}`,
-    {
-      role: ecsInstanceRole.name,
-      policyArn:
-        'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role',
-    },
-  );
-
   return new aws.iam.InstanceProfile(
-    `ecs-iam-instance-profile-${region}`,
+    `nitro-iam-instance-profile-${region}`,
     {
-      role: ecsInstanceRole.name,
+      role: instanceRole.name,
     },
     { provider },
   );
 }
 
 /**
- * This is the "user_data" for booting up an EC2 machine to run our cluster tasks
- * It installs our enclave per the config.
+ * This is the "user_data" for booting up an EC2 machine to run our Nitro Enclave + P
  */
 async function userData(
-  clusterName: string,
   constants: Config,
-  config: NitroEnclaveConfig,
+  config: NitroConfig,
+  secretsStore: StaticSecrets,
 ): Promise<string> {
   const current = await aws.getCallerIdentity({});
   const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
@@ -243,14 +349,11 @@ async function userData(
 
   const pulumiConfig = new pulumi.Config();
   const tailscaleAuthKey = pulumiConfig.get('serverTailscaleKey');
-  const hostName = `server-${pulumi.getStack()}`;
+  const hostName = `nitro-server-${pulumi.getStack()}`;
 
   // TODO: if enclave unhealthy after restart fail health check on ASG.
   return `
 #!/bin/bash
-
-echo -e "ECS_CLUSTER=${clusterName}\n" >> /etc/ecs/ecs.config
-echo -e ECS_AVAILABLE_LOGGING_DRIVERS='["json-file","syslog","awslogs","none"]' >> /etc/ecs/ecs.config
 
 sudo yum update -y
 sudo amazon-linux-extras install -y aws-nitro-enclaves-cli
@@ -269,21 +372,21 @@ cat <<'EOF' > /etc/awslogs/awslogs.conf
 state_file=/var/lib/awslogs/state/agent-state
 
 [/var/log/awslogs]
-log_group_name=/ec2/fpc_aws_logs
+log_group_name=/ec2/nitro_service_ec2_aws_logs
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/awslogs*
 initial_position=start_of_file
 
 [/var/log/boot]
-log_group_name=/ec2/fpc_boot_logs
+log_group_name=/ec2/nitro_service_ec2_boot_logs
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/boot*
 initial_position=start_of_file
 
 [/var/log/nitro_enclaves]
-log_group_name=/ec2/fpc_enclave_logs
+log_group_name=/ec2/nitro_service_ec2_enclave_logs
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/nitro_enclaves/*
@@ -346,6 +449,27 @@ WantedBy=multi-user.target
 EOF
 
 sudo cp enclave_runner.service /etc/systemd/system/enclave_runner.service
+sudo systemctl start enclave_runner.service && sudo systemctl enable enclave_runner.service
 
-sudo systemctl start enclave_runner.service && sudo systemctl enable enclave_runner.service`;
+# setup enclave_proxy
+
+sudo echo "ENCLAVE_PROXY_SECRET=$(aws --region us-east-1 ssm get-parameter --name "/static_secrets/${secretsStore.enclaveProxySecretName}" --with-decryption | jq -r ".Parameter.Value")" > /enclave_proxy_environment
+
+cat <<'EOF' > enclave_proxy.service
+[Unit]
+Description=enclave_proxy
+
+[Service]
+User=root
+WorkingDirectory=/
+EnvironmentFile=/enclave_proxy_environment
+ExecStart="/image/enclave_proxy"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo cp enclave_proxy.service /etc/systemd/system/enclave_proxy.service
+sudo systemctl start enclave_proxy.service && sudo systemctl enable enclave_proxy.service`;
 }

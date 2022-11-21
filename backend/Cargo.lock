@@ -1946,15 +1946,18 @@ name = "enclave_proxy"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "actix-web-httpauth",
  "async-trait",
  "bb8",
  "byteorder",
+ "crypto",
  "env_logger",
  "envconfig",
  "futures",
  "futures-util",
  "libc",
  "log",
+ "reqwest",
  "rpc",
  "serde",
  "serde_cbor",

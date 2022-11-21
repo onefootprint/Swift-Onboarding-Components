@@ -14,7 +14,7 @@ export type CdnConfig = {
 /**
  * Create a Cloudfront distribution to front access to the app service ALBs
  */
-export async function Create(
+export async function CreateCloudfrontDistribution(
   config: CdnConfig,
 ): Promise<aws.cloudfront.Distribution> {
   const requestPolicy = new aws.cloudfront.OriginRequestPolicy(
