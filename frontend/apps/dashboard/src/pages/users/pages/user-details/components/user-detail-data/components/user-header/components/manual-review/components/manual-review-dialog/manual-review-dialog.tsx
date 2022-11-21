@@ -2,9 +2,9 @@ import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
+import { stringifyAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 import { User } from 'src/pages/users/types/user.types';
 
-import { stringifyAnnotationNote } from '../../utils/annotation-note-utils';
 import ManualReviewForm, {
   ManualReviewFormData,
 } from './components/manual-review-form';

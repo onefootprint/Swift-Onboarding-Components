@@ -6,6 +6,7 @@ import {
 } from '@onefootprint/types';
 import { Drawer, LinkButton, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 import styled, { css } from 'styled-components';
 
 type OrgOverwriteDetailsProps = {
@@ -19,14 +20,19 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
   );
   const {
     decision: { timestamp, status },
+    annotation,
   } = data;
-  const { note, isPinned } = data.annotation!;
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [isNotePinned, setIsNotePinned] = useState(isPinned);
+  const [isNotePinned, setIsNotePinned] = useState(annotation?.isPinned);
   const handlePinNoteChange = () => {
     // TODO: https://linear.app/footprint/issue/FP-1814/make-an-api-call-to-pin-manual-overwrite-note
     setIsNotePinned(!isNotePinned);
   };
+
+  if (!annotation) {
+    return null;
+  }
+  const { reason, note } = parseAnnotationNote(annotation.note);
 
   return (
     <>
@@ -76,18 +82,28 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
               })}
             </Typography>
           </ItemContainer>
+          <ItemContainer>
+            <Typography variant="label-3" color="tertiary">
+              {t('org-overwrite.drawer.reason')}
+            </Typography>
+            <Typography variant="body-3">{reason ?? '-'}</Typography>
+          </ItemContainer>
         </GridContainer>
         <NoteContainer>
-          <Typography
-            variant="label-3"
-            color="tertiary"
-            sx={{ marginBottom: 2 }}
-          >
-            {t('org-overwrite.drawer.note')}
-          </Typography>
-          <Typography variant="body-3" sx={{ marginBottom: 6 }}>
-            {note}
-          </Typography>
+          {note && (
+            <>
+              <Typography
+                variant="label-3"
+                color="tertiary"
+                sx={{ marginBottom: 2 }}
+              >
+                {t('org-overwrite.drawer.note')}
+              </Typography>
+              <Typography variant="body-3" sx={{ marginBottom: 6 }}>
+                {note}
+              </Typography>
+            </>
+          )}
           <Toggle
             checked={isNotePinned}
             onChange={handlePinNoteChange}
