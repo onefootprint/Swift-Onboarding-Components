@@ -17,10 +17,16 @@ export async function CreateWildcardCertificate(
     region: config.region,
   });
 
+  const domainName = `*.${config.domain}`;
+
+  if (domainName.length >= 64) {
+    throw `Domain ${domainName} must be < 64 characters`;
+  }
+
   const cert = new aws.acm.Certificate(
     `cert-${nameSuffix}`,
     {
-      domainName: `*.${config.domain}`,
+      domainName,
       subjectAlternativeNames: [config.domain],
       validationMethod: 'DNS',
       // TODO update pulumi to officially support this
