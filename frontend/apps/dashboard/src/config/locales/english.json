@@ -197,6 +197,10 @@
           "alt": "A penguin playing with his phone"
         }
       },
+      "pinned-notes": {
+        "title": "Pinned note",
+        "title-by-author": " by {{author}}"
+      },
       "user-info": {
         "cta": {
           "select-all": "Select all",

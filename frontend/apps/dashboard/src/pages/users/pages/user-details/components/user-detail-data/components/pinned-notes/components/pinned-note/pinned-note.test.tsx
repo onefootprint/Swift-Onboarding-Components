@@ -1,0 +1,37 @@
+import { customRender, screen } from '@onefootprint/test-utils';
+import React from 'react';
+
+import PinnedNote, { PinnedNoteProps } from './pinned-note';
+
+describe('<PinnedNote />', () => {
+  const renderPinnedNote = ({ reason, author, note }: PinnedNoteProps) =>
+    customRender(<PinnedNote reason={reason} author={author} note={note} />);
+
+  it('renders title correctly', () => {
+    renderPinnedNote({ reason: 'Some reason' });
+    expect(screen.getByText('Pinned note')).toBeInTheDocument();
+    expect(screen.getByText('Some reason')).toBeInTheDocument();
+  });
+
+  it('renders reason correctly', () => {
+    renderPinnedNote({ reason: 'Some reason' });
+    expect(screen.getByText('Some reason')).toBeInTheDocument();
+  });
+
+  it('renders note correctly', () => {
+    renderPinnedNote({ reason: 'Some reason', note: 'Some note' });
+    expect(screen.getByText('Some reason')).toBeInTheDocument();
+    expect(screen.getByText('Some note')).toBeInTheDocument();
+  });
+
+  it('renders author correctly', () => {
+    renderPinnedNote({
+      reason: 'Some reason',
+      author: 'belce@onefootprint.com',
+    });
+    expect(
+      screen.getByText('Pinned note by belce@onefootprint.com'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Some reason')).toBeInTheDocument();
+  });
+});
