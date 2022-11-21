@@ -1,6 +1,11 @@
 type Item = {
   name: string;
   href: string;
+  img: {
+    src: string;
+    width: number;
+    height: number;
+  };
 };
 
 type Option = {
@@ -9,19 +14,34 @@ type Option = {
 };
 
 const vanilla: Option = {
-  name: 'Vanilla JS',
+  name: 'JS',
   links: [
     {
-      name: 'Pure Vanila JS',
+      name: 'JS',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js',
+      img: {
+        src: '/examples/js.png',
+        height: 32,
+        width: 32,
+      },
     },
     {
-      name: 'Vite + Vanilla JS',
+      name: 'Vite + JS',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-vite-vanilla',
+      img: {
+        src: '/examples/js-vite.png',
+        height: 32,
+        width: 76,
+      },
     },
     {
-      name: 'Go + Vanilla JS',
+      name: 'Go + JS',
       href: 'https://github.com/onefootprint/examples/tree/master/go-vanilla-js',
+      img: {
+        src: '/examples/js-go.png',
+        height: 32,
+        width: 76,
+      },
     },
   ],
 };
@@ -30,20 +50,40 @@ const react: Option = {
   name: 'React',
   links: [
     {
-      name: 'With CRA',
+      name: 'Create React App',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-cra',
+      img: {
+        src: '/examples/react.png',
+        height: 32,
+        width: 32,
+      },
     },
     {
-      name: 'With Next',
+      name: 'Next',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-next',
+      img: {
+        src: '/examples/next.png',
+        height: 32,
+        width: 32,
+      },
     },
     {
-      name: 'With Next + Typescript',
+      name: 'Next + Typescript',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-typescript-next',
+      img: {
+        src: '/examples/next-ts.png',
+        height: 32,
+        width: 76,
+      },
     },
     {
-      name: 'React with customization',
+      name: 'React + custom UI',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-customized',
+      img: {
+        src: '/examples/react-customization.png',
+        height: 32,
+        width: 76,
+      },
     },
   ],
 };
@@ -54,6 +94,11 @@ const vue: Option = {
     {
       name: 'Vite + Vue',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-vite-vue',
+      img: {
+        src: '/examples/vite-vue.png',
+        height: 32,
+        width: 76,
+      },
     },
   ],
 };
@@ -64,6 +109,11 @@ const mobile: Option = {
     {
       name: 'React Native',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-native',
+      img: {
+        src: '/examples/react.png',
+        height: 32,
+        width: 32,
+      },
     },
   ],
 };
@@ -72,27 +122,42 @@ const go: Option = {
   name: 'Go',
   links: [
     {
-      name: 'Go + Vanilla',
+      name: 'Go + JS',
       href: 'https://github.com/onefootprint/examples/tree/master/go-vanilla-js',
+      img: {
+        src: '/examples/js-go.png',
+        height: 32,
+        width: 76,
+      },
     },
   ],
 };
 
 const customized: Option = {
-  name: 'Customized flows',
+  name: 'Custom UI',
   links: [
     {
-      name: 'Vanilla + customization',
+      name: 'JS + custom UI',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js',
+      img: {
+        src: '/examples/js-customization.png',
+        height: 32,
+        width: 76,
+      },
     },
     {
-      name: 'React with customization',
+      name: 'React + custom UI',
       href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-customized',
+      img: {
+        src: '/examples/react-customization.png',
+        height: 32,
+        width: 76,
+      },
     },
   ],
 };
 
-const allOptions = [vanilla, react, vue, mobile, go, customized];
+const allOptions = [vanilla, customized, mobile, react, vue, go];
 
 const getAllLinksAndRemovedDuplicated = () => {
   const links = allOptions.map(option => option.links).flat();
