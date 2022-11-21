@@ -1,20 +1,24 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
+import { User } from 'src/pages/users/types/user.types';
 
-import ReviewStatus from '../../manual-review.types';
+import { stringifyAnnotationNote } from '../../utils/annotation-note-utils';
 import ManualReviewForm, {
   ManualReviewFormData,
 } from './components/manual-review-form';
 import useSubmitReview from './hooks/use-submit-review';
 
 export type ManualReviewDialogProps = {
+  user: User;
   open: boolean;
   onClose: () => void;
   status: ReviewStatus;
 };
 
 const ManualReviewDialog = ({
+  user,
   open,
   onClose,
   status,
@@ -24,8 +28,16 @@ const ManualReviewDialog = ({
   const submitReviewMutation = useSubmitReview();
 
   const handleSubmit = (data: ManualReviewFormData) => {
+    const { reason, isPinned, note } = data;
     submitReviewMutation.mutate(
-      { ...data, status },
+      {
+        footprintUserId: user.id,
+        status,
+        annotation: {
+          isPinned,
+          note: stringifyAnnotationNote({ reason, note }),
+        },
+      },
       {
         onSuccess: () => {
           onClose();

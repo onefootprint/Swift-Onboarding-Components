@@ -239,9 +239,8 @@
       },
       "manual-review": {
         "status": {
-          "do_not_onboard": "Do not onboard",
-          "verified": "Verified",
-          "not_verified": "Not verified"
+          "pass": "Verified",
+          "fail": "Not verified"
         },
         "button": {
           "label": "Review"

@@ -46,7 +46,7 @@ const UserHeader = ({ user }: UserHeaderProps) => {
           <CodeInline>{footprintUserId}</CodeInline>
         </RowContainer>
         <RowContainer>
-          <ManualReview />
+          <ManualReview user={user} />
           <DecryptControls />
         </RowContainer>
       </SplitRow>

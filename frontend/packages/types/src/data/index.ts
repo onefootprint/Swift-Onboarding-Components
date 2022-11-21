@@ -29,6 +29,7 @@ export { default as OnboardingStatus } from './onboarding-status';
 export * from './org-member';
 export * from './org-role';
 export * from './org-role-permission';
+export { default as ReviewStatus } from './review-status';
 export * from './risk-signal';
 export * from './scoped-user';
 export { default as SignalAttribute } from './signal-attribute';

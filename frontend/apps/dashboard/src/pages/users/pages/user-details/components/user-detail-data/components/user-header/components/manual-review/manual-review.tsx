@@ -1,12 +1,17 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { ReviewStatus } from '@onefootprint/types';
 import { Button, Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { User } from 'src/pages/users/types/user.types';
 import styled, { css } from 'styled-components';
 
 import ManualReviewDialog from './components/manual-review-dialog';
-import ReviewStatus from './manual-review.types';
 
-const ManualReview = () => {
+type ManualReviewProps = {
+  user: User;
+};
+
+const ManualReview = ({ user }: ManualReviewProps) => {
   const { t } = useTranslation('pages.user-details.manual-review');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [status, setStatus] = useState<ReviewStatus | undefined>();
@@ -23,33 +28,26 @@ const ManualReview = () => {
           <DropdownContent>
             <DropdownItem
               onClick={() => {
-                setStatus(ReviewStatus.verified);
+                setStatus(ReviewStatus.pass);
                 setDialogOpen(true);
               }}
             >
-              <div>{t(`status.${ReviewStatus.verified}`)}</div>
+              <div>{t(`status.${ReviewStatus.pass}`)}</div>
             </DropdownItem>
             <DropdownItem
               onClick={() => {
-                setStatus(ReviewStatus.notVerified);
+                setStatus(ReviewStatus.fail);
                 setDialogOpen(true);
               }}
             >
-              <div>{t(`status.${ReviewStatus.notVerified}`)}</div>
-            </DropdownItem>
-            <DropdownItem
-              onClick={() => {
-                setStatus(ReviewStatus.doNotOnboard);
-                setDialogOpen(true);
-              }}
-            >
-              <div>{t(`status.${ReviewStatus.doNotOnboard}`)}</div>
+              <div>{t(`status.${ReviewStatus.fail}`)}</div>
             </DropdownItem>
           </DropdownContent>
         </Dropdown.Portal>
       </Dropdown.Root>
       {status && (
         <ManualReviewDialog
+          user={user}
           status={status}
           open={dialogOpen}
           onClose={() => {

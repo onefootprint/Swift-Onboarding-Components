@@ -7,14 +7,17 @@ const submitReview = async (
   authHeaders: AuthHeaders,
   data: SubmitReviewRequest,
 ) => {
-  // TODO: Integrate with API when implemented
-  // https://linear.app/footprint/issue/FP-1860/integrate-with-submit-review-api-see-use-submit-reviewts-hook
+  const { footprintUserId, annotation, status } = data;
   const response = await request<SubmitReviewResponse>({
     method: 'POST',
-    url: '', // TODO:
-    data,
+    url: `/users/${footprintUserId}/decisions`,
+    data: {
+      annotation,
+      status,
+    },
     headers: authHeaders,
   });
+
   return response.data;
 };
 
