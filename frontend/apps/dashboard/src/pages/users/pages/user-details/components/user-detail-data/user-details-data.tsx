@@ -14,6 +14,7 @@ import { Fields } from '../../utils/decrypt-state-machine/types';
 import { useDecryptMachine } from '../decrypt-machine-provider';
 import AuditTrail from './components/audit-trail';
 import Insights from './components/insights';
+import PinnedNotes from './components/pinned-notes';
 import RiskSignals from './components/signals';
 import UserHeader from './components/user-header';
 import VaultData from './components/vault-data';
@@ -102,6 +103,9 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
       <UserHeader user={user} />
       <Box sx={{ marginY: 5 }}>
         <Divider />
+      </Box>
+      <Box sx={{ marginBottom: 5 }}>
+        <PinnedNotes />
       </Box>
       <Box sx={{ marginBottom: 9 }}>
         <VaultData user={user} onDecrypt={handleDecrypt} />
