@@ -60,7 +60,9 @@ const MenuList = <
 
 const StyledList = styled(List)`
   ${({ theme }) => css`
-    margin: ${theme.spacing[3]} 0 0 0;
+    & > div > div {
+      margin: ${theme.spacing[3]} 0 0 0;
+    }
   `}
 `;
 

@@ -211,6 +211,7 @@ const DropdownMenu = styled.div`
       position: absolute;
       width: 100%;
       z-index: ${theme.zIndex.dropdown};
+      overflow: hidden;
     `;
   }}
 `;
