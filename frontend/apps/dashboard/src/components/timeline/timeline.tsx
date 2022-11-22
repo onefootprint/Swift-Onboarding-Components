@@ -104,7 +104,7 @@ const HeaderContainer = styled.div`
 const BodyContainer = styled.div`
   grid-column-start: 4;
   ${({ theme }) => css`
-    margin-left: calc(${theme.spacing[2]} + ${theme.spacing[5]});
+    margin-left: ${theme.spacing[5]};
     margin-bottom: ${theme.spacing[4]};
   `};
 `;
