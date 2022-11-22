@@ -1,6 +1,6 @@
 import { DecisionSourceKind } from './onboarding-decision';
 
-export type PinnedAnnotation = {
+export type DecisionAnnotation = {
   id: string;
   isPinned: boolean;
   note: string;

@@ -4,6 +4,7 @@ import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { User } from 'src/pages/users/types/user.types';
 
+import useGetPinnedAnnotations from '../../../../hooks/use-get-pinned-annotations';
 import ManualReviewDialog from './components/manual-review-dialog';
 
 type ManualReviewProps = {
@@ -13,6 +14,7 @@ type ManualReviewProps = {
 const ManualReview = ({ user }: ManualReviewProps) => {
   const { t } = useTranslation('pages.user-details.manual-review');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const pinnedNotesQuery = useGetPinnedAnnotations();
   const { status } = user;
   if (status === OnboardingStatus.vaultOnly) {
     return null;
@@ -38,8 +40,11 @@ const ManualReview = ({ user }: ManualReviewProps) => {
           user={user}
           status={reviewStatus}
           open={dialogOpen}
-          onClose={() => {
+          onClose={(isComplete?: boolean) => {
             setDialogOpen(false);
+            if (isComplete) {
+              pinnedNotesQuery.refetch();
+            }
           }}
         />
       )}

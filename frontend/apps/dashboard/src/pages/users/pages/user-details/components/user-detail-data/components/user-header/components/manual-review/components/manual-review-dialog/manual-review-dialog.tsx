@@ -13,7 +13,7 @@ import useSubmitReview from './hooks/use-submit-review';
 export type ManualReviewDialogProps = {
   user: User;
   open: boolean;
-  onClose: () => void;
+  onClose: (isComplete?: boolean) => void;
   status: ReviewStatus;
 };
 
@@ -40,7 +40,7 @@ const ManualReviewDialog = ({
       },
       {
         onSuccess: () => {
-          onClose();
+          onClose(true);
         },
         onError: showRequestErrorToast,
       },

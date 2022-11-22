@@ -1,21 +1,20 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { parseAnnotationNote } from '../../utils/annotation-note-utils';
+import useGetPinnedAnnotations from '../../hooks/use-get-pinned-annotations';
 import PinnedNote from './components/pinned-note';
-import useGetPinnedAnnotations from './hooks/use-get-pinned-annotations';
 
 const PinnedNotes = () => {
-  const pinnedAnotationsQuery = useGetPinnedAnnotations();
+  const pinnedNotesQuery = useGetPinnedAnnotations();
+  const { data } = pinnedNotesQuery;
 
-  return (
+  return data ? (
     <Container>
-      {pinnedAnotationsQuery?.data?.map(annotation => {
-        const { reason, note } = parseAnnotationNote(annotation.note);
-        return <PinnedNote reason={reason} note={note} key={annotation.id} />;
-      })}
+      {data.map(({ reason, note, id }) => (
+        <PinnedNote reason={reason} note={note} key={id} />
+      ))}
     </Container>
-  );
+  ) : null;
 };
 
 const Container = styled.div`

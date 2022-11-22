@@ -1,4 +1,4 @@
-import { PinnedAnnotation } from '../data/pinned-annotation';
+import { DecisionAnnotation } from '../data/decision-annotation';
 
 export type GetPinnedAnnotationsRequest = {
   authHeaders: {
@@ -8,4 +8,4 @@ export type GetPinnedAnnotationsRequest = {
   userId: string | string[];
 };
 
-export type GetPinnedAnnotationsResponse = PinnedAnnotation[];
+export type GetPinnedAnnotationsResponse = DecisionAnnotation[];

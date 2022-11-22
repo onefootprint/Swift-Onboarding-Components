@@ -9,6 +9,8 @@ import React, { useState } from 'react';
 import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 import styled, { css } from 'styled-components';
 
+import useGetPinnedAnnotations from '../../../../../../../../hooks/use-get-pinned-annotations';
+
 type OrgOverwriteDetailsProps = {
   data: OnboardingDecisionEventData;
   source: DecisionSourceOrganization;
@@ -24,8 +26,11 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
   } = data;
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [isNotePinned, setIsNotePinned] = useState(annotation?.isPinned);
+  const pinnedNotesQuery = useGetPinnedAnnotations();
+
   const handlePinNoteChange = () => {
     // TODO: https://linear.app/footprint/issue/FP-1814/make-an-api-call-to-pin-manual-overwrite-note
+    pinnedNotesQuery.refetch();
     setIsNotePinned(!isNotePinned);
   };
 

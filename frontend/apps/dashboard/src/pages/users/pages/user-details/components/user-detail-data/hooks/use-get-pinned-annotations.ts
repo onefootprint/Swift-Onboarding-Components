@@ -1,12 +1,25 @@
+import { useIntl } from '@onefootprint/hooks';
 import request, { RequestError } from '@onefootprint/request';
 import {
+  DecisionAnnotation,
+  DecisionSourceKind,
   GetPinnedAnnotationsRequest,
   GetPinnedAnnotationsResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSessionUser from 'src/hooks/use-session-user';
+import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 
-import useUserId from '../../../../../hooks/use-user-id/use-user-id';
+import useUserId from '../../../hooks/use-user-id/use-user-id';
+
+export type PinnedAnnotation = {
+  id: string;
+  isPinned: boolean;
+  reason: string;
+  note?: string;
+  source: DecisionSourceKind;
+  timestamp: string;
+};
 
 const getPinnedAnnotations = async ({
   authHeaders,
@@ -20,25 +33,39 @@ const getPinnedAnnotations = async ({
       isPinned: true,
     },
   });
-  return response.data;
+
+  return response.data.map((annotation: DecisionAnnotation) => {
+    const { reason, note } = parseAnnotationNote(annotation.note);
+    return {
+      ...annotation,
+      reason,
+      note,
+    };
+  });
 };
 
 const useGetPinnedAnnotations = (
   options: {
-    onSuccess?: (data: GetPinnedAnnotationsResponse) => void;
+    onSuccess?: (data: PinnedAnnotation[]) => void;
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
   const { authHeaders } = useSessionUser();
   const userId = useUserId();
+  const { formatDateWithTime } = useIntl();
 
-  return useQuery<GetPinnedAnnotationsResponse, RequestError>(
+  return useQuery<PinnedAnnotation[], RequestError>(
     ['get-pinned-annotations', authHeaders, userId],
     () => getPinnedAnnotations({ authHeaders, userId }),
     {
       enabled: !!userId,
       onSuccess: options.onSuccess,
       onError: options.onError,
+      select: response =>
+        response.map(annotation => ({
+          ...annotation,
+          timestamp: formatDateWithTime(new Date(annotation.timestamp)),
+        })),
     },
   );
 };
