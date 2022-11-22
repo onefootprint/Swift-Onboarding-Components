@@ -24,7 +24,7 @@ export async function LoadDnsConfig(constants: Config): Promise<DnsConfig> {
       .substring(0, 9);
 
     const truncated = apiPrefix.substring(0, TRUNCATE_LENGTH);
-    apiPrefix = `${truncated}-${hostHash}`;
+    apiPrefix = `${truncated}-${hostHash}.`;
   }
 
   return {
