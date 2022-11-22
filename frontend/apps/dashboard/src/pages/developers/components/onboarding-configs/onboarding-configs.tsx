@@ -1,6 +1,6 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import { Box, Button, Divider, Typography } from '@onefootprint/ui';
+import { Box, Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -29,9 +29,7 @@ const OnboardingConfigs = () => {
           {t('header.cta')}
         </Button>
       </Header>
-      <Box sx={{ marginY: 5 }}>
-        <Divider />
-      </Box>
+      <Box sx={{ marginY: 5 }} />
       {data && <OnboardingConfigsData data={data} />}
       {isLoading && <OnboardingConfigsLoading />}
       {error && <OnboardingConfigsError message={getErrorMessage(error)} />}

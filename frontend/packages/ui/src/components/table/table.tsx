@@ -131,7 +131,7 @@ const TableContainer = styled.table`
     width: 100%;
 
     th {
-      ${createFontStyles('caption-2')};
+      ${createFontStyles('caption-3')};
       background: ${theme.backgroundColor.secondary};
       border-bottom: 1px solid ${theme.borderColor.tertiary};
       color: ${theme.color.secondary};

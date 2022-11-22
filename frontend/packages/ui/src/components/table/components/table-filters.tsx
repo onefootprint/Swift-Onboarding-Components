@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useDebounce, useUpdateEffect } from 'usehooks-ts';
 
 import Box from '../../box';
-import Divider from '../../divider';
 import SearchInput from '../../search-input';
 
 type TableFilterProps = {
@@ -38,9 +37,7 @@ const TableFilter = ({
         />
         {children}
       </TableFilterContainer>
-      <Box sx={{ paddingY: 5 }}>
-        <Divider />
-      </Box>
+      <Box sx={{ paddingY: 5 }} />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
-import { Box, Button, Divider, Typography } from '@onefootprint/ui';
+import { Box, Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -24,9 +24,7 @@ const ApiKeys = () => {
           {t('header.cta')}
         </Button>
       </Header>
-      <Box sx={{ marginY: 5 }}>
-        <Divider />
-      </Box>
+      <Box sx={{ marginY: 5 }} />
       <Table />
       <CreateDialog open={isCreateDialogOpen} onClose={closeCreateDialog} />
     </section>

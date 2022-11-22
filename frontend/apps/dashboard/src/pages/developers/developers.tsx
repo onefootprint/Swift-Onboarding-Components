@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Toggle, Tooltip, Typography } from '@onefootprint/ui';
+import { Box, Divider, Toggle, Tooltip, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
@@ -51,6 +51,9 @@ const Developers = () => {
       </Header>
       <Box sx={{ marginBottom: 9 }}>
         <ApiKeys />
+      </Box>
+      <Box sx={{ marginBottom: 8 }}>
+        <Divider />
       </Box>
       <Box>
         <OnboardingConfigs />

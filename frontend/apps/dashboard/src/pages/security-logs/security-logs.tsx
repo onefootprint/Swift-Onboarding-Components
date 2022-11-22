@@ -1,5 +1,5 @@
 import { AccessEvent } from '@onefootprint/types';
-import { Box, Divider, SearchInput, Typography } from '@onefootprint/ui';
+import { Box, SearchInput, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
 import styled from 'styled-components';
@@ -60,9 +60,7 @@ const SecurityLogs = () => {
         />
         <FilterDialog />
       </SearchAndFilterContainer>
-      <Box sx={{ marginTop: 5, marginBottom: 5 }}>
-        <Divider />
-      </Box>
+      <Box sx={{ marginTop: 5, marginBottom: 5 }} />
       <Timeline
         connectorVariant="tight"
         items={items}
