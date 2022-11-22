@@ -1,3 +1,4 @@
+import { DnsConfig } from './dns';
 import { ec2, Region, route53 } from '@pulumi/aws';
 import { Output } from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
@@ -8,6 +9,20 @@ export type CertConfig = {
   domain: string;
   region: Region;
 };
+
+/**
+ * Helper function to create a cert for a DnsConfig on a region
+ */
+export async function CreateRegionalWildCertificateForDnsConfig(
+  dnsConfig: DnsConfig,
+  region: Region,
+): Promise<aws.acm.Certificate> {
+  return await CreateWildcardCertificate({
+    domain: dnsConfig.apiDomain,
+    region: region,
+    hostedZoneId: dnsConfig.hostedZone.id,
+  });
+}
 
 export async function CreateWildcardCertificate(
   config: CertConfig,

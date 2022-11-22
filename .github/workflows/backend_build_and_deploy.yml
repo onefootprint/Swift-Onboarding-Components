@@ -71,6 +71,7 @@ jobs:
         with:
           ref: ${{ inputs.commitHash }}
       - name: Extract commit hash
+        id: constants
         shell: bash
         run: |
           git --version
@@ -80,8 +81,6 @@ jobs:
 
           echo "apiComponentVersion=${apiVersion}" >> $GITHUB_OUTPUT
           echo "enclaveComponentVersion=${enclaveVersion}" >> $GITHUB_OUTPUT
-
-        id: constants
 
   # build the main api image
   build_api:
@@ -191,10 +190,10 @@ jobs:
     name: deploy stack
     runs-on: ubuntu-latest
     outputs:
-      url: 'https://${{ steps.constants.outputs.url }}'
+      url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
     environment:
       name: ${{ inputs.environment }}
-      url: 'https://${{ steps.constants.outputs.url }}'
+      url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
     needs: [build_api, build_eif, extract_commit]
     if: success()
     steps:
@@ -253,22 +252,6 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
-      # get environment constants
-      - name: Extract Constants
-        shell: bash
-        working-directory: ./backend/infra
-        run: |
-          git --version
-          echo ${{ inputs.stackName }}
-          pulumi stack ls
-          sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
-          base=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.base)
-          url="${sub}${base}"
-          echo "##[set-output name=url;]$(echo ${url})"
-        id: constants
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-
       - name: 'set api/enclave image version'
         working-directory: ./backend/infra
         run: |
@@ -297,11 +280,12 @@ jobs:
 
       # deploy the stack
       - uses: pulumi/actions@v3
+        id: pulumi_deploy
         with:
           command: up
           work-dir: ./backend/infra
           stack-name: 'footprint/${{ inputs.stackName }}'
-          message: 'Deployed to https://${{ steps.constants.outputs.url }} with component ${{ needs.extract_commit.outputs.apiComponentVersion }}'
+          message: 'Deployed component ${{ needs.extract_commit.outputs.apiComponentVersion }}'
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -314,5 +298,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Deployed to https://${{ steps.constants.outputs.url }} with component tag `${{ needs.extract_commit.outputs.apiComponentVersion }}`'
+              body: 'Deployed to ${{ steps.pulumi_deploy.outputs.apiUrl }} with component tag `${{ needs.extract_commit.outputs.apiComponentVersion }}`'
             })

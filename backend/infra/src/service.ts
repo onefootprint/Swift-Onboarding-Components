@@ -56,6 +56,7 @@ export async function CreateApiService(
   vpcProvider: FootprintVpc,
   serviceConfig: ServiceConfig,
   dnsConfig: DnsConfig,
+  cert: aws.acm.Certificate,
   constants: Config,
   secretsStore: StaticSecrets,
   enclaveKeyDescriptor: EnclaveKeyDescriptor,
@@ -75,6 +76,7 @@ export async function CreateApiService(
     vpcProvider,
     secretsStore,
     dnsConfig,
+    cert,
     METRICS_ENDPOINT_PATH,
     serviceConfig,
     stackMetadata,
@@ -209,6 +211,7 @@ async function createCdnFrontedLoadBalancer(
   vpcProvider: FootprintVpc,
   secretsStore: StaticSecrets,
   dnsConfig: DnsConfig,
+  cert: aws.acm.Certificate,
   metricsEndpointPath: string,
   config: ServiceConfig,
   stackMetadata: StackMetadata,
@@ -217,15 +220,6 @@ async function createCdnFrontedLoadBalancer(
   const vpc = vpcProvider.vpc;
   const provider = vpcProvider.provider;
   const serviceName = stackMetadata.shortStackName;
-
-  // Create a certificate for this service
-  const domain = `${dnsConfig.apiPrefixHost}${dnsConfig.domainBaseName}`;
-
-  const cert = await certs.CreateWildcardCertificate({
-    domain: domain,
-    region: vpcProvider.region,
-    hostedZoneId: dnsConfig.hostedZone.id,
-  });
 
   // init our ALB
   const securityGroup = new awsx.ec2.SecurityGroup(
@@ -358,7 +352,7 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  const albDomainName = `internal.${domain}`;
+  const albDomainName = `internal.${dnsConfig.apiDomain}`;
   const record = new route53.Record(
     `dns-alb-${serviceName}-${region}`,
     {
@@ -382,7 +376,7 @@ async function createCdnFrontedLoadBalancer(
     certArn: cert.arn,
     cdnToAlbSecret: secretsStore.cloudfrontSecret,
     cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
-    domain: domain,
+    domain: dnsConfig.apiDomain,
     origin: albDomainName,
     hostedZoneId: dnsConfig.hostedZone.id,
   });
@@ -390,7 +384,7 @@ async function createCdnFrontedLoadBalancer(
   return {
     lb: loadBalancer,
     targetGroup: targetGroup,
-    cdnDomain: domain,
+    cdnDomain: dnsConfig.apiDomain,
     lbCname: albDomainName,
     cert,
     distribution,

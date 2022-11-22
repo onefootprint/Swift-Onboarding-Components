@@ -33,6 +33,7 @@ export async function CreateNitroService(
   vpcProvider: FootprintVpc,
   nitroConfig: NitroConfig,
   dnsConfig: DnsConfig,
+  cert: aws.acm.Certificate,
   constants: Config,
   secretsStore: StaticSecrets,
   enclaveKeyDescriptor: EnclaveKeyDescriptor,
@@ -117,6 +118,7 @@ export async function CreateNitroService(
     stackMetadata,
     instanceSecurityGroup,
     dnsConfig,
+    cert,
   );
 
   const autoScaling = new aws.autoscaling.Group(
@@ -156,20 +158,13 @@ async function createLoadBalancer(
   stackMetadata: StackMetadata,
   securityGroup: awsx.ec2.SecurityGroup,
   dnsConfig: DnsConfig,
+  cert: aws.acm.Certificate,
 ): Promise<NitroServiceOutput> {
   const vpc = vpcProvider.vpc;
   const region = vpcProvider.region;
   const provider = vpcProvider.provider;
   const serviceName = `ns-${stackMetadata.shortStackName}`;
-
-  // Create a certificate for this service
-  const domain = `enclave-proxy.${dnsConfig.apiPrefixHost}${dnsConfig.domainBaseName}`;
-
-  const cert = await certs.CreateWildcardCertificate({
-    domain: domain,
-    region: vpcProvider.region,
-    hostedZoneId: dnsConfig.hostedZone.id,
-  });
+  const domain = `enclave-proxy.${dnsConfig.apiDomain}`;
 
   const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
     `alb-${serviceName}`,

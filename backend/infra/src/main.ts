@@ -77,6 +77,11 @@ export default async function main() {
   // launch of core service
   const services = await Promise.all(
     vpcProviders.map(async vpcAndProvider => {
+      const cert = await certs.CreateRegionalWildCertificateForDnsConfig(
+        dnsConfig,
+        vpcAndProvider.region,
+      );
+
       // create the nitro service
       const nitroServiceOutput = await nitroService.CreateNitroService(
         vpcAndProvider,
@@ -86,6 +91,7 @@ export default async function main() {
           cpus: 2,
         },
         dnsConfig,
+        cert,
         constants,
         secretsStore,
         enclaveKeyConfig,
@@ -100,6 +106,7 @@ export default async function main() {
           instanceCount: constants.resources.instances,
         },
         dnsConfig,
+        cert,
         constants,
         secretsStore,
         enclaveKeyConfig,
@@ -128,6 +135,7 @@ export default async function main() {
         nitroServiceEndpoint: svc.nitroServiceOutput.serviceEndpoint,
       };
     }),
+    apiUrl: `https://${dnsConfig.apiDomain}`,
     databaseUrl: database.databaseUrl,
   };
 }

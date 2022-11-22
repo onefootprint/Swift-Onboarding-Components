@@ -6,6 +6,7 @@ export type DnsConfig = {
   domainBaseName: string;
   apiPrefixHost: string;
   hostedZone: aws.route53.GetZoneResult;
+  apiDomain: string;
 };
 
 // hostname's cannot be longer than 64 characters
@@ -31,5 +32,6 @@ export async function LoadDnsConfig(constants: Config): Promise<DnsConfig> {
     hostedZone: await aws.route53.getZone({ name: constants.domain.base }),
     domainBaseName: constants.domain.base,
     apiPrefixHost: apiPrefix,
+    apiDomain: `${apiPrefix}${constants.domain.base}`,
   };
 }
