@@ -1,18 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Box, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { User } from 'src/pages/users/types/user.types';
 
 import AuditTrailTimeline from './components/audit-trail-timeline';
 import useGetTimeline from './hooks/use-get-timeline';
 
-type AuditTrailProps = {
-  user: User;
-};
-
-const AuditTrail = ({ user }: AuditTrailProps) => {
+const AuditTrail = () => {
   const { t } = useTranslation('pages.user-details.audit-trail');
-  const getTimeline = useGetTimeline(user.id);
+  const timelineQuery = useGetTimeline();
 
   return (
     <>
@@ -23,8 +18,8 @@ const AuditTrail = ({ user }: AuditTrailProps) => {
         <Divider />
       </Box>
       <AuditTrailTimeline
-        timeline={getTimeline.data ?? []}
-        isLoading={getTimeline.isLoading}
+        timeline={timelineQuery.data || []}
+        isLoading={timelineQuery.isLoading}
       />
     </>
   );

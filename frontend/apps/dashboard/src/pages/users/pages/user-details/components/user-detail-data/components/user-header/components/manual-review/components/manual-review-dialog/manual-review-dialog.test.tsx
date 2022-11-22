@@ -1,48 +1,43 @@
 import {
+  createUseRouterSpy,
   customRender,
   screen,
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { OnboardingStatus, ReviewStatus } from '@onefootprint/types';
+import { ReviewStatus } from '@onefootprint/types';
 import React from 'react';
 
 import ManualReviewDialog, {
   ManualReviewDialogProps,
 } from './manual-review-dialog';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<ManualReviewDialog />', () => {
+  beforeEach(() => {
+    useRouterSpy({
+      pathname:
+        '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+      query: {
+        footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+      },
+    });
+  });
+
   const defaultOptions = {
     open: true,
     onClose: jest.fn(),
     status: ReviewStatus.pass,
-    user: {
-      id: 'user_id',
-      isPortable: true,
-      identityDataAttributes: [],
-      startTimestamp: '15:21:53 GMT-0500',
-      orderingId: 'id',
-      requiresManualReview: true,
-      status: OnboardingStatus.failed,
-      vaultData: {
-        kycData: {},
-      },
-    },
   };
 
   const renderManualReviewDialog = ({
     open = defaultOptions.open,
     onClose = defaultOptions.onClose,
     status = defaultOptions.status,
-    user = defaultOptions.user,
   }: Partial<ManualReviewDialogProps>) =>
     customRender(
-      <ManualReviewDialog
-        user={user}
-        open={open}
-        onClose={onClose}
-        status={status}
-      />,
+      <ManualReviewDialog open={open} onClose={onClose} status={status} />,
     );
 
   describe('when clicking on the cancel button', () => {

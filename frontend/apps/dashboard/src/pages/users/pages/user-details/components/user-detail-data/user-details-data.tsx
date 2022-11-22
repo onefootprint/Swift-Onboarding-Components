@@ -113,7 +113,7 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
       {user.isPortable ? (
         <>
           <Box sx={{ marginBottom: 9 }}>
-            <AuditTrail user={user} />
+            <AuditTrail />
           </Box>
           <Box sx={{ marginBottom: 9 }}>
             <RiskSignals />
