@@ -83,14 +83,16 @@ jobs:
 
       - name: Install Playwright Browsers
         working-directory: frontend
-        run: npx playwright install --with-deps
+        run: |
+          npx playwright install --with-deps
+          npx playwright install msedge
 
       - name: Build apps
         working-directory: frontend
         run: |
-          yarn build:packages
-          yarn build --filter=bifrost
-          yarn build --filter=demo
+          FORCE_FOOTPRINT_JS_TO_USE_LOCAL=true yarn build:packages
+          FORCE_FOOTPRINT_JS_TO_USE_LOCAL=true yarn build --filter=bifrost
+          FORCE_FOOTPRINT_JS_TO_USE_LOCAL=true yarn build --filter=demo
 
       - name: Run tests
         working-directory: frontend
