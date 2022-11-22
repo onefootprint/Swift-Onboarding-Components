@@ -16,6 +16,8 @@ use super::user_vault_helper;
 
 pub(super) mod build_request;
 pub(super) mod make_request;
+pub mod vendor_result;
+mod verification_result;
 
 /// Build verification requests from the UserVaultWrapper and save.
 /// We save so that if something happens, we can always replay the requests

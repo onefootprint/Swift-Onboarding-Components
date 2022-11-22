@@ -7,7 +7,7 @@ use crate::{
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
 use newtypes::{OnboardingId, UserVaultId};
 
-use super::{vendor_result::VendorResult, *};
+use super::*;
 /// The Engine module is the main entry point into running our verification logic
 ///
 ///
@@ -25,7 +25,9 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
                 VerificationRequest::get_requests_and_results_for_onboarding(conn, ob.id.clone())?;
             // In the case we have already run some verifications for this onboarding, create our previous VendorResults
             let previous_results =
-                VendorResult::from_verification_results_for_onboarding(requests_and_results.clone())?;
+                vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
+                    requests_and_results.clone(),
+                )?;
             let requests: Vec<VerificationRequest> = requests_and_results
                 .into_iter()
                 .filter_map(|(request, result)| {
@@ -41,14 +43,17 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
         })
         .await?;
 
-    // Build our IDV Vendor requests
-    let future_results = requests.into_iter().map(|r| make_idv_request(state, r));
-
     // Make requests
-    // TODO: if any of the requests fail, this joined future will fail. Handle individual vendor failures separately
-    let results = futures::future::try_join_all(future_results)
-        .await?
+    let raw_results = vendor::make_request::make_vendor_requests(state, requests).await?;
+    // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
+    if raw_results.iter().any(|r| r.is_err()) {
+        return Err(ApiError::VendorRequestFailed);
+    }
+
+    let results = raw_results
         .into_iter()
+        // We return early above if any fail, so this should not drop any results
+        .filter_map(|r| r.ok())
         .chain(previous_results.into_iter())
         .collect();
 
@@ -94,37 +99,11 @@ pub async fn perform_pre_run_operations(
             }
 
             // Checkpoint and create VerificationRequests
-            verification_request::build_verification_requests_and_checkpoint(conn, &ob_id, &uvw)?;
+            vendor::build_verification_requests_and_checkpoint(conn, &ob_id, &uvw)?;
 
             Ok(true)
         })
         .await?;
 
     Ok(true)
-}
-
-/// Make our requests to a vendor, building data from the cached VerificationRequest
-async fn make_idv_request(
-    state: &State,
-    request: VerificationRequest,
-) -> Result<vendor_result::VendorResult, ApiError> {
-    let request_id = request.id.clone();
-
-    let data =
-        verification_request::build_request::build_idv_data_from_verification_request(state, request.clone())
-            .await?;
-
-    let vendor_response = verification_request::make_request::send_idv_request(state, request, data).await?;
-
-    let verification_result =
-        verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
-            .await?;
-
-    let result = vendor_result::VendorResult {
-        response: vendor_response,
-        verification_result_id: verification_result.id,
-        verification_request_id: request_id,
-    };
-
-    Ok(result)
 }

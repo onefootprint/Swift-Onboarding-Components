@@ -100,6 +100,8 @@ pub enum ApiError {
     S3Error(#[from] crate::s3::S3Error),
     #[error("privacy pass token error: {0}")]
     PrivacyPassError(#[from] privacy_pass::Error),
+    #[error("One or more vendor requests failed")]
+    VendorRequestFailed,
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -175,6 +177,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::VendorRequestFailed => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_)
             | ApiError::InvalidJsonBody(_)
             | ApiError::InvalidFormError(_)

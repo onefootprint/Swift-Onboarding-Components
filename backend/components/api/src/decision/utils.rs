@@ -14,7 +14,7 @@ use crate::{
     State,
 };
 
-use super::verification_request::build_request;
+use super::vendor::build_request;
 
 type ShouldInitiateVerificationRequests = bool;
 

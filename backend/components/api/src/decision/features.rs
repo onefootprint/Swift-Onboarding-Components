@@ -4,7 +4,7 @@ use idv::{idology::verification::IDologySuccess, ParsedResponse};
 
 use newtypes::{DecisionStatus, Signal, VerificationResultId};
 
-use super::vendor_result::VendorResult;
+use super::vendor::vendor_result::VendorResult;
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]

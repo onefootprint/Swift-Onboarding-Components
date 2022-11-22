@@ -45,6 +45,4 @@ pub(self) mod features;
 pub mod risk;
 pub mod user_vault_helper;
 pub(self) mod utils;
-pub mod vendor_result;
-pub mod verification_request;
-pub(self) mod verification_result;
+pub mod vendor;
