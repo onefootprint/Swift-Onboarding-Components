@@ -81,6 +81,9 @@ jobs:
           apiVersion="${branch}-$(git rev-parse --short HEAD)"
           enclaveVersion="${branch}-$(git log -n 1 --format="%h" ./backend/components/enclave)"
 
+          echo "api is ${apiVersion}"
+          echo "enclave is ${enclaveVersion}"
+
           echo "apiComponentVersion=${apiVersion}" >> $GITHUB_OUTPUT
           echo "enclaveComponentVersion=${enclaveVersion}" >> $GITHUB_OUTPUT
 
