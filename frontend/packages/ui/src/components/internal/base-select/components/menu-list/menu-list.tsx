@@ -4,7 +4,8 @@ import { FixedSizeList as List } from 'react-window';
 import styled, { css } from 'styled-components';
 
 const OPTION_HEIGHT = 36;
-const ROWS = 5.5;
+const ROWS = 6;
+const MARGIN = 8;
 
 export type MenuListProps<
   Option = unknown,
@@ -40,8 +41,8 @@ const MenuList = <
 
   const height =
     children.length >= ROWS
-      ? OPTION_HEIGHT * ROWS
-      : children.length * OPTION_HEIGHT;
+      ? OPTION_HEIGHT * ROWS - MARGIN
+      : children.length * OPTION_HEIGHT + 2 * MARGIN;
 
   return Array.isArray(children) ? (
     <StyledList
