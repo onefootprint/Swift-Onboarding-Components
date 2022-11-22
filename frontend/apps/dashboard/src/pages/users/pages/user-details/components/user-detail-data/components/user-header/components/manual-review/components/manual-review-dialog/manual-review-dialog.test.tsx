@@ -66,7 +66,7 @@ describe('<ManualReviewDialog />', () => {
 
       renderManualReviewDialog({ status: ReviewStatus.fail });
       expect(
-        screen.getByText('Why are you marking this user as Not verified?'),
+        screen.getByText('Why are you marking this user as Failed?'),
       ).toBeInTheDocument();
     });
 

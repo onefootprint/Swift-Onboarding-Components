@@ -252,10 +252,11 @@
       "manual-review": {
         "status": {
           "pass": "Verified",
-          "fail": "Not verified"
+          "fail": "Failed"
         },
         "button": {
-          "label": "Review"
+          "mark-as-verified": "Mark as Verified",
+          "mark-as-failed": "Mark as Failed"
         },
         "dialog": {
           "title": "Review",
@@ -393,7 +394,7 @@
             "verified-by-footprint": "Verified by Footprint",
             "not-verified-by-footprint": "Could not be verified by Footprint",
             "verified": "Verified",
-            "not-verified": "Not Verified",
+            "not-verified": "Failed",
             "decision-status": {
               "pass": "Verified",
               "fail": "Failed",
