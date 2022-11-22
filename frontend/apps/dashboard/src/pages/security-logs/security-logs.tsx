@@ -1,10 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { AccessEvent } from '@onefootprint/types';
-
-import Head from 'next/head';
-
 import { Box, SearchInput, Typography } from '@onefootprint/ui';
-
+import Head from 'next/head';
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
 import styled from 'styled-components';
