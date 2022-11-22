@@ -1,5 +1,10 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { AccessEvent } from '@onefootprint/types';
+
+import Head from 'next/head';
+
 import { Box, SearchInput, Typography } from '@onefootprint/ui';
+
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
 import styled from 'styled-components';
@@ -12,6 +17,7 @@ import { useFilters } from './hooks/use-filters';
 import useGetAccessEvents from './hooks/use-get-access-events';
 
 const SecurityLogs = () => {
+  const { t } = useTranslation('pages.security-logs');
   const { filters, setFilter } = useFilters();
   const getAccessEvents = useGetAccessEvents();
   const accessEvents =
@@ -49,6 +55,9 @@ const SecurityLogs = () => {
 
   return (
     <>
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
       <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
         Security logs
       </Typography>

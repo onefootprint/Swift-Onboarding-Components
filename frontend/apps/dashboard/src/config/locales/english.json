@@ -418,8 +418,11 @@
         }
       }
     },
+    "security-logs": {
+      "page-title": "Foootprint | Security logs"
+    },
     "developers": {
-      "page-title": "Footprint - Developers",
+      "page-title": "Footprint | Developers",
       "header": {
         "title": "Developers",
         "subtitle": {
