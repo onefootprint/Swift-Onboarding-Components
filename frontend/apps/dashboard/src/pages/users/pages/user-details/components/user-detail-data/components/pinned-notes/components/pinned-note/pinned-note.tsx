@@ -22,14 +22,13 @@ const PinnedNote = ({ reason, note, author }: PinnedNoteProps) => {
           {author && t('title-by-author', { author })}
         </Typography>
       </TitleContainer>
-      <Typography variant="body-3" color="secondary">
+      <Typography variant="label-3" color="secondary" as="span">
         {reason}
-      </Typography>
-      {note && (
-        <Typography variant="body-3" color="secondary">
+        {note && ': '}
+        <Typography variant="body-3" color="secondary" as="span">
           {note}
         </Typography>
-      )}
+      </Typography>
     </Container>
   ) : null;
 };

@@ -20,8 +20,11 @@ describe('<PinnedNote />', () => {
 
   it('renders note correctly', () => {
     renderPinnedNote({ reason: 'Some reason', note: 'Some note' });
-    expect(screen.getByText('Some reason')).toBeInTheDocument();
-    expect(screen.getByText('Some note')).toBeInTheDocument();
+    const reasonWithNote = screen.getByText('Some reason', { exact: false });
+    expect(reasonWithNote).toBeInTheDocument();
+
+    const note = screen.getByText('Some note');
+    expect(note).toHaveTextContent('Some note');
   });
 
   it('renders author correctly', () => {
