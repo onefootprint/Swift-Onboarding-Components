@@ -5,7 +5,7 @@ export type GetPinnedAnnotationsRequest = {
     'x-fp-dashboard-authorization': string;
     'x-is-live': string;
   };
-  userId: string | string[];
+  userId: string;
 };
 
 export type GetPinnedAnnotationsResponse = DecisionAnnotation[];

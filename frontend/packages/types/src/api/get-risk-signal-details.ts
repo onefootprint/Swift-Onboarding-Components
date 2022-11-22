@@ -1,7 +1,7 @@
 import { RiskSignal } from '../data/risk-signal';
 
 export type GetRiskSignalDetailsRequest = {
-  userId: string | string[];
+  userId: string;
   riskSignalId: string;
   authHeaders: {
     'x-fp-dashboard-authorization': string;
