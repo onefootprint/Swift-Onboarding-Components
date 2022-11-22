@@ -62,14 +62,16 @@ on:
 jobs:
   extract_commit:
     name: Extract commit hash
-    runs-on: [beast, linux]
+    runs-on: ubuntu-latest
     outputs:
       apiComponentVersion: '${{ steps.constants.outputs.apiComponentVersion }}'
       enclaveComponentVersion: '${{ steps.constants.outputs.enclaveComponentVersion }}'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ inputs.commitHash }}
+          # We extract all commits here to make sure we're pulling the right commit hash
+          fetch-depth: 0
       - name: Extract commit hash
         id: constants
         shell: bash
