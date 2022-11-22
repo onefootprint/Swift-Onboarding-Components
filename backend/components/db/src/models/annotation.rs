@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use crate::{models::scoped_user::ScopedUser, schema::annotation, DbResult};
+use crate::{
+    models::scoped_user::ScopedUser,
+    schema::{annotation, scoped_user},
+    DbError, DbResult, TxnPgConnection,
+};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{AnnotationId, FootprintUserId, ScopedUserId, TenantId, TenantUserId};
@@ -33,6 +37,12 @@ struct NewAnnotation {
 
 pub type AnnotationInfo = (Annotation, Option<TenantUser>);
 
+#[derive(AsChangeset)]
+#[diesel(table_name = annotation)]
+struct AnnotationUpdate {
+    is_pinned: Option<bool>,
+}
+
 impl Annotation {
     pub fn create(
         conn: &mut PgConnection,
@@ -51,6 +61,30 @@ impl Annotation {
         let result = diesel::insert_into(annotation::table)
             .values(new)
             .get_result(conn)?;
+        Ok(result)
+    }
+
+    pub fn update(
+        conn: &mut PgConnection,
+        id: AnnotationId,
+        tenant_id: TenantId,
+        footprint_user_id: FootprintUserId,
+        is_live: bool,
+        is_pinned: Option<bool>,
+    ) -> DbResult<Self> {
+        let update = AnnotationUpdate { is_pinned };
+
+        let su_ids = scoped_user::table
+            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(is_live))
+            .select(scoped_user::id);
+        let result = diesel::update(annotation::table)
+            .filter(annotation::id.eq(id))
+            .filter(annotation::scoped_user_id.eq_any(su_ids))
+            .set(update)
+            .get_result::<Self>(conn)?;
+
         Ok(result)
     }
 

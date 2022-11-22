@@ -2,6 +2,7 @@ use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
+use crate::types::EmptyResponse;
 
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
@@ -9,11 +10,13 @@ use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 
-use api_wire_types::AnnotationFilters;
+use api_wire_types::{AnnotationFilters, UpdateAnnotationRequest};
 use db::models::annotation::Annotation;
+use newtypes::AnnotationId;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{api_v2_operation, get, patch, web};
 
 type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 
@@ -40,4 +43,45 @@ pub async fn get(
         .map(api_wire_types::Annotation::from_db)
         .collect();
     ResponseData::ok(annotations).json()
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+struct UpdateAnnotationPath {
+    footprint_user_id: FootprintUserId,
+    annotation_id: AnnotationId,
+}
+
+#[api_v2_operation(description = "Updates an existing annotation.", tags(Users, PublicApi))]
+#[patch("/users/{footprint_user_id}/annotations/{annotation_id}")]
+async fn patch(
+    state: web::Data<State>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    path: web::Path<UpdateAnnotationPath>,
+    request: web::Json<UpdateAnnotationRequest>,
+) -> JsonApiResponse<EmptyResponse> {
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let tenant = auth.tenant();
+    let is_live = auth.is_live()?;
+    let UpdateAnnotationPath {
+        footprint_user_id,
+        annotation_id,
+    } = path.into_inner();
+
+    let UpdateAnnotationRequest { is_pinned } = request.into_inner();
+    let tenant_id = tenant.id.clone();
+    let result = state
+        .db_pool
+        .db_query(move |conn| {
+            Annotation::update(
+                conn,
+                annotation_id,
+                tenant_id,
+                footprint_user_id,
+                is_live,
+                is_pinned,
+            )
+        })
+        .await?;
+
+    EmptyResponse::ok().json() // TODO: do we really want empty response or return the updated result?
 }

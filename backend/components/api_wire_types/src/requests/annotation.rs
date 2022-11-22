@@ -16,3 +16,10 @@ pub struct CreateAnnotationRequest {
 }
 
 export_schema!(CreateAnnotationRequest);
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+pub struct UpdateAnnotationRequest {
+    pub is_pinned: Option<bool>,
+}
+
+export_schema!(UpdateAnnotationRequest);
