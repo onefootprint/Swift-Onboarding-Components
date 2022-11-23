@@ -10,6 +10,7 @@ import { parseAnnotationNote } from 'src/pages/users/pages/user-details/componen
 import styled, { css } from 'styled-components';
 
 import useGetPinnedAnnotations from '../../../../../../../../hooks/use-get-pinned-annotations';
+import useUpdateAnnotation from '../../../../../../hooks/use-update-annotation';
 
 type OrgOverwriteDetailsProps = {
   data: OnboardingDecisionEventData;
@@ -25,13 +26,28 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
     annotation,
   } = data;
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [isNotePinned, setIsNotePinned] = useState(annotation?.isPinned);
+  const [isNotePinned, setIsNotePinned] = useState(!!annotation?.isPinned);
   const pinnedNotesQuery = useGetPinnedAnnotations();
+  const updateMutation = useUpdateAnnotation();
+
+  if (!annotation) {
+    return null;
+  }
 
   const handlePinNoteChange = () => {
-    // TODO: https://linear.app/footprint/issue/FP-1814/make-an-api-call-to-pin-manual-overwrite-note
-    pinnedNotesQuery.refetch();
-    setIsNotePinned(!isNotePinned);
+    const newIsNotePinned = !isNotePinned;
+    updateMutation.mutate(
+      {
+        isPinned: newIsNotePinned,
+        annotationId: annotation.id,
+      },
+      {
+        onSuccess: () => {
+          pinnedNotesQuery.refetch();
+        },
+      },
+    );
+    setIsNotePinned(newIsNotePinned);
   };
 
   if (!annotation) {
