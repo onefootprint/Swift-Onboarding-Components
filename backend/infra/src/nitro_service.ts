@@ -20,6 +20,7 @@ export type NitroServiceOutput = {
   serviceEndpoint: string;
   loadBalancer: awsx.lb.ApplicationLoadBalancer;
   targetGroup: aws.lb.TargetGroup;
+  nitroLoadBalancerSecurityGroupId: pulumi.Output<string>;
 };
 
 // the default port for the nitro proxy
@@ -69,22 +70,15 @@ export async function CreateNitroService(
     {
       vpc,
       ingress: [
+        // this limits ingress just to this security group!
         {
           protocol: '-1',
-          fromPort: 0,
-          toPort: 0,
-          cidrBlocks: [vpc.vpc.cidrBlock],
+          fromPort: PROXY_LB_PORT,
+          toPort: PROXY_LB_PORT,
+          self: true,
         },
-        { protocol: '-1', fromPort: 0, toPort: 0, self: true },
       ],
       egress: [
-        {
-          protocol: '-1',
-          fromPort: 0,
-          toPort: 0,
-          cidrBlocks: [vpc.vpc.cidrBlock],
-        },
-
         // TODO: lockdown just to AWS KMS
         { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
       ],
@@ -93,7 +87,7 @@ export async function CreateNitroService(
   );
 
   const launchTemplate = new aws.ec2.LaunchTemplate(
-    `launch-template-${serviceName}`,
+    `i-template-${serviceName}`,
     {
       namePrefix: `i-${serviceName}`,
       instanceType: 'c5a.xlarge',
@@ -109,6 +103,9 @@ export async function CreateNitroService(
       },
       updateDefaultVersion: true,
       vpcSecurityGroupIds: [instanceSecurityGroup.id],
+      tags: {
+        name: serviceName,
+      },
     },
     { provider },
   );
@@ -134,7 +131,7 @@ export async function CreateNitroService(
       healthCheckGracePeriod: 60,
       vpcZoneIdentifiers: vpcProvider.privateSubnetIds,
       protectFromScaleIn: false,
-      healthCheckType: 'EC2',
+      healthCheckType: 'ELB',
       targetGroupArns: [nitroServiceOutput.targetGroup.arn],
       instanceRefresh: {
         strategy: 'Rolling',
@@ -156,7 +153,7 @@ export async function CreateNitroService(
 async function createLoadBalancer(
   vpcProvider: FootprintVpc,
   stackMetadata: StackMetadata,
-  securityGroup: awsx.ec2.SecurityGroup,
+  instanceSecurityGroup: awsx.ec2.SecurityGroup,
   dnsConfig: DnsConfig,
   cert: aws.acm.Certificate,
 ): Promise<NitroServiceOutput> {
@@ -166,11 +163,51 @@ async function createLoadBalancer(
   const serviceName = `ns-${stackMetadata.shortStackName}`;
   const domain = `enclave-proxy.${dnsConfig.apiDomain}`;
 
+  // this security group is to control access TO the nitro LB
+  const sharedNitroLbSecurityGroup = new awsx.ec2.SecurityGroup(
+    `${serviceName}-shared-lb-sg`,
+    {
+      vpc,
+    },
+    { provider },
+  );
+
+  // this security group protects the nitro LB
+  const internalNitroLbSecurityGroup = new awsx.ec2.SecurityGroup(
+    `${serviceName}-lb-sg`,
+    {
+      vpc,
+      ingress: [
+        // this limits ingress just to this security group on port 443
+        {
+          protocol: 'tcp',
+          fromPort: 443,
+          toPort: 443,
+          sourceSecurityGroupId: sharedNitroLbSecurityGroup.id,
+        },
+      ],
+      egress: [
+        // this limits access only to only our nitro instances
+        {
+          protocol: 'tcp',
+          fromPort: PROXY_LB_PORT,
+          toPort: PROXY_LB_PORT,
+          sourceSecurityGroupId: instanceSecurityGroup.id,
+        },
+      ],
+    },
+    { provider },
+  );
+
   const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
     `alb-${serviceName}`,
     {
       vpc,
-      securityGroups: [securityGroup.id],
+      // this lets the LB communicate to our nitro instances
+      securityGroups: [
+        internalNitroLbSecurityGroup.id,
+        instanceSecurityGroup.id,
+      ],
       external: false,
 
       // private subnets as this is an internal service
@@ -239,6 +276,7 @@ async function createLoadBalancer(
     serviceEndpoint: `https://${domain}`,
     loadBalancer,
     targetGroup,
+    nitroLoadBalancerSecurityGroupId: sharedNitroLbSecurityGroup.id,
   };
 }
 /**
@@ -395,7 +433,7 @@ sudo systemctl start awslogsd
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${hostName}" --accept-dns=false 
+sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --hostname "${hostName}" --accept-dns=false 
 
 # setup enclave
 

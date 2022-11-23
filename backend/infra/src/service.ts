@@ -71,6 +71,67 @@ export async function CreateApiService(
   const vpc = vpcProvider.vpc;
   const provider = vpcProvider.provider;
 
+  /**
+   * Setup our core security groups for connectivity restrictions.
+   *
+   *                                                               [Open internet]
+   *                                                              /
+   * [Cloudfront]-->[Service Load Balancer]-->[Api Fargate Service]
+   *                                                              \
+   *                                                               [Nitro Service]
+   */
+  const serviceSecurityGroup = new awsx.ec2.SecurityGroup(
+    `fpc-ecs-service-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc,
+      egress: [
+        // gives access to egress to the whole internet
+        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+      ],
+    },
+    { provider },
+  );
+
+  const loadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(
+    `fpc-ecs-lb-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc,
+      ingress: [
+        {
+          protocol: 'tcp',
+          fromPort: 0,
+          toPort: 0,
+          cidrBlocks: ['0.0.0.0/0'],
+          description:
+            'must accept connections from the public internet (cloudfront)',
+        },
+      ],
+      egress: [
+        // the load balancer should only be allowed to talk to the FPC Api service container
+        {
+          protocol: 'tcp',
+          fromPort: FPC_SERVICE_PORT,
+          toPort: FPC_SERVICE_PORT,
+          sourceSecurityGroupId: serviceSecurityGroup.id,
+        },
+      ],
+    },
+    { provider },
+  );
+
+  serviceSecurityGroup.createIngressRule(
+    `fpc-ecs-service-ingress-rule-${stackMetadata.shortStackName}`,
+    {
+      protocol: 'tcp',
+      fromPort: FPC_SERVICE_PORT,
+      toPort: FPC_SERVICE_PORT,
+      sourceSecurityGroupId: loadBalancerSecurityGroup.id,
+      description:
+        'enables the load balancer communicate to the fargate api service',
+    },
+    { provider },
+  );
+
   // setup our load balancer and cloudfront CDN
   const lb = await createCdnFrontedLoadBalancer(
     vpcProvider,
@@ -80,10 +141,10 @@ export async function CreateApiService(
     METRICS_ENDPOINT_PATH,
     serviceConfig,
     stackMetadata,
+    loadBalancerSecurityGroup,
   );
 
   // init our cluster
-
   const cluster = new awsx.ecs.Cluster(
     `cluster-${stackMetadata.shortStackName}`,
     {
@@ -120,6 +181,7 @@ export async function CreateApiService(
   const execRole = createTaskExecutionRole(
     secretsStore,
     stackMetadata.shortStackName,
+    database.databaseUrlSecretName,
   );
 
   const taskRoleRole = createTaskContainerRole(
@@ -145,26 +207,7 @@ export async function CreateApiService(
     { provider, dependsOn: [cluster] },
   );
 
-  // build the cluster service
-  const serviceSg = new awsx.ec2.SecurityGroup(
-    `fpc-svc-sg-${stackMetadata.shortStackName}`,
-    {
-      vpc,
-      ingress: [
-        {
-          protocol: 'tcp',
-          fromPort: FPC_SERVICE_PORT,
-          toPort: FPC_SERVICE_PORT,
-          cidrBlocks: [vpc.vpc.cidrBlock],
-        },
-      ],
-      egress: [
-        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
-      ],
-    },
-    { provider },
-  );
-
+  // build the fargate service
   const service = new aws.ecs.Service(
     `svc-${stackMetadata.shortStackName}`,
     {
@@ -184,7 +227,13 @@ export async function CreateApiService(
       networkConfiguration: {
         assignPublicIp: false,
         subnets: vpc.privateSubnetIds,
-        securityGroups: [serviceSg.id],
+        securityGroups: [
+          serviceSecurityGroup.id,
+          // permits service to talk to the nitro LB
+          nitroService.nitroLoadBalancerSecurityGroupId,
+          // permits service to talk to the DB
+          database.securityGroupId,
+        ],
       },
       loadBalancers: [
         {
@@ -215,6 +264,7 @@ async function createCdnFrontedLoadBalancer(
   metricsEndpointPath: string,
   config: ServiceConfig,
   stackMetadata: StackMetadata,
+  loadBalancerSecurityGroup: awsx.ec2.SecurityGroup,
 ): Promise<ServiceLoadBalancer> {
   const region = vpcProvider.region;
   const vpc = vpcProvider.vpc;
@@ -222,31 +272,12 @@ async function createCdnFrontedLoadBalancer(
   const serviceName = stackMetadata.shortStackName;
 
   // init our ALB
-  const securityGroup = new awsx.ec2.SecurityGroup(
-    `fpc-lb-sg-${stackMetadata.shortStackName}`,
-    {
-      vpc,
-      ingress: [
-        { protocol: 'tcp', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
-      ],
-      egress: [
-        {
-          protocol: 'tcp',
-          fromPort: 0,
-          toPort: FPC_SERVICE_PORT,
-          cidrBlocks: [vpc.vpc.cidrBlock],
-        },
-      ],
-    },
-    { provider },
-  );
-
   const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
     `fpc-lb-${serviceName}`,
     {
       vpc,
       external: true,
-      securityGroups: [securityGroup],
+      securityGroups: [loadBalancerSecurityGroup],
       subnets: vpc.publicSubnetIds,
     },
     { provider },
@@ -398,8 +429,9 @@ async function createCdnFrontedLoadBalancer(
 function createTaskExecutionRole(
   secretsStore: StaticSecrets,
   serviceName: string,
+  dbSecretName: string,
 ): aws.iam.Role {
-  const taskExecRole = new aws.iam.Role(`task-exec-role-${serviceName}`, {
+  const taskExecRole = new aws.iam.Role(`fpc-task-exec-role-${serviceName}`, {
     assumeRolePolicy: {
       Version: '2012-10-17',
       Statement: [
@@ -429,6 +461,19 @@ function createTaskExecutionRole(
               ],
               Effect: 'Allow',
               Resource: '*',
+            },
+          ],
+        }),
+      },
+      {
+        name: 'allow_db_connection_secret',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${dbSecretName}`,
             },
           ],
         }),

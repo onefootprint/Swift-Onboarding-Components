@@ -16,8 +16,10 @@ export type DbConfig = {
 export type DbOutput = {
   databaseUrl: pulumi.Output<string>;
   databaseUrlSecretParam: aws.ssm.Parameter;
+  databaseUrlSecretName: string;
   db: aws.rds.Cluster;
   instances: aws.rds.ClusterInstance[];
+  securityGroupId: pulumi.Output<string>;
 };
 
 export async function CreateDB(
@@ -32,7 +34,7 @@ export async function CreateDB(
 
   const vpc = vpcProvider.vpc;
 
-  const vpcSecurityGroup = new awsx.ec2.SecurityGroup(
+  const databaseSecurityGroup = new awsx.ec2.SecurityGroup(
     `${clusterIdentifier}-db-sg`,
     {
       vpc: vpc,
@@ -41,11 +43,9 @@ export async function CreateDB(
           protocol: '-1',
           fromPort: 5432,
           toPort: 5432,
-          cidrBlocks: [vpc.vpc.cidrBlock],
+          self: true,
+          description: 'Allows inbound DB connections',
         },
-      ],
-      egress: [
-        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
       ],
     },
   );
@@ -67,7 +67,7 @@ export async function CreateDB(
     masterUsername: user,
     applyImmediately: true,
     snapshotIdentifier: await getSnapshotIdIfNeeded(clusterIdentifier),
-    vpcSecurityGroupIds: [vpcSecurityGroup.id],
+    vpcSecurityGroupIds: [databaseSecurityGroup.id],
     skipFinalSnapshot: !dbConfig.protectDeletion,
     deletionProtection: dbConfig.protectDeletion,
     restoreToPointInTime: await getRestorePointIfNeeded(),
@@ -98,20 +98,21 @@ export async function CreateDB(
       return `postgresql://${user}:${password}@${host}`;
     });
 
+  const dbSecretName = `/db/url-${clusterIdentifier}`;
   const databaseUrlSecretParam = new aws.ssm.Parameter(
-    `ssm-param-database-url-${clusterIdentifier}`,
+    `ssm-param-database-conn-${clusterIdentifier}`,
     {
       type: 'SecureString',
       value: databaseUrl,
-      name: `/static_secrets/db-url-${clusterIdentifier}`,
+      name: dbSecretName,
     },
   );
 
   const jump = await createDbJumpBox(
     clusterIdentifier,
     constants,
-    databaseUrl,
-    vpcSecurityGroup,
+    dbSecretName,
+    databaseSecurityGroup,
     vpcProvider,
   );
 
@@ -119,7 +120,9 @@ export async function CreateDB(
     databaseUrl,
     db,
     databaseUrlSecretParam,
+    databaseUrlSecretName: dbSecretName,
     instances: [_dbInstance, _dbInstance2],
+    securityGroupId: databaseSecurityGroup.id,
   };
 }
 
@@ -195,10 +198,11 @@ export type DbJump = {
 async function createDbJumpBox(
   clusterId: string,
   constants: Config,
-  dbUrl: pulumi.Output<string>,
+  dbSecretName: string,
   securityGroup: awsx.ec2.SecurityGroup,
   vpcProvider: FootprintVpc,
 ): Promise<aws.ec2.Instance> {
+  const provider = vpcProvider.provider;
   const size = 't2.micro';
 
   const jumpSg = new awsx.ec2.SecurityGroup(`jumpbox-${clusterId}-sg`, {
@@ -206,14 +210,6 @@ async function createDbJumpBox(
     egress: [
       { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
     ],
-  });
-
-  const dbSecretName = `/db-jump/db-url-${clusterId}`;
-  const dbSecret = new aws.ssm.Parameter(`ssm-param-jump-url-${clusterId}`, {
-    type: 'SecureString',
-    value: dbUrl,
-    name: dbSecretName,
-    overwrite: true,
   });
 
   const instanceRole = new aws.iam.Role(`jump-role-${clusterId}`, {
@@ -299,15 +295,22 @@ EOF
 
 chmod +x connect_db.sh`;
 
-  const jumpbox = new aws.ec2.Instance(`jump-${clusterId}`, {
-    instanceType: size,
-    subnetId: vpcProvider.privateSubnetIds[0],
-    vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
-    ami: 'ami-0f9fc25dd2506cf6d',
-    userData: Buffer.from(userData).toString('base64'),
-    iamInstanceProfile,
-    associatePublicIpAddress: false,
-  });
+  const jumpbox = new aws.ec2.Instance(
+    `jumpbox-${clusterId}`,
+    {
+      instanceType: size,
+      subnetId: vpcProvider.privateSubnetIds[0],
+      vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
+      ami: 'ami-0f9fc25dd2506cf6d',
+      userData: Buffer.from(userData).toString('base64'),
+      iamInstanceProfile,
+      associatePublicIpAddress: false,
+      tags: {
+        name: jumpHostname,
+      },
+    },
+    { provider },
+  );
 
   return jumpbox;
 }

@@ -321,8 +321,12 @@ export abstract class ServiceContainers {
     metricsEndpointPath: string,
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const out = pulumi
-      .all([secrets.traceOtelConfig.arn, secrets.elasticApmAgentKey.arn])
-      .apply(([config, apiKey]) => [
+      .all([
+        secrets.traceOtelConfig.arn,
+        secrets.elasticApmAgentKey.arn,
+        secrets.grafanaPrometheusPushAuth.arn,
+      ])
+      .apply(([config, apiKey, grafanaPrometheusPushAuth]) => [
         {
           name: 'AOT_CONFIG_CONTENT',
           valueFrom: config,
@@ -330,6 +334,10 @@ export abstract class ServiceContainers {
         {
           name: 'ELASTIC_APM_API_KEY',
           valueFrom: apiKey,
+        },
+        {
+          name: 'GRAFANA_PROMETHEUS_PUSH_AUTH',
+          valueFrom: grafanaPrometheusPushAuth,
         },
       ])
       .apply(secrets => {
