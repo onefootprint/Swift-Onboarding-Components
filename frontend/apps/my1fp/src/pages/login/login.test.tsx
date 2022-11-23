@@ -1,9 +1,20 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  customRender,
+  screen,
+  userEvent,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import Login from './login';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<Login />', () => {
+  beforeEach(() => {
+    useRouterSpy({ pathname: '/login' });
+  });
+
   const renderLogin = () => customRender(<Login />);
 
   describe('when pressing on the button', () => {
