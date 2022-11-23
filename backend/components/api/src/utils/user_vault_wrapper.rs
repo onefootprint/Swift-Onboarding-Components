@@ -153,9 +153,8 @@ impl UserVaultWrapper {
 
         let identity_document = request
             .identity_document_id
-            .map(|id| IdentityDocument::get(conn, id))
-            .transpose()?
-            .flatten();
+            .map(|id| IdentityDocument::get(conn, &id))
+            .transpose()?;
 
         Ok(Self {
             identity_data,
@@ -397,8 +396,7 @@ impl UserVaultWrapper {
         let ob_configs = ObConfiguration::list_authorized_for_user(conn, scoped_user.id.clone())?;
         let can_access_attributes: HashSet<_> = ob_configs
             .into_iter()
-            .flat_map(|x| x.can_access_data)
-            .flat_map(|x| x.attributes())
+            .flat_map(|x| x.can_access_fields())
             .collect();
         if !can_access_attributes.is_superset(&fields) {
             return Err(crate::auth::AuthError::ObConfigMissingDecryptPermission.into());

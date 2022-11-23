@@ -7,8 +7,8 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
-use newtypes::ApiKeyStatus;
 use newtypes::ScopedUserId;
+use newtypes::{ApiKeyStatus, DataAttribute};
 use newtypes::{CollectedDataOption, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -221,5 +221,20 @@ impl ObConfiguration {
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
+    }
+}
+
+impl ObConfiguration {
+    // returns which fields this ObConfiguration (upon authorization!) grant a tenant decrypt access to
+    // Don't use this on Onboardings that have not been authorized
+    pub fn can_access_fields(&self) -> Vec<DataAttribute> {
+        let mut fields: Vec<DataAttribute> =
+            self.can_access_data.iter().flat_map(|x| x.attributes()).collect();
+
+        if self.can_access_identity_document_images {
+            fields.push(DataAttribute::IdentityDocument)
+        }
+
+        fields
     }
 }

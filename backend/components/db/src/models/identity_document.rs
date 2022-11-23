@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use crate::schema::identity_document;
+use crate::schema::{document_request, identity_document};
 use crate::DbResult;
 use chrono::{DateTime, Utc};
+use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{
-    Base64Data, DocumentRequestId, IdentityDocumentId, OnboardingId, SealedVaultBytes, UserVaultId,
-    VaultPublicKey,
+    Base64Data, DocumentRequestId, IdentityDocumentId, OnboardingId, SealedVaultDataKey, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -28,25 +28,34 @@ pub struct IdentityDocument {
 }
 
 impl IdentityDocument {
-    pub fn vault_seal_from_base64_string(
-        image_str: &str,
-        document_type: String,
-        vault_public_key: &VaultPublicKey,
-    ) -> Result<SealedVaultBytes, crypto::Error> {
-        let b64_data = Base64Data::from_str_standard(image_str)?;
-        let before_sealing = chrono::Utc::now().timestamp_millis();
-        // Seal!
-        let sealed = vault_public_key.seal_bytes(&b64_data.0)?;
-        let after_sealing = chrono::Utc::now().timestamp_millis();
-
-        tracing::info!(
-            msg = "sealed identity document image",
-            time_in_ms = before_sealing - after_sealing,
-            document_type = document_type,
-        );
-        Ok(sealed)
+    pub fn seal_with_data_key(
+        b64_image: &str,
+        data_key: &ScopedSealingKey,
+    ) -> Result<AeadSealedBytes, crypto::Error> {
+        let b64_data = Base64Data::from_str_standard(b64_image)?;
+        data_key.seal_bytes(&b64_data.0)
     }
+    pub fn unseal_with_data_key(
+        image_bytes: AeadSealedBytes,
+        data_key: &ScopedSealingKey,
+    ) -> Result<String, crypto::Error> {
+        let bytes = data_key.unseal_bytes(image_bytes)?;
+        Ok(Base64Data::into_string_standard(bytes))
+    }
+    /// We encrypt the document image bytes upon collection with a key stashed on the DocumentRequest
+    /// It is stashed there since we need to use it before we have an IdentityDocument row
+    pub fn get_decrypt_keys_from_document_requests(
+        conn: &mut PgConnection,
+        identity_document_ids: Vec<IdentityDocumentId>,
+    ) -> DbResult<Vec<(IdentityDocument, SealedVaultDataKey)>> {
+        let res = identity_document::table
+            .filter(identity_document::id.eq_any(identity_document_ids))
+            .inner_join(document_request::table)
+            .select((identity_document::all_columns, document_request::e_data_key))
+            .get_results::<(IdentityDocument, SealedVaultDataKey)>(conn)?;
 
+        Ok(res)
+    }
     pub fn s3_path_for_document_image(
         image_type: &str,
         document_request_id: DocumentRequestId,
@@ -101,11 +110,10 @@ impl IdentityDocument {
         Ok(result)
     }
 
-    pub fn get(conn: &mut PgConnection, id: IdentityDocumentId) -> DbResult<Option<Self>> {
-        let res: Option<Self> = identity_document::table
+    pub fn get(conn: &mut PgConnection, id: &IdentityDocumentId) -> DbResult<Self> {
+        let res: Self = identity_document::table
             .filter(identity_document::id.eq(id))
-            .first(conn)
-            .optional()?;
+            .first(conn)?;
 
         Ok(res)
     }
@@ -154,5 +162,113 @@ impl IdentityDocument {
         }
 
         Ok(identity_doc_base_map)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{collections::HashSet, str::FromStr};
+
+    use super::*;
+    use crate::{models::document_request::DocumentRequest, test_helpers::test_db_pool, DbError};
+
+    #[tokio::test]
+    async fn test_create() -> Result<(), DbError> {
+        let db_pool = test_db_pool();
+
+        db_pool
+            .db_transaction(|conn| -> Result<(), DbError> {
+                let id_doc = IdentityDocument::create(
+                    conn.conn(),
+                    DocumentRequestId::from(String::from("dr_id")),
+                    UserVaultId::from(String::from("uv_id")),
+                    Some("s3_123".to_string()),
+                    Some("s3_345".to_string()),
+                    "doc_type".to_string(),
+                    "usa".to_string(),
+                    None,
+                )?;
+
+                let id_doc_from_db = IdentityDocument::get(conn.conn(), &id_doc.id)?;
+                assert_eq!(&id_doc.id, &id_doc_from_db.id);
+
+                Ok(())
+            })
+            .await
+            .ok();
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_get_decrypt_keys_from_document_requests() -> Result<(), DbError> {
+        let db_pool = test_db_pool();
+
+        db_pool
+            .db_transaction(|conn| -> Result<(), DbError> {
+                let ob_id1 = OnboardingId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap();
+                let data_key1 = SealedVaultDataKey(vec![1]);
+                let data_key2 = SealedVaultDataKey(vec![2]);
+                let data_key3 = SealedVaultDataKey(vec![3]);
+                let dr1 = DocumentRequest::create(conn.conn(), ob_id1.clone(), None, data_key1.clone())?;
+                let dr2 = DocumentRequest::create(conn.conn(), ob_id1.clone(), None, data_key2.clone())?;
+                let dr3 = DocumentRequest::create(conn.conn(), ob_id1, None, data_key3)?;
+
+                let id_doc1 = IdentityDocument::create(
+                    conn.conn(),
+                    dr1.id,
+                    UserVaultId::from(String::from("uv_id")),
+                    Some("s3_123".to_string()),
+                    Some("s3_345".to_string()),
+                    "dl".to_string(),
+                    "usa".to_string(),
+                    Some(dr1.onboarding_id),
+                )?;
+                let id_doc2 = IdentityDocument::create(
+                    conn.conn(),
+                    dr2.id,
+                    UserVaultId::from(String::from("uv_id")),
+                    Some("s3_123".to_string()),
+                    Some("s3_345".to_string()),
+                    "passport".to_string(),
+                    "ca".to_string(),
+                    Some(dr2.onboarding_id),
+                )?;
+                // Create a 3rd identity documnet which we don't fetch in order to test query filtering
+                IdentityDocument::create(
+                    conn.conn(),
+                    dr3.id,
+                    UserVaultId::from(String::from("uv_id")),
+                    Some("s3_123".to_string()),
+                    Some("s3_345".to_string()),
+                    "passport".to_string(),
+                    "ca".to_string(),
+                    Some(dr3.onboarding_id),
+                )?;
+
+                // Function under test
+                let docs_and_keys = IdentityDocument::get_decrypt_keys_from_document_requests(
+                    conn,
+                    vec![id_doc1.id.clone(), id_doc2.id.clone()],
+                )?;
+                assert_eq!(docs_and_keys.len(), 2);
+
+                // Check id documents are correct
+                let expected: HashSet<IdentityDocumentId> =
+                    HashSet::from_iter(vec![id_doc1.id, id_doc2.id].into_iter());
+                let res_set: HashSet<_> = docs_and_keys.clone().into_iter().map(|(doc, _)| doc.id).collect();
+                assert_eq!(expected, res_set);
+                // Check keys match
+                let expected_keys: HashSet<SealedVaultDataKey> =
+                    HashSet::from_iter(vec![data_key1, data_key2].into_iter());
+                let res_set_keys: HashSet<_> = docs_and_keys.into_iter().map(|(_, key)| key).collect();
+                assert_eq!(expected_keys, res_set_keys);
+
+                Ok(())
+            })
+            .await
+            .ok();
+
+        Ok(())
     }
 }

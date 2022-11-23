@@ -12,6 +12,10 @@ impl Base64Data {
     pub fn from_str_standard(s: &str) -> Result<Self, base64::DecodeError> {
         base64::decode_config(s, base64::STANDARD).map(Self)
     }
+
+    pub fn into_string_standard(b: Vec<u8>) -> String {
+        base64::encode_config(b, base64::STANDARD)
+    }
 }
 
 impl AsRef<[u8]> for Base64Data {

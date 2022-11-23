@@ -62,8 +62,8 @@ impl DocumentRequest {
 
     pub fn get(
         conn: &mut PgConnection,
-        onboarding_id: OnboardingId,
-        request_id: DocumentRequestId,
+        onboarding_id: &OnboardingId,
+        request_id: &DocumentRequestId,
     ) -> DbResult<Self> {
         let result = document_request::table
             .filter(document_request::onboarding_id.eq(onboarding_id))

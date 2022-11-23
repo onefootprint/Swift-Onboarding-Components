@@ -18,7 +18,7 @@ use api_wire_types::document_request::{
 use crypto::aead::AeadSealedBytes;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
-use newtypes::{Base64Data, DocumentRequestId, DocumentRequestStatus};
+use newtypes::{Base64Data, DocumentRequestId, DocumentRequestStatus, OnboardingId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
@@ -34,10 +34,10 @@ pub async fn post(
     let uvw_id = user_auth.user_vault_id();
     let request_id = DocumentRequestId::from(path.into_inner());
 
-    let (uvw, db_document_request) = state
+    let (uvw, db_document_request, ob_id) = state
         .db_pool
         .db_transaction(
-            move |conn| -> Result<(UserVaultWrapper, DbDocumentRequest), ApiError> {
+            move |conn| -> Result<(UserVaultWrapper, DbDocumentRequest, OnboardingId), ApiError> {
                 let uvw = UserVaultWrapper::get(conn, &uvw_id)?;
                 let Some(ob_id) = user_auth.onboarding(conn)?.map(|o| o.onboarding.id) else {
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
@@ -45,9 +45,9 @@ pub async fn post(
 
                 // TODO::9
                 // This will error if no doc request is found
-                let db_document_request = DbDocumentRequest::get(conn, ob_id, request_id)?;
+                let db_document_request = DbDocumentRequest::get(conn, &ob_id, &request_id)?;
 
-                Ok((uvw, db_document_request))
+                Ok((uvw, db_document_request, ob_id))
             },
         )
         .await?;
@@ -67,18 +67,13 @@ pub async fn post(
         )
         .await?;
 
-    let seal_helper = |b64_image: &str| -> Result<AeadSealedBytes, crypto::Error> {
-        let b64_data = Base64Data::from_str_standard(b64_image)?;
-        data_key.seal_bytes(&b64_data.0)
-    };
-
     // Encrypt the image using the UserVault
     // TODO::8
-    let sealed_front = seal_helper(&request.front_image)?;
+    let sealed_front = IdentityDocument::seal_with_data_key(&request.front_image, &data_key)?;
 
     // Save to s3
     let bucket = &state.config.document_s3_bucket.clone();
-    let _s3_path_front_image = state
+    let s3_path_front_image = state
         .s3_client
         .put_object(
             bucket,
@@ -92,22 +87,47 @@ pub async fn post(
         .await?;
 
     // Not all documents have backs
+    let mut s3_path_back_image: Option<String> = None;
     if let Some(back_image) = &request.back_image {
-        let sealed_back = seal_helper(back_image)?;
+        let sealed_back = IdentityDocument::seal_with_data_key(back_image, &data_key)?;
 
-        let _s3_path_back_image = state
-            .s3_client
-            .put_object(
-                bucket,
-                &IdentityDocument::s3_path_for_document_image(
-                    "back",
-                    db_document_request.id.clone(),
-                    uvw.user_vault.id.clone(),
-                ),
-                sealed_back.0,
-            )
-            .await?;
+        s3_path_back_image = Some(
+            state
+                .s3_client
+                .put_object(
+                    bucket,
+                    &IdentityDocument::s3_path_for_document_image(
+                        "back",
+                        db_document_request.id.clone(),
+                        uvw.user_vault.id.clone(),
+                    ),
+                    sealed_back.0,
+                )
+                .await?,
+        );
     }
+
+    // write a identity_document
+    let doc_request_id = db_document_request.id.clone();
+    state
+        .db_pool
+        .db_query(move |conn| -> Result<IdentityDocument, ApiError> {
+            let doc = IdentityDocument::create(
+                conn,
+                doc_request_id,
+                uvw.user_vault.id,
+                Some(s3_path_front_image),
+                s3_path_back_image,
+                // TODO: should be from vendor response
+                request.document_type.clone(),
+                // TODO: should be from vendor response
+                request.country_code.clone(),
+                Some(ob_id),
+            )?;
+
+            Ok(doc)
+        })
+        .await?;
 
     let update = DocumentRequestUpdate {
         // For now, just move this to Uploaded here to clear the requirement
@@ -149,7 +169,7 @@ pub async fn get(
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
                 };
                 // This will error if no doc request is found
-                let db_document_request = DbDocumentRequest::get(conn, ob_id, document_request_id)?;
+                let db_document_request = DbDocumentRequest::get(conn, &ob_id, &document_request_id)?;
 
                 Ok(db_document_request)
             })
