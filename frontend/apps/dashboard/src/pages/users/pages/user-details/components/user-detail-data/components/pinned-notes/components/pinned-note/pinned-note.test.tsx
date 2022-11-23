@@ -33,7 +33,7 @@ describe('<PinnedNote />', () => {
       author: 'belce@onefootprint.com',
     });
     expect(
-      screen.getByText('Pinned note by belce@onefootprint.com'),
+      screen.getByText('Pinned note from belce@onefootprint.com'),
     ).toBeInTheDocument();
     expect(screen.getByText('Some reason')).toBeInTheDocument();
   });

@@ -1,3 +1,4 @@
+import { DecisionSourceKind } from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -10,8 +11,17 @@ const PinnedNotes = () => {
 
   return data ? (
     <Container>
-      {data.map(({ reason, note, id }) => (
-        <PinnedNote reason={reason} note={note} key={id} />
+      {data.map(({ reason, note, id, source }) => (
+        <PinnedNote
+          reason={reason}
+          note={note}
+          key={id}
+          author={
+            source.kind === DecisionSourceKind.organization
+              ? source.member
+              : undefined
+          }
+        />
       ))}
     </Container>
   ) : null;

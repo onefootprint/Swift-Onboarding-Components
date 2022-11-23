@@ -2,7 +2,7 @@ import { useIntl } from '@onefootprint/hooks';
 import request, { RequestError } from '@onefootprint/request';
 import {
   DecisionAnnotation,
-  DecisionSourceKind,
+  DecisionSource,
   GetPinnedAnnotationsRequest,
   GetPinnedAnnotationsResponse,
 } from '@onefootprint/types';
@@ -17,7 +17,7 @@ export type PinnedAnnotation = {
   isPinned: boolean;
   reason: string;
   note?: string;
-  source: DecisionSourceKind;
+  source: DecisionSource;
   timestamp: string;
 };
 

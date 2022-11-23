@@ -1,9 +1,9 @@
-import { DecisionSourceKind } from './onboarding-decision';
+import { DecisionSource } from './onboarding-decision';
 
 export type DecisionAnnotation = {
   id: string;
   isPinned: boolean;
   note: string;
-  source: DecisionSourceKind;
+  source: DecisionSource;
   timestamp: string;
 };
