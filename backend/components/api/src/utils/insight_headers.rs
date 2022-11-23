@@ -21,6 +21,17 @@ pub struct InsightHeaders {
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
     pub timestamp: DateTime<Utc>,
+    pub is_android_user: Option<String>,
+    pub is_desktop_viewer: Option<String>,
+    pub is_ios_viewer: Option<String>,
+    pub is_mobile_viewer: Option<String>,
+    pub is_smarttv_viewer: Option<String>,
+    pub is_tablet_viewer: Option<String>,
+    pub asn: Option<String>,
+    pub country_code: Option<String>,
+    pub forwarded_proto: Option<String>,
+    pub http_version: Option<String>,
+    pub tls: Option<String>,
 }
 
 impl FromRequest for InsightHeaders {
@@ -52,6 +63,17 @@ impl InsightHeaders {
             time_zone: get_header("cloudfront-viewer-time-zone", headers),
             user_agent: get_header(actix_web::http::header::USER_AGENT.as_str(), headers),
             timestamp: chrono::Utc::now(),
+            is_android_user: get_header("cloudfront-is-android-viewer", headers),
+            is_desktop_viewer: get_header("cloudfront-is-desktop-viewer", headers),
+            is_ios_viewer: get_header("cloudfront-is-ios-viewer", headers),
+            is_mobile_viewer: get_header("cloudfront-is-mobile-viewer", headers),
+            is_smarttv_viewer: get_header("cloudfront-is-smarttv-viewer", headers),
+            is_tablet_viewer: get_header("cloudfront-is-tablet-viewer", headers),
+            asn: get_header("cloudfront-viewer-asn", headers),
+            country_code: get_header("cloudfront-viewer-country", headers),
+            forwarded_proto: get_header("cloudfront-forwarded-proto", headers),
+            http_version: get_header("cloudfront-viewer-http-version", headers),
+            tls: get_header("cloudfront-viewer-tls", headers),
         }
     }
 }
@@ -85,10 +107,28 @@ impl From<InsightHeaders> for CreateInsightEvent {
             time_zone,
             user_agent,
             timestamp,
+            is_android_user,
+            is_desktop_viewer,
+            is_ios_viewer,
+            is_mobile_viewer,
+            is_smarttv_viewer,
+            is_tablet_viewer,
+            asn,
+            country_code,
+            forwarded_proto,
+            http_version,
+            tls,
         } = i;
 
         let latitude = latitude.and_then(|lat| lat.parse().ok());
         let longitude = longitude.and_then(|lon| lon.parse().ok());
+        let is_android_user = is_android_user.and_then(|b| b.parse().ok());
+
+        let is_desktop_viewer = is_desktop_viewer.and_then(|b| b.parse().ok());
+        let is_ios_viewer = is_ios_viewer.and_then(|b| b.parse().ok());
+        let is_mobile_viewer = is_mobile_viewer.and_then(|b| b.parse().ok());
+        let is_smarttv_viewer = is_smarttv_viewer.and_then(|b| b.parse().ok());
+        let is_tablet_viewer = is_tablet_viewer.and_then(|b| b.parse().ok());
 
         CreateInsightEvent {
             timestamp,
@@ -103,6 +143,17 @@ impl From<InsightHeaders> for CreateInsightEvent {
             postal_code,
             time_zone,
             user_agent,
+            is_android_user,
+            is_desktop_viewer,
+            is_ios_viewer,
+            is_mobile_viewer,
+            is_smarttv_viewer,
+            is_tablet_viewer,
+            asn,
+            country_code,
+            forwarded_proto,
+            http_version,
+            tls,
         }
     }
 }

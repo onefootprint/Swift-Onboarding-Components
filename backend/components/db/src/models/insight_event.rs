@@ -23,6 +23,17 @@ pub struct InsightEvent {
     pub city: Option<String>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub is_android_user: Option<bool>,
+    pub is_desktop_viewer: Option<bool>,
+    pub is_ios_viewer: Option<bool>,
+    pub is_mobile_viewer: Option<bool>,
+    pub is_smarttv_viewer: Option<bool>,
+    pub is_tablet_viewer: Option<bool>,
+    pub asn: Option<String>,
+    pub country_code: Option<String>,
+    pub forwarded_proto: Option<String>,
+    pub http_version: Option<String>,
+    pub tls: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -40,6 +51,17 @@ pub struct CreateInsightEvent {
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
     pub city: Option<String>,
+    pub is_android_user: Option<bool>,
+    pub is_desktop_viewer: Option<bool>,
+    pub is_ios_viewer: Option<bool>,
+    pub is_mobile_viewer: Option<bool>,
+    pub is_smarttv_viewer: Option<bool>,
+    pub is_tablet_viewer: Option<bool>,
+    pub asn: Option<String>,
+    pub country_code: Option<String>,
+    pub forwarded_proto: Option<String>,
+    pub http_version: Option<String>,
+    pub tls: Option<String>,
 }
 
 impl CreateInsightEvent {

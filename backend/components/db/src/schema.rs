@@ -146,6 +146,17 @@ table! {
         city -> Nullable<Varchar>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        is_android_user -> Nullable<Bool>,
+        is_desktop_viewer -> Nullable<Bool>,
+        is_ios_viewer -> Nullable<Bool>,
+        is_mobile_viewer -> Nullable<Bool>,
+        is_smarttv_viewer -> Nullable<Bool>,
+        is_tablet_viewer -> Nullable<Bool>,
+        asn -> Nullable<Text>,
+        country_code -> Nullable<Text>,
+        forwarded_proto -> Nullable<Text>,
+        http_version -> Nullable<Text>,
+        tls -> Nullable<Text>,
     }
 }
 

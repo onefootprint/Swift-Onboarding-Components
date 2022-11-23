@@ -1,0 +1,11 @@
+ALTER TABLE insight_event DROP COLUMN is_android_user;
+ALTER TABLE insight_event DROP COLUMN is_desktop_viewer;
+ALTER TABLE insight_event DROP COLUMN is_ios_viewer;
+ALTER TABLE insight_event DROP COLUMN is_mobile_viewer;
+ALTER TABLE insight_event DROP COLUMN is_smarttv_viewer;
+ALTER TABLE insight_event DROP COLUMN is_tablet_viewer;
+ALTER TABLE insight_event DROP COLUMN asn;
+ALTER TABLE insight_event DROP COLUMN country_code;
+ALTER TABLE insight_event DROP COLUMN forwarded_proto;
+ALTER TABLE insight_event DROP COLUMN http_version;
+ALTER TABLE insight_event DROP COLUMN tls;

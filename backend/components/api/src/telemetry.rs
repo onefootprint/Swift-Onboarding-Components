@@ -103,6 +103,18 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             time_zone,
             user_agent,
             timestamp,
+            // TODO: should these be included in root_span!?
+            is_android_user,
+            is_desktop_viewer,
+            is_ios_viewer,
+            is_mobile_viewer,
+            is_smarttv_viewer,
+            is_tablet_viewer,
+            asn,
+            country_code,
+            forwarded_proto,
+            http_version,
+            tls,
         } = InsightHeaders::parse_from_request(request.headers());
 
         let server_git_hash = crate::GIT_HASH.to_string();
