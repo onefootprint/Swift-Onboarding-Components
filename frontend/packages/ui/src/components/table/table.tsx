@@ -81,7 +81,7 @@ const Table = <T,>({
         )}
         {isLoading ? (
           <tbody>
-            {times(4).map(() => (
+            {times(2).map(() => (
               <tr key={Math.random()}>
                 {times(columnsCount).map(() => (
                   <td key={Math.random()}>
