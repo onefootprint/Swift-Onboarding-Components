@@ -88,4 +88,20 @@ impl ScopedUser {
             .await??;
         Ok(ob)
     }
+
+    // TODO: feels weird this didn't exist already?
+    pub fn get(
+        conn: &mut PgConnection,
+        tenant_id: TenantId,
+        footprint_user_id: FootprintUserId,
+        is_live: bool,
+    ) -> Result<ScopedUser, DbError> {
+        let su = scoped_user::table
+            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(is_live))
+            .first::<ScopedUser>(conn)?;
+
+        Ok(su)
+    }
 }

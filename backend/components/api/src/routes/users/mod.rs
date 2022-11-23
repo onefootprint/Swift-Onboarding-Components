@@ -15,6 +15,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(index::post)
         .service(annotations::get)
         .service(annotations::patch)
+        .service(annotations::post)
         .service(decisions::post)
         .service(liveness::get)
         .service(timeline::get)

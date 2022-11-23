@@ -2,21 +2,26 @@ use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
+use crate::errors::tenant::TenantError;
+use crate::errors::ApiError;
 use crate::types::EmptyResponse;
 
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 
 use crate::utils::db2api::DbToApi;
+use crate::utils::validate_request::ValidateRequest;
 use crate::State;
 
-use api_wire_types::{AnnotationFilters, UpdateAnnotationRequest};
+use actix_web::web::Json;
+use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
 use db::models::annotation::Annotation;
+use db::models::scoped_user::ScopedUser;
 use newtypes::AnnotationId;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, web};
+use paperclip::actix::{api_v2_operation, get, patch, post, web};
 
 type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 
@@ -84,4 +89,51 @@ async fn patch(
         .await?;
 
     EmptyResponse::ok().json() // TODO: do we really want empty response or return the updated result?
+}
+
+impl ValidateRequest for CreateAnnotationRequest {
+    fn validate(&self) -> Result<(), ApiError> {
+        if self.note.is_empty() {
+            return Err(ApiError::from(TenantError::ValidationError(
+                "note cannot be empty".to_owned(),
+            )));
+        }
+        Ok(())
+    }
+}
+
+#[api_v2_operation(
+    description = "Creates a new freeform annotation.",
+    tags(Annotation, PublicApi)
+)]
+#[post("/users/{footprint_user_id}/annotations")]
+pub fn post(
+    state: web::Data<State>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    footprint_user_id: web::Path<FootprintUserId>,
+    request: Json<CreateAnnotationRequest>,
+) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?; // TODO: is this sufficient auth we need?
+    request.validate()?;
+    let is_live = auth.is_live()?;
+    let tenant_id = auth.tenant().id.clone();
+
+    let tenant_user = auth.tenant_user();
+    let tenant_user_id = tenant_user.map(|tu| tu.id.clone());
+
+    let CreateAnnotationRequest { note, is_pinned } = request.into_inner();
+
+    let footprint_user_id = footprint_user_id.into_inner();
+
+    let result = state
+        .db_pool
+        .db_query(move |conn| {
+            let scoped_user = ScopedUser::get(conn, tenant_id, footprint_user_id, is_live)?;
+
+            Annotation::create(conn, note, is_pinned, scoped_user.id, tenant_user_id)
+        })
+        .await??;
+
+    let result = api_wire_types::Annotation::from_db((result, tenant_user.cloned()));
+    ResponseData::ok(result).json()
 }
