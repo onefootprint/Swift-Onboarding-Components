@@ -579,7 +579,8 @@
       "cta": "Validate your ID"
     },
     "404": {
-      "title": "Oops! Page couldn't be found.",
+      "html-title": "Oops! Page not found.",
+      "title": "Oops! Page not found.",
       "description": "We're sorry, but the requested page doesn't exist or was removed.",
       "image": {
         "alt": "An image of a penguin using a smartphone"

@@ -11,11 +11,20 @@ export type ContainerProps = {
   id?: string;
   sx?: SXStyleProps;
   testID?: string;
+  className?: string;
 };
 
 const Container = forwardRef<HTMLElement, ContainerProps>(
   (
-    { id, as = 'div', sx, children, testID, fluid = false }: ContainerProps,
+    {
+      id,
+      as = 'div',
+      sx,
+      children,
+      testID,
+      fluid = false,
+      className,
+    }: ContainerProps,
     ref,
   ) => {
     const sxStyles = useSX(sx);
@@ -27,6 +36,7 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
         id={id}
         ref={ref}
         sx={sxStyles}
+        className={className}
       >
         {children}
       </StyledContainer>

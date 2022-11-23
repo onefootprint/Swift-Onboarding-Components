@@ -6,7 +6,7 @@ type SeoProps = {
   image?: string;
   keywords?: string;
   kind?: string;
-  slug: string;
+  slug?: string;
   title: string;
   og?: {
     title?: string;
