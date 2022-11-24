@@ -66,7 +66,7 @@ const SecurityLogs = () => {
         />
         <FilterDialog />
       </SearchAndFilterContainer>
-      <Box sx={{ marginTop: 5, marginBottom: 5 }} />
+      <Box sx={{ marginTop: 9, marginBottom: 9 }} />
       <Timeline
         connectorVariant="tight"
         items={items}
