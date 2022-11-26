@@ -13,13 +13,18 @@ def my1fp_authed_user(user, twilio):
     """
     # Identify the user by email
     identifier = {"email": user.email}
-    data = dict(
-        identifier=identifier, preferred_challenge_kind="sms", identify_type="my1fp"
-    )
 
     def identify():
+        data = dict(identifier=identifier)
         body = post("hosted/identify", data)
         assert body["user_found"]
+        assert body["available_challenge_kinds"]
+
+    def challenge():
+        data = dict(
+            identifier=identifier, preferred_challenge_kind="sms", identify_type="my1fp"
+        )
+        body = post("hosted/identify/login_challenge", data)
         assert (
             body["challenge_data"]["phone_number_last_two"]
             == user.real_phone_number[-2:]
@@ -27,7 +32,8 @@ def my1fp_authed_user(user, twilio):
         assert body["challenge_data"]["challenge_kind"] == "sms"
         return body["challenge_data"]["challenge_token"]
 
-    challenge_token = try_until_success(identify, 20, 1)
+    try_until_success(identify, 20, 1)
+    challenge_token = try_until_success(challenge, 20, 1)
 
     # Log in as the user
     my1fp_auth_token = try_until_success(

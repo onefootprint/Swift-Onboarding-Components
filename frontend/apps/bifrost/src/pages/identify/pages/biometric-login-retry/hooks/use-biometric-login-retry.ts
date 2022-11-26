@@ -1,12 +1,12 @@
 import {
-  useIdentify,
   useIdentifyVerify,
+  useLoginChallenge,
 } from '@onefootprint/footprint-elements';
 import {
   ChallengeData,
   ChallengeKind,
-  IdentifyResponse,
   IdentifyVerifyResponse,
+  LoginChallengeResponse,
 } from '@onefootprint/types';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import { Events } from 'src/utils/state-machine/identify/types';
@@ -16,19 +16,23 @@ import useIdentifyMachine from '../../../hooks/use-identify-machine';
 const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
   const { identifyType, email } = state.context;
-  const identifyMutation = useIdentify();
+  const loginChallengeMutation = useLoginChallenge();
   const identityVerifyMutation = useIdentifyVerify();
 
-  const requestBiometricChallenge = () => {
-    identifyMutation.mutate(
+  const requestLoginChallenge = (preferredChallengeKind: ChallengeKind) => {
+    if (!email) {
+      return;
+    }
+    loginChallengeMutation.mutate(
       {
         identifier: { email },
         identifyType,
-        preferredChallengeKind: ChallengeKind.biometric,
+        preferredChallengeKind,
       },
       {
-        onSuccess({ challengeData }: IdentifyResponse) {
-          if (challengeData?.challengeKind === ChallengeKind.biometric) {
+        onSuccess({ challengeData }: LoginChallengeResponse) {
+          const { challengeKind } = challengeData;
+          if (challengeKind === ChallengeKind.biometric) {
             handleBiometricChallenge(challengeData);
           } else {
             handlePhoneChallenge(challengeData);
@@ -38,25 +42,16 @@ const useBiometricLoginRetry = () => {
     );
   };
 
+  const requestBiometricChallenge = () => {
+    requestLoginChallenge(ChallengeKind.biometric);
+  };
+
   const requestPhoneChallenge = () => {
-    identifyMutation.mutate(
-      {
-        identifier: { email },
-        identifyType,
-        preferredChallengeKind: ChallengeKind.sms,
-      },
-      {
-        onSuccess({ challengeData }: IdentifyResponse) {
-          handlePhoneChallenge(challengeData);
-        },
-      },
-    );
+    requestLoginChallenge(ChallengeKind.sms);
   };
 
   const handleBiometricChallenge = async (challengeData: ChallengeData) => {
     const { biometricChallengeJson, challengeToken } = challengeData;
-    // TODO: log this error if we din't get a biometricChallengeJson
-    // https://linear.app/footprint/issue/FP-196
     if (!biometricChallengeJson) {
       return;
     }
@@ -81,15 +76,13 @@ const useBiometricLoginRetry = () => {
     );
   };
 
-  const handlePhoneChallenge = (challengeData?: ChallengeData) => {
-    if (challengeData) {
-      send({
-        type: Events.smsChallengeInitiated,
-        payload: {
-          challengeData,
-        },
-      });
-    }
+  const handlePhoneChallenge = (challengeData: ChallengeData) => {
+    send({
+      type: Events.smsChallengeInitiated,
+      payload: {
+        challengeData,
+      },
+    });
   };
 
   return [requestBiometricChallenge, requestPhoneChallenge];

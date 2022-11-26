@@ -1,8 +1,7 @@
 import {
   HeaderTitle,
   NavigationHeader,
-  useIdentify,
-  useIdentifyChallenge,
+  useSignupChallenge,
 } from '@onefootprint/footprint-elements';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoEmail24 } from '@onefootprint/icons';
@@ -20,16 +19,16 @@ const PhoneRegistration = () => {
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
   const { identifyType, email } = state.context;
-
-  const identifyMutation = useIdentify();
-  const identifyChallengeMutation = useIdentifyChallenge();
+  const signupChallengeMutation = useSignupChallenge();
+  const { isLoading } = signupChallengeMutation;
 
   const handleChangeEmail = () => {
     send({ type: Events.emailChangeRequested });
   };
 
-  const getNewPhoneChallenge = (phone: string, userFound: boolean) => {
-    identifyChallengeMutation.mutate(
+  const handleSubmit = (formData: { phone: string }) => {
+    const { phone } = formData;
+    signupChallengeMutation.mutate(
       { phoneNumber: phone, identifyType },
       {
         onSuccess({ challengeToken, retryDisabledUntil }) {
@@ -37,7 +36,7 @@ const PhoneRegistration = () => {
             type: Events.phoneIdentificationCompleted,
             payload: {
               phone,
-              userFound,
+              userFound: false,
               challengeData: {
                 challengeKind: ChallengeKind.sms,
                 challengeToken,
@@ -45,37 +44,6 @@ const PhoneRegistration = () => {
               },
             },
           });
-        },
-        onError: showRequestErrorToast,
-      },
-    );
-  };
-
-  const handleSubmit = (formData: { phone: string }) => {
-    const { phone } = formData;
-    // When onboarding a new user, always ask for an SMS challenge, we will register
-    // biometrics in another step if needed
-    identifyMutation.mutate(
-      {
-        identifier: { phoneNumber: phone },
-        identifyType,
-        preferredChallengeKind: ChallengeKind.sms,
-      },
-      {
-        onSuccess({ userFound, challengeData }) {
-          // Need to manually initiate a challenge for this unrecognized number
-          if (!userFound || !challengeData) {
-            getNewPhoneChallenge(phone, userFound);
-          } else {
-            send({
-              type: Events.phoneIdentificationCompleted,
-              payload: {
-                phone,
-                userFound,
-                challengeData,
-              },
-            });
-          }
         },
         onError: showRequestErrorToast,
       },
@@ -108,12 +76,7 @@ const PhoneRegistration = () => {
           {t('email-card.cta')}
         </LinkButton>
       </EmailCard>
-      <PhoneRegistrationForm
-        onSubmit={handleSubmit}
-        isLoading={
-          identifyMutation.isLoading || identifyChallengeMutation.isLoading
-        }
-      />
+      <PhoneRegistrationForm onSubmit={handleSubmit} isLoading={isLoading} />
     </>
   );
 };

@@ -1,16 +1,16 @@
 import request, { RequestError } from '@onefootprint/request';
 import {
-  IdentifyChallengeRequest,
-  IdentifyChallengeResponse,
+  SignupChallengeRequest,
+  SignupChallengeResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import getRetryDisabledUntil from './utils/get-retry-disabled-until';
 
-const identifyChallenge = async (payload: IdentifyChallengeRequest) => {
-  const response = await request<IdentifyChallengeResponse>({
+const signupChallenge = async (payload: SignupChallengeRequest) => {
+  const response = await request<SignupChallengeResponse>({
     method: 'POST',
-    url: '/hosted/identify/challenge',
+    url: '/hosted/identify/signup_challenge',
     data: payload,
   });
   const { challengeToken, timeBeforeRetryS } = response.data;
@@ -21,11 +21,9 @@ const identifyChallenge = async (payload: IdentifyChallengeRequest) => {
   };
 };
 
-const useIdentifyChallenge = () =>
-  useMutation<
-    IdentifyChallengeResponse,
-    RequestError,
-    IdentifyChallengeRequest
-  >(identifyChallenge);
+const useSignupChallenge = () =>
+  useMutation<SignupChallengeResponse, RequestError, SignupChallengeRequest>(
+    signupChallenge,
+  );
 
-export default useIdentifyChallenge;
+export default useSignupChallenge;

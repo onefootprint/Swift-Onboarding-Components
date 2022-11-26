@@ -32,7 +32,7 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 def auth_token(twilio):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
     data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
-    body = post("hosted/identify/challenge", data)
+    body = post("hosted/identify/signup_challenge", data)
     challenge_token = body["challenge_token"]
     return try_until_success(
         lambda: identify_verify(twilio, PHONE_NUMBER, challenge_token), 5
@@ -108,7 +108,6 @@ class TestBifrost:
         # First try identifying with an email. The user won't exist
         body = post("hosted/identify", data)
         assert not body["user_found"]
-        assert not body.get("challenge_data", dict())
         assert not body["available_challenge_kinds"]
 
     @pytest.mark.parametrize("token_type", ["publishable", "session"])
@@ -331,12 +330,17 @@ class TestBifrost:
         identifier = {"email": EMAIL}
         data = dict(
             identifier=identifier,
-            preferred_challenge_kind="biometric",
-            identify_type="onboarding",
         )
         body = post("hosted/identify", data)
         assert body["user_found"]
         assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
+
+        data = dict(
+            identifier=identifier,
+            preferred_challenge_kind="biometric",
+            identify_type="onboarding",
+        )
+        body = post("hosted/identify/login_challenge", data)
         assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
         assert body["challenge_data"]["phone_country"] == "US"
         assert body["challenge_data"]["challenge_kind"] == "biometric"
@@ -386,7 +390,6 @@ class TestBifrost:
         )
         body = post("hosted/identify", data)
         assert body["user_found"]
-        assert not body["challenge_data"]
         assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
 
     def test_identify_repeat_customer(self, foo_tenant, bar_tenant, twilio, auth_token):

@@ -1,6 +1,7 @@
 import {
   useIdentify,
   useIdentifyVerify,
+  useLoginChallenge,
 } from '@onefootprint/footprint-elements';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import {
@@ -26,24 +27,24 @@ type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentification = () => {
   const { t } = useTranslation('pages.email-identification');
-  const identifyMutation = useIdentify();
-  const identifyVerifyMutation = useIdentifyVerify();
-
+  const [challengePickerVisible, setChallengePickerVisible] = useState(false);
+  const [formData, setFormData] = useState({ [UserDataAttribute.email]: '' });
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
   const { device, identifyType } = state.context;
-
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
-  const [challengePickerVisible, setChallengePickerVisible] = useState(false);
-  const [formData, setFormData] = useState({ [UserDataAttribute.email]: '' });
+
+  const identifyMutation = useIdentify();
+  const loginChallengeMutation = useLoginChallenge();
+  const identifyVerifyMutation = useIdentifyVerify();
   const isLoading =
-    identifyMutation.isLoading || identifyVerifyMutation.isLoading;
+    identifyMutation.isLoading ||
+    loginChallengeMutation.isLoading ||
+    identifyVerifyMutation.isLoading;
 
   const handleBiometricChallenge = async (challengeData: ChallengeData) => {
     const { biometricChallengeJson, challengeToken } = challengeData;
-    // TODO: log this error if we din't get a biometricChallengeJson
-    // https://linear.app/footprint/issue/FP-196
     if (!biometricChallengeJson) {
       return;
     }
@@ -68,28 +69,29 @@ const EmailIdentification = () => {
     );
   };
 
-  const identifyWithChallenge = (
+  const requestLoginChallenge = (
     email: string,
     preferredChallengeKind: ChallengeKind,
   ) => {
-    identifyMutation.mutate(
+    loginChallengeMutation.mutate(
       {
         identifier: { email },
         preferredChallengeKind,
         identifyType,
       },
       {
-        onSuccess({ userFound, challengeData }) {
+        onSuccess({ challengeData }) {
           send({
             type: Events.emailIdentificationCompleted,
             payload: {
-              userFound,
+              userFound: true,
               challengeData,
               email,
             },
           });
 
-          if (challengeData?.challengeKind === ChallengeKind.biometric) {
+          const { challengeKind } = challengeData;
+          if (challengeKind === ChallengeKind.biometric) {
             handleBiometricChallenge(challengeData);
           }
         },
@@ -102,7 +104,7 @@ const EmailIdentification = () => {
     setFormData(data);
 
     identifyMutation.mutate(
-      { identifier: { email: data.email }, identifyType },
+      { identifier: { email: data.email } },
       {
         onSuccess({ userFound, availableChallengeKinds }: IdentifyResponse) {
           if (!userFound) {
@@ -122,7 +124,7 @@ const EmailIdentification = () => {
             ? availableChallengeKinds.includes(ChallengeKind.biometric)
             : false;
           if (!deviceSupportsWebauthn || !biometricChallengeAllowed) {
-            identifyWithChallenge(data.email, ChallengeKind.sms);
+            requestLoginChallenge(data.email, ChallengeKind.sms);
             return;
           }
 
@@ -135,11 +137,11 @@ const EmailIdentification = () => {
   };
 
   const handleSelectSms = () => {
-    identifyWithChallenge(formData.email, ChallengeKind.sms);
+    requestLoginChallenge(formData.email, ChallengeKind.sms);
   };
 
   const handleSelectBiometric = () => {
-    identifyWithChallenge(formData.email, ChallengeKind.biometric);
+    requestLoginChallenge(formData.email, ChallengeKind.biometric);
   };
 
   const handleChallengePickerClose = () => {

@@ -3,7 +3,7 @@ use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 
 use crate::errors::ApiError;
-use crate::hosted::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyType};
+use crate::hosted::identify::{ChallengeData, ChallengeState, IdentifyType};
 use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
@@ -50,14 +50,13 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let challenge_state =
-        Challenge::<IdentifyChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?
-            .data;
+        Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?.data;
 
     let (user_vault_id, user_kind) = match challenge_state.data {
-        IdentifyChallengeData::Sms(c_state) => {
+        ChallengeData::Sms(c_state) => {
             validate_sms_challenge(&state, c_state, &request.challenge_response).await?
         }
-        IdentifyChallengeData::Biometric(challenge_state) => {
+        ChallengeData::Biometric(challenge_state) => {
             validate_biometric_challenge(&state, challenge_state, &request.challenge_response)?
         }
     };

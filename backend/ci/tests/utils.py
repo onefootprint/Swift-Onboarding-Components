@@ -139,7 +139,7 @@ def create_basic_user(twilio, suffix=None):
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
         data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
-        body = post("hosted/identify/challenge", data)
+        body = post("hosted/identify/signup_challenge", data)
         return body["challenge_token"]
 
     challenge_token = try_until_success(
@@ -170,20 +170,28 @@ def create_basic_user(twilio, suffix=None):
 
 def create_inherited_non_sandbox_user(twilio):
     identifier = {"email": EMAIL}
-    data = dict(
-        identifier=identifier,
-        preferred_challenge_kind="sms",
-        identify_type="onboarding",
-    )
 
     def identify():
+        data = dict(
+            identifier=identifier,
+        )
         body = post("hosted/identify", data)
         assert body["user_found"]
+        assert body["available_challenge_kinds"]
+
+    def challenge():
+        data = dict(
+            identifier=identifier,
+            preferred_challenge_kind="sms",
+            identify_type="onboarding",
+        )
+        body = post("hosted/identify/login_challenge", data)
         assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
         assert body["challenge_data"]["challenge_kind"] == "sms"
         return body["challenge_data"]["challenge_token"]
 
-    challenge_token = try_until_success(identify, 20)
+    try_until_success(identify, 20)
+    challenge_token = try_until_success(challenge, 20)
 
     # Log in as the user
     return try_until_success(
@@ -255,7 +263,7 @@ def clean_up_user(phone_number, email):
     )
     body = post("hosted/identify", data)
     assert not body["user_found"]
-    assert not body.get("challenge_data", dict())
+    assert not body["available_challenge_kinds"]
 
 
 def get_requirement_from_requirements(kind, requirements):

@@ -16,4 +16,6 @@ pub enum ChallengeError {
     RateLimited(i64),
     #[error("Cannot add more than one biometric credential")]
     BiometricCredentialAlreadyExists,
+    #[error("Login challenge initiated for non-existent user vault")]
+    LoginChallengeUserNotFound,
 }

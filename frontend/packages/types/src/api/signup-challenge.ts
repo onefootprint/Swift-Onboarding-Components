@@ -1,11 +1,11 @@
 import { IdentifyType } from '../data';
 
-export type IdentifyChallengeRequest = {
+export type SignupChallengeRequest = {
   phoneNumber: string;
   identifyType: IdentifyType;
 };
 
-export type IdentifyChallengeResponse = {
+export type SignupChallengeResponse = {
   challengeToken: string;
   retryDisabledUntil?: Date;
   timeBeforeRetryS?: number;

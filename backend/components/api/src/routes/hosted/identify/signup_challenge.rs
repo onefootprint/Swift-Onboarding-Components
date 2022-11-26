@@ -1,35 +1,35 @@
 use super::IdentifyType;
-use crate::hosted::identify::IdentifyChallengeData;
+use crate::hosted::identify::ChallengeData;
 use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::State;
-use crate::{errors::ApiError, hosted::identify::IdentifyChallengeState};
+use crate::{errors::ApiError, hosted::identify::ChallengeState};
 use newtypes::PhoneNumber;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct ChallengeRequest {
+pub struct SignupChallengeRequest {
     phone_number: PhoneNumber,
     identify_type: IdentifyType,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct ChallengeResponse {
+pub struct SignupChallengeResponse {
     challenge_token: ChallengeToken, // Sealed Challenge<PhoneChallengeState>
     time_before_retry_s: i64,
 }
 
 #[api_v2_operation(
     tags(Hosted, Bifrost),
-    description = "Sends a challenge to the phone number and returns an HTTP 200. When the \
+    description = "Sends a challenge to a phone number and returns an HTTP 200. When the \
     challenge is completed through the identify/verify endpoint, the client can get or create \
     the user with this phone number."
 )]
-#[actix::post("/hosted/identify/challenge")]
+#[actix::post("/hosted/identify/signup_challenge")]
 pub async fn post(
-    request: Json<ChallengeRequest>,
+    request: Json<SignupChallengeRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ResponseData<ChallengeResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     // clean phone number
     let req = request.into_inner();
 
@@ -40,9 +40,9 @@ pub async fn post(
     let (challenge_state_data, time_before_retry_s) =
         twilio_client.send_challenge(&state, &phone_number).await?;
 
-    let challenge_state = IdentifyChallengeState {
+    let challenge_state = ChallengeState {
         identify_type: req.identify_type,
-        data: IdentifyChallengeData::Sms(challenge_state_data),
+        data: ChallengeData::Sms(challenge_state_data),
     };
 
     let challenge_token = Challenge {
@@ -52,7 +52,7 @@ pub async fn post(
     .seal(&state.challenge_sealing_key)?;
 
     Ok(Json(ResponseData {
-        data: ChallengeResponse {
+        data: SignupChallengeResponse {
             challenge_token,
             time_before_retry_s: time_before_retry_s.num_seconds(),
         },
