@@ -39,6 +39,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             createIdentifyMachine({
               device: { ...context.device! },
               identifyType: context.identifyType!,
+              bootstrapData: context.bootstrapData ?? {},
             }),
           onDone: [
             {
@@ -88,11 +89,13 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (event.type !== Events.initContextUpdated) {
           return context;
         }
-        const { identifyType, device, tenant } = event.payload;
+        const { identifyType, device, tenant, bootstrapData } = event.payload;
         context.identifyType =
           identifyType !== undefined ? identifyType : context.identifyType;
         context.device = device !== undefined ? device : context.device;
         context.tenant = tenant !== undefined ? tenant : context.tenant;
+        context.bootstrapData =
+          bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
 
         return context;
       }),

@@ -20,6 +20,7 @@ describe('initContextComplete', () => {
           canAccessData: [CollectedKycDataOption.name],
           orgName: 'tenantOrg',
         },
+        bootstrapData: {},
       };
       const event: BifrostEvent = {
         type: Events.initContextUpdated,
@@ -39,6 +40,7 @@ describe('initContextComplete', () => {
           canAccessData: [CollectedKycDataOption.name],
           orgName: 'tenantOrg',
         },
+        bootstrapData: {},
       };
       const event: BifrostEvent = {
         type: Events.initContextUpdated,
@@ -64,6 +66,7 @@ describe('initContextComplete', () => {
           canAccessData: [CollectedKycDataOption.name],
           orgName: 'tenantOrg',
         },
+        bootstrapData: {},
       };
       const event: BifrostEvent = {
         type: Events.initContextUpdated,

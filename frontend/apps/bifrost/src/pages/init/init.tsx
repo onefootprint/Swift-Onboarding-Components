@@ -11,6 +11,7 @@ import { Events } from 'src/utils/state-machine/bifrost';
 import styled, { css } from 'styled-components';
 
 import useAuthenticationFlow from './hooks/use-authentication-flow';
+import useBootstrapData from './hooks/use-bootstrap-data';
 import useTenantPublicKey from './hooks/use-tenant-public-key';
 
 const Init = () => {
@@ -60,6 +61,15 @@ const Init = () => {
         identifyType: isAuthenticationFlow
           ? IdentifyType.my1fp
           : IdentifyType.onboarding,
+      },
+    });
+  });
+
+  useBootstrapData(bootstrapData => {
+    send({
+      type: Events.initContextUpdated,
+      payload: {
+        bootstrapData,
       },
     });
   });

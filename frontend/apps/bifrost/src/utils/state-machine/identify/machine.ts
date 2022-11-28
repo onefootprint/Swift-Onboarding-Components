@@ -1,7 +1,9 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import { ChallengeKind, IdentifyType } from '@onefootprint/types';
+import validateBootstrapData from 'src/utils/validate-bootstrap-data';
 import { assign, createMachine } from 'xstate';
 
+import { BootstrapData } from '../bifrost/types';
 import {
   Actions,
   Events,
@@ -13,19 +15,39 @@ import {
 type IdentifyMachineArgs = {
   identifyType: IdentifyType;
   device: DeviceInfo;
+  bootstrapData?: BootstrapData;
 };
 
-const createIdentifyMachine = ({ identifyType, device }: IdentifyMachineArgs) =>
+const createIdentifyMachine = ({
+  identifyType,
+  device,
+  bootstrapData,
+}: IdentifyMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
       id: 'identify',
-      initial: States.emailIdentification,
+      initial: bootstrapData
+        ? States.processBootstrapData
+        : States.emailIdentification,
       context: {
         device,
         identifyType,
+        bootstrapData: bootstrapData ?? {},
       },
       states: {
+        [States.processBootstrapData]: {
+          entry: [Actions.assignBootstrapData],
+          on: {
+            [Events.bootstrapDataProcessed]: {
+              target: States.phoneVerification,
+              actions: [Actions.assignChallenge, Actions.assignUserFound],
+            },
+            [Events.bootstrapDataProcessErrored]: {
+              target: States.emailIdentification,
+            },
+          },
+        },
         [States.emailIdentification]: {
           on: {
             [Events.emailIdentificationCompleted]: [
@@ -139,6 +161,14 @@ const createIdentifyMachine = ({ identifyType, device }: IdentifyMachineArgs) =>
     },
     {
       actions: {
+        [Actions.assignBootstrapData]: assign(context => {
+          const { email, phoneNumber } = validateBootstrapData(
+            context.bootstrapData,
+          );
+          context.phone = phoneNumber;
+          context.email = email;
+          return context;
+        }),
         [Actions.assignEmail]: assign((context, event) => {
           if (
             (event.type === Events.emailIdentificationCompleted ||
@@ -186,6 +216,7 @@ const createIdentifyMachine = ({ identifyType, device }: IdentifyMachineArgs) =>
         }),
         [Actions.assignChallenge]: assign((context, event) => {
           if (
+            event.type !== Events.bootstrapDataProcessed &&
             event.type !== Events.emailIdentificationCompleted &&
             event.type !== Events.phoneIdentificationCompleted &&
             event.type !== Events.smsChallengeInitiated &&

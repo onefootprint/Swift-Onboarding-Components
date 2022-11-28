@@ -25,6 +25,11 @@ export enum Actions {
   assignValidationToken = 'assignValidationToken',
 }
 
+export type BootstrapData = {
+  email?: string;
+  phoneNumber?: string;
+};
+
 export type BifrostContext = {
   authToken?: string;
   device?: DeviceInfo;
@@ -32,6 +37,7 @@ export type BifrostContext = {
   tenant?: TenantInfo;
   userFound?: boolean;
   validationToken?: string;
+  bootstrapData?: BootstrapData;
 };
 
 export type BifrostEvent =
@@ -41,6 +47,7 @@ export type BifrostEvent =
         tenant?: TenantInfo;
         device?: DeviceInfo;
         identifyType?: IdentifyType;
+        bootstrapData?: BootstrapData;
       };
     }
   | {

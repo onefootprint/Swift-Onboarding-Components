@@ -1,7 +1,10 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import { ChallengeData, IdentifyType } from '@onefootprint/types';
 
+import { BootstrapData } from '../bifrost/types';
+
 export enum States {
+  processBootstrapData = 'processBootstrapData',
   emailIdentification = 'emailIdentification',
   phoneRegistration = 'phoneRegistration',
   phoneVerification = 'phoneVerification',
@@ -17,9 +20,12 @@ export type MachineContext = {
   phone?: string;
   authToken?: string;
   identifyType: IdentifyType;
+  bootstrapData: BootstrapData;
 };
 
 export enum Events {
+  bootstrapDataProcessed = 'bootstrapDataProcessed',
+  bootstrapDataProcessErrored = 'bootstrapDataProcessErrored',
   emailIdentificationCompleted = 'emailIdentificationCompleted',
   phoneIdentificationCompleted = 'phoneIdentificationCompleted',
   navigatedToPrevPage = 'navigatedToPrevPage',
@@ -32,6 +38,7 @@ export enum Events {
 }
 
 export enum Actions {
+  assignBootstrapData = 'assignBootstrapData',
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
   assignUserFound = 'assignUserFound',
@@ -41,6 +48,16 @@ export enum Actions {
 }
 
 export type MachineEvents =
+  | {
+      type: Events.bootstrapDataProcessed;
+      payload: {
+        userFound: boolean;
+        challengeData: ChallengeData;
+      };
+    }
+  | {
+      type: Events.bootstrapDataProcessErrored;
+    }
   | {
       type: Events.emailIdentificationCompleted;
       payload: {
