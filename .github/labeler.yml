@@ -13,6 +13,9 @@ Migrations:
 API:
   - backend/components/api/**/*
 
+Enclave:
+  - backend/components/enclave/**/*
+
 Frontend:
   - frontend/**/*
 

@@ -12,6 +12,20 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
 
 jobs:
+  wait_triage:
+    name: Wait for triage labels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Wait for triage
+        uses: lewagon/wait-on-check-action@v1.2.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: 'triage'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+          allowed-conclusions: success,skipped
+
   ephemeral_stack_name:
     name: Stack name
     runs-on: ubuntu-latest
@@ -30,7 +44,7 @@ jobs:
 
   deploy_ephemeral_stack:
     name: deploy ephemeral
-    needs: [ephemeral_stack_name]
+    needs: [ephemeral_stack_name, wait_triage]
     uses: ./.github/workflows/backend_build_and_deploy.yml
     # don't run for dependabot changes and only run when labeled ephemeral
     if: github.actor != 'dependabot[bot]' && contains( github.event.pull_request.labels.*.name, 'ephemeral')
