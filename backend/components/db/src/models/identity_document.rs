@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::schema::{document_request, identity_document};
+use crate::schema::{identity_document};
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
@@ -25,9 +25,12 @@ pub struct IdentityDocument {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub onboarding_id: Option<OnboardingId>,
+    pub e_data_key: SealedVaultDataKey,
 }
 
 impl IdentityDocument {
+    pub const DATA_KEY_SCOPE: &'static str = "identity_document";
+
     pub fn seal_with_data_key(
         b64_image: &str,
         data_key: &ScopedSealingKey,
@@ -41,20 +44,6 @@ impl IdentityDocument {
     ) -> Result<String, crypto::Error> {
         let bytes = data_key.unseal_bytes(image_bytes)?;
         Ok(Base64Data::into_string_standard(bytes))
-    }
-    /// We encrypt the document image bytes upon collection with a key stashed on the DocumentRequest
-    /// It is stashed there since we need to use it before we have an IdentityDocument row
-    pub fn get_decrypt_keys_from_document_requests(
-        conn: &mut PgConnection,
-        identity_document_ids: Vec<IdentityDocumentId>,
-    ) -> DbResult<Vec<(IdentityDocument, SealedVaultDataKey)>> {
-        let res = identity_document::table
-            .filter(identity_document::id.eq_any(identity_document_ids))
-            .inner_join(document_request::table)
-            .select((identity_document::all_columns, document_request::e_data_key))
-            .get_results::<(IdentityDocument, SealedVaultDataKey)>(conn)?;
-
-        Ok(res)
     }
     pub fn s3_path_for_document_image(
         image_type: &str,
@@ -80,6 +69,7 @@ pub struct NewIdentityDocument {
     pub country_code: String,
     pub created_at: DateTime<Utc>,
     pub onboarding_id: Option<OnboardingId>,
+    pub e_data_key: SealedVaultDataKey,
 }
 
 impl IdentityDocument {
@@ -93,6 +83,7 @@ impl IdentityDocument {
         document_type: String,
         country_code: String,
         onboarding_id: Option<OnboardingId>,
+        e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let new = NewIdentityDocument {
             request_id,
@@ -103,6 +94,7 @@ impl IdentityDocument {
             country_code,
             created_at: Utc::now(),
             onboarding_id,
+            e_data_key,
         };
         let result = diesel::insert_into(identity_document::table)
             .values(new)
@@ -167,10 +159,10 @@ impl IdentityDocument {
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashSet, str::FromStr};
+    
 
     use super::*;
-    use crate::{models::document_request::DocumentRequest, test_helpers::test_db_pool, DbError};
+    use crate::{test_helpers::test_db_pool, DbError};
 
     #[tokio::test]
     async fn test_create() -> Result<(), DbError> {
@@ -187,82 +179,11 @@ mod tests {
                     "doc_type".to_string(),
                     "usa".to_string(),
                     None,
+                    SealedVaultDataKey::default(),
                 )?;
 
                 let id_doc_from_db = IdentityDocument::get(conn.conn(), &id_doc.id)?;
                 assert_eq!(&id_doc.id, &id_doc_from_db.id);
-
-                Ok(())
-            })
-            .await
-            .ok();
-
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_get_decrypt_keys_from_document_requests() -> Result<(), DbError> {
-        let db_pool = test_db_pool();
-
-        db_pool
-            .db_transaction(|conn| -> Result<(), DbError> {
-                let ob_id1 = OnboardingId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap();
-                let data_key1 = SealedVaultDataKey(vec![1]);
-                let data_key2 = SealedVaultDataKey(vec![2]);
-                let data_key3 = SealedVaultDataKey(vec![3]);
-                let dr1 = DocumentRequest::create(conn.conn(), ob_id1.clone(), None, data_key1.clone())?;
-                let dr2 = DocumentRequest::create(conn.conn(), ob_id1.clone(), None, data_key2.clone())?;
-                let dr3 = DocumentRequest::create(conn.conn(), ob_id1, None, data_key3)?;
-
-                let id_doc1 = IdentityDocument::create(
-                    conn.conn(),
-                    dr1.id,
-                    UserVaultId::from(String::from("uv_id")),
-                    Some("s3_123".to_string()),
-                    Some("s3_345".to_string()),
-                    "dl".to_string(),
-                    "usa".to_string(),
-                    Some(dr1.onboarding_id),
-                )?;
-                let id_doc2 = IdentityDocument::create(
-                    conn.conn(),
-                    dr2.id,
-                    UserVaultId::from(String::from("uv_id")),
-                    Some("s3_123".to_string()),
-                    Some("s3_345".to_string()),
-                    "passport".to_string(),
-                    "ca".to_string(),
-                    Some(dr2.onboarding_id),
-                )?;
-                // Create a 3rd identity documnet which we don't fetch in order to test query filtering
-                IdentityDocument::create(
-                    conn.conn(),
-                    dr3.id,
-                    UserVaultId::from(String::from("uv_id")),
-                    Some("s3_123".to_string()),
-                    Some("s3_345".to_string()),
-                    "passport".to_string(),
-                    "ca".to_string(),
-                    Some(dr3.onboarding_id),
-                )?;
-
-                // Function under test
-                let docs_and_keys = IdentityDocument::get_decrypt_keys_from_document_requests(
-                    conn,
-                    vec![id_doc1.id.clone(), id_doc2.id.clone()],
-                )?;
-                assert_eq!(docs_and_keys.len(), 2);
-
-                // Check id documents are correct
-                let expected: HashSet<IdentityDocumentId> =
-                    HashSet::from_iter(vec![id_doc1.id, id_doc2.id].into_iter());
-                let res_set: HashSet<_> = docs_and_keys.clone().into_iter().map(|(doc, _)| doc.id).collect();
-                assert_eq!(expected, res_set);
-                // Check keys match
-                let expected_keys: HashSet<SealedVaultDataKey> =
-                    HashSet::from_iter(vec![data_key1, data_key2].into_iter());
-                let res_set_keys: HashSet<_> = docs_and_keys.into_iter().map(|(_, key)| key).collect();
-                assert_eq!(expected_keys, res_set_keys);
 
                 Ok(())
             })

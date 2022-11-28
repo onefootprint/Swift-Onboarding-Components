@@ -74,7 +74,7 @@ async fn patch(
 
     let UpdateAnnotationRequest { is_pinned } = request.into_inner();
     let tenant_id = tenant.id.clone();
-    state
+    let _result = state
         .db_pool
         .db_query(move |conn| {
             Annotation::update(

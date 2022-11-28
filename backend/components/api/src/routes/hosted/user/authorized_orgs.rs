@@ -47,9 +47,9 @@ pub async fn get(
                 .remove(&scoped_user.id)
                 .map(|(ob, conf, _, insight, _, _)| HostedUserOnboardingInfo {
                     name: conf.name.clone(),
-                    insight_event: InsightEvent::from_db(insight.clone()),
+                    insight_event: InsightEvent::from_db(insight),
                     timestamp: ob.start_timestamp,
-                    can_access_data: conf.can_access_data.clone(),
+                    can_access_data: conf.can_access_data,
                 })
                 // Should never hit this
                 .ok_or(ApiError::ResourceNotFound)?,

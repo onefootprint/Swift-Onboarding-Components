@@ -24,7 +24,7 @@ impl DbToApi<UserDetail> for api_wire_types::User {
             is_portable,
             identity_data_attributes,
             start_timestamp,
-            onboarding: onboarding_info.map(|x| api_wire_types::Onboarding::from_db(x.clone())),
+            onboarding: onboarding_info.map(api_wire_types::Onboarding::from_db),
             ordering_id,
         }
     }

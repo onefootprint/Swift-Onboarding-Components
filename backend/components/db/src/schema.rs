@@ -45,7 +45,6 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        e_data_key -> Bytea,
     }
 }
 
@@ -123,6 +122,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         onboarding_id -> Nullable<Uuid>,
+        e_data_key -> Bytea,
     }
 }
 

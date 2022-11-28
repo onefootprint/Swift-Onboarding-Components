@@ -13,7 +13,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    FootprintUserId, InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, SealedVaultDataKey,
+    FootprintUserId, InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId,
     TenantId, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
@@ -56,7 +56,6 @@ pub struct OnboardingCreateArgs {
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: CreateInsightEvent,
     pub should_create_document_request: bool,
-    pub must_collect_document_e_data_key: Option<SealedVaultDataKey>,
 }
 
 impl OnboardingUpdate {
@@ -290,13 +289,8 @@ impl Onboarding {
             .get_result::<Onboarding>(conn.conn())?;
 
         // To prevent duplicate document requests, only create a doc request if the onboarding is new
-        if args.should_create_document_request && args.must_collect_document_e_data_key.is_some() {
-            DocumentRequest::create(
-                conn,
-                ob.id.clone(),
-                None,
-                args.must_collect_document_e_data_key.unwrap(),
-            )?;
+        if args.should_create_document_request {
+            DocumentRequest::create(conn, ob.id.clone(), None)?;
         }
 
         Ok(ob)

@@ -219,6 +219,18 @@ impl SealedChaCha20Poly1305DataKey {
 
         Ok(SealedChaCha20Poly1305DataKey { sealed_key })
     }
+
+    /// generate a symmetric (ChaCha20Poly1305) sealing AEAD key with plaintext
+    pub fn generate_sealed_random_chacha20_poly1305_key_with_plaintext(
+        public_key: &[u8],
+        scope: &'static str,
+    ) -> Result<(SealedChaCha20Poly1305DataKey, ScopedSealingKey), crate::Error> {
+        let key = generate_chacha20_poly1305_key_bytes();
+        let sealed_key = seal::seal_ecies_p256_x963_sha256_aes_gcm(public_key, key.to_vec())?;
+        let sealed = SealedChaCha20Poly1305DataKey { sealed_key };
+        let key = ScopedSealingKey::new_from_key(key, scope);
+        Ok((sealed, key))
+    }
 }
 
 #[cfg(test)]

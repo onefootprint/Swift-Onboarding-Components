@@ -15,10 +15,12 @@ use actix_web::web::Path;
 use api_wire_types::document_request::{
     DocumentErrorReason, DocumentRequest, DocumentResponse, DocumentResponseStatus,
 };
+use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
-use newtypes::{DocumentRequestId, DocumentRequestStatus, OnboardingId};
+use newtypes::{DocumentRequestId, DocumentRequestStatus, OnboardingId, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
+
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
 #[api_v2_operation(description = "POSTs a document to footprint servers", tags(Hosted))]
@@ -57,14 +59,14 @@ pub async fn post(
         )));
     }
 
-    let data_key = state
-        .enclave_client
-        .decrypt_sealed_vault_data_key(
-            db_document_request.e_data_key.clone(),
-            &uvw.user_vault.e_private_key,
-            db::models::document_request::DocumentRequest::DATA_KEY_SCOPE,
-        )
-        .await?;
+    // generate a sealed data key (with its plaintext)
+    let (e_data_key, data_key) =
+        SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
+            uvw.user_vault.public_key.as_ref(),
+            IdentityDocument::DATA_KEY_SCOPE,
+        )?;
+
+    let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
 
     // Encrypt the image using the UserVault
     // TODO::8
@@ -108,7 +110,7 @@ pub async fn post(
 
     // write a identity_document
     let doc_request_id = db_document_request.id.clone();
-    state
+    let _ = state
         .db_pool
         .db_query(move |conn| -> Result<IdentityDocument, ApiError> {
             let doc = IdentityDocument::create(
@@ -122,6 +124,7 @@ pub async fn post(
                 // TODO: should be from vendor response
                 request.country_code.clone(),
                 Some(ob_id),
+                e_data_key,
             )?;
 
             Ok(doc)

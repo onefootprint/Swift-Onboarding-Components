@@ -48,21 +48,6 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| UserVaultWrapper::get(conn, &uv_id))
         .await??;
-    let should_create_document_request = onboarding_context.ob_config().must_collect_identity_document;
-
-    // very minor TODO: we only actually need this when we are creating a doc request, which only occurs if we hit this endpoint
-    // when creating a new onboarding. we could save a vault rpc if we did this inside ob::get_or_create, but that requires
-    // introducing deps to db crate, so let's just not do that
-    let must_collect_document_e_data_key = if should_create_document_request {
-        Some(
-            state
-                .enclave_client
-                .generated_sealed_data_key(&uvw.user_vault.public_key)
-                .await?,
-        )
-    } else {
-        None
-    };
 
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
@@ -81,6 +66,9 @@ pub async fn post(
 
             let insight_event = CreateInsightEvent::from(insights);
 
+            let should_create_document_request =
+                onboarding_context.ob_config().must_collect_identity_document;
+
             let ob_create_args = OnboardingCreateArgs {
                 scoped_user_id: scoped_user.id,
                 ob_configuration_id: onboarding_context.ob_config().id.clone(),
@@ -88,8 +76,8 @@ pub async fn post(
                 // Create a `DocumentRequest` if specified in the ob config.
                 // We do this inside the OB creation to make this route more idempotent
                 should_create_document_request,
-                must_collect_document_e_data_key,
             };
+
             let ob = Onboarding::get_or_create(conn, ob_create_args).map_err(|e| -> ApiError {
                 if e.is_constraint_violation() {
                     // We will eventually support this use case - for now, just display a nice error

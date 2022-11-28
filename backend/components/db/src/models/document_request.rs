@@ -2,7 +2,7 @@ use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{DocumentRequestId, DocumentRequestStatus, OnboardingId, SealedVaultDataKey};
+use newtypes::{DocumentRequestId, DocumentRequestStatus, OnboardingId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -15,7 +15,6 @@ pub struct DocumentRequest {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub e_data_key: SealedVaultDataKey,
 }
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
@@ -30,19 +29,15 @@ impl DocumentRequestUpdate {
 }
 
 impl DocumentRequest {
-    pub const DATA_KEY_SCOPE: &'static str = "document_request";
-
     pub fn create(
         conn: &mut PgConnection,
         onboarding_id: OnboardingId,
         ref_id: Option<String>,
-        e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let new = NewDocumentRequest {
             onboarding_id,
             ref_id,
             status: DocumentRequestStatus::Pending,
-            e_data_key,
             created_at: Utc::now(),
         };
         let result = diesel::insert_into(document_request::table)
@@ -104,5 +99,4 @@ pub struct NewDocumentRequest {
     pub ref_id: Option<String>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
-    pub e_data_key: SealedVaultDataKey,
 }
