@@ -1,12 +1,7 @@
 name: Backend Ephemeral Stack
 on:
   pull_request:
-    types: [labeled, reopened, opened, synchronize, edited]
-
-  workflow_run:
-    workflows: ['Tag Ephemeral']
-    types:
-      - completed
+    types: [labeled, reopened, opened, synchronize]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}

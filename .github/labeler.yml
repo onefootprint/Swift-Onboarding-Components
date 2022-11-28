@@ -16,6 +16,10 @@ API:
 Enclave:
   - backend/components/enclave/**/*
 
+ephemeral:
+  - 'backend/infra/**/*'
+  - 'backend/infra/*'
+
 Frontend:
   - frontend/**/*
 
