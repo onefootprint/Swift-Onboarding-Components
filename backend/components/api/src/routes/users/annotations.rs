@@ -17,7 +17,10 @@ use actix_web::web::Json;
 use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
 use db::models::annotation::Annotation;
 use db::models::scoped_user::ScopedUser;
+use db::models::user_timeline::UserTimeline;
+use db::DbError;
 use newtypes::AnnotationId;
+use newtypes::AnnotationInfo;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
 use paperclip::actix::Apiv2Schema;
@@ -88,7 +91,7 @@ async fn patch(
         })
         .await??;
 
-    EmptyResponse::ok().json() // TODO: do we really want empty response or return the updated result?
+    EmptyResponse::ok().json()
 }
 
 impl ValidateRequest for CreateAnnotationRequest {
@@ -113,7 +116,7 @@ pub fn post(
     footprint_user_id: web::Path<FootprintUserId>,
     request: Json<CreateAnnotationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?; // TODO: is this sufficient auth we need?
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     request.validate()?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
@@ -125,15 +128,26 @@ pub fn post(
 
     let footprint_user_id = footprint_user_id.into_inner();
 
-    let result = state
+    let annotation = state
         .db_pool
-        .db_query(move |conn| {
+        .db_transaction(move |conn| -> Result<_, DbError> {
             let scoped_user = ScopedUser::get(conn, tenant_id, footprint_user_id, is_live)?;
 
-            Annotation::create(conn, note, is_pinned, scoped_user.id, tenant_user_id)
-        })
-        .await??;
+            let annotation = Annotation::create(conn, note, is_pinned, scoped_user.id, tenant_user_id)?;
 
-    let result = api_wire_types::Annotation::from_db((result, tenant_user.cloned()));
+            UserTimeline::create(
+                conn,
+                AnnotationInfo {
+                    annotation_id: annotation.id.clone(),
+                },
+                scoped_user.user_vault_id,
+                None,
+            )?;
+
+            Ok(annotation)
+        })
+        .await?;
+
+    let result = api_wire_types::Annotation::from_db((annotation, tenant_user.cloned()));
     ResponseData::ok(result).json()
 }

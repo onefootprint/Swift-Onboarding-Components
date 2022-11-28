@@ -35,6 +35,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 )),
                 annotation: annotation.map(api_wire_types::Annotation::from_db),
             },
+            SaturatedTimelineEvent::Annotation(annotation_info) => {
+                Self::Annotation(api_wire_types::Annotation::from_db(annotation_info))
+            }
         }
     }
 }

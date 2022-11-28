@@ -1,7 +1,7 @@
 use newtypes::CollectedDataOption;
 
 use crate::{
-    export_schema, Annotation, Apiv2Schema, DateTime, Deserialize, JsonSchema, LivenessEvent,
+    export_schema, Actor, Annotation, Apiv2Schema, DateTime, Deserialize, JsonSchema, LivenessEvent,
     OnboardingDecision, Serialize, Utc,
 };
 
@@ -28,6 +28,7 @@ pub enum UserTimelineEvent {
         decision: OnboardingDecision,
         annotation: Option<Annotation>,
     },
+    Annotation(Annotation),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

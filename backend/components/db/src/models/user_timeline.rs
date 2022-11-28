@@ -41,6 +41,7 @@ pub enum SaturatedTimelineEvent {
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
     DocumentUploaded(newtypes::DocumentUploadedInfo), // TODO
     Liveness(LivenessEvent, InsightEvent),
+    Annotation(AnnotationInfo),
 }
 
 pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
@@ -101,6 +102,7 @@ impl UserTimeline {
         });
         let annotation_ids = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::OnboardingDecision(ref e) => e.annotation_id.as_ref(),
+            DbUserTimelineEvent::Annotation(ref e) => Some(&e.annotation_id),
             _ => None,
         });
         let liveness_event_ids = results.iter().flat_map(|ut| match ut.event {
@@ -138,6 +140,12 @@ impl UserTimeline {
                             .ok_or(DbError::RelatedObjectNotFound)?;
 
                         SaturatedTimelineEvent::Liveness(liveness, insight)
+                    }
+                    DbUserTimelineEvent::Annotation(ref e) => {
+                        let annotation = annotations
+                            .remove(&e.annotation_id)
+                            .ok_or(DbError::RelatedObjectNotFound)?;
+                        SaturatedTimelineEvent::Annotation(annotation)
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))

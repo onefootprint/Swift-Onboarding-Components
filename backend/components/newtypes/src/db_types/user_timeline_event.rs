@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId, OnboardingDecisionId,
-    WebauthnCredentialId,
+    TenantUserId, WebauthnCredentialId,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
@@ -16,6 +16,7 @@ pub enum DbUserTimelineEvent {
     DocumentUploaded(DocumentUploadedInfo),
     OnboardingDecision(OnboardingDecisionInfo),
     Liveness(LivenessInfo),
+    Annotation(AnnotationInfo),
 }
 
 impl From<DataCollectedInfo> for DbUserTimelineEvent {
@@ -39,6 +40,12 @@ impl From<OnboardingDecisionInfo> for DbUserTimelineEvent {
 impl From<LivenessInfo> for DbUserTimelineEvent {
     fn from(s: LivenessInfo) -> Self {
         Self::Liveness(s)
+    }
+}
+
+impl From<AnnotationInfo> for DbUserTimelineEvent {
+    fn from(s: AnnotationInfo) -> Self {
+        Self::Annotation(s)
     }
 }
 
@@ -66,4 +73,9 @@ pub struct OnboardingDecisionInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LivenessInfo {
     pub id: LivenessEventId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AnnotationInfo {
+    pub annotation_id: AnnotationId,
 }
