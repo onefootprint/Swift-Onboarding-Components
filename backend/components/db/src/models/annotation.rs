@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::{
     models::scoped_user::ScopedUser,
-    schema::{annotation, scoped_user},
-    DbError, DbResult, TxnPgConnection,
+    schema::{annotation, scoped_user, tenant_user},
+    DbResult,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -92,7 +92,6 @@ impl Annotation {
         conn: &mut PgConnection,
         ids: Vec<&AnnotationId>,
     ) -> DbResult<HashMap<AnnotationId, AnnotationInfo>> {
-        use crate::schema::tenant_user;
         let results = annotation::table
             .filter(annotation::id.eq_any(ids))
             .left_join(tenant_user::table)
@@ -111,7 +110,6 @@ impl Annotation {
         is_live: bool,
         is_pinned: Option<bool>,
     ) -> DbResult<Vec<AnnotationInfo>> {
-        use crate::schema::{scoped_user, tenant_user};
         let mut query = annotation::table
             .inner_join(scoped_user::table)
             .left_join(tenant_user::table)

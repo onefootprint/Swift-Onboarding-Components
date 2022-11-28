@@ -74,7 +74,7 @@ async fn patch(
 
     let UpdateAnnotationRequest { is_pinned } = request.into_inner();
     let tenant_id = tenant.id.clone();
-    let result = state
+    state
         .db_pool
         .db_query(move |conn| {
             Annotation::update(
@@ -86,7 +86,7 @@ async fn patch(
                 is_pinned,
             )
         })
-        .await?;
+        .await??;
 
     EmptyResponse::ok().json() // TODO: do we really want empty response or return the updated result?
 }

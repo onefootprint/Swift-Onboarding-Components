@@ -15,10 +15,9 @@ use actix_web::web::Path;
 use api_wire_types::document_request::{
     DocumentErrorReason, DocumentRequest, DocumentResponse, DocumentResponseStatus,
 };
-use crypto::aead::AeadSealedBytes;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
-use newtypes::{Base64Data, DocumentRequestId, DocumentRequestStatus, OnboardingId};
+use newtypes::{DocumentRequestId, DocumentRequestStatus, OnboardingId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
@@ -127,7 +126,7 @@ pub async fn post(
 
             Ok(doc)
         })
-        .await?;
+        .await??;
 
     let update = DocumentRequestUpdate {
         // For now, just move this to Uploaded here to clear the requirement
