@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 0.6.0
+
+### Minor Changes
+
+- 4b7452e6: Expose createButton function, so you can render the Footprint Button easily
+
 ## 0.5.0
 
 ### Minor Changes
