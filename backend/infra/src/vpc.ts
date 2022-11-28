@@ -17,10 +17,15 @@ export type Vpc = awsx.ec2.Vpc;
 export type FootprintVpc = {
   vpc: Vpc;
   region: Region;
-  provider: aws.Provider;
   cidrBlock: string;
   publicSubnetIds: pulumi.Output<string>[];
   privateSubnetIds: pulumi.Output<string>[];
+};
+
+export type RegionVpcOutput = {
+  region: Region;
+  provider: aws.Provider;
+  vpc: FootprintVpc;
 };
 
 const NUM_AZ = 2;
@@ -33,7 +38,7 @@ export async function CreateRegionalVPC(
   stackMetadata: StackMetadata,
   region: Region,
   config: Config,
-): Promise<FootprintVpc> {
+): Promise<RegionVpcOutput> {
   const stack = pulumi.getStack();
   const provider = new aws.Provider(`vpc-provider-${region}`, {
     region,
@@ -61,12 +66,15 @@ export async function CreateRegionalVPC(
     );
 
     return {
-      vpc,
+      vpc: {
+        vpc,
+        cidrBlock: DEFAULT_CIDR_BLOCK,
+        publicSubnetIds: await vpc.publicSubnetIds,
+        privateSubnetIds: await vpc.privateSubnetIds,
+        region,
+      },
       provider,
       region,
-      cidrBlock: DEFAULT_CIDR_BLOCK,
-      publicSubnetIds: await vpc.publicSubnetIds,
-      privateSubnetIds: await vpc.privateSubnetIds,
     };
   }
 
@@ -96,11 +104,14 @@ export async function CreateRegionalVPC(
   );
 
   return {
-    vpc,
+    vpc: {
+      vpc,
+      cidrBlock,
+      publicSubnetIds: await vpc.publicSubnetIds,
+      privateSubnetIds: await vpc.privateSubnetIds,
+      region,
+    },
     provider,
     region,
-    cidrBlock,
-    publicSubnetIds: await vpc.publicSubnetIds,
-    privateSubnetIds: await vpc.privateSubnetIds,
   };
 }

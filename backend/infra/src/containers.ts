@@ -6,7 +6,7 @@ import { StaticSecrets } from './secrets';
 import { Config } from './config';
 import { EnclaveKeyDescriptor } from './enclave_key';
 import { Region } from '@pulumi/aws';
-import { DbOutput } from './db';
+import { DatabaseOutput } from './db';
 import * as s3 from './s3';
 import { GetStackMetadata, StackEnvironment } from './stack_metadata';
 
@@ -21,7 +21,7 @@ export abstract class ServiceContainers {
     signingKeyDescriptor: HmacSigningKeyDescriptor,
     region: Region,
     parent: pulumi.Resource,
-    database: DbOutput,
+    database: DatabaseOutput,
     s3Buckets: s3.S3Buckets,
     metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
@@ -81,7 +81,7 @@ export abstract class ServiceContainers {
     enclaveKeyDescriptor: EnclaveKeyDescriptor,
     signingKeyDescriptor: HmacSigningKeyDescriptor,
     region: Region,
-    database: DbOutput,
+    database: DatabaseOutput,
     s3Buckets: s3.S3Buckets,
     metricsEndpointPath: string,
     nitroService: NitroServiceOutput,

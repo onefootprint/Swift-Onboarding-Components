@@ -1,3 +1,4 @@
+import { CoreSecurityGroups } from './sg';
 import * as aws from '@pulumi/aws';
 import { Region } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
@@ -13,45 +14,51 @@ export type DbConfig = {
   protectDeletion: boolean;
 };
 
-export type DbOutput = {
+export type DatabaseOutput = {
   databaseUrl: pulumi.Output<string>;
   databaseUrlSecretParam: aws.ssm.Parameter;
   databaseUrlSecretName: string;
   db: aws.rds.Cluster;
   instances: aws.rds.ClusterInstance[];
-  securityGroupId: pulumi.Output<string>;
 };
 
 export async function CreateDB(
-  vpcProvider: FootprintVpc,
+  vpc: FootprintVpc,
+  provider: aws.Provider,
   clusterIdentifier: string,
   constants: Config,
   secretsStore: StaticSecrets,
   dbConfig: DbConfig,
-): Promise<DbOutput> {
+  coreSecurityGroups: CoreSecurityGroups,
+): Promise<DatabaseOutput> {
   const user = 'footprint';
   const databaseName = 'footprint';
-
-  const vpc = vpcProvider.vpc;
 
   const databaseSecurityGroup = new awsx.ec2.SecurityGroup(
     `${clusterIdentifier}-db-sg`,
     {
-      vpc: vpc,
+      vpc: vpc.vpc,
       ingress: [
         {
           protocol: '-1',
           fromPort: 5432,
           toPort: 5432,
-          self: true,
-          description: 'Allows inbound DB connections',
+          sourceSecurityGroupId: coreSecurityGroups.fpcService.id,
+          description: 'Allows inbound DB connections from the FPC service',
+        },
+        {
+          protocol: '-1',
+          fromPort: 5432,
+          toPort: 5432,
+          sourceSecurityGroupId: coreSecurityGroups.jumpbox.id,
+          description: 'Allows inbound DB connections from the jumpbox',
         },
       ],
     },
   );
 
   const subnet = new aws.rds.SubnetGroup(`${clusterIdentifier}-subnet-group`, {
-    subnetIds: vpcProvider.privateSubnetIds,
+    subnetIds: vpc.privateSubnetIds,
   });
 
   const db = new aws.rds.Cluster(`aurora-v2-${clusterIdentifier}`, {
@@ -110,10 +117,10 @@ export async function CreateDB(
 
   const jump = await createDbJumpBox(
     clusterIdentifier,
-    constants,
     dbSecretName,
-    databaseSecurityGroup,
-    vpcProvider,
+    coreSecurityGroups.jumpbox,
+    vpc,
+    provider,
   );
 
   return {
@@ -122,7 +129,6 @@ export async function CreateDB(
     databaseUrlSecretParam,
     databaseUrlSecretName: dbSecretName,
     instances: [_dbInstance, _dbInstance2],
-    securityGroupId: databaseSecurityGroup.id,
   };
 }
 
@@ -197,20 +203,12 @@ export type DbJump = {
  */
 async function createDbJumpBox(
   clusterId: string,
-  constants: Config,
   dbSecretName: string,
   securityGroup: awsx.ec2.SecurityGroup,
-  vpcProvider: FootprintVpc,
+  vpc: FootprintVpc,
+  provider: aws.Provider,
 ): Promise<aws.ec2.Instance> {
-  const provider = vpcProvider.provider;
   const size = 't2.micro';
-
-  const jumpSg = new awsx.ec2.SecurityGroup(`jumpbox-${clusterId}-sg`, {
-    vpc: vpcProvider.vpc,
-    egress: [
-      { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
-    ],
-  });
 
   const instanceRole = new aws.iam.Role(`jump-role-${clusterId}`, {
     assumeRolePolicy: {
@@ -271,7 +269,7 @@ sudo sysctl -p /etc/sysctl.conf
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=${vpcProvider.cidrBlock}
+sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=${vpc.cidrBlock}
 
 # setup db access helper
 cat <<'EOF' > db_proxy.sh
@@ -299,8 +297,8 @@ chmod +x connect_db.sh`;
     `jumpbox-${clusterId}`,
     {
       instanceType: size,
-      subnetId: vpcProvider.privateSubnetIds[0],
-      vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
+      subnetId: vpc.privateSubnetIds[0],
+      vpcSecurityGroupIds: [securityGroup.id],
       ami: 'ami-0f9fc25dd2506cf6d',
       userData: Buffer.from(userData).toString('base64'),
       iamInstanceProfile,

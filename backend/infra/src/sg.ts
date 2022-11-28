@@ -1,0 +1,87 @@
+import { FootprintVpc } from './vpc';
+import { StackMetadata } from './stack_metadata';
+import * as awsx from '@pulumi/awsx';
+import * as aws from '@pulumi/aws';
+
+/**
+ * Gives access to egress to the whole internet
+ */
+export const EGRESS_ALL: awsx.ec2.EgressSecurityGroupRuleArgs = {
+  protocol: '-1',
+  fromPort: 0,
+  toPort: 0,
+  cidrBlocks: ['0.0.0.0/0'],
+};
+
+export type CoreSecurityGroups = {
+  fpcServiceLoadBalancer: awsx.ec2.SecurityGroup;
+  fpcService: awsx.ec2.SecurityGroup;
+  jumpbox: awsx.ec2.SecurityGroup;
+};
+
+// The service port for our main `api` container
+export const FPC_SERVICE_PORT: number = 8000;
+
+/**
+ *  Create the core security groups referenced throughout the infrastructure
+ */
+export function CreateCoreSecurityGroups(
+  vpc: FootprintVpc,
+  provider: aws.Provider,
+  stackMetadata: StackMetadata,
+): CoreSecurityGroups {
+  const fpcServiceLoadBalancer = new awsx.ec2.SecurityGroup(
+    `fpc-service-lb-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc: vpc.vpc,
+
+      ingress: [
+        {
+          protocol: 'tcp',
+          fromPort: 0,
+          toPort: 0,
+          cidrBlocks: ['0.0.0.0/0'],
+          description: 'Open internet ingress as cloudfront is the frontend',
+        },
+      ],
+      egress: [EGRESS_ALL],
+    },
+    { provider },
+  );
+
+  const fpcService = new awsx.ec2.SecurityGroup(
+    `fpc-service-api-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc: vpc.vpc,
+      ingress: [
+        {
+          protocol: 'tcp',
+          fromPort: FPC_SERVICE_PORT,
+          toPort: FPC_SERVICE_PORT,
+          sourceSecurityGroupId: fpcServiceLoadBalancer.id,
+          description:
+            'enables the load balancer communicate to the fargate api service',
+        },
+      ],
+
+      egress: [EGRESS_ALL],
+    },
+    { provider },
+  );
+
+  const jumpbox = new awsx.ec2.SecurityGroup(
+    `db-jumpbox-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc: vpc.vpc,
+
+      egress: [EGRESS_ALL],
+    },
+    { provider },
+  );
+
+  return {
+    fpcServiceLoadBalancer,
+    fpcService,
+    jumpbox,
+  };
+}

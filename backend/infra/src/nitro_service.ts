@@ -1,3 +1,5 @@
+import { EGRESS_ALL } from './sg';
+import { GlobalState } from './main';
 import { DnsConfig } from './dns';
 import { EnclaveKeyDescriptor } from './enclave_key';
 import { StaticSecrets } from './secrets';
@@ -20,7 +22,6 @@ export type NitroServiceOutput = {
   serviceEndpoint: string;
   loadBalancer: awsx.lb.ApplicationLoadBalancer;
   targetGroup: aws.lb.TargetGroup;
-  nitroLoadBalancerSecurityGroupId: pulumi.Output<string>;
 };
 
 // the default port for the nitro proxy
@@ -31,23 +32,38 @@ const PROXY_LB_PORT = 3668;
  * ALB -> ASG( EC2[proxy --> nitro_enclave])
  */
 export async function CreateNitroService(
-  vpcProvider: FootprintVpc,
+  g: GlobalState,
   nitroConfig: NitroConfig,
-  dnsConfig: DnsConfig,
   cert: aws.acm.Certificate,
-  constants: Config,
-  secretsStore: StaticSecrets,
-  enclaveKeyDescriptor: EnclaveKeyDescriptor,
 ): Promise<NitroServiceOutput> {
   const stackMetadata = GetStackMetadata();
   const serviceName = `nitro-service-${stackMetadata.shortStackName}`;
 
-  const vpc = vpcProvider.vpc;
-  const provider = vpcProvider.provider;
-  const region = vpcProvider.region;
+  const vpc = g.vpc.vpc;
+  const provider = g.provider;
+  const region = g.region;
+
+  // this security group protects the nitro LB
+  const nitroLoadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(
+    `${serviceName}-lb-sg`,
+    {
+      vpc,
+      ingress: [
+        {
+          protocol: 'tcp',
+          fromPort: 443,
+          toPort: 443,
+          sourceSecurityGroupId: g.coreSecurityGroups.fpcService.id,
+          description: 'this limits ingress just from the fpc service',
+        },
+      ],
+      egress: [EGRESS_ALL],
+    },
+    { provider },
+  );
 
   const instanceProfile = createInstanceRole(region, provider, [
-    secretsStore.enclaveProxySecretName,
+    g.secretsStore.enclaveProxySecretName,
   ]);
 
   // get our base image AMI
@@ -70,17 +86,17 @@ export async function CreateNitroService(
     {
       vpc,
       ingress: [
-        // this limits ingress just to this security group!
+        // this limits ingress just from the nitro load balancer
         {
           protocol: '-1',
           fromPort: PROXY_LB_PORT,
           toPort: PROXY_LB_PORT,
-          self: true,
+          sourceSecurityGroupId: nitroLoadBalancerSecurityGroup.id,
         },
       ],
       egress: [
-        // TODO: lockdown just to AWS KMS
-        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+        // TODO: lockdown just to AWS KMS and related services
+        EGRESS_ALL,
       ],
     },
     { provider },
@@ -92,7 +108,7 @@ export async function CreateNitroService(
       namePrefix: `i-${serviceName}`,
       instanceType: 'c5a.xlarge',
       userData: Buffer.from(
-        await userData(constants, nitroConfig, secretsStore),
+        await userData(g.constants, nitroConfig, g.secretsStore),
       ).toString('base64'),
       enclaveOptions: {
         enabled: true,
@@ -111,10 +127,10 @@ export async function CreateNitroService(
   );
 
   let nitroServiceOutput = await createLoadBalancer(
-    vpcProvider,
+    g,
     stackMetadata,
-    instanceSecurityGroup,
-    dnsConfig,
+    nitroLoadBalancerSecurityGroup,
+    g.dnsConfig,
     cert,
   );
 
@@ -129,7 +145,7 @@ export async function CreateNitroService(
         version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`),
       },
       healthCheckGracePeriod: 60,
-      vpcZoneIdentifiers: vpcProvider.privateSubnetIds,
+      vpcZoneIdentifiers: g.vpc.privateSubnetIds,
       protectFromScaleIn: false,
       healthCheckType: 'ELB',
       targetGroupArns: [nitroServiceOutput.targetGroup.arn],
@@ -151,67 +167,28 @@ export async function CreateNitroService(
  * Create Nitro LB for the ASG
  */
 async function createLoadBalancer(
-  vpcProvider: FootprintVpc,
+  g: GlobalState,
   stackMetadata: StackMetadata,
-  instanceSecurityGroup: awsx.ec2.SecurityGroup,
+  securityGroup: awsx.ec2.SecurityGroup,
   dnsConfig: DnsConfig,
   cert: aws.acm.Certificate,
 ): Promise<NitroServiceOutput> {
-  const vpc = vpcProvider.vpc;
-  const region = vpcProvider.region;
-  const provider = vpcProvider.provider;
+  const vpc = g.vpc.vpc;
+  const region = g.region;
+  const provider = g.provider;
   const serviceName = `ns-${stackMetadata.shortStackName}`;
   const domain = `enclave-proxy.${dnsConfig.apiDomain}`;
-
-  // this security group is to control access TO the nitro LB
-  const sharedNitroLbSecurityGroup = new awsx.ec2.SecurityGroup(
-    `${serviceName}-shared-lb-sg`,
-    {
-      vpc,
-    },
-    { provider },
-  );
-
-  // this security group protects the nitro LB
-  const internalNitroLbSecurityGroup = new awsx.ec2.SecurityGroup(
-    `${serviceName}-lb-sg`,
-    {
-      vpc,
-      ingress: [
-        // this limits ingress just to this security group on port 443
-        {
-          protocol: 'tcp',
-          fromPort: 443,
-          toPort: 443,
-          sourceSecurityGroupId: sharedNitroLbSecurityGroup.id,
-        },
-      ],
-      egress: [
-        // this limits access only to only our nitro instances
-        {
-          protocol: 'tcp',
-          fromPort: PROXY_LB_PORT,
-          toPort: PROXY_LB_PORT,
-          sourceSecurityGroupId: instanceSecurityGroup.id,
-        },
-      ],
-    },
-    { provider },
-  );
 
   const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
     `alb-${serviceName}`,
     {
       vpc,
       // this lets the LB communicate to our nitro instances
-      securityGroups: [
-        internalNitroLbSecurityGroup.id,
-        instanceSecurityGroup.id,
-      ],
+      securityGroups: [securityGroup],
       external: false,
 
       // private subnets as this is an internal service
-      subnets: vpcProvider.privateSubnetIds,
+      subnets: g.vpc.privateSubnetIds,
     },
     { provider },
   );
@@ -276,7 +253,6 @@ async function createLoadBalancer(
     serviceEndpoint: `https://${domain}`,
     loadBalancer,
     targetGroup,
-    nitroLoadBalancerSecurityGroupId: sharedNitroLbSecurityGroup.id,
   };
 }
 /**

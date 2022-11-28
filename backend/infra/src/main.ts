@@ -1,3 +1,4 @@
+import * as sg from './sg';
 import { Region } from '@pulumi/aws';
 import * as aws from '@pulumi/aws';
 import * as certs from './certs';
@@ -16,6 +17,23 @@ import * as nitroService from './nitro_service';
 import * as dns from './dns';
 
 /**
+ * Convenient type to pass shared global resources
+ */
+export type GlobalState = {
+  region: Region;
+  provider: aws.Provider;
+  vpc: vpcUtil.FootprintVpc;
+  constants: Config;
+  secretsStore: secrets.StaticSecrets;
+  enclaveKeyConfig: enclaveKey.EnclaveKeyDescriptor;
+  hmacSigningKeyConfig: hmacSigningKey.HmacSigningKeyDescriptor;
+  database: db.DatabaseOutput;
+  dnsConfig: dns.DnsConfig;
+  coreSecurityGroups: sg.CoreSecurityGroups;
+  buckets: s3.S3Buckets;
+};
+
+/**
  * Main infra entry point
  */
 export default async function main() {
@@ -24,118 +42,131 @@ export default async function main() {
 
   const stackMetadata = GetStackMetadata();
 
+  // NOTE: we currently do not deploy in other regions
+  // however the infra is architcted to support multiple regions
+  // with the exception of the database which will either need
+  // cross-region replication or VPC peering across region (TODO)
   const primaryRegion = Region.USEast1;
-  const otherRegions: Region[] = []; // [Region.USWest1];
-  const regions = [primaryRegion, ...otherRegions];
+  const otherRegions: Region[] = [];
 
-  // setup our vpcs and region providers
-  const vpcProviders = await Promise.all(
-    regions.map(region => {
-      return vpcUtil.CreateRegionalVPC(stackMetadata, region, constants);
-    }),
+  const { region, vpc, provider } = await vpcUtil.CreateRegionalVPC(
+    stackMetadata,
+    primaryRegion,
+    constants,
   );
 
-  // 2022-10-03 - we use one region (us-east-1)
-  // some resources will always be in the default region
-  const defaultVpcProvider = vpcProviders[0];
+  // Setup our DNS config
+  const dnsConfig = await dns.LoadDnsConfig(constants);
 
-  // init the enclave key
+  // setup our enclave/hmac keys
   const enclaveKeyConfig = await enclaveKey.Initialize(constants, otherRegions);
   const hmacSigningKeyConfig = await hmacSigningKey.Initialize(
     constants,
     otherRegions,
   );
 
-  // setup or secrets param store
+  // setup secrets
   const secretsStore = await secrets.LoadSecrets(
     config,
     enclaveKeyConfig,
     stackMetadata,
   );
 
+  // setup core security groups
+  const coreSecurityGroups = sg.CreateCoreSecurityGroups(
+    vpc,
+    provider,
+    stackMetadata,
+  );
+
   // Setup database
   const database = await db.CreateDB(
-    defaultVpcProvider,
+    vpc,
+    provider,
     `db-${stackMetadata.shortStackName}`,
     constants,
     secretsStore,
     {
       protectDeletion: constants.deletionProtection,
     },
+    coreSecurityGroups,
   );
-
-  // Setup our DNS config
-  const dnsConfig = await dns.LoadDnsConfig(constants);
 
   // Create our s3 buckets
-  const s3Buckets = s3.CreateBuckets(
-    defaultVpcProvider,
+  const s3Buckets = s3.CreateBuckets(provider, constants, stackMetadata);
+
+  const globalState: GlobalState = {
+    vpc,
+    region,
+    provider,
     constants,
-    stackMetadata,
+    secretsStore,
+    enclaveKeyConfig,
+    hmacSigningKeyConfig,
+    database,
+    dnsConfig,
+    coreSecurityGroups,
+    buckets: s3Buckets,
+  };
+
+  const service = await createCoreService(globalState);
+
+  return {
+    service,
+    apiUrl: `https://${dnsConfig.apiDomain}`,
+    databaseUrl: database.databaseUrl,
+  };
+}
+
+/**
+ * Outputs returned to pulumi by a stack deploy
+ */
+export type CoreServiceOutputs = {
+  cdnDomainName: pulumi.Output<string>;
+  externalDomain: string;
+  loadBalancerCname: string;
+  internalLoadBalancerDnsName: pulumi.Output<string>;
+  nitroServiceEndpoint: string;
+};
+
+/**
+ * Launches our core services
+ */
+async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
+  // launch core services
+  const cert = await certs.CreateRegionalWildCertificateForDnsConfig(
+    g.dnsConfig,
+    g.region,
   );
 
-  // launch of core service
-  const services = await Promise.all(
-    vpcProviders.map(async vpcAndProvider => {
-      const cert = await certs.CreateRegionalWildCertificateForDnsConfig(
-        dnsConfig,
-        vpcAndProvider.region,
-      );
+  // create the nitro service
+  const nitroServiceOutput = await nitroService.CreateNitroService(
+    g,
+    {
+      cid: 16,
+      memory: 256,
+      cpus: 2,
+    },
+    cert,
+  );
 
-      // create the nitro service
-      const nitroServiceOutput = await nitroService.CreateNitroService(
-        vpcAndProvider,
-        {
-          cid: 16,
-          memory: 256,
-          cpus: 2,
-        },
-        dnsConfig,
-        cert,
-        constants,
-        secretsStore,
-        enclaveKeyConfig,
-      );
-
-      // create our ecs api service
-      const service = await svc.CreateApiService(
-        vpcAndProvider,
-        {
-          cpuUnits: constants.resources.cpuUnits,
-          memoryMB: constants.resources.memoryMB,
-          instanceCount: constants.resources.instances,
-        },
-        dnsConfig,
-        cert,
-        constants,
-        secretsStore,
-        enclaveKeyConfig,
-        hmacSigningKeyConfig,
-        database,
-        s3Buckets,
-        nitroServiceOutput,
-      );
-
-      return {
-        service,
-        region: vpcAndProvider.region,
-        nitroServiceOutput,
-      };
-    }),
+  // create our ecs api service
+  const service = await svc.CreateApiService(
+    g,
+    {
+      cpuUnits: g.constants.resources.cpuUnits,
+      memoryMB: g.constants.resources.memoryMB,
+      instanceCount: g.constants.resources.instances,
+    },
+    cert,
+    nitroServiceOutput,
   );
 
   return {
-    regions: services.map(svc => {
-      return {
-        region: svc.region,
-        cdnDomainName: svc.service.distribution.domainName,
-        externalDomain: svc.service.cdnDomain,
-        loadBalancerCname: svc.service.lbCname,
-        internalLoadBalancerDnsName: svc.service.lb.loadBalancer.dnsName,
-        nitroServiceEndpoint: svc.nitroServiceOutput.serviceEndpoint,
-      };
-    }),
-    apiUrl: `https://${dnsConfig.apiDomain}`,
-    databaseUrl: database.databaseUrl,
+    cdnDomainName: service.distribution.domainName,
+    externalDomain: service.cdnDomain,
+    loadBalancerCname: service.lbCname,
+    internalLoadBalancerDnsName: service.lb.loadBalancer.dnsName,
+    nitroServiceEndpoint: nitroServiceOutput.serviceEndpoint,
   };
 }

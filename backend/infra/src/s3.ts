@@ -7,11 +7,10 @@ import { AWSPolicyConfig } from './service';
 import * as crypto from 'crypto';
 
 export function CreateBuckets(
-  vpcProvider: FootprintVpc,
+  provider: aws.Provider,
   config: Config,
   stackMetadata: StackMetadata,
 ): S3Buckets {
-  const provider = vpcProvider.provider;
   //////////////////////////////
   // Configure document Images bucket
   //

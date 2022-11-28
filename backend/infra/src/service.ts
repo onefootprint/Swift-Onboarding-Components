@@ -1,23 +1,20 @@
+import { GlobalState } from './main';
 import { DnsConfig } from './dns';
 import { NitroServiceOutput } from './nitro_service';
 import { StackMetadata } from './stack_metadata';
-import { ec2, Region, route53 } from '@pulumi/aws';
+import { route53 } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { StaticSecrets } from './secrets';
-import { Config } from './config';
 import { ServiceContainers } from './containers';
 import { EnclaveKeyDescriptor } from './enclave_key';
-import * as crypto from 'crypto';
-import { DbOutput } from './db';
-import { FootprintVpc, Vpc } from './vpc';
+import { FootprintVpc } from './vpc';
 import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as s3 from './s3';
-import { metrics } from '@pulumi/awsx/cloudwatch';
 import { GetStackMetadata } from './stack_metadata';
-import * as certs from './certs';
 import * as cdn from './cdn';
+import { FPC_SERVICE_PORT } from './sg';
 
 export type ServiceLoadBalancer = {
   lb: awsx.lb.LoadBalancer;
@@ -42,8 +39,6 @@ export type AWSPolicyConfig = {
 /**
  * Constants
  */
-// The service port for our main `api` container
-const FPC_SERVICE_PORT = 8000;
 // The path at which metrics are served.
 const METRICS_ENDPOINT_PATH = 'metrics';
 // Our header name for securing auth between cloudfront and internal load balancers
@@ -53,95 +48,23 @@ const CDN_PROTECTION_HEADER_NAME: string = 'X-Token-From-CloudFront';
  * Create our service on ECS
  */
 export async function CreateApiService(
-  vpcProvider: FootprintVpc,
+  g: GlobalState,
   serviceConfig: ServiceConfig,
-  dnsConfig: DnsConfig,
   cert: aws.acm.Certificate,
-  constants: Config,
-  secretsStore: StaticSecrets,
-  enclaveKeyDescriptor: EnclaveKeyDescriptor,
-  signingKeyDescriptor: HmacSigningKeyDescriptor,
-  database: DbOutput,
-  s3Buckets: s3.S3Buckets,
   nitroService: NitroServiceOutput,
 ): Promise<ServiceLoadBalancer> {
-  const region = vpcProvider.region;
+  const region = g.region;
 
   const stackMetadata = GetStackMetadata();
-  const vpc = vpcProvider.vpc;
-  const provider = vpcProvider.provider;
-
-  /**
-   * Setup our core security groups for connectivity restrictions.
-   *
-   *                                                               [Open internet]
-   *                                                              /
-   * [Cloudfront]-->[Service Load Balancer]-->[Api Fargate Service]
-   *                                                              \
-   *                                                               [Nitro Service]
-   */
-  const serviceSecurityGroup = new awsx.ec2.SecurityGroup(
-    `fpc-ecs-service-sg-${stackMetadata.shortStackName}`,
-    {
-      vpc,
-      egress: [
-        // gives access to egress to the whole internet
-        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
-      ],
-    },
-    { provider },
-  );
-
-  const loadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(
-    `fpc-ecs-lb-sg-${stackMetadata.shortStackName}`,
-    {
-      vpc,
-      ingress: [
-        {
-          protocol: 'tcp',
-          fromPort: 0,
-          toPort: 0,
-          cidrBlocks: ['0.0.0.0/0'],
-          description:
-            'must accept connections from the public internet (cloudfront)',
-        },
-      ],
-      egress: [
-        // the load balancer should only be allowed to talk to the FPC Api service container
-        {
-          protocol: 'tcp',
-          fromPort: FPC_SERVICE_PORT,
-          toPort: FPC_SERVICE_PORT,
-          sourceSecurityGroupId: serviceSecurityGroup.id,
-        },
-      ],
-    },
-    { provider },
-  );
-
-  serviceSecurityGroup.createIngressRule(
-    `fpc-ecs-service-ingress-rule-${stackMetadata.shortStackName}`,
-    {
-      protocol: 'tcp',
-      fromPort: FPC_SERVICE_PORT,
-      toPort: FPC_SERVICE_PORT,
-      sourceSecurityGroupId: loadBalancerSecurityGroup.id,
-      description:
-        'enables the load balancer communicate to the fargate api service',
-    },
-    { provider },
-  );
+  const vpc = g.vpc.vpc;
+  const provider = g.provider;
 
   // setup our load balancer and cloudfront CDN
   const lb = await createCdnFrontedLoadBalancer(
-    vpcProvider,
-    secretsStore,
-    dnsConfig,
+    g,
     cert,
     METRICS_ENDPOINT_PATH,
-    serviceConfig,
     stackMetadata,
-    loadBalancerSecurityGroup,
   );
 
   // init our cluster
@@ -163,14 +86,14 @@ export async function CreateApiService(
   // declare the containers we want to run
   const containerDefinitions = await ServiceContainers.apiMain(
     FPC_SERVICE_PORT,
-    constants,
-    secretsStore,
-    enclaveKeyDescriptor,
-    signingKeyDescriptor,
+    g.constants,
+    g.secretsStore,
+    g.enclaveKeyConfig,
+    g.hmacSigningKeyConfig,
     region,
     cluster,
-    database,
-    s3Buckets,
+    g.database,
+    g.buckets,
     METRICS_ENDPOINT_PATH,
     nitroService,
   );
@@ -179,17 +102,17 @@ export async function CreateApiService(
   const current = await aws.getCallerIdentity({});
 
   const execRole = createTaskExecutionRole(
-    secretsStore,
+    g.secretsStore,
     stackMetadata.shortStackName,
-    database.databaseUrlSecretName,
+    g.database.databaseUrlSecretName,
   );
 
   const taskRoleRole = createTaskContainerRole(
     (await aws.getCallerIdentity({})).accountId,
     stackMetadata.shortStackName,
-    enclaveKeyDescriptor,
-    signingKeyDescriptor,
-    s3Buckets,
+    g.enclaveKeyConfig,
+    g.hmacSigningKeyConfig,
+    g.buckets,
   );
 
   const taskDefinition = new aws.ecs.TaskDefinition(
@@ -227,13 +150,7 @@ export async function CreateApiService(
       networkConfiguration: {
         assignPublicIp: false,
         subnets: vpc.privateSubnetIds,
-        securityGroups: [
-          serviceSecurityGroup.id,
-          // permits service to talk to the nitro LB
-          nitroService.nitroLoadBalancerSecurityGroupId,
-          // permits service to talk to the DB
-          database.securityGroupId,
-        ],
+        securityGroups: [g.coreSecurityGroups.fpcService.id],
       },
       loadBalancers: [
         {
@@ -245,7 +162,12 @@ export async function CreateApiService(
     },
     {
       provider,
-      dependsOn: [lb.targetGroup, lb.lb, database.db, ...database.instances],
+      dependsOn: [
+        lb.targetGroup,
+        lb.lb,
+        g.database.db,
+        ...g.database.instances,
+      ],
     },
   );
 
@@ -257,18 +179,14 @@ export async function CreateApiService(
  * front the ALB with cloudfront and setup TLS on the domain
  */
 async function createCdnFrontedLoadBalancer(
-  vpcProvider: FootprintVpc,
-  secretsStore: StaticSecrets,
-  dnsConfig: DnsConfig,
+  g: GlobalState,
   cert: aws.acm.Certificate,
   metricsEndpointPath: string,
-  config: ServiceConfig,
   stackMetadata: StackMetadata,
-  loadBalancerSecurityGroup: awsx.ec2.SecurityGroup,
 ): Promise<ServiceLoadBalancer> {
-  const region = vpcProvider.region;
-  const vpc = vpcProvider.vpc;
-  const provider = vpcProvider.provider;
+  const region = g.region;
+  const vpc = g.vpc.vpc;
+  const provider = g.provider;
   const serviceName = stackMetadata.shortStackName;
 
   // init our ALB
@@ -277,7 +195,7 @@ async function createCdnFrontedLoadBalancer(
     {
       vpc,
       external: true,
-      securityGroups: [loadBalancerSecurityGroup],
+      securityGroups: [g.coreSecurityGroups.fpcServiceLoadBalancer],
       subnets: vpc.publicSubnetIds,
     },
     { provider },
@@ -359,7 +277,7 @@ async function createCdnFrontedLoadBalancer(
         {
           httpHeader: {
             httpHeaderName: CDN_PROTECTION_HEADER_NAME,
-            values: [secretsStore.cloudfrontSecret],
+            values: [g.secretsStore.cloudfrontSecret],
           },
         },
       ],
@@ -383,11 +301,11 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  const albDomainName = `internal.${dnsConfig.apiDomain}`;
+  const albDomainName = `internal.${g.dnsConfig.apiDomain}`;
   const record = new route53.Record(
     `dns-alb-${serviceName}-${region}`,
     {
-      zoneId: dnsConfig.hostedZone.id,
+      zoneId: g.dnsConfig.hostedZone.id,
       type: 'A',
       name: albDomainName,
       setIdentifier: `app-record-setid-${serviceName}-${region}`,
@@ -405,17 +323,17 @@ async function createCdnFrontedLoadBalancer(
 
   const distribution = await cdn.CreateCloudfrontDistribution({
     certArn: cert.arn,
-    cdnToAlbSecret: secretsStore.cloudfrontSecret,
+    cdnToAlbSecret: g.secretsStore.cloudfrontSecret,
     cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
-    domain: dnsConfig.apiDomain,
+    domain: g.dnsConfig.apiDomain,
     origin: albDomainName,
-    hostedZoneId: dnsConfig.hostedZone.id,
+    hostedZoneId: g.dnsConfig.hostedZone.id,
   });
 
   return {
     lb: loadBalancer,
     targetGroup: targetGroup,
-    cdnDomain: dnsConfig.apiDomain,
+    cdnDomain: g.dnsConfig.apiDomain,
     lbCname: albDomainName,
     cert,
     distribution,
