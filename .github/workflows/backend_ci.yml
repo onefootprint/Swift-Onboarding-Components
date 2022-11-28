@@ -22,7 +22,7 @@ concurrency:
 jobs:
   check_test:
     runs-on: beast
-
+    environment: dev
     services:
       postgres:
         image: postgres
@@ -62,6 +62,17 @@ jobs:
       - name: Build
         working-directory: ./backend
         run: cargo build --all --no-default-features --features simulate
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Set dot env
+        working-directory: ./backend
+        run: make set-dot-env
 
       - name: Run tests
         working-directory: ./backend

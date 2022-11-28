@@ -103,7 +103,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             time_zone,
             user_agent,
             timestamp,
-            // TODO: should these be included in root_span!?
             is_android_user: _,
             is_desktop_viewer: _,
             is_ios_viewer: _,
@@ -111,7 +110,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             is_smarttv_viewer: _,
             is_tablet_viewer: _,
             asn: _,
-            country_code: _,
+            country_code,
             forwarded_proto: _,
             http_version: _,
             tls: _,
@@ -135,6 +134,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             user_agent,
             timestamp=%timestamp,
             server_git_hash,
+            country_code,
             "request start");
         span
     }

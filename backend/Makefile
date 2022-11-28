@@ -11,12 +11,12 @@ RUST_VERSION := "1.65.0"
 # Builds the API crate into a musl binary
 api-release:
 	@echo "building release mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core --features vsock --release
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core --release
 	@cp ./target/x86_64-unknown-linux-musl/release/footprint-core ./out/footprint-core
 
 api-debug:
 	@echo "building debug mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core --features vsock
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core
 	@cp ./target/x86_64-unknown-linux-musl/debug/footprint-core ./out/footprint-core
 
 # Builds the builder that will help us build enclave docker images

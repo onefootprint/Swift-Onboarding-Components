@@ -31,6 +31,14 @@ pub struct State {
 }
 
 impl State {
+    /// initialize global state in test context
+    #[cfg(test)]
+    pub async fn test_state(enclave_proxy_port: u16) -> Self {
+        let mut config = Config::load_from_env().expect("failed to load config");
+        config.enclave_config.enclave_proxy_endpoint = format!("http://localhost:{}", enclave_proxy_port);
+        Self::init_or_die(config).await
+    }
+
     pub async fn init_or_die(mut config: Config) -> Self {
         let enclave_client = EnclaveClient::new(config.clone()).await;
 

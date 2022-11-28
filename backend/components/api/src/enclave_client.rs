@@ -1,8 +1,8 @@
 use crypto::{aead::ScopedSealingKey, hex, seal::EciesP256Sha256AesGcmSealed};
 use enclave_proxy::{
-    http_proxy::ProxyHttpClient, DataTransform, DecryptRequest, EnclavePayload, EnvelopeDecryptRequest,
-    FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
-    GeneratedSealedDataKey, KmsCredentials, RpcPayload, RpcRequest, SealedIkek,
+    http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, EnclavePayload,
+    EnvelopeDecryptRequest, FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
+    GeneratedDataKeyPair, GeneratedSealedDataKey, KmsCredentials, RpcPayload, RpcRequest, SealedIkek,
 };
 use newtypes::{EncryptedVaultPrivateKey, PiiString, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey};
 

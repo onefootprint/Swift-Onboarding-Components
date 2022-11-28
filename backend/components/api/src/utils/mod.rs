@@ -10,3 +10,6 @@ pub mod session;
 pub mod twilio;
 pub mod user_vault_wrapper;
 pub mod validate_request;
+
+#[cfg(test)]
+pub(crate) mod mock_enclave;

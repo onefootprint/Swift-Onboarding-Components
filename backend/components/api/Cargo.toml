@@ -4,14 +4,6 @@ version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-
-
-[features]
-default = []
-vsock = ["enclave_proxy/vsock"]
-
 [dependencies]
 actix-web = "4.0.1"
 async-trait = "0.1"
@@ -48,7 +40,7 @@ aws-sdk-s3 =  { workspace = true }
 aws-sdk-kms =  { workspace = true }
 
 thiserror = { workspace = true }
-enclave_proxy = { path = "../enclave/proxy", default-features = false }
+enclave_proxy = { path = "../enclave/proxy" }
 
 serde_json = { workspace = true }
 serde_cbor = { workspace = true }
@@ -91,3 +83,5 @@ gethostname = "0.4.0"
 
 [dev-dependencies]
 test-case = "2.1.0"
+enclave = { path = "../enclave/enclave"}
+portpicker = "0.1.1"

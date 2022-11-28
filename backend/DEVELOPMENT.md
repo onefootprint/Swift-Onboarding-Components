@@ -72,8 +72,11 @@ Note: the enclave in production is a Nitro Enclave and is only reachable via `VS
 # build the enclave for use within the Nitro Enclave
 cargo build -p enclave --features nitro
 
+# build the enclave-proxy to communicate to the Nitro Enclave
+cargo run -p enclave_proxy --features vsock
+
 # runs the api crate in vsock mode, assuming the binary in the previous step is loaded into the Nitro Enclave
-cargo run -p footprint-core --features vsock
+cargo run -p footprint-core
 ```
 
 ## Pulumi setup (for infra managment only)
