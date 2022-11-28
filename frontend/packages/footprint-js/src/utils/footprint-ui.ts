@@ -40,7 +40,10 @@ export const injectStyles = ({ variables = {} }: FootprintAppearance) => {
   `);
 };
 
-export const createButton = (container: HTMLElement): HTMLButtonElement => {
+export const createButton = (container?: HTMLElement): HTMLButtonElement => {
+  if (!container) {
+    throw new Error('A container is required to create a Footprint button');
+  }
   const button = createFootprintButton();
   container.appendChild(button);
   return button;

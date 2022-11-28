@@ -6,7 +6,7 @@ import {
   ShowFootprint,
 } from './footprint-js.types';
 import IframeManager from './utils/footprint-iframe';
-import { injectStyles } from './utils/footprint-ui';
+import { createButton, injectStyles } from './utils/footprint-ui';
 import { getAppearanceStyles, getURL } from './utils/footprint-utils';
 
 const iframeManager = new IframeManager();
@@ -78,6 +78,7 @@ const footprint = () => {
   return {
     show,
     hide,
+    createButton,
   };
 };
 
