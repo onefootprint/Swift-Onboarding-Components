@@ -9,7 +9,6 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 pub mod errors;
-pub mod test_helpers;
 
 #[allow(clippy::extra_unused_lifetimes)]
 pub mod models;
@@ -33,6 +32,20 @@ use strum::IntoEnumIterator;
 
 #[allow(unused_imports)]
 pub mod schema;
+
+pub mod access_event;
+pub mod scoped_user;
+pub mod tenant;
+pub mod user_vault;
+
+#[cfg(test)]
+mod test;
+
+#[allow(unused)]
+pub mod test_context;
+
+#[allow(unused)]
+pub mod test_helpers;
 
 pub type DbResult<T> = Result<T, DbError>;
 
@@ -341,11 +354,3 @@ pub trait HasDataAttributeFields {
         DataAttribute::iter().filter(|k| self.has_field(*k)).collect()
     }
 }
-
-pub mod access_event;
-pub mod scoped_user;
-pub mod tenant;
-pub mod user_vault;
-
-#[cfg(test)]
-mod test;

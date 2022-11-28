@@ -12,7 +12,7 @@ pub(crate) fn run_migrations_once(db_url: String) {
     });
 }
 
-fn db_url() -> String {
+pub(crate) fn db_url() -> String {
     std::env::var("DATABASE_URL").unwrap_or_else(|_| "postgresql://localhost/footprint_db".to_string())
 }
 pub fn test_db_conn() -> PgConnection {
