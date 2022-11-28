@@ -56,6 +56,9 @@ impl FromRequest for SecretTenantAuthContext {
                 .db_query(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
                 .await??
                 .ok_or(AuthError::ApiKeyNotFound)?;
+
+            tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, "authenticated");
+
             Ok(SecretTenantAuthContext { tenant, api_key })
         })
     }

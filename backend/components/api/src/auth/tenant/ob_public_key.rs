@@ -60,6 +60,9 @@ impl FromRequest for PublicOnboardingContext {
                         e.into()
                     }
                 })?;
+
+            tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "pk_ob_session authenticated");
+
             Ok(PublicOnboardingContext {
                 onboarding_key: ob_config.key.clone(),
                 tenant,

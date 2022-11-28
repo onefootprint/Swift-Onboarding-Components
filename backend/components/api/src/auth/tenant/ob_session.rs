@@ -41,6 +41,9 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         };
         let (ob_config, tenant) =
             ObConfiguration::get_enabled(conn, (&data.ob_config_id, &data.tenant_id, data.is_live))?;
+
+        tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "ob_session authenticated");
+
         Ok(ParsedOnboardingSession { ob_config, tenant })
     }
 }

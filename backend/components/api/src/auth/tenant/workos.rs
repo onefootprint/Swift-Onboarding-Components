@@ -58,6 +58,9 @@ impl ExtractableAuthSession for ParsedWorkOs {
             }
         };
         let (tenant, tenant_role, tenant_user) = TenantUser::login_by_id(conn, &data.tenant_user_id)?;
+
+        tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tenant_role.id, tenant_user_id=%tenant_user.id, "authenticated");
+
         Ok(Self(WorkOs {
             data,
             tenant,
