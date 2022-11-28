@@ -1,11 +1,13 @@
 use std::time::Duration;
 
+use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
+use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 use rpc::{EnclavePayload, RpcRequest};
 
 #[derive(Clone, Debug)]
 pub struct ProxyHttpClient {
     endpoint: String,
-    client: reqwest::Client,
+    client: ClientWithMiddleware,
     bearer_token: String,
 }
 
@@ -21,9 +23,18 @@ pub struct ProxyPayloadResponse {
 
 impl ProxyHttpClient {
     pub fn new(endpoint: &str, proxy_auth_token: &str) -> Result<Self, crate::Error> {
+        let retry_policy = ExponentialBackoff::builder()
+            .backoff_exponent(2)
+            .retry_bounds(Duration::from_millis(2), Duration::from_millis(6))
+            .build_with_max_retries(3);
+
         let client = reqwest::ClientBuilder::new()
             .timeout(Duration::from_secs(4))
             .build()?;
+
+        let client = ClientBuilder::new(client)
+            .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+            .build();
 
         Ok(Self {
             client,

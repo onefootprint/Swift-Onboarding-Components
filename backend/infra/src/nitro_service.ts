@@ -400,6 +400,13 @@ log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/nitro_enclaves/*
 initial_position=start_of_file
+
+[/var/log/enclave_proxy]
+log_group_name=/ec2/${hostName}
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/enclave_proxy.log
+initial_position=start_of_file
 EOF
 
 # start logging daemon
@@ -464,6 +471,16 @@ sudo systemctl start enclave_runner.service && sudo systemctl enable enclave_run
 
 sudo echo "ENCLAVE_PROXY_SECRET=$(aws --region us-east-1 ssm get-parameter --name "/static_secrets/${secretsStore.enclaveProxySecretName}" --with-decryption | jq -r ".Parameter.Value")" > /enclave_proxy_environment
 
+sudo echo "RUST_LOG=info" >> /enclave_proxy_environment
+touch /var/log/enclave_proxy.log
+
+cat <<'EOF' > /etc/rsyslog.d/enclave_proxy.conf 
+if $programname == 'enclave_proxy' then /var/log/enclave_proxy.log
+& stop
+EOF
+
+sudo systemctl restart rsyslog
+
 cat <<'EOF' > enclave_proxy.service
 [Unit]
 Description=enclave_proxy
@@ -474,6 +491,9 @@ WorkingDirectory=/
 EnvironmentFile=/enclave_proxy_environment
 ExecStart="/image/enclave_proxy"
 Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=enclave_proxy
 
 [Install]
 WantedBy=multi-user.target

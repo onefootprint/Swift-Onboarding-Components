@@ -38,6 +38,8 @@ pub enum Error {
     InvalidEnclaveResponse,
     #[error("http reqwest: {0}")]
     HttpClient(#[from] reqwest::Error),
+    #[error("http reqwest middleware: {0}")]
+    HttpClientMiddleware(#[from] reqwest_middleware::Error),
 }
 
 #[derive(Debug, Clone)]

@@ -75,6 +75,8 @@ webauthn-rs-core = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd7
 webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2"}
 
 reqwest = {version = "0.11", features=["json"]}
+reqwest-middleware = "0.1.6"
+reqwest-retry = "0.1.5"
 
 schemars = { version = "0.8", features = ["chrono", "uuid1", "preserve_order"]}
 

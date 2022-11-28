@@ -13,6 +13,9 @@ vsock = ["tokio-vsock"]
 tokio = { workspace = true }
 tokio-vsock = { version = "0.3", optional = true }
 reqwest = { workspace = true }
+reqwest-middleware = { workspace = true }
+reqwest-retry = { workspace = true }
+
 
 futures = { workspace = true }
 libc = "0.2"
