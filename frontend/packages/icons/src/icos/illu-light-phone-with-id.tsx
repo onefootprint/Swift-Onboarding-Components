@@ -15,7 +15,6 @@ const IlluLightPhoneWithId = ({
       height={64}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      role="img"
       data-testid={testID}
       className={className}
       aria-hidden="true"
