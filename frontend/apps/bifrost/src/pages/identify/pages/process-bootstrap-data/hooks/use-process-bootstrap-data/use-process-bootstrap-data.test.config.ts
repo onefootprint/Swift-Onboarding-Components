@@ -59,7 +59,10 @@ export const withLoginChallenge = (data = loginChallengeFixture) =>
   });
 
 const signupChallengeFixture: SignupChallengeResponse = {
-  challengeToken: 'challengeToken',
+  challengeData: {
+    challengeToken: 'challengeToken',
+    challengeKind: ChallengeKind.sms,
+  },
 };
 
 export const withSignupChallenge = (data = signupChallengeFixture) =>

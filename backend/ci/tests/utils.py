@@ -140,7 +140,7 @@ def create_basic_user(twilio, suffix=None):
     def initiate_challenge():
         data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
         body = post("hosted/identify/signup_challenge", data)
-        return body["challenge_token"]
+        return body["challenge_data"]["challenge_token"]
 
     challenge_token = try_until_success(
         initiate_challenge, 20
@@ -201,6 +201,7 @@ def create_inherited_non_sandbox_user(twilio):
         5,
     )
 
+
 def create_tenant(org_data, ob_conf_data):
     body = post("private/tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])
@@ -216,14 +217,15 @@ def create_tenant(org_data, ob_conf_data):
 
     return tenant
 
+
 def create_ob_config_for_tenant(tenant, ob_conf_data):
     body = post("org/onboarding_configs", ob_conf_data, tenant.sk.key)
     ob_config = ObConfiguration.from_response(body)
     print("\n======org onboarding info======")
     print(body)
-    
-    tenant.ob_configs[ob_conf_data['name']] = ob_config
-    
+
+    tenant.ob_configs[ob_conf_data["name"]] = ob_config
+
     return tenant
 
 

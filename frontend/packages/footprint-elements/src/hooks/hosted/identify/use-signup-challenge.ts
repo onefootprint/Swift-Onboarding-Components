@@ -13,11 +13,13 @@ const signupChallenge = async (payload: SignupChallengeRequest) => {
     url: '/hosted/identify/signup_challenge',
     data: payload,
   });
-  const { challengeToken, timeBeforeRetryS } = response.data;
+  const { challengeData } = { ...response.data };
+  challengeData.retryDisabledUntil = getRetryDisabledUntil(
+    challengeData.timeBeforeRetryS ?? 0,
+  );
 
   return {
-    challengeToken,
-    retryDisabledUntil: getRetryDisabledUntil(timeBeforeRetryS ?? 0),
+    challengeData,
   };
 };
 

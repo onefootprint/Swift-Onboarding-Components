@@ -1,4 +1,4 @@
-import { IdentifyType } from '../data';
+import { ChallengeData, IdentifyType } from '../data';
 
 export type SignupChallengeRequest = {
   phoneNumber: string;
@@ -6,7 +6,5 @@ export type SignupChallengeRequest = {
 };
 
 export type SignupChallengeResponse = {
-  challengeToken: string;
-  retryDisabledUntil?: Date;
-  timeBeforeRetryS?: number;
+  challengeData: ChallengeData;
 };

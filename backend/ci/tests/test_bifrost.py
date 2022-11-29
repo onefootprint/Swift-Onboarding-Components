@@ -33,7 +33,7 @@ def auth_token(twilio):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
     data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
     body = post("hosted/identify/signup_challenge", data)
-    challenge_token = body["challenge_token"]
+    challenge_token = body["challenge_data"]["challenge_token"]
     return try_until_success(
         lambda: identify_verify(twilio, PHONE_NUMBER, challenge_token), 5
     )

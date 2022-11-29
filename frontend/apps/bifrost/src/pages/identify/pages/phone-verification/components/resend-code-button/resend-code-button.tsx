@@ -70,16 +70,10 @@ const ResendCodeButton = () => {
         identifyType,
       },
       {
-        onError: showRequestErrorToast,
-        onSuccess: ({ challengeToken, retryDisabledUntil }) => {
-          const newChallengeData = {
-            challengeKind: ChallengeKind.sms,
-            challengeToken,
-            phoneNumberLastTwo: phoneNumber.slice(-2),
-            retryDisabledUntil,
-          };
+        onSuccess: ({ challengeData: newChallengeData }) => {
           handleChallengeResendSuccess(newChallengeData);
         },
+        onError: showRequestErrorToast,
       },
     );
   };

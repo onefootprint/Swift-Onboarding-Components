@@ -102,12 +102,8 @@ const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
           options.onSuccess(userFound, challengeData);
         });
       } else {
-        sendSmsSignupChallenge(({ challengeToken, retryDisabledUntil }) => {
-          options.onSuccess(userFound, {
-            challengeKind: ChallengeKind.sms,
-            challengeToken,
-            retryDisabledUntil,
-          });
+        sendSmsSignupChallenge(({ challengeData }) => {
+          options.onSuccess(userFound, challengeData);
         });
       }
     });

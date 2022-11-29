@@ -1,7 +1,7 @@
-use super::IdentifyType;
+use super::{ChallengeKind, IdentifyType, UserChallengeData};
 use crate::hosted::identify::ChallengeData;
 use crate::types::response::ResponseData;
-use crate::utils::challenge::{Challenge, ChallengeToken};
+use crate::utils::challenge::Challenge;
 use crate::State;
 use crate::{errors::ApiError, hosted::identify::ChallengeState};
 use newtypes::PhoneNumber;
@@ -15,8 +15,7 @@ pub struct SignupChallengeRequest {
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct SignupChallengeResponse {
-    challenge_token: ChallengeToken, // Sealed Challenge<PhoneChallengeState>
-    time_before_retry_s: i64,
+    challenge_data: UserChallengeData,
 }
 
 #[api_v2_operation(
@@ -53,8 +52,14 @@ pub async fn post(
 
     Ok(Json(ResponseData {
         data: SignupChallengeResponse {
-            challenge_token,
-            time_before_retry_s: time_before_retry_s.num_seconds(),
+            challenge_data: UserChallengeData {
+                challenge_kind: ChallengeKind::Sms,
+                challenge_token,
+                phone_number_last_two: phone_number.leak_last_two(),
+                phone_country: phone_number.iso_country_code.leak_to_string(),
+                biometric_challenge_json: None,
+                time_before_retry_s: time_before_retry_s.num_seconds(),
+            },
         },
     }))
 }

@@ -5,7 +5,6 @@ import {
 } from '@onefootprint/footprint-elements';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoEmail24 } from '@onefootprint/icons';
-import { ChallengeKind } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
@@ -31,17 +30,13 @@ const PhoneRegistration = () => {
     signupChallengeMutation.mutate(
       { phoneNumber: phone, identifyType },
       {
-        onSuccess({ challengeToken, retryDisabledUntil }) {
+        onSuccess({ challengeData }) {
           send({
             type: Events.phoneIdentificationCompleted,
             payload: {
               phone,
               userFound: false,
-              challengeData: {
-                challengeKind: ChallengeKind.sms,
-                challengeToken,
-                retryDisabledUntil,
-              },
+              challengeData,
             },
           });
         },
