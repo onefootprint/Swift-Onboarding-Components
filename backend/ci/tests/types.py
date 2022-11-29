@@ -25,7 +25,7 @@ class ObConfiguration(NamedTuple):
     must_collect_data: list
     can_access_data: list
     must_collect_identity_document: bool
-    can_access_identity_document: bool
+    can_access_identity_document_images: bool
 
     def from_response(resp):
         return ObConfiguration(
@@ -36,7 +36,7 @@ class ObConfiguration(NamedTuple):
             resp["must_collect_data"],
             resp["can_access_data"],
             resp.get("must_collect_identity_document", False),
-            resp.get("can_access_identity_document", False),
+            resp.get("can_access_identity_document_images", False),
         )
 
 

@@ -18,6 +18,12 @@ impl Base64Data {
     }
 }
 
+impl Base64Data {
+    pub fn to_string_standard(self) -> String {
+        Self::into_string_standard(self.0)
+    }
+}
+
 impl AsRef<[u8]> for Base64Data {
     fn as_ref(&self) -> &[u8] {
         self.0.as_slice()

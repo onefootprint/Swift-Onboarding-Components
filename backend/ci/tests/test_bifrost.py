@@ -71,23 +71,6 @@ def bar_tenant(must_collect_data, can_access_data):
     return create_tenant(org_data, ob_data)
 
 
-@pytest.fixture
-def document_requesting_tenant(must_collect_data, can_access_data):
-    org_data = {
-        "name": "document tenant",
-        "is_live": True,
-    }
-
-    ob_data = {
-        "name": "default",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
-        "must_collect_identity_document": True,
-    }
-
-    return create_tenant(org_data, ob_data)
-
-
 @pytest.fixture(scope="module", autouse="true")
 def cleanup():
     # Cleanup the non-sandbox user that is used across all integration test runs
@@ -479,6 +462,7 @@ class TestBifrost:
             ob_config_key,
             auth_token,
         )
+
         # We have a requirement
         req = get_requirement_from_requirements(
             "collect_document", body["requirements"]

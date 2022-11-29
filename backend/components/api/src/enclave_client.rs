@@ -104,7 +104,6 @@ impl EnclaveClient {
         Ok(encrypted_data_key)
     }
 
-    #[allow(unused)]
     /// generates a new sealed data key with the plaintext key
     pub async fn decrypt_sealed_vault_data_key(
         &self,

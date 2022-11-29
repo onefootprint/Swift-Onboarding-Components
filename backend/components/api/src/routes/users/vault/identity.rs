@@ -214,6 +214,12 @@ pub(super) async fn post_decrypt_internal(
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
     let request = request.into_inner();
     let fields = request.fields;
+    // TODO: fix this
+    if fields.contains(&DataAttribute::IdentityDocument) {
+        return Err(ApiError::InvalidFieldForDecryption(String::from(
+            "IdentityDocument",
+        )));
+    }
     let auth = auth.can_decrypt(fields.iter().cloned().collect())?;
 
     let footprint_user_id = path.into_inner();

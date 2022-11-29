@@ -63,7 +63,7 @@ impl S3Client {
             .await?;
         tracing::info!("s3: put object");
 
-        Ok(format!("{}{}{}", S3_PATH_PREFIX, bucket, key))
+        Ok(format!("{}{}/{}", S3_PATH_PREFIX, bucket, key))
     }
     /// Get an object in S3 from the path specified by `s3://{bucket}/{key}`
     #[allow(unused)]
@@ -106,7 +106,8 @@ impl S3Client {
             return Err(S3Error::InvalidS3Url);
         };
 
-        let object = s3_url.path();
+        // We need to shave off the `/`
+        let object = &s3_url.path()[1..];
 
         Ok((bucket.to_string(), object.to_string()))
     }
@@ -142,7 +143,7 @@ mod tests {
         let good_url = "s3://bucket/object/is/here";
         let (bucket, obj) = S3Client::parse_s3_url(good_url).expect("err");
         assert_eq!(bucket, "bucket".to_string());
-        assert_eq!(obj, "/object/is/here".to_string());
+        assert_eq!(obj, "object/is/here".to_string());
 
         // Failures
         let bad_url_wrong_scheme = "http://bucket/object/is/here";

@@ -20,6 +20,7 @@ from .utils import (
     _make_request,
     create_tenant,
     create_basic_user,
+    onboard_user_onto_tenant,
 )
 from .webauthn_simulator import SoftWebauthnDevice
 
@@ -104,6 +105,41 @@ def workos_sandbox_tenant(must_collect_data, can_access_data):
 
     return create_tenant(org_data, ob_data)
 
+@pytest.fixture
+def document_requesting_tenant(must_collect_data, can_access_data):
+    org_data = {
+        "name": "document tenant",
+        "is_live": True,
+    }
+
+    ob_data = {
+        "name": "default",
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
+        "must_collect_identity_document": True,
+    }
+
+    return create_tenant(org_data, ob_data)
+
+# TODO: some document tests rely on having a fresh tenant each run, so 
+# rather than fix that now, just introduce a separate tenant appropriately
+# pytest scoped
+@pytest.fixture(scope="session")
+def document_requesting_sandbox_tenant_session_scoped(must_collect_data, can_access_data):
+    org_data = {
+        "name": "sandbox document tenant",
+        "is_live": False,
+    }
+
+    ob_data = {
+        "name": "default",
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
+        "must_collect_identity_document": True,
+        "can_access_identity_document_images": True,
+    }
+
+    return create_tenant(org_data, ob_data)
 
 @pytest.fixture(scope="session")
 def twilio():
@@ -125,69 +161,19 @@ def user(workos_sandbox_tenant, twilio):
     """
     basic_user = create_basic_user(twilio)
     user_data = build_user_data()
+    return onboard_user_onto_tenant(workos_sandbox_tenant, basic_user, user_data, None)
 
-    # Initialize the onboarding
-    post(
-        "hosted/onboarding",
-        None,
-        workos_sandbox_tenant.ob_config().key,
-        basic_user.auth_token,
-    )
+@pytest.fixture(scope="module")
+def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twilio):
+    """
+    Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
+    with document info as well
+    """
+    basic_user = create_basic_user(twilio)
+    user_data = build_user_data()
+    return onboard_user_onto_tenant(document_requesting_sandbox_tenant_session_scoped, basic_user, user_data, "both")
 
-    # Populate the user's data
-    post("hosted/user/data/identity", user_data, basic_user.auth_token)
 
-    # Register the biometric credential
-    webauthn_device = SoftWebauthnDevice()
-    body = post("hosted/user/biometric/init", None, basic_user.auth_token)
-    chal_token = body["challenge_token"]
-    chal = _override_webauthn_challenge(json.loads(body["challenge_json"]))
-    attestation = webauthn_device.create(chal, os.environ.get("TEST_URL"))
-    attestation = _override_webauthn_attestation(attestation)
-    data = dict(
-        challenge_token=chal_token, device_response_json=json.dumps(attestation)
-    )
-    post("hosted/user/biometric", data, basic_user.auth_token)
-
-    # Run the KYC check
-    post(
-        "hosted/onboarding/submit",
-        None,
-        workos_sandbox_tenant.ob_config().key,
-        basic_user.auth_token,
-    )
-
-    # Authorize and complete the onboarding
-    body = post(
-        "hosted/onboarding/authorize",
-        None,
-        workos_sandbox_tenant.ob_config().key,
-        basic_user.auth_token,
-    )
-    validation_token = body["validation_token"]
-
-    # Get the fp_user_id
-    body = post(
-        "onboarding/session/validate",
-        dict(validation_token=validation_token),
-        workos_sandbox_tenant.sk.key,
-    )
-    fp_user_id = body["footprint_user_id"]
-    return User(
-        auth_token=basic_user.auth_token,
-        fp_user_id=fp_user_id,
-        first_name=user_data["name"]["first_name"],
-        last_name=user_data["name"]["last_name"],
-        address_line1=user_data["address"]["line1"],
-        address_line2=user_data["address"]["line2"],
-        zip=user_data["address"]["zip"],
-        country=user_data["address"]["country"],
-        ssn=user_data["ssn9"],
-        phone_number=basic_user.phone_number,
-        real_phone_number=basic_user.real_phone_number,
-        email=basic_user.email,
-        tenant=workos_sandbox_tenant,
-    )
 
 
 @pytest.fixture(scope="module")

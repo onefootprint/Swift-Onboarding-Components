@@ -55,6 +55,9 @@ class TestDashboardOnboardings:
             for attribute, value in attributes.items():
                 assert expected_data[attribute] == value
 
+    # Note: `user` was onboarded onto `user.tenant` with an ob configuration 
+    # that required the collection of DOB, but not the access. See the pytest fixture setup for the tenant associated
+    # with user passed into this function for more info
     def test_tenant_decrypt_no_permissions(self, user):
         tenant = user.tenant
         data = {
@@ -67,7 +70,126 @@ class TestDashboardOnboardings:
             tenant.sk.key,
             status_code=401,
         )
+    # A tenant needs to use /vault/document/decrypt for decrypting identity document, so 
+    # this fails
+    def test_tenant_decrypt_identity_doc_with_identity_endpoint(self, user):
+        tenant = user.tenant
+        data = {
+            "fields": ["identity_document"],
+            "reason": "Let me see the face of the man or woman who wronged me",
+        }
+        resp = post(
+            f"users/{user.fp_user_id}/vault/identity/decrypt",
+            data,
+            tenant.sk.key,
+            status_code=400
+        )
+        assert resp['error']['message'] == 'Cannot decrypt field IdentityDocument with this endpoint'
+    #########################
+    # Decrypting Documents
+    #########################
+    # This user has not authorized any access to identity documents for the tenant
+    def test_tenant_document_decrypt_no_permissions(self, user):
+        tenant = user.tenant
+        data = {
+            "document_type": "passport",
+            "reason": "Not doing a hecking decrypt",
+        }
+        # confirm they didn't auth identity_document
+        get_user_resp = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        assert not get_user_resp['onboarding']['can_access_identity_document_images']
+        
+        post(
+            f"users/{user.fp_user_id}/vault/document/decrypt",
+            data,
+            tenant.sk.key,
+            status_code=401,
+        )
+     # This user has not authorized any access to identity documents for the tenant, so they 
+     # can't even see what's in the vault
+    def test_tenant_document_get_decrypt_no_permissions(self, user):
+        tenant = user.tenant
+        # confirm they didn't auth identity_document
+        get_user_resp = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        assert not get_user_resp['onboarding']['can_access_identity_document_images']
+        
+        get(
+            f"users/{user.fp_user_id}/vault/document?document_types=",
+            None,
+            tenant.sk.key,
+            status_code=401,
+        )
+    # Check which things are available in the vault
+    def test_tenant_document_get_decrypt(self, user_with_documents):
+        tenant = user_with_documents.tenant
+        requested_doc_types = "passport,horse_license"
+        
+        resp = get(
+            f"users/{user_with_documents.fp_user_id}/vault/document?document_types={requested_doc_types}",
+            None,
+            tenant.sk.key,
+            status_code=200,
+        )
+        expected = {
+            'horse_license': False, # unfortunately
+            'passport': True
+        }
 
+        assert resp == expected
+
+        # now with no query
+        resp = get(
+            f"users/{user_with_documents.fp_user_id}/vault/document",
+            None,
+            tenant.sk.key,
+            status_code=200,
+        )
+        # Check empty query key
+        resp2 = get(
+            f"users/{user_with_documents.fp_user_id}/vault/document?document_types=",
+            None,
+            tenant.sk.key,
+            status_code=200,
+        )
+        expected = {
+            'passport': True
+        }
+
+        assert resp == expected
+        assert resp2 == expected
+
+        expected = {
+            'passport': True
+        }
+
+        assert resp == expected
+
+
+    # Test decryption of vaulted documents
+    def test_tenant_document_decrypt(self, user_with_documents):
+        from .image_fixtures import test_image
+
+        tenant = user_with_documents.tenant
+        requested_doc_type = 'passport'
+        data = {
+            "document_type": requested_doc_type,
+            "reason": "Responding to a customer request",
+        }
+        
+        resp = post(
+            f"users/{user_with_documents.fp_user_id}/vault/document/decrypt",
+            data,
+            tenant.sk.key,
+            status_code=200,
+        )
+
+        assert resp['document_type'] == requested_doc_type
+        assert resp['images'][0]['front'] == test_image
+        assert resp['images'][0]['back'] == test_image
+    ##############################
+    # End document tests
+    ###################################
+    
     def test_get_org(self, user):
         body = get("org", None, user.tenant.sk.key)
         tenant = body

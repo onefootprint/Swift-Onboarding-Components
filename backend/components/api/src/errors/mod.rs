@@ -102,6 +102,8 @@ pub enum ApiError {
     PrivacyPassError(#[from] privacy_pass::Error),
     #[error("One or more vendor requests failed")]
     VendorRequestFailed,
+    #[error("Cannot decrypt field {0} with this endpoint")]
+    InvalidFieldForDecryption(String),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -176,6 +178,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::InvalidFieldForDecryption(_) => StatusCode::BAD_REQUEST,
             ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::VendorRequestFailed => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_)

@@ -1,6 +1,7 @@
 use paperclip::actix::web;
 
 pub mod custom;
+pub mod document;
 pub mod identity;
 pub mod unified;
 
@@ -12,6 +13,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(identity::put)
         .service(identity::get)
         .service(identity::post_decrypt)
+        .service(document::get)
+        .service(document::post_decrypt)
         .service(custom::put)
         .service(custom::get)
         .service(custom::post_decrypt);
