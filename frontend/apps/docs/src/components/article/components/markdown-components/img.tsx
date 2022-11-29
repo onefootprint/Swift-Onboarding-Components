@@ -22,6 +22,8 @@ const img = ({ alt, src, title, width, height }: ImgProps) => (
 
 const StyledImage = styled(Image)`
   object-fit: contain;
+  max-width: 100%;
+  height: auto;
 `;
 
 export default img;

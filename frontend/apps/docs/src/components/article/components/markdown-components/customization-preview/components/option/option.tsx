@@ -26,6 +26,8 @@ const OptionContainer = styled.button`
     flex-direction: column;
     gap: ${theme.spacing[4]};
     justify-content: center;
+    margin: 0;
+    padding: 0;
 
     img {
       border: ${theme.borderWidth[2]} solid transparent;

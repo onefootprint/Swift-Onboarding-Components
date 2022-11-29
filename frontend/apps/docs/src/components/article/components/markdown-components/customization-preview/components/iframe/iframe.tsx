@@ -8,21 +8,31 @@ type IframeProps = {
 };
 
 const Iframe = ({ name, src, selected }: IframeProps) => (
-  <ShowIf cond={selected}>
-    <iframe
+  <IframeContainer show={selected}>
+    <StyledIframe
       allow="otp-credentials; publickey-credentials-get *; camera *;"
       src={src}
       title={name}
     />
-  </ShowIf>
+  </IframeContainer>
 );
 
-const ShowIf = styled.div<{ cond: boolean }>`
-  ${({ cond }) =>
-    !cond &&
+const IframeContainer = styled.div<{ show: boolean }>`
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+
+  ${({ show }) =>
+    !show &&
     css`
       display: none;
     `}
+`;
+
+const StyledIframe = styled.iframe`
+  max-width: 90%;
 `;
 
 export default Iframe;

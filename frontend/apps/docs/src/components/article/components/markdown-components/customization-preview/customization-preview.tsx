@@ -26,7 +26,6 @@ const CustomizationPreview = () => {
         <Typography variant="label-2" sx={{ marginBottom: 7 }}>
           Customize it
         </Typography>
-
         <SelectContainer>
           <Select>
             {themes.map(theme => (
@@ -53,9 +52,8 @@ const IframeContainer = styled.div`
     border-top-left-radius: ${theme.borderRadius.default};
     border-top-right-radius: ${theme.borderRadius.default};
     background: rgba(14, 20, 56, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    max-width: 100%;
 
     iframe {
       width: 500px;
@@ -81,7 +79,7 @@ const SelectContainer = styled.div`
 
 const Select = styled.div`
   ${({ theme }) => css`
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(4, 1fr);
     border-bottom-left-radius: ${theme.borderRadius.default};
     gap: ${theme.spacing[7]};
