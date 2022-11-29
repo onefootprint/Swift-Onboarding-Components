@@ -16,7 +16,7 @@ const FootprintLive = () => {
   return (
     <>
       <SEO title={t('html-title')} slug="/footprint-live" />
-      <Container>
+      <Wrapper>
         <BlurredBackground>
           <Blob color="#CBC1F6" width={70} height={60} top={0} left={0} />
           <Blob color="#F6D1C1" width={30} height={24} top={-10} left={50} />
@@ -54,22 +54,22 @@ const FootprintLive = () => {
             </ImageOffset>
           </ImageSection>
         </HeroContainer>
-      </Container>
+      </Wrapper>
     </>
   );
 };
 
-const Container = styled.div`
+const Wrapper = styled.div`
   max-width: 95%;
   margin: auto;
   isolation: isolate;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
 
   ${media.greaterThan('lg')`
       max-width: 1256px;
+      height: calc(100vh - 80px);
   `}
 `;
 
@@ -77,14 +77,17 @@ const HeroContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 0.3fr 1fr;
     grid-template-areas:
       'image image'
       'content content';
     gap: ${theme.spacing[4]};
-    align-items: center;
-    justify-content: center;
     padding-bottom: ${theme.spacing[11]};
+    min-height: calc(100vh - var(--desktop-header-height) * 3);
+
+    ${media.greaterThan('md')`
+      grid-template-rows: 1fr 1fr;
+    `};
 
     ${media.greaterThan('lg')`
       grid-template-areas: 
@@ -101,11 +104,12 @@ const ContentSection = styled.div`
     flex-direction: column;
     gap: ${theme.spacing[5]};
     z-index: 2;
-    padding-right: ${theme.spacing[10]};
     text-align: center;
+    justify-content: center;
 
     ${media.greaterThan('lg')`
       text-align: left; 
+      padding-right: ${theme.spacing[10]};
     `}
   `}
 `;
@@ -148,16 +152,16 @@ const ImageSection = styled.div`
 const ImageOffset = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  align-self: flex-end;
   width: 100%;
-  height: 420px;
+  height: 340px;
 
   img {
     object-fit: contain;
   }
 
   ${media.greaterThan('lg')`
+      align-self: center;
       position: absolute;
       left: 0;
       width: 1100px;

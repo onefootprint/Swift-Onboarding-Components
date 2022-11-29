@@ -11,17 +11,19 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import DesktopNav from './components/desktop-nav';
+import LogoLink from './components/logo-link/logo-link';
 import MobileNav from './components/mobile-nav';
 import { NavEntry } from './types';
 
 type NavbarProps = {
+  navVariant: string;
   cta: {
     text: string;
     onClick: () => void;
   };
 };
 
-const Navbar = ({ cta }: NavbarProps) => {
+const Navbar = ({ cta, navVariant }: NavbarProps) => {
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
   const hasScroll = useHasScroll();
   const { t } = useTranslation('components.navbar');
@@ -77,23 +79,29 @@ const Navbar = ({ cta }: NavbarProps) => {
   return (
     <Header isFloating={hasScroll && isFloatingEnabled}>
       <Container>
-        <Inner>
-          <MobileNav
-            onOpen={disableFloating}
-            onClose={enableFloating}
-            cta={{
-              text: cta.text,
-              onClick: cta.onClick,
-            }}
-            entries={entries}
-          />
-          <DesktopNav
-            cta={{
-              text: cta.text,
-              onClick: cta.onClick,
-            }}
-            entries={entries}
-          />
+        <Inner data-variant={navVariant}>
+          {navVariant === 'default' ? (
+            <>
+              <MobileNav
+                onOpen={disableFloating}
+                onClose={enableFloating}
+                cta={{
+                  text: cta.text,
+                  onClick: cta.onClick,
+                }}
+                entries={entries}
+              />
+              <DesktopNav
+                cta={{
+                  text: cta.text,
+                  onClick: cta.onClick,
+                }}
+                entries={entries}
+              />
+            </>
+          ) : (
+            <LogoLink />
+          )}
         </Inner>
       </Container>
     </Header>
@@ -127,6 +135,10 @@ const Inner = styled.div`
       padding:  ${theme.spacing[4]};
     `}
   `}
+  &[data-variant='min'] {
+    display: flex;
+    justify-content: center;
+  }
 `;
 
 export default Navbar;

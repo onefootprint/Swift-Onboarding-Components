@@ -20,19 +20,22 @@ const Layout = ({ children }: LayoutProps) => {
   const { t } = useTranslation('components');
 
   const router = useRouter();
-  const variant = router.asPath === '/' ? 'large' : 'default';
+  const footerVariant = router.asPath === '/' ? 'large' : 'default';
+  const navVariant = router.asPath === '/footprint-live' ? 'min' : 'default';
 
   return (
     <>
       <Navbar
+        navVariant={navVariant}
         cta={{
           text: t('navbar.cta'),
           onClick: toggleTypeform,
         }}
       />
+
       <Content>{children}</Content>
-      <FooterContainer data-variant={variant}>
-        {variant === 'default' ? null : (
+      <FooterContainer data-variant={footerVariant}>
+        {footerVariant === 'default' ? null : (
           <>
             <InvestorsSection
               imgAlt={t('investors.img-alt')}
@@ -49,7 +52,7 @@ const Layout = ({ children }: LayoutProps) => {
           </>
         )}
         <Footer
-          variant={variant}
+          variant={footerVariant}
           copyright={t('footer.copyright')}
           links={[
             {
