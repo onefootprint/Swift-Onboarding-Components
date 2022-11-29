@@ -120,7 +120,7 @@ const Container = styled(Markdown)`
     }
 
     pre > div {
-      margin-bottom: ${theme.spacing[7]};
+      margin-bottom: ${theme.spacing[9]};
     }
 
     table {
