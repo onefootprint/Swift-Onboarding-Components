@@ -30,9 +30,9 @@ const button: Button = {
         color: 'var(fp-buttons-primary-loading-bg)',
       },
       disabled: {
-        bg: 'var(fp-buttons-primary-disabled-bg)',
-        color: 'var(fp-buttons-primary-disabled-text)',
-        borderColor: 'var(fp-buttons-primary-disabled-border)',
+        bg: 'var(--fp-buttons-primary-disabled-bg)',
+        color: 'var(--fp-buttons-primary-disabled-text)',
+        borderColor: 'var(--fp-buttons-primary-disabled-border)',
       },
     },
     secondary: {
