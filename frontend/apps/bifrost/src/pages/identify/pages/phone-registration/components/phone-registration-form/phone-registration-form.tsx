@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
 
+import useIdentifyMachine from '../../../../../../hooks/use-identify-machine';
 import {
   PHONE_REGEX,
   PHONE_SANDBOX_REGEX,
@@ -24,13 +25,20 @@ const PhoneRegistrationForm = ({
   onSubmit,
 }: PhoneRegistrationFormProps) => {
   const { isSandbox } = useSandboxMode();
+  const [state] = useIdentifyMachine();
+  const { phone } = state.context;
   const { t } = useTranslation('pages.phone-registration.form');
   const {
     setValue,
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      phone,
+    },
+  });
 
   const getHint = () => {
     if (errors.phone) {
@@ -50,6 +58,7 @@ const PhoneRegistrationForm = ({
         onReset={() => {
           setValue('phone', '');
         }}
+        value={getValues('phone')}
         {...register('phone', {
           required: {
             value: true,

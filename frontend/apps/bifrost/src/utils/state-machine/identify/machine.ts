@@ -91,6 +91,9 @@ const createIdentifyMachine = ({
         },
         [States.phoneRegistration]: {
           on: {
+            [Events.navigatedToPrevPage]: {
+              target: States.emailIdentification,
+            },
             [Events.emailChangeRequested]: [
               {
                 target: States.emailIdentification,

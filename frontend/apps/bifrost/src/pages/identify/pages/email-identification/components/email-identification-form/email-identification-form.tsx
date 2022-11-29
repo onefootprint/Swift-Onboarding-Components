@@ -5,6 +5,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 
+import useIdentifyMachine from '../../../../../../hooks/use-identify-machine';
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
@@ -18,13 +19,15 @@ const EmailIdentificationForm = ({
   isLoading,
   onSubmit,
 }: EmailIdentificationFormProps) => {
+  const [state] = useIdentifyMachine();
+  const { email } = state.context;
   const { isSandbox } = useSandboxMode();
   const { t } = useTranslation('pages.email-identification.form');
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({ defaultValues: { email } });
 
   const getHint = () => {
     if (errors.email) {

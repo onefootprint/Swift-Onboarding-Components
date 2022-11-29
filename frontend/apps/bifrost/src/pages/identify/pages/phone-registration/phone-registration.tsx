@@ -25,6 +25,10 @@ const PhoneRegistration = () => {
     send({ type: Events.emailChangeRequested });
   };
 
+  const handleNavToPrevPage = () => {
+    send({ type: Events.navigatedToPrevPage });
+  };
+
   const handleSubmit = (formData: { phone: string }) => {
     const { phone } = formData;
     signupChallengeMutation.mutate(
@@ -50,7 +54,7 @@ const PhoneRegistration = () => {
       <NavigationHeader
         button={{
           variant: 'back',
-          onClick: handleChangeEmail,
+          onClick: handleNavToPrevPage,
         }}
       />
       <HeaderTitle
