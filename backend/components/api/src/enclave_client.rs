@@ -108,18 +108,25 @@ impl EnclaveClient {
     /// generates a new sealed data key with the plaintext key
     pub async fn decrypt_sealed_vault_data_key(
         &self,
-        sealed_data_key: SealedVaultDataKey,
+        sealed_data_keys: &[SealedVaultDataKey],
         sealed_key: &EncryptedVaultPrivateKey,
         scope: &'static str,
-    ) -> Result<ScopedSealingKey, EnclaveError> {
+    ) -> Result<Vec<ScopedSealingKey>, EnclaveError> {
+        let requests = sealed_data_keys
+            .iter()
+            .map(|k| -> Result<DecryptRequest, EnclaveError> {
+                Ok(DecryptRequest {
+                    sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(&k.0)?,
+                    transform: DataTransform::Identity,
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
         let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecryptRequest {
             kms_creds: self.kms_creds.clone(),
             sealed_ikek: self.sealed_ikek.clone(),
             sealed_key: crypto::aead::AeadSealedBytes(sealed_key.0.clone()),
-            requests: vec![DecryptRequest {
-                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(&sealed_data_key.0)?,
-                transform: DataTransform::Identity,
-            }],
+            requests,
         }));
 
         let response = self.send(req).await?;
@@ -128,11 +135,14 @@ impl EnclaveClient {
         let response = response
             .results
             .into_iter()
-            .next()
-            .ok_or(EnclaveError::InvalidEnclaveDecryptResponse)?;
+            .map(|r| -> Result<ScopedSealingKey, crypto::Error> {
+                let k = ScopedSealingKey::new(r.data, scope)?;
+                Ok(k)
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| EnclaveError::InvalidEnclaveDecryptResponse)?;
 
-        let scoped_sealing_key = ScopedSealingKey::new(response.data, scope)?;
-        Ok(scoped_sealing_key)
+        Ok(response)
     }
 
     pub async fn decrypt_bytes(
