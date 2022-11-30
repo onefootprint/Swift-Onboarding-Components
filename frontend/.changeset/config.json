@@ -23,6 +23,7 @@
     "@onefootprint/hooks",
     "@onefootprint/request",
     "@onefootprint/test-utils",
-    "@onefootprint/design-tokens"
+    "@onefootprint/design-tokens",
+    "@onefootprint/dev-tools"
   ]
 }
