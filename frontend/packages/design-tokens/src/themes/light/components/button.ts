@@ -50,13 +50,13 @@ const button: Button = {
         borderColor: 'var(--fp-buttons-secondary-active-border)',
       },
       loading: {
-        bg: 'var(fp-buttons-secondary-loading-bg)',
-        color: 'var(fp-buttons-secondary-loading-bg)',
+        bg: 'var(--fp-buttons-secondary-loading-bg)',
+        color: 'var(--fp-buttons-secondary-loading-bg)',
       },
       disabled: {
-        bg: 'var(fp-buttons-secondary-disabled-bg)',
-        color: 'var(fp-buttons-secondary-disabled-text)',
-        borderColor: 'var(fp-buttons-secondary-disabled-border)',
+        bg: 'var(--fp-buttons-secondary-disabled-bg)',
+        color: 'var(--fp-buttons-secondary-disabled-text)',
+        borderColor: 'var(--fp-buttons-secondary-disabled-border)',
       },
     },
   },
