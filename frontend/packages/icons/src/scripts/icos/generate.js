@@ -3,7 +3,8 @@ const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
 const { last, startCase } = require('lodash');
-const template = require('./template');
+const defaultTemplate = require('./templates/default-template');
+const coloredTemplate = require('./templates/colored-template');
 
 const INPUT_SVG_PATH = path.join(__dirname, '../../assets/ico/**/*.svg');
 const OUTPUT_PATH = path.join(__dirname, '../../icos');
@@ -16,13 +17,14 @@ const getComponentName = fileName =>
 const createIcoComponent = async icoPath => {
   const svgSource = await fs.promises.readFile(icoPath);
   const fileName = getFileName(icoPath);
+  const isColored = fileName.includes('colored');
   const componentName = getComponentName(fileName);
   const SvgComponent = await transform(
     svgSource,
     {
       typescript: true,
       expandProps: false,
-      template,
+      template: isColored ? coloredTemplate : defaultTemplate,
       replaceAttrValues: { '#000000': '{theme.color[color]}' },
       svgProps: {
         'data-testid': '{testID}',
