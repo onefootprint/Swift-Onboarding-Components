@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::ops::Deref;
 
 use aead::Aead;
 use aead::{KeyInit, Payload};
@@ -9,6 +10,34 @@ use serde::{Deserialize, Serialize};
 
 pub const CHA_CHA20_POLY1305_KEY_BYTES_LENGTH: usize = 32;
 pub type ChaCha20Poly1305KeyBytes = [u8; CHA_CHA20_POLY1305_KEY_BYTES_LENGTH];
+
+/// A SealingKey is simply a ScopedSealingKey with no scope (i.e. empty bytes, b"")
+/// This is as if passing empty AAD.
+#[derive(Clone)]
+pub struct SealingKey(ScopedSealingKey);
+
+/// This enables us to use the underlying crypto primitives of a ScopedSealingKey
+impl Deref for SealingKey {
+    type Target = ScopedSealingKey;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl SealingKey {
+    pub fn generate() -> Result<Self, crate::Error> {
+        Ok(Self(ScopedSealingKey::generate("")?))
+    }
+
+    pub fn new_from_key(key: ChaCha20Poly1305KeyBytes) -> Self {
+        Self(ScopedSealingKey::new_from_key(key, ""))
+    }
+
+    pub fn new(bytes: Vec<u8>) -> Result<Self, crate::Error> {
+        Ok(Self(ScopedSealingKey::new(bytes, "")?))
+    }
+}
 
 #[derive(Clone)]
 pub struct ScopedSealingKey {
