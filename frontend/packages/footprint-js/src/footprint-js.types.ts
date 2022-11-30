@@ -179,3 +179,12 @@ export enum FootprintEvents {
   completed = 'completed',
   canceled = 'canceled',
 }
+
+export type UserData = {
+  email?: string;
+  phoneNumber?: string;
+};
+
+export type IdentifyRequest = {
+  identifier: { email: string } | { phone_number: string };
+};

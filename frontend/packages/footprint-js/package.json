@@ -27,6 +27,8 @@
     "identity verification"
   ],
   "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
     "dev": "tsup --watch",
     "build": "tsup",
     "lint": "eslint src --fix",
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
+    "jest-fetch-mock": "^3.0.3",
     "@types/postmate": "^1.5.2",
     "csstype": "^3.1.1",
     "eslint-config-footprint": "*",

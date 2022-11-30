@@ -1,3 +1,4 @@
+export { default as fetchMock } from 'jest-fetch-mock';
 export * from './spies';
 export * from './utils/mock-request';
 export * from './utils/render';

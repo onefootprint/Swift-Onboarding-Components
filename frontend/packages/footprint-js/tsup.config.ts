@@ -26,6 +26,16 @@ const getBifrostUrl = (isLocal: boolean) => {
   return 'https://id.onefootprint.com';
 };
 
+const getApiUrl = (isLocal: boolean) => {
+  if (isLocal) {
+    return 'http://localhost:8000/';
+  }
+  if (isDevelopment || isPreview) {
+    return 'https://api.dev.onefootprint.com';
+  }
+  return 'https://api.onefootprint.com';
+};
+
 export default defineConfig(options => ({
   entryPoints: {
     'footprint-js': 'src/index.ts',
@@ -37,6 +47,7 @@ export default defineConfig(options => ({
   watch: options.watch,
   minify: !options.watch,
   env: {
+    API_BASE_URL: getApiUrl(!!options.watch || forceFootprintToUseLocal),
     BIFROST_URL: getBifrostUrl(!!options.watch || forceFootprintToUseLocal),
     NODE_ENV: options.watch ? 'development' : 'production',
   },
