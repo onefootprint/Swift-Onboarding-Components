@@ -1,5 +1,5 @@
 declare interface Window {
-  onFootprintCanceled?: () => void;
-  onFootprintCompleted?: (validationToken: string) => void;
-  onFootprintFailed?: () => void;
+  onFootprintCanceled?: any;
+  onFootprintCompleted?: any;
+  footprintAppearance?: any;
 }

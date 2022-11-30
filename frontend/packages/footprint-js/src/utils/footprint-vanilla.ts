@@ -5,17 +5,39 @@ const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
 };
 
+const isFunction = (fn: any) => typeof fn === 'function';
+
+const isObject = (obj: any) => typeof obj === 'object' && !!obj;
+
 const startVanillaIntegration = (footprint: Footprint) => {
   if (typeof window === 'undefined') return;
+
+  const getAppearance = () => {
+    const appearance = window.footprintAppearance;
+    if (!appearance || !isObject(appearance)) {
+      return undefined;
+    }
+    return {
+      fontSrc: appearance.fontSrc,
+      rules: appearance.rules,
+      theme: appearance.theme,
+      variables: appearance.variables,
+    };
+  };
 
   const handleButtonClicked = (publicKey: string) => {
     footprint.show({
       publicKey,
+      appearance: getAppearance(),
       onCanceled: () => {
-        window.onFootprintCanceled?.();
+        if (isFunction(window.onFootprintCanceled)) {
+          window.onFootprintCanceled?.();
+        }
       },
       onCompleted: (validationToken: string) => {
-        window.onFootprintCompleted?.(validationToken);
+        if (isFunction(window.onFootprintCompleted)) {
+          window.onFootprintCompleted?.(validationToken);
+        }
       },
     });
   };
