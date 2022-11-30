@@ -8,6 +8,7 @@ import {
   States,
 } from './types';
 import StatusReceivedTransitions from './utils';
+import initContextComplete from './utils/init-context-complete';
 
 export const createHandoffMachine = () =>
   createMachine<MachineContext, MachineEvents>(
@@ -19,34 +20,16 @@ export const createHandoffMachine = () =>
       states: {
         [States.init]: {
           on: {
-            [Events.authTokenReceived]: [
+            [Events.initContextUpdated]: [
               {
-                cond: context => !!context.device && !!context.tenant,
-                actions: [Actions.assignAuthToken, Actions.assignTenantPk],
+                description:
+                  'Only transition to next state if all required info is collected',
+                actions: [Actions.assignInitContext],
                 target: States.checkRequirements,
+                cond: (context, event) => initContextComplete(context, event),
               },
               {
-                actions: [Actions.assignAuthToken, Actions.assignTenantPk],
-              },
-            ],
-            [Events.tenantInfoReceived]: [
-              {
-                cond: context => !!context.device && !!context.authToken,
-                actions: [Actions.assignTenant],
-                target: States.checkRequirements,
-              },
-              {
-                actions: [Actions.assignTenant],
-              },
-            ],
-            [Events.deviceInfoIdentified]: [
-              {
-                cond: context => !!context.tenant && !!context.authToken,
-                actions: [Actions.assignDeviceInfo],
-                target: States.checkRequirements,
-              },
-              {
-                actions: [Actions.assignDeviceInfo],
+                actions: [Actions.assignInitContext],
               },
             ],
             [Events.d2pAlreadyCompleted]: [
@@ -112,19 +95,18 @@ export const createHandoffMachine = () =>
     },
     {
       actions: {
-        [Actions.assignDeviceInfo]: assign((context, event) => {
-          if (event.type === Events.deviceInfoIdentified) {
-            context.device = {
-              type: event.payload.type,
-              hasSupportForWebauthn: event.payload.hasSupportForWebauthn,
-            };
+        [Actions.assignInitContext]: assign((context, event) => {
+          if (event.type !== Events.initContextUpdated) {
+            return context;
           }
-          return context;
-        }),
-        [Actions.assignAuthToken]: assign((context, event) => {
-          if (event.type === Events.authTokenReceived) {
-            context.authToken = event.payload.authToken;
-          }
+          const { device, tenant, tenantPk, authToken } = event.payload;
+          context.device = device !== undefined ? device : context.device;
+          context.authToken =
+            authToken !== undefined ? authToken : context.authToken;
+          context.tenant = tenant !== undefined ? tenant : context.tenant;
+          context.tenantPk =
+            tenantPk !== undefined ? tenantPk : context.tenantPk;
+
           return context;
         }),
         [Actions.assignRequirements]: assign((context, event) => {
@@ -132,18 +114,6 @@ export const createHandoffMachine = () =>
             context.requirements = {
               ...event.payload,
             };
-          }
-          return context;
-        }),
-        [Actions.assignTenantPk]: assign((context, event) => {
-          if (event.type === Events.authTokenReceived) {
-            context.tenantPk = event.payload.tenantPk;
-          }
-          return context;
-        }),
-        [Actions.assignTenant]: assign((context, event) => {
-          if (event.type === Events.tenantInfoReceived) {
-            context.tenant = event.payload.tenant;
           }
           return context;
         }),

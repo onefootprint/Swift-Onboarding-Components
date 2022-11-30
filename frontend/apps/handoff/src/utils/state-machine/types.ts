@@ -12,9 +12,7 @@ export enum States {
 }
 
 export enum Events {
-  authTokenReceived = 'authTokenReceived',
-  tenantInfoReceived = 'tenantInfoReceived', // Fetching tenant by tenant pk is complete
-  deviceInfoIdentified = 'deviceInfoIdentified',
+  initContextUpdated = 'initContextUpdated',
   requirementsReceived = 'requirementsReceived', // Fetching onboarding requirements is complete
   livenessCompleted = 'livenessCompleted',
   idDocCompleted = 'idDocCompleted',
@@ -23,10 +21,7 @@ export enum Events {
 }
 
 export enum Actions {
-  assignDeviceInfo = 'assignDeviceInfo',
-  assignAuthToken = 'assignAuthToken',
-  assignTenantPk = 'assignTenantPk',
-  assignTenant = 'assignTenant',
+  assignInitContext = 'assignInitContext',
   assignRequirements = 'assignRequirements',
 }
 
@@ -46,21 +41,13 @@ export type MachineEvents =
       type: Events.d2pAlreadyCompleted;
     }
   | {
-      type: Events.authTokenReceived;
+      type: Events.initContextUpdated;
       payload: {
-        authToken: string;
+        authToken?: string;
         tenantPk?: string;
+        tenant?: TenantInfo;
+        device?: DeviceInfo;
       };
-    }
-  | {
-      type: Events.tenantInfoReceived;
-      payload: {
-        tenant: TenantInfo;
-      };
-    }
-  | {
-      type: Events.deviceInfoIdentified;
-      payload: DeviceInfo;
     }
   | {
       type: Events.statusReceived;

@@ -40,7 +40,7 @@ const Init = () => {
           },
           onSettled() {
             send({
-              type: Events.authTokenReceived,
+              type: Events.initContextUpdated,
               payload: {
                 authToken,
                 tenantPk,
@@ -69,7 +69,7 @@ const Init = () => {
       };
 
       send({
-        type: Events.tenantInfoReceived,
+        type: Events.initContextUpdated,
         payload: {
           tenant,
         },
@@ -77,10 +77,12 @@ const Init = () => {
     },
   });
 
-  useDeviceInfo((info: DeviceInfo) => {
+  useDeviceInfo((device: DeviceInfo) => {
     send({
-      type: Events.deviceInfoIdentified,
-      payload: info,
+      type: Events.initContextUpdated,
+      payload: {
+        device,
+      },
     });
   });
 
