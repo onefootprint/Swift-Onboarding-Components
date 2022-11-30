@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoGoogleColored24 = ({ className, testID }: IconProps) => (
+const IcoGoogle24 = ({ className, testID }: IconProps) => (
   <svg
     width={24}
     height={24}
@@ -30,4 +30,4 @@ const IcoGoogleColored24 = ({ className, testID }: IconProps) => (
     />
   </svg>
 );
-export default IcoGoogleColored24;
+export default IcoGoogle24;

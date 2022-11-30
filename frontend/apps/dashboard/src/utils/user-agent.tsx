@@ -1,6 +1,6 @@
 import {
-  IcoAndroidColored24,
-  IcoAppleColored24,
+  IcoAndroid24,
+  IcoApple24,
   IcoCode24,
   IcoLaptop24,
   IcoPhone24,
@@ -18,10 +18,10 @@ export const icoForUserAgent = (userAgentStr: string) => {
     userAgent.os.name?.toLowerCase() === 'ios' ||
     userAgent.device.vendor?.toLowerCase() === 'apple'
   ) {
-    return <IcoAppleColored24 />;
+    return <IcoApple24 />;
   }
   if (userAgent.os.name?.toLowerCase() === 'android') {
-    return <IcoAndroidColored24 />;
+    return <IcoAndroid24 />;
   }
   if (userAgent.device.type?.toLowerCase() === 'mobile') {
     return <IcoPhone24 />;

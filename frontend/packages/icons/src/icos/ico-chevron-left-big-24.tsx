@@ -20,7 +20,7 @@ const IcoChevronLeftBig24 = ({
       aria-hidden="true"
     >
       <path
-        d="M14.824 6.75 9.17 12l5.654 5.25"
+        d="M14.324 6.75 8.67 12l5.654 5.25"
         stroke={theme.color[color]}
         strokeWidth={1.8}
         strokeLinecap="round"

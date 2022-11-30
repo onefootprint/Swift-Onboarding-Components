@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoAppleColored40 = ({ className, testID }: IconProps) => (
+const IcoApple40 = ({ className, testID }: IconProps) => (
   <svg
     width={40}
     height={40}
@@ -18,4 +18,4 @@ const IcoAppleColored40 = ({ className, testID }: IconProps) => (
     />
   </svg>
 );
-export default IcoAppleColored40;
+export default IcoApple40;

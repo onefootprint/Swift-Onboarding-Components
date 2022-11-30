@@ -1,4 +1,4 @@
-import { IcoAndroidColored16, IcoAppleColored16 } from '@onefootprint/icons';
+import { IcoAndroid16, IcoApple16 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -14,13 +14,13 @@ describe('<RadioSelect />', () => {
       {
         title: 'Item 1',
         description: 'Description 1',
-        IconComponent: IcoAndroidColored16,
+        IconComponent: IcoAndroid16,
         value: 'Item 1',
       },
       {
         title: 'Item 2',
         description: 'Description 2',
-        IconComponent: IcoAppleColored16,
+        IconComponent: IcoApple16,
         value: 'Item 2',
       },
     ];

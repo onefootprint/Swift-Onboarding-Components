@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoAndroidColored16 = ({ className, testID }: IconProps) => (
+const IcoAndroid16 = ({ className, testID }: IconProps) => (
   <svg
     width={16}
     height={16}
@@ -18,4 +18,4 @@ const IcoAndroidColored16 = ({ className, testID }: IconProps) => (
     />
   </svg>
 );
-export default IcoAndroidColored16;
+export default IcoAndroid16;

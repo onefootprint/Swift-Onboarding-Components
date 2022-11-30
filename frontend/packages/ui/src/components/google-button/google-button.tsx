@@ -1,4 +1,4 @@
-import { IcoGoogleColored24 } from '@onefootprint/icons';
+import { IcoGoogle24 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -38,7 +38,7 @@ const GoogleButton = ({
   </Button>
 );
 
-const StyledIcon = styled(IcoGoogleColored24)`
+const StyledIcon = styled(IcoGoogle24)`
   ${({ theme }) => css`
     margin-right: ${theme.spacing[3]};
   `}
