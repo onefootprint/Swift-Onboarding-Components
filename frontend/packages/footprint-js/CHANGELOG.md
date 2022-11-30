@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 0.6.1
+
+### Patch Changes
+
+- 0a9b10d5: Fix a bug where footprint couldn't open after closing the iframe
+
 ## 0.6.0
 
 ### Minor Changes
