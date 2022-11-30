@@ -45,10 +45,14 @@ const getMy1fpUrl = (env = 'local', branchName?: string) => {
   return 'https://my.onefootprint.com';
 };
 
+const IS_VERCEL_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
+
 export const IS_BROWSER = typeof window !== 'undefined';
 export const IS_SERVER = typeof window === 'undefined';
+
 export const IS_DEV = process.env.NODE_ENV === 'development';
 export const IS_PROD = !IS_DEV;
+export const IS_PREVIEW = IS_VERCEL_PREVIEW;
 
 export const HANDOFF_BASE_URL = getHandoffUrl(
   process.env.NEXT_PUBLIC_VERCEL_ENV,

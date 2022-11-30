@@ -66,6 +66,7 @@ module.exports = {
       '@onefootprint/hooks',
       '@onefootprint/request',
       '@onefootprint/types',
+      '@onefootprint/dev-tools',
     ],
   },
   async redirects() {

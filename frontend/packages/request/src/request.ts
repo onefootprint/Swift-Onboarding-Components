@@ -1,3 +1,4 @@
+import { getCustomEnvVariable } from '@onefootprint/dev-tools';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
@@ -60,7 +61,10 @@ export const getErrorMessage = (error: unknown | Error): string => {
 const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
   const client = applyCaseMiddleware(axios.create());
   return client.request<Response>({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseURL: getCustomEnvVariable(
+      'NEXT_PUBLIC_API_BASE_URL',
+      process.env.NEXT_PUBLIC_API_BASE_URL,
+    ),
     timeout: 60000,
     withCredentials: true,
     ...requestConfig,
