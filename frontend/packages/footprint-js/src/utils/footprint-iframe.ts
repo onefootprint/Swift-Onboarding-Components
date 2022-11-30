@@ -30,7 +30,7 @@ class FootprintIframe {
       'otp-credentials; publickey-credentials-get *; camera *;',
     );
     handleOnIframeLoaded();
-    child.on(FootprintEvents.closed, () => this.hide());
+    child.on(FootprintEvents.closed, () => this.close());
     this.child = child;
   }
 
@@ -41,7 +41,7 @@ class FootprintIframe {
     return this.child.on(eventName, callback);
   }
 
-  hide() {
+  close() {
     hideOverlay();
     if (this.child) {
       this.child.destroy();

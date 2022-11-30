@@ -10,7 +10,7 @@ import { createButton, injectStyles } from './utils/footprint-ui';
 import { getAppearanceStyles, getURL } from './utils/footprint-utils';
 
 const iframeManager = new IframeManager();
-let hasIframe = false;
+let hasIframeOpened = false;
 
 const footprint = () => {
   const setDialogStyles = ({
@@ -50,34 +50,42 @@ const footprint = () => {
   const handleOnCanceled = (callback: () => void) =>
     iframeManager.on(FootprintEvents.canceled, callback);
 
+  const handleOnClosed = (callback: () => void) =>
+    iframeManager.on(FootprintEvents.closed, callback);
+
   const show = async ({
     appearance,
     publicKey,
     onCompleted,
     onCanceled,
   }: ShowFootprint) => {
-    if (hasIframe) return;
-    hasIframe = true;
+    if (hasIframeOpened) {
+      console.warn('Cannot open two instances of Footprint at the same time');
+      return;
+    }
+
     setDialogStyles(appearance);
     const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
     const url = getURL({ fontSrc, publicKey, rules, variables });
     await iframeManager.show(url);
+
     if (onCompleted) {
       handleOnCompleted(onCompleted);
     }
     if (onCanceled) {
       handleOnCanceled(onCanceled);
     }
+    handleOnClosed(close);
   };
 
-  const hide = async () => {
-    await iframeManager.hide();
-    hasIframe = false;
+  const close = async () => {
+    await iframeManager.close();
+    hasIframeOpened = false;
   };
 
   return {
     show,
-    hide,
+    close,
     createButton,
   };
 };

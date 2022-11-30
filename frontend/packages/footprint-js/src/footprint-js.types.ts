@@ -166,12 +166,8 @@ export type ShowFootprint = {
 };
 
 export type Footprint = {
-  show: ({
-    publicKey,
-    onCompleted,
-    onCanceled,
-  }: ShowFootprint) => Promise<void>;
-  hide: () => Promise<void>;
+  show: (options: ShowFootprint) => Promise<void>;
+  close: () => Promise<void>;
 };
 
 export enum FootprintEvents {
