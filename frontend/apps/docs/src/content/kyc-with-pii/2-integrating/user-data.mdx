@@ -1,0 +1,29 @@
+---
+page: KYC + PII Vault
+slug: /kyc-with-pii/user-data
+category: Integrating
+title: User data
+position: 3
+meta: { title: KYC + PII Vault - User data, description: How to pass user data }
+---
+
+## Introduction
+
+Depending on your onboarding configuration, Footprint might request customer's phone number and email. In some circustances,
+you might have this data already available, so Footprint doesn't need to request this data once more. To pass user data to Footprint's flow,
+use the `userData` option:
+
+```typescript
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const userData = { email: 'john@doe.com', phoneNumber: '+1-202-555-0179' };
+footprint.open({ publicKey, userData });
+```
+
+### Available user data
+
+| Variable      | Description                                                             |
+| ------------- | ----------------------------------------------------------------------- |
+| `email`       | Optional. User email (e.g `john@doe.com`)                               |
+| `phoneNumber` | Optional. User phone. Must include country code (e.g `+1-202-555-0179`) |

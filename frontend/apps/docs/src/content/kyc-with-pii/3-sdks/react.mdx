@@ -11,7 +11,7 @@ meta:
   }
 ---
 
-## Install footprint
+## Installation
 
 1. Install `footprint-js` and `footprint-react`:
 
@@ -25,7 +25,7 @@ yarn add @onefootprint/footprint-js
 yarn add @onefootprint/footprint-react
 ```
 
-## Integrate footprint
+## Integration
 
 1. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
@@ -58,3 +58,57 @@ const Page = () => {
 ```
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-cra) to check out a full example. We also have some examples using [Next.js](https://github.com/onefootprint/examples/tree/master/frontend-react-typescript-next)
+
+## Changing appearance
+
+You can customize the appearance of our flow using the `appearance` prop:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+
+import { FootprintButton } from '@onefooprint/footprint-react';
+
+const Page = () => {
+  return (
+    <main>
+      <FootprintButton
+        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        appearance={{
+          borderRadius: 0,
+          inputBg: 'red',
+        }}
+      />
+    </main>
+  );
+};
+```
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-customized) to check out a full example and [here](https://docs.onefootprint.com/kyc-with-pii/customization) for more details about customization.
+
+## Setting user data
+
+Depending on your onboarding configuration, Footprint might request customer's phone number and email. In some circustances,
+you might have this data already available, so Footprint doesn't need to request this data once more. To pass user data to Footprint's flow,
+use the prop `userData`:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+
+import { FootprintButton } from '@onefooprint/footprint-react';
+
+const Page = () => {
+  return (
+    <main>
+      <FootprintButton
+        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        userData={{
+          email: 'john.doe@gmail.com',
+          phoneNumber: '+1-202-555-0179',
+        }}
+      />
+    </main>
+  );
+};
+```
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-user-data) to check out a full example and [here](https://docs.onefootprint.com/kyc-with-pii/user-data) for more details about user data.
