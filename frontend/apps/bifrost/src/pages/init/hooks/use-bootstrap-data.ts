@@ -1,19 +1,30 @@
+import {
+  FootprintInternalEvent,
+  useFootprintProvider,
+} from '@onefootprint/footprint-elements';
 import { BootstrapData } from 'src/hooks/use-bifrost-machine';
 import { useEffectOnce } from 'usehooks-ts';
 
+const WAITING_USER_DATA_TIME = 250;
+
 const useBootstrapData = (
-  onSuccess: (bootstrapData: BootstrapData) => void,
+  onSuccess: (bootstrapData?: BootstrapData) => void,
 ) => {
-  // TODO: derive this from the url or the post message
-  // For now, we are using a placeholder
+  const footprintProvider = useFootprintProvider();
+
   useEffectOnce(() => {
-    onSuccess({
-      // TODO: uncomment values below for testing/demo
-      // email: 'belce.dogru@gmail.com',
-      // email: 'belce@onefootprint.com',
-      // phoneNumber: '+16504600700',
-      // phoneNumber: '+12143266968',
-    });
+    footprintProvider.ready();
+    const unsubscribe = footprintProvider.on(
+      FootprintInternalEvent.bootstrapDataReceived,
+      data => {
+        onSuccess({ email: data.email, phoneNumber: data.phoneNumber });
+      },
+    );
+
+    setTimeout(() => {
+      unsubscribe();
+      onSuccess({ email: undefined, phoneNumber: undefined });
+    }, WAITING_USER_DATA_TIME);
   });
 };
 

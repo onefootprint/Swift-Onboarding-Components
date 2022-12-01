@@ -1,13 +1,17 @@
-import { FootprintEvents } from '@onefootprint/footprint-js';
+import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import Postmate from 'postmate';
 
 import {
   CompletePayload,
   FootprintClient,
+  FootprintInternalEvent,
 } from '../footprint-js-provider.types';
+import EventEmitter from '../utils/event-emitter/event-emmiter';
 
 class IframeAdapter implements FootprintClient {
   postmate: Postmate.ChildAPI | null = null;
+
+  eventEmitter = new EventEmitter();
 
   constructor() {
     this.init();
@@ -24,23 +28,38 @@ class IframeAdapter implements FootprintClient {
   };
 
   async init() {
-    const postmate = await new Postmate.Model({});
+    const postmate = await new Postmate.Model({
+      [FootprintInternalEvent.bootstrapDataReceived]: (data?: any) => {
+        this.eventEmitter.emit(
+          FootprintInternalEvent.bootstrapDataReceived,
+          data,
+        );
+      },
+    });
     this.postmate = postmate;
   }
 
   close() {
-    this.sendEvent(FootprintEvents.closed);
+    this.sendEvent(FootprintPublicEvent.closed);
   }
 
   cancel() {
-    this.sendEvent(FootprintEvents.canceled);
+    this.sendEvent(FootprintPublicEvent.canceled);
+  }
+
+  ready() {
+    this.sendEvent(FootprintInternalEvent.ready);
   }
 
   complete({ validationToken, closeDelay = 0 }: CompletePayload) {
-    this.sendEvent(FootprintEvents.completed, validationToken);
+    this.sendEvent(FootprintPublicEvent.completed, validationToken);
     setTimeout(() => {
       this.close();
     }, closeDelay);
+  }
+
+  on(name: string, callback: (result: unknown) => void) {
+    return this.eventEmitter.on(name, callback);
   }
 }
 

@@ -1,32 +1,38 @@
-import footprint, { FootprintAppearance } from '@onefootprint/footprint-js';
+import footprint, {
+  FootprintAppearance,
+  UserData,
+} from '@onefootprint/footprint-js';
 import React from 'react';
 
 export type FootprintButtonProps = {
   appearance?: FootprintAppearance;
   label?: string;
+  onCanceled?: () => void;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onCompleted?: (validationToken: string) => void;
-  onCanceled?: () => void;
   publicKey: string;
   testID?: string;
+  userData?: UserData;
 };
 
 const FootprintButton = ({
   appearance,
   label = 'Verify with Footprint',
+  onCanceled,
   onClick,
   onCompleted,
-  onCanceled,
   publicKey,
   testID,
+  userData,
 }: FootprintButtonProps) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     footprint.show({
       appearance,
-      publicKey,
-      onCompleted,
       onCanceled,
+      onCompleted,
+      publicKey,
+      userData,
     });
   };
 

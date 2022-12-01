@@ -163,6 +163,7 @@ export type ShowFootprint = {
   onCanceled?: () => void;
   onCompleted?: (validationToken: string) => void;
   publicKey?: string;
+  userData?: UserData;
 };
 
 export type Footprint = {
@@ -170,10 +171,15 @@ export type Footprint = {
   close: () => Promise<void>;
 };
 
-export enum FootprintEvents {
+export enum FootprintPublicEvent {
   closed = 'closed',
   completed = 'completed',
   canceled = 'canceled',
+}
+
+export enum FootprintInternalEvent {
+  bootstrapDataReceived = 'bootstrapDataReceived',
+  ready = 'ready',
 }
 
 export type UserData = {
