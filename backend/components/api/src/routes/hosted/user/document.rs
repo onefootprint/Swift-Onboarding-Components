@@ -70,7 +70,7 @@ pub async fn post(
 
     // Encrypt the image using the UserVault
     // TODO::8
-    let sealed_front = IdentityDocument::seal_with_data_key(&request.front_image, &data_key)?;
+    let sealed_front = IdentityDocument::seal_with_data_key(request.front_image.leak(), &data_key)?;
 
     // Save to s3
     let bucket = &state.config.document_s3_bucket.clone();
@@ -90,7 +90,7 @@ pub async fn post(
     // Not all documents have backs
     let mut s3_path_back_image: Option<String> = None;
     if let Some(back_image) = &request.back_image {
-        let sealed_back = IdentityDocument::seal_with_data_key(back_image, &data_key)?;
+        let sealed_back = IdentityDocument::seal_with_data_key(back_image.leak(), &data_key)?;
 
         s3_path_back_image = Some(
             state

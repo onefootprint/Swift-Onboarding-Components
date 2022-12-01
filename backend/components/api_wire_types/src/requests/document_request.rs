@@ -1,19 +1,18 @@
-use newtypes::DocumentRequestStatus;
+use newtypes::{DocumentRequestStatus, PiiString};
 use paperclip::actix::Apiv2Schema;
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+/// POST request body for sending Footprint identity document images
+#[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct DocumentRequest {
-    // base64 encoded image bytes (padded!)
-    pub front_image: String,
-    // base64 encoded image bytes (padded!)
-    // Not all documents have backs
-    pub back_image: Option<String>,
-    // type of document
+    /// base64 standard encoded image bytes
+    pub front_image: PiiString,
+    /// base64 standard encoded image bytes!)
+    pub back_image: Option<PiiString>,
+    /// type of document
     pub document_type: String,
-    // country of document
+    /// country of document
     pub country_code: String,
 }
-
+/// Status of identity document collection
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]
@@ -45,6 +44,8 @@ pub enum DocumentErrorReason {
     Invalid,
 }
 
+/// Response for a identity document request. Errors are non-optional if the identity vendor
+/// requires additional images be collected.
 #[derive(Debug, Apiv2Schema, serde::Serialize)]
 pub struct DocumentResponse {
     pub status: DocumentResponseStatus,
