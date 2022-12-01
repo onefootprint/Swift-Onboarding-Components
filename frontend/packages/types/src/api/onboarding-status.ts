@@ -39,7 +39,7 @@ export type OnboardingStatusRequest = {
 
 export type AuthorizeFields = {
   collectedData: CollectedKycDataOption[];
-  identityDocumentType: IdDocType[];
+  identityDocumentTypes: IdDocType[];
 };
 
 export type OnboardingStatusResponse = {

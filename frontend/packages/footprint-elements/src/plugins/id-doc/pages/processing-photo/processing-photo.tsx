@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40, IcoClose40 } from '@onefootprint/icons';
 import {
-  DocStatusType,
+  DocStatusKind,
   GetDocStatusResponse,
   IdDocBadImageError,
 } from '@onefootprint/types';
@@ -66,15 +66,19 @@ const ProcessingPhoto = () => {
 
   useGetDocStatus({
     onSuccess: (response: GetDocStatusResponse) => {
-      const { status, frontImageError, backImageError } = response;
-      if (status === DocStatusType.retryLimitExceeded) {
+      const {
+        status: { kind },
+        frontImageError,
+        backImageError,
+      } = response;
+      if (kind === DocStatusKind.retryLimitExceeded) {
         handleRetryLimitExceeded();
       } else if (
-        status === DocStatusType.error &&
+        kind === DocStatusKind.error &&
         (frontImageError || backImageError)
       ) {
         handleDocError(frontImageError, backImageError);
-      } else if (status === DocStatusType.complete) {
+      } else if (kind === DocStatusKind.complete) {
         handleDocSuccess();
       }
     },

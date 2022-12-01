@@ -63,7 +63,7 @@ const Authorize = () => {
 
   const statusQuery = useGetOnboardingStatus(authToken, tenantPk, {
     onSuccess: ({ fieldsToAuthorize }) => {
-      setCollectedDocs(fieldsToAuthorize?.identityDocumentType ?? []);
+      setCollectedDocs(fieldsToAuthorize?.identityDocumentTypes ?? []);
     },
   });
 
@@ -111,8 +111,8 @@ const Authorize = () => {
   };
   const docTypeLabels: Record<IdDocType, string> = {
     [IdDocType.idCard]: t('data-labels.id-card'),
-    [IdDocType.driversLicense]: t('data-labels.passport'),
-    [IdDocType.passport]: t('data-labels.driversLicense'),
+    [IdDocType.passport]: t('data-labels.passport'),
+    [IdDocType.driversLicense]: t('data-labels.driversLicense'),
   };
 
   return (

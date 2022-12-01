@@ -6,7 +6,7 @@ export type GetDocStatusRequest = {
   documentRequestId: string;
 };
 
-export enum DocStatusType {
+export enum DocStatusKind {
   pending = 'pending',
   complete = 'complete',
   error = 'error',
@@ -14,7 +14,7 @@ export enum DocStatusType {
 }
 
 export type GetDocStatusResponse = {
-  status: DocStatusType;
+  status: { kind: DocStatusKind };
   frontImageError?: IdDocBadImageError;
   backImageError?: IdDocBadImageError;
 };
