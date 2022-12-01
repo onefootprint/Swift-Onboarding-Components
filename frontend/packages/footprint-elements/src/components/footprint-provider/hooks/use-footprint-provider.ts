@@ -1,7 +1,6 @@
 import {
   CompletePayload,
   FootprintClient,
-  FootprintInternalEvent,
 } from '../footprint-js-provider.types';
 
 type UseFootprintProvider = {
@@ -21,20 +20,10 @@ const useFootprintProvider = ({ client }: UseFootprintProvider) => {
     client.cancel();
   };
 
-  const on = (name: FootprintInternalEvent, callback: (data?: any) => void) => {
-    client.on(name, callback);
-  };
-
-  const ready = () => {
-    client.ready();
-  };
-
   return {
-    ready,
     close,
     complete,
     cancel,
-    on,
   };
 };
 

@@ -6,6 +6,7 @@ vanillaIntegration(footprint);
 
 export type {
   Footprint,
+  // TODO: Remove Footprint as it's repetitive
   FootprintAppearance,
   FootprintAppearanceParams,
   FootprintAppearanceRules,
@@ -17,10 +18,7 @@ export type {
   ShowFootprint,
   UserData,
 } from './footprint-js.types';
-export {
-  FootprintInternalEvent,
-  FootprintPublicEvent,
-} from './footprint-js.types';
+export { FootprintEvents } from './footprint-js.types';
 export { default as identifyUser } from './utils/identify-user';
 
 export default footprint;

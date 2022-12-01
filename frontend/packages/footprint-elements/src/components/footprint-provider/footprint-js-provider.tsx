@@ -9,5 +9,3 @@ const [Provider, useBareFootprintProvider] = constate(
 export const useFootprintProvider = () => useBareFootprintProvider();
 
 export default Provider;
-
-export * from './footprint-js-provider.types';
