@@ -7,6 +7,7 @@ use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
 use db::models::user_vault_data::UserVaultData;
 use db::models::verification_request::VerificationRequest;
+use db::HasLifetime;
 use db::TxnPgConnection;
 use enclave_proxy::DataTransform;
 use std::convert::Into;
@@ -91,8 +92,8 @@ impl UserVaultWrapper {
 
         // Fetch all the data related to the active lifetimes
         let data = UserVaultData::get_for(conn, &active_lifetimes)?;
-        let phone_number = PhoneNumber::get_primary_for(conn, &active_lifetimes)?;
-        let email = Email::get_primary_for(conn, &active_lifetimes)?;
+        let phone_number = PhoneNumber::get_for(conn, &active_lifetimes)?.into_iter().next();
+        let email = Email::get_for(conn, &active_lifetimes)?.into_iter().next();
 
         // TODO migrate this to DataLifetimes
         let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
@@ -124,8 +125,8 @@ impl UserVaultWrapper {
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
         // UserVaultWrapper for each User
         let mut uvds = UserVaultData::bulk_get(conn, &active_lifetimes)?;
-        let mut phone_numbers = PhoneNumber::bulk_get_primary(conn, &active_lifetimes)?;
-        let mut emails = Email::bulk_get_primary(conn, &active_lifetimes)?;
+        let mut phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetimes)?;
+        let mut emails = Email::bulk_get(conn, &active_lifetimes)?;
 
         // Fetch all the identity documents for the user vault ids
         let mut identity_document_map = IdentityDocument::multi_get_for_user_vault_ids(conn, uv_ids)?;
@@ -139,8 +140,8 @@ impl UserVaultWrapper {
                     scoped_user_id: Some(su.id),
                     user_vault: uv,
                     data: uvds.remove(&uv_id).unwrap_or_default(),
-                    phone_number: phone_numbers.remove(&uv_id),
-                    email: emails.remove(&uv_id),
+                    phone_number: phone_numbers.remove(&uv_id).and_then(|v| v.into_iter().next()),
+                    email: emails.remove(&uv_id).and_then(|v| v.into_iter().next()),
                     identity_documents: identity_document_map.remove(&uv_id).unwrap_or_default(),
                     is_locked: false,
                     _seqno: None,

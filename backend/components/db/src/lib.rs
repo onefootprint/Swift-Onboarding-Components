@@ -35,9 +35,11 @@ pub mod schema;
 
 pub mod access_event;
 pub mod actor;
+mod has_lifetime;
 pub mod scoped_user;
 pub mod tenant;
 pub mod user_vault;
+pub use has_lifetime::*;
 
 #[cfg(test)]
 mod test;

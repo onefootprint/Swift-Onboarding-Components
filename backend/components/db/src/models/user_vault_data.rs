@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 use crate::schema::user_vault_data;
 use crate::DbResult;
+use crate::HasLifetime;
 use crate::TxnPgConnection;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use itertools::Itertools;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
@@ -76,6 +74,8 @@ impl UserVaultData {
         kinds: Vec<UvdKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<()> {
+        // TODO we might want to eventually move this onto the HasLifetime trait - fine for now
+        // since we don't have codepaths that do this for PhoneNumber or Email
         use crate::schema::data_lifetime;
         let lifetime_ids = user_vault_data::table
             .inner_join(data_lifetime::table)
@@ -89,31 +89,17 @@ impl UserVaultData {
         DataLifetime::bulk_deactivate(conn, lifetime_ids, seqno)?;
         Ok(())
     }
+}
 
-    pub fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
+impl HasLifetime for UserVaultData {
+    fn lifetime_id(&self) -> &DataLifetimeId {
+        &self.lifetime_id
+    }
+
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
         let results = user_vault_data::table
             .filter(user_vault_data::lifetime_id.eq_any(lifetime_ids))
             .get_results(conn)?;
-        Ok(results)
-    }
-
-    pub fn bulk_get(
-        conn: &mut PgConnection,
-        lifetime_ids: &[DataLifetimeId],
-    ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
-        use crate::schema::data_lifetime;
-        let results: Vec<(Self, DataLifetime)> = user_vault_data::table
-            .inner_join(data_lifetime::table)
-            .filter(user_vault_data::lifetime_id.eq_any(lifetime_ids))
-            .get_results(conn)?;
-
-        // Group the UVDs by UserVaultId
-        let results = results
-            .into_iter()
-            .map(|(data, lifetime)| (lifetime.user_vault_id, data))
-            .sorted_by_key(|(uv_id, _)| uv_id.clone())
-            .into_group_map();
-
         Ok(results)
     }
 }

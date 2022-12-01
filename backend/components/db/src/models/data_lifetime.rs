@@ -208,7 +208,7 @@ impl DataLifetime {
         conn: &mut PgConnection,
         user_vault_ids: Vec<&UserVaultId>,
         tenant_id: &TenantId,
-    ) -> DbResult<Vec<DataLifetimeId>> {
+    ) -> DbResult<Vec<DataLifetime>> {
         use crate::schema::scoped_user;
         let q_is_committed = not(data_lifetime::committed_seqno.is_null());
         let q_belongs_to_tenant = scoped_user::tenant_id.eq(tenant_id);
@@ -221,7 +221,7 @@ impl DataLifetime {
             // OR belong to this tenant
             .filter(q_is_committed.or(q_belongs_to_tenant));
 
-        let results = query.select(data_lifetime::id).get_results(conn)?;
+        let results = query.select(data_lifetime::all_columns).get_results(conn)?;
         Ok(results)
     }
 

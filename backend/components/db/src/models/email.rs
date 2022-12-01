@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
 use crate::{
     schema::{data_lifetime, email, scoped_user},
-    DbResult, TxnPgConnection,
+    DbResult, HasLifetime, TxnPgConnection,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -52,34 +50,6 @@ impl Email {
             .select(email::all_columns)
             .load(conn)?;
         Ok(results)
-    }
-
-    pub fn get_primary_for(
-        conn: &mut PgConnection,
-        lifetime_ids: &[DataLifetimeId],
-    ) -> DbResult<Option<Self>> {
-        let result = email::table
-            .filter(email::lifetime_id.eq_any(lifetime_ids))
-            .filter(email::priority.eq(DataPriority::Primary))
-            .first(conn)
-            .optional()?;
-        Ok(result)
-    }
-
-    pub fn bulk_get_primary(
-        conn: &mut PgConnection,
-        lifetime_ids: &[DataLifetimeId],
-    ) -> DbResult<HashMap<UserVaultId, Self>> {
-        let result = email::table
-            .inner_join(data_lifetime::table)
-            .filter(email::lifetime_id.eq_any(lifetime_ids))
-            .filter(email::priority.eq(DataPriority::Primary))
-            .get_results::<(Self, DataLifetime)>(conn)?
-            .into_iter()
-            .map(|(email, lifetime)| (lifetime.user_vault_id, email))
-            .collect();
-
-        Ok(result)
     }
 
     pub fn create(
@@ -148,5 +118,20 @@ impl HasDataAttributeFields for Email {
             DataAttribute::Email => Some(&self.e_data),
             _ => None,
         }
+    }
+}
+
+impl HasLifetime for Email {
+    fn lifetime_id(&self) -> &DataLifetimeId {
+        &self.lifetime_id
+    }
+
+    /// Note: only returns primary emails
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
+        let results = email::table
+            .filter(email::lifetime_id.eq_any(lifetime_ids))
+            .filter(email::priority.eq(DataPriority::Primary))
+            .get_results(conn)?;
+        Ok(results)
     }
 }
