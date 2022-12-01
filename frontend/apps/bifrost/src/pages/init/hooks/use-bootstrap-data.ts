@@ -5,7 +5,7 @@ import {
 import { BootstrapData } from 'src/hooks/use-bifrost-machine';
 import { useEffectOnce } from 'usehooks-ts';
 
-const WAITING_USER_DATA_TIME = 250;
+const WAITING_USER_DATA_TIME = 500;
 
 const useBootstrapData = (
   onSuccess: (bootstrapData?: BootstrapData) => void,
