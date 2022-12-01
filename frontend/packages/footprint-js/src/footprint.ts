@@ -2,7 +2,7 @@ import './footprint-styles.css';
 
 import {
   FootprintAppearance,
-  FootprintEvents,
+  FootprintPublicEvent,
   ShowFootprint,
 } from './footprint-js.types';
 import IframeManager from './utils/footprint-iframe';
@@ -41,23 +41,24 @@ const footprint = () => {
   };
 
   const handleOnCompleted = (callback: (validationToken: string) => void) =>
-    iframeManager.on(FootprintEvents.completed, (data: any) => {
+    iframeManager.on(FootprintPublicEvent.completed, (data: any) => {
       if (data && typeof data === 'string') {
         callback(data);
       }
     });
 
   const handleOnCanceled = (callback: () => void) =>
-    iframeManager.on(FootprintEvents.canceled, callback);
+    iframeManager.on(FootprintPublicEvent.canceled, callback);
 
   const handleOnClosed = (callback: () => void) =>
-    iframeManager.on(FootprintEvents.closed, callback);
+    iframeManager.on(FootprintPublicEvent.closed, callback);
 
   const show = async ({
     appearance,
-    publicKey,
-    onCompleted,
     onCanceled,
+    onCompleted,
+    publicKey,
+    userData,
   }: ShowFootprint) => {
     if (hasIframeOpened) {
       console.warn('Cannot open two instances of Footprint at the same time');
@@ -67,8 +68,7 @@ const footprint = () => {
     setDialogStyles(appearance);
     const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
     const url = getURL({ fontSrc, publicKey, rules, variables });
-    await iframeManager.show(url);
-
+    await iframeManager.show(url, userData);
     if (onCompleted) {
       handleOnCompleted(onCompleted);
     }

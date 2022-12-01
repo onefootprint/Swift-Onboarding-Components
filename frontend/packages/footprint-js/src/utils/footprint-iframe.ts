@@ -1,6 +1,10 @@
 import Postmate from 'postmate';
 
-import { FootprintEvents } from '../footprint-js.types';
+import {
+  FootprintInternalEvent,
+  FootprintPublicEvent,
+  UserData,
+} from '../footprint-js.types';
 import {
   createContainer,
   createFootprintButton,
@@ -12,29 +16,38 @@ import {
 class FootprintIframe {
   private child: Postmate.ParentAPI | null = null;
 
-  async show(url: string) {
-    const handleOnIframeLoaded = () => {
-      removeLoader();
-    };
+  private bootstrap(userData?: UserData) {
+    if (userData) {
+      this.child?.call(FootprintInternalEvent.bootstrapDataReceived, userData);
+    }
+  }
 
+  private handleIframeLoaded = () => {
+    removeLoader();
+  };
+
+  async show(url: string, userData?: UserData) {
     const container = createContainer();
     showOverlay(container);
-    const child = await new Postmate({
+    this.child = await new Postmate({
       classListArray: ['footprint-modal'],
       container,
       name: 'footprint-iframe',
       url,
     });
-    child.frame.setAttribute(
+    this.handleIframeLoaded();
+    this.child.frame.setAttribute(
       'allow',
       'otp-credentials; publickey-credentials-get *; camera *;',
     );
-    handleOnIframeLoaded();
-    child.on(FootprintEvents.closed, () => this.close());
-    this.child = child;
+
+    this.child.on(FootprintPublicEvent.closed, () => this.close());
+    this.child.on(FootprintInternalEvent.ready, () => {
+      this.bootstrap(userData);
+    });
   }
 
-  on(eventName: FootprintEvents, callback: (data?: any) => void) {
+  on(eventName: FootprintPublicEvent, callback: (data?: any) => void) {
     if (!this.child) {
       throw new Error('Footprint should be open in order to listen events');
     }
