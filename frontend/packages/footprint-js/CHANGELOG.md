@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 1.0.0
+
+### Major Changes
+
+- a63df443: Rename show method to open. Allow to pass user data as parameter
+
 ## 0.6.1
 
 ### Patch Changes

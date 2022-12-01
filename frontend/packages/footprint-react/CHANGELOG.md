@@ -1,5 +1,12 @@
 # @onefootprint/footprint-react
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [a63df443]
+  - @onefootprint/footprint-js@1.0.0
+
 ## 1.0.1
 
 ### Patch Changes
