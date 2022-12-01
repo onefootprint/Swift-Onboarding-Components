@@ -1,7 +1,7 @@
 use newtypes::CollectedDataOption;
 
 use crate::{
-    export_schema, Actor, Annotation, Apiv2Schema, DateTime, Deserialize, JsonSchema, LivenessEvent,
+    export_schema, Annotation, Apiv2Schema, DateTime, Deserialize, JsonSchema, LivenessEvent,
     OnboardingDecision, Serialize, Utc,
 };
 

@@ -6,11 +6,11 @@ use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext};
 use crate::auth::{tenant::WorkOsAuthContext, Either};
 
 use crate::errors::ApiError;
-use crate::routes::hosted::user::DecryptDocumentResult;
 use crate::types::{JsonApiResponse, ResponseData};
 
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::uvw_decryption::DecryptDocumentResult;
 use crate::State;
 
 use api_wire_types::{
@@ -147,7 +147,7 @@ pub(super) async fn post_internal(
 
     // As of 2022-11-28: It's possible a user has more than 1 document of a given document_type
     let decrypted_docs: Vec<DecryptDocumentResult> =
-        crate::hosted::user::decrypt_document(&state, uvw.user_vault, document_type.clone()).await?;
+        uvw.decrypt_document(&state, document_type.clone()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed identity document
     NewAccessEvent {

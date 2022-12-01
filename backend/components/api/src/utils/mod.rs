@@ -9,6 +9,10 @@ pub mod liveness;
 pub mod session;
 pub mod twilio;
 pub mod user_vault_wrapper;
+pub mod uvw_custom_data;
+pub mod uvw_decryption;
+pub mod uvw_document;
+pub mod uvw_identity_data;
 pub mod validate_request;
 
 #[cfg(test)]
