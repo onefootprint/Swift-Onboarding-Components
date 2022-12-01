@@ -24,7 +24,7 @@
     "@svgr/plugin-prettier": "^6.1.2",
     "@svgr/plugin-svgo": "^6.2.0",
     "@types/glob": "^7.2.0",
-    "@types/react-dom": "^18.0.6",
+    "@types/react-dom": "^18.0.9",
     "@types/styled-components": "^5.1.25",
     "csstype": "^3.1.0",
     "eslint-config-footprint": "*",
