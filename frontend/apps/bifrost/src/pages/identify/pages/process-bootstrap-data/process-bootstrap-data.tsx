@@ -1,6 +1,6 @@
 import { ChallengeData } from '@onefootprint/types';
-import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
+import InitShimmer from 'src/components/init-shimmer';
 import { Events } from 'src/hooks/use-identify-machine';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
@@ -38,7 +38,7 @@ const ProcessBootstrapData = () => {
     },
   });
 
-  return <LoadingIndicator />;
+  return <InitShimmer />;
 };
 
 export default ProcessBootstrapData;

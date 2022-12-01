@@ -1,8 +1,10 @@
-import { FootprintButton } from '@onefootprint/footprint-react';
-import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
+import { media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+
+import Form from './components/form';
+import Success from './components/success';
 
 export type DemoProps = {
   page: {
@@ -15,10 +17,11 @@ export type DemoProps = {
   };
 };
 
-const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
-
 const Demo = ({ page }: DemoProps) => {
   const [showConfirmation, setConfirmation] = useState(false);
+  const handleSuccess = () => {
+    setConfirmation(true);
+  };
 
   return (
     <>
@@ -28,36 +31,9 @@ const Demo = ({ page }: DemoProps) => {
       <Container>
         <Inner>
           {showConfirmation ? (
-            <Box>
-              <Typography
-                color="primary"
-                sx={{ marginBottom: 7 }}
-                variant="heading-2"
-              >
-                Onboarding complete!
-              </Typography>
-              <Typography color="secondary" variant="body-1" as="div">
-                Thanks for trying Footprint. If you have any questions or want
-                to learn more about our product, please contact us and we will
-                get back to you as soon as possible.
-              </Typography>
-            </Box>
+            <Success />
           ) : (
-            <>
-              <Content dangerouslySetInnerHTML={{ __html: page.html }} />
-              <ButtonContainer>
-                <FootprintButton
-                  publicKey={publicKey}
-                  onCompleted={(validationToken: string) => {
-                    setConfirmation(true);
-                    console.log('on completed', validationToken);
-                  }}
-                  onCanceled={() => {
-                    console.log('user canceled!');
-                  }}
-                />
-              </ButtonContainer>
-            </>
+            <Form html={page.html} onSuccess={handleSuccess} />
           )}
         </Inner>
         <Typography color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
@@ -102,31 +78,6 @@ const Inner = styled.div`
       max-width: 700px;
     `}
   `}
-`;
-
-const Content = styled.div`
-  ${({ theme }) => css`
-    img {
-      margin-bottom: ${theme.spacing[7]};
-    }
-
-    h1,
-    h2,
-    h3 {
-      ${createFontStyles('heading-2')};
-      color: ${theme.color.primary};
-      margin-bottom: ${theme.spacing[7]};
-    }
-
-    p {
-      ${createFontStyles('body-1')};
-      color: ${theme.color.secondary};
-    }
-  `}
-`;
-
-const ButtonContainer = styled.div`
-  margin: 0 auto;
 `;
 
 export default Demo;
