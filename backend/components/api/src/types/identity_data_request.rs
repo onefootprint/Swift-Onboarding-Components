@@ -1,15 +1,10 @@
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
-use crate::utils::fingerprint_builder::FingerprintBuilder;
-use crate::State;
-
-use db::models::fingerprint::IsUnique;
 
 use newtypes::address::{Address, FullAddressOrZip, ZipAndCountry};
 use newtypes::dob::DateOfBirth;
 use newtypes::name::FullName;
 use newtypes::ssn::{Ssn, Ssn4, Ssn9};
-use newtypes::{DataAttribute, Fingerprint};
 
 use paperclip::actix::Apiv2Schema;
 
@@ -58,36 +53,4 @@ pub struct IdentityDataUpdate {
     pub dob: Option<DateOfBirth>,
     pub address: Option<FullAddressOrZip>,
     pub ssn: Option<Ssn>,
-}
-
-pub type ComputedFingerprints = Vec<(DataAttribute, Fingerprint, IsUnique)>;
-impl IdentityDataUpdate {
-    pub async fn fingerprints(&self, state: &State) -> Result<ComputedFingerprints, ApiError> {
-        let mut builder = FingerprintBuilder::new();
-
-        let IdentityDataUpdate {
-            name,
-            dob,
-            ssn,
-            address,
-        } = self.clone();
-
-        if let Some(name) = name {
-            builder.add_full_name(name);
-        }
-
-        if let Some(dob) = dob {
-            builder.add(dob.into(), DataAttribute::Dob);
-        }
-
-        if let Some(ssn) = ssn {
-            builder.add_ssn(ssn);
-        }
-
-        if let Some(address) = address {
-            builder.add_address_or_zip(address);
-        }
-
-        builder.create(state).await
-    }
 }

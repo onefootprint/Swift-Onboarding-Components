@@ -9,7 +9,6 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 
@@ -18,6 +17,7 @@ use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_user::ScopedUser;
 
+use db::models::user_vault::UserVault;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -41,25 +41,20 @@ pub async fn post(
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
     let mut user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
-
     let uv_id = user_auth.user_vault_id();
-
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| UserVaultWrapper::get(conn, &uv_id))
-        .await??;
 
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            if onboarding_context.ob_config().is_live != uvw.user_vault.is_live {
+            let uv = UserVault::lock(conn, &uv_id)?;
+            if onboarding_context.ob_config().is_live != uv.is_live {
                 return Err(OnboardingError::InvalidSandboxState.into());
             }
 
             let scoped_user = ScopedUser::get_or_create(
                 conn,
-                uvw.user_vault.id,
+                uv.id,
                 onboarding_context.tenant().id.clone(),
                 onboarding_context.ob_config().is_live,
             )?;

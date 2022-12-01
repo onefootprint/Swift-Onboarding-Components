@@ -1,58 +1,65 @@
-use crate::{schema::email, DbError};
+use std::collections::HashMap;
+
+use crate::{
+    schema::{data_lifetime, email, scoped_user},
+    DbResult, TxnPgConnection,
+};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::DataAttribute;
+use newtypes::DataLifetimeId;
 use newtypes::{
-    DataPriority, EmailId, Fingerprint as FingerprintData, FingerprintId, SealedVaultBytes, UserVaultId,
+    DataPriority, EmailId, Fingerprint as FingerprintData, ScopedUserId, SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
-use super::fingerprint::Fingerprint;
 use super::user_vault::UserVault;
+use super::{
+    data_lifetime::DataLifetime,
+    fingerprint::{Fingerprint, NewFingerprint},
+};
 use crate::HasDataAttributeFields;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = email)]
 pub struct Email {
     pub id: EmailId,
-    pub user_vault_id: UserVaultId,
-    pub fingerprint_ids: Vec<FingerprintId>,
     pub e_data: SealedVaultBytes,
     pub is_verified: bool,
     pub priority: DataPriority,
     pub deactivated_at: Option<DateTime<Utc>>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub lifetime_id: DataLifetimeId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = email)]
 pub struct NewEmail {
-    pub user_vault_id: UserVaultId,
-    pub fingerprint_ids: Vec<FingerprintId>,
     pub e_data: SealedVaultBytes,
     pub is_verified: bool,
     pub priority: DataPriority,
+    pub lifetime_id: DataLifetimeId,
 }
 
 impl Email {
-    pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Vec<Self>, DbError> {
+    pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = email::table
-            .filter(email::user_vault_id.eq(user_vault_id))
+            .inner_join(data_lifetime::table.inner_join(scoped_user::table))
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .filter(email::deactivated_at.is_null())
+            .select(email::all_columns)
             .load(conn)?;
         Ok(results)
     }
 
-    pub fn get_primary(
+    pub fn get_primary_for(
         conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
-    ) -> Result<Option<Self>, DbError> {
-        tracing::info!("fetching email for user_vault_id");
+        lifetime_ids: &[DataLifetimeId],
+    ) -> DbResult<Option<Self>> {
         let result = email::table
-            .filter(email::user_vault_id.eq(user_vault_id))
-            .filter(email::deactivated_at.is_null())
+            .filter(email::lifetime_id.eq_any(lifetime_ids))
             .filter(email::priority.eq(DataPriority::Primary))
             .first(conn)
             .optional()?;
@@ -61,42 +68,49 @@ impl Email {
 
     pub fn bulk_get_primary(
         conn: &mut PgConnection,
-        user_vault_ids: &Vec<UserVaultId>,
-    ) -> Result<Vec<Self>, DbError> {
-        tracing::info!("bulk fetching email for user_vault_ids");
+        lifetime_ids: &[DataLifetimeId],
+    ) -> DbResult<HashMap<UserVaultId, Self>> {
         let result = email::table
-            .filter(email::user_vault_id.eq_any(user_vault_ids))
-            .filter(email::deactivated_at.is_null())
+            .inner_join(data_lifetime::table)
+            .filter(email::lifetime_id.eq_any(lifetime_ids))
             .filter(email::priority.eq(DataPriority::Primary))
-            .load::<Self>(conn)?;
+            .get_results::<(Self, DataLifetime)>(conn)?
+            .into_iter()
+            .map(|(email, lifetime)| (lifetime.user_vault_id, email))
+            .collect();
 
         Ok(result)
     }
 
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         user_vault_id: UserVaultId,
         e_data: SealedVaultBytes,
         fingerprint: FingerprintData,
-        is_verified: bool,
         priority: DataPriority,
-    ) -> Result<Email, DbError> {
-        // TODO: ensure that the fingerprint tuple of (user_vault_id, fingerprint) is unique
-        let fingerprint_ids = Fingerprint::bulk_create(
-            conn,
-            &user_vault_id,
-            vec![(DataAttribute::Email, fingerprint, is_verified)],
-        )?;
+        scoped_user_id: ScopedUserId,
+    ) -> DbResult<Email> {
+        let lifetime = DataLifetime::create(conn, user_vault_id, Some(scoped_user_id))?;
         let new_row = NewEmail {
-            user_vault_id,
-            fingerprint_ids,
             e_data,
-            is_verified,
+            is_verified: false,
             priority,
+            lifetime_id: lifetime.id.clone(),
         };
         let email = diesel::insert_into(email::table)
             .values(new_row)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
+
+        // After inserting the data, also create a fingerprint for this piece of data tied to the
+        // same DataLifetime
+        let new_fingerprint = NewFingerprint {
+            sh_data: fingerprint,
+            kind: DataAttribute::Email,
+            lifetime_id: lifetime.id,
+        };
+        // TODO: ensure that the fingerprint tuple of (user_vault_id, fingerprint) is unique
+        Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
+
         Ok(email)
     }
 
@@ -104,17 +118,18 @@ impl Email {
         conn: &mut PgConnection,
         id: &EmailId,
         user_vault_id: &UserVaultId,
-    ) -> Result<(Email, UserVault), crate::DbError> {
+    ) -> DbResult<(Email, UserVault)> {
         use crate::schema::user_vault;
         let result = email::table
-            .inner_join(user_vault::table)
+            .inner_join(data_lifetime::table.inner_join(scoped_user::table.inner_join(user_vault::table)))
             .filter(email::id.eq(id))
-            .filter(email::user_vault_id.eq(user_vault_id))
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .select((email::all_columns, user_vault::all_columns))
             .get_result(conn)?;
         Ok(result)
     }
 
-    pub fn mark_verified(conn: &mut PgConnection, id: &EmailId) -> Result<(), DbError> {
+    pub fn mark_verified(conn: &mut PgConnection, id: &EmailId) -> DbResult<()> {
         diesel::update(email::table)
             .filter(email::id.eq(id))
             .set(email::is_verified.eq(true))

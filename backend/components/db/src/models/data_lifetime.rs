@@ -1,0 +1,263 @@
+use chrono::{DateTime, Utc};
+use diesel::dsl::not;
+use diesel::prelude::*;
+use newtypes::DataLifetimeSeqno;
+use newtypes::ScopedUserId;
+use newtypes::TenantId;
+use newtypes::{DataLifetimeId, UserVaultId};
+use serde::{Deserialize, Serialize};
+
+use crate::nextval;
+use crate::schema::data_lifetime;
+use crate::TxnPgConnection;
+use crate::{DbError, DbResult};
+
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[diesel(table_name = data_lifetime)]
+/// DataLifetime is a generic model that allows us to represent the lifecycle of a piece of data
+/// that belongs to a user. All pieces of data "belonging" to a user vault share some attributes,
+/// and those attributes are all represented here. You will see many models throughout the codebase
+/// contain a pointer to a DataLifetime row. Also notable, Fingerprints and the underlying data
+/// storage rows point to the same DataLifetime row, which conveniently deactivates fingerprints as
+/// soon as the underlying data is deactivated.
+///
+/// Ownership attributes:
+/// - `user_vault_id`: The user to which this piece of data belongs
+/// - `scoped_user_id`: The scoped_user that represents during onboarding to which tenant this data
+///   was added
+///
+/// Lifecycle attributes:
+/// - `created_at`/`created_seqno`: When the data was created
+/// - `committed_at`/`committed_seqno`: When the data was committed and made portable. Generally, this
+///   is after is has been verified with data vendors.
+/// - `deactivated_at`/`deactivated_seqno`: When the data was archived and is no longer active. This
+///   may happen if a piece of data is replaced with newer data.
+///
+/// Notably, each lifecycle attribute is represented both with a human-readable timestamp AND with
+/// a machine-readable seqno. The seqno is controlled by a postgres sequence that is incremented
+/// when new rows are added/committed/deactivated. It provides a _total_ ordering of events that
+/// occur during the data lifecycle (which cannot always be provided by a timestamp).
+///
+/// More info here: https://www.notion.so/Data-model-v4-724c993c985748fc85a77f80e9a46f72
+pub struct DataLifetime {
+    pub id: DataLifetimeId,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
+    // Ownership attributes
+    pub user_vault_id: UserVaultId,
+    pub scoped_user_id: Option<ScopedUserId>,
+    // Lifecycle attributes
+    pub created_at: DateTime<Utc>,
+    pub committed_at: Option<DateTime<Utc>>,
+    pub deactivated_at: Option<DateTime<Utc>>,
+    pub created_seqno: DataLifetimeSeqno,
+    pub committed_seqno: Option<DataLifetimeSeqno>,
+    pub deactivated_seqno: Option<DataLifetimeSeqno>,
+}
+
+#[derive(Clone, Insertable)]
+#[diesel(table_name = data_lifetime)]
+struct NewDataLifetime {
+    // This is just denormalized for fast querying.
+    user_vault_id: UserVaultId,
+    // We might want to not support creating data not linked to a tenant. Right now this is only
+    // used for the my1fp login flow
+    scoped_user_id: Option<ScopedUserId>,
+    created_at: DateTime<Utc>,
+    created_seqno: DataLifetimeSeqno,
+}
+
+#[derive(Default, AsChangeset)]
+#[diesel(table_name = data_lifetime)]
+struct DataLifetimeUpdate {
+    committed_at: Option<Option<DateTime<Utc>>>,
+    deactivated_at: Option<Option<DateTime<Utc>>>,
+    committed_seqno: Option<Option<DataLifetimeSeqno>>,
+    deactivated_seqno: Option<Option<DataLifetimeSeqno>>,
+}
+
+impl DataLifetime {
+    /// Gets the next sequence number for the lifetime table. Should be used when creating new data.
+    ///
+    /// This uses a postgres sequence under the hood. Postgres sequences are most known for their
+    /// role in keeping track of the current/next value for an auto-incrementing primary key column.
+    /// We use them here to keep track of our seqno timeline of data operations that can happen on
+    /// a user vault.
+    ///
+    /// Uniquely, writes made to a sequence are never undone, even if the transaction that made the
+    /// write ends up rolling back. Because of this, multiple concurrently running transactions can
+    /// fetch the next value from a sequence without creating an observable throughput bottleneck.
+    pub fn get_next_seqno(conn: &mut PgConnection) -> DbResult<DataLifetimeSeqno> {
+        let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
+        Ok(result)
+    }
+
+    /// Gets the current sequence number for the lifetime table without incrementing. Should be used
+    /// when taking a snapshot
+    pub fn get_current_seqno(conn: &mut PgConnection) -> DbResult<DataLifetimeSeqno> {
+        // TODO need to do some raw SQL to get the last_value from the sequence.
+        // For now, we'll increment the sequence just to get the value
+        /*
+        let result = diesel::sql_query("SELECT last_value FROM data_lifetime_seqno")
+            .get_result::<(i64,)>(conn)?
+            .0;
+        Ok(DataLifetimeSeqno(result))
+        */
+        Self::get_next_seqno(conn)
+    }
+
+    /// Creates len new DataLifetime rows with the same created_seqno and created_at
+    pub(crate) fn bulk_create(
+        conn: &mut TxnPgConnection,
+        user_vault_id: UserVaultId,
+        scoped_user_id: Option<ScopedUserId>,
+        len: usize,
+        seqno: DataLifetimeSeqno,
+    ) -> DbResult<Vec<Self>> {
+        let new_row = NewDataLifetime {
+            user_vault_id,
+            scoped_user_id,
+            created_at: Utc::now(),
+            created_seqno: seqno,
+        };
+        // Make len copies of the row (each with a different primary key) since each piece of UVD
+        // needs its own lifetime
+        let new_rows = vec![new_row; len];
+        let result = diesel::insert_into(data_lifetime::table)
+            .values(new_rows)
+            .get_results::<Self>(conn.conn())?;
+        Ok(result)
+    }
+
+    /// Creates a single new DataLifetime row
+    pub(crate) fn create(
+        conn: &mut TxnPgConnection,
+        user_vault_id: UserVaultId,
+        scoped_user_id: Option<ScopedUserId>,
+    ) -> DbResult<Self> {
+        let seqno = Self::get_next_seqno(conn)?;
+        let lifetime = Self::bulk_create(conn, user_vault_id, scoped_user_id, 1, seqno)?
+            .into_iter()
+            .next()
+            .ok_or(DbError::ObjectNotFound)?;
+        Ok(lifetime)
+    }
+
+    pub fn commit(self, conn: &mut PgConnection, seqno: DataLifetimeSeqno) -> DbResult<Self> {
+        let result = diesel::update(data_lifetime::table)
+            .filter(data_lifetime::id.eq(&self.id))
+            .set((
+                data_lifetime::committed_at.eq(Utc::now()),
+                data_lifetime::committed_seqno.eq(seqno),
+            ))
+            .get_result(conn)?;
+        Ok(result)
+    }
+
+    /// Given a list of DataLifetimeIds, marks the active DataLifetime rows as deactivated.
+    pub(crate) fn bulk_deactivate(
+        conn: &mut PgConnection,
+        ids: Vec<DataLifetimeId>,
+        seqno: DataLifetimeSeqno,
+    ) -> DbResult<()> {
+        let update = DataLifetimeUpdate {
+            deactivated_at: Some(Some(Utc::now())),
+            deactivated_seqno: Some(Some(seqno)),
+            ..DataLifetimeUpdate::default()
+        };
+        diesel::update(data_lifetime::table)
+            .filter(data_lifetime::id.eq_any(ids))
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .set(update)
+            .execute(conn)?;
+        Ok(())
+    }
+
+    /// Get the list of currently active DataLifetimeIds for the provided scoped_user_id.
+    /// A piece of user data is visible if it is (1) committed and (2) not deactivated.
+    /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
+    /// whether or not the data is committed.
+    pub fn get_active(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+        scoped_user_id: Option<&ScopedUserId>,
+    ) -> DbResult<Vec<DataLifetimeId>> {
+        let mut query = data_lifetime::table
+            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .into_boxed();
+
+        let q_is_committed = not(data_lifetime::committed_seqno.is_null());
+        if let Some(scoped_user_id) = scoped_user_id {
+            // Fetch committed data
+            // And also fetch uncommitted, non-portable data that was active at the time
+            // and belongs to the tenant
+            let q_belongs_to_tenant = data_lifetime::scoped_user_id.eq(scoped_user_id);
+            query = query.filter(q_is_committed.or(q_belongs_to_tenant));
+        } else {
+            // Only fetch committed, portable data
+            query = query.filter(q_is_committed)
+        }
+        let results = query.select(data_lifetime::id).get_results(conn)?;
+        Ok(results)
+    }
+
+    /// Get the list of currently active DataLifetimeIds for the provided tenant_id and list
+    /// of user_vault_ids.
+    pub fn get_bulk_active_for_tenant(
+        conn: &mut PgConnection,
+        user_vault_ids: Vec<&UserVaultId>,
+        tenant_id: &TenantId,
+    ) -> DbResult<Vec<DataLifetimeId>> {
+        use crate::schema::scoped_user;
+        let q_is_committed = not(data_lifetime::committed_seqno.is_null());
+        let q_belongs_to_tenant = scoped_user::tenant_id.eq(tenant_id);
+        let query = data_lifetime::table
+            .left_join(scoped_user::table)
+            // Get data belonging to these users that is not deactivated
+            .filter(data_lifetime::user_vault_id.eq_any(user_vault_ids))
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            // Fetch all rows that are either committed
+            // OR belong to this tenant
+            .filter(q_is_committed.or(q_belongs_to_tenant));
+
+        let results = query.select(data_lifetime::id).get_results(conn)?;
+        Ok(results)
+    }
+
+    /// Get the list of currently active DataLifetimeIds for the provided (user_vault_id, scoped_user_id)
+    /// at a given seqno. This allows reconstructing a snapshot of what a user vault looked like at a time.
+    pub fn get_active_at(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+        seqno: DataLifetimeSeqno,
+        scoped_user_id: Option<&ScopedUserId>,
+    ) -> DbResult<Vec<DataLifetimeId>> {
+        // This is kind of unnecessarily similar to `get_active`, but it's hard to combine
+        // this logic in diesel
+        let mut query = data_lifetime::table
+            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
+            .filter(
+                data_lifetime::deactivated_seqno
+                    .gt(seqno)
+                    .or(data_lifetime::deactivated_seqno.is_null()),
+            )
+            .into_boxed();
+
+        let q_is_committed = data_lifetime::committed_seqno.le(seqno);
+        if let Some(scoped_user_id) = scoped_user_id {
+            // Fetch committed data
+            // AND also fetch uncommitted, non-portable data that was active at the time
+            // and belongs to the tenant
+            let q_belongs_to_tenant = data_lifetime::scoped_user_id
+                .eq(scoped_user_id)
+                .and(data_lifetime::created_seqno.le(seqno));
+            query = query.filter(q_is_committed.or(q_belongs_to_tenant));
+        } else {
+            // Only fetch committed, portable data
+            query = query.filter(q_is_committed)
+        }
+        let results = query.select(data_lifetime::id).get_results(conn)?;
+        Ok(results)
+    }
+}

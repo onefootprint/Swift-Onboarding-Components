@@ -5,7 +5,6 @@ use crate::{
 };
 
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use newtypes::{OnboardingId, UserVaultId};
 
 use super::*;
 /// The Engine module is the main entry point into running our verification logic
@@ -71,19 +70,18 @@ type ShouldRunDecisionEngine = bool;
 /// Determine if we are in a position to run IDV checks and produce a Decision. Otherwise, set up some testing data
 pub async fn perform_pre_run_operations(
     state: &State,
-    uvw_id: UserVaultId,
-    ob_id: OnboardingId,
+    ob: Onboarding,
     ob_config: ObConfiguration,
 ) -> Result<ShouldRunDecisionEngine, ApiError> {
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::get(conn, &uvw_id))
+        .db_query(move |conn| UserVaultWrapper::get_for_tenant(conn, &ob.scoped_user_id))
         .await??;
 
     // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
     // phone number's sandbox suffix
     let should_initiate_verification_requests =
-        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob_id.clone()).await?;
+        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob.id.clone()).await?;
     if !should_initiate_verification_requests {
         return Ok(false);
     }
@@ -99,7 +97,7 @@ pub async fn perform_pre_run_operations(
             }
 
             // Checkpoint and create VerificationRequests
-            vendor::build_verification_requests_and_checkpoint(conn, &ob_id, &uvw)?;
+            vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
 
             Ok(true)
         })

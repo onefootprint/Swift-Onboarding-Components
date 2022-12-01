@@ -9,9 +9,10 @@ use crate::auth::{
 };
 use crate::errors::ApiResult;
 use crate::hosted::user::DecryptFieldsResult;
-use crate::types::identity_data_request::{ComputedFingerprints, IdentityDataRequest, IdentityDataUpdate};
+use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
+use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
@@ -22,12 +23,12 @@ use db::models::insight_event::CreateInsightEvent;
 use db::HasDataAttributeFields;
 use db::TxnPgConnection;
 
+use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
-use db::models::user_vault::UserVault;
 use newtypes::csv::Csv;
 use newtypes::{
-    flat_api_object_map_type, AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, PiiString,
-    TenantPermission,
+    flat_api_object_map_type, AccessEventKind, DataAttribute, DataIdentifier, Fingerprint, FootprintUserId,
+    PiiString, TenantPermission, UvdKind,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -51,15 +52,14 @@ pub async fn put(
     let is_live = tenant_auth.is_live()?;
     let request = request.into_inner();
     let update = IdentityDataUpdate::try_from(request)?;
-    let fingerprints = update.fingerprints(&state).await?;
+    let fingerprints = FingerprintBuilder::fingerprints(&state, update.clone()).await?;
     let insight = CreateInsightEvent::from(insight);
 
     state
         .db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
-            let (user_vault, scoped_user) =
-                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-            let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
+            let (ob, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
             put_internal(
                 conn,
                 &mut uvw,
@@ -68,6 +68,7 @@ pub async fn put(
                 insight,
                 update,
                 fingerprints,
+                ob,
             )?;
             Ok(())
         })
@@ -83,7 +84,8 @@ pub fn put_internal(
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,
     update: IdentityDataUpdate,
-    fingerprints: ComputedFingerprints,
+    fingerprints: Vec<(UvdKind, Fingerprint)>,
+    onboarding: Onboarding,
 ) -> ApiResult<()> {
     if uvw.user_vault.is_portable {
         return Err(AuthError::CannotModifyPortableUser.into());
@@ -98,12 +100,12 @@ pub fn put_internal(
         kind: AccessEventKind::Update,
         targets: fingerprints
             .iter()
-            .map(|fp| fp.0)
+            .map(|fp| fp.0.into())
             .map(DataIdentifier::Identity)
             .collect(),
     }
     .create(conn)?;
-    uvw.update_identity_data(conn, update, fingerprints, None)?;
+    uvw.update_identity_data(conn, update, fingerprints, onboarding.id)?;
     Ok(())
 }
 
@@ -154,10 +156,8 @@ pub(super) async fn get_internal(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (user_vault, scoped_user) =
-                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-
-            let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
+            let (_, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let user_vault_wrapper = UserVaultWrapper::get_for_tenant(conn, &scoped_user.id)?;
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 
             Ok(user_vault_wrapper)
@@ -230,10 +230,8 @@ pub(super) async fn post_decrypt_internal(
     let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (user_vault, scoped_user) =
-                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-
-            let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
+            let (_, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let user_vault_wrapper = UserVaultWrapper::get_for_tenant(conn, &scoped_user.id)?;
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 
             Ok((user_vault_wrapper, scoped_user))

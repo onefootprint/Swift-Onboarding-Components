@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuthContext, UserAuthScope};
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -38,14 +38,7 @@ pub async fn post(
         return Ok(Json(EmptyResponse::ok()));
     }
 
-    let user_vault = user_auth.user_vault(&state.db_pool).await?;
-
     let email = request.into_inner().email;
-    // Enforce that sandbox emails are used for sandbox users
-    if email.is_live() != user_vault.is_live {
-        return Err(UserError::SandboxMismatch.into());
-    }
-
     let sh_data = state
         .compute_fingerprint(DataAttribute::Email, email.to_piistring().clean_for_fingerprint())
         .await?;
@@ -54,7 +47,18 @@ pub async fn post(
     let email_id = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
+            // TODO For now, we only allow adding an email during onboarding since we otherwise
+            // don't know which scoped user to associate the data with.
+            // We might one day want to support this outside of onboarding for my1fp, but without
+            // the data being portable
+            let ob_info = user_auth.assert_onboarding(conn)?;
+            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
+
+            // Enforce that sandbox emails are used for sandbox users
+            if email.is_live() != uvw.user_vault.is_live {
+                return Err(UserError::SandboxMismatch.into());
+            }
+
             let email_id = uvw.add_email(conn, email.clone(), sh_data)?;
             Ok(email_id)
         })

@@ -3,12 +3,10 @@ use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection};
-use newtypes::{
-    EmailId, IdentityDataId, IdentityDocumentId, OnboardingId, PhoneNumberId, Vendor, VendorAPI,
-    VerificationRequestId,
-};
+use newtypes::{DataLifetimeSeqno, OnboardingId, Vendor, VendorAPI, VerificationRequestId};
 use serde::{Deserialize, Serialize};
 
+use super::data_lifetime::DataLifetime;
 use super::verification_result::VerificationResult;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
@@ -19,32 +17,40 @@ pub struct VerificationRequest {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub email_id: Option<EmailId>,
-    pub phone_number_id: Option<PhoneNumberId>,
-    pub identity_data_id: Option<IdentityDataId>,
     pub onboarding_id: OnboardingId,
-    pub identity_document_id: Option<IdentityDocumentId>,
     pub vendor_api: VendorAPI,
+    // The current seqno when this VerificationRequest was created.
+    // This is used to reconstruct the UserVaultWrapper at the time the request was sent.
+    pub uvw_snapshot_seqno: DataLifetimeSeqno,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = verification_request)]
-pub struct NewVerificationRequest {
-    pub onboarding_id: OnboardingId,
-    pub vendor: Vendor,
-    pub timestamp: DateTime<Utc>,
-    pub email_id: Option<EmailId>,
-    pub phone_number_id: Option<PhoneNumberId>,
-    pub identity_data_id: Option<IdentityDataId>,
-    pub identity_document_id: Option<IdentityDocumentId>,
-    pub vendor_api: VendorAPI,
+struct NewVerificationRequestRow {
+    onboarding_id: OnboardingId,
+    vendor: Vendor,
+    timestamp: DateTime<Utc>,
+    vendor_api: VendorAPI,
+    uvw_snapshot_seqno: DataLifetimeSeqno,
 }
 
 impl VerificationRequest {
-    pub fn bulk_save(
+    pub fn bulk_create(
         conn: &mut PgConnection,
-        requests: Vec<NewVerificationRequest>,
+        onboarding_id: OnboardingId,
+        vendor_apis: Vec<VendorAPI>,
     ) -> Result<Vec<Self>, crate::DbError> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let requests: Vec<_> = vendor_apis
+            .into_iter()
+            .map(|vendor_api| NewVerificationRequestRow {
+                onboarding_id: onboarding_id.clone(),
+                vendor_api,
+                vendor: Vendor::from(vendor_api),
+                timestamp: Utc::now(),
+                uvw_snapshot_seqno: seqno,
+            })
+            .collect();
         let result = diesel::insert_into(verification_request::table)
             .values(requests)
             .get_results(conn)?;

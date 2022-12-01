@@ -8,4 +8,6 @@ pub enum UserError {
     InvalidIdentityDataUpdate,
     #[error("Data update is not allowed")]
     DataUpdateNotAllowed,
+    #[error("Data update is temporarily not allowed outside of onboarding")]
+    NotAllowedOutsideOnboarding,
 }

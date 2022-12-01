@@ -7,9 +7,8 @@
 /// Notion: https://www.notion.so/onefootprint/Document-Request-TODOs-75f3131f609d4010a4e52799d9700525
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiError;
+use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use actix_web::web::Path;
 use api_wire_types::document_request::{
@@ -18,7 +17,8 @@ use api_wire_types::document_request::{
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
-use newtypes::{DocumentRequestId, DocumentRequestStatus, OnboardingId, SealedVaultDataKey};
+use db::models::user_vault::UserVault;
+use newtypes::{DocumentRequestId, DocumentRequestStatus, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /// Backend APIs for working with identity documents.
@@ -32,25 +32,23 @@ pub async fn post(
     path: Path<String>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
-    let uvw_id = user_auth.user_vault_id();
+    let uv_id = user_auth.user_vault_id();
     let request_id = DocumentRequestId::from(path.into_inner());
 
-    let (uvw, db_document_request, ob_id) = state
+    let (uv, db_document_request, ob_id) = state
         .db_pool
-        .db_transaction(
-            move |conn| -> Result<(UserVaultWrapper, DbDocumentRequest, OnboardingId), ApiError> {
-                let uvw = UserVaultWrapper::get(conn, &uvw_id)?;
-                let Some(ob_id) = user_auth.onboarding(conn)?.map(|o| o.onboarding.id) else {
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let Some(ob_id) = user_auth.onboarding(conn)?.map(|o| o.onboarding.id) else {
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
                 };
 
-                // TODO::9
-                // This will error if no doc request is found
-                let db_document_request = DbDocumentRequest::get(conn, &ob_id, &request_id)?;
+            // TODO::9
+            // This will error if no doc request is found
+            let db_document_request = DbDocumentRequest::get(conn, &ob_id, &request_id)?;
+            let uv = UserVault::get(conn, &uv_id)?;
 
-                Ok((uvw, db_document_request, ob_id))
-            },
-        )
+            Ok((uv, db_document_request, ob_id))
+        })
         .await?;
     // Check request is pending. If not, there's nothing to do here
     if !db_document_request.is_pending() {
@@ -62,7 +60,7 @@ pub async fn post(
     // generate a sealed data key (with its plaintext)
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
-            uvw.user_vault.public_key.as_ref(),
+            uv.public_key.as_ref(),
         )?;
 
     let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
@@ -80,7 +78,7 @@ pub async fn post(
             &IdentityDocument::s3_path_for_document_image(
                 "front",
                 db_document_request.id.clone(),
-                uvw.user_vault.id.clone(),
+                uv.id.clone(),
             ),
             sealed_front.0,
         )
@@ -99,7 +97,7 @@ pub async fn post(
                     &IdentityDocument::s3_path_for_document_image(
                         "back",
                         db_document_request.id.clone(),
-                        uvw.user_vault.id.clone(),
+                        uv.id.clone(),
                     ),
                     sealed_back.0,
                 )
@@ -115,7 +113,7 @@ pub async fn post(
             let doc = IdentityDocument::create(
                 conn,
                 doc_request_id,
-                uvw.user_vault.id,
+                uv.id,
                 Some(s3_path_front_image),
                 s3_path_back_image,
                 // TODO: should be from vendor response

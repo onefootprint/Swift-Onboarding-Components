@@ -1,9 +1,9 @@
 pub mod access_event;
 pub mod annotation;
+pub mod data_lifetime;
 pub mod document_request;
 pub mod email;
 pub mod fingerprint;
-pub mod identity_data;
 pub mod identity_document;
 pub mod insight_event;
 pub mod kv_data;
@@ -23,6 +23,7 @@ pub mod tenant_role;
 pub mod tenant_user;
 pub mod user_timeline;
 pub mod user_vault;
+pub mod user_vault_data;
 pub mod verification_request;
 pub mod verification_result;
 pub mod webauthn_credential;

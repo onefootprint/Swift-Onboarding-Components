@@ -12,7 +12,7 @@ use paperclip::actix::web;
 
 use crate::{
     auth::session::AuthSessionData,
-    auth::user::ValidateUserToken,
+    auth::user::{AuthedOnboardingInfo, ValidateUserToken},
     errors::ApiResult,
     types::onboarding_requirement::OnboardingRequirement,
     utils::{session::AuthSession, user_vault_wrapper::UserVaultWrapper},
@@ -56,12 +56,14 @@ fn create_onboarding_validation_token(
 
 pub fn get_requirements(
     conn: &mut PgConnection,
-    user_vault_id: &UserVaultId,
-    ob_config: &ObConfiguration,
+    ob_info: &AuthedOnboardingInfo,
 ) -> ApiResult<(Vec<OnboardingRequirement>, Onboarding)> {
-    let uvw = UserVaultWrapper::get(conn, user_vault_id)?;
-    let (onboarding, _, _, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
-    let missing_attributes = uvw.missing_fields(ob_config);
+    let ob_config_id = &ob_info.ob_config.id;
+    let scoped_user_id = &ob_info.scoped_user.id;
+
+    let uvw = UserVaultWrapper::get_for_tenant(conn, scoped_user_id)?;
+    let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.user_vault.id, ob_config_id))?;
+    let missing_attributes = uvw.missing_fields(&ob_info.ob_config);
     // Document requirements are determined by the presence of DocumentRequest database objects.
     // In various places in the codebase, we will determine if a DocumentRequest should be created
     //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance

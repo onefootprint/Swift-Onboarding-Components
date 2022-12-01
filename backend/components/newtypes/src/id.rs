@@ -109,6 +109,31 @@ define_newtype_id!(RiskSignalId, String, "Identifier for a risk signal");
 define_newtype_id!(LivenessEventId, String, "Identifier for a liveness event");
 define_newtype_id!(AnnotationId, String, "Identifier for an annotation");
 define_newtype_id!(ManualReviewId, String, "Identifier for a manual review");
+define_newtype_id!(DataLifetimeId, String, "Identifier for a data lifetime");
+define_newtype_id!(UvdId, String, "Identifier for a UserVaultData");
+
+#[doc = "Sequence number used to order DataLifetimes"]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Hash,
+    PartialEq,
+    Eq,
+    Ord,
+    PartialOrd,
+    Display,
+    From,
+    Into,
+    FromStr,
+    Serialize,
+    Deserialize,
+    Default,
+    DieselNewType,
+    JsonSchema,
+)]
+#[serde(transparent)]
+pub struct DataLifetimeSeqno(i64);
 
 impl ObConfigurationKey {
     /// prefixed on LIVE keys

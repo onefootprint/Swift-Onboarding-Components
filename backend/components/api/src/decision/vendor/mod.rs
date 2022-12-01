@@ -23,8 +23,8 @@ mod verification_result;
 /// We save so that if something happens, we can always replay the requests
 pub fn build_verification_requests_and_checkpoint(
     conn: &mut TxnPgConnection,
-    ob_id: &OnboardingId,
     uvw: &UserVaultWrapper,
+    ob_id: &OnboardingId,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     let ob = Onboarding::lock(conn, ob_id)?;
     // Can only initiate IDV reqs one time for an onboarding
@@ -34,17 +34,12 @@ pub fn build_verification_requests_and_checkpoint(
         return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
     }
     // Always set the idv_reqs_initiated to true in order to checkpoint
-    let ob = ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
+    ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
     // From the data in the vault, figure out which vendors we need to send to
     let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(uvw);
     // From the possible vendors, select which ones we're sending to (logic TBD)
     let vendor_apis = choose_vendor_apis(available_vendor_apis);
-
-    let requests_to_save = vendor_apis
-        .into_iter()
-        .map(|v| build_request::build_verification_request(uvw, ob.id.clone(), v))
-        .collect();
-    let requests_to_initiate = VerificationRequest::bulk_save(conn, requests_to_save)?;
+    let requests_to_initiate = VerificationRequest::bulk_create(conn, ob_id.clone(), vendor_apis)?;
 
     Ok(requests_to_initiate)
 }

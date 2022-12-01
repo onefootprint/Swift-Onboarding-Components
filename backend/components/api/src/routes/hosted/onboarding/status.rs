@@ -30,8 +30,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| {
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let (requirements, _): (Vec<OnboardingRequirement>, _) =
-                get_requirements(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
+            let (requirements, _) = get_requirements(conn, &ob_info)?;
             let fields_to_authorize: AuthorizeFields =
                 get_fields_to_authorize(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
             let res: (Vec<OnboardingRequirement>, AuthorizeFields) = (requirements, fields_to_authorize);

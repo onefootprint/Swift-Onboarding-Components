@@ -1,14 +1,15 @@
 use crypto::aead::SealingKey;
-use db::models::fingerprint::IsUnique;
-use db::models::identity_data::IdentityData;
+use db::models::data_lifetime::DataLifetime;
 use db::models::identity_document::IdentityDocument;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
+use db::models::user_vault_data::UserVaultData;
 use db::models::verification_request::VerificationRequest;
 use db::TxnPgConnection;
 use enclave_proxy::DataTransform;
+use std::convert::Into;
 
 use db::models::email::Email;
 use newtypes::email::Email as NewtypeEmail;
@@ -24,17 +25,18 @@ use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataAttribute, DataCollectedInfo, DataPriority, EmailId, Fingerprint,
-    IdentityDocumentId, KvDataKey, OnboardingId, PiiString, SealedVaultBytes, SealedVaultDataKey, TenantId,
-    UserVaultId, ValidatedPhoneNumber,
+    CollectedDataOption, DataAttribute, DataCollectedInfo, DataLifetimeSeqno, DataPriority, EmailId,
+    Fingerprint, IdentityDocumentId, KvDataKey, OnboardingId, PiiString, ScopedUserId, SealedVaultBytes,
+    SealedVaultDataKey, TenantId, UvdKind, ValidatedPhoneNumber,
 };
 
+use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::s3::S3Error;
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::State;
 
-use super::identity_data_builder::IdentityDataBuilder;
+use super::uvd_builder::UvdBuilder;
 use db::HasDataAttributeFields;
 
 /// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
@@ -49,11 +51,18 @@ use db::HasDataAttributeFields;
 #[derive(Debug, Clone)]
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
-    pub identity_data: Option<IdentityData>,
+    pub data: Vec<UserVaultData>,
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
     pub identity_documents: Vec<IdentityDocument>,
+
+    // The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.
+    _seqno: Option<DataLifetimeSeqno>,
+    // When set, the UVW was constructed for a specific tenant's view of the world.
+    // A tenant is able to see its own uncommitted data on the user vault.
+    scoped_user_id: Option<ScopedUserId>,
+    // If true, the UVW was constructed inside of a transaction holding a lock on the UserVault
     is_locked: bool,
     // Represents whether we have fetched the appropriate data
     is_hydrated: PhantomData<()>,
@@ -65,22 +74,37 @@ pub struct DecryptRequest {
 }
 
 impl UserVaultWrapper {
-    fn build_internal(
+    fn build_single(
         conn: &mut PgConnection,
         user_vault: UserVault,
+        scoped_user_id: Option<&ScopedUserId>,
         is_locked: bool,
+        seqno: Option<DataLifetimeSeqno>,
     ) -> Result<Self, DbError> {
-        let identity_data = IdentityData::get_active(conn, &user_vault.id)?;
-        let phone_number = PhoneNumber::get_primary(conn, &user_vault.id)?;
-        let email = Email::get_primary(conn, &user_vault.id)?;
+        let active_lifetimes = if let Some(seqno) = seqno {
+            // We are reconstructing the UVW as it appeared at a given seqno
+            DataLifetime::get_active_at(conn, &user_vault.id, seqno, scoped_user_id)?
+        } else {
+            // We are constructing the UVW as it appears right now
+            DataLifetime::get_active(conn, &user_vault.id, scoped_user_id)?
+        };
+
+        // Fetch all the data related to the active lifetimes
+        let data = UserVaultData::get_for(conn, &active_lifetimes)?;
+        let phone_number = PhoneNumber::get_primary_for(conn, &active_lifetimes)?;
+        let email = Email::get_primary_for(conn, &active_lifetimes)?;
+
+        // TODO migrate this to DataLifetimes
         let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
 
         Ok(Self {
-            identity_data,
             user_vault,
+            data,
             phone_number,
             email,
             identity_documents,
+            _seqno: seqno,
+            scoped_user_id: scoped_user_id.cloned(),
             is_locked,
             is_hydrated: PhantomData,
         })
@@ -88,46 +112,38 @@ impl UserVaultWrapper {
 
     // In order to minimize database queries, we would like to be able to bulk fetch
     // various data elements for a set of Users.
-    fn multi_build_internal(
+    pub fn multi_get_for_tenant(
         conn: &mut PgConnection,
-        user_vaults: Vec<UserVault>,
-        is_locked: bool,
+        users: Vec<(ScopedUser, UserVault)>,
+        tenant_id: &TenantId,
     ) -> Result<Vec<Self>, DbError> {
-        let uv_ids: Vec<UserVaultId> = user_vaults.iter().map(|uv| uv.id.clone()).collect();
+        let uv_ids: Vec<_> = users.iter().map(|su| &su.1.id).collect();
+        let active_lifetimes = DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
 
-        // For each data source, fetch data _for all users_ in the `user_vaults` list in a single DB transaction.
+        // For each data source, fetch data _for all users_ in the `user_vaults` list.
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
         // UserVaultWrapper for each User
-        let mut identity_data: HashMap<UserVaultId, IdentityData> =
-            IdentityData::bulk_get_active(conn, &uv_ids)?
-                .into_iter()
-                .map(|id| (id.user_vault_id.clone(), id))
-                .collect();
-        let mut phone_number: HashMap<UserVaultId, PhoneNumber> =
-            PhoneNumber::bulk_get_primary(conn, &uv_ids)?
-                .into_iter()
-                .map(|phone| (phone.user_vault_id.clone(), phone))
-                .collect();
-        let mut email: HashMap<UserVaultId, Email> = Email::bulk_get_primary(conn, &uv_ids)?
-            .into_iter()
-            .map(|email| (email.user_vault_id.clone(), email))
-            .collect();
+        let mut uvds = UserVaultData::bulk_get(conn, &active_lifetimes)?;
+        let mut phone_numbers = PhoneNumber::bulk_get_primary(conn, &active_lifetimes)?;
+        let mut emails = Email::bulk_get_primary(conn, &active_lifetimes)?;
 
         // Fetch all the identity documents for the user vault ids
-        let mut identity_document_map = IdentityDocument::multi_get_for_user_vault_ids(conn, &uv_ids)?;
+        let mut identity_document_map = IdentityDocument::multi_get_for_user_vault_ids(conn, uv_ids)?;
 
         // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
-        Ok(user_vaults
+        Ok(users
             .into_iter()
-            .map(move |uv| {
+            .map(move |(su, uv)| {
                 let uv_id = uv.id.clone();
                 Self {
-                    identity_data: identity_data.remove(&uv_id),
+                    scoped_user_id: Some(su.id),
                     user_vault: uv,
-                    phone_number: phone_number.remove(&uv_id),
-                    email: email.remove(&uv_id),
+                    data: uvds.remove(&uv_id).unwrap_or_default(),
+                    phone_number: phone_numbers.remove(&uv_id),
+                    email: emails.remove(&uv_id),
                     identity_documents: identity_document_map.remove(&uv_id).unwrap_or_default(),
-                    is_locked,
+                    is_locked: false,
+                    _seqno: None,
                     is_hydrated: PhantomData,
                 }
             })
@@ -141,56 +157,33 @@ impl UserVaultWrapper {
     ) -> Result<Self, DbError> {
         let (_, scoped_user, _, _) = Onboarding::get(conn, &request.onboarding_id)?;
         let user_vault = UserVault::get(conn, &scoped_user.user_vault_id)?;
-        let email = request
-            .email_id
-            .map(|id| Email::get(conn, &id, &user_vault.id))
-            .transpose()?
-            .map(|(email, _)| email);
-        let phone_number = request
-            .phone_number_id
-            .map(|id| PhoneNumber::get(conn, &id, &user_vault.id))
-            .transpose()?;
-        let identity_data = request
-            .identity_data_id
-            .map(|id| IdentityData::get(conn, &id, &user_vault.id))
-            .transpose()?;
-
-        let identity_document = request
-            .identity_document_id
-            .map(|id| IdentityDocument::get(conn, &id))
-            .transpose()?;
-
-        Ok(Self {
-            identity_data,
+        Self::build_single(
+            conn,
             user_vault,
-            phone_number,
-            email,
-            identity_documents: vec![identity_document].into_iter().flatten().collect(),
-            is_locked: false,
-            is_hydrated: PhantomData,
-        })
+            Some(&scoped_user.id),
+            false,
+            Some(request.uvw_snapshot_seqno),
+        )
     }
 
-    pub fn build(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
-        Self::build_internal(conn, user_vault, false)
+    /// Builds a UVW that only sees committed data
+    pub fn get_committed(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
+        Self::build_single(conn, user_vault, None, false, None)
     }
 
-    pub fn lock(conn: &mut TxnPgConnection, id: &UserVaultId) -> Result<Self, DbError> {
-        let user_vault = UserVault::lock(conn, id)?;
-        let uvw = Self::build_internal(conn, user_vault, true)?;
-        Ok(uvw)
+    /// Builds a UVW that sees committed data AND speculative data for the tenant
+    pub fn get_for_tenant(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> Result<Self, DbError> {
+        let user_vault = UserVault::get(conn, scoped_user_id)?;
+        Self::build_single(conn, user_vault, Some(scoped_user_id), false, None)
     }
 
-    pub fn get(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
-        let user_vault = UserVault::get(conn, id)?;
-        let uvw = Self::build_internal(conn, user_vault, false)?;
-        Ok(uvw)
-    }
-
-    pub fn multi_get(conn: &mut PgConnection, ids: Vec<&UserVaultId>) -> Result<Vec<Self>, DbError> {
-        let user_vaults = UserVault::multi_get(conn, ids)?;
-        let uvw = Self::multi_build_internal(conn, user_vaults, false)?;
-        Ok(uvw)
+    /// Builds a locked UVW that sees committed data AND speculative data for the tenant
+    pub fn lock_for_tenant(
+        conn: &mut TxnPgConnection,
+        scoped_user_id: &ScopedUserId,
+    ) -> Result<Self, DbError> {
+        let user_vault = UserVault::lock(conn, scoped_user_id)?;
+        Self::build_single(conn, user_vault, Some(scoped_user_id), true, None)
     }
 
     pub fn assert_is_locked(&self, _conn: &mut TxnPgConnection) -> Result<(), ApiError> {
@@ -211,6 +204,11 @@ impl UserVaultWrapper {
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
         self.assert_is_locked(conn)?;
+        let scoped_user_id = self
+            .scoped_user_id
+            .clone()
+            .ok_or(UserError::NotAllowedOutsideOnboarding)?;
+
         let email = email.to_piistring();
         let e_data = self.user_vault.public_key.seal_pii(&email)?;
         let priority = if self.email.is_some() {
@@ -219,8 +217,14 @@ impl UserVaultWrapper {
             DataPriority::Primary
         };
         let user_vault_id = self.user_vault.id.clone();
-        let email =
-            db::models::email::Email::create(conn, user_vault_id, e_data, fingerprint, false, priority)?;
+        let email = db::models::email::Email::create(
+            conn,
+            user_vault_id,
+            e_data,
+            fingerprint,
+            priority,
+            scoped_user_id,
+        )?;
         let email_id = email.id.clone();
 
         if priority == DataPriority::Primary {
@@ -287,22 +291,25 @@ impl UserVaultWrapper {
 
 impl HasDataAttributeFields for UserVaultWrapper {
     fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
-        let id = self.identity_data.as_ref();
         let email = self.email.as_ref();
         let phone = self.phone_number.as_ref();
         match data_attribute {
             // identity
-            DataAttribute::FirstName => id?.get_e_field(data_attribute),
-            DataAttribute::LastName => id?.get_e_field(data_attribute),
-            DataAttribute::Dob => id?.get_e_field(data_attribute),
-            DataAttribute::Ssn9 => id?.get_e_field(data_attribute),
-            DataAttribute::AddressLine1 => id?.get_e_field(data_attribute),
-            DataAttribute::AddressLine2 => id?.get_e_field(data_attribute),
-            DataAttribute::City => id?.get_e_field(data_attribute),
-            DataAttribute::State => id?.get_e_field(data_attribute),
-            DataAttribute::Zip => id?.get_e_field(data_attribute),
-            DataAttribute::Country => id?.get_e_field(data_attribute),
-            DataAttribute::Ssn4 => id?.get_e_field(data_attribute),
+            DataAttribute::FirstName
+            | DataAttribute::LastName
+            | DataAttribute::Dob
+            | DataAttribute::Ssn9
+            | DataAttribute::AddressLine1
+            | DataAttribute::AddressLine2
+            | DataAttribute::City
+            | DataAttribute::State
+            | DataAttribute::Zip
+            | DataAttribute::Country
+            | DataAttribute::Ssn4 => self
+                .data
+                .iter()
+                .find(|d| Into::<DataAttribute>::into(d.kind) == data_attribute)
+                .map(|d| &d.e_data),
             // email
             DataAttribute::Email => email?.get_e_field(data_attribute),
             // phone
@@ -318,45 +325,17 @@ impl UserVaultWrapper {
         &mut self,
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
-        fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
-        onboarding_id: Option<OnboardingId>,
+        fingerprints: Vec<(UvdKind, Fingerprint)>,
+        onboarding_id: OnboardingId,
     ) -> Result<(), ApiError> {
         self.assert_is_locked(conn)?;
-        let mut builder = IdentityDataBuilder::new(
-            self.user_vault.is_portable,
-            self.user_vault.id.clone(),
-            self.identity_data.clone(),
-            self.user_vault.public_key.clone(),
-            fingerprints,
-        );
+        let builder = UvdBuilder::build(update, self.user_vault.public_key.clone())?;
+        let scoped_user_id = self
+            .scoped_user_id
+            .clone()
+            .ok_or(UserError::NotAllowedOutsideOnboarding)?;
 
-        let IdentityDataUpdate {
-            name,
-            dob,
-            ssn,
-            address,
-        } = update;
-
-        if let Some(name) = name {
-            builder.add_full_name(name)?;
-        }
-
-        if let Some(dob) = dob {
-            builder.add_dob(dob)?;
-        }
-
-        if let Some(ssn) = ssn {
-            builder.add_ssn(ssn)?;
-        }
-
-        if let Some(address) = address {
-            builder.add_full_address_or_zip(address)?;
-        }
-
-        let (new_identity_data, collected_data) = builder.finish(conn)?;
-        // finally create our new fingerprint
-        let identity_data = IdentityData::create(conn, new_identity_data)?;
-
+        let collected_data = builder.save(conn, self.user_vault.id.clone(), scoped_user_id, fingerprints)?;
         if !collected_data.is_empty() {
             // Create a timeline event that shows all the new data that was added
             UserTimeline::create(
@@ -365,10 +344,9 @@ impl UserVaultWrapper {
                     attributes: collected_data,
                 },
                 self.user_vault.id.clone(),
-                onboarding_id,
+                Some(onboarding_id),
             )?;
         }
-        self.identity_data = Some(identity_data);
 
         Ok(())
     }

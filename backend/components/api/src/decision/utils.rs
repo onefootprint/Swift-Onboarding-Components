@@ -14,8 +14,6 @@ use crate::{
     State,
 };
 
-use super::vendor::build_request;
-
 type ShouldInitiateVerificationRequests = bool;
 
 // Logic to figure out test status from some of the identity data we collected during onboarding
@@ -68,10 +66,9 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
 
             // Create some mock verification request and results
             let request =
-                build_request::build_verification_request(&uvw, ob_id.clone(), VendorAPI::IdologyExpectID);
-            let request = VerificationRequest::bulk_save(conn, vec![request])?
-                .pop()
-                .ok_or(ApiError::ResourceNotFound)?;
+                VerificationRequest::bulk_create(conn, ob_id.clone(), vec![VendorAPI::IdologyExpectID])?
+                    .pop()
+                    .ok_or(ApiError::ResourceNotFound)?;
             let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
             // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
             let result = VerificationResult::create(conn, request.id, raw_response)?;

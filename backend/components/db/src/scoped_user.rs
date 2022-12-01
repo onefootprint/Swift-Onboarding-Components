@@ -1,7 +1,9 @@
 use crate::models::scoped_user::ScopedUser;
+use crate::models::user_vault::UserVault;
 use crate::schema;
 use crate::{errors::DbError, schema::scoped_user::BoxedQuery};
 use chrono::{DateTime, Utc};
+use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, OnboardingStatus, TenantId};
@@ -22,7 +24,9 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
     // Filter out onboardings that haven't been explicitly authorized by the user - these should
     // not be visible in the dashboard since the tenant doesn't have permissions to view anything
     // about the user
-    use crate::schema::{fingerprint, manual_review, onboarding, onboarding_decision, scoped_user};
+    use crate::schema::{
+        data_lifetime, fingerprint, manual_review, onboarding, onboarding_decision, scoped_user,
+    };
     let authorized_ids = onboarding::table
         .filter(onboarding::is_authorized.eq(true))
         .select(onboarding::scoped_user_id)
@@ -73,11 +77,17 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
 
     if let Some(fingerprints) = params.fingerprints {
         let matching_uv_ids = fingerprint::table
-            .filter(fingerprint::user_vault_id.eq(scoped_user::user_vault_id))
-            .filter(fingerprint::deactivated_at.is_null())
+            .inner_join(data_lifetime::table)
+            // Active lifetimes - all active rows that are committed
+            // TODO should also be able to search uncommitted fingerprints made by this tenant.
+            // But diesel doesn't let you join on scoped_user and use it in a subquery
+            // Might be able to execute this subquery and then use it - I don't think results
+            // would be large
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .filter(not(data_lifetime::committed_seqno.is_null()))
+            // Matching fingerprint
             .filter(fingerprint::sh_data.eq_any(fingerprints))
-            .select(fingerprint::user_vault_id)
-            .distinct();
+            .select(data_lifetime::user_vault_id);
         query = query.filter(scoped_user::user_vault_id.eq_any(matching_uv_ids))
     }
 
@@ -100,7 +110,7 @@ pub fn list_authorized_for_tenant(
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<ScopedUser>, DbError> {
+) -> Result<Vec<(ScopedUser, UserVault)>, DbError> {
     let mut scoped_users = list_authorized_for_tenant_query(params)
         .order_by(schema::scoped_user::ordering_id.desc())
         .limit(page_size);
@@ -109,6 +119,9 @@ pub fn list_authorized_for_tenant(
         scoped_users = scoped_users.filter(schema::scoped_user::ordering_id.le(cursor));
     }
 
-    let scoped_users = scoped_users.load::<ScopedUser>(conn)?;
-    Ok(scoped_users)
+    let results = scoped_users
+        .inner_join(schema::user_vault::table)
+        .select((schema::scoped_user::all_columns, schema::user_vault::all_columns))
+        .get_results(conn)?;
+    Ok(results)
 }

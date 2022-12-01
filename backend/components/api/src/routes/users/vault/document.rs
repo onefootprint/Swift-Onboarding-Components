@@ -19,6 +19,7 @@ use api_wire_types::{
 };
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::onboarding::Onboarding;
 use db::models::user_vault::UserVault;
 use newtypes::{AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, TenantPermission};
 
@@ -54,10 +55,10 @@ pub(super) async fn get_internal(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (user_vault, scoped_user) =
-                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
+            let user_vault = UserVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let (_, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
-            let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
+            let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
             // Important to check requester has access
             let fields = HashSet::from_iter([DataAttribute::IdentityDocument]);
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
@@ -132,10 +133,9 @@ pub(super) async fn post_internal(
     let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (user_vault, scoped_user) =
-                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-
-            let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
+            let user_vault = UserVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let (_, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
 
             // Important to check requester has access
             let fields = HashSet::from_iter([DataAttribute::IdentityDocument]);

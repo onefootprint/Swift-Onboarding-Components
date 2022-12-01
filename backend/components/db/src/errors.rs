@@ -53,6 +53,9 @@ pub enum DbError {
     #[error("Related object not found")]
     RelatedObjectNotFound,
 
+    #[error("Object not found")]
+    ObjectNotFound,
+
     #[error("Invalid data group set for data kind. For instance, data group address may be set for ssn")]
     InvalidDataGroupForKind,
 

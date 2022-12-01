@@ -19,13 +19,12 @@ pub async fn create(pool: &crate::DbPool, new_user: NewPortableUserVaultReq) -> 
             let user_vault = diesel::insert_into(schema::user_vault::table)
                 .values(new_user_vault)
                 .get_result::<UserVault>(conn.conn())?;
-            PhoneNumber::create(
+            PhoneNumber::create_verified(
                 conn,
                 user_vault.id.clone(),
                 new_user.e_phone_number,
                 new_user.sh_phone_number,
                 new_user.e_phone_country,
-                true, // phone numbers created as verified
                 DataPriority::Primary,
             )?;
             Ok(user_vault)
@@ -81,13 +80,13 @@ pub async fn get_by_fingerprint(
     // we don't filter by is_unique here because we opportunistically
     // want to identify users with not-yet-verified emails
     // (provided they are the only such user in the system)
+    use crate::schema::{data_lifetime, fingerprint, user_vault};
     let results: Vec<(UserVault, models::fingerprint::Fingerprint)> = pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let result = schema::user_vault::table
-                .inner_join(schema::fingerprint::table)
-                .filter(schema::fingerprint::sh_data.eq(sh_data))
-                // multiple fingerprints may point to the same vault
-                .distinct_on(schema::user_vault::id)
+            let result = user_vault::table
+                .inner_join(data_lifetime::table.inner_join(fingerprint::table))
+                .filter(fingerprint::sh_data.eq(sh_data))
+                .select((user_vault::all_columns, fingerprint::all_columns))
                 .get_results(conn)?;
             Ok(result)
         })
@@ -98,7 +97,9 @@ pub async fn get_by_fingerprint(
         // find the unique vaults for this fingerprint
         let unique: Vec<UserVault> = results
             .into_iter()
-            .filter(|(_, fp)| fp.is_unique)
+            // TOOD
+            // TODO test that duplicate fingerprint pointing to the same vault works here
+            // .filter(|(_, fp)| fp.is_unique)
             .map(|(uv, _)| uv)
             .collect();
 

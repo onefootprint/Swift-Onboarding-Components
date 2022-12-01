@@ -11,6 +11,7 @@ use crate::auth::{
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
+use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
@@ -18,7 +19,7 @@ use crate::{errors::ApiError, State};
 use actix_web::web::Query;
 
 use db::models::insight_event::CreateInsightEvent;
-use db::models::user_vault::UserVault;
+use db::models::onboarding::Onboarding;
 use newtypes::csv::Csv;
 use newtypes::{DataAttribute, DataIdentifier, FootprintUserId, KvDataKey};
 
@@ -58,7 +59,7 @@ pub async fn put(
 
     let (update, fingerprints) = if let Some(identity) = request.identity {
         let update = IdentityDataUpdate::try_from(identity)?;
-        let fingerprints = update.fingerprints(&state).await?;
+        let fingerprints = FingerprintBuilder::fingerprints(&state, update.clone()).await?;
         (Some(update), fingerprints)
     } else {
         (None, vec![])
@@ -68,9 +69,8 @@ pub async fn put(
     let _uvw = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (user_vault, scoped_user) =
-                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-            let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
+            let (ob, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
 
             if let Some(update) = update {
                 identity::put_internal(
@@ -81,6 +81,7 @@ pub async fn put(
                     insight.clone(),
                     update,
                     fingerprints,
+                    ob,
                 )?
             }
 

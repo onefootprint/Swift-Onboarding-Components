@@ -1,24 +1,27 @@
-use crate::schema::phone_number;
+use std::collections::HashMap;
+
+use crate::schema::{data_lifetime, phone_number, scoped_user};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{
-    DataAttribute, DataPriority, Fingerprint as FingerprintData, FingerprintId, PhoneNumberId,
+    DataAttribute, DataLifetimeId, DataPriority, Fingerprint as FingerprintData, PhoneNumberId,
     SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::DbError;
+use crate::{DbResult, TxnPgConnection};
 
-use super::fingerprint::Fingerprint;
+use super::{
+    data_lifetime::DataLifetime,
+    fingerprint::{Fingerprint, NewFingerprint},
+};
 use crate::HasDataAttributeFields;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = phone_number)]
 pub struct PhoneNumber {
     pub id: PhoneNumberId,
-    pub user_vault_id: UserVaultId,
-    pub fingerprint_ids: Vec<FingerprintId>,
     pub e_e164: SealedVaultBytes,
     pub e_country: SealedVaultBytes,
     pub is_verified: bool,
@@ -26,36 +29,36 @@ pub struct PhoneNumber {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub lifetime_id: DataLifetimeId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = phone_number)]
 pub struct NewPhoneNumber {
-    pub user_vault_id: UserVaultId,
-    pub fingerprint_ids: Vec<FingerprintId>,
     pub e_e164: SealedVaultBytes,
     pub e_country: SealedVaultBytes,
     pub is_verified: bool,
     pub priority: DataPriority,
+    pub lifetime_id: DataLifetimeId,
 }
 
 impl PhoneNumber {
-    pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Vec<Self>, DbError> {
+    pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = phone_number::table
-            .filter(phone_number::user_vault_id.eq(user_vault_id))
+            .inner_join(data_lifetime::table.inner_join(scoped_user::table))
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .filter(phone_number::deactivated_at.is_null())
+            .select(phone_number::all_columns)
             .load(conn)?;
         Ok(results)
     }
 
-    pub fn get_primary(
+    pub fn get_primary_for(
         conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
-    ) -> Result<Option<Self>, DbError> {
-        tracing::info!("fetching phone number for user_vault_id");
+        lifetime_ids: &[DataLifetimeId],
+    ) -> DbResult<Option<Self>> {
         let result = phone_number::table
-            .filter(phone_number::user_vault_id.eq(user_vault_id))
-            .filter(phone_number::deactivated_at.is_null())
+            .filter(phone_number::lifetime_id.eq_any(lifetime_ids))
             .filter(phone_number::priority.eq(DataPriority::Primary))
             .first(conn)
             .optional()?;
@@ -64,14 +67,16 @@ impl PhoneNumber {
 
     pub fn bulk_get_primary(
         conn: &mut PgConnection,
-        user_vault_ids: &Vec<UserVaultId>,
-    ) -> Result<Vec<Self>, DbError> {
-        tracing::info!("bulk fetching phone numbers for user_vault_ids");
+        lifetime_ids: &[DataLifetimeId],
+    ) -> DbResult<HashMap<UserVaultId, Self>> {
         let result = phone_number::table
-            .filter(phone_number::user_vault_id.eq_any(user_vault_ids))
-            .filter(phone_number::deactivated_at.is_null())
+            .inner_join(data_lifetime::table)
+            .filter(phone_number::lifetime_id.eq_any(lifetime_ids))
             .filter(phone_number::priority.eq(DataPriority::Primary))
-            .load::<Self>(conn)?;
+            .get_results::<(Self, DataLifetime)>(conn)?
+            .into_iter()
+            .map(|(phone, lifetime)| (lifetime.user_vault_id, phone))
+            .collect();
 
         Ok(result)
     }
@@ -80,40 +85,51 @@ impl PhoneNumber {
         conn: &mut PgConnection,
         phone_number_id: &PhoneNumberId,
         user_vault_id: &UserVaultId,
-    ) -> Result<Self, DbError> {
+    ) -> DbResult<Self> {
         let result = phone_number::table
-            .filter(phone_number::user_vault_id.eq(user_vault_id))
+            .inner_join(data_lifetime::table.inner_join(scoped_user::table))
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .filter(phone_number::id.eq(phone_number_id))
+            .select(phone_number::all_columns)
             .first(conn)?;
         Ok(result)
     }
 
-    pub fn create(
-        conn: &mut PgConnection,
+    pub fn create_verified(
+        conn: &mut TxnPgConnection,
         user_vault_id: UserVaultId,
         e_e164: SealedVaultBytes,
         fp_e164: FingerprintData,
         e_country: SealedVaultBytes,
-        is_verified: bool,
         priority: DataPriority,
-    ) -> Result<PhoneNumber, DbError> {
-        let fingerprint_ids = Fingerprint::bulk_create(
-            conn,
-            &user_vault_id,
-            vec![(DataAttribute::PhoneNumber, fp_e164, is_verified)],
-        )?;
-
+    ) -> DbResult<PhoneNumber> {
+        // Create a committed lifetime - since the identify flow doesn't have any information
+        // on the tenant and requires that the phone number is verified, we will create the phone
+        // number as immediately portable, committed data that is not associated with a tenant
+        // TODO revisit
+        let lifetime = DataLifetime::create(conn, user_vault_id, None)?;
+        let seqno = lifetime.created_seqno;
+        let lifetime = lifetime.commit(conn, seqno)?;
         let new_row = NewPhoneNumber {
-            user_vault_id,
-            fingerprint_ids,
             e_e164,
             e_country,
-            is_verified,
+            is_verified: true,
             priority,
+            lifetime_id: lifetime.id.clone(),
         };
         let phone_number = diesel::insert_into(phone_number::table)
             .values(new_row)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
+
+        // After inserting the data, also create a fingerprint for this piece of data tied to the
+        // same DataLifetime
+        let new_fingerprint = NewFingerprint {
+            sh_data: fp_e164,
+            kind: DataAttribute::PhoneNumber,
+            lifetime_id: lifetime.id,
+        };
+        Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
+
         Ok(phone_number)
     }
 

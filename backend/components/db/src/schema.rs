@@ -37,6 +37,25 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    data_lifetime (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        user_vault_id -> Text,
+        scoped_user_id -> Nullable<Text>,
+        created_at -> Timestamptz,
+        committed_at -> Nullable<Timestamptz>,
+        deactivated_at -> Nullable<Timestamptz>,
+        created_seqno -> Int8,
+        committed_seqno -> Nullable<Int8>,
+        deactivated_seqno -> Nullable<Int8>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     document_request (id) {
         id -> Text,
         onboarding_id -> Uuid,
@@ -54,14 +73,13 @@ table! {
 
     email (id) {
         id -> Text,
-        user_vault_id -> Text,
-        fingerprint_ids -> Array<Uuid>,
         e_data -> Bytea,
         is_verified -> Bool,
         priority -> Text,
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        lifetime_id -> Text,
     }
 }
 
@@ -71,38 +89,11 @@ table! {
 
     fingerprint (id) {
         id -> Uuid,
-        user_vault_id -> Text,
         sh_data -> Bytea,
-        deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        data_attribute -> Text,
-        is_unique -> Bool,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    identity_data (id) {
-        id -> Text,
-        user_vault_id -> Text,
-        fingerprint_ids -> Array<Uuid>,
-        e_first_name -> Nullable<Bytea>,
-        e_last_name -> Nullable<Bytea>,
-        e_dob -> Nullable<Bytea>,
-        e_ssn9 -> Nullable<Bytea>,
-        e_ssn4 -> Nullable<Bytea>,
-        e_address_line1 -> Nullable<Bytea>,
-        e_address_line2 -> Nullable<Bytea>,
-        e_address_city -> Nullable<Bytea>,
-        e_address_state -> Nullable<Bytea>,
-        e_address_zip -> Nullable<Bytea>,
-        e_address_country -> Nullable<Bytea>,
-        deactivated_at -> Nullable<Timestamptz>,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
+        kind -> Text,
+        lifetime_id -> Text,
     }
 }
 
@@ -280,8 +271,6 @@ table! {
 
     phone_number (id) {
         id -> Text,
-        user_vault_id -> Text,
-        fingerprint_ids -> Array<Uuid>,
         e_e164 -> Bytea,
         e_country -> Bytea,
         is_verified -> Bool,
@@ -289,6 +278,7 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        lifetime_id -> Text,
     }
 }
 
@@ -487,18 +477,29 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    user_vault_data (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        lifetime_id -> Text,
+        kind -> Text,
+        e_data -> Bytea,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     verification_request (id) {
         id -> Uuid,
         vendor -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        email_id -> Nullable<Text>,
-        phone_number_id -> Nullable<Text>,
-        identity_data_id -> Nullable<Text>,
         onboarding_id -> Uuid,
-        identity_document_id -> Nullable<Text>,
         vendor_api -> Text,
+        uvw_snapshot_seqno -> Int8,
     }
 }
 
@@ -538,10 +539,11 @@ table! {
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(annotation -> scoped_user (scoped_user_id));
+joinable!(data_lifetime -> scoped_user (scoped_user_id));
+joinable!(data_lifetime -> user_vault (user_vault_id));
 joinable!(document_request -> onboarding (onboarding_id));
-joinable!(email -> user_vault (user_vault_id));
-joinable!(fingerprint -> user_vault (user_vault_id));
-joinable!(identity_data -> user_vault (user_vault_id));
+joinable!(email -> data_lifetime (lifetime_id));
+joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
 joinable!(identity_document -> onboarding (onboarding_id));
 joinable!(kv_data -> tenant (tenant_id));
@@ -557,7 +559,7 @@ joinable!(onboarding -> scoped_user (scoped_user_id));
 joinable!(onboarding_decision -> onboarding (onboarding_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
-joinable!(phone_number -> user_vault (user_vault_id));
+joinable!(phone_number -> data_lifetime (lifetime_id));
 joinable!(requirement -> onboarding (onboarding_id));
 joinable!(requirement -> user_vault (user_vault_id));
 joinable!(requirement_verification_request_junction -> requirement (requirement_id));
@@ -572,11 +574,8 @@ joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
 joinable!(user_timeline -> onboarding (onboarding_id));
 joinable!(user_timeline -> user_vault (user_vault_id));
-joinable!(verification_request -> email (email_id));
-joinable!(verification_request -> identity_data (identity_data_id));
-joinable!(verification_request -> identity_document (identity_document_id));
+joinable!(user_vault_data -> data_lifetime (lifetime_id));
 joinable!(verification_request -> onboarding (onboarding_id));
-joinable!(verification_request -> phone_number (phone_number_id));
 joinable!(verification_result -> verification_request (request_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
 joinable!(webauthn_credential -> user_vault (user_vault_id));
@@ -584,10 +583,10 @@ joinable!(webauthn_credential -> user_vault (user_vault_id));
 allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
+    data_lifetime,
     document_request,
     email,
     fingerprint,
-    identity_data,
     identity_document,
     insight_event,
     kv_data,
@@ -610,6 +609,7 @@ allow_tables_to_appear_in_same_query!(
     tenant_user,
     user_timeline,
     user_vault,
+    user_vault_data,
     verification_request,
     verification_result,
     webauthn_credential,

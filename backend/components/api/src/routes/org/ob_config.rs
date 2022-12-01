@@ -111,14 +111,14 @@ impl CreateOnboardingConfigurationRequest {
             .cloned()
             .map(|x| (x.parent(), x))
             .sorted()
-            .group_by(|(p, _)| *p)
+            .into_group_map()
             .into_iter()
-            .map(|(_, g)| g.map(|x| x.1).collect())
-            .find(|x: &Vec<_>| x.len() > 1);
+            // Find the CollectedDataOption parents that have more than one option specified
+            .find(|(_, options)| options.len() > 1);
         if let Some(invalid_config) = invalid_config {
             return Err(TenantError::ValidationError(format!(
                 "Cannot provide both {} and {}",
-                invalid_config[0], invalid_config[1]
+                invalid_config.1[0], invalid_config.1[1]
             )));
         } else if !HashSet::<&CollectedDataOption>::from_iter(self.can_access_data.iter()).is_subset(
             &HashSet::<&CollectedDataOption>::from_iter(self.must_collect_data.iter()),

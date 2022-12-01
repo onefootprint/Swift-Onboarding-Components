@@ -218,11 +218,11 @@ pub async fn private_cleanup_integration_tests(
     let deleted_rows = pool
         .db_transaction(move |conn| -> Result<usize, DbError> {
             use schema::{
-                access_event, annotation, document_request, email, fingerprint, identity_data,
+                access_event, annotation, data_lifetime, document_request, email, fingerprint,
                 identity_document, liveness_event, manual_review, onboarding, onboarding_decision,
                 onboarding_decision_verification_result_junction, phone_number, requirement, risk_signal,
-                scoped_user, user_timeline, user_vault, verification_request, verification_result,
-                webauthn_credential,
+                scoped_user, user_timeline, user_vault, user_vault_data, verification_request,
+                verification_result, webauthn_credential,
             };
             let mut deleted_rows = 0;
 
@@ -238,6 +238,33 @@ pub async fn private_cleanup_integration_tests(
             deleted_rows += diesel::delete(user_timeline::table)
                 .filter(user_timeline::user_vault_id.eq(&uv.id))
                 .execute(conn.conn())?;
+
+            // DataLifetimes
+            {
+                let dl_ids = data_lifetime::table
+                    .filter(data_lifetime::user_vault_id.eq(&uv.id))
+                    .select(data_lifetime::id);
+
+                deleted_rows += diesel::delete(email::table)
+                    .filter(email::lifetime_id.eq_any(dl_ids))
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(phone_number::table)
+                    .filter(phone_number::lifetime_id.eq_any(dl_ids))
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(user_vault_data::table)
+                    .filter(user_vault_data::lifetime_id.eq_any(dl_ids))
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(fingerprint::table)
+                    .filter(fingerprint::lifetime_id.eq_any(dl_ids))
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(data_lifetime::table)
+                    .filter(data_lifetime::user_vault_id.eq(&uv.id))
+                    .execute(conn.conn())?;
+            }
 
             // Scoped users
             {
@@ -324,22 +351,6 @@ pub async fn private_cleanup_integration_tests(
                 .filter(identity_document::user_vault_id.eq(&uv.id))
                 .execute(conn.conn())?;
 
-            deleted_rows += diesel::delete(phone_number::table)
-                .filter(phone_number::user_vault_id.eq(&uv.id))
-                .execute(conn.conn())?;
-
-            deleted_rows += diesel::delete(email::table)
-                .filter(email::user_vault_id.eq(&uv.id))
-                .execute(conn.conn())?;
-
-            deleted_rows += diesel::delete(identity_data::table)
-                .filter(identity_data::user_vault_id.eq(&uv.id))
-                .execute(conn.conn())?;
-
-            deleted_rows += diesel::delete(fingerprint::table)
-                .filter(fingerprint::user_vault_id.eq(&uv.id))
-                .execute(conn.conn())?;
-
             // delete user vault
             deleted_rows += diesel::delete(user_vault::table)
                 .filter(user_vault::id.eq(&uv.id))
@@ -362,3 +373,5 @@ pub trait HasDataAttributeFields {
         DataAttribute::iter().filter(|k| self.has_field(*k)).collect()
     }
 }
+
+sql_function!(fn nextval(a: diesel::sql_types::VarChar) -> diesel::sql_types::BigInt);

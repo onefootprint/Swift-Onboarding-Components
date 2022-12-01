@@ -66,8 +66,9 @@ pub async fn get(
         None => None,
     };
 
+    let tenant_id = tenant.id.clone();
     let query_params = OnboardingListQueryParams {
-        tenant_id: tenant.id.clone(),
+        tenant_id: tenant_id.clone(),
         is_live: auth.is_live()?,
         requires_manual_review,
         statuses,
@@ -86,9 +87,9 @@ pub async fn get(
                 (page_size + 1) as i64,
             )?;
             let count = db::scoped_user::count_authorized_for_tenant(conn, query_params).map(Some)?;
-            let (scoped_user_ids, user_vault_ids): (Vec<&ScopedUserId>, Vec<&UserVaultId>) =
-                scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
-            let uvws: Vec<UserVaultWrapper> = UserVaultWrapper::multi_get(conn, user_vault_ids)?;
+            let uvws: Vec<UserVaultWrapper> =
+                UserVaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
+            let scoped_user_ids: Vec<_> = scoped_users.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
             let ob_config_map = ObConfiguration::list_authorized_for_users(conn, scoped_user_ids)?;
 
@@ -99,7 +100,7 @@ pub async fn get(
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = request
         .cursor_item(&state, &scoped_users)
-        .map(|su| su.ordering_id);
+        .map(|(su, _)| su.ordering_id);
 
     // Since we zip these Vecs together, we should ensure they are in the same order.
     // scoped_users.sort_by_key(|su| su.user_vault_id.clone());
@@ -111,7 +112,7 @@ pub async fn get(
     let scoped_users = scoped_users
         .into_iter()
         .take(page_size)
-        .map(|su| {
+        .map(|(su, _)| {
             let uvw = uvw_map.remove(&su.user_vault_id).unwrap();
             let ob_configs = ob_config_map.remove(&su.id).unwrap();
             // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
@@ -155,10 +156,10 @@ pub async fn get_detail(
     let (su, ob, uvw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let su = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
+            let (su, _) = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let uvw = UserVaultWrapper::get(conn, &su.user_vault_id)?;
+            let uvw = UserVaultWrapper::get_for_tenant(conn, &su.id)?;
             let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
                 .remove(&su.id)
                 .ok_or(ApiError::ResourceNotFound)?;

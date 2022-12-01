@@ -67,7 +67,7 @@ pub async fn decrypt(
     // Filter out fields that don't have values set on the user vault
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build(conn, user_vault))
+        .db_query(move |conn| UserVaultWrapper::get_committed(conn, user_vault))
         .await??;
     let (fields_to_decrypt, e_datas): (Vec<DataAttribute>, Vec<&SealedVaultBytes>) = data_attributes
         .iter()
@@ -101,7 +101,7 @@ pub async fn decrypt_document(
 ) -> Result<Vec<DecryptDocumentResult>, ApiError> {
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build(conn, user_vault))
+        .db_query(move |conn| UserVaultWrapper::get_committed(conn, user_vault))
         .await??;
 
     let images = uvw

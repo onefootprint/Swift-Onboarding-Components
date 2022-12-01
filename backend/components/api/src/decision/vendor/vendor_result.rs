@@ -49,11 +49,10 @@ impl VendorResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::Utc;
-    use db::models::verification_request::{NewVerificationRequest, VerificationRequest};
+    use db::models::verification_request::VerificationRequest;
     use db::models::verification_result::VerificationResult;
     use db::test_helpers::test_db_pool;
-    use newtypes::{OnboardingId, Vendor, VendorAPI};
+    use newtypes::{OnboardingId, VendorAPI};
     use std::str::FromStr;
 
     #[tokio::test]
@@ -73,47 +72,20 @@ mod tests {
         //  - For OB1, it ignores (gracefully) the verification request that does not have a corresponding result
         //  - For OB1, it handles requests/results from multiple vendors
 
-        // Requests for OB1
-        let request1_ob1 = NewVerificationRequest {
-            onboarding_id: ob_id1.clone(),
-            vendor: Vendor::Idology,
-            timestamp: Utc::now(),
-            email_id: None,
-            phone_number_id: None,
-            identity_data_id: None,
-            identity_document_id: None,
-            vendor_api: VendorAPI::IdologyExpectID,
-        };
-        let request2_ob1 = NewVerificationRequest {
-            onboarding_id: ob_id1.clone(),
-            vendor: Vendor::Twilio,
-            timestamp: Utc::now(),
-            email_id: None,
-            phone_number_id: None,
-            identity_data_id: None,
-            identity_document_id: None,
-            vendor_api: VendorAPI::TwilioLookupV2,
-        };
-
-        // Requests for OB2
-        let request1_ob2 = NewVerificationRequest {
-            onboarding_id: ob_id2.clone(),
-            vendor: Vendor::Twilio,
-            timestamp: Utc::now(),
-            email_id: None,
-            phone_number_id: None,
-            identity_data_id: None,
-            identity_document_id: None,
-            vendor_api: VendorAPI::TwilioLookupV2,
-        };
-
         // See the note on db_test_transaction for the explanation why we use this.
         db_pool
             .db_test_transaction(move |conn| -> Result<(), ApiError> {
                 // create VerificationRequests
-                let ob1_requests =
-                    VerificationRequest::bulk_save(conn.conn(), vec![request1_ob1, request2_ob1])?;
-                let ob2_requests = VerificationRequest::bulk_save(conn.conn(), vec![request1_ob2])?;
+                let ob1_requests = VerificationRequest::bulk_create(
+                    conn.conn(),
+                    ob_id1.clone(),
+                    vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2],
+                )?;
+                let ob2_requests = VerificationRequest::bulk_create(
+                    conn.conn(),
+                    ob_id2.clone(),
+                    vec![VendorAPI::TwilioLookupV2],
+                )?;
                 // Only create a result for the first
                 let ob1_result = VerificationResult::create(
                     conn,

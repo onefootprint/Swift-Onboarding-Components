@@ -32,7 +32,7 @@ pub async fn post(
         .db_query(move |conn| -> Result<_, ApiError> {
             // Verify there are no unmet requirements
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let (requirements, ob) = get_requirements(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
+            let (requirements, ob) = get_requirements(conn, &ob_info)?;
             if !requirements.is_empty() {
                 let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect();
                 return Err(OnboardingError::UnmetRequirements(unmet_requirements).into());

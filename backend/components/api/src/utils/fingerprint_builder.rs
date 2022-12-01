@@ -1,40 +1,73 @@
-use db::models::fingerprint::IsUnique;
 use futures::TryFutureExt;
 use newtypes::{
     address::{Address, FullAddressOrZip, ZipAndCountry},
     name::FullName,
     ssn::Ssn,
-    DataAttribute, Fingerprint, Fingerprinter, PiiString,
+    DataAttribute, Fingerprint, Fingerprinter, PiiString, UvdKind,
 };
+use std::convert::Into;
 
-use crate::{errors::ApiError, State};
+use crate::{errors::ApiResult, types::identity_data_request::IdentityDataUpdate, State};
 
-/// help collecting fingerprints
+/// help collecting fingerprints for identity data updates (eventually stored in UserVaultData)
 pub struct FingerprintBuilder {
-    fingerprints: Vec<(DataAttribute, PiiString)>,
+    fingerprints: Vec<(UvdKind, PiiString)>,
 }
+
 impl FingerprintBuilder {
-    pub fn new() -> Self {
-        Self { fingerprints: vec![] }
+    pub async fn fingerprints(
+        state: &State,
+        request: IdentityDataUpdate,
+    ) -> ApiResult<Vec<(UvdKind, Fingerprint)>> {
+        let mut builder = Self { fingerprints: vec![] };
+
+        let IdentityDataUpdate {
+            name,
+            dob,
+            ssn,
+            address,
+        } = request;
+
+        if let Some(name) = name {
+            builder.add_full_name(name);
+        }
+        if let Some(dob) = dob {
+            builder.add(dob.into(), UvdKind::Dob);
+        }
+        if let Some(ssn) = ssn {
+            builder.add_ssn(ssn);
+        }
+        if let Some(address) = address {
+            builder.add_address_or_zip(address);
+        }
+
+        let fut_fingerprints = builder.fingerprints.into_iter().map(|(kind, pii)| {
+            let pii = pii.clean_for_fingerprint();
+            state
+                .compute_fingerprint(Into::<DataAttribute>::into(kind), pii)
+                .map_ok(move |sh_data| (kind, sh_data))
+        });
+        let fingerprints = futures::future::try_join_all(fut_fingerprints).await?;
+        Ok(fingerprints)
     }
 
-    pub fn add(&mut self, pii: PiiString, kind: DataAttribute) {
+    fn add(&mut self, pii: PiiString, kind: UvdKind) {
         self.fingerprints.push((kind, pii))
     }
 
-    pub fn add_full_name(&mut self, name: FullName) {
-        self.add(name.first_name.into(), DataAttribute::FirstName);
-        self.add(name.last_name.into(), DataAttribute::LastName);
+    fn add_full_name(&mut self, name: FullName) {
+        self.add(name.first_name.into(), UvdKind::FirstName);
+        self.add(name.last_name.into(), UvdKind::LastName);
     }
 
-    pub fn add_ssn(&mut self, ssn: Ssn) {
+    fn add_ssn(&mut self, ssn: Ssn) {
         match ssn {
-            Ssn::Ssn9(ssn9) => self.add(ssn9.into(), DataAttribute::Ssn9),
-            Ssn::Ssn4(ssn4) => self.add(ssn4.into(), DataAttribute::Ssn4),
+            Ssn::Ssn9(ssn9) => self.add(ssn9.into(), UvdKind::Ssn9),
+            Ssn::Ssn4(ssn4) => self.add(ssn4.into(), UvdKind::Ssn4),
         }
     }
 
-    pub fn add_address(&mut self, address: Address) {
+    fn add_address(&mut self, address: Address) {
         let Address {
             line1: line_1,
             line2: line_2,
@@ -44,42 +77,25 @@ impl FingerprintBuilder {
             country,
         } = address;
 
-        self.add(line_1.into(), DataAttribute::AddressLine1);
+        self.add(line_1.into(), UvdKind::AddressLine1);
 
         if let Some(line_2) = line_2 {
-            self.add(line_2.into(), DataAttribute::AddressLine2);
+            self.add(line_2.into(), UvdKind::AddressLine2);
         };
 
-        self.add(city.into(), DataAttribute::City);
-        self.add(state.into(), DataAttribute::State);
-        self.add(zip.into(), DataAttribute::Zip);
-        self.add(country.into(), DataAttribute::Country);
+        self.add(city.into(), UvdKind::City);
+        self.add(state.into(), UvdKind::State);
+        self.add(zip.into(), UvdKind::Zip);
+        self.add(country.into(), UvdKind::Country);
     }
 
-    pub fn add_address_or_zip(&mut self, address: FullAddressOrZip) {
+    fn add_address_or_zip(&mut self, address: FullAddressOrZip) {
         match address {
             FullAddressOrZip::Address(address) => self.add_address(address),
             FullAddressOrZip::ZipAndCountry(ZipAndCountry { zip, country }) => {
-                self.add(zip.into(), DataAttribute::Zip);
-                self.add(country.into(), DataAttribute::Country);
+                self.add(zip.into(), UvdKind::Zip);
+                self.add(country.into(), UvdKind::Country);
             }
         }
-    }
-
-    pub async fn create(
-        self,
-        state: &State,
-    ) -> Result<Vec<(DataAttribute, Fingerprint, IsUnique)>, ApiError> {
-        // create the new fingerprints
-        let fut_fingerprints = self.fingerprints.into_iter().map(|(kind, pii)| {
-            let pii = pii.clean_for_fingerprint();
-            state.compute_fingerprint(kind, pii).map_ok(move |fp| {
-                // do not mark verified for this data
-                (kind, fp, false)
-            })
-        });
-        let fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)> =
-            futures::future::try_join_all(fut_fingerprints).await?;
-        Ok(fingerprints)
     }
 }

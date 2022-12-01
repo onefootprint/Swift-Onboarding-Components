@@ -51,8 +51,7 @@ pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonAp
     // Check we can proceed
     let should_make_idv_requests_and_decision = decision::engine::perform_pre_run_operations(
         &state,
-        ob_info.user_vault_id.clone(),
-        ob_info.onboarding.id.clone(),
+        ob_info.onboarding.clone(),
         ob_info.ob_config.clone(),
     )
     .await?;

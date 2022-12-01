@@ -4,7 +4,8 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId, OnboardingDecisionId, WebauthnCredentialId,
+    AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId, OnboardingDecisionId,
+    WebauthnCredentialId,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]

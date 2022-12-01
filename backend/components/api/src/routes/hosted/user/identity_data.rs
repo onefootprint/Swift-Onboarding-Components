@@ -1,10 +1,10 @@
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::types::identity_data_request::IdentityDataRequest;
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
+use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -25,14 +25,18 @@ async fn post(
 
     let request = request.into_inner();
     let update = IdentityDataUpdate::try_from(request)?;
-    let fingerprints = update.fingerprints(&state).await?;
+    let fingerprints = FingerprintBuilder::fingerprints(&state, update.clone()).await?;
 
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let mut uvw = UserVaultWrapper::lock(conn, &user_auth.user_vault_id())?;
-            let ob_id = user_auth.onboarding(conn)?.map(|o| o.onboarding.id);
-            uvw.update_identity_data(conn, update, fingerprints, ob_id)?;
+            // TODO For now, we only allow adding an data during onboarding since we otherwise
+            // don't know which scoped user to associate the data with.
+            // We might one day want to support this outside of onboarding for my1fp, but without
+            // the data being portable
+            let ob_info = user_auth.assert_onboarding(conn)?;
+            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
+            uvw.update_identity_data(conn, update, fingerprints, ob_info.onboarding.id)?;
 
             Ok(())
         })

@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
-use crate::schema::{identity_document};
+use crate::schema::identity_document;
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
+use itertools::Itertools;
 use newtypes::{
     Base64Data, DocumentRequestId, IdentityDocumentId, OnboardingId, SealedVaultDataKey, UserVaultId,
 };
@@ -134,30 +135,24 @@ impl IdentityDocument {
     /// Return a mapping from UserVaultId to Vec<IdentityDocument>
     pub fn multi_get_for_user_vault_ids(
         conn: &mut PgConnection,
-        user_vault_ids: &Vec<UserVaultId>,
+        user_vault_ids: Vec<&UserVaultId>,
     ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
         let results: Vec<IdentityDocument> = identity_document::table
             .filter(identity_document::user_vault_id.eq_any(user_vault_ids))
             .get_results(conn)?;
 
-        let mut identity_doc_base_map: HashMap<UserVaultId, Vec<IdentityDocument>> = user_vault_ids
-            .iter()
-            .map(|i| (i.clone(), vec![]))
-            .collect::<HashMap<_, _>>();
-
-        for id in results {
-            identity_doc_base_map
-                .entry(id.user_vault_id.clone())
-                .and_modify(|e| e.push(id));
-        }
-
-        Ok(identity_doc_base_map)
+        // Group the IdentityDocuments by UserVaultId
+        let results = results
+            .into_iter()
+            .map(|doc| (doc.user_vault_id.clone(), doc))
+            .sorted_by_key(|(uv_id, _)| uv_id.clone())
+            .into_group_map();
+        Ok(results)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    
 
     use super::*;
     use crate::{test_helpers::test_db_pool, DbError};
