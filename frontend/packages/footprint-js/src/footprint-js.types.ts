@@ -183,8 +183,8 @@ export enum FootprintInternalEvent {
 }
 
 export type UserData = {
-  email?: string;
-  phoneNumber?: string;
+  email?: string | null;
+  phoneNumber?: string | null;
 };
 
 export type IdentifyRequest = {

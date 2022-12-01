@@ -25,7 +25,10 @@ const startVanillaIntegration = (footprint: Footprint) => {
     };
   };
 
-  const handleButtonClicked = (publicKey: string) => {
+  const handleButtonClicked = (publicKey: string, container: HTMLElement) => {
+    const email = container.getAttribute('data-user-email');
+    const phoneNumber = container.getAttribute('data-user-phone-number');
+
     footprint.show({
       publicKey,
       appearance: getAppearance(),
@@ -38,6 +41,10 @@ const startVanillaIntegration = (footprint: Footprint) => {
         if (isFunction(window.onFootprintCompleted)) {
           window.onFootprintCompleted?.(validationToken);
         }
+      },
+      userData: {
+        email,
+        phoneNumber,
       },
     });
   };
@@ -60,7 +67,7 @@ const startVanillaIntegration = (footprint: Footprint) => {
     const createButtonAndListen = () => {
       const button = createButton(container);
       button.addEventListener('click', () => {
-        handleButtonClicked(publicKey);
+        handleButtonClicked(publicKey, container);
       });
     };
     defer(createButtonAndListen);
