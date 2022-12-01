@@ -3,7 +3,7 @@ import './footprint-styles.css';
 import {
   FootprintAppearance,
   FootprintPublicEvent,
-  ShowFootprint,
+  OpenFootprint,
 } from './footprint-js.types';
 import IframeManager from './utils/footprint-iframe';
 import { createButton, injectStyles } from './utils/footprint-ui';
@@ -53,13 +53,13 @@ const footprint = () => {
   const handleOnClosed = (callback: () => void) =>
     iframeManager.on(FootprintPublicEvent.closed, callback);
 
-  const show = async ({
+  const open = async ({
     appearance,
     onCanceled,
     onCompleted,
     publicKey,
     userData,
-  }: ShowFootprint) => {
+  }: OpenFootprint) => {
     if (hasIframeOpened) {
       console.warn('Cannot open two instances of Footprint at the same time');
       return;
@@ -68,7 +68,7 @@ const footprint = () => {
     setDialogStyles(appearance);
     const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
     const url = getURL({ fontSrc, publicKey, rules, variables });
-    await iframeManager.show(url, userData);
+    await iframeManager.open(url, userData);
     if (onCompleted) {
       handleOnCompleted(onCompleted);
     }
@@ -84,7 +84,7 @@ const footprint = () => {
   };
 
   return {
-    show,
+    open,
     close,
     createButton,
   };

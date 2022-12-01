@@ -14,7 +14,7 @@ export type {
   FootprintExternalStyles,
   FootprintMainStyles,
   FootprintShowParams,
-  ShowFootprint,
+  OpenFootprint,
   UserData,
 } from './footprint-js.types';
 export {

@@ -27,7 +27,7 @@ const FootprintButton = ({
 }: FootprintButtonProps) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
-    footprint.show({
+    footprint.open({
       appearance,
       onCanceled,
       onCompleted,

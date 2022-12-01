@@ -158,7 +158,7 @@ export type FootprintAppearance = {
   variables?: FootprintAppearanceVariables;
 };
 
-export type ShowFootprint = {
+export type OpenFootprint = {
   appearance?: FootprintAppearance;
   onCanceled?: () => void;
   onCompleted?: (validationToken: string) => void;
@@ -167,7 +167,7 @@ export type ShowFootprint = {
 };
 
 export type Footprint = {
-  show: (options: ShowFootprint) => Promise<void>;
+  open: (options: OpenFootprint) => Promise<void>;
   close: () => Promise<void>;
 };
 

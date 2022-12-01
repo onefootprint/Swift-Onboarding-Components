@@ -29,7 +29,7 @@ const startVanillaIntegration = (footprint: Footprint) => {
     const email = container.getAttribute('data-user-email');
     const phoneNumber = container.getAttribute('data-user-phone-number');
 
-    footprint.show({
+    footprint.open({
       publicKey,
       appearance: getAppearance(),
       onCanceled: () => {

@@ -26,7 +26,7 @@ class FootprintIframe {
     removeLoader();
   };
 
-  async show(url: string, userData?: UserData) {
+  async open(url: string, userData?: UserData) {
     const container = createContainer();
     showOverlay(container);
     this.child = await new Postmate({
