@@ -41,7 +41,7 @@ const Prompt = ({ showGuidelines, onDone }: PromptProps) => {
         <StyledInput
           ref={takePhotoRef as React.RefObject<HTMLInputElement>}
           type="file"
-          accept="image/*"
+          accept="image/*,.heic,.heif"
           capture="environment"
           onChange={handleImage}
         />
@@ -52,7 +52,7 @@ const Prompt = ({ showGuidelines, onDone }: PromptProps) => {
         <StyledInput
           ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
           type="file"
-          accept="image/*"
+          accept="image/*,.heic,.heif"
           onChange={handleImage}
         />
       </ButtonsContainer>

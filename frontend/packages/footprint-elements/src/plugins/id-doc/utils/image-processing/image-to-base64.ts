@@ -8,7 +8,7 @@ const convertImageToBase64 = (image: File) =>
         reject();
         return;
       }
-      const base64 = reader.result?.replace(/data:image\/.+?;base64,/i, '');
+      const base64 = reader.result?.replace(/data:.+?;base64,/i, '');
       resolve(base64);
     };
     reader.readAsDataURL(image);
