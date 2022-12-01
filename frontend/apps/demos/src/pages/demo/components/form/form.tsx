@@ -49,7 +49,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
     }
     const foundUser = await identifyUser(userData);
     if (foundUser) {
-      footprint.show({
+      footprint.open({
         userData,
         publicKey,
         onCanceled: handleFootprintCanceled,
