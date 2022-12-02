@@ -70,7 +70,7 @@ class TestDashboardOnboardings:
             tenant.sk.key,
             status_code=401,
         )
-    # A tenant needs to use /vault/document/decrypt for decrypting identity document, so 
+    # A tenant needs to use /vault/identity/document/decrypt for decrypting identity document, so 
     # this fails
     def test_tenant_decrypt_identity_doc_with_identity_endpoint(self, user):
         tenant = user.tenant
@@ -100,7 +100,7 @@ class TestDashboardOnboardings:
         assert not get_user_resp['onboarding']['can_access_identity_document_images']
         
         post(
-            f"users/{user.fp_user_id}/vault/document/decrypt",
+            f"users/{user.fp_user_id}/vault/identity/document/decrypt",
             data,
             tenant.sk.key,
             status_code=401,
@@ -114,7 +114,7 @@ class TestDashboardOnboardings:
         assert not get_user_resp['onboarding']['can_access_identity_document_images']
         
         get(
-            f"users/{user.fp_user_id}/vault/document?document_types=",
+            f"users/{user.fp_user_id}/vault/identity/document?document_types=",
             None,
             tenant.sk.key,
             status_code=401,
@@ -125,7 +125,7 @@ class TestDashboardOnboardings:
         requested_doc_types = "passport,horse_license"
         
         resp = get(
-            f"users/{user_with_documents.fp_user_id}/vault/document?document_types={requested_doc_types}",
+            f"users/{user_with_documents.fp_user_id}/vault/identity/document?document_types={requested_doc_types}",
             None,
             tenant.sk.key,
             status_code=200,
@@ -139,14 +139,14 @@ class TestDashboardOnboardings:
 
         # now with no query
         resp = get(
-            f"users/{user_with_documents.fp_user_id}/vault/document",
+            f"users/{user_with_documents.fp_user_id}/vault/identity/document",
             None,
             tenant.sk.key,
             status_code=200,
         )
         # Check empty query key
         resp2 = get(
-            f"users/{user_with_documents.fp_user_id}/vault/document?document_types=",
+            f"users/{user_with_documents.fp_user_id}/vault/identity/document?document_types=",
             None,
             tenant.sk.key,
             status_code=200,
@@ -177,7 +177,7 @@ class TestDashboardOnboardings:
         }
         
         resp = post(
-            f"users/{user_with_documents.fp_user_id}/vault/document/decrypt",
+            f"users/{user_with_documents.fp_user_id}/vault/identity/document/decrypt",
             data,
             tenant.sk.key,
             status_code=200,

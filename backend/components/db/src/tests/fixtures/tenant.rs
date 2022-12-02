@@ -4,7 +4,9 @@ use newtypes::{EncryptedVaultPrivateKey, VaultPublicKey};
 use crate::models::tenant::{NewTenant, Tenant};
 
 pub fn create(conn: &mut PgConnection) -> Tenant {
-    let tenant = NewTenant {
+    
+
+    NewTenant {
         name: "Test tenant".to_owned(),
         public_key: VaultPublicKey::unvalidated(vec![]),
         e_private_key: EncryptedVaultPrivateKey(vec![]),
@@ -13,7 +15,5 @@ pub fn create(conn: &mut PgConnection) -> Tenant {
         sandbox_restricted: false,
     }
     .save(conn)
-    .expect("Couldn't create tenant");
-
-    tenant
+    .expect("Couldn't create tenant")
 }

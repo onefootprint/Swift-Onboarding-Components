@@ -1,7 +1,7 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use crypto::aead::AeadSealedBytes;
 use db::{
-    models::{identity_document::IdentityDocument, user_vault::UserVault},
+    models::{user_vault::UserVault},
     HasDataAttributeFields,
 };
 use newtypes::{Base64Data, DataAttribute, IdentityDocumentId, PiiString, SealedVaultBytes};

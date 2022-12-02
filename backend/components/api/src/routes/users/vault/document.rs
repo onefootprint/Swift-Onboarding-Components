@@ -28,7 +28,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Q
     description = "Checks existence if items in the document vault.",
     tags(Vault, PublicApi, Users)
 )]
-#[actix::get("/users/{footprint_user_id}/vault/document")]
+#[actix::get("/users/{footprint_user_id}/vault/identity/document")]
 pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -102,7 +102,7 @@ pub(super) async fn get_internal(
     description = "Decryptes images from in the document vault.",
     tags(Vault, PublicApi, Users)
 )]
-#[actix::post("/users/{footprint_user_id}/vault/document/decrypt")]
+#[actix::post("/users/{footprint_user_id}/vault/identity/document/decrypt")]
 pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
