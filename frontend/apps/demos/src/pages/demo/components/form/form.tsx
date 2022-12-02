@@ -9,9 +9,12 @@ import {
   TextInput,
   Typography,
 } from '@onefootprint/ui';
-import React from 'react';
+import debounce from 'lodash/debounce';
+import React, { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
+
+import validateUserData from './utils/validate-user-data';
 
 type FormData = {
   email?: string;
@@ -39,24 +42,42 @@ const Form = ({ html, onSuccess }: FormProps) => {
     console.log('user canceled!');
   };
 
-  const bootstrap = async () => {
+  const showFootprint = () => {
+    console.log('show footprint');
+    footprint.open({
+      userData: {
+        email: getValues('email'),
+        phoneNumber: getValues('phoneNumber'),
+      },
+      publicKey,
+      onCanceled: handleFootprintCanceled,
+      onCompleted: handleFootprintCompleted,
+    });
+  };
+
+  const bootstrap = async (email?: string, phoneNumber?: string) => {
+    try {
+      const foundUser = await identifyUser({ email, phoneNumber });
+      if (foundUser) {
+        showFootprint();
+      }
+    } catch (_) {
+      // do nothing
+    }
+  };
+
+  const handleChange = () => {
     const userData = {
       email: getValues('email'),
       phoneNumber: getValues('phoneNumber'),
     };
-    if (!userData.email && !userData.phoneNumber) {
-      return;
-    }
-    const foundUser = await identifyUser(userData);
-    if (foundUser) {
-      footprint.open({
-        userData,
-        publicKey,
-        onCanceled: handleFootprintCanceled,
-        onCompleted: handleFootprintCompleted,
-      });
+    const isValidUserData = validateUserData(userData);
+    if (isValidUserData) {
+      bootstrap(userData.email, userData.phoneNumber);
     }
   };
+
+  const debouncedHandleChange = useCallback(debounce(handleChange, 300), []);
 
   return (
     <Container>
@@ -68,7 +89,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
             placeholder="jane.doe@email.com"
             type="email"
             {...register('email', {
-              onBlur: bootstrap,
+              onChange: debouncedHandleChange,
             })}
           />
           <PhoneInput
@@ -79,11 +100,11 @@ const Form = ({ html, onSuccess }: FormProps) => {
                 value: PHONE_REGEX,
                 message: 'Phone number format is incorrect',
               },
-              onBlur: bootstrap,
+              onChange: debouncedHandleChange,
             })}
           />
         </InputsContainer>
-        <Button fullWidth type="submit" variant="secondary">
+        <Button fullWidth variant="secondary" onClick={showFootprint}>
           Continue
         </Button>
         <OrDivider>
@@ -92,11 +113,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
             or
           </Typography>
         </OrDivider>
-        <FootprintButton
-          publicKey={publicKey}
-          onCompleted={handleFootprintCompleted}
-          onCanceled={handleFootprintCanceled}
-        />
+        <FootprintButton publicKey={publicKey} />
       </FormContainer>
     </Container>
   );
