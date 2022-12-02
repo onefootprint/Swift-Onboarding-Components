@@ -20,7 +20,6 @@ use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
-use db::DbResult;
 use itertools::Itertools;
 use newtypes::CollectedDataOption;
 use newtypes::ObConfigurationId;

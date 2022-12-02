@@ -1,9 +1,6 @@
-use diesel::{Connection, PgConnection};
+use diesel::PgConnection;
 
-use crate::{
-    test_helpers::{db_url, test_db_conn},
-    DbError, DbResult, TxnPgConnection,
-};
+use crate::{test_helpers::test_db_conn, DbError, DbResult, TxnPgConnection};
 
 /// Wrapper around TxnPgConnection that is used only in tests
 pub struct TestPgConnection<'a>(TxnPgConnection<'a>);
