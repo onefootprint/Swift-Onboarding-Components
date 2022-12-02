@@ -17,3 +17,4 @@ tls_proxy/local_proxy.json
 .DS_Store
 *.pem
 .idea/
+fp_test_server_log_*

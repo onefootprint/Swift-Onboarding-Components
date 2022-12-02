@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
 use crate::TxnPgConnection;
@@ -31,7 +33,6 @@ pub struct ObConfiguration {
     pub must_collect_identity_document: bool,
     pub can_access_identity_document_images: bool,
 }
-
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
 struct NewObConfiguration {
@@ -139,6 +140,26 @@ impl ObConfiguration {
         Ok(obcs)
     }
 
+    pub fn list_authorized_for_users(
+        conn: &mut PgConnection,
+        scoped_user_ids: Vec<&ScopedUserId>,
+    ) -> DbResult<HashMap<ScopedUserId, Vec<Self>>> {
+        // For now, this will be either 0 or 1 result
+        let obcs: HashMap<ScopedUserId, Vec<Self>> = ob_configuration::table
+            .inner_join(onboarding::table)
+            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
+            .filter(onboarding::is_authorized.eq(true))
+            .select((onboarding::scoped_user_id, ob_configuration::all_columns))
+            .get_results::<(ScopedUserId, ObConfiguration)>(conn)?
+            .into_iter()
+            .fold(HashMap::new(), |mut acc, (su, ob)| {
+                acc.entry(su).or_default().push(ob);
+                acc
+            });
+
+        Ok(obcs)
+    }
+
     pub fn get_enabled<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
@@ -228,6 +249,22 @@ impl ObConfiguration {
             self.can_access_data.iter().flat_map(|x| x.attributes()).collect();
 
         if self.can_access_identity_document_images {
+            fields.push(DataAttribute::IdentityDocument)
+        }
+
+        fields
+    }
+
+    // returns which fields this ObConfiguration tried to collect
+    // Don't use this on Onboardings that have not been authorized
+    pub fn intent_to_collect_fields(&self) -> Vec<DataAttribute> {
+        let mut fields: Vec<DataAttribute> = self
+            .must_collect_data
+            .iter()
+            .flat_map(|x| x.attributes())
+            .collect();
+
+        if self.must_collect_identity_document {
             fields.push(DataAttribute::IdentityDocument)
         }
 

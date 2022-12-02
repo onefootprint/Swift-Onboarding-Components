@@ -22,6 +22,7 @@ use db::models::phone_number::PhoneNumber;
 
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
+use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataAttribute, DataCollectedInfo, DataPriority, EmailId, Fingerprint,
     IdentityDocumentId, KvDataKey, OnboardingId, PiiString, SealedVaultBytes, SealedVaultDataKey, TenantId,
@@ -421,6 +422,54 @@ impl UserVaultWrapper {
 
         Ok(())
     }
+
+    /// We don't allow a tenant to know if data is in the Vault without having an authorized OBConfig that wanted to collect those fields
+    pub fn data_fields_tenant_requested_to_collect(
+        &self,
+        // Ideally we'd take a scoped user and calculate this here,
+        // but /users does some bulk fetching and this makes it easier
+        ob_configs: Vec<ObConfiguration>,
+    ) -> Vec<DataAttribute> {
+        // As of 2022-11, ob<>scoped user is 1-1
+        let intent_to_collect_attributes: HashSet<DataAttribute> = ob_configs
+            .into_iter()
+            .flat_map(|x| x.intent_to_collect_fields())
+            .collect();
+        let fields_present_in_vault: HashSet<DataAttribute> =
+            HashSet::from_iter(self.get_populated_fields().into_iter());
+
+        (intent_to_collect_attributes.intersection(&fields_present_in_vault))
+            .into_iter()
+            .cloned()
+            .collect::<Vec<_>>()
+    }
+    /// Retrieve the fields that the tenant has requested/gotten authorized access to collect
+    ///
+    /// Note: This is not checking `READ` permissions of data, e.g. fields that the tenant can actually decrypt.
+    ///    For that, use `ensure_scope_allows_access`. This is just for displaying what data the tenant _collected_.
+    ///    This is what we display in /users, and it would be a little weird to collect, but then not display the info we collected anywhere.
+    pub fn get_accessible_populated_fields(
+        &self,
+        ob_configs: Vec<ObConfiguration>,
+    ) -> (Vec<DataAttribute>, Vec<String>) {
+        let accessible_fields: HashSet<DataAttribute> = HashSet::from_iter(
+            self.data_fields_tenant_requested_to_collect(ob_configs)
+                .into_iter(),
+        );
+        let document_types = if accessible_fields.contains(&DataAttribute::IdentityDocument) {
+            self.get_identity_document_types()
+        } else {
+            vec![]
+        };
+        let data_attributes: Vec<DataAttribute> =
+            HashSet::from_iter(self.get_populated_fields().iter().cloned())
+                .intersection(&accessible_fields)
+                .into_iter()
+                .cloned()
+                .collect::<Vec<_>>();
+
+        (data_attributes, document_types)
+    }
 }
 
 pub struct IdentityDocumentImages {
@@ -480,5 +529,15 @@ impl UserVaultWrapper {
             .map(|doc| Self::internal_fetch_image(state, doc));
 
         futures::future::join_all(futures).await
+    }
+
+    pub fn get_identity_document_types(&self) -> Vec<String> {
+        self.identity_documents
+            .iter()
+            .map(|i| i.document_type.clone())
+            .collect::<Vec<String>>()
+            .into_iter()
+            .unique()
+            .collect::<Vec<String>>()
     }
 }

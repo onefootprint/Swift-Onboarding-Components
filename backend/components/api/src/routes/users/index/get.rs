@@ -14,11 +14,11 @@ use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use api_wire_types::ListUsersRequest;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
-use db::HasDataAttributeFields;
-
 use newtypes::FootprintUserId;
+use newtypes::ScopedUserId;
 use newtypes::TenantPermission;
 use newtypes::UserVaultId;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter};
@@ -76,7 +76,7 @@ pub async fn get(
         timestamp_lte,
         timestamp_gte,
     };
-    let (scoped_users, mut obs, uvws, count) = state
+    let (scoped_users, mut obs, uvws, count, mut ob_config_map) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_users = db::scoped_user::list_authorized_for_tenant(
@@ -86,12 +86,13 @@ pub async fn get(
                 (page_size + 1) as i64,
             )?;
             let count = db::scoped_user::count_authorized_for_tenant(conn, query_params).map(Some)?;
-            let (scoped_user_ids, user_vault_ids): (_, Vec<_>) =
+            let (scoped_user_ids, user_vault_ids): (Vec<&ScopedUserId>, Vec<&UserVaultId>) =
                 scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
             let uvws: Vec<UserVaultWrapper> = UserVaultWrapper::multi_get(conn, user_vault_ids)?;
-            let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
+            let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
+            let ob_config_map = ObConfiguration::list_authorized_for_users(conn, scoped_user_ids)?;
 
-            Ok((scoped_users, obs, uvws, count))
+            Ok((scoped_users, obs, uvws, count, ob_config_map))
         })
         .await??;
 
@@ -112,8 +113,12 @@ pub async fn get(
         .take(page_size)
         .map(|su| {
             let uvw = uvw_map.remove(&su.user_vault_id).unwrap();
+            let ob_configs = ob_config_map.remove(&su.id).unwrap();
+            // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
+            let (data_attributes, document_types) = uvw.get_accessible_populated_fields(ob_configs);
             <api_wire_types::User as DbToApi<UserDetail>>::from_db((
-                uvw.get_populated_fields(),
+                data_attributes,
+                document_types,
                 obs.remove(&su.id),
                 su,
                 uvw.user_vault.is_portable,
@@ -161,9 +166,13 @@ pub async fn get_detail(
             Ok((su, ob, uvw))
         })
         .await??;
+    let (_, ob_config, _, _, _, _) = &ob;
+    // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
+    let (data_attributes, document_types) = uvw.get_accessible_populated_fields(vec![ob_config.clone()]);
 
     let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
-        uvw.get_populated_fields(),
+        data_attributes,
+        document_types,
         Some(ob),
         su,
         uvw.user_vault.is_portable,
