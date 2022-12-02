@@ -29,8 +29,6 @@ pub struct IdentityDocument {
 }
 
 impl IdentityDocument {
-    pub const DATA_KEY_SCOPE: &'static str = "identity_document";
-
     pub fn seal_with_data_key(
         b64_image: &str,
         data_key: &ScopedSealingKey,

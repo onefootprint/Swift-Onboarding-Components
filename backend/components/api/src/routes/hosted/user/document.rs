@@ -63,7 +63,6 @@ pub async fn post(
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
             uvw.user_vault.public_key.as_ref(),
-            IdentityDocument::DATA_KEY_SCOPE,
         )?;
 
     let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;

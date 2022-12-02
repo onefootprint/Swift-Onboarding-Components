@@ -1,4 +1,8 @@
-use crypto::{aead::ScopedSealingKey, hex, seal::EciesP256Sha256AesGcmSealed};
+use crypto::{
+    aead::{SealingKey},
+    hex,
+    seal::EciesP256Sha256AesGcmSealed,
+};
 use enclave_proxy::{
     http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, EnclavePayload,
     EnvelopeDecryptRequest, FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
@@ -109,8 +113,7 @@ impl EnclaveClient {
         &self,
         sealed_data_keys: &[SealedVaultDataKey],
         sealed_key: &EncryptedVaultPrivateKey,
-        scope: &'static str,
-    ) -> Result<Vec<ScopedSealingKey>, EnclaveError> {
+    ) -> Result<Vec<SealingKey>, EnclaveError> {
         let requests = sealed_data_keys
             .iter()
             .map(|k| -> Result<DecryptRequest, EnclaveError> {
@@ -134,8 +137,8 @@ impl EnclaveClient {
         let response = response
             .results
             .into_iter()
-            .map(|r| -> Result<ScopedSealingKey, crypto::Error> {
-                let k = ScopedSealingKey::new(r.data, scope)?;
+            .map(|r| -> Result<_, crypto::Error> {
+                let k = SealingKey::new(r.data)?;
                 Ok(k)
             })
             .collect::<Result<Vec<_>, _>>()

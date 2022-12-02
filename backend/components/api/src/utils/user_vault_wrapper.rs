@@ -1,4 +1,4 @@
-use crypto::aead::ScopedSealingKey;
+use crypto::aead::SealingKey;
 use db::models::fingerprint::IsUnique;
 use db::models::identity_data::IdentityData;
 use db::models::identity_document::IdentityDocument;
@@ -245,11 +245,10 @@ impl UserVaultWrapper {
         &self,
         state: &State,
         keys: Vec<SealedVaultDataKey>,
-        scope: &'static str,
-    ) -> ApiResult<Vec<ScopedSealingKey>> {
+    ) -> ApiResult<Vec<SealingKey>> {
         let decrypted_results = state
             .enclave_client
-            .decrypt_sealed_vault_data_key(&keys, &self.user_vault.e_private_key, scope)
+            .decrypt_sealed_vault_data_key(&keys, &self.user_vault.e_private_key)
             .await?;
 
         Ok(decrypted_results)

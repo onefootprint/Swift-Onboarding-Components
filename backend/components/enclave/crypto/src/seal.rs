@@ -8,7 +8,7 @@ use sha2::{Digest, Sha256};
 use std::fmt::Debug;
 use std::str::FromStr;
 
-use crate::aead::{generate_chacha20_poly1305_key_bytes, AeadSealedBytes, ScopedSealingKey};
+use crate::aead::{generate_chacha20_poly1305_key_bytes, AeadSealedBytes, ScopedSealingKey, SealingKey};
 
 pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
@@ -223,12 +223,11 @@ impl SealedChaCha20Poly1305DataKey {
     /// generate a symmetric (ChaCha20Poly1305) sealing AEAD key with plaintext
     pub fn generate_sealed_random_chacha20_poly1305_key_with_plaintext(
         public_key: &[u8],
-        scope: &'static str,
-    ) -> Result<(SealedChaCha20Poly1305DataKey, ScopedSealingKey), crate::Error> {
+    ) -> Result<(SealedChaCha20Poly1305DataKey, SealingKey), crate::Error> {
         let key = generate_chacha20_poly1305_key_bytes();
         let sealed_key = seal::seal_ecies_p256_x963_sha256_aes_gcm(public_key, key.to_vec())?;
         let sealed = SealedChaCha20Poly1305DataKey { sealed_key };
-        let key = ScopedSealingKey::new_from_key(key, scope);
+        let key = SealingKey::new_from_key(key);
         Ok((sealed, key))
     }
 }

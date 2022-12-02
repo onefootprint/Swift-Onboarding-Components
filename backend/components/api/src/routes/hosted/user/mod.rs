@@ -1,5 +1,5 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
-use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
+use crypto::aead::AeadSealedBytes;
 use db::{
     models::{identity_document::IdentityDocument, user_vault::UserVault},
     HasDataAttributeFields,
@@ -111,9 +111,7 @@ pub async fn decrypt_document(
         .collect::<Result<Vec<_>, _>>()?; // Error with whatever the first error is
 
     let sealed_keys = images.iter().map(|i| i.e_data_key.clone()).collect();
-    let unsealed_keys: Vec<ScopedSealingKey> = uvw
-        .decrypt_data_keys(state, sealed_keys, IdentityDocument::DATA_KEY_SCOPE)
-        .await?;
+    let unsealed_keys = uvw.decrypt_data_keys(state, sealed_keys).await?;
     let res: Result<Vec<DecryptDocumentResult>, _> = images
         .into_iter()
         .zip(unsealed_keys.iter())
