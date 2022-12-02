@@ -179,7 +179,7 @@ pub(super) async fn post_internal(
 /// Splitting out since we may in the future want to filter on things like
 /// expired/is_valid etc
 fn available_images_from_uvw(uvw: &UserVaultWrapper) -> Vec<String> {
-    uvw.identity_documents
+    uvw.identity_documents()
         .iter()
         .map(|i| i.document_type.clone())
         .collect()

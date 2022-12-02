@@ -64,17 +64,7 @@ pub async fn get(
         })
         .await??;
     Ok(Json(ResponseData::ok(FpUser {
-        phone_numbers: uvw
-            .phone_number
-            .as_ref()
-            .map(FpUserData::from)
-            .map(|v| vec![v])
-            .unwrap_or_default(),
-        emails: uvw
-            .email
-            .as_ref()
-            .map(FpUserData::from)
-            .map(|v| vec![v])
-            .unwrap_or_default(),
+        phone_numbers: uvw.phone_numbers().iter().map(FpUserData::from).collect(),
+        emails: uvw.emails().iter().map(FpUserData::from).collect(),
     })))
 }

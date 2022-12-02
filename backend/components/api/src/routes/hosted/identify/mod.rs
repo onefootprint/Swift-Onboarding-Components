@@ -3,6 +3,7 @@ pub mod identify;
 pub mod login_challenge;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use db::models::webauthn_credential::WebauthnCredential;
+use db::HasDataAttributeFields;
 pub mod signup_challenge;
 pub mod verify;
 use crate::errors::ApiError;
@@ -149,7 +150,7 @@ async fn get_user_challenge_context(
         .await??;
 
     let mut kinds: Vec<ChallengeKind> = Vec::new();
-    if uvw.phone_number.is_some() {
+    if uvw.has_field(DataAttribute::PhoneNumber) {
         kinds.push(ChallengeKind::Sms);
     }
     if !creds.is_empty() {

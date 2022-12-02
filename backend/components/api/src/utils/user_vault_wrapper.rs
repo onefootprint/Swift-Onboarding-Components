@@ -52,11 +52,12 @@ use db::HasDataAttributeFields;
 #[derive(Debug, Clone)]
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
+    // TODO wrap these in another struct that separates committed vs speculative data
     data: Vec<UserVaultData>,
-    pub phone_number: Option<PhoneNumber>,
-    pub email: Option<Email>,
+    phone_numbers: Vec<PhoneNumber>,
+    emails: Vec<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
-    pub identity_documents: Vec<IdentityDocument>,
+    identity_documents: Vec<IdentityDocument>,
 
     // A map of all of the DataLifetimes for data on this table
     lifetimes: HashMap<DataLifetimeId, DataLifetime>,
@@ -96,11 +97,10 @@ impl UserVaultWrapper {
         let active_lifetime_ids: Vec<_> = active_lifetimes.keys().cloned().collect();
 
         // Fetch all the data related to the active lifetimes
+        // Split into committed + uncommitted data
         let data = UserVaultData::get_for(conn, &active_lifetime_ids)?;
-        let phone_number = PhoneNumber::get_for(conn, &active_lifetime_ids)?
-            .into_iter()
-            .next();
-        let email = Email::get_for(conn, &active_lifetime_ids)?.into_iter().next();
+        let phone_numbers = PhoneNumber::get_for(conn, &active_lifetime_ids)?;
+        let emails = Email::get_for(conn, &active_lifetime_ids)?;
 
         // TODO migrate this to DataLifetimes
         let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
@@ -108,8 +108,8 @@ impl UserVaultWrapper {
         Ok(Self {
             user_vault,
             data,
-            phone_number,
-            email,
+            phone_numbers,
+            emails,
             identity_documents,
             lifetimes: active_lifetimes,
             _seqno: seqno,
@@ -153,8 +153,8 @@ impl UserVaultWrapper {
                     scoped_user_id: Some(su.id),
                     user_vault: uv,
                     data: uvds.remove(&uv_id).unwrap_or_default(),
-                    phone_number: phone_numbers.remove(&uv_id).and_then(|v| v.into_iter().next()),
-                    email: emails.remove(&uv_id).and_then(|v| v.into_iter().next()),
+                    phone_numbers: phone_numbers.remove(&uv_id).unwrap_or_default(),
+                    emails: emails.remove(&uv_id).unwrap_or_default(),
                     identity_documents: identity_document_map.remove(&uv_id).unwrap_or_default(),
                     lifetimes: uv_id_to_active_lifetimes.remove(&uv_id).unwrap_or_default(),
                     is_locked: false,
@@ -230,7 +230,7 @@ impl UserVaultWrapper {
 
         let email = email.to_piistring();
         let e_data = self.user_vault.public_key.seal_pii(&email)?;
-        let priority = if self.email.is_some() {
+        let priority = if !self.emails.is_empty() {
             DataPriority::Secondary
         } else {
             DataPriority::Primary
@@ -247,7 +247,7 @@ impl UserVaultWrapper {
         let email_id = email.id.clone();
 
         if priority == DataPriority::Primary {
-            self.email = Some(email);
+            self.emails = vec![email];
         }
         Ok(email_id)
     }
@@ -279,8 +279,9 @@ impl UserVaultWrapper {
 
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<ValidatedPhoneNumber, ApiError> {
         let number = self
-            .phone_number
-            .as_ref()
+            .phone_numbers()
+            .iter()
+            .next()
             .ok_or(ApiError::NoPhoneNumberForVault)?;
 
         let decrypt_response = self
@@ -306,12 +307,27 @@ impl UserVaultWrapper {
             .cloned()
             .collect()
     }
+
+    pub fn phone_numbers(&self) -> &[PhoneNumber] {
+        // TODO proxy between committed/uncommitted
+        &self.phone_numbers
+    }
+
+    pub fn emails(&self) -> &[Email] {
+        // TODO proxy between committed/uncommitted
+        &self.emails
+    }
+
+    pub fn identity_documents(&self) -> &[IdentityDocument] {
+        // TODO proxy between committed/uncommitted
+        &self.identity_documents
+    }
 }
 
 impl HasDataAttributeFields for UserVaultWrapper {
     fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
-        let email = self.email.as_ref();
-        let phone = self.phone_number.as_ref();
+        let email = self.emails().iter().next();
+        let phone = self.phone_numbers().iter().next();
         match data_attribute {
             // identity
             DataAttribute::FirstName
