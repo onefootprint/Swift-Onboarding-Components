@@ -1,7 +1,7 @@
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
+use crate::TxnPgConnection;
 use crate::{DbError, DbResult};
-use crate::{DbPool, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -168,8 +168,8 @@ impl ObConfiguration {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub async fn create(
-        pool: &DbPool,
+    pub fn create(
+        conn: &mut PgConnection,
         name: String,
         tenant_id: TenantId,
         must_collect_data: Vec<CollectedDataOption>,
@@ -190,20 +190,16 @@ impl ObConfiguration {
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
         };
-        let obc = pool
-            .db_query(move |conn| {
-                diesel::insert_into(ob_configuration::table)
-                    .values(config)
-                    .get_result::<ObConfiguration>(conn)
-            })
-            .await??;
+        let obc = diesel::insert_into(ob_configuration::table)
+            .values(config)
+            .get_result::<ObConfiguration>(conn)?;
         Ok(obc)
     }
 
     pub fn update(
         conn: &mut TxnPgConnection,
-        id: ObConfigurationId,
-        tenant_id: TenantId,
+        id: &ObConfigurationId,
+        tenant_id: &TenantId,
         is_live: bool,
         name: Option<String>,
         status: Option<ApiKeyStatus>,

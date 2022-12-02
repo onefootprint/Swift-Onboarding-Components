@@ -40,8 +40,10 @@ pub mod user_vault;
 
 #[cfg(test)]
 mod test;
+#[cfg(test)]
+mod tests;
 
-#[allow(unused)]
+#[cfg(test)]
 pub mod test_context;
 
 #[allow(unused)]

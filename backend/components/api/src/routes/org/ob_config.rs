@@ -20,6 +20,7 @@ use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
+use db::DbResult;
 use itertools::Itertools;
 use newtypes::CollectedDataOption;
 use newtypes::ObConfigurationId;
@@ -150,7 +151,7 @@ impl CreateOnboardingConfigurationRequest {
     tags(Organization, PublicApi)
 )]
 #[post("/org/onboarding_configs")]
-pub fn post(
+pub async fn post(
     state: web::Data<State>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
@@ -166,17 +167,23 @@ pub fn post(
         can_access_identity_document_images,
     } = request.into_inner();
 
-    let obc = ObConfiguration::create(
-        &state.db_pool,
-        name,
-        tenant.id.clone(),
-        must_collect_data,
-        can_access_data,
-        must_collect_identity_document,
-        can_access_identity_document_images,
-        auth.is_live()?,
-    )
-    .await?;
+    let is_live = auth.is_live()?;
+    let tenant_id = tenant.id.clone();
+    let obc = state
+        .db_pool
+        .db_query(move |conn| {
+            ObConfiguration::create(
+                conn,
+                name,
+                tenant_id,
+                must_collect_data,
+                can_access_data,
+                must_collect_identity_document,
+                can_access_identity_document_images,
+                is_live,
+            )
+        })
+        .await??;
 
     Ok(Json(ResponseData::ok(
         api_wire_types::OnboardingConfiguration::from_db((obc, tenant)),
@@ -213,7 +220,7 @@ async fn patch(
     let tenant_id = tenant.id.clone();
     let result = state
         .db_pool
-        .db_transaction(move |conn| ObConfiguration::update(conn, id, tenant_id, is_live, name, status))
+        .db_transaction(move |conn| ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status))
         .await?;
 
     Ok(Json(ResponseData::ok(
