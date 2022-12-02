@@ -65,7 +65,7 @@ pub async fn put(
 
 pub fn put_internal(
     conn: &mut TxnPgConnection,
-    uvw: &mut UserVaultWrapper,
+    uvw: &UserVaultWrapper,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,

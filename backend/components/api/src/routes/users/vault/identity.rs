@@ -59,10 +59,10 @@ pub async fn put(
         .db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
             let (ob, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
+            let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
             put_internal(
                 conn,
-                &mut uvw,
+                uvw,
                 &tenant_auth,
                 &scoped_user,
                 insight,
@@ -79,7 +79,7 @@ pub async fn put(
 
 pub fn put_internal(
     conn: &mut TxnPgConnection,
-    uvw: &mut UserVaultWrapper,
+    uvw: UserVaultWrapper,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,

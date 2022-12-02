@@ -18,7 +18,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::FootprintUserId;
-use newtypes::ScopedUserId;
 use newtypes::TenantPermission;
 use newtypes::UserVaultId;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter};

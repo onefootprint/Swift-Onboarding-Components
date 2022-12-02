@@ -35,7 +35,7 @@ async fn post(
             // We might one day want to support this outside of onboarding for my1fp, but without
             // the data being portable
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
+            let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
             uvw.update_identity_data(conn, update, fingerprints, ob_info.onboarding.id)?;
 
             Ok(())

@@ -200,10 +200,6 @@ impl DataLifetime {
         Ok(())
     }
 
-    fn map(v: Vec<Self>) -> HashMap<DataLifetimeId, DataLifetime> {
-        HashMap::from_iter(v.into_iter().map(|v| (v.id.clone(), v)))
-    }
-
     /// Get the list of currently active DataLifetimeIds for the provided scoped_user_id.
     /// A piece of user data is visible if it is (1) committed and (2) not deactivated.
     /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
@@ -212,7 +208,7 @@ impl DataLifetime {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
-    ) -> DbResult<HashMap<DataLifetimeId, Self>> {
+    ) -> DbResult<Vec<Self>> {
         let mut query = data_lifetime::table
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
             .filter(data_lifetime::deactivated_seqno.is_null())
@@ -230,7 +226,7 @@ impl DataLifetime {
             query = query.filter(q_is_committed)
         }
         let results = query.get_results(conn)?;
-        Ok(Self::map(results))
+        Ok(results)
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided tenant_id and list
@@ -239,7 +235,7 @@ impl DataLifetime {
         conn: &mut PgConnection,
         user_vault_ids: Vec<&UserVaultId>,
         tenant_id: &TenantId,
-    ) -> DbResult<HashMap<UserVaultId, HashMap<DataLifetimeId, Self>>> {
+    ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
         use crate::schema::scoped_user;
         let q_is_committed = not(data_lifetime::committed_seqno.is_null());
         let q_belongs_to_tenant = scoped_user::tenant_id.eq(tenant_id);
@@ -260,7 +256,7 @@ impl DataLifetime {
             .into_group_map();
         let results = uv_id_to_lifetimes
             .into_iter()
-            .map(|(uv_id, lifetimes)| (uv_id, Self::map(lifetimes)))
+            .map(|(uv_id, lifetimes)| (uv_id, lifetimes))
             .collect();
         Ok(results)
     }
@@ -272,7 +268,7 @@ impl DataLifetime {
         user_vault_id: &UserVaultId,
         seqno: DataLifetimeSeqno,
         scoped_user_id: Option<&ScopedUserId>,
-    ) -> DbResult<HashMap<DataLifetimeId, Self>> {
+    ) -> DbResult<Vec<Self>> {
         // This is kind of unnecessarily similar to `get_active`, but it's hard to combine
         // this logic in diesel
         let mut query = data_lifetime::table
@@ -298,6 +294,6 @@ impl DataLifetime {
             query = query.filter(q_is_committed)
         }
         let results = query.get_results(conn)?;
-        Ok(Self::map(results))
+        Ok(results)
     }
 }

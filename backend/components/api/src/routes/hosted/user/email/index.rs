@@ -52,7 +52,7 @@ pub async fn post(
             // We might one day want to support this outside of onboarding for my1fp, but without
             // the data being portable
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
+            let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
 
             // Enforce that sandbox emails are used for sandbox users
             if email.is_live() != uvw.user_vault.is_live {

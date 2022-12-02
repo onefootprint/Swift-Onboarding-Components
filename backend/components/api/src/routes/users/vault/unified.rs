@@ -66,30 +66,36 @@ pub async fn put(
     };
 
     //NOTE: these operations on the different parts of the user vault must be atomic
-    let _uvw = state
+    state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let (ob, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
+            let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
 
-            if let Some(update) = update {
-                identity::put_internal(
+            if let Some(custom_update) = request.custom {
+                custom::put_internal(
                     conn,
-                    &mut uvw,
+                    &uvw,
                     &tenant_auth,
                     &scoped_user,
                     insight.clone(),
+                    custom_update,
+                )?;
+            }
+            if let Some(update) = update {
+                identity::put_internal(
+                    conn,
+                    uvw,
+                    &tenant_auth,
+                    &scoped_user,
+                    insight,
                     update,
                     fingerprints,
                     ob,
                 )?
             }
 
-            if let Some(custom_update) = request.custom {
-                custom::put_internal(conn, &mut uvw, &tenant_auth, &scoped_user, insight, custom_update)?;
-            }
-
-            Ok(uvw)
+            Ok(())
         })
         .await?;
 

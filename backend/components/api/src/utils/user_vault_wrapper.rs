@@ -10,6 +10,7 @@ use db::models::verification_request::VerificationRequest;
 use db::HasLifetime;
 use db::TxnPgConnection;
 use enclave_proxy::DataTransform;
+use itertools::Itertools;
 use std::convert::Into;
 
 use db::models::email::Email;
@@ -24,7 +25,6 @@ use db::models::phone_number::PhoneNumber;
 
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
-use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataAttribute, DataCollectedInfo, DataLifetimeId, DataLifetimeSeqno, DataPriority,
     EmailId, Fingerprint, IdentityDocumentId, KvDataKey, OnboardingId, PiiString, ScopedUserId,
@@ -40,6 +40,71 @@ use crate::State;
 use super::uvd_builder::UvdBuilder;
 use db::HasDataAttributeFields;
 
+#[derive(Clone, Debug)]
+struct UvwData {
+    uvd: Vec<UserVaultData>,
+    phone_numbers: Vec<PhoneNumber>,
+    emails: Vec<Email>,
+    // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
+    identity_documents: Vec<IdentityDocument>,
+
+    // A map of all of the DataLifetimes for this data
+    lifetimes: HashMap<DataLifetimeId, DataLifetime>,
+}
+
+impl UvwData {
+    fn build(
+        uvd: Vec<UserVaultData>,
+        phone_numbers: Vec<PhoneNumber>,
+        emails: Vec<Email>,
+        identity_documents: Vec<IdentityDocument>,
+        // TODO this should just take in a Vec<DataLifetime> and split into maps
+        lifetimes: Vec<DataLifetime>,
+    ) -> (Self, Self) {
+        // Partition lifetimes by committed / speculative
+        let (committed_lifetimes, speculative_lifetimes): (Vec<_>, Vec<_>) =
+            // should we also double check if this speculative data belongs to the scoped user?
+            // or do we just assume
+            lifetimes.into_iter().partition(|l| l.committed_seqno.is_some());
+        let speculative_lifetime_ids = HashSet::from_iter(speculative_lifetimes.iter().map(|l| l.id.clone()));
+
+        // Partition each piece of data by committed / speculative
+        fn partition<T: HasLifetime>(
+            data: Vec<T>,
+            speculative_lifetime_ids: &HashSet<DataLifetimeId>,
+        ) -> (Vec<T>, Vec<T>) {
+            data.into_iter()
+                .partition(|d| speculative_lifetime_ids.contains(d.lifetime_id()))
+        }
+        let (committed_uvd, speculative_uvd) = partition(uvd, &speculative_lifetime_ids);
+        let (committed_phone_numbers, speculative_phone_numbers) =
+            partition(phone_numbers, &speculative_lifetime_ids);
+        let (committed_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
+
+        fn map(v: Vec<DataLifetime>) -> HashMap<DataLifetimeId, DataLifetime> {
+            HashMap::from_iter(v.into_iter().map(|v| (v.id.clone(), v)))
+        }
+
+        // Construct the UvwData structs
+        let committed = Self {
+            uvd: committed_uvd,
+            phone_numbers: committed_phone_numbers,
+            emails: committed_emails,
+            // TODO migrate once identity documents support lifetimes
+            identity_documents,
+            lifetimes: map(committed_lifetimes),
+        };
+        let speculative = Self {
+            uvd: speculative_uvd,
+            phone_numbers: speculative_phone_numbers,
+            emails: speculative_emails,
+            identity_documents: vec![],
+            lifetimes: map(speculative_lifetimes),
+        };
+        (committed, speculative)
+    }
+}
+
 /// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
 /// about a particular user.
 ///
@@ -53,14 +118,9 @@ use db::HasDataAttributeFields;
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
     // TODO wrap these in another struct that separates committed vs speculative data
-    data: Vec<UserVaultData>,
-    phone_numbers: Vec<PhoneNumber>,
-    emails: Vec<Email>,
-    // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
-    identity_documents: Vec<IdentityDocument>,
+    speculative: UvwData,
+    committed: UvwData,
 
-    // A map of all of the DataLifetimes for data on this table
-    lifetimes: HashMap<DataLifetimeId, DataLifetime>,
     // The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.
     _seqno: Option<DataLifetimeSeqno>,
     // When set, the UVW was constructed for a specific tenant's view of the world.
@@ -94,7 +154,7 @@ impl UserVaultWrapper {
             // We are constructing the UVW as it appears right now
             DataLifetime::get_active(conn, &user_vault.id, scoped_user_id)?
         };
-        let active_lifetime_ids: Vec<_> = active_lifetimes.keys().cloned().collect();
+        let active_lifetime_ids: Vec<_> = active_lifetimes.iter().map(|l| l.id.clone()).collect();
 
         // Fetch all the data related to the active lifetimes
         // Split into committed + uncommitted data
@@ -105,13 +165,13 @@ impl UserVaultWrapper {
         // TODO migrate this to DataLifetimes
         let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
 
+        let (committed, speculative) =
+            UvwData::build(data, phone_numbers, emails, identity_documents, active_lifetimes);
+
         Ok(Self {
             user_vault,
-            data,
-            phone_numbers,
-            emails,
-            identity_documents,
-            lifetimes: active_lifetimes,
+            committed,
+            speculative,
             _seqno: seqno,
             scoped_user_id: scoped_user_id.cloned(),
             is_locked,
@@ -129,10 +189,7 @@ impl UserVaultWrapper {
         let uv_ids: Vec<_> = users.iter().map(|su| &su.1.id).collect();
         let mut uv_id_to_active_lifetimes =
             DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
-        let active_lifetime_list: Vec<_> = uv_id_to_active_lifetimes
-            .values()
-            .flat_map(|x| x.values())
-            .collect();
+        let active_lifetime_list: Vec<_> = uv_id_to_active_lifetimes.values().flatten().collect();
 
         // For each data source, fetch data _for all users_ in the `user_vaults` list.
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
@@ -149,14 +206,19 @@ impl UserVaultWrapper {
             .into_iter()
             .map(move |(su, uv)| {
                 let uv_id = uv.id.clone();
+                let lifetimes = uv_id_to_active_lifetimes.remove(&uv_id).unwrap_or_default();
+                let (committed, speculative) = UvwData::build(
+                    uvds.remove(&uv_id).unwrap_or_default(),
+                    phone_numbers.remove(&uv_id).unwrap_or_default(),
+                    emails.remove(&uv_id).unwrap_or_default(),
+                    identity_document_map.remove(&uv_id).unwrap_or_default(),
+                    lifetimes,
+                );
                 Self {
                     scoped_user_id: Some(su.id),
                     user_vault: uv,
-                    data: uvds.remove(&uv_id).unwrap_or_default(),
-                    phone_numbers: phone_numbers.remove(&uv_id).unwrap_or_default(),
-                    emails: emails.remove(&uv_id).unwrap_or_default(),
-                    identity_documents: identity_document_map.remove(&uv_id).unwrap_or_default(),
-                    lifetimes: uv_id_to_active_lifetimes.remove(&uv_id).unwrap_or_default(),
+                    committed,
+                    speculative,
                     is_locked: false,
                     _seqno: None,
                     is_hydrated: PhantomData,
@@ -217,7 +279,7 @@ impl UserVaultWrapper {
 
 impl UserVaultWrapper {
     pub fn add_email(
-        &mut self,
+        self, // Intentionally consume to prevent using stale UVW
         conn: &mut TxnPgConnection,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
@@ -230,7 +292,7 @@ impl UserVaultWrapper {
 
         let email = email.to_piistring();
         let e_data = self.user_vault.public_key.seal_pii(&email)?;
-        let priority = if !self.emails.is_empty() {
+        let priority = if !self.emails().is_empty() {
             DataPriority::Secondary
         } else {
             DataPriority::Primary
@@ -244,12 +306,7 @@ impl UserVaultWrapper {
             priority,
             scoped_user_id,
         )?;
-        let email_id = email.id.clone();
-
-        if priority == DataPriority::Primary {
-            self.emails = vec![email];
-        }
-        Ok(email_id)
+        Ok(email.id)
     }
 
     pub async fn decrypt(
@@ -308,19 +365,42 @@ impl UserVaultWrapper {
             .collect()
     }
 
+    pub fn uvd(&self, kind: DataAttribute) -> Option<&UserVaultData> {
+        // Return the speculative piece of data with this kind if it exists, otherwise committed
+        self.speculative
+            .uvd
+            .iter()
+            .find(|d| Into::<DataAttribute>::into(d.kind) == kind)
+            .or_else(|| {
+                self.committed
+                    .uvd
+                    .iter()
+                    .find(|d| Into::<DataAttribute>::into(d.kind) == kind)
+            })
+    }
+
     pub fn phone_numbers(&self) -> &[PhoneNumber] {
-        // TODO proxy between committed/uncommitted
-        &self.phone_numbers
+        if !self.speculative.phone_numbers.is_empty() {
+            &self.speculative.phone_numbers
+        } else {
+            &self.committed.phone_numbers
+        }
     }
 
     pub fn emails(&self) -> &[Email] {
-        // TODO proxy between committed/uncommitted
-        &self.emails
+        if !self.speculative.emails.is_empty() {
+            &self.speculative.emails
+        } else {
+            &self.committed.emails
+        }
     }
 
     pub fn identity_documents(&self) -> &[IdentityDocument] {
-        // TODO proxy between committed/uncommitted
-        &self.identity_documents
+        if !self.speculative.identity_documents.is_empty() {
+            &self.speculative.identity_documents
+        } else {
+            &self.committed.identity_documents
+        }
     }
 }
 
@@ -329,7 +409,7 @@ impl HasDataAttributeFields for UserVaultWrapper {
         let email = self.emails().iter().next();
         let phone = self.phone_numbers().iter().next();
         match data_attribute {
-            // identity
+            // uvd
             DataAttribute::FirstName
             | DataAttribute::LastName
             | DataAttribute::Dob
@@ -340,11 +420,7 @@ impl HasDataAttributeFields for UserVaultWrapper {
             | DataAttribute::State
             | DataAttribute::Zip
             | DataAttribute::Country
-            | DataAttribute::Ssn4 => self
-                .data
-                .iter()
-                .find(|d| Into::<DataAttribute>::into(d.kind) == data_attribute)
-                .map(|d| &d.e_data),
+            | DataAttribute::Ssn4 => self.uvd(data_attribute).map(|d| &d.e_data),
             // email
             DataAttribute::Email => email?.get_e_field(data_attribute),
             // phone
@@ -357,14 +433,14 @@ impl HasDataAttributeFields for UserVaultWrapper {
 
 impl UserVaultWrapper {
     pub fn update_identity_data(
-        &mut self,
+        self, // Intentionally consume UVW to prevent using stale UVW
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
         fingerprints: Vec<(UvdKind, Fingerprint)>,
         onboarding_id: OnboardingId,
     ) -> Result<(), ApiError> {
         self.assert_is_locked(conn)?;
-        let builder = UvdBuilder::build(update, self.user_vault.public_key.clone())?;
+        let builder = UvdBuilder::build(update, self.user_vault.public_key)?;
         let scoped_user_id = self
             .scoped_user_id
             .clone()
@@ -378,7 +454,7 @@ impl UserVaultWrapper {
                 DataCollectedInfo {
                     attributes: collected_data,
                 },
-                self.user_vault.id.clone(),
+                self.user_vault.id,
                 Some(onboarding_id),
             )?;
         }
@@ -389,7 +465,7 @@ impl UserVaultWrapper {
 
 impl UserVaultWrapper {
     pub fn update_custom_data(
-        &self,
+        &self, // Doesn't need to consume since we don't currently store custom data on UVW
         conn: &mut TxnPgConnection,
         tenant_id: TenantId,
         update: HashMap<KvDataKey, PiiString>,
@@ -534,17 +610,16 @@ impl UserVaultWrapper {
         document_type: String,
     ) -> Vec<Result<IdentityDocumentImages, ApiError>> {
         let futures = self
-            .identity_documents
-            .clone()
-            .into_iter()
+            .identity_documents()
+            .iter()
             .filter(|i| i.document_type == document_type)
-            .map(|doc| Self::internal_fetch_image(state, doc));
+            .map(|doc| Self::internal_fetch_image(state, doc.clone()));
 
         futures::future::join_all(futures).await
     }
 
     pub fn get_identity_document_types(&self) -> Vec<String> {
-        self.identity_documents
+        self.identity_documents()
             .iter()
             .map(|i| i.document_type.clone())
             .collect::<Vec<String>>()
@@ -570,11 +645,9 @@ impl UserVaultWrapper {
         // TODO we probably check that the lifetimes here are for models loaded onto the UVW
         // Make lifetime_id -> Box<dyn HasLifetime> map, then use the Box to deactivate old things with this kind
         let lifetime_ids = self
+            .speculative
             .lifetimes
             .values()
-            .filter(|lifetime| {
-                lifetime.committed_at.is_none() && lifetime.scoped_user_id == self.scoped_user_id
-            })
             .map(|lifetime| lifetime.id.clone())
             .collect();
 
