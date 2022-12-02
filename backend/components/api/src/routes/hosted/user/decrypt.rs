@@ -2,9 +2,9 @@ use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
+use crate::hosted::user::decrypt;
+use crate::hosted::user::DecryptFieldsResult;
 use crate::types::response::ResponseData;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
-use crate::utils::uvw_decryption::DecryptFieldsResult;
 use crate::State;
 use newtypes::DataAttribute;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -34,24 +34,16 @@ fn post(
         UserAuthScope::BasicProfile
     };
     let user_auth = user_auth.check_permissions(vec![required_scope])?;
-    let user_vault = user_auth.user_vault(&state.db_pool).await?;
 
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
-            let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
-
-            Ok(user_vault_wrapper)
-        })
-        .await??;
-
-    // TODO: implement decryption of user's own identity documents
     let DecryptFieldsResult {
         decrypted_data_attributes: _,
         result_map,
-    } = uvw
-        .decrypt_data_attributes(&state, request.attributes.clone())
-        .await?;
+    } = decrypt(
+        &state,
+        user_auth.user_vault(&state.db_pool).await?,
+        request.attributes.clone(),
+    )
+    .await?;
 
     let result_map = result_map
         .into_iter()

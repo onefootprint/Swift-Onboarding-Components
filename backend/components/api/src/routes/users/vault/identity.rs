@@ -8,12 +8,12 @@ use crate::auth::{
     AuthError, Either,
 };
 use crate::errors::ApiResult;
+use crate::hosted::user::DecryptFieldsResult;
 use crate::types::identity_data_request::{ComputedFingerprints, IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
-use crate::utils::uvw_decryption::DecryptFieldsResult;
 use crate::{errors::ApiError, State};
 
 use actix_web::web::Query;
@@ -243,9 +243,7 @@ pub(super) async fn post_decrypt_internal(
     let DecryptFieldsResult {
         decrypted_data_attributes,
         result_map,
-    } = uvw
-        .decrypt_data_attributes(&state, fields.into_iter().collect())
-        .await?;
+    } = crate::hosted::user::decrypt(&state, uvw.user_vault, fields.into_iter().collect()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {

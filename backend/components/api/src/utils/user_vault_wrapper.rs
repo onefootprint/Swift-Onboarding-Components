@@ -1,13 +1,17 @@
+use crypto::aead::ScopedSealingKey;
+use db::models::fingerprint::IsUnique;
 use db::models::identity_data::IdentityData;
 use db::models::identity_document::IdentityDocument;
+use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
-
+use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
 use db::TxnPgConnection;
+use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
-
+use newtypes::email::Email as NewtypeEmail;
 use paperclip::actix::Apiv2Schema;
 
 use std::collections::{HashMap, HashSet};
@@ -18,9 +22,19 @@ use db::models::phone_number::PhoneNumber;
 
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
-use newtypes::{DataAttribute, UserVaultId};
+use newtypes::{
+    CollectedDataOption, DataAttribute, DataCollectedInfo, DataPriority, EmailId, Fingerprint,
+    IdentityDocumentId, KvDataKey, OnboardingId, PiiString, SealedVaultBytes, SealedVaultDataKey, TenantId,
+    UserVaultId, ValidatedPhoneNumber,
+};
 
 use crate::errors::{ApiError, ApiResult};
+use crate::s3::S3Error;
+use crate::types::identity_data_request::IdentityDataUpdate;
+use crate::State;
+
+use super::identity_data_builder::IdentityDataBuilder;
+use db::HasDataAttributeFields;
 
 /// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
 /// about a particular user.
@@ -31,8 +45,6 @@ use crate::errors::{ApiError, ApiResult};
 ///    3. The decision engine and verification logic _only knows about what's in the UserVault_
 ///         * it is the information we send to vendors (a UVW gets "serialized" in a `VerificationRequest` in the decision engine)
 ///         * it is the source of truth to know what we datums we have collected from a User
-///
-/// See the individual `user_vault_wrapper_*` files for methods related to working with documents and identity data
 #[derive(Debug, Clone)]
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
@@ -191,6 +203,200 @@ impl UserVaultWrapper {
 }
 
 impl UserVaultWrapper {
+    pub fn add_email(
+        &mut self,
+        conn: &mut TxnPgConnection,
+        email: NewtypeEmail,
+        fingerprint: Fingerprint,
+    ) -> ApiResult<EmailId> {
+        self.assert_is_locked(conn)?;
+        let email = email.to_piistring();
+        let e_data = self.user_vault.public_key.seal_pii(&email)?;
+        let priority = if self.email.is_some() {
+            DataPriority::Secondary
+        } else {
+            DataPriority::Primary
+        };
+        let user_vault_id = self.user_vault.id.clone();
+        let email =
+            db::models::email::Email::create(conn, user_vault_id, e_data, fingerprint, false, priority)?;
+        let email_id = email.id.clone();
+
+        if priority == DataPriority::Primary {
+            self.email = Some(email);
+        }
+        Ok(email_id)
+    }
+
+    pub async fn decrypt(
+        &self,
+        state: &State,
+        data: Vec<&SealedVaultBytes>,
+    ) -> Result<Vec<PiiString>, ApiError> {
+        let decrypted_results = state
+            .enclave_client
+            .decrypt_bytes_batch(data, &self.user_vault.e_private_key, DataTransform::Identity)
+            .await?;
+        Ok(decrypted_results)
+    }
+
+    pub async fn decrypt_data_keys(
+        &self,
+        state: &State,
+        keys: Vec<SealedVaultDataKey>,
+        scope: &'static str,
+    ) -> ApiResult<Vec<ScopedSealingKey>> {
+        let decrypted_results = state
+            .enclave_client
+            .decrypt_sealed_vault_data_key(&keys, &self.user_vault.e_private_key, scope)
+            .await?;
+
+        Ok(decrypted_results)
+    }
+
+    pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<ValidatedPhoneNumber, ApiError> {
+        let number = self
+            .phone_number
+            .as_ref()
+            .ok_or(ApiError::NoPhoneNumberForVault)?;
+
+        let decrypt_response = self
+            .decrypt(state, vec![&number.e_e164, &number.e_country])
+            .await?;
+        let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
+        let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();
+
+        let validated_phone_number = ValidatedPhoneNumber::__build_from_vault(e164, country)?;
+        Ok(validated_phone_number)
+    }
+
+    pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
+        ob_config
+            .must_collect_data
+            .iter()
+            .filter(|cdo| {
+                cdo.attributes()
+                    .iter()
+                    .filter(|d| d.is_required())
+                    .any(|d| !self.has_field(*d))
+            })
+            .cloned()
+            .collect()
+    }
+}
+
+impl HasDataAttributeFields for UserVaultWrapper {
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+        let id = self.identity_data.as_ref();
+        let email = self.email.as_ref();
+        let phone = self.phone_number.as_ref();
+        match data_attribute {
+            // identity
+            DataAttribute::FirstName => id?.get_e_field(data_attribute),
+            DataAttribute::LastName => id?.get_e_field(data_attribute),
+            DataAttribute::Dob => id?.get_e_field(data_attribute),
+            DataAttribute::Ssn9 => id?.get_e_field(data_attribute),
+            DataAttribute::AddressLine1 => id?.get_e_field(data_attribute),
+            DataAttribute::AddressLine2 => id?.get_e_field(data_attribute),
+            DataAttribute::City => id?.get_e_field(data_attribute),
+            DataAttribute::State => id?.get_e_field(data_attribute),
+            DataAttribute::Zip => id?.get_e_field(data_attribute),
+            DataAttribute::Country => id?.get_e_field(data_attribute),
+            DataAttribute::Ssn4 => id?.get_e_field(data_attribute),
+            // email
+            DataAttribute::Email => email?.get_e_field(data_attribute),
+            // phone
+            DataAttribute::PhoneNumber => phone?.get_e_field(data_attribute),
+            // We need to handle identity document separately since users can have multiple identity documents (for now, there's an open item https://linear.app/footprint/issue/FP-1968/de-chonk-the-identitydocument-dataattribute)
+            DataAttribute::IdentityDocument => None,
+        }
+    }
+}
+
+impl UserVaultWrapper {
+    pub fn update_identity_data(
+        &mut self,
+        conn: &mut TxnPgConnection,
+        update: IdentityDataUpdate,
+        fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
+        onboarding_id: Option<OnboardingId>,
+    ) -> Result<(), ApiError> {
+        self.assert_is_locked(conn)?;
+        let mut builder = IdentityDataBuilder::new(
+            self.user_vault.is_portable,
+            self.user_vault.id.clone(),
+            self.identity_data.clone(),
+            self.user_vault.public_key.clone(),
+            fingerprints,
+        );
+
+        let IdentityDataUpdate {
+            name,
+            dob,
+            ssn,
+            address,
+        } = update;
+
+        if let Some(name) = name {
+            builder.add_full_name(name)?;
+        }
+
+        if let Some(dob) = dob {
+            builder.add_dob(dob)?;
+        }
+
+        if let Some(ssn) = ssn {
+            builder.add_ssn(ssn)?;
+        }
+
+        if let Some(address) = address {
+            builder.add_full_address_or_zip(address)?;
+        }
+
+        let (new_identity_data, collected_data) = builder.finish(conn)?;
+        // finally create our new fingerprint
+        let identity_data = IdentityData::create(conn, new_identity_data)?;
+
+        if !collected_data.is_empty() {
+            // Create a timeline event that shows all the new data that was added
+            UserTimeline::create(
+                conn,
+                DataCollectedInfo {
+                    attributes: collected_data,
+                },
+                self.user_vault.id.clone(),
+                onboarding_id,
+            )?;
+        }
+        self.identity_data = Some(identity_data);
+
+        Ok(())
+    }
+}
+
+impl UserVaultWrapper {
+    pub fn update_custom_data(
+        &self,
+        conn: &mut TxnPgConnection,
+        tenant_id: TenantId,
+        update: HashMap<KvDataKey, PiiString>,
+    ) -> ApiResult<()> {
+        self.assert_is_locked(conn)?;
+
+        let update = update
+            .into_iter()
+            .map(|(data_key, pii)| {
+                let e_data = self.user_vault.public_key.seal_pii(&pii)?;
+                Ok(NewKeyValueDataArgs { data_key, e_data })
+            })
+            .collect::<Result<Vec<_>, ApiError>>()?;
+
+        KeyValueData::update_or_insert(conn, self.user_vault.id.clone(), tenant_id, update)?;
+        Ok(())
+    }
+}
+
+impl UserVaultWrapper {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
     pub fn ensure_scope_allows_access(
@@ -214,5 +420,65 @@ impl UserVaultWrapper {
         }
 
         Ok(())
+    }
+}
+
+pub struct IdentityDocumentImages {
+    pub identity_document_id: IdentityDocumentId,
+    pub document_type: String,
+    pub document_country: String,
+    pub front_image: SealedVaultBytes,
+    // not all documents have backs
+    pub back_image: Option<SealedVaultBytes>,
+    pub e_data_key: SealedVaultDataKey,
+}
+
+/// Impl for helpers related to fetching documents
+impl UserVaultWrapper {
+    async fn internal_fetch_image(
+        state: &State,
+        identity_document: IdentityDocument,
+    ) -> Result<IdentityDocumentImages, ApiError> {
+        // require at least front to be non-None
+        let (Some(front_path), back_path) = (identity_document.front_image_s3_url, identity_document.back_image_s3_url) else {
+            // TODO is this really the right error?
+            return Err(ApiError::S3Error(S3Error::InvalidS3Url))
+        };
+
+        let front = state
+            .s3_client
+            .get_object_from_s3_url(front_path.as_str())
+            .await?;
+        let mut back: Option<actix_web::web::Bytes> = None;
+        if let Some(b) = back_path {
+            back = Some(state.s3_client.get_object_from_s3_url(b.as_str()).await?);
+        }
+
+        Ok(IdentityDocumentImages {
+            identity_document_id: identity_document.id,
+            document_type: identity_document.document_type,
+            document_country: identity_document.country_code,
+            front_image: SealedVaultBytes(front.to_vec()),
+            back_image: back.map(|b| SealedVaultBytes(b.to_vec())),
+            e_data_key: identity_document.e_data_key,
+        })
+    }
+
+    /// Given a document_type, fetch from S3
+    /// ALERT ALERT : this function assumes you have already check if the requester
+    /// can access the image!
+    pub async fn get_encrypted_images_from_s3(
+        &self,
+        state: &State,
+        document_type: String,
+    ) -> Vec<Result<IdentityDocumentImages, ApiError>> {
+        let futures = self
+            .identity_documents
+            .clone()
+            .into_iter()
+            .filter(|i| i.document_type == document_type)
+            .map(|doc| Self::internal_fetch_image(state, doc));
+
+        futures::future::join_all(futures).await
     }
 }
