@@ -26,9 +26,9 @@ use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataAttribute, DataCollectedInfo, DataLifetimeSeqno, DataPriority, EmailId,
-    Fingerprint, IdentityDocumentId, KvDataKey, OnboardingId, PiiString, ScopedUserId, SealedVaultBytes,
-    SealedVaultDataKey, TenantId, UvdKind, ValidatedPhoneNumber,
+    CollectedDataOption, DataAttribute, DataCollectedInfo, DataLifetimeId, DataLifetimeSeqno, DataPriority,
+    EmailId, Fingerprint, IdentityDocumentId, KvDataKey, OnboardingId, PiiString, ScopedUserId,
+    SealedVaultBytes, SealedVaultDataKey, TenantId, UvdKind, ValidatedPhoneNumber,
 };
 
 use crate::errors::user::UserError;
@@ -52,12 +52,14 @@ use db::HasDataAttributeFields;
 #[derive(Debug, Clone)]
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
-    pub data: Vec<UserVaultData>,
+    data: Vec<UserVaultData>,
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
     pub identity_documents: Vec<IdentityDocument>,
 
+    // A map of all of the DataLifetimes for data on this table
+    lifetimes: HashMap<DataLifetimeId, DataLifetime>,
     // The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.
     _seqno: Option<DataLifetimeSeqno>,
     // When set, the UVW was constructed for a specific tenant's view of the world.
@@ -82,6 +84,8 @@ impl UserVaultWrapper {
         is_locked: bool,
         seqno: Option<DataLifetimeSeqno>,
     ) -> Result<Self, DbError> {
+        // TODO unit tests
+        // TODO apply speculative lifetimes ON TOP (ie overwrite committed data) of committed ones
         let active_lifetimes = if let Some(seqno) = seqno {
             // We are reconstructing the UVW as it appeared at a given seqno
             DataLifetime::get_active_at(conn, &user_vault.id, seqno, scoped_user_id)?
@@ -89,11 +93,14 @@ impl UserVaultWrapper {
             // We are constructing the UVW as it appears right now
             DataLifetime::get_active(conn, &user_vault.id, scoped_user_id)?
         };
+        let active_lifetime_ids: Vec<_> = active_lifetimes.keys().cloned().collect();
 
         // Fetch all the data related to the active lifetimes
-        let data = UserVaultData::get_for(conn, &active_lifetimes)?;
-        let phone_number = PhoneNumber::get_for(conn, &active_lifetimes)?.into_iter().next();
-        let email = Email::get_for(conn, &active_lifetimes)?.into_iter().next();
+        let data = UserVaultData::get_for(conn, &active_lifetime_ids)?;
+        let phone_number = PhoneNumber::get_for(conn, &active_lifetime_ids)?
+            .into_iter()
+            .next();
+        let email = Email::get_for(conn, &active_lifetime_ids)?.into_iter().next();
 
         // TODO migrate this to DataLifetimes
         let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
@@ -104,6 +111,7 @@ impl UserVaultWrapper {
             phone_number,
             email,
             identity_documents,
+            lifetimes: active_lifetimes,
             _seqno: seqno,
             scoped_user_id: scoped_user_id.cloned(),
             is_locked,
@@ -119,14 +127,19 @@ impl UserVaultWrapper {
         tenant_id: &TenantId,
     ) -> Result<Vec<Self>, DbError> {
         let uv_ids: Vec<_> = users.iter().map(|su| &su.1.id).collect();
-        let active_lifetimes = DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
+        let mut uv_id_to_active_lifetimes =
+            DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
+        let active_lifetime_list: Vec<_> = uv_id_to_active_lifetimes
+            .values()
+            .flat_map(|x| x.values())
+            .collect();
 
         // For each data source, fetch data _for all users_ in the `user_vaults` list.
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
         // UserVaultWrapper for each User
-        let mut uvds = UserVaultData::bulk_get(conn, &active_lifetimes)?;
-        let mut phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetimes)?;
-        let mut emails = Email::bulk_get(conn, &active_lifetimes)?;
+        let mut uvds = UserVaultData::bulk_get(conn, &active_lifetime_list)?;
+        let mut phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
+        let mut emails = Email::bulk_get(conn, &active_lifetime_list)?;
 
         // Fetch all the identity documents for the user vault ids
         let mut identity_document_map = IdentityDocument::multi_get_for_user_vault_ids(conn, uv_ids)?;
@@ -143,6 +156,7 @@ impl UserVaultWrapper {
                     phone_number: phone_numbers.remove(&uv_id).and_then(|v| v.into_iter().next()),
                     email: emails.remove(&uv_id).and_then(|v| v.into_iter().next()),
                     identity_documents: identity_document_map.remove(&uv_id).unwrap_or_default(),
+                    lifetimes: uv_id_to_active_lifetimes.remove(&uv_id).unwrap_or_default(),
                     is_locked: false,
                     _seqno: None,
                     is_hydrated: PhantomData,
@@ -167,18 +181,22 @@ impl UserVaultWrapper {
         )
     }
 
-    /// Builds a UVW that only sees committed data
+    /// Builds a UVW that only sees committed data.
     pub fn get_committed(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
         Self::build_single(conn, user_vault, None, false, None)
     }
 
-    /// Builds a UVW that sees committed data AND speculative data for the tenant
+    /// Builds a UVW that sees committed data AND speculative data for the tenant.
+    /// This should be used during onboarding operations in order to allow the tenant to see
+    /// uncommitted data that has been added by previous operations
     pub fn get_for_tenant(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> Result<Self, DbError> {
         let user_vault = UserVault::get(conn, scoped_user_id)?;
         Self::build_single(conn, user_vault, Some(scoped_user_id), false, None)
     }
 
-    /// Builds a locked UVW that sees committed data AND speculative data for the tenant
+    /// Builds a locked UVW that sees committed data AND speculative data for the tenant.
+    /// This should be used during onboarding operations in order to allow the tenant to see
+    /// uncommitted data that has been added by previous operations
     pub fn lock_for_tenant(
         conn: &mut TxnPgConnection,
         scoped_user_id: &ScopedUserId,
@@ -517,5 +535,44 @@ impl UserVaultWrapper {
             .into_iter()
             .unique()
             .collect::<Vec<String>>()
+    }
+}
+
+impl UserVaultWrapper {
+    /// Marks all speculative data
+    /// speculative data and make it portable after it is verified by an approved onboarding
+    pub fn commit_data_for_tenant(&self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
+        // TODO how do we enforce this UVW was created inside the same `conn` we have here?
+        self.assert_is_locked(conn)?;
+        let scoped_user_id = self
+            .scoped_user_id
+            .as_ref()
+            .ok_or(UserError::NotAllowedOutsideOnboarding)?;
+
+        // Get the lifetimes of uncommitted data added by this scoped user. These are the lifetimes
+        // that we will update toe be commit
+        // TODO we probably check that the lifetimes here are for models loaded onto the UVW
+        // Make lifetime_id -> Box<dyn HasLifetime> map, then use the Box to deactivate old things with this kind
+        let lifetime_ids = self
+            .lifetimes
+            .values()
+            .filter(|lifetime| {
+                lifetime.committed_at.is_none() && lifetime.scoped_user_id == self.scoped_user_id
+            })
+            .map(|lifetime| lifetime.id.clone())
+            .collect();
+
+        // Mark all speculative lifetimes as committed. This could commit data across any number
+        // of tables.
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let committed_lifetimes =
+            DataLifetime::bulk_commit_for_tenant(conn, lifetime_ids, scoped_user_id.clone(), seqno)?;
+
+        // TODO archive all old data that is replaced by new committed data at seqno
+        // should we do this in a follow-up PR?
+        // Look at which lifetimes were committed and archive old data that had that lifetime
+
+        // TODO set this seqno on the old data
+        Ok(seqno)
     }
 }

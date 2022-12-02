@@ -9,7 +9,9 @@ use std::convert::Into;
 
 use crate::{errors::ApiResult, types::identity_data_request::IdentityDataUpdate, State};
 
-/// help collecting fingerprints for identity data updates (eventually stored in UserVaultData)
+/// Helps to bulk compute fingerprints for data in an IdentityDataUpdate request.
+/// These fingerprints are only for data that ends up being stored inside of the UserVaultData table.
+/// The UvdBuilder ends up using the output of this FingerprintBuilder.
 pub struct FingerprintBuilder {
     fingerprints: Vec<(UvdKind, PiiString)>,
 }

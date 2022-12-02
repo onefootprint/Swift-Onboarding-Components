@@ -33,11 +33,13 @@ pub async fn handler(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let ob_info = user_auth.onboarding(conn)?;
-            // If the auth token is during an onboarding session, create a UVW that sees all
-            // speculative data for the tenant. Otherwise, create a UVW that only sees committed data
             let uvw = if let Some(ob_info) = ob_info {
+                // If the auth token is during an onboarding session, create a UVW that sees all
+                // speculative data for the tenant in order to see an uncommitted phone number
+                // that was added by this tenant.
                 UserVaultWrapper::get_for_tenant(conn, &ob_info.scoped_user.id)?
             } else {
+                // Otherwise, create a UVW that only sees committed data
                 let uv = UserVault::get(conn, &user_auth.user_vault_id())?;
                 UserVaultWrapper::get_committed(conn, uv)?
             };

@@ -6,7 +6,6 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 use crate::DataAttribute;
 
-/// The type of data attribute
 #[derive(
     Debug,
     Display,
@@ -30,6 +29,7 @@ use crate::DataAttribute;
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// Subset of DataAttributes that are stored in the UserVaultData table
 pub enum UvdKind {
     FirstName,
     LastName,

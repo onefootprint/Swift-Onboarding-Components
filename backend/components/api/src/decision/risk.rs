@@ -9,6 +9,7 @@ use db::models::{
 use super::features::*;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
+    utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
 
@@ -28,6 +29,16 @@ pub async fn create_final_decision(
             let (current_ob, scoped_user, _, _) = Onboarding::get(conn, &ob_id)?;
             let decision = final_decision(&features, current_ob)?;
 
+            // If the decision is a pass, mark all data as verified for the onboarding
+            let seqno = if decision.decision_status == DecisionStatus::Pass {
+                // TODO will this cause deadlock to lock onboarding AND uv?
+                let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
+                let seqno = uvw.commit_data_for_tenant(conn)?;
+                Some(seqno)
+            } else {
+                None
+            };
+
             // Create decision
             let onboarding_decision = OnboardingDecisionCreateArgs {
                 user_vault_id: scoped_user.user_vault_id,
@@ -37,6 +48,7 @@ pub async fn create_final_decision(
                 result_ids: features.verification_results(),
                 annotation_id: None,
                 actor: DbActor::Footprint,
+                seqno,
             };
             OnboardingDecision::create(conn, onboarding_decision)?;
 

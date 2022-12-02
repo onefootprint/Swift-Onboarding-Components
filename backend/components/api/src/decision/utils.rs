@@ -81,6 +81,7 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
                 result_ids: vec![result.id],
                 annotation_id: None,
                 actor: DbActor::Footprint,
+                seqno: None,
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 

@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedUserId;
 use newtypes::TenantId;
@@ -144,14 +147,38 @@ impl DataLifetime {
     }
 
     pub fn commit(self, conn: &mut PgConnection, seqno: DataLifetimeSeqno) -> DbResult<Self> {
+        let update = DataLifetimeUpdate {
+            committed_at: Some(Some(Utc::now())),
+            committed_seqno: Some(Some(seqno)),
+            ..DataLifetimeUpdate::default()
+        };
         let result = diesel::update(data_lifetime::table)
             .filter(data_lifetime::id.eq(&self.id))
-            .set((
-                data_lifetime::committed_at.eq(Utc::now()),
-                data_lifetime::committed_seqno.eq(seqno),
-            ))
+            .set(update)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    /// Marks a list of DataLifetimes as committed for a specific (user, tenant). Used to commit
+    /// speculative data and make it portable after it is verified by an approved onboarding
+    pub fn bulk_commit_for_tenant(
+        conn: &mut PgConnection,
+        ids: Vec<DataLifetimeId>,
+        scoped_user_id: ScopedUserId,
+        seqno: DataLifetimeSeqno,
+    ) -> DbResult<Vec<Self>> {
+        let update = DataLifetimeUpdate {
+            committed_at: Some(Some(Utc::now())),
+            committed_seqno: Some(Some(seqno)),
+            ..DataLifetimeUpdate::default()
+        };
+        let results = diesel::update(data_lifetime::table)
+            .filter(data_lifetime::id.eq_any(ids))
+            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
+            .filter(data_lifetime::committed_seqno.is_null())
+            .set(update)
+            .get_results(conn)?;
+        Ok(results)
     }
 
     /// Given a list of DataLifetimeIds, marks the active DataLifetime rows as deactivated.
@@ -173,6 +200,10 @@ impl DataLifetime {
         Ok(())
     }
 
+    fn map(v: Vec<Self>) -> HashMap<DataLifetimeId, DataLifetime> {
+        HashMap::from_iter(v.into_iter().map(|v| (v.id.clone(), v)))
+    }
+
     /// Get the list of currently active DataLifetimeIds for the provided scoped_user_id.
     /// A piece of user data is visible if it is (1) committed and (2) not deactivated.
     /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
@@ -181,7 +212,7 @@ impl DataLifetime {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
-    ) -> DbResult<Vec<DataLifetimeId>> {
+    ) -> DbResult<HashMap<DataLifetimeId, Self>> {
         let mut query = data_lifetime::table
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
             .filter(data_lifetime::deactivated_seqno.is_null())
@@ -198,8 +229,8 @@ impl DataLifetime {
             // Only fetch committed, portable data
             query = query.filter(q_is_committed)
         }
-        let results = query.select(data_lifetime::id).get_results(conn)?;
-        Ok(results)
+        let results = query.get_results(conn)?;
+        Ok(Self::map(results))
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided tenant_id and list
@@ -208,7 +239,7 @@ impl DataLifetime {
         conn: &mut PgConnection,
         user_vault_ids: Vec<&UserVaultId>,
         tenant_id: &TenantId,
-    ) -> DbResult<Vec<DataLifetime>> {
+    ) -> DbResult<HashMap<UserVaultId, HashMap<DataLifetimeId, Self>>> {
         use crate::schema::scoped_user;
         let q_is_committed = not(data_lifetime::committed_seqno.is_null());
         let q_belongs_to_tenant = scoped_user::tenant_id.eq(tenant_id);
@@ -221,7 +252,16 @@ impl DataLifetime {
             // OR belong to this tenant
             .filter(q_is_committed.or(q_belongs_to_tenant));
 
-        let results = query.select(data_lifetime::all_columns).get_results(conn)?;
+        let results: Vec<Self> = query.select(data_lifetime::all_columns).get_results(conn)?;
+        let uv_id_to_lifetimes = results
+            .into_iter()
+            .map(|l| (l.user_vault_id.clone(), l))
+            .sorted_by_key(|(uv_id, _)| uv_id.clone())
+            .into_group_map();
+        let results = uv_id_to_lifetimes
+            .into_iter()
+            .map(|(uv_id, lifetimes)| (uv_id, Self::map(lifetimes)))
+            .collect();
         Ok(results)
     }
 
@@ -232,7 +272,7 @@ impl DataLifetime {
         user_vault_id: &UserVaultId,
         seqno: DataLifetimeSeqno,
         scoped_user_id: Option<&ScopedUserId>,
-    ) -> DbResult<Vec<DataLifetimeId>> {
+    ) -> DbResult<HashMap<DataLifetimeId, Self>> {
         // This is kind of unnecessarily similar to `get_active`, but it's hard to combine
         // this logic in diesel
         let mut query = data_lifetime::table
@@ -257,7 +297,7 @@ impl DataLifetime {
             // Only fetch committed, portable data
             query = query.filter(q_is_committed)
         }
-        let results = query.select(data_lifetime::id).get_results(conn)?;
-        Ok(results)
+        let results = query.get_results(conn)?;
+        Ok(Self::map(results))
     }
 }

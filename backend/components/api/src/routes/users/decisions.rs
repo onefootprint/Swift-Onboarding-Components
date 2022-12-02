@@ -66,6 +66,7 @@ pub async fn post(
                     status: status.into(),
                     annotation_id: Some(annotation.0.id),
                     actor: DbActor::from(actor.clone()),
+                    seqno: None,
                 };
                 let decision = OnboardingDecision::create(conn, new_decision)?;
                 Some(decision)

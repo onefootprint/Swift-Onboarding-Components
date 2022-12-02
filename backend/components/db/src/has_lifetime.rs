@@ -20,7 +20,7 @@ pub trait HasLifetime: Sized {
     /// Used where the lifetime IDs all belong to potentially multiple user vaults.
     fn bulk_get(
         conn: &mut PgConnection,
-        lifetimes: &[DataLifetime],
+        lifetimes: &[&DataLifetime],
     ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
         let lifetime_ids: Vec<_> = lifetimes.iter().map(|l| l.id.clone()).collect();
         let lifetime_id_to_uv_id: HashMap<DataLifetimeId, UserVaultId> =

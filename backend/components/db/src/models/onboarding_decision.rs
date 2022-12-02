@@ -13,8 +13,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    AnnotationId, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId,
-    OnboardingStatus, UserVaultId, VerificationResultId,
+    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo,
+    OnboardingId, OnboardingStatus, UserVaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -34,6 +34,8 @@ pub struct OnboardingDecision {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub status: DecisionStatus,
     pub actor: DbActor,
+    // Only non-null for pass decisions made by footprint
+    pub seqno: Option<DataLifetimeSeqno>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -44,6 +46,7 @@ struct NewOnboardingDecisionRow {
     created_at: DateTime<Utc>,
     status: DecisionStatus,
     actor: DbActor,
+    seqno: Option<DataLifetimeSeqno>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -62,6 +65,7 @@ pub struct OnboardingDecisionCreateArgs {
     pub result_ids: Vec<VerificationResultId>,
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
+    pub seqno: Option<DataLifetimeSeqno>,
 }
 
 pub type SaturatedOnboardingDecisionInfo = (
@@ -94,6 +98,7 @@ impl OnboardingDecision {
             created_at: Utc::now(),
             status: args.status,
             actor: args.actor,
+            seqno: args.seqno,
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)

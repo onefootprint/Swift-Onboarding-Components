@@ -251,6 +251,7 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         status -> Text,
         actor -> Jsonb,
+        seqno -> Nullable<Int8>,
     }
 }
 

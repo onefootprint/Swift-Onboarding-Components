@@ -22,12 +22,13 @@ use crate::{
     types::identity_data_request::IdentityDataUpdate,
 };
 
-/// Helper for updating identity data
+/// Helps to process updates for data in an IdentityDataUpdate request.
 pub struct UvdBuilder {
     vault_public_key: VaultPublicKey,
     data: Vec<NewUserVaultData>,
-    // We will clear old
+    // We will deactivate the old UserVaultData rows and their fingerprints if they are replaced
     kinds_to_deactivate: Vec<UvdKind>,
+    // Keeps track of which pieces of data were added during this request
     collected_data: Vec<CollectedDataOption>,
 }
 
@@ -131,6 +132,7 @@ impl UvdBuilder {
         if let Some(line_2) = line_2 {
             self.add_sealed(line_2.into(), UvdKind::AddressLine2)?;
         } else {
+            // Regardless of whether the new address has a line2, clear the old line2
             self.kinds_to_deactivate.push(UvdKind::AddressLine2);
         }
 
