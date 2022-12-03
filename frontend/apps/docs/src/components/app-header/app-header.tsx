@@ -1,9 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  IcoArrowUpRight16,
-  IcoDatabase16,
-  IcoShield16,
-} from '@onefootprint/icons';
+import { IcoArrowUpRight16, IcoShield16 } from '@onefootprint/icons';
 import React from 'react';
 import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
@@ -23,12 +19,6 @@ const AppHeader = ({ navigation }: AppHeaderProps) => {
       href: '/kyc-with-pii/getting-started',
       Icon: IcoShield16,
       text: t('nav.kyc-with-pii'),
-    },
-    {
-      baseHref: '/pii',
-      href: '/pii/getting-started',
-      Icon: IcoDatabase16,
-      text: t('nav.pii'),
     },
   ];
 
