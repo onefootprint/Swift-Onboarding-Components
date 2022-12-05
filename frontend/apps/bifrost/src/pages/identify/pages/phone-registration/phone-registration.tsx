@@ -62,19 +62,21 @@ const PhoneRegistration = () => {
         sx={{ marginBottom: 8 }}
         title={t('title')}
       />
-      <EmailCard>
-        <EmailCardContent>
-          <Box>
-            <StyledIcoEmail24 />
-          </Box>
-          <Typography variant="label-3" color="primary">
-            {email}
-          </Typography>
-        </EmailCardContent>
-        <LinkButton size="compact" onClick={handleChangeEmail}>
-          {t('email-card.cta')}
-        </LinkButton>
-      </EmailCard>
+      {email && (
+        <EmailCard>
+          <EmailCardContent>
+            <Box>
+              <StyledIcoEmail24 />
+            </Box>
+            <Typography variant="label-3" color="primary">
+              {email}
+            </Typography>
+          </EmailCardContent>
+          <LinkButton size="compact" onClick={handleChangeEmail}>
+            {t('email-card.cta')}
+          </LinkButton>
+        </EmailCard>
+      )}
       <PhoneRegistrationForm onSubmit={handleSubmit} isLoading={isLoading} />
     </>
   );
