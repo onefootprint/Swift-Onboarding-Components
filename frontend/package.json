@@ -22,6 +22,7 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "version": "changeset version",
     "release": "changeset publish",
+    "start": "turbo run start",
     "start:demo": "turbo run start --filter=demo...",
     "start:bifrost": "turbo run start --filter=bifrost...",
     "test:e2e": "turbo run test:e2e",
