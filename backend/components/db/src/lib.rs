@@ -62,11 +62,16 @@ impl DbPool {
         F: FnOnce(&mut PgConnection) -> R + Send + 'static,
         R: Send + 'static,
     {
+        let current_span = tracing::info_span!("db query");
+
         let result = self
             .0
             .get()
             .await?
-            .interact(move |conn| f(conn))
+            .interact(move |conn| {
+                let _guard = current_span.enter();
+                f(conn)
+            })
             .await
             .map_err(DbError::from)?;
         Ok(result)
