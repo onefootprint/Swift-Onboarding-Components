@@ -86,6 +86,8 @@ pub async fn get_by_fingerprint(
             let result = schema::user_vault::table
                 .inner_join(schema::fingerprint::table)
                 .filter(schema::fingerprint::sh_data.eq(sh_data))
+                // multiple fingerprints may point to the same vault
+                .distinct_on(schema::user_vault::id)
                 .get_results(conn)?;
             Ok(result)
         })

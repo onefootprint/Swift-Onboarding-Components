@@ -47,6 +47,9 @@ impl std::str::FromStr for Email {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // ALL emails are case insensitive
+        let s = s.trim().to_lowercase();
+
         // See if there's a sandbox suffix on the domain of the email
         let parts = s.split('@').collect::<Vec<&str>>();
         if parts.len() != 2 {

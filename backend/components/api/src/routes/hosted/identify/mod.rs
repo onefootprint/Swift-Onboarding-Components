@@ -106,6 +106,7 @@ impl ChallengeState {
     }
 }
 
+#[tracing::instrument(skip(state))]
 async fn get_user_by_identifier(
     state: &web::Data<State>,
     identifier: &Identifier,
@@ -118,12 +119,15 @@ async fn get_user_by_identifier(
         }
         Identifier::Email(email) => (DataAttribute::Email, PiiString::from(email.clone())),
     };
-    let sh_data = state.compute_fingerprint(data_attribute, data).await?;
+    let sh_data = state
+        .compute_fingerprint(data_attribute, data.clean_for_fingerprint())
+        .await?;
     // TODO should we only look for verified emails?
     let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, sh_data).await?;
     Ok(existing_user)
 }
 
+#[tracing::instrument(skip(state))]
 async fn get_user_challenge_context(
     state: &web::Data<State>,
     identifier: &Identifier,

@@ -81,6 +81,7 @@ impl Email {
         is_verified: bool,
         priority: DataPriority,
     ) -> Result<Email, DbError> {
+        // TODO: ensure that the fingerprint tuple of (user_vault_id, fingerprint) is unique
         let fingerprint_ids = Fingerprint::bulk_create(
             conn,
             &user_vault_id,
