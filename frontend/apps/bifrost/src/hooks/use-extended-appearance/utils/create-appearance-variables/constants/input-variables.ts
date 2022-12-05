@@ -21,6 +21,12 @@ const inputVariables = new Map<
     },
   ],
   [
+    'inputColor',
+    {
+      var: '--fp-base-inputs-focus-typing-input-content',
+    },
+  ],
+  [
     'inputHeight',
     {
       var: '--fp-base-inputs-height-default',
