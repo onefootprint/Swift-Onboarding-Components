@@ -8,7 +8,6 @@ import { Post } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import SubscribeToNewsletter from '../../components/writing-layout/components/subscribe-to-newsletter';
 import LibraryPostPreview from './components/library-post-preview';
 
 export const getStaticProps = async () => {
@@ -52,7 +51,6 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
           </Posts>
           <StyledDivider />
         </WritingLayout>
-        <SubscribeToNewsletter />
       </Container>
     </>
   );
