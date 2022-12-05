@@ -14,17 +14,19 @@ const useBootstrapData = (
 
   useEffectOnce(() => {
     footprintProvider.ready();
+
+    const expirationTimeout = setTimeout(() => {
+      unsubscribe();
+      onSuccess({ email: undefined, phoneNumber: undefined });
+    }, WAITING_USER_DATA_TIME);
+
     const unsubscribe = footprintProvider.on(
       FootprintInternalEvent.bootstrapDataReceived,
       data => {
         onSuccess({ email: data.email, phoneNumber: data.phoneNumber });
+        clearTimeout(expirationTimeout);
       },
     );
-
-    setTimeout(() => {
-      unsubscribe();
-      onSuccess({ email: undefined, phoneNumber: undefined });
-    }, WAITING_USER_DATA_TIME);
   });
 };
 

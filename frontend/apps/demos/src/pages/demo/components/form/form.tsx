@@ -43,7 +43,6 @@ const Form = ({ html, onSuccess }: FormProps) => {
   };
 
   const showFootprint = () => {
-    console.log('show footprint');
     footprint.open({
       userData: {
         email: getValues('email'),
