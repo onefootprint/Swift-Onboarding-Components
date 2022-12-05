@@ -29,6 +29,10 @@ const MobileNav = ({ navItems, navigation, links }: MobileNavProps) => {
     setIsExpanded(prevState => !prevState);
   };
 
+  const handleNavItemClick = () => {
+    setIsExpanded(false);
+  };
+
   return (
     <Container>
       <Header>
@@ -85,7 +89,10 @@ const MobileNav = ({ navItems, navigation, links }: MobileNavProps) => {
       <Box ref={animateNavMenu}>
         {isExpanded && navigation && (
           <NavMenu>
-            <PageNav navigation={navigation} />
+            <PageNav
+              navigation={navigation}
+              onNavItemClick={handleNavItemClick}
+            />
           </NavMenu>
         )}
       </Box>

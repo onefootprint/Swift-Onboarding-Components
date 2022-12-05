@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import { Tab, Tabs } from '@onefootprint/ui';
+import { media, Tab, Tabs } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -53,9 +53,13 @@ const List = styled.div`
   ${({ theme }) => css`
     display: grid;
     grid-gap: ${theme.spacing[5]};
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     margin: ${theme.spacing[8]} 0;
     width: 100%;
+
+    ${media.greaterThan('md')`
+      grid-template-columns: repeat(3, 1fr);
+    `}
   `};
 `;
 

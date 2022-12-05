@@ -8,9 +8,10 @@ import styled, { css } from 'styled-components';
 
 type PageNavProps = {
   navigation: PageNavigation;
+  onNavItemClick: () => void;
 };
 
-const PageNav = ({ navigation }: PageNavProps) => {
+const PageNav = ({ navigation, onNavItemClick }: PageNavProps) => {
   const router = useRouter();
 
   return (
@@ -27,6 +28,7 @@ const PageNav = ({ navigation }: PageNavProps) => {
                   data-selected={router.asPath === slug}
                   href={slug}
                   key={slug}
+                  onClick={onNavItemClick}
                 >
                   {title}
                 </StyledLink>
