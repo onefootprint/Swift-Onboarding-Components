@@ -220,7 +220,7 @@ jobs:
       - name: Setup Pulumi CLI
         uses: pulumi/setup-pulumi@v2.0.0
         with:
-          pulumi-version: 3.39.1
+          pulumi-version: 3.48.0
 
       - run: yarn install
         working-directory: ./backend/infra

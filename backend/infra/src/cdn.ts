@@ -1,9 +1,10 @@
 import { route53 } from '@pulumi/aws';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
+import { Certificate } from './certs';
 
 export type CdnConfig = {
-  certArn: pulumi.Output<string>;
+  cert: Certificate;
   domain: string;
   origin: string;
   cdnToAlbSecretHeaderName: string;
@@ -139,7 +140,7 @@ export async function CreateCloudfrontDistribution(
       },
     ],
     viewerCertificate: {
-      acmCertificateArn: config.certArn,
+      acmCertificateArn: config.cert.arn,
       minimumProtocolVersion: 'TLSv1.2_2021',
       sslSupportMethod: 'sni-only',
     },

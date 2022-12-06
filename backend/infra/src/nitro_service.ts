@@ -11,6 +11,7 @@ import * as pulumi from '@pulumi/pulumi';
 import { Config } from './config';
 import { StackMetadata, GetStackMetadata } from './stack_metadata';
 import * as certs from './certs';
+import { Certificate } from './certs';
 
 export type NitroConfig = {
   cpus: number;
@@ -29,12 +30,12 @@ const PROXY_LB_PORT = 3668;
 
 /**
  * Create the nitro service
- * ALB -> ASG( EC2[proxy --> nitro_enclave])
+ * ALB to ASG( EC2[proxy to nitro_enclave])
  */
 export async function CreateNitroService(
   g: GlobalState,
   nitroConfig: NitroConfig,
-  cert: aws.acm.Certificate,
+  cert: Certificate,
 ): Promise<NitroServiceOutput> {
   const stackMetadata = GetStackMetadata();
   const serviceName = `nitro-service-${stackMetadata.shortStackName}`;
@@ -171,7 +172,7 @@ async function createLoadBalancer(
   stackMetadata: StackMetadata,
   securityGroup: awsx.ec2.SecurityGroup,
   dnsConfig: DnsConfig,
-  cert: aws.acm.Certificate,
+  cert: Certificate,
 ): Promise<NitroServiceOutput> {
   const vpc = g.vpc.vpc;
   const region = g.region;

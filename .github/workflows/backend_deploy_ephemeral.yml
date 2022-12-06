@@ -20,6 +20,8 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
           allowed-conclusions: success,skipped
+      - name: wait
+        run: sleep 10
 
   ephemeral_stack_name:
     name: Stack name

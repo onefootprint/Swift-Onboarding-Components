@@ -4,9 +4,9 @@
         "@types/node": "^14.18.12"
     },
     "dependencies": {
-        "@pulumi/aws": "5.13.0",
+        "@pulumi/aws": "5.22.0",
         "@pulumi/awsx": "0.40.0",
-        "@pulumi/pulumi": "3.39.1",
+        "@pulumi/pulumi": "3.48.0",
         "@pulumi/random": "4.4.2",
         "@pulumi/aws-native": "0.25.0",
         "@aws-sdk/client-kms": "3.159.0"

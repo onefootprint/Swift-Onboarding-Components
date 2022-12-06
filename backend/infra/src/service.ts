@@ -15,11 +15,11 @@ import * as s3 from './s3';
 import { GetStackMetadata } from './stack_metadata';
 import * as cdn from './cdn';
 import { FPC_SERVICE_PORT } from './sg';
+import { Certificate } from './certs';
 
 export type ServiceLoadBalancer = {
   lb: awsx.lb.LoadBalancer;
   targetGroup: aws.lb.TargetGroup;
-  cert: aws.acm.Certificate;
   cdnDomain: string;
   lbCname: string;
   distribution: aws.cloudfront.Distribution;
@@ -39,6 +39,7 @@ export type AWSPolicyConfig = {
 /**
  * Constants
  */
+
 // The path at which metrics are served.
 const METRICS_ENDPOINT_PATH = 'metrics';
 // Our header name for securing auth between cloudfront and internal load balancers
@@ -50,7 +51,7 @@ const CDN_PROTECTION_HEADER_NAME: string = 'X-Token-From-CloudFront';
 export async function CreateApiService(
   g: GlobalState,
   serviceConfig: ServiceConfig,
-  cert: aws.acm.Certificate,
+  cert: Certificate,
   nitroService: NitroServiceOutput,
 ): Promise<ServiceLoadBalancer> {
   const region = g.region;
@@ -180,7 +181,7 @@ export async function CreateApiService(
  */
 async function createCdnFrontedLoadBalancer(
   g: GlobalState,
-  cert: aws.acm.Certificate,
+  cert: Certificate,
   metricsEndpointPath: string,
   stackMetadata: StackMetadata,
 ): Promise<ServiceLoadBalancer> {
@@ -322,7 +323,7 @@ async function createCdnFrontedLoadBalancer(
   );
 
   const distribution = await cdn.CreateCloudfrontDistribution({
-    certArn: cert.arn,
+    cert,
     cdnToAlbSecret: g.secretsStore.cloudfrontSecret,
     cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
     domain: g.dnsConfig.apiDomain,
@@ -335,7 +336,6 @@ async function createCdnFrontedLoadBalancer(
     targetGroup: targetGroup,
     cdnDomain: g.dnsConfig.apiDomain,
     lbCname: albDomainName,
-    cert,
     distribution,
   };
 }

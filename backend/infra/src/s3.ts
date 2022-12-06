@@ -6,17 +6,14 @@ import { Config, S3ConfigValue } from './config';
 import { AWSPolicyConfig } from './service';
 import * as crypto from 'crypto';
 
+/**
+ * Configure document Images bucket
+ */
 export function CreateBuckets(
   provider: aws.Provider,
   config: Config,
   stackMetadata: StackMetadata,
 ): S3Buckets {
-  //////////////////////////////
-  // Configure document Images bucket
-  //
-  // If adding more bucket creation, copy and update the below code!
-  //////////////////////////////
-
   const bucketName = `${config.s3.documentImagesBucket.prefix}-${stackMetadata.shortStackName}`;
   const bucket = new aws.s3.Bucket(
     bucketName,

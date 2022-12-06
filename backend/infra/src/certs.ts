@@ -10,13 +10,18 @@ export type CertConfig = {
   region: Region;
 };
 
+export type Certificate = {
+  cert: aws.acm.Certificate;
+  arn: pulumi.Output<string>;
+};
+
 /**
  * Helper function to create a cert for a DnsConfig on a region
  */
 export async function CreateRegionalWildCertificateForDnsConfig(
   dnsConfig: DnsConfig,
   region: Region,
-): Promise<aws.acm.Certificate> {
+): Promise<Certificate> {
   return await CreateWildcardCertificate({
     domain: dnsConfig.apiDomain,
     region: region,
@@ -26,7 +31,7 @@ export async function CreateRegionalWildCertificateForDnsConfig(
 
 export async function CreateWildcardCertificate(
   config: CertConfig,
-): Promise<aws.acm.Certificate> {
+): Promise<Certificate> {
   const nameSuffix = `${config.domain}-cert-${config.region}`;
   const provider = new aws.Provider(`provider-${nameSuffix}`, {
     region: config.region,
@@ -39,14 +44,12 @@ export async function CreateWildcardCertificate(
   }
 
   const cert = new aws.acm.Certificate(
-    `cert-${nameSuffix}`,
+    `cert-ecdsa-p256-${nameSuffix}`,
     {
       domainName,
       subjectAlternativeNames: [config.domain],
       validationMethod: 'DNS',
-      // TODO update pulumi to officially support this
-      key_algorithm: 'EC_secp384r1',
-      keyAlgorithm: 'EC_secp384r1',
+      keyAlgorithm: 'EC_prime256v1',
     } as aws.acm.CertificateArgs,
     { provider },
   );
@@ -87,5 +90,5 @@ export async function CreateWildcardCertificate(
     { provider },
   );
 
-  return cert;
+  return { cert, arn: certValidation.certificateArn };
 }
