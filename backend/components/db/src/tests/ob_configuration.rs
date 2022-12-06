@@ -1,3 +1,4 @@
+use macros::db_test;
 use newtypes::ApiKeyStatus;
 
 use super::fixtures;
@@ -5,6 +6,7 @@ use crate::tests::prelude::*;
 
 use crate::models::ob_configuration::ObConfiguration;
 
+#[db_test]
 fn test_ob_config(conn: &mut TestPgConnection) {
     // Create an ob config
     let tenant = fixtures::tenant::create(conn);
@@ -29,5 +31,3 @@ fn test_ob_config(conn: &mut TestPgConnection) {
     // Enforce it does not exist
     ObConfiguration::get_enabled(conn, &ob_config.id).expect_err("Shouldn't find disabled ob config");
 }
-
-db_test!(db_test_ob_config, test_ob_config);

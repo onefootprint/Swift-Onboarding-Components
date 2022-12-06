@@ -51,15 +51,3 @@ where
     }
     .expect("Test transaction did not roll back with expected error");
 }
-
-// TODO turn this into an attribute-style macro, derive the fn name from the test name
-macro_rules! db_test {
-    ($name: ident, $test_fn: ident) => {
-        #[test]
-        fn $name() {
-            run_test_txn($test_fn);
-        }
-    };
-}
-
-pub(super) use db_test;
