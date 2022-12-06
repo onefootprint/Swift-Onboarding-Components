@@ -1,1 +1,1 @@
-export type Prediction = google.maps.places.AutocompletePrediction;
+export type AddressPrediction = google.maps.places.AutocompletePrediction;

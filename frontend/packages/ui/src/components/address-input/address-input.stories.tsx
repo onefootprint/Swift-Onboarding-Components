@@ -65,7 +65,7 @@ const Template: Story<AddressInputProps> = ({
 
   const handleChangeText = (text: string) => {
     setValue(text);
-    if (onChangeText) onChangeText(text);
+    onChangeText?.(text);
   };
 
   return (

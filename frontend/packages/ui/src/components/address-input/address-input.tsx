@@ -9,8 +9,9 @@ import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 import usePlacesAutocomplete from 'use-places-autocomplete';
 
+import Box from '../box';
 import Input, { InputProps } from '../internal/input';
-import type { Prediction } from './address-input.types';
+import type { AddressPrediction } from './address-input.types';
 import AddressDropdownFooter from './components/address-dropdown-footer';
 import AddressDropdownItem from './components/address-dropdown-item';
 import usePopper from './hooks/use-popper';
@@ -18,7 +19,7 @@ import usePopper from './hooks/use-popper';
 const MAX_OF_RESULTS = 5;
 
 export type AddressInputProps = Omit<InputProps, 'onSelect'> & {
-  onSelect?: (prediction?: Prediction | null) => void;
+  onSelect?: (prediction?: AddressPrediction | null) => void;
   country?: CountryCode;
 };
 
@@ -57,7 +58,6 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       getMenuProps,
       getToggleButtonProps,
       highlightedIndex,
-      inputValue: search,
       isOpen: downShiftIsOpen,
     } = useCombobox({
       items: options,
@@ -65,15 +65,16 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       onSelectedItemChange: ({ selectedItem }) => {
         onChangeText?.(selectedItem?.structured_formatting.main_text || '');
         onSelect(selectedItem);
+
         const hasToTriggerChangeEvent = isUncontrolled && localRef.current;
         if (hasToTriggerChangeEvent) {
           const event = new window.Event('change', { bubbles: true });
           localRef.current.dispatchEvent(event);
         }
       },
-      onInputValueChange: ({ inputValue: nextSearch = '' }) => {
-        onChangeText?.(nextSearch);
-        setValue(nextSearch);
+      onInputValueChange: ({ inputValue: nextInputValue = '' }) => {
+        onChangeText?.(nextInputValue);
+        setValue(nextInputValue);
       },
     });
     const comboBoxProps = getComboboxProps();
@@ -98,14 +99,13 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       onKeyDown(event);
     };
 
-    const renderAddressItem = (item: Prediction, index: number) => {
+    const renderAddressItem = (item: AddressPrediction, index: number) => {
       const itemProps = getItemProps({ item, index });
       return (
         <AddressDropdownItem
           disableHoverStyles={highlightedIndex !== -1}
           highlighted={highlightedIndex === index}
           key={item.place_id}
-          searchWords={search.split(' ')}
           subtitle={item.structured_formatting.secondary_text}
           title={item.structured_formatting.main_text}
           {...itemProps}
@@ -114,51 +114,49 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     };
 
     return (
-      <Container {...comboBoxProps}>
-        <Input
-          {...props}
-          {...toggleButtonProps}
-          {...inputProps}
-          autoComplete="address-line1"
-          tabIndex={0}
-          value={value}
-          onBlur={handleBlur}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          ref={mergeRefs([
-            localRef,
-            setReferenceElement,
-            inputProps.ref,
-            toggleButtonProps.ref,
-            ref,
-          ])}
-        />
-        {isDropdownOpen ? (
-          <Dropdown
-            {...menuProps}
-            {...popper.attributes.popper}
-            ref={mergeRefs([menuProps.ref, setPopperElement])}
-            style={popper.styles.popper}
-          >
-            <>
-              {options.map(renderAddressItem)}
-              <AddressDropdownFooter />
-            </>
-          </Dropdown>
-        ) : null}
-      </Container>
+      <Box {...comboBoxProps}>
+        <Box ref={setReferenceElement} sx={{ position: 'relative' }}>
+          <Input
+            {...props}
+            {...toggleButtonProps}
+            aria-autocomplete={inputProps['aria-autocomplete']}
+            aria-controls={inputProps['aria-controls']}
+            autoComplete="address-line1"
+            id={inputProps.id}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            tabIndex={0}
+            value={value}
+            ref={mergeRefs([
+              localRef,
+              inputProps.ref,
+              toggleButtonProps.ref,
+              ref,
+            ])}
+          />
+          {isDropdownOpen ? (
+            <Dropdown
+              {...menuProps}
+              {...popper.attributes.popper}
+              ref={mergeRefs([menuProps.ref, setPopperElement])}
+              style={popper.styles.popper}
+            >
+              <>
+                {options.map(renderAddressItem)}
+                <AddressDropdownFooter />
+              </>
+            </Dropdown>
+          ) : null}
+        </Box>
+      </Box>
     );
   },
 );
 
-const Container = styled.div`
-  position: relative;
-`;
-
 const Dropdown = styled.ul`
   ${({ theme }) => {
     const { dropdown } = theme.components;
-
     return css`
       background: ${dropdown.bg};
       border-radius: ${dropdown.borderRadius};

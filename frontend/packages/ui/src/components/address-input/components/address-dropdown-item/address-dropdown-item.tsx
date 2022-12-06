@@ -1,5 +1,4 @@
 import React, { forwardRef } from 'react';
-import Highlighter from 'react-highlight-words';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../utils/mixins';
@@ -12,7 +11,6 @@ export type AddressDropdownItemProps = {
   onClick: (event: React.MouseEvent<HTMLLIElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLLIElement>) => void;
   onMouseMove: (event: React.MouseEvent<HTMLLIElement>) => void;
-  searchWords: string[];
   subtitle: string;
   title: string;
 };
@@ -27,7 +25,6 @@ const AddressDropdownItem = forwardRef<HTMLLIElement, AddressDropdownItemProps>(
       onClick,
       onKeyDown,
       onMouseMove,
-      searchWords,
       subtitle,
       title,
     }: AddressDropdownItemProps,
@@ -44,16 +41,7 @@ const AddressDropdownItem = forwardRef<HTMLLIElement, AddressDropdownItemProps>(
       ref={ref}
       role="option"
     >
-      <Title>
-        <Highlighter
-          searchWords={searchWords}
-          textToHighlight={title}
-          highlightStyle={{
-            background: 'none',
-            fontWeight: 600,
-          }}
-        />
-      </Title>
+      <Title>{title}</Title>
       <Subtitle>{subtitle}</Subtitle>
     </AddressDropdownItemContainer>
   ),
