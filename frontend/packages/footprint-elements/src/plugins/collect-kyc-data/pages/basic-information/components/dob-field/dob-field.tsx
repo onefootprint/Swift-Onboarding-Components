@@ -10,6 +10,7 @@ const DobField = () => {
   const { t } = useTranslation('pages.basic-information');
   const {
     register,
+    getValues,
     formState: { errors },
   } = useFormContext();
   const inputMasks = useInputMask('en-US');
@@ -21,6 +22,7 @@ const DobField = () => {
       label={t('form.dob.label')}
       mask={inputMasks.dob}
       placeholder={t('form.dob.placeholder')}
+      value={getValues(UserDataAttribute.dob)}
       {...register(UserDataAttribute.dob, {
         required: true,
         validate: validateDob,
