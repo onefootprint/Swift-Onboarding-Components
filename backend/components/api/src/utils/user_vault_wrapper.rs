@@ -666,6 +666,9 @@ impl UserVaultWrapper {
             .speculative
             .lifetimes
             .values()
+            // Just a sanity check filter that we don't commit other data - all results should match
+            // this filter
+            .filter(|lifetime| lifetime.scoped_user_id == self.scoped_user_id)
             .map(|lifetime| lifetime.id.clone())
             .collect();
 
