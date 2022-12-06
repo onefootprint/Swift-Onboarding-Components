@@ -1,0 +1,188 @@
+---
+page: KYC + PII Vault
+slug: /kyc-with-pii/javascript
+category: SDKs
+title: Javascript
+position: 1
+meta:
+  {
+    title: KYC + PII Vault - Javascript Integration,
+    description: Discover how to integrate Footprint with a Javascript Codebase,
+  }
+---
+
+## About the library
+
+`footprint-js` let's you integrate your application with Footprint. It can be used together
+with any framework or library, such as Angular, React, Vue, or simply plain Javascript. Under the hood, it
+launches an iframe from your website, and exchanges secure messages between Footprint and your application.
+
+### Browser support
+
+Footprint supports all recent versions of major browsers. For the sake of security and providing the best experience to the majority of customers, we do not support less popular browsers that no longer receive security updates.
+
+| Name                    | Versions              |
+| ----------------------- | --------------------- |
+| Chrome                  | Last 3 major versions |
+| Chrome Mobile           | Last 3 major versions |
+| Firefox                 | Last 3 major versions |
+| Microsoft Edge          | Last 3 major versions |
+| Safari OSX              | Last 3 major versions |
+| Safari iOS              | Last 3 major versions |
+| Android default browser | Last 3 major versions |
+
+Footprint products depends on certain native browser functionality. Polyfilling certain browser features (e.g Promises API) may prevent footprint.js from working normally. If footprint.js isn't functioning as expected, try removing polyfills to determine if they might be causing the issue.
+
+## Install footprint
+
+1. Install `footprint-js` :
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-js
+
+# With yarn
+yarn add @onefootprint/footprint-js
+```
+
+## Integrate Footprint
+
+1. Grab the Onboarding Publishable Key, for example, `ob_test_VMooXd04EUlnu3AvMYKjMW`.
+
+2. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>Footprint | Vanilla</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@onefootprint/footprint-js@0.5.0/dist/footprint-js.css"
+    />
+    <script>
+      window.onFootprintCompleted = function (validationToken) {
+        // TODO: Post the token to your server
+        console.log(validationToken);
+      };
+      window.onFootprintCanceled = function () {
+        console.log('canceled');
+      };
+    </script>
+    <style>
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <main>
+      <div
+        id="footprint-button"
+        data-public-key="ob_test_WNgSBRR7uxoT8JRDBBflgw"
+      ></div>
+    </main>
+    <script
+      src="https://unpkg.com/@onefootprint/footprint-js@0.5.0/dist/footprint-js.umd.js"
+      crossorigin
+    ></script>
+  </body>
+</html>
+```
+
+What's happening under the hood?
+
+1. Footprint will identify an element with the id `footprint-button`, and will render our button inside it. Using the `public-key`, passed
+   via the `data` attribute, it will start the KYC flow using your onboarding configuration.
+
+2. Once the user completes the flow, you'll receive the `validationToken` through the `window.onFootprintCompleted` event, and from there
+   you can post it to your backend.
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js) to check out a full example.
+
+### Usage with frameworks
+
+Let's imagine your app was written using [Vue](https://vuejs.org/) (could be any framework or library). To integrate with Footprint,
+you'll need to:
+
+1. Render Footprint Button
+2. Open Footprint once the button is clicked
+
+This can be achieved easily with our `createButton` and `show` methods:
+
+```vue
+<script>
+import footprint from '@onefootprint/footprint-js';
+
+export default {
+  mounted() {
+    const container = document.getElementById('footprint-container');
+    const button = footprint.createButton(container);
+    button.addEventListener('click', this.handleOpen);
+  },
+
+  methods: {
+    handleOpen() {
+      footprint.show({
+        publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
+      });
+    },
+  },
+};
+</script>
+
+<template>
+  <div id="footprint-container"></div>
+</template>
+```
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-vue) to check out a full example.
+
+### Custom button
+
+In fact you can open Footprint from any button or action. To do that, just call `footprint.show` on your event handler.
+
+```vue
+<script>
+import footprint from '@onefootprint/footprint-js';
+
+export default {
+  methods: {
+    handleOpen() {
+      footprint.show({
+        publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
+      });
+    },
+  },
+};
+</script>
+
+<template>
+  <button @click="handleOpen">Verify</button>
+</template>
+```
+
+## Listening to events
+
+Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `show` method.
+
+```typescript
+footprint.show({
+  publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
+  onCompleted: validationToken => {
+    console.log(validationToken);
+  },
+});
+```
+
+| Name        | Description                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| onCompleted | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend |
+| onCanceled  | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe     |
