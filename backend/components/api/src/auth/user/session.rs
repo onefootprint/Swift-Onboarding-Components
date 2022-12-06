@@ -142,10 +142,10 @@ impl ExtractableAuthSession for ParsedUserSession {
 
     fn try_from(value: AuthSessionData, _conn: &mut PgConnection) -> Result<Self, ApiError> {
         match value {
-            AuthSessionData::User(data) => {                
+            AuthSessionData::User(data) => {
                 tracing::info!(user_vault_id=%data.user_vault_id, "user session authenticated");
                 Ok(ParsedUserSession(data))
-            },
+            }
             _ => Err(AuthError::SessionTypeError.into()),
         }
     }

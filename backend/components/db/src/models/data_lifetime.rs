@@ -186,18 +186,18 @@ impl DataLifetime {
         conn: &mut PgConnection,
         ids: Vec<DataLifetimeId>,
         seqno: DataLifetimeSeqno,
-    ) -> DbResult<()> {
+    ) -> DbResult<Vec<Self>> {
         let update = DataLifetimeUpdate {
             deactivated_at: Some(Some(Utc::now())),
             deactivated_seqno: Some(Some(seqno)),
             ..DataLifetimeUpdate::default()
         };
-        diesel::update(data_lifetime::table)
+        let results = diesel::update(data_lifetime::table)
             .filter(data_lifetime::id.eq_any(ids))
             .filter(data_lifetime::deactivated_seqno.is_null())
             .set(update)
-            .execute(conn)?;
-        Ok(())
+            .get_results(conn)?;
+        Ok(results)
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided scoped_user_id.
@@ -266,8 +266,8 @@ impl DataLifetime {
     pub fn get_active_at(
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
-        seqno: DataLifetimeSeqno,
         scoped_user_id: Option<&ScopedUserId>,
+        seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         // This is kind of unnecessarily similar to `get_active`, but it's hard to combine
         // this logic in diesel

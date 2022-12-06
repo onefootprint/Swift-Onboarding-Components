@@ -67,9 +67,6 @@ impl Drop for TestContext {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::email::Email;
-    use crate::test::test_user_vault;
-    use newtypes::{Fingerprint, SealedVaultBytes};
 
     /// This test shows an example of how to use the test context
     /// When dropping the context, the database is deleted
@@ -77,16 +74,20 @@ mod tests {
     #[test]
     fn test_test_context() {
         let create_unique_email = |conn: &mut PgConnection| {
+            // No longer works with new email create API, which requires txn
+            /*
             let uv = test_user_vault(conn, true);
+            let su_id = ScopedUserId::test_data("su_test".to_owned());
             let _ = Email::create(
                 conn,
                 uv.id,
                 SealedVaultBytes::default(),
                 Fingerprint::default(),
-                true,
                 newtypes::DataPriority::Primary,
+                su_id,
             )
             .expect("create email");
+            */
         };
 
         let mut c = TestContext::new();

@@ -149,7 +149,7 @@ impl UserVaultWrapper {
         // TODO apply speculative lifetimes ON TOP (ie overwrite committed data) of committed ones
         let active_lifetimes = if let Some(seqno) = seqno {
             // We are reconstructing the UVW as it appeared at a given seqno
-            DataLifetime::get_active_at(conn, &user_vault.id, seqno, scoped_user_id)?
+            DataLifetime::get_active_at(conn, &user_vault.id, scoped_user_id, seqno)?
         } else {
             // We are constructing the UVW as it appears right now
             DataLifetime::get_active(conn, &user_vault.id, scoped_user_id)?

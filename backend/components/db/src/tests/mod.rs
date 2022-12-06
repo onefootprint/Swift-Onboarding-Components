@@ -4,4 +4,5 @@ mod prelude;
 
 mod fixtures;
 
+mod data_lifetime;
 mod ob_configuration;
