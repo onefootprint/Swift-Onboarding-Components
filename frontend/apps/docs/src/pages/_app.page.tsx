@@ -30,7 +30,7 @@ const App = ({ Component, pageProps }: AppProps) => (
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
     html {
-      --header-height: 95px;
+      --header-height: 56px;
       --page-aside-nav-width: 270px;
 
       ${media.greaterThan('sm')`

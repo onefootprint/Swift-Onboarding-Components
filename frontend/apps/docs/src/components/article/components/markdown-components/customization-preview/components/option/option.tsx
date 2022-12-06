@@ -1,3 +1,4 @@
+import { Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -12,7 +13,9 @@ export type OptionProps = {
 const Option = ({ name, image, selected, onClick }: OptionProps) => (
   <OptionContainer data-selected={selected} onClick={onClick}>
     <Image src={image} width={120} height={97} alt={name} />
-    {name}
+    <Typography color="secondary" variant="body-3">
+      {name}
+    </Typography>
   </OptionContainer>
 );
 

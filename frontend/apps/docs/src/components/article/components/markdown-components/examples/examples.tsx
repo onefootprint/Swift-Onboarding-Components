@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import { media, Tab, Tabs } from '@onefootprint/ui';
+import { media, Tab, Tabs, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -41,7 +41,17 @@ const Examples = () => {
                 width={img.width}
               />
             </ImageContainer>
-            <Name>{name}</Name>
+            <Typography
+              color="secondary"
+              variant="body-3"
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {name}
+            </Typography>
           </Item>
         ))}
       </List>
@@ -100,12 +110,6 @@ const ImageContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[4]};
   `};
-`;
-
-const Name = styled.div`
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 `;
 
 export default Examples;

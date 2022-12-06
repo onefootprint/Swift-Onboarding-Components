@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoArrowUpRight16, IcoShield16 } from '@onefootprint/icons';
+import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import React from 'react';
 import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
@@ -13,14 +13,6 @@ type AppHeaderProps = {
 
 const AppHeader = ({ navigation }: AppHeaderProps) => {
   const { t } = useTranslation('components.header');
-  const navItems = [
-    {
-      baseHref: '/kyc-with-pii',
-      href: '/kyc-with-pii/getting-started',
-      Icon: IcoShield16,
-      text: t('nav.kyc-with-pii'),
-    },
-  ];
 
   const desktopLinks = [
     {
@@ -40,18 +32,15 @@ const AppHeader = ({ navigation }: AppHeaderProps) => {
 
   return (
     <Header>
-      <DesktopNav navItems={navItems} links={desktopLinks} />
-      <MobileNav
-        navItems={navItems}
-        links={mobileLinks}
-        navigation={navigation}
-      />
+      <DesktopNav links={desktopLinks} />
+      <MobileNav links={mobileLinks} navigation={navigation} />
     </Header>
   );
 };
 
 const Header = styled.header`
   ${({ theme }) => css`
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     background: ${theme.backgroundColor.primary};
     left: 0;
     position: fixed;

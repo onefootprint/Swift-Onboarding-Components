@@ -1,26 +1,23 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from '@onefootprint/icons';
-import { Box, LinkButton, media, Tab, Tabs } from '@onefootprint/ui';
+import { Box, LinkButton, media } from '@onefootprint/ui';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
-import type { LinkItem, NavItem } from '../../app-header.types';
+import type { LinkItem } from '../../app-header.types';
 import PageNav from './components/page-nav';
 
 type MobileNavProps = {
-  navItems: NavItem[];
   navigation?: PageNavigation;
   links: LinkItem[];
 };
 
-const MobileNav = ({ navItems, navigation, links }: MobileNavProps) => {
+const MobileNav = ({ navigation, links }: MobileNavProps) => {
   const { t } = useTranslation('components.header');
-  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [animateNavMenu] = useAutoAnimate<HTMLDivElement>();
   useLockedBody(isExpanded);
@@ -36,9 +33,9 @@ const MobileNav = ({ navItems, navigation, links }: MobileNavProps) => {
   return (
     <Container>
       <Header>
-        <InternalNavContainer>
+        <NavTriggerContainer>
           {navigation && (
-            <NavTriggerButton
+            <NavTrigger
               type="button"
               onClick={handleToggleNav}
               aria-label={
@@ -49,43 +46,25 @@ const MobileNav = ({ navItems, navigation, links }: MobileNavProps) => {
               aria-expanded={isExpanded}
             >
               {isExpanded ? <IcoClose24 /> : <IcoMenu24 />}
-            </NavTriggerButton>
+            </NavTrigger>
           )}
           <Link href="/" aria-label={t('nav.home')}>
             <LogoFpdocsDefault />
           </Link>
-        </InternalNavContainer>
-        {links.length && (
-          <div>
-            {links.map(({ href, text, Icon }) => (
-              <LinkButton
-                href={href}
-                iconComponent={Icon}
-                key={text}
-                size="compact"
-                target="_blank"
-              >
-                {text}
-              </LinkButton>
-            ))}
-          </div>
-        )}
-      </Header>
-      <Nav>
-        <Tabs variant="pill">
-          {navItems.map(({ baseHref, href, Icon, text }) => (
-            <Tab
-              as={Link}
+        </NavTriggerContainer>
+        {links.length &&
+          links.map(({ href, text, Icon }) => (
+            <LinkButton
               href={href}
+              iconComponent={Icon}
               key={text}
-              selected={router.asPath.startsWith(baseHref)}
+              size="compact"
+              target="_blank"
             >
-              <Icon />
               {text}
-            </Tab>
+            </LinkButton>
           ))}
-        </Tabs>
-      </Nav>
+      </Header>
       <Box ref={animateNavMenu}>
         {isExpanded && navigation && (
           <NavMenu>
@@ -106,7 +85,7 @@ const Container = styled.div`
   `}
 `;
 
-const InternalNavContainer = styled.div`
+const NavTriggerContainer = styled.div`
   align-items: center;
   display: flex;
 
@@ -124,7 +103,7 @@ const Header = styled.div`
   `};
 `;
 
-const NavTriggerButton = styled.button`
+const NavTrigger = styled.button`
   ${({ theme }) => css`
     background: none;
     border: none;
@@ -137,27 +116,11 @@ const NavTriggerButton = styled.button`
   `};
 `;
 
-const Nav = styled.nav`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    display: flex;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-  `};
-`;
-
 const NavMenu = styled.div`
   ${({ theme }) => css`
-    --mobile-header-height: 46px;
-    --mobile-nav-height: 48px;
-
     background: ${theme.backgroundColor.primary};
     padding: ${theme.spacing[7]} ${theme.spacing[5]} ${theme.spacing[4]};
-    height: calc(
-      100vh - var(--mobile-header-height) - var(--mobile-nav-height)
-    );
+    height: calc(100vh - var(--header-height));
   `};
 `;
 
