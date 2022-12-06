@@ -53,7 +53,7 @@ struct UvwData {
 }
 
 impl UvwData {
-    fn build(
+    fn partition(
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
@@ -138,6 +138,31 @@ pub struct DecryptRequest {
 }
 
 impl UserVaultWrapper {
+    #[allow(clippy::too_many_arguments)]
+    fn build(
+        user_vault: UserVault,
+        seqno: Option<DataLifetimeSeqno>,
+        scoped_user_id: Option<ScopedUserId>,
+        is_locked: bool,
+        uvd: Vec<UserVaultData>,
+        phone_numbers: Vec<PhoneNumber>,
+        emails: Vec<Email>,
+        identity_documents: Vec<IdentityDocument>,
+        lifetimes: Vec<DataLifetime>,
+    ) -> Self {
+        let (committed, speculative) =
+            UvwData::partition(uvd, phone_numbers, emails, identity_documents, lifetimes);
+        Self {
+            user_vault,
+            committed,
+            speculative,
+            _seqno: seqno,
+            scoped_user_id,
+            is_locked,
+            is_hydrated: PhantomData,
+        }
+    }
+
     fn build_single(
         conn: &mut PgConnection,
         user_vault: UserVault,
@@ -146,7 +171,6 @@ impl UserVaultWrapper {
         seqno: Option<DataLifetimeSeqno>,
     ) -> Result<Self, DbError> {
         // TODO unit tests
-        // TODO apply speculative lifetimes ON TOP (ie overwrite committed data) of committed ones
         let active_lifetimes = if let Some(seqno) = seqno {
             // We are reconstructing the UVW as it appeared at a given seqno
             DataLifetime::get_active_at(conn, &user_vault.id, scoped_user_id, seqno)?
@@ -165,18 +189,18 @@ impl UserVaultWrapper {
         // TODO migrate this to DataLifetimes
         let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
 
-        let (committed, speculative) =
-            UvwData::build(data, phone_numbers, emails, identity_documents, active_lifetimes);
-
-        Ok(Self {
+        let result = Self::build(
             user_vault,
-            committed,
-            speculative,
-            _seqno: seqno,
-            scoped_user_id: scoped_user_id.cloned(),
+            seqno,
+            scoped_user_id.cloned(),
             is_locked,
-            is_hydrated: PhantomData,
-        })
+            data,
+            phone_numbers,
+            emails,
+            identity_documents,
+            active_lifetimes,
+        );
+        Ok(result)
     }
 
     // In order to minimize database queries, we would like to be able to bulk fetch
@@ -206,23 +230,17 @@ impl UserVaultWrapper {
             .into_iter()
             .map(move |(su, uv)| {
                 let uv_id = uv.id.clone();
-                let lifetimes = uv_id_to_active_lifetimes.remove(&uv_id).unwrap_or_default();
-                let (committed, speculative) = UvwData::build(
+                Self::build(
+                    uv,
+                    None,
+                    Some(su.id),
+                    false,
                     uvds.remove(&uv_id).unwrap_or_default(),
                     phone_numbers.remove(&uv_id).unwrap_or_default(),
                     emails.remove(&uv_id).unwrap_or_default(),
                     identity_document_map.remove(&uv_id).unwrap_or_default(),
-                    lifetimes,
-                );
-                Self {
-                    scoped_user_id: Some(su.id),
-                    user_vault: uv,
-                    committed,
-                    speculative,
-                    is_locked: false,
-                    _seqno: None,
-                    is_hydrated: PhantomData,
-                }
+                    uv_id_to_active_lifetimes.remove(&uv_id).unwrap_or_default(),
+                )
             })
             .collect())
     }
