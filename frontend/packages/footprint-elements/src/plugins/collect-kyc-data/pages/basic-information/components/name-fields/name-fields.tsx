@@ -30,7 +30,7 @@ const NameFields = () => {
         <TextInput
           hasError={!!errors[UserDataAttribute.lastName]}
           hint={
-            errors[UserDataAttribute.firstName]
+            errors[UserDataAttribute.lastName]
               ? t('form.last-name.error')
               : undefined
           }
