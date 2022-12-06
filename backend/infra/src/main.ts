@@ -49,14 +49,15 @@ export default async function main() {
   const primaryRegion = Region.USEast1;
   const otherRegions: Region[] = [];
 
+  // Setup our DNS config
+  const dnsConfig = await dns.LoadDnsConfig(constants);
+
   const { region, vpc, provider } = await vpcUtil.CreateRegionalVPC(
     stackMetadata,
     primaryRegion,
     constants,
+    dnsConfig,
   );
-
-  // Setup our DNS config
-  const dnsConfig = await dns.LoadDnsConfig(constants);
 
   // setup our enclave/hmac keys
   const enclaveKeyConfig = await enclaveKey.Initialize(constants, otherRegions);

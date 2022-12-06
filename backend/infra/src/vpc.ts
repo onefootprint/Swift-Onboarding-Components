@@ -1,3 +1,4 @@
+import { DnsConfig } from './dns';
 import { StackEnvironment, StackMetadata } from './stack_metadata';
 import { Config } from './config';
 import {
@@ -38,6 +39,7 @@ export async function CreateRegionalVPC(
   stackMetadata: StackMetadata,
   region: Region,
   config: Config,
+  dnsConfig: DnsConfig,
 ): Promise<RegionVpcOutput> {
   const stack = pulumi.getStack();
   const provider = new aws.Provider(`vpc-provider-${region}`, {
@@ -45,9 +47,21 @@ export async function CreateRegionalVPC(
     defaultTags: { tags: { env: stack } },
   });
 
+  let vpc: awsx.ec2.Vpc;
+  let cidrBlock: string;
+  let natGateways: aws.ec2.NatGateway[];
+
   // use default dev-ephemeral VPC for ephemeral environments (this is fixed to footprint dev account)
   if (stackMetadata.environment === StackEnvironment.DevEphemeral) {
-    const vpc = awsx.ec2.Vpc.fromExistingIds(
+    cidrBlock = DEFAULT_CIDR_BLOCK;
+
+    const natGatewayIds = ['nat-0759ff9be4fc255ad', 'nat-0e8aa04bcde0b6a8f'];
+
+    natGateways = natGatewayIds.map(ngId => {
+      return aws.ec2.NatGateway.get(`ng-${ngId}`, ngId);
+    });
+
+    vpc = awsx.ec2.Vpc.fromExistingIds(
       'dev-ephemeral',
       {
         vpcId: 'vpc-0016cfc859affc477',
@@ -60,48 +74,41 @@ export async function CreateRegionalVPC(
           'subnet-0451c81e3508c50f0',
         ],
         internetGatewayId: 'igw-06ceacc83403de268',
-        natGatewayIds: ['nat-0759ff9be4fc255ad', 'nat-0e8aa04bcde0b6a8f'],
+        natGatewayIds,
       },
       { provider },
     );
-
-    return {
-      vpc: {
-        vpc,
-        cidrBlock: DEFAULT_CIDR_BLOCK,
-        publicSubnetIds: await vpc.publicSubnetIds,
-        privateSubnetIds: await vpc.privateSubnetIds,
-        region,
-      },
-      provider,
-      region,
-    };
-  }
-
-  // otherwise create an isolated VPC
-  const vpcStack = `vpc-${stack}-${region}`;
-  let cidrBlock: string;
-  let protect: boolean = true;
-
-  if (stack === 'prod') {
-    cidrBlock = PROD_CIDR_BLOCK;
-  } else if (stack === 'dev') {
-    cidrBlock = DEV_CIDR_BLOCK;
   } else {
-    cidrBlock = STACK_CIDR_BLOCK;
-    // don't protect unknown stack vpcs
-    protect = false;
+    // otherwise create an isolated VPC
+    const vpcStack = `vpc-${stack}-${region}`;
+    let protect: boolean = true;
+
+    if (stack === 'prod') {
+      cidrBlock = PROD_CIDR_BLOCK;
+    } else if (stack === 'dev') {
+      cidrBlock = DEV_CIDR_BLOCK;
+    } else {
+      cidrBlock = STACK_CIDR_BLOCK;
+      // don't protect unknown stack vpcs
+      protect = false;
+    }
+
+    vpc = new awsx.ec2.Vpc(
+      vpcStack,
+      {
+        tags: { stack: stack },
+        numberOfAvailabilityZones: NUM_AZ,
+        cidrBlock,
+      },
+      { provider, protect: config.deletionProtection || protect },
+    );
+
+    natGateways = (await vpc.natGateways).map(ng => {
+      return ng.natGateway;
+    });
   }
 
-  const vpc = new awsx.ec2.Vpc(
-    vpcStack,
-    {
-      tags: { stack: stack },
-      numberOfAvailabilityZones: NUM_AZ,
-      cidrBlock,
-    },
-    { provider, protect: config.deletionProtection || protect },
-  );
+  await createEgressDnsRecord(natGateways, dnsConfig, provider);
 
   return {
     vpc: {
@@ -114,4 +121,29 @@ export async function CreateRegionalVPC(
     provider,
     region,
   };
+}
+
+/**
+ * Set the egress records to identify our IP address block
+ */
+async function createEgressDnsRecord(
+  natGateways: aws.ec2.NatGateway[],
+  dnsConfig: DnsConfig,
+  provider: aws.Provider,
+) {
+  let ips = natGateways.map(ng => {
+    return ng.publicIp;
+  });
+
+  const record = new route53.Record(
+    `dns-egress`,
+    {
+      zoneId: dnsConfig.hostedZone.id,
+      type: 'A',
+      name: `egress.${dnsConfig.apiDomain}`,
+      records: ips,
+      ttl: 60,
+    },
+    { provider },
+  );
 }
