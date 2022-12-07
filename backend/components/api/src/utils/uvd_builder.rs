@@ -13,28 +13,36 @@ use newtypes::{
     dob::DateOfBirth,
     name::FullName,
     ssn::{Ssn, Ssn4, Ssn9},
-    CollectedDataOption, Fingerprint as FingerprintBytes, PiiString, ScopedUserId, UserVaultId, UvdKind,
-    VaultPublicKey,
+    CollectedDataOption, DataAttribute, Fingerprint as FingerprintBytes, PiiString, ScopedUserId,
+    UserVaultId, UvdKind, VaultPublicKey,
 };
 
 use crate::{
-    errors::{ApiError, ApiResult},
+    errors::{user::UserError, ApiError, ApiResult},
     types::identity_data_request::IdentityDataUpdate,
 };
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
 pub struct UvdBuilder {
     vault_public_key: VaultPublicKey,
+    /// Existing (committed or uncomitted) fields. Used to enforce that partial updates don't
+    /// overwrite full data
+    existing_fields: Vec<DataAttribute>,
     data: Vec<NewUserVaultData>,
-    // We will deactivate the old UserVaultData rows and their fingerprints if they are replaced
+    /// We will deactivate the old UserVaultData rows and their fingerprints if they are replaced
     kinds_to_deactivate: Vec<UvdKind>,
-    // Keeps track of which pieces of data were added during this request
+    /// Keeps track of which pieces of data were added during this request
     collected_data: Vec<CollectedDataOption>,
 }
 
 impl UvdBuilder {
-    pub fn build(update: IdentityDataUpdate, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
+    pub fn build(
+        update: IdentityDataUpdate,
+        vault_public_key: VaultPublicKey,
+        existing_fields: Vec<DataAttribute>,
+    ) -> ApiResult<Self> {
         let mut builder = Self {
+            existing_fields,
             vault_public_key,
             data: vec![],
             kinds_to_deactivate: vec![],
@@ -90,17 +98,22 @@ impl UvdBuilder {
     fn add_ssn9(&mut self, ssn9: Ssn9) -> ApiResult<()> {
         let ssn4 = Ssn4::from(&ssn9);
         self.add_sealed(ssn9.into(), UvdKind::Ssn9)?;
-
-        // TODO What happens if the ssn4 is already set?
         self.add_sealed(ssn4.into(), UvdKind::Ssn4)?;
 
         self.collected_data.push(CollectedDataOption::Ssn9);
-        self.collected_data.push(CollectedDataOption::Ssn4);
         Ok(())
     }
 
     fn add_ssn4(&mut self, ssn4: Ssn4) -> ApiResult<()> {
-        // verify the update is allowed
+        // We currently disallow setting only ssn4 if you already have a full ssn9
+        // set, otherwise you would have to deactivate ssn9 when adding only a partial
+        // ssn4. In the future, we might want to change this functionality to just require
+        // the whole ssn9 if the tenant requests only a partial ssn4 but the user wants to
+        // update their data and already has a full ssn9
+        if self.existing_fields.contains(&DataAttribute::Ssn9) {
+            return Err(UserError::PartialSsnUpdateNotAllowed.into());
+        }
+
         self.add_sealed(ssn4.into(), UvdKind::Ssn4)?;
         self.collected_data.push(CollectedDataOption::Ssn4);
         Ok(())
@@ -150,8 +163,15 @@ impl UvdBuilder {
         self.add_sealed(zip.into(), UvdKind::Zip)?;
         self.add_sealed(country.into(), UvdKind::Country)?;
 
-        // TODO What happens if other fields are set? We probably shouldn't allow you to set zip +
-        // country if we already have full address
+        // We currently disallow setting only the zip + country if you already have a full address
+        // set, otherwise you would have to deactivate a full address when adding only a partial
+        // address. In the future, we might want to change this functionality to just require
+        // the whole address if the tenant requests only a partial address but the user wants to
+        // update their data and already has a full address
+        if self.existing_fields.contains(&DataAttribute::AddressLine1) {
+            return Err(UserError::PartialAddressUpdateNotAllowed.into());
+        }
+
         self.kinds_to_deactivate.push(UvdKind::AddressLine1);
         self.kinds_to_deactivate.push(UvdKind::AddressLine2);
         self.kinds_to_deactivate.push(UvdKind::City);
@@ -183,7 +203,8 @@ impl UvdBuilder {
     ) -> ApiResult<Vec<CollectedDataOption>> {
         // TODO verify there isn't already committed data for this user vault
 
-        // Deactivate old UVDs that we have overwritten
+        // Deactivate old UVDs that we have overwritten that belong to this tenant.
+        // We will only deactivate speculative, uncommitted data here - never committed data
         let seqno = DataLifetime::get_next_seqno(conn)?;
         UserVaultData::bulk_deactivate_uncommitted(
             conn,

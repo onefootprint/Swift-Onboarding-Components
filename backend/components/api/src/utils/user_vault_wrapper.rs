@@ -103,6 +103,39 @@ impl UvwData {
         };
         (committed, speculative)
     }
+
+    fn uvd(&self, kind: DataAttribute) -> Option<&UserVaultData> {
+        self.uvd
+            .iter()
+            .find(|d| Into::<DataAttribute>::into(d.kind) == kind)
+    }
+}
+
+impl HasDataAttributeFields for UvwData {
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+        let email = self.emails.iter().next();
+        let phone = self.phone_numbers.iter().next();
+        match data_attribute {
+            // uvd
+            DataAttribute::FirstName
+            | DataAttribute::LastName
+            | DataAttribute::Dob
+            | DataAttribute::Ssn9
+            | DataAttribute::AddressLine1
+            | DataAttribute::AddressLine2
+            | DataAttribute::City
+            | DataAttribute::State
+            | DataAttribute::Zip
+            | DataAttribute::Country
+            | DataAttribute::Ssn4 => self.uvd(data_attribute).map(|d| &d.e_data),
+            // email
+            DataAttribute::Email => email?.get_e_field(data_attribute),
+            // phone
+            DataAttribute::PhoneNumber => phone?.get_e_field(data_attribute),
+            // We need to handle identity document separately since users can have multiple identity documents (for now, there's an open item https://linear.app/footprint/issue/FP-1968/de-chonk-the-identitydocument-dataattribute)
+            DataAttribute::IdentityDocument => None,
+        }
+    }
 }
 
 /// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
@@ -383,20 +416,7 @@ impl UserVaultWrapper {
             .collect()
     }
 
-    pub fn uvd(&self, kind: DataAttribute) -> Option<&UserVaultData> {
-        // Return the speculative piece of data with this kind if it exists, otherwise committed
-        self.speculative
-            .uvd
-            .iter()
-            .find(|d| Into::<DataAttribute>::into(d.kind) == kind)
-            .or_else(|| {
-                self.committed
-                    .uvd
-                    .iter()
-                    .find(|d| Into::<DataAttribute>::into(d.kind) == kind)
-            })
-    }
-
+    /// Return speculative phone numbers if exist, otherwise committed. There should only be one
     pub fn phone_numbers(&self) -> &[PhoneNumber] {
         if !self.speculative.phone_numbers.is_empty() {
             &self.speculative.phone_numbers
@@ -405,6 +425,7 @@ impl UserVaultWrapper {
         }
     }
 
+    /// Return speculative emails if exist, otherwise committed. There should only be one
     pub fn emails(&self) -> &[Email] {
         if !self.speculative.emails.is_empty() {
             &self.speculative.emails
@@ -413,6 +434,7 @@ impl UserVaultWrapper {
         }
     }
 
+    /// Return speculative identity_documents if exist, otherwise committed. There should only be one
     pub fn identity_documents(&self) -> &[IdentityDocument] {
         if !self.speculative.identity_documents.is_empty() {
             &self.speculative.identity_documents
@@ -424,28 +446,9 @@ impl UserVaultWrapper {
 
 impl HasDataAttributeFields for UserVaultWrapper {
     fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
-        let email = self.emails().iter().next();
-        let phone = self.phone_numbers().iter().next();
-        match data_attribute {
-            // uvd
-            DataAttribute::FirstName
-            | DataAttribute::LastName
-            | DataAttribute::Dob
-            | DataAttribute::Ssn9
-            | DataAttribute::AddressLine1
-            | DataAttribute::AddressLine2
-            | DataAttribute::City
-            | DataAttribute::State
-            | DataAttribute::Zip
-            | DataAttribute::Country
-            | DataAttribute::Ssn4 => self.uvd(data_attribute).map(|d| &d.e_data),
-            // email
-            DataAttribute::Email => email?.get_e_field(data_attribute),
-            // phone
-            DataAttribute::PhoneNumber => phone?.get_e_field(data_attribute),
-            // We need to handle identity document separately since users can have multiple identity documents (for now, there's an open item https://linear.app/footprint/issue/FP-1968/de-chonk-the-identitydocument-dataattribute)
-            DataAttribute::IdentityDocument => None,
-        }
+        self.speculative
+            .get_e_field(data_attribute)
+            .or_else(|| self.committed.get_e_field(data_attribute))
     }
 }
 
@@ -458,7 +461,9 @@ impl UserVaultWrapper {
         onboarding_id: OnboardingId,
     ) -> Result<(), ApiError> {
         self.assert_is_locked(conn)?;
-        let builder = UvdBuilder::build(update, self.user_vault.public_key)?;
+        let existing_fields = self.get_populated_fields();
+
+        let builder = UvdBuilder::build(update, self.user_vault.public_key, existing_fields)?;
         let scoped_user_id = self
             .scoped_user_id
             .clone()
