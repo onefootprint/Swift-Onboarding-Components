@@ -78,8 +78,6 @@ pub async fn perform_pre_run_operations(
         .db_query(move |conn| UserVaultWrapper::get_for_tenant(conn, &ob.scoped_user_id))
         .await??;
 
-    // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
-    // phone number's sandbox suffix
     let should_initiate_verification_requests =
         utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob.id.clone()).await?;
     if !should_initiate_verification_requests {

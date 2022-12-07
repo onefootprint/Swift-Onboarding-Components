@@ -1,6 +1,7 @@
+use super::onboarding::Onboarding;
 use super::tenant::Tenant;
 use crate::schema::scoped_user;
-use crate::{DbError, DbPool};
+use crate::{DbPool, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -36,7 +37,7 @@ impl ScopedUser {
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
         is_live: bool,
-    ) -> Result<ScopedUser, DbError> {
+    ) -> DbResult<ScopedUser> {
         let scoped_user = scoped_user::table
             .filter(scoped_user::user_vault_id.eq(&user_vault_id))
             .filter(scoped_user::tenant_id.eq(&tenant_id))
@@ -62,7 +63,7 @@ impl ScopedUser {
     pub fn list_for_user_vault(
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
-    ) -> Result<Vec<(ScopedUser, Tenant)>, DbError> {
+    ) -> DbResult<Vec<(ScopedUser, Tenant)>> {
         use crate::schema::tenant;
         let results = scoped_user::table
             .inner_join(tenant::table)
@@ -75,9 +76,9 @@ impl ScopedUser {
         pool: &DbPool,
         tenant_id: TenantId,
         user_vault_id: UserVaultId,
-    ) -> Result<Option<ScopedUser>, DbError> {
+    ) -> DbResult<Option<ScopedUser>> {
         let ob = pool
-            .db_query(|conn| -> Result<Option<ScopedUser>, DbError> {
+            .db_query(|conn| -> DbResult<_> {
                 let ob = scoped_user::table
                     .filter(scoped_user::tenant_id.eq(tenant_id))
                     .filter(scoped_user::user_vault_id.eq(user_vault_id))
@@ -89,19 +90,20 @@ impl ScopedUser {
         Ok(ob)
     }
 
-    // TODO: feels weird this didn't exist already?
     pub fn get(
         conn: &mut PgConnection,
-        tenant_id: TenantId,
-        footprint_user_id: FootprintUserId,
+        footprint_user_id: &FootprintUserId,
+        tenant_id: &TenantId,
         is_live: bool,
-    ) -> Result<ScopedUser, DbError> {
-        let su = scoped_user::table
+    ) -> DbResult<(ScopedUser, Option<Onboarding>)> {
+        use crate::schema::onboarding;
+        let result = scoped_user::table
+            .left_join(onboarding::table)
             .filter(scoped_user::fp_user_id.eq(footprint_user_id))
             .filter(scoped_user::tenant_id.eq(tenant_id))
             .filter(scoped_user::is_live.eq(is_live))
-            .first::<ScopedUser>(conn)?;
+            .first(conn)?;
 
-        Ok(su)
+        Ok(result)
     }
 }

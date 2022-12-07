@@ -42,6 +42,8 @@ class ObConfiguration(NamedTuple):
 
 class GetObConfigError(Exception):
     pass
+
+
 class Tenant(NamedTuple):
     ob_configs: dict
     sk: SecretApiKey
@@ -54,14 +56,15 @@ class Tenant(NamedTuple):
         if len(configs) == 1:
             return self.ob_configs[configs[0]]
         else:
-            raise GetObConfigError(f"There are {len(configs)} defined for this Tenant. Please specify which one you want!")
+            raise GetObConfigError(
+                f"There are {len(configs)} defined for this Tenant. Please specify which one you want!"
+            )
 
 
 class BasicUser(NamedTuple):
     auth_token: str
     phone_number: str
     real_phone_number: str
-    email: str
 
 
 class User(NamedTuple):
@@ -79,6 +82,7 @@ class User(NamedTuple):
     phone_number: str
     real_phone_number: str
     email: str
+    validation_token: str
     tenant: Tenant
 
     def identity_data(self): 

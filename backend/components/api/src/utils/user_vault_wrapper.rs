@@ -466,7 +466,7 @@ impl UserVaultWrapper {
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
         fingerprints: Vec<(UvdKind, Fingerprint)>,
-        onboarding_id: OnboardingId,
+        onboarding_id: Option<OnboardingId>,
     ) -> Result<(), ApiError> {
         self.assert_is_locked(conn)?;
         let existing_fields = self.get_populated_fields();
@@ -486,7 +486,9 @@ impl UserVaultWrapper {
                     attributes: collected_data,
                 },
                 self.user_vault.id,
-                Some(onboarding_id),
+                // TODO point this at ScopedUser rather than Onboarding.
+                // Even identity data updates to vault-only users should make an audit trail log
+                onboarding_id,
             )?;
         }
 
@@ -672,6 +674,7 @@ impl UserVaultWrapper {
             .as_ref()
             .ok_or(UserError::NotAllowedOutsideOnboarding)?;
 
+        // Use the same seqno to deactivate old data and commit new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
 
         //
@@ -712,7 +715,6 @@ impl UserVaultWrapper {
             .collect();
         DataLifetime::bulk_commit_for_tenant(conn, lifetime_ids_to_commit, scoped_user_id.clone(), seqno)?;
 
-        // TODO set this seqno on the old data
         Ok(seqno)
     }
 }

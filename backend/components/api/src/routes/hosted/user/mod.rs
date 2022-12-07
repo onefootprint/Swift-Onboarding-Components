@@ -1,9 +1,6 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use crypto::aead::AeadSealedBytes;
-use db::{
-    models::{user_vault::UserVault},
-    HasDataAttributeFields,
-};
+use db::{models::user_vault::UserVault, HasDataAttributeFields};
 use newtypes::{Base64Data, DataAttribute, IdentityDocumentId, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;
@@ -61,14 +58,10 @@ pub struct DecryptDocumentResult {
 /// TODO: potentially move this to UVW
 pub async fn decrypt(
     state: &web::Data<State>,
-    user_vault: UserVault,
+    uvw: UserVaultWrapper,
     data_attributes: Vec<DataAttribute>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     // Filter out fields that don't have values set on the user vault
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| UserVaultWrapper::get_committed(conn, user_vault))
-        .await??;
     let (fields_to_decrypt, e_datas): (Vec<DataAttribute>, Vec<&SealedVaultBytes>) = data_attributes
         .iter()
         .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))

@@ -5,6 +5,7 @@ use crate::errors::ApiError;
 use crate::hosted::user::decrypt;
 use crate::hosted::user::DecryptFieldsResult;
 use crate::types::response::ResponseData;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use newtypes::DataAttribute;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -34,16 +35,16 @@ fn post(
         UserAuthScope::BasicProfile
     };
     let user_auth = user_auth.check_permissions(vec![required_scope])?;
+    let user_vault = user_auth.user_vault(&state.db_pool).await?;
+    let uvw = state
+        .db_pool
+        .db_query(|conn| UserVaultWrapper::get_committed(conn, user_vault))
+        .await??;
 
     let DecryptFieldsResult {
         decrypted_data_attributes: _,
         result_map,
-    } = decrypt(
-        &state,
-        user_auth.user_vault(&state.db_pool).await?,
-        request.attributes.clone(),
-    )
-    .await?;
+    } = decrypt(&state, uvw, request.attributes.clone()).await?;
 
     let result_map = result_map
         .into_iter()

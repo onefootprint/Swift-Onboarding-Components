@@ -4,6 +4,7 @@ import pytest
 
 from tests.constants import EMAIL, PHONE_NUMBER
 from tests.auth import FpAuth
+from tests.bifrost_client import BifrostClient
 from tests.utils import (
     _b64_decode,
     _b64_encode,
@@ -187,14 +188,14 @@ class TestBifrost:
         data.pop("speculative")
         post("hosted/user/data/identity", data, auth_token)
 
-        # Shouldn't be allowed to update fields that are already set
+        # Should be allowed to update speculative fields that are already set
         data = {
             "name": {
                 "first_name": "Flerp2",
                 "last_name": "Derp2",
             }
         }
-        post("hosted/user/data/identity", data, auth_token, status_code=400)
+        post("hosted/user/data/identity", data, auth_token)
 
     def test_add_email(self, auth_token):
         post("hosted/user/email", {"email": EMAIL}, auth_token)
@@ -516,42 +517,17 @@ class TestBifrostSandbox:
         expected_status,
         expected_requires_manual_review,
     ):
-        basic_user = create_basic_user(twilio, suffix)
-        user_data = build_user_data()
-
-        # Initialize the onboarding, poopulate data, authorize the onboarding
-        post(
-            "hosted/onboarding",
-            None,
-            workos_sandbox_tenant.ob_config().key,
-            basic_user.auth_token,
+        bifrost_client = BifrostClient(workos_sandbox_tenant)
+        bifrost_client.init_user_for_onboarding(
+            create_basic_user(twilio, suffix),
+            build_user_data(),
         )
-        post("hosted/user/data/identity", user_data, basic_user.auth_token)
-        post(
-            "hosted/onboarding/skip_liveness",
-            None,
-            workos_sandbox_tenant.ob_config().key,
-            basic_user.auth_token,
-        )
-        post(
-            "hosted/onboarding/submit",
-            None,
-            workos_sandbox_tenant.ob_config().key,
-            basic_user.auth_token,
-        )
-
-        body = post(
-            "hosted/onboarding/authorize",
-            None,
-            workos_sandbox_tenant.ob_config().key,
-            basic_user.auth_token,
-        )
-        validation_token = body["validation_token"]
+        user = bifrost_client.onboard_user_onto_tenant()
 
         # Get the status
         body = post(
             "onboarding/session/validate",
-            dict(validation_token=validation_token),
+            dict(validation_token=user.validation_token),
             workos_sandbox_tenant.sk.key,
         )
         assert body["status"] == expected_status

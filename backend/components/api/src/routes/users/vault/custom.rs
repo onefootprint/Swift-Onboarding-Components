@@ -15,7 +15,6 @@ use crate::{errors::ApiError, State};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::kv_data::KeyValueData;
-use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
 use db::TxnPgConnection;
@@ -53,9 +52,9 @@ pub async fn put(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (_, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let mut uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
-            put_internal(conn, &mut uvw, &tenant_auth, &scoped_user, insight, update)?;
+            let (scoped_user, _) = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
+            put_internal(conn, &uvw, &tenant_auth, &scoped_user, insight, update)?;
             Ok(())
         })
         .await?;
@@ -193,7 +192,7 @@ pub(super) async fn post_decrypt_internal(
     let (user_vault, scoped_user, results) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (_, scoped_user, _, _) = Onboarding::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let (scoped_user, _) = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
             let user_vault = UserVault::get(conn, &scoped_user.user_vault_id)?;
             let found = KeyValueData::get_all(conn, user_vault.id.clone(), tenant_id, &fields_copy)?;
             Ok((user_vault, scoped_user, found))

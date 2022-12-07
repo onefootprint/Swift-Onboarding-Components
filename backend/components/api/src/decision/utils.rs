@@ -23,6 +23,8 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
     uvw: UserVaultWrapper,
     ob_id: OnboardingId,
 ) -> ApiResult<ShouldInitiateVerificationRequests> {
+    // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
+    // phone number's sandbox suffix
     let decrypted_phone = if !uvw.user_vault.is_live {
         let phone_number = uvw.get_decrypted_primary_phone(state).await?;
         Some(phone_number)
@@ -57,7 +59,7 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             if ob.idv_reqs_initiated {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
-            ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
+            let ob = ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
 
             // Create ManualReview row if requested
             if create_manual_review {
@@ -72,7 +74,20 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
             // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
             let result = VerificationResult::create(conn, request.id, raw_response)?;
+
+            // If the decision is a pass, mark all data as verified for the onboarding
+            let seqno = if decision_status == DecisionStatus::Pass {
+                // TODO will this cause deadlock to lock onboarding AND uv?
+                let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob.scoped_user_id)?;
+                let seqno = uvw.commit_data_for_tenant(conn)?;
+                Some(seqno)
+            } else {
+                None
+            };
+
             // Create the decision itself
+            // TODO should we move the creation of the decision onto the locked UVW since we also
+            // commit the data there? Would dedupe this logic between tests + prod
             let new_decision = OnboardingDecisionCreateArgs {
                 user_vault_id: uvw.user_vault.id.clone(),
                 onboarding_id: ob_id,
@@ -81,7 +96,7 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
                 result_ids: vec![result.id],
                 annotation_id: None,
                 actor: DbActor::Footprint,
-                seqno: None,
+                seqno,
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 

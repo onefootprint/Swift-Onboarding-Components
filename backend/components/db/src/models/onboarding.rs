@@ -77,11 +77,6 @@ impl OnboardingUpdate {
 #[derive(Debug)]
 pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
-    FpUserId {
-        fp_user_id: &'a FootprintUserId,
-        tenant_id: &'a TenantId,
-        is_live: bool,
-    },
     UserId {
         id: &'a OnboardingId,
         user_vault_id: &'a UserVaultId,
@@ -95,16 +90,6 @@ pub enum OnboardingIdentifier<'a> {
 impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
     fn from(id: &'a OnboardingId) -> Self {
         Self::Id(id)
-    }
-}
-
-impl<'a> From<(&'a FootprintUserId, &'a TenantId, bool)> for OnboardingIdentifier<'a> {
-    fn from((fp_user_id, tenant_id, is_live): (&'a FootprintUserId, &'a TenantId, bool)) -> Self {
-        Self::FpUserId {
-            fp_user_id,
-            tenant_id,
-            is_live,
-        }
     }
 }
 
@@ -168,16 +153,6 @@ impl Onboarding {
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::FpUserId {
-                fp_user_id,
-                tenant_id,
-                is_live,
-            } => {
-                query = query
-                    .filter(scoped_user::fp_user_id.eq(fp_user_id))
-                    .filter(scoped_user::tenant_id.eq(tenant_id))
-                    .filter(scoped_user::is_live.eq(is_live))
-            }
             OnboardingIdentifier::UserId { id, user_vault_id } => {
                 query = query
                     .filter(onboarding::id.eq(id))
@@ -223,14 +198,16 @@ impl Onboarding {
     ) -> DbResult<BasicOnboardingInfo> {
         let scoped_user_ids = scoped_user::table
             .filter(scoped_user::fp_user_id.eq(fp_user_id))
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(is_live))
             .select(scoped_user::id);
-        onboarding::table
+        let ob = onboarding::table
             .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
             .for_no_key_update()
-            .load::<Onboarding>(conn.conn())?;
+            .first::<Onboarding>(conn.conn())?;
 
         // It's a bit precarious to make a FOR UPDATE statement with joins
-        Self::get(conn, (fp_user_id, tenant_id, is_live))
+        Self::get(conn, &ob.id)
     }
 
     pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> DbResult<Self> {

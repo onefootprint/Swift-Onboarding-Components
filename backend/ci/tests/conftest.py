@@ -1,4 +1,3 @@
-import json
 import requests
 import os
 import time
@@ -10,18 +9,14 @@ from .constants import (
     TWILIO_API_KEY,
     TWILIO_API_KEY_SECRET,
 )
-from .types import User
 from .utils import (
     IncorrectServerVersion,
-    override_webauthn_attestation,
-    override_webauthn_challenge,
     build_user_data,
     post,
     _make_request,
     create_tenant,
     create_basic_user,
 )
-from .webauthn_simulator import SoftWebauthnDevice
 from .bifrost_client import BifrostClient
 
 
@@ -105,6 +100,7 @@ def workos_sandbox_tenant(must_collect_data, can_access_data):
 
     return create_tenant(org_data, ob_data)
 
+
 @pytest.fixture
 def document_requesting_tenant(must_collect_data, can_access_data):
     org_data = {
@@ -121,11 +117,14 @@ def document_requesting_tenant(must_collect_data, can_access_data):
 
     return create_tenant(org_data, ob_data)
 
-# TODO: some document tests rely on having a fresh tenant each run, so 
+
+# TODO: some document tests rely on having a fresh tenant each run, so
 # rather than fix that now, just introduce a separate tenant appropriately
 # pytest scoped
 @pytest.fixture(scope="session")
-def document_requesting_sandbox_tenant_session_scoped(must_collect_data, can_access_data):
+def document_requesting_sandbox_tenant_session_scoped(
+    must_collect_data, can_access_data
+):
     org_data = {
         "name": "sandbox document tenant",
         "is_live": False,
@@ -140,6 +139,7 @@ def document_requesting_sandbox_tenant_session_scoped(must_collect_data, can_acc
     }
 
     return create_tenant(org_data, ob_data)
+
 
 @pytest.fixture(scope="session")
 def twilio():
@@ -160,8 +160,11 @@ def user(workos_sandbox_tenant, twilio):
     Create a user with registered data and webuathn creds and onboard them onto the workos_sandbox_tenant
     """
     bifrost_client = BifrostClient(workos_sandbox_tenant)
-    bifrost_client.init_user_for_onboarding(create_basic_user(twilio), build_user_data())
+    bifrost_client.init_user_for_onboarding(
+        create_basic_user(twilio), build_user_data()
+    )
     return bifrost_client.onboard_user_onto_tenant()
+
 
 @pytest.fixture(scope="module")
 def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twilio):
@@ -170,8 +173,11 @@ def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twili
     with document info as well
     """
     bifrost_client = BifrostClient(document_requesting_sandbox_tenant_session_scoped)
-    bifrost_client.init_user_for_onboarding(create_basic_user(twilio), build_user_data(), "both")
+    bifrost_client.init_user_for_onboarding(
+        create_basic_user(twilio), build_user_data(), "both"
+    )
     return bifrost_client.onboard_user_onto_tenant()
+
 
 @pytest.fixture(scope="module")
 def ob_session_token(workos_tenant):

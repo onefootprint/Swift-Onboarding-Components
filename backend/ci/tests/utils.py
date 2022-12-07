@@ -7,8 +7,7 @@ import arrow
 import time
 import os
 
-from .types import ObConfiguration, SecretApiKey, Tenant, BasicUser, User
-from .webauthn_simulator import SoftWebauthnDevice
+from .types import ObConfiguration, SecretApiKey, Tenant, BasicUser
 from .auth import DashboardAuth, FpAuth
 from .constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
 
@@ -133,8 +132,8 @@ def identify_verify(
     assert False, "Didn't find correct code for identify"
 
 
-def create_basic_user(twilio, suffix=None):
-    sandbox_phone_number, sandbox_email = _random_sandbox_info(suffix)
+def create_basic_user(twilio, suffix=None) -> BasicUser:
+    sandbox_phone_number = _random_sandbox_phone(suffix)
     phone_number = sandbox_phone_number.split("#")[0]
 
     # Initiate the challenge to a sandbox phone number
@@ -152,21 +151,12 @@ def create_basic_user(twilio, suffix=None):
         lambda: identify_verify(twilio, phone_number, challenge_token), 5
     )
 
-    user_data = {
-        "email": sandbox_email,
-    }
-    post(
-        "hosted/user/email",
-        user_data,
-        auth_token,
-    )
-
     return BasicUser(
         auth_token=auth_token,
-        email=sandbox_email,
         phone_number=sandbox_phone_number,
         real_phone_number=phone_number,
     )
+
 
 def create_inherited_non_sandbox_user(twilio):
     identifier = {"email": EMAIL}
@@ -280,10 +270,16 @@ def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
 
-def _random_sandbox_info(suffix=None):
+def _random_sandbox_phone(suffix=None):
     suffix = suffix or "sandbox"
     seed = _gen_random_n_digit_number(10)
-    return (f"{PHONE_NUMBER}#{suffix}{seed}", f"{EMAIL}#{suffix}{seed}")
+    return f"{PHONE_NUMBER}#{suffix}{seed}"
+
+
+def _sandbox_email(phone_number):
+    # Extract the suffix from an already generated sandbox phone number
+    suffix = phone_number.split("#")[-1]
+    return f"{EMAIL}#{suffix}"
 
 
 def _gen_random_ssn():
