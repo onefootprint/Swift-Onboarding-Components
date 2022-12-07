@@ -44,6 +44,7 @@ pub async fn build_idv_data_from_verification_request(
         city: decrypted_values.remove(&DataAttribute::City),
         state: decrypted_values.remove(&DataAttribute::State),
         zip: decrypted_values.remove(&DataAttribute::Zip),
+        country: decrypted_values.remove(&DataAttribute::Country),
         ssn4: decrypted_values.remove(&DataAttribute::Ssn4),
         ssn9: decrypted_values.remove(&DataAttribute::Ssn9),
         dob: decrypted_values.remove(&DataAttribute::Dob),

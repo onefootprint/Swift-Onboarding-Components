@@ -1,55 +1,52 @@
 use chrono::{DateTime, Utc};
-use newtypes::address::Address;
+use newtypes::dob::DateOfBirth;
 use newtypes::*;
 use std::fmt::Debug;
+
+use super::SocureConversionError;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SocureRequest {
+    // TODO: which fields are mandatory based on the modules we are using
     modules: Vec<String>,
     first_name: PiiString,
     sur_name: PiiString,
-    /// YYYY-MM-DD
-    dob: PiiString,
-    national_id: PiiString,
-    email: PiiString,
-    /// e164 format, from twilio
-    mobile_number: PiiString,
+    dob: Option<PiiString>, // YYYY-MM-DD
+    national_id: Option<PiiString>,
+    email: Option<PiiString>,
+    mobile_number: Option<PiiString>, // e164 format, from twilio
     physical_address: Option<PiiString>,
     physical_address_2: Option<PiiString>,
     city: Option<PiiString>,
-    state: Option<PiiString>,
-    zip: Option<PiiString>,
-    country: Option<PiiString>,
+    state: Option<PiiString>, // 2 digit ISO 3166-2
+    zip: Option<PiiString>,   // 5 or 9 digit
+    country: PiiString,
     user_consent: bool,
     consent_timestamp: DateTime<Utc>,
 }
 
 /// identify request and vec of modules we want to use
 impl SocureRequest {
-    pub fn new(modules: Vec<String>, request: IdentifyRequest) -> Result<Self, crate::SocureError> {
-        let IdentifyRequest {
+    // TODO: make this TryFrom<IdvData> instead
+    pub fn new(modules: Vec<String>, idv_data: IdvData) -> Result<Self, crate::socure::SocureError> {
+        let IdvData {
             first_name,
             last_name,
-            dob,
-            ssn,
-            email,
-            phone,
-            address,
-        } = request;
-
-        let Address {
-            address: street_address,
+            address_line1,
+            address_line2,
             city,
             state,
             zip,
             country,
-        } = address;
+            ssn4: _,
+            ssn9,
+            dob,
+            email,
+            phone_number,
+        } = idv_data;
 
-        // if street_address.is_none() {
-        //     return Err(crate::SocureConversionError::NoAddressPresent.into());
-        // }
-
+        // TODO: this zip code validation logic already existed- unsure if its entirely necessary:
         // per socure API, zip code must either be 5 or 9 digits. hyphens
         // are optional, but it can't contain spaces (which we allow)
         // filter only for digits & check length before sending
@@ -59,28 +56,31 @@ impl SocureRequest {
         //     return Err(crate::SocureConversionError::UnsupportedZipFormat.into());
         // }
 
+        let first_name = first_name.ok_or(SocureConversionError::MissingFirstName)?;
+        let last_name = last_name.ok_or(SocureConversionError::MissingLastName)?;
+        let country = country.ok_or(SocureConversionError::MissingCountry)?;
+
+        let dob = dob
+            .map(|dob| DateOfBirth::try_from(dob).map_err(|_| SocureConversionError::CantParseDob))
+            .transpose()?
+            .map(|dob| dob.yyyy_mm_dd());
+
         Ok(Self {
             modules,
-            first_name: first_name.into(),
-            sur_name: last_name.into(),
-            dob: dob.yyyy_mm_dd(),
-            national_id: ssn.into(),
-            email: email.into(),
-            mobile_number: phone.into(),
-            // no restrictions on physical address
-            physical_address: street_address.as_ref().map(|s| s.street_address.clone().into()),
-            physical_address_2: street_address
-                .as_ref()
-                .and_then(|s| s.street_address_2.clone().map(|s2| s2.into())),
-            // no restrictions on city
-            city: city.map(PiiString::from),
-            // state is already 2 digit us state
-            state: state.map(PiiString::from),
-            zip: zip.map(PiiString::from),
-            // country is already 2 digit country code
-            country: country.map(PiiString::from),
-            user_consent: true,
-            consent_timestamp: Utc::now(),
+            first_name,
+            sur_name: last_name,
+            dob,
+            national_id: ssn9,
+            email,
+            mobile_number: phone_number,
+            physical_address: address_line1,
+            physical_address_2: address_line2,
+            city,
+            state,
+            zip,
+            country,
+            user_consent: true, // TODO: can we hardcode to true or do we need to more explicitly route the users consent to here
+            consent_timestamp: Utc::now(), // TODO: same as above
         })
     }
 }

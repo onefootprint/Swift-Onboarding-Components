@@ -9,6 +9,7 @@ pub struct IdvData {
     pub city: Option<PiiString>,
     pub state: Option<PiiString>,
     pub zip: Option<PiiString>,
+    pub country: Option<PiiString>,
     pub ssn4: Option<PiiString>,
     pub ssn9: Option<PiiString>,
     pub dob: Option<PiiString>,

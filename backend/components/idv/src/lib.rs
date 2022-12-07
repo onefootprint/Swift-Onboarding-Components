@@ -5,6 +5,7 @@ use idology::verification::IDologyResponse;
 use newtypes::Vendor;
 
 pub mod idology;
+pub mod socure;
 pub mod test_fixtures;
 pub mod twilio;
 

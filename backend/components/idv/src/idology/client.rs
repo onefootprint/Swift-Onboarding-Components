@@ -47,6 +47,7 @@ impl TryFrom<IdvData> for IdologyRequestData {
             city,
             state,
             zip,
+            country: _,
             ssn4,
             ssn9,
             dob,

@@ -21,7 +21,6 @@ mod state;
 mod types;
 mod utils;
 
-
 use crate::errors::ApiError;
 use paperclip::actix::{web, OpenApiExt};
 
