@@ -45,11 +45,9 @@ const NavigationCloseButton = ({
   };
 
   return (
-    <IconButton
-      aria-label="Close window"
-      iconComponent={IcoClose24}
-      onClick={handleClick}
-    />
+    <IconButton aria-label="Close window" onClick={handleClick}>
+      <IcoClose24 />
+    </IconButton>
   );
 };
 

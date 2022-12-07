@@ -35,7 +35,7 @@ type BaseDialogProps = {
 const BaseDialog = ({
   children,
   closeAriaLabel = 'Close',
-  closeIconComponent = IcoClose24,
+  closeIconComponent: CloseIcon = IcoClose24,
   linkButton = undefined,
   onClose,
   open,
@@ -69,11 +69,9 @@ const BaseDialog = ({
           >
             <Header>
               <CloseContainer>
-                <IconButton
-                  aria-label={closeAriaLabel}
-                  iconComponent={closeIconComponent}
-                  onClick={onClose}
-                />
+                <IconButton aria-label={closeAriaLabel} onClick={onClose}>
+                  <CloseIcon />
+                </IconButton>
               </CloseContainer>
               <Typography variant="label-2">{title}</Typography>
             </Header>

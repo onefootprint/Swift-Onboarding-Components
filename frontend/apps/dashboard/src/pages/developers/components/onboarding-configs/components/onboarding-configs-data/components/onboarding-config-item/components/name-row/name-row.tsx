@@ -26,11 +26,9 @@ const NameRow = ({ data, onEdit }: NameRowProps) => {
       <th>
         <Name>
           <Typography variant="label-2">{name}</Typography>
-          <IconButton
-            aria-label={t('edit')}
-            iconComponent={IcoPencil16}
-            onClick={onEdit}
-          />
+          <IconButton aria-label={t('edit')} onClick={onEdit}>
+            <IcoPencil16 />
+          </IconButton>
         </Name>
         <Typography variant="body-4" color="secondary">
           {t('created-at', { date: createdAt })}

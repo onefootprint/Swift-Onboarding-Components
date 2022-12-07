@@ -18,7 +18,7 @@ export default {
       description: 'Callback function triggered upon click',
       required: false,
     },
-    iconComponent: {
+    children: {
       control: 'select',
       description: 'Icon to be rendered',
       name: 'Icon *',
@@ -43,16 +43,17 @@ const Template: Story<IconButtonProps> = ({
   <IconButton
     aria-label={ariaLabel}
     disabled={disabled}
-    iconComponent={IcoClose24}
     onClick={onClick}
     testID={testID}
-  />
+  >
+    <IcoClose24 color="tertiary" />
+  </IconButton>
 );
 
 export const Base = Template.bind({});
 Base.args = {
   'aria-label': 'Close',
-  iconComponent: IcoClose24,
+  children: <IcoClose24 />,
   onClick: console.log,
   testID: 'icon-button-test-id',
 };

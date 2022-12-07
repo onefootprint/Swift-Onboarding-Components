@@ -7,11 +7,9 @@ export type NavigationBackButtonProps = {
 };
 
 const NavigationBackButton = ({ onClick }: NavigationBackButtonProps) => (
-  <IconButton
-    aria-label="Go back"
-    iconComponent={IcoChevronLeftBig24}
-    onClick={onClick}
-  />
+  <IconButton aria-label="Go back" onClick={onClick}>
+    <IcoChevronLeftBig24 />
+  </IconButton>
 );
 
 export default NavigationBackButton;

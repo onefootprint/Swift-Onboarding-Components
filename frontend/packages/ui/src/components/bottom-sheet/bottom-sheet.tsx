@@ -78,11 +78,9 @@ const BottomSheet = ({
         >
           <Header hasBorder={!!title}>
             <CloseContainer onClick={onClose}>
-              <IconButton
-                aria-label={closeAriaLabel}
-                iconComponent={IcoClose24}
-                onClick={onClose}
-              />
+              <IconButton aria-label={closeAriaLabel} onClick={onClose}>
+                <IcoClose24 />
+              </IconButton>
             </CloseContainer>
             {title && <Typography variant="label-2">{title}</Typography>}
           </Header>

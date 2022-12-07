@@ -20,11 +20,9 @@ const Header = () => {
             Footprint
           </Typography>
         </FootprintLogoContainer>
-        <IconButton
-          iconComponent={IcoUser24}
-          onClick={handleClick}
-          aria-label="account"
-        />
+        <IconButton onClick={handleClick} aria-label="account">
+          <IcoUser24 />
+        </IconButton>
       </Inner>
     </Container>
   );

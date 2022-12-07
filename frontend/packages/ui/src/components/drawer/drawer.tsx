@@ -24,7 +24,7 @@ export type DrawerProps = {
 const Drawer = ({
   children,
   closeAriaLabel = 'Close',
-  closeIconComponent = IcoClose24,
+  closeIconComponent: CloseIconComponent = IcoClose24,
   onClose,
   open,
   testID,
@@ -53,11 +53,9 @@ const Drawer = ({
           >
             <Header>
               <CloseContainer>
-                <IconButton
-                  aria-label={closeAriaLabel}
-                  iconComponent={closeIconComponent}
-                  onClick={onClose}
-                />
+                <IconButton aria-label={closeAriaLabel} onClick={onClose}>
+                  <CloseIconComponent />
+                </IconButton>
               </CloseContainer>
               <Typography variant="label-2" as="h2">
                 {title}

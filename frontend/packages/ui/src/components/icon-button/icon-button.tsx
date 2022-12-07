@@ -6,7 +6,7 @@ import { createOverlayBackground } from '../../utils/mixins';
 
 export type IconButtonProps = {
   'aria-label': string;
-  iconComponent: Icon;
+  children: React.ReactElement<Icon>;
   onClick?: () => void;
   disabled?: boolean;
   testID?: string;
@@ -16,7 +16,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (
     {
       'aria-label': ariaLabel,
-      iconComponent: Icon,
+      children,
       onClick,
       disabled,
       testID,
@@ -32,7 +32,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       type="button"
       disabled={disabled}
     >
-      <Icon color="primary" />
+      {children}
     </Container>
   ),
 );

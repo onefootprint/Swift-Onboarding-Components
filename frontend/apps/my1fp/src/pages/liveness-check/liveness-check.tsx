@@ -45,11 +45,9 @@ const LivenessCheck = ({ onClose }: LivenessCheckProps) => {
           >
             <Header>
               <CloseContainer>
-                <IconButton
-                  aria-label="Close"
-                  iconComponent={IcoClose24}
-                  onClick={onClose}
-                />
+                <IconButton aria-label="Close" onClick={onClose}>
+                  <IcoClose24 />
+                </IconButton>
               </CloseContainer>
             </Header>
             <Body>

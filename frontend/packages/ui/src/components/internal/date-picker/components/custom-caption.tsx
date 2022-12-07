@@ -14,18 +14,20 @@ const CustomCaption = ({ displayMonth }: CaptionProps) => {
       <IconButton
         aria-label="Previous"
         disabled={!previousMonth}
-        iconComponent={IcoChevronLeft24}
         onClick={() => previousMonth && goToMonth(previousMonth)}
-      />
+      >
+        <IcoChevronLeft24 />
+      </IconButton>
       <Typograhy variant="label-2" as="h2">
         {format(displayMonth, 'MMM yyy')}
       </Typograhy>
       <IconButton
         aria-label="Next"
         disabled={!nextMonth}
-        iconComponent={IcoChevronRight24}
         onClick={() => nextMonth && goToMonth(nextMonth)}
-      />
+      >
+        <IcoChevronRight24 />
+      </IconButton>
     </CaptionContainer>
   );
 };
