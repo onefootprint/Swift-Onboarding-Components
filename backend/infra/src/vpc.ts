@@ -33,7 +33,10 @@ const NUM_AZ = 2;
 const DEFAULT_CIDR_BLOCK = '10.0.0.0/16';
 const DEV_CIDR_BLOCK = '10.1.0.0/16';
 const PROD_CIDR_BLOCK = '10.2.0.0/16';
-const STACK_CIDR_BLOCK = '10.3.0.0/16';
+const DEV_EPHEMERAL_NAT_IDS = [
+  'nat-0759ff9be4fc255ad',
+  'nat-0e8aa04bcde0b6a8f',
+];
 
 export async function CreateRegionalVPC(
   stackMetadata: StackMetadata,
@@ -49,15 +52,12 @@ export async function CreateRegionalVPC(
 
   let vpc: awsx.ec2.Vpc;
   let cidrBlock: string;
-  let natGateways: aws.ec2.NatGateway[];
+  let natGateways: aws.ec2.NatGateway[] = [];
 
   // use default dev-ephemeral VPC for ephemeral environments (this is fixed to footprint dev account)
   if (stackMetadata.environment === StackEnvironment.DevEphemeral) {
     cidrBlock = DEFAULT_CIDR_BLOCK;
-
-    const natGatewayIds = ['nat-0759ff9be4fc255ad', 'nat-0e8aa04bcde0b6a8f'];
-
-    natGateways = natGatewayIds.map(ngId => {
+    natGateways = DEV_EPHEMERAL_NAT_IDS.map(ngId => {
       return aws.ec2.NatGateway.get(`ng-${ngId}`, ngId);
     });
 
@@ -74,23 +74,28 @@ export async function CreateRegionalVPC(
           'subnet-0451c81e3508c50f0',
         ],
         internetGatewayId: 'igw-06ceacc83403de268',
-        natGatewayIds,
+        natGatewayIds: DEV_EPHEMERAL_NAT_IDS,
       },
       { provider },
     );
   } else {
     // otherwise create an isolated VPC
     const vpcStack = `vpc-${stack}-${region}`;
-    let protect: boolean = true;
 
-    if (stack === 'prod') {
-      cidrBlock = PROD_CIDR_BLOCK;
-    } else if (stack === 'dev') {
-      cidrBlock = DEV_CIDR_BLOCK;
-    } else {
-      cidrBlock = STACK_CIDR_BLOCK;
-      // don't protect unknown stack vpcs
-      protect = false;
+    switch (stackMetadata.environment) {
+      case StackEnvironment.Dev: {
+        cidrBlock = DEV_CIDR_BLOCK;
+
+        // include our dev-ephemeral egress records on dev
+        natGateways = DEV_EPHEMERAL_NAT_IDS.map(ngId => {
+          return aws.ec2.NatGateway.get(`ng-${ngId}`, ngId);
+        });
+        break;
+      }
+      case StackEnvironment.Prod: {
+        cidrBlock = PROD_CIDR_BLOCK;
+        break;
+      }
     }
 
     vpc = new awsx.ec2.Vpc(
@@ -100,12 +105,14 @@ export async function CreateRegionalVPC(
         numberOfAvailabilityZones: NUM_AZ,
         cidrBlock,
       },
-      { provider, protect: config.deletionProtection || protect },
+      { provider, protect: true },
     );
 
-    natGateways = (await vpc.natGateways).map(ng => {
-      return ng.natGateway;
-    });
+    natGateways.push(
+      ...(await vpc.natGateways).map(ng => {
+        return ng.natGateway;
+      }),
+    );
   }
 
   await createEgressDnsRecord(natGateways, dnsConfig, provider);
