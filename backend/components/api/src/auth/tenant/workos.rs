@@ -12,7 +12,7 @@ use db::{
 use newtypes::{DataAttribute, TenantPermission, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
-use super::{CheckTenantPermissions, TenantAuth};
+use super::{AuthActor, CheckTenantPermissions, TenantAuth};
 
 #[derive(Debug, Clone)]
 pub struct WorkOs {
@@ -154,7 +154,7 @@ impl TenantAuth for SessionContext<WorkOs> {
         self.data.format_principal()
     }
 
-    fn tenant_user(&self) -> Option<&TenantUser> {
-        Some(&self.data.tenant_user)
+    fn actor(&self) -> AuthActor {
+        AuthActor::from(self.data.tenant_user.id.clone())
     }
 }

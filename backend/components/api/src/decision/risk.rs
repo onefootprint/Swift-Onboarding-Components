@@ -1,4 +1,4 @@
-use newtypes::{DecisionStatus, OnboardingId};
+use newtypes::{DbActor, DecisionStatus, OnboardingId};
 
 use db::models::{
     manual_review::ManualReview,
@@ -33,10 +33,10 @@ pub async fn create_final_decision(
                 user_vault_id: scoped_user.user_vault_id,
                 onboarding_id: ob_id.clone(),
                 logic_git_hash: crate::GIT_HASH.to_string(),
-                tenant_user_id: None,
                 status: decision.decision_status,
                 result_ids: features.verification_results(),
                 annotation_id: None,
+                actor: DbActor::Footprint,
             };
             OnboardingDecision::create(conn, onboarding_decision)?;
 

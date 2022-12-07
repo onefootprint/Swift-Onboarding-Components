@@ -67,9 +67,9 @@ impl Drop for TestContext {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use newtypes::{Fingerprint, SealedVaultBytes};
     use crate::models::email::Email;
     use crate::test::test_user_vault;
+    use newtypes::{Fingerprint, SealedVaultBytes};
 
     /// This test shows an example of how to use the test context
     /// When dropping the context, the database is deleted

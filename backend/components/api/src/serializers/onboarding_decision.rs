@@ -1,14 +1,17 @@
 use api_wire_types::Actor;
-use db::models::{
-    ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, tenant_user::TenantUser,
-    verification_request::VerificationRequest,
+use db::{
+    actor::SaturatedActor,
+    models::{
+        ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, tenant_user::TenantUser,
+        verification_request::VerificationRequest,
+    },
 };
 
 use crate::utils::db2api::DbToApi;
 
-impl DbToApi<(OnboardingDecision, Option<TenantUser>)> for api_wire_types::OnboardingDecision {
-    fn from_db((decision, tenant_user): (OnboardingDecision, Option<TenantUser>)) -> Self {
-        Self::from_db((decision, None, None, tenant_user))
+impl DbToApi<(OnboardingDecision, SaturatedActor)> for api_wire_types::OnboardingDecision {
+    fn from_db((decision, saturated_db_actor): (OnboardingDecision, SaturatedActor)) -> Self {
+        Self::from_db((decision, None, None, saturated_db_actor))
     }
 }
 
@@ -16,11 +19,11 @@ type OnboardingDecisionInfo = (
     OnboardingDecision,
     Option<ObConfiguration>,
     Option<Vec<VerificationRequest>>,
-    Option<TenantUser>,
+    SaturatedActor,
 );
 
 impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
-    fn from_db((decision, ob_configuration, vrs, tenant_user): OnboardingDecisionInfo) -> Self {
+    fn from_db((decision, ob_configuration, vrs, saturated_db_actor): OnboardingDecisionInfo) -> Self {
         let OnboardingDecision {
             id,
             status,
@@ -32,7 +35,7 @@ impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
             id,
             status,
             timestamp: created_at,
-            source: Actor::from_db(tenant_user),
+            source: Actor::from_db(saturated_db_actor),
             ob_configuration: ob_configuration.map(api_wire_types::LiteObConfiguration::from_db),
             vendors,
         }

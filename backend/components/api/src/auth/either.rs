@@ -121,10 +121,10 @@ where
         }
     }
 
-    fn tenant_user(&self) -> Option<&TenantUser> {
+    fn actor(&self) -> super::tenant::AuthActor {
         match self {
-            Either::Left(l) => l.tenant_user(),
-            Either::Right(r) => r.tenant_user(),
+            Either::Left(l) => l.actor(),
+            Either::Right(r) => r.actor(),
         }
     }
 }

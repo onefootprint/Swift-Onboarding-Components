@@ -1,4 +1,5 @@
 mod access_event_kind;
+mod actor;
 mod attestation_type;
 mod collected_data;
 mod compliance_status;
@@ -23,7 +24,7 @@ mod vendor;
 mod verification_status;
 
 pub use self::{
-    access_event_kind::*, attestation_type::*, collected_data::*, compliance_status::*,
+    access_event_kind::*, actor::*, attestation_type::*, collected_data::*, compliance_status::*,
     d2p_session_status::*, data_attribute::*, data_identifier::*, data_priority::*, decision_status::*,
     document_request_status::*, fingerprint::*, footprint_reason_code::*, liveness_source::*,
     ob_config_status::*, onboarding_status::*, org_member_email::*, requirement_status::*, sealed_bytes::*,

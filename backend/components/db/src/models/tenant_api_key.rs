@@ -157,12 +157,12 @@ impl TenantApiKey {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_key)]
-struct NewTenantApiKey {
-    name: String,
-    sh_secret_api_key: Fingerprint,
-    e_secret_api_key: SealedVaultBytes,
-    tenant_id: TenantId,
-    is_live: bool,
-    status: ApiKeyStatus,
-    created_at: DateTime<Utc>,
+pub struct NewTenantApiKey {
+    pub name: String,
+    pub sh_secret_api_key: Fingerprint,
+    pub e_secret_api_key: SealedVaultBytes,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
+    pub status: ApiKeyStatus,
+    pub created_at: DateTime<Utc>,
 }

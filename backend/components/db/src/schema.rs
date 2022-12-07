@@ -27,9 +27,9 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         scoped_user_id -> Text,
-        tenant_user_id -> Nullable<Text>,
         note -> Text,
         is_pinned -> Bool,
+        actor -> Jsonb,
     }
 }
 
@@ -204,7 +204,7 @@ table! {
         onboarding_id -> Uuid,
         completed_at -> Nullable<Timestamptz>,
         completed_by_decision_id -> Nullable<Text>,
-        completed_by_tenant_user_id -> Nullable<Text>,
+        completed_by_actor -> Nullable<Jsonb>,
     }
 }
 
@@ -254,12 +254,12 @@ table! {
         id -> Text,
         onboarding_id -> Uuid,
         logic_git_hash -> Text,
-        tenant_user_id -> Nullable<Text>,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
         status -> Text,
+        actor -> Jsonb,
     }
 }
 
@@ -536,7 +536,6 @@ table! {
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(annotation -> scoped_user (scoped_user_id));
-joinable!(annotation -> tenant_user (tenant_user_id));
 joinable!(document_request -> onboarding (onboarding_id));
 joinable!(email -> user_vault (user_vault_id));
 joinable!(fingerprint -> user_vault (user_vault_id));
@@ -549,13 +548,11 @@ joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> onboarding (onboarding_id));
 joinable!(manual_review -> onboarding (onboarding_id));
 joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
-joinable!(manual_review -> tenant_user (completed_by_tenant_user_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
 joinable!(onboarding -> scoped_user (scoped_user_id));
 joinable!(onboarding_decision -> onboarding (onboarding_id));
-joinable!(onboarding_decision -> tenant_user (tenant_user_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
 joinable!(phone_number -> user_vault (user_vault_id));

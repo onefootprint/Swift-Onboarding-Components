@@ -15,12 +15,14 @@ use crate::State;
 
 use actix_web::web::Json;
 use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
+use db::actor::SaturatedActor;
 use db::models::annotation::Annotation;
+use db::models::annotation::AnnotationInfo;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
 use db::DbError;
 use newtypes::AnnotationId;
-use newtypes::AnnotationInfo;
+use newtypes::DbActor;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
 use paperclip::actix::Apiv2Schema;
@@ -120,25 +122,26 @@ pub fn post(
     request.validate()?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
-
-    let tenant_user = auth.tenant_user();
-    let tenant_user_id = tenant_user.map(|tu| tu.id.clone());
+    let auth_actor = auth.actor();
 
     let CreateAnnotationRequest { note, is_pinned } = request.into_inner();
 
     let footprint_user_id = footprint_user_id.into_inner();
 
-    let annotation = state
+    // TODO: should possibly make this route handler dumber and move these DB operations into a helper function, ie MakeAnnotation::call(note,is_pinned,footprint_user_id,auth_actor)
+    //   we can call this from tests, from future spots where we want to create annotations (eg: decision engine)
+    let annotation: AnnotationInfo = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let scoped_user = ScopedUser::get(conn, tenant_id, footprint_user_id, is_live)?;
 
-            let annotation = Annotation::create(conn, note, is_pinned, scoped_user.id, tenant_user_id)?;
+            let annotation: AnnotationInfo =
+                Annotation::create(conn, note, is_pinned, scoped_user.id, auth_actor)?;
 
             UserTimeline::create(
                 conn,
-                AnnotationInfo {
-                    annotation_id: annotation.id.clone(),
+                newtypes::AnnotationInfo {
+                    annotation_id: annotation.0.id.clone(),
                 },
                 scoped_user.user_vault_id,
                 None,
@@ -148,6 +151,6 @@ pub fn post(
         })
         .await?;
 
-    let result = api_wire_types::Annotation::from_db((annotation, tenant_user.cloned()));
+    let result = api_wire_types::Annotation::from_db(annotation);
     ResponseData::ok(result).json()
 }

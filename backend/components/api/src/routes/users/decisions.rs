@@ -11,6 +11,7 @@ use db::models::annotation::Annotation;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
+use newtypes::DbActor;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -28,13 +29,10 @@ pub async fn post(
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::ManualReview])?;
     let tenant_id = auth.tenant().id.clone();
-    let tenant_user_id = auth
-        .tenant_user()
-        .ok_or(TenantError::TenantUserDoesNotExist)?
-        .id
-        .clone();
+    let actor = auth.actor();
     let is_live = auth.is_live()?;
     let fp_user_id = fp_user_id.into_inner();
+    let actor = auth.actor();
 
     let DecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },
@@ -57,7 +55,7 @@ pub async fn post(
             }
             // If a manual review will be cleared or we will create a new decision, the operation
             // is not a no-op and we should create an annotation in the DB
-            let annotation = Annotation::create(conn, note, is_pinned, su.id, Some(tenant_user_id.clone()))?;
+            let annotation = Annotation::create(conn, note, is_pinned, su.id, actor.clone())?;
 
             let decision = if status_changed {
                 // Create a new decision if the status is different
@@ -65,10 +63,10 @@ pub async fn post(
                     user_vault_id: su.user_vault_id,
                     onboarding_id: ob.id,
                     logic_git_hash: crate::GIT_HASH.to_string(),
-                    tenant_user_id: Some(tenant_user_id.clone()),
                     result_ids: vec![],
                     status: status.into(),
-                    annotation_id: Some(annotation.id),
+                    annotation_id: Some(annotation.0.id),
+                    actor: DbActor::from(actor.clone()),
                 };
                 let decision = OnboardingDecision::create(conn, new_decision)?;
                 Some(decision)
@@ -79,7 +77,7 @@ pub async fn post(
 
             // If there is an outstanding review, creating this override decision clears it
             if let Some(manual_review) = manual_review {
-                manual_review.complete(conn, tenant_user_id, decision.map(|d| d.id))?;
+                manual_review.complete(conn, actor.clone(), decision.map(|d| d.id))?;
             }
 
             Ok(())

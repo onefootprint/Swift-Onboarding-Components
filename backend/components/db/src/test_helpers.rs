@@ -1,4 +1,4 @@
-use crate::{run_migrations, DbPool};
+use crate::{run_migrations, DbPool, TxnPgConnection};
 use diesel::{Connection, PgConnection};
 use std::sync::Once;
 

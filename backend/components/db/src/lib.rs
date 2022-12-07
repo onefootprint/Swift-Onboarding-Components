@@ -34,6 +34,7 @@ use strum::IntoEnumIterator;
 pub mod schema;
 
 pub mod access_event;
+pub mod actor;
 pub mod scoped_user;
 pub mod tenant;
 pub mod user_vault;

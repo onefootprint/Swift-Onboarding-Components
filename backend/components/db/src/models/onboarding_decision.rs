@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
+use crate::actor::SaturatedActor;
 use crate::models::verification_request::VerificationRequest;
 use crate::TxnPgConnection;
 use crate::{
+    actor,
     schema::{onboarding_decision, onboarding_decision_verification_result_junction},
     DbResult,
 };
@@ -11,7 +13,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    AnnotationId, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId,
+    AnnotationId, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId,
     OnboardingStatus, TenantUserId, UserVaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
@@ -27,12 +29,12 @@ pub struct OnboardingDecision {
     pub id: OnboardingDecisionId,
     pub onboarding_id: OnboardingId,
     pub logic_git_hash: String,
-    pub tenant_user_id: Option<TenantUserId>,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
     pub status: DecisionStatus,
+    pub actor: DbActor,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -40,9 +42,9 @@ pub struct OnboardingDecision {
 struct NewOnboardingDecisionRow {
     onboarding_id: OnboardingId,
     logic_git_hash: String,
-    tenant_user_id: Option<TenantUserId>,
     created_at: DateTime<Utc>,
     status: DecisionStatus,
+    actor: DbActor,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -57,17 +59,17 @@ pub struct OnboardingDecisionCreateArgs {
     pub user_vault_id: UserVaultId,
     pub onboarding_id: OnboardingId,
     pub logic_git_hash: String,
-    pub tenant_user_id: Option<TenantUserId>,
     pub status: DecisionStatus,
     pub result_ids: Vec<VerificationResultId>,
     pub annotation_id: Option<AnnotationId>,
+    pub actor: DbActor,
 }
 
 pub type SaturatedOnboardingDecisionInfo = (
     OnboardingDecision,
     ObConfiguration,
     Vec<VerificationRequest>,
-    Option<TenantUser>,
+    SaturatedActor,
 );
 
 impl OnboardingDecision {
@@ -90,9 +92,9 @@ impl OnboardingDecision {
         let new = NewOnboardingDecisionRow {
             onboarding_id: args.onboarding_id.clone(),
             logic_git_hash: args.logic_git_hash,
-            tenant_user_id: args.tenant_user_id,
             created_at: Utc::now(),
             status: args.status,
+            actor: args.actor,
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)
@@ -131,14 +133,16 @@ impl OnboardingDecision {
         use crate::schema::{
             ob_configuration, onboarding, tenant_user, verification_request, verification_result,
         };
-        let results: Vec<(Self, (Onboarding, ObConfiguration), Option<TenantUser>)> =
-            onboarding_decision::table
-                .inner_join(onboarding::table.inner_join(ob_configuration::table))
-                .left_join(tenant_user::table)
-                .filter(onboarding_decision::id.eq_any(ids))
-                .get_results(conn)?;
+        let results: Vec<(Self, (Onboarding, ObConfiguration))> = onboarding_decision::table
+            .inner_join(onboarding::table.inner_join(ob_configuration::table))
+            .filter(onboarding_decision::id.eq_any(ids))
+            .get_results(conn)?;
 
-        let decision_ids: Vec<_> = results.iter().map(|(decision, _, _)| &decision.id).collect();
+        let onboarding_decisions: Vec<OnboardingDecision> =
+            results.clone().into_iter().map(|r| r.0).collect();
+        let onboarding_decisions_with_actors = actor::saturate_actors(conn, onboarding_decisions)?;
+
+        let decision_ids: Vec<_> = results.iter().map(|(decision, _)| &decision.id).collect();
 
         // Get VRs associated with each decision
         let vrs = onboarding_decision_verification_result_junction::table
@@ -154,19 +158,22 @@ impl OnboardingDecision {
             .into_iter()
             .into_group_map();
 
-        let results = results
+        let result_map = results
             .into_iter()
-            .map(|(ob_decision, (_, ob_config), tenant_user)| {
-                (
-                    ob_decision.clone(),
-                    ob_config,
-                    vrs.get(&ob_decision.id).unwrap_or(&vec![]).clone(),
-                    tenant_user,
-                )
-            })
+            .zip(onboarding_decisions_with_actors.into_iter())
+            .map(
+                |((onboarding_decision, (onboarding, onboarding_configuration)), (_, saturated_db_actor))| {
+                    (
+                        onboarding_decision.clone(),
+                        onboarding_configuration,
+                        vrs.get(&onboarding_decision.id).unwrap_or(&vec![]).clone(),
+                        saturated_db_actor,
+                    )
+                },
+            )
             .map(|d| (d.0.id.clone(), d))
             .collect();
 
-        Ok(results)
+        Ok(result_map)
     }
 }

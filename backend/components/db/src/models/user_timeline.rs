@@ -127,7 +127,7 @@ impl UserTimeline {
                             decisions.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
                             e.annotation_id
                                 .as_ref()
-                                .map(|a_id| annotations.remove(a_id).ok_or(DbError::RelatedObjectNotFound))
+                                .map(|a_id| annotations.remove(a_id).ok_or(DbError::RelatedObjectNotFound)) // TODO: annotations.remove here and in a below match is sketch, could replace with .get.clone
                                 .transpose()?,
                         )
                     }
@@ -153,5 +153,136 @@ impl UserTimeline {
             .collect::<DbResult<Vec<_>>>()?;
 
         Ok(results)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use newtypes::{DbActor, Fingerprint, SealedVaultBytes};
+
+    use super::*;
+    use crate::actor::SaturatedActor;
+    use crate::models::tenant_api_key::TenantApiKey;
+    use crate::test::{
+        test_annotation, test_tenant, test_tenant_admin_role, test_tenant_api_key, test_tenant_user,
+        test_user_vault,
+    };
+    use crate::test_helpers::test_db_pool;
+
+    #[tokio::test]
+    async fn test_list() -> Result<(), DbError> {
+        // TODO: wrap this in a fat db_transaction and refac test_ methods to take in a conn not a db_poo
+        test_db_pool()
+            .db_test_transaction(move |conn| -> Result<(), DbError> {
+                let is_live = true;
+                let user_vault = test_user_vault(conn, true);
+                let tenant = test_tenant(conn);
+
+                let tenant_role = test_tenant_admin_role(conn, tenant.id.clone());
+                let scoped_user =
+                    ScopedUser::get_or_create(conn, user_vault.id.clone(), tenant.id.clone(), is_live)
+                        .unwrap();
+
+                let tenant_user1 = test_tenant_user(
+                    conn,
+                    String::from("tu1@acme.com"),
+                    tenant.id.clone(),
+                    tenant_role.id.clone(),
+                );
+                let tenant_user2 = test_tenant_user(
+                    conn,
+                    String::from("tu2@acme.com"),
+                    tenant.id.clone(),
+                    tenant_role.id.clone(),
+                );
+
+                let annotation1 = test_annotation(
+                    conn,
+                    String::from("yo sup"),
+                    false,
+                    scoped_user.id.clone(),
+                    user_vault.id.clone(),
+                    DbActor::TenantUser {
+                        id: tenant_user1.id.clone(),
+                    },
+                )
+                .0;
+
+                let annotation2 = test_annotation(
+                    conn,
+                    String::from("yo sup"),
+                    false,
+                    scoped_user.id.clone(),
+                    user_vault.id.clone(),
+                    DbActor::TenantUser {
+                        id: tenant_user2.id.clone(),
+                    },
+                )
+                .0;
+
+                let tenant_api_key =
+                    test_tenant_api_key(conn, String::from("test key"), tenant.id.clone(), is_live);
+
+                let user_vault_id = user_vault.id.clone();
+                let annotation3 = test_annotation(
+                    conn,
+                    String::from("yo sup"),
+                    false,
+                    scoped_user.id.clone(),
+                    user_vault_id,
+                    DbActor::TenantApiKey {
+                        id: tenant_api_key.id.clone(),
+                    },
+                )
+                .0;
+
+                let user_timeline_infos =
+                    UserTimeline::list(conn, scoped_user.fp_user_id, tenant.id, is_live).unwrap();
+
+                assert_eq!(3, user_timeline_infos.len());
+
+                // TODO: what is the sane way to do equality checks in tests in Rust
+                let ut1 = match &user_timeline_infos[0].1 {
+                    SaturatedTimelineEvent::Annotation(a) => a,
+                    _ => unreachable!(),
+                };
+                assert_eq!(ut1.0.id, annotation1.id);
+                match ut1.1 {
+                    SaturatedActor::TenantUser(ref tenant_user) => {
+                        assert_eq!(tenant_user.id, tenant_user1.id)
+                    }
+                    _ => unreachable!(),
+                };
+
+                let ut2 = match &user_timeline_infos[1].1 {
+                    SaturatedTimelineEvent::Annotation(a) => a,
+                    _ => unreachable!(),
+                };
+                assert_eq!(ut2.0.id, annotation2.id);
+                match ut2.1 {
+                    SaturatedActor::TenantUser(ref tenant_user) => {
+                        assert_eq!(tenant_user.id, tenant_user2.id)
+                    }
+                    _ => unreachable!(),
+                };
+
+                let ut3 = match &user_timeline_infos[2].1 {
+                    SaturatedTimelineEvent::Annotation(a) => a,
+                    _ => unreachable!(),
+                };
+                assert_eq!(ut3.0.id, annotation3.id);
+                match ut3.1 {
+                    SaturatedActor::TenantApiKey(ref tenant_api_key) => {
+                        assert_eq!(tenant_api_key.id, tenant_api_key.id)
+                    }
+                    _ => unreachable!(),
+                };
+                Ok(())
+            })
+            .await
+            .ok();
+
+        Ok(())
     }
 }

@@ -6,7 +6,7 @@ use db::models::{
     verification_request::VerificationRequest,
     verification_result::VerificationResult,
 };
-use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId, Vendor, VendorAPI};
+use newtypes::{DbActor, DecisionStatus, FootprintReasonCode, OnboardingId, Vendor, VendorAPI};
 
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
@@ -80,10 +80,10 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
                 user_vault_id: uvw.user_vault.id.clone(),
                 onboarding_id: ob_id,
                 logic_git_hash: crate::GIT_HASH.to_string(),
-                tenant_user_id: None,
                 status: decision_status,
                 result_ids: vec![result.id],
                 annotation_id: None,
+                actor: DbActor::Footprint,
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 

@@ -55,7 +55,7 @@ class TestDashboardOnboardings:
             for attribute, value in attributes.items():
                 assert expected_data[attribute] == value
 
-    # Note: `user` was onboarded onto `user.tenant` with an ob configuration 
+    # Note: `user` was onboarded onto `user.tenant` with an ob configuration
     # that required the collection of DOB, but not the access. See the pytest fixture setup for the tenant associated
     # with user passed into this function for more info
     def test_tenant_decrypt_no_permissions(self, user):
@@ -70,7 +70,8 @@ class TestDashboardOnboardings:
             tenant.sk.key,
             status_code=401,
         )
-    # A tenant needs to use /vault/identity/document/decrypt for decrypting identity document, so 
+
+    # A tenant needs to use /vault/identity/document/decrypt for decrypting identity document, so
     # this fails
     def test_tenant_decrypt_identity_doc_with_identity_endpoint(self, user):
         tenant = user.tenant
@@ -82,9 +83,13 @@ class TestDashboardOnboardings:
             f"users/{user.fp_user_id}/vault/identity/decrypt",
             data,
             tenant.sk.key,
-            status_code=400
+            status_code=400,
         )
-        assert resp['error']['message'] == 'Cannot decrypt field IdentityDocument with this endpoint'
+        assert (
+            resp["error"]["message"]
+            == "Cannot decrypt field IdentityDocument with this endpoint"
+        )
+
     #########################
     # Decrypting Documents
     #########################
@@ -97,43 +102,42 @@ class TestDashboardOnboardings:
         }
         # confirm they didn't auth identity_document
         get_user_resp = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
-        assert not get_user_resp['onboarding']['can_access_identity_document_images']
-        
+        assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
+
         post(
             f"users/{user.fp_user_id}/vault/identity/document/decrypt",
             data,
             tenant.sk.key,
             status_code=401,
         )
-     # This user has not authorized any access to identity documents for the tenant, so they 
-     # can't even see what's in the vault
+
+    # This user has not authorized any access to identity documents for the tenant, so they
+    # can't even see what's in the vault
     def test_tenant_document_get_decrypt_no_permissions(self, user):
         tenant = user.tenant
         # confirm they didn't auth identity_document
         get_user_resp = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
-        assert not get_user_resp['onboarding']['can_access_identity_document_images']
-        
+        assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
+
         get(
             f"users/{user.fp_user_id}/vault/identity/document?document_types=",
             None,
             tenant.sk.key,
             status_code=401,
         )
+
     # Check which things are available in the vault
     def test_tenant_document_get_decrypt(self, user_with_documents):
         tenant = user_with_documents.tenant
         requested_doc_types = "passport,horse_license"
-        
+
         resp = get(
             f"users/{user_with_documents.fp_user_id}/vault/identity/document?document_types={requested_doc_types}",
             None,
             tenant.sk.key,
             status_code=200,
         )
-        expected = {
-            'horse_license': False, # unfortunately
-            'passport': True
-        }
+        expected = {"horse_license": False, "passport": True}  # unfortunately
 
         assert resp == expected
 
@@ -151,31 +155,26 @@ class TestDashboardOnboardings:
             tenant.sk.key,
             status_code=200,
         )
-        expected = {
-            'passport': True
-        }
+        expected = {"passport": True}
 
         assert resp == expected
         assert resp2 == expected
 
-        expected = {
-            'passport': True
-        }
+        expected = {"passport": True}
 
         assert resp == expected
-
 
     # Test decryption of vaulted documents
     def test_tenant_document_decrypt(self, user_with_documents):
         from .image_fixtures import test_image
 
         tenant = user_with_documents.tenant
-        requested_doc_type = 'passport'
+        requested_doc_type = "passport"
         data = {
             "document_type": requested_doc_type,
             "reason": "Responding to a customer request",
         }
-        
+
         resp = post(
             f"users/{user_with_documents.fp_user_id}/vault/identity/document/decrypt",
             data,
@@ -183,13 +182,14 @@ class TestDashboardOnboardings:
             status_code=200,
         )
 
-        assert resp['document_type'] == requested_doc_type
-        assert resp['images'][0]['front'] == test_image
-        assert resp['images'][0]['back'] == test_image
+        assert resp["document_type"] == requested_doc_type
+        assert resp["images"][0]["front"] == test_image
+        assert resp["images"][0]["back"] == test_image
+
     ##############################
     # End document tests
     ###################################
-    
+
     def test_get_org(self, user):
         body = get("org", None, user.tenant.sk.key)
         tenant = body
@@ -565,3 +565,62 @@ class TestDashboardAdminUsers:
         # Make sure the deactivated role isn't displayed anymore
         body = get("org/roles", None, workos_sandbox_tenant.auth_token)
         assert role_id not in set(u["id"] for u in body["data"])
+
+    def test_get_annotations(self, user, workos_sandbox_tenant):
+        print(f"{user.fp_user_id}")
+        # res = get(f"/users/{user.fp_user_id}/annotations", None, user.tenant.sk.key)
+
+        note1 = "this user is chill"
+        # Actor = TenantApiKey
+        annotation1 = post(
+            f"/users/{user.fp_user_id}/annotations",
+            dict(
+                note=note1,
+                is_pinned=False,
+            ),
+            user.tenant.sk.key,
+            # `user` creates a scoped user that is is_live=false but the auths (tenant.sk.key, tenant.auth_token, workos_sandbox_tentnat.auth_token)
+            # all are auth.is_live() = true, so I think I need to pass this DashboardAuthIsLive struct on every request? seems weird
+            DashboardAuthIsLive("false"),
+        )
+
+        annotations = get(
+            f"/users/{user.fp_user_id}/annotations",
+            None,
+            user.tenant.sk.key,
+            DashboardAuthIsLive("false"),
+        )
+        annotations.sort(key=lambda x: x["timestamp"])
+
+        assert annotation1["id"] == annotations[-1]["id"]
+        assert annotation1["note"] == note1
+        assert annotation1["source"]["kind"] == "api_key"
+        assert annotation1["is_pinned"] == False
+
+        note2 = "ok mb they are a little sketch"
+        # Actor = TenantUser
+        annotation2 = post(
+            f"/users/{user.fp_user_id}/annotations",
+            dict(
+                note=note2,
+                is_pinned=True,
+            ),
+            user.tenant.auth_token,
+            DashboardAuthIsLive("false"),
+        )
+
+        annotations = get(
+            f"/users/{user.fp_user_id}/annotations",
+            None,
+            user.tenant.auth_token,
+            DashboardAuthIsLive("false"),
+        )
+        annotations.sort(key=lambda x: x["timestamp"])
+
+        assert annotation2["id"] == annotations[-1]["id"]
+        assert annotation2["note"] == note2
+        assert annotation2["source"]["kind"] == "organization"
+        assert (
+            annotation2["source"]["member"] == "integrationtests@onefootprint.com"
+        )  # I guess there's no way to get the tenant user from Tenant so we just hard code this?
+        assert annotation2["is_pinned"] == True

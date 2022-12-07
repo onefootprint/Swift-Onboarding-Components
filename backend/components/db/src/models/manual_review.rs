@@ -4,9 +4,10 @@ use crate::{DbError, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::PgConnection;
-use newtypes::{ManualReviewId, OnboardingDecisionId, OnboardingId, TenantUserId};
+use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId, TenantUserId};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Queryable, Default)]
+#[derive(Debug, Clone, Queryable, Default, Serialize, Deserialize)]
 #[diesel(table_name = manual_review)]
 pub struct ManualReview {
     pub id: ManualReviewId,
@@ -20,7 +21,7 @@ pub struct ManualReview {
     // Otherwise, means the ManualReview was simply cleared without making an updated decision.
     pub completed_by_decision_id: Option<OnboardingDecisionId>,
     // If the ManualReview was completed by a tenant dashboard user, linked here
-    pub completed_by_tenant_user_id: Option<TenantUserId>,
+    pub completed_by_actor: Option<DbActor>,
 }
 
 #[derive(Debug, Clone, Insertable, Default)]
@@ -30,12 +31,12 @@ struct NewManualReview {
     onboarding_id: OnboardingId,
 }
 
-#[derive(Debug, AsChangeset, Default)]
+#[derive(Debug, AsChangeset, Default, Serialize, Deserialize)]
 #[diesel(table_name = manual_review)]
 struct ManualReviewUpdate {
     completed_at: Option<Option<DateTime<Utc>>>,
     completed_by_decision_id: Option<Option<OnboardingDecisionId>>,
-    completed_by_tenant_user_id: Option<Option<TenantUserId>>,
+    completed_by_actor: Option<Option<DbActor>>,
 }
 
 impl ManualReview {
@@ -53,16 +54,19 @@ impl ManualReview {
     }
 
     /// Used to mark the manual review as complete
-    pub fn complete(
+    pub fn complete<T>(
         self,
         conn: &mut TxnPgConnection,
-        tenant_user_id: TenantUserId,
+        actor: T,
         decision_id: Option<OnboardingDecisionId>,
-    ) -> DbResult<()> {
+    ) -> DbResult<()>
+    where
+        T: Into<DbActor>,
+    {
         let update = ManualReviewUpdate {
             completed_at: Some(Some(Utc::now())),
             completed_by_decision_id: Some(decision_id),
-            completed_by_tenant_user_id: Some(Some(tenant_user_id)),
+            completed_by_actor: Some(Some(actor.into())),
         };
         let results = diesel::update(manual_review::table)
             .filter(manual_review::id.eq(self.id))

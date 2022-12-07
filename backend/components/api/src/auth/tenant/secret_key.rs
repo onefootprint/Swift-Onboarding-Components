@@ -15,6 +15,8 @@ use newtypes::DataAttribute;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
+use super::AuthActor;
+
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
@@ -98,8 +100,8 @@ impl TenantAuth for SecretTenantAuthContext {
         Ok(self.api_key.is_live)
     }
 
-    fn tenant_user(&self) -> Option<&TenantUser> {
-        None
+    fn actor(&self) -> AuthActor {
+        AuthActor::TenantApiKey(self.api_key().id.clone())
     }
 }
 

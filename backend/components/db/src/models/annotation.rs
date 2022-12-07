@@ -1,17 +1,23 @@
 use std::collections::HashMap;
 
 use crate::{
+    actor,
+    actor::SaturatedActor,
     models::scoped_user::ScopedUser,
-    schema::{annotation, scoped_user, tenant_user},
-    DbResult,
+    schema::{annotation, scoped_user, tenant_api_key, tenant_user},
+    DbError, DbResult,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AnnotationId, FootprintUserId, ScopedUserId, TenantId, TenantUserId};
+use itertools::Either;
+use newtypes::{
+    AnnotationId, DbActor, FootprintUserId, ScopedUserId, TenantApiKeyId, TenantId, TenantUserId,
+};
 
-use super::tenant_user::TenantUser;
+use super::{tenant_api_key::TenantApiKey, tenant_user::TenantUser};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Serialize, Deserialize)]
 #[diesel(table_name = annotation)]
 pub struct Annotation {
     pub id: AnnotationId,
@@ -19,23 +25,22 @@ pub struct Annotation {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub scoped_user_id: ScopedUserId,
-    // When set, indicates that an admin user at the tenant created this annotation
-    pub tenant_user_id: Option<TenantUserId>,
     pub note: String,
     pub is_pinned: bool,
+    pub actor: DbActor,
 }
 
-#[derive(Debug, Clone, Insertable)]
+#[derive(Debug, Clone, Insertable, Serialize, Deserialize)]
 #[diesel(table_name = annotation)]
 struct NewAnnotation {
     timestamp: DateTime<Utc>,
     scoped_user_id: ScopedUserId,
-    tenant_user_id: Option<TenantUserId>,
     note: String,
     is_pinned: bool,
+    actor: DbActor,
 }
 
-pub type AnnotationInfo = (Annotation, Option<TenantUser>);
+pub type AnnotationInfo = (Annotation, SaturatedActor);
 
 #[derive(AsChangeset)]
 #[diesel(table_name = annotation)]
@@ -44,24 +49,34 @@ struct AnnotationUpdate {
 }
 
 impl Annotation {
-    pub fn create(
+    pub fn create<T>(
         conn: &mut PgConnection,
         note: String,
         is_pinned: bool,
         scoped_user_id: ScopedUserId,
-        tenant_user_id: Option<TenantUserId>,
-    ) -> DbResult<Self> {
+        actor: T,
+    ) -> DbResult<AnnotationInfo>
+    where
+        T: Into<DbActor>,
+    {
         let new = NewAnnotation {
             timestamp: Utc::now(),
             scoped_user_id,
-            tenant_user_id,
             note,
             is_pinned,
+            actor: actor.into(),
         };
-        let result = diesel::insert_into(annotation::table)
+
+        let annotation: Annotation = diesel::insert_into(annotation::table)
             .values(new)
-            .get_result(conn)?;
-        Ok(result)
+            .get_result::<Annotation>(conn)?;
+
+        let annotation_info: AnnotationInfo = actor::saturate_actors::<Annotation>(conn, vec![annotation])?
+            .first()
+            .ok_or(DbError::RelatedObjectNotFound)?
+            .clone();
+
+        Ok(annotation_info)
     }
 
     pub fn update(
@@ -92,15 +107,18 @@ impl Annotation {
         conn: &mut PgConnection,
         ids: Vec<&AnnotationId>,
     ) -> DbResult<HashMap<AnnotationId, AnnotationInfo>> {
-        let results = annotation::table
+        let annotations = annotation::table
             .filter(annotation::id.eq_any(ids))
-            .left_join(tenant_user::table)
-            .get_results::<AnnotationInfo>(conn)?
+            .get_results::<Annotation>(conn)?;
+
+        let annotations_with_actors = actor::saturate_actors(conn, annotations)?;
+
+        let annotation_map: HashMap<AnnotationId, AnnotationInfo> = annotations_with_actors
             .into_iter()
-            .map(|a| (a.0.id.clone(), a))
+            .map(|z| (z.0.id.clone(), z))
             .collect();
 
-        Ok(results)
+        Ok(annotation_map)
     }
 
     pub fn list(
@@ -112,7 +130,6 @@ impl Annotation {
     ) -> DbResult<Vec<AnnotationInfo>> {
         let mut query = annotation::table
             .inner_join(scoped_user::table)
-            .left_join(tenant_user::table)
             .filter(scoped_user::fp_user_id.eq(fp_user_id))
             .filter(scoped_user::tenant_id.eq(tenant_id))
             .filter(scoped_user::is_live.eq(is_live))
@@ -120,14 +137,10 @@ impl Annotation {
         if let Some(is_pinned) = is_pinned {
             query = query.filter(annotation::is_pinned.eq(is_pinned));
         }
-        let results = query
-            .get_results::<(Self, ScopedUser, Option<TenantUser>)>(conn)?
-            .into_iter()
-            // It's really difficult to box a query in diesel with a left_join and a select(),
-            // so we fetch all three tables even though we don't need the scoped user
-            .map(|(annotation, _, tu)| (annotation, tu))
-            .collect();
 
-        Ok(results)
+        let results: Vec<(Annotation, ScopedUser)> = query.get_results::<(Self, ScopedUser)>(conn)?;
+        let annotations = results.into_iter().map(|t| t.0).collect();
+        let annotations_with_actors = actor::saturate_actors(conn, annotations)?;
+        Ok(annotations_with_actors)
     }
 }
