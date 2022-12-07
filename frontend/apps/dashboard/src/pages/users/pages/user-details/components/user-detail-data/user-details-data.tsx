@@ -104,9 +104,7 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
       <Box sx={{ marginY: 5 }}>
         <Divider />
       </Box>
-      <Box sx={{ marginBottom: 5 }}>
-        <PinnedNotes />
-      </Box>
+      <PinnedNotes />
       <Box sx={{ marginBottom: 9 }}>
         <VaultData user={user} onDecrypt={handleDecrypt} />
       </Box>

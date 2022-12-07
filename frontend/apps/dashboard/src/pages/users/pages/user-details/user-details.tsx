@@ -10,7 +10,7 @@ import UserDetailsData from './components/user-detail-data';
 import UserDetailEmptyState from './components/user-detail-empty-state';
 import UserDetailsLoading from './components/user-detail-loading';
 
-const Detail = () => {
+const UserDetails = () => {
   const { t } = useTranslation('pages.user-details');
   const { users, decryptUser, isLoading } = useGetUsers(1);
   const user = users?.[0];
@@ -41,4 +41,4 @@ const Detail = () => {
   );
 };
 
-export default Detail;
+export default UserDetails;
