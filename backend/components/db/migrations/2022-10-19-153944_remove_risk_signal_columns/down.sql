@@ -1,7 +1,0 @@
-ALTER TABLE risk_signal
-    ADD COLUMN description TEXT NOT NULL DEFAULT '',
-    ADD COLUMN scope TEXT[] NOT NULL DEFAULT CAST(ARRAY[] AS TEXT[]);
-
-ALTER TABLE risk_signal
-    ALTER COLUMN description DROP DEFAULT,
-    ALTER COLUMN scope DROP DEFAULT;

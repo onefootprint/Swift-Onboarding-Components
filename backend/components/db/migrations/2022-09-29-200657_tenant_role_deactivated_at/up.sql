@@ -1,1 +1,0 @@
-ALTER TABLE tenant_role ADD COLUMN deactivated_at TIMESTAMPTZ;

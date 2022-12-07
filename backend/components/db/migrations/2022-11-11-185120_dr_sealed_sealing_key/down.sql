@@ -1,1 +1,0 @@
-ALTER TABLE document_request DROP COLUMN e_data_key;

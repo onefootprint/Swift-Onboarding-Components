@@ -1,1 +1,0 @@
-ALTER TABLE tenant_user DROP COLUMN deactivated_at;

@@ -1,2 +1,0 @@
-ALTER TABLE onboarding ADD COLUMN status TEXT NOT NULL DEFAULT 'pending';
-ALTER TABLE onboarding ALTER COLUMN status DROP DEFAULT;

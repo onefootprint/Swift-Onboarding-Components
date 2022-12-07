@@ -1,1 +1,0 @@
-ALTER TABLE tenant DROP COLUMN workos_admin_profile_id;

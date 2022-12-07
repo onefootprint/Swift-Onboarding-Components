@@ -1,1 +1,0 @@
-ALTER TABLE risk_signal DROP COLUMN vendors;

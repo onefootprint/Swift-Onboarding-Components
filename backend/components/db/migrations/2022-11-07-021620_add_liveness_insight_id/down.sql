@@ -1,1 +1,0 @@
-ALTER TABLE liveness_event DROP COLUMN insight_event_id;

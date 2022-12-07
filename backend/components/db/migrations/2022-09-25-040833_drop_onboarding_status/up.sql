@@ -1,1 +1,0 @@
-ALTER TABLE onboarding DROP COLUMN status;

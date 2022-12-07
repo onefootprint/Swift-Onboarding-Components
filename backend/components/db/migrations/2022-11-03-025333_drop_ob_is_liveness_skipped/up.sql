@@ -1,1 +1,0 @@
-ALTER TABLE onboarding DROP COLUMN is_liveness_skipped;

@@ -1,1 +1,0 @@
-ALTER TABLE risk_signal ADD COLUMN vendors TEXT[] NOT NULL DEFAULT CAST(ARRAY['idology'] as TEXT[]);

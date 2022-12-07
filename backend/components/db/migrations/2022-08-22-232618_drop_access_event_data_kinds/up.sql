@@ -1,1 +1,0 @@
-ALTER TABLE access_event DROP COLUMN data_kinds;

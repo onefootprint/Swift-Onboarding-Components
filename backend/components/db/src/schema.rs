@@ -287,38 +287,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    requirement (id) {
-        id -> Text,
-        kind -> Text,
-        status -> Text,
-        initiator -> Text,
-        user_vault_id -> Text,
-        fulfilled_at -> Nullable<Timestamptz>,
-        fulfilled_by_requirement_id -> Nullable<Text>,
-        onboarding_id -> Nullable<Uuid>,
-        created_at -> Timestamptz,
-        deactivated_at -> Nullable<Timestamptz>,
-        error_message -> Nullable<Text>,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    requirement_verification_request_junction (id) {
-        id -> Uuid,
-        verification_request_id -> Uuid,
-        requirement_id -> Text,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     risk_signal (id) {
         id -> Text,
         onboarding_decision_id -> Text,
@@ -561,10 +529,6 @@ joinable!(onboarding_decision -> onboarding (onboarding_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
 joinable!(phone_number -> data_lifetime (lifetime_id));
-joinable!(requirement -> onboarding (onboarding_id));
-joinable!(requirement -> user_vault (user_vault_id));
-joinable!(requirement_verification_request_junction -> requirement (requirement_id));
-joinable!(requirement_verification_request_junction -> verification_request (verification_request_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
 joinable!(scoped_user -> tenant (tenant_id));
 joinable!(scoped_user -> user_vault (user_vault_id));
@@ -598,8 +562,6 @@ allow_tables_to_appear_in_same_query!(
     onboarding_decision,
     onboarding_decision_verification_result_junction,
     phone_number,
-    requirement,
-    requirement_verification_request_junction,
     risk_signal,
     scoped_user,
     session,
