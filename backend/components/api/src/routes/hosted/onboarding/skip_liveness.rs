@@ -2,7 +2,7 @@ use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::insight_headers::InsightHeaders;
+use crate::utils::headers::InsightHeaders;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;

@@ -7,6 +7,8 @@ use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
+use super::get_header;
+
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]
 pub struct InsightHeaders {
     pub ip_address: Option<String>,
@@ -76,10 +78,6 @@ impl InsightHeaders {
             tls: get_header("cloudfront-viewer-tls", headers),
         }
     }
-}
-
-fn get_header(name: &str, req: &HeaderMap) -> Option<String> {
-    req.get(name).and_then(|h| h.to_str().ok()).map(|s| s.to_string())
 }
 
 impl InsightHeaders {

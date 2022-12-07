@@ -15,7 +15,8 @@ use tracing_subscriber::EnvFilter;
 use tracing_subscriber::Registry;
 
 use crate::config::Config;
-use crate::utils::insight_headers::InsightHeaders;
+use crate::utils::headers::InsightHeaders;
+use crate::utils::headers::TelemetryHeaders;
 
 pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::error::Error>> {
     env_logger::init();
@@ -94,15 +95,15 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             ip_address,
             city,
             country,
-            region,
             region_name,
             latitude,
             longitude,
-            metro_code,
             postal_code,
             time_zone,
             user_agent,
             timestamp,
+            region: _,
+            metro_code: _,
             is_android_user: _,
             is_desktop_viewer: _,
             is_ios_viewer: _,
@@ -116,8 +117,14 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             tls: _,
         } = InsightHeaders::parse_from_request(request.headers());
 
+        let TelemetryHeaders {
+            session_id,
+        } = TelemetryHeaders::parse_from_request(request.headers());
+
         let server_git_hash = crate::GIT_HASH.to_string();
 
+        // Note: It seems we can only provide a fixed number of args to the root_span - you may
+        // have to remove some if you add more.
         let span = root_span!(
             request,
             route, 
@@ -126,16 +133,15 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             longitude,
             city,
             country,
-            region,
             region_name,
-            metro_code,
             postal_code,
             time_zone,
             user_agent,
+            session_id,
             timestamp=%timestamp,
             server_git_hash,
             country_code,
-            "request start");
+            "Root span");
         span
     }
 

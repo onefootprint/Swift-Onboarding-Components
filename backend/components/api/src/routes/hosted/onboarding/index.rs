@@ -8,7 +8,7 @@ use crate::auth::{user::UserAuth, Either, SessionContext};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
-use crate::utils::insight_headers::InsightHeaders;
+use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;

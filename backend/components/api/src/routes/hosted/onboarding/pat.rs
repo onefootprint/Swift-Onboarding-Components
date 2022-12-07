@@ -3,8 +3,8 @@
 
 use actix_web::HttpResponseBuilder;
 use db::models::{
-    insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent,
-    onboarding::Onboarding, user_timeline::UserTimeline,
+    insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent, onboarding::Onboarding,
+    user_timeline::UserTimeline,
 };
 use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{
@@ -16,10 +16,10 @@ use reqwest::{header::AUTHORIZATION, StatusCode};
 use web::HttpResponse;
 
 use crate::{
-    auth::user::{UserAuthContext, UserAuthScopeDiscriminant, UserAuth},
+    auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant},
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     types::EmptyResponse,
-    utils::insight_headers::InsightHeaders,
+    utils::headers::InsightHeaders,
     State,
 };
 
@@ -113,7 +113,7 @@ async fn authorize_privacy_pass(
                     id: liveness_event.id,
                 },
                 user_auth.user_vault_id(),
-                Some(ob_info.onboarding.id)
+                Some(ob_info.onboarding.id),
             )?;
 
             Ok(())

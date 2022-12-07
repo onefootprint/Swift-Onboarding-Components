@@ -4,7 +4,7 @@ use crate::{
     types::{response::ResponseData, EmptyResponse},
     utils::{
         challenge::{Challenge, ChallengeToken},
-        insight_headers::InsightHeaders,
+        headers::InsightHeaders,
         liveness::LivenessWebauthnConfig,
     },
     State,

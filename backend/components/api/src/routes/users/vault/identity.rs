@@ -12,7 +12,7 @@ use crate::hosted::user::DecryptFieldsResult;
 use crate::types::identity_data_request::{ComputedFingerprints, IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
-use crate::utils::insight_headers::InsightHeaders;
+use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 
