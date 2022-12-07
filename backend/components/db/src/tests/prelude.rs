@@ -30,7 +30,7 @@ impl<'a> TestPgConnection<'a> {
 }
 
 /// Util to run a single function inside of a test transaction
-pub(crate) fn run_test_txn<F>(f: F)
+pub fn run_test_txn<F>(f: F)
 where
     F: FnOnce(&mut TestPgConnection) + Send + 'static,
 {

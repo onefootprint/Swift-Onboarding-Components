@@ -1,16 +1,17 @@
-use crate::errors::DbError;
 use crate::schema::scoped_user;
 use crate::schema::user_vault::{self, BoxedQuery};
-use crate::TxnPgConnection;
+use crate::{DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, ScopedUserId, SealedVaultBytes, TenantId,
-    UserVaultId, VaultPublicKey,
+    DataPriority, EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, ScopedUserId, SealedVaultBytes,
+    TenantId, UserVaultId, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
+
+use super::phone_number::PhoneNumber;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vault)]
@@ -85,7 +86,7 @@ impl UserVault {
         }
     }
 
-    pub fn get<'a, T>(conn: &mut PgConnection, id: T) -> Result<Self, DbError>
+    pub fn get<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<Self>
     where
         T: Into<UserVaultIdentifier<'a>>,
     {
@@ -93,7 +94,7 @@ impl UserVault {
         Ok(user)
     }
 
-    pub fn lock<'a, T>(conn: &mut TxnPgConnection, id: T) -> Result<Self, DbError>
+    pub fn lock<'a, T>(conn: &mut TxnPgConnection, id: T) -> DbResult<Self>
     where
         T: Into<UserVaultIdentifier<'a>>,
     {
@@ -131,7 +132,7 @@ impl UserVault {
         Ok(user)
     }
 
-    pub fn multi_get(conn: &mut PgConnection, ids: Vec<&ScopedUserId>) -> Result<Vec<Self>, DbError> {
+    pub fn multi_get(conn: &mut PgConnection, ids: Vec<&ScopedUserId>) -> DbResult<Vec<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq_any(ids))
             .select(scoped_user::user_vault_id);
@@ -139,6 +140,31 @@ impl UserVault {
             .filter(user_vault::id.eq_any(uv_ids))
             .load::<Self>(conn)?;
         Ok(users)
+    }
+
+    /// creates a portable user vault
+    pub fn create(
+        conn: &mut TxnPgConnection,
+        new_user: NewUserVaultArgs,
+    ) -> DbResult<(UserVault, PhoneNumber)> {
+        let new_user_vault = NewUserVault {
+            e_private_key: new_user.e_private_key,
+            public_key: new_user.public_key,
+            is_live: new_user.is_live,
+            is_portable: true,
+        };
+        let user_vault = diesel::insert_into(user_vault::table)
+            .values(new_user_vault)
+            .get_result::<UserVault>(conn.conn())?;
+        let phone_number = PhoneNumber::create_verified(
+            conn,
+            user_vault.id.clone(),
+            new_user.e_phone_number,
+            new_user.sh_phone_number,
+            new_user.e_phone_country,
+            DataPriority::Primary,
+        )?;
+        Ok((user_vault, phone_number))
     }
 }
 
@@ -151,7 +177,7 @@ pub struct NewUserVault {
     pub is_portable: bool,
 }
 
-pub struct NewPortableUserVaultReq {
+pub struct NewUserVaultArgs {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub is_live: bool,

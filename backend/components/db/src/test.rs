@@ -142,23 +142,21 @@ async fn test_db() {
         .await
         .expect("couldn't make DB query");
 
-    crate::user_vault::create(
-        &pool,
-        crate::models::user_vault::NewPortableUserVaultReq {
-            e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
-            public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
-            e_phone_number: SealedVaultBytes("blah".as_bytes().to_vec()),
-            sh_phone_number: Fingerprint(
-                crypto::random::gen_random_alphanumeric_code(32)
-                    .as_bytes()
-                    .to_vec(),
-            ),
-            e_phone_country: SealedVaultBytes("blah".as_bytes().to_vec()),
-            is_live: false,
-        },
-    )
-    .await
-    .expect("couldn't init user vault");
+    let new_user = crate::models::user_vault::NewUserVaultArgs {
+        e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
+        public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
+        e_phone_number: SealedVaultBytes("blah".as_bytes().to_vec()),
+        sh_phone_number: Fingerprint(
+            crypto::random::gen_random_alphanumeric_code(32)
+                .as_bytes()
+                .to_vec(),
+        ),
+        e_phone_country: SealedVaultBytes("blah".as_bytes().to_vec()),
+        is_live: false,
+    };
+    pool.db_transaction(|conn| UserVault::create(conn, new_user))
+        .await
+        .expect("couldn't init user vault");
 
     // TODO find_by_phone_number and find_by_email
 }

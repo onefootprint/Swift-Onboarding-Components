@@ -41,16 +41,15 @@ pub mod tenant;
 pub mod user_vault;
 pub use has_lifetime::*;
 
+// Old tests
 #[cfg(test)]
 mod test;
 #[cfg(test)]
-mod tests;
-
-#[cfg(test)]
 pub mod test_context;
-
 #[allow(unused)]
 pub mod test_helpers;
+
+pub mod tests;
 
 pub type DbResult<T> = Result<T, DbError>;
 

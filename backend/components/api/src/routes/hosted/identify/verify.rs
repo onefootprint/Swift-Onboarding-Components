@@ -12,7 +12,7 @@ use crate::State;
 
 use chrono::Duration;
 use crypto::sha256;
-use db::models::user_vault::{NewPortableUserVaultReq, UserVault};
+use db::models::user_vault::{NewUserVaultArgs, UserVault};
 use newtypes::{DataAttribute, Fingerprinter, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -130,7 +130,7 @@ async fn create_new_user_vault(
 ) -> Result<UserVault, ApiError> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
-    let new_user = NewPortableUserVaultReq {
+    let new_user = NewUserVaultArgs {
         e_private_key,
         e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
         e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
@@ -140,7 +140,10 @@ async fn create_new_user_vault(
             .await?,
         is_live: phone_number.is_live(),
     };
-    let user = db::user_vault::create(&state.db_pool, new_user).await?;
+    let (user, _) = state
+        .db_pool
+        .db_transaction(|conn| UserVault::create(conn, new_user))
+        .await?;
 
     Ok(user)
 }

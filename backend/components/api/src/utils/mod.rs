@@ -13,3 +13,6 @@ pub mod validate_request;
 
 #[cfg(test)]
 pub(crate) mod mock_enclave;
+
+#[cfg(test)]
+mod test_user_vault_wrapper;
