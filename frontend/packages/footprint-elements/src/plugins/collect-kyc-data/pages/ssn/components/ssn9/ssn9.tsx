@@ -1,5 +1,6 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24, IcoLock24, IcoShield24 } from '@onefootprint/icons';
+import { UserDataAttribute } from '@onefootprint/types';
 import { Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,6 +9,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/header-title';
 import InfoBox from '../../../../../../components/info-box';
 import NavigationHeader from '../../../../components/navigation-header';
+import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { SSN9Information } from '../../../../utils/data-types';
 
 type FormData = SSN9Information;
@@ -29,14 +31,21 @@ const SSN9 = ({
   hideNavHeader,
   onSubmit,
 }: SSN9Props) => {
+  const [state] = useCollectKycDataMachine();
+  const { data } = state.context;
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('pages.ssn.full');
   const { t: cta } = useTranslation('pages.cta');
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      [UserDataAttribute.ssn9]: data[UserDataAttribute.ssn9],
+    },
+  });
 
   return (
     <>
@@ -52,7 +61,8 @@ const SSN9 = ({
           mask={inputMasks.ssn}
           placeholder={t('form.placeholder')}
           type="tel"
-          {...register('ssn9', {
+          value={getValues(UserDataAttribute.ssn9)}
+          {...register(UserDataAttribute.ssn9, {
             required: true,
             // Numbers with all zeros in any digit group (000-##-####, ###-00-####, ###-##-0000) are not allowed.
             // Numbers with 666 or 900–999 in the first digit group are not allowed.
