@@ -3,7 +3,7 @@ import pytest
 from urllib.parse import quote
 from typing import NamedTuple
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
-from tests.utils import get, put, post, patch, _gen_random_ssn
+from tests.utils import get, put, post, patch, _gen_random_ssn, create_tenant
 from tests.types import SecretApiKey, ObConfiguration
 from .auth import (
     PublishableOnboardingKey,

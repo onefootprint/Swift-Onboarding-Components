@@ -168,109 +168,6 @@ def create_basic_user(twilio, suffix=None):
         real_phone_number=phone_number,
     )
 
-def onboard_user_onto_tenant(tenant, basic_user, user_data, document_data=None):
-    # Initialize the onboarding
-    post(
-        "hosted/onboarding",
-        None,
-        tenant.ob_config().key,
-        basic_user.auth_token,
-    )
-
-    # Populate the user's data
-    post("hosted/user/data/identity", user_data, basic_user.auth_token)
-
-    # Register the biometric credential
-    webauthn_device = SoftWebauthnDevice()
-    body = post("hosted/user/biometric/init", None, basic_user.auth_token)
-    chal_token = body["challenge_token"]
-    chal = _override_webauthn_challenge(json.loads(body["challenge_json"]))
-    attestation = webauthn_device.create(chal, os.environ.get("TEST_URL"))
-    attestation = _override_webauthn_attestation(attestation)
-    data = dict(
-        challenge_token=chal_token, device_response_json=json.dumps(attestation)
-    )
-    post("hosted/user/biometric", data, basic_user.auth_token)
-
-    if document_data is not None:
-        from .image_fixtures import test_image
-
-        body = get(
-            "hosted/onboarding/status",
-            None,
-            tenant.ob_config().key,
-            basic_user.auth_token,
-        )
-
-        # We have a requirement
-        req = get_requirement_from_requirements(
-            "collect_document", body["requirements"]
-        )
-        # stash the request id
-        document_request_id = req["document_request_id"]
-
-        if document_data == "front_only":
-            data =  {
-            "front_image": test_image,
-            "back_image": None,
-            "document_type": "passport",
-            "country_code": "USA",
-        }
-        else:
-            data = {
-                "front_image": test_image,
-                "back_image": test_image,
-                "document_type": "passport",
-                "country_code": "USA",
-            }
-        post(
-            f"hosted/user/document/{document_request_id}",
-            data,
-            basic_user.auth_token,
-            tenant.ob_config().key,
-        )
-
-
-    # Run the KYC check
-    post(
-        "hosted/onboarding/submit",
-        None,
-        tenant.ob_config().key,
-        basic_user.auth_token,
-    )
-
-    # Authorize and complete the onboarding
-    body = post(
-        "hosted/onboarding/authorize",
-        None,
-        tenant.ob_config().key,
-        basic_user.auth_token,
-    )
-    validation_token = body["validation_token"]
-
-    # Get the fp_user_id
-    body = post(
-        "onboarding/session/validate",
-        dict(validation_token=validation_token),
-        tenant.sk.key,
-    )
-    fp_user_id = body["footprint_user_id"]
-    return User(
-        auth_token=basic_user.auth_token,
-        fp_user_id=fp_user_id,
-        first_name=user_data["name"]["first_name"],
-        last_name=user_data["name"]["last_name"],
-        address_line1=user_data["address"]["line1"],
-        address_line2=user_data["address"]["line2"],
-        zip=user_data["address"]["zip"],
-        country=user_data["address"]["country"],
-        ssn=user_data["ssn9"],
-        phone_number=basic_user.phone_number,
-        real_phone_number=basic_user.real_phone_number,
-        email=basic_user.email,
-        tenant=tenant,
-    )
-
 def create_inherited_non_sandbox_user(twilio):
     identifier = {"email": EMAIL}
 
@@ -409,14 +306,14 @@ def _b64_encode(v):
     return base64.urlsafe_b64encode(v).decode("ascii").rstrip("=")
 
 
-def _override_webauthn_challenge(chal):
+def override_webauthn_challenge(chal):
     chal["publicKey"]["attestation"] = "none"
     chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
     chal["publicKey"]["user"]["id"] = _b64_decode(chal["publicKey"]["user"]["id"])
     return chal
 
 
-def _override_webauthn_attestation(attestation):
+def override_webauthn_attestation(attestation):
     attestation["rawId"] = _b64_encode(attestation["rawId"])
     attestation["id"] = _b64_encode(attestation["id"])
     attestation["response"]["clientDataJSON"] = _b64_encode(

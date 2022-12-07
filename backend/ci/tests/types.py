@@ -72,9 +72,41 @@ class User(NamedTuple):
     address_line1: str
     address_line2: str
     zip: str
+    city: str
+    state: str
     country: str
     ssn: str
     phone_number: str
     real_phone_number: str
     email: str
     tenant: Tenant
+
+    def identity_data(self): 
+        return {
+        "name": {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+        },
+        # todo
+        # "dob": None,
+        "address": {
+            "line1": self.address_line1,
+            "line2": self.address_line2,
+            "city": self.city,
+            "state": self.state,
+            "zip": self.zip,
+            "country": self.country,
+        },
+        "ssn9": self.ssn,
+    }
+
+    # Represents the challenged user, the base user construct 
+    # that becomes an onboarded User once information is supplied
+    # for a given onboarding config
+    def basic_user(self):
+        return BasicUser(
+            auth_token=self.auth_token,
+            phone_number=self.phone_number,
+            real_phone_number=self.real_phone_number,
+            email=self.email,
+        )

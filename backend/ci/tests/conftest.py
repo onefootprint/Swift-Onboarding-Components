@@ -13,16 +13,16 @@ from .constants import (
 from .types import User
 from .utils import (
     IncorrectServerVersion,
-    _override_webauthn_attestation,
-    _override_webauthn_challenge,
+    override_webauthn_attestation,
+    override_webauthn_challenge,
     build_user_data,
     post,
     _make_request,
     create_tenant,
     create_basic_user,
-    onboard_user_onto_tenant,
 )
 from .webauthn_simulator import SoftWebauthnDevice
+from .bifrost_client import BifrostClient
 
 
 @pytest.fixture(scope="session", autouse="true")
@@ -159,9 +159,9 @@ def user(workos_sandbox_tenant, twilio):
     """
     Create a user with registered data and webuathn creds and onboard them onto the workos_sandbox_tenant
     """
-    basic_user = create_basic_user(twilio)
-    user_data = build_user_data()
-    return onboard_user_onto_tenant(workos_sandbox_tenant, basic_user, user_data, None)
+    bifrost_client = BifrostClient(workos_sandbox_tenant)
+    bifrost_client.init_user_for_onboarding(create_basic_user(twilio), build_user_data())
+    return bifrost_client.onboard_user_onto_tenant()
 
 @pytest.fixture(scope="module")
 def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twilio):
@@ -169,12 +169,9 @@ def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twili
     Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
     with document info as well
     """
-    basic_user = create_basic_user(twilio)
-    user_data = build_user_data()
-    return onboard_user_onto_tenant(document_requesting_sandbox_tenant_session_scoped, basic_user, user_data, "both")
-
-
-
+    bifrost_client = BifrostClient(document_requesting_sandbox_tenant_session_scoped)
+    bifrost_client.init_user_for_onboarding(create_basic_user(twilio), build_user_data(), "both")
+    return bifrost_client.onboard_user_onto_tenant()
 
 @pytest.fixture(scope="module")
 def ob_session_token(workos_tenant):

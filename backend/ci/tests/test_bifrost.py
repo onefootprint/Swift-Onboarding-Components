@@ -9,8 +9,8 @@ from tests.utils import (
     _b64_encode,
     _gen_random_ssn,
     try_until_success,
-    _override_webauthn_attestation,
-    _override_webauthn_challenge,
+    override_webauthn_attestation,
+    override_webauthn_challenge,
     get,
     post,
     create_tenant,
@@ -227,9 +227,9 @@ class TestBifrost:
         _update_status("in_progress")
         body = post("hosted/user/biometric/init", None, d2p_auth_token)
         chal_token = body["challenge_token"]
-        chal = _override_webauthn_challenge(json.loads(body["challenge_json"]))
+        chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
         attestation = WEBAUTHN_DEVICE.create(chal, os.environ.get("TEST_URL"))
-        attestation = _override_webauthn_attestation(attestation)
+        attestation = override_webauthn_attestation(attestation)
 
         # Register credential
         data = dict(
