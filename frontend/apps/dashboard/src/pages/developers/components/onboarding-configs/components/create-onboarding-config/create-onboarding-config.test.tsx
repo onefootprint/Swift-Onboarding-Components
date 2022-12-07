@@ -34,8 +34,8 @@ describe('<CreateDialog />', () => {
     renderCreateDialog(options);
     const inputName = screen.getByLabelText('Onboarding configuration name');
     await userEvent.type(inputName, 'User ID verification');
-    const continueButton = screen.getByRole('button', { name: 'Continue' });
-    await userEvent.click(continueButton);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(nextButton);
   };
 
   const renderCreateDialogOnTheAccessDataSection = async (
@@ -47,17 +47,17 @@ describe('<CreateDialog />', () => {
     renderCreateDialog(options);
     const inputName = screen.getByLabelText('Onboarding configuration name');
     await userEvent.type(inputName, 'User ID verification');
-    const continueButton = screen.getByRole('button', { name: 'Continue' });
-    await userEvent.click(continueButton);
-    await userEvent.click(continueButton);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(nextButton);
+    await userEvent.click(nextButton);
   };
 
   describe('"Name" section', () => {
     it('should show an error if name is not filled', async () => {
       renderCreateDialog();
 
-      const continueButton = screen.getByRole('button', { name: 'Continue' });
-      await userEvent.click(continueButton);
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
 
       await waitFor(() => {
         const errorMessage = screen.getByText(
@@ -73,8 +73,8 @@ describe('<CreateDialog />', () => {
       const inputName = screen.getByLabelText('Onboarding configuration name');
       await userEvent.type(inputName, 'User ID verification');
 
-      const continueButton = screen.getByRole('button', { name: 'Continue' });
-      await userEvent.click(continueButton);
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
 
       const collectDataTitle = screen.getByText('Collected data');
       expect(collectDataTitle).toBeInTheDocument();
@@ -169,8 +169,8 @@ describe('<CreateDialog />', () => {
       const nameCheckbox = screen.getByLabelText('Full name');
       await userEvent.click(nameCheckbox);
 
-      const continueButton = screen.getByRole('button', { name: 'Continue' });
-      await userEvent.click(continueButton);
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId('access-form')).toBeVisible();
@@ -190,8 +190,8 @@ describe('<CreateDialog />', () => {
       const idDocToggle = screen.getByRole('switch');
       await userEvent.click(idDocToggle);
 
-      const continueButton = screen.getByRole('button', { name: 'Continue' });
-      await userEvent.click(continueButton);
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId('access-form')).toBeVisible();
@@ -212,10 +212,10 @@ describe('<CreateDialog />', () => {
           const ssnRadio = screen.getByLabelText('Full');
           await userEvent.click(ssnRadio);
 
-          const continueButton = screen.getByRole('button', {
-            name: 'Continue',
+          const nextButton = screen.getByRole('button', {
+            name: 'Next',
           });
-          await userEvent.click(continueButton);
+          await userEvent.click(nextButton);
 
           await waitFor(() => {
             expect(screen.getByTestId('access-form')).toBeVisible();
@@ -236,10 +236,10 @@ describe('<CreateDialog />', () => {
           const ssnRadio = screen.getByLabelText('Last 4');
           await userEvent.click(ssnRadio);
 
-          const continueButton = screen.getByRole('button', {
-            name: 'Continue',
+          const nextButton = screen.getByRole('button', {
+            name: 'Next',
           });
-          await userEvent.click(continueButton);
+          await userEvent.click(nextButton);
 
           await waitFor(() => {
             expect(screen.getByTestId('access-form')).toBeVisible();
@@ -259,10 +259,10 @@ describe('<CreateDialog />', () => {
           const addressCheckbox = screen.getByLabelText('Address');
           await userEvent.click(addressCheckbox);
 
-          const continueButton = screen.getByRole('button', {
-            name: 'Continue',
+          const nextButton = screen.getByRole('button', {
+            name: 'Next',
           });
-          await userEvent.click(continueButton);
+          await userEvent.click(nextButton);
 
           await waitFor(() => {
             expect(screen.getByTestId('access-form')).toBeVisible();
@@ -284,10 +284,10 @@ describe('<CreateDialog />', () => {
           const addressRadio = screen.getByLabelText('Country & Zip Code');
           await userEvent.click(addressRadio);
 
-          const continueButton = screen.getByRole('button', {
-            name: 'Continue',
+          const nextButton = screen.getByRole('button', {
+            name: 'Next',
           });
-          await userEvent.click(continueButton);
+          await userEvent.click(nextButton);
 
           await waitFor(() => {
             expect(screen.getByTestId('access-form')).toBeVisible();

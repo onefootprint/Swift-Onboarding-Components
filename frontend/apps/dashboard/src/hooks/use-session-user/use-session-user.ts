@@ -52,7 +52,10 @@ const useSessionUser = () => {
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(!!isLive),
   } as AuthHeaders;
 
+  const dangerouslyData = data as UserSession;
+
   return {
+    dangerouslyData,
     data,
     returnUrl,
     isLoggedIn,

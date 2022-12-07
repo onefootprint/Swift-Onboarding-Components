@@ -13,9 +13,11 @@
     "cta_other": "Filters · {{count}}"
   },
   "save": "Save",
+  "skip": "Skip",
   "close": "Close",
   "back": "Go back",
-  "next": "Continue",
+  "next": "Next",
+  "complete": "Complete",
   "confirm": {
     "title": "Are you sure?",
     "description": "Your data won't be saved.",
@@ -135,6 +137,10 @@
     },
     "auth": {
       "page-title": "Footprint Login | Logging in to the Footprint Dashboard"
+    },
+    "onboarding": {
+      "page-title": "Footprint | Onboarding",
+      "logged-as": "Logged in as"
     },
     "users": {
       "page-title": "Footprint | Users",
