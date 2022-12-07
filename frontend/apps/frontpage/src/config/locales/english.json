@@ -416,7 +416,7 @@
           "drivers-license-scans": {
             "title": "Do you support driver’s license scans?",
             "content": [
-              "Yes. We offer the ability to to a scan and selfie check for an extra $1 per verification, and will do a KBA for an extra $1.50. Our goal is to not do this unless your internal compliance team requires this, or if we can not make a confident pass decision without doing so. Unlike others in the space, our default is to not charge the extra dollar to do the dl scan."
+              "Yes. We offer the ability to do a scan and selfie check for an extra $1 per verification, and will do a KBA for an extra $1.50. Our goal is to not do this unless your internal compliance team requires this, or if we can not make a confident pass decision without doing so. Unlike others in the space, our default is to not charge the extra dollar to do the DL scan."
             ]
           }
         }
