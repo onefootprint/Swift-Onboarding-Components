@@ -65,7 +65,7 @@ pub async fn post(
     let (scopes, duration) = match challenge_state.identify_type {
         IdentifyType::Onboarding => (
             vec![UserAuthScope::SignUp, UserAuthScope::OrgOnboardingInit],
-            Duration::minutes(15),
+            Duration::minutes(20),
         ),
         IdentifyType::My1fp => (
             vec![UserAuthScope::SignUp, UserAuthScope::BasicProfile],
