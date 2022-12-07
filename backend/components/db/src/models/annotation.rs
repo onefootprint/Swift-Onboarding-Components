@@ -4,17 +4,13 @@ use crate::{
     actor,
     actor::SaturatedActor,
     models::scoped_user::ScopedUser,
-    schema::{annotation, scoped_user, tenant_api_key, tenant_user},
+    schema::{annotation, scoped_user},
     DbError, DbResult,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use itertools::Either;
-use newtypes::{
-    AnnotationId, DbActor, FootprintUserId, ScopedUserId, TenantApiKeyId, TenantId, TenantUserId,
-};
+use newtypes::{AnnotationId, DbActor, FootprintUserId, ScopedUserId, TenantId};
 
-use super::{tenant_api_key::TenantApiKey, tenant_user::TenantUser};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Serialize, Deserialize)]

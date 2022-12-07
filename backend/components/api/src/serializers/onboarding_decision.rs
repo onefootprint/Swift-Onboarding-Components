@@ -2,7 +2,7 @@ use api_wire_types::Actor;
 use db::{
     actor::SaturatedActor,
     models::{
-        ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, tenant_user::TenantUser,
+        ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision,
         verification_request::VerificationRequest,
     },
 };

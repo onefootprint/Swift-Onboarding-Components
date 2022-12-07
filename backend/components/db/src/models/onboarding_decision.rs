@@ -14,13 +14,12 @@ use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     AnnotationId, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId,
-    OnboardingStatus, TenantUserId, UserVaultId, VerificationResultId,
+    OnboardingStatus, UserVaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::ObConfiguration;
 use super::onboarding::Onboarding;
-use super::tenant_user::TenantUser;
 use super::user_timeline::UserTimeline;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -130,9 +129,7 @@ impl OnboardingDecision {
         conn: &mut PgConnection,
         ids: Vec<&OnboardingDecisionId>,
     ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
-        use crate::schema::{
-            ob_configuration, onboarding, tenant_user, verification_request, verification_result,
-        };
+        use crate::schema::{ob_configuration, onboarding, verification_request, verification_result};
         let results: Vec<(Self, (Onboarding, ObConfiguration))> = onboarding_decision::table
             .inner_join(onboarding::table.inner_join(ob_configuration::table))
             .filter(onboarding_decision::id.eq_any(ids))
@@ -162,7 +159,7 @@ impl OnboardingDecision {
             .into_iter()
             .zip(onboarding_decisions_with_actors.into_iter())
             .map(
-                |((onboarding_decision, (onboarding, onboarding_configuration)), (_, saturated_db_actor))| {
+                |((onboarding_decision, (_, onboarding_configuration)), (_, saturated_db_actor))| {
                     (
                         onboarding_decision.clone(),
                         onboarding_configuration,

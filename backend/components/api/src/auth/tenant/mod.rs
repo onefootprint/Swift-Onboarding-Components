@@ -1,5 +1,5 @@
 mod ob_public_key;
-use db::models::{tenant::Tenant, tenant_user::TenantUser};
+use db::models::tenant::Tenant;
 pub use ob_public_key::*;
 mod secret_key;
 pub use secret_key::*;

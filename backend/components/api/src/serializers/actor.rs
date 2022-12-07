@@ -1,6 +1,5 @@
 use api_wire_types::Actor;
-use db::{actor::SaturatedActor, models::tenant_user::TenantUser};
-use newtypes::DbActor;
+use db::actor::SaturatedActor;
 
 use crate::utils::db2api::DbToApi;
 

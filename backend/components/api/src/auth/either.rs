@@ -1,7 +1,7 @@
 use std::pin::Pin;
 
 use actix_web::FromRequest;
-use db::models::{tenant::Tenant, tenant_user::TenantUser};
+use db::models::tenant::Tenant;
 use futures_util::Future;
 use newtypes::DataAttribute;
 

@@ -1,6 +1,5 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::WorkOsAuthContext;
-use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
@@ -29,7 +28,6 @@ pub async fn post(
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::ManualReview])?;
     let tenant_id = auth.tenant().id.clone();
-    let actor = auth.actor();
     let is_live = auth.is_live()?;
     let fp_user_id = fp_user_id.into_inner();
     let actor = auth.actor();

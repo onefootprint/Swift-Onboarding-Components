@@ -4,7 +4,7 @@ use crate::{DbError, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::PgConnection;
-use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId, TenantUserId};
+use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Default, Serialize, Deserialize)]

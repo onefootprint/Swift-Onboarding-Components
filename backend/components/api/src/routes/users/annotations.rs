@@ -15,14 +15,12 @@ use crate::State;
 
 use actix_web::web::Json;
 use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
-use db::actor::SaturatedActor;
 use db::models::annotation::Annotation;
 use db::models::annotation::AnnotationInfo;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
 use db::DbError;
 use newtypes::AnnotationId;
-use newtypes::DbActor;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
 use paperclip::actix::Apiv2Schema;
