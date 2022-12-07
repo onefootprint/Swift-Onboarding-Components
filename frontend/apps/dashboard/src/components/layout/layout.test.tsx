@@ -17,8 +17,8 @@ describe('<Layout />', () => {
     useRouterSpy({ pathname: '/lorem' });
   });
 
-  const renderLayout = ({ children = 'Foo' }: Partial<LayoutProps>) =>
-    customRender(<Layout>{children}</Layout>);
+  const renderLayout = ({ children = 'Foo', name }: Partial<LayoutProps>) =>
+    customRender(<Layout name={name}>{children}</Layout>);
 
   describe('when the user is NOT logged', () => {
     beforeEach(() => {
@@ -31,7 +31,7 @@ describe('<Layout />', () => {
     });
   });
 
-  describe.skip('when the user is logged', () => {
+  describe('when the user is logged', () => {
     beforeEach(() => {
       useStore.setState({
         data: {
@@ -44,9 +44,15 @@ describe('<Layout />', () => {
         },
       });
     });
-    it('should render the private layout', () => {
-      renderLayout({});
-      expect(screen.getByTestId('private-layout')).toBeInTheDocument();
+
+    it('should render the default template', () => {
+      renderLayout({ name: 'default' });
+      expect(screen.getByTestId('private-default-layout')).toBeInTheDocument();
+    });
+
+    it('should render the blank template', () => {
+      renderLayout({ name: 'blank' });
+      expect(screen.getByTestId('private-blank-layout')).toBeInTheDocument();
     });
   });
 });

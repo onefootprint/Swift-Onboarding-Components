@@ -89,7 +89,10 @@
   },
   "components": {
     "private-layout": {
-      "nav-dropdown": {
+      "nav": {
+        "users": "Users",
+        "security-logs": "Security Logs",
+        "developers": "Developers",
         "log-out": "Log out"
       },
       "sandbox-banner": {

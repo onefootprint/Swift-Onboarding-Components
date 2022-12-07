@@ -6,12 +6,13 @@ import PublicLayout from './components/public-layout';
 
 export type LayoutProps = {
   children: React.ReactNode;
+  name?: string;
 };
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, name = 'default' }: LayoutProps) => {
   const { isLoggedIn } = useSessionUser();
   return isLoggedIn ? (
-    <PrivateLayout>{children}</PrivateLayout>
+    <PrivateLayout name={name}>{children}</PrivateLayout>
   ) : (
     <PublicLayout>{children}</PublicLayout>
   );

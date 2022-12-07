@@ -3,6 +3,7 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 import themes from '@onefootprint/design-tokens';
 import FootprintDevTools from '@onefootprint/dev-tools';
 import { DesignSystemProvider } from '@onefootprint/ui';
+import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
@@ -16,11 +17,6 @@ import { UserDataProvider } from './users/hooks/use-user-data';
 
 configureSentry();
 configureReactI18next();
-
-type AppProps = {
-  Component: React.FC;
-  pageProps: Record<string, any>;
-};
 
 const App = ({ Component, pageProps }: AppProps) => {
   const [mounted, setMounted] = useState(false);
@@ -38,8 +34,8 @@ const App = ({ Component, pageProps }: AppProps) => {
           <UserDataProvider>
             <GlobalStyle />
             <PageGuard>
-              <Layout>
-                <Component {...pageProps} />
+              <Layout name={pageProps.layout}>
+                <Component />
               </Layout>
             </PageGuard>
           </UserDataProvider>
