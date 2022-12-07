@@ -182,7 +182,7 @@ impl DataLifetime {
     }
 
     /// Given a list of DataLifetimeIds, marks the active DataLifetime rows as deactivated.
-    pub(crate) fn bulk_deactivate(
+    pub fn bulk_deactivate(
         conn: &mut PgConnection,
         ids: Vec<DataLifetimeId>,
         seqno: DataLifetimeSeqno,

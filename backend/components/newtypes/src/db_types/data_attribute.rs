@@ -1,4 +1,4 @@
-use crate::{PiiString, SaltedFingerprint};
+use crate::{CollectedData, PiiString, SaltedFingerprint};
 use crypto::sha256;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -70,6 +70,19 @@ impl DataAttribute {
 
     pub fn fingerprintable() -> impl Iterator<Item = DataAttribute> {
         Self::iter().filter(DataAttribute::allows_fingerprint)
+    }
+
+    /// Maps the DataAttribute to the CollectedData that may collect this attribute
+    fn parent(&self) -> Option<CollectedData> {
+        CollectedData::iter().find(|c| c.children().contains(self))
+    }
+
+    /// Get the list of DataAttributes that should be cleared when this kind is updated
+    pub fn kinds_to_clear(&self) -> Vec<Self> {
+        // Look at the CollectedData that encompasses this DataAttribute.
+        // All of the other DataAttributes represented by that CollectedData need to be cleared
+        // when one is set
+        self.parent().map(|c| c.children()).unwrap_or_default()
     }
 }
 

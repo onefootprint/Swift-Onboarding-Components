@@ -2,26 +2,33 @@ use std::collections::HashMap;
 
 use diesel::PgConnection;
 use itertools::Itertools;
-use newtypes::{DataLifetimeId, UserVaultId};
+use newtypes::{DataLifetimeId, SealedVaultBytes, UserVaultId};
 
 use crate::{models::data_lifetime::DataLifetime, DbError, DbResult};
 
 /// Defines common functionality required for pieces of data that belong to a user vault and
 /// have an associated DataLifetime.
-pub trait HasLifetime: Sized {
+pub trait HasLifetime {
     /// Get the lifetime_id associated with this row.
     fn lifetime_id(&self) -> &DataLifetimeId;
 
+    fn e_data(&self) -> &SealedVaultBytes;
+
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to a single user vault.
-    fn get_for(conn: &mut PgConnection, lifetimes: &[DataLifetimeId]) -> DbResult<Vec<Self>>;
+    fn get_for(conn: &mut PgConnection, lifetimes: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    where
+        Self: Sized;
 
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to potentially multiple user vaults.
     fn bulk_get(
         conn: &mut PgConnection,
         lifetimes: &[&DataLifetime],
-    ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
+    ) -> DbResult<HashMap<UserVaultId, Vec<Self>>>
+    where
+        Self: Sized,
+    {
         let lifetime_ids: Vec<_> = lifetimes.iter().map(|l| l.id.clone()).collect();
         let lifetime_id_to_uv_id: HashMap<DataLifetimeId, UserVaultId> =
             HashMap::from_iter(lifetimes.iter().map(|l| (l.id.clone(), l.user_vault_id.clone())));

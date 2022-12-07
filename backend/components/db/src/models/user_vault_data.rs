@@ -96,7 +96,14 @@ impl HasLifetime for UserVaultData {
         &self.lifetime_id
     }
 
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
+    fn e_data(&self) -> &SealedVaultBytes {
+        &self.e_data
+    }
+
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
         let results = user_vault_data::table
             .filter(user_vault_data::lifetime_id.eq_any(lifetime_ids))
             .get_results(conn)?;

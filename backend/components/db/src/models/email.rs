@@ -126,8 +126,15 @@ impl HasLifetime for Email {
         &self.lifetime_id
     }
 
+    fn e_data(&self) -> &SealedVaultBytes {
+        &self.e_data
+    }
+
     /// Note: only returns primary emails
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
         let results = email::table
             .filter(email::lifetime_id.eq_any(lifetime_ids))
             .filter(email::priority.eq(DataPriority::Primary))

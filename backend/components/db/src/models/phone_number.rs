@@ -122,8 +122,14 @@ impl HasLifetime for PhoneNumber {
         &self.lifetime_id
     }
 
+    fn e_data(&self) -> &SealedVaultBytes {
+        &self.e_e164
+    }
     /// Note: only returns primary phone numbers
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
         let results = phone_number::table
             .filter(phone_number::lifetime_id.eq_any(lifetime_ids))
             .filter(phone_number::priority.eq(DataPriority::Primary))
