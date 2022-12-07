@@ -15,7 +15,7 @@ import {
   Typography,
   useToast,
 } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 
@@ -31,6 +31,7 @@ const ResendCodeButton = () => {
   const signupChallengeMutation = useSignupChallenge();
   const showRequestErrorToast = useRequestErrorToast();
   const { setDate, countdown } = useCountdown();
+  const [resendClicked, setResendClicked] = useState(false);
 
   useEffect(() => {
     const retryDisabledUntil = challengeData?.retryDisabledUntil;
@@ -98,6 +99,11 @@ const ResendCodeButton = () => {
   };
 
   const handleResend = () => {
+    setResendClicked(true);
+    if (countdown > 0) {
+      return;
+    }
+
     // Depending on if the user's phone is known (if this is a new user who went
     // through the phone-registration page) handle resending differently
     if (userFound) {
@@ -109,10 +115,14 @@ const ResendCodeButton = () => {
 
   return (
     <Container>
-      <LinkButton disabled={countdown > 0} onClick={handleResend}>
+      <LinkButton
+        disabled={resendClicked && countdown > 0}
+        onClick={handleResend}
+        size="compact"
+      >
         {t('cta')}
       </LinkButton>
-      {countdown > 0 && (
+      {resendClicked && countdown > 0 && (
         <Typography variant="body-4" color="tertiary">
           {t('disabled', { seconds: countdown })}{' '}
         </Typography>
