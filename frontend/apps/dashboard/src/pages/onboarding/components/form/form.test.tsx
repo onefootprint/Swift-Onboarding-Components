@@ -18,6 +18,10 @@ describe('<Form />', () => {
 
       const userDataStep = screen.getByText('Tell us about you');
       expect(userDataStep).toBeInTheDocument();
+
+      const nameInput = screen.getByLabelText('Full name');
+      await userEvent.type(nameInput, 'Jane Doe');
+
       await userEvent.click(screen.getByRole('button', { name: 'Next' }));
 
       const companyDataStep = screen.getByText('Tell us about your company');
@@ -43,6 +47,9 @@ describe('<Form />', () => {
 
       const userDataStep = screen.getByText('Tell us about you');
       expect(userDataStep).toBeInTheDocument();
+
+      const nameInput = screen.getByLabelText('Full name');
+      await userEvent.type(nameInput, 'Jane Doe');
       await userEvent.click(screen.getByRole('button', { name: 'Next' }));
 
       const companyDataStep = screen.getByText('Tell us about your company');

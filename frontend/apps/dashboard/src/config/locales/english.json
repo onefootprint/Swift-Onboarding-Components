@@ -145,6 +145,23 @@
         "title": "Welcome to Footprint!",
         "subtitle": "Your account is almost ready. We just need a bit more information about you and your company."
       },
+      "user-data": {
+        "title": "Tell us about you",
+        "subtitle": "Please provide some basic personal information",
+        "form": {
+          "email": {
+            "label": "Email address",
+            "placeholder": "jane.doe@acmebank.com"
+          },
+          "name": {
+            "label": "Full name",
+            "placeholder": "Jane Doe",
+            "errors": {
+              "required": "Please enter a name"
+            }
+          }
+        }
+      },
       "logged-as": "Logged in as"
     },
     "users": {

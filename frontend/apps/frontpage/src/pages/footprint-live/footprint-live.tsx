@@ -6,7 +6,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import Blob from './components/blobs/blobs';
+import Blob from './components/blobs';
 
 const publicKey = 'ob_test_CnzlAM1i4ce9IV5EsIxFbn';
 

@@ -13,8 +13,8 @@ describe('<Onboarding />', () => {
     useStore.setState({
       data: {
         auth: '1',
-        email: 'john.doe@gmail.com',
-        firstName: 'John',
+        email: 'jane.doe@acme.com',
+        firstName: 'Jane',
         lastName: 'Doe',
         sandboxRestricted: false,
         tenantName: 'Footprint',
@@ -29,7 +29,7 @@ describe('<Onboarding />', () => {
   it('should render the logged user email', () => {
     renderOnboarding();
 
-    const email = screen.getByText('john.doe@gmail.com');
+    const email = screen.getByText('jane.doe@acme.com');
     expect(email).toBeInTheDocument();
   });
 });
