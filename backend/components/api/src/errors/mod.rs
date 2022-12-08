@@ -155,6 +155,23 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
     }
 }
 
+impl ApiError {
+    fn message(&self) -> String {
+        match self {
+            // omit database errors always
+            ApiError::Database(e) => if e.is_not_found() {
+                "data not found"
+            } else if e.is_constraint_violation() {
+                "data not allowed: violation"
+            } else {
+                "something went wrong"
+            }
+            .to_string(),
+            _ => self.to_string(),
+        }
+    }
+}
+
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self {
@@ -211,7 +228,7 @@ impl actix_web::ResponseError for ApiError {
             "something went wrong".to_string()
         } else {
             tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api error");
-            self.to_string()
+            self.message()
         };
 
         let response = ApiResponseError {
