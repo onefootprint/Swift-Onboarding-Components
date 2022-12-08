@@ -4,7 +4,7 @@ import { Box, Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { getDateRange } from 'src/utils/date-range';
 
-import useFilters from '../../hooks/user-users-filters';
+import useFilters from '../../hooks/use-users-filters';
 import Form, { FormData } from './components/form';
 import { NEXT_WEEK, TODAY } from './filters.constants';
 

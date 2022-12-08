@@ -13,7 +13,7 @@ import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import useUserFilters, {
   getCursors,
   ScopedUsersListQueryString,
-} from 'src/pages/users/hooks/user-users-filters';
+} from 'src/pages/users/hooks/use-users-filters';
 import { dateRangeToFilterParams } from 'src/utils/date-range';
 
 type ScopedUsersListQueryKey = [
@@ -51,7 +51,15 @@ const getScopedUsersRequest = async ({
   return response.data;
 };
 
-const useGetScopedUsers = (pageSize: number) => {
+const useGetScopedUsers = (
+  pageSize: number,
+  options: {
+    onSuccess?: (
+      data: PaginatedRequestResponse<ScopedUsersListResponse>,
+    ) => void;
+    onError?: (error: RequestError) => void;
+  } = {},
+) => {
   const { authHeaders } = useSessionUser();
   const { filters } = useUserFilters();
 
@@ -77,6 +85,8 @@ const useGetScopedUsers = (pageSize: number) => {
     getScopedUsersRequest,
     {
       retry: false,
+      onSuccess: options?.onSuccess,
+      onError: options.onError,
     },
   );
 };
