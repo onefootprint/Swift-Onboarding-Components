@@ -5,7 +5,7 @@ use crate::utils::db2api::DbToApi;
 
 impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
     fn from_db(
-        (onboarding, config, liveness_event, insight, manual_review, latest_decision): SerializableOnboardingInfo,
+        (onboarding, config, (_, liveness_event), insight, manual_review, latest_decision): SerializableOnboardingInfo,
     ) -> Self {
         let Onboarding { start_timestamp, .. } = onboarding;
         let status = latest_decision.as_ref().and_then(|d| d.0.visible_status());

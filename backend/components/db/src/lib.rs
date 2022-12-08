@@ -276,15 +276,19 @@ pub async fn private_cleanup_integration_tests(
                     .filter(annotation::scoped_user_id.eq_any(su_ids))
                     .execute(conn.conn())?;
 
+                deleted_rows += diesel::delete(liveness_event::table)
+                    .filter(liveness_event::scoped_user_id.eq_any(su_ids))
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(document_request::table)
+                    .filter(document_request::scoped_user_id.eq_any(su_ids))
+                    .execute(conn.conn())?;
+
                 // Onboardings
                 {
                     let ob_ids = onboarding::table
                         .filter(onboarding::scoped_user_id.eq_any(su_ids))
                         .select(onboarding::id);
-
-                    deleted_rows += diesel::delete(liveness_event::table)
-                        .filter(liveness_event::onboarding_id.eq_any(ob_ids))
-                        .execute(conn.conn())?;
 
                     deleted_rows += diesel::delete(manual_review::table)
                         .filter(manual_review::onboarding_id.eq_any(ob_ids))
@@ -319,10 +323,6 @@ pub async fn private_cleanup_integration_tests(
                             .filter(verification_request::onboarding_id.eq_any(ob_ids))
                             .execute(conn.conn())?;
                     }
-
-                    deleted_rows += diesel::delete(document_request::table)
-                        .filter(document_request::onboarding_id.eq_any(ob_ids))
-                        .execute(conn.conn())?;
 
                     deleted_rows += diesel::delete(onboarding::table)
                         .filter(onboarding::scoped_user_id.eq_any(su_ids))

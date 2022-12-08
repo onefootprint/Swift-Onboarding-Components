@@ -8,7 +8,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    Base64Data, DocumentRequestId, IdentityDocumentId, OnboardingId, SealedVaultDataKey, UserVaultId,
+    Base64Data, DocumentRequestId, IdentityDocumentId, ScopedUserId, SealedVaultDataKey, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -25,7 +25,7 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub onboarding_id: Option<OnboardingId>,
+    pub scoped_user_id: Option<ScopedUserId>,
     pub e_data_key: SealedVaultDataKey,
 }
 
@@ -67,7 +67,7 @@ pub struct NewIdentityDocument {
     pub document_type: String,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
-    pub onboarding_id: Option<OnboardingId>,
+    pub scoped_user_id: Option<ScopedUserId>,
     pub e_data_key: SealedVaultDataKey,
 }
 
@@ -81,7 +81,7 @@ impl IdentityDocument {
         back_image_s3_url: Option<String>,
         document_type: String,
         country_code: String,
-        onboarding_id: Option<OnboardingId>,
+        scoped_user_id: Option<ScopedUserId>,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let new = NewIdentityDocument {
@@ -92,7 +92,7 @@ impl IdentityDocument {
             document_type,
             country_code,
             created_at: Utc::now(),
-            onboarding_id,
+            scoped_user_id,
             e_data_key,
         };
         let result = diesel::insert_into(identity_document::table)
@@ -109,12 +109,12 @@ impl IdentityDocument {
         Ok(res)
     }
     /// Get all the documents collected for a given onboarding
-    pub fn get_for_onboarding_id(
+    pub fn get_for_scoped_user_id(
         conn: &mut PgConnection,
-        onboarding_id: OnboardingId,
+        scoped_user_id: &ScopedUserId,
     ) -> DbResult<Vec<Self>> {
         let results = identity_document::table
-            .filter(identity_document::onboarding_id.eq(onboarding_id))
+            .filter(identity_document::scoped_user_id.eq(scoped_user_id))
             .get_results(conn)?;
 
         Ok(results)

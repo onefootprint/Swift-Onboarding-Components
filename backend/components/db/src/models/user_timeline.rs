@@ -6,7 +6,7 @@ use crate::{schema::user_timeline, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{DbUserTimelineEvent, FootprintUserId, OnboardingId, TenantId, UserTimelineId, UserVaultId};
+use newtypes::{DbUserTimelineEvent, FootprintUserId, ScopedUserId, TenantId, UserTimelineId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
@@ -17,7 +17,7 @@ use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecision
 #[diesel(table_name = user_timeline)]
 pub struct UserTimeline {
     pub id: UserTimelineId,
-    pub onboarding_id: Option<OnboardingId>,
+    pub scoped_user_id: Option<ScopedUserId>,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -29,7 +29,7 @@ pub struct UserTimeline {
 #[diesel(table_name = user_timeline)]
 pub struct NewUserTimeline {
     pub user_vault_id: UserVaultId,
-    pub onboarding_id: Option<OnboardingId>,
+    pub scoped_user_id: Option<ScopedUserId>,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
 }
@@ -51,14 +51,14 @@ impl UserTimeline {
         conn: &mut PgConnection,
         event: T,
         user_vault_id: UserVaultId,
-        onboarding_id: Option<OnboardingId>,
+        scoped_user_id: Option<ScopedUserId>,
     ) -> DbResult<()>
     where
         T: Into<DbUserTimelineEvent>,
     {
         let new = NewUserTimeline {
             event: event.into(),
-            onboarding_id,
+            scoped_user_id,
             user_vault_id,
             timestamp: chrono::Utc::now(),
         };
@@ -76,21 +76,13 @@ impl UserTimeline {
     ) -> DbResult<Vec<UserTimelineInfo>> {
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
-        use crate::schema::{onboarding, scoped_user};
-        let su: ScopedUser = scoped_user::table
-            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
-            .get_result(conn)?;
-        let onboarding_ids = onboarding::table
-            .filter(onboarding::scoped_user_id.eq(su.id))
-            .select(onboarding::id.nullable());
+        let su = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
         let results: Vec<Self> = user_timeline::table
             .filter(user_timeline::user_vault_id.eq(su.user_vault_id))
             .filter(
-                user_timeline::onboarding_id
+                user_timeline::scoped_user_id
                     .is_null()
-                    .or(user_timeline::onboarding_id.eq_any(onboarding_ids)),
+                    .or(user_timeline::scoped_user_id.eq(su.id)),
             )
             .order_by(user_timeline::timestamp.asc())
             .get_results(conn)?;

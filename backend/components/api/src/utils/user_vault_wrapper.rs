@@ -27,8 +27,8 @@ use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
     CollectedDataOption, DataAttribute, DataCollectedInfo, DataLifetimeId, DataLifetimeSeqno, DataPriority,
-    EmailId, Fingerprint, IdentityDocumentId, KvDataKey, OnboardingId, PiiString, ScopedUserId,
-    SealedVaultBytes, SealedVaultDataKey, TenantId, UvdKind, ValidatedPhoneNumber,
+    EmailId, Fingerprint, IdentityDocumentId, KvDataKey, PiiString, ScopedUserId, SealedVaultBytes,
+    SealedVaultDataKey, TenantId, UvdKind, ValidatedPhoneNumber,
 };
 
 use crate::errors::user::UserError;
@@ -466,7 +466,6 @@ impl UserVaultWrapper {
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
         fingerprints: Vec<(UvdKind, Fingerprint)>,
-        onboarding_id: Option<OnboardingId>,
     ) -> Result<(), ApiError> {
         self.assert_is_locked(conn)?;
         let existing_fields = self.get_populated_fields();
@@ -486,9 +485,7 @@ impl UserVaultWrapper {
                     attributes: collected_data,
                 },
                 self.user_vault.id,
-                // TODO point this at ScopedUser rather than Onboarding.
-                // Even identity data updates to vault-only users should make an audit trail log
-                onboarding_id,
+                self.scoped_user_id,
             )?;
         }
 

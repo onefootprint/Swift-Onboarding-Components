@@ -68,7 +68,7 @@ pub fn get_requirements(
     // In various places in the codebase, we will determine if a DocumentRequest should be created
     //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
     //      we will create a DocumentRequest row.
-    let document_request_requirements = DocumentRequest::get_active_requests(conn, onboarding.id.clone())?
+    let document_request_requirements = DocumentRequest::get_active_requests(conn, scoped_user_id)?
         .into_iter()
         .map(|request| OnboardingRequirement::CollectDocument {
             document_request_id: request.id,
@@ -112,7 +112,7 @@ pub fn get_fields_to_authorize(
     let mut identity_documents: Vec<String> = vec![];
     if ob_config.can_access_identity_document_images {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-        identity_documents = IdentityDocument::get_for_onboarding_id(conn, onboarding.id)?
+        identity_documents = IdentityDocument::get_for_scoped_user_id(conn, &onboarding.scoped_user_id)?
             .into_iter()
             .map(|id| id.document_type)
             .unique()

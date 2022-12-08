@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use crate::schema;
 
 use crate::schema::liveness_event;
-use crate::schema::onboarding;
 use crate::schema::scoped_user;
 use crate::DbError;
 use crate::DbResult;
@@ -20,7 +19,7 @@ use newtypes::LivenessAttributes;
 
 use newtypes::TenantId;
 use newtypes::UserVaultId;
-use newtypes::{LivenessEventId, LivenessSource, OnboardingId};
+use newtypes::{LivenessEventId, LivenessSource, ScopedUserId};
 
 use serde::{Deserialize, Serialize};
 
@@ -30,7 +29,7 @@ use super::insight_event::InsightEvent;
 #[diesel(table_name = liveness_event)]
 pub struct LivenessEvent {
     pub id: LivenessEventId,
-    pub onboarding_id: OnboardingId,
+    pub scoped_user_id: ScopedUserId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
     pub created_at: DateTime<Utc>,
@@ -40,28 +39,16 @@ pub struct LivenessEvent {
 }
 
 impl LivenessEvent {
-    pub fn get_for_onboarding_id(
-        conn: &mut PgConnection,
-        onboarding_id: &OnboardingId,
-    ) -> Result<Vec<Self>, DbError> {
-        Ok(liveness_event::table
-            .filter(liveness_event::onboarding_id.eq(onboarding_id))
-            .get_results(conn)?)
-    }
-
     pub fn get_by_user_vault_id(
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
     ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
-        let scoped_ids = scoped_user::table
+        use schema::insight_event;
+        let results = liveness_event::table
+            .inner_join(insight_event::table)
+            .inner_join(scoped_user::table)
             .filter(scoped_user::user_vault_id.eq(user_vault_id))
-            .select(scoped_user::id);
-
-        let results = onboarding::table
-            .filter(onboarding::scoped_user_id.eq_any(scoped_ids))
-            .inner_join(liveness_event::table)
-            .inner_join(schema::insight_event::table)
-            .select((liveness_event::all_columns, schema::insight_event::all_columns))
+            .select((liveness_event::all_columns, insight_event::all_columns))
             .load(conn)?;
         Ok(results)
     }
@@ -72,16 +59,13 @@ impl LivenessEvent {
         tenant_id: &TenantId,
         is_live: bool,
     ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
-        let scoped_ids = schema::scoped_user::table
-            .filter(schema::scoped_user::tenant_id.eq(tenant_id))
-            .filter(schema::scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(schema::scoped_user::is_live.eq(is_live))
-            .select(schema::scoped_user::id);
-
-        let results = onboarding::table
-            .filter(onboarding::scoped_user_id.eq_any(scoped_ids))
-            .inner_join(liveness_event::table)
-            .inner_join(schema::insight_event::table)
+        use schema::insight_event;
+        let results = liveness_event::table
+            .inner_join(insight_event::table)
+            .inner_join(scoped_user::table)
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_user::is_live.eq(is_live))
             .select((liveness_event::all_columns, schema::insight_event::all_columns))
             .load(conn)?;
         Ok(results)
@@ -106,7 +90,7 @@ impl LivenessEvent {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = liveness_event)]
 pub struct NewLivenessEvent {
-    pub onboarding_id: OnboardingId,
+    pub scoped_user_id: ScopedUserId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
     pub insight_event_id: InsightEventId,

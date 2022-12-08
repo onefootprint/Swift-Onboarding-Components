@@ -82,7 +82,7 @@ impl OnboardingDecision {
 
     pub fn create(conn: &mut TxnPgConnection, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
         // Lock Onboarding so a new decision isn't added while we deactivate the old
-        Onboarding::lock(conn, &args.onboarding_id)?;
+        let ob = Onboarding::lock(conn, &args.onboarding_id)?;
 
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
@@ -125,7 +125,7 @@ impl OnboardingDecision {
                 annotation_id: args.annotation_id,
             },
             args.user_vault_id,
-            Some(args.onboarding_id.clone()),
+            Some(ob.scoped_user_id),
         )?;
         Ok(result)
     }

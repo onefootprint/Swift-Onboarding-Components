@@ -228,7 +228,7 @@ pub async fn complete_post(
             if let Some(ref ob_info) = ob_info {
                 let liveness_event = if let Some(attributes) = liveness_event_attributes {
                     NewLivenessEvent {
-                        onboarding_id: ob_info.onboarding.id.clone(),
+                        scoped_user_id: ob_info.scoped_user.id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: Some(attributes),
                         insight_event_id: insight_event.id.clone(),
@@ -241,7 +241,7 @@ pub async fn complete_post(
                     // maintain the mechanics that webauthn -> liveness
                     // we should update this such that liveness is skipped via API call
                     NewLivenessEvent {
-                        onboarding_id: ob_info.onboarding.id.clone(),
+                        scoped_user_id: ob_info.scoped_user.id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: None,
                         insight_event_id: insight_event.id.clone(),
@@ -256,7 +256,7 @@ pub async fn complete_post(
                         id: liveness_event.id,
                     },
                     user_auth.user_vault_id(),
-                    Some(ob_info.onboarding.id.clone()),
+                    Some(ob_info.scoped_user.id.clone()),
                 )?;
             }
 

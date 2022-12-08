@@ -27,7 +27,7 @@ use db::models::scoped_user::ScopedUser;
 use newtypes::csv::Csv;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataAttribute, DataIdentifier, Fingerprint, FootprintUserId,
-    OnboardingId, PiiString, TenantPermission, UvdKind,
+    PiiString, TenantPermission, UvdKind,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -57,7 +57,7 @@ pub async fn put(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
-            let (scoped_user, ob) = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let scoped_user = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
             let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
             put_internal(
                 conn,
@@ -67,7 +67,6 @@ pub async fn put(
                 insight,
                 update,
                 fingerprints,
-                ob.map(|ob| ob.id),
             )?;
             Ok(())
         })
@@ -84,7 +83,6 @@ pub fn put_internal(
     insight: CreateInsightEvent,
     update: IdentityDataUpdate,
     fingerprints: Vec<(UvdKind, Fingerprint)>,
-    onboarding_id: Option<OnboardingId>,
 ) -> ApiResult<()> {
     if uvw.user_vault.is_portable {
         return Err(AuthError::CannotModifyPortableUser.into());
@@ -104,7 +102,7 @@ pub fn put_internal(
             .collect(),
     }
     .create(conn)?;
-    uvw.update_identity_data(conn, update, fingerprints, onboarding_id)?;
+    uvw.update_identity_data(conn, update, fingerprints)?;
     Ok(())
 }
 
@@ -155,7 +153,7 @@ pub(super) async fn get_internal(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (scoped_user, _) = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let scoped_user = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
             let user_vault_wrapper = UserVaultWrapper::get_for_tenant(conn, &scoped_user.id)?;
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 
@@ -229,7 +227,7 @@ pub(super) async fn post_decrypt_internal(
     let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (scoped_user, _) = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let scoped_user = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
             let user_vault_wrapper = UserVaultWrapper::get_for_tenant(conn, &scoped_user.id)?;
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 

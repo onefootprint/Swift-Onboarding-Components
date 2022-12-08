@@ -111,7 +111,7 @@ impl<'a> From<(&'a UserVaultId, &'a ObConfigurationId)> for OnboardingIdentifier
 type OnboardingInfo<TDecision> = (
     Onboarding,
     ObConfiguration,
-    Option<LivenessEvent>,
+    (ScopedUser, Option<LivenessEvent>),
     InsightEvent,
     Option<ManualReview>,
     Option<TDecision>,
@@ -228,7 +228,7 @@ impl Onboarding {
         let result: Vec<OnboardingInfo<OnboardingDecision>> = onboarding::table
             .inner_join(ob_configuration::table)
             // TODO return all liveness events
-            .left_join(liveness_event::table)
+            .inner_join(scoped_user::table.left_join(liveness_event::table))
             .inner_join(insight_event::table)
             // Only fetch active manual review for this onboarding
             .left_join(manual_review::table)
@@ -294,7 +294,7 @@ impl Onboarding {
 
         // To prevent duplicate document requests, only create a doc request if the onboarding is new
         if args.should_create_document_request {
-            DocumentRequest::create(conn, ob.id.clone(), None)?;
+            DocumentRequest::create(conn, ob.scoped_user_id.clone(), None)?;
         }
 
         Ok(ob)

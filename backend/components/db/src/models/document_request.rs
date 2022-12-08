@@ -2,14 +2,14 @@ use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{DocumentRequestId, DocumentRequestStatus, OnboardingId};
+use newtypes::{DocumentRequestId, DocumentRequestStatus, ScopedUserId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
-    pub onboarding_id: OnboardingId,
+    pub scoped_user_id: ScopedUserId,
     pub ref_id: Option<String>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
@@ -31,11 +31,11 @@ impl DocumentRequestUpdate {
 impl DocumentRequest {
     pub fn create(
         conn: &mut PgConnection,
-        onboarding_id: OnboardingId,
+        scoped_user_id: ScopedUserId,
         ref_id: Option<String>,
     ) -> DbResult<Self> {
         let new = NewDocumentRequest {
-            onboarding_id,
+            scoped_user_id,
             ref_id,
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
@@ -46,9 +46,12 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    pub fn get_active_requests(conn: &mut PgConnection, onboarding_id: OnboardingId) -> DbResult<Vec<Self>> {
+    pub fn get_active_requests(
+        conn: &mut PgConnection,
+        scoped_user_id: &ScopedUserId,
+    ) -> DbResult<Vec<Self>> {
         let results = document_request::table
-            .filter(document_request::onboarding_id.eq(onboarding_id))
+            .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
             .load::<Self>(conn)?;
 
@@ -57,11 +60,11 @@ impl DocumentRequest {
 
     pub fn get(
         conn: &mut PgConnection,
-        onboarding_id: &OnboardingId,
+        scoped_user_id: &ScopedUserId,
         request_id: &DocumentRequestId,
     ) -> DbResult<Self> {
         let result = document_request::table
-            .filter(document_request::onboarding_id.eq(onboarding_id))
+            .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .filter(document_request::id.eq(request_id))
             .first(conn)?;
 
@@ -95,7 +98,7 @@ impl DocumentRequest {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct NewDocumentRequest {
-    pub onboarding_id: OnboardingId,
+    pub scoped_user_id: ScopedUserId,
     pub ref_id: Option<String>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,

@@ -1,5 +1,3 @@
-use super::onboarding::Onboarding;
-use super::tenant::Tenant;
 use crate::schema::scoped_user;
 use crate::{DbPool, DbResult};
 use chrono::{DateTime, Utc};
@@ -7,6 +5,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{FootprintUserId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
+
+use super::tenant::Tenant;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = scoped_user)]
@@ -95,10 +95,8 @@ impl ScopedUser {
         footprint_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> DbResult<(ScopedUser, Option<Onboarding>)> {
-        use crate::schema::onboarding;
+    ) -> DbResult<ScopedUser> {
         let result = scoped_user::table
-            .left_join(onboarding::table)
             .filter(scoped_user::fp_user_id.eq(footprint_user_id))
             .filter(scoped_user::tenant_id.eq(tenant_id))
             .filter(scoped_user::is_live.eq(is_live))

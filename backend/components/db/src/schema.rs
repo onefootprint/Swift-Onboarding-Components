@@ -58,7 +58,7 @@ table! {
 
     document_request (id) {
         id -> Text,
-        onboarding_id -> Uuid,
+        scoped_user_id -> Text,
         ref_id -> Nullable<Text>,
         status -> Text,
         created_at -> Timestamptz,
@@ -112,7 +112,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        onboarding_id -> Nullable<Uuid>,
+        scoped_user_id -> Nullable<Text>,
         e_data_key -> Bytea,
     }
 }
@@ -173,7 +173,7 @@ table! {
 
     liveness_event (id) {
         id -> Text,
-        onboarding_id -> Uuid,
+        scoped_user_id -> Text,
         liveness_source -> Text,
         attributes -> Nullable<Jsonb>,
         created_at -> Timestamptz,
@@ -418,7 +418,7 @@ table! {
 
     user_timeline (id) {
         id -> Text,
-        onboarding_id -> Nullable<Uuid>,
+        scoped_user_id -> Nullable<Text>,
         event -> Jsonb,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
@@ -510,15 +510,15 @@ joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(annotation -> scoped_user (scoped_user_id));
 joinable!(data_lifetime -> scoped_user (scoped_user_id));
 joinable!(data_lifetime -> user_vault (user_vault_id));
-joinable!(document_request -> onboarding (onboarding_id));
+joinable!(document_request -> scoped_user (scoped_user_id));
 joinable!(email -> data_lifetime (lifetime_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
-joinable!(identity_document -> onboarding (onboarding_id));
+joinable!(identity_document -> scoped_user (scoped_user_id));
 joinable!(kv_data -> tenant (tenant_id));
 joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
-joinable!(liveness_event -> onboarding (onboarding_id));
+joinable!(liveness_event -> scoped_user (scoped_user_id));
 joinable!(manual_review -> onboarding (onboarding_id));
 joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
 joinable!(ob_configuration -> tenant (tenant_id));
@@ -537,7 +537,7 @@ joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
-joinable!(user_timeline -> onboarding (onboarding_id));
+joinable!(user_timeline -> scoped_user (scoped_user_id));
 joinable!(user_timeline -> user_vault (user_vault_id));
 joinable!(user_vault_data -> data_lifetime (lifetime_id));
 joinable!(verification_request -> onboarding (onboarding_id));

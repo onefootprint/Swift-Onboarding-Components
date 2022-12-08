@@ -36,7 +36,7 @@ async fn post(
             // the data being portable
             let ob_info = user_auth.assert_onboarding(conn)?;
             let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
-            uvw.update_identity_data(conn, update, fingerprints, Some(ob_info.onboarding.id))?;
+            uvw.update_identity_data(conn, update, fingerprints)?;
 
             Ok(())
         })

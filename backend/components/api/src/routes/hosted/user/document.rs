@@ -35,19 +35,19 @@ pub async fn post(
     let uv_id = user_auth.user_vault_id();
     let request_id = DocumentRequestId::from(path.into_inner());
 
-    let (uv, db_document_request, ob_id) = state
+    let (uv, db_document_request, scoped_user_id) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let Some(ob_id) = user_auth.onboarding(conn)?.map(|o| o.onboarding.id) else {
+            let Some(scoped_user_id) = user_auth.onboarding(conn)?.map(|o| o.scoped_user.id) else {
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
                 };
 
             // TODO::9
             // This will error if no doc request is found
-            let db_document_request = DbDocumentRequest::get(conn, &ob_id, &request_id)?;
+            let db_document_request = DbDocumentRequest::get(conn, &scoped_user_id, &request_id)?;
             let uv = UserVault::get(conn, &uv_id)?;
 
-            Ok((uv, db_document_request, ob_id))
+            Ok((uv, db_document_request, scoped_user_id))
         })
         .await?;
     // Check request is pending. If not, there's nothing to do here
@@ -120,7 +120,7 @@ pub async fn post(
                 request.document_type.clone(),
                 // TODO: should be from vendor response
                 request.country_code.clone(),
-                Some(ob_id),
+                Some(scoped_user_id),
                 e_data_key,
             )?;
 
@@ -164,11 +164,12 @@ pub async fn get(
         let doc_req = state
             .db_pool
             .db_transaction(move |conn| -> Result<DbDocumentRequest, ApiError> {
-                let Some(ob_id) = user_auth.onboarding(conn)?.map(|o| o.onboarding.id) else {
+                let Some(scoped_user_id) = user_auth.onboarding(conn)?.map(|o| o.scoped_user.id) else {
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
                 };
                 // This will error if no doc request is found
-                let db_document_request = DbDocumentRequest::get(conn, &ob_id, &document_request_id)?;
+                let db_document_request =
+                    DbDocumentRequest::get(conn, &scoped_user_id, &document_request_id)?;
 
                 Ok(db_document_request)
             })

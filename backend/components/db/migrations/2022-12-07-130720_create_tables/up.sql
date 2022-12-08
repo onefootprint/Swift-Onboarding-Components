@@ -553,19 +553,19 @@ SELECT diesel_manage_updated_at('tenant_user');
 --
 CREATE TABLE document_request (
     id TEXT PRIMARY KEY DEFAULT prefixed_uid('dr_'),
-    onboarding_id UUID NOT NULL,
+    scoped_user_id TEXT NOT NULL,
     ref_id TEXT,
     status TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     _updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_document_request_onboarding_id
-        FOREIGN KEY(onboarding_id) 
-        REFERENCES onboarding(id)
+    CONSTRAINT fk_document_request_scoped_user_id
+        FOREIGN KEY(scoped_user_id) 
+        REFERENCES scoped_user(id)
         DEFERRABLE INITIALLY DEFERRED
 );
 
-CREATE INDEX IF NOT EXISTS document_request_onboarding_id ON document_request(onboarding_id);
+CREATE INDEX IF NOT EXISTS document_request_scoped_user_id ON document_request(scoped_user_id);
 
 SELECT diesel_manage_updated_at('document_request');
 
@@ -584,20 +584,20 @@ CREATE TABLE identity_document (
     created_at TIMESTAMPTZ NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     _updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    onboarding_id UUID,
+    scoped_user_id TEXT,
     e_data_key BYTEA NOT NULL,
     CONSTRAINT fk_identity_document_request_id
         FOREIGN KEY(request_id) 
         REFERENCES document_request(id)
         DEFERRABLE INITIALLY DEFERRED,
-    CONSTRAINT fk_identity_document_onboarding_id
-        FOREIGN KEY(onboarding_id) 
-        REFERENCES onboarding(id)
+    CONSTRAINT fk_identity_document_scoped_user_id
+        FOREIGN KEY(scoped_user_id) 
+        REFERENCES scoped_user(id)
         DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE INDEX IF NOT EXISTS identity_document_request_id ON identity_document(request_id);
-CREATE INDEX IF NOT EXISTS identity_document_onboarding_id ON identity_document(onboarding_id);
+CREATE INDEX IF NOT EXISTS identity_document_scoped_user_id ON identity_document(scoped_user_id);
 
 SELECT diesel_manage_updated_at('identity_document');
 
@@ -681,15 +681,15 @@ SELECT diesel_manage_updated_at('risk_signal');
 
 CREATE TABLE user_timeline (
     id TEXT PRIMARY KEY DEFAULT prefixed_uid('ut_'),
-    onboarding_id UUID,
+    scoped_user_id TEXT,
     event jsonb NOT NULL,
     timestamp timestamptz NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
     user_vault_id TEXT NOT NULL,
-    CONSTRAINT fk_user_timeline_onboarding_id
-        FOREIGN KEY(onboarding_id)
-        REFERENCES onboarding(id)
+    CONSTRAINT fk_user_timeline_scoped_user_id
+        FOREIGN KEY(scoped_user_id)
+        REFERENCES scoped_user(id)
         DEFERRABLE INITIALLY DEFERRED,
     CONSTRAINT fk_user_timeline_user_vault_id
         FOREIGN KEY(user_vault_id)
@@ -697,7 +697,7 @@ CREATE TABLE user_timeline (
         DEFERRABLE INITIALLY DEFERRED
 );
 
-CREATE INDEX IF NOT EXISTS user_timeline_onboarding_id ON user_timeline(onboarding_id);
+CREATE INDEX IF NOT EXISTS user_timeline_scoped_user_id ON user_timeline(scoped_user_id);
 CREATE INDEX IF NOT EXISTS user_timeline_user_vault_id ON user_timeline(user_vault_id);
 
 SELECT diesel_manage_updated_at('user_timeline');
@@ -708,7 +708,7 @@ SELECT diesel_manage_updated_at('user_timeline');
 
 CREATE TABLE liveness_event (
     id TEXT PRIMARY KEY DEFAULT prefixed_uid('liveness_'),
-    onboarding_id UUID NOT NULL,
+    scoped_user_id TEXT NOT NULL,
     liveness_source TEXT NOT NULL,
     attributes jsonb,
     created_at timestamptz NOT NULL DEFAULT NOW(),
@@ -717,8 +717,8 @@ CREATE TABLE liveness_event (
     insight_event_id UUID NOT NULL,
 
     CONSTRAINT fk_liveness_onboarding_id
-        FOREIGN KEY(onboarding_id)
-        REFERENCES onboarding(id)
+        FOREIGN KEY(scoped_user_id)
+        REFERENCES scoped_user(id)
         DEFERRABLE INITIALLY DEFERRED,
     CONSTRAINT fk_liveness_event_insight_event_id
         FOREIGN KEY(insight_event_id)
@@ -726,7 +726,7 @@ CREATE TABLE liveness_event (
         DEFERRABLE INITIALLY DEFERRED
 );
 
-CREATE INDEX IF NOT EXISTS user_liveness_event_onboarding_id ON liveness_event(onboarding_id);
+CREATE INDEX IF NOT EXISTS user_liveness_event_scoped_user_id ON liveness_event(scoped_user_id);
 CREATE INDEX IF NOT EXISTS user_liveness_event_insight_event_id ON liveness_event(insight_event_id);
 
 SELECT diesel_manage_updated_at('liveness_event');
