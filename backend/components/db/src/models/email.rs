@@ -1,5 +1,5 @@
 use crate::{
-    schema::{data_lifetime, email, scoped_user},
+    schema::{data_lifetime, email},
     DbResult, HasLifetime, TxnPgConnection,
 };
 use chrono::{DateTime, Utc};
@@ -26,7 +26,6 @@ pub struct Email {
     pub e_data: SealedVaultBytes,
     pub is_verified: bool,
     pub priority: DataPriority,
-    pub deactivated_at: Option<DateTime<Utc>>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
@@ -44,9 +43,9 @@ pub struct NewEmail {
 impl Email {
     pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = email::table
-            .inner_join(data_lifetime::table.inner_join(scoped_user::table))
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
-            .filter(email::deactivated_at.is_null())
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
+            .filter(data_lifetime::deactivated_seqno.is_null())
             .select(email::all_columns)
             .load(conn)?;
         Ok(results)
@@ -91,9 +90,9 @@ impl Email {
     ) -> DbResult<(Email, UserVault)> {
         use crate::schema::user_vault;
         let result = email::table
-            .inner_join(data_lifetime::table.inner_join(scoped_user::table.inner_join(user_vault::table)))
+            .inner_join(data_lifetime::table.inner_join(user_vault::table))
             .filter(email::id.eq(id))
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
             .select((email::all_columns, user_vault::all_columns))
             .get_result(conn)?;
         Ok(result)

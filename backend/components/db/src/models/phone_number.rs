@@ -1,4 +1,4 @@
-use crate::schema::{data_lifetime, phone_number, scoped_user};
+use crate::schema::{data_lifetime, phone_number};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
@@ -24,7 +24,6 @@ pub struct PhoneNumber {
     pub e_country: SealedVaultBytes,
     pub is_verified: bool,
     pub priority: DataPriority,
-    pub deactivated_at: Option<DateTime<Utc>>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
@@ -43,9 +42,9 @@ pub struct NewPhoneNumber {
 impl PhoneNumber {
     pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = phone_number::table
-            .inner_join(data_lifetime::table.inner_join(scoped_user::table))
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
-            .filter(phone_number::deactivated_at.is_null())
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
+            .filter(data_lifetime::deactivated_at.is_null())
             .select(phone_number::all_columns)
             .load(conn)?;
         Ok(results)
@@ -57,8 +56,8 @@ impl PhoneNumber {
         user_vault_id: &UserVaultId,
     ) -> DbResult<Self> {
         let result = phone_number::table
-            .inner_join(data_lifetime::table.inner_join(scoped_user::table))
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
             .filter(phone_number::id.eq(phone_number_id))
             .select(phone_number::all_columns)
             .first(conn)?;
