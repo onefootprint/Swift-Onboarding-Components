@@ -5,13 +5,13 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::max;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{TenantApiKeyId, Uuid};
+use newtypes::{TenantApiKeyAccessLogId, TenantApiKeyId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_key_access_log)]
 pub struct TenantApiKeyAccessLog {
-    pub id: Uuid,
+    pub id: TenantApiKeyAccessLogId,
     pub tenant_api_key_id: TenantApiKeyId,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,

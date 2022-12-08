@@ -45,7 +45,7 @@ SELECT diesel_manage_updated_at('tenant_api_key');
 -- insight_event
 --
 CREATE TABLE insight_event (
-    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),    
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('ie_'),
     timestamp timestamptz NOT NULL DEFAULT NOW(),
     ip_address VARCHAR(250),
     country VARCHAR(250),
@@ -155,8 +155,8 @@ SELECT diesel_manage_updated_at('scoped_user');
 -- webauthn_credential
 --
 CREATE TABLE webauthn_credential (
-    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_vault_id text NOT NULL,
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('wcred_'),
+    user_vault_id TEXT NOT NULL,
     
     credential_id BYTEA NOT NULL,
     public_key BYTEA NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE webauthn_credential (
 
     backup_eligible boolean not null default False,
     attestation_type text not null DEFAULT 'Unknown',
-    insight_event_id uuid NOT NULL,
+    insight_event_id TEXT NOT NULL,
 
     CONSTRAINT fk_webauthn_credentials_user_vault_id
         FOREIGN KEY(user_vault_id)
@@ -191,7 +191,7 @@ SELECT diesel_manage_updated_at('webauthn_credential');
 -- access_event
 --
 CREATE TABLE access_event (
-    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('ae_'),
     scoped_user_id text NOT NULL,
     -- TODO who at the tenant accessed?
     -- TODO what was the exact data accessed? if there are multiple emails, might help to store data here
@@ -199,7 +199,7 @@ CREATE TABLE access_event (
     timestamp timestamptz NOT NULL DEFAULT NOW(),
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
-    insight_event_id uuid NOT NULL,
+    insight_event_id TEXT NOT NULL,
     reason VARCHAR(250),
     principal VARCHAR(250) NOT NULL,
     ordering_id BIGSERIAL NOT NULL,
@@ -255,13 +255,13 @@ SELECT diesel_manage_updated_at('session');
 -- onboarding
 --
 CREATE TABLE onboarding (
-    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('ob_'),
     scoped_user_id text NOT NULL,
     ob_configuration_id text NOT NULL,
     start_timestamp timestamptz NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
-    insight_event_id UUID NOT NULL,
+    insight_event_id TEXT NOT NULL,
     is_authorized BOOL NOT NULL,
     idv_reqs_initiated BOOL NOT NULL,
     CONSTRAINT fk_onboardings_insight_event_id
@@ -289,12 +289,12 @@ CREATE INDEX IF NOT EXISTS onboardings_insight_event_id ON onboarding(insight_ev
 -- verification_request
 --
 CREATE TABLE verification_request (
-    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('vreq_'),
     vendor text NOT NULL,
     timestamp timestamptz NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
-    onboarding_id UUID NOT NULL,
+    onboarding_id TEXT NOT NULL,
     vendor_api TEXT NOT NULL,
     uvw_snapshot_seqno BIGINT NOT NULL,
     CONSTRAINT fk_verification_request_onboarding_id
@@ -311,8 +311,8 @@ SELECT diesel_manage_updated_at('verification_request');
 -- verification_result
 --
 CREATE TABLE verification_result (
-    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    request_id uuid NOT NULL,
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('vres_'),
+    request_id TEXT NOT NULL,
     response jsonb NOT NULL,
     timestamp timestamptz NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
@@ -331,7 +331,7 @@ SELECT diesel_manage_updated_at('verification_result');
 -- tenant_api_key_access_log
 --
 CREATE TABLE tenant_api_key_access_log (
-    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('klog_'),
     tenant_api_key_id TEXT NOT NULL,
     timestamp timestamptz NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
@@ -406,7 +406,7 @@ SELECT diesel_manage_updated_at('user_vault_data');
 -- fingerprint
 --
 CREATE TABLE fingerprint (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY DEFAULT prefixed_uid('fprint_'),
     sh_data BYTEA NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
@@ -607,7 +607,7 @@ SELECT diesel_manage_updated_at('identity_document');
 
 CREATE TABLE onboarding_decision (
     id TEXT PRIMARY KEY DEFAULT prefixed_uid('decision_'),
-    onboarding_id uuid NOT NULL,
+    onboarding_id TEXT NOT NULL,
     logic_git_hash TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -632,8 +632,8 @@ SELECT diesel_manage_updated_at('onboarding_decision');
 --
 
 CREATE TABLE onboarding_decision_verification_result_junction(
-    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    verification_result_id uuid NOT NULL,
+    id TEXT NOT NULL PRIMARY KEY DEFAULT prefixed_uid('od_vres_'),
+    verification_result_id TEXT NOT NULL,
     onboarding_decision_id TEXT NOT NULL,
 
     CONSTRAINT fk_onboarding_decision_verification_result_junction_verification_result_id
@@ -714,7 +714,7 @@ CREATE TABLE liveness_event (
     created_at timestamptz NOT NULL DEFAULT NOW(),
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
-    insight_event_id UUID NOT NULL,
+    insight_event_id TEXT NOT NULL,
 
     CONSTRAINT fk_liveness_onboarding_id
         FOREIGN KEY(scoped_user_id)
@@ -763,7 +763,7 @@ CREATE TABLE manual_review (
     timestamp TIMESTAMPTZ NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     _updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    onboarding_id UUID NOT NULL,
+    onboarding_id TEXT NOT NULL,
     completed_at TIMESTAMPTZ,
     completed_by_decision_id TEXT,
     completed_by_actor JSONB,

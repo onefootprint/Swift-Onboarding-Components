@@ -1,7 +1,6 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 /// This macro generates an Id type that wraps a string
 macro_rules! define_newtype_id {
@@ -63,16 +62,21 @@ define_newtype_id!(TenantId, String, "Identifier for a Org");
 define_newtype_id!(TenantRoleId, String, "Identifier for a Org role");
 define_newtype_id!(TenantUserId, String, "Identifier for a Org user");
 define_newtype_id!(TenantApiKeyId, String, "Identifier for an org api key");
+define_newtype_id!(
+    TenantApiKeyAccessLogId,
+    String,
+    "Identifier for an org api key access log"
+);
 define_newtype_id!(UserVaultId, String, "Identifier for a User Vault");
 
-define_newtype_id!(FingerprintId, Uuid, "Identifier for a fingerprint");
+define_newtype_id!(FingerprintId, String, "Identifier for a fingerprint");
 define_newtype_id!(AddressId, String, "Identifier for an address");
 define_newtype_id!(EmailId, String, "Identifier for an email");
 define_newtype_id!(PhoneNumberId, String, "Identifier for a phone number");
 define_newtype_id!(UserProfileId, String, "Identifier for user basic info");
 define_newtype_id!(IdentityDataId, String, "Identifier for user identity data row");
 define_newtype_id!(ScopedUserId, String, "Identifier for an ScopedUser");
-define_newtype_id!(OnboardingId, Uuid, "Identifier for an OnboardingLink");
+define_newtype_id!(OnboardingId, String, "Identifier for an OnboardingLink");
 define_newtype_id!(FootprintUserId, String, "Identifier for a ScopedUser");
 define_newtype_id!(
     ObConfigurationId,
@@ -84,15 +88,23 @@ define_newtype_id!(
     String,
     "Public identifier for a an onboarding configuration"
 );
-define_newtype_id!(WebauthnCredentialId, Uuid, "Identifier for a webauthn credential");
-define_newtype_id!(AccessEventId, Uuid, "Identifier for an access event");
-define_newtype_id!(InsightEventId, Uuid, "Identifier for an insight event");
+define_newtype_id!(
+    WebauthnCredentialId,
+    String,
+    "Identifier for a webauthn credential"
+);
+define_newtype_id!(AccessEventId, String, "Identifier for an access event");
+define_newtype_id!(InsightEventId, String, "Identifier for an insight event");
 define_newtype_id!(
     VerificationRequestId,
-    Uuid,
+    String,
     "Identifier for a verification request"
 );
-define_newtype_id!(VerificationResultId, Uuid, "Identifier for a verification result");
+define_newtype_id!(
+    VerificationResultId,
+    String,
+    "Identifier for a verification result"
+);
 define_newtype_id!(UserTimelineId, String, "Identifier for a user timeline entry");
 define_newtype_id!(
     KeyValueDataId,
@@ -167,6 +179,7 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
+    use uuid::Uuid;
 
     #[test]
     fn test_id_string() {

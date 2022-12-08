@@ -3,12 +3,12 @@ table! {
     use newtypes::db_types::*;
 
     access_event (id) {
-        id -> Uuid,
+        id -> Text,
         scoped_user_id -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        insight_event_id -> Uuid,
+        insight_event_id -> Text,
         reason -> Nullable<Varchar>,
         principal -> Varchar,
         ordering_id -> Int8,
@@ -88,7 +88,7 @@ table! {
     use newtypes::db_types::*;
 
     fingerprint (id) {
-        id -> Uuid,
+        id -> Text,
         sh_data -> Bytea,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -122,7 +122,7 @@ table! {
     use newtypes::db_types::*;
 
     insight_event (id) {
-        id -> Uuid,
+        id -> Text,
         timestamp -> Timestamptz,
         ip_address -> Nullable<Varchar>,
         country -> Nullable<Varchar>,
@@ -179,7 +179,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        insight_event_id -> Uuid,
+        insight_event_id -> Text,
     }
 }
 
@@ -192,7 +192,7 @@ table! {
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        onboarding_id -> Uuid,
+        onboarding_id -> Text,
         completed_at -> Nullable<Timestamptz>,
         completed_by_decision_id -> Nullable<Text>,
         completed_by_actor -> Nullable<Jsonb>,
@@ -225,13 +225,13 @@ table! {
     use newtypes::db_types::*;
 
     onboarding (id) {
-        id -> Uuid,
+        id -> Text,
         scoped_user_id -> Text,
         ob_configuration_id -> Text,
         start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        insight_event_id -> Uuid,
+        insight_event_id -> Text,
         is_authorized -> Bool,
         idv_reqs_initiated -> Bool,
     }
@@ -243,7 +243,7 @@ table! {
 
     onboarding_decision (id) {
         id -> Text,
-        onboarding_id -> Uuid,
+        onboarding_id -> Text,
         logic_git_hash -> Text,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
@@ -260,8 +260,8 @@ table! {
     use newtypes::db_types::*;
 
     onboarding_decision_verification_result_junction (id) {
-        id -> Uuid,
-        verification_result_id -> Uuid,
+        id -> Text,
+        verification_result_id -> Text,
         onboarding_decision_id -> Text,
     }
 }
@@ -369,7 +369,7 @@ table! {
     use newtypes::db_types::*;
 
     tenant_api_key_access_log (id) {
-        id -> Uuid,
+        id -> Text,
         tenant_api_key_id -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
@@ -461,12 +461,12 @@ table! {
     use newtypes::db_types::*;
 
     verification_request (id) {
-        id -> Uuid,
+        id -> Text,
         vendor -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        onboarding_id -> Uuid,
+        onboarding_id -> Text,
         vendor_api -> Text,
         uvw_snapshot_seqno -> Int8,
     }
@@ -477,8 +477,8 @@ table! {
     use newtypes::db_types::*;
 
     verification_result (id) {
-        id -> Uuid,
-        request_id -> Uuid,
+        id -> Text,
+        request_id -> Text,
         response -> Jsonb,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
@@ -491,7 +491,7 @@ table! {
     use newtypes::db_types::*;
 
     webauthn_credential (id) {
-        id -> Uuid,
+        id -> Text,
         user_vault_id -> Text,
         credential_id -> Bytea,
         public_key -> Bytea,
@@ -501,7 +501,7 @@ table! {
         _updated_at -> Timestamptz,
         backup_eligible -> Bool,
         attestation_type -> Text,
-        insight_event_id -> Uuid,
+        insight_event_id -> Text,
     }
 }
 
