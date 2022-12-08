@@ -494,7 +494,7 @@ async function createAlbAccessLogsBucket(
   stackMetadata: StackMetadata,
 ): Promise<string> {
   const provider = g.provider;
-  const bucketName = `alb-access-logs-${stackMetadata.shortStackName}`;
+  const bucketName = `1fp-alb-access-logs-${stackMetadata.shortStackName}`;
   const elbAccountArn = await (
     await aws.elb.getServiceAccount({ region: g.region })
   ).arn;
