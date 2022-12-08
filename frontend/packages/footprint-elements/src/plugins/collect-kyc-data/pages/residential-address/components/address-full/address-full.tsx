@@ -4,7 +4,6 @@ import { UserDataAttribute } from '@onefootprint/types';
 import {
   AddressInput,
   Button,
-  CountrySelect,
   CountrySelectOption,
   Grid,
   Select,
@@ -12,17 +11,18 @@ import {
   TextInput,
 } from '@onefootprint/ui';
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { ResidentialAddressFull } from '../../../../utils/data-types';
-import useInputValidations from '../../hooks/use-input-validations';
 import getAddressComponent from '../../utils/get-address-components/get-address-components';
 import getInitialCountry from '../../utils/get-initial-country/get-initial-country';
 import getInitialState from '../../utils/get-initial-state/get-initial-state';
+import CountryField from '../country-field';
+import ZipField from '../zip-field';
 
 type FormData = {
   [UserDataAttribute.addressLine1]: string;
@@ -52,15 +52,7 @@ const AddressFull = ({
   const { data } = state.context;
   const { t } = useTranslation('pages.residential-address.full');
   const { t: cta } = useTranslation('pages.cta');
-  const {
-    watch,
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-    setFocus,
-    setValue,
-  } = useForm<FormData>({
+  const methods = useForm<FormData>({
     defaultValues: {
       [UserDataAttribute.country]: getInitialCountry(
         data[UserDataAttribute.country],
@@ -72,8 +64,16 @@ const AddressFull = ({
       [UserDataAttribute.addressLine2]: data[UserDataAttribute.addressLine2],
     },
   });
+  const {
+    watch,
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+    setFocus,
+    setValue,
+  } = methods;
   const country = watch(UserDataAttribute.country);
-  const { zipcode } = useInputValidations(country.value);
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
@@ -135,107 +135,81 @@ const AddressFull = ({
   return (
     <>
       {!hideNavHeader && <NavigationHeader />}
-      <Form onSubmit={handleSubmit(onSubmitFormData)}>
-        {!hideTitle && (
-          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        )}
-        <Controller
-          control={control}
-          name={UserDataAttribute.country}
-          render={({ field }) => (
-            <CountrySelect
-              label={t('form.country.label')}
-              onBlur={field.onBlur}
-              onChange={nextValue => {
-                field.onChange(nextValue);
-                handleCountryChange();
+      <FormProvider {...methods}>
+        <Form onSubmit={handleSubmit(onSubmitFormData)}>
+          {!hideTitle && (
+            <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+          )}
+          <CountryField onChange={handleCountryChange} />
+          <AddressInput
+            country={country.value}
+            hasError={!!errors[UserDataAttribute.addressLine1]}
+            hint={
+              errors[UserDataAttribute.addressLine1] &&
+              t('form.address-line-1.error')
+            }
+            label={t('form.address-line-1.label')}
+            onSelect={handleAddressSelect}
+            placeholder={t('form.address-line-1.placeholder')}
+            {...register(UserDataAttribute.addressLine1, { required: true })}
+          />
+          <TextInput
+            autoComplete="address-line2"
+            label={t('form.address-line-2.label')}
+            placeholder={t('form.address-line-2.placeholder')}
+            {...register(UserDataAttribute.addressLine2)}
+          />
+          <Grid.Row>
+            <Grid.Column col={6}>
+              <TextInput
+                autoComplete="address-level2"
+                hasError={!!errors[UserDataAttribute.city]}
+                hint={errors[UserDataAttribute.city] && t('form.city.error')}
+                label={t('form.city.label')}
+                placeholder={t('form.city.placeholder')}
+                {...register(UserDataAttribute.city, { required: true })}
+              />
+            </Grid.Column>
+            <Grid.Column col={6}>
+              <ZipField countryCode={country.value} />
+            </Grid.Column>
+          </Grid.Row>
+          {country.value === 'US' ? (
+            <Controller
+              control={control}
+              name={UserDataAttribute.state}
+              render={({ field }) => {
+                const value =
+                  typeof field.value === 'object' ? field.value : undefined;
+                return (
+                  <Select
+                    label={t('form.state.label')}
+                    onBlur={field.onBlur}
+                    options={STATES}
+                    onChange={nextOption => {
+                      field.onChange(nextOption);
+                    }}
+                    placeholder={t('form.state.placeholder')}
+                    value={value}
+                  />
+                );
               }}
-              placeholder={t('form.country.placeholder')}
-              value={field.value}
+            />
+          ) : (
+            <TextInput
+              autoComplete="address-level1"
+              hasError={!!errors[UserDataAttribute.state]}
+              hint={errors[UserDataAttribute.state] && t('form.state.error')}
+              label={t('form.state.label')}
+              placeholder={t('form.state.placeholder')}
+              {...register(UserDataAttribute.state)}
             />
           )}
-        />
-        <AddressInput
-          country={country.value}
-          hasError={!!errors[UserDataAttribute.addressLine1]}
-          hint={
-            errors[UserDataAttribute.addressLine1] &&
-            t('form.address-line-1.error')
-          }
-          label={t('form.address-line-1.label')}
-          onSelect={handleAddressSelect}
-          placeholder={t('form.address-line-1.placeholder')}
-          {...register(UserDataAttribute.addressLine1, { required: true })}
-        />
-        <TextInput
-          autoComplete="address-line2"
-          label={t('form.address-line-2.label')}
-          placeholder={t('form.address-line-2.placeholder')}
-          {...register(UserDataAttribute.addressLine2)}
-        />
-        <Grid.Row>
-          <Grid.Column col={6}>
-            <TextInput
-              autoComplete="address-level2"
-              hasError={!!errors[UserDataAttribute.city]}
-              hint={errors[UserDataAttribute.city] && t('form.city.error')}
-              label={t('form.city.label')}
-              placeholder={t('form.city.placeholder')}
-              {...register(UserDataAttribute.city, { required: true })}
-            />
-          </Grid.Column>
-          <Grid.Column col={6}>
-            <TextInput
-              autoComplete="postal-code"
-              hasError={!!errors[UserDataAttribute.zip]}
-              hint={errors[UserDataAttribute.zip] && t('form.zipCode.error')}
-              label={t('form.zipCode.label')}
-              mask={zipcode.mask}
-              maxLength={zipcode.maxLength}
-              minLength={zipcode.minLength}
-              placeholder={t('form.zipCode.placeholder')}
-              {...register(UserDataAttribute.zip, {
-                required: true,
-                pattern: zipcode.pattern,
-              })}
-            />
-          </Grid.Column>
-        </Grid.Row>
-        {country.value === 'US' ? (
-          <Controller
-            control={control}
-            name={UserDataAttribute.state}
-            render={({ field }) => {
-              const value =
-                typeof field.value === 'object' ? field.value : undefined;
-              return (
-                <Select
-                  label={t('form.state.label')}
-                  onBlur={field.onBlur}
-                  options={STATES}
-                  onChange={nextOption => {
-                    field.onChange(nextOption);
-                  }}
-                  placeholder={t('form.state.placeholder')}
-                  value={value}
-                />
-              );
-            }}
-          />
-        ) : (
-          <TextInput
-            autoComplete="address-level1"
-            hasError={!!errors[UserDataAttribute.state]}
-            hint={errors[UserDataAttribute.state] && t('form.state.error')}
-            label={t('form.state.label')}
-            placeholder={t('form.state.placeholder')}
-            {...register(UserDataAttribute.state)}
-          />
-        )}
-        <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ?? cta('continue')}
-        </Button>
-      </Form>
+          <Button type="submit" fullWidth loading={isMutationLoading}>
+            {ctaLabel ?? cta('continue')}
+          </Button>
+        </Form>
+      </FormProvider>
     </>
   );
 };

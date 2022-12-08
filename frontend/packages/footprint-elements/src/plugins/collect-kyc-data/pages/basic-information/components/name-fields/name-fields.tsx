@@ -9,7 +9,7 @@ const NameFields = () => {
     register,
     formState: { errors },
   } = useFormContext();
-  const { t } = useTranslation('pages.basic-information');
+  const { t } = useTranslation('pages.basic-information.form');
 
   return (
     <Grid.Row>
@@ -18,11 +18,11 @@ const NameFields = () => {
           hasError={!!errors[UserDataAttribute.firstName]}
           hint={
             errors[UserDataAttribute.firstName]
-              ? t('form.first-name.error')
+              ? t('first-name.error')
               : undefined
           }
-          label={t('form.first-name.label')}
-          placeholder={t('form.first-name.placeholder')}
+          label={t('first-name.label')}
+          placeholder={t('first-name.placeholder')}
           {...register(UserDataAttribute.firstName, { required: true })}
         />
       </Grid.Column>
@@ -30,12 +30,12 @@ const NameFields = () => {
         <TextInput
           hasError={!!errors[UserDataAttribute.lastName]}
           hint={
-            errors[UserDataAttribute.lastName]
-              ? t('form.last-name.error')
+            errors[UserDataAttribute.firstName]
+              ? t('last-name.error')
               : undefined
           }
-          label={t('form.last-name.label')}
-          placeholder={t('form.last-name.placeholder')}
+          label={t('last-name.label')}
+          placeholder={t('last-name.placeholder')}
           {...register(UserDataAttribute.lastName, { required: true })}
         />
       </Grid.Column>

@@ -26,15 +26,22 @@
       }
     },
     "residential-address": {
+      "form": {
+        "country": {
+          "label": "Country",
+          "placeholder": "Select",
+          "error": "Country cannot be empty"
+        },
+        "zipCode": {
+          "label": "Zip code",
+          "placeholder": "11206",
+          "error": "Zip code cannot be empty"
+        }
+      },
       "full": {
         "title": "What's your residential address?",
         "subtitle": "We're legally required to collect this information.",
         "form": {
-          "country": {
-            "label": "Country",
-            "placeholder": "Select",
-            "error": "Country cannot be empty"
-          },
           "address-line-1": {
             "label": "Address line 1",
             "placeholder": "Street and house number",
@@ -49,11 +56,6 @@
             "placeholder": "Brooklyn",
             "error": "City cannot be empty"
           },
-          "zipCode": {
-            "label": "Zip code",
-            "placeholder": "11206",
-            "error": "Zip code cannot be empty"
-          },
           "state": {
             "label": "State",
             "placeholder": "Select",
@@ -63,19 +65,7 @@
       },
       "zip-code-and-country": {
         "title": "What's your country zip code?",
-        "subtitle": "We're legally required to collect this information.",
-        "form": {
-          "country": {
-            "label": "Country",
-            "placeholder": "Select",
-            "error": "Country cannot be empty"
-          },
-          "zipCode": {
-            "label": "Zip code",
-            "placeholder": "11206",
-            "error": "Zip code cannot be empty"
-          }
-        }
+        "subtitle": "We're legally required to collect this information."
       },
       "sync-data-error": {
         "title": "An error occurred",

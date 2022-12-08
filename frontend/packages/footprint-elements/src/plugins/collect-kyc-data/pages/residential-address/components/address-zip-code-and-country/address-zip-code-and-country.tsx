@@ -1,21 +1,17 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
-import {
-  Button,
-  CountrySelect,
-  CountrySelectOption,
-  TextInput,
-} from '@onefootprint/ui';
+import { Button, CountrySelectOption } from '@onefootprint/ui';
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { ResidentialZipCodeAndCountry } from '../../../../utils/data-types';
-import useInputValidations from '../../hooks/use-input-validations';
 import getInitialCountry from '../../utils/get-initial-country';
+import CountryField from '../country-field';
+import ZipField from '../zip-field';
 
 type FormData = {
   [UserDataAttribute.country]: CountrySelectOption;
@@ -43,15 +39,7 @@ const AddressZipCodeAndCountry = ({
     'pages.residential-address.zip-code-and-country',
   );
   const { t: cta } = useTranslation('pages.cta');
-  const {
-    watch,
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-    setFocus,
-    setValue,
-  } = useForm<FormData>({
+  const methods = useForm<FormData>({
     defaultValues: {
       [UserDataAttribute.country]: getInitialCountry(
         data[UserDataAttribute.country],
@@ -59,9 +47,8 @@ const AddressZipCodeAndCountry = ({
       [UserDataAttribute.zip]: data[UserDataAttribute.zip],
     },
   });
-
+  const { watch, handleSubmit, setFocus, setValue } = methods;
   const country = watch(UserDataAttribute.country);
-  const { zipcode } = useInputValidations(country.value);
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
@@ -78,46 +65,18 @@ const AddressZipCodeAndCountry = ({
   return (
     <>
       {!hideNavHeader && <NavigationHeader />}
-      <Form onSubmit={handleSubmit(onSubmitFormData)}>
-        {!hideTitle && (
-          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        )}
-        <Controller
-          control={control}
-          name={UserDataAttribute.country}
-          render={({ field }) => (
-            <CountrySelect
-              label={t('form.country.label')}
-              onBlur={field.onBlur}
-              onChange={nextValue => {
-                field.onChange(nextValue);
-                handleCountryChange();
-              }}
-              placeholder={t('form.country.placeholder')}
-              value={field.value}
-            />
+      <FormProvider {...methods}>
+        <Form onSubmit={handleSubmit(onSubmitFormData)}>
+          {!hideTitle && (
+            <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           )}
-        />
-
-        <TextInput
-          autoComplete="postal-code"
-          hasError={!!errors.zip}
-          hint={errors.zip && t('form.zipCode.error')}
-          label={t('form.zipCode.label')}
-          mask={zipcode.mask}
-          maxLength={zipcode.maxLength}
-          minLength={zipcode.minLength}
-          placeholder={t('form.zipCode.placeholder')}
-          {...register(UserDataAttribute.zip, {
-            required: true,
-            pattern: zipcode.pattern,
-          })}
-        />
-
-        <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ?? cta('continue')}
-        </Button>
-      </Form>
+          <CountryField onChange={handleCountryChange} />
+          <ZipField countryCode={country.value} />
+          <Button type="submit" fullWidth loading={isMutationLoading}>
+            {ctaLabel ?? cta('continue')}
+          </Button>
+        </Form>
+      </FormProvider>
     </>
   );
 };

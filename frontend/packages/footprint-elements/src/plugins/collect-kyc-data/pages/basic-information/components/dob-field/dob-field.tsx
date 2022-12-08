@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form';
 import validateDob from '../../utils/validate-dob';
 
 const DobField = () => {
-  const { t } = useTranslation('pages.basic-information');
+  const { t } = useTranslation('pages.basic-information.form.dob');
   const {
     register,
     getValues,
@@ -18,10 +18,10 @@ const DobField = () => {
   return (
     <TextInput
       hasError={!!errors[UserDataAttribute.dob]}
-      hint={errors[UserDataAttribute.dob] ? t('form.dob.error') : undefined}
-      label={t('form.dob.label')}
+      hint={errors[UserDataAttribute.dob] ? t('error') : undefined}
+      label={t('label')}
       mask={inputMasks.dob}
-      placeholder={t('form.dob.placeholder')}
+      placeholder={t('placeholder')}
       value={getValues(UserDataAttribute.dob)}
       {...register(UserDataAttribute.dob, {
         required: true,
