@@ -258,6 +258,10 @@ pub async fn private_cleanup_integration_tests(
                     .filter(fingerprint::lifetime_id.eq_any(dl_ids))
                     .execute(conn.conn())?;
 
+                deleted_rows += diesel::delete(identity_document::table)
+                    .filter(identity_document::lifetime_id.eq_any(dl_ids))
+                    .execute(conn.conn())?;
+
                 deleted_rows += diesel::delete(data_lifetime::table)
                     .filter(data_lifetime::user_vault_id.eq(&uv.id))
                     .execute(conn.conn())?;
@@ -343,10 +347,6 @@ pub async fn private_cleanup_integration_tests(
                     .filter(scoped_user::user_vault_id.eq(&uv.id))
                     .execute(conn.conn())?;
             }
-
-            deleted_rows += diesel::delete(identity_document::table)
-                .filter(identity_document::user_vault_id.eq(&uv.id))
-                .execute(conn.conn())?;
 
             // delete user vault
             deleted_rows += diesel::delete(user_vault::table)

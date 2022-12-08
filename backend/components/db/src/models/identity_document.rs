@@ -1,23 +1,23 @@
-use std::collections::HashMap;
-
-use crate::schema::identity_document;
-use crate::DbResult;
+use crate::schema::{data_lifetime, identity_document};
+use crate::{DbResult, HasLifetime, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use itertools::Itertools;
+
 use newtypes::{
-    Base64Data, DocumentRequestId, IdentityDocumentId, ScopedUserId, SealedVaultDataKey, UserVaultId,
+    Base64Data, DataLifetimeId, DocumentRequestId, IdentityDocumentId, ScopedUserId, SealedVaultBytes,
+    SealedVaultDataKey, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
+
+use super::data_lifetime::DataLifetime;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = identity_document)]
 pub struct IdentityDocument {
     pub id: IdentityDocumentId,
     pub request_id: DocumentRequestId,
-    pub user_vault_id: UserVaultId,
     pub front_image_s3_url: Option<String>,
     pub back_image_s3_url: Option<String>,
     pub document_type: String,
@@ -25,8 +25,32 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub scoped_user_id: Option<ScopedUserId>,
     pub e_data_key: SealedVaultDataKey,
+    pub lifetime_id: DataLifetimeId,
+}
+
+impl HasLifetime for IdentityDocument {
+    fn lifetime_id(&self) -> &DataLifetimeId {
+        &self.lifetime_id
+    }
+    // The actual underlying e_data lives in S3 and this method of accessing
+    // is really only for data kinds that are more like point lookups, so we panic.
+    //
+    // Alternatively, we could make e_data -> Option<SealedVaultBytes>, but this feels like
+    // enough of a special case for now.
+    fn e_data(&self) -> &SealedVaultBytes {
+        unimplemented!()
+    }
+
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
+        let results = identity_document::table
+            .filter(identity_document::lifetime_id.eq_any(lifetime_ids))
+            .get_results(conn)?;
+        Ok(results)
+    }
 }
 
 impl IdentityDocument {
@@ -61,20 +85,19 @@ impl IdentityDocument {
 #[diesel(table_name = identity_document)]
 pub struct NewIdentityDocument {
     pub request_id: DocumentRequestId,
-    pub user_vault_id: UserVaultId,
     pub front_image_s3_url: Option<String>,
     pub back_image_s3_url: Option<String>,
     pub document_type: String,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
-    pub scoped_user_id: Option<ScopedUserId>,
     pub e_data_key: SealedVaultDataKey,
+    pub lifetime_id: DataLifetimeId,
 }
 
 impl IdentityDocument {
     #[allow(clippy::too_many_arguments)]
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         request_id: DocumentRequestId,
         user_vault_id: UserVaultId,
         front_image_s3_url: Option<String>,
@@ -84,20 +107,20 @@ impl IdentityDocument {
         scoped_user_id: Option<ScopedUserId>,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
+        let lifetime = DataLifetime::create(conn, user_vault_id, scoped_user_id)?;
         let new = NewIdentityDocument {
             request_id,
-            user_vault_id,
             front_image_s3_url,
             back_image_s3_url,
             document_type,
             country_code,
             created_at: Utc::now(),
-            scoped_user_id,
             e_data_key,
+            lifetime_id: lifetime.id,
         };
         let result = diesel::insert_into(identity_document::table)
             .values(new)
-            .get_result::<IdentityDocument>(conn)?;
+            .get_result::<IdentityDocument>(conn.conn())?;
         Ok(result)
     }
 
@@ -114,39 +137,11 @@ impl IdentityDocument {
         scoped_user_id: &ScopedUserId,
     ) -> DbResult<Vec<Self>> {
         let results = identity_document::table
-            .filter(identity_document::scoped_user_id.eq(scoped_user_id))
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
+            .select(identity_document::all_columns)
             .get_results(conn)?;
 
-        Ok(results)
-    }
-
-    /// Get all the documents collected for a given UserVault
-    pub fn get_for_user_vault_id(
-        conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
-    ) -> DbResult<Vec<Self>> {
-        let results = identity_document::table
-            .filter(identity_document::user_vault_id.eq(user_vault_id))
-            .get_results(conn)?;
-
-        Ok(results)
-    }
-
-    /// Return a mapping from UserVaultId to Vec<IdentityDocument>
-    pub fn multi_get_for_user_vault_ids(
-        conn: &mut PgConnection,
-        user_vault_ids: Vec<&UserVaultId>,
-    ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
-        let results: Vec<IdentityDocument> = identity_document::table
-            .filter(identity_document::user_vault_id.eq_any(user_vault_ids))
-            .get_results(conn)?;
-
-        // Group the IdentityDocuments by UserVaultId
-        let results = results
-            .into_iter()
-            .map(|doc| (doc.user_vault_id.clone(), doc))
-            .sorted_by_key(|(uv_id, _)| uv_id.clone())
-            .into_group_map();
         Ok(results)
     }
 }
@@ -164,7 +159,7 @@ mod tests {
         db_pool
             .db_transaction(|conn| -> Result<(), DbError> {
                 let id_doc = IdentityDocument::create(
-                    conn.conn(),
+                    conn,
                     DocumentRequestId::from(String::from("dr_id")),
                     UserVaultId::from(String::from("uv_id")),
                     Some("s3_123".to_string()),

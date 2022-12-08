@@ -109,8 +109,8 @@ pub async fn post(
     let doc_request_id = db_document_request.id.clone();
     let _ = state
         .db_pool
-        .db_query(move |conn| -> Result<IdentityDocument, ApiError> {
-            let doc = IdentityDocument::create(
+        .db_transaction(move |conn| -> Result<IdentityDocument, ApiError> {
+            IdentityDocument::create(
                 conn,
                 doc_request_id,
                 uv.id,
@@ -122,11 +122,10 @@ pub async fn post(
                 request.country_code.clone(),
                 Some(scoped_user_id),
                 e_data_key,
-            )?;
-
-            Ok(doc)
+            )
+            .map_err(ApiError::from)
         })
-        .await??;
+        .await?;
 
     let update = DocumentRequestUpdate {
         // For now, just move this to Uploaded here to clear the requirement

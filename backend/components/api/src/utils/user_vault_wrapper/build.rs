@@ -63,9 +63,7 @@ impl UserVaultWrapper {
         let data = UserVaultData::get_for(conn, &active_lifetime_ids)?;
         let phone_numbers = PhoneNumber::get_for(conn, &active_lifetime_ids)?;
         let emails = Email::get_for(conn, &active_lifetime_ids)?;
-
-        // TODO migrate this to DataLifetimes
-        let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
+        let identity_documents = IdentityDocument::get_for(conn, &active_lifetime_ids)?;
 
         let result = Self::build(
             user_vault,
@@ -88,7 +86,7 @@ impl UserVaultWrapper {
         users: Vec<(ScopedUser, UserVault)>,
         tenant_id: &TenantId,
     ) -> Result<Vec<Self>, DbError> {
-        let uv_ids: Vec<_> = users.iter().map(|su| &su.1.id).collect();
+        let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();
         let mut uv_id_to_active_lifetimes =
             DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
         let active_lifetime_list: Vec<_> = uv_id_to_active_lifetimes.values().flatten().collect();
@@ -99,9 +97,7 @@ impl UserVaultWrapper {
         let mut uvds = UserVaultData::bulk_get(conn, &active_lifetime_list)?;
         let mut phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
         let mut emails = Email::bulk_get(conn, &active_lifetime_list)?;
-
-        // Fetch all the identity documents for the user vault ids
-        let mut identity_document_map = IdentityDocument::multi_get_for_user_vault_ids(conn, uv_ids)?;
+        let mut identity_document_map = IdentityDocument::bulk_get(conn, &active_lifetime_list)?;
 
         // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
         Ok(users

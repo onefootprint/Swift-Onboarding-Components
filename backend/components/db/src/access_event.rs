@@ -105,7 +105,7 @@ impl AccessEventListItemForTenant {
                     .into_iter()
                     .zip(access_event_infos.into_iter())
                     .map(
-                        |((_access_event, scoped_user, insight_event, tenant), access_event_info)| Self {
+                        |((_access_event, scoped_user, insight_event, _tenant), access_event_info)| Self {
                             event: access_event_info,
                             scoped_user,
                             insight: insight_event,

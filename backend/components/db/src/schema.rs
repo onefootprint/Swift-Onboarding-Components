@@ -103,7 +103,6 @@ table! {
     identity_document (id) {
         id -> Text,
         request_id -> Text,
-        user_vault_id -> Text,
         front_image_s3_url -> Nullable<Text>,
         back_image_s3_url -> Nullable<Text>,
         document_type -> Text,
@@ -111,8 +110,8 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        scoped_user_id -> Nullable<Text>,
         e_data_key -> Bytea,
+        lifetime_id -> Text,
     }
 }
 
@@ -511,8 +510,8 @@ joinable!(data_lifetime -> user_vault (user_vault_id));
 joinable!(document_request -> scoped_user (scoped_user_id));
 joinable!(email -> data_lifetime (lifetime_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
+joinable!(identity_document -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
-joinable!(identity_document -> scoped_user (scoped_user_id));
 joinable!(kv_data -> tenant (tenant_id));
 joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(liveness_event -> insight_event (insight_event_id));

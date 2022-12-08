@@ -109,6 +109,10 @@ impl UvwData {
 
 impl HasDataAttributeFields for UvwData {
     fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+        if data_attribute.disallows_e_data() {
+            return None;
+        }
+
         let value = self.get(data_attribute);
         value.map(|v| v.e_data())
     }
