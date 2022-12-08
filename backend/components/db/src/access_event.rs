@@ -104,13 +104,11 @@ impl AccessEventListItemForTenant {
                 result
                     .into_iter()
                     .zip(access_event_infos.into_iter())
-                    .map(
-                        |((_access_event, scoped_user, insight_event, _tenant), access_event_info)| Self {
-                            event: access_event_info,
-                            scoped_user,
-                            insight: insight_event,
-                        },
-                    )
+                    .map(|((_, scoped_user, insight_event, _), access_event_info)| Self {
+                        event: access_event_info,
+                        scoped_user,
+                        insight: insight_event,
+                    })
                     .collect::<Vec<AccessEventListItemForTenant>>()
             })
             .await?;
@@ -153,7 +151,7 @@ impl AccessEventListItemForUser {
                 result
                     .into_iter()
                     .zip(access_event_infos.into_iter())
-                    .map(|((_access_event, scoped_user, tenant), access_event_info)| Self {
+                    .map(|((_, scoped_user, tenant), access_event_info)| Self {
                         event: access_event_info,
                         scoped_user,
                         tenant_name: tenant.name,

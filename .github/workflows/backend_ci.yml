@@ -265,4 +265,4 @@ jobs:
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --manifest-path ./backend/Cargo.toml
+          args: --manifest-path ./backend/Cargo.toml -- -D warnings
