@@ -24,6 +24,8 @@ pub struct TenantUser {
     pub last_login_at: Option<DateTime<Utc>>,
     pub tenant_id: TenantId,
     pub deactivated_at: Option<DateTime<Utc>>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
 }
 
 impl TenantUser {
@@ -77,6 +79,8 @@ impl TenantUser {
         email: OrgMemberEmail,
         tenant_id: TenantId,
         tenant_role_id: TenantRoleId,
+        first_name: Option<String>,
+        last_name: Option<String>,
     ) -> DbResult<(Self, TenantRole)> {
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
@@ -88,6 +92,8 @@ impl TenantUser {
             // init to None since they haven't logged in yet!
             last_login_at: None,
             tenant_id,
+            first_name,
+            last_name,
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
@@ -149,6 +155,8 @@ struct NewTenantUser {
     created_at: DateTime<Utc>,
     last_login_at: Option<DateTime<Utc>>,
     tenant_id: TenantId,
+    first_name: Option<String>,
+    last_name: Option<String>,
 }
 
 #[derive(AsChangeset, Default)]

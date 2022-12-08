@@ -78,8 +78,8 @@ async fn handler(
         data: DashboardAuthorizationResponse {
             email: profile.email.clone(),
             auth: auth_token,
-            first_name: profile.first_name.clone(),
-            last_name: profile.last_name.clone(),
+            first_name: tenant_user.first_name,
+            last_name: tenant_user.last_name,
             created_new_tenant: is_new,
             tenant_name: tenant.name,
             sandbox_restricted: tenant.sandbox_restricted,
@@ -106,6 +106,8 @@ async fn find_or_create_user(
 
     // Otherwise, find or create the tenant and create a new TenantUser
     let (tenant, is_new_tenant) = find_or_create_tenant(state, profile).await?;
+    let first_name = profile.first_name.clone();
+    let last_name = profile.last_name.clone();
     let tenant_id = tenant.id.clone();
     let tenant_user = state
         .db_pool
@@ -113,8 +115,14 @@ async fn find_or_create_user(
             // Get or create the admin role for this tenant
             // TODO: we shouldn't always give a new user admin permissions
             let admin_role = TenantRole::get_or_create_admin_role(conn, tenant_id)?;
-            let (tenant_user, _) =
-                TenantUser::create(conn, email2.into(), admin_role.tenant_id, admin_role.id)?;
+            let (tenant_user, _) = TenantUser::create(
+                conn,
+                email2.into(),
+                admin_role.tenant_id,
+                admin_role.id,
+                first_name,
+                last_name,
+            )?;
             Ok(tenant_user)
         })
         .await?;

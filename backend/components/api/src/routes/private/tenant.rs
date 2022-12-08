@@ -58,6 +58,8 @@ async fn post(
                 "integrationtests@onefootprint.com".to_owned().into(),
                 admin_role.tenant_id,
                 admin_role.id,
+                None,
+                None,
             )?;
             let session_data = AuthSessionData::WorkOs(WorkOsSession {
                 email: tenant_user.email.0,

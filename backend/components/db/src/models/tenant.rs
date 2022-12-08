@@ -1,4 +1,4 @@
-use crate::{schema::tenant};
+use crate::schema::tenant;
 use crate::{DbPool, DbResult};
 use diesel::prelude::*;
 

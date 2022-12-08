@@ -58,6 +58,8 @@ struct CreateTenantUserRequest {
     email: String,
     role_id: TenantRoleId,
     redirect_url: String, // The URL to the dashboard where the invite login link should be sent
+    first_name: Option<String>,
+    last_name: Option<String>,
 }
 
 #[api_v2_operation(
@@ -78,10 +80,14 @@ async fn post(
         email,
         role_id,
         redirect_url,
+        first_name,
+        last_name,
     } = request.into_inner();
     let (user, role) = state
         .db_pool
-        .db_transaction(move |conn| TenantUser::create(conn, email.into(), tenant_id, role_id))
+        .db_transaction(move |conn| {
+            TenantUser::create(conn, email.into(), tenant_id, role_id, first_name, last_name)
+        })
         .await?;
 
     // TODO use a different email template for inviting a teammate

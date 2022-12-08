@@ -5,7 +5,7 @@ use crate::*;
 #[serde(tag = "kind")]
 pub enum Actor {
     Footprint,
-    Organization { member: OrgMemberEmail },
+    Organization { member: String },
     ApiKey,
 }
 

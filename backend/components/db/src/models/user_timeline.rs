@@ -159,11 +159,11 @@ impl UserTimeline {
 #[cfg(test)]
 mod tests {
 
-    use newtypes::{DbActor, Fingerprint, SealedVaultBytes};
+    use newtypes::{DbActor};
 
     use super::*;
     use crate::actor::SaturatedActor;
-    use crate::models::tenant_api_key::TenantApiKey;
+    
     use crate::test::{
         test_annotation, test_tenant, test_tenant_admin_role, test_tenant_api_key, test_tenant_user,
         test_user_vault,
@@ -189,12 +189,16 @@ mod tests {
                     String::from("tu1@acme.com"),
                     tenant.id.clone(),
                     tenant_role.id.clone(),
+                    None,
+                    None,
                 );
                 let tenant_user2 = test_tenant_user(
                     conn,
                     String::from("tu2@acme.com"),
                     tenant.id.clone(),
-                    tenant_role.id.clone(),
+                    tenant_role.id,
+                    None,
+                    None,
                 );
 
                 let annotation1 = test_annotation(
@@ -224,7 +228,7 @@ mod tests {
                 let tenant_api_key =
                     test_tenant_api_key(conn, String::from("test key"), tenant.id.clone(), is_live);
 
-                let user_vault_id = user_vault.id.clone();
+                let user_vault_id = user_vault.id;
                 let annotation3 = test_annotation(
                     conn,
                     String::from("yo sup"),
@@ -232,7 +236,7 @@ mod tests {
                     scoped_user.id.clone(),
                     user_vault_id,
                     DbActor::TenantApiKey {
-                        id: tenant_api_key.id.clone(),
+                        id: tenant_api_key.id,
                     },
                 )
                 .0;

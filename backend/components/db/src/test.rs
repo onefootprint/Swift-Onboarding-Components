@@ -11,13 +11,13 @@ use crate::{
     },
     schema,
 };
-use crate::{test_helpers, DbError, DbPool, TxnPgConnection};
+use crate::{test_helpers, TxnPgConnection};
 use chrono::Utc;
 use diesel::prelude::*;
-use itertools::Either;
+
 use newtypes::{
     ApiKeyStatus, DbActor, EncryptedVaultPrivateKey, Fingerprint, OrgMemberEmail, ScopedUserId,
-    SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId, TenantUserId, UserVaultId, VaultPublicKey,
+    SealedVaultBytes, TenantId, TenantRoleId, UserVaultId, VaultPublicKey,
 };
 
 pub(crate) fn test_user_vault(conn: &mut PgConnection, is_portable: bool) -> UserVault {
@@ -55,9 +55,18 @@ pub(crate) fn test_tenant_user(
     email: String,
     tenant_id: TenantId,
     tenant_role_id: TenantRoleId,
+    first_name: Option<String>,
+    last_name: Option<String>,
 ) -> TenantUser {
-    let (tenant_user, _) =
-        TenantUser::create(conn, OrgMemberEmail::from(email), tenant_id, tenant_role_id).unwrap();
+    let (tenant_user, _) = TenantUser::create(
+        conn,
+        OrgMemberEmail::from(email),
+        tenant_id,
+        tenant_role_id,
+        first_name,
+        last_name,
+    )
+    .unwrap();
     tenant_user
 }
 
