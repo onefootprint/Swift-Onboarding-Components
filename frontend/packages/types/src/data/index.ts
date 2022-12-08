@@ -31,6 +31,7 @@ export { default as OnboardingStatus } from './onboarding-status';
 export * from './org-member';
 export * from './org-role';
 export * from './org-role-permission';
+export * from './pinned-annotation';
 export { default as ReviewStatus } from './review-status';
 export * from './risk-signal';
 export * from './scoped-user';

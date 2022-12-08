@@ -2,24 +2,15 @@ import { useIntl } from '@onefootprint/hooks';
 import request, { RequestError } from '@onefootprint/request';
 import {
   DecisionAnnotation,
-  DecisionSource,
   GetPinnedAnnotationsRequest,
   GetPinnedAnnotationsResponse,
+  PinnedAnnotation,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSessionUser from 'src/hooks/use-session-user';
 import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 
 import useUserId from '../../../hooks/use-user-id/use-user-id';
-
-export type PinnedAnnotation = {
-  id: string;
-  isPinned: boolean;
-  reason: string;
-  note?: string;
-  source: DecisionSource;
-  timestamp: string;
-};
 
 const getPinnedAnnotations = async ({
   authHeaders,
