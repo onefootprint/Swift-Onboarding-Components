@@ -11,6 +11,7 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.lastName]: 'Footprint',
           [UserDataAttribute.email]: 'piip@onefootprint.com',
         },
+        idDoc: {},
       });
       expect(sectionsVisibility).toEqual({
         basicSection: true,
@@ -30,6 +31,7 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.email]: 'piip@onefootprint.com',
           [UserDataAttribute.ssn4]: '6009',
         },
+        idDoc: {},
       });
       expect(sectionsVisibility).toEqual({
         basicSection: true,
@@ -45,6 +47,7 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.email]: 'piip@onefootprint.com',
           [UserDataAttribute.ssn9]: '453436009',
         },
+        idDoc: {},
       });
       expect(sectionsVisibility1).toEqual({
         basicSection: true,
@@ -61,6 +64,7 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.ssn9]: '453436009',
           [UserDataAttribute.dob]: '01/01/2001',
         },
+        idDoc: {},
       });
       expect(sectionsVisibility2).toEqual({
         basicSection: true,
@@ -81,6 +85,7 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.zip]: null,
           [UserDataAttribute.country]: null,
         },
+        idDoc: {},
       });
       expect(sectionsVisibility).toEqual({
         basicSection: true,
@@ -100,6 +105,7 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.addressLine2]: null,
           [UserDataAttribute.country]: null,
         },
+        idDoc: {},
       });
       expect(sectionsVisibility1).toEqual({
         basicSection: true,

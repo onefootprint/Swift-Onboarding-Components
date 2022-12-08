@@ -34,7 +34,7 @@ const useDecryptUser = () => {
       },
       {
         onSuccess: (data: DecryptUserResponse) => {
-          updateUserVault(userId, { kycData: data });
+          updateUserVault(userId, { kycData: data, idDoc: {} });
           options.onSuccess?.(data);
         },
         onError: options.onError,

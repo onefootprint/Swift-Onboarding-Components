@@ -6,8 +6,8 @@ import {
 } from '@onefootprint/types';
 import { Box, Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
+import { DataValue } from 'src/hooks/use-user-store';
 import { User } from 'src/pages/users/types/user.types';
-import { DataValue } from 'src/pages/users/types/vault-data.types';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { Event } from '../../utils/decrypt-state-machine';

@@ -1,5 +1,5 @@
 import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
-import { UserVaultData } from 'src/pages/users/types/vault-data.types';
+import { UserVaultData } from 'src/hooks/use-user-store';
 
 const getSectionsVisibility = (vaultData: UserVaultData) => {
   const { kycData, idDoc } = vaultData;

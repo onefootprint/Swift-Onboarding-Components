@@ -1,8 +1,8 @@
 import { OnboardingStatus, ScopedUser } from '@onefootprint/types';
 import { useMemo } from 'react';
+import { UserVaultData } from 'src/hooks/use-user-store';
 
 import { User } from '../types/user.types';
-import { UserVaultData } from '../types/vault-data.types';
 
 type DecryptedUsersMap = Omit<
   Map<String, UserVaultData>,
@@ -19,6 +19,7 @@ const useJoinUsers = (
         // Copy over the decrypted values, for remaining encrypted identityDataAttributes, add null entries
         const vaultData = decryptedUsers.get(scopedUser.id) || {
           kycData: {},
+          idDoc: {},
         };
         scopedUser.identityDataAttributes.forEach(attr => {
           const decryptedVal = vaultData.kycData[attr];

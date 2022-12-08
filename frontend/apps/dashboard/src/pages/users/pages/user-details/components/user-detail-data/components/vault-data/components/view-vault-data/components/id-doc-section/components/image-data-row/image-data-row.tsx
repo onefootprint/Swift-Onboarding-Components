@@ -1,7 +1,7 @@
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
-import { DataValue } from 'src/pages/users/types/vault-data.types';
+import { DataValue } from 'src/hooks/use-user-store';
 import styled from 'styled-components';
 
 export type ImageDataRowProps = {

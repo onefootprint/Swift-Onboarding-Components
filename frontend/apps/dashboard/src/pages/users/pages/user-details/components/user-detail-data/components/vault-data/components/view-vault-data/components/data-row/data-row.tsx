@@ -1,7 +1,7 @@
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { DataValue } from 'src/hooks/use-user-store';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
-import { DataValue } from 'src/pages/users/types/vault-data.types';
 import styled from 'styled-components';
 
 export type DataRowProps = {

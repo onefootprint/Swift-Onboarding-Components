@@ -1,14 +1,16 @@
 import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
 import constate from 'constate';
+import { UserVaultData } from 'src/hooks/use-user-store';
 import { useMap } from 'usehooks-ts';
-
-import { UserVaultData } from '../types/vault-data.types';
 
 // Maintains state on decrypted user attributes
 const useUserDataImpl = () => {
   const [userVaults, { set }] = useMap<String, UserVaultData>(new Map());
   const updateUserVault = (userId: string, newData: UserVaultData) => {
-    const entry = userVaults.get(userId) || { kycData: {} };
+    const entry = userVaults.get(userId) || {
+      kycData: {},
+      idDoc: {},
+    };
     const user = { ...entry };
     const { kycData, idDoc } = newData;
 

@@ -1,9 +1,8 @@
 import { UserDataAttribute } from '@onefootprint/types';
-
-import { DataValue, UserVaultData } from '../../types/vault-data.types';
+import { DataValue, UserVaultData } from 'src/hooks/use-user-store';
 
 const getFullNameDataValue = (
-  attributes: UserVaultData,
+  attributes: Pick<UserVaultData, 'kycData'>,
 ): DataValue | undefined => {
   const { kycData } = attributes;
   const firstName = kycData[UserDataAttribute.firstName];

@@ -19,35 +19,29 @@ export type User = {
   liveness: UserLiveness;
 };
 
-// Base type to remember whether to refresh / whether currently loading
-export type UserFieldValue = {
-  isLoading: boolean;
-};
-
-export type UserLiveness = UserFieldValue & {
+export type UserLiveness = {
   insightEvent?: InsightEvent;
 };
 
-export type UserAnnotations = UserFieldValue & {
+export type UserAnnotations = {
   annotations: PinnedAnnotation[];
 };
 
-export type UserRiskSignals = UserFieldValue & {
+export type UserRiskSignals = {
   signals: RiskSignal[];
 };
 
-export type UserTimeline = UserFieldValue & {
+export type UserTimeline = {
   events: TimelineEvent[];
 };
 
-export type UserMetadata = UserFieldValue &
-  ScopedUser & {
-    // Derived fields
-    requiresManualReview: boolean;
-    status: OnboardingStatus;
-  };
+export type UserMetadata = ScopedUser & {
+  // Derived fields
+  requiresManualReview: boolean;
+  status: OnboardingStatus;
+};
 
-export type UserVaultData = UserFieldValue & {
+export type UserVaultData = {
   kycData: Partial<Record<UserDataAttribute, DataValue>>;
   idDoc: Partial<Record<IdDocDataAttribute, DataValue>>;
 };
