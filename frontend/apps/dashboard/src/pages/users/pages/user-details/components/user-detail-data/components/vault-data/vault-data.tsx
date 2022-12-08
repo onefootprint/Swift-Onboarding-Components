@@ -1,7 +1,6 @@
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 import { User } from 'src/pages/users/types/user.types';
-import { IdDocDataAttribute } from 'src/pages/users/types/vault-data.types';
 import getAttrListFromFields from 'src/utils/get-attr-list-from-fields';
 import { useUpdateEffect } from 'usehooks-ts';
 

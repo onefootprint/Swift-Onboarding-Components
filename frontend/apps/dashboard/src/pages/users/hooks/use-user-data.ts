@@ -1,8 +1,8 @@
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
 import constate from 'constate';
 import { useMap } from 'usehooks-ts';
 
-import { IdDocDataAttribute, UserVaultData } from '../types/vault-data.types';
+import { UserVaultData } from '../types/vault-data.types';
 
 // Maintains state on decrypted user attributes
 const useUserDataImpl = () => {

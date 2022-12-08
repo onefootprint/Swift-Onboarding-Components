@@ -1,5 +1,4 @@
-import { UserDataAttribute } from '@onefootprint/types';
-import { IdDocDataAttribute } from 'src/pages/users/types/vault-data.types';
+import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
 
 import getSectionsVisibility from './get-sections-visibility';
 

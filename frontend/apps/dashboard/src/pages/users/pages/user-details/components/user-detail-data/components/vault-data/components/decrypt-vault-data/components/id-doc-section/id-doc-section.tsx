@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24 } from '@onefootprint/icons';
+import { IdDocDataAttribute } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/types/user.types';
 
-import { IdDocDataAttribute } from '../../../../../../../../../../types/vault-data.types';
 import DataSection from '../../../data-section';
 import isCheckboxDisabled from '../../utils/is-checkbox-disabled';
 

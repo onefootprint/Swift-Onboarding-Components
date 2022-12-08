@@ -1,7 +1,10 @@
 import { RequestError } from '@onefootprint/request';
-import { DecryptUserResponse, UserDataAttribute } from '@onefootprint/types';
+import {
+  DecryptUserResponse,
+  IdDocDataAttribute,
+  UserDataAttribute,
+} from '@onefootprint/types';
 
-import { IdDocDataAttribute } from '../types/vault-data.types';
 import useUserData from './use-user-data';
 import useUserVaultDecrypt from './use-user-vault-decrypt';
 

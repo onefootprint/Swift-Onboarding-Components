@@ -1,12 +1,13 @@
 import { getErrorMessage, RequestError } from '@onefootprint/request';
-import { DecryptUserResponse, UserDataAttribute } from '@onefootprint/types';
+import {
+  DecryptUserResponse,
+  IdDocDataAttribute,
+  UserDataAttribute,
+} from '@onefootprint/types';
 import { Box, Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { User } from 'src/pages/users/types/user.types';
-import {
-  DataValue,
-  IdDocDataAttribute,
-} from 'src/pages/users/types/vault-data.types';
+import { DataValue } from 'src/pages/users/types/vault-data.types';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { Event } from '../../utils/decrypt-state-machine';

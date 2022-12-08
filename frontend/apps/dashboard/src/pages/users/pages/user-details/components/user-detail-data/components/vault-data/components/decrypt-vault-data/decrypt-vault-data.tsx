@@ -1,10 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { User } from 'src/pages/users/types/user.types';
-import { IdDocDataAttribute } from 'src/pages/users/types/vault-data.types';
 import getAttrListFromFields from 'src/utils/get-attr-list-from-fields';
 import styled, { css } from 'styled-components';
 
