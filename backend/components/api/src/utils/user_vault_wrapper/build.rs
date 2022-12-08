@@ -31,6 +31,10 @@ impl UserVaultWrapper {
     ) -> Self {
         let (committed, speculative) =
             UvwData::partition(uvd, phone_numbers, emails, identity_documents, lifetimes);
+        tracing::info!(
+            user_vault_id=%user_vault.id, scoped_user_id=%format!("{:?}", scoped_user_id), seqno=%format!("{:?}", seqno.as_ref()),
+            "Built UserVaultWrapper"
+        );
         Self {
             user_vault,
             committed,

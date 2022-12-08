@@ -104,6 +104,8 @@ pub enum ApiError {
     VendorRequestFailed,
     #[error("Cannot decrypt field {0} with this endpoint")]
     InvalidFieldForDecryption(String),
+    #[error("Unexpected: {0}")]
+    AssertionError(String),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -213,6 +215,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::PrivacyPassError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Custom(_) => StatusCode::BAD_REQUEST,
+            ApiError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
