@@ -221,8 +221,9 @@ pub async fn private_cleanup_integration_tests(
             use schema::{
                 access_event, annotation, data_lifetime, document_request, email, fingerprint,
                 identity_document, liveness_event, manual_review, onboarding, onboarding_decision,
-                phone_number, risk_signal, scoped_user, user_timeline, user_vault, user_vault_data,
-                verification_request, verification_result, webauthn_credential,
+                onboarding_decision_verification_result_junction, phone_number, risk_signal, scoped_user,
+                user_timeline, user_vault, user_vault_data, verification_request, verification_result,
+                webauthn_credential,
             };
             let mut deleted_rows = 0;
 
@@ -299,6 +300,14 @@ pub async fn private_cleanup_integration_tests(
                         let decision_ids = onboarding_decision::table
                             .filter(onboarding_decision::onboarding_id.eq_any(ob_ids))
                             .select(onboarding_decision::id);
+
+                        deleted_rows +=
+                            diesel::delete(onboarding_decision_verification_result_junction::table)
+                                .filter(
+                                    onboarding_decision_verification_result_junction::onboarding_decision_id
+                                        .eq_any(decision_ids),
+                                )
+                                .execute(conn.conn())?;
 
                         deleted_rows += diesel::delete(risk_signal::table)
                             .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids))
