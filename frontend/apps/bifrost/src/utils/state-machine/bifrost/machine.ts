@@ -40,6 +40,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               device: { ...context.device! },
               identifyType: context.identifyType!,
               bootstrapData: context.bootstrapData ?? {},
+              tenantPk: context.tenant!.pk,
             }),
           onDone: [
             {

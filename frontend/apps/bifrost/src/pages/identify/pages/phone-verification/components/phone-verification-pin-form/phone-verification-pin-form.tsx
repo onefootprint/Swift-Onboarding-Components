@@ -26,7 +26,7 @@ const PhoneVerificationPinForm = ({
   const { t } = useTranslation('pages.phone-verification.form');
 
   const [state, send] = useIdentifyMachine();
-  const { email, userFound, challengeData } = state.context;
+  const { email, userFound, challengeData, tenantPk } = state.context;
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
 
@@ -40,7 +40,7 @@ const PhoneVerificationPinForm = ({
     // Only send the user email to the backend if we are onboarding the user for
     // the first time
     if (!userFound) {
-      userEmailMutation.mutate({ data: { email }, authToken });
+      userEmailMutation.mutate({ data: { email }, authToken, tenantPk });
     }
 
     if (authToken) {

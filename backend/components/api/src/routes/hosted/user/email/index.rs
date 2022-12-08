@@ -1,4 +1,6 @@
-use crate::auth::user::{UserAuthContext, UserAuthScope};
+use crate::auth::tenant::{ParsedOnboardingSession, PublicOnboardingContext};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::{Either, SessionContext};
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -7,6 +9,8 @@ use crate::utils::email::send_email_challenge;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
+use db::models::scoped_user::ScopedUser;
+use db::models::user_vault::UserVault;
 use newtypes::email::Email as EmailData;
 use newtypes::{DataAttribute, Fingerprinter};
 
@@ -28,6 +32,7 @@ pub struct AddEmailRequest {
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
+    onboarding_context: Option<Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>>,
     request: Json<AddEmailRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
@@ -51,8 +56,27 @@ pub async fn post(
             // don't know which scoped user to associate the data with.
             // We might one day want to support this outside of onboarding for my1fp, but without
             // the data being portable
-            let ob_info = user_auth.assert_onboarding(conn)?;
-            let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
+            UserVault::lock(conn, &user_auth.user_vault_id())?; // Lock since we might create scoped user
+            let scoped_user_id = if let Some(ob_info) = user_auth.onboarding(conn)? {
+                // We have an auth token from after calling POST /hosted/onboarding - the scoped
+                // user has already been created
+                ob_info.scoped_user.id
+            } else if let Some(ob_context) = onboarding_context {
+                // Or, an ob config public key was provided. get or create the scoped user
+                // NOTE: This is only a short-term action to allow rolling out data model v4.
+                // We need to find a better way of associating data with a tenant
+                // https://linear.app/footprint/issue/FP-2139/handle-email-update-when-an-email-already-exists
+                let scoped_user = ScopedUser::get_or_create(
+                    conn,
+                    user_auth.user_vault_id(),
+                    ob_context.tenant().id.clone(),
+                    ob_context.ob_config().is_live,
+                )?;
+                scoped_user.id
+            } else {
+                return Err(UserError::NotAllowedOutsideOnboarding.into());
+            };
+            let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user_id)?;
 
             // Enforce that sandbox emails are used for sandbox users
             if email.is_live() != uvw.user_vault.is_live {

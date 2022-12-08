@@ -4,8 +4,9 @@ export type UserEmailObj = {
 
 export type UserEmailRequest = {
   data: UserEmailObj;
-  authToken: string;
   speculative?: boolean;
+  authToken: string;
+  tenantPk: string;
 };
 
 export type UserEmailResponse = {};

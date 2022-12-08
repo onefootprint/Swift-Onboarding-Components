@@ -21,6 +21,7 @@ export type MachineContext = {
   authToken?: string;
   identifyType: IdentifyType;
   bootstrapData: BootstrapData;
+  tenantPk: string;
 };
 
 export enum Events {

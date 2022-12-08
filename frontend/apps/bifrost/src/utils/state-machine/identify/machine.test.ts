@@ -10,6 +10,7 @@ describe('Identify Machine Tests', () => {
     createIdentifyMachine({
       device: deviceInfo,
       identifyType: IdentifyType.onboarding,
+      tenantPk: '',
     });
 
   describe('with existing account', () => {

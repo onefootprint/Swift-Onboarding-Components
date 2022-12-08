@@ -16,12 +16,14 @@ type IdentifyMachineArgs = {
   identifyType: IdentifyType;
   device: DeviceInfo;
   bootstrapData?: BootstrapData;
+  tenantPk: string;
 };
 
 const createIdentifyMachine = ({
   identifyType,
   device,
   bootstrapData,
+  tenantPk,
 }: IdentifyMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
@@ -34,6 +36,7 @@ const createIdentifyMachine = ({
         device,
         identifyType,
         bootstrapData: bootstrapData ?? {},
+        tenantPk,
       },
       states: {
         [States.processBootstrapData]: {
