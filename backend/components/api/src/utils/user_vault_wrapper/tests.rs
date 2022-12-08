@@ -14,7 +14,7 @@ use db::tests::prelude::*;
 use db::HasDataAttributeFields;
 use newtypes::UvdKind;
 
-use super::user_vault_wrapper::UserVaultWrapper;
+use super::UserVaultWrapper;
 
 #[db_test]
 fn test_user_vault_wrapper(conn: &mut TestPgConnection) {

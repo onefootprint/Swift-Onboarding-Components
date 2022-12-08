@@ -1,5 +1,7 @@
-use std::collections::HashMap;
-
+use crate::{
+    errors::{user::UserError, ApiError, ApiResult},
+    types::identity_data_request::IdentityDataUpdate,
+};
 use db::{
     models::{
         data_lifetime::DataLifetime,
@@ -16,11 +18,7 @@ use newtypes::{
     CollectedDataOption, DataAttribute, Fingerprint as FingerprintBytes, PiiString, ScopedUserId,
     UserVaultId, UvdKind, VaultPublicKey,
 };
-
-use crate::{
-    errors::{user::UserError, ApiError, ApiResult},
-    types::identity_data_request::IdentityDataUpdate,
-};
+use std::collections::HashMap;
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
 pub struct UvdBuilder {
