@@ -140,6 +140,11 @@
     },
     "onboarding": {
       "page-title": "Footprint | Onboarding",
+      "welcome": {
+        "img-alt": "A Penguin using a cellphone",
+        "title": "Welcome to Footprint!",
+        "subtitle": "Your account is almost ready. We just need a bit more information about you and your company."
+      },
       "logged-as": "Logged in as"
     },
     "users": {

@@ -53,6 +53,8 @@ const Container = styled.div`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[1]};
     margin-bottom: ${theme.spacing[6]};
+    overflow: hidden;
+    position: relative;
     width: 500px;
   `}
 `;
