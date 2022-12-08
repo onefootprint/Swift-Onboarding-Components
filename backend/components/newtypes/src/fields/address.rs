@@ -109,22 +109,10 @@ impl TryFrom<String> for State {
         if INVALID_INPUT_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidCharacters(value).into());
         }
-        let state = value.to_uppercase();
-        if !ISO_3166_TWO_DIGIT_US_STATES.contains(&state.as_str()) {
-            return Err(crate::AddressError::InvalidState(state).into());
-        }
-        Ok(State(PiiString::new(state)))
+
+        Ok(State(PiiString::new(value)))
     }
 }
-
-// from https://en.wikipedia.org/wiki/List_of_U.S._state_and_territory_abbreviations
-// our bifrost UI only allows U.S. states for now
-const ISO_3166_TWO_DIGIT_US_STATES: [&str; 60] = [
-    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS",
-    "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC",
-    "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
-    "AS", "GU", "MP", "PR", "VI", "UM", "MH", "FM", "PW",
-];
 
 impl TryFrom<String> for Country {
     type Error = crate::Error;
@@ -151,9 +139,9 @@ impl Country {
     }
 }
 
-// list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data
-// eventually we should maybe just pony up and pay for the subscription to iso: https://www.iso.org/publication/PUB500001.html
-// Channel islands does not have a country code
+/// list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data
+/// eventually we should maybe just pony up and pay for the subscription to iso: https://www.iso.org/publication/PUB500001.html
+/// Channel islands does not have a country code
 const ISO_3166_COUNTRIES: [&str; 249] = [
     "TW", "AF", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS",
     "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BQ", "BA", "BW", "BV", "BR", "IO", "VG",
