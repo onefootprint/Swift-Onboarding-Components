@@ -201,7 +201,7 @@ CREATE TABLE access_event (
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
     insight_event_id TEXT NOT NULL,
     reason VARCHAR(250),
-    principal VARCHAR(250) NOT NULL,
+    principal JSONB NOT NULL,
     ordering_id BIGSERIAL NOT NULL,
     kind TEXT NOT NULL,
     targets TEXT[] NOT NULL,

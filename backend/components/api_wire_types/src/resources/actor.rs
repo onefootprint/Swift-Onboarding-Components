@@ -6,7 +6,7 @@ use crate::*;
 pub enum Actor {
     Footprint,
     Organization { member: String },
-    ApiKey,
+    ApiKey { name: String },
 }
 
 export_schema!(OnboardingDecision);

@@ -10,7 +10,7 @@ table! {
         _updated_at -> Timestamptz,
         insight_event_id -> Text,
         reason -> Nullable<Varchar>,
-        principal -> Varchar,
+        principal -> Jsonb,
         ordering_id -> Int8,
         kind -> Text,
         targets -> Array<Text>,

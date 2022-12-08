@@ -2,7 +2,7 @@ use crate::schema::access_event;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::{Connection, Insertable, PgConnection, Queryable, RunQueryDsl};
-use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, InsightEventId, ScopedUserId};
+use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedUserId};
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::CreateInsightEvent;
@@ -17,7 +17,7 @@ pub struct AccessEvent {
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
     pub reason: Option<String>,
-    pub principal: String,
+    pub principal: DbActor,
     pub ordering_id: i64,
     pub kind: AccessEventKind,
     pub targets: Vec<DataIdentifier>,
@@ -27,7 +27,7 @@ pub struct AccessEvent {
 pub struct NewAccessEvent {
     pub scoped_user_id: ScopedUserId,
     pub reason: Option<String>,
-    pub principal: String,
+    pub principal: DbActor,
     pub insight: CreateInsightEvent,
     pub kind: AccessEventKind,
     pub targets: Vec<DataIdentifier>,
@@ -39,7 +39,7 @@ struct NewAccessEventWithInsight {
     scoped_user_id: ScopedUserId,
     insight_event_id: InsightEventId,
     reason: Option<String>,
-    principal: String,
+    principal: DbActor,
     kind: AccessEventKind,
     targets: Vec<DataIdentifier>,
 }

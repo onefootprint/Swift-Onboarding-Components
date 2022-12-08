@@ -74,7 +74,7 @@ pub fn put_internal(
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: None,
-        principal: tenant_auth.format_principal(),
+        principal: tenant_auth.actor().into(),
         insight,
         kind: AccessEventKind::Update,
         targets: update.keys().cloned().map(DataIdentifier::Custom).collect(),
@@ -206,7 +206,7 @@ pub(super) async fn post_decrypt_internal(
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: Some(reason),
-        principal: tenant_auth.format_principal(),
+        principal: tenant_auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
         targets: fields.into_iter().map(DataIdentifier::Custom).collect(),

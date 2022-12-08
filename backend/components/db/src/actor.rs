@@ -5,14 +5,14 @@ use newtypes::{DbActor, TenantApiKeyId, TenantUserId};
 
 use crate::{
     models::{
-        annotation::Annotation, onboarding_decision::OnboardingDecision, tenant_api_key::TenantApiKey,
-        tenant_user::TenantUser,
+        access_event::AccessEvent, annotation::Annotation, onboarding_decision::OnboardingDecision,
+        tenant_api_key::TenantApiKey, tenant_user::TenantUser,
     },
     schema::{tenant_api_key, tenant_user},
     DbError, DbResult,
 };
 use diesel::prelude::*;
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum SaturatedActor {
     TenantUser(TenantUser),
     TenantApiKey(TenantApiKey),
@@ -32,6 +32,12 @@ impl HasActor for Annotation {
 impl HasActor for OnboardingDecision {
     fn actor(&self) -> DbActor {
         self.actor.clone()
+    }
+}
+
+impl HasActor for AccessEvent {
+    fn actor(&self) -> DbActor {
+        self.principal.clone()
     }
 }
 

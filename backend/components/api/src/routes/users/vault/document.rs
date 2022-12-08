@@ -153,7 +153,7 @@ pub(super) async fn post_internal(
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: Some(request.reason),
-        principal: auth.format_principal(),
+        principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
         targets: vec![DataIdentifier::Identity(DataAttribute::IdentityDocument)],

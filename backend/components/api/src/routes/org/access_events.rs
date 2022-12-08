@@ -70,7 +70,9 @@ async fn get(
         AccessEventListItemForTenant::get(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;
 
     // If there are more than page_size results, we should tell the client there's another page
-    let cursor = request.cursor_item(&state, &results).map(|x| x.event.ordering_id);
+    let cursor = request
+        .cursor_item(&state, &results)
+        .map(|x| x.event.0.ordering_id);
     let response = results
         .into_iter()
         .take(page_size)

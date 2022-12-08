@@ -17,7 +17,7 @@ impl DbToApi<SaturatedActor> for Actor {
                     member: name.get_or_insert(tenant_user.email.0).clone(),
                 }
             }
-            SaturatedActor::TenantApiKey(_) => Actor::ApiKey,
+            SaturatedActor::TenantApiKey(tak) => Actor::ApiKey { name: tak.name },
             SaturatedActor::Footprint => Actor::Footprint,
         }
     }

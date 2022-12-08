@@ -92,7 +92,7 @@ pub fn put_internal(
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: None,
-        principal: tenant_auth.format_principal(),
+        principal: tenant_auth.actor().into(),
         insight,
         kind: AccessEventKind::Update,
         targets: fingerprints
@@ -244,7 +244,7 @@ pub(super) async fn post_decrypt_internal(
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: Some(request.reason),
-        principal: auth.format_principal(),
+        principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
         targets: DataIdentifier::list(decrypted_data_attributes.clone()),
