@@ -33,9 +33,7 @@ config:
       memoryMB: 512
     rpId: onefootprint.com
     s3:
-      documentImagesBucket:
-        envVarName: DOCUMENT_S3_BUCKET
-        prefix: opaque-documents
+      documentImagesBucketNamePrefix: opaque-documents
     sendgrid:
       apiKey:
         secure: v1:rcN9jM7uB9KA3jjQ:H49idM5tdoD3IoVXyA2T5rSIbr5xvjxqJJXHYh7jCtKefwzpE7VakZc2VzMeAC3kAX4W0uRTdvI9iSKycCMFDAXYaLH5P715BhcWm9lr739sJ849wg==

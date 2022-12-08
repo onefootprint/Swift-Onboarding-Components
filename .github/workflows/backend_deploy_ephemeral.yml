@@ -1,35 +1,25 @@
 name: Backend Ephemeral Stack
 on:
   pull_request:
-    types: [labeled, reopened, opened, synchronize]
+    types: [labeled, opened, synchronize]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
 
 jobs:
-  wait_triage:
-    name: Wait for triage labels
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Wait for triage
-        uses: lewagon/wait-on-check-action@v1.2.0
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          check-name: 'triage'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-          allowed-conclusions: success,skipped
-      - name: wait
-        run: sleep 10
-
-  ephemeral_stack_name:
-    name: Stack name
+  ephemeral_stack:
+    name: Detect ephemeral
     runs-on: ubuntu-latest
     outputs:
       stackName: ${{ steps.constants.outputs.branch }}
+      hasInfraChanges: ${{ steps.detect.outputs.ephemeral }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          # We extract all commits here to make sure we're pulling the right commit hash
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
       - name: Extract Constants
         id: constants
         shell: bash
@@ -37,14 +27,29 @@ jobs:
           branch_raw="${{ github.head_ref }}"
           branch="$(echo ${branch_raw} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           echo "friendly branch name is ${branch}"
-          echo "::set-output name=branch::$(echo ${branch})"
+          echo "branch=${branch}" >> $GITHUB_OUTPUT
+
+      - name: Detect infra changes
+        id: detect
+        shell: bash
+        run: |
+          git --version          
+          code_hash="$(git log -n 1 --format="%h" ./)"
+          infra_hash="$(git log -n 1 --format="%h" ./backend/infra)"
+          echo "code=${code_hash} infra=${infra_hash}"
+
+          if [ "$code_hash" == "$infra_hash" ]; then
+            echo "ephemeral=true" >> $GITHUB_OUTPUT
+          else
+            echo "ephemeral=false" >> $GITHUB_OUTPUT
+          fi
 
   deploy_ephemeral_stack:
     name: deploy ephemeral
-    needs: [ephemeral_stack_name, wait_triage]
+    needs: [ephemeral_stack]
     uses: ./.github/workflows/backend_build_and_deploy.yml
-    # don't run for dependabot changes and only run when labeled ephemeral
-    if: github.actor != 'dependabot[bot]' && contains( github.event.pull_request.labels.*.name, 'ephemeral')
+    # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
+    if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'ephemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
     permissions:
       contents: write
       pull-requests: write
@@ -52,8 +57,8 @@ jobs:
       environment: dev
       baseStackName: dev
       createStack: true
-      stackName: 'dev-${{ needs.ephemeral_stack_name.outputs.stackName }}'
-      prefixDomain: 'api-${{ needs.ephemeral_stack_name.outputs.stackName }}.'
+      stackName: 'dev-${{ needs.ephemeral_stack.outputs.stackName }}'
+      prefixDomain: 'api-${{ needs.ephemeral_stack.outputs.stackName }}.'
 
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

@@ -46,12 +46,8 @@ export interface Twilio {
   integrationTestPhoneNumber: string;
 }
 
-export interface S3ConfigValue {
-  prefix: string;
-  envVarName: string;
-}
 export interface S3 {
-  documentImagesBucket: S3ConfigValue;
+  documentImagesBucketNamePrefix: string;
 }
 
 export interface Sendgrid {

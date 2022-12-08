@@ -30,7 +30,7 @@ export type GlobalState = {
   database: db.DatabaseOutput;
   dnsConfig: dns.DnsConfig;
   coreSecurityGroups: sg.CoreSecurityGroups;
-  buckets: s3.S3Buckets;
+  buckets: s3.ServiceS3Buckets;
 };
 
 /**
@@ -94,7 +94,7 @@ export default async function main() {
   );
 
   // Create our s3 buckets
-  const s3Buckets = s3.CreateBuckets(provider, constants, stackMetadata);
+  const s3Buckets = s3.CreateServiceBuckets(provider, constants, stackMetadata);
 
   const globalState: GlobalState = {
     vpc,

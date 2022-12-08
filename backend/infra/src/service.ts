@@ -60,7 +60,7 @@ export async function CreateApiService(
   const vpc = g.vpc.vpc;
   const provider = g.provider;
 
-  // setup our load balancer and cloudfront CDN
+  // Setup our load balancer and CloudFront
   const lb = await createCdnFrontedLoadBalancer(
     g,
     cert,
@@ -198,6 +198,11 @@ async function createCdnFrontedLoadBalancer(
       external: true,
       securityGroups: [g.coreSecurityGroups.fpcServiceLoadBalancer],
       subnets: vpc.publicSubnetIds,
+      accessLogs: {
+        bucket: await createAlbAccessLogsBucket(g, stackMetadata),
+        enabled: true,
+        prefix: 'fpc-svc',
+      },
     },
     { provider },
   );
@@ -427,7 +432,7 @@ function createTaskContainerRole(
   serviceName: string,
   enclaveKeyDescriptor: EnclaveKeyDescriptor,
   signingKeyDescriptor: HmacSigningKeyDescriptor,
-  s3Buckets: s3.S3Buckets,
+  s3Buckets: s3.ServiceS3Buckets,
 ): pulumi.Output<aws.iam.Role> {
   const s3Policies: AWSPolicyConfig[] = [s3Buckets.documentImages.policy];
 
@@ -482,4 +487,50 @@ function createTaskContainerRole(
     });
 
   return role;
+}
+
+async function createAlbAccessLogsBucket(
+  g: GlobalState,
+  stackMetadata: StackMetadata,
+): Promise<string> {
+  const provider = g.provider;
+  const bucketName = `alb-access-logs-${stackMetadata.shortStackName}`;
+  const elbAccountArn = await (
+    await aws.elb.getServiceAccount({ region: g.region })
+  ).arn;
+  const bucket = new aws.s3.Bucket(
+    bucketName,
+    {
+      forceDestroy: !g.constants.deletionProtection,
+      bucket: bucketName,
+      arn: `arn:aws:s3:::${bucketName}`,
+      acl: 'private',
+      serverSideEncryptionConfiguration: {
+        rule: {
+          applyServerSideEncryptionByDefault: {
+            sseAlgorithm: 'aws:kms',
+          },
+          bucketKeyEnabled: true,
+        },
+      },
+      policy: {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Action: ['s3:PutObject'],
+            Principal: {
+              AWS: elbAccountArn,
+            },
+            Resource: `arn:aws:s3:::${bucketName}/*/AWSLogs/*`,
+          },
+        ],
+      },
+    },
+    {
+      provider,
+    },
+  );
+
+  return bucketName;
 }

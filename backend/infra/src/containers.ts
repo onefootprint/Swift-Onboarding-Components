@@ -22,7 +22,7 @@ export abstract class ServiceContainers {
     region: Region,
     parent: pulumi.Resource,
     database: DatabaseOutput,
-    s3Buckets: s3.S3Buckets,
+    s3Buckets: s3.ServiceS3Buckets,
     metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
   ): Promise<pulumi.Output<string>> {
@@ -82,7 +82,7 @@ export abstract class ServiceContainers {
     signingKeyDescriptor: HmacSigningKeyDescriptor,
     region: Region,
     database: DatabaseOutput,
-    s3Buckets: s3.S3Buckets,
+    s3Buckets: s3.ServiceS3Buckets,
     metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
@@ -269,7 +269,7 @@ export abstract class ServiceContainers {
                 value: constants.twilio.integrationTestPhoneNumber,
               },
               {
-                name: s3Buckets.documentImages.envVarName,
+                name: 'DOCUMENT_S3_BUCKET',
                 value: s3Buckets.documentImages.bucketName,
               },
               {
