@@ -35,7 +35,7 @@
     "react-dom": "18.2.0",
     "styled-components": "^5.3.6",
     "usehooks-ts": "^2.7.2",
-    "xstate": "^4.33.6"
+    "xstate": "^4.35.0"
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",

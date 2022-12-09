@@ -36,7 +36,7 @@
     "styled-media-query": "^2.1.2",
     "use-places-autocomplete": "^4.0.0",
     "usehooks-ts": "2.7.2",
-    "xstate": "^4.33.6"
+    "xstate": "^4.35.0"
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",

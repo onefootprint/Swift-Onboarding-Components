@@ -22,7 +22,7 @@
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/ui": "*",
-    "@tryghost/content-api": "^1.11.0",
+    "@tryghost/content-api": "^1.11.5",
     "google-libphonenumber": "^3.2.31",
     "isemail": "^3.2.0",
     "lodash": "^4.17.21",

@@ -3967,10 +3967,10 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@tryghost/content-api@^1.11.0":
-  version "1.11.4"
-  resolved "https://registry.yarnpkg.com/@tryghost/content-api/-/content-api-1.11.4.tgz#4a1afa6a7580eb414d82ce6bd3ca712126927fbc"
-  integrity sha512-1ShIj8i37rR/9gaenRiaGvPNAU3jAuvViD64mmVxE1cedXJjpqbaOLM8lFWaVuGUafDQrfo5tv57FN6ac51QeQ==
+"@tryghost/content-api@^1.11.5":
+  version "1.11.5"
+  resolved "https://registry.yarnpkg.com/@tryghost/content-api/-/content-api-1.11.5.tgz#8023bd03c9e0073a4aaf244c7d527cdd71a80b13"
+  integrity sha512-dDU3EBgi8fpSZqnEOunYra/W/yABGlJng6f6i99ZLHir/y/KbShA+zA5/R19Y7Z109ocB8R4VWHk44GjFSTeBA==
   dependencies:
     axios "^0.27.0"
 
@@ -11669,10 +11669,10 @@ markdown-extensions@^1.0.0:
   resolved "https://registry.yarnpkg.com/markdown-extensions/-/markdown-extensions-1.1.1.tgz#fea03b539faeaee9b4ef02a3769b455b189f7fc3"
   integrity sha512-WWC0ZuMzCyDHYCasEGs4IPvLyTGftYwh6wIEOULOF0HXcqZlhwRzrK0w2VUlxWA98xnvb/jszw4ZSkJ6ADpM6Q==
 
-markdown-to-jsx@^7.1.7:
-  version "7.1.7"
-  resolved "https://registry.yarnpkg.com/markdown-to-jsx/-/markdown-to-jsx-7.1.7.tgz#a5f22102fb12241c8cea1ca6a4050bb76b23a25d"
-  integrity sha512-VI3TyyHlGkO8uFle0IOibzpO1c1iJDcXcS/zBrQrXQQvJ2tpdwVzVZ7XdKsyRz1NdRmre4dqQkMZzUHaKIG/1w==
+markdown-to-jsx@^7.1.8:
+  version "7.1.8"
+  resolved "https://registry.yarnpkg.com/markdown-to-jsx/-/markdown-to-jsx-7.1.8.tgz#49c3bb3c122aa714324034142c8829b93c889338"
+  integrity sha512-rRSa1aFmFnpDRFAhv5vIkWM4nPaoB9vnzIjuIKa1wGupfn2hdCNeaQHKpu4/muoc8n8J7yowjTP2oncA4/Rbgg==
 
 md5.js@^1.3.4:
   version "1.3.5"
@@ -17132,10 +17132,10 @@ xmlchars@^2.2.0:
   resolved "https://registry.yarnpkg.com/xmlchars/-/xmlchars-2.2.0.tgz#060fe1bcb7f9c76fe2a17db86a9bc3ab894210cb"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
 
-xstate@^4.33.5, xstate@^4.33.6:
-  version "4.34.0"
-  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.34.0.tgz#401901c478f0b2a7f07576c020b6e6f750b5bd10"
-  integrity sha512-MFnYz7cJrWuXSZ8IPkcCyLB1a2T3C71kzMeShXKmNaEjBR/JQebKZPHTtxHKZpymESaWO31rA3IQ30TC6LW+sw==
+xstate@^4.35.0:
+  version "4.35.0"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.35.0.tgz#cccd4af2b233c47c661bab4f51bfa02266e41b5a"
+  integrity sha512-MSc3MCn2SDB/ShI0KHXpWGIDMo6i+qwJPKgBdyi1AClJm37k4oHJ7lr79qdTrTvirKuC2ZP+63lhsvvYrl0URQ==
 
 xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:
   version "4.0.2"
