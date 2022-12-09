@@ -49,13 +49,18 @@ const CountrySelect = ({
     options={options}
     testID={testID}
     value={value}
-    renderTrigger={({ isOpen, selectedOption, onClick, ref }) => (
+    renderTrigger={({
+      isOpen,
+      selectedOption,
+      onClick,
+      testID: triggerTestID,
+    }) => (
       <BaseSelectTrigger
         disabled={disabled}
         hasError={hasError}
         hasFocus={isOpen}
         onClick={onClick}
-        ref={ref}
+        testID={triggerTestID}
       >
         {selectedOption && <StyledFlag code={selectedOption.value} />}
         {selectedOption?.label || placeholder}

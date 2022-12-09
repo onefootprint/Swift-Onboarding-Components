@@ -48,7 +48,6 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
         rules={{ required: true }}
         render={({ field, fieldState }) => (
           <Select
-            isSearchable={false}
             label={t('form.reason.label')}
             hasError={!!fieldState.error}
             hint={fieldState.error && t('form.reason.errors.required')}

@@ -1,5 +1,5 @@
-import React from 'react';
-import type { CommonPropsAndClassName, GroupBase } from 'react-select';
+import React, { Children } from 'react';
+import type { MenuListProps } from 'react-select';
 import { FixedSizeList as List } from 'react-window';
 import styled, { css } from 'styled-components';
 
@@ -7,26 +7,9 @@ const OPTION_HEIGHT = 36;
 const ROWS = 6;
 const MARGIN = 8;
 
-export type MenuListProps<
-  Option = unknown,
-  IsMulti extends boolean = boolean,
-  Group extends GroupBase<Option> = GroupBase<Option>,
-> = CommonPropsAndClassName<Option, IsMulti, Group> & {
-  children: React.ReactNode[];
-  innerRef: React.RefCallback<HTMLDivElement>;
-};
-
-const MenuList = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->({
-  innerRef,
-  options,
-  children,
-  getValue,
-}: MenuListProps<Option, IsMulti, Group>) => {
+const MenuList = ({ innerRef, options, children, getValue }: MenuListProps) => {
   const [value] = getValue();
+  const length = Children.count(children);
 
   const getInitialOffset = () => {
     if (options.indexOf(value) !== -1) {
@@ -40,15 +23,15 @@ const MenuList = <
   };
 
   const height =
-    children.length >= ROWS
+    length >= ROWS
       ? OPTION_HEIGHT * ROWS - MARGIN
-      : children.length * OPTION_HEIGHT + 2 * MARGIN;
+      : length * OPTION_HEIGHT + 2 * MARGIN;
 
   return Array.isArray(children) ? (
     <StyledList
       height={height}
       initialScrollOffset={getInitialOffset()}
-      itemCount={children.length}
+      itemCount={length}
       itemSize={OPTION_HEIGHT}
       width="100%"
     >

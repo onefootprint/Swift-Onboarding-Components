@@ -55,7 +55,6 @@ const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
         rules={{ required: true }}
         render={({ field, fieldState }) => (
           <Select
-            isSearchable={false}
             label={t('dialog.form.reason.label')}
             hasError={!!fieldState.error}
             hint={fieldState.error && t('dialog.form.reason.errors.required')}

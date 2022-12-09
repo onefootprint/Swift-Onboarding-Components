@@ -1,14 +1,14 @@
-import React, { useCallback, useRef, useState } from 'react';
-import ReactSelect, { defaultTheme, OptionProps } from 'react-select';
-import styled, { css, useTheme } from 'styled-components';
-import { useEventListener, useOnClickOutside } from 'usehooks-ts';
+import React, { useCallback, useId, useState } from 'react';
+import { usePopper } from 'react-popper';
+import ReactSelect, { OptionProps } from 'react-select';
+import styled, { useTheme } from 'styled-components';
 
-import Box from '../../box';
 import Hint from '../hint';
 import Label from '../label';
 import type { BaseSelectOption } from './base-select.types';
+import modifiers from './base-select.utils';
+import Control from './components/control';
 import EmptyState from './components/empty-state';
-import Input from './components/input';
 import MenuList from './components/menu-list';
 import Option from './components/option';
 
@@ -24,12 +24,11 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   onChange?: (newOption: Option) => void;
   options: Option[];
   searchPlaceholder?: string;
-  isSearchable?: boolean;
   renderTrigger?: (options: {
-    onClick: () => void;
-    ref: React.RefObject<HTMLButtonElement>;
-    selectedOption?: Option;
     isOpen: boolean;
+    onClick: () => void;
+    selectedOption?: Option;
+    testID?: string;
   }) => React.ReactNode;
   value?: Option;
   OptionComponent?: React.ComponentType<OptionProps<any, false, any>>;
@@ -39,7 +38,6 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
 const BaseSelect = <Option extends BaseSelectOption>({
   disabled,
   emptyStateText = 'No results found',
-  OptionComponent = Option,
   hasError,
   hint,
   id,
@@ -47,54 +45,36 @@ const BaseSelect = <Option extends BaseSelectOption>({
   name,
   onBlur,
   onChange,
+  OptionComponent = Option,
   options,
   renderTrigger,
   searchPlaceholder = 'Search',
-  isSearchable = true,
   testID,
   value,
 }: BaseSelectProps<Option>) => {
+  const internalId = useId();
   const [isOpen, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const selectRef = useRef<HTMLInputElement>(null);
   const theme = useTheme();
-  const { dropdown } = theme.components;
+  const { dropdown, input } = theme.components;
+  const [referenceElement, setReferenceElement] =
+    useState<HTMLElement | null>();
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>();
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    strategy: 'fixed',
+    modifiers,
+  });
+  const isSearchable = options.length > 7;
 
   const closeDropdown = () => {
     setOpen(false);
   };
 
-  useEventListener('keydown', event => {
-    if (event.key === 'Tab' || event.key === 'Escape') {
-      closeDropdown();
-    }
-  });
-  useOnClickOutside(containerRef, closeDropdown);
-
-  const handleFakeSelectFocus = () => {
-    triggerRef.current?.focus();
-  };
-
-  const handleToggleDropdown = () => {
+  const toggleDropdown = () => {
     setOpen(currentOpen => !currentOpen);
   };
 
-  const handleAutoComplete = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    const autoCompletedValue = event.target.value;
-    if (autoCompletedValue) {
-      const possibleOption = options.find(
-        option => option.label === autoCompletedValue,
-      );
-      if (possibleOption) {
-        onChange?.(possibleOption);
-      }
-    }
-  };
-
-  const handleChange = (newOption: unknown) => {
-    onChange?.(newOption as Option);
+  const handleChange = (newOption: Option) => {
+    onChange?.(newOption);
     closeDropdown();
   };
 
@@ -104,127 +84,90 @@ const BaseSelect = <Option extends BaseSelectOption>({
   );
 
   return (
-    <Box ref={containerRef} testID={testID}>
+    <Container data-testid={testID} className="fp-dropdown">
       {label && <Label htmlFor={id || label}>{label}</Label>}
-      <HiddenSelect
-        aria-hidden="true"
-        autoComplete="country-name"
-        id={id || label}
-        onChange={handleAutoComplete}
-        onFocus={handleFakeSelectFocus}
-        ref={selectRef}
-      />
-      <Dropdown>
+      <div ref={setReferenceElement}>
         {renderTrigger?.({
+          testID: internalId,
           isOpen,
-          onClick: handleToggleDropdown,
-          ref: triggerRef,
+          onClick: toggleDropdown,
           selectedOption: value,
         })}
-        {isOpen && (
-          <DropdownMenu className="fp-dropdown">
-            <ReactSelect
-              isSearchable={isSearchable}
-              maxMenuHeight={180}
-              backspaceRemovesValue={false}
-              controlShouldRenderValue={false}
-              hideSelectedOptions={false}
-              autoFocus
-              components={{
-                DropdownIndicator: null,
-                IndicatorSeparator: null,
-                Input,
-                // @ts-ignore
-                MenuList,
-                Option: OptionComponent,
-                Placeholder: () => null,
-                SingleValue: () => null,
-                ...(isSearchable ? {} : { Control: () => null }),
-              }}
-              inputId={id}
-              isDisabled={disabled}
-              menuIsOpen
-              name={name}
-              noOptionsMessage={renderEmptyState}
-              onBlur={onBlur}
-              onChange={handleChange}
-              options={options}
-              placeholder={searchPlaceholder}
-              styles={{
-                control: () => ({
-                  display: 'flex',
-                  alignItems: 'center',
-                  borderBottom: `${dropdown.borderWidth} solid ${dropdown.borderColor}`,
-                  flexWrap: 'wrap',
-                  justifyContent: 'space-between',
-                  outline: 0,
-                  position: 'relative',
-                  transition: 'all 100ms',
-                  borderRadius: `${dropdown.borderRadius} ${dropdown.borderRadius} 0 0`,
-                  background: dropdown.bg,
-                  height: 40,
-                  '&:hover': {
-                    borderColor: dropdown.borderColor,
-                  },
-                }),
-                menu: () => ({}),
-              }}
-              value={value}
-              theme={{
-                ...defaultTheme,
-                colors: {
-                  ...defaultTheme.colors,
-                  primary: theme.color.accent,
-                  primary25: theme.overlay['darken-1'],
-                  primary50: theme.overlay['darken-2'],
-                },
-                borderRadius: 0,
-                spacing: {
-                  baseUnit: 4,
-                  controlHeight: 40,
-                  menuGutter: 8,
-                },
-              }}
-            />
-          </DropdownMenu>
-        )}
-      </Dropdown>
+      </div>
+      {isOpen && (
+        <div
+          data-testid={`select-${internalId}`}
+          ref={setPopperElement}
+          style={{ ...styles.popper, zIndex: theme.zIndex.dropdown }}
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...attributes.popper}
+        >
+          <ReactSelect
+            autoFocus
+            backspaceRemovesValue={false}
+            controlShouldRenderValue={false}
+            components={{
+              Control,
+              DropdownIndicator: null,
+              IndicatorSeparator: null,
+              MenuList,
+              Option: OptionComponent,
+              ...(isSearchable ? {} : { Control: () => null }),
+            }}
+            styles={{
+              container: () => ({
+                background: dropdown.bg,
+                borderColor: dropdown.borderColor,
+                borderRadius: dropdown.borderRadius,
+                borderStyle: 'solid',
+                borderWidth: dropdown.borderWidth,
+                boxShadow: dropdown.elevation,
+                marginTop: theme.spacing[3],
+                overflow: 'hidden',
+                width: '100%',
+              }),
+              placeholder: provided => ({
+                ...provided,
+                font: theme.typography['body-3'],
+              }),
+              control: () => ({
+                alignItems: 'center',
+                background: input.state.default.initial.bg,
+                backgroundColor: dropdown.bg,
+                borderRadiusTopLeftRadius: dropdown.borderRadius,
+                borderRadiusTopRightRadius: dropdown.borderRadius,
+                display: 'flex',
+                height: 40,
+              }),
+              input: provided => ({
+                ...provided,
+                font: theme.typography['body-3'],
+              }),
+              menu: () => ({}),
+            }}
+            hideSelectedOptions={false}
+            inputId={id}
+            isDisabled={disabled}
+            isSearchable={isSearchable}
+            maxMenuHeight={180}
+            menuIsOpen
+            name={name}
+            noOptionsMessage={renderEmptyState}
+            onBlur={onBlur}
+            onChange={handleChange}
+            onMenuClose={closeDropdown}
+            options={options}
+            placeholder={searchPlaceholder}
+            value={value}
+          />
+        </div>
+      )}
+
       {hint && <Hint hasError={hasError}>{hint}</Hint>}
-    </Box>
+    </Container>
   );
 };
 
-const Dropdown = styled.div`
-  position: relative;
-`;
-
-const DropdownMenu = styled.div`
-  ${({ theme }) => {
-    const { dropdown } = theme.components;
-
-    return css`
-      background: ${dropdown.bg};
-      border-radius: ${dropdown.borderRadius};
-      border: ${dropdown.borderWidth} solid ${dropdown.borderColor};
-      box-shadow: ${dropdown.elevation};
-      margin-top: ${theme.spacing[3]};
-      position: absolute;
-      width: 100%;
-      z-index: ${theme.zIndex.dropdown};
-      overflow: hidden;
-    `;
-  }}
-`;
-
-const HiddenSelect = styled.input`
-  background: none;
-  border: 0px;
-  display: block;
-  height: 1px;
-  margin: 0px;
-  outline: 0px;
-  padding: 0px;
-  width: 1px;
-`;
+const Container = styled.div``;
 
 export default BaseSelect;

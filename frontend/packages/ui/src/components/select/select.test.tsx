@@ -1,4 +1,9 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  selectEvents,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import Select, { SelectProps } from './select';
@@ -22,7 +27,7 @@ describe('<Select />', () => {
     hasError,
     hint,
     id = 'some id',
-    label = 'label text',
+    label = 'label ',
     onChange = jest.fn(),
     options = defaultOptions,
     placeholder = 'Select',
@@ -57,28 +62,48 @@ describe('<Select />', () => {
     expect(screen.getByText('some label text')).toBeInTheDocument();
   });
 
-  describe('when there is NO item selected', () => {
-    it('should render the placeholder', () => {
-      renderSelect({ placeholder: 'placeholder' });
-      expect(screen.getByText('placeholder')).toBeInTheDocument();
-    });
+  it('should render the placeholder', () => {
+    renderSelect({ placeholder: 'placeholder' });
+    expect(screen.getByText('placeholder')).toBeInTheDocument();
   });
 
-  describe('when there is an item selected', () => {
-    it('should NOT render the placeholder', () => {
+  it('should render the hint text', () => {
+    const hint = 'This is an important message';
+    renderSelect({ hint });
+    expect(screen.getByText(hint)).toBeInTheDocument();
+  });
+
+  describe('when clicking on the trigger', () => {
+    it('should display the list of options', async () => {
       const options = [
         { value: 'foo', label: 'foo' },
         { value: 'bar', label: 'bar' },
       ];
-      const [selectedOption] = options;
-      renderSelect({
-        placeholder: 'placeholder',
-        options,
-        value: selectedOption,
+      renderSelect({ options });
+      const trigger = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.openMenu(trigger);
+      options.forEach(option => {
+        expect(screen.getByText(option.label)).toBeInTheDocument();
       });
-      expect(screen.queryByText('placeholder')).toBeNull();
     });
+  });
 
+  describe('when selecting an option', () => {
+    it('should call the onChange callback', async () => {
+      const onChange = jest.fn();
+      renderSelect({ onChange });
+      const trigger = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(trigger, 'option 2');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({
+          value: 'option 2',
+          label: 'option 2',
+        });
+      });
+    });
+  });
+
+  describe('when there is an item selected', () => {
     it('should render the label of the selected item', () => {
       const options = [
         { value: 'foo', label: 'foo' },
@@ -97,7 +122,7 @@ describe('<Select />', () => {
       const [selectedOption] = options;
       renderSelect({ options, value: selectedOption });
       const trigger = screen.getByText(selectedOption.label);
-      await userEvent.click(trigger);
+      await selectEvents.openMenu(trigger);
       const listOption = screen.getByRole('option', {
         name: selectedOption.label,
       });
@@ -105,27 +130,12 @@ describe('<Select />', () => {
     });
   });
 
-  describe('when clicking on the trigger', () => {
-    it('should display the list of options', async () => {
-      const options = [
-        { value: 'foo', label: 'foo' },
-        { value: 'bar', label: 'bar' },
-      ];
-      renderSelect({ options, placeholder: 'placeholder' });
-      await userEvent.click(screen.getByText('placeholder'));
-      options.forEach(option => {
-        expect(screen.getByText(option.label)).toBeInTheDocument();
-      });
-    });
-  });
-
   describe('search', () => {
     describe('when typing in the search', () => {
       it('should filter the results', async () => {
         renderSelect({});
-        await userEvent.click(screen.getByRole('button', { name: 'Select' }));
-        const search = screen.getByPlaceholderText('Search');
-        await userEvent.type(search, defaultOptions[0].label);
+        const trigger = screen.getByRole('button', { name: 'Select' });
+        await selectEvents.search(trigger, 'option 1');
         expect(screen.queryAllByRole('option').length).toEqual(1);
       });
 
@@ -134,28 +144,17 @@ describe('<Select />', () => {
           renderSelect({
             emptyStateText: 'No results were found',
           });
-          await userEvent.click(screen.getByRole('button', { name: 'Select' }));
-          const search = screen.getByPlaceholderText('Search');
-          await userEvent.type(search, 'Lorem');
+          const trigger = screen.getByRole('button', { name: 'Select' });
+          await selectEvents.search(trigger, 'lorem');
           expect(screen.getByText('No results were found')).toBeInTheDocument();
         });
       });
     });
   });
 
-  describe('when there is a hint', () => {
-    it('should render the hint text', () => {
-      const hint = 'This is an important message';
-      renderSelect({ hint });
-      expect(screen.getByText(hint)).toBeInTheDocument();
-    });
-  });
-
   describe('when there is a error', () => {
     it('should add an error border to the trigger', () => {
-      renderSelect({
-        hasError: true,
-      });
+      renderSelect({ hasError: true });
       const trigger = screen.getByRole('button', {
         name: 'Select',
       }) as HTMLButtonElement;
@@ -165,10 +164,7 @@ describe('<Select />', () => {
     });
 
     it('should add an error border to the hint', () => {
-      renderSelect({
-        hasError: true,
-        hint: 'Hint',
-      });
+      renderSelect({ hasError: true, hint: 'Hint' });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({
         color: 'var(--fp-base-inputs-base-hint-error)',
@@ -178,9 +174,7 @@ describe('<Select />', () => {
 
   describe('when is disabled', () => {
     it('should not be able to interact with the trigger', async () => {
-      renderSelect({
-        disabled: true,
-      });
+      renderSelect({ disabled: true });
       const trigger = screen.getByRole('button', {
         name: 'Select',
       }) as HTMLButtonElement;

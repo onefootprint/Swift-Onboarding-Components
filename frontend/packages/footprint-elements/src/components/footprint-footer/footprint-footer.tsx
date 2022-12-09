@@ -37,9 +37,6 @@ const FootprintFooter = () => {
 
 const FootprintFooterContainer = styled.footer`
   ${({ theme }) => css`
-    position: sticky;
-    z-index: ${theme.zIndex.sticky};
-    bottom: 0;
     background-color: ${theme.backgroundColor.secondary};
     border-radius: 0 0 ${theme.borderRadius.default}
       ${theme.borderRadius.default};

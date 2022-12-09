@@ -1,7 +1,7 @@
 import * as CSS from 'csstype';
 
 export type Dropdown = {
-  bg: CSS.Property.Background;
+  bg: CSS.Property.BackgroundColor;
   borderColor: CSS.Property.BorderColor;
   elevation: CSS.Property.BoxShadow;
   borderWidth: CSS.Property.BorderWidth;
@@ -10,10 +10,10 @@ export type Dropdown = {
   colorSecondary: CSS.Property.Color;
 
   hover: {
-    bg: CSS.Property.Background;
+    bg: CSS.Property.BackgroundColor;
   };
 
   footer: {
-    bg: CSS.Property.Background;
+    bg: CSS.Property.BackgroundColor;
   };
 };

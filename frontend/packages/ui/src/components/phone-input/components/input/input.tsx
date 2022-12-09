@@ -14,10 +14,9 @@ type InputProps = PhoneInputProps & {
   hasMask?: boolean;
   isLoading?: boolean;
   prefix: string;
-  selectTrigger: {
+  selectTrigger?: {
     isOpen?: boolean;
     onClick?: () => void;
-    ref: React.RefObject<HTMLButtonElement>;
   };
 };
 
@@ -47,21 +46,20 @@ const PhoneInput = forwardRef<HTMLInputElement, InputProps>(
           {...props}
           autoComplete="tel"
           hasError={hasError}
-          hasFocus={selectTrigger.isOpen}
+          hasFocus={selectTrigger?.isOpen}
           mask={hasMask ? mask : { prefix }}
           placeholder=""
           readOnly={isLoading}
           className="fp-input-phone"
           prefixComponent={
             <Trigger
-              onClick={isLoading ? undefined : selectTrigger.onClick}
-              ref={selectTrigger.ref}
+              onClick={isLoading ? undefined : selectTrigger?.onClick}
               tabIndex={isLoading ? -1 : 0}
               type="button"
             >
               <Flag code={countryCode} />
               <DropdownIndicator
-                color={getIndicatorColor(!!hasError, !!selectTrigger.isOpen)}
+                color={getIndicatorColor(!!hasError, !!selectTrigger?.isOpen)}
               />
             </Trigger>
           }

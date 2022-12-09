@@ -125,7 +125,6 @@ const SupportDialog = ({
           hint={getMessageHint()}
           label={t('form.message.label')}
           placeholder={t('form.message.placeholder')}
-          // eslint-disable-next-line react/jsx-props-no-spreading
           {...register(FormField.message, {
             required: {
               value: true,

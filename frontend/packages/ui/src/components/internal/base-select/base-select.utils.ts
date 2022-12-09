@@ -1,34 +1,20 @@
-import { CommonPropsAndClassName, GroupBase } from 'react-select';
+/* eslint-disable no-param-reassign */
+import { Modifier } from 'react-popper';
 
-const cleanCommonProps = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
-  AdditionalProps,
->(
-  props: Partial<CommonPropsAndClassName<Option, IsMulti, Group>> &
-    AdditionalProps,
-): Omit<
-  AdditionalProps,
-  keyof CommonPropsAndClassName<Option, IsMulti, Group>
-> => {
-  const {
-    className,
-    clearValue,
-    cx,
-    getStyles,
-    getValue,
-    hasValue,
-    isMulti,
-    isRtl,
-    options,
-    selectOption,
-    selectProps,
-    setValue,
-    theme,
-    ...innerProps
-  } = props;
-  return { ...innerProps };
-};
+const modifiers: Modifier<string, Record<string, unknown>>[] = [
+  {
+    name: 'sameWidth',
+    enabled: true,
+    phase: 'beforeWrite',
+    requires: ['computeStyles'],
+    fn({ state }) {
+      state.styles.popper.width = `${state.rects.reference.width}px`;
+    },
+    effect({ state }) {
+      // @ts-ignore
+      state.elements.popper.style.width = `${state.elements.reference.offsetWidth}px`;
+    },
+  },
+];
 
-export default cleanCommonProps;
+export default modifiers;

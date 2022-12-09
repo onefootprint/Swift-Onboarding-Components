@@ -45,6 +45,8 @@ module.exports = {
           'TextArea',
           'TextInput',
           'Toggle',
+          'components.Control',
+          'components.Input',
         ],
       },
     ],

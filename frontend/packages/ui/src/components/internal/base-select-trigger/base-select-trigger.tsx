@@ -10,22 +10,31 @@ type BaseSelectTriggerProps = {
   hasError?: boolean;
   hasFocus?: boolean;
   onClick?: () => void;
+  testID?: string;
 };
 
 const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
   (
-    { children, disabled, hasError, hasFocus, onClick }: BaseSelectTriggerProps,
+    {
+      children,
+      disabled,
+      hasError,
+      hasFocus,
+      onClick,
+      testID,
+    }: BaseSelectTriggerProps,
     ref,
   ) => (
     <BaseSelectTriggerContainer
       data-has-error={hasError}
       data-has-focus={hasFocus}
+      data-testid={testID}
       disabled={disabled}
       onClick={onClick}
       ref={ref}
       type="button"
     >
-      <Content>{children}</Content>
+      <Content data-testid={testID}>{children}</Content>
       <IcoChevronDown16 />
     </BaseSelectTriggerContainer>
   ),

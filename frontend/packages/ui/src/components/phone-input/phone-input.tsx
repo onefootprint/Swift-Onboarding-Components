@@ -69,9 +69,6 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
                 ref={mergeRefs([ref, localRef])}
                 hasError={hasError}
                 value={value}
-                selectTrigger={{
-                  ref: trigger.ref,
-                }}
               />
             </div>
           ) : (
@@ -86,7 +83,6 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
               selectTrigger={{
                 isOpen: trigger.isOpen,
                 onClick: trigger.onClick,
-                ref: trigger.ref,
               }}
             />
           )

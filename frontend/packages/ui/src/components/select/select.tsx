@@ -29,16 +29,20 @@ const Select = <Option extends SelectOption = SelectOption>({
   options,
   placeholder = 'Select',
   searchPlaceholder,
-  isSearchable,
   testID,
   value,
-  renderTrigger = ({ onClick, ref, isOpen, selectedOption }) => (
+  renderTrigger = ({
+    onClick,
+    isOpen,
+    selectedOption,
+    testID: triggerTestID,
+  }) => (
     <BaseSelectTrigger
       disabled={disabled}
       hasError={hasError}
       hasFocus={isOpen}
       onClick={onClick}
-      ref={ref}
+      testID={triggerTestID}
     >
       {selectedOption?.label || placeholder}
     </BaseSelectTrigger>
@@ -58,7 +62,6 @@ const Select = <Option extends SelectOption = SelectOption>({
     options={options}
     renderTrigger={renderTrigger}
     searchPlaceholder={searchPlaceholder}
-    isSearchable={isSearchable}
     testID={testID}
     value={value}
   />
