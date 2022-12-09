@@ -13,7 +13,7 @@ use chrono::{DateTime, Duration, Utc};
 use db::models::user_vault::UserVault;
 use newtypes::email::Email;
 use newtypes::PhoneNumber;
-use newtypes::{DataAttribute, Fingerprinter, PiiString};
+use newtypes::{DataLifetimeKind, Fingerprinter, PiiString};
 use newtypes::{UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::AuthenticationState;
@@ -116,9 +116,9 @@ async fn get_user_by_identifier(
     let (data_attribute, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
             let phone_number = twilio_client.standardize(phone_number).await?;
-            (DataAttribute::PhoneNumber, phone_number.to_piistring())
+            (DataLifetimeKind::PhoneNumber, phone_number.to_piistring())
         }
-        Identifier::Email(email) => (DataAttribute::Email, PiiString::from(email.clone())),
+        Identifier::Email(email) => (DataLifetimeKind::Email, PiiString::from(email.clone())),
     };
     let sh_data = state
         .compute_fingerprint(data_attribute, data.clean_for_fingerprint())
@@ -150,7 +150,7 @@ async fn get_user_challenge_context(
         .await??;
 
     let mut kinds: Vec<ChallengeKind> = Vec::new();
-    if uvw.has_field(DataAttribute::PhoneNumber) {
+    if uvw.has_field(DataLifetimeKind::PhoneNumber) {
         kinds.push(ChallengeKind::Sms);
     }
     if !creds.is_empty() {

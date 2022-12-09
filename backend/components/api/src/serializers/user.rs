@@ -1,11 +1,11 @@
 use db::models::{onboarding::SerializableOnboardingInfo, scoped_user::ScopedUser};
-use newtypes::DataAttribute;
+use newtypes::DataLifetimeKind;
 
 use crate::utils::db2api::DbToApi;
 
 type IdentityDocumentType = String;
 pub type UserDetail = (
-    Vec<DataAttribute>,
+    Vec<DataLifetimeKind>,
     Vec<IdentityDocumentType>,
     Option<SerializableOnboardingInfo>,
     ScopedUser,

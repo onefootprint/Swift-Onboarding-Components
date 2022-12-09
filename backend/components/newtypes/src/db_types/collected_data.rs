@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use strum::EnumIter;
 use strum_macros::{AsRefStr, EnumString};
 
-use super::DataAttribute;
+use super::DataLifetimeKind;
 
 #[derive(
     Debug,
@@ -44,22 +44,22 @@ crate::util::impl_enum_str_diesel!(CollectedData);
 
 impl CollectedData {
     /// Maps the CollectedData to the list of DataAttributes that may be collected by variants of this CollectedOption
-    pub fn children(&self) -> Vec<DataAttribute> {
+    pub fn children(&self) -> Vec<DataLifetimeKind> {
         // This is basically the same as getting this CollectedData's CollectedDataOptions' children
         match self {
-            Self::Name => vec![DataAttribute::FirstName, DataAttribute::LastName],
-            Self::Dob => vec![DataAttribute::Dob],
-            Self::Email => vec![DataAttribute::Email],
-            Self::PhoneNumber => vec![DataAttribute::PhoneNumber],
+            Self::Name => vec![DataLifetimeKind::FirstName, DataLifetimeKind::LastName],
+            Self::Dob => vec![DataLifetimeKind::Dob],
+            Self::Email => vec![DataLifetimeKind::Email],
+            Self::PhoneNumber => vec![DataLifetimeKind::PhoneNumber],
             // These are the only two CollectedDatas that map to multiple DataAttributes
-            Self::Ssn => vec![DataAttribute::Ssn4, DataAttribute::Ssn9],
+            Self::Ssn => vec![DataLifetimeKind::Ssn4, DataLifetimeKind::Ssn9],
             Self::Address => vec![
-                DataAttribute::AddressLine1,
-                DataAttribute::AddressLine2,
-                DataAttribute::City,
-                DataAttribute::State,
-                DataAttribute::Zip,
-                DataAttribute::Country,
+                DataLifetimeKind::AddressLine1,
+                DataLifetimeKind::AddressLine2,
+                DataLifetimeKind::City,
+                DataLifetimeKind::State,
+                DataLifetimeKind::Zip,
+                DataLifetimeKind::Country,
             ],
         }
     }
@@ -112,23 +112,23 @@ impl CollectedDataOption {
         }
     }
 
-    pub fn attributes(&self) -> Vec<DataAttribute> {
+    pub fn attributes(&self) -> Vec<DataLifetimeKind> {
         match self {
-            Self::Name => vec![DataAttribute::FirstName, DataAttribute::LastName],
-            Self::Dob => vec![DataAttribute::Dob],
-            Self::Ssn9 => vec![DataAttribute::Ssn9, DataAttribute::Ssn4],
-            Self::Ssn4 => vec![DataAttribute::Ssn4],
+            Self::Name => vec![DataLifetimeKind::FirstName, DataLifetimeKind::LastName],
+            Self::Dob => vec![DataLifetimeKind::Dob],
+            Self::Ssn9 => vec![DataLifetimeKind::Ssn9, DataLifetimeKind::Ssn4],
+            Self::Ssn4 => vec![DataLifetimeKind::Ssn4],
             Self::FullAddress => vec![
-                DataAttribute::AddressLine1,
-                DataAttribute::AddressLine2,
-                DataAttribute::City,
-                DataAttribute::State,
-                DataAttribute::Zip,
-                DataAttribute::Country,
+                DataLifetimeKind::AddressLine1,
+                DataLifetimeKind::AddressLine2,
+                DataLifetimeKind::City,
+                DataLifetimeKind::State,
+                DataLifetimeKind::Zip,
+                DataLifetimeKind::Country,
             ],
-            Self::PartialAddress => vec![DataAttribute::Zip, DataAttribute::Country],
-            Self::Email => vec![DataAttribute::Email],
-            Self::PhoneNumber => vec![DataAttribute::PhoneNumber],
+            Self::PartialAddress => vec![DataLifetimeKind::Zip, DataLifetimeKind::Country],
+            Self::Email => vec![DataLifetimeKind::Email],
+            Self::PhoneNumber => vec![DataLifetimeKind::PhoneNumber],
         }
     }
 }

@@ -5,8 +5,8 @@ use crate::{
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::DataAttribute;
 use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeKind;
 use newtypes::{
     DataPriority, EmailId, Fingerprint as FingerprintData, ScopedUserId, SealedVaultBytes, UserVaultId,
 };
@@ -74,7 +74,7 @@ impl Email {
         // same DataLifetime
         let new_fingerprint = NewFingerprint {
             sh_data: fingerprint,
-            kind: DataAttribute::Email,
+            kind: DataLifetimeKind::Email,
             lifetime_id: lifetime.id,
         };
         // TODO: ensure that the fingerprint tuple of (user_vault_id, fingerprint) is unique
@@ -106,15 +106,15 @@ impl Email {
         Ok(())
     }
 
-    pub fn data_items(self) -> Vec<(DataAttribute, SealedVaultBytes)> {
-        vec![(DataAttribute::Email, self.e_data)]
+    pub fn data_items(self) -> Vec<(DataLifetimeKind, SealedVaultBytes)> {
+        vec![(DataLifetimeKind::Email, self.e_data)]
     }
 }
 
 impl HasDataAttributeFields for Email {
-    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
         match data_attribute {
-            DataAttribute::Email => Some(&self.e_data),
+            DataLifetimeKind::Email => Some(&self.e_data),
             _ => None,
         }
     }

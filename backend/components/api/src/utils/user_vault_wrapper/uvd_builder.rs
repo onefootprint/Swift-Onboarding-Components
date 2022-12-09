@@ -15,7 +15,7 @@ use newtypes::{
     dob::DateOfBirth,
     name::FullName,
     ssn::{Ssn, Ssn4, Ssn9},
-    CollectedDataOption, DataAttribute, Fingerprint as FingerprintBytes, PiiString, ScopedUserId,
+    CollectedDataOption, DataLifetimeKind, Fingerprint as FingerprintBytes, PiiString, ScopedUserId,
     UserVaultId, UvdKind, VaultPublicKey,
 };
 use std::collections::HashMap;
@@ -25,7 +25,7 @@ pub struct UvdBuilder {
     vault_public_key: VaultPublicKey,
     /// Existing (committed or uncomitted) fields. Used to enforce that partial updates don't
     /// overwrite full data
-    existing_fields: Vec<DataAttribute>,
+    existing_fields: Vec<DataLifetimeKind>,
     data: Vec<NewUserVaultData>,
     /// We will deactivate the old UserVaultData rows and their fingerprints if they are replaced
     kinds_to_deactivate: Vec<UvdKind>,
@@ -37,7 +37,7 @@ impl UvdBuilder {
     pub fn build(
         update: IdentityDataUpdate,
         vault_public_key: VaultPublicKey,
-        existing_fields: Vec<DataAttribute>,
+        existing_fields: Vec<DataLifetimeKind>,
     ) -> ApiResult<Self> {
         let mut builder = Self {
             existing_fields,
@@ -108,7 +108,7 @@ impl UvdBuilder {
         // ssn4. In the future, we might want to change this functionality to just require
         // the whole ssn9 if the tenant requests only a partial ssn4 but the user wants to
         // update their data and already has a full ssn9
-        if self.existing_fields.contains(&DataAttribute::Ssn9) {
+        if self.existing_fields.contains(&DataLifetimeKind::Ssn9) {
             return Err(UserError::PartialSsnUpdateNotAllowed.into());
         }
 
@@ -166,7 +166,7 @@ impl UvdBuilder {
         // address. In the future, we might want to change this functionality to just require
         // the whole address if the tenant requests only a partial address but the user wants to
         // update their data and already has a full address
-        if self.existing_fields.contains(&DataAttribute::AddressLine1) {
+        if self.existing_fields.contains(&DataLifetimeKind::AddressLine1) {
             return Err(UserError::PartialAddressUpdateNotAllowed.into());
         }
 

@@ -6,7 +6,7 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
 use thiserror::Error;
 
 use crate::{
-    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, DataAttribute, KvDataKey,
+    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, DataLifetimeKind, KvDataKey,
 };
 
 /// Identifies a piece of data for a user vault
@@ -17,7 +17,7 @@ use crate::{
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DataIdentifier {
-    Identity(DataAttribute),
+    Identity(DataLifetimeKind),
     Custom(KvDataKey),
 }
 
@@ -54,7 +54,8 @@ impl FromStr for DataIdentifier {
             .map_err(|_| Error::CannotParsePrefix(prefix.to_owned()))?;
         let result = match prefix {
             DataIdentifierDiscriminants::Identity => Self::Identity(
-                DataAttribute::from_str(suffix).map_err(|_| Error::CannotParseSuffix(suffix.to_owned()))?,
+                DataLifetimeKind::from_str(suffix)
+                    .map_err(|_| Error::CannotParseSuffix(suffix.to_owned()))?,
             ),
             DataIdentifierDiscriminants::Custom => Self::Custom(
                 KvDataKey::from_str(suffix).map_err(|_| Error::CannotParseSuffix(suffix.to_owned()))?,
@@ -84,7 +85,7 @@ impl serde::Serialize for DataIdentifier {
 }
 
 impl DataIdentifier {
-    pub fn list(attributes: Vec<DataAttribute>) -> Vec<Self> {
+    pub fn list(attributes: Vec<DataLifetimeKind>) -> Vec<Self> {
         attributes.into_iter().map(Self::Identity).collect()
     }
 }
@@ -96,16 +97,16 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case(DataIdentifier::Identity(DataAttribute::PhoneNumber) => "identity.phone_number")]
-    #[test_case(DataIdentifier::Identity(DataAttribute::Email) => "identity.email")]
+    #[test_case(DataIdentifier::Identity(DataLifetimeKind::PhoneNumber) => "identity.phone_number")]
+    #[test_case(DataIdentifier::Identity(DataLifetimeKind::Email) => "identity.email")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
 
-    #[test_case("identity.phone_number" => DataIdentifier::Identity(DataAttribute::PhoneNumber))]
-    #[test_case("identity.email" => DataIdentifier::Identity(DataAttribute::Email))]
+    #[test_case("identity.phone_number" => DataIdentifier::Identity(DataLifetimeKind::PhoneNumber))]
+    #[test_case("identity.email" => DataIdentifier::Identity(DataLifetimeKind::Email))]
     #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]

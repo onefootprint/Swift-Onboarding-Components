@@ -13,7 +13,7 @@ use crate::State;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::user_vault::{NewUserVaultArgs, UserVault};
-use newtypes::{DataAttribute, Fingerprinter, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
+use newtypes::{DataLifetimeKind, Fingerprinter, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -110,7 +110,7 @@ async fn validate_sms_challenge(
 
     let phone_number = challenge_state.phone_number;
     let sh_phone_number = state
-        .compute_fingerprint(DataAttribute::PhoneNumber, phone_number.to_piistring())
+        .compute_fingerprint(DataLifetimeKind::PhoneNumber, phone_number.to_piistring())
         .await?;
     let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, sh_phone_number).await?;
     let result = match existing_user {
@@ -136,7 +136,7 @@ async fn create_new_user_vault(
         e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
         public_key,
         sh_phone_number: state
-            .compute_fingerprint(DataAttribute::PhoneNumber, phone_number.to_piistring())
+            .compute_fingerprint(DataLifetimeKind::PhoneNumber, phone_number.to_piistring())
             .await?,
         is_live: phone_number.is_live(),
     };

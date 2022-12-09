@@ -1,7 +1,7 @@
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 
 use db::HasDataAttributeFields;
-use newtypes::{DataAttribute, VendorAPI};
+use newtypes::{DataLifetimeKind, VendorAPI};
 
 use itertools::Itertools;
 
@@ -18,21 +18,21 @@ pub(super) fn get_vendor_apis_from_user_vault_wrapper(
         .collect()
 }
 
-fn available_vendor_api_from_scope(attribute: DataAttribute) -> Vec<VendorAPI> {
+fn available_vendor_api_from_scope(attribute: DataLifetimeKind) -> Vec<VendorAPI> {
     match attribute {
-        DataAttribute::FirstName => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::LastName => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::Dob => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::Ssn9 => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::Ssn4 => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::AddressLine1 => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::AddressLine2 => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::City => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::State => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::Zip => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::Country => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::Email => vec![VendorAPI::IdologyExpectID],
-        DataAttribute::PhoneNumber => vec![VendorAPI::TwilioLookupV2],
-        DataAttribute::IdentityDocument => vec![VendorAPI::IdologyScanVerify],
+        DataLifetimeKind::FirstName => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::LastName => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::Dob => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::Ssn9 => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::Ssn4 => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::AddressLine1 => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::AddressLine2 => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::City => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::State => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::Zip => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::Country => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::Email => vec![VendorAPI::IdologyExpectID],
+        DataLifetimeKind::PhoneNumber => vec![VendorAPI::TwilioLookupV2],
+        DataLifetimeKind::IdentityDocument => vec![VendorAPI::IdologyScanVerify],
     }
 }

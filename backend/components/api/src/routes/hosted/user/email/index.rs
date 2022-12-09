@@ -12,7 +12,7 @@ use crate::State;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
 use newtypes::email::Email as EmailData;
-use newtypes::{DataAttribute, Fingerprinter};
+use newtypes::{DataLifetimeKind, Fingerprinter};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -45,7 +45,10 @@ pub async fn post(
 
     let email = request.into_inner().email;
     let sh_data = state
-        .compute_fingerprint(DataAttribute::Email, email.to_piistring().clean_for_fingerprint())
+        .compute_fingerprint(
+            DataLifetimeKind::Email,
+            email.to_piistring().clean_for_fingerprint(),
+        )
         .await?;
     // grab our uvw
     let email_address = email.email.clone();

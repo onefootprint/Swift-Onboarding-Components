@@ -3,7 +3,7 @@ use std::pin::Pin;
 use actix_web::FromRequest;
 use db::models::tenant::Tenant;
 use futures_util::Future;
-use newtypes::DataAttribute;
+use newtypes::DataLifetimeKind;
 
 use crate::errors::ApiError;
 
@@ -144,7 +144,7 @@ where
         }
     }
 
-    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+    fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<Box<dyn TenantAuth>, AuthError> {
         match self {
             Either::Left(l) => l.can_decrypt(attributes),
             Either::Right(r) => r.can_decrypt(attributes),

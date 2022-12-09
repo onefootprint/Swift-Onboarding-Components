@@ -1,7 +1,7 @@
 use crate::*;
 
 export_schema!(AccessEventKind);
-export_schema!(DataAttribute);
+export_schema!(DataLifetimeKind);
 export_schema!(CollectedDataOption);
 export_schema!(CollectedData);
 export_schema!(TenantPermission);

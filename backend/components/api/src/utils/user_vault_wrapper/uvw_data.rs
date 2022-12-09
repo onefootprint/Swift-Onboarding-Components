@@ -5,7 +5,7 @@ use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
 use db::HasDataAttributeFields;
 use db::HasLifetime;
-use newtypes::{DataAttribute, DataLifetimeId, SealedVaultBytes};
+use newtypes::{DataLifetimeId, DataLifetimeKind, SealedVaultBytes};
 use std::collections::{HashMap, HashSet};
 use std::convert::Into;
 
@@ -72,43 +72,43 @@ impl UvwData {
         (committed, speculative)
     }
 
-    fn uvd(&self, kind: DataAttribute) -> Option<&UserVaultData> {
+    fn uvd(&self, kind: DataLifetimeKind) -> Option<&UserVaultData> {
         self.uvd
             .iter()
-            .find(|d| Into::<DataAttribute>::into(d.kind) == kind)
+            .find(|d| Into::<DataLifetimeKind>::into(d.kind) == kind)
     }
 
     /// Dispatch queries for a piece of data with a given DataAttribute kind to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub(super) fn get(&self, kind: DataAttribute) -> Option<&dyn HasLifetime> {
+    pub(super) fn get(&self, kind: DataLifetimeKind) -> Option<&dyn HasLifetime> {
         let email = self.emails.first();
         let phone = self.phone_numbers.first();
         match kind {
             // uvd
-            DataAttribute::FirstName
-            | DataAttribute::LastName
-            | DataAttribute::Dob
-            | DataAttribute::Ssn9
-            | DataAttribute::AddressLine1
-            | DataAttribute::AddressLine2
-            | DataAttribute::City
-            | DataAttribute::State
-            | DataAttribute::Zip
-            | DataAttribute::Country
-            | DataAttribute::Ssn4 => self.uvd(kind).map(|uvd| uvd as &dyn HasLifetime),
+            DataLifetimeKind::FirstName
+            | DataLifetimeKind::LastName
+            | DataLifetimeKind::Dob
+            | DataLifetimeKind::Ssn9
+            | DataLifetimeKind::AddressLine1
+            | DataLifetimeKind::AddressLine2
+            | DataLifetimeKind::City
+            | DataLifetimeKind::State
+            | DataLifetimeKind::Zip
+            | DataLifetimeKind::Country
+            | DataLifetimeKind::Ssn4 => self.uvd(kind).map(|uvd| uvd as &dyn HasLifetime),
             // email
-            DataAttribute::Email => email.map(|email| email as &dyn HasLifetime),
+            DataLifetimeKind::Email => email.map(|email| email as &dyn HasLifetime),
             // phone
-            DataAttribute::PhoneNumber => phone.map(|phone| phone as &dyn HasLifetime),
+            DataLifetimeKind::PhoneNumber => phone.map(|phone| phone as &dyn HasLifetime),
             // We need to handle identity document separately since users can have multiple identity documents (for now, there's an open item https://linear.app/footprint/issue/FP-1968/de-chonk-the-identitydocument-dataattribute)
-            DataAttribute::IdentityDocument => None,
+            DataLifetimeKind::IdentityDocument => None,
         }
     }
 }
 
 impl HasDataAttributeFields for UvwData {
-    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
         if data_attribute.disallows_e_data() {
             return None;
         }

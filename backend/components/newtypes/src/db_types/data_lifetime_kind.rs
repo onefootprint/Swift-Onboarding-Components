@@ -31,7 +31,7 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum DataAttribute {
+pub enum DataLifetimeKind {
     FirstName,
     LastName,
     Dob,
@@ -48,33 +48,33 @@ pub enum DataAttribute {
     IdentityDocument,
 }
 
-crate::util::impl_enum_str_diesel!(DataAttribute);
+crate::util::impl_enum_str_diesel!(DataLifetimeKind);
 
-impl DataAttribute {
+impl DataLifetimeKind {
     /// Returns true if we store a fingerprint of this value to allow exact match searching.
     pub fn allows_fingerprint(&self) -> bool {
         matches!(
             self,
-            DataAttribute::PhoneNumber
-                | DataAttribute::Email
-                | DataAttribute::Ssn9
-                | DataAttribute::FirstName
-                | DataAttribute::LastName
-                | DataAttribute::Ssn4
+            DataLifetimeKind::PhoneNumber
+                | DataLifetimeKind::Email
+                | DataLifetimeKind::Ssn9
+                | DataLifetimeKind::FirstName
+                | DataLifetimeKind::LastName
+                | DataLifetimeKind::Ssn4
         )
     }
 
     /// Returns true if the DataAttribute supports accessing e_data
     pub fn disallows_e_data(&self) -> bool {
-        matches!(self, DataAttribute::IdentityDocument)
+        matches!(self, DataLifetimeKind::IdentityDocument)
     }
 
     pub fn is_required(&self) -> bool {
-        !matches!(self, DataAttribute::AddressLine2)
+        !matches!(self, DataLifetimeKind::AddressLine2)
     }
 
-    pub fn fingerprintable() -> impl Iterator<Item = DataAttribute> {
-        Self::iter().filter(DataAttribute::allows_fingerprint)
+    pub fn fingerprintable() -> impl Iterator<Item = DataLifetimeKind> {
+        Self::iter().filter(DataLifetimeKind::allows_fingerprint)
     }
 
     /// Maps the DataAttribute to the CollectedData that may collect this attribute
@@ -91,7 +91,7 @@ impl DataAttribute {
     }
 }
 
-impl SaltedFingerprint for DataAttribute {
+impl SaltedFingerprint for DataLifetimeKind {
     fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
         let self_name = self.to_string();
         let data_clean = data.clean_for_fingerprint();

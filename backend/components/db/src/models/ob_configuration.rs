@@ -10,7 +10,7 @@ use diesel::prelude::*;
 use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::ScopedUserId;
-use newtypes::{ApiKeyStatus, DataAttribute};
+use newtypes::{ApiKeyStatus, DataLifetimeKind};
 use newtypes::{CollectedDataOption, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -244,12 +244,12 @@ impl ObConfiguration {
 impl ObConfiguration {
     // returns which fields this ObConfiguration (upon authorization!) grant a tenant decrypt access to
     // Don't use this on Onboardings that have not been authorized
-    pub fn can_access_fields(&self) -> Vec<DataAttribute> {
-        let mut fields: Vec<DataAttribute> =
+    pub fn can_access_fields(&self) -> Vec<DataLifetimeKind> {
+        let mut fields: Vec<DataLifetimeKind> =
             self.can_access_data.iter().flat_map(|x| x.attributes()).collect();
 
         if self.can_access_identity_document_images {
-            fields.push(DataAttribute::IdentityDocument)
+            fields.push(DataLifetimeKind::IdentityDocument)
         }
 
         fields
@@ -257,15 +257,15 @@ impl ObConfiguration {
 
     // returns which fields this ObConfiguration tried to collect
     // Don't use this on Onboardings that have not been authorized
-    pub fn intent_to_collect_fields(&self) -> Vec<DataAttribute> {
-        let mut fields: Vec<DataAttribute> = self
+    pub fn intent_to_collect_fields(&self) -> Vec<DataLifetimeKind> {
+        let mut fields: Vec<DataLifetimeKind> = self
             .must_collect_data
             .iter()
             .flat_map(|x| x.attributes())
             .collect();
 
         if self.must_collect_identity_document {
-            fields.push(DataAttribute::IdentityDocument)
+            fields.push(DataLifetimeKind::IdentityDocument)
         }
 
         fields

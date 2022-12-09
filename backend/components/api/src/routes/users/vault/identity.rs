@@ -26,8 +26,8 @@ use db::TxnPgConnection;
 use db::models::scoped_user::ScopedUser;
 use newtypes::csv::Csv;
 use newtypes::{
-    flat_api_object_map_type, AccessEventKind, DataAttribute, DataIdentifier, Fingerprint, FootprintUserId,
-    PiiString, TenantPermission, UvdKind,
+    flat_api_object_map_type, AccessEventKind, DataIdentifier, DataLifetimeKind, Fingerprint,
+    FootprintUserId, PiiString, TenantPermission, UvdKind,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -114,11 +114,11 @@ pub fn put_internal(
 pub struct FieldsParams {
     /// Comma separated list of fields to check
     #[openapi(example = "last_name, dob, ssn9")]
-    pub fields: Csv<DataAttribute>,
+    pub fields: Csv<DataLifetimeKind>,
 }
 
 flat_api_object_map_type!(
-    GetIdentityDataResponse<DataAttribute, bool>,
+    GetIdentityDataResponse<DataLifetimeKind, bool>,
     description="A key-value map indicating what identity fields are present",
     example=r#"{ "last_name": true, "dob": true, "ssn9": false }"#
 );
@@ -175,14 +175,14 @@ pub(super) async fn get_internal(
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct DecryptIdentityFieldsRequest {
     /// attributes to decrypt
-    pub fields: HashSet<DataAttribute>,
+    pub fields: HashSet<DataLifetimeKind>,
 
     /// reason for the data decryption
     pub reason: String,
 }
 
 flat_api_object_map_type!(
-    DecryptIdentityDataResponse<DataAttribute, Option<PiiString>>,
+    DecryptIdentityDataResponse<DataLifetimeKind, Option<PiiString>>,
     description="A key-value map with the corresponding decrypted identity data values",
     example=r#"{ "last_name": "smith", "ssn9": "121121212", "dob": "12-12-1990" }"#
 );
@@ -212,7 +212,7 @@ pub(super) async fn post_decrypt_internal(
     let request = request.into_inner();
     let fields = request.fields;
     // TODO: fix this
-    if fields.contains(&DataAttribute::IdentityDocument) {
+    if fields.contains(&DataLifetimeKind::IdentityDocument) {
         return Err(ApiError::InvalidFieldForDecryption(String::from(
             "IdentityDocument",
         )));

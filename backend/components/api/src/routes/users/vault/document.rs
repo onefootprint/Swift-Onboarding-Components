@@ -21,7 +21,7 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
-use newtypes::{AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, TenantPermission};
+use newtypes::{AccessEventKind, DataIdentifier, DataLifetimeKind, FootprintUserId, TenantPermission};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Query};
 
@@ -60,7 +60,7 @@ pub(super) async fn get_internal(
 
             let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
             // Important to check requester has access
-            let fields = HashSet::from_iter([DataAttribute::IdentityDocument]);
+            let fields = HashSet::from_iter([DataLifetimeKind::IdentityDocument]);
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok(user_vault_wrapper)
@@ -124,7 +124,7 @@ pub(super) async fn post_internal(
     let request = request.into_inner();
     let document_type = request.document_type;
 
-    let auth = auth.can_decrypt(vec![DataAttribute::IdentityDocument])?;
+    let auth = auth.can_decrypt(vec![DataLifetimeKind::IdentityDocument])?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
@@ -138,7 +138,7 @@ pub(super) async fn post_internal(
             let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
 
             // Important to check requester has access
-            let fields = HashSet::from_iter([DataAttribute::IdentityDocument]);
+            let fields = HashSet::from_iter([DataLifetimeKind::IdentityDocument]);
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok((user_vault_wrapper, scoped_user))
@@ -156,7 +156,7 @@ pub(super) async fn post_internal(
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
-        targets: vec![DataIdentifier::Identity(DataAttribute::IdentityDocument)],
+        targets: vec![DataIdentifier::Identity(DataLifetimeKind::IdentityDocument)],
     }
     .save(&state.db_pool)
     .await?;

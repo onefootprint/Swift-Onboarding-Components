@@ -4,7 +4,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
-use crate::DataAttribute;
+use crate::DataLifetimeKind;
 
 #[derive(
     Debug,
@@ -46,7 +46,7 @@ pub enum UvdKind {
 
 // UvdKind is a subset of DataAttribute, where UvdKind just represents the types of data stored in
 // the UserVaultData table
-impl From<UvdKind> for DataAttribute {
+impl From<UvdKind> for DataLifetimeKind {
     fn from(kind: UvdKind) -> Self {
         match kind {
             UvdKind::FirstName => Self::FirstName,

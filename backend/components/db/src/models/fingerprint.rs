@@ -2,7 +2,7 @@ use crate::schema::fingerprint;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::{DataAttribute, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId};
+use newtypes::{DataLifetimeId, DataLifetimeKind, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};
 
 use crate::{DbResult, TxnPgConnection};
@@ -15,7 +15,7 @@ pub struct Fingerprint {
     pub sh_data: FingerprintData,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub kind: DataAttribute,
+    pub kind: DataLifetimeKind,
     pub lifetime_id: DataLifetimeId,
 }
 
@@ -23,7 +23,7 @@ pub struct Fingerprint {
 #[diesel(table_name = fingerprint)]
 pub struct NewFingerprint {
     pub sh_data: FingerprintData,
-    pub kind: DataAttribute,
+    pub kind: DataLifetimeKind,
     pub lifetime_id: DataLifetimeId,
 }
 

@@ -10,7 +10,7 @@ pub use self::workos::*;
 
 use super::AuthError;
 use crate::errors::ApiError;
-use newtypes::{DataAttribute, DbActor, TenantApiKeyId, TenantPermission, TenantUserId};
+use newtypes::{DataLifetimeKind, DbActor, TenantApiKeyId, TenantPermission, TenantUserId};
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
@@ -50,5 +50,5 @@ impl From<AuthActor> for DbActor {
 
 pub trait CheckTenantPermissions {
     fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError>;
-    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError>;
+    fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<Box<dyn TenantAuth>, AuthError>;
 }

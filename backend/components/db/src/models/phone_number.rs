@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{
-    DataAttribute, DataLifetimeId, DataPriority, Fingerprint as FingerprintData, PhoneNumberId,
+    DataLifetimeId, DataLifetimeKind, DataPriority, Fingerprint as FingerprintData, PhoneNumberId,
     SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
@@ -94,7 +94,7 @@ impl PhoneNumber {
         // same DataLifetime
         let new_fingerprint = NewFingerprint {
             sh_data: fp_e164,
-            kind: DataAttribute::PhoneNumber,
+            kind: DataLifetimeKind::PhoneNumber,
             lifetime_id: lifetime.id,
         };
         Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
@@ -102,15 +102,15 @@ impl PhoneNumber {
         Ok(phone_number)
     }
 
-    pub fn data_items(self) -> Vec<(DataAttribute, SealedVaultBytes)> {
-        vec![(DataAttribute::PhoneNumber, self.e_e164)]
+    pub fn data_items(self) -> Vec<(DataLifetimeKind, SealedVaultBytes)> {
+        vec![(DataLifetimeKind::PhoneNumber, self.e_e164)]
     }
 }
 
 impl HasDataAttributeFields for PhoneNumber {
-    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
         match data_attribute {
-            DataAttribute::PhoneNumber => Some(&self.e_e164),
+            DataLifetimeKind::PhoneNumber => Some(&self.e_e164),
             _ => None,
         }
     }

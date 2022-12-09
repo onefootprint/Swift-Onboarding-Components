@@ -21,7 +21,7 @@ use actix_web::web::Query;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
 use newtypes::csv::Csv;
-use newtypes::{DataAttribute, DataIdentifier, FootprintUserId, KvDataKey};
+use newtypes::{DataIdentifier, DataLifetimeKind, FootprintUserId, KvDataKey};
 
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
@@ -133,7 +133,7 @@ pub async fn get(
     let footprint_id = path.into_inner();
     let request = request.into_inner();
 
-    let mut requested_identity_fields: Vec<DataAttribute> = Vec::new();
+    let mut requested_identity_fields: Vec<DataLifetimeKind> = Vec::new();
     let mut requested_custom_fields: Vec<KvDataKey> = Vec::new();
 
     request.fields.into_iter().for_each(|f| match f {
@@ -205,7 +205,7 @@ pub async fn post_decrypt(
     let footprint_id = path.into_inner();
     let request = request.into_inner();
 
-    let mut requested_identity_fields: HashSet<DataAttribute> = HashSet::new();
+    let mut requested_identity_fields: HashSet<DataLifetimeKind> = HashSet::new();
     let mut requested_custom_fields: Vec<KvDataKey> = Vec::new();
 
     request.fields.into_iter().for_each(|f| match f {

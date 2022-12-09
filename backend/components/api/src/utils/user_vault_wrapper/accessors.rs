@@ -7,7 +7,7 @@ use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::HasDataAttributeFields;
 use db::PgConnection;
-use newtypes::{CollectedDataOption, DataAttribute, SealedVaultBytes};
+use newtypes::{CollectedDataOption, DataLifetimeKind, SealedVaultBytes};
 use std::collections::HashSet;
 use std::convert::Into;
 
@@ -55,7 +55,7 @@ impl UserVaultWrapper {
 }
 
 impl HasDataAttributeFields for UserVaultWrapper {
-    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
         self.speculative
             .get_e_field(data_attribute)
             .or_else(|| self.committed.get_e_field(data_attribute))
@@ -69,7 +69,7 @@ impl UserVaultWrapper {
         &self,
         conn: &mut PgConnection,
         scoped_user: &ScopedUser,
-        fields: HashSet<DataAttribute>,
+        fields: HashSet<DataLifetimeKind>,
     ) -> ApiResult<()> {
         // tenant's can do what they wish with NON-portable vaults they own
         if !self.user_vault.is_portable {
@@ -94,13 +94,13 @@ impl UserVaultWrapper {
         // Ideally we'd take a scoped user and calculate this here,
         // but /users does some bulk fetching and this makes it easier
         ob_configs: Vec<ObConfiguration>,
-    ) -> Vec<DataAttribute> {
+    ) -> Vec<DataLifetimeKind> {
         // As of 2022-11, ob<>scoped user is 1-1
-        let intent_to_collect_attributes: HashSet<DataAttribute> = ob_configs
+        let intent_to_collect_attributes: HashSet<DataLifetimeKind> = ob_configs
             .into_iter()
             .flat_map(|x| x.intent_to_collect_fields())
             .collect();
-        let fields_present_in_vault: HashSet<DataAttribute> =
+        let fields_present_in_vault: HashSet<DataLifetimeKind> =
             HashSet::from_iter(self.get_populated_fields().into_iter());
 
         (intent_to_collect_attributes.intersection(&fields_present_in_vault))
@@ -116,17 +116,17 @@ impl UserVaultWrapper {
     pub fn get_accessible_populated_fields(
         &self,
         ob_configs: Vec<ObConfiguration>,
-    ) -> (Vec<DataAttribute>, Vec<String>) {
-        let accessible_fields: HashSet<DataAttribute> = HashSet::from_iter(
+    ) -> (Vec<DataLifetimeKind>, Vec<String>) {
+        let accessible_fields: HashSet<DataLifetimeKind> = HashSet::from_iter(
             self.data_fields_tenant_requested_to_collect(ob_configs)
                 .into_iter(),
         );
-        let document_types = if accessible_fields.contains(&DataAttribute::IdentityDocument) {
+        let document_types = if accessible_fields.contains(&DataLifetimeKind::IdentityDocument) {
             self.get_identity_document_types()
         } else {
             vec![]
         };
-        let data_attributes: Vec<DataAttribute> =
+        let data_attributes: Vec<DataLifetimeKind> =
             HashSet::from_iter(self.get_populated_fields().iter().cloned())
                 .intersection(&accessible_fields)
                 .into_iter()

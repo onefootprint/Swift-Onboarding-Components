@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 // TODO put this somewhere else
 use macros::db_test;
-use newtypes::DataAttribute;
 use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeKind;
 use newtypes::SealedVaultBytes;
 
 use db::models::data_lifetime::DataLifetime;
@@ -22,10 +22,10 @@ fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
     let tenant = fixtures::tenant::create(conn);
     let su = fixtures::scoped_user::create(conn, &uv.id, &tenant.id);
 
-    let mut data_kind_to_lifetime_id = HashMap::<DataAttribute, DataLifetimeId>::new();
+    let mut data_kind_to_lifetime_id = HashMap::<DataLifetimeKind, DataLifetimeId>::new();
 
     // Phone number created with user vault as the auth method
-    data_kind_to_lifetime_id.insert(DataAttribute::PhoneNumber, phone_number.lifetime_id);
+    data_kind_to_lifetime_id.insert(DataLifetimeKind::PhoneNumber, phone_number.lifetime_id);
 
     // Add identity data
     let data = vec![
@@ -50,25 +50,25 @@ fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
 
     // Create email
     let email = fixtures::email::create(conn, &uv.id, &su.id);
-    data_kind_to_lifetime_id.insert(DataAttribute::Email, email.lifetime_id);
+    data_kind_to_lifetime_id.insert(DataLifetimeKind::Email, email.lifetime_id);
 
     // TODO fiddle with lifetimes to commit/deactivate data
 
     let uvw = UserVaultWrapper::get_for_tenant(conn, &su.id).unwrap();
     let tests = vec![
-        (DataAttribute::FirstName, Some(SealedVaultBytes(vec![1]))),
-        (DataAttribute::LastName, Some(SealedVaultBytes(vec![2]))),
-        (DataAttribute::Ssn4, Some(SealedVaultBytes(vec![3]))),
-        (DataAttribute::Email, Some(email.e_data)),
-        (DataAttribute::PhoneNumber, Some(phone_number.e_e164.clone())),
-        (DataAttribute::Dob, None),
-        (DataAttribute::AddressLine1, None),
-        (DataAttribute::AddressLine2, None),
-        (DataAttribute::City, None),
-        (DataAttribute::State, None),
-        (DataAttribute::Zip, None),
-        (DataAttribute::Country, None),
-        (DataAttribute::Ssn9, None),
+        (DataLifetimeKind::FirstName, Some(SealedVaultBytes(vec![1]))),
+        (DataLifetimeKind::LastName, Some(SealedVaultBytes(vec![2]))),
+        (DataLifetimeKind::Ssn4, Some(SealedVaultBytes(vec![3]))),
+        (DataLifetimeKind::Email, Some(email.e_data)),
+        (DataLifetimeKind::PhoneNumber, Some(phone_number.e_e164.clone())),
+        (DataLifetimeKind::Dob, None),
+        (DataLifetimeKind::AddressLine1, None),
+        (DataLifetimeKind::AddressLine2, None),
+        (DataLifetimeKind::City, None),
+        (DataLifetimeKind::State, None),
+        (DataLifetimeKind::Zip, None),
+        (DataLifetimeKind::Country, None),
+        (DataLifetimeKind::Ssn9, None),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -78,19 +78,19 @@ fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
     // get_committed should only show the phone number
     let uvw = UserVaultWrapper::get_committed(conn, uv).unwrap();
     let tests = vec![
-        (DataAttribute::FirstName, None),
-        (DataAttribute::LastName, None),
-        (DataAttribute::Ssn4, None),
-        (DataAttribute::Email, None),
-        (DataAttribute::PhoneNumber, Some(phone_number.e_e164)),
-        (DataAttribute::Dob, None),
-        (DataAttribute::AddressLine1, None),
-        (DataAttribute::AddressLine2, None),
-        (DataAttribute::City, None),
-        (DataAttribute::State, None),
-        (DataAttribute::Zip, None),
-        (DataAttribute::Country, None),
-        (DataAttribute::Ssn9, None),
+        (DataLifetimeKind::FirstName, None),
+        (DataLifetimeKind::LastName, None),
+        (DataLifetimeKind::Ssn4, None),
+        (DataLifetimeKind::Email, None),
+        (DataLifetimeKind::PhoneNumber, Some(phone_number.e_e164)),
+        (DataLifetimeKind::Dob, None),
+        (DataLifetimeKind::AddressLine1, None),
+        (DataLifetimeKind::AddressLine2, None),
+        (DataLifetimeKind::City, None),
+        (DataLifetimeKind::State, None),
+        (DataLifetimeKind::Zip, None),
+        (DataLifetimeKind::Country, None),
+        (DataLifetimeKind::Ssn9, None),
     ];
     for test in tests {
         let (attribute, expected_value) = test;

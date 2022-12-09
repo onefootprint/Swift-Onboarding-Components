@@ -9,7 +9,7 @@ use db::{
     models::{tenant::Tenant, tenant_role::TenantRole, tenant_user::TenantUser},
     PgConnection,
 };
-use newtypes::{DataAttribute, TenantPermission, TenantUserId};
+use newtypes::{DataLifetimeKind, TenantPermission, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
 use super::{AuthActor, CheckTenantPermissions, TenantAuth};
@@ -82,7 +82,7 @@ impl ParsedWorkOs {
         }
     }
 
-    pub fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<WorkOs, AuthError> {
+    pub fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<WorkOs, AuthError> {
         if self.0.tenant_role.permissions.can_decrypt(attributes) {
             Ok(self.0)
         } else {
@@ -121,7 +121,7 @@ impl CheckTenantPermissions for WorkOsAuthContext {
         Ok(Box::new(result))
     }
 
-    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+    fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<Box<dyn TenantAuth>, AuthError> {
         let result = self.map(|c| c.can_decrypt(attributes))?;
         Ok(Box::new(result))
     }

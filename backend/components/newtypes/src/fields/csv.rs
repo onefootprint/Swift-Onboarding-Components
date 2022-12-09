@@ -1,5 +1,5 @@
 use crate::DataIdentifier;
-use crate::{api_schema_helper::string_api_data_type_alias, DataAttribute, KvDataKey};
+use crate::{api_schema_helper::string_api_data_type_alias, DataLifetimeKind, KvDataKey};
 use derive_more::Deref;
 use serde::de::IntoDeserializer;
 use serde::de::{self, DeserializeOwned};
@@ -22,7 +22,7 @@ impl<T: DeserializeOwned> IntoIterator for Csv<T> {
 }
 
 string_api_data_type_alias!(Csv<KvDataKey>);
-string_api_data_type_alias!(Csv<DataAttribute>);
+string_api_data_type_alias!(Csv<DataLifetimeKind>);
 string_api_data_type_alias!(Csv<DataIdentifier>);
 
 /// serde_urlencoded, used by actix's web::Query, isn't very good at deserializing Vecs:
@@ -50,12 +50,12 @@ where
 mod tests {
     use super::Csv;
 
-    use crate::DataAttribute;
+    use crate::DataLifetimeKind;
     #[test]
     fn test_data_kinds() {
         #[derive(serde::Serialize, serde::Deserialize)]
         struct Test {
-            fields: Csv<DataAttribute>,
+            fields: Csv<DataLifetimeKind>,
         }
         let test = r#"{ "fields": "last_name, first_name, address_line1,city" }"#;
         let test: Test = serde_json::from_str(test).unwrap();
@@ -63,10 +63,10 @@ mod tests {
         assert_eq!(
             test.fields.0,
             vec![
-                DataAttribute::LastName,
-                DataAttribute::FirstName,
-                DataAttribute::AddressLine1,
-                DataAttribute::City
+                DataLifetimeKind::LastName,
+                DataLifetimeKind::FirstName,
+                DataLifetimeKind::AddressLine1,
+                DataLifetimeKind::City
             ]
         );
     }

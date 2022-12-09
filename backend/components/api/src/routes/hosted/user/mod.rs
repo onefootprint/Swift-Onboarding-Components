@@ -1,7 +1,7 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use crypto::aead::AeadSealedBytes;
 use db::{models::user_vault::UserVault, HasDataAttributeFields};
-use newtypes::{Base64Data, DataAttribute, IdentityDocumentId, PiiString, SealedVaultBytes};
+use newtypes::{Base64Data, DataLifetimeKind, IdentityDocumentId, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;
 
@@ -45,8 +45,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
 }
 
 pub struct DecryptFieldsResult {
-    pub decrypted_data_attributes: Vec<DataAttribute>,
-    pub result_map: HashMap<DataAttribute, Option<PiiString>>,
+    pub decrypted_data_attributes: Vec<DataLifetimeKind>,
+    pub result_map: HashMap<DataLifetimeKind, Option<PiiString>>,
 }
 
 pub struct DecryptDocumentResult {
@@ -59,22 +59,22 @@ pub struct DecryptDocumentResult {
 pub async fn decrypt(
     state: &web::Data<State>,
     uvw: UserVaultWrapper,
-    data_attributes: Vec<DataAttribute>,
+    data_attributes: Vec<DataLifetimeKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     // Filter out fields that don't have values set on the user vault
-    let (fields_to_decrypt, e_datas): (Vec<DataAttribute>, Vec<&SealedVaultBytes>) = data_attributes
+    let (fields_to_decrypt, e_datas): (Vec<DataLifetimeKind>, Vec<&SealedVaultBytes>) = data_attributes
         .iter()
         .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))
         .unzip();
 
     // Actually decrypt the fields
     let decrypt_response = uvw.decrypt(state, e_datas).await?;
-    let decrypted_data: HashMap<DataAttribute, PiiString> = decrypt_response
+    let decrypted_data: HashMap<DataLifetimeKind, PiiString> = decrypt_response
         .into_iter()
         .enumerate()
         .map(|(i, result)| (fields_to_decrypt[i], result))
         .collect();
-    let result_map: HashMap<DataAttribute, Option<PiiString>> = data_attributes
+    let result_map: HashMap<DataLifetimeKind, Option<PiiString>> = data_attributes
         .into_iter()
         .enumerate()
         .map(|(_, data_attribute)| (data_attribute, decrypted_data.get(&data_attribute).cloned()))
