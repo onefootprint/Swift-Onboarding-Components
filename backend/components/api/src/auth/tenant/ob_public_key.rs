@@ -77,7 +77,13 @@ impl FromRequest for PublicOnboardingContext {
     }
 }
 
-impl Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>> {
+/// Auth extractor for a short-lived session that represents the onboarding
+pub type ObPkSessionAuth = SessionContext<ParsedOnboardingSession>;
+
+/// Auth extractor for methods that
+pub type ObPkAuth = Either<PublicOnboardingContext, ObPkSessionAuth>;
+
+impl Either<PublicOnboardingContext, ObPkSessionAuth> {
     pub fn ob_config(&self) -> &ObConfiguration {
         match self {
             Either::Left(l) => &l.ob_config,

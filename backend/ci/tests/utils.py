@@ -106,7 +106,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 
 def identify_verify(
-    twilio, phone_number, challenge_token, expected_kind="user_created"
+    twilio, phone_number, challenge_token, tenant_pk=None, expected_kind="user_created"
 ):
     messages = twilio.messages.list(to=phone_number, limit=6)
     for message in messages:
@@ -122,7 +122,8 @@ def identify_verify(
                 "challenge_kind": "sms",
                 "challenge_token": challenge_token,
             }
-            body = post("hosted/identify/verify", data)
+            args = [tenant_pk] if tenant_pk else []
+            body = post("hosted/identify/verify", data, *args)
             assert body["kind"] == expected_kind
             return FpAuth(body["auth_token"])
         except HttpError as e:
@@ -132,7 +133,7 @@ def identify_verify(
     assert False, "Didn't find correct code for identify"
 
 
-def create_basic_user(twilio, suffix=None) -> BasicUser:
+def create_basic_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
     sandbox_phone_number = _random_sandbox_phone(suffix)
     phone_number = sandbox_phone_number.split("#")[0]
 
@@ -148,7 +149,10 @@ def create_basic_user(twilio, suffix=None) -> BasicUser:
 
     # Respond to the challenge and create the sandbox user
     auth_token = try_until_success(
-        lambda: identify_verify(twilio, phone_number, challenge_token), 5
+        lambda: identify_verify(
+            twilio, phone_number, challenge_token, tenant_pk=tenant_pk
+        ),
+        5,
     )
 
     return BasicUser(

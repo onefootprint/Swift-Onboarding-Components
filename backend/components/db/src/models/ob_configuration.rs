@@ -16,6 +16,8 @@ use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
 
+pub type IsLive = bool;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
@@ -25,7 +27,7 @@ pub struct ObConfiguration {
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub is_live: bool,
+    pub is_live: IsLive,
     pub status: ApiKeyStatus,
     pub created_at: DateTime<Utc>,
     pub must_collect_data: Vec<CollectedDataOption>,

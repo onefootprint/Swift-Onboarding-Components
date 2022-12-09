@@ -1,10 +1,10 @@
 import arrow
 import pytest
 from urllib.parse import quote
-from typing import NamedTuple
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
-from tests.utils import get, put, post, patch, _gen_random_ssn, create_tenant
+from tests.utils import get, put, post, patch, _gen_random_ssn, build_user_data
 from tests.types import SecretApiKey, ObConfiguration
+from tests.bifrost_client import BifrostClient
 from .auth import (
     PublishableOnboardingKey,
     DashboardAuthIsLive,
@@ -27,6 +27,19 @@ def ob_configuration(workos_sandbox_tenant, must_collect_data, can_access_data):
     )
     body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
     return ObConfiguration.from_response(body)
+
+
+@pytest.fixture(scope="module")
+def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twilio):
+    """
+    Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
+    with document info as well
+    """
+    bifrost_client = BifrostClient(document_requesting_sandbox_tenant_session_scoped)
+    bifrost_client.init_user_for_onboarding(
+        twilio, build_user_data(), document_data="both"
+    )
+    return bifrost_client.onboard_user_onto_tenant()
 
 
 class TestDashboardOnboardings:
@@ -221,7 +234,6 @@ class TestDashboardOnboardings:
 
     def test_liveness_list(self, user):
         tenant = user.tenant
-        print(user.fp_user_id)
         body = get(f"users/{user.fp_user_id}/liveness", None, tenant.sk.key)
         creds = body
         assert len(creds)
@@ -264,7 +276,6 @@ class TestDashboardOnboardings:
         body = post(
             f"users/{user.fp_user_id}/vault/identity/decrypt", data, user.tenant.sk.key
         )
-        print(body)
         assert body["first_name"]
 
         data = {
@@ -287,7 +298,6 @@ class TestDashboardOnboardings:
     def test_override_onboarding_decision(self, user):
         tenant = user.tenant
 
-        # TODO This will get simpler with the onboarding-scoped dashboard
         scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
         onboarding = scoped_user["onboarding"]
         assert onboarding["status"] == "pass"
@@ -567,7 +577,6 @@ class TestDashboardAdminUsers:
         assert role_id not in set(u["id"] for u in body["data"])
 
     def test_get_annotations(self, user, workos_sandbox_tenant):
-        print(f"{user.fp_user_id}")
         # res = get(f"/users/{user.fp_user_id}/annotations", None, user.tenant.sk.key)
 
         note1 = "this user is chill"

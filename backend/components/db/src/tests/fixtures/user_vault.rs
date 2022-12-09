@@ -16,6 +16,8 @@ pub fn create(conn: &mut TxnPgConnection) -> (UserVault, PhoneNumber) {
         e_phone_number: SealedVaultBytes(vec![]),
         sh_phone_number: Fingerprint(vec![]),
         e_phone_country: SealedVaultBytes(vec![]),
+        tenant_id: None,
     };
-    UserVault::create(conn, new_user).unwrap()
+    let (uv, _, phone_number) = UserVault::create(conn, new_user).unwrap();
+    (uv, phone_number)
 }

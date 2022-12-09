@@ -153,6 +153,7 @@ async fn test_db() {
         ),
         e_phone_country: SealedVaultBytes("blah".as_bytes().to_vec()),
         is_live: false,
+        tenant_id: None,
     };
     pool.db_transaction(|conn| UserVault::create(conn, new_user))
         .await

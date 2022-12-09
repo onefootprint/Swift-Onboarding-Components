@@ -1,9 +1,8 @@
-use crate::auth::tenant::ParsedOnboardingSession;
-use crate::auth::tenant::PublicOnboardingContext;
+use crate::auth::tenant::ObPkAuth;
+use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::auth::user::UserAuthScopeDiscriminant;
-use crate::auth::{user::UserAuth, Either, SessionContext};
 
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -36,7 +35,7 @@ pub struct OnboardingResponse {
 #[actix::post("/hosted/onboarding")]
 pub async fn post(
     state: web::Data<State>,
-    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
+    ob_pk_auth: ObPkAuth,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
@@ -48,25 +47,24 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let uv = UserVault::lock(conn, &uv_id)?;
-            if onboarding_context.ob_config().is_live != uv.is_live {
+            if ob_pk_auth.ob_config().is_live != uv.is_live {
                 return Err(OnboardingError::InvalidSandboxState.into());
             }
 
             let scoped_user = ScopedUser::get_or_create(
                 conn,
                 uv.id,
-                onboarding_context.tenant().id.clone(),
-                onboarding_context.ob_config().is_live,
+                ob_pk_auth.tenant().id.clone(),
+                ob_pk_auth.ob_config().is_live,
             )?;
 
             let insight_event = CreateInsightEvent::from(insights);
 
-            let should_create_document_request =
-                onboarding_context.ob_config().must_collect_identity_document;
+            let should_create_document_request = ob_pk_auth.ob_config().must_collect_identity_document;
 
             let ob_create_args = OnboardingCreateArgs {
                 scoped_user_id: scoped_user.id,
-                ob_configuration_id: onboarding_context.ob_config().id.clone(),
+                ob_configuration_id: ob_pk_auth.ob_config().id.clone(),
                 insight_event,
                 // Create a `DocumentRequest` if specified in the ob config.
                 // We do this inside the OB creation to make this route more idempotent

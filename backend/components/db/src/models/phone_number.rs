@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{
     DataLifetimeId, DataLifetimeKind, DataPriority, Fingerprint as FingerprintData, PhoneNumberId,
-    SealedVaultBytes, UserVaultId,
+    ScopedUserId, SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -71,12 +71,12 @@ impl PhoneNumber {
         fp_e164: FingerprintData,
         e_country: SealedVaultBytes,
         priority: DataPriority,
+        scoped_user_id: Option<ScopedUserId>,
     ) -> DbResult<PhoneNumber> {
-        // Create a committed lifetime - since the identify flow doesn't have any information
-        // on the tenant and requires that the phone number is verified, we will create the phone
-        // number as immediately portable, committed data that is not associated with a tenant
-        // TODO revisit
-        let lifetime = DataLifetime::create(conn, user_vault_id, None, DataLifetimeKind::PhoneNumber)?;
+        // Create a committed lifetime - once the phone number is verified and bound to a vault
+        // it should be immediately portable, even though it isn't verified by vendors.
+        let lifetime =
+            DataLifetime::create(conn, user_vault_id, scoped_user_id, DataLifetimeKind::PhoneNumber)?;
         let seqno = lifetime.created_seqno;
         let lifetime = lifetime.commit(conn, seqno)?;
         let new_row = NewPhoneNumber {

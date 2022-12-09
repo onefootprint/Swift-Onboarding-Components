@@ -16,7 +16,6 @@ from tests.utils import (
     post,
     create_tenant,
     clean_up_user,
-    create_basic_user,
     build_user_data,
     identify_verify,
     create_inherited_non_sandbox_user,
@@ -30,13 +29,16 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
 
 @pytest.fixture(scope="module")
-def auth_token(twilio):
+def auth_token(twilio, workos_tenant):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
     data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
     body = post("hosted/identify/signup_challenge", data)
     challenge_token = body["challenge_data"]["challenge_token"]
     return try_until_success(
-        lambda: identify_verify(twilio, PHONE_NUMBER, challenge_token), 5
+        lambda: identify_verify(
+            twilio, PHONE_NUMBER, challenge_token, workos_tenant.ob_config().key
+        ),
+        5,
     )
 
 
@@ -519,8 +521,7 @@ class TestBifrostSandbox:
     ):
         bifrost_client = BifrostClient(workos_sandbox_tenant)
         bifrost_client.init_user_for_onboarding(
-            create_basic_user(twilio, suffix),
-            build_user_data(),
+            twilio, build_user_data(), sandbox_suffix=suffix
         )
         user = bifrost_client.onboard_user_onto_tenant()
 

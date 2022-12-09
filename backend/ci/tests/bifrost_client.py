@@ -6,6 +6,7 @@ from .webauthn_simulator import SoftWebauthnDevice
 
 from .utils import (
     _sandbox_email,
+    create_basic_user,
     get,
     post,
     override_webauthn_challenge,
@@ -28,8 +29,14 @@ class BifrostClient:
         self.tenant = tenant
 
     # Associate a specific instance with a challenged user and data we'd like to simulate submitting
-    def init_user_for_onboarding(self, basic_user, user_data, document_data=None):
-        self.basic_user = basic_user
+    def init_user_for_onboarding(
+        self, twilio, user_data, sandbox_suffix=None, document_data=None
+    ):
+        self.basic_user = create_basic_user(
+            twilio,
+            tenant_pk=self.tenant.ob_config().key,
+            suffix=sandbox_suffix,
+        )
         self.user_data = user_data
         self.document_data = document_data
 
@@ -67,7 +74,7 @@ class BifrostClient:
         post("hosted/user/biometric", data, basic_user.auth_token)
 
     # add identity documents to vault
-    def add_identity_document_data(self, tenant, basic_user, document_data):
+    def add_identity_document_data(self, tenant, basic_user):
         from .image_fixtures import test_image
 
         body = get(
@@ -84,7 +91,7 @@ class BifrostClient:
         # stash the request id since we need it for the POST
         document_request_id = req["document_request_id"]
 
-        if document_data == "front_only":
+        if self.document_data == "front_only":
             data = {
                 "front_image": test_image,
                 "back_image": None,
@@ -154,9 +161,7 @@ class BifrostClient:
         self.register_biometric_credentials(self.basic_user)
         # Identity Document data, if applicable
         if self.document_data is not None:
-            self.add_identity_document_data(
-                self.tenant, self.basic_user, self.document_data
-            )
+            self.add_identity_document_data(self.tenant, self.basic_user)
         # Submit the onboarding via /submit
         self.submit_collected_data(self.tenant, self.basic_user)
         # Retrieve validation token

@@ -11,7 +11,9 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
+use super::ob_configuration::IsLive;
 use super::phone_number::PhoneNumber;
+use super::scoped_user::ScopedUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vault)]
@@ -21,7 +23,7 @@ pub struct UserVault {
     pub public_key: VaultPublicKey,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub is_live: bool,
+    pub is_live: IsLive,
     pub is_portable: bool,
 }
 
@@ -31,7 +33,7 @@ pub enum UserVaultIdentifier<'a> {
     FpUserId {
         fp_user_id: &'a FootprintUserId,
         tenant_id: &'a TenantId,
-        is_live: bool,
+        is_live: IsLive,
     },
 }
 
@@ -47,8 +49,8 @@ impl<'a> From<&'a ScopedUserId> for UserVaultIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a FootprintUserId, &'a TenantId, bool)> for UserVaultIdentifier<'a> {
-    fn from((fp_user_id, tenant_id, is_live): (&'a FootprintUserId, &'a TenantId, bool)) -> Self {
+impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for UserVaultIdentifier<'a> {
+    fn from((fp_user_id, tenant_id, is_live): (&'a FootprintUserId, &'a TenantId, IsLive)) -> Self {
         Self::FpUserId {
             fp_user_id,
             tenant_id,
@@ -146,7 +148,7 @@ impl UserVault {
     pub fn create(
         conn: &mut TxnPgConnection,
         new_user: NewUserVaultArgs,
-    ) -> DbResult<(UserVault, PhoneNumber)> {
+    ) -> DbResult<(UserVault, Option<ScopedUser>, PhoneNumber)> {
         let new_user_vault = NewUserVault {
             e_private_key: new_user.e_private_key,
             public_key: new_user.public_key,
@@ -156,6 +158,12 @@ impl UserVault {
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user_vault)
             .get_result::<UserVault>(conn.conn())?;
+        let su = if let Some(tenant_id) = new_user.tenant_id {
+            let su = ScopedUser::get_or_create(conn, user_vault.id.clone(), tenant_id, new_user.is_live)?;
+            Some(su)
+        } else {
+            None
+        };
         let phone_number = PhoneNumber::create_verified(
             conn,
             user_vault.id.clone(),
@@ -163,8 +171,9 @@ impl UserVault {
             new_user.sh_phone_number,
             new_user.e_phone_country,
             DataPriority::Primary,
+            su.as_ref().map(|su| su.id.clone()),
         )?;
-        Ok((user_vault, phone_number))
+        Ok((user_vault, su, phone_number))
     }
 }
 
@@ -173,23 +182,25 @@ impl UserVault {
 pub struct NewUserVault {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
-    pub is_live: bool,
+    pub is_live: IsLive,
     pub is_portable: bool,
 }
 
 pub struct NewUserVaultArgs {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
-    pub is_live: bool,
+    pub is_live: IsLive,
     // Note: these aren't actual columns on the table -
     pub e_phone_number: SealedVaultBytes,
     pub sh_phone_number: Fingerprint,
     pub e_phone_country: SealedVaultBytes,
+    /// When provided, creates the ScopedUser at the same time as created the user vault
+    pub tenant_id: Option<TenantId>,
 }
 
 pub struct NewNonPortableUserVaultReq {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
-    pub is_live: bool,
+    pub is_live: IsLive,
     pub tenant_id: TenantId,
 }

@@ -1,7 +1,9 @@
 use super::{BiometricChallengeState, PhoneChallengeState};
+use crate::auth::tenant::ObPkAuth;
 use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 
+use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::hosted::identify::{ChallengeData, ChallengeState, IdentifyType};
 use crate::types::response::ResponseData;
@@ -12,8 +14,11 @@ use crate::State;
 
 use chrono::Duration;
 use crypto::sha256;
+use db::models::ob_configuration::IsLive;
 use db::models::user_vault::{NewUserVaultArgs, UserVault};
-use newtypes::{DataLifetimeKind, Fingerprinter, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
+use newtypes::{
+    DataLifetimeKind, Fingerprinter, SessionAuthToken, TenantId, UserVaultId, ValidatedPhoneNumber,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -47,6 +52,7 @@ pub struct VerifyResponse {
 pub async fn post(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
+    ob_pk_auth: Option<ObPkAuth>,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let challenge_state =
@@ -54,7 +60,8 @@ pub async fn post(
 
     let (user_vault_id, user_kind) = match challenge_state.data {
         ChallengeData::Sms(c_state) => {
-            validate_sms_challenge(&state, c_state, &request.challenge_response).await?
+            let tenant_info = ob_pk_auth.map(|ob| (ob.tenant().id.clone(), ob.ob_config().is_live));
+            validate_sms_challenge(&state, c_state, &request.challenge_response, tenant_info).await?
         }
         ChallengeData::Biometric(challenge_state) => {
             validate_biometric_challenge(&state, challenge_state, &request.challenge_response)?
@@ -73,6 +80,8 @@ pub async fn post(
         ),
         IdentifyType::Unspecified => return Err(ApiError::NotImplemented),
     };
+    // TODO put scoped user id inside of the UserSession if it is created, don't associate auth only with ob_id
+    // could do in a follow-up task
     let data = UserSession::make(user_vault_id, scopes);
     let auth_token = AuthSession::create(&state, data, duration).await?;
 
@@ -103,6 +112,7 @@ async fn validate_sms_challenge(
     state: &web::Data<State>,
     challenge_state: PhoneChallengeState,
     challenge_response: &str,
+    tenant_info: Option<(TenantId, IsLive)>,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
@@ -117,7 +127,7 @@ async fn validate_sms_challenge(
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(state, &phone_number).await?;
+            let user = create_new_user_vault(state, &phone_number, tenant_info).await?;
             (user.id, VerifyKind::UserCreated)
         }
     };
@@ -127,8 +137,19 @@ async fn validate_sms_challenge(
 async fn create_new_user_vault(
     state: &web::Data<State>,
     phone_number: &ValidatedPhoneNumber,
+    tenant_info: Option<(TenantId, IsLive)>,
 ) -> Result<UserVault, ApiError> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
+
+    let tenant_id = tenant_info
+        .map(|(tenant_id, is_live)| {
+            // If we are making a ScopedUser here, verify that the ob config is_live matches the user vault
+            if is_live != phone_number.is_live() {
+                return Err(UserError::SandboxMismatch);
+            }
+            Ok(tenant_id)
+        })
+        .transpose()?;
 
     let new_user = NewUserVaultArgs {
         e_private_key,
@@ -139,8 +160,9 @@ async fn create_new_user_vault(
             .compute_fingerprint(DataLifetimeKind::PhoneNumber, phone_number.to_piistring())
             .await?,
         is_live: phone_number.is_live(),
+        tenant_id,
     };
-    let (user, _) = state
+    let (user, _, _) = state
         .db_pool
         .db_transaction(|conn| UserVault::create(conn, new_user))
         .await?;

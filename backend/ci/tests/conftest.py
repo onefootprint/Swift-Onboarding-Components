@@ -160,22 +160,7 @@ def user(workos_sandbox_tenant, twilio):
     Create a user with registered data and webuathn creds and onboard them onto the workos_sandbox_tenant
     """
     bifrost_client = BifrostClient(workos_sandbox_tenant)
-    bifrost_client.init_user_for_onboarding(
-        create_basic_user(twilio), build_user_data()
-    )
-    return bifrost_client.onboard_user_onto_tenant()
-
-
-@pytest.fixture(scope="module")
-def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twilio):
-    """
-    Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
-    with document info as well
-    """
-    bifrost_client = BifrostClient(document_requesting_sandbox_tenant_session_scoped)
-    bifrost_client.init_user_for_onboarding(
-        create_basic_user(twilio), build_user_data(), "both"
-    )
+    bifrost_client.init_user_for_onboarding(twilio, build_user_data())
     return bifrost_client.onboard_user_onto_tenant()
 
 

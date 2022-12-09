@@ -32,8 +32,9 @@ use crate::{DbError, DbResult};
 ///
 /// Lifecycle attributes:
 /// - `created_at`/`created_seqno`: When the data was created
-/// - `committed_at`/`committed_seqno`: When the data was committed and made portable. Generally, this
-///   is after is has been verified with data vendors.
+/// - `committed_at`/`committed_seqno`: When the data was committed and made portable. This is
+///   usually after is has been verified with data vendors. BUT, it is not synonymous with verified -
+///   we also make contact info like phone/email portable as soon as it is added
 /// - `deactivated_at`/`deactivated_seqno`: When the data was archived and is no longer active. This
 ///   may happen if a piece of data is replaced with newer data.
 ///

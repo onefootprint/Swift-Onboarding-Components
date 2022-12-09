@@ -1,6 +1,5 @@
-use crate::auth::tenant::{ParsedOnboardingSession, PublicOnboardingContext};
+use crate::auth::tenant::ObPkAuth;
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
-use crate::auth::{Either, SessionContext};
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -32,7 +31,7 @@ pub struct AddEmailRequest {
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-    onboarding_context: Option<Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>>,
+    ob_pk_auth: Option<ObPkAuth>,
     request: Json<AddEmailRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
@@ -64,16 +63,16 @@ pub async fn post(
                 // We have an auth token from after calling POST /hosted/onboarding - the scoped
                 // user has already been created
                 ob_info.scoped_user.id
-            } else if let Some(ob_context) = onboarding_context {
+            } else if let Some(ob_pk_auth) = ob_pk_auth {
                 // Or, an ob config public key was provided. get or create the scoped user
                 // NOTE: This is only a short-term action to allow rolling out data model v4.
                 // We need to find a better way of associating data with a tenant
-                // https://linear.app/footprint/issue/FP-2139/handle-email-update-when-an-email-already-exists
+                // TODO: maybe just get scoped user here
                 let scoped_user = ScopedUser::get_or_create(
                     conn,
                     user_auth.user_vault_id(),
-                    ob_context.tenant().id.clone(),
-                    ob_context.ob_config().is_live,
+                    ob_pk_auth.tenant().id.clone(),
+                    ob_pk_auth.ob_config().is_live,
                 )?;
                 scoped_user.id
             } else {
