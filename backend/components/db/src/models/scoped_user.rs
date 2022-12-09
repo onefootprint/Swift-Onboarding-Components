@@ -1,5 +1,5 @@
 use crate::schema::scoped_user;
-use crate::{DbPool, DbResult};
+use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -7,6 +7,7 @@ use newtypes::{FootprintUserId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
+use super::user_vault::UserVault;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = scoped_user)]
@@ -33,15 +34,22 @@ struct NewScopedUser {
 
 impl ScopedUser {
     pub fn get_or_create(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
         is_live: bool,
     ) -> DbResult<ScopedUser> {
+        // TODO maybe pass in locked user vault instead of re-locking here
+        let uv = UserVault::lock(conn, &user_vault_id)?;
+        if uv.is_live != is_live {
+            return Err(DbError::SandboxMismatch);
+        }
+        // Has to be inside locked txn, otherwise this could be a stale read.
+        // Still protected by uniqueness constraints, but those are clunkier
         let scoped_user = scoped_user::table
             .filter(scoped_user::user_vault_id.eq(&user_vault_id))
             .filter(scoped_user::tenant_id.eq(&tenant_id))
-            .first(conn)
+            .first(conn.conn())
             .optional()?;
         if let Some(scoped_user) = scoped_user {
             return Ok(scoped_user);
@@ -55,7 +63,7 @@ impl ScopedUser {
         };
         let ob = diesel::insert_into(scoped_user::table)
             .values(new)
-            .get_result::<ScopedUser>(conn)?;
+            .get_result::<ScopedUser>(conn.conn())?;
         Ok(ob)
     }
 
@@ -70,24 +78,6 @@ impl ScopedUser {
             .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .get_results(conn)?;
         Ok(results)
-    }
-
-    pub async fn get_for_tenant(
-        pool: &DbPool,
-        tenant_id: TenantId,
-        user_vault_id: UserVaultId,
-    ) -> DbResult<Option<ScopedUser>> {
-        let ob = pool
-            .db_query(|conn| -> DbResult<_> {
-                let ob = scoped_user::table
-                    .filter(scoped_user::tenant_id.eq(tenant_id))
-                    .filter(scoped_user::user_vault_id.eq(user_vault_id))
-                    .first(conn)
-                    .optional()?;
-                Ok(ob)
-            })
-            .await??;
-        Ok(ob)
     }
 
     pub fn get(

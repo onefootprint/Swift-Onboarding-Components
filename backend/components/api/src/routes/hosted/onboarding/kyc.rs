@@ -20,7 +20,7 @@ pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> JsonApi
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let ob = Onboarding::get(conn, (&ob_info.onboarding.id, &ob_info.user_vault_id))?;
+            let ob = Onboarding::get(conn, (&ob_info.scoped_user.id, &ob_info.user_vault_id))?;
             Ok(ob)
         })
         .await??;

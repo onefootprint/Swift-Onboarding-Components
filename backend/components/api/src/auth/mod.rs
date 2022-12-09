@@ -47,4 +47,6 @@ pub enum AuthError {
     ObConfigMissingDecryptPermission,
     #[error("Cannot modify global properties on portable user")]
     CannotModifyPortableUser,
+    #[error("Not allowed: handoff tokens cannot create other handoff tokens")]
+    CannotCreateMultipleHandoffTokens,
 }

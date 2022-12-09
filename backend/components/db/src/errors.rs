@@ -86,8 +86,11 @@ pub enum DbError {
     #[error("Not in transaction")]
     NotInTransaction,
 
-    #[error("Transaction RollBack in a unit test")]
+    #[error("Transaction rollback in a unit test")]
     TransactionRollbackTest,
+
+    #[error("Scoped user is_live doesn't match UserVault is_live")]
+    SandboxMismatch,
 }
 
 impl DbError {

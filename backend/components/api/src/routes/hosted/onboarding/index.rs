@@ -47,10 +47,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let uv = UserVault::lock(conn, &uv_id)?;
-            if ob_pk_auth.ob_config().is_live != uv.is_live {
-                return Err(OnboardingError::InvalidSandboxState.into());
-            }
-
+            // TODO assert that auth token has proper scoped user
             let scoped_user = ScopedUser::get_or_create(
                 conn,
                 uv.id,
@@ -80,13 +77,9 @@ pub async fn post(
                     e.into()
                 }
             })?;
-            // Update the auth session in the DB to have the OrgOnboarding scope tied to this onboarding
-            // Even though the OrgOnboardingInit scope is only used by this endpoint, we notably don't remove
-            // it since we want this endpoint to be idempotent (in case the client needs to retry)
-            let data = user_auth
-                .data
-                .clone()
-                .replace_scope(UserAuthScope::OrgOnboarding { id: ob.id.clone() });
+            // Update the auth session in the DB to have the OrgOnboarding scope, giving permission
+            // to perform other operations
+            let data = user_auth.data.clone().add_scope(UserAuthScope::OrgOnboarding);
             user_auth.update_session(conn, &session_key, data)?;
 
             // If the user has already onboarded onto this same ob config, return a validation token

@@ -1,7 +1,6 @@
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::UserAuthScope;
-use crate::auth::user::UserSession;
+use crate::auth::user::{UserAuthScope, UserAuthScopeDiscriminant};
+use crate::auth::AuthError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::session::JsonSession;
@@ -29,23 +28,18 @@ pub async fn handler(
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<GenerateResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
+    if user_auth.data.has_scope(&UserAuthScopeDiscriminant::Handoff) {
+        // Don't allow making a handoff token with an existing handoff token. This allows subverting
+        // token expiry by constantly just making a new one
+        return Err(AuthError::CannotCreateMultipleHandoffTokens.into());
+    }
 
     let session_sealing_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let expires_in = Duration::minutes(10);
-            // If the token used to generate the d2p token has the OrgOnboarding scope, pass it along to the d2p token
-            let onboarding_scope = user_auth
-                .onboarding(conn)?
-                .map(|ob_info| UserAuthScope::OrgOnboarding {
-                    id: ob_info.onboarding.id,
-                });
-            let token_scopes = [Some(UserAuthScope::Handoff), onboarding_scope]
-                .into_iter()
-                .flatten()
-                .collect();
-            let data = UserSession::make(user_auth.user_vault_id(), token_scopes);
+            let data = user_auth.data.add_scope(UserAuthScope::Handoff);
             let auth_token = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on
             // a hash of the auth token so both handoff clients can look up the status

@@ -65,6 +65,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ChallengeState {
+    // TODO remove identify_type since we can infer now if tenantPk is provided
     identify_type: IdentifyType,
     data: ChallengeData,
 }

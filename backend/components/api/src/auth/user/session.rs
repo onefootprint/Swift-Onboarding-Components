@@ -45,13 +45,12 @@ impl UserSession {
             .contains(scope)
     }
 
-    pub fn replace_scope(self, new_scope: UserAuthScope) -> AuthSessionData {
-        let new_scope2 = new_scope.clone();
+    pub fn add_scope(self, new_scope: UserAuthScope) -> AuthSessionData {
+        let new_scope_kind = UserAuthScopeDiscriminant::from(&new_scope);
         let new_scopes = self.scopes
-            .iter()
-            .cloned()
+            .into_iter()
             // Filter out any old scope of the same type
-            .filter(move |x| UserAuthScopeDiscriminant::from(x) != UserAuthScopeDiscriminant::from(&new_scope2))
+            .filter(|x| UserAuthScopeDiscriminant::from(x) != new_scope_kind)
             // And replace it with the new scope
             .chain([new_scope].into_iter())
             .collect();
@@ -76,22 +75,22 @@ pub struct AuthedOnboardingInfo {
 impl SessionContext<UserSession> {
     /// Fetch the onboarding info associated with this user token, if it exists
     pub fn onboarding(&self, conn: &mut PgConnection) -> ApiResult<Option<AuthedOnboardingInfo>> {
-        let onboarding_id = self
+        let scoped_user_id = self
             .data
             .scopes
             .iter()
             .filter_map(|x| match x {
-                UserAuthScope::OrgOnboarding { id } => Some(id.clone()),
+                UserAuthScope::OrgOnboardingInit { id } => Some(id.clone()),
                 _ => None,
             })
             .next();
-        let Some(onboarding_id) = onboarding_id else {
+        let Some(scoped_user_id) = scoped_user_id else {
             return Ok(None);
         };
 
         // Confirm that the onboarding in the auth token belongs to the user
         let (onboarding, scoped_user, _, _) =
-            Onboarding::get(conn, (&onboarding_id, &self.data.user_vault_id))?;
+            Onboarding::get(conn, (&scoped_user_id, &self.data.user_vault_id))?;
         // Confirm that the ob config is active
         let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &onboarding.ob_configuration_id)?;
         let info = AuthedOnboardingInfo {
@@ -107,6 +106,8 @@ impl SessionContext<UserSession> {
     /// Assert that the onboarding info exists for this user auth token and return it.
     /// Useful as a shorthand for endpoints along the onboarding flow
     pub fn assert_onboarding(&self, conn: &mut PgConnection) -> ApiResult<AuthedOnboardingInfo> {
+        // TODO shouldn't fail if there's only a scoped user
+        // Some use cases will only want a scoped user, others will want the whole onboarding
         let info = self
             .onboarding(conn)?
             .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboarding]))?;

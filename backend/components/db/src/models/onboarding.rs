@@ -77,8 +77,8 @@ impl OnboardingUpdate {
 #[derive(Debug)]
 pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
-    UserId {
-        id: &'a OnboardingId,
+    ScopedUserId {
+        su_id: &'a ScopedUserId,
         user_vault_id: &'a UserVaultId,
     },
     ConfigId {
@@ -93,9 +93,10 @@ impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a OnboardingId, &'a UserVaultId)> for OnboardingIdentifier<'a> {
-    fn from((id, user_vault_id): (&'a OnboardingId, &'a UserVaultId)) -> Self {
-        Self::UserId { id, user_vault_id }
+// TODO change this to su_id, user_vault_id?
+impl<'a> From<(&'a ScopedUserId, &'a UserVaultId)> for OnboardingIdentifier<'a> {
+    fn from((su_id, user_vault_id): (&'a ScopedUserId, &'a UserVaultId)) -> Self {
+        Self::ScopedUserId { su_id, user_vault_id }
     }
 }
 
@@ -153,9 +154,9 @@ impl Onboarding {
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::UserId { id, user_vault_id } => {
+            OnboardingIdentifier::ScopedUserId { su_id, user_vault_id } => {
                 query = query
-                    .filter(onboarding::id.eq(id))
+                    .filter(onboarding::scoped_user_id.eq(su_id))
                     .filter(scoped_user::user_vault_id.eq(user_vault_id))
             }
             OnboardingIdentifier::ConfigId {

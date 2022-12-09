@@ -162,40 +162,6 @@ def create_basic_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
     )
 
 
-def create_inherited_non_sandbox_user(twilio):
-    identifier = {"email": EMAIL}
-
-    def identify():
-        data = dict(
-            identifier=identifier,
-        )
-        body = post("hosted/identify", data)
-        assert body["user_found"]
-        assert body["available_challenge_kinds"]
-
-    def challenge():
-        data = dict(
-            identifier=identifier,
-            preferred_challenge_kind="sms",
-            identify_type="onboarding",
-        )
-        body = post("hosted/identify/login_challenge", data)
-        assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-        assert body["challenge_data"]["challenge_kind"] == "sms"
-        return body["challenge_data"]["challenge_token"]
-
-    try_until_success(identify, 20)
-    challenge_token = try_until_success(challenge, 20)
-
-    # Log in as the user
-    return try_until_success(
-        lambda: identify_verify(
-            twilio, PHONE_NUMBER, challenge_token, expected_kind="user_inherited"
-        ),
-        5,
-    )
-
-
 def create_tenant(org_data, ob_conf_data):
     body = post("private/tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])

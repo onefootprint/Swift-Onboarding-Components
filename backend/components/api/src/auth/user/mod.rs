@@ -2,7 +2,7 @@ use super::SessionContext;
 use crate::errors::ApiError;
 use async_trait::async_trait;
 use db::{models::user_vault::UserVault, DbPool};
-use newtypes::{OnboardingId, UserVaultId};
+use newtypes::{ScopedUserId, UserVaultId};
 use paperclip::actix::Apiv2Schema;
 
 mod session;
@@ -25,8 +25,8 @@ pub enum UserAuthScope {
     // all the different kinds of user tokens in the future
     All,
     SignUp,
-    OrgOnboardingInit,
-    OrgOnboarding { id: OnboardingId },
+    OrgOnboardingInit { id: ScopedUserId },
+    OrgOnboarding,
     BasicProfile,
     ExtendedProfile,
     SensitiveProfile,

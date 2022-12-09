@@ -2,7 +2,15 @@ import arrow
 import pytest
 from urllib.parse import quote
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
-from tests.utils import get, put, post, patch, _gen_random_ssn, build_user_data
+from tests.utils import (
+    get,
+    put,
+    post,
+    patch,
+    _gen_random_ssn,
+    build_user_data,
+    create_basic_user,
+)
 from tests.types import SecretApiKey, ObConfiguration
 from tests.bifrost_client import BifrostClient
 from .auth import (
@@ -351,7 +359,7 @@ class TestDashboardObConfigs:
         assert config["status"] == ob_configuration.status
         assert config["created_at"]
 
-    def test_config_create(self, workos_sandbox_tenant, basic_user):
+    def test_config_create(self, workos_sandbox_tenant, twilio):
         data = dict(
             name="Acme Bank Loan",
             must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
@@ -361,7 +369,8 @@ class TestDashboardObConfigs:
         ob_config = body
         ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
-        post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
+        user = create_basic_user(twilio, ob_config_key)
+        post("hosted/onboarding", None, ob_config_key, user.auth_token)
 
     @pytest.mark.parametrize(
         "must_collect,can_access,expected_status",

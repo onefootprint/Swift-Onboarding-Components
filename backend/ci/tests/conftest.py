@@ -12,7 +12,6 @@ from .constants import (
 from .utils import (
     IncorrectServerVersion,
     build_user_data,
-    post,
     _make_request,
     create_tenant,
     create_basic_user,
@@ -69,6 +68,7 @@ def must_collect_data(can_access_data):
 
 
 @pytest.fixture(scope="session")
+# TODO rename to prod_tenant or non_sandbox_tenant
 def workos_tenant(must_collect_data, can_access_data):
     org_data = {
         "name": "Acme Bank",
@@ -162,10 +162,3 @@ def user(workos_sandbox_tenant, twilio):
     bifrost_client = BifrostClient(workos_sandbox_tenant)
     bifrost_client.init_user_for_onboarding(twilio, build_user_data())
     return bifrost_client.onboard_user_onto_tenant()
-
-
-@pytest.fixture(scope="module")
-def ob_session_token(workos_tenant):
-    data = {"onboarding_config_id": workos_tenant.ob_config().id}
-    body = post("onboarding/session", data, workos_tenant.sk.key)
-    return OnboardingSessionToken(body["session_token"])

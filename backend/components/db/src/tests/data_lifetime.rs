@@ -9,6 +9,8 @@ use crate::TxnPgConnection;
 
 use crate::models::data_lifetime::DataLifetime;
 
+use super::fixtures;
+
 /// Util function to create multiple DataLifetimes with the provided info
 fn build_lifetime(
     conn: &mut TxnPgConnection,
@@ -78,10 +80,10 @@ impl TestData {
         let t_id = TenantId::test_data("org_merp".to_owned());
         let t2_id = TenantId::test_data("org_merp2".to_owned());
 
-        // Create user vaults
-        let uv_id = UserVaultId::test_data("uv_flerp".to_owned());
-        let uv2_id = UserVaultId::test_data("uv_flerp2".to_owned());
-        let uvx_id = UserVaultId::test_data("uv_flerpx".to_owned());
+        // Create user vaults (without phone number)
+        let uv_id = fixtures::user_vault::create_no_phone(conn).id;
+        let uv2_id = fixtures::user_vault::create_no_phone(conn).id;
+        let uvx_id = fixtures::user_vault::create_no_phone(conn).id;
 
         // Create scoped users
         let su_id = ScopedUser::get_or_create(conn, uv_id.clone(), t_id.clone(), true)
