@@ -1,8 +1,9 @@
 use crate::models::scoped_user::ScopedUser;
-use crate::models::user_vault::*;
+use crate::models::user_vault::{NewUserVault, UserVault};
 use crate::schema;
-use crate::{errors::DbError, models};
+use crate::{errors::DbError, models::user_vault::NewNonPortableUserVaultReq};
 use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::{Fingerprint, UserVaultId};
 
 // TODO modernize these utils
@@ -54,13 +55,13 @@ pub async fn get_by_fingerprint(
     // want to identify users with not-yet-verified emails
     // (provided they are the only such user in the system)
     use crate::schema::{data_lifetime, fingerprint, user_vault};
-    let results: Vec<(UserVault, models::fingerprint::Fingerprint)> = pool
+    let results: Vec<_> = pool
         .db_query(move |conn| -> Result<_, DbError> {
             let result = user_vault::table
                 .inner_join(data_lifetime::table.inner_join(fingerprint::table))
                 .filter(fingerprint::sh_data.eq(sh_data))
-                .select((user_vault::all_columns, fingerprint::all_columns))
-                .get_results(conn)?;
+                .select(user_vault::all_columns)
+                .get_results::<UserVault>(conn)?;
             Ok(result)
         })
         .await??;
@@ -68,14 +69,7 @@ pub async fn get_by_fingerprint(
     // we found more than 1 vault on this fingerprint
     if results.len() > 1 {
         // find the unique vaults for this fingerprint
-        let unique: Vec<UserVault> = results
-            .into_iter()
-            // TOOD
-            // TODO test that duplicate fingerprint pointing to the same vault works here
-            // .filter(|(_, fp)| fp.is_unique)
-            .map(|(uv, _)| uv)
-            .collect();
-
+        let unique: Vec<_> = results.into_iter().unique_by(|uv| uv.id.clone()).collect();
         if unique.len() == 1 {
             return Ok(unique.into_iter().next());
         }
@@ -86,5 +80,5 @@ pub async fn get_by_fingerprint(
         return Ok(None);
     }
 
-    Ok(results.into_iter().map(|(uv, _)| uv).next())
+    Ok(results.into_iter().next())
 }
