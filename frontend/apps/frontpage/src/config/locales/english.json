@@ -282,7 +282,7 @@
         "too-good": {
           "title": "This seems too good to be true—you handle KYC + PII Vaulting—what’s the catch?",
           "content": [
-            "The catch was that you were paying for those services separately before. We aren’t geniuses—it is actually simpler, quicker, and more secure to do both of these in one solution. By virtue of us securely storing data, we verify it. For example, by storing John Doe’s encrypted SSN as credentialed by the Social Security Administration, we are in real-time verifying John Doe’s identity in conjunction with our liveness checks.",
+            "The catch was that you were paying for those services separately before. We aren’t geniuses—it is actually simpler, quicker, and more secure to do both of these in one solution. By virtue of us securely storing data, we verify it. For example, by storing Jane Doe’s encrypted SSN as credentialed by the Social Security Administration, we are in real-time verifying Jane Doe’s identity in conjunction with our liveness checks.",
             "We think it is silly that in the past, companies had to pay to tokenize/vault this KYC data that was of little use to them. Fraudsters are always changing their approach, but nothing screams static like tokenizing KYC data upon account creation. Our vault with PII is a living mechanism. We constantly update our predictions on people’s identity based on new signals, such as them being good actors in new accounts they create through Footprint. Footprint was built to make it easier to get more good actors in the door."
           ]
         },

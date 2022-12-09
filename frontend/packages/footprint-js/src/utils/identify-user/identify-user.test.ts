@@ -29,7 +29,7 @@ describe('identifyUser', () => {
 
     it('should return true', async () => {
       await expect(
-        identifyUser({ email: 'john.doe@gmail.com' }),
+        identifyUser({ email: 'jane.doe@acme.com' }),
       ).resolves.toEqual(true);
     });
   });
@@ -67,7 +67,7 @@ describe('identifyUser', () => {
     it('should return true', async () => {
       await expect(
         identifyUser({
-          email: 'john.doe@gmail.com',
+          email: 'jane.doe@acme.com',
           phoneNumber: '+1-202-555-0130',
         }),
       ).resolves.toEqual(true);
@@ -83,7 +83,7 @@ describe('identifyUser', () => {
 
     it('should return false', async () => {
       await expect(
-        identifyUser({ email: 'john.doe@gmail.com' }),
+        identifyUser({ email: 'jane.doe@acme.com' }),
       ).resolves.toEqual(false);
     });
   });
@@ -101,7 +101,7 @@ describe('identifyUser', () => {
     it('should return false', async () => {
       await expect(
         identifyUser({
-          email: 'john.doe@gmail.com',
+          email: 'jane.doe@acme.com',
           phoneNumber: '+1-202-555-0130',
         }),
       ).resolves.toEqual(false);

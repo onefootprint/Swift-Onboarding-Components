@@ -38,10 +38,10 @@ describe('useSessionUser', () => {
       const nextData: UserSession = {
         authToken: 'lorem',
         data: {
-          firstName: 'John',
+          firstName: 'Jane',
           lastName: 'Doe',
           phoneNumber: '+1 (305) 541-3102',
-          email: 'john.doe@gmail.com',
+          email: 'jane.doe@acme.com',
           dob: '01/01/2000',
           streetAddress: '14 Linda St',
           streetAddress2: null,
@@ -67,10 +67,10 @@ describe('useSessionUser', () => {
       const nextData: UserSession = {
         authToken: 'lorem',
         data: {
-          firstName: 'John',
+          firstName: 'Jane',
           lastName: 'Doe',
           phoneNumber: '+1 (305) 541-3102',
-          email: 'john.doe@gmail.com',
+          email: 'jane.doe@acme.com',
           dob: '01/01/2000',
           streetAddress: '14 Linda St',
           streetAddress2: null,
@@ -97,10 +97,10 @@ describe('useSessionUser', () => {
     it('should correctly update user data', () => {
       const { result } = renderHook(() => useSessionUser());
       const oldData: UserSessionData = {
-        firstName: 'John',
+        firstName: 'Jane',
         lastName: 'Doe',
         phoneNumber: '+1 (305) 541-3102',
-        email: 'john.doe@gmail.com',
+        email: 'jane.doe@acme.com',
         dob: '01/01/2000',
         streetAddress: '14 Linda St',
         streetAddress2: null,
@@ -120,7 +120,7 @@ describe('useSessionUser', () => {
         firstName: 'Belce',
         lastName: 'Dogru',
         phoneNumber: '+1 (305) 541-3102',
-        email: 'john.doe@gmail.com',
+        email: 'jane.doe@acme.com',
         dob: '01/01/2000',
         streetAddress: '14 Linda St',
         streetAddress2: null,
@@ -166,10 +166,10 @@ describe('useSessionUser', () => {
         ],
       };
       const data: UserSessionData = {
-        firstName: 'John',
+        firstName: 'Jane',
         lastName: 'Doe',
         phoneNumber: '+1 (305) 541-3102',
-        email: 'john.doe@gmail.com',
+        email: 'jane.doe@acme.com',
         dob: '01/01/2000',
         streetAddress: '14 Linda St',
         streetAddress2: null,
@@ -222,10 +222,10 @@ describe('useSessionUser', () => {
     it('should correctly update metadata', () => {
       const { result } = renderHook(() => useSessionUser());
       const data: UserSessionData = {
-        firstName: 'John',
+        firstName: 'Jane',
         lastName: 'Doe',
         phoneNumber: '+1 (305) 541-3102',
-        email: 'john.doe@gmail.com',
+        email: 'jane.doe@acme.com',
         dob: '01/01/2000',
         streetAddress: '14 Linda St',
         streetAddress2: null,

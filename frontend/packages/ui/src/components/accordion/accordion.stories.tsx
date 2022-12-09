@@ -71,7 +71,7 @@ Base.args = {
         Email
       </Typography>
       <Typography color="primary" variant="body-3">
-        john.doe@gmail.com
+        jane.doe@acme.com
       </Typography>
     </>
   ),
@@ -90,7 +90,7 @@ OpenedByDefault.args = {
         Email
       </Typography>
       <Typography color="primary" variant="body-3">
-        john.doe@gmail.com
+        jane.doe@acme.com
       </Typography>
     </>
   ),

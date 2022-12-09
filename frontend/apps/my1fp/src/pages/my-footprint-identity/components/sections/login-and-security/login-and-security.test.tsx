@@ -119,8 +119,8 @@ describe('<LoginAndSecurity />', () => {
         city: 'San Francisco',
         country: 'United States',
         dob: '01/01/2000',
-        email: 'john.doe@gmail.com',
-        firstName: 'John',
+        email: 'jane.doe@acme.com',
+        firstName: 'Jane',
         lastName: 'Doe',
         phoneNumber: '+1 (305) 541-3102',
         state: 'CA',
@@ -140,7 +140,7 @@ describe('<LoginAndSecurity />', () => {
       withLivenessQuery();
       withUserQuery();
       renderLoginAndSecurity();
-      expect(screen.getByText('john.doe@gmail.com')).toBeInTheDocument();
+      expect(screen.getByText('jane.doe@acme.com')).toBeInTheDocument();
       expect(screen.getByText('+1 (305) 541-3102')).toBeInTheDocument();
     });
 
@@ -161,8 +161,8 @@ describe('<LoginAndSecurity />', () => {
         city: 'San Francisco',
         country: 'United States',
         dob: '01/01/2000',
-        email: 'john.doe@gmail.com',
-        firstName: 'John',
+        email: 'jane.doe@acme.com',
+        firstName: 'Jane',
         lastName: 'Doe',
         phoneNumber: '+1 (305) 541-3102',
         state: 'CA',
@@ -197,8 +197,8 @@ describe('<LoginAndSecurity />', () => {
         city: 'San Francisco',
         country: 'United States',
         dob: '01/01/2000',
-        email: 'john.doe@gmail.com',
-        firstName: 'John',
+        email: 'jane.doe@acme.com',
+        firstName: 'Jane',
         lastName: 'Doe',
         phoneNumber: '+1 (305) 541-3102',
         state: 'CA',
@@ -218,7 +218,7 @@ describe('<LoginAndSecurity />', () => {
       withEmptyLivenessQuery();
       withUserQuery();
       renderLoginAndSecurity();
-      expect(screen.getByText('john.doe@gmail.com')).toBeInTheDocument();
+      expect(screen.getByText('jane.doe@acme.com')).toBeInTheDocument();
       expect(screen.getByText('+1 (305) 541-3102')).toBeInTheDocument();
     });
 
@@ -257,8 +257,8 @@ describe('<LoginAndSecurity />', () => {
             city: 'San Francisco',
             country: 'United States',
             dob: '01/01/2000',
-            email: 'john.doe@gmail.com',
-            firstName: 'John',
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
             lastName: 'Doe',
             phoneNumber: '+1 (305) 541-3102',
             state: 'CA',

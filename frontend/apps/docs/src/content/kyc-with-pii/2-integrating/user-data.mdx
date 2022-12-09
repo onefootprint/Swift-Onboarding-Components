@@ -17,7 +17,7 @@ use the `userData` option:
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
-const userData = { email: 'john@doe.com', phoneNumber: '+1-202-555-0179' };
+const userData = { email: 'jane.doe@acme.com', phoneNumber: '+1-202-555-0179' };
 footprint.open({ publicKey, userData });
 ```
 
@@ -25,5 +25,5 @@ footprint.open({ publicKey, userData });
 
 | Variable      | Description                                                             |
 | ------------- | ----------------------------------------------------------------------- |
-| `email`       | Optional. User email (e.g `john@doe.com`)                               |
+| `email`       | Optional. User email (e.g `jane.doe@acme.com`)                          |
 | `phoneNumber` | Optional. User phone. Must include country code (e.g `+1-202-555-0179`) |

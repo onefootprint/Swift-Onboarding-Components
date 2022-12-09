@@ -14,8 +14,8 @@ describe('<Field />', () => {
 
   describe('when it has value', () => {
     it('should render the value', () => {
-      renderBadge({ value: 'John Doe' });
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      renderBadge({ value: 'Jane Doe' });
+      expect(screen.getByText('Jane Doe')).toBeInTheDocument();
     });
   });
 

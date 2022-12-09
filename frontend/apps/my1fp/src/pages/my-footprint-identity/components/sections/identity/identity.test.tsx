@@ -39,8 +39,8 @@ describe('<Identity />', () => {
             city: 'San Francisco',
             country: 'United States',
             dob: '01/01/2000',
-            email: 'john.doe@gmail.com',
-            firstName: 'John',
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
             lastName: 'Doe',
             phoneNumber: '+1 (305) 541-3102',
             state: 'CA',
@@ -57,7 +57,7 @@ describe('<Identity />', () => {
 
     it('should render the full name', () => {
       renderIdentity();
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('Jane Doe')).toBeInTheDocument();
     });
 
     it('should render the SSN masked', () => {
@@ -80,8 +80,8 @@ describe('<Identity />', () => {
             city: 'San Francisco',
             country: 'United States',
             dob: '01/01/2000',
-            email: 'john.doe@gmail.com',
-            firstName: 'John',
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
             lastName: 'Doe',
             phoneNumber: '+1 (305) 541-3102',
             state: 'CA',
@@ -110,8 +110,8 @@ describe('<Identity />', () => {
             city: 'San Francisco',
             country: 'United States',
             dob: '01/01/2000',
-            email: 'john.doe@gmail.com',
-            firstName: 'John',
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
             lastName: 'Doe',
             phoneNumber: '+1 (305) 541-3102',
             state: 'CA',

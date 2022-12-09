@@ -6,7 +6,7 @@
       "form": {
         "first-name": {
           "label": "First name",
-          "placeholder": "John",
+          "placeholder": "Jane",
           "error": "First name cannot be empty or is invalid"
         },
         "last-name": {

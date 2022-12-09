@@ -43,9 +43,9 @@ describe('useIsSandbox', () => {
           isLive: false,
           data: {
             auth: 'vtok_X7n2zMasfrMSCp8DQJD56cnDojCJUtaUKRzKKF',
-            firstName: 'John',
+            firstName: 'Jane',
             lastName: 'Doe',
-            email: 'john.doe@gmail.com',
+            email: 'jane.doe@acme.com',
             tenantName: 'Acme Bank',
             sandboxRestricted: true,
           },
