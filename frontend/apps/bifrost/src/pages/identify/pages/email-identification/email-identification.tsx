@@ -31,7 +31,7 @@ const EmailIdentification = () => {
   const [formData, setFormData] = useState({ [UserDataAttribute.email]: '' });
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
-  const { device, identifyType } = state.context;
+  const { device, identifyType, tenantPk } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
 
@@ -52,7 +52,7 @@ const EmailIdentification = () => {
       biometricChallengeJson,
     );
     identifyVerifyMutation.mutate(
-      { challengeResponse, challengeToken },
+      { challengeResponse, challengeToken, tenantPk },
       {
         onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
           send({

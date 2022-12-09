@@ -64,6 +64,7 @@ const PhoneVerificationPinForm = ({
       {
         challengeResponse: pin,
         challengeToken,
+        tenantPk,
       },
       {
         onSuccess: handlePinValidationSucceeded,
