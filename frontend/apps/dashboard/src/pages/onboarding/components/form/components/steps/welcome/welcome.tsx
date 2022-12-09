@@ -4,12 +4,12 @@ import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export type WelcomeStepProps = {
+export type WelcomeProps = {
   id: string;
   onComplete: () => void;
 };
 
-const WelcomeStep = ({ id, onComplete }: WelcomeStepProps) => {
+const Welcome = ({ id, onComplete }: WelcomeProps) => {
   const { t } = useTranslation('pages.onboarding.welcome');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -55,4 +55,4 @@ const StyledImage = styled(Image)`
   `}
 `;
 
-export default WelcomeStep;
+export default Welcome;

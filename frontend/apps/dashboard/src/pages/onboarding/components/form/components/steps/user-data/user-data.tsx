@@ -2,11 +2,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
 
 import Header from '../header';
 
-export type UserDataStepProps = {
+export type UserDataProps = {
   id: string;
   onComplete: () => void;
 };
@@ -15,7 +16,8 @@ type FormData = {
   name: string;
 };
 
-const UserDataStep = ({ id, onComplete }: UserDataStepProps) => {
+const UserData = ({ id, onComplete }: UserDataProps) => {
+  const { dangerouslyData } = useSessionUser();
   const { t } = useTranslation('pages.onboarding.user-data');
   const {
     register,
@@ -39,7 +41,7 @@ const UserDataStep = ({ id, onComplete }: UserDataStepProps) => {
           label={t('form.email.label')}
           placeholder={t('form.email.placeholder')}
           type="email"
-          value="jane.doe@acme.com"
+          value={dangerouslyData.email}
         />
         <TextInput
           hasError={!!errors.name}
@@ -72,4 +74,4 @@ const Form = styled.form`
   `}
 `;
 
-export default UserDataStep;
+export default UserData;

@@ -162,6 +162,30 @@
           }
         }
       },
+      "company-data": {
+        "title": "Tell us about your company",
+        "subtitle": "Please provide some basic company information",
+        "form": {
+          "name": {
+            "label": "Company name",
+            "placeholder": "Acme Bank",
+            "errors": {
+              "required": "Please enter a name"
+            }
+          },
+          "website": {
+            "label": "Company website",
+            "placeholder": "https://www.acme.com"
+          },
+          "size": {
+            "label": "Company size",
+            "placeholder": "Select",
+            "errors": {
+              "required": "Please enter one option"
+            }
+          }
+        }
+      },
       "logged-as": "Logged in as"
     },
     "users": {

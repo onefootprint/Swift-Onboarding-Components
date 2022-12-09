@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import FormControls from './components/form-controls';
-import CompanyDataStep from './components/steps/company-data-step';
+import CompanyData from './components/steps/company-data';
 import InviteStep from './components/steps/invite-step';
-import UserDataStep from './components/steps/user-data-step';
-import WelcomeStep from './components/steps/welcome-step';
+import UserData from './components/steps/user-data';
+import Welcome from './components/steps/welcome';
 
 export type FormProps = {
   onComplete: () => void;
 };
 
 const steps = [
-  { id: 'welcome-form', Step: WelcomeStep },
-  { id: 'user-data-form', Step: UserDataStep },
-  { id: 'company-data-form', Step: CompanyDataStep },
+  { id: 'welcome-form', Step: Welcome },
+  { id: 'user-data-form', Step: UserData },
+  { id: 'company-data-form', Step: CompanyData },
   { id: 'invite-form', Step: InviteStep },
 ];
 
