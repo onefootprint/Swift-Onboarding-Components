@@ -76,7 +76,7 @@ impl PhoneNumber {
         // on the tenant and requires that the phone number is verified, we will create the phone
         // number as immediately portable, committed data that is not associated with a tenant
         // TODO revisit
-        let lifetime = DataLifetime::create(conn, user_vault_id, None)?;
+        let lifetime = DataLifetime::create(conn, user_vault_id, None, DataLifetimeKind::PhoneNumber)?;
         let seqno = lifetime.created_seqno;
         let lifetime = lifetime.commit(conn, seqno)?;
         let new_row = NewPhoneNumber {

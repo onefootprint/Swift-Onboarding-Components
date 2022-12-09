@@ -6,8 +6,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DocumentRequestId, IdentityDocumentId, ScopedUserId, SealedVaultBytes,
-    SealedVaultDataKey, UserVaultId,
+    Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdentityDocumentId, ScopedUserId,
+    SealedVaultBytes, SealedVaultDataKey, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -107,7 +107,12 @@ impl IdentityDocument {
         scoped_user_id: Option<ScopedUserId>,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
-        let lifetime = DataLifetime::create(conn, user_vault_id, scoped_user_id)?;
+        let lifetime = DataLifetime::create(
+            conn,
+            user_vault_id,
+            scoped_user_id,
+            DataLifetimeKind::IdentityDocument,
+        )?;
         let new = NewIdentityDocument {
             request_id,
             front_image_s3_url,

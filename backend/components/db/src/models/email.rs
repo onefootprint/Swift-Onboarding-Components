@@ -59,7 +59,8 @@ impl Email {
         priority: DataPriority,
         scoped_user_id: ScopedUserId,
     ) -> DbResult<Email> {
-        let lifetime = DataLifetime::create(conn, user_vault_id, Some(scoped_user_id))?;
+        let lifetime =
+            DataLifetime::create(conn, user_vault_id, Some(scoped_user_id), DataLifetimeKind::Email)?;
         let new_row = NewEmail {
             e_data,
             is_verified: false,

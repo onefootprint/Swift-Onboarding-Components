@@ -73,7 +73,7 @@ mod tests {
     /// this avoid conflicting data creation (like the same unique email row)
     #[test]
     fn test_test_context() {
-        let create_unique_email = |conn: &mut PgConnection| {
+        let create_unique_email = |_conn: &mut PgConnection| {
             // No longer works with new email create API, which requires txn
             /*
             let uv = test_user_vault(conn, true);

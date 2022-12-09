@@ -49,6 +49,7 @@ table! {
         created_seqno -> Int8,
         committed_seqno -> Nullable<Int8>,
         deactivated_seqno -> Nullable<Int8>,
+        kind -> Text,
     }
 }
 

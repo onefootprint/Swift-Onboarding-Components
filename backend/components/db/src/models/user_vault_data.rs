@@ -4,6 +4,7 @@ use crate::HasLifetime;
 use crate::TxnPgConnection;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
@@ -49,7 +50,13 @@ impl UserVaultData {
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         // Make a DataLifetime row for each of the new pieces of data being inserted
-        let lifetimes = DataLifetime::bulk_create(conn, user_vault_id, scoped_user_id, data.len(), seqno)?;
+        let lifetimes = DataLifetime::bulk_create(
+            conn,
+            user_vault_id,
+            scoped_user_id,
+            data.iter().map(|d| DataLifetimeKind::from(d.kind)).collect(),
+            seqno,
+        )?;
         let new_rows: Vec<_> = data
             .into_iter()
             .zip(lifetimes.into_iter())

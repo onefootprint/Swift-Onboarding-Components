@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use macros::db_test;
-use newtypes::{DataLifetimeId, DataLifetimeSeqno, ScopedUserId, TenantId, UserVaultId};
+use newtypes::{DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, ScopedUserId, TenantId, UserVaultId};
 
 use crate::models::scoped_user::ScopedUser;
 use crate::tests::prelude::*;
@@ -17,11 +17,18 @@ fn build_lifetime(
     created_seqno: DataLifetimeSeqno,
     committed_seqno: Option<DataLifetimeSeqno>,
     deactivated_seqno: Option<DataLifetimeSeqno>,
+    kind: DataLifetimeKind,
 ) -> DataLifetime {
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id.clone(), Some(su_id.clone()), 1, created_seqno)
-        .unwrap()
-        .pop()
-        .unwrap();
+    let mut lifetime = DataLifetime::bulk_create(
+        conn,
+        uv_id.clone(),
+        Some(su_id.clone()),
+        vec![kind],
+        created_seqno,
+    )
+    .unwrap()
+    .pop()
+    .unwrap();
     if let Some(committed_seqno) = committed_seqno {
         lifetime = lifetime.commit(conn, committed_seqno).unwrap();
     }
@@ -97,14 +104,54 @@ impl TestData {
         let seqno6 = DataLifetime::get_next_seqno(conn).unwrap();
 
         // Place some DataLifetimes at various points along the timeline
-        let lifetime1 = build_lifetime(conn, &uv_id, &su_id, seqno1, None, None);
-        let lifetime2 = build_lifetime(conn, &uv_id, &su_id, seqno1, Some(seqno3), None);
-        let lifetime3 = build_lifetime(conn, &uv_id, &su_id, seqno1, Some(seqno4), Some(seqno5));
+        let lifetime1 = build_lifetime(conn, &uv_id, &su_id, seqno1, None, None, DataLifetimeKind::Email);
+        let lifetime2 = build_lifetime(
+            conn,
+            &uv_id,
+            &su_id,
+            seqno1,
+            Some(seqno3),
+            None,
+            DataLifetimeKind::FirstName,
+        );
+        let lifetime3 = build_lifetime(
+            conn,
+            &uv_id,
+            &su_id,
+            seqno1,
+            Some(seqno4),
+            Some(seqno5),
+            DataLifetimeKind::LastName,
+        );
         // For same user, different scoped user
-        let lifetime4 = build_lifetime(conn, &uv_id, &su3_id, seqno1, Some(seqno4), None);
+        let lifetime4 = build_lifetime(
+            conn,
+            &uv_id,
+            &su3_id,
+            seqno1,
+            Some(seqno4),
+            None,
+            DataLifetimeKind::PhoneNumber,
+        );
         // For different user
-        let lifetime5 = build_lifetime(conn, &uv2_id, &su2_id, seqno1, None, None);
-        let lifetime6 = build_lifetime(conn, &uv2_id, &su2_id, seqno1, Some(seqno3), None);
+        let lifetime5 = build_lifetime(
+            conn,
+            &uv2_id,
+            &su2_id,
+            seqno1,
+            None,
+            None,
+            DataLifetimeKind::IdentityDocument,
+        );
+        let lifetime6 = build_lifetime(
+            conn,
+            &uv2_id,
+            &su2_id,
+            seqno1,
+            Some(seqno3),
+            None,
+            DataLifetimeKind::AddressLine1,
+        );
 
         Self {
             t_id,

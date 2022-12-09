@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
+use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedUserId;
 use newtypes::TenantId;
@@ -56,6 +57,7 @@ pub struct DataLifetime {
     pub created_seqno: DataLifetimeSeqno,
     pub committed_seqno: Option<DataLifetimeSeqno>,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
+    pub kind: DataLifetimeKind,
 }
 
 #[derive(Clone, Insertable)]
@@ -68,6 +70,7 @@ struct NewDataLifetime {
     scoped_user_id: Option<ScopedUserId>,
     created_at: DateTime<Utc>,
     created_seqno: DataLifetimeSeqno,
+    kind: DataLifetimeKind,
 }
 
 #[derive(Default, AsChangeset)]
@@ -109,23 +112,24 @@ impl DataLifetime {
         Self::get_next_seqno(conn)
     }
 
-    /// Creates len new DataLifetime rows with the same created_seqno and created_at
+    /// Creates a new DataLifetime rows with the same created_seqno and created_at for each kind in `kinds`
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConnection,
         user_vault_id: UserVaultId,
         scoped_user_id: Option<ScopedUserId>,
-        len: usize,
+        kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
-        let new_row = NewDataLifetime {
-            user_vault_id,
-            scoped_user_id,
-            created_at: Utc::now(),
-            created_seqno: seqno,
-        };
-        // Make len copies of the row (each with a different primary key) since each piece of UVD
-        // needs its own lifetime
-        let new_rows = vec![new_row; len];
+        let new_rows: Vec<NewDataLifetime> = kinds
+            .into_iter()
+            .map(|k| NewDataLifetime {
+                user_vault_id: user_vault_id.clone(),
+                scoped_user_id: scoped_user_id.clone(),
+                created_at: Utc::now(),
+                created_seqno: seqno,
+                kind: k,
+            })
+            .collect();
         let result = diesel::insert_into(data_lifetime::table)
             .values(new_rows)
             .get_results::<Self>(conn.conn())?;
@@ -137,9 +141,10 @@ impl DataLifetime {
         conn: &mut TxnPgConnection,
         user_vault_id: UserVaultId,
         scoped_user_id: Option<ScopedUserId>,
+        kind: DataLifetimeKind,
     ) -> DbResult<Self> {
         let seqno = Self::get_next_seqno(conn)?;
-        let lifetime = Self::bulk_create(conn, user_vault_id, scoped_user_id, 1, seqno)?
+        let lifetime = Self::bulk_create(conn, user_vault_id, scoped_user_id, vec![kind], seqno)?
             .into_iter()
             .next()
             .ok_or(DbError::ObjectNotFound)?;
