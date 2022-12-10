@@ -40,7 +40,7 @@ const PhoneVerificationPinForm = ({
     // Only send the user email to the backend if we are onboarding the user for
     // the first time
     if (!userFound) {
-      userEmailMutation.mutate({ data: { email }, authToken, tenantPk });
+      userEmailMutation.mutate({ data: { email }, authToken });
     }
 
     if (authToken) {

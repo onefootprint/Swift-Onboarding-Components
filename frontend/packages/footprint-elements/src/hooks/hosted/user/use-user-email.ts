@@ -2,10 +2,7 @@ import request from '@onefootprint/request';
 import { UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import {
-  AUTH_HEADER,
-  ONBOARDING_CONFIG_KEY_HEADER,
-} from '../../../config/constants';
+import { AUTH_HEADER } from '../../../config/constants';
 
 const userEmailRequest = async (payload: UserEmailRequest) => {
   const response = await request<UserEmailResponse>({
@@ -17,9 +14,6 @@ const userEmailRequest = async (payload: UserEmailRequest) => {
     },
     headers: {
       [AUTH_HEADER]: payload.authToken,
-      // Temporarily including the ob public key header here in order to associate addedd email with
-      // a tenant user
-      [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk,
     },
   });
   return response.data;
