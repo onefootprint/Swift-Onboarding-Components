@@ -27,16 +27,15 @@ from tests.webauthn_simulator import SoftWebauthnDevice
 WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
 
-# TODO should we autouse this?
 @pytest.fixture(scope="module")
-def non_sandbox_auth_token(twilio, workos_tenant):
+def non_sandbox_auth_token(twilio, tenant):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
     data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
     body = post("hosted/identify/signup_challenge", data)
     challenge_token = body["challenge_data"]["challenge_token"]
     return try_until_success(
         lambda: identify_verify(
-            twilio, PHONE_NUMBER, challenge_token, workos_tenant.ob_config().key
+            twilio, PHONE_NUMBER, challenge_token, tenant.ob_config().key
         ),
         5,
     )
@@ -117,9 +116,9 @@ def bar_tenant(must_collect_data, can_access_data):
 
 
 @pytest.fixture(scope="module")
-def ob_session_token(workos_tenant):
-    data = {"onboarding_config_id": workos_tenant.ob_config().id}
-    body = post("onboarding/session", data, workos_tenant.sk.key)
+def ob_session_token(tenant):
+    data = {"onboarding_config_id": tenant.ob_config().id}
+    body = post("onboarding/session", data, tenant.sk.key)
     return OnboardingSessionToken(body["session_token"])
 
 
@@ -148,13 +147,13 @@ class TestBifrost:
     @pytest.mark.parametrize("token_type", ["publishable", "session"])
     def test_onboarding_init(
         self,
-        workos_tenant,
+        tenant,
         non_sandbox_auth_token,
         token_type,
         ob_session_token,
     ):
         ob_auth = {
-            "publishable": workos_tenant.ob_config().key,
+            "publishable": tenant.ob_config().key,
             "session": ob_session_token,
         }[token_type]
         body = post(
@@ -192,17 +191,17 @@ class TestBifrost:
         post(
             "hosted/onboarding/authorize",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
             status_code=400,
         )
 
-    def test_skip_liveness(self, non_sandbox_auth_token, workos_tenant):
+    def test_skip_liveness(self, non_sandbox_auth_token, tenant):
         # Liveness requirement exists
         body = get(
             "hosted/onboarding/status",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
         assert list(r for r in body["requirements"] if r["kind"] == "liveness")
@@ -210,7 +209,7 @@ class TestBifrost:
         post(
             "hosted/onboarding/skip_liveness",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
 
@@ -218,7 +217,7 @@ class TestBifrost:
         body = get(
             "hosted/onboarding/status",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
         assert not list(r for r in body["requirements"] if r["kind"] == "liveness")
@@ -320,11 +319,11 @@ class TestBifrost:
         post("hosted/user/biometric/init", None, d2p_auth_token, status_code=400)
         post("hosted/user/biometric", data, d2p_auth_token, status_code=400)
 
-    def test_onboarding_kyc(self, workos_tenant, non_sandbox_auth_token):
+    def test_onboarding_kyc(self, tenant, non_sandbox_auth_token):
         body = get(
             "hosted/onboarding/kyc",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
         assert body["status"] == "pending"
@@ -332,23 +331,23 @@ class TestBifrost:
         post(
             "hosted/onboarding/submit",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
 
         body = get(
             "hosted/onboarding/kyc",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
         assert body["status"] == "complete"
 
-    def test_onboarding_authorize(self, workos_tenant, non_sandbox_auth_token):
+    def test_onboarding_authorize(self, tenant, non_sandbox_auth_token):
         body = post(
             "hosted/onboarding/authorize",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
         validation_token = body["validation_token"]
@@ -357,20 +356,20 @@ class TestBifrost:
 
         # test the validate api call
         data = dict(validation_token=validation_token)
-        body = post("onboarding/session/validate", data, workos_tenant.sk.key)
+        body = post("onboarding/session/validate", data, tenant.sk.key)
         assert body["footprint_user_id"]
         assert body["status"]
 
-    def test_onboard_onto_same_ob_config(self, workos_tenant, non_sandbox_auth_token):
+    def test_onboard_onto_same_ob_config(self, tenant, non_sandbox_auth_token):
         body = post(
             "hosted/onboarding",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("onboarding/session/validate", data, workos_tenant.sk.key)
+        body = post("onboarding/session/validate", data, tenant.sk.key)
         assert body["footprint_user_id"]
 
         # We won't ever actually hit onboarding/authorize if the tenant has already onboarded,
@@ -378,16 +377,16 @@ class TestBifrost:
         body = post(
             "hosted/onboarding/authorize",
             None,
-            workos_tenant.ob_config().key,
+            tenant.ob_config().key,
             non_sandbox_auth_token,
         )
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("onboarding/session/validate", data, workos_tenant.sk.key)
+        body = post("onboarding/session/validate", data, tenant.sk.key)
         footprint_user_id = body["footprint_user_id"]
         assert footprint_user_id
 
-        body = get(f"users/{footprint_user_id}/timeline", None, workos_tenant.sk.key)
+        body = get(f"users/{footprint_user_id}/timeline", None, tenant.sk.key)
         assert len(body) > 0
 
     def test_identify_login_repeat_customer_biometric(self, non_sandbox_auth_token):
@@ -608,12 +607,12 @@ class TestBifrostSandbox:
     def test_deterministic_onboarding(
         self,
         twilio,
-        workos_sandbox_tenant,
+        sandbox_tenant,
         suffix,
         expected_status,
         expected_requires_manual_review,
     ):
-        bifrost_client = BifrostClient(workos_sandbox_tenant)
+        bifrost_client = BifrostClient(sandbox_tenant)
         bifrost_client.init_user_for_onboarding(
             twilio, build_user_data(), sandbox_suffix=suffix
         )
@@ -623,7 +622,7 @@ class TestBifrostSandbox:
         body = post(
             "onboarding/session/validate",
             dict(validation_token=user.validation_token),
-            workos_sandbox_tenant.sk.key,
+            sandbox_tenant.sk.key,
         )
         assert body["status"] == expected_status
         assert body["requires_manual_review"] == expected_requires_manual_review

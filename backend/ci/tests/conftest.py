@@ -68,8 +68,7 @@ def must_collect_data(can_access_data):
 
 
 @pytest.fixture(scope="session")
-# TODO rename to prod_tenant or non_sandbox_tenant
-def workos_tenant(must_collect_data, can_access_data):
+def tenant(must_collect_data, can_access_data):
     org_data = {
         "name": "Acme Bank",
         "is_live": True,
@@ -85,8 +84,7 @@ def workos_tenant(must_collect_data, can_access_data):
 
 
 @pytest.fixture(scope="session")
-def workos_sandbox_tenant(must_collect_data, can_access_data):
-
+def sandbox_tenant(must_collect_data, can_access_data):
     org_data = {
         "name": "Acme Bank",
         "is_live": False,
@@ -155,10 +153,10 @@ def basic_user(twilio):
 
 
 @pytest.fixture(scope="module")
-def user(workos_sandbox_tenant, twilio):
+def user(sandbox_tenant, twilio):
     """
-    Create a user with registered data and webuathn creds and onboard them onto the workos_sandbox_tenant
+    Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant
     """
-    bifrost_client = BifrostClient(workos_sandbox_tenant)
+    bifrost_client = BifrostClient(sandbox_tenant)
     bifrost_client.init_user_for_onboarding(twilio, build_user_data())
     return bifrost_client.onboard_user_onto_tenant()
