@@ -15,10 +15,7 @@ pub struct OnboardingStatusResponse {
     fields_to_authorize: Option<AuthorizeFields>,
 }
 
-#[api_v2_operation(
-    tags(Hosted, Bifrost),
-    description = "Gets or creates the Onboarding for this (user, ob_config) pair."
-)]
+#[api_v2_operation(tags(Hosted, Bifrost), description = "Returns the status of the onboarding.")]
 #[actix::get("/hosted/onboarding/status")]
 pub async fn get(
     state: web::Data<State>,

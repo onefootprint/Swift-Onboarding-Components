@@ -6,6 +6,7 @@ use diesel::{Insertable, Queryable};
 use newtypes::{FootprintUserId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
+use super::ob_configuration::IsLive;
 use super::tenant::Tenant;
 use super::user_vault::UserVault;
 
@@ -30,6 +31,34 @@ struct NewScopedUser {
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
+}
+
+pub enum ScopedUserIdentifier<'a> {
+    Id {
+        id: &'a ScopedUserId,
+        uv_id: &'a UserVaultId,
+    },
+    FpUserId {
+        fp_user_id: &'a FootprintUserId,
+        t_id: &'a TenantId,
+        is_live: IsLive,
+    },
+}
+
+impl<'a> From<(&'a ScopedUserId, &'a UserVaultId)> for ScopedUserIdentifier<'a> {
+    fn from((id, uv_id): (&'a ScopedUserId, &'a UserVaultId)) -> Self {
+        Self::Id { id, uv_id }
+    }
+}
+
+impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for ScopedUserIdentifier<'a> {
+    fn from((fp_user_id, t_id, is_live): (&'a FootprintUserId, &'a TenantId, IsLive)) -> Self {
+        Self::FpUserId {
+            fp_user_id,
+            t_id,
+            is_live,
+        }
+    }
 }
 
 impl ScopedUser {
@@ -80,18 +109,30 @@ impl ScopedUser {
         Ok(results)
     }
 
-    pub fn get(
+    pub fn get<'a, T: Into<ScopedUserIdentifier<'a>>>(
         conn: &mut PgConnection,
-        footprint_user_id: &FootprintUserId,
-        tenant_id: &TenantId,
-        is_live: bool,
+        id: T,
     ) -> DbResult<ScopedUser> {
-        let result = scoped_user::table
-            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
-            .first(conn)?;
+        let mut query = scoped_user::table.into_boxed();
 
+        match id.into() {
+            ScopedUserIdentifier::Id { id, uv_id } => {
+                query = query
+                    .filter(scoped_user::id.eq(id))
+                    .filter(scoped_user::user_vault_id.eq(uv_id))
+            }
+            ScopedUserIdentifier::FpUserId {
+                fp_user_id,
+                t_id,
+                is_live,
+            } => {
+                query = query
+                    .filter(scoped_user::fp_user_id.eq(fp_user_id))
+                    .filter(scoped_user::tenant_id.eq(t_id))
+                    .filter(scoped_user::is_live.eq(is_live));
+            }
+        }
+        let result = query.first(conn)?;
         Ok(result)
     }
 }

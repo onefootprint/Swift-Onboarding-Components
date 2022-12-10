@@ -1,5 +1,4 @@
-use crate::auth::tenant::ObPkAuth;
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuthContext, UserAuthScope};
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -8,8 +7,6 @@ use crate::utils::email::send_email_challenge;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
-use db::models::scoped_user::ScopedUser;
-use db::models::user_vault::UserVault;
 use newtypes::email::Email as EmailData;
 use newtypes::{DataLifetimeKind, Fingerprinter};
 
@@ -31,7 +28,6 @@ pub struct AddEmailRequest {
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-    ob_pk_auth: Option<ObPkAuth>,
     request: Json<AddEmailRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
@@ -56,25 +52,11 @@ pub async fn post(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             // TODO For now, we only allow adding an email during onboarding since we otherwise
             // don't know which scoped user to associate the data with.
-            // We might one day want to support this outside of onboarding for my1fp, but without
-            // the data being portable
-            UserVault::lock(conn, &user_auth.user_vault_id())?; // Lock since we might create scoped user
-            let scoped_user_id = if let Some(ob_info) = user_auth.onboarding(conn)? {
-                // We have an auth token from after calling POST /hosted/onboarding - the scoped
-                // user has already been created
-                ob_info.scoped_user.id
-            } else if let Some(ob_pk_auth) = ob_pk_auth {
-                // Or, an ob config public key was provided. get or create the scoped user
-                // NOTE: This is only a short-term action to allow rolling out data model v4.
-                // We need to find a better way of associating data with a tenant
-                // TODO: maybe just get scoped user here
-                let scoped_user = ScopedUser::get_or_create(
-                    conn,
-                    user_auth.user_vault_id(),
-                    ob_pk_auth.tenant().id.clone(),
-                    ob_pk_auth.ob_config().is_live,
-                )?;
-                scoped_user.id
+            // We might one day want to support this outside of onboarding for my1fp. In that case,
+            // maybe we make the data portable immediately to autofill onboardings
+            let scoped_user_id = if let Some(su) = user_auth.scoped_user(conn)? {
+                // We have an auth token created with the tenant PK - the scoped user should already exist
+                su.id
             } else {
                 return Err(UserError::NotAllowedOutsideOnboarding.into());
             };

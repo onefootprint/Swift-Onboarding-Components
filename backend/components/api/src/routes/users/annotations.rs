@@ -131,7 +131,7 @@ pub fn post(
     let annotation: AnnotationInfo = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let scoped_user = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
             let annotation: AnnotationInfo =
                 Annotation::create(conn, note, is_pinned, scoped_user.id.clone(), auth_actor)?;

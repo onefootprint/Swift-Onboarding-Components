@@ -76,7 +76,7 @@ impl UserTimeline {
     ) -> DbResult<Vec<UserTimelineInfo>> {
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
-        let su = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+        let su = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
         let results: Vec<Self> = user_timeline::table
             .filter(user_timeline::user_vault_id.eq(su.user_vault_id))
             .filter(
@@ -151,11 +151,11 @@ impl UserTimeline {
 #[cfg(test)]
 mod tests {
 
-    use newtypes::{DbActor};
+    use newtypes::DbActor;
 
     use super::*;
     use crate::actor::SaturatedActor;
-    
+
     use crate::test::{
         test_annotation, test_tenant, test_tenant_admin_role, test_tenant_api_key, test_tenant_user,
         test_user_vault,

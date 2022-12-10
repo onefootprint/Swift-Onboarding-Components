@@ -69,7 +69,7 @@ pub async fn put(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
 
             if let Some(custom_update) = request.custom {

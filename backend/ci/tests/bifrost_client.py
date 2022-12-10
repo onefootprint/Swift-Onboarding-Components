@@ -151,10 +151,11 @@ class BifrostClient:
                 "please call init_user_for_onboarding() before calling onboard_user_onto_tenant"
             )
 
-        # Start an onboarding
-        self.initialize_onboarding(self.tenant, self.basic_user)
         sandbox_email = _sandbox_email(self.basic_user.phone_number)
         self.add_email(self.basic_user, sandbox_email)
+
+        # Start an onboarding
+        self.initialize_onboarding(self.tenant, self.basic_user)
         # Add identity data
         self.add_identity_data(self.basic_user, self.user_data)
         # Liveness

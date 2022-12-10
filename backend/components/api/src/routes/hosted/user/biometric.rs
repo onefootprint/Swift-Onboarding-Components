@@ -224,11 +224,11 @@ pub async fn complete_post(
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
 
             // if we're in an onboarding, optimisticaly try to submit a liveness event if the webauthn
-            let ob_info = user_auth.onboarding(conn)?;
-            if let Some(ref ob_info) = ob_info {
+            let su = user_auth.scoped_user(conn)?;
+            if let Some(ref su) = su {
                 let liveness_event = if let Some(attributes) = liveness_event_attributes {
                     NewLivenessEvent {
-                        scoped_user_id: ob_info.scoped_user.id.clone(),
+                        scoped_user_id: su.id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: Some(attributes),
                         insight_event_id: insight_event.id.clone(),
@@ -241,7 +241,7 @@ pub async fn complete_post(
                     // maintain the mechanics that webauthn -> liveness
                     // we should update this such that liveness is skipped via API call
                     NewLivenessEvent {
-                        scoped_user_id: ob_info.scoped_user.id.clone(),
+                        scoped_user_id: su.id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: None,
                         insight_event_id: insight_event.id.clone(),
@@ -256,7 +256,7 @@ pub async fn complete_post(
                         id: liveness_event.id,
                     },
                     user_auth.user_vault_id(),
-                    Some(ob_info.scoped_user.id.clone()),
+                    Some(su.id.clone()),
                 )?;
             }
 

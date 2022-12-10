@@ -38,7 +38,7 @@ pub async fn post(
     let (uv, db_document_request, scoped_user_id) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let Some(scoped_user_id) = user_auth.onboarding(conn)?.map(|o| o.scoped_user.id) else {
+            let Some(scoped_user_id) = user_auth.scoped_user(conn)?.map(|o| o.id) else {
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
                 };
 
@@ -163,7 +163,7 @@ pub async fn get(
         let doc_req = state
             .db_pool
             .db_transaction(move |conn| -> Result<DbDocumentRequest, ApiError> {
-                let Some(scoped_user_id) = user_auth.onboarding(conn)?.map(|o| o.scoped_user.id) else {
+                let Some(scoped_user_id) = user_auth.scoped_user(conn)?.map(|su| su.id) else {
                     return Err(ApiError::from(OnboardingError::NoOnboarding))
                 };
                 // This will error if no doc request is found

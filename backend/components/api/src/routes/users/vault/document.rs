@@ -56,7 +56,7 @@ pub(super) async fn get_internal(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let user_vault = UserVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let scoped_user = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
             let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
             // Important to check requester has access
@@ -134,7 +134,7 @@ pub(super) async fn post_internal(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let user_vault = UserVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let scoped_user = ScopedUser::get(conn, &footprint_user_id, &tenant_id, is_live)?;
+            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
 
             // Important to check requester has access

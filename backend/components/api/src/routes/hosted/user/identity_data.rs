@@ -1,5 +1,6 @@
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
+use crate::errors::user::UserError;
 use crate::types::identity_data_request::IdentityDataRequest;
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::types::response::ResponseData;
@@ -34,8 +35,13 @@ async fn post(
             // don't know which scoped user to associate the data with.
             // We might one day want to support this outside of onboarding for my1fp, but without
             // the data being portable
-            let ob_info = user_auth.assert_onboarding(conn)?;
-            let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob_info.scoped_user.id)?;
+            let scoped_user_id = if let Some(su) = user_auth.scoped_user(conn)? {
+                // We have an auth token created with the tenant PK - the scoped user should already exist
+                su.id
+            } else {
+                return Err(UserError::NotAllowedOutsideOnboarding.into());
+            };
+            let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user_id)?;
             uvw.update_identity_data(conn, update, fingerprints)?;
 
             Ok(())
