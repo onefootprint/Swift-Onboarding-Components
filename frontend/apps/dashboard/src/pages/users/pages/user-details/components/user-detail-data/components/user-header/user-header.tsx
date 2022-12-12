@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoWarning16 } from '@onefootprint/icons';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { User } from 'src/pages/users/types/user.types';
@@ -28,10 +29,14 @@ const UserHeader = ({ user }: UserHeaderProps) => {
     <HeaderContainer>
       <RowContainer>
         <Typography variant="label-1">User info</Typography>
-        <Badge variant={badgeVariant}>{t(user.status)}</Badge>
-        {user.requiresManualReview && (
-          <Badge variant="error">{t('manual-review')}</Badge>
-        )}
+        <Badge variant={badgeVariant}>
+          {t(user.status)}
+          {user.requiresManualReview && (
+            <IconContainer>
+              <IcoWarning16 color={badgeVariant} />
+            </IconContainer>
+          )}
+        </Badge>
       </RowContainer>
       <SplitRow>
         <RowContainer>
@@ -58,6 +63,12 @@ const UserHeader = ({ user }: UserHeaderProps) => {
     </HeaderContainer>
   );
 };
+
+const IconContainer = styled.div`
+  ${({ theme }) => css`
+    margin-left: ${theme.spacing[2]};
+  `};
+`;
 
 const HeaderContainer = styled.div`
   ${({ theme }) => css`

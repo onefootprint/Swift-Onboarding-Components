@@ -9,8 +9,10 @@ const AuditTrail = () => {
   const { t } = useTranslation('pages.user-details.audit-trail');
   const timelineQuery = useGetTimeline();
 
+  // Add an id on the container because the ManualReviewBanner supports
+  // auto-scrolling this component into view
   return (
-    <>
+    <div id="audit-trail">
       <Typography variant="label-1" as="h2">
         {t('title')}
       </Typography>
@@ -21,7 +23,7 @@ const AuditTrail = () => {
         timeline={timelineQuery.data || []}
         isLoading={timelineQuery.isLoading}
       />
-    </>
+    </div>
   );
 };
 

@@ -1,6 +1,7 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
+import LinkButton from '../link-button';
 import InlineAlert, { InlineAlertProps } from './inline-alert';
 
 export default {
@@ -42,4 +43,24 @@ export const Info = Template.bind({});
 Info.args = {
   children: 'Info message goes here.',
   variant: 'info',
+};
+
+export const WithLink = Template.bind({});
+WithLink.args = {
+  children: (
+    <>
+      Critical message goes here. <a href="/">Link</a>
+    </>
+  ),
+  variant: 'error',
+};
+
+export const WithLinkButton = Template.bind({});
+WithLinkButton.args = {
+  children: (
+    <>
+      Critical message goes here. <LinkButton>Link Button</LinkButton>
+    </>
+  ),
+  variant: 'warning',
 };

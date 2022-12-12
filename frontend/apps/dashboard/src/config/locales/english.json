@@ -104,6 +104,11 @@
       },
       "timeline": {
         "empty": "No items"
+      },
+      "manual-review-banner": {
+        "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
+        "failed-needs-review": "This user could not be verified and needs to be manually reviewed.",
+        "see-audit-trail": "See audit trail"
       }
     }
   },
@@ -233,7 +238,6 @@
           "form": {
             "status": {
               "title": "Status",
-              "manual-review": "Manual Review",
               "verified": "Verified",
               "failed": "Failed"
             },

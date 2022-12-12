@@ -51,6 +51,26 @@ const InlineAlertContainer = styled.div<{
     display: flex;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     width: 100%;
+
+    a,
+    button {
+      ${createFontStyles('label-2')};
+      color: currentColor;
+      background: unset;
+      border: unset;
+      cursor: pointer;
+      text-decoration: underline;
+
+      &:hover {
+        color: currentColor;
+        opacity: 0.7;
+      }
+
+      &:active {
+        color: currentColor;
+        opacity: 0.85;
+      }
+    }
   `};
 
   ${({ sx }) => css`
