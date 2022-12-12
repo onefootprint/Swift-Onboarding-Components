@@ -6,7 +6,7 @@ import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 const NavDropdown = () => {
-  const { t } = useTranslation('components.private-layout.nav-dropdown');
+  const { t } = useTranslation('components.private-layout.nav');
   const { dangerouslyCastedData, logOut } = useSession();
 
   return (
