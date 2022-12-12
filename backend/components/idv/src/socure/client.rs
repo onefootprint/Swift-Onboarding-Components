@@ -7,7 +7,7 @@ use std::time::Duration;
 use tokio_retry::strategy::{jitter, ExponentialBackoff};
 use tokio_retry::Retry;
 
-use super::decode_response;
+use super::{decode_response, requirements};
 
 #[derive(Clone)]
 pub struct SocureClient {
@@ -62,9 +62,13 @@ impl SocureClient {
         &self,
         idv_data: IdvData,
     ) -> Result<serde_json::Value, crate::socure::SocureError> {
-        // TODO: what modules are we using
-        let req = SocureRequest::new(vec!["kyc".to_string()], idv_data)?;
+        let modules = requirements::all_modules_with_met_requirements(&idv_data)
+            .iter()
+            .map(|m| m.to_string())
+            .collect::<Vec<String>>();
 
+        let req = SocureRequest::new(modules, idv_data)?;
+        tracing::info!(req = format!("{:?}", req), "SocureClient req");
         let response = self
             .client
             .post(self.url.to_string())
@@ -118,7 +122,7 @@ mod tests {
             ssn9: None,
             dob: Some(PiiString::from("1975-04-02")),
             email: None,
-            phone_number: None,
+            phone_number: Some(PiiString::from("1234567891")),
         };
 
         let res = socure_client.verify_kyc(idv_data).await.unwrap();

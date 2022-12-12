@@ -1,8 +1,12 @@
 pub mod client;
 mod conversion;
+pub mod requirements;
+pub mod response;
 use serde::de::DeserializeOwned;
 use std::fmt::Display;
 use thiserror::Error;
+
+use self::response::SocureIDPlusResponse;
 
 pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T, SocureError> {
     if response.status().is_success() {
@@ -12,8 +16,8 @@ pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -
     }
 }
 
-pub fn parse_response(value: serde_json::Value) -> Result<SocureKycResponse, SocureError> {
-    let response: SocureKycResponse = serde_json::value::from_value(value)?;
+pub fn parse_response(value: serde_json::Value) -> Result<SocureIDPlusResponse, SocureError> {
+    let response: SocureIDPlusResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }
 
@@ -75,30 +79,107 @@ pub enum SocureReqwestError {
     ReqwestSendError(String),
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SocureKycResponse {
-    reference_id: String,
-    kyc: SocureKycData,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::{json, Value};
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SocureKycData {
-    reason_codes: Vec<String>,
-    field_validations: ValidationStruct,
-}
+    #[test]
+    fn test_parse_response() {
+        let response_json: Value = json!({
+            "referenceId": "b8f0508f-1600-48f0-aad9-b7f7afbec318",
+            "nameAddressCorrelation": {
+              "reasonCodes": [
+                "I709",
+                "I710",
+                "I708"
+              ],
+              "score": 0.99
+            },
+            "nameEmailCorrelation": {
+              "reasonCodes": [
+                "I556",
+                "I557",
+                "I558"
+              ],
+              "score": 0.99
+            },
+            "namePhoneCorrelation": {
+              "reasonCodes": [
+                "I618",
+                "I621",
+                "I622"
+              ],
+              "score": 0.99
+            },
+            "fraud": {
+              "reasonCodes": [
+                "I553",
+                "I121",
+                "I127"
+              ],
+              "scores": [
+                {
+                  "name": "sigma",
+                  "version": "3.0",
+                  "score": 0.488
+                }
+              ]
+            },
+            "kyc": {
+              "reasonCodes": [
+                "I919"
+              ],
+              "fieldValidations": {
+                "firstName": 0.99,
+                "surName": 0.99,
+                "streetAddress": 0.99,
+                "city": 0.99,
+                "state": 0.99,
+                "zip": 0.99,
+                "mobileNumber": 0.99,
+                "dob": 0.99,
+                "ssn": 0.99
+              }
+            },
+            "addressRisk": {
+              "reasonCodes": [
+                "I707",
+                "I704",
+                "I708"
+              ],
+              "score": 0.01
+            },
+            "emailRisk": {
+              "reasonCodes": [
+                "I520",
+                "I555"
+              ],
+              "score": 0.01
+            },
+            "phoneRisk": {
+              "reasonCodes": [
+                "I620",
+                "I611",
+                "I602"
+              ],
+              "score": 0.01
+            },
+            "alertList": {
+              "reasonCodes": [],
+              "matches": []
+            },
+            "globalWatchlist": {
+              "reasonCodes": [
+                "I196"
+              ],
+              "matches": {}
+            }
+          }
+        );
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ValidationStruct {
-    first_name: Option<f32>,
-    sur_name: Option<f32>,
-    street_address: Option<f32>,
-    city: Option<f32>,
-    state: Option<f32>,
-    zip: Option<f32>,
-    mobile_number: Option<f32>,
-    dob: Option<f32>,
-    ssn: Option<f32>,
+        let decoded_response = parse_response(response_json).expect("Failed to parse!!");
+        println!("{:?}", decoded_response);
+    }
+    //decode_response
 }

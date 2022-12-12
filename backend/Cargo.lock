@@ -2588,6 +2588,8 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "strum",
+ "strum_macros",
  "test-case",
  "thiserror",
  "tokio",

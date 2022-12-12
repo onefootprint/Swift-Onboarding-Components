@@ -20,6 +20,9 @@ tracing = { workspace = true }
 tokio = { workspace = true }
 tokio-retry = "0.3"
 tracing-test = "0.2.3"
+strum = { workspace = true }
+strum_macros = { workspace = true }
+
 
 [dev-dependencies]
 test-case = "2.1.0"
