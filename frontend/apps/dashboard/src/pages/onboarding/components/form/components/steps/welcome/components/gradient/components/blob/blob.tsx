@@ -6,6 +6,7 @@ type BlobProps = {
   height: number;
   left: number;
   top: number;
+  mixBlendMode?: string;
 };
 
 const Blob = styled.div<BlobProps>`
@@ -18,6 +19,7 @@ const Blob = styled.div<BlobProps>`
   width: ${props => props.width}%;
   transform: translate(-50%, -50%);
   filter: blur(100px);
+  mix-blend-mode: ${props => props.mixBlendMode};
 `;
 
 export default Blob;

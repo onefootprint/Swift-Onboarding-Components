@@ -4,6 +4,8 @@ import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import Gradient from './components/gradient';
+
 export type WelcomeProps = {
   id: string;
   onComplete: () => void;
@@ -19,6 +21,7 @@ const Welcome = ({ id, onComplete }: WelcomeProps) => {
 
   return (
     <Container>
+      <Gradient />
       <form id={id} onSubmit={handleSubmit}>
         <ImageContainer>
           <StyledImage
@@ -40,6 +43,12 @@ const Welcome = ({ id, onComplete }: WelcomeProps) => {
 const Container = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[9]} ${theme.spacing[7]};
+    position: relative;
+    background: linear-gradient(
+      180deg,
+      #cbc1f6 0%,
+      rgba(203, 193, 246, 0) 100%
+    );
   `}
 `;
 
