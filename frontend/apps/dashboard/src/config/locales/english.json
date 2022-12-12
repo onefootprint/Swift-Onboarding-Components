@@ -289,8 +289,7 @@
         "status": {
           "pass": "Verified",
           "fail": "Failed",
-          "vault-only": "Vault",
-          "manual-review": "Manual Review"
+          "vault-only": "Vault"
         }
       },
       "user-info": {

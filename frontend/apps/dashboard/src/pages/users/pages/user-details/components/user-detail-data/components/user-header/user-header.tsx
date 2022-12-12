@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { statusToBadgeVariant } from 'src/constants/onboarding-status-display';
 import { User } from 'src/pages/users/types/user.types';
+import getOnboardingStatusBadgeVariant from 'src/pages/users/utils/get-onboarding-status-badge-variant';
 import styled, { css } from 'styled-components';
 
 import { State } from '../../../../utils/decrypt-state-machine';
@@ -19,14 +19,16 @@ const UserHeader = ({ user }: UserHeaderProps) => {
   const { t } = useTranslation('pages.user-details.user-header.status');
   const [state] = useDecryptMachine();
   const shouldShowManualReview = state.matches(State.idle);
+  const badgeVariant = getOnboardingStatusBadgeVariant(
+    user.status,
+    user.requiresManualReview,
+  );
 
   return (
     <HeaderContainer>
       <RowContainer>
         <Typography variant="label-1">User info</Typography>
-        <Badge variant={statusToBadgeVariant[user.status]}>
-          {t(user.status)}
-        </Badge>
+        <Badge variant={badgeVariant}>{t(user.status)}</Badge>
         {user.requiresManualReview && (
           <Badge variant="error">{t('manual-review')}</Badge>
         )}

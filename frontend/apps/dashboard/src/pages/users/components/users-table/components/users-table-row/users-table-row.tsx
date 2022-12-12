@@ -1,11 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoWarning16 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { statusToBadgeVariant } from 'src/constants/onboarding-status-display';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
 import { User } from 'src/pages/users/types/user.types';
 import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
+import getOnboardingStatusBadgeVariant from 'src/pages/users/utils/get-onboarding-status-badge-variant';
+import styled, { css } from 'styled-components';
 
 type UsersTableRowProps = {
   user: User;
@@ -13,6 +15,10 @@ type UsersTableRowProps = {
 
 const UsersTableRow = ({ user }: UsersTableRowProps) => {
   const { allT } = useTranslation('pages.users');
+  const badgeVariant = getOnboardingStatusBadgeVariant(
+    user.status,
+    user.requiresManualReview,
+  );
 
   return (
     <>
@@ -24,14 +30,14 @@ const UsersTableRow = ({ user }: UsersTableRowProps) => {
       </td>
 
       <td>
-        <Badge variant={statusToBadgeVariant[user.status]}>
+        <Badge variant={badgeVariant}>
           {allT(`pages.user-details.user-header.status.${user.status}`)}
+          {user.requiresManualReview && (
+            <IconContainer>
+              <IcoWarning16 color={badgeVariant} />
+            </IconContainer>
+          )}
         </Badge>
-        {user.requiresManualReview && (
-          <Badge variant="error">
-            {allT('pages.user-details.user-header.status.manual-review')}
-          </Badge>
-        )}
       </td>
       <td>
         <FieldOrPlaceholder
@@ -66,5 +72,11 @@ const UsersTableRow = ({ user }: UsersTableRowProps) => {
     </>
   );
 };
+
+const IconContainer = styled.div`
+  ${({ theme }) => css`
+    margin-left: ${theme.spacing[2]};
+  `};
+`;
 
 export default UsersTableRow;
