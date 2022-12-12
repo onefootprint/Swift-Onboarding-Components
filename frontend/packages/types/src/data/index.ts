@@ -20,7 +20,6 @@ export { default as IdDocBadImageError } from './id-doc-bad-image-error';
 export { default as IdDocDataAttribute } from './id-doc-data-attribute';
 export { default as IdDocType } from './id-doc-type';
 export * from './identifier';
-export { default as IdentifyType } from './identify-type';
 export { default as IdentifyUserKind } from './identify-user-kind';
 export * from './insight-event';
 export * from './liveness';

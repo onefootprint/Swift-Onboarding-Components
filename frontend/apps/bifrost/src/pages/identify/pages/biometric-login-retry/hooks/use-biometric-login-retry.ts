@@ -15,7 +15,7 @@ import useIdentifyMachine from '../../../hooks/use-identify-machine';
 
 const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
-  const { identifyType, email, tenantPk } = state.context;
+  const { email, tenantPk } = state.context;
   const loginChallengeMutation = useLoginChallenge();
   const identityVerifyMutation = useIdentifyVerify();
 
@@ -26,7 +26,6 @@ const useBiometricLoginRetry = () => {
     loginChallengeMutation.mutate(
       {
         identifier: { email },
-        identifyType,
         preferredChallengeKind,
       },
       {

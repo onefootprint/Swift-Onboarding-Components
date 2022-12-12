@@ -8,7 +8,7 @@ import useProcessBootstrapData from './hooks/use-process-bootstrap-data';
 
 const ProcessBootstrapData = () => {
   const [state, send] = useIdentifyMachine();
-  const { bootstrapData, identifyType } = state.context;
+  const { bootstrapData } = state.context;
 
   const handleError = () => {
     send({
@@ -31,7 +31,6 @@ const ProcessBootstrapData = () => {
 
   useProcessBootstrapData({
     bootstrapData,
-    identifyType,
     options: {
       onSuccess: handleChallengeSent,
       onError: handleError,

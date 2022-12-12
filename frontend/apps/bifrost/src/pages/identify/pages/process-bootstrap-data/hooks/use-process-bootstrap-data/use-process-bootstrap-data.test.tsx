@@ -1,5 +1,5 @@
 import { customRenderHook, waitFor } from '@onefootprint/test-utils';
-import { ChallengeKind, IdentifyType } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import MockDate from 'mockdate';
 import { BootstrapData } from 'src/hooks/use-bifrost-machine';
 
@@ -29,7 +29,6 @@ describe('useProcessBootstrapData hook', () => {
 
     customRenderHook(() =>
       useProcessBootstrapData({
-        identifyType: IdentifyType.onboarding,
         options: { onSuccess, onError },
         bootstrapData,
       }),

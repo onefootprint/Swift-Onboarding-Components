@@ -1,23 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { IdentifyType } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '../../../../hooks/use-identify-machine';
-
 const PhoneVerificationSuccess = () => {
-  const [state] = useIdentifyMachine();
-  const { identifyType } = state.context;
   const { t } = useTranslation('pages.phone-verification.form.success');
   return (
     <PhoneVerificationSuccessContainer>
       <IcoCheckCircle40 color="success" />
       <Typography variant="label-3" color="success">
-        {identifyType === IdentifyType.onboarding
-          ? t('onboarding-description')
-          : t('authentication-description')}
+        {t('onboarding-description')}
       </Typography>
     </PhoneVerificationSuccessContainer>
   );

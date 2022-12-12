@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { IdentifyType, TenantInfo } from '@onefootprint/types';
+import { TenantInfo } from '@onefootprint/types';
 
 export enum States {
   init = 'Init',
@@ -33,7 +33,6 @@ export type BootstrapData = {
 export type BifrostContext = {
   authToken?: string;
   device?: DeviceInfo;
-  identifyType?: IdentifyType;
   tenant?: TenantInfo;
   userFound?: boolean;
   validationToken?: string;
@@ -46,7 +45,6 @@ export type BifrostEvent =
       payload: {
         tenant?: TenantInfo;
         device?: DeviceInfo;
-        identifyType?: IdentifyType;
         bootstrapData?: BootstrapData;
       };
     }

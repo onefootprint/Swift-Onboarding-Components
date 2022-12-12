@@ -1,4 +1,4 @@
-import { CollectedKycDataOption, IdentifyType } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 
 import { BifrostContext, BifrostEvent, Events } from '../../types';
 import initContextComplete from './init-context-complete';
@@ -11,7 +11,6 @@ describe('initContextComplete', () => {
           type: 'mobile',
           hasSupportForWebauthn: true,
         },
-        identifyType: IdentifyType.my1fp,
         tenant: {
           isLive: true,
           pk: 'key',
@@ -31,7 +30,6 @@ describe('initContextComplete', () => {
 
     it('when some data is in the machine context and some in the event payload', () => {
       const context: BifrostContext = {
-        identifyType: IdentifyType.my1fp,
         tenant: {
           isLive: true,
           pk: 'key',
@@ -58,14 +56,6 @@ describe('initContextComplete', () => {
   describe('when init context is incomplete', () => {
     it('when context and payload have missing data', () => {
       const context: BifrostContext = {
-        tenant: {
-          isLive: true,
-          pk: 'key',
-          name: 'tenant',
-          mustCollectData: [CollectedKycDataOption.name],
-          canAccessData: [CollectedKycDataOption.name],
-          orgName: 'tenantOrg',
-        },
         bootstrapData: {},
       };
       const event: BifrostEvent = {

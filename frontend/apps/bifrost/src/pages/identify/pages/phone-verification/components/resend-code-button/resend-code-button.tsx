@@ -25,8 +25,7 @@ const ResendCodeButton = () => {
   const toast = useToast();
   const { t } = useTranslation('pages.phone-verification.form.resend-code');
   const [state, send] = useIdentifyMachine();
-  const { phone, email, identifyType, challengeData, userFound } =
-    state.context;
+  const { phone, email, challengeData, userFound } = state.context;
   const loginChallengeMutation = useLoginChallenge();
   const signupChallengeMutation = useSignupChallenge();
   const showRequestErrorToast = useRequestErrorToast();
@@ -68,7 +67,6 @@ const ResendCodeButton = () => {
     signupChallengeMutation.mutate(
       {
         phoneNumber,
-        identifyType,
       },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {
@@ -87,7 +85,6 @@ const ResendCodeButton = () => {
       {
         identifier: { email },
         preferredChallengeKind: ChallengeKind.sms,
-        identifyType,
       },
       {
         onSuccess({ challengeData: newChallengeData }) {

@@ -8,7 +8,6 @@ import {
   ChallengeKind,
   Identifier,
   IdentifyResponse,
-  IdentifyType,
   LoginChallengeResponse,
   SignupChallengeResponse,
 } from '@onefootprint/types';
@@ -22,7 +21,6 @@ const canSendSmsLoginChallenge = (
 
 type UseProcessBootstrapDataArgs = {
   bootstrapData: BootstrapData;
-  identifyType: IdentifyType;
   options: {
     onSuccess: (userFound: boolean, challengeData: ChallengeData) => void;
     onError: () => void;
@@ -32,7 +30,6 @@ type UseProcessBootstrapDataArgs = {
 const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
   const {
     bootstrapData: { email, phoneNumber },
-    identifyType,
     options,
   } = args;
 
@@ -63,7 +60,6 @@ const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
       {
         identifier,
         preferredChallengeKind: ChallengeKind.sms,
-        identifyType,
       },
       {
         onSuccess,
@@ -81,7 +77,7 @@ const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
     }
 
     signupChallengeMutation.mutate(
-      { phoneNumber, identifyType },
+      { phoneNumber },
       {
         onSuccess,
         onError: options.onError,

@@ -30,7 +30,7 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 @pytest.fixture(scope="module")
 def non_sandbox_auth_token(twilio, tenant):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
-    data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
+    data = dict(phone_number=PHONE_NUMBER)
     body = post("hosted/identify/signup_challenge", data)
     challenge_token = body["challenge_data"]["challenge_token"]
     return try_until_success(
@@ -60,7 +60,6 @@ def create_inherited_non_sandbox_user(twilio, tenant_auth):
         data = dict(
             identifier=identifier,
             preferred_challenge_kind="sms",
-            identify_type="onboarding",
         )
         body = post("hosted/identify/login_challenge", data)
         assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
@@ -136,7 +135,6 @@ class TestBifrost:
         data = dict(
             identifier=identifier,
             preferred_challenge_kind="sms",
-            identify_type="onboarding",
         )
 
         # First try identifying with an email. The user won't exist
@@ -404,7 +402,6 @@ class TestBifrost:
         data = dict(
             identifier=identifier,
             preferred_challenge_kind="biometric",
-            identify_type="onboarding",
         )
         body = post("hosted/identify/login_challenge", data)
         assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
@@ -452,7 +449,6 @@ class TestBifrost:
         identifier = {"email": EMAIL}
         data = dict(
             identifier=identifier,
-            identify_type="onboarding",
         )
         body = post("hosted/identify", data)
         assert body["user_found"]

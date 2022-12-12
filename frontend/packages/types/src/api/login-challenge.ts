@@ -1,14 +1,8 @@
-import {
-  ChallengeData,
-  ChallengeKind,
-  Identifier,
-  IdentifyType,
-} from '../data';
+import { ChallengeData, ChallengeKind, Identifier } from '../data';
 
 export type LoginChallengeRequest = {
   identifier: Identifier;
   preferredChallengeKind: ChallengeKind;
-  identifyType: IdentifyType;
 };
 
 export type LoginChallengeResponse = {

@@ -139,7 +139,7 @@ def create_basic_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
 
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
-        data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
+        data = dict(phone_number=sandbox_phone_number)
         body = post("hosted/identify/signup_challenge", data)
         return body["challenge_data"]["challenge_token"]
 
@@ -221,7 +221,6 @@ def clean_up_user(phone_number, email):
     data = dict(
         identifier=identifier,
         preferred_challenge_kind="sms",
-        identify_type="onboarding",
     )
     body = post("hosted/identify", data)
     assert not body["user_found"]

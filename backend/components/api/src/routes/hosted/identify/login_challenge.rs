@@ -1,4 +1,4 @@
-use super::{BiometricChallengeState, ChallengeKind, Identifier, IdentifyType, UserChallengeData};
+use super::{BiometricChallengeState, ChallengeKind, Identifier, UserChallengeData};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::onboarding::OnboardingError;
 use crate::hosted::identify::get_user_challenge_context;
@@ -19,7 +19,6 @@ use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 pub struct LoginChallengeRequest {
     identifier: Identifier,
     preferred_challenge_kind: ChallengeKind,
-    identify_type: IdentifyType,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -42,7 +41,6 @@ pub async fn post(
     let LoginChallengeRequest {
         identifier,
         preferred_challenge_kind,
-        identify_type,
     } = request.into_inner();
 
     // Fall back to SMS if the user requested webauthn but doesn't have any creds
@@ -100,7 +98,6 @@ pub async fn post(
         };
 
     let challenge_state = ChallengeState {
-        identify_type,
         data: challenge_state_data,
     };
 

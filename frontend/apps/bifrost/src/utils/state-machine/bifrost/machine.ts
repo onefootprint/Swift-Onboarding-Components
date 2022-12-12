@@ -1,4 +1,3 @@
-import { IdentifyType } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import createIdentifyMachine from '../identify';
@@ -38,7 +37,6 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           src: context =>
             createIdentifyMachine({
               device: { ...context.device! },
-              identifyType: context.identifyType!,
               bootstrapData: context.bootstrapData ?? {},
               tenantPk: context.tenant!.pk,
             }),
@@ -46,9 +44,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             {
               target: States.onboarding,
               actions: [Actions.assignAuthToken, Actions.assignUserFound],
-              cond: context =>
-                !!context.tenant &&
-                context.identifyType === IdentifyType.onboarding,
+              cond: context => !!context.tenant,
             },
             {
               target: States.authenticationSuccess,
@@ -90,9 +86,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (event.type !== Events.initContextUpdated) {
           return context;
         }
-        const { identifyType, device, tenant, bootstrapData } = event.payload;
-        context.identifyType =
-          identifyType !== undefined ? identifyType : context.identifyType;
+        const { device, tenant, bootstrapData } = event.payload;
         context.device = device !== undefined ? device : context.device;
         context.tenant = tenant !== undefined ? tenant : context.tenant;
         context.bootstrapData =

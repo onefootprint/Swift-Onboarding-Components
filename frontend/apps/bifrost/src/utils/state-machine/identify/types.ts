@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ChallengeData, IdentifyType } from '@onefootprint/types';
+import { ChallengeData } from '@onefootprint/types';
 
 import { BootstrapData } from '../bifrost/types';
 
@@ -19,7 +19,6 @@ export type MachineContext = {
   challengeData?: ChallengeData;
   phone?: string;
   authToken?: string;
-  identifyType: IdentifyType;
   bootstrapData: BootstrapData;
   tenantPk: string;
 };

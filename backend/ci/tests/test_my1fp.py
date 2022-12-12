@@ -21,9 +21,7 @@ def my1fp_authed_user(user, twilio):
         assert body["available_challenge_kinds"]
 
     def challenge():
-        data = dict(
-            identifier=identifier, preferred_challenge_kind="sms", identify_type="my1fp"
-        )
+        data = dict(identifier=identifier, preferred_challenge_kind="sms")
         body = post("hosted/identify/login_challenge", data)
         assert (
             body["challenge_data"]["phone_number_last_two"]

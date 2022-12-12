@@ -17,7 +17,7 @@ const PhoneRegistration = () => {
   const { t } = useTranslation('pages.phone-registration');
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
-  const { identifyType, email } = state.context;
+  const { email } = state.context;
   const signupChallengeMutation = useSignupChallenge();
   const { isLoading } = signupChallengeMutation;
 
@@ -32,7 +32,7 @@ const PhoneRegistration = () => {
   const handleSubmit = (formData: { phone: string }) => {
     const { phone } = formData;
     signupChallengeMutation.mutate(
-      { phoneNumber: phone, identifyType },
+      { phoneNumber: phone },
       {
         onSuccess({ challengeData }) {
           send({

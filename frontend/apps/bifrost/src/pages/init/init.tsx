@@ -1,15 +1,11 @@
 import { useGetOnboardingConfig } from '@onefootprint/footprint-elements';
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedKycDataOptionLabels,
-  IdentifyType,
-} from '@onefootprint/types';
+import { CollectedKycDataOptionLabels } from '@onefootprint/types';
 import React from 'react';
 import InitShimmer from 'src/components/init-shimmer';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
 
-import useAuthenticationFlow from './hooks/use-authentication-flow';
 import useBootstrapData from './hooks/use-bootstrap-data';
 import useTenantPublicKey from './hooks/use-tenant-public-key';
 
@@ -51,17 +47,6 @@ const Init = () => {
         type: Events.tenantInfoRequestFailed,
       });
     },
-  });
-
-  useAuthenticationFlow((isAuthenticationFlow: boolean) => {
-    send({
-      type: Events.initContextUpdated,
-      payload: {
-        identifyType: isAuthenticationFlow
-          ? IdentifyType.my1fp
-          : IdentifyType.onboarding,
-      },
-    });
   });
 
   useBootstrapData(bootstrapData => {

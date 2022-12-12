@@ -1,8 +1,7 @@
-import { ChallengeData, IdentifyType } from '../data';
+import { ChallengeData } from '../data';
 
 export type SignupChallengeRequest = {
   phoneNumber: string;
-  identifyType: IdentifyType;
 };
 
 export type SignupChallengeResponse = {

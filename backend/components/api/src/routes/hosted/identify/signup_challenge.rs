@@ -1,4 +1,4 @@
-use super::{ChallengeKind, IdentifyType, UserChallengeData};
+use super::{ChallengeKind, UserChallengeData};
 use crate::hosted::identify::ChallengeData;
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
@@ -10,7 +10,6 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct SignupChallengeRequest {
     phone_number: PhoneNumber,
-    identify_type: IdentifyType,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -40,7 +39,6 @@ pub async fn post(
         twilio_client.send_challenge(&state, &phone_number).await?;
 
     let challenge_state = ChallengeState {
-        identify_type: req.identify_type,
         data: ChallengeData::Sms(challenge_state_data),
     };
 

@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ChallengeKind, IdentifyType } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';
@@ -9,7 +9,6 @@ describe('Identify Machine Tests', () => {
   const createMachine = (deviceInfo: DeviceInfo) =>
     createIdentifyMachine({
       device: deviceInfo,
-      identifyType: IdentifyType.onboarding,
       tenantPk: '',
     });
 

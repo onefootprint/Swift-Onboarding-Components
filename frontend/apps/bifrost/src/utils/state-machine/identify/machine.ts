@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ChallengeKind, IdentifyType } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import validateBootstrapData from 'src/utils/validate-bootstrap-data';
 import { assign, createMachine } from 'xstate';
 
@@ -13,14 +13,12 @@ import {
 } from './types';
 
 type IdentifyMachineArgs = {
-  identifyType: IdentifyType;
   device: DeviceInfo;
   bootstrapData?: BootstrapData;
   tenantPk: string;
 };
 
 const createIdentifyMachine = ({
-  identifyType,
   device,
   bootstrapData,
   tenantPk,
@@ -34,7 +32,6 @@ const createIdentifyMachine = ({
         : States.emailIdentification,
       context: {
         device,
-        identifyType,
         bootstrapData: bootstrapData ?? {},
         tenantPk,
       },

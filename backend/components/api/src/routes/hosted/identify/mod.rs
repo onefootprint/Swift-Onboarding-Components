@@ -65,23 +65,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ChallengeState {
-    // TODO remove identify_type since we can infer now if tenantPk is provided
-    identify_type: IdentifyType,
     data: ChallengeData,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize, Eq, PartialEq, Clone, Copy, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub enum IdentifyType {
-    Unspecified,
-    Onboarding,
-    My1fp,
-}
-
-impl Default for IdentifyType {
-    fn default() -> Self {
-        Self::Unspecified
-    }
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
