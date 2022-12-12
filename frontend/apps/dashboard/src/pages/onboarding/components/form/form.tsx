@@ -3,22 +3,23 @@ import styled, { css } from 'styled-components';
 
 import FormControls from './components/form-controls';
 import CompanyData from './components/steps/company-data';
-import InviteStep from './components/steps/invite-step';
+import Invite from './components/steps/invite';
 import UserData from './components/steps/user-data';
 import Welcome from './components/steps/welcome';
 
 export type FormProps = {
   onComplete: () => void;
+  onSkip?: () => void;
 };
 
 const steps = [
   { id: 'welcome-form', Step: Welcome },
   { id: 'user-data-form', Step: UserData },
   { id: 'company-data-form', Step: CompanyData },
-  { id: 'invite-form', Step: InviteStep },
+  { id: 'invite-form', Step: Invite },
 ];
 
-const Form = ({ onComplete }: FormProps) => {
+const Form = ({ onComplete, onSkip }: FormProps) => {
   const [step, setStep] = useState(0);
   const stepsCount = steps.length;
   const maxStep = stepsCount - 1;
@@ -41,7 +42,13 @@ const Form = ({ onComplete }: FormProps) => {
   return (
     <Container>
       <Step id={id} onComplete={handleComplete} />
-      <FormControls id={id} max={stepsCount} onPrev={handlePrev} value={step} />
+      <FormControls
+        id={id}
+        max={stepsCount}
+        onPrev={handlePrev}
+        onSkip={onSkip}
+        value={step}
+      />
     </Container>
   );
 };

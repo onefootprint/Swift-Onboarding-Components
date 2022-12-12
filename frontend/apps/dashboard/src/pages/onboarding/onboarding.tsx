@@ -16,13 +16,18 @@ const Onboarding = () => {
     // https://linear.app/footprint/issue/FP-2132/dashboard-onboarding-complete-ob-flow-and-redirect-to
   };
 
+  const handleSkip = () => {
+    // TODO: FP-2132
+    // https://linear.app/footprint/issue/FP-2132/dashboard-onboarding-complete-ob-flow-and-redirect-to
+  };
+
   return (
     <>
       <Head>
         <title>{t('page-title')}</title>
       </Head>
       <Container data-testid="onboarding-page">
-        <Form onComplete={handleCompleted} />
+        <Form onComplete={handleCompleted} onSkip={handleSkip} />
         <LoggedUser email={dangerouslyData.email} />
       </Container>
     </>

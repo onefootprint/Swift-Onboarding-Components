@@ -40,7 +40,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   emptyStateText = 'No results found',
   hasError,
   hint,
-  id,
+  id: baseId,
   label,
   name,
   onBlur,
@@ -53,6 +53,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   value,
 }: BaseSelectProps<Option>) => {
   const internalId = useId();
+  const id = baseId || internalId;
   const [isOpen, setOpen] = useState(false);
   const theme = useTheme();
   const { dropdown, input } = theme.components;
@@ -85,7 +86,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
 
   return (
     <Container data-testid={testID} className="fp-dropdown">
-      {label && <Label htmlFor={id || label}>{label}</Label>}
+      {label && <Label htmlFor={id}>{label}</Label>}
       <div ref={setReferenceElement}>
         {renderTrigger?.({
           testID: internalId,
@@ -103,6 +104,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
           {...attributes.popper}
         >
           <ReactSelect
+            id={id}
             autoFocus
             backspaceRemovesValue={false}
             controlShouldRenderValue={false}
@@ -146,7 +148,6 @@ const BaseSelect = <Option extends BaseSelectOption>({
               menu: () => ({}),
             }}
             hideSelectedOptions={false}
-            inputId={id}
             isDisabled={disabled}
             isSearchable={isSearchable}
             maxMenuHeight={180}

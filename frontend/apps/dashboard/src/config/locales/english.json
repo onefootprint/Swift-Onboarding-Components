@@ -151,7 +151,7 @@
         "form": {
           "email": {
             "label": "Email address",
-            "placeholder": "jane.doe@acmebank.com"
+            "placeholder": "jane.doe@acme.com"
           },
           "name": {
             "label": "Full name",
@@ -185,6 +185,35 @@
             }
           }
         }
+      },
+      "invite": {
+        "title": "Invite teammates",
+        "subtitle": "Invite your teammates to join you on Footprint",
+        "form": {
+          "email": {
+            "label": "Email address",
+            "placeholder": "jane.doe@acme.com",
+            "errors": {
+              "required": "Please enter an email"
+            }
+          },
+          "role": {
+            "label": "Role",
+            "placeholder": "Select",
+            "errors": {
+              "required": "Please enter a role"
+            },
+            "options": {
+              "admin": "Admin",
+              "developer": "Developer",
+              "member": "Member"
+            }
+          },
+          "errors": {
+            "invalid": "Please complete the fields above."
+          }
+        },
+        "add-more": "Add more"
       },
       "logged-as": "Logged in as"
     },

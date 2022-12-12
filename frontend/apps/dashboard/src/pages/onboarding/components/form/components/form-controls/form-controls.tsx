@@ -28,7 +28,7 @@ const FormControls = ({
       <Steps max={max} onPrev={onPrev} value={value} />
       <ButtonsContainer>
         {isLast && (
-          <LinkButton form={id} onClick={onSkip} type="submit">
+          <LinkButton form={id} onClick={onSkip}>
             {t('skip')}
           </LinkButton>
         )}

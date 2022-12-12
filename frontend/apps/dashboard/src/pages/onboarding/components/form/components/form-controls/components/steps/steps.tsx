@@ -1,4 +1,3 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeft24 } from '@onefootprint/icons';
 import { IconButton } from '@onefootprint/ui';
@@ -14,11 +13,10 @@ export type StepsProps = {
 
 const Steps = ({ value, max, onPrev }: StepsProps) => {
   const { t } = useTranslation();
-  const [animateSteps] = useAutoAnimate<HTMLDivElement>();
   const shouldPrev = value > 0;
 
   return (
-    <Container ref={animateSteps}>
+    <Container>
       {shouldPrev && (
         <PrevContainer>
           <IconButton aria-label={t('back')} onClick={onPrev}>

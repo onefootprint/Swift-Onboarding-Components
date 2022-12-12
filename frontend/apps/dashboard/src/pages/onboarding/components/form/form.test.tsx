@@ -13,8 +13,11 @@ import Form, { FormProps } from './form';
 const originalState = useStore.getState();
 
 describe('<Form />', () => {
-  const renderForm = ({ onComplete = jest.fn() }: Partial<FormProps>) =>
-    customRender(<Form onComplete={onComplete} />);
+  const renderForm = ({
+    onComplete = jest.fn(),
+    onSkip = jest.fn(),
+  }: Partial<FormProps>) =>
+    customRender(<Form onComplete={onComplete} onSkip={onSkip} />);
 
   beforeEach(() => {
     useStore.setState({
@@ -83,15 +86,21 @@ describe('<Form />', () => {
       });
       const inviteStep = screen.getByText('Invite teammates');
       expect(inviteStep).toBeInTheDocument();
+
+      const emailField = screen.getByPlaceholderText('jane.doe@acme.com');
+      await userEvent.type(emailField, 'jane.doe@acme.com');
+
       await userEvent.click(screen.getByRole('button', { name: 'Complete' }));
-      expect(onComplete).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(onComplete).toHaveBeenCalled();
+      });
     });
   });
 
   describe('when completing all the steps, except the last one which is skipped', () => {
-    it('should call the onComplete callback', async () => {
-      const onComplete = jest.fn();
-      renderForm({ onComplete });
+    it('should call the onSkip callback', async () => {
+      const onSkip = jest.fn();
+      renderForm({ onSkip });
 
       // 1st step
       await waitFor(() => {
@@ -138,8 +147,11 @@ describe('<Form />', () => {
       });
       const inviteStep = screen.getByText('Invite teammates');
       expect(inviteStep).toBeInTheDocument();
+
       await userEvent.click(screen.getByRole('button', { name: 'Skip' }));
-      expect(onComplete).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(onSkip).toHaveBeenCalled();
+      });
     });
   });
 });
