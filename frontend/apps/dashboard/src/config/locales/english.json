@@ -339,8 +339,13 @@
           "fail": "Failed"
         },
         "button": {
+          "review": "Review user",
           "mark-as-verified": "Mark as Verified",
           "mark-as-failed": "Mark as Failed"
+        },
+        "dropdown": {
+          "mark-as": "Mark user as {{status}}",
+          "keep-as": "Keep user as {{status}}"
         },
         "dialog": {
           "title": "Review",
