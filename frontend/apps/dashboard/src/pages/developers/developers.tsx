@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Box, Toggle, Tooltip, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
-import useSandboxMode from 'src/hooks/use-sandbox-mode';
+import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 import ApiKeys from './components/api-keys';
@@ -10,7 +10,7 @@ import OnboardingConfigs from './components/onboarding-configs';
 
 const Developers = () => {
   const { t } = useTranslation('pages.developers');
-  const sandboxMode = useSandboxMode();
+  const { sandbox } = useOrgSession();
 
   return (
     <>
@@ -24,26 +24,26 @@ const Developers = () => {
           </Typography>
           <Typography
             variant="body-2"
-            color={sandboxMode.isSandbox ? 'warning' : 'success'}
+            color={sandbox.isSandbox ? 'warning' : 'success'}
           >
-            {sandboxMode.isSandbox
+            {sandbox.isSandbox
               ? t('header.subtitle.sandbox')
               : t('header.subtitle.live')}
           </Typography>
         </Box>
         <ToggleContainer>
           <Tooltip
-            disabled={sandboxMode.canToggle}
+            disabled={sandbox.canToggle}
             size="compact"
             text={t('header.toggle-sandbox.tooltip')}
           >
             <Box>
               <Toggle
                 aria-label={t('header.toggle-sandbox.label')}
-                checked={sandboxMode.isSandbox}
-                disabled={!sandboxMode.canToggle}
+                checked={sandbox.isSandbox}
+                disabled={!sandbox.canToggle}
                 label={t('header.toggle-sandbox.label')}
-                onChange={sandboxMode.toggle}
+                onChange={sandbox.toggle}
               />
             </Box>
           </Tooltip>

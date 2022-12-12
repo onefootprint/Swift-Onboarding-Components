@@ -2,12 +2,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoLogOut24, IcoUser24 } from '@onefootprint/icons';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import React from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 const NavDropdown = () => {
   const { t } = useTranslation('components.private-layout.nav-dropdown');
-  const { data, logOut } = useSessionUser();
+  const { dangerouslyCastedData, logOut } = useSession();
 
   return (
     <Container>
@@ -19,10 +19,11 @@ const NavDropdown = () => {
           <NavDropdownContent align="end">
             <UserDropdownItem>
               <Typography variant="label-3" as="div">
-                {data?.firstName} {data?.lastName}
+                {dangerouslyCastedData.user.firstName}{' '}
+                {dangerouslyCastedData.user.lastName}
               </Typography>
               <Typography variant="body-3" color="secondary" as="div">
-                {data?.email}
+                {dangerouslyCastedData.user.email}
               </Typography>
             </UserDropdownItem>
             <Dropdown.Divider />

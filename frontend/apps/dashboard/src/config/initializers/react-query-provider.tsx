@@ -2,14 +2,14 @@ import { isLogoutError } from '@onefootprint/request';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 
 type ReactQueryProviderProps = {
   children: React.ReactNode;
 };
 
 const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
-  const { logOut } = useSessionUser();
+  const { logOut } = useSession();
   const router = useRouter();
 
   const handleError = (error: unknown) => {

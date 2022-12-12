@@ -7,7 +7,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 import omit from 'lodash/omit';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 import { dateRangeToFilterParams } from 'src/utils/date-range';
 
 import useOrgMembersFilters, {
@@ -44,7 +44,7 @@ const getOrgMembersRequest = async ({
 };
 
 const useGetOrgMembers = (pageSize: number) => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const { formatRelativeDate } = useIntl();
   const { filters } = useOrgMembersFilters();
 

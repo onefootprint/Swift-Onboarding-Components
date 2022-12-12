@@ -5,7 +5,7 @@ import {
   UpdateAnnotationResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
 const updateOnboardingConfig = async (
@@ -26,7 +26,7 @@ const updateOnboardingConfig = async (
 };
 
 const useUpdateAnnotation = () => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const showErrorToast = useRequestErrorToast();
   const userId = useUserId();
 

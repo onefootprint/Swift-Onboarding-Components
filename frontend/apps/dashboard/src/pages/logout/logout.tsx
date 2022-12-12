@@ -1,9 +1,9 @@
 import { Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 
 const Logout = () => {
-  const session = useSessionUser();
+  const session = useSession();
 
   useEffect(() => {
     session.logOut();

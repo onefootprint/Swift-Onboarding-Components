@@ -1,6 +1,6 @@
 import React from 'react';
 
-import useSessionUser from '../../hooks/use-session-user';
+import useSession from '../../hooks/use-session';
 import PrivateLayout from './components/private-layout';
 import PublicLayout from './components/public-layout';
 
@@ -10,7 +10,7 @@ export type LayoutProps = {
 };
 
 const Layout = ({ children, name = 'default' }: LayoutProps) => {
-  const { isLoggedIn } = useSessionUser();
+  const { isLoggedIn } = useSession();
   return isLoggedIn ? (
     <PrivateLayout name={name}>{children}</PrivateLayout>
   ) : (

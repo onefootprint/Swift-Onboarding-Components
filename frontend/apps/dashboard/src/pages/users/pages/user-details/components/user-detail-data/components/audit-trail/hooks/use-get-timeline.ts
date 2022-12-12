@@ -5,7 +5,7 @@ import {
   QueryKey,
   useQuery,
 } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
 type TimelineRequestQueryString = {
@@ -31,7 +31,7 @@ const getTimelineRequest = async ({
 };
 
 const useGetTimeline = () => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const footprintUserId = useUserId();
   const filters = {
     footprintUserId,

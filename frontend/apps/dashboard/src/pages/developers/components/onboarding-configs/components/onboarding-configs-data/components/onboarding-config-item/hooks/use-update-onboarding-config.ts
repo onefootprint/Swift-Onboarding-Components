@@ -6,7 +6,7 @@ import {
   OrgOnboardingConfigUpdateResponse,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const updateOnboardingConfig = async (
   authHeaders: AuthHeaders,
@@ -26,7 +26,7 @@ const updateOnboardingConfig = async (
 
 const useUpdateStatus = () => {
   const queryClient = useQueryClient();
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const showErrorToast = useRequestErrorToast();
 
   return useMutation<

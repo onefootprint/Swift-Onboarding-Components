@@ -6,7 +6,7 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { useStore } from '../../hooks/use-session-user';
+import { useStore } from '../../hooks/use-session';
 import Developers from './developers';
 import { withApiKeys, withOnboardingConfigs } from './developers.test.config';
 
@@ -27,7 +27,19 @@ describe('<Developers />', () => {
   describe('when is in sandbox mode', () => {
     it('should show a warning message', () => {
       useStore.setState({
-        isLive: false,
+        data: {
+          auth: '1',
+          user: {
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          org: {
+            isLive: false,
+            name: 'Acme',
+            sandboxRestricted: false,
+          },
+        },
       });
 
       renderDevelopers();
@@ -40,14 +52,18 @@ describe('<Developers />', () => {
     describe('when its restricted to use only the sandbox mode', () => {
       beforeEach(() => {
         useStore.setState({
-          isLive: false,
           data: {
-            auth: 'vtok_X7n2zMasfrMSCp8DQJD56cnDojCJUtaUKRzKKF',
-            firstName: 'Jane',
-            lastName: 'Doe',
-            email: 'jane.doe@acme.com',
-            tenantName: 'Acme Bank',
-            sandboxRestricted: true,
+            auth: '1',
+            user: {
+              email: 'jane.doe@acme.com',
+              firstName: 'Jane',
+              lastName: 'Doe',
+            },
+            org: {
+              isLive: false,
+              name: 'Acme',
+              sandboxRestricted: true,
+            },
           },
         });
       });
@@ -63,14 +79,18 @@ describe('<Developers />', () => {
     describe('when toggling', () => {
       beforeEach(() => {
         useStore.setState({
-          isLive: false,
           data: {
-            auth: 'vtok_X7n2zMasfrMSCp8DQJD56cnDojCJUtaUKRzKKF',
-            firstName: 'Jane',
-            lastName: 'Doe',
-            email: 'jane.doe@acme.com',
-            tenantName: 'Acme Bank',
-            sandboxRestricted: false,
+            auth: '1',
+            user: {
+              email: 'jane.doe@acme.com',
+              firstName: 'Jane',
+              lastName: 'Doe',
+            },
+            org: {
+              isLive: false,
+              name: 'Acme',
+              sandboxRestricted: false,
+            },
           },
         });
       });
@@ -94,7 +114,19 @@ describe('<Developers />', () => {
   describe('when is in live mode', () => {
     beforeEach(() => {
       useStore.setState({
-        isLive: true,
+        data: {
+          auth: '1',
+          user: {
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          org: {
+            isLive: true,
+            name: 'Acme',
+            sandboxRestricted: false,
+          },
+        },
       });
     });
 

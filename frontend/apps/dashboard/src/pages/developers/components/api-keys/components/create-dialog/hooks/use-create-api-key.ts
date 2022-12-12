@@ -5,7 +5,7 @@ import {
   OrgCreateApiKeysResponse,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const createApiKey = async (
   authHeaders: AuthHeaders,
@@ -22,7 +22,7 @@ const createApiKey = async (
 
 const useCreateApiKey = () => {
   const showErrorToast = useRequestErrorToast();
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
   return useMutation<

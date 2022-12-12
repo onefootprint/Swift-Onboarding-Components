@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { SubmitReviewRequest, SubmitReviewResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const submitReview = async (
   authHeaders: AuthHeaders,
@@ -22,7 +22,7 @@ const submitReview = async (
 };
 
 const useSubmitReview = () => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
 
   return useMutation<SubmitReviewResponse, RequestError, SubmitReviewRequest>(
     (data: SubmitReviewRequest) => submitReview(authHeaders, data),

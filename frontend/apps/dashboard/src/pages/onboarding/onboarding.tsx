@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import Head from 'next/head';
 import React from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-user-session';
 import styled from 'styled-components';
 
 import Form from './components/form';
@@ -9,7 +9,7 @@ import LoggedUser from './components/logged-user';
 
 const Onboarding = () => {
   const { t } = useTranslation('pages.onboarding');
-  const { dangerouslyData } = useSessionUser();
+  const { dangerouslyCastedData } = useSession();
 
   const handleCompleted = () => {
     // TODO: FP-2132
@@ -28,7 +28,7 @@ const Onboarding = () => {
       </Head>
       <Container data-testid="onboarding-page">
         <Form onComplete={handleCompleted} onSkip={handleSkip} />
-        <LoggedUser email={dangerouslyData.email} />
+        <LoggedUser email={dangerouslyCastedData.email} />
       </Container>
     </>
   );

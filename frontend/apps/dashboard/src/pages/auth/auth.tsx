@@ -5,12 +5,12 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import useLogin from 'src/hooks/use-login';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 
 const Auth = () => {
   const { t } = useTranslation('pages.auth');
   const router = useRouter();
-  const { isLoggedIn, logIn } = useSessionUser();
+  const { isLoggedIn, logIn } = useSession();
   const login = useLogin();
   const {
     query: { code },
@@ -38,12 +38,17 @@ const Auth = () => {
         lastName,
       }: OrgAuthLoginResponse) {
         logIn({
-          firstName,
-          lastName,
+          user: {
+            firstName,
+            lastName,
+            email,
+          },
+          org: {
+            name: tenantName,
+            sandboxRestricted,
+            isLive: !sandboxRestricted,
+          },
           auth,
-          email,
-          tenantName,
-          sandboxRestricted,
         });
         router.push('/users');
       },

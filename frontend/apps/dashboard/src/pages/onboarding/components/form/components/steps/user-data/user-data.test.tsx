@@ -5,7 +5,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
-import { useStore } from 'src/hooks/use-session-user';
+import { useStore } from 'src/hooks/use-session';
 
 import UserData, { UserDataProps } from './user-data';
 
@@ -30,11 +30,16 @@ describe('<UserData />', () => {
     useStore.setState({
       data: {
         auth: '1',
-        email: 'jane.doe@acme.com',
-        firstName: 'Jane',
-        lastName: 'Doe',
-        sandboxRestricted: false,
-        tenantName: 'Footprint',
+        user: {
+          email: 'jane.doe@acme.com',
+          firstName: 'Jane',
+          lastName: 'Doe',
+        },
+        org: {
+          isLive: false,
+          name: 'Acme',
+          sandboxRestricted: false,
+        },
       },
     });
   });

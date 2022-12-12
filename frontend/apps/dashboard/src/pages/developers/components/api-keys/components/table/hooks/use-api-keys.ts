@@ -6,7 +6,7 @@ import request, {
 import { ApiKey } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import take from 'lodash/take';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 export type GetApiKeysRequest = {
   authHeaders: AuthHeaders;
@@ -27,7 +27,7 @@ const getApiKeys = async ({ authHeaders }: GetApiKeysRequest) => {
 
 const useApiKeys = () => {
   const { formatDateWithTime } = useIntl();
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   return useQuery<GetApiKeysResponse, RequestError>(
     ['api-keys', authHeaders],
     () => getApiKeys({ authHeaders }),

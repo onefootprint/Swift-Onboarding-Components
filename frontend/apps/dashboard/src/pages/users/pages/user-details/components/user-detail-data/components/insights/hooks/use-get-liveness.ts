@@ -5,7 +5,7 @@ import {
   QueryKey,
   useQuery,
 } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 type LivenessRequestQueryString = {
   footprintUserId: string;
@@ -35,7 +35,7 @@ const getLivenessRequest = async ({
 };
 
 const useGetLiveness = (footprintUserId: string) => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const filters = {
     footprintUserId,
   };

@@ -1,6 +1,6 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
-import { useStore } from 'src/hooks/use-session-user';
+import { useStore } from 'src/hooks/use-session';
 
 import BlankLayout, { BlankLayoutProps } from './blank-layout';
 
@@ -14,14 +14,18 @@ describe('<BlankLayout />', () => {
 
   beforeEach(() => {
     useStore.setState({
-      isLive: false,
       data: {
-        auth: 'vtok_X7n2zMasfrMSCp8DQJD56cnDojCJUtaUKRzKKF',
-        firstName: 'Jane',
-        lastName: 'Doe',
-        email: 'jane.doe@acme.com',
-        tenantName: 'Acme Bank',
-        sandboxRestricted: true,
+        auth: '1',
+        user: {
+          email: 'jane.doe@acme.com',
+          firstName: 'Jane',
+          lastName: 'Doe',
+        },
+        org: {
+          isLive: false,
+          name: 'Acme',
+          sandboxRestricted: true,
+        },
       },
     });
   });

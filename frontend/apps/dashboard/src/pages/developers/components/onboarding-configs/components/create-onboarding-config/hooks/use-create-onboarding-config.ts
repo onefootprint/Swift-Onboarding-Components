@@ -5,7 +5,7 @@ import {
   OrgOnboardingConfigCreateResponse,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const createOnboardingConfig = async (
   authHeaders: AuthHeaders,
@@ -22,7 +22,7 @@ const createOnboardingConfig = async (
 
 const useCreateOnboardingConfig = () => {
   const showErrorToast = useRequestErrorToast();
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
   return useMutation<

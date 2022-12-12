@@ -4,7 +4,7 @@ import {
   GetRiskSignalDetailsResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 
 import useUserId from '../../../../../../../hooks/use-user-id';
 
@@ -22,7 +22,7 @@ const getRiskSignalDetails = async ({
 };
 
 const useRiskSignalDetails = (riskSignalId = '') => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const userId = useUserId();
 
   return useQuery(

@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { OrgRolePermission } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 
 import CreateRoleForm, {
   CreateRoleFormData,
@@ -17,7 +17,7 @@ type CreateRoleProps = {
 const CreateRole = ({ open, onClose }: CreateRoleProps) => {
   const { t } = useTranslation('pages.settings.team-roles.create-role');
   const toast = useToast();
-  const { data } = useSessionUser();
+  const { data } = useSession();
   const orgRoleMutation = useCreateOrgRole();
 
   const handleSubmit = (formData: CreateRoleFormData) => {

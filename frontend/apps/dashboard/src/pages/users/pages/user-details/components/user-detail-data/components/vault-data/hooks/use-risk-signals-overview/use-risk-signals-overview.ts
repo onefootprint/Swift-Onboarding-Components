@@ -4,7 +4,7 @@ import type {
   GetRiskSignalsResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 
 import useUserId from '../../../../../../hooks/use-user-id';
 import groupBySection from './utils/group-by-section';
@@ -36,7 +36,7 @@ export const groupBySectionAndSeverity = (
 };
 
 const useRiskSignalsOverview = () => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const userId = useUserId();
   const params = {};
 

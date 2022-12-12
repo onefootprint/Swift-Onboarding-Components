@@ -8,7 +8,7 @@ import {
   QueryKey,
   useInfiniteQuery,
 } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 import {
   AccessEventFilters,
   useFilters,
@@ -48,7 +48,7 @@ const getAccessEventsRequest = async ({
 };
 
 const useGetAccessEvents = () => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const { filters } = useFilters();
 
   const debouncedFilters = useDebounce(filters, 500);

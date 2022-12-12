@@ -1,6 +1,6 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
-import { useStore } from 'src/hooks/use-session-user';
+import { useStore } from 'src/hooks/use-session';
 
 import SandboxBanner from './sandbox-banner';
 
@@ -16,7 +16,19 @@ describe('<SandboxBanner />', () => {
   describe('when sandbox is enabled', () => {
     beforeEach(() => {
       useStore.setState({
-        isLive: false,
+        data: {
+          auth: '1',
+          user: {
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          org: {
+            isLive: false,
+            name: 'Acme',
+            sandboxRestricted: false,
+          },
+        },
       });
     });
 
@@ -31,7 +43,7 @@ describe('<SandboxBanner />', () => {
         renderSandboxBanner();
         const toggle = screen.getByRole('button', { name: 'Disable' });
         await userEvent.click(toggle);
-        expect(useStore.getState().isLive).toBeTruthy();
+        expect(useStore.getState().data?.org.isLive).toBeTruthy();
         const banner = screen.queryByRole('alert');
         expect(banner).not.toBeInTheDocument();
       });
@@ -41,14 +53,18 @@ describe('<SandboxBanner />', () => {
   describe('when sandbox is enabled, but is restricted', () => {
     beforeEach(() => {
       useStore.setState({
-        isLive: false,
         data: {
-          auth: 'vtok_X7n2zMasfrMSCp8DQJD56cnDojCJUtaUKRzKKF',
-          email: 'joe@doe.com',
-          firstName: 'Joe',
-          lastName: 'Doe',
-          sandboxRestricted: true,
-          tenantName: 'Acme Bank',
+          auth: '1',
+          user: {
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          org: {
+            isLive: false,
+            name: 'Acme',
+            sandboxRestricted: true,
+          },
         },
       });
     });
@@ -69,7 +85,19 @@ describe('<SandboxBanner />', () => {
   describe('when sandbox is disabled', () => {
     beforeEach(() => {
       useStore.setState({
-        isLive: true,
+        data: {
+          auth: '1',
+          user: {
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          org: {
+            isLive: true,
+            name: 'Acme',
+            sandboxRestricted: false,
+          },
+        },
       });
     });
 

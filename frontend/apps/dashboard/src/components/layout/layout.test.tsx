@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { useStore } from '../../hooks/use-session-user';
+import { useStore } from '../../hooks/use-session';
 import Layout, { LayoutProps } from './layout';
 
 const originalState = useStore.getState();
@@ -35,12 +35,17 @@ describe('<Layout />', () => {
     beforeEach(() => {
       useStore.setState({
         data: {
-          firstName: 'Jane',
-          lastName: 'Doe',
-          tenantName: 'Footprint',
-          sandboxRestricted: false,
           auth: '1',
-          email: 'lorem',
+          user: {
+            email: 'jane.doe@acme.com',
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          org: {
+            isLive: false,
+            name: 'Acme',
+            sandboxRestricted: false,
+          },
         },
       });
     });

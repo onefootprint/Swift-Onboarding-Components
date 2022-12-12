@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useSessionUser from 'src/hooks/use-session-user';
+import useUserSession from 'src/hooks/use-user-session';
 import styled, { css } from 'styled-components';
 
 import Header from '../header';
@@ -17,7 +17,7 @@ type FormData = {
 };
 
 const UserData = ({ id, onComplete }: UserDataProps) => {
-  const { dangerouslyData } = useSessionUser();
+  const { dangerouslyCastedData } = useUserSession();
   const { t } = useTranslation('pages.onboarding.user-data');
   const {
     register,
@@ -26,8 +26,6 @@ const UserData = ({ id, onComplete }: UserDataProps) => {
   } = useForm<FormData>();
 
   const handleSubmit = (formData: FormData) => {
-    // TODO: FP-2105
-    // https://linear.app/footprint/issue/FP-2105/dashboard-onboarding-step-2-save-data
     console.log(formData);
     onComplete();
   };
@@ -41,7 +39,7 @@ const UserData = ({ id, onComplete }: UserDataProps) => {
           label={t('form.email.label')}
           placeholder={t('form.email.placeholder')}
           type="email"
-          value={dangerouslyData.email}
+          value={dangerouslyCastedData.email}
         />
         <TextInput
           hasError={!!errors.name}

@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { DecryptUserRequest, DecryptUserResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const userVaultDecryptRequest = async (
   authHeaders: AuthHeaders,
@@ -21,7 +21,7 @@ const userVaultDecryptRequest = async (
 };
 
 const useUserVaultDecrypt = () => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   return useMutation<DecryptUserResponse, RequestError, DecryptUserRequest>(
     (data: DecryptUserRequest) => userVaultDecryptRequest(authHeaders, data),
   );

@@ -1,10 +1,10 @@
 import { ApiKey } from '@onefootprint/types';
 import { useQueryClient } from '@tanstack/react-query';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 
 const useUpdateApiKeyCache = () => {
   const queryClient = useQueryClient();
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
 
   return (apiKey: ApiKey) => {
     queryClient.setQueryData(

@@ -5,7 +5,7 @@ import request, {
 } from '@onefootprint/request';
 import { OnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 export type GetOnboardingConfigsRequest = {
   authHeaders: AuthHeaders;
@@ -26,7 +26,7 @@ const getApiKeys = async ({ authHeaders }: GetOnboardingConfigsRequest) => {
 
 const useOnboardingConfigs = () => {
   const { formatDateWithTime } = useIntl();
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   return useQuery<GetOnboardingConfigsResponse, RequestError>(
     ['onboarding-configs', authHeaders],
     () => getApiKeys({ authHeaders }),

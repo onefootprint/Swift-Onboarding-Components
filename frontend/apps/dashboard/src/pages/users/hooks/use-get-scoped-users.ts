@@ -9,7 +9,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 import omit from 'lodash/omit';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 import useUserFilters, {
   getCursors,
   ScopedUsersListQueryString,
@@ -60,7 +60,7 @@ const useGetScopedUsers = (
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const { filters } = useUserFilters();
 
   const query: Record<string, any> = {};

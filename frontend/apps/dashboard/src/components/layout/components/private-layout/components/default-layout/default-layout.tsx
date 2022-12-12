@@ -9,7 +9,7 @@ import { Container, Tab, Tabs, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
+import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 import NavDropdown from './components/nav-dropdown';
@@ -22,7 +22,7 @@ type DefaultLayoutProps = {
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
-  const { data } = useSessionUser();
+  const { dangerouslyCastedData } = useOrgSession();
   const routes = [
     { href: '/users', Icon: IcoUsers16, text: t('users') },
     { href: '/security-logs', Icon: IcoFileText16, text: t('security-logs') },
@@ -66,7 +66,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
       </Header>
       <Footer>
         <Typography color="tertiary" variant="label-4">
-          Footprint ❤️ {data?.tenantName}
+          Footprint ❤️ {dangerouslyCastedData.name}
         </Typography>
       </Footer>
     </>

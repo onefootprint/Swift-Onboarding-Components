@@ -5,7 +5,7 @@ import {
   OrgApiKeyRevealResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import useUpdateApiKeyCache from './use-update-api-key-cache';
 
@@ -23,7 +23,7 @@ const revealApiKey = async (
 
 const useRevealKey = (apiKey: ApiKey) => {
   const updateApiCache = useUpdateApiKeyCache();
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
 
   const mutation = useMutation<
     OrgApiKeyRevealResponse,

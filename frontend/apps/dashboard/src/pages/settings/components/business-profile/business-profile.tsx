@@ -2,12 +2,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Box, Divider, LinkButton, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
+import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 const BusinessProfile = () => {
   const { t } = useTranslation('pages.settings.business-profile');
-  const { data } = useSessionUser();
+  const { dangerouslyCastedData } = useOrgSession();
 
   // TODO: https://linear.app/footprint/issue/FP-1712/implement-editing-name-icon-and-address-on-business-profile-section
   const handleChangeLogo = () => {};
@@ -53,7 +53,9 @@ const BusinessProfile = () => {
               {t('company.name')}
             </Typography>
             {/* TODO: https://linear.app/footprint/issue/FP-1735/add-usetenant-hook-for-fetching-tenant-data */}
-            <Typography variant="body-3">{data?.tenantName}</Typography>
+            <Typography variant="body-3">
+              {dangerouslyCastedData.name}
+            </Typography>
           </ProfileInfo>
           <LinkButton onClick={handleEditName}>{t('company.edit')}</LinkButton>
         </ProfileContainer>

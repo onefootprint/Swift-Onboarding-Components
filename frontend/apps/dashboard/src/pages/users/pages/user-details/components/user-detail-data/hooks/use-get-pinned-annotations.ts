@@ -7,7 +7,7 @@ import {
   PinnedAnnotation,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSession from 'src/hooks/use-session';
 import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 
 import useUserId from '../../../hooks/use-user-id/use-user-id';
@@ -41,7 +41,7 @@ const useGetPinnedAnnotations = (
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
-  const { authHeaders } = useSessionUser();
+  const { authHeaders } = useSession();
   const userId = useUserId();
   const { formatDateWithTime } = useIntl();
 
