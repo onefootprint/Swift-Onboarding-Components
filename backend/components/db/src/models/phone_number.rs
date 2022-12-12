@@ -31,12 +31,19 @@ pub struct PhoneNumber {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = phone_number)]
-pub struct NewPhoneNumber {
-    pub e_e164: SealedVaultBytes,
-    pub e_country: SealedVaultBytes,
-    pub is_verified: bool,
-    pub priority: DataPriority,
-    pub lifetime_id: DataLifetimeId,
+struct NewPhoneNumberRow {
+    e_e164: SealedVaultBytes,
+    e_country: SealedVaultBytes,
+    is_verified: bool,
+    priority: DataPriority,
+    lifetime_id: DataLifetimeId,
+}
+
+#[derive(Debug)]
+pub struct NewPhoneNumberArgs {
+    pub e_phone_number: SealedVaultBytes,
+    pub sh_phone_number: FingerprintData,
+    pub e_phone_country: SealedVaultBytes,
 }
 
 impl PhoneNumber {
@@ -67,9 +74,7 @@ impl PhoneNumber {
     pub fn create_verified(
         conn: &mut TxnPgConnection,
         user_vault_id: UserVaultId,
-        e_e164: SealedVaultBytes,
-        fp_e164: FingerprintData,
-        e_country: SealedVaultBytes,
+        args: NewPhoneNumberArgs,
         priority: DataPriority,
         scoped_user_id: Option<ScopedUserId>,
     ) -> DbResult<PhoneNumber> {
@@ -79,9 +84,9 @@ impl PhoneNumber {
             DataLifetime::create(conn, user_vault_id, scoped_user_id, DataLifetimeKind::PhoneNumber)?;
         let seqno = lifetime.created_seqno;
         let lifetime = lifetime.commit(conn, seqno)?;
-        let new_row = NewPhoneNumber {
-            e_e164,
-            e_country,
+        let new_row = NewPhoneNumberRow {
+            e_e164: args.e_phone_number,
+            e_country: args.e_phone_country,
             is_verified: true,
             priority,
             lifetime_id: lifetime.id.clone(),
@@ -93,7 +98,7 @@ impl PhoneNumber {
         // After inserting the data, also create a fingerprint for this piece of data tied to the
         // same DataLifetime
         let new_fingerprint = NewFingerprint {
-            sh_data: fp_e164,
+            sh_data: args.sh_phone_number,
             kind: DataLifetimeKind::PhoneNumber,
             lifetime_id: lifetime.id,
         };

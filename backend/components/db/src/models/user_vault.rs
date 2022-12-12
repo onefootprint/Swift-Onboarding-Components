@@ -6,14 +6,11 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    DataPriority, EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, ScopedUserId, SealedVaultBytes,
-    TenantId, UserVaultId, VaultPublicKey,
+    EncryptedVaultPrivateKey, FootprintUserId, ScopedUserId, TenantId, UserVaultId, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
-use super::phone_number::PhoneNumber;
-use super::scoped_user::ScopedUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vault)]
@@ -144,58 +141,27 @@ impl UserVault {
         Ok(users)
     }
 
-    /// creates a portable user vault
-    pub fn create(
-        conn: &mut TxnPgConnection,
-        new_user: NewUserVaultArgs,
-    ) -> DbResult<(UserVault, Option<ScopedUser>, PhoneNumber)> {
-        let new_user_vault = NewUserVault {
-            e_private_key: new_user.e_private_key,
-            public_key: new_user.public_key,
-            is_live: new_user.is_live,
-            is_portable: true,
-        };
+    pub fn create(conn: &mut PgConnection, new_user: NewUserVaultArgs) -> DbResult<UserVault> {
         let user_vault = diesel::insert_into(user_vault::table)
-            .values(new_user_vault)
-            .get_result::<UserVault>(conn.conn())?;
-        let su = if let Some(tenant_id) = new_user.tenant_id {
-            let su = ScopedUser::get_or_create(conn, user_vault.id.clone(), tenant_id, new_user.is_live)?;
-            Some(su)
-        } else {
-            None
-        };
-        let phone_number = PhoneNumber::create_verified(
-            conn,
-            user_vault.id.clone(),
-            new_user.e_phone_number,
-            new_user.sh_phone_number,
-            new_user.e_phone_country,
-            DataPriority::Primary,
-            su.as_ref().map(|su| su.id.clone()),
-        )?;
-        Ok((user_vault, su, phone_number))
+            .values(new_user)
+            .get_result::<UserVault>(conn)?;
+        Ok(user_vault)
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = user_vault)]
-pub struct NewUserVault {
+pub struct NewUserVaultArgs {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub is_live: IsLive,
     pub is_portable: bool,
 }
 
-pub struct NewUserVaultArgs {
+pub struct NewUserInfo {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub is_live: IsLive,
-    // Note: these aren't actual columns on the table -
-    pub e_phone_number: SealedVaultBytes,
-    pub sh_phone_number: Fingerprint,
-    pub e_phone_country: SealedVaultBytes,
-    /// When provided, creates the ScopedUser at the same time as created the user vault
-    pub tenant_id: Option<TenantId>,
 }
 
 pub struct NewNonPortableUserVaultReq {

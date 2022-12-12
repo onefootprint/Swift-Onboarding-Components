@@ -18,14 +18,11 @@ use super::UserVaultWrapper;
 
 #[db_test]
 fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
-    let (uv, phone_number) = fixtures::user_vault::create(conn);
+    let uv = fixtures::user_vault::create(conn);
     let tenant = fixtures::tenant::create(conn);
     let su = fixtures::scoped_user::create(conn, &uv.id, &tenant.id);
 
     let mut data_kind_to_lifetime_id = HashMap::<DataLifetimeKind, DataLifetimeId>::new();
-
-    // Phone number created with user vault as the auth method
-    data_kind_to_lifetime_id.insert(DataLifetimeKind::PhoneNumber, phone_number.lifetime_id);
 
     // Add identity data
     let data = vec![
@@ -51,6 +48,10 @@ fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
     // Create email
     let email = fixtures::email::create(conn, &uv.id, &su.id);
     data_kind_to_lifetime_id.insert(DataLifetimeKind::Email, email.lifetime_id);
+
+    // Create phone number
+    let phone_number = fixtures::phone_number::create(conn, &uv.id, Some(&su.id));
+    data_kind_to_lifetime_id.insert(DataLifetimeKind::PhoneNumber, phone_number.lifetime_id);
 
     // TODO fiddle with lifetimes to commit/deactivate data
 

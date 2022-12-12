@@ -81,9 +81,9 @@ impl TestData {
         let t2_id = TenantId::test_data("org_merp2".to_owned());
 
         // Create user vaults (without phone number)
-        let uv_id = fixtures::user_vault::create_no_phone(conn).id;
-        let uv2_id = fixtures::user_vault::create_no_phone(conn).id;
-        let uvx_id = fixtures::user_vault::create_no_phone(conn).id;
+        let uv_id = fixtures::user_vault::create(conn).id;
+        let uv2_id = fixtures::user_vault::create(conn).id;
+        let uvx_id = fixtures::user_vault::create(conn).id;
 
         // Create scoped users
         let su_id = ScopedUser::get_or_create(conn, uv_id.clone(), t_id.clone(), true)

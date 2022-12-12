@@ -7,7 +7,7 @@ use crate::models::user_timeline::UserTimeline;
 use crate::{
     models::{
         tenant::{NewTenant, Tenant},
-        user_vault::{NewUserVault, UserVault},
+        user_vault::{NewUserVaultArgs, UserVault},
     },
     schema,
 };
@@ -22,7 +22,7 @@ use newtypes::{
 
 pub(crate) fn test_user_vault(conn: &mut PgConnection, is_portable: bool) -> UserVault {
     diesel::insert_into(schema::user_vault::table)
-        .values(&NewUserVault {
+        .values(&NewUserVaultArgs {
             e_private_key: EncryptedVaultPrivateKey(vec![]),
             public_key: VaultPublicKey::unvalidated(vec![]),
             is_live: true,
@@ -145,15 +145,8 @@ async fn test_db() {
     let new_user = crate::models::user_vault::NewUserVaultArgs {
         e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
         public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
-        e_phone_number: SealedVaultBytes("blah".as_bytes().to_vec()),
-        sh_phone_number: Fingerprint(
-            crypto::random::gen_random_alphanumeric_code(32)
-                .as_bytes()
-                .to_vec(),
-        ),
-        e_phone_country: SealedVaultBytes("blah".as_bytes().to_vec()),
         is_live: false,
-        tenant_id: None,
+        is_portable: true,
     };
     pool.db_transaction(|conn| UserVault::create(conn, new_user))
         .await

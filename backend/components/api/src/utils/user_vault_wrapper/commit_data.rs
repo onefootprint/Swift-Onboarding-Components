@@ -55,6 +55,10 @@ impl LockedUserVaultWrapper {
         // of tables.
         // Get the lifetimes of uncommitted data added by this scoped user. These are the lifetimes
         // that we will commit.
+        // TODO if we have a speculative lifetime for a secondary email, we will commit it here.
+        // But we won't deactivate anything above. Maybe we want a list of lifetime IDs for all
+        // the data. Maybe store Lifetimes joined with underlying data to prevent having more
+        // lifetimes than we have data on the speculative UvwData
         let lifetimes_to_commit: Vec<_> = uvw.speculative.lifetimes.values().collect();
         let all_data_belongs_to_scoped_user = lifetimes_to_commit
             .iter()

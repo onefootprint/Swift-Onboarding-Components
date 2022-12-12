@@ -1,18 +1,22 @@
 use super::uvw_data::UvwData;
 use super::LockedUserVaultWrapper;
 use super::UserVaultWrapper;
+use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
 use db::models::onboarding::Onboarding;
+use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
+use db::models::user_vault::NewUserInfo;
 use db::models::user_vault::UserVault;
 use db::models::user_vault_data::UserVaultData;
 use db::models::verification_request::VerificationRequest;
 use db::HasLifetime;
 use db::TxnPgConnection;
 use db::{errors::DbError, PgConnection};
+use newtypes::DataPriority;
 use newtypes::{DataLifetimeSeqno, ScopedUserId, TenantId};
 use std::marker::PhantomData;
 
@@ -157,5 +161,34 @@ impl UserVaultWrapper {
         let uvw = Self::build_single(conn, user_vault, Some(scoped_user_id), None)?;
 
         Ok(LockedUserVaultWrapper::new(uvw))
+    }
+
+    pub fn create_user_vault(
+        conn: &mut TxnPgConnection,
+        user_info: NewUserInfo,
+        tenant_id: Option<TenantId>,
+        phone_args: NewPhoneNumberArgs,
+    ) -> ApiResult<UserVault> {
+        let new_user_vault = db::models::user_vault::NewUserVaultArgs {
+            e_private_key: user_info.e_private_key,
+            public_key: user_info.public_key,
+            is_live: user_info.is_live,
+            is_portable: true,
+        };
+        let uv = UserVault::create(conn, new_user_vault)?;
+        let su = if let Some(tenant_id) = tenant_id {
+            let su = ScopedUser::get_or_create(conn, uv.id.clone(), tenant_id, user_info.is_live)?;
+            Some(su)
+        } else {
+            None
+        };
+        PhoneNumber::create_verified(
+            conn,
+            uv.id.clone(),
+            phone_args,
+            DataPriority::Primary,
+            su.as_ref().map(|su| su.id.clone()),
+        )?;
+        Ok(uv)
     }
 }

@@ -10,13 +10,15 @@ use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::session::AuthSession;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
 use chrono::Duration;
 use crypto::sha256;
 use db::models::ob_configuration::IsLive;
+use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::scoped_user::ScopedUser;
-use db::models::user_vault::{NewUserVaultArgs, UserVault};
+use db::models::user_vault::{NewUserInfo, UserVault};
 use newtypes::{
     DataLifetimeKind, Fingerprinter, SessionAuthToken, TenantId, UserVaultId, ValidatedPhoneNumber,
 };
@@ -161,20 +163,21 @@ async fn create_new_user_vault(
         })
         .transpose()?;
 
-    let new_user = NewUserVaultArgs {
-        e_private_key,
+    let phone_info = NewPhoneNumberArgs {
         e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
         e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
-        public_key,
         sh_phone_number: state
             .compute_fingerprint(DataLifetimeKind::PhoneNumber, phone_number.to_piistring())
             .await?,
-        is_live: phone_number.is_live(),
-        tenant_id,
     };
-    let (user, _, _) = state
+    let user_info = NewUserInfo {
+        e_private_key,
+        public_key,
+        is_live: phone_number.is_live(),
+    };
+    let user = state
         .db_pool
-        .db_transaction(|conn| UserVault::create(conn, new_user))
+        .db_transaction(|conn| UserVaultWrapper::create_user_vault(conn, user_info, tenant_id, phone_info))
         .await?;
 
     Ok(user)

@@ -1,6 +1,5 @@
 use crate::models::scoped_user::ScopedUser;
-use crate::models::user_vault::{NewUserVault, UserVault};
-use crate::schema;
+use crate::models::user_vault::{NewUserVaultArgs, UserVault};
 use crate::{errors::DbError, models::user_vault::NewNonPortableUserVaultReq};
 use diesel::prelude::*;
 use itertools::Itertools;
@@ -22,15 +21,13 @@ pub async fn create_non_portable(
 
     let scoped_user = pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let new_user_vault = NewUserVault {
+            let new_user_vault = NewUserVaultArgs {
                 e_private_key,
                 public_key,
                 is_live,
                 is_portable: false,
             };
-            let user_vault = diesel::insert_into(schema::user_vault::table)
-                .values(new_user_vault)
-                .get_result::<UserVault>(conn.conn())?;
+            let user_vault = UserVault::create(conn, new_user_vault)?;
 
             // create the scoped user
             let scoped_user = ScopedUser::get_or_create(conn, user_vault.id, tenant_id, is_live)?;
