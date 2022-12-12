@@ -5,6 +5,8 @@ import { statusToBadgeVariant } from 'src/constants/onboarding-status-display';
 import { User } from 'src/pages/users/types/user.types';
 import styled, { css } from 'styled-components';
 
+import { State } from '../../../../utils/decrypt-state-machine';
+import { useDecryptMachine } from '../../../decrypt-machine-provider';
 import DecryptControls from './components/decrypt-controls';
 import ManualReview from './components/manual-review';
 
@@ -15,6 +17,8 @@ type UserHeaderProps = {
 const UserHeader = ({ user }: UserHeaderProps) => {
   const { id: footprintUserId } = user;
   const { t } = useTranslation('pages.user-details.user-header.status');
+  const [state] = useDecryptMachine();
+  const shouldShowManualReview = state.matches(State.idle);
 
   return (
     <HeaderContainer>
@@ -45,7 +49,7 @@ const UserHeader = ({ user }: UserHeaderProps) => {
           <CodeInline>{footprintUserId}</CodeInline>
         </RowContainer>
         <RowContainer>
-          <ManualReview user={user} />
+          {shouldShowManualReview && <ManualReview user={user} />}
           <DecryptControls />
         </RowContainer>
       </SplitRow>
