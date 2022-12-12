@@ -16,7 +16,6 @@ use db::models::verification_request::VerificationRequest;
 use db::HasLifetime;
 use db::TxnPgConnection;
 use db::{errors::DbError, PgConnection};
-use newtypes::DataPriority;
 use newtypes::{DataLifetimeSeqno, ScopedUserId, TenantId};
 use std::marker::PhantomData;
 
@@ -182,13 +181,20 @@ impl UserVaultWrapper {
         } else {
             None
         };
-        PhoneNumber::create_verified(
-            conn,
-            uv.id.clone(),
-            phone_args,
-            DataPriority::Primary,
-            su.as_ref().map(|su| su.id.clone()),
-        )?;
+        // Create a wrapper around this new UserVault that has no data associated with it
+        let wrapper = Self::build(
+            uv.clone(),
+            None,
+            su.map(|su| su.id),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+        );
+        // Safe to make a LockedUVW here because no other transaction can see this UserVault
+        let wrapper = LockedUserVaultWrapper::new(wrapper);
+        wrapper.add_verified_phone_number(conn, phone_args)?;
         Ok(uv)
     }
 }

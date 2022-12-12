@@ -26,13 +26,13 @@ impl TryFrom<IdentityDataRequest> for IdentityDataUpdate {
     fn try_from(r: IdentityDataRequest) -> Result<Self, Self::Error> {
         let IdentityDataRequest { name, dob, .. } = r;
         let ssn = match (r.ssn9, r.ssn4) {
-            (Some(_), Some(_)) => return Err(UserError::InvalidIdentityDataUpdate.into()),
+            (Some(_), Some(_)) => return Err(UserError::InvalidDataUpdate.into()),
             (Some(ssn9), None) => Some(Ssn::Ssn9(ssn9)),
             (None, Some(ssn4)) => Some(Ssn::Ssn4(ssn4)),
             (None, None) => None,
         };
         let address = match (r.address, r.zip_address) {
-            (Some(_), Some(_)) => return Err(UserError::InvalidIdentityDataUpdate.into()),
+            (Some(_), Some(_)) => return Err(UserError::InvalidDataUpdate.into()),
             (Some(full_address), None) => Some(FullAddressOrZip::Address(full_address)),
             (None, Some(zip_and_country)) => Some(FullAddressOrZip::ZipAndCountry(zip_and_country)),
             (None, None) => None,
