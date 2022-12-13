@@ -47,6 +47,10 @@ impl LockedUserVaultWrapper {
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
         let uvw = self.into_inner();
+        if !uvw.emails().is_empty() {
+            // We don't currently support adding a secondary email
+            return Err(UserError::InvalidDataUpdate.into());
+        }
         let scoped_user_id = uvw
             .scoped_user_id
             .clone()
@@ -56,18 +60,13 @@ impl LockedUserVaultWrapper {
 
         let email = email.to_piistring();
         let e_data = uvw.user_vault.public_key.seal_pii(&email)?;
-        let priority = if !uvw.emails().is_empty() {
-            DataPriority::Secondary
-        } else {
-            DataPriority::Primary
-        };
         let user_vault_id = uvw.user_vault.id;
         let email = db::models::email::Email::create(
             conn,
             user_vault_id,
             e_data,
             fingerprint,
-            priority,
+            DataPriority::Primary,
             scoped_user_id,
         )?;
 

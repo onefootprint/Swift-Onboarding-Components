@@ -1,6 +1,6 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use crypto::aead::AeadSealedBytes;
-use db::{models::user_vault::UserVault, HasDataAttributeFields};
+use db::HasDataAttributeFields;
 use newtypes::{Base64Data, DataLifetimeKind, IdentityDocumentId, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;
@@ -89,14 +89,9 @@ pub async fn decrypt(
 /// TODO: potentially move this to UVW
 pub async fn decrypt_document(
     state: &web::Data<State>,
-    user_vault: UserVault,
+    uvw: UserVaultWrapper,
     document_type: String,
 ) -> Result<Vec<DecryptDocumentResult>, ApiError> {
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| UserVaultWrapper::get_committed(conn, user_vault))
-        .await??;
-
     let images = uvw
         .get_encrypted_images_from_s3(state, document_type)
         .await

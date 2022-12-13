@@ -20,7 +20,6 @@ use api_wire_types::{
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
-use db::models::user_vault::UserVault;
 use newtypes::{AccessEventKind, DataIdentifier, DataLifetimeKind, FootprintUserId, TenantPermission};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Query};
@@ -55,10 +54,8 @@ pub(super) async fn get_internal(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let user_vault = UserVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-
-            let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
+            let user_vault_wrapper = UserVaultWrapper::get_for_tenant(conn, &scoped_user.id)?;
             // Important to check requester has access
             let fields = HashSet::from_iter([DataLifetimeKind::IdentityDocument]);
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
@@ -133,21 +130,20 @@ pub(super) async fn post_internal(
     let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let user_vault = UserVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let user_vault_wrapper = UserVaultWrapper::get_committed(conn, user_vault)?;
+            let uvw = UserVaultWrapper::get_for_tenant(conn, &scoped_user.id)?;
 
             // Important to check requester has access
             let fields = HashSet::from_iter([DataLifetimeKind::IdentityDocument]);
-            user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
+            uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
-            Ok((user_vault_wrapper, scoped_user))
+            Ok((uvw, scoped_user))
         })
         .await??;
 
     // As of 2022-11-28: It's possible a user has more than 1 document of a given document_type
     let decrypted_docs: Vec<DecryptDocumentResult> =
-        crate::hosted::user::decrypt_document(&state, uvw.user_vault, document_type.clone()).await?;
+        crate::hosted::user::decrypt_document(&state, uvw, document_type.clone()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed identity document
     NewAccessEvent {

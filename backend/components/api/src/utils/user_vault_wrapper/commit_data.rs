@@ -26,48 +26,47 @@ impl LockedUserVaultWrapper {
         //
         // Deactivate all existing, committed data that is about to be replaced by speculative data.
         //
+        // NOTE: this isn't committing identity documents since we never return IdentityDocument
+        // from get_populated_fields
         let about_to_commit_kinds = uvw.speculative.get_populated_fields();
         let kinds_to_deactivate = about_to_commit_kinds
-            .into_iter()
+            .iter()
             .flat_map(|k| k.kinds_to_clear())
             .unique();
-        let lifetime_ids_to_deactivate: Vec<_> = kinds_to_deactivate
-            // Gather the committed lifetime_ids for this set of DataAttribute kinds
-            .flat_map(|k| uvw.committed.get(k).map(|o| o.lifetime_id().clone()))
+        let lifetimes_to_deactivate: Vec<_> = kinds_to_deactivate
+            // Gather the committed lifetimes for this set of DataAttribute kinds
+            .flat_map(|k| uvw.committed.get_lifetime(&k))
+            .cloned()
             .collect();
 
-        let is_all_data_committed = lifetime_ids_to_deactivate.iter().all(|id| {
-            uvw.committed
-                .lifetimes
-                .get(id)
-                .map(|lifetime| lifetime.committed_seqno.is_some())
-                == Some(true)
-        });
+        let is_all_data_committed = lifetimes_to_deactivate
+            .iter()
+            .all(|l| l.committed_seqno.is_some());
         if !is_all_data_committed {
             // Everything we are deactivating should be committed already
             return Err(ApiError::AssertionError(
                 "Lifetime to deactivate is not committed".to_owned(),
             ));
         }
+        let lifetime_ids_to_deactivate = lifetimes_to_deactivate.into_iter().map(|l| l.id).collect();
         DataLifetime::bulk_deactivate(conn, lifetime_ids_to_deactivate, seqno)?;
 
         // Mark all speculative lifetimes as committed. This could commit data across any number
         // of tables.
         // Get the lifetimes of uncommitted data added by this scoped user. These are the lifetimes
         // that we will commit.
-        // TODO if we have a speculative lifetime for a secondary email, we will commit it here.
-        // But we won't deactivate anything above. Maybe we want a list of lifetime IDs for all
-        // the data. Maybe store Lifetimes joined with underlying data to prevent having more
-        // lifetimes than we have data on the speculative UvwData
-        let lifetimes_to_commit: Vec<_> = uvw.speculative.lifetimes.values().collect();
-        let all_data_belongs_to_scoped_user = lifetimes_to_commit
+        let lifetimes_to_commit: Vec<_> = about_to_commit_kinds
             .iter()
-            .all(|l| l.scoped_user_id == uvw.scoped_user_id);
-        if !all_data_belongs_to_scoped_user {
+            .flat_map(|k| uvw.speculative.get_lifetime(k))
+            .collect();
+        let all_data_is_speculative_and_belongs_to_scoped_user = lifetimes_to_commit
+            .iter()
+            .all(|l| l.committed_seqno.is_none() && l.scoped_user_id == uvw.scoped_user_id);
+        if !all_data_is_speculative_and_belongs_to_scoped_user {
             // Just a sanity check filter that we don't commit other data - all results should match
             // this filter
             return Err(ApiError::AssertionError(
-                "About to commit data not belonging to user".to_owned(),
+                "About to commit data that is not speculative or does not belong to tenant".to_owned(),
             ));
         }
         let lifetime_ids_to_commit = lifetimes_to_commit.into_iter().map(|l| l.id.clone()).collect();

@@ -17,8 +17,8 @@ pub(super) struct UvwData {
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
     pub(super) identity_documents: Vec<IdentityDocument>,
 
-    // A map of all of the DataLifetimes for this data
-    pub(super) lifetimes: HashMap<DataLifetimeId, DataLifetime>,
+    // A map of all of the DataLifetimes for this data.
+    lifetimes: HashMap<DataLifetimeId, DataLifetime>,
 }
 
 impl UvwData {
@@ -27,14 +27,13 @@ impl UvwData {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocument>,
-        lifetimes: Vec<DataLifetime>,
+        all_lifetimes: Vec<DataLifetime>,
     ) -> (Self, Self) {
-        // Partition lifetimes by committed / speculative
-        let (committed_lifetimes, speculative_lifetimes): (Vec<_>, Vec<_>) =
-            // should we also double check if this speculative data belongs to the scoped user?
-            // or do we just assume
-            lifetimes.into_iter().partition(|l| l.committed_seqno.is_some());
-        let speculative_lifetime_ids = HashSet::from_iter(speculative_lifetimes.iter().map(|l| l.id.clone()));
+        let speculative_lifetime_ids: HashSet<_> = all_lifetimes
+            .iter()
+            .filter(|l| l.committed_seqno.is_some())
+            .map(|l| l.id.clone())
+            .collect();
 
         // Partition each piece of data by committed / speculative
         fn partition<T: HasLifetime>(
@@ -49,27 +48,53 @@ impl UvwData {
             partition(phone_numbers, &speculative_lifetime_ids);
         let (committed_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
 
-        fn map(v: Vec<DataLifetime>) -> HashMap<DataLifetimeId, DataLifetime> {
-            HashMap::from_iter(v.into_iter().map(|v| (v.id.clone(), v)))
-        }
-
-        // Construct the UvwData structs
-        let committed = Self {
-            uvd: committed_uvd,
-            phone_numbers: committed_phone_numbers,
-            emails: committed_emails,
-            // TODO migrate once identity documents support lifetimes
+        let committed = Self::build(
+            committed_uvd,
+            committed_phone_numbers,
+            committed_emails,
             identity_documents,
-            lifetimes: map(committed_lifetimes),
-        };
-        let speculative = Self {
-            uvd: speculative_uvd,
-            phone_numbers: speculative_phone_numbers,
-            emails: speculative_emails,
-            identity_documents: vec![],
-            lifetimes: map(speculative_lifetimes),
-        };
+            &all_lifetimes,
+        );
+        let speculative = Self::build(
+            speculative_uvd,
+            speculative_phone_numbers,
+            speculative_emails,
+            vec![],
+            &all_lifetimes,
+        );
         (committed, speculative)
+    }
+
+    fn build(
+        uvd: Vec<UserVaultData>,
+        phone_numbers: Vec<PhoneNumber>,
+        emails: Vec<Email>,
+        identity_documents: Vec<IdentityDocument>,
+        all_lifetimes: &[DataLifetime],
+    ) -> Self {
+        let lifetime_ids: Vec<Vec<_>> = vec![
+            uvd.iter().map(|d| d.lifetime_id()).collect(),
+            phone_numbers.iter().map(|d| d.lifetime_id()).collect(),
+            emails.iter().map(|d| d.lifetime_id()).collect(),
+            identity_documents.iter().map(|d| d.lifetime_id()).collect(),
+        ];
+        let lifetime_ids: HashSet<_> = lifetime_ids.into_iter().flatten().collect();
+        // Since all_lifetimes contains a superset of lifetimes represented by the data in this
+        // UvwData, we filter for only the lifetimes whose data are stored in this UvwData
+        let lifetimes: HashMap<_, _> = all_lifetimes
+            .iter()
+            .filter(|l| lifetime_ids.contains(&l.id))
+            .cloned()
+            .map(|l| (l.id.clone(), l))
+            .collect();
+
+        Self {
+            uvd,
+            phone_numbers,
+            emails,
+            identity_documents,
+            lifetimes,
+        }
     }
 
     fn uvd(&self, kind: DataLifetimeKind) -> Option<&UserVaultData> {
@@ -81,7 +106,7 @@ impl UvwData {
     /// Dispatch queries for a piece of data with a given DataAttribute kind to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub(super) fn get(&self, kind: DataLifetimeKind) -> Option<&dyn HasLifetime> {
+    pub(super) fn get(&self, kind: &DataLifetimeKind) -> Option<&dyn HasLifetime> {
         let email = self.emails.first();
         let phone = self.phone_numbers.first();
         match kind {
@@ -96,7 +121,7 @@ impl UvwData {
             | DataLifetimeKind::State
             | DataLifetimeKind::Zip
             | DataLifetimeKind::Country
-            | DataLifetimeKind::Ssn4 => self.uvd(kind).map(|uvd| uvd as &dyn HasLifetime),
+            | DataLifetimeKind::Ssn4 => self.uvd(*kind).map(|uvd| uvd as &dyn HasLifetime),
             // email
             DataLifetimeKind::Email => email.map(|email| email as &dyn HasLifetime),
             // phone
@@ -105,15 +130,23 @@ impl UvwData {
             DataLifetimeKind::IdentityDocument => None,
         }
     }
+
+    pub(super) fn get_lifetime(&self, kind: &DataLifetimeKind) -> Option<&DataLifetime> {
+        self.get(kind).and_then(|d| {
+            let lifetime_id = d.lifetime_id();
+            self.lifetimes.get(lifetime_id)
+        })
+    }
 }
 
 impl HasDataAttributeFields for UvwData {
     fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
+        // NOTE: this prevents us from ever committing IdentityDocuments
         if data_attribute.disallows_e_data() {
             return None;
         }
 
-        let value = self.get(data_attribute);
+        let value = self.get(&data_attribute);
         value.map(|v| v.e_data())
     }
 }
