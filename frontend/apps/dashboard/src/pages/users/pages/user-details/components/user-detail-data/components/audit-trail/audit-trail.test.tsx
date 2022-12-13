@@ -15,7 +15,7 @@ const footprintUserId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 describe('<AuditTrail />', () => {
   beforeAll(() => {
     useRouterSpy({
-      pathname: `/users/detail?footprint_user_id=${footprintUserId}`,
+      pathname: `/users/detail`,
       query: {
         footprint_user_id: footprintUserId,
       },
@@ -27,10 +27,9 @@ describe('<AuditTrail />', () => {
 
   it('renders container and title correctly', () => {
     useRouterSpy({
-      pathname:
-        '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+      pathname: '/users/detail',
       query: {
-        footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+        footprint_user_id: footprintUserId,
       },
     });
 

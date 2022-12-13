@@ -17,8 +17,7 @@ const useRouterSpy = createUseRouterSpy();
 describe('<ManualReviewDialog />', () => {
   beforeEach(() => {
     useRouterSpy({
-      pathname:
-        '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+      pathname: '/users/detail',
       query: {
         footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
       },

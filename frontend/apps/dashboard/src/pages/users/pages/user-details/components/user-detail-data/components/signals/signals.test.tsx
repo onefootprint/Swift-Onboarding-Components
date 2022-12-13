@@ -12,14 +12,14 @@ import Signals from './signals';
 import { withSignals, withSignalsError } from './signals.test.config';
 
 const useRouterSpy = createUseRouterSpy();
+const footprintUserId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
 describe('<Signals />', () => {
   beforeEach(() => {
     useRouterSpy({
-      pathname:
-        '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+      pathname: '/users/detail',
       query: {
-        footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+        footprint_user_id: footprintUserId,
       },
     });
   });
@@ -88,10 +88,9 @@ describe('<Signals />', () => {
         it('should append signal_id', async () => {
           const pushMockFn = jest.fn();
           useRouterSpy({
-            pathname:
-              '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+            pathname: '/users/detail',
             query: {
-              footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+              footprint_user_id: footprintUserId,
             },
             push: pushMockFn,
           });
@@ -103,7 +102,7 @@ describe('<Signals />', () => {
             {
               query: {
                 signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
-                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                footprint_user_id: footprintUserId,
               },
             },
             undefined,
@@ -117,10 +116,9 @@ describe('<Signals />', () => {
           it('should append signal_description', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
-              pathname:
-                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              pathname: '/users/detail',
               query: {
-                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                footprint_user_id: footprintUserId,
               },
               push: pushMockFn,
             });
@@ -132,7 +130,7 @@ describe('<Signals />', () => {
               expect(pushMockFn).toHaveBeenCalledWith(
                 {
                   query: {
-                    footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                    footprint_user_id: footprintUserId,
                     signal_description: 'lorem',
                   },
                 },
@@ -147,10 +145,9 @@ describe('<Signals />', () => {
           it('should display the text on the table search', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
-              pathname:
-                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              pathname: '/users/detail',
               query: {
-                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                footprint_user_id: footprintUserId,
                 signal_description: 'lorem',
               },
               push: pushMockFn,
@@ -166,10 +163,9 @@ describe('<Signals />', () => {
           it('should append a signal_severity', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
-              pathname:
-                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              pathname: '/users/detail',
               query: {
-                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                footprint_user_id: footprintUserId,
               },
               push: pushMockFn,
             });
@@ -193,7 +189,7 @@ describe('<Signals />', () => {
             expect(pushMockFn).toHaveBeenCalledWith(
               {
                 query: {
-                  footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                  footprint_user_id: footprintUserId,
                   signal_severity: 'medium',
                 },
               },
@@ -207,10 +203,9 @@ describe('<Signals />', () => {
           it('should append a signal_severity', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
-              pathname:
-                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              pathname: '/users/detail',
               query: {
-                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                footprint_user_id: footprintUserId,
               },
               push: pushMockFn,
             });
@@ -247,12 +242,11 @@ describe('<Signals />', () => {
           it('should indicate the number of filters selected', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
-              pathname:
-                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              pathname: '/users/detail',
               query: {
                 signal_scope: 'email',
                 signal_severity: 'high',
-                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                footprint_user_id: footprintUserId,
               },
               push: pushMockFn,
             });
@@ -269,12 +263,11 @@ describe('<Signals />', () => {
           it('should remove all the signal filters from the URL', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
-              pathname:
-                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              pathname: '/users/detail',
               query: {
                 signal_scope: 'email',
                 signal_severity: 'high',
-                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                footprint_user_id: footprintUserId,
               },
               push: pushMockFn,
             });

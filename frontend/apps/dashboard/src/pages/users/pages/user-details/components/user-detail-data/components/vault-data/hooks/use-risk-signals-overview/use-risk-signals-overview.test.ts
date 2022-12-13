@@ -17,7 +17,7 @@ const routerSpy = createUseRouterSpy();
 describe('useRiskSignalsOverview', () => {
   beforeEach(() => {
     routerSpy({
-      pathname: '/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+      pathname: '/user/detail',
       query: {
         footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
       },
