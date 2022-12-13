@@ -1,5 +1,5 @@
 use super::uvd_builder::UvdBuilder;
-use super::UserVaultWrapper;
+use super::LockedUserVaultWrapper;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::identity_data_request::IdentityDataUpdate;
@@ -13,27 +13,27 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
-impl UserVaultWrapper {
+impl LockedUserVaultWrapper {
     pub fn add_email(
         self, // Intentionally consume to prevent using stale UVW
         conn: &mut TxnPgConnection,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
-        self.assert_is_locked(conn)?;
-        let scoped_user_id = self
+        let uvw = self.into_inner();
+        let scoped_user_id = uvw
             .scoped_user_id
             .clone()
             .ok_or(UserError::NotAllowedOutsideOnboarding)?;
 
         let email = email.to_piistring();
-        let e_data = self.user_vault.public_key.seal_pii(&email)?;
-        let priority = if !self.emails().is_empty() {
+        let e_data = uvw.user_vault.public_key.seal_pii(&email)?;
+        let priority = if !uvw.emails().is_empty() {
             DataPriority::Secondary
         } else {
             DataPriority::Primary
         };
-        let user_vault_id = self.user_vault.id.clone();
+        let user_vault_id = uvw.user_vault.id;
         let email = db::models::email::Email::create(
             conn,
             user_vault_id,
@@ -51,16 +51,16 @@ impl UserVaultWrapper {
         update: IdentityDataUpdate,
         fingerprints: Vec<(UvdKind, Fingerprint)>,
     ) -> Result<(), ApiError> {
-        self.assert_is_locked(conn)?;
-        let existing_fields = self.get_populated_fields();
+        let uvw = self.into_inner();
+        let existing_fields = uvw.get_populated_fields();
 
-        let builder = UvdBuilder::build(update, self.user_vault.public_key, existing_fields)?;
-        let scoped_user_id = self
+        let builder = UvdBuilder::build(update, uvw.user_vault.public_key, existing_fields)?;
+        let scoped_user_id = uvw
             .scoped_user_id
             .clone()
             .ok_or(UserError::NotAllowedOutsideOnboarding)?;
 
-        let collected_data = builder.save(conn, self.user_vault.id.clone(), scoped_user_id, fingerprints)?;
+        let collected_data = builder.save(conn, uvw.user_vault.id.clone(), scoped_user_id, fingerprints)?;
         if !collected_data.is_empty() {
             // Create a timeline event that shows all the new data that was added
             UserTimeline::create(
@@ -68,8 +68,8 @@ impl UserVaultWrapper {
                 DataCollectedInfo {
                     attributes: collected_data,
                 },
-                self.user_vault.id,
-                self.scoped_user_id,
+                uvw.user_vault.id,
+                uvw.scoped_user_id,
             )?;
         }
 
@@ -82,17 +82,15 @@ impl UserVaultWrapper {
         tenant_id: TenantId,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()> {
-        self.assert_is_locked(conn)?;
-
         let update = update
             .into_iter()
             .map(|(data_key, pii)| {
-                let e_data = self.user_vault.public_key.seal_pii(&pii)?;
+                let e_data = self.user_vault().public_key.seal_pii(&pii)?;
                 Ok(NewKeyValueDataArgs { data_key, e_data })
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
 
-        KeyValueData::update_or_insert(conn, self.user_vault.id.clone(), tenant_id, update)?;
+        KeyValueData::update_or_insert(conn, self.user_vault().id.clone(), tenant_id, update)?;
         Ok(())
     }
 }

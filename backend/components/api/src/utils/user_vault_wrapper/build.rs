@@ -1,6 +1,6 @@
 use super::uvw_data::UvwData;
+use super::LockedUserVaultWrapper;
 use super::UserVaultWrapper;
-use crate::errors::ApiError;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
@@ -22,7 +22,6 @@ impl UserVaultWrapper {
         user_vault: UserVault,
         seqno: Option<DataLifetimeSeqno>,
         scoped_user_id: Option<ScopedUserId>,
-        is_locked: bool,
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
@@ -41,7 +40,6 @@ impl UserVaultWrapper {
             speculative,
             _seqno: seqno,
             scoped_user_id,
-            is_locked,
             is_hydrated: PhantomData,
         }
     }
@@ -50,7 +48,6 @@ impl UserVaultWrapper {
         conn: &mut PgConnection,
         user_vault: UserVault,
         scoped_user_id: Option<&ScopedUserId>,
-        is_locked: bool,
         seqno: Option<DataLifetimeSeqno>,
     ) -> Result<Self, DbError> {
         let active_lifetimes = if let Some(seqno) = seqno {
@@ -73,7 +70,6 @@ impl UserVaultWrapper {
             user_vault,
             seqno,
             scoped_user_id.cloned(),
-            is_locked,
             data,
             phone_numbers,
             emails,
@@ -112,7 +108,6 @@ impl UserVaultWrapper {
                     uv,
                     None,
                     Some(su.id),
-                    false,
                     uvds.remove(&uv_id).unwrap_or_default(),
                     phone_numbers.remove(&uv_id).unwrap_or_default(),
                     emails.remove(&uv_id).unwrap_or_default(),
@@ -134,14 +129,13 @@ impl UserVaultWrapper {
             conn,
             user_vault,
             Some(&scoped_user.id),
-            false,
             Some(request.uvw_snapshot_seqno),
         )
     }
 
     /// Builds a UVW that only sees committed data.
     pub fn get_committed(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
-        Self::build_single(conn, user_vault, None, false, None)
+        Self::build_single(conn, user_vault, None, None)
     }
 
     /// Builds a UVW that sees committed data AND speculative data for the tenant.
@@ -149,7 +143,7 @@ impl UserVaultWrapper {
     /// uncommitted data that has been added by previous operations
     pub fn get_for_tenant(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> Result<Self, DbError> {
         let user_vault = UserVault::get(conn, scoped_user_id)?;
-        Self::build_single(conn, user_vault, Some(scoped_user_id), false, None)
+        Self::build_single(conn, user_vault, Some(scoped_user_id), None)
     }
 
     /// Builds a locked UVW that sees committed data AND speculative data for the tenant.
@@ -158,17 +152,10 @@ impl UserVaultWrapper {
     pub fn lock_for_tenant(
         conn: &mut TxnPgConnection,
         scoped_user_id: &ScopedUserId,
-    ) -> Result<Self, DbError> {
+    ) -> Result<LockedUserVaultWrapper, DbError> {
         let user_vault = UserVault::lock(conn, scoped_user_id)?;
-        Self::build_single(conn, user_vault, Some(scoped_user_id), true, None)
-    }
+        let uvw = Self::build_single(conn, user_vault, Some(scoped_user_id), None)?;
 
-    pub fn assert_is_locked(&self, _conn: &mut TxnPgConnection) -> Result<(), ApiError> {
-        // Accept _conn to make sure we pass in a TxnPgConnection, not PgConnection
-        if !self.is_locked {
-            Err(ApiError::UserNotLocked)
-        } else {
-            Ok(())
-        }
+        Ok(LockedUserVaultWrapper::new(uvw))
     }
 }

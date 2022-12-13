@@ -63,7 +63,7 @@ pub async fn post(
             let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user_id)?;
 
             // Enforce that sandbox emails are used for sandbox users
-            if email.is_live() != uvw.user_vault.is_live {
+            if email.is_live() != uvw.user_vault().is_live {
                 return Err(UserError::SandboxMismatch.into());
             }
 

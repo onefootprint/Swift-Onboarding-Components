@@ -14,7 +14,7 @@ use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::{LockedUserVaultWrapper, UserVaultWrapper};
 use crate::{errors::ApiError, State};
 
 use actix_web::web::Query;
@@ -77,14 +77,14 @@ pub async fn put(
 
 pub fn put_internal(
     conn: &mut TxnPgConnection,
-    uvw: UserVaultWrapper,
+    uvw: LockedUserVaultWrapper,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,
     update: IdentityDataUpdate,
     fingerprints: Vec<(UvdKind, Fingerprint)>,
 ) -> ApiResult<()> {
-    if uvw.user_vault.is_portable {
+    if uvw.user_vault().is_portable {
         return Err(AuthError::CannotModifyPortableUser.into());
     }
 

@@ -9,7 +9,7 @@ use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::{LockedUserVaultWrapper, UserVaultWrapper};
 use crate::{errors::ApiError, State};
 
 use db::models::access_event::NewAccessEvent;
@@ -64,7 +64,7 @@ pub async fn put(
 
 pub fn put_internal(
     conn: &mut TxnPgConnection,
-    uvw: &UserVaultWrapper,
+    uvw: &LockedUserVaultWrapper,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,
