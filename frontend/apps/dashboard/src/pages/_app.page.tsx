@@ -3,6 +3,7 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 import themes from '@onefootprint/design-tokens';
 import FootprintDevTools from '@onefootprint/dev-tools';
 import { DesignSystemProvider } from '@onefootprint/ui';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
@@ -30,6 +31,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
       <ReactQueryProvider>
         <DesignSystemProvider theme={themes.light}>
+          <ReactQueryDevtools />
           <FootprintDevTools />
           <UserDataProvider>
             <GlobalStyle />
