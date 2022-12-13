@@ -36,17 +36,10 @@ export async function CreateDB(
   const databaseName = 'footprint';
 
   const databaseSecurityGroup = new awsx.ec2.SecurityGroup(
-    `${clusterIdentifier}-db-sg`,
+    `${clusterIdentifier}-db-sg2`,
     {
       vpc: vpc.vpc,
       ingress: [
-        {
-          protocol: '-1',
-          fromPort: 5432,
-          toPort: 5432,
-          sourceSecurityGroupId: coreSecurityGroups.airplane.id,
-          description: 'Allows inbound DB connections from the airplane-agent',
-        },
         {
           protocol: '-1',
           fromPort: 5432,
@@ -60,6 +53,13 @@ export async function CreateDB(
           toPort: 5432,
           sourceSecurityGroupId: coreSecurityGroups.jumpbox.id,
           description: 'Allows inbound DB connections from the jumpbox',
+        },
+        {
+          protocol: '-1',
+          fromPort: 5432,
+          toPort: 5432,
+          sourceSecurityGroupId: coreSecurityGroups.airplane.id,
+          description: 'Allows inbound DB connections from the airplane-agent',
         },
       ],
     },
