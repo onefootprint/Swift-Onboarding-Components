@@ -48,8 +48,11 @@ const QueryUI = () => {
           {loading ? <Loader variant="dots" /> : <>Run Query</>}
         </Button>
 
-        {error ? <Text color="error">{error.message}</Text> : <></>}
-        <Table title="Results" defaultPageSize={100} data={output ?? []} />
+        {error ? (
+          <Text color="error">{error.message}</Text>
+        ) : (
+          <Table title="Results" defaultPageSize={100} data={output ?? []} />
+        )}
       </Stack>
     </Stack>
   );

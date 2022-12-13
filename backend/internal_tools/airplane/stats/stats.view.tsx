@@ -21,33 +21,95 @@ const Stats = () => {
   return (
     <Stack>
       <Stack direction="row">
-        <Stack width={{ xs: '50%', sm: '25%' }}>
-          <OnboardingStats></OnboardingStats>
-        </Stack>
-        <Stack width={{ xs: '50%', sm: '75%' }}>
-          <Tenants></Tenants>
-          <UserVaults></UserVaults>
-        </Stack>
+        <OverviewCard
+          title={'Customers'}
+          query={
+            "select count(*) from tenant where name not like 'Acme%' and name not like 'foo' and name not like 'bar' and name not like '%document tenant';"
+          }
+        ></OverviewCard>
+        <OverviewCard
+          title={'Portable identities'}
+          query={
+            'select count(*) from user_vault where is_portable=true and is_live=true;'
+          }
+        ></OverviewCard>
       </Stack>
+      <OnboardingStats></OnboardingStats>
+      <TenantUsers></TenantUsers>
+      <Tenants></Tenants>
+      <UserVaults></UserVaults>
     </Stack>
+  );
+};
+
+const OverviewCard = ({ title, query }) => {
+  const { output, loading, error } = useTaskQuery({
+    slug: 'dbquery',
+    params: {
+      query: query,
+    },
+  });
+
+  console.log(output);
+  return (
+    <Card>
+      <Stack>
+        <Text size="xl" weight={700}>
+          {title}
+        </Text>
+        {loading ? (
+          <Loader variant="dots" />
+        ) : error ? (
+          <Text color="error">{error.message}</Text>
+        ) : (
+          <Title color="green">{output[0].count}</Title>
+        )}
+      </Stack>
+    </Card>
   );
 };
 
 const OnboardingStats = () => {
   return (
-    <Table
-      title="Onboardings per day"
-      task={{
-        slug: 'dbquery',
-        params: {
-          query: `\
+    <Card>
+      <Table
+        title="Onboardings per day"
+        task={{
+          slug: 'dbquery',
+          params: {
+            query: `\
             SELECT date_trunc('week', CAST(onboarding.start_timestamp AS timestamp)):: date AS day, count(DISTINCT onboarding.id) \
             FROM onboarding \
             GROUP BY day \
             ORDER BY day DESC;`,
-        },
-      }}
-    />
+          },
+        }}
+      />
+    </Card>
+  );
+};
+
+const TenantUsers = () => {
+  return (
+    <Card>
+      <Table
+        title="Org Users"
+        defaultPageSize={10}
+        columns={[
+          { accessor: 'count', label: 'onboardings' },
+          { accessor: '_created_at', label: 'created' },
+        ]}
+        task={{
+          slug: 'dbquery',
+          params: {
+            query: `\
+            SELECT tenant_user.email, tenant_user._created_at, tenant.name as org FROM tenant \
+            INNER JOIN tenant_user on tenant_user.tenant_id = tenant.id \
+            WHERE email NOT LIKE '%@onefootprint.com' ORDER BY _created_at DESC;`,
+          },
+        }}
+      ></Table>
+    </Card>
   );
 };
 
@@ -55,7 +117,7 @@ const Tenants = () => {
   return (
     <Card>
       <Table
-        title="Tenants"
+        title="Orgs"
         defaultPageSize={10}
         columns={[
           { accessor: 'count', label: 'onboardings' },
