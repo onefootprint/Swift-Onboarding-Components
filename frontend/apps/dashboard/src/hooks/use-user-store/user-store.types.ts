@@ -4,6 +4,7 @@ import {
   OnboardingStatus,
   PinnedAnnotation,
   RiskSignal,
+  RiskSignalSeverity,
   ScopedUser,
   TimelineEvent,
   UserDataAttribute,
@@ -27,8 +28,16 @@ export type UserAnnotations = {
   annotations: PinnedAnnotation[];
 };
 
+type RiskSignalSeverityGrouping = {
+  [RiskSignalSeverity.Low]: RiskSignal[];
+  [RiskSignalSeverity.Medium]: RiskSignal[];
+  [RiskSignalSeverity.High]: RiskSignal[];
+};
+
 export type UserRiskSignals = {
-  signals: RiskSignal[];
+  basic: RiskSignalSeverityGrouping;
+  identity: RiskSignalSeverityGrouping;
+  address: RiskSignalSeverityGrouping;
 };
 
 export type UserTimeline = {

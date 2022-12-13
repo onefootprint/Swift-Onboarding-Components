@@ -1,7 +1,13 @@
 import request, { RequestError } from '@onefootprint/request';
-import { DecryptUserRequest, DecryptUserResponse } from '@onefootprint/types';
+import { DecryptUserResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
+
+type DecryptUserRequest = {
+  footprintUserId: string;
+  fields: string[];
+  reason: string;
+};
 
 const userVaultDecryptRequest = async (
   authHeaders: AuthHeaders,
