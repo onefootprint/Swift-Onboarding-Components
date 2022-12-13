@@ -12,9 +12,10 @@ import * as db from './db';
 import * as vpcUtil from './vpc';
 import * as hmacSigningKey from './hmac_key';
 import * as s3 from './s3';
-import { GetStackMetadata } from './stack_metadata';
+import { GetStackMetadata, StackMetadata } from './stack_metadata';
 import * as nitroService from './nitro_service';
 import * as dns from './dns';
+import * as airplane from './airplane';
 
 /**
  * Convenient type to pass shared global resources
@@ -31,6 +32,7 @@ export type GlobalState = {
   dnsConfig: dns.DnsConfig;
   coreSecurityGroups: sg.CoreSecurityGroups;
   buckets: s3.ServiceS3Buckets;
+  stackMetadata: StackMetadata;
 };
 
 /**
@@ -108,7 +110,11 @@ export default async function main() {
     dnsConfig,
     coreSecurityGroups,
     buckets: s3Buckets,
+    stackMetadata,
   };
+
+  // create airplane agent
+  const airplaneOutput = airplane.CreateAirplaneAgentStack(globalState);
 
   const service = await createCoreService(globalState);
 
@@ -116,6 +122,8 @@ export default async function main() {
     service,
     apiUrl: `https://${dnsConfig.apiDomain}`,
     databaseUrl: database.databaseUrl,
+    airplaneEnvSlug: airplaneOutput.envSlug,
+    shortStackName: stackMetadata.shortStackName,
   };
 }
 

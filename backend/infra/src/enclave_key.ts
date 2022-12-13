@@ -22,7 +22,7 @@ export async function Initialize(
   replicaRegions: Region[],
 ): Promise<EnclaveKeyDescriptor> {
   const current = await aws.getCallerIdentity({});
-  // todo: change parent to be role!
+  // TODO: change parent to be role
   const enclaveUser = new aws.iam.User(`enclave`);
 
   const keyPolicy = pulumi.all([enclaveUser.arn]).apply(([enclaveArn]) => {

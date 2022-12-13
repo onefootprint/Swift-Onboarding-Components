@@ -59,6 +59,8 @@ on:
         required: true
       PULUMI_ACCESS_TOKEN:
         required: true
+      AIRPLANE_API_KEY:
+        required: true
 jobs:
   extract_commit:
     name: Extract commit hash
@@ -266,31 +268,35 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # refresh the state
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@v3.20.0
         with:
           command: refresh
           work-dir: ./backend/infra
           stack-name: 'footprint/${{ inputs.stackName }}'
+          comment-on-pr: false
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # preview the stack
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@v3.20.0
         with:
           command: preview
           work-dir: ./backend/infra
           stack-name: 'footprint/${{ inputs.stackName }}'
+          comment-on-pr: false
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # deploy the stack
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@v3.20.0
         id: pulumi_deploy
         with:
           command: up
           work-dir: ./backend/infra
           stack-name: 'footprint/${{ inputs.stackName }}'
           message: 'Deployed component ${{ needs.extract_commit.outputs.apiComponentVersion }} and ${{ needs.extract_commit.outputs.enclaveComponentVersion }}'
+          comment-on-pr: true
+          edit-pr-comment: true
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -299,9 +305,43 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // get existing comments
+            const {data: comments} = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Deployed to ${{ steps.pulumi_deploy.outputs.apiUrl }} with component tags `${{ needs.extract_commit.outputs.apiComponentVersion }}`, `${{ needs.extract_commit.outputs.enclaveComponentVersion }}`.'
-            })
+              issue_number: context.issue.number,
+            });
+
+            // Find any comment already made by the bot.                                                                                                    
+            const botComment = comments.find(comment => comment.user.id === 41898282 && comment.body.includes('Deployed 🚀'));
+            const commentBody = "**Deployed 🚀**\n\
+            - URL: ${{ steps.pulumi_deploy.outputs.apiUrl }}\n\
+            - Stack name: `${{ steps.pulumi_deploy.outputs.shortStackName }}`\n\
+            - **api**: `${{ needs.extract_commit.outputs.apiComponentVersion }}`\n\
+            - **enclave**: `${{ needs.extract_commit.outputs.enclaveComponentVersion }}`";
+                                                                  
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      - name: Airplane deploy
+        working-directory: ./backend/internal_tools/airplane
+        run: |
+          curl -L https://github.com/airplanedev/cli/releases/latest/download/install.sh | sh
+          /home/runner/.airplane/bin/airplane deploy --env ${{ steps.pulumi_deploy.outputs.airplaneEnvSlug }} .
+        env:
+          AP_TEAM_ID: tea20220706zs7g4auu0i6
+          AP_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
+          AP_SOURCE: githubAction

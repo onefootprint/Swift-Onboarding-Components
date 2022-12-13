@@ -16,6 +16,7 @@ export type DbConfig = {
 
 export type DatabaseOutput = {
   databaseUrl: pulumi.Output<string>;
+  readOnlyDatabaseUrl: pulumi.Output<string>;
   databaseUrlSecretParam: aws.ssm.Parameter;
   databaseUrlSecretName: string;
   db: aws.rds.Cluster;
@@ -39,6 +40,13 @@ export async function CreateDB(
     {
       vpc: vpc.vpc,
       ingress: [
+        {
+          protocol: '-1',
+          fromPort: 5432,
+          toPort: 5432,
+          sourceSecurityGroupId: coreSecurityGroups.airplane.id,
+          description: 'Allows inbound DB connections from the airplane-agent',
+        },
         {
           protocol: '-1',
           fromPort: 5432,
@@ -99,10 +107,12 @@ export async function CreateDB(
     engineVersion: db.engineVersion,
   });
 
-  const databaseUrl = pulumi
-    .all([db.endpoint, secretsStore.dbPassword])
-    .apply(([host, password]) => {
-      return `postgresql://${user}:${password}@${host}`;
+  const { rw: databaseUrl, ro: readOnlyDatabaseUrl } = pulumi
+    .all([db.endpoint, db.readerEndpoint, secretsStore.dbPassword])
+    .apply(([host, roHost, password]) => {
+      const rw = `postgresql://${user}:${password}@${host}`;
+      const ro = `postgresql://${user}:${password}@${roHost}`;
+      return { rw, ro };
     });
 
   const dbSecretName = `/db/url-${clusterIdentifier}`;
@@ -125,6 +135,7 @@ export async function CreateDB(
 
   return {
     databaseUrl,
+    readOnlyDatabaseUrl,
     db,
     databaseUrlSecretParam,
     databaseUrlSecretName: dbSecretName,
@@ -312,3 +323,7 @@ chmod +x connect_db.sh`;
 
   return jumpbox;
 }
+
+/**
+ *
+ */

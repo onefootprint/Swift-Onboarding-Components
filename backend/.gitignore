@@ -13,6 +13,8 @@ tls_proxy/*.key
 tls_proxy/local_proxy.json
 **/__pycache__/
 
+.airplane/
+
 # misc
 .DS_Store
 *.pem

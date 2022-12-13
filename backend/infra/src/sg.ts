@@ -17,6 +17,7 @@ export type CoreSecurityGroups = {
   fpcServiceLoadBalancer: awsx.ec2.SecurityGroup;
   fpcService: awsx.ec2.SecurityGroup;
   jumpbox: awsx.ec2.SecurityGroup;
+  airplane: awsx.ec2.SecurityGroup;
 };
 
 // The service port for our main `api` container
@@ -79,9 +80,21 @@ export function CreateCoreSecurityGroups(
     { provider },
   );
 
+  const airplane = new awsx.ec2.SecurityGroup(
+    `airplane-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc: vpc.vpc,
+
+      egress: [EGRESS_ALL],
+    },
+    { provider },
+  );
+
+
   return {
     fpcServiceLoadBalancer,
     fpcService,
     jumpbox,
+    airplane
   };
 }

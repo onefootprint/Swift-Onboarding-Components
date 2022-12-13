@@ -27,6 +27,7 @@ export interface StaticSecrets {
   idologyUsername: aws.ssm.Parameter;
   idologyPassword: aws.ssm.Parameter;
   grafanaPrometheusPushAuth: aws.ssm.Parameter;
+  airplaneApiToken: pulumi.Output<string>;
 }
 
 interface SecretConstants {
@@ -36,6 +37,7 @@ interface SecretConstants {
   sendgrid: Sendgrid;
   idology: IDology;
   grafana: Grafana;
+  airplane: Airplane;
 }
 
 interface ElasticSecrets {
@@ -63,6 +65,10 @@ interface IDology {
 
 interface Grafana {
   prometheusPushAuth: string;
+}
+
+interface Airplane {
+  apiToken: string;
 }
 
 export async function LoadSecrets(
@@ -133,7 +139,7 @@ export async function LoadSecrets(
     }),
     traceOtelConfig: new aws.ssm.Parameter(`ssm-param-trace-otelconfig`, {
       type: 'SecureString',
-      value: fs.readFileSync('./monitoring/otel.yml', 'utf8'),
+      value: fs.readFileSync('./config/otel.yml', 'utf8'),
       name: `/static_secrets/trace-otelconfig-${stack}`,
     }),
     dbPassword: pulumi.secret(auroraDbPassword.result),
@@ -177,6 +183,7 @@ export async function LoadSecrets(
       `grafanaPrometheusPushAuth-${stack}`,
       secretConstants.grafana.prometheusPushAuth,
     ),
+    airplaneApiToken: pulumi.secret(secretConstants.airplane.apiToken),
   };
 }
 

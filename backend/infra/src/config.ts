@@ -11,6 +11,7 @@ export interface Config {
   sendgrid: Sendgrid;
   sentryUrl: string;
   deletionProtection: boolean;
+  airplane: Airplane;
 }
 
 export interface Domains {
@@ -52,4 +53,8 @@ export interface S3 {
 
 export interface Sendgrid {
   fromEmail: string;
+}
+
+export interface Airplane {
+  teamId: string;
 }

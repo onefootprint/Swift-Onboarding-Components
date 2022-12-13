@@ -3,6 +3,10 @@ encryptedkey: AQICAHgpY5Udo7qUEpCiqKUsoEkW+S7YqIg73iLR+fnkXhfd3wHP9rr2NW7SwYOE+i
 config:
   aws:region: us-east-1
   infra:constants:
+    airplane:
+      teamId: tea20220706zs7g4auu0i6
+      apiToken:
+        secure: v1:55HGj2SicsoDxPjb:vzL+Naq2v8YsHrULZACPMycL36JsouJlrIonJJyFZFV47PjOq2qFMXuNdARsKzIRiqIOdxrqTBQ=
     containers:
       apiVersion: latest
       enclaveVersion: latest
@@ -33,7 +37,7 @@ config:
       memoryMB: 512
     rpId: onefootprint.com
     s3:
-      documentImagesBucketNamePrefix: 'opaque-documents'
+      documentImagesBucketNamePrefix: opaque-documents
     sendgrid:
       apiKey:
         secure: v1:bKv7D+zTxpPdjHoO:qfXikLY0jplLN/CmQ4/P0/Ts4akQLZttRFJKjW08xIEQDuFGW5DUK2VnihJq1OVtS0CgV81VJTeHdJfE5YesX4GCRVdO03bnR010AC5tJeyPnHPs/Q==
