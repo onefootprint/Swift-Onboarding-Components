@@ -31,7 +31,6 @@ pub async fn create_final_decision(
 
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision.decision_status == DecisionStatus::Pass {
-                // TODO will this cause deadlock to lock onboarding AND uv?
                 let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
                 let seqno = uvw.commit_data_for_tenant(conn)?;
                 Some(seqno)

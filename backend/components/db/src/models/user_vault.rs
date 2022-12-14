@@ -93,41 +93,22 @@ impl UserVault {
         Ok(user)
     }
 
-    pub fn lock<'a, T>(conn: &mut TxnPgConnection, id: T) -> DbResult<Self>
-    where
-        T: Into<UserVaultIdentifier<'a>>,
-    {
-        // Sadly have to duplicate this logic since you can't add `for_no_key_update()` to a boxed query
-        let user = match id.into() {
-            UserVaultIdentifier::Id(id) => user_vault::table
-                .filter(user_vault::id.eq(id))
-                .for_no_key_update()
-                .first(conn.conn())?,
-            UserVaultIdentifier::ScopedUserId(scoped_user_id) => {
-                let uv_ids = scoped_user::table
-                    .filter(scoped_user::id.eq(scoped_user_id))
-                    .select(scoped_user::user_vault_id);
-                user_vault::table
-                    .filter(user_vault::id.eq_any(uv_ids))
-                    .for_no_key_update()
-                    .first(conn.conn())?
-            }
-            UserVaultIdentifier::FpUserId {
-                fp_user_id,
-                tenant_id,
-                is_live,
-            } => {
-                let uv_ids = scoped_user::table
-                    .filter(scoped_user::fp_user_id.eq(fp_user_id))
-                    .filter(scoped_user::tenant_id.eq(tenant_id))
-                    .filter(scoped_user::is_live.eq(is_live))
-                    .select(scoped_user::user_vault_id);
-                user_vault::table
-                    .filter(user_vault::id.eq_any(uv_ids))
-                    .for_no_key_update()
-                    .first(conn.conn())?
-            }
-        };
+    pub fn lock(conn: &mut TxnPgConnection, id: &UserVaultId) -> DbResult<Self> {
+        let user = user_vault::table
+            .filter(user_vault::id.eq(id))
+            .for_no_key_update()
+            .first(conn.conn())?;
+        Ok(user)
+    }
+
+    pub fn lock_by_scoped_user(conn: &mut TxnPgConnection, su_id: &ScopedUserId) -> DbResult<Self> {
+        let uv_ids = scoped_user::table
+            .filter(scoped_user::id.eq(su_id))
+            .select(scoped_user::user_vault_id);
+        let user = user_vault::table
+            .filter(user_vault::id.eq_any(uv_ids))
+            .for_no_key_update()
+            .first(conn.conn())?;
         Ok(user)
     }
 

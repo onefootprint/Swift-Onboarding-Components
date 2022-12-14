@@ -156,7 +156,7 @@ impl UserVaultWrapper {
         conn: &mut TxnPgConnection,
         scoped_user_id: &ScopedUserId,
     ) -> Result<LockedUserVaultWrapper, DbError> {
-        let user_vault = UserVault::lock(conn, scoped_user_id)?;
+        let user_vault = UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
         let uvw = Self::build_single(conn, user_vault, Some(scoped_user_id), None)?;
 
         Ok(LockedUserVaultWrapper::new(uvw))

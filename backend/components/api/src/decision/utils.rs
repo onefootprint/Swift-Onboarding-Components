@@ -77,7 +77,6 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
 
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision_status == DecisionStatus::Pass {
-                // TODO will this cause deadlock to lock onboarding AND uv?
                 let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob.scoped_user_id)?;
                 let seqno = uvw.commit_data_for_tenant(conn)?;
                 Some(seqno)
