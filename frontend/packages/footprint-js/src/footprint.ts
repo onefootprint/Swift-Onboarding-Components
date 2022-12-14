@@ -61,9 +61,9 @@ const footprint = () => {
     userData,
   }: OpenFootprint) => {
     if (hasIframeOpened) {
-      console.warn('Cannot open two instances of Footprint at the same time');
       return;
     }
+    hasIframeOpened = true;
 
     setDialogStyles(appearance);
     const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
