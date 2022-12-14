@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 
 use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::WorkOsSession;
 use crate::errors::workos_login::WorkOsLoginError;
 use crate::errors::ApiResult;
 use crate::utils::email_domain;
@@ -66,12 +65,7 @@ async fn handler(
     let (tenant, tenant_user, is_new) = find_or_create_user(&state, profile).await?;
 
     // Save tenant login in session data into the DB
-    let session_data = AuthSessionData::WorkOs(WorkOsSession {
-        email: profile.email.clone(),
-        first_name: profile.first_name.clone(),
-        last_name: profile.last_name.clone(),
-        tenant_user_id: tenant_user.id,
-    });
+    let session_data = AuthSessionData::WorkOs(tenant_user.clone().into());
     let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
 
     Ok(Json(ResponseData {
@@ -209,7 +203,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
     Ok((tenant, true))
 }
 
-pub(crate) async fn create_tenant(
+async fn create_tenant(
     state: &State,
     tenant_name: String,
     workos_org_id: Option<String>,
@@ -217,19 +211,17 @@ pub(crate) async fn create_tenant(
 ) -> Result<Tenant, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
+    let new_tenant = NewTenant {
+        name: tenant_name,
+        e_private_key: e_priv_key,
+        public_key: ec_pk_uncompressed,
+        workos_id: workos_org_id,
+        logo_url: None,
+        sandbox_restricted,
+    };
     let result = state
         .db_pool
-        .db_query(move |conn| {
-            NewTenant {
-                name: tenant_name,
-                e_private_key: e_priv_key,
-                public_key: ec_pk_uncompressed,
-                workos_id: workos_org_id,
-                logo_url: None,
-                sandbox_restricted,
-            }
-            .save(conn)
-        })
+        .db_query(move |conn| Tenant::save(conn, new_tenant))
         .await??;
 
     Ok(result)

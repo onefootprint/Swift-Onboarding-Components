@@ -8,4 +8,6 @@ pub enum TenantError {
     CannotDeactivateCurrentUser,
     #[error("Tenant user does not exist")]
     TenantUserDoesNotExist,
+    #[error("Cannot inherit credentials for a non-integration test tenant")]
+    NotIntegrationTestTenant,
 }

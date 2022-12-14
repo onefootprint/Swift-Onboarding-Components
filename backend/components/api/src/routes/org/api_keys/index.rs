@@ -78,15 +78,15 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
     let tenant = auth.tenant();
-    let new_key = TenantApiKey::create(
-        &state.db_pool,
-        request.into_inner().name,
-        secret_key.fingerprint(&state.hmac_client).await?,
-        secret_key.seal_to(&tenant.public_key)?,
-        tenant.id.clone(),
-        is_live,
-    )
-    .await?;
+    let tenant_id = tenant.id.clone();
+    let sh_key = secret_key.fingerprint(&state.hmac_client).await?;
+    let e_key = secret_key.seal_to(&tenant.public_key)?;
+    let new_key = state
+        .db_pool
+        .db_query(move |conn| {
+            TenantApiKey::create(conn, request.into_inner().name, sh_key, e_key, tenant_id, is_live)
+        })
+        .await??;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
         new_key,

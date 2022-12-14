@@ -35,7 +35,7 @@ async fn get(
     let (key, last_used_at) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let key = TenantApiKey::get(conn, &tenant_id, &request.id, is_live)?;
+            let key = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
             let last_used_at = TenantApiKeyAccessLog::get(conn, vec![&key.id])?
                 .get(&key.id)
                 .map(|x| x.to_owned());

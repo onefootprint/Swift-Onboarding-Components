@@ -1,13 +1,17 @@
 use crate::schema::tenant;
-use crate::{DbPool, DbResult};
+use crate::{DbPool, DbResult, TxnPgConnection};
+use diesel::insertable::CanInsertInSingleQuery;
+use diesel::pg::Pg;
 use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
+use diesel::query_builder::QueryFragment;
+use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
 use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant)]
 pub struct Tenant {
     pub id: TenantId,
@@ -21,17 +25,7 @@ pub struct Tenant {
     pub sandbox_restricted: bool,
 }
 
-impl Tenant {
-    pub fn lock(conn: &mut PgConnection, id: &TenantId) -> DbResult<Self> {
-        let tenant = tenant::table
-            .for_no_key_update()
-            .filter(tenant::id.eq(id))
-            .first(conn)?;
-        Ok(tenant)
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant)]
 pub struct NewTenant {
     pub name: String,
@@ -42,11 +36,36 @@ pub struct NewTenant {
     pub sandbox_restricted: bool,
 }
 
-impl NewTenant {
-    pub fn save(self, conn: &mut PgConnection) -> Result<Tenant, crate::DbError> {
+/// Allows creating with an application-generated TenantId rather than db-generated
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = tenant)]
+pub struct NewIntegrationTestTenant {
+    pub id: TenantId,
+    pub name: String,
+    pub public_key: VaultPublicKey,
+    pub e_private_key: EncryptedVaultPrivateKey,
+    pub sandbox_restricted: bool,
+}
+
+impl Tenant {
+    pub fn lock(conn: &mut TxnPgConnection, id: &TenantId) -> DbResult<Self> {
+        let tenant = tenant::table
+            .for_no_key_update()
+            .filter(tenant::id.eq(id))
+            .first(conn.conn())?;
+        Ok(tenant)
+    }
+
+    /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
+    /// are kind of clunky, but removes the need to have two separate functions with the same exact body
+    pub fn save<T>(conn: &mut PgConnection, value: T) -> DbResult<Self>
+    where
+        T: Insertable<tenant::table>,
+        <T as Insertable<tenant::table>>::Values: QueryFragment<Pg> + CanInsertInSingleQuery<Pg> + QueryId,
+    {
         let tenant = diesel::insert_into(tenant::table)
-            .values(&self)
-            .get_result::<Tenant>(conn)?;
+            .values(value)
+            .get_result(conn)?;
         Ok(tenant)
     }
 }
@@ -60,7 +79,7 @@ pub struct UpdateTenantNameOrLogo {
 }
 
 impl UpdateTenantNameOrLogo {
-    pub async fn update(self, pool: &DbPool) -> Result<(), crate::DbError> {
+    pub async fn update(self, pool: &DbPool) -> DbResult<()> {
         let _ = pool
             .db_query(move |conn| {
                 diesel::update(tenant::table)

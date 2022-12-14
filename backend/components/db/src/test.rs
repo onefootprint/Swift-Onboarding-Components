@@ -1,5 +1,4 @@
 use crate::models::annotation::{Annotation, AnnotationInfo};
-use crate::models::tenant_api_key::NewTenantApiKey;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
 use crate::models::tenant_user::TenantUser;
@@ -12,12 +11,11 @@ use crate::{
     schema,
 };
 use crate::{test_helpers, TxnPgConnection};
-use chrono::Utc;
 use diesel::prelude::*;
 
 use newtypes::{
-    ApiKeyStatus, DbActor, EncryptedVaultPrivateKey, Fingerprint, OrgMemberEmail, ScopedUserId,
-    SealedVaultBytes, TenantId, TenantRoleId, UserVaultId, VaultPublicKey,
+    DbActor, EncryptedVaultPrivateKey, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId,
+    TenantRoleId, UserVaultId, VaultPublicKey,
 };
 
 pub(crate) fn test_user_vault(conn: &mut PgConnection, is_portable: bool) -> UserVault {
@@ -97,27 +95,21 @@ where
     annotation
 }
 
-// TODO: TenantApiKey::create takes in a db_pool instead of a conn which is why this function can't call it and has to duplicate what it does here.
-// we should probably refactor TenantApiKey::create to take in a conn which is our more cannonical pattern
 pub(crate) fn test_tenant_api_key(
     conn: &mut PgConnection,
     name: String,
     tenant_id: TenantId,
     is_live: bool,
 ) -> TenantApiKey {
-    let new_key = NewTenantApiKey {
+    TenantApiKey::create(
+        conn,
         name,
-        sh_secret_api_key: Fingerprint(vec![0, 1, 2]),
-        e_secret_api_key: SealedVaultBytes(vec![4, 5, 6]),
+        Fingerprint(vec![0, 1, 2]),
+        SealedVaultBytes(vec![4, 5, 6]),
         tenant_id,
         is_live,
-        status: ApiKeyStatus::Enabled,
-        created_at: Utc::now(),
-    };
-    diesel::insert_into(schema::tenant_api_key::table)
-        .values(new_key)
-        .get_result::<TenantApiKey>(conn)
-        .unwrap()
+    )
+    .unwrap()
 }
 
 #[actix_rt::test]
@@ -138,7 +130,7 @@ async fn test_db() {
         workos_id: None,
         sandbox_restricted: true,
     };
-    pool.db_query(|conn| tenant.save(conn).expect("couldn't create tenant"))
+    pool.db_query(|conn| Tenant::save(conn, tenant).expect("couldn't create tenant"))
         .await
         .expect("couldn't make DB query");
 

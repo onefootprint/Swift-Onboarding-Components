@@ -179,6 +179,12 @@ impl ObConfigurationKey {
     }
 }
 
+impl TenantId {
+    pub fn is_integration_test_tenant(&self) -> bool {
+        self.0.starts_with("_private_it_org_")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;

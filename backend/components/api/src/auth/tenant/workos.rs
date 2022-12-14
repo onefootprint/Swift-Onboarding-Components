@@ -45,6 +45,17 @@ pub struct WorkOsSession {
     pub tenant_user_id: TenantUserId,
 }
 
+impl From<TenantUser> for WorkOsSession {
+    fn from(tu: TenantUser) -> Self {
+        Self {
+            email: tu.email.0,
+            first_name: tu.first_name,
+            last_name: tu.last_name,
+            tenant_user_id: tu.id,
+        }
+    }
+}
+
 impl ExtractableAuthSession for ParsedWorkOs {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]

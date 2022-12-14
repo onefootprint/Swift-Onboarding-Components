@@ -163,7 +163,7 @@ def create_basic_sandbox_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
 
 
 def create_tenant(org_data, ob_conf_data):
-    body = post("private/tenant", org_data, CUSTODIAN_AUTH)
+    body = post("private/test_tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])
     auth_token = DashboardAuth(body["auth_token"])
     ob_config = create_ob_config(sk, ob_conf_data)

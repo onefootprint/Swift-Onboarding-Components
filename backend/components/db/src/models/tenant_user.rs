@@ -74,6 +74,18 @@ impl TenantUser {
         Ok(())
     }
 
+    pub fn get_by_email(
+        conn: &mut PgConnection,
+        email: &OrgMemberEmail,
+        tenant_id: &TenantId,
+    ) -> DbResult<Self> {
+        let user = tenant_user::table
+            .filter(tenant_user::email.eq(email))
+            .filter(tenant_user::tenant_id.eq(tenant_id))
+            .get_result(conn)?;
+        Ok(user)
+    }
+
     pub fn create(
         conn: &mut TxnPgConnection,
         email: OrgMemberEmail,

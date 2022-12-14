@@ -1,8 +1,8 @@
 use paperclip::actix::web;
 
 pub mod cleanup;
-pub mod tenant;
+pub mod test_tenant;
 
 pub fn routes(config: &mut web::ServiceConfig) {
-    config.service(cleanup::post).service(tenant::post);
+    config.service(cleanup::post).service(test_tenant::post);
 }

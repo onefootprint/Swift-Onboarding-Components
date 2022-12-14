@@ -5,6 +5,8 @@ import pytest
 from tests.constants import (
     EMAIL,
     PHONE_NUMBER,
+    TENANT_ID3,
+    TENANT_ID4,
 )
 from tests.auth import FpAuth, OnboardingSessionToken
 from tests.bifrost_client import BifrostClient
@@ -88,6 +90,7 @@ def create_inherited_non_sandbox_user(twilio, tenant_auth):
 @pytest.fixture(scope="session")
 def foo_tenant(must_collect_data, can_access_data):
     org_data = {
+        "id": TENANT_ID3,
         "name": "Footprint Integration Testing Foo",
         "is_live": True,
     }
@@ -104,6 +107,7 @@ def foo_tenant(must_collect_data, can_access_data):
 @pytest.fixture(scope="session")
 def bar_tenant(must_collect_data, can_access_data):
     org_data = {
+        "id": TENANT_ID4,
         "name": "Footprint Integration Testing Bar",
         "is_live": True,
     }
@@ -516,9 +520,12 @@ class TestBifrost:
     def test_onboarding_requiring_document(
         self,
         twilio,
-        doc_request_ob_config,
         non_sandbox_auth_token,
         test_name,
+        # TODO: For now, need two separate tenants since we use the same user. Can change this once
+        # we start allowing multiple ScopedUsers per tenant
+        doc_request_ob_config,
+        doc_request_ob_config2,
     ):
         # Not used but need to create the fixture
         non_sandbox_auth_token
@@ -543,7 +550,10 @@ class TestBifrost:
             "both": doc_data_both,
             "front_only": doc_data_only_front,
         }[test_name]
-        ob_config_key = doc_request_ob_config.key
+        ob_config_key = {
+            "both": doc_request_ob_config.key,
+            "front_only": doc_request_ob_config2.key,
+        }[test_name]
 
         # Log in as the user
         auth_token = create_inherited_non_sandbox_user(

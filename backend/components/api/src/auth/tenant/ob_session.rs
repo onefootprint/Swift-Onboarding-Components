@@ -15,7 +15,7 @@ pub struct OnboardingSession {
     pub is_live: bool,
 }
 
-#[derive(Debug, Clone, Apiv2Security, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
     in = "header",

@@ -10,6 +10,7 @@ from tests.utils import (
     _gen_random_ssn,
     build_user_data,
     create_basic_sandbox_user,
+    _gen_random_n_digit_number,
 )
 from tests.types import SecretApiKey, ObConfiguration
 from tests.bifrost_client import BifrostClient
@@ -497,8 +498,9 @@ class TestDashboardApiKeys:
 
 @pytest.fixture(scope="session")
 def limited_role(sandbox_tenant):
+    suffix = _gen_random_n_digit_number(10)
     role_data = dict(
-        name="Test limited role",
+        name=f"Test limited role {suffix}",
         permissions=[dict(kind="users"), dict(kind="security_logs")],
     )
     body = post("org/roles", role_data, sandbox_tenant.auth_token)
@@ -532,8 +534,10 @@ def tenant_user(sandbox_tenant, admin_role):
 class TestDashboardAdminUsers:
     def test_update_roles(self, sandbox_tenant, limited_role, admin_role):
         role_id = limited_role["id"]
+        suffix = _gen_random_n_digit_number(10)
         patch_data = dict(
-            name="New role name", permissions=[{"kind": "onboarding_configuration"}]
+            name=f"New role name {suffix}",
+            permissions=[{"kind": "onboarding_configuration"}],
         )
         patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token)
 
@@ -639,6 +643,7 @@ class TestDashboardAdminUsers:
         assert annotation2["note"] == note2
         assert annotation2["source"]["kind"] == "organization"
         assert (
-            annotation2["source"]["member"] == "integrationtests@onefootprint.com"
-        )  # I guess there's no way to get the tenant sandbox_user from Tenant so we just hard code this?
+            annotation2["source"]["member"]
+            == "Footprint Integration Testing (integrationtests@onefootprint.com)"
+        )  # I guess there's no way to get the tenant user from Tenant so we just hard code this?
         assert annotation2["is_pinned"] == True
