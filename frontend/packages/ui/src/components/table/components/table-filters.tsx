@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useDebounce, useUpdateEffect } from 'usehooks-ts';
 
-import Box from '../../box';
 import SearchInput from '../../search-input';
 
 type TableFilterProps = {
@@ -28,23 +27,23 @@ const TableFilter = ({
   }, [debouncedSearch]);
 
   return (
-    <>
-      <TableFilterContainer>
-        <SearchInput
-          onChangeText={handleChangeText}
-          sx={{ width: '300px' }}
-          value={search}
-        />
-        {children}
-      </TableFilterContainer>
-      <Box sx={{ paddingY: 5 }} />
-    </>
+    <TableFilterContainer>
+      <SearchInput
+        onChangeText={handleChangeText}
+        sx={{ width: '300px' }}
+        value={search}
+      />
+      {children}
+    </TableFilterContainer>
   );
 };
 
 const TableFilterContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: ${theme.spacing[5]};
+  `}
 `;
 
 export default TableFilter;
