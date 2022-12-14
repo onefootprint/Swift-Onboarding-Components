@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 1.0.1
+
+### Patch Changes
+
+- 3384653b: Prevent to display more than one modal
+
 ## 1.0.0
 
 ### Major Changes
