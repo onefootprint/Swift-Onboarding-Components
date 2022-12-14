@@ -137,7 +137,7 @@ const Sheet = styled.div`
 
 const Header = styled.div<{ hasBorder: boolean }>`
   ${({ theme, hasBorder }) => css`
-    height: 56px;
+    height: 52px;
     padding: ${theme.spacing[5]};
     display: flex;
     justify-content: center;

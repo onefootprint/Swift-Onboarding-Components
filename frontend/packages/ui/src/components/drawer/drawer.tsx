@@ -117,7 +117,7 @@ const Header = styled.header`
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     justify-content: center;
     padding: 0 ${theme.spacing[10]};
-    height: 56px;
+    height: 52px;
     position: relative;
 
     h2 {
