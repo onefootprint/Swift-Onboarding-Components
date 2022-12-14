@@ -37,17 +37,17 @@ def ob_configuration(sandbox_tenant, must_collect_data, can_access_data):
     return ObConfiguration.from_response(body)
 
 
-@pytest.fixture(scope="module")
-def user_with_documents(document_requesting_sandbox_tenant_session_scoped, twilio):
+@pytest.fixture(scope="session")
+def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
     """
     Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
     with document info as well
     """
-    bifrost_client = BifrostClient(document_requesting_sandbox_tenant_session_scoped)
+    bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
     bifrost_client.init_user_for_onboarding(
         twilio, build_user_data(), document_data="both"
     )
-    return bifrost_client.onboard_user_onto_tenant()
+    return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
 
 class TestDashboardOnboardings:
@@ -214,7 +214,7 @@ class TestDashboardOnboardings:
     def test_get_org(self, user):
         body = get("org", None, user.tenant.sk.key)
         tenant = body
-        assert tenant["name"] == "Acme Bank"
+        assert tenant["name"] == user.tenant.name
         assert not tenant["is_sandbox_restricted"]
         tenant["logo_url"]
 

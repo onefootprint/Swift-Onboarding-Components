@@ -2,7 +2,10 @@ import json
 import os
 import pytest
 
-from tests.constants import EMAIL, PHONE_NUMBER
+from tests.constants import (
+    EMAIL,
+    PHONE_NUMBER,
+)
 from tests.auth import FpAuth, OnboardingSessionToken
 from tests.bifrost_client import BifrostClient
 from tests.utils import (
@@ -35,7 +38,7 @@ def non_sandbox_auth_token(twilio, tenant):
     challenge_token = body["challenge_data"]["challenge_token"]
     return try_until_success(
         lambda: identify_verify(
-            twilio, PHONE_NUMBER, challenge_token, tenant.ob_config().key
+            twilio, PHONE_NUMBER, challenge_token, tenant.default_ob_config.key
         ),
         5,
     )
@@ -46,7 +49,7 @@ def create_inherited_non_sandbox_user(twilio, tenant_auth):
     Completes identify flow to get an auth token for the single integration test non-sandbox user
     using the specified tenant auth
     """
-    identifier = dict(email=EMAIL)
+    identifier = dict(phone_number=PHONE_NUMBER)
 
     def identify():
         data = dict(
@@ -85,38 +88,38 @@ def create_inherited_non_sandbox_user(twilio, tenant_auth):
 @pytest.fixture(scope="session")
 def foo_tenant(must_collect_data, can_access_data):
     org_data = {
-        "name": "foo",
+        "name": "Footprint Integration Testing Foo",
         "is_live": True,
     }
 
-    ob_data = {
-        "name": "Foo Stocks",
+    ob_conf_data = {
+        "name": "Foo Credit Card",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
     }
 
-    return create_tenant(org_data, ob_data)
+    return create_tenant(org_data, ob_conf_data)
 
 
 @pytest.fixture(scope="session")
 def bar_tenant(must_collect_data, can_access_data):
     org_data = {
-        "name": "bar",
+        "name": "Footprint Integration Testing Bar",
         "is_live": True,
     }
 
-    ob_data = {
+    ob_conf_data = {
         "name": "Bar Insurance",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
     }
 
-    return create_tenant(org_data, ob_data)
+    return create_tenant(org_data, ob_conf_data)
 
 
 @pytest.fixture(scope="module")
 def ob_session_token(tenant):
-    data = {"onboarding_config_id": tenant.ob_config().id}
+    data = {"onboarding_config_id": tenant.default_ob_config.id}
     body = post("onboarding/session", data, tenant.sk.key)
     return OnboardingSessionToken(body["session_token"])
 
@@ -151,7 +154,7 @@ class TestBifrost:
         ob_session_token,
     ):
         ob_auth = {
-            "publishable": tenant.ob_config().key,
+            "publishable": tenant.default_ob_config.key,
             "session": ob_session_token,
         }[token_type]
         body = post(
@@ -189,7 +192,7 @@ class TestBifrost:
         post(
             "hosted/onboarding/authorize",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
             status_code=400,
         )
@@ -199,7 +202,7 @@ class TestBifrost:
         body = get(
             "hosted/onboarding/status",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
         assert list(r for r in body["requirements"] if r["kind"] == "liveness")
@@ -207,7 +210,7 @@ class TestBifrost:
         post(
             "hosted/onboarding/skip_liveness",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
 
@@ -215,7 +218,7 @@ class TestBifrost:
         body = get(
             "hosted/onboarding/status",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
         assert not list(r for r in body["requirements"] if r["kind"] == "liveness")
@@ -321,7 +324,7 @@ class TestBifrost:
         body = get(
             "hosted/onboarding/kyc",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
         assert body["status"] == "pending"
@@ -329,14 +332,14 @@ class TestBifrost:
         post(
             "hosted/onboarding/submit",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
 
         body = get(
             "hosted/onboarding/kyc",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
         assert body["status"] == "complete"
@@ -345,7 +348,7 @@ class TestBifrost:
         body = post(
             "hosted/onboarding/authorize",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
         validation_token = body["validation_token"]
@@ -362,7 +365,7 @@ class TestBifrost:
         body = post(
             "hosted/onboarding",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
         validation_token = body["validation_token"]
@@ -375,7 +378,7 @@ class TestBifrost:
         body = post(
             "hosted/onboarding/authorize",
             None,
-            tenant.ob_config().key,
+            tenant.default_ob_config.key,
             non_sandbox_auth_token,
         )
         validation_token = body["validation_token"]
@@ -463,17 +466,25 @@ class TestBifrost:
         def onboard_onto_tenant(tenant):
             # Log in as the user
             auth_token = create_inherited_non_sandbox_user(
-                twilio, tenant.ob_config().key
+                twilio, tenant.default_ob_config.key
             )
 
             # Start onboarding for user
-            post("hosted/onboarding", None, tenant.ob_config().key, auth_token)
+            post("hosted/onboarding", None, tenant.default_ob_config.key, auth_token)
 
-            post("hosted/onboarding/submit", None, tenant.ob_config().key, auth_token)
+            post(
+                "hosted/onboarding/submit",
+                None,
+                tenant.default_ob_config.key,
+                auth_token,
+            )
 
             # authorize onboarding for user
             body = post(
-                "hosted/onboarding/authorize", None, tenant.ob_config().key, auth_token
+                "hosted/onboarding/authorize",
+                None,
+                tenant.default_ob_config.key,
+                auth_token,
             )
             validation_token = body["validation_token"]
             assert validation_token
@@ -505,7 +516,7 @@ class TestBifrost:
     def test_onboarding_requiring_document(
         self,
         twilio,
-        document_requesting_tenant,
+        doc_request_ob_config,
         non_sandbox_auth_token,
         test_name,
     ):
@@ -532,7 +543,7 @@ class TestBifrost:
             "both": doc_data_both,
             "front_only": doc_data_only_front,
         }[test_name]
-        ob_config_key = document_requesting_tenant.ob_config().key
+        ob_config_key = doc_request_ob_config.key
 
         # Log in as the user
         auth_token = create_inherited_non_sandbox_user(
@@ -608,11 +619,11 @@ class TestBifrostSandbox:
         expected_status,
         expected_requires_manual_review,
     ):
-        bifrost_client = BifrostClient(sandbox_tenant)
+        bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
         bifrost_client.init_user_for_onboarding(
             twilio, build_user_data(), sandbox_suffix=suffix
         )
-        user = bifrost_client.onboard_user_onto_tenant()
+        user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
         # Get the status
         body = post(

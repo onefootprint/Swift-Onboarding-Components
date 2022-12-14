@@ -166,27 +166,25 @@ def create_tenant(org_data, ob_conf_data):
     body = post("private/tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])
     auth_token = DashboardAuth(body["auth_token"])
+    ob_config = create_ob_config(sk, ob_conf_data)
     print("\n======org info======")
     print(body)
     tenant = Tenant(
-        ob_configs={},
+        default_ob_config=ob_config,
         sk=sk,
         auth_token=auth_token,
+        name=org_data["name"],
     )
-    create_ob_config_for_tenant(tenant, ob_conf_data)
-
     return tenant
 
 
-def create_ob_config_for_tenant(tenant, ob_conf_data):
-    body = post("org/onboarding_configs", ob_conf_data, tenant.sk.key)
+def create_ob_config(sk, ob_conf_data):
+    # TODO also make this get or create?
+    body = post("org/onboarding_configs", ob_conf_data, sk.key)
     ob_config = ObConfiguration.from_response(body)
     print("\n======org onboarding info======")
     print(body)
-
-    tenant.ob_configs[ob_conf_data["name"]] = ob_config
-
-    return tenant
+    return ob_config
 
 
 def build_user_data():

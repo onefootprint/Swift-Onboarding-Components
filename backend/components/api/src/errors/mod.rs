@@ -165,7 +165,7 @@ impl ApiError {
             ApiError::Database(e) => if e.is_not_found() {
                 "data not found"
             } else if e.is_constraint_violation() {
-                "data not allowed: violation"
+                "operation not allowed: constraint violation"
             } else {
                 "something went wrong"
             }

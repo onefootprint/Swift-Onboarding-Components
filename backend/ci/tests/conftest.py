@@ -15,6 +15,7 @@ from .utils import (
     _make_request,
     create_tenant,
     create_basic_user,
+    create_ob_config,
 )
 from .bifrost_client import BifrostClient
 
@@ -70,73 +71,61 @@ def must_collect_data(can_access_data):
 @pytest.fixture(scope="session")
 def tenant(must_collect_data, can_access_data):
     org_data = {
-        "name": "Acme Bank",
+        "name": "Footprint Live Integration Testing",
         "is_live": True,
     }
 
-    ob_data = {
+    ob_conf_data = {
         "name": "Acme Bank Card",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
     }
 
-    return create_tenant(org_data, ob_data)
+    return create_tenant(org_data, ob_conf_data)
 
 
 @pytest.fixture(scope="session")
 def sandbox_tenant(must_collect_data, can_access_data):
     org_data = {
-        "name": "Acme Bank",
+        "name": "Footprint Sandbox Integration Testing",
         "is_live": False,
     }
 
-    ob_data = {
+    ob_conf_data = {
         "name": "Acme Bank Card",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
     }
 
-    return create_tenant(org_data, ob_data)
+    return create_tenant(org_data, ob_conf_data)
 
 
 @pytest.fixture
-def document_requesting_tenant(must_collect_data, can_access_data):
+def doc_request_ob_config(must_collect_data, can_access_data):
+    # TODO just use `tenant` when we can have multiple ScopedUsers for a single tenant. FP-2159
     org_data = {
-        "name": "document tenant",
+        "name": "Footprint Integration Testing (docs)",
         "is_live": True,
     }
-
-    ob_data = {
-        "name": "default",
+    ob_conf_data = {
+        "name": "Doc request config",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
         "must_collect_identity_document": True,
     }
+    return create_tenant(org_data, ob_conf_data).default_ob_config
 
-    return create_tenant(org_data, ob_data)
 
-
-# TODO: some document tests rely on having a fresh tenant each run, so
-# rather than fix that now, just introduce a separate tenant appropriately
-# pytest scoped
 @pytest.fixture(scope="session")
-def document_requesting_sandbox_tenant_session_scoped(
-    must_collect_data, can_access_data
-):
-    org_data = {
-        "name": "sandbox document tenant",
-        "is_live": False,
-    }
-
-    ob_data = {
-        "name": "default",
+def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
+    ob_conf_data = {
+        "name": "Doc request config",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
         "must_collect_identity_document": True,
         "can_access_identity_document_images": True,
     }
-
-    return create_tenant(org_data, ob_data)
+    return create_ob_config(sandbox_tenant.sk, ob_conf_data)
 
 
 @pytest.fixture(scope="session")
@@ -157,6 +146,6 @@ def user(sandbox_tenant, twilio):
     """
     Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant
     """
-    bifrost_client = BifrostClient(sandbox_tenant)
+    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
     bifrost_client.init_user_for_onboarding(twilio, build_user_data())
-    return bifrost_client.onboard_user_onto_tenant()
+    return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)

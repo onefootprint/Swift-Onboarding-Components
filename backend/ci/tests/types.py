@@ -40,25 +40,11 @@ class ObConfiguration(NamedTuple):
         )
 
 
-class GetObConfigError(Exception):
-    pass
-
-
 class Tenant(NamedTuple):
-    ob_configs: dict
+    default_ob_config: ObConfiguration
     sk: SecretApiKey
     auth_token: DashboardAuth
-
-    def ob_config(self, name=None):
-        if name:
-            return self.ob_configs[name]
-        configs = list(self.ob_configs.keys())
-        if len(configs) == 1:
-            return self.ob_configs[configs[0]]
-        else:
-            raise GetObConfigError(
-                f"There are {len(configs)} defined for this Tenant. Please specify which one you want!"
-            )
+    name: str
 
 
 class BasicUser(NamedTuple):
@@ -85,26 +71,26 @@ class User(NamedTuple):
     validation_token: str
     tenant: Tenant
 
-    def identity_data(self): 
+    def identity_data(self):
         return {
-        "name": {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-        },
-        # todo
-        # "dob": None,
-        "address": {
-            "line1": self.address_line1,
-            "line2": self.address_line2,
-            "city": self.city,
-            "state": self.state,
-            "zip": self.zip,
-            "country": self.country,
-        },
-        "ssn9": self.ssn,
-    }
+            "name": {
+                "first_name": self.first_name,
+                "last_name": self.last_name,
+            },
+            # todo
+            # "dob": None,
+            "address": {
+                "line1": self.address_line1,
+                "line2": self.address_line2,
+                "city": self.city,
+                "state": self.state,
+                "zip": self.zip,
+                "country": self.country,
+            },
+            "ssn9": self.ssn,
+        }
 
-    # Represents the challenged user, the base user construct 
+    # Represents the challenged user, the base user construct
     # that becomes an onboarded User once information is supplied
     # for a given onboarding config
     def basic_user(self):
