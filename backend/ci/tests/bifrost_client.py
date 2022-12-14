@@ -6,7 +6,7 @@ from .webauthn_simulator import SoftWebauthnDevice
 
 from .utils import (
     _sandbox_email,
-    create_basic_user,
+    create_basic_sandbox_user,
     get,
     post,
     override_webauthn_challenge,
@@ -32,7 +32,7 @@ class BifrostClient:
     def init_user_for_onboarding(
         self, twilio, user_data, sandbox_suffix=None, document_data=None
     ):
-        self.basic_user = create_basic_user(
+        self.basic_sandbox_user = create_basic_sandbox_user(
             twilio,
             tenant_pk=self.ob_config.key,
             suffix=sandbox_suffix,
@@ -46,23 +46,29 @@ class BifrostClient:
             "hosted/onboarding",
             None,
             self.ob_config.key,
-            self.basic_user.auth_token,
+            self.basic_sandbox_user.auth_token,
         )
 
     def add_email(self, sandbox_email):
         email_data = {"email": sandbox_email}
-        post("hosted/user/email", email_data, self.basic_user.auth_token)
+        post("hosted/user/email", email_data, self.basic_sandbox_user.auth_token)
 
     def add_identity_data(self):
         """Add identity data via hosted/user/data/identity"""
         # TODO: maybe add onboarding id
         # Populate the user's data
-        post("hosted/user/data/identity", self.user_data, self.basic_user.auth_token)
+        post(
+            "hosted/user/data/identity",
+            self.user_data,
+            self.basic_sandbox_user.auth_token,
+        )
 
     def register_biometric_credentials(self):
         """Register the biometric credential"""
         webauthn_device = SoftWebauthnDevice()
-        body = post("hosted/user/biometric/init", None, self.basic_user.auth_token)
+        body = post(
+            "hosted/user/biometric/init", None, self.basic_sandbox_user.auth_token
+        )
         chal_token = body["challenge_token"]
         chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
         attestation = webauthn_device.create(chal, os.environ.get("TEST_URL"))
@@ -70,7 +76,7 @@ class BifrostClient:
         data = dict(
             challenge_token=chal_token, device_response_json=json.dumps(attestation)
         )
-        post("hosted/user/biometric", data, self.basic_user.auth_token)
+        post("hosted/user/biometric", data, self.basic_sandbox_user.auth_token)
 
     def add_identity_document_data(self):
         """Add identity documents to vault"""
@@ -80,7 +86,7 @@ class BifrostClient:
             "hosted/onboarding/status",
             None,
             self.ob_config.key,
-            self.basic_user.auth_token,
+            self.basic_sandbox_user.auth_token,
         )
 
         # We have a requirement
@@ -107,7 +113,7 @@ class BifrostClient:
         post(
             f"hosted/user/document/{document_request_id}",
             data,
-            self.basic_user.auth_token,
+            self.basic_sandbox_user.auth_token,
             self.ob_config.key,
         )
 
@@ -117,7 +123,7 @@ class BifrostClient:
             "hosted/onboarding/submit",
             None,
             self.ob_config.key,
-            self.basic_user.auth_token,
+            self.basic_sandbox_user.auth_token,
         )
 
     def authorize_user_to_tenant(self):
@@ -126,7 +132,7 @@ class BifrostClient:
             "hosted/onboarding/authorize",
             None,
             self.ob_config.key,
-            self.basic_user.auth_token,
+            self.basic_sandbox_user.auth_token,
         )
         return body["validation_token"]
 
@@ -145,12 +151,12 @@ class BifrostClient:
         """
 
         # Simple check, this could be better
-        if self.basic_user is None:
+        if self.basic_sandbox_user is None:
             raise InsufficientArgsForOnboarding(
                 "please call init_user_for_onboarding() before calling onboard_user_onto_tenant"
             )
 
-        sandbox_email = _sandbox_email(self.basic_user.phone_number)
+        sandbox_email = _sandbox_email(self.basic_sandbox_user.phone_number)
         self.add_email(sandbox_email)
 
         # Start an onboarding
@@ -170,7 +176,7 @@ class BifrostClient:
         fp_user_id = self.validate_user(validation_token, tenant.sk)
 
         return User(
-            auth_token=self.basic_user.auth_token,
+            auth_token=self.basic_sandbox_user.auth_token,
             fp_user_id=fp_user_id,
             first_name=self.user_data["name"]["first_name"],
             last_name=self.user_data["name"]["last_name"],
@@ -181,8 +187,8 @@ class BifrostClient:
             state=self.user_data["address"]["state"],
             country=self.user_data["address"]["country"],
             ssn=self.user_data["ssn9"],
-            phone_number=self.basic_user.phone_number,
-            real_phone_number=self.basic_user.real_phone_number,
+            phone_number=self.basic_sandbox_user.phone_number,
+            real_phone_number=self.basic_sandbox_user.real_phone_number,
             email=sandbox_email,
             validation_token=validation_token,
             tenant=tenant,

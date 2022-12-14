@@ -7,12 +7,12 @@ from tests.utils import try_until_success, post, get, identify_verify
 
 
 @pytest.fixture(scope="module")
-def my1fp_authed_user(user, twilio):
+def my1fp_sandbox_user(sandbox_user, twilio):
     """
-    Returns a user authed under a my1fp scope
+    Returns a sandbox_user authed under a my1fp scope
     """
-    # Identify the user by email
-    identifier = {"email": user.email}
+    # Identify the sandbox_user by email
+    identifier = {"email": sandbox_user.email}
 
     def identify():
         data = dict(identifier=identifier)
@@ -25,7 +25,7 @@ def my1fp_authed_user(user, twilio):
         body = post("hosted/identify/login_challenge", data)
         assert (
             body["challenge_data"]["phone_number_last_two"]
-            == user.real_phone_number[-2:]
+            == sandbox_user.real_phone_number[-2:]
         )
         assert body["challenge_data"]["challenge_kind"] == "sms"
         return body["challenge_data"]["challenge_token"]
@@ -33,40 +33,42 @@ def my1fp_authed_user(user, twilio):
     try_until_success(identify, 20, 1)
     challenge_token = try_until_success(challenge, 20, 1)
 
-    # Log in as the user
+    # Log in as the sandbox_user
     my1fp_auth_token = try_until_success(
         lambda: identify_verify(
             twilio,
-            user.real_phone_number,
+            sandbox_user.real_phone_number,
             challenge_token,
             expected_kind="user_inherited",
         ),
         5,
     )
-    return user._replace(auth_token=my1fp_auth_token)
+    return sandbox_user._replace(auth_token=my1fp_auth_token)
 
 
 class TestMy1fp:
-    def test_decrypt(self, my1fp_authed_user):
+    def test_decrypt(self, my1fp_sandbox_user):
         data = {"attributes": ["phone_number", "email", "address_line1", "zip"]}
-        body = post("hosted/user/decrypt", data, my1fp_authed_user.auth_token)
+        body = post("hosted/user/decrypt", data, my1fp_sandbox_user.auth_token)
         attributes = body
-        assert attributes["phone_number"] == my1fp_authed_user.phone_number.replace(
+        assert attributes["phone_number"] == my1fp_sandbox_user.phone_number.replace(
             " ", ""
         )
-        assert attributes["email"] == my1fp_authed_user.email
+        assert attributes["email"] == my1fp_sandbox_user.email
         assert attributes["address_line1"] == "1 Footprint Way"
         assert attributes["zip"] == "10009"
 
-    def test_unauthorized_my1fp_basic_session_decrypt(self, my1fp_authed_user):
+    def test_unauthorized_my1fp_basic_session_decrypt(self, my1fp_sandbox_user):
         return
         # TODO Re-instate this test after we differentiate between basic and step-up auth
         data = {"attributes": ["ssn9"]}
-        post("hosted/user/decrypt", data, my1fp_authed_user.auth_token, status_code=401)
+        post(
+            "hosted/user/decrypt", data, my1fp_sandbox_user.auth_token, status_code=401
+        )
 
-    def test_user_detail(self, my1fp_authed_user):
+    def test_user_detail(self, my1fp_sandbox_user):
         # Get the user detail using the logged in context
-        body = get("hosted/user", None, my1fp_authed_user.auth_token)
+        body = get("hosted/user", None, my1fp_sandbox_user.auth_token)
         phone_numbers = body["phone_numbers"]
         assert phone_numbers[0]["is_verified"]
         assert phone_numbers[0]["priority"] == "primary"
@@ -74,9 +76,9 @@ class TestMy1fp:
         assert not emails[0]["is_verified"]
         assert emails[0]["priority"] == "primary"
 
-    def test_authorized_tenants(self, my1fp_authed_user, can_access_data):
+    def test_authorized_tenants(self, my1fp_sandbox_user, can_access_data):
         # Get the user detail using the logged in context
-        body = get("hosted/user/authorized_orgs", None, my1fp_authed_user.auth_token)
+        body = get("hosted/user/authorized_orgs", None, my1fp_sandbox_user.auth_token)
         authorized_orgs = body
 
         onboarding_info = authorized_orgs[0]["onboarding"]
@@ -84,8 +86,8 @@ class TestMy1fp:
         assert onboarding_info["insight_event"]
         assert set(onboarding_info["can_access_data"]) == set(can_access_data)
 
-    def test_access_events(self, my1fp_authed_user):
-        tenant = my1fp_authed_user.tenant
+    def test_access_events(self, my1fp_sandbox_user):
+        tenant = my1fp_sandbox_user.tenant
         # Decrypt as the tenant in order to generate some access events
         for attributes in FIELDS_TO_DECRYPT:
             data = {
@@ -93,13 +95,13 @@ class TestMy1fp:
                 "reason": "Doing a hecking decrypt",
             }
             post(
-                f"users/{my1fp_authed_user.fp_user_id}/vault/identity/decrypt",
+                f"users/{my1fp_sandbox_user.fp_user_id}/vault/identity/decrypt",
                 data,
                 tenant.sk.key,
             )
 
         # Get the user detail using the logged in context
-        body = get("hosted/user/access_events", None, my1fp_authed_user.auth_token)
+        body = get("hosted/user/access_events", None, my1fp_sandbox_user.auth_token)
         access_events = body
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):

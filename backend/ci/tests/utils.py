@@ -133,7 +133,7 @@ def identify_verify(
     assert False, "Didn't find correct code for identify"
 
 
-def create_basic_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
+def create_basic_sandbox_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
     sandbox_phone_number = _random_sandbox_phone(suffix)
     phone_number = sandbox_phone_number.split("#")[0]
 
@@ -251,10 +251,6 @@ def _sandbox_email(phone_number):
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)
-
-
-def _pretty_print_json_str(o):
-    print(_pretty_print_json(json.loads(o)))
 
 
 def _pretty_print_json(o):

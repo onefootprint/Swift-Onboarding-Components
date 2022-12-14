@@ -14,7 +14,7 @@ from .utils import (
     build_user_data,
     _make_request,
     create_tenant,
-    create_basic_user,
+    create_basic_sandbox_user,
     create_ob_config,
 )
 from .bifrost_client import BifrostClient
@@ -134,17 +134,18 @@ def twilio():
 
 
 @pytest.fixture(scope="module")
-def basic_user(twilio):
+def basic_sandbox_user(twilio):
     """
-    Create a sandbox user with no data other than phone/email
+    Create a sandbox user with no data other than phone.
+    The user will not be onboarded onto any tenants.
     """
-    return create_basic_user(twilio)
+    return create_basic_sandbox_user(twilio)
 
 
 @pytest.fixture(scope="module")
-def user(sandbox_tenant, twilio):
+def sandbox_user(sandbox_tenant, twilio):
     """
-    Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant
+    Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant.
     """
     bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
     bifrost_client.init_user_for_onboarding(twilio, build_user_data())

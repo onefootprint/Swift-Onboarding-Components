@@ -9,7 +9,7 @@ from tests.utils import (
     patch,
     _gen_random_ssn,
     build_user_data,
-    create_basic_user,
+    create_basic_sandbox_user,
 )
 from tests.types import SecretApiKey, ObConfiguration
 from tests.bifrost_client import BifrostClient
@@ -51,18 +51,18 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
 
 
 class TestDashboardOnboardings:
-    def test_tenant_decrypt(self, user):
-        tenant = user.tenant
+    def test_tenant_decrypt(self, sandbox_user):
+        tenant = sandbox_user.tenant
         expected_data = dict(
-            first_name=user.first_name,
-            last_name=user.last_name,
-            email=user.email,
-            address_line1=user.address_line1,
-            address_line2=user.address_line2,
-            zip=user.zip,
-            country=user.country,
-            ssn9=user.ssn,
-            ssn4=user.ssn[-4:],
+            first_name=sandbox_user.first_name,
+            last_name=sandbox_user.last_name,
+            email=sandbox_user.email,
+            address_line1=sandbox_user.address_line1,
+            address_line2=sandbox_user.address_line2,
+            zip=sandbox_user.zip,
+            country=sandbox_user.country,
+            ssn9=sandbox_user.ssn,
+            ssn4=sandbox_user.ssn[-4:],
         )
         for attributes in FIELDS_TO_DECRYPT:
             data = {
@@ -70,23 +70,25 @@ class TestDashboardOnboardings:
                 "reason": "Doing a hecking decrypt",
             }
             body = post(
-                f"users/{user.fp_user_id}/vault/identity/decrypt", data, tenant.sk.key
+                f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
+                data,
+                tenant.sk.key,
             )
             attributes = body
             for attribute, value in attributes.items():
                 assert expected_data[attribute] == value
 
-    # Note: `user` was onboarded onto `user.tenant` with an ob configuration
+    # Note: `sandbox_user` was onboarded onto `sandbox_user.tenant` with an ob configuration
     # that required the collection of DOB, but not the access. See the pytest fixture setup for the tenant associated
-    # with user passed into this function for more info
-    def test_tenant_decrypt_no_permissions(self, user):
-        tenant = user.tenant
+    # with sandbox_user passed into this function for more info
+    def test_tenant_decrypt_no_permissions(self, sandbox_user):
+        tenant = sandbox_user.tenant
         data = {
             "fields": ["dob"],
             "reason": "Not doing a hecking decrypt",
         }
         post(
-            f"users/{user.fp_user_id}/vault/identity/decrypt",
+            f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
             data,
             tenant.sk.key,
             status_code=401,
@@ -94,14 +96,14 @@ class TestDashboardOnboardings:
 
     # A tenant needs to use /vault/identity/document/decrypt for decrypting identity document, so
     # this fails
-    def test_tenant_decrypt_identity_doc_with_identity_endpoint(self, user):
-        tenant = user.tenant
+    def test_tenant_decrypt_identity_doc_with_identity_endpoint(self, sandbox_user):
+        tenant = sandbox_user.tenant
         data = {
             "fields": ["identity_document"],
             "reason": "Let me see the face of the man or woman who wronged me",
         }
         resp = post(
-            f"users/{user.fp_user_id}/vault/identity/decrypt",
+            f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
             data,
             tenant.sk.key,
             status_code=400,
@@ -114,34 +116,34 @@ class TestDashboardOnboardings:
     #########################
     # Decrypting Documents
     #########################
-    # This user has not authorized any access to identity documents for the tenant
-    def test_tenant_document_decrypt_no_permissions(self, user):
-        tenant = user.tenant
+    # This sandbox_user has not authorized any access to identity documents for the tenant
+    def test_tenant_document_decrypt_no_permissions(self, sandbox_user):
+        tenant = sandbox_user.tenant
         data = {
             "document_type": "passport",
             "reason": "Not doing a hecking decrypt",
         }
         # confirm they didn't auth identity_document
-        get_user_resp = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        get_user_resp = get(f"users/{sandbox_user.fp_user_id}", None, tenant.sk.key)
         assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
 
         post(
-            f"users/{user.fp_user_id}/vault/identity/document/decrypt",
+            f"users/{sandbox_user.fp_user_id}/vault/identity/document/decrypt",
             data,
             tenant.sk.key,
             status_code=401,
         )
 
-    # This user has not authorized any access to identity documents for the tenant, so they
+    # This sandbox_user has not authorized any access to identity documents for the tenant, so they
     # can't even see what's in the vault
-    def test_tenant_document_get_decrypt_no_permissions(self, user):
-        tenant = user.tenant
+    def test_tenant_document_get_decrypt_no_permissions(self, sandbox_user):
+        tenant = sandbox_user.tenant
         # confirm they didn't auth identity_document
-        get_user_resp = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        get_user_resp = get(f"users/{sandbox_user.fp_user_id}", None, tenant.sk.key)
         assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
 
         get(
-            f"users/{user.fp_user_id}/vault/identity/document?document_types=",
+            f"users/{sandbox_user.fp_user_id}/vault/identity/document?document_types=",
             None,
             tenant.sk.key,
             status_code=401,
@@ -211,47 +213,49 @@ class TestDashboardOnboardings:
     # End document tests
     ###################################
 
-    def test_get_org(self, user):
-        body = get("org", None, user.tenant.sk.key)
+    def test_get_org(self, sandbox_user):
+        body = get("org", None, sandbox_user.tenant.sk.key)
         tenant = body
-        assert tenant["name"] == user.tenant.name
+        assert tenant["name"] == sandbox_user.tenant.name
         assert not tenant["is_sandbox_restricted"]
         tenant["logo_url"]
 
-    def test_get_users_list(self, user):
-        tenant = user.tenant
+    def test_get_users_list(self, sandbox_user):
+        tenant = sandbox_user.tenant
         # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
         # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
-        body = get("users", dict(fp_user_id=user.fp_user_id), tenant.sk.key)
+        body = get("users", dict(fp_user_id=sandbox_user.fp_user_id), tenant.sk.key)
         scoped_users = body["data"]
         assert len(scoped_users)
 
-        scoped_user = list(filter(lambda su: su["id"] == user.fp_user_id, scoped_users))
+        scoped_user = list(
+            filter(lambda su: su["id"] == sandbox_user.fp_user_id, scoped_users)
+        )
         assert len(scoped_user) == 1
 
         assert set(["first_name", "last_name"]) < set(
             scoped_user[0]["identity_data_attributes"]
         )
 
-    def test_get_users_detail(self, user):
-        tenant = user.tenant
-        scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+    def test_get_users_detail(self, sandbox_user):
+        tenant = sandbox_user.tenant
+        scoped_user = get(f"users/{sandbox_user.fp_user_id}", None, tenant.sk.key)
         assert set(["first_name", "last_name"]) < set(
             scoped_user["identity_data_attributes"]
         )
 
-    def test_liveness_list(self, user):
-        tenant = user.tenant
-        body = get(f"users/{user.fp_user_id}/liveness", None, tenant.sk.key)
+    def test_liveness_list(self, sandbox_user):
+        tenant = sandbox_user.tenant
+        body = get(f"users/{sandbox_user.fp_user_id}/liveness", None, tenant.sk.key)
         creds = body
         assert len(creds)
         assert creds[0]["insight_event"]
 
-    def test_access_events_list(self, user):
-        tenant = user.tenant
+    def test_access_events_list(self, sandbox_user):
+        tenant = sandbox_user.tenant
         body = get(
             "org/access_events",
-            dict(footprint_user_id=user.fp_user_id),
+            dict(footprint_user_id=sandbox_user.fp_user_id),
             tenant.sk.key,
         )
         access_events = body["data"]
@@ -264,7 +268,7 @@ class TestDashboardOnboardings:
         # Test filtering on kinds. We provide two different kinds, and we should get all access events
         # that contain at least one of these fields
         params = dict(
-            footprint_user_id=user.fp_user_id,
+            footprint_user_id=sandbox_user.fp_user_id,
             targets=",".join(["identity.email", "identity.address_line1"]),
             kind="decrypt",
         )
@@ -279,10 +283,12 @@ class TestDashboardOnboardings:
         body = get("org/access_events", params, tenant.sk.key)
         assert not body["data"]
 
-    def test_portable_failed_data_write(self, user):
+    def test_portable_failed_data_write(self, sandbox_user):
         data = dict(reason="test", fields=["first_name", "ssn9"])
         body = post(
-            f"users/{user.fp_user_id}/vault/identity/decrypt", data, user.tenant.sk.key
+            f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
+            data,
+            sandbox_user.tenant.sk.key,
         )
         assert body["first_name"]
 
@@ -297,16 +303,16 @@ class TestDashboardOnboardings:
 
         # ensure we cannot change data in a portable vault
         put(
-            f"users/{user.fp_user_id}/vault/identity",
+            f"users/{sandbox_user.fp_user_id}/vault/identity",
             data,
-            user.tenant.sk.key,
+            sandbox_user.tenant.sk.key,
             status_code=401,
         )
 
-    def test_override_onboarding_decision(self, user):
-        tenant = user.tenant
+    def test_override_onboarding_decision(self, sandbox_user):
+        tenant = sandbox_user.tenant
 
-        scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        scoped_user = get(f"users/{sandbox_user.fp_user_id}", None, tenant.sk.key)
         onboarding = scoped_user["onboarding"]
         assert onboarding["status"] == "pass"
         latest_decision = onboarding["latest_decision"]
@@ -319,13 +325,13 @@ class TestDashboardOnboardings:
             status="fail",
         )
         post(
-            f"users/{user.fp_user_id}/decisions",
+            f"users/{sandbox_user.fp_user_id}/decisions",
             decision_data,
             tenant.auth_token,
             DashboardAuthIsLive("false"),
         )
 
-        scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        scoped_user = get(f"users/{sandbox_user.fp_user_id}", None, tenant.sk.key)
         onboarding = scoped_user["onboarding"]
         assert onboarding["status"] == "fail"
         # Assert the latest decision is a manual decision
@@ -336,7 +342,7 @@ class TestDashboardOnboardings:
 
         # Assert that the annotation is pinned
         pinned_annotations = get(
-            f"users/{user.fp_user_id}/annotations",
+            f"users/{sandbox_user.fp_user_id}/annotations",
             dict(is_pinned="true"),
             tenant.sk.key,
         )
@@ -369,8 +375,8 @@ class TestDashboardObConfigs:
         ob_config = body
         ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
-        user = create_basic_user(twilio, ob_config_key)
-        post("hosted/onboarding", None, ob_config_key, user.auth_token)
+        sandbox_user = create_basic_sandbox_user(twilio, ob_config_key)
+        post("hosted/onboarding", None, ob_config_key, sandbox_user.auth_token)
 
     @pytest.mark.parametrize(
         "must_collect,can_access,expected_status",
@@ -579,27 +585,27 @@ class TestDashboardAdminUsers:
         body = get("org/roles", None, sandbox_tenant.auth_token)
         assert role_id not in set(u["id"] for u in body["data"])
 
-    def test_get_annotations(self, user, sandbox_tenant):
-        # res = get(f"/users/{user.fp_user_id}/annotations", None, user.tenant.sk.key)
+    def test_get_annotations(self, sandbox_user, sandbox_tenant):
+        # res = get(f"/users/{sandbox_user.fp_user_id}/annotations", None, sandbox_user.tenant.sk.key)
 
         note1 = "this user is chill"
         # Actor = TenantApiKey
         annotation1 = post(
-            f"/users/{user.fp_user_id}/annotations",
+            f"/users/{sandbox_user.fp_user_id}/annotations",
             dict(
                 note=note1,
                 is_pinned=False,
             ),
-            user.tenant.sk.key,
-            # `user` creates a scoped user that is is_live=false but the auths (tenant.sk.key, tenant.auth_token, workos_sandbox_tentnat.auth_token)
+            sandbox_user.tenant.sk.key,
+            # `sandbox_user` creates a scoped sandbox_user that is is_live=false but the auths (tenant.sk.key, tenant.auth_token, workos_sandbox_tentnat.auth_token)
             # all are auth.is_live() = true, so I think I need to pass this DashboardAuthIsLive struct on every request? seems weird
             DashboardAuthIsLive("false"),
         )
 
         annotations = get(
-            f"/users/{user.fp_user_id}/annotations",
+            f"/users/{sandbox_user.fp_user_id}/annotations",
             None,
-            user.tenant.sk.key,
+            sandbox_user.tenant.sk.key,
             DashboardAuthIsLive("false"),
         )
         annotations.sort(key=lambda x: x["timestamp"])
@@ -612,19 +618,19 @@ class TestDashboardAdminUsers:
         note2 = "ok mb they are a little sketch"
         # Actor = TenantUser
         annotation2 = post(
-            f"/users/{user.fp_user_id}/annotations",
+            f"/users/{sandbox_user.fp_user_id}/annotations",
             dict(
                 note=note2,
                 is_pinned=True,
             ),
-            user.tenant.auth_token,
+            sandbox_user.tenant.auth_token,
             DashboardAuthIsLive("false"),
         )
 
         annotations = get(
-            f"/users/{user.fp_user_id}/annotations",
+            f"/users/{sandbox_user.fp_user_id}/annotations",
             None,
-            user.tenant.auth_token,
+            sandbox_user.tenant.auth_token,
             DashboardAuthIsLive("false"),
         )
         annotations.sort(key=lambda x: x["timestamp"])
@@ -634,5 +640,5 @@ class TestDashboardAdminUsers:
         assert annotation2["source"]["kind"] == "organization"
         assert (
             annotation2["source"]["member"] == "integrationtests@onefootprint.com"
-        )  # I guess there's no way to get the tenant user from Tenant so we just hard code this?
+        )  # I guess there's no way to get the tenant sandbox_user from Tenant so we just hard code this?
         assert annotation2["is_pinned"] == True
