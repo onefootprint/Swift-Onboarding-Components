@@ -127,6 +127,7 @@ export abstract class ServiceContainers {
         secretsStore.idologyUsername.arn,
         secretsStore.idologyPassword.arn,
         secretsStore.enclaveProxySecret.arn,
+        secretsStore.socureSandboxApiKey.arn,
       ])
       .apply(
         ([
@@ -144,6 +145,7 @@ export abstract class ServiceContainers {
           idologyUsername,
           idologyPassword,
           enclaveProxySecret,
+          socureSandboxApiKey,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -193,6 +195,10 @@ export abstract class ServiceContainers {
               {
                 name: 'ENCLAVE_PROXY_SECRET',
                 valueFrom: enclaveProxySecret,
+              },
+              {
+                name: 'SOCURE_SANDBOX_API_KEY',
+                valueFrom: socureSandboxApiKey,
               },
             ],
             environment: [

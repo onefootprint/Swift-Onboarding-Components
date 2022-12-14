@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
-use idv::idology::client::IdologyClient;
+use idv::{idology::client::IdologyClient, socure::client::SocureClient};
 use workos::{ApiKey, WorkOs};
 
 use crate::{
@@ -28,6 +28,8 @@ pub struct State {
     pub(crate) idology_client: IdologyClient,
     #[allow(unused)]
     pub(crate) s3_client: s3::S3Client,
+    #[allow(unused)]
+    pub(crate) socure_sandbox_client: SocureClient,
 }
 
 impl State {
@@ -76,6 +78,9 @@ impl State {
         )
         .unwrap();
 
+        let socure_sandbox_client =
+            SocureClient::new(config.socure_config.sandbox_api_key.clone(), true).unwrap();
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -115,6 +120,7 @@ impl State {
             session_sealing_key,
             idology_client,
             s3_client,
+            socure_sandbox_client,
         }
     }
 }

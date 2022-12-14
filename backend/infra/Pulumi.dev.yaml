@@ -4,9 +4,9 @@ config:
   aws:region: us-east-1
   infra:constants:
     airplane:
-      teamId: tea20220706zs7g4auu0i6
       apiToken:
         secure: v1:87RDKonGk+sxikjQ:HDZ9lz9jGhBb1oQmYdyHvGX2BVGq6kkpGZ0MK5eLMgiAT9TnrZ/jUd/ZeoP5Jac3T9sW+rdDEaU=
+      teamId: tea20220706zs7g4auu0i6
     containers:
       apiVersion: latest
       enclaveVersion: latest
@@ -44,14 +44,17 @@ config:
       fromEmail: verify@noreply.onefootprint.com
     sentryUrl:
       secure: v1:Ppt53FIYgHl6OQN8:eV5cnm9Eqlo1XPMv/nXYd7V7HqgeizALAvdntlpsutbGsFln9Di1hnf8kMogZJj6JVw8ECgFDbo3WUYScuXlKfI6zmp7tjwYG5lO2M8/ycL1qBbJV+teR3zL
+    socure:
+      sandboxApiKey:
+        secure: v1:E/Vv2txLN2q/bNr8:dTiRlaKK+HXTMsYVV4xUwg4V3MUNBBMd52Q9iP6UKW3HjbyLAQTvO1T67TbUHu16+mKE8g==
     twilio:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

@@ -98,6 +98,9 @@ pub struct Config {
 
     #[envconfig(from = "DOCUMENT_S3_BUCKET", default = "footprint-dev-test")]
     pub document_s3_bucket: String,
+
+    #[envconfig(nested = true)]
+    pub socure_config: SocureConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -206,4 +209,10 @@ impl enclave_proxy::StreamConfig for EnclaveConfig {
             address: format!("127.0.0.1:{}", self.enclave_port),
         }
     }
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct SocureConfig {
+    #[envconfig(from = "SOCURE_SANDBOX_API_KEY")]
+    pub sandbox_api_key: String,
 }

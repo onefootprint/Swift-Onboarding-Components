@@ -28,6 +28,7 @@ export interface StaticSecrets {
   idologyPassword: aws.ssm.Parameter;
   grafanaPrometheusPushAuth: aws.ssm.Parameter;
   airplaneApiToken: pulumi.Output<string>;
+  socureSandboxApiKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -38,6 +39,7 @@ interface SecretConstants {
   idology: IDology;
   grafana: Grafana;
   airplane: Airplane;
+  socure: Socure;
 }
 
 interface ElasticSecrets {
@@ -61,6 +63,10 @@ interface Sendgrid {
 interface IDology {
   username: string;
   password: string;
+}
+
+interface Socure {
+  sandboxApiKey: string;
 }
 
 interface Grafana {
@@ -184,9 +190,12 @@ export async function LoadSecrets(
       secretConstants.grafana.prometheusPushAuth,
     ),
     airplaneApiToken: pulumi.secret(secretConstants.airplane.apiToken),
+    socureSandboxApiKey: createSecretParameter(
+      `socureSandboxApiKey-${stack}`,
+      secretConstants.socure.sandboxApiKey,
+    ),
   };
 }
-
 /// create a secret param
 function createSecretParameter(
   name: string,
