@@ -331,6 +331,20 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    socure_device_session (id) {
+        id -> Text,
+        onboarding_id -> Text,
+        device_session_id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     tenant (id) {
         id -> Text,
         name -> Text,
@@ -530,6 +544,7 @@ joinable!(phone_number -> data_lifetime (lifetime_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
 joinable!(scoped_user -> tenant (tenant_id));
 joinable!(scoped_user -> user_vault (user_vault_id));
+joinable!(socure_device_session -> onboarding (onboarding_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
@@ -563,6 +578,7 @@ allow_tables_to_appear_in_same_query!(
     risk_signal,
     scoped_user,
     session,
+    socure_device_session,
     tenant,
     tenant_api_key,
     tenant_api_key_access_log,

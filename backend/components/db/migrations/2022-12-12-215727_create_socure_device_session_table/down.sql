@@ -1,0 +1,1 @@
+DROP TABLE socure_device_session;

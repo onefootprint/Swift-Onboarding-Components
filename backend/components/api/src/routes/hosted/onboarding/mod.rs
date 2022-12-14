@@ -26,6 +26,7 @@ pub mod index;
 pub mod kyc;
 pub mod pat;
 pub mod skip_liveness;
+pub mod socure_device;
 pub mod status;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -36,7 +37,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(kyc::get)
         .service(kyc::post)
         .service(skip_liveness::post)
-        .service(pat::get);
+        .service(pat::get)
+        .service(socure_device::post);
     d2p::routes(config);
 }
 

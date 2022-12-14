@@ -123,6 +123,11 @@ define_newtype_id!(AnnotationId, String, "Identifier for an annotation");
 define_newtype_id!(ManualReviewId, String, "Identifier for a manual review");
 define_newtype_id!(DataLifetimeId, String, "Identifier for a data lifetime");
 define_newtype_id!(UvdId, String, "Identifier for a UserVaultData");
+define_newtype_id!(
+    SocureDeviceSessionId,
+    String,
+    "Identifier for a socure_device_session"
+);
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

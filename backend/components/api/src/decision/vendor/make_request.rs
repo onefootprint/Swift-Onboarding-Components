@@ -17,6 +17,8 @@ pub async fn send_idv_request(
         onboarding_id = request.onboarding_id.to_string(),
     );
     // Make the request to the IDV vendor
+
+    // TODO: query for SocureDeviceSession:latest_for_onboard and pass along to Socure request
     let result = match request.vendor {
         Vendor::Idology => idv::idology::request::send_expectid_request(&state.idology_client, data).await?,
         Vendor::Twilio => idv::twilio::lookup_v2(&state.twilio_client.client, data)
