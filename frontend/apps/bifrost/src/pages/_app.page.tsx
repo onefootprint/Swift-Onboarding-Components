@@ -14,6 +14,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
 import Layout from '../components/layout';
+import SocureSdk from '../components/socure-sdk/socure-sdk';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
@@ -56,6 +57,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`}
         strategy="lazyOnload"
       />
+      <SocureSdk />
     </>
   );
 };
