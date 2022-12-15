@@ -23,7 +23,7 @@
     "@onefootprint/footprint-js": "*",
     "@onefootprint/footprint-react": "*",
     "@radix-ui/react-navigation-menu": "^1.0.0",
-    "@tanstack/react-query": "^4.19.1",
+    "@tanstack/react-query": "^4.20.4",
     "@tryghost/content-api": "^1.11.5",
     "@typeform/embed": "^1.35.1",
     "axios": "^1.2.1",
