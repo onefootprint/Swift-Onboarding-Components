@@ -3,6 +3,7 @@ use std::fmt::Debug;
 use ::twilio::response::lookup::LookupV2Response;
 use idology::verification::IDologyResponse;
 use newtypes::Vendor;
+use socure::response::SocureIDPlusResponse;
 
 pub mod idology;
 pub mod socure;
@@ -14,6 +15,7 @@ pub mod twilio;
 pub enum ParsedResponse {
     IDology(IDologyResponse),
     Twilio(LookupV2Response),
+    Socure(SocureIDPlusResponse),
 }
 
 impl ParsedResponse {
@@ -27,6 +29,12 @@ impl ParsedResponse {
         let parsed = ::twilio::response::parse_response(raw_response).map_err(Error::from)?;
 
         Ok(Self::Twilio(parsed))
+    }
+
+    pub fn from_socure_idplus_response(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed = crate::socure::parse_response(raw_response).map_err(Error::from)?;
+
+        Ok(Self::Socure(parsed))
     }
 }
 
@@ -47,4 +55,6 @@ pub enum Error {
     TwilioError(#[from] twilio::Error),
     #[error("Not implemented")]
     NotImplemented,
+    #[error("Socure error: {0}")]
+    SocureError(#[from] socure::Error),
 }

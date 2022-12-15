@@ -62,6 +62,7 @@ pub enum VendorAPI {
     IdologyExpectID,
     IdologyScanVerify,
     TwilioLookupV2,
+    SocureIDPlus,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -71,6 +72,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IdologyExpectID => Self::Idology,
             VendorAPI::IdologyScanVerify => Self::Idology,
             VendorAPI::TwilioLookupV2 => Self::Twilio,
+            VendorAPI::SocureIDPlus => Self::Socure,
         }
     }
 }

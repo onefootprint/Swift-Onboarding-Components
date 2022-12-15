@@ -1,6 +1,6 @@
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
-use idv::{idology::verification::IDologySuccess, ParsedResponse};
+use idv::{idology::verification::IDologySuccess, socure::response::SocureIDPlusResponse, ParsedResponse};
 
 use newtypes::{DecisionStatus, Signal, VerificationResultId};
 
@@ -33,10 +33,17 @@ pub struct TwilioFeatures {
     pub verification_result: VerificationResultId,
 }
 
-#[derive(Clone, Default, PartialEq, Eq, Debug)]
+// TODO: translate SocureKycReponse into a more digestible struct of features like Idology does?
+#[derive(Clone, Debug)]
+pub struct SocureFeatures {
+    pub idplus_response: SocureIDPlusResponse,
+}
+
+#[derive(Clone, Default, Debug)]
 pub struct FeatureVector {
     pub idology_features: Option<IDologyFeatures>,
     pub twilio_features: Option<TwilioFeatures>,
+    pub socure_features: Option<SocureFeatures>,
 }
 
 impl FeatureVector {
@@ -48,6 +55,7 @@ impl FeatureVector {
         Self {
             idology_features: self.idology_features.or(other.idology_features),
             twilio_features: self.twilio_features.or(other.twilio_features),
+            socure_features: self.socure_features.or(other.socure_features),
         }
     }
 }
@@ -107,6 +115,7 @@ impl From<VendorResult> for FeatureVector {
                 Self {
                     idology_features: Some(idology_features),
                     twilio_features: None,
+                    socure_features: None,
                 }
             }
             // TODO!
@@ -115,6 +124,12 @@ impl From<VendorResult> for FeatureVector {
                 twilio_features: Some(TwilioFeatures {
                     verification_result: verification_result_id,
                 }),
+                socure_features: None,
+            },
+            ParsedResponse::Socure(idplus_response) => Self {
+                idology_features: None,
+                twilio_features: None,
+                socure_features: Some(SocureFeatures { idplus_response }),
             },
         }
     }
@@ -217,8 +232,14 @@ mod tests {
         let expected_feature_vector = FeatureVector {
             idology_features: Some(expected_idology_features),
             twilio_features: None,
+            socure_features: None,
         };
-        assert_eq!(expected_feature_vector, feature_vector);
+        assert_eq!(
+            expected_feature_vector.idology_features,
+            feature_vector.idology_features
+        );
+        assert!(feature_vector.twilio_features.is_none());
+        assert!(feature_vector.socure_features.is_none());
 
         Ok(())
     }

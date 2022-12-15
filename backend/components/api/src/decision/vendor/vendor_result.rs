@@ -27,6 +27,9 @@ impl VendorResult {
                     newtypes::VendorAPI::TwilioLookupV2 => {
                         ParsedResponse::from_twilio_lookupv2_response(result.response.clone())?
                     }
+                    newtypes::VendorAPI::SocureIDPlus => {
+                        ParsedResponse::from_socure_idplus_response(result.response.clone())?
+                    }
                 };
                 let res = VendorResult {
                     response: VendorResponse {

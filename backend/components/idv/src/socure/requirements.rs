@@ -1,7 +1,4 @@
-use newtypes::{
-    DataLifetimeKind::{self, *},
-    IdvData,
-};
+use newtypes::DataLifetimeKind::{self, *};
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
@@ -87,14 +84,13 @@ impl SocureModule {
         }
     }
 
-    fn meets_requirements_for_module(&self, idv_data: &IdvData) -> bool {
-        let present_data_attributes = IdvData::present_data_attributes(idv_data);
+    fn meets_requirements_for_module(&self, present_data_kinds: &[DataLifetimeKind]) -> bool {
         let requirements_for_module = self.requirements();
 
         let required_met = requirements_for_module
             .required
             .iter()
-            .all(|r| present_data_attributes.contains(r));
+            .all(|r| present_data_kinds.contains(r));
 
         let one_of_met = if requirements_for_module.one_of.is_empty() {
             true
@@ -102,16 +98,16 @@ impl SocureModule {
             requirements_for_module
                 .one_of
                 .iter()
-                .any(|v| v.iter().all(|r| present_data_attributes.contains(r)))
+                .any(|v| v.iter().all(|r| present_data_kinds.contains(r)))
         };
 
         required_met & one_of_met
     }
 }
 
-pub fn all_modules_with_met_requirements(idv_data: &IdvData) -> Vec<SocureModule> {
+pub fn all_modules_with_met_requirements(present_data_kinds: &[DataLifetimeKind]) -> Vec<SocureModule> {
     SocureModule::iter()
-        .filter(|sm| sm.meets_requirements_for_module(idv_data))
+        .filter(|sm| sm.meets_requirements_for_module(present_data_kinds))
         .collect()
 }
 
@@ -119,7 +115,7 @@ pub fn all_modules_with_met_requirements(idv_data: &IdvData) -> Vec<SocureModule
 mod tests {
 
     use super::*;
-    use newtypes::PiiString;
+    use newtypes::{IdvData, PiiString};
     use SocureModule::*;
 
     #[test]
@@ -140,9 +136,10 @@ mod tests {
             phone_number: None,
         };
 
+        let present_data_kinds = IdvData::present_data_attributes(&idv_data);
         assert_eq!(
             vec![KYC, WatchlistPremier],
-            all_modules_with_met_requirements(&idv_data)
+            all_modules_with_met_requirements(&present_data_kinds)
         );
     }
 }

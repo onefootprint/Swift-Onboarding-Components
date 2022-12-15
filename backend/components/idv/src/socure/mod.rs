@@ -1,28 +1,45 @@
 pub mod client;
 mod conversion;
+use newtypes::{IdvData, Vendor};
 pub mod requirements;
 pub mod response;
 use serde::de::DeserializeOwned;
 use std::fmt::Display;
 use thiserror::Error;
 
-use self::response::SocureIDPlusResponse;
+use crate::{ParsedResponse, VendorResponse};
 
-pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T, SocureError> {
+use self::{client::SocureClient, response::SocureIDPlusResponse};
+
+pub async fn send_idplus_request(
+    socure_client: &SocureClient,
+    idv_data: IdvData,
+) -> Result<VendorResponse, Error> {
+    let response = socure_client.idplus(idv_data).await?;
+    let parsed_response = parse_response(response.clone())?;
+
+    Ok(VendorResponse {
+        vendor: Vendor::Socure,
+        response: ParsedResponse::Socure(parsed_response),
+        raw_response: response,
+    })
+}
+
+pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T, Error> {
     if response.status().is_success() {
         Ok(response.json().await?)
     } else {
-        Err(SocureError::Api(response.json().await?))
+        Err(Error::Api(response.json().await?))
     }
 }
 
-pub fn parse_response(value: serde_json::Value) -> Result<SocureIDPlusResponse, SocureError> {
+pub fn parse_response(value: serde_json::Value) -> Result<SocureIDPlusResponse, Error> {
     let response: SocureIDPlusResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum SocureError {
+pub enum Error {
     #[error("request error: {0}")]
     Request(#[from] reqwest::Error),
     #[error("socure type conversion error: {0}")]

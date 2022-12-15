@@ -28,7 +28,7 @@ pub(crate) struct SocureRequest {
 /// identify request and vec of modules we want to use
 impl SocureRequest {
     // TODO: make this TryFrom<IdvData> instead
-    pub fn new(modules: Vec<String>, idv_data: IdvData) -> Result<Self, crate::socure::SocureError> {
+    pub fn new(modules: Vec<String>, idv_data: IdvData) -> Result<Self, crate::socure::Error> {
         let IdvData {
             first_name,
             last_name,

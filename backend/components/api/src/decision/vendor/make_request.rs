@@ -24,6 +24,9 @@ pub async fn send_idv_request(
         Vendor::Twilio => idv::twilio::lookup_v2(&state.twilio_client.client, data)
             .await
             .map_err(idv::Error::from)?,
+        Vendor::Socure => idv::socure::send_idplus_request(&state.socure_sandbox_client, data)
+            .await
+            .map_err(idv::Error::from)?,
         _ => return Err(ApiError::NotImplemented),
     };
 

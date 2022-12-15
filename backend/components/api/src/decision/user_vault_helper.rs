@@ -1,6 +1,7 @@
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 
 use db::HasDataAttributeFields;
+use idv::socure;
 use newtypes::{DataLifetimeKind, VendorAPI};
 
 use itertools::Itertools;
@@ -11,11 +12,18 @@ pub(super) fn get_vendor_apis_from_user_vault_wrapper(
 ) -> Vec<VendorAPI> {
     let attributes_available = user_vault_wrapper.get_populated_fields();
 
-    attributes_available
+    let mut vendor_apis: Vec<VendorAPI> = attributes_available
+        .clone()
         .into_iter()
         .flat_map(available_vendor_api_from_scope)
         .unique()
-        .collect()
+        .collect();
+
+    if !socure::requirements::all_modules_with_met_requirements(&attributes_available).is_empty() {
+        vendor_apis.push(VendorAPI::SocureIDPlus);
+    }
+
+    vendor_apis
 }
 
 fn available_vendor_api_from_scope(attribute: DataLifetimeKind) -> Vec<VendorAPI> {

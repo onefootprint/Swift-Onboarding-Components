@@ -46,23 +46,19 @@ impl SocureClient {
         })
     }
 
-    pub async fn verify_kyc(
-        self,
-        idv_data: IdvData,
-    ) -> Result<serde_json::Value, crate::socure::SocureError> {
+    // Makes call to Socure's ID+ endpoint: https://developer.socure.com/reference#tag/ID+
+    pub async fn idplus(&self, idv_data: IdvData) -> Result<serde_json::Value, crate::socure::Error> {
         // TODO: For now this just tries 1 time. We need to differentiate retriable errors from other errors
         //  and match on that and then enable this to retry multiple times
         let retry_strategy = ExponentialBackoff::from_millis(10).map(jitter).take(0);
-        let result = Retry::spawn(retry_strategy, || self.attempt_verify_kyc(idv_data.clone())).await?;
+        let result = Retry::spawn(retry_strategy, || self.attempt_idplus(idv_data.clone())).await?;
 
         Ok(result)
     }
 
-    async fn attempt_verify_kyc(
-        &self,
-        idv_data: IdvData,
-    ) -> Result<serde_json::Value, crate::socure::SocureError> {
-        let modules = requirements::all_modules_with_met_requirements(&idv_data)
+    async fn attempt_idplus(&self, idv_data: IdvData) -> Result<serde_json::Value, crate::socure::Error> {
+        let present_data_kinds = IdvData::present_data_attributes(&idv_data);
+        let modules = requirements::all_modules_with_met_requirements(&present_data_kinds)
             .iter()
             .map(|m| m.to_string())
             .collect::<Vec<String>>();
@@ -125,9 +121,9 @@ mod tests {
             phone_number: Some(PiiString::from("1234567891")),
         };
 
-        let res = socure_client.verify_kyc(idv_data).await.unwrap();
-        println!("res: {:?}", res);
+        let res = socure_client.idplus(idv_data).await.unwrap();
+        tracing::info!(res = format!("{:?}", res), "res");
         let parsed_res = crate::socure::parse_response(res).unwrap();
-        println!("parsed_res: {:?}", parsed_res);
+        tracing::info!(parsed_res = format!("{:?}", parsed_res), "parsed_res");
     }
 }
