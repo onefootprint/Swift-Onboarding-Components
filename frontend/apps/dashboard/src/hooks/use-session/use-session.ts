@@ -29,18 +29,22 @@ export type AuthHeaders = {
 // https://www.notion.so/onefootprint/Migrating-session-w-Zustand-92cc5a563d6747ca80fd689232c5b7b4
 type UserSessionState = {
   data?: Session;
-  update: (data?: Session) => void;
+  logIn: (data: Session) => void;
+  logOut: () => void;
+  updateData: (data: Session) => void;
 };
 
 export const useStore = create<UserSessionState>()(
   persist(set => ({
     data: undefined,
-    update: (data?: Session) => set({ data }),
+    logIn: (data: Session) => set({ data }),
+    logOut: () => set({ data: undefined }),
+    updateData: (data: Session) => set({ data }),
   })),
 );
 
 const useSession = () => {
-  const { data, update } = useStore(state => state);
+  const { data, updateData, logIn, logOut } = useStore(state => state);
   const dangerouslyCastedData = data as Session;
   const isLoggedIn = !!data;
   const authHeaders = {
@@ -48,16 +52,8 @@ const useSession = () => {
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(!!data?.org.isLive),
   } as AuthHeaders;
 
-  const logIn = (nextData: Session) => {
-    update(nextData);
-  };
-
-  const logOut = () => {
-    update();
-  };
-
   const setOrg = (nextOrg: Partial<Session['org']>) => {
-    update({
+    updateData({
       ...dangerouslyCastedData,
       org: { ...dangerouslyCastedData.org, ...nextOrg },
     });
@@ -71,6 +67,7 @@ const useSession = () => {
     logIn,
     logOut,
     setOrg,
+    updateData,
   };
 };
 
