@@ -79,7 +79,7 @@ pub async fn decrypt(
         .enumerate()
         .map(|(_, data_attribute)| (data_attribute, decrypted_data.get(&data_attribute).cloned()))
         .collect();
-    let decrypted_data_attributes = result_map.iter().map(|(kind, _)| *kind).collect();
+    let decrypted_data_attributes = result_map.keys().copied().collect();
     Ok(DecryptFieldsResult {
         decrypted_data_attributes,
         result_map,
