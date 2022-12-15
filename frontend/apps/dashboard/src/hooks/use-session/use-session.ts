@@ -25,8 +25,6 @@ export type AuthHeaders = {
   [DASHBOARD_IS_LIVE_HEADER]: string;
 };
 
-// Whenever changing this, make sure to read this guide:
-// https://www.notion.so/onefootprint/Migrating-session-w-Zustand-92cc5a563d6747ca80fd689232c5b7b4
 type UserSessionState = {
   data?: Session;
   logIn: (data: Session) => void;
