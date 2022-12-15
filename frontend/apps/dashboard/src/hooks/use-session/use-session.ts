@@ -5,6 +5,7 @@ import {
   DASHBOARD_AUTHORIZATION_HEADER,
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
+import migrations from './migrations';
 
 export type Session = {
   auth: string;
@@ -25,24 +26,27 @@ export type AuthHeaders = {
   [DASHBOARD_IS_LIVE_HEADER]: string;
 };
 
+// Whenever changing this, make sure to read this guide:
+// https://www.notion.so/onefootprint/Migrating-session-w-Zustand-92cc5a563d6747ca80fd689232c5b7b4
 type UserSessionState = {
   data?: Session;
-  logIn: (data: Session) => void;
-  logOut: () => void;
-  updateData: (data: Session) => void;
+  update: (data?: Session) => void;
+  reset: () => void;
 };
 
 export const useStore = create<UserSessionState>()(
-  persist(set => ({
-    data: undefined,
-    logIn: (data: Session) => set({ data }),
-    logOut: () => set({ data: undefined }),
-    updateData: (data: Session) => set({ data }),
-  })),
+  persist(
+    set => ({
+      data: undefined,
+      reset: () => set({ data: undefined }),
+      update: (data?: Session) => set({ data }),
+    }),
+    migrations,
+  ),
 );
 
 const useSession = () => {
-  const { data, updateData, logIn, logOut } = useStore(state => state);
+  const { data, reset, update } = useStore(state => state);
   const dangerouslyCastedData = data as Session;
   const isLoggedIn = !!data;
   const authHeaders = {
@@ -50,10 +54,19 @@ const useSession = () => {
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(!!data?.org.isLive),
   } as AuthHeaders;
 
+  const logIn = (nextData: Session) => {
+    update(nextData);
+  };
+
+  const logOut = () => {
+    reset();
+  };
+
   const setOrg = (nextOrg: Partial<Session['org']>) => {
-    updateData({
-      ...dangerouslyCastedData,
-      org: { ...dangerouslyCastedData.org, ...nextOrg },
+    if (!data) return;
+    update({
+      ...data,
+      org: { ...data.org, ...nextOrg },
     });
   };
 
@@ -65,7 +78,7 @@ const useSession = () => {
     logIn,
     logOut,
     setOrg,
-    updateData,
+    update,
   };
 };
 
