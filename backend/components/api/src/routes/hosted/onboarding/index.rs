@@ -3,6 +3,7 @@ use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::auth::user::UserAuthScopeDiscriminant;
+use crate::auth::AuthError;
 
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -14,7 +15,6 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::onboarding::Onboarding;
 
 use db::models::onboarding::OnboardingCreateArgs;
-use db::models::scoped_user::ScopedUser;
 
 use db::models::user_vault::UserVault;
 use newtypes::SessionAuthToken;
@@ -46,17 +46,12 @@ pub async fn post(
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let uv = UserVault::lock(conn, &uv_id)?;
-            // TODO assert that auth token has proper scoped user
-            let scoped_user = ScopedUser::get_or_create(
-                conn,
-                uv.id,
-                ob_pk_auth.tenant().id.clone(),
-                ob_pk_auth.ob_config().is_live,
-            )?;
+            UserVault::lock(conn, &uv_id)?;
+            let scoped_user = user_auth
+                .scoped_user(conn)?
+                .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboardingInit]))?;
 
             let insight_event = CreateInsightEvent::from(insights);
-
             let should_create_document_request = ob_pk_auth.ob_config().must_collect_identity_document;
 
             let ob_create_args = OnboardingCreateArgs {
