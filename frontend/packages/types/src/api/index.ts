@@ -31,6 +31,7 @@ export * from './org-onboarding-configs-create';
 export * from './org-onboarding-configs-update';
 export * from './signup-challenge';
 export * from './skip-liveness';
+export * from './socure-device-session-d';
 export * from './submit-doc';
 export * from './submit-review';
 export * from './update-d2p-status';

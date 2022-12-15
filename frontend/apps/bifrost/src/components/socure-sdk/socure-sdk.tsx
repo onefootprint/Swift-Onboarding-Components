@@ -1,8 +1,9 @@
 import Script from 'next/script';
 import React from 'react';
 import { SOCURE_PUBLIC_KEY } from 'src/config/constants';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
-import useSendDeviceId from './hooks/use-send-device-id';
+import useSendDeviceSessionId from './hooks/use-send-device-session-id';
 import type {
   SocureContext,
   SocureRequest,
@@ -16,9 +17,10 @@ type SocureSdkProps = {
 
 const SocureSdk = ({
   context = 'profile',
-  userConsent = false,
+  userConsent = true,
 }: SocureSdkProps) => {
-  const sendDeviceIdMutation = useSendDeviceId();
+  const [state] = useBifrostMachine();
+  const sendDeviceIdMutation = useSendDeviceSessionId();
 
   // Socure adds the devicer object to the window object
   // https://developer.socure.com/docs/sdks/sigma-device/js-sdk/js-overview
@@ -27,7 +29,7 @@ const SocureSdk = ({
     return devicer;
   };
 
-  const initializeSdk = (publicKey: string) => {
+  const initializeSdk = (publicKey: string, authToken: string) => {
     const devicer = getDevicer();
     const options: SocureRequest = {
       publicKey,
@@ -36,23 +38,27 @@ const SocureSdk = ({
     };
     devicer.run(options, (response: SocureResponse) => {
       if (response.sessionId) {
-        sendDeviceIdMutation.mutate(response.sessionId);
+        sendDeviceIdMutation.mutate({
+          deviceSessionId: response.sessionId,
+          authToken,
+        });
       }
     });
   };
 
-  const handleLoad = () => {
-    if (SOCURE_PUBLIC_KEY) {
-      initializeSdk(SOCURE_PUBLIC_KEY);
+  const handleReady = () => {
+    const { authToken } = state.context;
+    if (SOCURE_PUBLIC_KEY && authToken) {
+      initializeSdk(SOCURE_PUBLIC_KEY, authToken);
     } else {
       console.warn(
-        'SOCURE_PUBLIC_KEY is not set. Please set it in the environment variables.',
+        'Socure public key or auth token is not available. Skipping Socure SDK initialization',
       );
     }
   };
 
   return (
-    <Script src="https://js.dvnfo.com/devicer.min.js" onLoad={handleLoad} />
+    <Script src="https://js.dvnfo.com/devicer.min.js" onReady={handleReady} />
   );
 };
 

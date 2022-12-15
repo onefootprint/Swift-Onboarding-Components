@@ -1,5 +1,6 @@
 import { withProvider } from '@onefootprint/footprint-elements';
 import React from 'react';
+import SocureSdk from 'src/components/socure-sdk';
 import { States } from 'src/utils/state-machine/onboarding';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
@@ -14,13 +15,23 @@ const Onboarding = () => {
   if (state.matches(States.initOnboarding)) {
     return <InitOnboarding />;
   }
-  if (state.matches(States.authorize)) {
-    return <Authorize />;
-  }
-  if (state.matches(States.onboardingRequirements)) {
-    return <OnboardingRequirements />;
-  }
 
+  if (state.matches(States.onboardingRequirements)) {
+    return (
+      <>
+        <OnboardingRequirements />
+        <SocureSdk context="profile" key="profile" />
+      </>
+    );
+  }
+  if (state.matches(States.authorize)) {
+    return (
+      <>
+        <Authorize />
+        <SocureSdk context="transaction" key="transaction" />
+      </>
+    );
+  }
   return null;
 };
 
