@@ -1,4 +1,4 @@
-import { getCustomEnvVariable } from '@onefootprint/dev-tools';
+import { getCustomEnvVariable, getSessionId } from '@onefootprint/dev-tools';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
@@ -59,6 +59,7 @@ export const getErrorMessage = (error: unknown | Error): string => {
 };
 
 const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
+  const sessionId = getSessionId();
   const client = applyCaseMiddleware(axios.create());
   return client.request<Response>({
     baseURL: getCustomEnvVariable(
@@ -68,6 +69,10 @@ const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
     timeout: 60000,
     withCredentials: true,
     ...requestConfig,
+    headers: {
+      'x-fp-session-id': sessionId,
+      ...requestConfig.headers,
+    },
   });
 };
 
