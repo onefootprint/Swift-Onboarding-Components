@@ -155,6 +155,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::NotInTransaction => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::TransactionRollbackTest => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::SandboxMismatch => StatusCode::BAD_REQUEST,
+        DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }
 

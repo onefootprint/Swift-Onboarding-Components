@@ -28,9 +28,7 @@ pub async fn create_non_portable(
                 is_portable: false,
             };
             let user_vault = UserVault::create(conn, new_user_vault)?;
-
-            // create the scoped user
-            let scoped_user = ScopedUser::get_or_create(conn, user_vault.id, tenant_id, is_live, None)?;
+            let scoped_user = ScopedUser::create_non_portable(conn, user_vault, tenant_id)?;
 
             Ok(scoped_user)
         })

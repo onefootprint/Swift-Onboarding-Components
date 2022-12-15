@@ -161,7 +161,7 @@ impl UserVaultWrapper {
     pub fn create_user_vault(
         conn: &mut TxnPgConnection,
         user_info: NewUserInfo,
-        tenant_info: Option<(TenantId, ObConfiguration)>,
+        ob_config: Option<ObConfiguration>,
         phone_args: NewPhoneNumberArgs,
     ) -> ApiResult<UserVault> {
         let new_user_vault = db::models::user_vault::NewUserVaultArgs {
@@ -171,9 +171,8 @@ impl UserVaultWrapper {
             is_portable: true,
         };
         let uv = UserVault::create(conn, new_user_vault)?;
-        let su = if let Some((tenant_id, ob_config)) = tenant_info {
-            let is_live = ob_config.is_live;
-            let su = ScopedUser::get_or_create(conn, uv.id.clone(), tenant_id, is_live, Some(ob_config.id))?;
+        let su = if let Some(ob_config) = ob_config {
+            let su = ScopedUser::get_or_create(conn, uv.id.clone(), ob_config.id)?;
             Some(su)
         } else {
             None

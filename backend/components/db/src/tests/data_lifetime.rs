@@ -77,8 +77,12 @@ struct TestData {
 impl TestData {
     fn build(conn: &mut TxnPgConnection) -> Self {
         // Create tenants
-        let t_id = TenantId::test_data("org_merp".to_owned());
-        let t2_id = TenantId::test_data("org_merp2".to_owned());
+        let t_id = fixtures::tenant::create(conn).id;
+        let t2_id = fixtures::tenant::create(conn).id;
+
+        // Create ob configs
+        let ob_config_id = fixtures::ob_configuration::create(conn, &t_id).id;
+        let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id).id;
 
         // Create user vaults (without phone number)
         let uv_id = fixtures::user_vault::create(conn).id;
@@ -86,15 +90,9 @@ impl TestData {
         let uvx_id = fixtures::user_vault::create(conn).id;
 
         // Create scoped users
-        let su_id = ScopedUser::get_or_create(conn, uv_id.clone(), t_id.clone(), true, None)
-            .unwrap()
-            .id;
-        let su2_id = ScopedUser::get_or_create(conn, uv2_id.clone(), t_id.clone(), true, None)
-            .unwrap()
-            .id;
-        let su3_id = ScopedUser::get_or_create(conn, uv_id.clone(), t2_id.clone(), true, None)
-            .unwrap()
-            .id;
+        let su_id = fixtures::scoped_user::create(conn, &uv_id, &ob_config_id).id;
+        let su2_id = fixtures::scoped_user::create(conn, &uv2_id, &ob_config_id).id;
+        let su3_id = fixtures::scoped_user::create(conn, &uv_id, &ob_config2_id).id;
 
         // Timeline of seqnos
         let seqno0 = DataLifetime::get_next_seqno(conn).unwrap();

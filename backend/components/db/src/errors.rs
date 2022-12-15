@@ -91,6 +91,9 @@ pub enum DbError {
 
     #[error("Scoped user is_live doesn't match UserVault is_live")]
     SandboxMismatch,
+
+    #[error("Only portable vaults can be linked to an ob config")]
+    CannotCreatedScopedUser,
 }
 
 impl DbError {

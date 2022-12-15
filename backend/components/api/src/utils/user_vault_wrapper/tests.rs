@@ -20,7 +20,8 @@ use super::UserVaultWrapper;
 fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
     let uv = fixtures::user_vault::create(conn);
     let tenant = fixtures::tenant::create(conn);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     let mut data_kind_to_lifetime_id = HashMap::<DataLifetimeKind, DataLifetimeId>::new();
 
