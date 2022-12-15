@@ -46,7 +46,7 @@ impl DbToApi<ScopedUser> for api_wire_types::User {
             _updated_at,
             ordering_id,
             start_timestamp,
-            is_live: _,
+            ..
         } = target;
 
         Self {

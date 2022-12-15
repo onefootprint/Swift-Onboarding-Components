@@ -86,13 +86,13 @@ impl TestData {
         let uvx_id = fixtures::user_vault::create(conn).id;
 
         // Create scoped users
-        let su_id = ScopedUser::get_or_create(conn, uv_id.clone(), t_id.clone(), true)
+        let su_id = ScopedUser::get_or_create(conn, uv_id.clone(), t_id.clone(), true, None)
             .unwrap()
             .id;
-        let su2_id = ScopedUser::get_or_create(conn, uv2_id.clone(), t_id.clone(), true)
+        let su2_id = ScopedUser::get_or_create(conn, uv2_id.clone(), t_id.clone(), true, None)
             .unwrap()
             .id;
-        let su3_id = ScopedUser::get_or_create(conn, uv_id.clone(), t2_id.clone(), true)
+        let su3_id = ScopedUser::get_or_create(conn, uv_id.clone(), t2_id.clone(), true, None)
             .unwrap()
             .id;
 

@@ -173,7 +173,7 @@ mod tests {
 
                 let tenant_role = test_tenant_admin_role(conn, tenant.id.clone());
                 let scoped_user =
-                    ScopedUser::get_or_create(conn, user_vault.id.clone(), tenant.id.clone(), is_live)
+                    ScopedUser::get_or_create(conn, user_vault.id.clone(), tenant.id.clone(), is_live, None)
                         .unwrap();
 
                 let tenant_user1 = test_tenant_user(

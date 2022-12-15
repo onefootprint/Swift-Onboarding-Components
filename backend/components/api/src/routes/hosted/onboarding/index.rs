@@ -5,7 +5,6 @@ use crate::auth::user::UserAuthScope;
 use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::auth::AuthError;
 
-use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
@@ -63,15 +62,7 @@ pub async fn post(
                 should_create_document_request,
             };
 
-            let ob = Onboarding::get_or_create(conn, ob_create_args).map_err(|e| -> ApiError {
-                if e.is_constraint_violation() {
-                    // We will eventually support this use case - for now, just display a nice error
-                    // message in case tenants hit this branch
-                    OnboardingError::UserOnboardedOntoTenant.into()
-                } else {
-                    e.into()
-                }
-            })?;
+            let ob = Onboarding::get_or_create(conn, ob_create_args)?;
             // Update the auth session in the DB to have the OrgOnboarding scope, giving permission
             // to perform other operations
             let data = user_auth.data.clone().add_scope(UserAuthScope::OrgOnboarding);

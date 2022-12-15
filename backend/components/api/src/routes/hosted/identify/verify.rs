@@ -15,7 +15,7 @@ use crate::State;
 
 use chrono::Duration;
 use crypto::sha256;
-use db::models::ob_configuration::IsLive;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::{NewUserInfo, UserVault};
@@ -61,10 +61,10 @@ pub async fn post(
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?.data;
 
-    let tenant_info = ob_pk_auth.map(|ob| (ob.tenant().id.clone(), ob.ob_config().is_live));
+    let tenant_info = ob_pk_auth.map(|ob| (ob.tenant().id.clone(), ob.ob_config().clone()));
     let (user_vault_id, user_kind) = match challenge_state.data {
         ChallengeData::Sms(c_state) => {
-            validate_sms_challenge(&state, c_state, &request.challenge_response, &tenant_info).await?
+            validate_sms_challenge(&state, c_state, &request.challenge_response, tenant_info.clone()).await?
         }
         ChallengeData::Biometric(challenge_state) => {
             validate_biometric_challenge(&state, challenge_state, &request.challenge_response)?
@@ -72,14 +72,14 @@ pub async fn post(
     };
 
     // If a tenant PK is provided, create the ScopedUser if it doesn't yet exist
-    let (token_scopes, duration) = if let Some((tenant_id, is_live)) = tenant_info {
+    let (token_scopes, duration) = if let Some((tenant_id, ob_config)) = tenant_info {
         // Tenant ob config public key is provided - we are in the identify flow for bifrost.
         let user_vault_id = user_vault_id.clone();
         let su = state
             .db_pool
             // This already happens if we make a UserVault, but there are many codepaths that don't
             // create a UserVault that may need to create a ScopedUser
-            .db_transaction(move |conn| ScopedUser::get_or_create(conn, user_vault_id, tenant_id, is_live))
+            .db_transaction(move |conn| ScopedUser::get_or_create(conn, user_vault_id, tenant_id, ob_config.is_live, Some(ob_config.id)))
             .await?;
         let token_scopes = vec![
             UserAuthScope::SignUp,
@@ -123,7 +123,7 @@ async fn validate_sms_challenge(
     state: &web::Data<State>,
     challenge_state: PhoneChallengeState,
     challenge_response: &str,
-    tenant_info: &Option<(TenantId, IsLive)>,
+    tenant_info: Option<(TenantId, ObConfiguration)>,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
@@ -148,20 +148,16 @@ async fn validate_sms_challenge(
 async fn create_new_user_vault(
     state: &web::Data<State>,
     phone_number: &ValidatedPhoneNumber,
-    tenant_info: &Option<(TenantId, IsLive)>,
+    tenant_info: Option<(TenantId, ObConfiguration)>,
 ) -> ApiResult<UserVault> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
-    let tenant_id = tenant_info
-        .as_ref()
-        .map(|(tenant_id, is_live)| {
-            // If we are making a ScopedUser here, verify that the ob config is_live matches the user vault
-            if *is_live != phone_number.is_live() {
-                return Err(UserError::SandboxMismatch);
-            }
-            Ok(tenant_id.clone())
-        })
-        .transpose()?;
+    if let Some((_, ob_config)) = tenant_info.as_ref() {
+        // If we are making a ScopedUser here, verify that the ob config is_live matches the user vault
+        if ob_config.is_live != phone_number.is_live() {
+            return Err(UserError::SandboxMismatch.into());
+        }
+    }
 
     let phone_info = NewPhoneNumberArgs {
         e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
@@ -177,7 +173,7 @@ async fn create_new_user_vault(
     };
     let user = state
         .db_pool
-        .db_transaction(|conn| UserVaultWrapper::create_user_vault(conn, user_info, tenant_id, phone_info))
+        .db_transaction(|conn| UserVaultWrapper::create_user_vault(conn, user_info, tenant_info, phone_info))
         .await?;
 
     Ok(user)

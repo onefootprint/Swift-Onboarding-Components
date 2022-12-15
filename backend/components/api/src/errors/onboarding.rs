@@ -29,6 +29,4 @@ pub enum OnboardingError {
     NoPendingDocumentRequestFound(DocumentRequestId),
     #[error("No decision can be made from decision engine")]
     NoDecisionMade,
-    #[error("This user has already has an onboarding for the tenant. Footprint does not yet support this use case")]
-    UserOnboardedOntoTenant,
 }

@@ -311,6 +311,7 @@ table! {
         ordering_id -> Int8,
         start_timestamp -> Timestamptz,
         is_live -> Bool,
+        ob_configuration_id -> Nullable<Text>,
     }
 }
 
@@ -542,6 +543,7 @@ joinable!(onboarding_decision_verification_result_junction -> onboarding_decisio
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
 joinable!(phone_number -> data_lifetime (lifetime_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
+joinable!(scoped_user -> ob_configuration (ob_configuration_id));
 joinable!(scoped_user -> tenant (tenant_id));
 joinable!(scoped_user -> user_vault (user_vault_id));
 joinable!(socure_device_session -> onboarding (onboarding_id));

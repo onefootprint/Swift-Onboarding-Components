@@ -5,6 +5,7 @@ use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
@@ -165,7 +166,7 @@ impl UserVaultWrapper {
     pub fn create_user_vault(
         conn: &mut TxnPgConnection,
         user_info: NewUserInfo,
-        tenant_id: Option<TenantId>,
+        tenant_info: Option<(TenantId, ObConfiguration)>,
         phone_args: NewPhoneNumberArgs,
     ) -> ApiResult<UserVault> {
         let new_user_vault = db::models::user_vault::NewUserVaultArgs {
@@ -175,8 +176,9 @@ impl UserVaultWrapper {
             is_portable: true,
         };
         let uv = UserVault::create(conn, new_user_vault)?;
-        let su = if let Some(tenant_id) = tenant_id {
-            let su = ScopedUser::get_or_create(conn, uv.id.clone(), tenant_id, user_info.is_live)?;
+        let su = if let Some((tenant_id, ob_config)) = tenant_info {
+            let is_live = ob_config.is_live;
+            let su = ScopedUser::get_or_create(conn, uv.id.clone(), tenant_id, is_live, Some(ob_config.id))?;
             Some(su)
         } else {
             None

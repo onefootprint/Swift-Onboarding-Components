@@ -3,13 +3,16 @@ use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, ScopedUserId, TenantId, UserVaultId};
+use newtypes::{FootprintUserId, ObConfigurationId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
 use super::tenant::Tenant;
 use super::user_vault::UserVault;
 
+/// Creates a unique identifier specific to each onboarding configuration.
+/// This allows one user to onboard onto multiple onboarding configurations at the same tenant
+/// while keeping information for each onboarding separate.
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = scoped_user)]
 pub struct ScopedUser {
@@ -22,6 +25,8 @@ pub struct ScopedUser {
     pub ordering_id: i64,
     pub start_timestamp: DateTime<Utc>,
     pub is_live: bool,
+    // Only null when the vault is non-portable
+    pub ob_configuration_id: Option<ObConfigurationId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -31,6 +36,7 @@ struct NewScopedUser {
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
+    ob_configuration_id: Option<ObConfigurationId>,
 }
 
 pub enum ScopedUserIdentifier<'a> {
@@ -67,6 +73,8 @@ impl ScopedUser {
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
         is_live: bool,
+        // TODO should i just take in the ob_config ID and infer is_live and tenant_id from it?
+        ob_configuration_id: Option<ObConfigurationId>,
     ) -> DbResult<ScopedUser> {
         // TODO maybe pass in locked user vault instead of re-locking here
         let uv = UserVault::lock(conn, &user_vault_id)?;
@@ -78,6 +86,7 @@ impl ScopedUser {
         let scoped_user = scoped_user::table
             .filter(scoped_user::user_vault_id.eq(&user_vault_id))
             .filter(scoped_user::tenant_id.eq(&tenant_id))
+            .filter(scoped_user::ob_configuration_id.eq(ob_configuration_id.as_ref()))
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_user) = scoped_user {
@@ -89,6 +98,7 @@ impl ScopedUser {
             tenant_id,
             start_timestamp: Utc::now(),
             is_live,
+            ob_configuration_id,
         };
         let ob = diesel::insert_into(scoped_user::table)
             .values(new)

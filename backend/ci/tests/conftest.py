@@ -10,8 +10,6 @@ from .constants import (
     TWILIO_API_KEY_SECRET,
     TENANT_ID1,
     TENANT_ID2,
-    TENANT_ID5,
-    TENANT_ID6,
 )
 from .utils import (
     IncorrectServerVersion,
@@ -107,37 +105,25 @@ def sandbox_tenant(must_collect_data, can_access_data):
 
 
 @pytest.fixture
-def doc_request_ob_config(must_collect_data, can_access_data):
-    # TODO just use `tenant` when we can have multiple ScopedUsers for a single tenant. FP-2159
-    org_data = {
-        "id": TENANT_ID5,
-        "name": "Footprint Integration Testing (docs)",
-        "is_live": True,
-    }
+def doc_request_ob_config(tenant, must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Doc request config",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
         "must_collect_identity_document": True,
     }
-    return create_tenant(org_data, ob_conf_data).default_ob_config
+    return create_ob_config(tenant.sk, ob_conf_data)
 
 
 @pytest.fixture
-def doc_request_ob_config2(must_collect_data, can_access_data):
-    # TODO just use `tenant` when we can have multiple ScopedUsers for a single tenant. FP-2159
-    org_data = {
-        "id": TENANT_ID6,
-        "name": "Footprint Integration Testing (docs)",
-        "is_live": True,
-    }
+def doc_request_ob_config2(tenant, must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Doc request config",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
         "must_collect_identity_document": True,
     }
-    return create_tenant(org_data, ob_conf_data).default_ob_config
+    return create_ob_config(tenant.sk, ob_conf_data)
 
 
 @pytest.fixture(scope="session")

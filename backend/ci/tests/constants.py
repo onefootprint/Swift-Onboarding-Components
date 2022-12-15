@@ -51,6 +51,3 @@ TENANT_ID1 = "_private_it_org_1"
 TENANT_ID2 = "_private_it_org_2"
 TENANT_ID3 = "_private_it_org_3"
 TENANT_ID4 = "_private_it_org_4"
-# TODO These won't be needed once we reuse tenant for doc request ob configs
-TENANT_ID5 = "_private_it_org_5"
-TENANT_ID6 = "_private_it_org_6"
