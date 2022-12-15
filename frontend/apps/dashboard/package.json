@@ -12,7 +12,7 @@
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "set:dot-env": "vercel env pull"
+    "set:dot-env": "npx vercel link -y && npx vercel env pull"
   },
   "dependencies": {
     "@formkit/auto-animate": "^1.0.0-beta.5",

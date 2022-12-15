@@ -16,6 +16,7 @@
     "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "preset:dot-env": "npx --yes vercel whoami",
     "set:dot-env": "turbo run set:dot-env",
     "build:storybook": "turbo run build:storybook",
     "typecheck": "turbo run typecheck",
