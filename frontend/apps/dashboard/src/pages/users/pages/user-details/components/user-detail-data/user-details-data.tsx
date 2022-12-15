@@ -6,7 +6,7 @@ import {
 } from '@onefootprint/types';
 import { Box, Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
-import { DataValue } from 'src/hooks/use-user-store';
+import { DataValue } from 'src/hooks/use-user';
 import { User } from 'src/pages/users/types/user.types';
 import { useEffectOnce } from 'usehooks-ts';
 

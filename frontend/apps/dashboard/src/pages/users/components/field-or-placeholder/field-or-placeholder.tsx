@@ -1,7 +1,7 @@
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
-import { DataValue } from 'src/hooks/use-user-store';
+import { DataValue } from 'src/hooks/use-user';
 
 type FieldOrPlaceholderProps = {
   data?: DataValue;

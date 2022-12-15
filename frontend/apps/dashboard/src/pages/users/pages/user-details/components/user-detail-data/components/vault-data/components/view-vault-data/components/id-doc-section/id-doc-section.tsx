@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24 } from '@onefootprint/icons';
 import { IdDocDataAttribute } from '@onefootprint/types';
 import React, { useState } from 'react';
-import { UserVaultData } from 'src/hooks/use-user-store';
+import { UserVaultData } from 'src/hooks/use-user';
 
 import DataSection from '../../../data-section';
 import ImageDataRow from './components/image-data-row';

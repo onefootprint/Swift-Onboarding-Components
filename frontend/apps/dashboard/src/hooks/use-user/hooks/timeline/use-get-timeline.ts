@@ -2,6 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetTimelineRequest, GetTimelineResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
+import useUserStore from 'src/hooks/use-user-store';
 
 const getTimelineRequest = async ({
   userId,
@@ -17,6 +18,7 @@ const getTimelineRequest = async ({
 };
 
 const useGetTimeline = (userId: string) => {
+  const userStore = useUserStore();
   const { authHeaders } = useSession();
 
   return useQuery<GetTimelineResponse, RequestError>(
@@ -25,6 +27,14 @@ const useGetTimeline = (userId: string) => {
     {
       enabled: !!userId,
       retry: false,
+      onSuccess(data) {
+        userStore.merge({
+          userId,
+          data: {
+            timeline: { events: data },
+          },
+        });
+      },
     },
   );
 };

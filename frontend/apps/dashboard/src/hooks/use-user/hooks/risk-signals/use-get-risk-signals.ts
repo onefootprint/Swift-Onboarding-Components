@@ -6,8 +6,9 @@ import type {
 import { RiskSignal } from '@onefootprint/types/src/data/risk-signal';
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
+import useUserStore from 'src/hooks/use-user-store';
 
-import { UserRiskSignals } from '../../user-store.types';
+import { UserRiskSignals } from '../../types';
 import groupBySection from './utils/group-by-section';
 import groupBySeverity from './utils/group-by-severity';
 
@@ -22,7 +23,8 @@ const getRiskSignals = async ({
     url: `/users/${userId}/risk_signals`,
     params,
   });
-  return response;
+
+  return groupBySectionAndSeverity(response);
 };
 
 export const groupBySectionAndSeverity = (
@@ -36,24 +38,24 @@ export const groupBySectionAndSeverity = (
   };
 };
 
-const useGetRiskSignals = (
-  userId?: string,
-  options?: {
-    onSuccess?: (data: UserRiskSignals) => void;
-    onError?: (error: RequestError) => void;
-  },
-) => {
+const useGetRiskSignals = (userId: string) => {
+  const userStore = useUserStore();
   const { authHeaders } = useSession();
   const params = {};
 
-  return useQuery(
+  return useQuery<UserRiskSignals, RequestError>(
     ['riskSignals', authHeaders, userId, params],
-    () => getRiskSignals({ authHeaders, userId: userId ?? '', params }),
+    () => getRiskSignals({ authHeaders, userId, params }),
     {
-      select: groupBySectionAndSeverity,
       enabled: !!userId,
-      onSuccess: options?.onSuccess,
-      onError: options?.onError,
+      onSuccess(data) {
+        userStore.merge({
+          userId,
+          data: {
+            riskSignals: data,
+          },
+        });
+      },
     },
   );
 };

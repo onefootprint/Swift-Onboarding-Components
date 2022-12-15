@@ -1,5 +1,7 @@
 import { renderHook, waitFor, Wrapper } from '@onefootprint/test-utils';
 import { RiskSignalSeverity, SignalAttribute } from '@onefootprint/types';
+import React from 'react';
+import { UserStoreProvider } from 'src/hooks/use-user-store';
 
 import useGetRiskSignals from './use-get-risk-signals';
 import {
@@ -7,7 +9,20 @@ import {
   withRiskSignals,
 } from './use-get-risk-signals.test.config';
 
+type WrapperProps = {
+  children: React.ReactNode;
+};
+
 describe('useGetRiskSignals', () => {
+  const customWrapper = ({ children }: WrapperProps) => (
+    <Wrapper>
+      <UserStoreProvider>{children}</UserStoreProvider>
+    </Wrapper>
+  );
+
+  const renderUseGetRiskSignals = (userId: string) =>
+    renderHook(() => useGetRiskSignals(userId), { wrapper: customWrapper });
+
   describe('when the request succeeds', () => {
     it('should return the correct user id', async () => {
       const email = createRiskSignal({
@@ -26,9 +41,7 @@ describe('useGetRiskSignals', () => {
       withRiskSignals(riskSignalsResponse);
 
       const userId = 'fp_id_yCZehsWNeywHnk5JqL20u';
-      const { result } = renderHook(() => useGetRiskSignals(userId), {
-        wrapper: Wrapper,
-      });
+      const { result } = renderUseGetRiskSignals(userId);
       await waitFor(() => {
         expect(result.current.data).toBeDefined();
       });

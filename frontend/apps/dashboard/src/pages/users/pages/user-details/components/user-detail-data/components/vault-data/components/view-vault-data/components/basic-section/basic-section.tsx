@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText224 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import { UserVaultData } from 'src/hooks/use-user-store';
+import { UserVaultData } from 'src/hooks/use-user';
 import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
 
 import useRiskSignalsOverview from '../../../../hooks/use-risk-signals-overview';

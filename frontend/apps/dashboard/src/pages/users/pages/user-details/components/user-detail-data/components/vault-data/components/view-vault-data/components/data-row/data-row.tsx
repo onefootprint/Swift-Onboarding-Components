@@ -1,6 +1,6 @@
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import { DataValue } from 'src/hooks/use-user-store';
+import { DataValue } from 'src/hooks/use-user';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
 import styled from 'styled-components';
 

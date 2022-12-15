@@ -2,6 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetLivenessRequest, GetLivenessResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
+import useUserStore from 'src/hooks/use-user-store';
 
 const getLivenessRequest = async ({
   userId,
@@ -17,6 +18,7 @@ const getLivenessRequest = async ({
 };
 
 const useGetLiveness = (userId: string) => {
+  const userStore = useUserStore();
   const { authHeaders } = useSession();
 
   return useQuery<GetLivenessResponse, RequestError>(
@@ -25,6 +27,16 @@ const useGetLiveness = (userId: string) => {
     {
       enabled: !!userId,
       retry: false,
+      onSuccess(data) {
+        userStore.merge({
+          userId,
+          data: {
+            liveness: {
+              events: data,
+            },
+          },
+        });
+      },
     },
   );
 };

@@ -1,6 +1,7 @@
+import { RequestError } from '@onefootprint/request';
 import {
   IdDocDataAttribute,
-  InsightEvent,
+  Liveness,
   OnboardingStatus,
   PinnedAnnotation,
   RiskSignal,
@@ -12,16 +13,34 @@ import {
 
 // Encapsulates all user data
 export type User = {
-  metadata: UserMetadata;
-  vaultData: UserVaultData;
-  timeline: UserTimeline;
-  annotations: UserAnnotations;
-  riskSignals: UserRiskSignals;
-  liveness: UserLiveness;
+  metadata?: UserMetadata;
+  vaultData?: UserVaultData;
+  timeline?: UserTimeline;
+  annotations?: UserAnnotations;
+  riskSignals?: UserRiskSignals;
+  liveness?: UserLiveness;
+};
+
+export type UserLoadingStates = {
+  metadata: boolean;
+  timeline: boolean;
+  annotations: boolean;
+  riskSignals: boolean;
+  liveness: boolean;
+  vaultData: boolean;
+};
+
+export type UserErrors = {
+  metadata: RequestError | null;
+  timeline: RequestError | null;
+  annotations: RequestError | null;
+  riskSignals: RequestError | null;
+  liveness: RequestError | null;
+  vaultData: RequestError | null;
 };
 
 export type UserLiveness = {
-  insightEvent?: InsightEvent;
+  events: Liveness[];
 };
 
 export type UserAnnotations = {

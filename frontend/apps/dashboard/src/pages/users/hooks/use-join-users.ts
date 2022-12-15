@@ -1,6 +1,6 @@
 import { OnboardingStatus, ScopedUser } from '@onefootprint/types';
 import { useMemo } from 'react';
-import { UserVaultData } from 'src/hooks/use-user-store';
+import { UserVaultData } from 'src/hooks/use-user';
 
 import { User } from '../types/user.types';
 

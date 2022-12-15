@@ -1,13 +1,9 @@
 import { DecryptedUserDataAttributes } from '../data';
 
 export type DecryptUserRequest = {
-  footprintUserId: string;
+  userId: string;
   fields: string[];
   reason: string;
-  authHeaders: {
-    'x-fp-dashboard-authorization': string;
-    'x-is-live': string;
-  };
 };
 
 export type DecryptUserResponse = DecryptedUserDataAttributes;

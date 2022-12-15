@@ -1,5 +1,5 @@
 import { UserDataAttribute } from '@onefootprint/types';
-import { DataValue, UserVaultData } from 'src/hooks/use-user-store';
+import { DataValue, UserVaultData } from 'src/hooks/use-user';
 
 const getFullNameDataValue = (
   attributes: Pick<UserVaultData, 'kycData'>,

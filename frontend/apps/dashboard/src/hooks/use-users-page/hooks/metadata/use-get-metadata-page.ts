@@ -6,7 +6,8 @@ import { OnboardingStatus, ScopedUser } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import omit from 'lodash/omit';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
-import { User } from 'src/hooks/use-user-store/user-store.types';
+import { UserMetadata } from 'src/hooks/use-user/types';
+import useUserStore from 'src/hooks/use-user-store';
 import useUserFilters, {
   getCursors,
   ScopedUsersListQueryString,
@@ -46,16 +47,25 @@ const getMetadataPageRequest = async ({
     headers: authHeaders,
   });
 
-  return response;
+  const { data, meta } = response;
+  return {
+    meta,
+    data: data.map((metadata: ScopedUser) => ({
+      ...metadata,
+      requiresManualReview: metadata.onboarding?.requiresManualReview || false,
+      status: metadata.onboarding?.status || OnboardingStatus.vaultOnly,
+    })),
+  };
 };
 
 const useGetMetadataPage = (
   pageSize: number,
   options?: {
-    onSuccess?: (data: PaginatedRequestResponse<User>) => void;
+    onSuccess?: (data: PaginatedRequestResponse<UserMetadata[]>) => void;
     onError?: (error: RequestError) => void;
   },
 ) => {
+  const userStore = useUserStore();
   const { authHeaders } = useSession();
   const { filters } = useUserFilters();
 
@@ -77,18 +87,12 @@ const useGetMetadataPage = (
       enabled: !!pageSize,
       retry: false,
       onError: options?.onError,
-      select: response => ({
-        meta: response.meta,
-        data: response.data.map((metadata: ScopedUser) => ({
-          metadata: {
-            ...metadata,
-            requiresManualReview:
-              metadata.onboarding?.requiresManualReview || false,
-            status: metadata.onboarding?.status || OnboardingStatus.vaultOnly,
-          },
-          vaultData: undefined,
-        })),
-      }),
+      onSuccess: (response: PaginatedRequestResponse<UserMetadata[]>) => {
+        response.data.forEach((metadata: UserMetadata) => {
+          userStore.merge({ userId: metadata.id, data: { metadata } });
+        });
+        options?.onSuccess?.(response);
+      },
     },
   );
 };
