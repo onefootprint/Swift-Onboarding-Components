@@ -45,7 +45,6 @@ class BifrostClient:
         post(
             "hosted/onboarding",
             None,
-            self.ob_config.key,
             self.basic_sandbox_user.auth_token,
         )
 
@@ -85,7 +84,6 @@ class BifrostClient:
         body = get(
             "hosted/onboarding/status",
             None,
-            self.ob_config.key,
             self.basic_sandbox_user.auth_token,
         )
 
@@ -114,7 +112,6 @@ class BifrostClient:
             f"hosted/user/document/{document_request_id}",
             data,
             self.basic_sandbox_user.auth_token,
-            self.ob_config.key,
         )
 
     def submit_collected_data(self):
@@ -122,7 +119,6 @@ class BifrostClient:
         post(
             "hosted/onboarding/submit",
             None,
-            self.ob_config.key,
             self.basic_sandbox_user.auth_token,
         )
 
@@ -131,7 +127,6 @@ class BifrostClient:
         body = post(
             "hosted/onboarding/authorize",
             None,
-            self.ob_config.key,
             self.basic_sandbox_user.auth_token,
         )
         return body["validation_token"]

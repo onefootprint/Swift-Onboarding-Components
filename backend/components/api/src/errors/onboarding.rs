@@ -29,4 +29,6 @@ pub enum OnboardingError {
     NoPendingDocumentRequestFound(DocumentRequestId),
     #[error("No decision can be made from decision engine")]
     NoDecisionMade,
+    #[error("Cannot onboard a non-portable scoped user onto any ob config")]
+    NonPortableScopedUser,
 }

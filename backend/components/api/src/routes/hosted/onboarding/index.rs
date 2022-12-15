@@ -1,16 +1,17 @@
-use crate::auth::tenant::ObPkAuth;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::auth::AuthError;
 
+use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 
+use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 
 use db::models::onboarding::OnboardingCreateArgs;
@@ -34,7 +35,6 @@ pub struct OnboardingResponse {
 #[actix::post("/hosted/onboarding")]
 pub async fn post(
     state: web::Data<State>,
-    ob_pk_auth: ObPkAuth,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
@@ -46,16 +46,24 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             UserVault::lock(conn, &uv_id)?;
+            // By the time we call POST /hosted/onboarding, we expect that the user auth token was
+            // created with a tenant's onboarding config PK. This will have already created a
+            // ScopedUser and associated it with the user auth token.
             let scoped_user = user_auth
                 .scoped_user(conn)?
                 .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboardingInit]))?;
+            let ob_configuration_id = scoped_user
+                .ob_configuration_id
+                .ok_or(OnboardingError::NonPortableScopedUser)?;
+            // Check that the ob configuration is still active
+            let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
 
             let insight_event = CreateInsightEvent::from(insights);
-            let should_create_document_request = ob_pk_auth.ob_config().must_collect_identity_document;
+            let should_create_document_request = ob_config.must_collect_identity_document;
 
             let ob_create_args = OnboardingCreateArgs {
                 scoped_user_id: scoped_user.id,
-                ob_configuration_id: ob_pk_auth.ob_config().id.clone(),
+                ob_configuration_id,
                 insight_event,
                 // Create a `DocumentRequest` if specified in the ob config.
                 // We do this inside the OB creation to make this route more idempotent
