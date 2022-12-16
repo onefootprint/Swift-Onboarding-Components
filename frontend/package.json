@@ -24,10 +24,10 @@
     "version": "changeset version",
     "release": "changeset publish",
     "start": "turbo run start",
-    "start:demo": "turbo run start --filter=demo...",
+    "start:demos": "turbo run start --filter=demos...",
     "start:bifrost": "turbo run start --filter=bifrost...",
     "test:e2e": "turbo run test:e2e",
-    "test:e2e:ci": "start-server-and-test start:bifrost http://localhost:3000 start:demo http://localhost:3002 test:e2e"
+    "test:e2e:ci": "start-server-and-test start:bifrost http://localhost:3000 start:demos http://localhost:3002 test:e2e"
   },
   "devDependencies": {
     "@changesets/cli": "^2.24.3",
