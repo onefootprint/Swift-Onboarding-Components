@@ -7,7 +7,6 @@ pub struct SocureIDPlusResponse {
     pub name_address_correlation: Option<Correlation>,
     pub name_phone_correlation: Option<Correlation>,
     pub fraud: Option<Fraud>,
-    pub synthetic: Option<Synthetic>,
     pub kyc: Option<Kyc>,
     pub address_risk: Option<AddressRisk>,
     pub email_risk: Option<EmailRisk>,
@@ -29,13 +28,6 @@ pub struct Correlation {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Fraud {
-    pub reason_codes: Vec<String>,
-    pub scores: Vec<Score>,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Synthetic {
     pub reason_codes: Vec<String>,
     pub scores: Vec<Score>,
 }
