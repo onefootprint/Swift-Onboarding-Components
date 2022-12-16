@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
+use diesel::sql_types::Int8;
 use itertools::Itertools;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
@@ -96,6 +97,12 @@ struct DataLifetimeUpdate {
     deactivated_seqno: Option<Option<DataLifetimeSeqno>>,
 }
 
+#[derive(QueryableByName)]
+struct PgSequence {
+    #[diesel(sql_type = Int8)]
+    last_value: DataLifetimeSeqno,
+}
+
 impl DataLifetime {
     /// Gets the next sequence number for the lifetime table. Should be used when creating new data.
     ///
@@ -115,15 +122,9 @@ impl DataLifetime {
     /// Gets the current sequence number for the lifetime table without incrementing. Should be used
     /// when taking a snapshot
     pub fn get_current_seqno(conn: &mut PgConnection) -> DbResult<DataLifetimeSeqno> {
-        // TODO need to do some raw SQL to get the last_value from the sequence.
-        // For now, we'll increment the sequence just to get the value
-        /*
-        let result = diesel::sql_query("SELECT last_value FROM data_lifetime_seqno")
-            .get_result::<(i64,)>(conn)?
-            .0;
-        Ok(DataLifetimeSeqno(result))
-        */
-        Self::get_next_seqno(conn)
+        let result = diesel::sql_query("SELECT last_value FROM data_lifetime_seqno".to_owned())
+            .get_result::<PgSequence>(conn)?;
+        Ok(result.last_value)
     }
 
     /// Creates a new DataLifetime rows with the same created_seqno and created_at for each kind in `kinds`
