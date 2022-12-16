@@ -15,6 +15,7 @@ use std::convert::Into;
 
 impl UserVaultWrapper {
     pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
+        // TODO can we update this at all?
         ob_config
             .must_collect_data
             .iter()

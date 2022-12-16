@@ -137,6 +137,13 @@ impl UvwData {
             self.lifetimes.get(lifetime_id)
         })
     }
+
+    pub(super) fn get_lifetimes<'a, T>(&self, kinds: T) -> Vec<&DataLifetime>
+    where
+        T: IntoIterator<Item = &'a DataLifetimeKind>,
+    {
+        kinds.into_iter().flat_map(|k| self.get_lifetime(k)).collect()
+    }
 }
 
 impl HasDataAttributeFields for UvwData {
