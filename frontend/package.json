@@ -16,7 +16,7 @@
     "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "preset:dot-env": "npx --yes vercel whoami --scope footprint",
+    "preset:dot-env": "npx vercel login footprint",
     "set:dot-env": "turbo run set:dot-env",
     "pull:env": "npx vercel link -y --scope footprint && npx vercel env pull",
     "build:storybook": "turbo run build:storybook",
