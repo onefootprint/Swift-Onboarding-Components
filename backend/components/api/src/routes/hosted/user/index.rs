@@ -5,7 +5,6 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::email::Email;
 use db::models::phone_number::PhoneNumber;
-use db::models::user_vault::UserVault;
 use newtypes::DataPriority;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -58,8 +57,7 @@ pub async fn get(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let uv = UserVault::get(conn, &user_auth.user_vault_id())?;
-            let uvw = UserVaultWrapper::get_committed(conn, uv)?;
+            let uvw = UserVaultWrapper::build_for_user(conn, &user_auth.user_vault_id())?;
             Ok(uvw)
         })
         .await??;

@@ -12,10 +12,9 @@ pub async fn build_idv_data_from_verification_request(
 ) -> Result<IdvData, ApiError> {
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
-    // This is unnecessary right now, but will allow us to re-run this logic when this task is async
     let uvw = state
         .db_pool
-        .db_query(|conn| UserVaultWrapper::from_verification_request(conn, request))
+        .db_query(|conn| UserVaultWrapper::build_for_idv(conn, request))
         .await??;
 
     let (keys, encrypted_values): (Vec<_>, Vec<_>) = DataLifetimeKind::iter()

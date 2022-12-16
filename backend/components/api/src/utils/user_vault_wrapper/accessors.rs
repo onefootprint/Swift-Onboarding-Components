@@ -8,6 +8,7 @@ use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
 use db::HasDataAttributeFields;
 use db::PgConnection;
+use newtypes::ScopedUserId;
 use newtypes::{CollectedDataOption, DataLifetimeKind, SealedVaultBytes};
 use std::collections::HashSet;
 use std::convert::Into;
@@ -142,5 +143,10 @@ impl UserVaultWrapper {
     /// helper to expose a reference/deref coercion to the underlying UV (normally from a LockedUserVaultWrapper)
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault
+    }
+
+    /// helper to expose a reference/deref coercion to the underlying UV (normally from a LockedUserVaultWrapper)
+    pub fn scoped_user_id(&self) -> Option<&ScopedUserId> {
+        self.scoped_user_id.as_ref()
     }
 }

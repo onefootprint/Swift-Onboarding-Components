@@ -128,7 +128,7 @@ async fn get_user_challenge_context(
     let (uvw, creds) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let uvw = UserVaultWrapper::get_committed(conn, existing_user)?;
+            let uvw = UserVaultWrapper::build_for_user(conn, &existing_user.id)?;
             let creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
             Ok((uvw, creds))
         })

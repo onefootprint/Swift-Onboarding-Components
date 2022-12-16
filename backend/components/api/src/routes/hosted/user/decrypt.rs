@@ -36,9 +36,10 @@ fn post(
     };
     let user_auth = user_auth.check_permissions(vec![required_scope])?;
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
+    let uv_id = user_vault.id.clone();
     let uvw = state
         .db_pool
-        .db_query(|conn| UserVaultWrapper::get_committed(conn, user_vault))
+        .db_query(move |conn| UserVaultWrapper::build_for_user(conn, &uv_id))
         .await??;
 
     let DecryptFieldsResult {

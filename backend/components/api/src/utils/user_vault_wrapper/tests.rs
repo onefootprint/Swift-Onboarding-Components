@@ -55,7 +55,7 @@ fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
 
     // TODO fiddle with lifetimes to commit/deactivate data
 
-    let uvw = UserVaultWrapper::get_for_tenant(conn, &su.id).unwrap();
+    let uvw = UserVaultWrapper::build_for_onboarding(conn, &su.id).unwrap();
     let tests = vec![
         (DataLifetimeKind::FirstName, Some(SealedVaultBytes(vec![1]))),
         (DataLifetimeKind::LastName, Some(SealedVaultBytes(vec![2]))),
@@ -77,7 +77,7 @@ fn test_user_vault_wrapper(conn: &mut TestPgConnection) {
     }
 
     // get_committed should only show the phone number
-    let uvw = UserVaultWrapper::get_committed(conn, uv).unwrap();
+    let uvw = UserVaultWrapper::build_for_user(conn, &uv.id).unwrap();
     let tests = vec![
         (DataLifetimeKind::FirstName, None),
         (DataLifetimeKind::LastName, None),

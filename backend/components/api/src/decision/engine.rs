@@ -75,7 +75,7 @@ pub async fn perform_pre_run_operations(
 ) -> Result<ShouldRunDecisionEngine, ApiError> {
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::get_for_tenant(conn, &ob.scoped_user_id))
+        .db_query(move |conn| UserVaultWrapper::build_for_onboarding(conn, &ob.scoped_user_id))
         .await??;
 
     let should_initiate_verification_requests =

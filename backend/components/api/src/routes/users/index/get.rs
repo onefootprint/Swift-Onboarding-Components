@@ -158,7 +158,7 @@ pub async fn get_detail(
             let (su, _) = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let uvw = UserVaultWrapper::get_for_tenant(conn, &su.id)?;
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &su.id)?;
             let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
                 .remove(&su.id)
                 .ok_or(ApiError::ResourceNotFound)?;

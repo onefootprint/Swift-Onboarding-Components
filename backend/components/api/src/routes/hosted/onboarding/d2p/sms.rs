@@ -3,7 +3,6 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::user_vault::UserVault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -37,11 +36,10 @@ pub async fn handler(
                 // If the auth token is during an onboarding session, create a UVW that sees all
                 // speculative data for the tenant in order to see an uncommitted phone number
                 // that was added by this tenant.
-                UserVaultWrapper::get_for_tenant(conn, &su.id)?
+                UserVaultWrapper::build_for_onboarding(conn, &su.id)?
             } else {
                 // Otherwise, create a UVW that only sees committed data
-                let uv = UserVault::get(conn, &user_auth.user_vault_id())?;
-                UserVaultWrapper::get_committed(conn, uv)?
+                UserVaultWrapper::build_for_user(conn, &user_auth.user_vault_id())?
             };
             Ok(uvw)
         })

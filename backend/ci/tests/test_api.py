@@ -42,7 +42,6 @@ class TestNonPortableVaultApi:
         # post data to it
         data = build_user_data()
         put(f"users/{fp_id}/vault/identity", data, sandbox_tenant.sk.key)
-
         # check that the data is there now
         params = {"fields": "first_name, last_name, zip, ssn9, city"}
         response = get(f"users/{fp_id}/vault/identity", params, sandbox_tenant.sk.key)
@@ -149,6 +148,7 @@ class TestUnifiedVaultApi:
         params = {
             "fields": "identity.last_name, identity.ssn9, custom.ach_account_number,custom.cc4, custom.insurance_id"
         }
+
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
         assert response["identity"]["last_name"] == True
         assert response["identity"]["ssn9"] == True

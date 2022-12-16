@@ -38,7 +38,20 @@ use crate::{DbError, DbResult};
 /// - `deactivated_at`/`deactivated_seqno`: When the data was archived and is no longer active. This
 ///   may happen if a piece of data is replaced with newer data.
 ///
-/// Notably, each lifecycle attribute is represented both with a human-readable timestamp AND with
+/// Access:
+/// In the case of portable data, DataLifetimes don't help in all cases with checking if the Tenant ever _requested_ access to that data
+/// during an onboarding (via a OB configuration). Since DataLifetimes do not speak in terms of accessing specific data attributes (`kind`s) previously collected,
+/// (which is a unique/distinct case from ownership) we associate each DataLifetime with a `kind`, which helps when retrieving data.
+///
+/// For example:
+///   - Tenant A onboards User U, requesting data_lifetime_kind_1 and data_lifetime_kind_2 and both kinds become portable
+///   - Tenant B onboards User U, requesting *just* data_lifetime_kind_1. data_lifetime_kind_2 is portable, but Tenant B should not know of it's existence (or read it's value).
+///   As currently defined in the DataLifetime model, data_lifetime_kind_1 and data_lifetime_kind_2 are owned by U's user_vault, and Tenant A's scoped user for User U.
+///   There is no way in the DataLifetime model to keep an "ACL" with respect to Tenant B visibility of User U's portable data.
+///   Hence, we control this at the UVW level, where we can materialize individual data kinds based on lifetimes and check ACL based on ob configs
+///
+/// Notably:
+/// Each lifecycle attribute is represented both with a human-readable timestamp AND with
 /// a machine-readable seqno. The seqno is controlled by a postgres sequence that is incremented
 /// when new rows are added/committed/deactivated. It provides a _total_ ordering of events that
 /// occur during the data lifecycle (which cannot always be provided by a timestamp).
@@ -214,6 +227,7 @@ impl DataLifetime {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
+        accessible_kinds: Option<Vec<DataLifetimeKind>>,
     ) -> DbResult<Vec<Self>> {
         let mut query = data_lifetime::table
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
@@ -231,6 +245,12 @@ impl DataLifetime {
             // Only fetch committed, portable data
             query = query.filter(q_is_committed)
         }
+
+        // Filter to specific kinds
+        if let Some(kinds) = accessible_kinds {
+            query = query.filter(data_lifetime::kind.eq_any(kinds));
+        };
+
         let results = query.get_results(conn)?;
         Ok(results)
     }
@@ -274,6 +294,7 @@ impl DataLifetime {
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
         seqno: DataLifetimeSeqno,
+        accessible_kinds: Option<Vec<DataLifetimeKind>>,
     ) -> DbResult<Vec<Self>> {
         // This is kind of unnecessarily similar to `get_active`, but it's hard to combine
         // this logic in diesel
@@ -299,6 +320,12 @@ impl DataLifetime {
             // Only fetch committed, portable data
             query = query.filter(q_is_committed)
         }
+
+        // Filter to specific kinds
+        if let Some(kinds) = accessible_kinds {
+            query = query.filter(data_lifetime::kind.eq_any(kinds));
+        };
+
         let results = query.get_results(conn)?;
         Ok(results)
     }

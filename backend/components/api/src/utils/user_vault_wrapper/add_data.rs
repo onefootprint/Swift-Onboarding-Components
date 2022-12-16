@@ -74,22 +74,20 @@ impl LockedUserVaultWrapper {
     }
 
     pub fn update_identity_data(
-        self, // Intentionally consume UVW to prevent using stale UVW
+        self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
         fingerprints: Vec<(UvdKind, Fingerprint)>,
     ) -> Result<(), ApiError> {
-        let uvw = self.into_inner();
-        let existing_fields = uvw.get_populated_fields();
-
-        let builder = UvdBuilder::build(update, uvw.user_vault.public_key.clone(), existing_fields)?;
-        let scoped_user_id = uvw
-            .scoped_user_id
-            .clone()
+        let existing_fields = self.get_populated_fields();
+        let uv = self.user_vault();
+        let builder = UvdBuilder::build(update, uv.public_key.clone(), existing_fields)?;
+        let scoped_user_id = self
+            .scoped_user_id()
             .ok_or(UserError::NotAllowedOutsideOnboarding)?;
 
-        let collected_data = builder.save(conn, uvw.user_vault.id.clone(), scoped_user_id, fingerprints)?;
-        uvw.add_user_timeline(conn, collected_data)?;
+        let collected_data = builder.save(conn, uv.id.clone(), scoped_user_id.clone(), fingerprints)?;
+        self.add_user_timeline(conn, collected_data)?;
 
         Ok(())
     }

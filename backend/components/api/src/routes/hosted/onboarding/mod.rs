@@ -63,7 +63,7 @@ pub fn get_requirements(
     let ob_config_id = &ob_info.ob_config.id;
     let scoped_user_id = &ob_info.scoped_user.id;
 
-    let uvw = UserVaultWrapper::get_for_tenant(conn, scoped_user_id)?;
+    let uvw = UserVaultWrapper::build_for_onboarding(conn, scoped_user_id)?;
     let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.user_vault.id, ob_config_id))?;
     let missing_attributes = uvw.missing_fields(&ob_info.ob_config);
     // Document requirements are determined by the presence of DocumentRequest database objects.

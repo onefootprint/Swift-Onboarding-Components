@@ -222,9 +222,10 @@ async fn decrypt_inner(
     user_vault: UserVault,
     kv_data: &[KeyValueData],
 ) -> Result<Vec<PiiString>, ApiError> {
+    // Since this is custom data, requester has access to everything committed in the vault
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::get_committed(conn, user_vault))
+        .db_query(move |conn| UserVaultWrapper::build_for_user(conn, &user_vault.id))
         .await??;
 
     let e_datas = kv_data.iter().map(|kv| &kv.e_data).collect();
