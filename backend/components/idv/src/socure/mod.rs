@@ -14,8 +14,9 @@ use self::{client::SocureClient, response::SocureIDPlusResponse};
 pub async fn send_idplus_request(
     socure_client: &SocureClient,
     idv_data: IdvData,
+    device_session_id: Option<String>,
 ) -> Result<VendorResponse, Error> {
-    let response = socure_client.idplus(idv_data).await?;
+    let response = socure_client.idplus(idv_data, device_session_id).await?;
     let parsed_response = parse_response(response.clone())?;
 
     Ok(VendorResponse {

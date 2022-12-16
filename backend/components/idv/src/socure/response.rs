@@ -13,6 +13,9 @@ pub struct SocureIDPlusResponse {
     pub phone_risk: Option<PhoneRisk>,
     pub alert_list: Option<AlertList>,
     pub global_watchlist: Option<GlobalWatchlist>,
+    pub device_risk: Option<DeviceRisk>,
+    pub device_identity_correlation: Option<Correlation>,
+    pub device_data: Option<DeviceData>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -103,4 +106,83 @@ pub struct AlertListMatch {
 pub struct GlobalWatchlist {
     pub reason_codes: Vec<String>,
     pub matches: serde_json::Value, // TODO: this ones pretty intense and the schema isn't clear will defer for now
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeviceRisk {
+    pub reason_codes: Vec<String>,
+    pub score: f32,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeviceData {
+    pub information: Information,
+    pub geolocation: Geolocation,
+    pub observations: Observations,
+    pub velocity_metrics: VelocityMetrics,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Information {
+    pub device_manufacturer: String,
+    pub device_model_number: String,
+    pub operating_system: String,
+    pub operating_system_version: String,
+    pub browser_type: String,
+    pub browser_version: String,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Geolocation {
+    pub ip_geolocation: IpGeolocation,
+    pub gps_geolocation: GpsGeolocation,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IpGeolocation {
+    pub coordinates: String,
+    pub city: String,
+    pub state: String,
+    pub zip: String,
+    pub country: String,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GpsGeolocation {
+    pub coordinates: String,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Observations {
+    pub first_seen: String,
+    pub last_seen: String,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VelocityMetrics {
+    pub historical_count: HistoricalCount,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoricalCount {
+    pub email: Counts,
+    pub mobile_number: Counts,
+    pub sur_name: Counts,
+    pub first_name: Counts,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Counts {
+    pub unique_count: u32,
+    pub unique_share_percent: u32,
 }

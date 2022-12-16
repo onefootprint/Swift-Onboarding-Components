@@ -1,6 +1,6 @@
 use super::*;
 use crate::{errors::ApiError, State};
-use db::models::verification_request::VerificationRequest;
+use db::models::{socure_device_session::SocureDeviceSession, verification_request::VerificationRequest};
 use idv::VendorResponse;
 use newtypes::{IdvData, Vendor};
 
@@ -24,9 +24,19 @@ pub async fn send_idv_request(
         Vendor::Twilio => idv::twilio::lookup_v2(&state.twilio_client.client, data)
             .await
             .map_err(idv::Error::from)?,
-        Vendor::Socure => idv::socure::send_idplus_request(&state.socure_sandbox_client, data)
-            .await
-            .map_err(idv::Error::from)?,
+        Vendor::Socure => {
+            let socure_device_session_id = state
+                .db_pool
+                .db_query(move |conn| {
+                    SocureDeviceSession::latest_for_onboarding(conn, &request.onboarding_id)
+                })
+                .await??
+                .map(|d| d.device_session_id);
+
+            idv::socure::send_idplus_request(&state.socure_sandbox_client, data, socure_device_session_id)
+                .await
+                .map_err(idv::Error::from)?
+        }
         _ => return Err(ApiError::NotImplemented),
     };
 

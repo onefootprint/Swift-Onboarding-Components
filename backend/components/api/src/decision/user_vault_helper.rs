@@ -19,7 +19,7 @@ pub(super) fn get_vendor_apis_from_user_vault_wrapper(
         .unique()
         .collect();
 
-    if !socure::requirements::all_modules_with_met_requirements(&attributes_available).is_empty() {
+    if !socure::requirements::meets_requirements_for_idplus_request(&attributes_available) {
         vendor_apis.push(VendorAPI::SocureIDPlus);
     }
 

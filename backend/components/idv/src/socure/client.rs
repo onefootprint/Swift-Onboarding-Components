@@ -47,23 +47,34 @@ impl SocureClient {
     }
 
     // Makes call to Socure's ID+ endpoint: https://developer.socure.com/reference#tag/ID+
-    pub async fn idplus(&self, idv_data: IdvData) -> Result<serde_json::Value, crate::socure::Error> {
+    pub async fn idplus(
+        &self,
+        idv_data: IdvData,
+        device_session_id: Option<String>,
+    ) -> Result<serde_json::Value, crate::socure::Error> {
         // TODO: For now this just tries 1 time. We need to differentiate retriable errors from other errors
         //  and match on that and then enable this to retry multiple times
         let retry_strategy = ExponentialBackoff::from_millis(10).map(jitter).take(0);
-        let result = Retry::spawn(retry_strategy, || self.attempt_idplus(idv_data.clone())).await?;
+        let result = Retry::spawn(retry_strategy, || {
+            self.attempt_idplus(idv_data.clone(), device_session_id.clone())
+        })
+        .await?;
 
         Ok(result)
     }
 
-    async fn attempt_idplus(&self, idv_data: IdvData) -> Result<serde_json::Value, crate::socure::Error> {
+    async fn attempt_idplus(
+        &self,
+        idv_data: IdvData,
+        device_session_id: Option<String>,
+    ) -> Result<serde_json::Value, crate::socure::Error> {
         let present_data_kinds = IdvData::present_data_attributes(&idv_data);
-        let modules = requirements::all_modules_with_met_requirements(&present_data_kinds)
+        let modules = requirements::modules_for_idplus_request(&present_data_kinds, &device_session_id)
             .iter()
             .map(|m| m.to_string())
             .collect::<Vec<String>>();
 
-        let req = SocureRequest::new(modules, idv_data)?;
+        let req = SocureRequest::new(modules, idv_data, device_session_id)?;
         tracing::info!(req = format!("{:?}", req), "SocureClient req");
         let response = self
             .client
@@ -121,7 +132,9 @@ mod tests {
             phone_number: Some(PiiString::from("1234567891")),
         };
 
-        let res = socure_client.idplus(idv_data).await.unwrap();
+        let device_session_id = Some(String::from("placeholder"));
+
+        let res = socure_client.idplus(idv_data, device_session_id).await.unwrap();
         tracing::info!(res = format!("{:?}", res), "res");
         let parsed_res = crate::socure::parse_response(res).unwrap();
         tracing::info!(parsed_res = format!("{:?}", parsed_res), "parsed_res");

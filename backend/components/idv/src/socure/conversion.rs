@@ -23,12 +23,17 @@ pub(crate) struct SocureRequest {
     country: Option<PiiString>,
     user_consent: bool,
     consent_timestamp: DateTime<Utc>,
+    device_session_id: Option<String>,
 }
 
 /// identify request and vec of modules we want to use
 impl SocureRequest {
     // TODO: make this TryFrom<IdvData> instead
-    pub fn new(modules: Vec<String>, idv_data: IdvData) -> Result<Self, crate::socure::Error> {
+    pub fn new(
+        modules: Vec<String>,
+        idv_data: IdvData,
+        device_session_id: Option<String>,
+    ) -> Result<Self, crate::socure::Error> {
         let IdvData {
             first_name,
             last_name,
@@ -76,6 +81,7 @@ impl SocureRequest {
             country,
             user_consent: true, // TODO: can we hardcode to true or do we need to more explicitly route the users consent to here
             consent_timestamp: Utc::now(), // TODO: same as above
+            device_session_id,
         })
     }
 }

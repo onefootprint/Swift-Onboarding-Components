@@ -7,15 +7,14 @@ use strum_macros::{Display, EnumIter};
 pub enum SocureModule {
     AddressRisk,
     AlertList,
+    Decision,
     EmailRisk,
     KYC,
-    // KYCPlus,
     WatchlistPremier,
     PhoneRisk,
-    // DeviceRisk, TODO: requires wiring deviceSessionId from frontend SDK
+    DeviceRisk,
     Fraud,
-    // Synthetic, TODO: our api key isn't provisioned for synthetic
-    // ECBSV, TODO: our api key isn't provisioned for ecbsv
+    Synthetic,
 }
 
 struct Requirements {
@@ -24,7 +23,16 @@ struct Requirements {
 }
 
 impl SocureModule {
-    fn requirements(&self) -> Requirements {
+    // Whether or not the Socure module requires certain pieces of PII data
+    fn requires_pii_data(&self) -> bool {
+        match self {
+            SocureModule::Decision => false, // Decision is always included in the request
+            SocureModule::DeviceRisk => false, // Device risk is included if we have a deviceSessionId (which we theoretically should also always have)
+            _ => true,
+        }
+    }
+
+    fn pii_data_requirements(&self) -> Requirements {
         match self {
             SocureModule::AddressRisk => Requirements {
                 required: vec![FirstName, LastName, AddressLine1, Country],
@@ -42,16 +50,16 @@ impl SocureModule {
                 required: vec![FirstName, LastName, Country],
                 one_of: vec![vec![AddressLine1, City, State, Zip], vec![Ssn9], vec![Dob]],
             },
-            // SocureModule::KYCPlus => Requirements {
-            //     required: vec![FirstName, LastName, Country],
-            //     one_of: vec![vec![AddressLine1, City, State, Zip], vec![Dob], vec![Ssn9]],
-            // },
             SocureModule::WatchlistPremier => Requirements {
                 required: vec![FirstName, LastName],
                 one_of: vec![],
             },
             SocureModule::PhoneRisk => Requirements {
                 required: vec![PhoneNumber, Country],
+                one_of: vec![],
+            },
+            SocureModule::DeviceRisk => Requirements {
+                required: vec![],
                 one_of: vec![],
             },
             SocureModule::Fraud => Requirements {
@@ -65,27 +73,27 @@ impl SocureModule {
                     vec![Email],
                 ],
             },
-            // SocureModule::Synthetic => Requirements {
-            //     required: vec![FirstName, LastName, Country],
-            //     one_of: vec![
-            //         vec![AddressLine1, City, State, Zip],
-            //         vec![AddressLine1, City, State],
-            //         vec![AddressLine1, Zip],
-            //         vec![PhoneNumber],
-            //         vec![Email],
-            //         vec![Ssn9],
-            //         vec![Dob],
-            //     ],
-            // },
-            // SocureModule::ECBSV => Requirements {
-            //     required: vec![FirstName, LastName, Dob, Ssn9],
-            //     one_of: vec![],
-            // },
+            SocureModule::Decision => Requirements {
+                required: vec![],
+                one_of: vec![],
+            },
+            SocureModule::Synthetic => Requirements {
+                required: vec![FirstName, LastName, Country],
+                one_of: vec![
+                    vec![AddressLine1, City, State, Zip],
+                    vec![AddressLine1, City, State],
+                    vec![AddressLine1, Zip],
+                    vec![PhoneNumber],
+                    vec![Email],
+                    vec![Ssn9],
+                    vec![Dob],
+                ],
+            },
         }
     }
 
     fn meets_requirements_for_module(&self, present_data_kinds: &[DataLifetimeKind]) -> bool {
-        let requirements_for_module = self.requirements();
+        let requirements_for_module = self.pii_data_requirements();
 
         let required_met = requirements_for_module
             .required
@@ -105,10 +113,31 @@ impl SocureModule {
     }
 }
 
-pub fn all_modules_with_met_requirements(present_data_kinds: &[DataLifetimeKind]) -> Vec<SocureModule> {
+fn modules_meeting_pii_requirements(present_data_kinds: &[DataLifetimeKind]) -> Vec<SocureModule> {
     SocureModule::iter()
+        .filter(|sm| sm.requires_pii_data())
         .filter(|sm| sm.meets_requirements_for_module(present_data_kinds))
         .collect()
+}
+
+pub fn modules_for_idplus_request(
+    present_data_kinds: &[DataLifetimeKind],
+    device_session_id: &Option<String>,
+) -> Vec<SocureModule> {
+    let mut modules_meeting_requirement = modules_meeting_pii_requirements(present_data_kinds);
+
+    if device_session_id.is_some() {
+        modules_meeting_requirement.push(SocureModule::DeviceRisk);
+    }
+    // modules_meeting_requirement.push(SocureModule::Decision); //TODO: we aren't provisioned for this yet
+
+    modules_meeting_requirement
+}
+
+pub fn meets_requirements_for_idplus_request(present_data_kinds: &[DataLifetimeKind]) -> bool {
+    let modules_meeting_requirements = modules_meeting_pii_requirements(present_data_kinds);
+
+    !modules_meeting_requirements.is_empty()
 }
 
 #[cfg(test)]
@@ -138,8 +167,16 @@ mod tests {
 
         let present_data_kinds = IdvData::present_data_attributes(&idv_data);
         assert_eq!(
-            vec![KYC, WatchlistPremier],
-            all_modules_with_met_requirements(&present_data_kinds)
+            vec![KYC, WatchlistPremier, Synthetic],
+            modules_meeting_pii_requirements(&present_data_kinds)
+        );
+        assert_eq!(
+            vec![KYC, WatchlistPremier, Synthetic, DeviceRisk],
+            modules_for_idplus_request(&present_data_kinds, &Some(String::from("device123")))
+        );
+        assert_eq!(
+            vec![KYC, WatchlistPremier, Synthetic],
+            modules_for_idplus_request(&present_data_kinds, &None)
         );
     }
 }
