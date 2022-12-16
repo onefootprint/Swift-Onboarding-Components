@@ -1,9 +1,12 @@
+use std::collections::HashSet;
+
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use strum::EnumIter;
+use strum::{EnumIter, IntoEnumIterator};
 use strum_macros::{AsRefStr, EnumString};
 
 use super::DataLifetimeKind;
@@ -31,6 +34,10 @@ use super::DataLifetimeKind;
 #[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// Represents a type of collectible data. Each variant represents a set of fields that must be
+/// collected together, like FirstName and LastName.
+/// Some CollectedData variants have multiple Options of allowable collectible fields. For example,
+/// Address can be populated by providing either a PartialAddress or a FullAddress
 pub enum CollectedData {
     Name,
     Dob,
@@ -44,23 +51,27 @@ crate::util::impl_enum_str_diesel!(CollectedData);
 
 impl CollectedData {
     /// Maps the CollectedData to the list of DataAttributes that may be collected by variants of this CollectedOption
-    pub fn children(&self) -> Vec<DataLifetimeKind> {
-        // This is basically the same as getting this CollectedData's CollectedDataOptions' children
+    pub fn attributes(&self) -> Vec<DataLifetimeKind> {
+        self.options()
+            .into_iter()
+            .flat_map(|cdo| cdo.attributes())
+            .unique()
+            .collect()
+    }
+
+    /// Returns all the variants of this CollectedDataOption, in increasing order of "completeness."
+    pub fn options(&self) -> Vec<CollectedDataOption> {
+        use CollectedDataOption::*;
         match self {
-            Self::Name => vec![DataLifetimeKind::FirstName, DataLifetimeKind::LastName],
-            Self::Dob => vec![DataLifetimeKind::Dob],
-            Self::Email => vec![DataLifetimeKind::Email],
-            Self::PhoneNumber => vec![DataLifetimeKind::PhoneNumber],
-            // These are the only two CollectedDatas that map to multiple DataAttributes
-            Self::Ssn => vec![DataLifetimeKind::Ssn4, DataLifetimeKind::Ssn9],
-            Self::Address => vec![
-                DataLifetimeKind::AddressLine1,
-                DataLifetimeKind::AddressLine2,
-                DataLifetimeKind::City,
-                DataLifetimeKind::State,
-                DataLifetimeKind::Zip,
-                DataLifetimeKind::Country,
-            ],
+            Self::Name => vec![Name],
+            Self::Dob => vec![Dob],
+            Self::Email => vec![Email],
+            Self::PhoneNumber => vec![PhoneNumber],
+            // These are the only two CollectedDatas that map to multiple Options
+            // NOTE: these MUST be returned in increasing order of "completeness" - the options that
+            // contain fewer fields are first
+            Self::Ssn => vec![Ssn4, Ssn9],
+            Self::Address => vec![PartialAddress, FullAddress],
         }
     }
 }
@@ -87,6 +98,10 @@ impl CollectedData {
 #[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// Represent the options of allowed CollectedData.
+/// Some CollectedData variants only have a single allowable CollectedDataOption.
+/// Other CollectedData variants may have multiple Options of assortments of data that can be collected.
+/// Each CollectedDataOption maps to a list of DataLifetimeKinds that are represented by the CDO
 pub enum CollectedDataOption {
     Name,
     Dob,
@@ -130,5 +145,77 @@ impl CollectedDataOption {
             Self::Email => vec![DataLifetimeKind::Email],
             Self::PhoneNumber => vec![DataLifetimeKind::PhoneNumber],
         }
+    }
+
+    pub fn required_attributes(&self) -> Vec<DataLifetimeKind> {
+        self.attributes()
+            .into_iter()
+            .filter(|k| k.is_required())
+            .collect()
+    }
+
+    /// Given a list of DataLifetimeKinds (maybe collected via API), computes the set of
+    /// CollectedDataOptions represented by this list of DataLifetimeKinds
+    pub fn list_from(kinds: Vec<DataLifetimeKind>) -> HashSet<Self> {
+        let kinds: HashSet<_> = kinds.into_iter().collect();
+        // For each CollectedData variant, figure out which of the options (if any) is represented
+        // in the list of kinds
+        CollectedData::iter()
+            .flat_map(|cd| {
+                let possible_options = cd.options();
+                // Get the maximal option whose attributes are entirely contained in this list of kinds
+                // in the list of kinds
+                possible_options.into_iter().rev().find(|cdo| {
+                    let required_attrs = HashSet::from_iter(cdo.required_attributes().into_iter());
+                    kinds.is_superset(&required_attrs)
+                })
+            })
+            .collect()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::collections::HashSet;
+    use strum::IntoEnumIterator;
+    use test_case::test_case;
+
+    use crate::{CollectedData, CollectedDataOption as CDO, DataLifetimeKind};
+    use DataLifetimeKind::*;
+
+    #[test]
+    fn test_increasing_cd_options() {
+        // The Options for each CollectedData must be sorted in order of
+        for cd in CollectedData::iter() {
+            let options = cd.options();
+            assert!(options.len() <= 2, "More than 2 options for CollectedData {}", cd);
+            assert!(!options.is_empty(), "No option for CollectedData {}", cd);
+            let attrs_for_options: Vec<_> =
+                options.into_iter().map(|dlk| dlk.required_attributes()).collect();
+            let is_sorted = attrs_for_options.windows(2).all(|w| w[0].len() <= w[1].len());
+            assert!(
+                is_sorted,
+                "Options for CollectedData {} are not in ascending order",
+                cd
+            );
+        }
+    }
+
+    #[test_case(vec![FirstName] => HashSet::from_iter([]))]
+    #[test_case(vec![FirstName, LastName] => HashSet::from_iter([CDO::Name]))]
+    #[test_case(vec![FirstName, LastName, Dob, Email] => HashSet::from_iter([CDO::Name, CDO::Dob, CDO::Email]))]
+    #[test_case(vec![Ssn4, Dob] => HashSet::from_iter([CDO::Ssn4, CDO::Dob]))]
+    #[test_case(vec![Ssn4, Ssn9, Dob] => HashSet::from_iter([CDO::Ssn9, CDO::Dob]))]
+    #[test_case(vec![Ssn9] => HashSet::from_iter([]))]
+    #[test_case(vec![Zip, Country] => HashSet::from_iter([CDO::PartialAddress]))]
+    #[test_case(vec![AddressLine1, City, State, Zip, Country] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![AddressLine1, AddressLine2, City, State, Zip, Country] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![AddressLine1, AddressLine2, City, State, Zip, Country, FirstName] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![AddressLine1, AddressLine2, City, State, Zip, Country, FirstName, LastName] => HashSet::from_iter([CDO::FullAddress, CDO::Name]))]
+    #[test_case(vec![Zip, Ssn4, LastName, Country, FirstName] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name]))]
+    #[test_case(vec![Zip, Ssn4, LastName, Country, FirstName, Dob, Email, PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
+    #[test_case(vec![City, State, Zip, Ssn4, LastName, Country, FirstName, Dob, Email, PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
+    fn test_parse_list_of_kinds(kinds: Vec<DataLifetimeKind>) -> HashSet<CDO> {
+        CDO::list_from(kinds)
     }
 }

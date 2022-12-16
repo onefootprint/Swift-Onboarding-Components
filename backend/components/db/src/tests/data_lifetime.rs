@@ -3,7 +3,6 @@ use std::collections::HashSet;
 use macros::db_test;
 use newtypes::{DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, ScopedUserId, TenantId, UserVaultId};
 
-use crate::models::scoped_user::ScopedUser;
 use crate::tests::prelude::*;
 use crate::TxnPgConnection;
 

@@ -86,8 +86,11 @@ impl LockedUserVaultWrapper {
             .scoped_user_id()
             .ok_or(UserError::NotAllowedOutsideOnboarding)?;
 
-        let collected_data = builder.save(conn, uv.id.clone(), scoped_user_id.clone(), fingerprints)?;
-        self.add_user_timeline(conn, collected_data)?;
+        let created_kinds = builder.save(conn, uv.id.clone(), scoped_user_id.clone(), fingerprints)?;
+        let created_cd_options = CollectedDataOption::list_from(created_kinds)
+            .into_iter()
+            .collect();
+        self.add_user_timeline(conn, created_cd_options)?;
 
         Ok(())
     }

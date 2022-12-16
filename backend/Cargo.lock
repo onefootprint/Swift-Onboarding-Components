@@ -2981,6 +2981,7 @@ dependencies = [
  "diesel-derive-newtype",
  "diesel_as_jsonb",
  "diesel_migrations",
+ "itertools",
  "lazy_static",
  "paperclip",
  "regex",

@@ -79,7 +79,7 @@ impl DataLifetimeKind {
 
     /// Maps the DataAttribute to the CollectedData that may collect this attribute
     fn parent(&self) -> Option<CollectedData> {
-        CollectedData::iter().find(|c| c.children().contains(self))
+        CollectedData::iter().find(|c| c.attributes().contains(self))
     }
 
     /// Get the list of DataAttributes that should be cleared when this kind is updated
@@ -87,7 +87,7 @@ impl DataLifetimeKind {
         // Look at the CollectedData that encompasses this DataAttribute.
         // All of the other DataAttributes represented by that CollectedData need to be cleared
         // when one is set
-        self.parent().map(|c| c.children()).unwrap_or_default()
+        self.parent().map(|c| c.attributes()).unwrap_or_default()
     }
 }
 

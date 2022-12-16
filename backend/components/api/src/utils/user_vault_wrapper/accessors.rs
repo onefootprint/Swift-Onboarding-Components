@@ -18,12 +18,7 @@ impl UserVaultWrapper {
         ob_config
             .must_collect_data
             .iter()
-            .filter(|cdo| {
-                cdo.attributes()
-                    .iter()
-                    .filter(|d| d.is_required())
-                    .any(|d| !self.has_field(*d))
-            })
+            .filter(|cdo| cdo.required_attributes().iter().any(|d| !self.has_field(*d)))
             .cloned()
             .collect()
     }

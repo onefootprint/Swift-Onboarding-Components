@@ -21,6 +21,7 @@ crypto = { path = "../enclave/crypto" }
 lazy_static = "1.0"
 uuid = { workspace = true }
 schemars = { workspace = true }
+itertools = { workspace = true }
 
 # diesel
 diesel = { workspace = true }

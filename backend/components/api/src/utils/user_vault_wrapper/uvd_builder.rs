@@ -15,8 +15,8 @@ use newtypes::{
     dob::DateOfBirth,
     name::FullName,
     ssn::{Ssn, Ssn4, Ssn9},
-    CollectedDataOption, DataLifetimeKind, Fingerprint as FingerprintBytes, PiiString, ScopedUserId,
-    UserVaultId, UvdKind, VaultPublicKey,
+    DataLifetimeKind, Fingerprint as FingerprintBytes, PiiString, ScopedUserId, UserVaultId, UvdKind,
+    VaultPublicKey,
 };
 use std::collections::HashMap;
 
@@ -29,8 +29,6 @@ pub struct UvdBuilder {
     data: Vec<NewUserVaultData>,
     /// We will deactivate the old UserVaultData rows and their fingerprints if they are replaced
     kinds_to_deactivate: Vec<UvdKind>,
-    /// Keeps track of which pieces of data were added during this request
-    collected_data: Vec<CollectedDataOption>,
 }
 
 impl UvdBuilder {
@@ -44,7 +42,6 @@ impl UvdBuilder {
             vault_public_key,
             data: vec![],
             kinds_to_deactivate: vec![],
-            collected_data: vec![],
         };
 
         let IdentityDataUpdate {
@@ -83,13 +80,11 @@ impl UvdBuilder {
         } = name;
         self.add_sealed(first_name.into(), UvdKind::FirstName)?;
         self.add_sealed(last_name.into(), UvdKind::LastName)?;
-        self.collected_data.push(CollectedDataOption::Name);
         Ok(())
     }
 
     fn add_dob(&mut self, dob: DateOfBirth) -> ApiResult<()> {
         self.add_sealed(dob.into(), UvdKind::Dob)?;
-        self.collected_data.push(CollectedDataOption::Dob);
         Ok(())
     }
 
@@ -98,7 +93,6 @@ impl UvdBuilder {
         self.add_sealed(ssn9.into(), UvdKind::Ssn9)?;
         self.add_sealed(ssn4.into(), UvdKind::Ssn4)?;
 
-        self.collected_data.push(CollectedDataOption::Ssn9);
         Ok(())
     }
 
@@ -113,7 +107,6 @@ impl UvdBuilder {
         }
 
         self.add_sealed(ssn4.into(), UvdKind::Ssn4)?;
-        self.collected_data.push(CollectedDataOption::Ssn4);
         Ok(())
     }
 
@@ -152,8 +145,6 @@ impl UvdBuilder {
         self.add_sealed(zip.into(), UvdKind::Zip)?;
         self.add_sealed(country.into(), UvdKind::Country)?;
 
-        self.collected_data.push(CollectedDataOption::FullAddress);
-
         Ok(())
     }
 
@@ -175,7 +166,6 @@ impl UvdBuilder {
         self.kinds_to_deactivate.push(UvdKind::City);
         self.kinds_to_deactivate.push(UvdKind::State);
 
-        self.collected_data.push(CollectedDataOption::PartialAddress);
         Ok(())
     }
 
@@ -198,9 +188,7 @@ impl UvdBuilder {
         user_vault_id: UserVaultId,
         scoped_user_id: ScopedUserId,
         fingerprints: Vec<(UvdKind, FingerprintBytes)>,
-    ) -> ApiResult<Vec<CollectedDataOption>> {
-        // TODO verify there isn't already committed data for this user vault
-
+    ) -> ApiResult<Vec<DataLifetimeKind>> {
         // Deactivate old UVDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never committed data
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -231,7 +219,7 @@ impl UvdBuilder {
             })
             .collect::<ApiResult<_>>()?;
         Fingerprint::bulk_create(conn, fingerprints)?;
-
-        Ok(self.collected_data)
+        let created_kinds = kind_to_lifetime.keys().map(|k| (*k).into()).collect();
+        Ok(created_kinds)
     }
 }
