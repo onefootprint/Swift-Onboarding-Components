@@ -86,6 +86,7 @@ impl CollectedData {
     Display,
     Clone,
     Copy,
+    EnumIter,
     Deserialize,
     Serialize,
     Apiv2Schema,
@@ -172,6 +173,16 @@ impl CollectedDataOption {
             })
             .collect()
     }
+
+    /// Maps the partial variant to a full variant of an option, if exists.
+    /// Should stay in sync with CollectedData::options()
+    pub fn full_variant(&self) -> Option<Self> {
+        match self {
+            Self::Ssn4 => Some(Self::Ssn9),
+            Self::PartialAddress => Some(Self::FullAddress),
+            _ => None,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -184,12 +195,15 @@ mod test {
     use DataLifetimeKind::*;
 
     #[test]
-    fn test_increasing_cd_options() {
+    fn test_collected_data_options() {
         // The Options for each CollectedData must be sorted in order of
         for cd in CollectedData::iter() {
             let options = cd.options();
             assert!(options.len() <= 2, "More than 2 options for CollectedData {}", cd);
             assert!(!options.is_empty(), "No option for CollectedData {}", cd);
+            // Enforce that the .full_variant() util stays in sync with .options()
+            assert!(options.get(0).unwrap().full_variant() == options.get(1).cloned());
+
             let attrs_for_options: Vec<_> =
                 options.into_iter().map(|dlk| dlk.required_attributes()).collect();
             let is_sorted = attrs_for_options.windows(2).all(|w| w[0].len() <= w[1].len());
@@ -198,6 +212,14 @@ mod test {
                 "Options for CollectedData {} are not in ascending order",
                 cd
             );
+        }
+    }
+
+    #[test]
+    fn test_cdo_parent() {
+        for cdo in CDO::iter() {
+            // Parent's children should contain self
+            assert!(cdo.parent().options().contains(&cdo));
         }
     }
 
