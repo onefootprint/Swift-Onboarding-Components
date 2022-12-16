@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 import useUserStore from 'src/hooks/use-user-store';
 
+import useSignalFilters from '../../../../pages/users/pages/user-details/components/user-detail-data/components/signals/hooks/use-signals-filters';
 import { UserRiskSignals } from '../../types';
 import groupBySection from './utils/group-by-section';
 import groupBySeverity from './utils/group-by-severity';
@@ -39,12 +40,17 @@ export const groupBySectionAndSeverity = (
 };
 
 const useGetRiskSignals = (userId: string) => {
+  const filters = useSignalFilters();
   const userStore = useUserStore();
   const { authHeaders } = useSession();
-  const params = {};
+  const params = {
+    scope: filters.query.signal_scope,
+    description: filters.query.signal_description,
+    severity: filters.query.signal_severity,
+  };
 
   return useQuery<UserRiskSignals, RequestError>(
-    ['riskSignals', authHeaders, userId, params],
+    ['riskSignals', authHeaders, userId],
     () => getRiskSignals({ authHeaders, userId, params }),
     {
       enabled: !!userId,

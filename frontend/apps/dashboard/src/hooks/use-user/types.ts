@@ -47,7 +47,7 @@ export type UserAnnotations = {
   annotations: PinnedAnnotation[];
 };
 
-type RiskSignalSeverityGrouping = {
+export type RiskSignalSeverityGrouping = {
   [RiskSignalSeverity.Low]: RiskSignal[];
   [RiskSignalSeverity.Medium]: RiskSignal[];
   [RiskSignalSeverity.High]: RiskSignal[];

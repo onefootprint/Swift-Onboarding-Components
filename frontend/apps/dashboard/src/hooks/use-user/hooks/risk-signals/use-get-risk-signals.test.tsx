@@ -1,4 +1,9 @@
-import { renderHook, waitFor, Wrapper } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  renderHook,
+  waitFor,
+  Wrapper,
+} from '@onefootprint/test-utils';
 import { RiskSignalSeverity, SignalAttribute } from '@onefootprint/types';
 import React from 'react';
 import { UserStoreProvider } from 'src/hooks/use-user-store';
@@ -13,7 +18,13 @@ type WrapperProps = {
   children: React.ReactNode;
 };
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('useGetRiskSignals', () => {
+  beforeEach(() => {
+    useRouterSpy({ pathname: '/users/detail', query: {} });
+  });
+
   const customWrapper = ({ children }: WrapperProps) => (
     <Wrapper>
       <UserStoreProvider>{children}</UserStoreProvider>

@@ -1,7 +1,8 @@
 import constate from 'constate';
 import { useMap } from 'usehooks-ts';
 
-import { User, UserVaultData } from '../use-user/types';
+import { User, UserMetadata } from '../use-user/types';
+import syncVaultWithMetadata from './utils/sync-vault-with-metadata/sync-vault-with-metadata';
 
 type MergeArgs = {
   userId: string;
@@ -26,22 +27,12 @@ const useUserStoreImpl = () => {
     const user = usersMap.get(userId) ?? ({} as User);
 
     Object.entries(data).forEach(([key, value]) => {
-      if (key === 'vaultData') {
-        if (!user.vaultData) {
-          user.vaultData = {
-            kycData: {},
-            idDoc: {},
-          };
-        }
-        const { kycData, idDoc } = value as UserVaultData;
-        user.vaultData.kycData = {
-          ...user.vaultData.kycData,
-          ...kycData,
-        };
-        user.vaultData.idDoc = {
-          ...user.vaultData.idDoc,
-          ...idDoc,
-        };
+      if (key === 'metadata') {
+        const metadata = value as UserMetadata;
+        // If there are new user fields, need to add them as "encrypted fields" to the vault
+        const syncedVaultData = syncVaultWithMetadata(metadata, user.vaultData);
+        user.vaultData = syncedVaultData;
+        user.metadata = metadata;
       } else {
         (user as any)[key] = value;
       }

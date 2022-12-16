@@ -83,6 +83,10 @@ describe('useUsersPage', () => {
               canAccessIdentityDocumentImages: false,
             },
           },
+          vaultData: {
+            kycData: {},
+            idDoc: {},
+          },
         },
         {
           metadata: {
@@ -110,6 +114,10 @@ describe('useUsersPage', () => {
               canAccessIdentityDocumentImages: false,
             },
           },
+          vaultData: {
+            kycData: {},
+            idDoc: {},
+          },
         },
         {
           metadata: {
@@ -121,6 +129,10 @@ describe('useUsersPage', () => {
             orderingId: 'id',
             requiresManualReview: false,
             status: OnboardingStatus.vaultOnly,
+          },
+          vaultData: {
+            kycData: {},
+            idDoc: {},
           },
         },
       ]);
@@ -184,6 +196,10 @@ describe('useUsersPage', () => {
             },
           },
           timeline: emptyTimeline,
+          vaultData: {
+            kycData: {},
+            idDoc: {},
+          },
         },
         {
           metadata: {
@@ -211,6 +227,10 @@ describe('useUsersPage', () => {
               canAccessIdentityDocumentImages: false,
             },
           },
+          vaultData: {
+            kycData: {},
+            idDoc: {},
+          },
         },
         {
           metadata: {
@@ -222,6 +242,10 @@ describe('useUsersPage', () => {
             orderingId: 'id',
             requiresManualReview: false,
             status: OnboardingStatus.vaultOnly,
+          },
+          vaultData: {
+            kycData: {},
+            idDoc: {},
           },
         },
       ]);

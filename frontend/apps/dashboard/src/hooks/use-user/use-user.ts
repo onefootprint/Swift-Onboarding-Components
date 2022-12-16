@@ -9,6 +9,7 @@ import useGetRiskSignals from './hooks/risk-signals/use-get-risk-signals';
 import useGetTimeline from './hooks/timeline/use-get-timeline';
 import useDecryptKycData from './hooks/vault-data/use-decrypt-kyc-data';
 import { UserErrors, UserLoadingStates } from './types';
+import syncVaultWithDecryptedData from './utils/sync-vault-with-decrypted-data';
 
 type DecryptCallbackArgs = {
   data: {
@@ -23,7 +24,9 @@ type DecryptCallbackArgs = {
 };
 
 const useUser = (userId: string) => {
-  const usersStore = useUserStore();
+  const userStore = useUserStore();
+  const user = userStore.get(userId) || {};
+
   const decryptKycData = useDecryptKycData();
   const getMetadata = useGetMetadata(userId);
   const getTimeline = useGetTimeline(userId);
@@ -35,7 +38,15 @@ const useUser = (userId: string) => {
     const {
       data: { kycData, reason },
     } = args;
-    decryptKycData.mutate({ userId, fields: kycData, reason });
+    decryptKycData.mutate(
+      { userId, fields: kycData, reason },
+      {
+        onSuccess: data => {
+          const vaultData = syncVaultWithDecryptedData(data, user.vaultData);
+          userStore.merge({ userId, data: { vaultData } });
+        },
+      },
+    );
     return decryptKycData;
   };
 
@@ -66,7 +77,7 @@ const useUser = (userId: string) => {
   };
 
   return {
-    user: usersStore.get(userId) || {},
+    user,
     decrypt,
     refresh,
     loadingStates,

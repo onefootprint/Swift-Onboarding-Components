@@ -107,6 +107,10 @@ describe('useUserStore', () => {
       annotations: emptyAnnotations,
       timeline: timelineWithData,
       metadata: user1Metadata,
+      vaultData: {
+        kycData: {},
+        idDoc: {},
+      },
     });
 
     const user2Metadata: UserMetadata = {
@@ -114,23 +118,57 @@ describe('useUserStore', () => {
       status: OnboardingStatus.failed,
       id: 'u2',
       isPortable: true,
-      identityDataAttributes: [],
-      identityDocumentTypes: [],
+      identityDataAttributes: [
+        UserDataAttribute.firstName,
+        UserDataAttribute.addressLine1,
+      ],
+      identityDocumentTypes: [
+        IdDocDataAttribute.frontImage,
+        IdDocDataAttribute.backImage,
+      ],
       startTimestamp: 'time',
       orderingId: 'id',
     };
     act(() => {
       result.current.merge({ userId: 'u2', data: { metadata: user2Metadata } });
     });
-    expect(result.current.get('u2')).toStrictEqual({ metadata: user2Metadata });
+    expect(result.current.get('u2')).toStrictEqual({
+      metadata: user2Metadata,
+      vaultData: {
+        kycData: {
+          [UserDataAttribute.firstName]: null,
+          [UserDataAttribute.addressLine1]: null,
+        },
+        idDoc: {
+          [IdDocDataAttribute.frontImage]: null,
+          [IdDocDataAttribute.backImage]: null,
+        },
+      },
+    });
 
     expect(result.current.getAll()).toStrictEqual([
       {
         annotations: emptyAnnotations,
         timeline: timelineWithData,
         metadata: user1Metadata,
+        vaultData: {
+          kycData: {},
+          idDoc: {},
+        },
       },
-      { metadata: user2Metadata },
+      {
+        metadata: user2Metadata,
+        vaultData: {
+          kycData: {
+            [UserDataAttribute.firstName]: null,
+            [UserDataAttribute.addressLine1]: null,
+          },
+          idDoc: {
+            [IdDocDataAttribute.frontImage]: null,
+            [IdDocDataAttribute.backImage]: null,
+          },
+        },
+      },
     ]);
 
     act(() => {
@@ -166,31 +204,9 @@ describe('useUserStore', () => {
     });
     expect(result.current.get('u1')).toStrictEqual({ vaultData: kycData });
 
-    const updatedKycData: UserVaultData = {
-      kycData: {
-        [UserDataAttribute.lastName]: 'Footprint',
-      },
-      idDoc: {},
-    };
-    act(() => {
-      result.current.merge({
-        userId: 'u1',
-        data: { vaultData: updatedKycData },
-      });
-    });
-    expect(result.current.get('u1')).toStrictEqual({
-      vaultData: {
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-        },
-        idDoc: {},
-      },
-    });
-
     const overwriteKycData: UserVaultData = {
       kycData: {
-        [UserDataAttribute.lastName]: 'Footprint 2',
+        [UserDataAttribute.lastName]: 'Footprint',
       },
       idDoc: {},
     };
@@ -203,8 +219,7 @@ describe('useUserStore', () => {
     expect(result.current.get('u1')).toStrictEqual({
       vaultData: {
         kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint 2',
+          [UserDataAttribute.lastName]: 'Footprint',
         },
         idDoc: {},
       },
@@ -221,10 +236,7 @@ describe('useUserStore', () => {
     });
     expect(result.current.get('u1')).toStrictEqual({
       vaultData: {
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint 2',
-        },
+        kycData: {},
         idDoc: {
           [IdDocDataAttribute.frontImage]: 'image',
         },
