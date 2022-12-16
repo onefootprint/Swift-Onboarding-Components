@@ -9,6 +9,7 @@ import React from 'react';
 import { useStore } from 'src/hooks/use-session';
 
 import Form, { FormProps } from './form';
+import withUser from './form.test.config';
 
 const originalState = useStore.getState();
 
@@ -20,6 +21,7 @@ describe('<Form />', () => {
     customRender(<Form onComplete={onComplete} onSkip={onSkip} />);
 
   beforeEach(() => {
+    withUser();
     useStore.setState({
       data: {
         auth: '1',
@@ -62,8 +64,11 @@ describe('<Form />', () => {
       const userDataStep = screen.getByText('Tell us about you');
       expect(userDataStep).toBeInTheDocument();
 
-      const nameField = screen.getByLabelText('Full name');
-      await userEvent.type(nameField, 'Jane Doe');
+      const firstNameField = screen.getByLabelText('First name');
+      await userEvent.type(firstNameField, 'Jane');
+
+      const lastNameField = screen.getByLabelText('Last name');
+      await userEvent.type(lastNameField, 'Doe');
 
       await userEvent.click(screen.getByRole('button', { name: 'Next' }));
 
@@ -123,8 +128,11 @@ describe('<Form />', () => {
       const userDataStep = screen.getByText('Tell us about you');
       expect(userDataStep).toBeInTheDocument();
 
-      const nameField = screen.getByLabelText('Full name');
-      await userEvent.type(nameField, 'Jane Doe');
+      const firstNameField = screen.getByLabelText('First name');
+      await userEvent.type(firstNameField, 'Jane');
+
+      const lastNameField = screen.getByLabelText('Last name');
+      await userEvent.type(lastNameField, 'Doe');
 
       await userEvent.click(screen.getByRole('button', { name: 'Next' }));
 

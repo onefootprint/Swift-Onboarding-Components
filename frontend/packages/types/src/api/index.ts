@@ -40,4 +40,5 @@ export * from './user-decrypt';
 export * from './user-email';
 export * from './user-email-challenge';
 export * from './user-email-verify';
+export * from './user-update';
 export * from './users-update-annotation';

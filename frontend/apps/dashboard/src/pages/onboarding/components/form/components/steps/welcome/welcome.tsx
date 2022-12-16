@@ -27,6 +27,7 @@ const Welcome = ({ id, onComplete }: WelcomeProps) => {
           <StyledImage
             alt={t('img-alt')}
             height={201}
+            priority
             src="/onboarding/penguin.png"
             width={150}
           />

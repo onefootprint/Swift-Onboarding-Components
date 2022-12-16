@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { TextInput } from '@onefootprint/ui';
+import { Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useUserSession from 'src/hooks/use-user-session';
@@ -13,21 +13,28 @@ export type UserDataProps = {
 };
 
 type FormData = {
-  name: string;
+  firstName: string;
+  lastName: string;
 };
 
 const UserData = ({ id, onComplete }: UserDataProps) => {
-  const { dangerouslyCastedData } = useUserSession();
+  const { dangerouslyCastedData, mutation } = useUserSession();
   const { t } = useTranslation('pages.onboarding.user-data');
   const {
     register,
     handleSubmit: handleFormSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      firstName: dangerouslyCastedData.firstName || '',
+      lastName: dangerouslyCastedData.lastName || '',
+    },
+  });
 
   const handleSubmit = (formData: FormData) => {
-    console.log(formData);
-    onComplete();
+    mutation.mutate(formData, {
+      onSuccess: onComplete,
+    });
   };
 
   return (
@@ -41,18 +48,45 @@ const UserData = ({ id, onComplete }: UserDataProps) => {
           type="email"
           value={dangerouslyCastedData.email}
         />
-        <TextInput
-          hasError={!!errors.name}
-          hint={errors.name ? t('form.name.errors.required') : undefined}
-          label={t('form.name.label')}
-          placeholder={t('form.name.placeholder')}
-          {...register('name', {
-            required: {
-              value: true,
-              message: t('form.name.errors.required'),
-            },
-          })}
-        />
+        <Grid.Row>
+          <Grid.Column col={6}>
+            <TextInput
+              autoFocus
+              hasError={!!errors.firstName}
+              hint={
+                errors.firstName
+                  ? t('form.first-name.errors.required')
+                  : undefined
+              }
+              label={t('form.first-name.label')}
+              placeholder={t('form.first-name.placeholder')}
+              {...register('firstName', {
+                required: {
+                  value: true,
+                  message: t('form.first-name.errors.required'),
+                },
+              })}
+            />
+          </Grid.Column>
+          <Grid.Column col={6}>
+            <TextInput
+              hasError={!!errors.lastName}
+              hint={
+                errors.lastName
+                  ? t('form.last-name.errors.required')
+                  : undefined
+              }
+              label={t('form.last-name.label')}
+              placeholder={t('form.last-name.placeholder')}
+              {...register('lastName', {
+                required: {
+                  value: true,
+                  message: t('form.last-name.errors.required'),
+                },
+              })}
+            />
+          </Grid.Column>
+        </Grid.Row>
       </Form>
     </Container>
   );

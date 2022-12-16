@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 
+// TODO: Define ContentSecurityPolicy based on environment
+// https://linear.app/footprint/issue/FP-2198/define-contentsecuritypolicy-based-on-environment
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' localhost:8000 *.onefootprint.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.usefathom.com *.ingest.sentry.io; 
+  connect-src 'self' localhost:8000 6398b28afe03352a94dba0aa.mockapi.io *.onefootprint.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.usefathom.com *.ingest.sentry.io; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';

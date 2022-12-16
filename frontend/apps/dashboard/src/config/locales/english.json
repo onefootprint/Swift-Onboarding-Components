@@ -158,11 +158,18 @@
             "label": "Email address",
             "placeholder": "jane.doe@acme.com"
           },
-          "name": {
-            "label": "Full name",
-            "placeholder": "Jane Doe",
+          "first-name": {
+            "label": "First name",
+            "placeholder": "Jane",
             "errors": {
-              "required": "Please enter a name"
+              "required": "Please enter a first name"
+            }
+          },
+          "last-name": {
+            "label": "Last name",
+            "placeholder": "Doe",
+            "errors": {
+              "required": "Please enter a last name"
             }
           }
         }

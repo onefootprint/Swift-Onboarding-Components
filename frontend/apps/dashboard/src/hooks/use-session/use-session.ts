@@ -10,9 +10,9 @@ import migrations from './migrations';
 export type Session = {
   auth: string;
   user: {
+    email: string;
     firstName: string | null;
     lastName: string | null;
-    email: string;
   };
   org: {
     name: string;
@@ -49,9 +49,11 @@ const useSession = () => {
   const { data, reset, update } = useStore(state => state);
   const dangerouslyCastedData = data as Session;
   const isLoggedIn = !!data;
+  const isLive = !!data?.org?.isLive;
+
   const authHeaders = {
     [DASHBOARD_AUTHORIZATION_HEADER]: data?.auth as string,
-    [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(!!data?.org.isLive),
+    [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(isLive),
   } as AuthHeaders;
 
   const logIn = (nextData: Session) => {
@@ -70,6 +72,14 @@ const useSession = () => {
     });
   };
 
+  const setUser = (nextUser: Partial<Session['user']>) => {
+    if (!data) return;
+    update({
+      ...data,
+      user: { ...data.user, ...nextUser },
+    });
+  };
+
   return {
     authHeaders,
     dangerouslyCastedData,
@@ -78,7 +88,7 @@ const useSession = () => {
     logIn,
     logOut,
     setOrg,
-    update,
+    setUser,
   };
 };
 
