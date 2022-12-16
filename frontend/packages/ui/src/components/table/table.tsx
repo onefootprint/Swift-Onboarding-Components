@@ -44,7 +44,7 @@ const Table = <T,>({
 }: TableProps<T>) => {
   const shouldRenderFilters = onChangeSearchText || renderActions;
   const shouldShowEmptyState = !isLoading && !items?.length;
-  const shouldShowData = !isLoading && items;
+  const shouldShowData = !isLoading && !!items;
   const columnsCount = columns.length;
 
   return (
