@@ -32,7 +32,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
-    margin-bottom: {$theme.spacing[5]};
+    margin-bottom: ${theme.spacing[5]};
   `}
 `;
 
