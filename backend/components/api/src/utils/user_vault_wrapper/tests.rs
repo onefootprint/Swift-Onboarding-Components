@@ -320,5 +320,63 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConnection) {
     }
 }
 
-// might have to interleave onboardings tests for this
-// fn test_uvw_commit_data_validation(conn: &mut TestPgConnection) {}
+#[db_test]
+fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
+    // This is a very particular test and exposes a very niche condition. It tests:
+    // - Add speculative ssn4 to tenant 1
+    // - Add speculative ssn9 to tenant 2 and commit it
+    // - Commit data for tenant 1
+    // Since there'a already an ssn9 when we commit the ssn4 for tenant1, we shouldn't
+    // overwrite the more "complete" ssn9 on the user vault
+    // This specific race condition was solved in https://linear.app/footprint/issue/FP-2129/handle-onboarding-race-condition
+    let uv = fixtures::user_vault::create(conn);
+    let tenant = fixtures::tenant::create(conn);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id);
+    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su2 = fixtures::scoped_user::create(conn, &uv.id, &ob_config2.id);
+
+    // Add speculative ssn4 (and some other data) by tenant 1
+    let update = IdentityDataUpdate {
+        ssn: Some(Ssn::Ssn4(Ssn4::from_str("0987").unwrap())),
+        name: Some(FullName {
+            first_name: Name::from_str("Flerp").unwrap(),
+            last_name: Name::from_str("Derp").unwrap(),
+        }),
+        ..IdentityDataUpdate::default()
+    };
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    uvw.update_identity_data(conn, update, vec![]).unwrap();
+    // Get the ssn4 as was written by tenant 1
+    let uvw = UserVaultWrapper::build_for_onboarding(conn, &su.id).unwrap();
+    let ssn4_tenant1 = uvw.get_e_field(DataLifetimeKind::Ssn4);
+    assert!(!uvw.has_field(DataLifetimeKind::Ssn9));
+
+    // Add speculative ssn9 by tenant 2
+    let update = Ssn::Ssn9(Ssn9::from_str("123121234").unwrap()).into();
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su2.id).unwrap();
+    uvw.update_identity_data(conn, update, vec![]).unwrap();
+    // Get the ssn4 and ssn9 as written by tenant 2
+    let uvw = UserVaultWrapper::build_for_onboarding(conn, &su2.id).unwrap();
+    let ssn4_tenant2 = uvw.get_e_field(DataLifetimeKind::Ssn4);
+    let ssn9_tenant2 = uvw.get_e_field(DataLifetimeKind::Ssn9);
+    assert_ne!(ssn4_tenant1, ssn4_tenant2);
+
+    // Commit data for tenant2
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su2.id).unwrap();
+    uvw.commit_data_for_tenant(conn).unwrap();
+
+    // Commit data for tenant1 - the new ssn4 should _not_ be committed
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    uvw.commit_data_for_tenant(conn).unwrap();
+
+    // Now, when getting committed data, we should still see the ssn9 added for tenant 2
+    let uvw = UserVaultWrapper::build_for_user(conn, &uv.id).unwrap();
+    assert_eq!(uvw.get_e_field(DataLifetimeKind::Ssn4), ssn4_tenant2);
+    assert_eq!(uvw.get_e_field(DataLifetimeKind::Ssn9), ssn9_tenant2);
+    // But, we should still have the name that was committed by tenant 1
+    assert!(uvw.has_field(DataLifetimeKind::FirstName));
+    assert!(uvw.has_field(DataLifetimeKind::LastName));
+}
+
+// TODO rm address line 2

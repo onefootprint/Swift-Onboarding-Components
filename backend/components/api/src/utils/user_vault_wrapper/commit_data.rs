@@ -105,7 +105,7 @@ impl LockedUserVaultWrapper {
             // And, grab the IDs of speculative data that we're deactivating.
             let speculative_lifetimes_to_deactivate =
                 uvw.speculative.get_lifetimes(&speculative_kinds_to_deactivate);
-            if true {
+            if !speculative_lifetimes_to_deactivate.is_empty() {
                 // For now, we only deactivate speculative data if committing it would otherwise
                 // replace more full data on the user vault.
                 // This only happens in an onboarding race condition - let's just track when it happens
