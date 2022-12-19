@@ -35,6 +35,7 @@ uuid = { workspace = true }
 diesel = { workspace = true, features = ["extras", "uuid", "postgres"] }
 diesel-derive-newtype = { workspace = true }
 diesel_migrations = { workspace = true }
+hex = { workspace = true }
 
 [dev-dependencies]
 actix-rt = "2.7.0"

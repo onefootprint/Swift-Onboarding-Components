@@ -1625,6 +1625,7 @@ dependencies = [
  "diesel-derive-newtype",
  "diesel_migrations",
  "dotenv",
+ "hex",
  "itertools",
  "macros",
  "newtypes",

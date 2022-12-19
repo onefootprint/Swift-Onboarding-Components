@@ -47,7 +47,7 @@ impl TryFrom<IdentityDataRequest> for IdentityDataUpdate {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct IdentityDataUpdate {
     pub name: Option<FullName>,
     pub dob: Option<DateOfBirth>,
