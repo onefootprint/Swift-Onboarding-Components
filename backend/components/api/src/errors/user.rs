@@ -1,3 +1,4 @@
+use newtypes::CollectedDataOption;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -6,10 +7,8 @@ pub enum UserError {
     SandboxMismatch,
     #[error("Data update request is invalid")]
     InvalidDataUpdate,
-    #[error("Cannot add last 4 of SSN when vault already has full SSN")]
-    PartialSsnUpdateNotAllowed,
-    #[error("Cannot add partial address when vault already has full address")]
-    PartialAddressUpdateNotAllowed,
+    #[error("Cannot add {0} when user vault already has full data")]
+    PartialUpdateNotAllowed(CollectedDataOption),
     #[error("Data update is temporarily not allowed outside of onboarding")]
     NotAllowedOutsideOnboarding,
 }

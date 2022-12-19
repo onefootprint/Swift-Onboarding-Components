@@ -81,15 +81,18 @@ impl LockedUserVaultWrapper {
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_fields();
         let uv = self.user_vault();
-        let builder = UvdBuilder::build(update, uv.public_key.clone(), existing_fields)?;
         let scoped_user_id = self
             .scoped_user_id()
             .ok_or(UserError::NotAllowedOutsideOnboarding)?;
 
-        let created_kinds = builder.save(conn, uv.id.clone(), scoped_user_id.clone(), fingerprints)?;
-        let created_cd_options = CollectedDataOption::list_from(created_kinds)
-            .into_iter()
-            .collect();
+        let builder = UvdBuilder::build(update, uv.public_key.clone())?;
+        let created_cd_options = builder.validate_and_save(
+            conn,
+            existing_fields,
+            uv.id.clone(),
+            scoped_user_id.clone(),
+            fingerprints,
+        )?;
         self.add_user_timeline(conn, created_cd_options)?;
 
         Ok(())

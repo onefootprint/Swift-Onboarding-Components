@@ -2,7 +2,6 @@ use std::collections::HashSet;
 
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -50,15 +49,6 @@ pub enum CollectedData {
 crate::util::impl_enum_str_diesel!(CollectedData);
 
 impl CollectedData {
-    /// Maps the CollectedData to the list of DataAttributes that may be collected by variants of this CollectedOption
-    pub fn attributes(&self) -> Vec<DataLifetimeKind> {
-        self.options()
-            .into_iter()
-            .flat_map(|cdo| cdo.attributes())
-            .unique()
-            .collect()
-    }
-
     /// Returns all the variants of this CollectedDataOption, in increasing order of "completeness."
     pub fn options(&self) -> Vec<CollectedDataOption> {
         use CollectedDataOption::*;

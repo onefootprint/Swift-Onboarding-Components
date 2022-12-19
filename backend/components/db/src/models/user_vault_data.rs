@@ -71,31 +71,6 @@ impl UserVaultData {
             .get_results(conn.conn())?;
         Ok(results)
     }
-
-    /// Deactivates the uncommitted DataLifetimes associated with UserVaultData rows belonging to
-    /// this (user, tenant) with the provided kinds.
-    /// This should only be used when replacing speculative, un-committed user data with new un-committed user data
-    pub fn bulk_deactivate_uncommitted(
-        conn: &mut PgConnection,
-        scoped_user_id: ScopedUserId,
-        kinds: Vec<UvdKind>,
-        seqno: DataLifetimeSeqno,
-    ) -> DbResult<()> {
-        // TODO we might want to eventually move this onto the HasLifetime trait - fine for now
-        // since we don't have codepaths that do this for PhoneNumber or Email
-        use crate::schema::data_lifetime;
-        let lifetime_ids = user_vault_data::table
-            .inner_join(data_lifetime::table)
-            .filter(user_vault_data::kind.eq_any(kinds))
-            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
-            .filter(data_lifetime::deactivated_seqno.is_null())
-            // Specifically don't allow deactivating committed data here since we are replacing it
-            // with uncommitted data
-            .filter(data_lifetime::committed_seqno.is_null())
-            .select(user_vault_data::lifetime_id).get_results(conn)?;
-        DataLifetime::bulk_deactivate(conn, lifetime_ids, seqno)?;
-        Ok(())
-    }
 }
 
 impl HasLifetime for UserVaultData {

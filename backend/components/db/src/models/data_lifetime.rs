@@ -220,6 +220,31 @@ impl DataLifetime {
         Ok(results)
     }
 
+    /// Deactivates the uncommitted DataLifetimes with the provided kinds associated with this (user, tenant).
+    /// This should only be used when replacing speculative, un-committed user data with new un-committed user data
+    pub fn bulk_deactivate_uncommitted(
+        conn: &mut PgConnection,
+        scoped_user_id: &ScopedUserId,
+        kinds: Vec<DataLifetimeKind>,
+        seqno: DataLifetimeSeqno,
+    ) -> DbResult<Vec<Self>> {
+        let update = DataLifetimeUpdate {
+            deactivated_at: Some(Some(Utc::now())),
+            deactivated_seqno: Some(Some(seqno)),
+            ..DataLifetimeUpdate::default()
+        };
+        let results = diesel::update(data_lifetime::table)
+            .filter(data_lifetime::kind.eq_any(kinds))
+            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            // Specifically don't allow deactivating committed data here since we are replacing it
+            // with uncommitted data
+            .filter(data_lifetime::committed_seqno.is_null())
+            .set(update)
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     /// Get the list of currently active DataLifetimeIds for the provided scoped_user_id.
     /// A piece of user data is visible if it is (1) committed and (2) not deactivated.
     /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
