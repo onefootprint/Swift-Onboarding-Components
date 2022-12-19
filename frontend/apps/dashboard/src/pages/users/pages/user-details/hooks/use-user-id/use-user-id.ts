@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 const useUserId = () => {
   const router = useRouter();
   const userId = router.query.footprint_user_id;
-  if (!userId) {
+  if (!router.isReady || !userId) {
     return '';
   }
   if (typeof userId === 'string') {

@@ -10,6 +10,7 @@ type RouterSpy = {
   pathname?: string;
   query?: Record<string, any>;
   asPath?: string;
+  isReady?: boolean;
 };
 
 const createUseRouterSpy = () => {
@@ -22,8 +23,10 @@ const createUseRouterSpy = () => {
     query,
     replace = jest.fn(),
     route,
+    isReady = true,
   }: RouterSpy) => {
     useRouter.mockImplementation(() => ({
+      isReady,
       asPath,
       pathname,
       push,
