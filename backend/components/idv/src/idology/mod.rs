@@ -1,44 +1,29 @@
-use newtypes::ValidatedPhoneNumber;
-use std::fmt::Debug;
-
 pub mod client;
-pub mod request;
-pub mod verification;
+pub mod error;
+pub mod expectid;
 
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-    #[error("socure type conversion error: {0}")]
-    ConversionEror(#[from] ConversionError),
-    #[error("internal reqwest error: {0}")]
-    ReqwestError(#[from] ReqwestError),
-    #[error("Json error: {0}")]
-    SerdeJson(#[from] serde_json::Error),
-}
+use newtypes::IdvData;
 
-#[derive(Debug, thiserror::Error)]
-pub enum ConversionError {
-    #[error("First name must be provided")]
-    MissingFirstName,
-    #[error("Last name must be provided")]
-    MissingLastName,
-    #[error("Address must be provided")]
-    MissingAddress,
-    #[error("Could not parse DOB")]
-    CantParseDob,
-    #[error("zip code is unsupported length for socure API validation")]
-    UnsupportedZipFormat,
-    #[error("phone number must be 10 digits")]
-    UnsupportedPhoneNumber(ValidatedPhoneNumber),
-    #[error("unsupported country, country must be US")]
-    UnsupportedCountry(String),
-}
+use crate::{ParsedResponse, VendorResponse};
 
-#[derive(Debug, thiserror::Error)]
-pub enum ReqwestError {
-    #[error("error building reqwest client: {0}")]
-    InternalError(#[from] reqwest::Error),
-    #[error("error setting api headers: {0}")]
-    InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
-    #[error("error sending request to socure api: {0}")]
-    SendError(String),
+use crate::idology::client::IdologyClient;
+use expectid::response::IDologyResponse;
+use newtypes::Vendor;
+
+pub async fn send_expectid_request(
+    client: &IdologyClient,
+    data: IdvData,
+) -> Result<VendorResponse, crate::Error> {
+    let response = client
+        .verify_expectid(data)
+        .await
+        .map_err(crate::idology::error::Error::from)?;
+    let parsed_response: IDologyResponse =
+        expectid::response::parse_response(response.clone()).map_err(crate::idology::error::Error::from)?;
+
+    Ok(VendorResponse {
+        vendor: Vendor::Idology,
+        raw_response: response,
+        response: ParsedResponse::IDology(parsed_response),
+    })
 }

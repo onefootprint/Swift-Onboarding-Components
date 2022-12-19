@@ -1,6 +1,8 @@
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
-use idv::{idology::verification::IDologySuccess, socure::response::SocureIDPlusResponse, ParsedResponse};
+use idv::{
+    idology::expectid::response::IDologySuccess, socure::response::SocureIDPlusResponse, ParsedResponse,
+};
 
 use newtypes::{DecisionStatus, Signal, VerificationResultId};
 
@@ -192,8 +194,8 @@ mod tests {
 
     use super::*;
     use idv::{
-        idology::verification::{self as idology_verification, IDologyResponse},
-        idology::Error as IdologyError,
+        idology::error::Error as IdologyError,
+        idology::expectid::response::{self as idology_verification, IDologyResponse},
         ParsedResponse, VendorResponse,
     };
     use newtypes::{OldSignalSeverity, SignalScope, Vendor, VerificationRequestId};

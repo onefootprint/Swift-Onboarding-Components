@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
-use idology::verification::IDologyResponse;
+use idology::expectid::response::IDologyResponse;
 use newtypes::Vendor;
 use socure::response::SocureIDPlusResponse;
 
@@ -20,7 +20,7 @@ pub enum ParsedResponse {
 
 impl ParsedResponse {
     pub fn from_idology_expectid_response(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
-        let parsed = crate::idology::verification::parse_response(raw_response).map_err(Error::from)?;
+        let parsed = crate::idology::expectid::response::parse_response(raw_response).map_err(Error::from)?;
 
         Ok(Self::IDology(parsed))
     }
@@ -48,7 +48,7 @@ pub struct VendorResponse {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("IDology error: {0}")]
-    IDologyError(#[from] idology::Error),
+    IDologyError(#[from] idology::error::Error),
     #[error("Twilio error: {0}")]
     TwilioRequestError(#[from] ::twilio::error::Error),
     #[error("Twilio error: {0}")]

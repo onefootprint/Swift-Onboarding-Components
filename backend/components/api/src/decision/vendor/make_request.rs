@@ -20,7 +20,7 @@ pub async fn send_idv_request(
 
     // TODO: query for SocureDeviceSession:latest_for_onboard and pass along to Socure request
     let result = match request.vendor {
-        Vendor::Idology => idv::idology::request::send_expectid_request(&state.idology_client, data).await?,
+        Vendor::Idology => idv::idology::send_expectid_request(&state.idology_client, data).await?,
         Vendor::Twilio => idv::twilio::lookup_v2(&state.twilio_client.client, data)
             .await
             .map_err(idv::Error::from)?,

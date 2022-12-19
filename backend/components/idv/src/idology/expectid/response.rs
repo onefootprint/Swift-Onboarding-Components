@@ -1,8 +1,9 @@
+use crate::idology::error as IdologyError;
 use newtypes::{DecisionStatus, ReasonCode};
 use std::str::FromStr;
 
 // Given a raw response, deserialize
-pub fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Error> {
+pub fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, IdologyError::Error> {
     let response: IDologyResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }
