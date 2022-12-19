@@ -61,8 +61,6 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     let phone_number = fixtures::phone_number::create(conn, &uv.id, Some(&su.id));
     data_kind_to_lifetime_id.insert(DataLifetimeKind::PhoneNumber, phone_number.lifetime_id);
 
-    // TODO fiddle with lifetimes to commit/deactivate data
-
     let uvw = UserVaultWrapper::build_for_onboarding(conn, &su.id).unwrap();
     let tests = vec![
         (DataLifetimeKind::FirstName, Some(SealedVaultBytes(vec![1]))),
@@ -379,4 +377,49 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     assert!(uvw.has_field(DataLifetimeKind::LastName));
 }
 
-// TODO rm address line 2
+#[db_test]
+fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
+    let uv = fixtures::user_vault::create(conn);
+    let tenant = fixtures::tenant::create(conn);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+
+    let updates = vec![
+        // Partial address
+        FullAddressOrZip::ZipAndCountry(ZipAndCountry {
+            zip: Zip::try_from("94117".to_owned()).unwrap(),
+            country: Country::try_from("US".to_owned()).unwrap(),
+        }),
+        // Full address with line2
+        FullAddressOrZip::Address(Address {
+            line1: AddressLine::try_from("Flerp".to_owned()).unwrap(),
+            line2: Some(AddressLine::try_from("Flerp".to_owned()).unwrap()),
+            city: City::try_from("San Francisco".to_owned()).unwrap(),
+            state: State::try_from("CA".to_owned()).unwrap(),
+            zip: Zip::try_from("94117".to_owned()).unwrap(),
+            country: Country::try_from("US".to_owned()).unwrap(),
+        }),
+        // Full address without line2
+        FullAddressOrZip::Address(Address {
+            line1: AddressLine::try_from("Flerp".to_owned()).unwrap(),
+            line2: None,
+            city: City::try_from("San Francisco".to_owned()).unwrap(),
+            state: State::try_from("CA".to_owned()).unwrap(),
+            zip: Zip::try_from("94117".to_owned()).unwrap(),
+            country: Country::try_from("US".to_owned()).unwrap(),
+        }),
+    ];
+
+    for update in updates {
+        let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+        uvw.update_identity_data(conn, update.into(), vec![]).unwrap();
+    }
+    let uvw = UserVaultWrapper::build_for_onboarding(conn, &su.id).unwrap();
+    assert!(uvw.has_field(DataLifetimeKind::AddressLine1));
+    // We should have cleared out line2 in the last update
+    assert!(!uvw.has_field(DataLifetimeKind::AddressLine2));
+    assert!(uvw.has_field(DataLifetimeKind::City));
+    assert!(uvw.has_field(DataLifetimeKind::State));
+    assert!(uvw.has_field(DataLifetimeKind::Zip));
+    assert!(uvw.has_field(DataLifetimeKind::Country));
+}
