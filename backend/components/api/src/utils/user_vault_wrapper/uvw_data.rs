@@ -47,19 +47,21 @@ impl UvwData {
         let (committed_phone_numbers, speculative_phone_numbers) =
             partition(phone_numbers, &speculative_lifetime_ids);
         let (committed_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
+        let (committed_identity_documents, speculative_identity_documents) =
+            partition(identity_documents, &speculative_lifetime_ids);
 
         let committed = Self::build(
             committed_uvd,
             committed_phone_numbers,
             committed_emails,
-            identity_documents,
+            committed_identity_documents,
             &all_lifetimes,
         );
         let speculative = Self::build(
             speculative_uvd,
             speculative_phone_numbers,
             speculative_emails,
-            vec![],
+            speculative_identity_documents,
             &all_lifetimes,
         );
         (committed, speculative)
