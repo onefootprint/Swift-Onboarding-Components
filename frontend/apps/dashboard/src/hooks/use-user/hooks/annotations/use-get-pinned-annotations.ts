@@ -50,7 +50,7 @@ const useGetPinnedAnnotations = (userId: string) => {
           userId,
           data: {
             annotations: {
-              annotations: data,
+              entries: data,
             },
           },
         });

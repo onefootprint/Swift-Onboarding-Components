@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
+import { UserStoreProvider } from 'src/hooks/use-user-store';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Layout from '../components/layout';
@@ -14,7 +15,6 @@ import PageGuard from '../components/page-guard';
 import configureReactI18next from '../config/initializers/react-i18next';
 import ReactQueryProvider from '../config/initializers/react-query-provider';
 import configureSentry from '../config/initializers/sentry';
-import { UserDataProvider } from './users/hooks/use-user-data';
 
 configureSentry();
 configureReactI18next();
@@ -33,14 +33,14 @@ const App = ({ Component, pageProps }: AppProps) => {
         <DesignSystemProvider theme={themes.light}>
           <ReactQueryDevtools />
           <FootprintDevTools />
-          <UserDataProvider>
+          <UserStoreProvider>
             <GlobalStyle />
             <PageGuard>
               <Layout name={pageProps.layout}>
                 <Component />
               </Layout>
             </PageGuard>
-          </UserDataProvider>
+          </UserStoreProvider>
         </DesignSystemProvider>
       </ReactQueryProvider>
     </>

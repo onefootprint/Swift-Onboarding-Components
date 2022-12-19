@@ -3,22 +3,24 @@ import { Box, Breadcrumb, BreadcrumbItem } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
+import useUser from 'src/hooks/use-user';
 
-import useGetUsers from '../../hooks/use-get-users';
 import DecryptMachineProvider from './components/decrypt-machine-provider';
 import ManualReviewBanner from './components/manual-review-banner';
 import UserDetailsData from './components/user-detail-data';
 import UserDetailEmptyState from './components/user-detail-empty-state';
 import UserDetailsLoading from './components/user-detail-loading';
+import useUserId from './hooks/use-user-id';
 
 const UserDetails = () => {
   const { t } = useTranslation('pages.user-details');
-  const { users, decryptUser, isLoading } = useGetUsers(1);
-  const user = users?.[0];
-  const shouldShowData = user && !isLoading;
-  const shouldShowEmptyState = !user && !isLoading;
+  const userId = useUserId();
+  const { user, loadingStates } = useUser(userId);
+  const { metadata } = user;
+  const shouldShowData = metadata && !loadingStates.metadata;
+  const shouldShowEmptyState = !metadata && !loadingStates.metadata;
   const shouldShowManualReviewBanner =
-    shouldShowData && user?.requiresManualReview;
+    shouldShowData && metadata?.requiresManualReview;
 
   const handleClickAuditTrailLink = () => {
     const auditTrail = document.getElementById('audit-trail');
@@ -33,7 +35,7 @@ const UserDetails = () => {
       {shouldShowManualReviewBanner && (
         <Box sx={{ marginBottom: 7 }}>
           <ManualReviewBanner
-            status={user.status}
+            status={metadata.status}
             onClickAuditTrailLink={handleClickAuditTrailLink}
           />
         </Box>
@@ -47,10 +49,8 @@ const UserDetails = () => {
         </Breadcrumb>
       </Box>
       <DecryptMachineProvider>
-        {isLoading && <UserDetailsLoading />}
-        {shouldShowData && (
-          <UserDetailsData user={user} decrypt={decryptUser} />
-        )}
+        {loadingStates.metadata && <UserDetailsLoading />}
+        {shouldShowData && <UserDetailsData />}
         {shouldShowEmptyState && <UserDetailEmptyState />}
       </DecryptMachineProvider>
     </>

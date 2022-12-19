@@ -1,26 +1,20 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { getErrorMessage } from '@onefootprint/request';
+import { useToast } from '@onefootprint/ui';
 import React from 'react';
-import { User } from 'src/pages/users/types/user.types';
+import useUser from 'src/hooks/use-user';
 import getAttrListFromFields from 'src/utils/get-attr-list-from-fields';
 import { useUpdateEffect } from 'usehooks-ts';
 
-import { State } from '../../../../utils/decrypt-state-machine';
+import useUserId from '../../../../hooks/use-user-id';
+import { Event, State } from '../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../decrypt-machine-provider';
 import { DecryptVaultData, ViewVaultData } from './components';
-import useRiskSignalsOverview from './hooks/use-risk-signals-overview';
 
-type VaultDataProps = {
-  user: User;
-  onDecrypt: (
-    kyc: UserDataAttribute[],
-    idDoc: IdDocDataAttribute[],
-    reason: string,
-  ) => void;
-};
-
-const VaultData = ({ user, onDecrypt }: VaultDataProps) => {
-  useRiskSignalsOverview();
-  const [state] = useDecryptMachine();
+const VaultData = () => {
+  const userId = useUserId();
+  const { decrypt } = useUser(userId);
+  const [state, send] = useDecryptMachine();
+  const toast = useToast();
   const { fields, reason } = state.context;
   const showForm =
     state.matches(State.selectingFields) ||
@@ -34,15 +28,26 @@ const VaultData = ({ user, onDecrypt }: VaultDataProps) => {
         fields.kycData,
         fields.idDoc,
       );
-      onDecrypt(kycData, idDoc, reason);
+      decrypt({
+        data: { kycData, idDoc, reason },
+        options: {
+          onSuccess: () => {
+            send({ type: Event.decryptSucceeded });
+          },
+          onError: error => {
+            send({ type: Event.decryptFailed });
+            toast.show({
+              description: getErrorMessage(error),
+              title: 'Uh-oh!',
+              variant: 'error',
+            });
+          },
+        },
+      });
     }
   }, [state.value]);
 
-  return showForm ? (
-    <DecryptVaultData user={user} />
-  ) : (
-    <ViewVaultData user={user} />
-  );
+  return showForm ? <DecryptVaultData /> : <ViewVaultData />;
 };
 
 export default VaultData;

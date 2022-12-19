@@ -44,7 +44,7 @@ export type UserLiveness = {
 };
 
 export type UserAnnotations = {
-  annotations: PinnedAnnotation[];
+  entries: PinnedAnnotation[];
 };
 
 export type RiskSignalSeverityGrouping = {

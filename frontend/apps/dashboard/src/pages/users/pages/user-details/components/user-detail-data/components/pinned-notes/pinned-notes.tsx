@@ -1,17 +1,20 @@
 import { DecisionSourceKind } from '@onefootprint/types';
 import React from 'react';
+import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import styled, { css } from 'styled-components';
 
-import useGetPinnedAnnotations from '../../hooks/use-get-pinned-annotations';
 import PinnedNote from './components/pinned-note';
 
 const PinnedNotes = () => {
-  const pinnedNotesQuery = useGetPinnedAnnotations();
-  const { data } = pinnedNotesQuery;
+  const userId = useUserId();
+  const {
+    user: { annotations },
+  } = useUser(userId);
 
-  return data ? (
+  return annotations?.entries ? (
     <Container>
-      {data.map(({ reason, note, id, source }) => (
+      {annotations?.entries.map(({ reason, note, id, source }) => (
         <PinnedNote
           reason={reason}
           note={note}

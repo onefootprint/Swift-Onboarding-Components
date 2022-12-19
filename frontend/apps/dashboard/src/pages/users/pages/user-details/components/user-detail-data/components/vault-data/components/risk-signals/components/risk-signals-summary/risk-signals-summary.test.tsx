@@ -6,10 +6,10 @@ import {
 import { RiskSignalSeverity, SignalAttribute } from '@onefootprint/types';
 import React from 'react';
 
-import createRiskSignal from './risk-signal-overview.test.config';
-import RiskSignalsOverview, {
-  RiskSignalsOverviewProps,
-} from './risk-signals-overview';
+import RiskSignalsSummary, {
+  RiskSignalsSummaryProps,
+} from './risk-signals-summary';
+import createRiskSignal from './risk-signals-summary.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -22,9 +22,9 @@ describe('<RiskSignalsOverview />', () => {
     data,
     error,
     isLoading,
-  }: RiskSignalsOverviewProps) =>
+  }: RiskSignalsSummaryProps) =>
     customRender(
-      <RiskSignalsOverview data={data} error={error} isLoading={isLoading} />,
+      <RiskSignalsSummary data={data} error={error} isLoading={isLoading} />,
     );
 
   describe('when it is loading', () => {

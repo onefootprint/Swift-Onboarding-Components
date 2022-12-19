@@ -17,9 +17,9 @@ type DecryptCallbackArgs = {
     idDoc: IdDocDataAttribute[];
     reason: string;
   };
-  options: {
-    onSuccess: () => void;
-    onError: (error: RequestError) => void;
+  options?: {
+    onSuccess?: () => void;
+    onError?: (error: RequestError) => void;
   };
 };
 
@@ -37,6 +37,7 @@ const useUser = (userId: string) => {
   const decrypt = (args: DecryptCallbackArgs) => {
     const {
       data: { kycData, reason },
+      options,
     } = args;
     decryptKycData.mutate(
       { userId, fields: kycData, reason },
@@ -44,7 +45,9 @@ const useUser = (userId: string) => {
         onSuccess: data => {
           const vaultData = syncVaultWithDecryptedData(data, user.vaultData);
           userStore.merge({ userId, data: { vaultData } });
+          options?.onSuccess?.();
         },
+        onError: options?.onError,
       },
     );
     return decryptKycData;

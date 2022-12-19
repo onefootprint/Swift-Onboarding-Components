@@ -1,6 +1,6 @@
 import { UserDataAttribute } from '@onefootprint/types';
 import { Control, FieldValues, useWatch } from 'react-hook-form';
-import { User } from 'src/pages/users/types/user.types';
+import { User } from 'src/hooks/use-user/types';
 
 import isCheckboxDisabled from '../../../utils/is-checkbox-disabled';
 
@@ -24,27 +24,26 @@ const useFormState = ({
     name: `kycData.${UserDataAttribute.dob}`,
   });
 
+  const { metadata, vaultData } = user;
   const fieldsState = {
     [UserDataAttribute.ssn9]: {
-      visible: user.identityDataAttributes.includes(UserDataAttribute.ssn9),
-      checked: !!ssn9,
-      disabled: isCheckboxDisabled(
-        user.vaultData.kycData[UserDataAttribute.ssn9],
+      visible: metadata?.identityDataAttributes.includes(
+        UserDataAttribute.ssn9,
       ),
+      checked: !!ssn9,
+      disabled: isCheckboxDisabled(vaultData?.kycData[UserDataAttribute.ssn9]),
     },
     [UserDataAttribute.ssn4]: {
-      visible: user.identityDataAttributes.includes(UserDataAttribute.ssn4),
-      checked: !!ssn4,
-      disabled: isCheckboxDisabled(
-        user.vaultData.kycData[UserDataAttribute.ssn4],
+      visible: metadata?.identityDataAttributes.includes(
+        UserDataAttribute.ssn4,
       ),
+      checked: !!ssn4,
+      disabled: isCheckboxDisabled(vaultData?.kycData[UserDataAttribute.ssn4]),
     },
     [UserDataAttribute.dob]: {
-      visible: user.identityDataAttributes.includes(UserDataAttribute.dob),
+      visible: metadata?.identityDataAttributes.includes(UserDataAttribute.dob),
       checked: !!dob,
-      disabled: isCheckboxDisabled(
-        user.vaultData.kycData[UserDataAttribute.dob],
-      ),
+      disabled: isCheckboxDisabled(vaultData?.kycData[UserDataAttribute.dob]),
     },
   };
 

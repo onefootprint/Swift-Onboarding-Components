@@ -2,9 +2,9 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Pagination, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
+import useUsersPage from 'src/hooks/use-users-page';
 
 import UsersTable from './components/users-table/users-table';
-import useGetUsers from './hooks/use-get-users';
 
 const PAGE_SIZE = 10;
 
@@ -13,13 +13,13 @@ const Users = () => {
   const {
     users,
     isLoading,
-    totalNumResults,
+    totalNumUsers,
     pageIndex,
     loadNextPage,
     loadPrevPage,
     hasNextPage,
     hasPrevPage,
-  } = useGetUsers(PAGE_SIZE);
+  } = useUsersPage(PAGE_SIZE);
 
   return (
     <>
@@ -30,9 +30,9 @@ const Users = () => {
         {t('header.title')}
       </Typography>
       <UsersTable users={users} isLoading={isLoading} />
-      {totalNumResults > 0 && (
+      {totalNumUsers > 0 && (
         <Pagination
-          totalNumResults={totalNumResults}
+          totalNumResults={totalNumUsers}
           pageSize={PAGE_SIZE}
           pageIndex={pageIndex}
           onNextPage={loadNextPage}

@@ -6,10 +6,11 @@ import {
 } from '@onefootprint/types';
 import { Drawer, LinkButton, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import useUser from 'src/hooks/use-user';
 import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import styled, { css } from 'styled-components';
 
-import useGetPinnedAnnotations from '../../../../../../../../hooks/use-get-pinned-annotations';
 import useUpdateAnnotation from '../../../../../../hooks/use-update-annotation';
 
 type OrgOverwriteDetailsProps = {
@@ -21,13 +22,14 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
   const { t } = useTranslation(
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
+  const userId = useUserId();
+  const { refresh } = useUser(userId);
   const {
     decision: { timestamp, status },
     annotation,
   } = data;
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [isNotePinned, setIsNotePinned] = useState(!!annotation?.isPinned);
-  const pinnedNotesQuery = useGetPinnedAnnotations();
   const updateMutation = useUpdateAnnotation();
 
   if (!annotation) {
@@ -43,7 +45,7 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
       },
       {
         onSuccess: () => {
-          pinnedNotesQuery.refetch();
+          refresh();
         },
       },
     );

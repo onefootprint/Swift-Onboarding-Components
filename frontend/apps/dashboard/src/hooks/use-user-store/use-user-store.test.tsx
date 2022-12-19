@@ -77,7 +77,7 @@ describe('useUserStore', () => {
     });
 
     const emptyAnnotations: UserAnnotations = {
-      annotations: [],
+      entries: [],
     };
     act(() => {
       result.current.merge({

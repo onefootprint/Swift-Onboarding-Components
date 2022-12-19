@@ -4,21 +4,18 @@ import { UserDataAttribute } from '@onefootprint/types';
 import { Checkbox, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { User } from 'src/pages/users/types/user.types';
+import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
-import useRiskSignalsOverview from '../../../../hooks/use-risk-signals-overview';
 import DataSection from '../../../data-section';
-import RiskSignalsOverview from '../../../risk-signals-overview';
+import RiskSignals from '../../../risk-signals';
 import useFormState from './hooks/use-form-state';
 
-type BasicSectionProps = {
-  user: User;
-};
-
-const BasicSection = ({ user }: BasicSectionProps) => {
+const BasicSection = () => {
   const { t, allT } = useTranslation('pages.user-details.user-info');
+  const userId = useUserId();
+  const { user } = useUser(userId);
   const { register, setValue, control } = useFormContext();
-  const riskSignalsOverview = useRiskSignalsOverview();
   const { areAllFieldsSelected, areAllFieldsDisabled, fieldsState } =
     useFormState({
       control,
@@ -49,13 +46,7 @@ const BasicSection = ({ user }: BasicSectionProps) => {
     <DataSection
       iconComponent={IcoFileText224}
       title={t('basic.title')}
-      footer={
-        <RiskSignalsOverview
-          data={riskSignalsOverview.data?.basic}
-          error={riskSignalsOverview.error}
-          isLoading={riskSignalsOverview.isLoading}
-        />
-      }
+      footer={<RiskSignals type="basic" />}
       renderCta={() =>
         areAllFieldsDisabled ? null : (
           <LinkButton

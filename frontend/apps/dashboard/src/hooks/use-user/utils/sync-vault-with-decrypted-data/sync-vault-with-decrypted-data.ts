@@ -14,11 +14,14 @@ const syncVaultWithDecryptedData = (
     idDoc: {},
   };
 
-  const keys = Object.keys(data) as UserDataAttribute[];
+  const keys = Object.keys(
+    data,
+  ) as unknown as (keyof DecryptedUserDataAttributes)[];
   keys.forEach(key => {
     const value = data[key];
     if (value !== undefined) {
-      syncedVaultData.kycData[key] = value;
+      const attrKey = (UserDataAttribute as any)[key] as UserDataAttribute;
+      syncedVaultData.kycData[attrKey] = value;
     }
   });
 

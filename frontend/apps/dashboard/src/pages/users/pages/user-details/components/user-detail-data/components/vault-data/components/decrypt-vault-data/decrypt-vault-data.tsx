@@ -3,7 +3,8 @@ import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { User } from 'src/pages/users/types/user.types';
+import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import getAttrListFromFields from 'src/utils/get-attr-list-from-fields';
 import styled, { css } from 'styled-components';
 
@@ -16,10 +17,6 @@ import {
   IdDocSection,
   IdentitySection,
 } from './components';
-
-type DecryptVaultDataProps = {
-  user: User;
-};
 
 // Only add first name in the form as a checkbox, combine first & last to show when decrypted
 type FormKycAttributes = Exclude<UserDataAttribute, UserDataAttribute.lastName>;
@@ -34,8 +31,12 @@ type FormData = {
   idDoc: Partial<Record<FormIdDocAttributes, boolean>>;
 };
 
-const DecryptVaultData = ({ user }: DecryptVaultDataProps) => {
+const DecryptVaultData = () => {
   const { t } = useTranslation('pages.user-details');
+  const userId = useUserId();
+  const {
+    user: { vaultData },
+  } = useUser(userId);
   const [state, send] = useDecryptMachine();
   const formMethods = useForm<FormData>({
     defaultValues: state.context.fields || {
@@ -45,7 +46,7 @@ const DecryptVaultData = ({ user }: DecryptVaultDataProps) => {
   });
   const { handleSubmit } = formMethods;
   const toast = useToast();
-  const sectionsVisibility = getSectionsVisibility(user.vaultData);
+  const sectionsVisibility = getSectionsVisibility(vaultData);
   const { identitySection, addressSection, idDocSection } = sectionsVisibility;
 
   const showMinSelectionError = () => {
@@ -64,9 +65,9 @@ const DecryptVaultData = ({ user }: DecryptVaultDataProps) => {
       showMinSelectionError();
       return;
     }
-    const { idDoc: vaultIdDocData, kycData: vaultKycData } = user.vaultData;
+    const { idDoc: vaultIdDocData, kycData: vaultKycData } = vaultData ?? {};
     const allKycDecrypted = attrLists.kycData.every(
-      attr => typeof vaultKycData[attr] === 'string',
+      attr => typeof vaultKycData?.[attr] === 'string',
     );
     const allIdDocDecrypted =
       !vaultIdDocData ||
@@ -96,8 +97,8 @@ const DecryptVaultData = ({ user }: DecryptVaultDataProps) => {
       <FormProvider {...formMethods}>
         <Container>
           <DataGrid>
-            <BasicSection user={user} />
-            {identitySection && <IdentitySection user={user} />}
+            <BasicSection />
+            {identitySection && <IdentitySection />}
             {addressSection && (
               <Box
                 sx={{
@@ -105,11 +106,11 @@ const DecryptVaultData = ({ user }: DecryptVaultDataProps) => {
                   gridColumn: '2 / 2',
                 }}
               >
-                <AddressSection user={user} />
+                <AddressSection />
               </Box>
             )}
           </DataGrid>
-          {idDocSection && <IdDocSection user={user} />}
+          {idDocSection && <IdDocSection />}
         </Container>
       </FormProvider>
     </form>

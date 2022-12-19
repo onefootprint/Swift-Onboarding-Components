@@ -6,8 +6,8 @@ describe('syncVaultWithDecryptedData', () => {
   it('when decrypting data for the first time', () => {
     const vaultData = syncVaultWithDecryptedData(
       {
-        [UserDataAttribute.addressLine1]: '123 Summer St',
-        [UserDataAttribute.city]: 'Boston',
+        addressLine1: '123 Summer St',
+        city: 'Boston',
       },
       {
         kycData: {},
@@ -27,8 +27,8 @@ describe('syncVaultWithDecryptedData', () => {
   it('when decrypting new data', () => {
     const vaultData = syncVaultWithDecryptedData(
       {
-        [UserDataAttribute.addressLine1]: '123 Summer St',
-        [UserDataAttribute.city]: 'Boston',
+        addressLine1: '123 Summer St',
+        city: 'Boston',
       },
       {
         kycData: {
@@ -78,8 +78,8 @@ describe('syncVaultWithDecryptedData', () => {
   it('when vaultData is empty', () => {
     const vaultData = syncVaultWithDecryptedData(
       {
-        [UserDataAttribute.firstName]: 'Piip',
-        [UserDataAttribute.lastName]: 'Footprint',
+        firstName: 'Piip',
+        lastName: 'Footprint',
       },
       undefined,
     );

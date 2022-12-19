@@ -2,9 +2,9 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Button, Table, TableRow } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { User } from 'src/hooks/use-user';
 
 import useUserFilters from '../../hooks/use-users-filters';
-import { User } from '../../types/user.types';
 import Filters from '../filters';
 import UsersTableRow from './components/users-table-row';
 
@@ -12,6 +12,9 @@ type UsersTableProps = {
   users?: User[];
   isLoading: boolean;
 };
+
+type UserWithMetadata = Omit<User, 'metadata'> &
+  Required<Pick<User, 'metadata'>>;
 
 const UsersTable = ({ isLoading, users }: UsersTableProps) => {
   const router = useRouter();
@@ -26,9 +29,11 @@ const UsersTable = ({ isLoading, users }: UsersTableProps) => {
     { text: t('table.header.phone-number'), width: '14%' },
     { text: t('table.header.start'), width: '14%' },
   ];
+  const usersWithMetadata = (users?.filter((user: User) => !!user.metadata) ??
+    []) as UserWithMetadata[];
 
   return (
-    <Table<User>
+    <Table<UserWithMetadata>
       initialSearch={filters.fingerprint}
       onChangeSearchText={fingerprint => {
         setFilter({ fingerprint });
@@ -44,18 +49,18 @@ const UsersTable = ({ isLoading, users }: UsersTableProps) => {
       )}
       aria-label={t('table.aria-label')}
       emptyStateText={t('table.empty-state')}
-      items={users}
+      items={usersWithMetadata}
       isLoading={isLoading}
-      getKeyForRow={(user: User) => user.id}
-      onRowClick={(user: User) => {
+      getKeyForRow={(item: UserWithMetadata) => item.metadata.id}
+      onRowClick={(item: UserWithMetadata) => {
         router.push({
           pathname: 'users/detail',
-          query: { footprint_user_id: user.id },
+          query: { footprint_user_id: item.metadata.id },
         });
       }}
       columns={columns}
-      renderTr={({ item: user }: TableRow<User>) => (
-        <UsersTableRow user={user} />
+      renderTr={({ item }: TableRow<UserWithMetadata>) => (
+        <UsersTableRow user={item} />
       )}
     />
   );

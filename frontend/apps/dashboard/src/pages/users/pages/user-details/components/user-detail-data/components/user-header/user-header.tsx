@@ -2,27 +2,31 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { User } from 'src/pages/users/types/user.types';
+import useUser from 'src/hooks/use-user';
 import getOnboardingStatusBadgeVariant from 'src/pages/users/utils/get-onboarding-status-badge-variant';
 import styled, { css } from 'styled-components';
 
+import useUserId from '../../../../hooks/use-user-id';
 import { State } from '../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../decrypt-machine-provider';
 import DecryptControls from './components/decrypt-controls';
 import ManualReview from './components/manual-review';
 
-type UserHeaderProps = {
-  user: User;
-};
-
-const UserHeader = ({ user }: UserHeaderProps) => {
-  const { id: footprintUserId } = user;
+const UserHeader = () => {
+  const userId = useUserId();
+  const {
+    user: { metadata },
+  } = useUser(userId);
   const { t } = useTranslation('pages.user-details.user-header.status');
   const [state] = useDecryptMachine();
   const shouldShowManualReview = state.matches(State.idle);
+  if (!metadata) {
+    return null;
+  }
+
   const badgeVariant = getOnboardingStatusBadgeVariant(
-    user.status,
-    user.requiresManualReview,
+    metadata.status,
+    metadata.requiresManualReview,
   );
 
   return (
@@ -30,8 +34,8 @@ const UserHeader = ({ user }: UserHeaderProps) => {
       <RowContainer>
         <Typography variant="label-1">User info</Typography>
         <Badge variant={badgeVariant}>
-          {t(user.status)}
-          {user.requiresManualReview && (
+          {t(metadata.status)}
+          {metadata.requiresManualReview && (
             <IconContainer>
               <IcoWarning16 color={badgeVariant} />
             </IconContainer>
@@ -42,7 +46,7 @@ const UserHeader = ({ user }: UserHeaderProps) => {
         <RowContainer>
           <Typography variant="body-3" color="primary">
             {/* TODO better formatting utils */}
-            {new Date(user.startTimestamp).toLocaleString('en-us', {
+            {new Date(metadata.startTimestamp).toLocaleString('en-us', {
               month: 'numeric',
               day: 'numeric',
               year: '2-digit',
@@ -53,11 +57,11 @@ const UserHeader = ({ user }: UserHeaderProps) => {
           <Typography variant="body-3" color="tertiary">
             ·
           </Typography>
-          <CodeInline>{footprintUserId}</CodeInline>
+          <CodeInline>{metadata.id}</CodeInline>
         </RowContainer>
         <RowContainer>
           <DecryptControls />
-          {shouldShowManualReview && <ManualReview user={user} />}
+          {shouldShowManualReview && <ManualReview />}
         </RowContainer>
       </SplitRow>
     </HeaderContainer>

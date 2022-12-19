@@ -7,7 +7,7 @@ import useUserFilters, {
 import useGetMetadataPage from './hooks/metadata/use-get-metadata-page';
 
 const useUsersPage = (pageSize: number) => {
-  const usersStore = useUserStore();
+  const userStore = useUserStore();
   const { filters, setCursors } = useUserFilters();
   const [totalNumUsers, setTotalNumUsers] = useState(0);
 
@@ -33,7 +33,7 @@ const useUsersPage = (pageSize: number) => {
   const loadPrevPage = () => setCursors(cursors.slice(0, -1));
 
   return {
-    users: usersStore.getAll(),
+    users: userStore.getAll(),
     totalNumUsers,
     pageIndex: cursors.length,
     isLoading: getMetadataPage.isLoading,

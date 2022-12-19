@@ -1,13 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Box, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
+import useUser from 'src/hooks/use-user';
 
+import useUserId from '../../../../hooks/use-user-id';
 import AuditTrailTimeline from './components/audit-trail-timeline';
-import useGetTimeline from './hooks/use-get-timeline';
 
 const AuditTrail = () => {
   const { t } = useTranslation('pages.user-details.audit-trail');
-  const timelineQuery = useGetTimeline();
+  const userId = useUserId();
+  const {
+    user: { timeline },
+    loadingStates,
+  } = useUser(userId);
 
   // Add an id on the container because the ManualReviewBanner supports
   // auto-scrolling this component into view
@@ -20,8 +25,8 @@ const AuditTrail = () => {
         <Divider />
       </Box>
       <AuditTrailTimeline
-        timeline={timelineQuery.data || []}
-        isLoading={timelineQuery.isLoading}
+        timeline={timeline?.events || []}
+        isLoading={loadingStates.timeline}
       />
     </div>
   );

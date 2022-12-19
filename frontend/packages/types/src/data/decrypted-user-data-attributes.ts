@@ -1,17 +1,15 @@
-import { UserDataAttribute } from './user-data-attribute';
-
 export type DecryptedUserDataAttributes = {
-  [UserDataAttribute.firstName]?: string;
-  [UserDataAttribute.lastName]?: string;
-  [UserDataAttribute.dob]?: string;
-  [UserDataAttribute.email]?: string;
-  [UserDataAttribute.ssn9]?: string;
-  [UserDataAttribute.ssn4]?: string;
-  [UserDataAttribute.addressLine1]?: string;
-  [UserDataAttribute.addressLine2]?: string;
-  [UserDataAttribute.city]?: string;
-  [UserDataAttribute.state]?: string;
-  [UserDataAttribute.country]?: string;
-  [UserDataAttribute.zip]?: string;
-  [UserDataAttribute.phoneNumber]?: string;
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  email?: string;
+  ssn9?: string;
+  ssn4?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zip?: string;
+  phoneNumber?: string;
 };

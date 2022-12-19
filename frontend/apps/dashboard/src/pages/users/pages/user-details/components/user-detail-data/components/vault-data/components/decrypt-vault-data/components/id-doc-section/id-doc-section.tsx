@@ -4,19 +4,20 @@ import { IdDocDataAttribute } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { User } from 'src/pages/users/types/user.types';
+import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
 import DataSection from '../../../data-section';
 import isCheckboxDisabled from '../../utils/is-checkbox-disabled';
 
-type IdDocSectionProps = {
-  user: User;
-};
-
-const IdDocSection = ({ user }: IdDocSectionProps) => {
+const IdDocSection = () => {
   const { t, allT } = useTranslation('pages.user-details.user-info.id-doc');
+  const userId = useUserId();
+  const {
+    user: { vaultData },
+  } = useUser(userId);
   const { register } = useFormContext();
-  const { idDoc } = user.vaultData;
+  const { idDoc } = vaultData ?? {};
 
   return (
     <DataSection iconComponent={IcoIdCard24} title={t('title')}>

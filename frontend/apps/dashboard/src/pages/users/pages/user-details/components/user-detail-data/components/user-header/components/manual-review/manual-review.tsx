@@ -1,26 +1,29 @@
 import { OnboardingStatus, ReviewStatus } from '@onefootprint/types';
 import React, { useState } from 'react';
-import { User } from 'src/pages/users/types/user.types';
+import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
-import useGetPinnedAnnotations from '../../../../hooks/use-get-pinned-annotations';
-import useGetTimeline from '../../../audit-trail/hooks/use-get-timeline';
 import ManualReviewDialog from './components/manual-review-dialog';
 import ManualReviewOptionalButton from './components/manual-review-optional-button';
 import ManualReviewRequiredButton from './components/manual-review-required-button';
 
-type ManualReviewProps = {
-  user: User;
-};
-
-const ManualReview = ({ user }: ManualReviewProps) => {
+const ManualReview = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const userId = useUserId();
+  const {
+    user: { metadata },
+    refresh,
+  } = useUser(userId);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
-  const pinnedNotesQuery = useGetPinnedAnnotations();
-  const auditTrailQuery = useGetTimeline();
-  const { status, requiresManualReview } = user;
+  if (!metadata) {
+    return null;
+  }
+
+  const { status, requiresManualReview } = metadata;
   if (status === OnboardingStatus.vaultOnly) {
     return null;
   }
+
   const handleOpenDialog = (dialogStatus: ReviewStatus) => {
     setReviewStatus(dialogStatus);
     setDialogOpen(true);
@@ -30,8 +33,7 @@ const ManualReview = ({ user }: ManualReviewProps) => {
     setDialogOpen(false);
     setReviewStatus(undefined);
     if (isComplete) {
-      pinnedNotesQuery.refetch();
-      auditTrailQuery.refetch();
+      refresh();
     }
   };
 

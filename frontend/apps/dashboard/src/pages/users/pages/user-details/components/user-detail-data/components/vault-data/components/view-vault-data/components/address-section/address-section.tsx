@@ -2,39 +2,32 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import { UserVaultData } from 'src/hooks/use-user';
+import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
-import useRiskSignalsOverview from '../../../../hooks/use-risk-signals-overview';
 import DataSection from '../../../data-section';
-import RiskSignalsOverview from '../../../risk-signals-overview';
+import RiskSignals from '../../../risk-signals';
 import DataRow from '../data-row';
 
-type AddressSectionProps = {
-  vaultData: UserVaultData;
-};
-
-const AddressSection = ({ vaultData }: AddressSectionProps) => {
-  const riskSignalsOverview = useRiskSignalsOverview();
+const AddressSection = () => {
   const { t, allT } = useTranslation('pages.user-details.user-info.address');
-  const { kycData } = vaultData;
-  const country = kycData[UserDataAttribute.country];
-  const addressLine1 = kycData[UserDataAttribute.addressLine1];
-  const addressLine2 = kycData[UserDataAttribute.addressLine2];
-  const city = kycData[UserDataAttribute.city];
-  const zip = kycData[UserDataAttribute.zip];
-  const state = kycData[UserDataAttribute.state];
+  const userId = useUserId();
+  const {
+    user: { vaultData },
+  } = useUser(userId);
+  const { kycData } = vaultData ?? {};
+  const country = kycData?.[UserDataAttribute.country];
+  const addressLine1 = kycData?.[UserDataAttribute.addressLine1];
+  const addressLine2 = kycData?.[UserDataAttribute.addressLine2];
+  const city = kycData?.[UserDataAttribute.city];
+  const zip = kycData?.[UserDataAttribute.zip];
+  const state = kycData?.[UserDataAttribute.state];
 
   return (
     <DataSection
       iconComponent={IcoBuilding24}
       title={t('title')}
-      footer={
-        <RiskSignalsOverview
-          data={riskSignalsOverview.data?.address}
-          error={riskSignalsOverview.error}
-          isLoading={riskSignalsOverview.isLoading}
-        />
-      }
+      footer={<RiskSignals type="address" />}
     >
       {country !== undefined && (
         <DataRow title={allT('user-data-attributes.country')} data={country} />

@@ -2,36 +2,29 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import { UserVaultData } from 'src/hooks/use-user';
+import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
-import useRiskSignalsOverview from '../../../../hooks/use-risk-signals-overview';
 import DataSection from '../../../data-section';
-import RiskSignalsOverview from '../../../risk-signals-overview';
+import RiskSignals from '../../../risk-signals';
 import DataRow from '../data-row';
 
-type IdentitySectionProps = {
-  vaultData: UserVaultData;
-};
-
-const IdentitySection = ({ vaultData }: IdentitySectionProps) => {
-  const riskSignalsOverview = useRiskSignalsOverview();
+const IdentitySection = () => {
   const { t, allT } = useTranslation('pages.user-details.user-info.identity');
-  const { kycData } = vaultData;
-  const ssn9 = kycData[UserDataAttribute.ssn9];
-  const ssn4 = kycData[UserDataAttribute.ssn4];
-  const dob = kycData[UserDataAttribute.dob];
+  const userId = useUserId();
+  const {
+    user: { vaultData },
+  } = useUser(userId);
+  const { kycData } = vaultData ?? {};
+  const ssn9 = kycData?.[UserDataAttribute.ssn9];
+  const ssn4 = kycData?.[UserDataAttribute.ssn4];
+  const dob = kycData?.[UserDataAttribute.dob];
 
   return (
     <DataSection
       iconComponent={IcoUserCircle24}
       title={t('title')}
-      footer={
-        <RiskSignalsOverview
-          data={riskSignalsOverview.data?.identity}
-          error={riskSignalsOverview.error}
-          isLoading={riskSignalsOverview.isLoading}
-        />
-      }
+      footer={<RiskSignals type="identity" />}
     >
       {ssn9 !== undefined && (
         <DataRow title={allT('collected-kyc-data-options.ssn9')} data={ssn9} />

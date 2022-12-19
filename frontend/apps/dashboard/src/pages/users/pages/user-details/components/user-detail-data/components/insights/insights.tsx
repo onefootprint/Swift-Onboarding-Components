@@ -2,23 +2,23 @@ import { IcoCheckCircle16, IcoClose16 } from '@onefootprint/icons';
 import { Box, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import GoogleMapReact from 'google-map-react';
 import React from 'react';
-import { User } from 'src/pages/users/types/user.types';
+import useUser from 'src/hooks/use-user';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';
 
+import useUserId from '../../../../hooks/use-user-id';
 import MapMarker from './components/map-marker';
-import useGetLiveness from './hooks/use-get-liveness';
 import mapStyles from './insight.styles';
 
-type InsightsProps = {
-  user: User;
-};
+const Insights = () => {
+  const userId = useUserId();
+  const {
+    user: { metadata, liveness },
+    loadingStates,
+  } = useUser(userId);
 
-const Insights = ({ user }: InsightsProps) => {
-  const getLiveness = useGetLiveness(user.id);
-
-  const biometricCred = getLiveness.data?.[0];
+  const biometricCred = liveness?.events[0];
 
   // If there's a biometric credential, use the insight event from it since it will most likely be the mobile device.
   // If there's no biometric credential, use the insight event from the onboarding, which is when the user finished
@@ -26,7 +26,7 @@ const Insights = ({ user }: InsightsProps) => {
   // If there's no onboarding, use the insight event from the scoped user, which is when the user started signing up.
   // We only show `Biometric: Verified` if the user has a biometric credential
   const insightEvent =
-    biometricCred?.insightEvent || user.onboarding?.insightEvent;
+    biometricCred?.insightEvent || metadata?.onboarding?.insightEvent;
 
   if (!insightEvent) {
     return null;
@@ -47,7 +47,7 @@ const Insights = ({ user }: InsightsProps) => {
       >
         <Divider />
       </Box>
-      {getLiveness.isLoading ? (
+      {loadingStates.liveness ? (
         <Shimmer sx={{ height: '384px' }} />
       ) : (
         <Box
