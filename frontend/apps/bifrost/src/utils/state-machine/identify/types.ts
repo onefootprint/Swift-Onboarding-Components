@@ -20,7 +20,7 @@ export type MachineContext = {
   phone?: string;
   authToken?: string;
   bootstrapData: BootstrapData;
-  tenantPk: string;
+  tenantPk?: string;
 };
 
 export enum Events {

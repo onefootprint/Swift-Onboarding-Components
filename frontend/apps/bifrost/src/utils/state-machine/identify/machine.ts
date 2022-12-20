@@ -15,7 +15,7 @@ import {
 type IdentifyMachineArgs = {
   device: DeviceInfo;
   bootstrapData?: BootstrapData;
-  tenantPk: string;
+  tenantPk?: string;
 };
 
 const createIdentifyMachine = ({

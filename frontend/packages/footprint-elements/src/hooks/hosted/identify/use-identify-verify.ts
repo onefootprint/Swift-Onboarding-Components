@@ -12,9 +12,9 @@ const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
     method: 'POST',
     url: '/hosted/identify/verify',
     data: payload,
-    headers: {
-      [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk,
-    },
+    headers: payload.tenantPk
+      ? { [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk }
+      : {},
   });
   return response.data;
 };
