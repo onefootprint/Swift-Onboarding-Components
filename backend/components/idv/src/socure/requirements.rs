@@ -7,7 +7,6 @@ use strum_macros::{Display, EnumIter};
 pub enum SocureModule {
     AddressRisk,
     AlertList,
-    Decision,
     EmailRisk,
     KYC,
     WatchlistPremier,
@@ -26,7 +25,6 @@ impl SocureModule {
     // Whether or not the Socure module requires certain pieces of PII data
     fn requires_pii_data(&self) -> bool {
         match self {
-            SocureModule::Decision => false, // Decision is always included in the request
             SocureModule::DeviceRisk => false, // Device risk is included if we have a deviceSessionId (which we theoretically should also always have)
             _ => true,
         }
@@ -72,10 +70,6 @@ impl SocureModule {
                     vec![PhoneNumber],
                     vec![Email],
                 ],
-            },
-            SocureModule::Decision => Requirements {
-                required: vec![],
-                one_of: vec![],
             },
             SocureModule::Synthetic => Requirements {
                 required: vec![FirstName, LastName, Country],
