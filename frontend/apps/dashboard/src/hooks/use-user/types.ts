@@ -31,12 +31,12 @@ export type UserLoadingStates = {
 };
 
 export type UserErrors = {
-  metadata: RequestError | null;
-  timeline: RequestError | null;
-  annotations: RequestError | null;
-  riskSignals: RequestError | null;
-  liveness: RequestError | null;
-  vaultData: RequestError | null;
+  metadata: RequestError | unknown | null;
+  timeline: RequestError | unknown | null;
+  annotations: RequestError | unknown | null;
+  riskSignals: RequestError | unknown | null;
+  liveness: RequestError | unknown | null;
+  vaultData: RequestError | unknown | null;
 };
 
 export type UserLiveness = {

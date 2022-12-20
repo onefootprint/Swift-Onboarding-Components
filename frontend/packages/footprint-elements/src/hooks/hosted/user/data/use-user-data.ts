@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { UserDataRequest, UserDataResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
@@ -19,7 +19,6 @@ const userDataRequest = async (payload: UserDataRequest) => {
   return response.data;
 };
 
-const useUserData = () =>
-  useMutation<UserDataResponse, RequestError, UserDataRequest>(userDataRequest);
+const useUserData = () => useMutation(userDataRequest);
 
 export default useUserData;

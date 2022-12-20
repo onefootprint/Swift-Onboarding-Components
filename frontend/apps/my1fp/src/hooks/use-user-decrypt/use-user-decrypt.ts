@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { UserDecryptRequest, UserDecryptResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
@@ -18,9 +18,6 @@ const decryptUserRequest = async (payload: UserDecryptRequest) => {
   return response.data;
 };
 
-const useUserDecrypt = () =>
-  useMutation<UserDecryptResponse, RequestError, UserDecryptRequest>(
-    decryptUserRequest,
-  );
+const useUserDecrypt = () => useMutation(decryptUserRequest);
 
 export default useUserDecrypt;

@@ -1,4 +1,3 @@
-import { RequestError } from '@onefootprint/request';
 import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
 import useUserStore from 'src/hooks/use-user-store';
 
@@ -19,7 +18,7 @@ type DecryptCallbackArgs = {
   };
   options?: {
     onSuccess?: () => void;
-    onError?: (error: RequestError) => void;
+    onError?: (error: unknown) => void;
   };
 };
 

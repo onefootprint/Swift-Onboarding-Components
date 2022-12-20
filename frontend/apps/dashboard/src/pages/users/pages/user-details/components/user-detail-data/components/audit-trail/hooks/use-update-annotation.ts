@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   UpdateAnnotationRequest,
   UpdateAnnotationResponse,
@@ -30,11 +30,7 @@ const useUpdateAnnotation = () => {
   const showErrorToast = useRequestErrorToast();
   const userId = useUserId();
 
-  return useMutation<
-    UpdateAnnotationResponse,
-    RequestError,
-    UpdateAnnotationRequest
-  >(
+  return useMutation(
     (updateAnnotationRequest: UpdateAnnotationRequest) =>
       updateOnboardingConfig(authHeaders, updateAnnotationRequest, userId),
     {

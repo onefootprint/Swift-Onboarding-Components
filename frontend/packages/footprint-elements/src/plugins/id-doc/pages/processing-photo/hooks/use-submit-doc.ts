@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { SubmitDocRequest, SubmitDocResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
@@ -35,7 +35,6 @@ const submitDoc = async (payload: SubmitDocRequest) => {
   return response.data;
 };
 
-const useSubmitDoc = () =>
-  useMutation<SubmitDocResponse, RequestError, SubmitDocRequest>(submitDoc);
+const useSubmitDoc = () => useMutation(submitDoc);
 
 export default useSubmitDoc;

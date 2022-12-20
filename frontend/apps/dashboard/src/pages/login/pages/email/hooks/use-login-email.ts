@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   OrgAuthMagicLinkRequest,
   OrgAuthMagicLinkResponse,
@@ -14,9 +14,6 @@ const loginEmailRequest = async (payload: OrgAuthMagicLinkRequest) => {
   return response.data;
 };
 
-const useLoginEmail = () =>
-  useMutation<OrgAuthMagicLinkResponse, RequestError, OrgAuthMagicLinkRequest>(
-    loginEmailRequest,
-  );
+const useLoginEmail = () => useMutation(loginEmailRequest);
 
 export default useLoginEmail;

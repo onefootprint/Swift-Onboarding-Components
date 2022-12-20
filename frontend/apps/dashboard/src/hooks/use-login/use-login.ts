@@ -1,5 +1,5 @@
-import request, { RequestError } from '@onefootprint/request';
-import { OrgAuthLoginRequest, OrgAuthLoginResponse } from '@onefootprint/types';
+import request from '@onefootprint/request';
+import { OrgAuthLoginResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const login = async (code: string) => {
@@ -11,7 +11,6 @@ const login = async (code: string) => {
   return response.data;
 };
 
-const useLogin = () =>
-  useMutation<OrgAuthLoginResponse, RequestError, OrgAuthLoginRequest>(login);
+const useLogin = () => useMutation(login);
 
 export default useLogin;

@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   LoginChallengeRequest,
   LoginChallengeResponse,
@@ -23,9 +23,6 @@ const loginChallenge = async (payload: LoginChallengeRequest) => {
   };
 };
 
-const useLoginChallenge = () =>
-  useMutation<LoginChallengeResponse, RequestError, LoginChallengeRequest>(
-    loginChallenge,
-  );
+const useLoginChallenge = () => useMutation(loginChallenge);
 
 export default useLoginChallenge;

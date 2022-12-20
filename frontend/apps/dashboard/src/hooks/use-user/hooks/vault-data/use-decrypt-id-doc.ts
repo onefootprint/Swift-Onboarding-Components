@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { DecryptIdDocRequest, DecryptIdDocResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
@@ -22,8 +22,8 @@ const decryptIdDoc = async (
 
 const useDecryptIdDoc = () => {
   const { authHeaders } = useSession();
-  return useMutation<DecryptIdDocResponse, RequestError, DecryptIdDocRequest>(
-    (data: DecryptIdDocRequest) => decryptIdDoc(data, authHeaders),
+  return useMutation((data: DecryptIdDocRequest) =>
+    decryptIdDoc(data, authHeaders),
   );
 };
 

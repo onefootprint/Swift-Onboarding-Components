@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
@@ -19,9 +19,6 @@ const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
   return response.data;
 };
 
-const useIdentifyVerify = () =>
-  useMutation<IdentifyVerifyResponse, RequestError, IdentifyVerifyRequest>(
-    identifyVerifyRequest,
-  );
+const useIdentifyVerify = () => useMutation(identifyVerifyRequest);
 
 export default useIdentifyVerify;

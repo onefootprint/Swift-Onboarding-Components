@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   ApiKey,
   OrgApiKeyUpdateRequest,
@@ -26,37 +26,36 @@ const useUpdateStatus = (apiKey: ApiKey) => {
   const queryClient = useQueryClient();
   const { authHeaders } = useSession();
 
-  const mutation = useMutation<
-    OrgApiKeyUpdateResponse,
-    RequestError,
-    OrgApiKeyUpdateRequest
-  >((data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data), {
-    onMutate: async updatedApiKey => {
-      await queryClient.cancelQueries(['api-keys', authHeaders]);
-      const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData([
-        'api-keys',
-        authHeaders,
-      ]);
-      queryClient.setQueryData(['api-keys', authHeaders], () => {
-        const apiKeys = previousApiKeys?.map(_apiKey => {
-          if (_apiKey.id === updatedApiKey.id) {
-            return updatedApiKey;
-          }
-          return _apiKey;
+  const mutation = useMutation(
+    (data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data),
+    {
+      onMutate: async updatedApiKey => {
+        await queryClient.cancelQueries(['api-keys', authHeaders]);
+        const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData([
+          'api-keys',
+          authHeaders,
+        ]);
+        queryClient.setQueryData(['api-keys', authHeaders], () => {
+          const apiKeys = previousApiKeys?.map(_apiKey => {
+            if (_apiKey.id === updatedApiKey.id) {
+              return updatedApiKey;
+            }
+            return _apiKey;
+          });
+          return apiKeys;
         });
-        return apiKeys;
-      });
-      return { previousApiKeys };
+        return { previousApiKeys };
+      },
+      onError: (err, updatedApiKey, context: any) => {
+        if (context.previousApiKeys) {
+          queryClient.setQueryData(
+            ['api-keys', authHeaders],
+            context.previousApiKeys,
+          );
+        }
+      },
     },
-    onError: (err, updatedApiKey, context: any) => {
-      if (context.previousApiKeys) {
-        queryClient.setQueryData(
-          ['api-keys', authHeaders],
-          context.previousApiKeys,
-        );
-      }
-    },
-  });
+  );
 
   const toggle = () => {
     if (apiKey.status === 'enabled') {

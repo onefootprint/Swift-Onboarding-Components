@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   BiometricRegisterChallengeJson,
   BiometricRegisterRequest,
@@ -70,11 +70,6 @@ const biometricInit = async (payload: BiometricRegisterRequest) => {
   return response.data;
 };
 
-const useBiometricInit = () =>
-  useMutation<
-    BiometricRegisterResponse,
-    RequestError,
-    BiometricRegisterRequest
-  >(biometricInit);
+const useBiometricInit = () => useMutation(biometricInit);
 
 export default useBiometricInit;

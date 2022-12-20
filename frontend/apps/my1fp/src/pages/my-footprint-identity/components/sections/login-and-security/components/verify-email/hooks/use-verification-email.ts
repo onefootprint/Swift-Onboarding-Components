@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   UserEmailChallengeRequest,
   UserEmailChallengeResponse,
@@ -20,11 +20,6 @@ const verificationEmailRequest = async (payload: UserEmailChallengeRequest) => {
   return response.data;
 };
 
-const useVerificationEmail = () =>
-  useMutation<
-    UserEmailChallengeResponse,
-    RequestError,
-    UserEmailChallengeRequest
-  >(verificationEmailRequest);
+const useVerificationEmail = () => useMutation(verificationEmailRequest);
 
 export default useVerificationEmail;

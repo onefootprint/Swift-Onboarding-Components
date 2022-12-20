@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   DecryptKycDataRequest,
   DecryptKycDataResponse,
@@ -24,11 +24,9 @@ const decryptKycData = async (
 
 const useDecryptKycData = () => {
   const { authHeaders } = useSession();
-  return useMutation<
-    DecryptKycDataResponse,
-    RequestError,
-    DecryptKycDataRequest
-  >((data: DecryptKycDataRequest) => decryptKycData(data, authHeaders));
+  return useMutation((data: DecryptKycDataRequest) =>
+    decryptKycData(data, authHeaders),
+  );
 };
 
 export default useDecryptKycData;

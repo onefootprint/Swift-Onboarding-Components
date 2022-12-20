@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   OrgOnboardingConfigCreateRequest,
   OrgOnboardingConfigCreateResponse,
@@ -25,11 +25,7 @@ const useCreateOnboardingConfig = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation<
-    OrgOnboardingConfigCreateResponse,
-    RequestError,
-    OrgOnboardingConfigCreateRequest
-  >(
+  return useMutation(
     (data: OrgOnboardingConfigCreateRequest) =>
       createOnboardingConfig(authHeaders, data),
     {

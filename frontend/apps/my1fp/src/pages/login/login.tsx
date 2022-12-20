@@ -1,7 +1,7 @@
 import footprint from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
-import { getErrorMessage, RequestError } from '@onefootprint/request';
+import { getErrorMessage } from '@onefootprint/request';
 import { UserDecryptResponse } from '@onefootprint/types';
 import {
   FootprintButton,
@@ -61,7 +61,7 @@ const Login = () => {
               saveSessionData(authToken, data);
               router.push('/');
             },
-            onError: (error: RequestError) => {
+            onError: (error: unknown) => {
               toast.show({
                 description: getErrorMessage(error),
                 title: 'Uh-oh!',

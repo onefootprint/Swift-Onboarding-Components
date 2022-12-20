@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
 type SubscribeUserResponse = {};
@@ -16,9 +16,6 @@ const subscribeUser = async (payload: SubscribeUserRequest) => {
   return response.data;
 };
 
-const useSubscribeUser = () =>
-  useMutation<SubscribeUserResponse, RequestError, SubscribeUserRequest>(
-    subscribeUser,
-  );
+const useSubscribeUser = () => useMutation(subscribeUser);
 
 export default useSubscribeUser;

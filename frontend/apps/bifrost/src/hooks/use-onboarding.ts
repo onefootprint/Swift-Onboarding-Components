@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { OnboardingRequest, OnboardingResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import { AUTH_HEADER, CLIENT_PUBLIC_KEY_HEADER } from 'src/config/constants';
@@ -15,9 +15,6 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
   return response.data;
 };
 
-const useOnboarding = () =>
-  useMutation<OnboardingResponse, RequestError, OnboardingRequest>(
-    onboardingRequest,
-  );
+const useOnboarding = () => useMutation(onboardingRequest);
 
 export default useOnboarding;

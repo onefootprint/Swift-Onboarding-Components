@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
 import type { SupportFormData } from '../../support-list.types';
@@ -18,7 +18,6 @@ const supportFormRequest = async ({ url, data }: SupportFormRequest) => {
   return response.data;
 };
 
-const useSupportForm = () =>
-  useMutation<{}, RequestError, SupportFormRequest>(supportFormRequest);
+const useSupportForm = () => useMutation(supportFormRequest);
 
 export default useSupportForm;

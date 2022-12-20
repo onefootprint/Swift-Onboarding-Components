@@ -1,4 +1,4 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   ApiKey,
   OrgApiKeyRevealRequest,
@@ -25,15 +25,14 @@ const useRevealKey = (apiKey: ApiKey) => {
   const updateApiCache = useUpdateApiKeyCache();
   const { authHeaders } = useSession();
 
-  const mutation = useMutation<
-    OrgApiKeyRevealResponse,
-    RequestError,
-    OrgApiKeyRevealRequest
-  >((data: OrgApiKeyRevealRequest) => revealApiKey(authHeaders, data), {
-    onSuccess: response => {
-      updateApiCache(response);
+  const mutation = useMutation(
+    (data: OrgApiKeyRevealRequest) => revealApiKey(authHeaders, data),
+    {
+      onSuccess: response => {
+        updateApiCache(response);
+      },
     },
-  });
+  );
 
   const show = () => {
     mutation.mutate({ id: apiKey.id });

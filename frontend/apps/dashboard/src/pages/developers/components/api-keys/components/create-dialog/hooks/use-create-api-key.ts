@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   OrgCreateApiKeyRequest,
   OrgCreateApiKeysResponse,
@@ -25,16 +25,15 @@ const useCreateApiKey = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation<
-    OrgCreateApiKeysResponse,
-    RequestError,
-    OrgCreateApiKeyRequest
-  >((data: OrgCreateApiKeyRequest) => createApiKey(authHeaders, data), {
-    onError: showErrorToast,
-    onSettled: () => {
-      queryClient.invalidateQueries(['api-keys', authHeaders]);
+  return useMutation(
+    (data: OrgCreateApiKeyRequest) => createApiKey(authHeaders, data),
+    {
+      onError: showErrorToast,
+      onSettled: () => {
+        queryClient.invalidateQueries(['api-keys', authHeaders]);
+      },
     },
-  });
+  );
 };
 
 export default useCreateApiKey;

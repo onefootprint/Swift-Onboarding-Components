@@ -1,5 +1,4 @@
 import { useUserData } from '@onefootprint/footprint-elements';
-import { RequestError } from '@onefootprint/request';
 import {
   UserData,
   UserDataAttribute,
@@ -29,7 +28,7 @@ const useSyncData = () => {
     options: {
       speculative?: boolean;
       onSuccess?: (data: UserDataResponse) => void;
-      onError?: (error: RequestError) => void;
+      onError?: (error: unknown) => void;
     } = {},
   ) => {
     if (!authToken) {
