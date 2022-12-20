@@ -54,7 +54,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     }
 
     // Create email
-    let email = fixtures::email::create(conn, &uv.id, &su.id);
+    let email = fixtures::email::create(conn, &uv.id, &su.id, seqno);
     data_kind_to_lifetime_id.insert(DataLifetimeKind::Email, email.lifetime_id);
 
     // Create phone number
@@ -115,6 +115,11 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
     // Add an email
     let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
     let email = Email::from_str("test@onefootprint.com").unwrap();
+    uvw.add_email(conn, email, Fingerprint(vec![])).unwrap();
+
+    // Allow replacing the email
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    let email = Email::from_str("test2@onefootprint.com").unwrap();
     uvw.add_email(conn, email, Fingerprint(vec![])).unwrap();
 
     // Add a name

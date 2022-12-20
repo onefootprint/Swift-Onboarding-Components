@@ -73,15 +73,15 @@ impl PhoneNumber {
 
     pub fn create_verified(
         conn: &mut TxnPgConnection,
-        user_vault_id: UserVaultId,
+        uv_id: UserVaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
-        scoped_user_id: Option<ScopedUserId>,
+        su_id: Option<ScopedUserId>,
     ) -> DbResult<PhoneNumber> {
         // Create a committed lifetime - once the phone number is verified and bound to a vault
         // it should be immediately portable, even though it isn't verified by vendors.
-        let lifetime =
-            DataLifetime::create(conn, user_vault_id, scoped_user_id, DataLifetimeKind::PhoneNumber)?;
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let lifetime = DataLifetime::create(conn, uv_id, su_id, DataLifetimeKind::PhoneNumber, seqno)?;
         let seqno = lifetime.created_seqno;
         let lifetime = lifetime.commit(conn, seqno)?;
         let new_row = NewPhoneNumberRow {

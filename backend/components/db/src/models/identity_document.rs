@@ -99,20 +99,16 @@ impl IdentityDocument {
     pub fn create(
         conn: &mut TxnPgConnection,
         request_id: DocumentRequestId,
-        user_vault_id: UserVaultId,
+        uv_id: UserVaultId,
         front_image_s3_url: Option<String>,
         back_image_s3_url: Option<String>,
         document_type: String,
         country_code: String,
-        scoped_user_id: Option<ScopedUserId>,
+        su_id: Option<ScopedUserId>,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
-        let lifetime = DataLifetime::create(
-            conn,
-            user_vault_id,
-            scoped_user_id,
-            DataLifetimeKind::IdentityDocument,
-        )?;
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let lifetime = DataLifetime::create(conn, uv_id, su_id, DataLifetimeKind::IdentityDocument, seqno)?;
         let new = NewIdentityDocument {
             request_id,
             front_image_s3_url,

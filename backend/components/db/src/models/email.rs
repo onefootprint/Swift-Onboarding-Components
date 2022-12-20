@@ -5,8 +5,8 @@ use crate::{
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeKind;
+use newtypes::{DataLifetimeId, DataLifetimeSeqno};
 use newtypes::{
     DataPriority, EmailId, Fingerprint as FingerprintData, ScopedUserId, SealedVaultBytes, UserVaultId,
 };
@@ -53,14 +53,14 @@ impl Email {
 
     pub fn create(
         conn: &mut TxnPgConnection,
-        user_vault_id: UserVaultId,
+        uv_id: UserVaultId,
         e_data: SealedVaultBytes,
         fingerprint: FingerprintData,
         priority: DataPriority,
-        scoped_user_id: ScopedUserId,
+        su_id: ScopedUserId,
+        seqno: DataLifetimeSeqno,
     ) -> DbResult<Email> {
-        let lifetime =
-            DataLifetime::create(conn, user_vault_id, Some(scoped_user_id), DataLifetimeKind::Email)?;
+        let lifetime = DataLifetime::create(conn, uv_id, Some(su_id), DataLifetimeKind::Email, seqno)?;
         let new_row = NewEmail {
             e_data,
             is_verified: false,

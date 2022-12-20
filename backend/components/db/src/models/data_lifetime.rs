@@ -157,8 +157,8 @@ impl DataLifetime {
         user_vault_id: UserVaultId,
         scoped_user_id: Option<ScopedUserId>,
         kind: DataLifetimeKind,
+        seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {
-        let seqno = Self::get_next_seqno(conn)?;
         let lifetime = Self::bulk_create(conn, user_vault_id, scoped_user_id, vec![kind], seqno)?
             .into_iter()
             .next()

@@ -3,6 +3,7 @@ use super::{LockedUserVaultWrapper, UserVaultWrapper};
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::identity_data_request::IdentityDataUpdate;
+use db::models::data_lifetime::DataLifetime;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::phone_number::{NewPhoneNumberArgs, PhoneNumber};
 use db::models::user_timeline::UserTimeline;
@@ -10,8 +11,8 @@ use db::HasDataAttributeFields;
 use db::TxnPgConnection;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, KvDataKey, PiiString,
-    TenantId, UvdKind,
+    CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, EmailId, Fingerprint, KvDataKey,
+    PiiString, TenantId, UvdKind,
 };
 use std::collections::HashMap;
 
@@ -47,7 +48,7 @@ impl LockedUserVaultWrapper {
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
         let uvw = self.into_inner();
-        if !uvw.emails().is_empty() {
+        if !uvw.committed.emails.is_empty() {
             // We don't currently support adding a secondary email
             return Err(UserError::InvalidDataUpdate.into());
         }
@@ -58,6 +59,12 @@ impl LockedUserVaultWrapper {
 
         uvw.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
 
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        // Deactivate the old speculative email, if exists
+        let kinds = vec![DataLifetimeKind::Email];
+        DataLifetime::bulk_deactivate_uncommitted(conn, &scoped_user_id, kinds, seqno)?;
+
+        // Add the new speculative email
         let email = email.to_piistring();
         let e_data = uvw.user_vault.public_key.seal_pii(&email)?;
         let user_vault_id = uvw.user_vault.id;
@@ -68,6 +75,7 @@ impl LockedUserVaultWrapper {
             fingerprint,
             DataPriority::Primary,
             scoped_user_id,
+            seqno,
         )?;
 
         Ok(email.id)
