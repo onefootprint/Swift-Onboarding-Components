@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24 } from '@onefootprint/icons';
-import { IdDocDataAttribute } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { IdDocType } from '@onefootprint/types';
+import React from 'react';
 import useUser from 'src/hooks/use-user';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { useMap } from 'usehooks-ts';
 
 import DataSection from '../../../data-section';
 import ImageDataRow from './components/image-data-row';
@@ -15,26 +16,28 @@ const IdDocSection = () => {
     user: { vaultData },
   } = useUser(userId);
   const { idDoc } = vaultData ?? {};
-  const [idDocVisible, setIdDocVisible] = useState(false);
+  const [idDocTypeVisible, { set }] = useMap<IdDocType, boolean>(new Map());
+  const docTypes = Object.keys(idDoc ?? {}) as IdDocType[];
+  if (!idDoc || !docTypes.length) {
+    return null;
+  }
 
-  const handleShowIdDocImage = () => {
-    // TODO: display the decrypted image here
-    // https://linear.app/footprint/issue/FP-1792/display-decrypted-image-in-dashboard-user-details-page
-    setIdDocVisible(!idDocVisible);
+  const handleToggleIdDocVisibility = (type: IdDocType) => {
+    const isVisible = idDocTypeVisible.get(type);
+    set(type, !isVisible);
   };
 
   return (
     <DataSection iconComponent={IcoIdCard24} title={t('title')}>
-      <ImageDataRow
-        title={allT('collected-id-doc-attributes.id-doc-image')}
-        data={idDoc && idDoc[IdDocDataAttribute.frontImage]}
-        showButton={{
-          label: idDocVisible
-            ? t('id-doc-images.hide')
-            : t('id-doc-images.show'),
-          onClick: handleShowIdDocImage,
-        }}
-      />
+      {docTypes.map(type => (
+        <ImageDataRow
+          key={type}
+          title={allT('collected-id-doc-attributes.id-doc-image')}
+          data={idDoc[type]}
+          imagesVisible={idDocTypeVisible.get(type)}
+          onToggleImageVisibility={() => handleToggleIdDocVisibility(type)}
+        />
+      ))}
     </DataSection>
   );
 };

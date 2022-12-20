@@ -1,4 +1,4 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 import { UserMetadata, UserVaultData } from 'src/hooks/use-user/types';
 
 // Syncs the decrypted user vault data with the fields from the metadata
@@ -16,7 +16,7 @@ const syncVaultWithMetadata = (
       syncedVaultData.kycData[attr] = null;
     });
 
-    identityDocumentTypes.forEach((attr: IdDocDataAttribute) => {
+    identityDocumentTypes.forEach((attr: IdDocType) => {
       syncedVaultData.idDoc[attr] = null;
     });
   }
@@ -30,7 +30,7 @@ const syncVaultWithMetadata = (
 
     Object.entries(idDoc).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        syncedVaultData.idDoc[key as IdDocDataAttribute] = value;
+        syncedVaultData.idDoc[key as IdDocType] = value;
       }
     });
   }

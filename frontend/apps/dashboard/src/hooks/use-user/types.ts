@@ -1,6 +1,7 @@
 import { RequestError } from '@onefootprint/request';
 import {
-  IdDocDataAttribute,
+  DecryptedIdDoc,
+  IdDocType,
   Liveness,
   OnboardingStatus,
   PinnedAnnotation,
@@ -70,8 +71,9 @@ export type UserMetadata = ScopedUser & {
 };
 
 export type UserVaultData = {
-  kycData: Partial<Record<UserDataAttribute, DataValue>>;
-  idDoc: Partial<Record<IdDocDataAttribute, DataValue>>;
+  kycData: Partial<Record<UserDataAttribute, KycDataValue>>;
+  idDoc: Partial<Record<IdDocType, IdDocDataValue>>;
 };
 
-export type DataValue = string | null; // Null value means encrypted
+export type KycDataValue = string | null; // Null value means encrypted
+export type IdDocDataValue = DecryptedIdDoc[] | null;

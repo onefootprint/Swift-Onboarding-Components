@@ -1,9 +1,9 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 
 const getAttrListFromFields = (
   kycData: Partial<Record<UserDataAttribute, boolean>>,
-  idDoc: Partial<Record<IdDocDataAttribute, boolean>>,
-): { kycData: UserDataAttribute[]; idDoc: IdDocDataAttribute[] } => {
+  idDoc: Partial<Record<IdDocType, boolean>>,
+): { kycData: UserDataAttribute[]; idDoc: IdDocType[] } => {
   const kycAttrs = Object.entries(kycData)
     .filter(entry => {
       const val = entry[1];
@@ -21,7 +21,7 @@ const getAttrListFromFields = (
     .map(entry => {
       const attr = entry[0];
       return attr;
-    }) as IdDocDataAttribute[];
+    }) as IdDocType[];
 
   return { kycData: kycAttrs, idDoc: idDocAttrs };
 };

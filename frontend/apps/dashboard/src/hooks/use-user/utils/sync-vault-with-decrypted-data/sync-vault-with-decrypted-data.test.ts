@@ -1,4 +1,4 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 
 import syncVaultWithDecryptedData from './sync-vault-with-decrypted-data';
 
@@ -36,7 +36,11 @@ describe('syncVaultWithDecryptedData', () => {
           [UserDataAttribute.lastName]: 'Footprint',
         },
         idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image',
+          [IdDocType.passport]: [
+            {
+              front: 'image',
+            },
+          ],
         },
       },
     );
@@ -49,7 +53,11 @@ describe('syncVaultWithDecryptedData', () => {
         [UserDataAttribute.city]: 'Boston',
       },
       idDoc: {
-        [IdDocDataAttribute.frontImage]: 'image',
+        [IdDocType.passport]: [
+          {
+            front: 'image',
+          },
+        ],
       },
     });
   });

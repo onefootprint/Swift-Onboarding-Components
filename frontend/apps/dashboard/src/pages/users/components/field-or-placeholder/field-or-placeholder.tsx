@@ -1,10 +1,10 @@
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
-import { DataValue } from 'src/hooks/use-user';
+import { KycDataValue } from 'src/hooks/use-user';
 
 type FieldOrPlaceholderProps = {
-  data?: DataValue;
+  data?: KycDataValue;
 };
 
 const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) => {

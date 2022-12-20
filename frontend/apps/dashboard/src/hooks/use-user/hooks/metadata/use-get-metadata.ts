@@ -15,9 +15,6 @@ const getMetadataRequest = async ({ authHeaders, userId }: GetUserRequest) => {
     headers: authHeaders,
     method: 'GET',
     url: `/users/${userId}`,
-    params: {
-      isPinned: true,
-    },
   });
 
   const { data } = response;

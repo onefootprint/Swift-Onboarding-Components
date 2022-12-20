@@ -1,5 +1,5 @@
 import {
-  IdDocDataAttribute,
+  IdDocType,
   OnboardingStatus,
   UserDataAttribute,
 } from '@onefootprint/types';
@@ -18,10 +18,7 @@ describe('syncVaultWithMetadata', () => {
         UserDataAttribute.firstName,
         UserDataAttribute.lastName,
       ],
-      identityDocumentTypes: [
-        IdDocDataAttribute.frontImage,
-        IdDocDataAttribute.backImage,
-      ],
+      identityDocumentTypes: [IdDocType.passport, IdDocType.driversLicense],
       startTimestamp: 'time',
       orderingId: 'id',
     };
@@ -31,7 +28,7 @@ describe('syncVaultWithMetadata', () => {
         [UserDataAttribute.firstName]: null,
       },
       idDoc: {
-        [IdDocDataAttribute.frontImage]: null,
+        [IdDocType.passport]: null,
       },
     };
 
@@ -42,8 +39,8 @@ describe('syncVaultWithMetadata', () => {
         [UserDataAttribute.lastName]: null,
       },
       idDoc: {
-        [IdDocDataAttribute.frontImage]: null,
-        [IdDocDataAttribute.backImage]: null,
+        [IdDocType.passport]: null,
+        [IdDocType.driversLicense]: null,
       },
     });
   });
@@ -58,7 +55,7 @@ describe('syncVaultWithMetadata', () => {
         UserDataAttribute.firstName,
         UserDataAttribute.lastName,
       ],
-      identityDocumentTypes: [IdDocDataAttribute.frontImage],
+      identityDocumentTypes: [IdDocType.passport],
       startTimestamp: 'time',
       orderingId: 'id',
     };
@@ -75,7 +72,7 @@ describe('syncVaultWithMetadata', () => {
         [UserDataAttribute.lastName]: null,
       },
       idDoc: {
-        [IdDocDataAttribute.frontImage]: null,
+        [IdDocType.passport]: null,
       },
     });
   });
@@ -92,10 +89,7 @@ describe('syncVaultWithMetadata', () => {
         UserDataAttribute.addressLine1,
         UserDataAttribute.addressLine2,
       ],
-      identityDocumentTypes: [
-        IdDocDataAttribute.frontImage,
-        IdDocDataAttribute.selfie,
-      ],
+      identityDocumentTypes: [IdDocType.passport, IdDocType.driversLicense],
       startTimestamp: 'time',
       orderingId: 'id',
     };
@@ -106,7 +100,7 @@ describe('syncVaultWithMetadata', () => {
         [UserDataAttribute.addressLine1]: '123 Summer St',
       },
       idDoc: {
-        [IdDocDataAttribute.frontImage]: 'image',
+        [IdDocType.passport]: [{ front: 'image' }],
       },
     };
 
@@ -119,8 +113,8 @@ describe('syncVaultWithMetadata', () => {
         [UserDataAttribute.addressLine2]: null,
       },
       idDoc: {
-        [IdDocDataAttribute.frontImage]: 'image',
-        [IdDocDataAttribute.selfie]: null,
+        [IdDocType.passport]: [{ front: 'image' }],
+        [IdDocType.driversLicense]: null,
       },
     });
   });

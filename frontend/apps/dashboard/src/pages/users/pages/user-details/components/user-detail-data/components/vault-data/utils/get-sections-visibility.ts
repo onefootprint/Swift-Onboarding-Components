@@ -1,4 +1,4 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { UserDataAttribute } from '@onefootprint/types';
 import { UserVaultData } from 'src/hooks/use-user';
 
 const getSectionsVisibility = (vaultData?: UserVaultData) => {
@@ -14,10 +14,7 @@ const getSectionsVisibility = (vaultData?: UserVaultData) => {
   const hasState = kycData?.[UserDataAttribute.state] !== undefined;
   const hasCountry = kycData?.[UserDataAttribute.country] !== undefined;
   const hasZip = kycData?.[UserDataAttribute.zip] !== undefined;
-  const hasIdDocImages =
-    !!idDoc &&
-    (idDoc[IdDocDataAttribute.frontImage] !== undefined ||
-      idDoc[IdDocDataAttribute.backImage] !== undefined);
+  const hasIdDocImages = !!idDoc && Object.keys(idDoc).length > 0;
 
   return {
     basicSection: true,

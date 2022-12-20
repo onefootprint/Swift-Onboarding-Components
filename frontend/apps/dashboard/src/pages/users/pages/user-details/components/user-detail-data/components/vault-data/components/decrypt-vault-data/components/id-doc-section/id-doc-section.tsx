@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24 } from '@onefootprint/icons';
-import { IdDocDataAttribute } from '@onefootprint/types';
+import { IdDocType } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -18,16 +18,20 @@ const IdDocSection = () => {
   } = useUser(userId);
   const { register } = useFormContext();
   const { idDoc } = vaultData ?? {};
+  const docTypes = Object.keys(idDoc ?? {}) as IdDocType[];
+  if (!idDoc || !docTypes.length) {
+    return null;
+  }
 
   return (
     <DataSection iconComponent={IcoIdCard24} title={t('title')}>
-      <Checkbox
-        {...register(`idDoc.${IdDocDataAttribute.frontImage}`)}
-        disabled={
-          !idDoc || isCheckboxDisabled(idDoc[IdDocDataAttribute.frontImage])
-        }
-        label={allT('collected-id-doc-attributes.id-doc-image')}
-      />
+      {docTypes.map(type => (
+        <Checkbox
+          {...register(`idDoc.${type}`)}
+          disabled={!idDoc || isCheckboxDisabled(idDoc[type])}
+          label={allT('collected-id-doc-attributes.id-doc-image')}
+        />
+      ))}
     </DataSection>
   );
 };

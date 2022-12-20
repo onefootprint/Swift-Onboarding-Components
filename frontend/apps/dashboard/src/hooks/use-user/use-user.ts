@@ -1,4 +1,4 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 import useUserStore from 'src/hooks/use-user-store';
 
 import useGetPinnedAnnotations from './hooks/annotations/use-get-pinned-annotations';
@@ -13,7 +13,7 @@ import syncVaultWithDecryptedData from './utils/sync-vault-with-decrypted-data';
 type DecryptCallbackArgs = {
   data: {
     kycData: UserDataAttribute[];
-    idDoc: IdDocDataAttribute[];
+    idDoc: IdDocType[];
     reason: string;
   };
   options?: {

@@ -1,6 +1,5 @@
 import { act, renderHook, Wrapper } from '@onefootprint/test-utils';
 import {
-  IdDocDataAttribute,
   IdDocType,
   OnboardingStatus,
   TimelineEventKind,
@@ -122,10 +121,7 @@ describe('useUserStore', () => {
         UserDataAttribute.firstName,
         UserDataAttribute.addressLine1,
       ],
-      identityDocumentTypes: [
-        IdDocDataAttribute.frontImage,
-        IdDocDataAttribute.backImage,
-      ],
+      identityDocumentTypes: [IdDocType.passport, IdDocType.driversLicense],
       startTimestamp: 'time',
       orderingId: 'id',
     };
@@ -140,8 +136,8 @@ describe('useUserStore', () => {
           [UserDataAttribute.addressLine1]: null,
         },
         idDoc: {
-          [IdDocDataAttribute.frontImage]: null,
-          [IdDocDataAttribute.backImage]: null,
+          [IdDocType.passport]: null,
+          [IdDocType.driversLicense]: null,
         },
       },
     });
@@ -164,8 +160,8 @@ describe('useUserStore', () => {
             [UserDataAttribute.addressLine1]: null,
           },
           idDoc: {
-            [IdDocDataAttribute.frontImage]: null,
-            [IdDocDataAttribute.backImage]: null,
+            [IdDocType.passport]: null,
+            [IdDocType.driversLicense]: null,
           },
         },
       },
@@ -228,7 +224,11 @@ describe('useUserStore', () => {
     const idDoc: UserVaultData = {
       kycData: {},
       idDoc: {
-        [IdDocDataAttribute.frontImage]: 'image',
+        [IdDocType.passport]: [
+          {
+            front: 'image',
+          },
+        ],
       },
     };
     act(() => {
@@ -238,7 +238,11 @@ describe('useUserStore', () => {
       vaultData: {
         kycData: {},
         idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image',
+          [IdDocType.passport]: [
+            {
+              front: 'image',
+            },
+          ],
         },
       },
     });

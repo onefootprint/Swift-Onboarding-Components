@@ -1,4 +1,4 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 
 import getSectionsVisibility from './get-sections-visibility';
 
@@ -127,7 +127,11 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.country]: null,
         },
         idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image_bytes',
+          [IdDocType.passport]: [
+            {
+              front: 'image_bytes',
+            },
+          ],
         },
       });
       expect(sectionsVisibility).toEqual({
@@ -152,7 +156,12 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.country]: null,
         },
         idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image_bytes',
+          [IdDocType.driversLicense]: [
+            {
+              front: 'image_bytes',
+              back: 'image_bytes',
+            },
+          ],
         },
       });
       expect(sectionsVisibility).toEqual({
@@ -176,7 +185,7 @@ describe('getSectionsVisibility', () => {
           [UserDataAttribute.country]: null,
         },
         idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image_bytes',
+          [IdDocType.passport]: null,
         },
       });
       expect(sectionsVisibility1).toEqual({

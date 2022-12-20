@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -21,14 +21,10 @@ import {
 // Only add first name in the form as a checkbox, combine first & last to show when decrypted
 type FormKycAttributes = Exclude<UserDataAttribute, UserDataAttribute.lastName>;
 // Only add frontImage in the form as a checkbox, show both front & back (if available) when decrypted
-type FormIdDocAttributes = Exclude<
-  IdDocDataAttribute,
-  IdDocDataAttribute.backImage
->;
 
 type FormData = {
   kycData: Partial<Record<FormKycAttributes, boolean>>;
-  idDoc: Partial<Record<FormIdDocAttributes, boolean>>;
+  idDoc: Partial<Record<IdDocType, boolean>>;
 };
 
 const DecryptVaultData = () => {
@@ -83,11 +79,7 @@ const DecryptVaultData = () => {
         // Decrypt both first & last names together
         [UserDataAttribute.lastName]: !!kycData[UserDataAttribute.firstName],
       },
-      idDoc: {
-        ...idDoc,
-        // Decrypt both front & back images together
-        [IdDocDataAttribute.backImage]: !!idDoc[IdDocDataAttribute.frontImage],
-      },
+      idDoc,
     };
     send({ type: Event.submittedFields, payload: { fields } });
   };

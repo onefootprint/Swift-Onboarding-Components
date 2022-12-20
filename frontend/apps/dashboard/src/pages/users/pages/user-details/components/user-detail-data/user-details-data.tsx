@@ -1,7 +1,7 @@
-import { IdDocDataAttribute, UserDataAttribute } from '@onefootprint/types';
+import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
-import useUser, { DataValue } from 'src/hooks/use-user';
+import useUser, { IdDocDataValue, KycDataValue } from 'src/hooks/use-user';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useUserId from '../../hooks/use-user-id';
@@ -32,7 +32,7 @@ const UserDetailsData = () => {
     if (kycData) {
       Object.entries(kycData).forEach(entry => {
         const attr = entry[0] as UserDataAttribute;
-        const value = entry[1] as DataValue;
+        const value = entry[1] as KycDataValue;
         if (value !== null) {
           fields.kycData[attr] = true;
         }
@@ -41,8 +41,8 @@ const UserDetailsData = () => {
 
     if (idDoc) {
       Object.entries(idDoc).forEach(entry => {
-        const attr = entry[0] as IdDocDataAttribute;
-        const value = entry[1] as DataValue;
+        const attr = entry[0] as IdDocType;
+        const value = entry[1] as IdDocDataValue;
         if (value !== null) {
           fields.idDoc[attr] = true;
         }
