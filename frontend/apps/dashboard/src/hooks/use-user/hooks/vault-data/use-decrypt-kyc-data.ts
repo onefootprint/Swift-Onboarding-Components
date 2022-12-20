@@ -1,13 +1,16 @@
 import request, { RequestError } from '@onefootprint/request';
-import { DecryptUserRequest, DecryptUserResponse } from '@onefootprint/types';
+import {
+  DecryptKycDataRequest,
+  DecryptKycDataResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const decryptKycData = async (
-  { userId, fields, reason }: DecryptUserRequest,
+  { userId, fields, reason }: DecryptKycDataRequest,
   authHeaders: AuthHeaders,
 ) => {
-  const response = await request<DecryptUserResponse>({
+  const response = await request<DecryptKycDataResponse>({
     method: 'POST',
     url: `/users/${userId}/vault/identity/decrypt`,
     data: {
@@ -21,9 +24,11 @@ const decryptKycData = async (
 
 const useDecryptKycData = () => {
   const { authHeaders } = useSession();
-  return useMutation<DecryptUserResponse, RequestError, DecryptUserRequest>(
-    (data: DecryptUserRequest) => decryptKycData(data, authHeaders),
-  );
+  return useMutation<
+    DecryptKycDataResponse,
+    RequestError,
+    DecryptKycDataRequest
+  >((data: DecryptKycDataRequest) => decryptKycData(data, authHeaders));
 };
 
 export default useDecryptKycData;

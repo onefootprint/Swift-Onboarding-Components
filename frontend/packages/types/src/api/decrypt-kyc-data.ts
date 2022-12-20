@@ -1,9 +1,9 @@
 import { DecryptedUserDataAttributes } from '../data';
 
-export type DecryptUserRequest = {
+export type DecryptKycDataRequest = {
   userId: string;
   fields: string[];
   reason: string;
 };
 
-export type DecryptUserResponse = DecryptedUserDataAttributes;
+export type DecryptKycDataResponse = DecryptedUserDataAttributes;
