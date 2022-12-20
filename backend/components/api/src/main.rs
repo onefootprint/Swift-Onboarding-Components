@@ -1,4 +1,5 @@
 use actix_web::{middleware::Logger, App, HttpServer, ResponseError};
+use idv::socure::reason_code::check_reason_code_api::query_socure_reason_code_endpoint_and_compare_against_enum;
 
 use std::borrow::Cow;
 use telemetry::TelemetrySpanBuilder;
@@ -63,6 +64,27 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_BACKTRACE", "1");
 
     let state = State::init_or_die(config.clone()).await;
+
+    // only perform Socure Reason Code API check on prod startups
+    if config.service_config.is_production() {
+        tracing::info!("[Socure Reason Code check] Beginning check");
+        match query_socure_reason_code_endpoint_and_compare_against_enum(&state.socure_certification_client)
+            .await
+        {
+            Ok(reason_code_discrepancies) => {
+                if reason_code_discrepancies.missing_reason_codes.is_empty()
+                    && reason_code_discrepancies
+                        .differing_description_reason_codes
+                        .is_empty()
+                {
+                    tracing::info!("[Socure Reason Code check] no discrepancies between latest API response and defined enum detected");
+                } else {
+                    tracing::warn!(reason_code_discrepancies = format!("{:?}", reason_code_discrepancies), "[Socure Reason Code check] found discrepancies between latest API response and defined enum");
+                }
+            }
+            Err(err) => tracing::warn!(err = format!("{:?}", err), "[Socure Reason Code check] Error"),
+        }
+    }
 
     log::info!("starting server on port {}", config.port);
 

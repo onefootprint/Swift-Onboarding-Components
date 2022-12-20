@@ -1,6 +1,7 @@
 pub mod client;
 mod conversion;
 use newtypes::{IdvData, Vendor};
+pub mod reason_code;
 pub mod requirements;
 pub mod response;
 use serde::de::DeserializeOwned;

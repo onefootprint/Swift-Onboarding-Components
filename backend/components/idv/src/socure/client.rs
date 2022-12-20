@@ -12,7 +12,8 @@ use super::{decode_response, requirements};
 #[derive(Clone)]
 pub struct SocureClient {
     client: reqwest::Client,
-    url: String,
+    idplus_url: String,
+    reason_code_url: String,
 }
 
 impl std::fmt::Debug for SocureClient {
@@ -23,11 +24,12 @@ impl std::fmt::Debug for SocureClient {
 
 impl SocureClient {
     pub fn new(sdk_key: String, sandbox: bool) -> Result<Self, crate::socure::SocureReqwestError> {
-        let url = if sandbox {
+        let idplus_url = if sandbox {
             "https://sandbox.socure.com/api/3.0/EmailAuthScore"
         } else {
             "https://socure.com/api/3.0/EmailAuthScore"
         };
+        let reason_code_url = "https://service.socure.com/api/3.0/reasoncodes";
         let mut headers = header::HeaderMap::new();
         let header_val = format!("SocureApiKey {}", sdk_key);
         headers.insert(
@@ -42,7 +44,8 @@ impl SocureClient {
         let client = reqwest::Client::builder().default_headers(headers).build()?;
         Ok(Self {
             client,
-            url: url.to_string(),
+            idplus_url: idplus_url.to_string(),
+            reason_code_url: reason_code_url.to_string(),
         })
     }
 
@@ -78,7 +81,7 @@ impl SocureClient {
         tracing::info!(req = format!("{:?}", req), "SocureClient req");
         let response = self
             .client
-            .post(self.url.to_string())
+            .post(self.idplus_url.to_string())
             .json(&req)
             .timeout(Duration::from_secs(5))
             .send()
@@ -93,6 +96,29 @@ impl SocureClient {
             }
             Err(ref err) => {
                 tracing::warn!(error = format!("{:?}", err), "SocureClient error");
+                // TODO: write grafana/es alerts off of these
+            }
+        }
+        json_response
+    }
+
+    pub async fn reason_code(&self) -> Result<serde_json::Value, crate::socure::Error> {
+        tracing::info!("SocureClient reason_code");
+        let response = self
+            .client
+            .get(self.reason_code_url.clone())
+            .timeout(Duration::from_secs(3))
+            .send()
+            .await?;
+
+        let json_response = decode_response::<serde_json::Value>(response).await;
+
+        match json_response {
+            Ok(_) => {
+                tracing::info!("SocureClient reason_code success");
+            }
+            Err(ref err) => {
+                tracing::warn!(error = format!("{:?}", err), "SocureClient reason_code error");
                 // TODO: write grafana/es alerts off of these
             }
         }
