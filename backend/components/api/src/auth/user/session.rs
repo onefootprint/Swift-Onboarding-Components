@@ -98,7 +98,7 @@ impl SessionContext<UserSession> {
     }
 
     /// Fetch the onboarding info associated with this user token, if it exists
-    fn onboarding(&self, conn: &mut PgConnection) -> ApiResult<Option<AuthedOnboardingInfo>> {
+    pub fn onboarding(&self, conn: &mut PgConnection) -> ApiResult<Option<AuthedOnboardingInfo>> {
         if !self.data.has_scope(&UserAuthScopeDiscriminant::OrgOnboarding) {
             // If there is no Onboarding scope on this auth token, the Onboarding won't exist
             return Ok(None);

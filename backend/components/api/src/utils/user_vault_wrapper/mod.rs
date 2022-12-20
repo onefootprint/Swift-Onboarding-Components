@@ -5,6 +5,7 @@ use db::models::user_vault::UserVault;
 use newtypes::{DataLifetimeSeqno, ScopedUserId};
 
 use self::uvw_data::UvwData;
+pub mod checks;
 
 mod accessors;
 mod add_data;

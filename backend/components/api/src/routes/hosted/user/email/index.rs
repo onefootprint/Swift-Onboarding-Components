@@ -4,6 +4,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::email::send_email_challenge;
+use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
@@ -50,16 +51,8 @@ pub async fn post(
     let email_id = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            // TODO For now, we only allow adding an email during onboarding since we otherwise
-            // don't know which scoped user to associate the data with.
-            // We might one day want to support this outside of onboarding for my1fp. In that case,
-            // maybe we make the data portable immediately to autofill onboardings
-            let scoped_user_id = if let Some(su) = user_auth.scoped_user(conn)? {
-                // We have an auth token created with the tenant PK - the scoped user should already exist
-                su.id
-            } else {
-                return Err(UserError::NotAllowedOutsideOnboarding.into());
-            };
+            let scoped_user_id = pre_add_data_checks(&user_auth, conn)?;
+
             let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user_id)?;
 
             // Enforce that sandbox emails are used for sandbox users
