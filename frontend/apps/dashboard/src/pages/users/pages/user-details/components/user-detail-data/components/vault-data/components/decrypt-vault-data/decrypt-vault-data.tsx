@@ -95,23 +95,30 @@ const DecryptVaultData = () => {
   return (
     <form onSubmit={handleSubmit(handleBeforeSubmit)} id="decrypt-form">
       <FormProvider {...formMethods}>
-        <Container>
-          <DataGrid>
-            <BasicSection />
-            {identitySection && <IdentitySection />}
-            {addressSection && (
-              <Box
-                sx={{
-                  gridRow: identitySection ? '1 / span 2' : undefined,
-                  gridColumn: '2 / 2',
-                }}
-              >
-                <AddressSection />
-              </Box>
-            )}
-          </DataGrid>
-          {idDocSection && <IdDocSection />}
-        </Container>
+        <DataGrid>
+          <BasicSection />
+          {identitySection && <IdentitySection />}
+          {addressSection && (
+            <Box
+              sx={{
+                gridRow: identitySection ? '1 / span 2' : undefined,
+                gridColumn: '2 / 2',
+              }}
+            >
+              <AddressSection />
+            </Box>
+          )}
+          {idDocSection && (
+            <Box
+              sx={{
+                gridRow: '3 / 3',
+                gridColumn: '1 / 3',
+              }}
+            >
+              <IdDocSection />
+            </Box>
+          )}
+        </DataGrid>
       </FormProvider>
     </form>
   );
@@ -122,13 +129,6 @@ const DataGrid = styled.div`
     display: grid;
     gap: ${theme.spacing[5]};
     grid-template-columns: repeat(2, 1fr);
-  `};
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[5]}px;
   `};
 `;
 
