@@ -30,6 +30,8 @@ pub struct State {
     pub(crate) s3_client: s3::S3Client,
     #[allow(unused)]
     pub(crate) socure_sandbox_client: SocureClient,
+    #[allow(unused)]
+    pub(crate) socure_certification_client: SocureClient,
 }
 
 impl State {
@@ -81,6 +83,9 @@ impl State {
         let socure_sandbox_client =
             SocureClient::new(config.socure_config.sandbox_api_key.clone(), true).unwrap();
 
+        let socure_certification_client =
+            SocureClient::new(config.socure_config.certification_api_key.clone(), false).unwrap();
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -121,6 +126,7 @@ impl State {
             idology_client,
             s3_client,
             socure_sandbox_client,
+            socure_certification_client,
         }
     }
 }

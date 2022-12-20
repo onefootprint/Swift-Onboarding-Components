@@ -215,4 +215,7 @@ impl enclave_proxy::StreamConfig for EnclaveConfig {
 pub struct SocureConfig {
     #[envconfig(from = "SOCURE_SANDBOX_API_KEY")]
     pub sandbox_api_key: String,
+
+    #[envconfig(from = "SOCURE_CERTIFICATION_API_KEY")]
+    pub certification_api_key: String,
 }

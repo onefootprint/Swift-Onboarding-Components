@@ -45,6 +45,8 @@ config:
     sentryUrl:
       secure: v1:WtHZGm3z+ldCM2Hu:pGr/a63SHFQiYKm1Wa53xwNM0P268cqpgVIBfBlN2cJ/DUB15PebePtgF8eS+bERXNVsQP5Hw+8bViuhs0CgQfsErTvtE2DGRFcpzdNjCcRkrTMLAUjlXnav
     socure:
+      certificationApiKey:
+        secure: v1:hu3JSlQDBxn2W+wI:kawQei7qPaCswzA51+1I4VNbr273Wqs1OSNpH1iLAYuLtMhfTRNDHdgvGoo9SsoaR3z6Yg==
       sandboxApiKey:
         secure: v1:WRoRIuzYLRosCaSz:ccesq8xPn8lzvmo0LPM7DQQhglEeCX9PlH/BseYHw/8OEJa2z1ZVgLceyqjOQ6OrsGSV6Q==
     twilio:
