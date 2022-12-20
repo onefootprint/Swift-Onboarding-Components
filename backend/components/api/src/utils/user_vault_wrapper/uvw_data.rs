@@ -158,4 +158,12 @@ impl HasDataAttributeFields for UvwData {
         let value = self.get(&data_attribute);
         value.map(|v| v.e_data())
     }
+
+    fn has_field(&self, data_attribute: DataLifetimeKind) -> bool {
+        match data_attribute {
+            // UVData is stored differently than IdentityDocuments
+            DataLifetimeKind::IdentityDocument => !self.identity_documents.is_empty(),
+            _ => self.get_e_field(data_attribute).is_some(),
+        }
+    }
 }

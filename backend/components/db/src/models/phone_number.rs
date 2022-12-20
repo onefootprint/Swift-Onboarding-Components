@@ -14,7 +14,6 @@ use super::{
     data_lifetime::DataLifetime,
     fingerprint::{Fingerprint, NewFingerprint},
 };
-use crate::HasDataAttributeFields;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = phone_number)]
@@ -109,15 +108,6 @@ impl PhoneNumber {
 
     pub fn data_items(self) -> Vec<(DataLifetimeKind, SealedVaultBytes)> {
         vec![(DataLifetimeKind::PhoneNumber, self.e_e164)]
-    }
-}
-
-impl HasDataAttributeFields for PhoneNumber {
-    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
-        match data_attribute {
-            DataLifetimeKind::PhoneNumber => Some(&self.e_e164),
-            _ => None,
-        }
     }
 }
 

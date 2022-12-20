@@ -362,9 +362,7 @@ pub async fn private_cleanup_integration_tests(
 pub trait HasDataAttributeFields {
     fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes>;
 
-    fn has_field(&self, data_attribute: DataLifetimeKind) -> bool {
-        self.get_e_field(data_attribute).is_some()
-    }
+    fn has_field(&self, data_attribute: DataLifetimeKind) -> bool;
 
     fn get_populated_fields(&self) -> Vec<DataLifetimeKind> {
         DataLifetimeKind::iter().filter(|k| self.has_field(*k)).collect()

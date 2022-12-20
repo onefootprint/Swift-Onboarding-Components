@@ -57,6 +57,10 @@ impl HasDataAttributeFields for UserVaultWrapper {
             .get_e_field(data_attribute)
             .or_else(|| self.committed.get_e_field(data_attribute))
     }
+
+    fn has_field(&self, data_attribute: DataLifetimeKind) -> bool {
+        self.speculative.has_field(data_attribute) || self.committed.has_field(data_attribute)
+    }
 }
 
 impl UserVaultWrapper {
