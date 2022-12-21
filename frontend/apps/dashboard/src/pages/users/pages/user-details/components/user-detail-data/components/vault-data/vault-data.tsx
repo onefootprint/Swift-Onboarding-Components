@@ -28,13 +28,13 @@ const VaultData = () => {
         fields.kycData,
         fields.idDoc,
       );
-      decrypt({
-        data: { kycData, idDoc, reason },
-        options: {
+      decrypt(
+        { kycData, idDoc, reason },
+        {
           onSuccess: () => {
             send({ type: Event.decryptSucceeded });
           },
-          onError: error => {
+          onError: (error: unknown) => {
             send({ type: Event.decryptFailed });
             toast.show({
               description: getErrorMessage(error),
@@ -43,7 +43,7 @@ const VaultData = () => {
             });
           },
         },
-      });
+      );
     }
   }, [state.value]);
 

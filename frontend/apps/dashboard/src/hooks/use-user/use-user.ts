@@ -6,50 +6,48 @@ import useGetLiveness from './hooks/liveness/use-get-liveness';
 import useGetMetadata from './hooks/metadata/use-get-metadata';
 import useGetRiskSignals from './hooks/risk-signals/use-get-risk-signals';
 import useGetTimeline from './hooks/timeline/use-get-timeline';
-import useDecryptKycData from './hooks/vault-data/use-decrypt-kyc-data';
-import { UserErrors, UserLoadingStates } from './types';
-import syncVaultWithDecryptedData from './utils/sync-vault-with-decrypted-data';
-
-type DecryptCallbackArgs = {
-  data: {
-    kycData: UserDataAttribute[];
-    idDoc: IdDocType[];
-    reason: string;
-  };
-  options?: {
-    onSuccess?: () => void;
-    onError?: (error: unknown) => void;
-  };
-};
+import useDecryptVaultData from './hooks/vault-data/use-decrypt-vault-data';
+import { UserErrors, UserLoadingStates, UserVaultData } from './types';
+import syncVaultWithDecryptedData from './utils/sync-vault-with-decrypted-data/sync-vault-with-decrypted-data';
 
 const useUser = (userId: string) => {
   const userStore = useUserStore();
   const user = userStore.get(userId) || {};
 
-  const decryptKycData = useDecryptKycData();
+  const decryptVaultData = useDecryptVaultData(userId);
   const getMetadata = useGetMetadata(userId);
   const getTimeline = useGetTimeline(userId);
   const getPinnedAnnotations = useGetPinnedAnnotations(userId);
   const getRiskSignals = useGetRiskSignals(userId);
   const getLiveness = useGetLiveness(userId);
 
-  const decrypt = (args: DecryptCallbackArgs) => {
-    const {
-      data: { kycData, reason },
-      options,
-    } = args;
-    decryptKycData.mutate(
-      { userId, fields: kycData, reason },
-      {
-        onSuccess: data => {
-          const vaultData = syncVaultWithDecryptedData(data, user.vaultData);
+  const decrypt = (
+    data: {
+      kycData: UserDataAttribute[];
+      idDoc: IdDocType[];
+      reason: string;
+    },
+    options?: {
+      onSuccess?: () => void;
+      onError?: (error: unknown) => void;
+    },
+  ) => {
+    decryptVaultData({
+      data,
+      options: {
+        onSuccess: (decryptedVaultData: UserVaultData) => {
+          const vaultData = syncVaultWithDecryptedData(
+            decryptedVaultData,
+            user.vaultData,
+          );
           userStore.merge({ userId, data: { vaultData } });
           options?.onSuccess?.();
         },
-        onError: options?.onError,
+        onError: error => {
+          options?.onError?.(error);
+        },
       },
-    );
-    return decryptKycData;
+    });
   };
 
   const refresh = () => {
@@ -63,7 +61,6 @@ const useUser = (userId: string) => {
   const loadingStates: UserLoadingStates = {
     metadata: getMetadata.isLoading,
     timeline: getTimeline.isLoading,
-    vaultData: decryptKycData.isLoading,
     annotations: getPinnedAnnotations.isLoading,
     riskSignals: getRiskSignals.isLoading,
     liveness: getLiveness.isLoading,
@@ -75,7 +72,6 @@ const useUser = (userId: string) => {
     annotations: getPinnedAnnotations.error,
     riskSignals: getRiskSignals.error,
     liveness: getLiveness.error,
-    vaultData: decryptKycData.error,
   };
 
   return {

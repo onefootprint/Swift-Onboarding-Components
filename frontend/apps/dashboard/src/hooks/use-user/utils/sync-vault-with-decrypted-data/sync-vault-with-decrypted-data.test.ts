@@ -6,8 +6,11 @@ describe('syncVaultWithDecryptedData', () => {
   it('when decrypting data for the first time', () => {
     const vaultData = syncVaultWithDecryptedData(
       {
-        addressLine1: '123 Summer St',
-        city: 'Boston',
+        kycData: {
+          [UserDataAttribute.addressLine1]: '123 Summer St',
+          [UserDataAttribute.city]: 'Boston',
+        },
+        idDoc: {},
       },
       {
         kycData: {},
@@ -27,8 +30,17 @@ describe('syncVaultWithDecryptedData', () => {
   it('when decrypting new data', () => {
     const vaultData = syncVaultWithDecryptedData(
       {
-        addressLine1: '123 Summer St',
-        city: 'Boston',
+        kycData: {
+          [UserDataAttribute.addressLine1]: '123 Summer St',
+          [UserDataAttribute.city]: 'Boston',
+        },
+        idDoc: {
+          [IdDocType.driversLicense]: [
+            {
+              front: 'image',
+            },
+          ],
+        },
       },
       {
         kycData: {
@@ -53,6 +65,11 @@ describe('syncVaultWithDecryptedData', () => {
         [UserDataAttribute.city]: 'Boston',
       },
       idDoc: {
+        [IdDocType.driversLicense]: [
+          {
+            front: 'image',
+          },
+        ],
         [IdDocType.passport]: [
           {
             front: 'image',
@@ -64,7 +81,10 @@ describe('syncVaultWithDecryptedData', () => {
 
   it('when data is empty', () => {
     const vaultData = syncVaultWithDecryptedData(
-      {},
+      {
+        kycData: {},
+        idDoc: {},
+      },
       {
         kycData: {
           [UserDataAttribute.firstName]: 'Piip',
@@ -86,8 +106,11 @@ describe('syncVaultWithDecryptedData', () => {
   it('when vaultData is empty', () => {
     const vaultData = syncVaultWithDecryptedData(
       {
-        firstName: 'Piip',
-        lastName: 'Footprint',
+        kycData: {
+          [UserDataAttribute.firstName]: 'Piip',
+          [UserDataAttribute.lastName]: 'Footprint',
+        },
+        idDoc: {},
       },
       undefined,
     );

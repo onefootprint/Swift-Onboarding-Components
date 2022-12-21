@@ -28,7 +28,6 @@ export type UserLoadingStates = {
   annotations: boolean;
   riskSignals: boolean;
   liveness: boolean;
-  vaultData: boolean;
 };
 
 export type UserErrors = {
@@ -37,7 +36,6 @@ export type UserErrors = {
   annotations: RequestError | unknown | null;
   riskSignals: RequestError | unknown | null;
   liveness: RequestError | unknown | null;
-  vaultData: RequestError | unknown | null;
 };
 
 export type UserLiveness = {
