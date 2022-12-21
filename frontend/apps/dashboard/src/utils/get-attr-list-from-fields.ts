@@ -13,6 +13,7 @@ const getAttrListFromFields = (
       const attr = entry[0];
       return attr;
     }) as UserDataAttribute[];
+
   const idDocAttrs = Object.entries(idDoc)
     .filter(entry => {
       const val = entry[1];

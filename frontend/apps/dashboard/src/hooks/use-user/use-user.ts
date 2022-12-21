@@ -32,9 +32,29 @@ const useUser = (userId: string) => {
       onError?: (error: unknown) => void;
     },
   ) => {
-    decryptVaultData({
-      data,
-      options: {
+    const { reason } = data;
+    // Don't decrypt fields that are already decrypted
+    // Filter out fields that the user doesn't have
+    const kycData = data.kycData.filter(
+      attr =>
+        user.metadata?.identityDataAttributes.includes(attr) &&
+        (user.vaultData?.kycData[attr] === null ||
+          user.vaultData?.kycData[attr] === undefined),
+    );
+    const idDoc = data.idDoc.filter(
+      attr =>
+        user.metadata?.identityDocumentTypes.includes(attr) &&
+        (user.vaultData?.idDoc[attr] === null ||
+          user.vaultData?.idDoc[attr] === undefined),
+    );
+
+    decryptVaultData(
+      {
+        kycData,
+        idDoc,
+        reason,
+      },
+      {
         onSuccess: (decryptedVaultData: UserVaultData) => {
           const vaultData = syncVaultWithDecryptedData(
             decryptedVaultData,
@@ -47,7 +67,7 @@ const useUser = (userId: string) => {
           options?.onError?.(error);
         },
       },
-    });
+    );
   };
 
   const refresh = () => {
