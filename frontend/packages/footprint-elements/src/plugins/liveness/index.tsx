@@ -15,7 +15,7 @@ const i18n = configureI18next();
 
 const App = ({ context, onDone }: LivenessProps) => {
   const [, send] = useLivenessMachine();
-  const { authToken, device, tenant } = context;
+  const { authToken, device } = context;
 
   useEffectOnce(() => {
     send({
@@ -23,7 +23,6 @@ const App = ({ context, onDone }: LivenessProps) => {
       payload: {
         authToken,
         device,
-        tenant,
       },
     });
   });

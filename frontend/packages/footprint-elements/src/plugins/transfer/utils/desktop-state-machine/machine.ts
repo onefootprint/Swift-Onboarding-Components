@@ -117,12 +117,10 @@ const createDesktopMachine = () =>
       actions: {
         [Actions.assignContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, missingRequirements, tenant } =
-              event.payload;
+            const { authToken, device, missingRequirements } = event.payload;
             context.authToken = authToken;
             context.device = device;
             context.missingRequirements = { ...missingRequirements };
-            context.tenant = tenant;
           }
           return context;
         }),

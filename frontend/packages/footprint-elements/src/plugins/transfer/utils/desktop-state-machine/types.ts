@@ -1,5 +1,4 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { TenantInfo } from '@onefootprint/types';
 
 import { TransferRequirements } from '../../types';
 
@@ -34,7 +33,6 @@ export type MachineContext = {
   // Plugin context
   authToken?: string;
   scopedAuthToken?: string;
-  tenant?: TenantInfo;
   device?: DeviceInfo;
   missingRequirements: TransferRequirements;
 };
@@ -45,7 +43,6 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
-        tenant: TenantInfo;
         missingRequirements: TransferRequirements;
       };
     }

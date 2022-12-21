@@ -14,7 +14,7 @@ const i18n = configureI18next();
 
 const MobileApp = ({ context, onDone }: TransferProps) => {
   const [, send] = useMobileMachine();
-  const { authToken, device, tenant } = context;
+  const { authToken, device } = context;
 
   useEffectOnce(() => {
     send({
@@ -22,7 +22,6 @@ const MobileApp = ({ context, onDone }: TransferProps) => {
       payload: {
         authToken,
         device,
-        tenant,
       },
     });
   });

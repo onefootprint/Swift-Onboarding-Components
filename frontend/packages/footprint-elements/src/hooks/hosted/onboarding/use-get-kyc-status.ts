@@ -2,10 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetKycStatusRequest, GetKycStatusResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import {
-  AUTH_HEADER,
-  ONBOARDING_CONFIG_KEY_HEADER,
-} from '../../../config/constants';
+import { AUTH_HEADER } from '../../../config/constants';
 
 const KYC_STATUS_FETCH_INTERVAL = 1000;
 
@@ -15,7 +12,6 @@ const getKycStatus = async (payload: GetKycStatusRequest) => {
     url: '/hosted/onboarding/kyc',
     headers: {
       [AUTH_HEADER]: payload.authToken,
-      [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk,
     },
   });
   return response.data;
@@ -24,22 +20,20 @@ const getKycStatus = async (payload: GetKycStatusRequest) => {
 const useGetKycStatus = (
   enabled: boolean,
   authToken: string,
-  tenantPk: string,
   options: {
     onSuccess?: (data: GetKycStatusResponse) => void;
     onError?: (error: RequestError) => void;
   } = {},
 ) =>
   useQuery<GetKycStatusResponse, RequestError>(
-    ['kyc-status', authToken, tenantPk],
+    ['kyc-status', authToken],
     () =>
       getKycStatus({
         authToken,
-        tenantPk,
       }),
     {
       refetchInterval: KYC_STATUS_FETCH_INTERVAL,
-      enabled: enabled && !!authToken && !!tenantPk,
+      enabled: enabled && !!authToken,
       onSuccess: options.onSuccess,
       onError: options.onError,
     },

@@ -3,7 +3,6 @@ import {
   CountryCode3,
   IdDocBadImageError,
   IdDocType,
-  TenantInfo,
 } from '@onefootprint/types';
 
 export enum States {
@@ -40,7 +39,6 @@ export type MachineContext = {
   // Plugin context
   authToken?: string;
   device?: DeviceInfo;
-  tenant?: TenantInfo;
   documentRequestId?: string;
   // Machine generated
   type?: IdDocType;
@@ -57,7 +55,6 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
-        tenant: TenantInfo;
         documentRequestId: string;
       };
     }

@@ -11,16 +11,16 @@ import useBiometricInit from '../../hooks/use-register-biometric';
 const Retry = () => {
   const { t } = useTranslation('pages.retry');
   const [state, send] = useLivenessMachine();
-  const { authToken, tenant } = state.context;
+  const { authToken } = state.context;
   const biometricInitMutation = useBiometricInit();
   const skipLivenessMutation = useSkipLiveness();
 
   const handleSkip = () => {
-    if (!authToken || !tenant?.pk) {
+    if (!authToken) {
       return;
     }
     skipLivenessMutation.mutate(
-      { authToken, tenantPk: tenant.pk },
+      { authToken },
       {
         onSuccess: () => {
           send({ type: Events.skipped });

@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { D2PStatus, TenantInfo } from '@onefootprint/types';
+import { D2PStatus } from '@onefootprint/types';
 
 export enum States {
   init = 'init',
@@ -27,8 +27,6 @@ export enum Actions {
 
 export type MachineContext = {
   device?: DeviceInfo;
-  tenant?: TenantInfo;
-  tenantPk?: string;
   authToken?: string;
   requirements?: {
     idDocRequestId?: string;
@@ -44,8 +42,6 @@ export type MachineEvents =
       type: Events.initContextUpdated;
       payload: {
         authToken?: string;
-        tenantPk?: string;
-        tenant?: TenantInfo;
         device?: DeviceInfo;
       };
     }

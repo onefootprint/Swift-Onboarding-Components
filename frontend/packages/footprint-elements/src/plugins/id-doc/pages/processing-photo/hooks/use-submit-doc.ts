@@ -2,15 +2,11 @@ import request from '@onefootprint/request';
 import { SubmitDocRequest, SubmitDocResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import {
-  AUTH_HEADER,
-  CLIENT_PUBLIC_KEY_HEADER,
-} from '../../../config/constants';
+import { AUTH_HEADER } from '../../../config/constants';
 
 const submitDoc = async (payload: SubmitDocRequest) => {
   const {
     authToken,
-    tenantPk,
     frontImage,
     backImage,
     documentType,
@@ -28,7 +24,6 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     },
     headers: {
       [AUTH_HEADER]: authToken,
-      [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
     },
   });
 

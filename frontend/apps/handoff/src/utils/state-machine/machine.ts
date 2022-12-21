@@ -99,13 +99,10 @@ export const createHandoffMachine = () =>
           if (event.type !== Events.initContextUpdated) {
             return context;
           }
-          const { device, tenant, tenantPk, authToken } = event.payload;
+          const { device, authToken } = event.payload;
           context.device = device !== undefined ? device : context.device;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
-          context.tenant = tenant !== undefined ? tenant : context.tenant;
-          context.tenantPk =
-            tenantPk !== undefined ? tenantPk : context.tenantPk;
 
           return context;
         }),

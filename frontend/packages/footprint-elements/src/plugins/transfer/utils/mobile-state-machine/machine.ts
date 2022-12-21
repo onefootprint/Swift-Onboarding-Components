@@ -91,10 +91,9 @@ const createMobileMachine = () =>
       actions: {
         [Actions.assignInitialContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { device, authToken, tenant } = event.payload;
+            const { device, authToken } = event.payload;
             context.device = device;
             context.authToken = authToken;
-            context.tenant = tenant;
           }
           return context;
         }),

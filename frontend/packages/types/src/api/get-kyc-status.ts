@@ -8,7 +8,6 @@ export enum KycStatus {
 
 export type GetKycStatusRequest = {
   authToken: string;
-  tenantPk: string;
 };
 
 export type GetKycStatusResponse = {

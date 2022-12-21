@@ -17,10 +17,10 @@ const i18n = configureI18next();
 
 const App = ({ context, onDone }: CollectKycDataProps) => {
   const [, send] = useCollectKycDataMachine();
-  const { authToken, customData, tenant, device } = context;
+  const { authToken, customData, device } = context;
 
   useEffectOnce(() => {
-    if (!customData || !tenant) {
+    if (!customData) {
       return;
     }
     const { missingAttributes, userFound } = customData;
@@ -31,7 +31,6 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
         authToken,
         missingAttributes,
         userFound,
-        tenant,
       },
     });
   });

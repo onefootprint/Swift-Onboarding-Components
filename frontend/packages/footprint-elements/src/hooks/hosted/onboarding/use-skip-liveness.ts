@@ -2,10 +2,7 @@ import request from '@onefootprint/request';
 import { SkipLivenessRequest, SkipLivenessResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import {
-  AUTH_HEADER,
-  ONBOARDING_CONFIG_KEY_HEADER,
-} from '../../../config/constants';
+import { AUTH_HEADER } from '../../../config/constants';
 
 const skipLiveness = async (payload: SkipLivenessRequest) => {
   const response = await request<SkipLivenessResponse>({
@@ -14,7 +11,6 @@ const skipLiveness = async (payload: SkipLivenessRequest) => {
     data: payload,
     headers: {
       [AUTH_HEADER]: payload.authToken,
-      [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk,
     },
   });
   return response.data;

@@ -1,34 +1,11 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedKycDataOption,
-  TenantInfo,
-  UserDataAttribute,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createCollectKycDataMachine from './machine';
 import { Events, States } from './types';
 
 describe('Collect KYC Data Machine Tests', () => {
-  const tenant: TenantInfo = {
-    isLive: true,
-    pk: 'pk',
-    name: 'tenant',
-    mustCollectData: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.fullAddress,
-      CollectedKycDataOption.ssn9,
-    ],
-    canAccessData: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.fullAddress,
-      CollectedKycDataOption.ssn9,
-    ],
-    orgName: 'tenantOrg',
-  };
-
   const createMachine = (
     userFound: boolean,
     missingAttributes: CollectedKycDataOption[],
@@ -44,7 +21,6 @@ describe('Collect KYC Data Machine Tests', () => {
       payload: {
         userFound,
         authToken: 'authToken',
-        tenant,
         missingAttributes,
         device,
       },

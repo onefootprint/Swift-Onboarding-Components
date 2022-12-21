@@ -82,10 +82,9 @@ export const createLivenessMachine = () =>
       actions: {
         [Actions.assignContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, tenant } = event.payload;
+            const { authToken, device } = event.payload;
             context.authToken = authToken;
             context.device = device;
-            context.tenant = tenant;
           }
           return context;
         }),

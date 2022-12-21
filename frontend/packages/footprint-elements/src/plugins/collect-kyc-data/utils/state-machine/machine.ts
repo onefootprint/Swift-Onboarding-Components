@@ -233,12 +233,11 @@ const createCollectKycDataMachine = () =>
       actions: {
         [Actions.assignInitialContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, userFound, tenant, missingAttributes } =
+            const { authToken, device, userFound, missingAttributes } =
               event.payload;
             context.device = device;
             context.authToken = authToken;
             context.userFound = userFound;
-            context.tenant = { ...tenant };
             context.missingAttributes = [...missingAttributes];
           }
           return context;

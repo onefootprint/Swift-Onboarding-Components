@@ -12,18 +12,15 @@ import useOnboardingMachine from '../../../../hooks/use-onboarding-machine';
 const InitOnboarding = () => {
   const { t } = useTranslation('pages.init-onboarding');
   const [state, send] = useOnboardingMachine();
-  const {
-    tenant: { pk },
-    authToken,
-  } = state.context;
+  const { authToken } = state.context;
   const onboardingMutation = useOnboarding();
 
   useEffectOnce(() => {
-    if (!authToken || !pk || onboardingMutation.isLoading) {
+    if (!authToken || onboardingMutation.isLoading) {
       return;
     }
     onboardingMutation.mutate(
-      { authToken, tenantPk: pk },
+      { authToken },
       {
         onSuccess: ({ validationToken }) => {
           send({
@@ -37,7 +34,7 @@ const InitOnboarding = () => {
     );
   });
 
-  if (!pk || !authToken || onboardingMutation.isError) {
+  if (!authToken || onboardingMutation.isError) {
     return (
       <Container>
         <TitleContainer>

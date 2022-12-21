@@ -34,7 +34,6 @@ export type OnboardingRequirement =
 
 export type OnboardingStatusRequest = {
   authToken: string;
-  tenantPk: string;
 };
 
 export type AuthorizeFields = {

@@ -11,15 +11,12 @@ import useMobileMachine, {
 
 const SkipLiveness = () => {
   const [state, send] = useMobileMachine();
-  const { authToken, tenant } = state.context;
+  const { authToken } = state.context;
   const skipLivenessMutation = useSkipLiveness();
 
   useEffectOnce(() => {
-    if (!tenant?.pk) {
-      return;
-    }
     skipLivenessMutation.mutate(
-      { authToken, tenantPk: tenant.pk },
+      { authToken },
       {
         onSuccess: () => {
           send({

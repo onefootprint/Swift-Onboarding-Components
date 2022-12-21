@@ -27,15 +27,8 @@ const TRANSITION_DELAY = 3000;
 const ProcessingPhoto = () => {
   const { t } = useTranslation('pages.processing-photo');
   const [state, send] = useIdDocMachine();
-  const {
-    type,
-    tenant,
-    country,
-    authToken,
-    frontImage,
-    backImage,
-    documentRequestId,
-  } = state.context;
+  const { type, country, authToken, frontImage, backImage, documentRequestId } =
+    state.context;
   const docType = type ? IdDocTypeToLabel[type] : t('default-document-label');
   const [displayStatus, setDisplayStatus] = useState<DisplayStatus>(
     DisplayStatus.loading,
@@ -43,21 +36,13 @@ const ProcessingPhoto = () => {
   const submitDocMutation = useSubmitDoc();
 
   useEffectOnce(() => {
-    if (
-      !frontImage ||
-      !authToken ||
-      !tenant ||
-      !type ||
-      !country ||
-      !documentRequestId
-    ) {
+    if (!frontImage || !authToken || !type || !country || !documentRequestId) {
       return;
     }
     submitDocMutation.mutate({
       frontImage,
       backImage,
       authToken,
-      tenantPk: tenant?.pk,
       documentType: type,
       countryCode: country,
       documentRequestId,

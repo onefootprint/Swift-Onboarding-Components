@@ -1,9 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedKycDataOption,
-  TenantInfo,
-  UserData,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, UserData } from '@onefootprint/types';
 
 import {
   BasicInformation,
@@ -34,7 +30,6 @@ export enum States {
 export type MachineContext = {
   // Plugin context
   device?: DeviceInfo;
-  tenant?: TenantInfo;
   authToken?: string;
   userFound?: boolean;
   // Machine generated
@@ -70,7 +65,6 @@ export type MachineEvents =
         missingAttributes: readonly CollectedKycDataOption[];
         userFound: boolean;
         device: DeviceInfo;
-        tenant: TenantInfo;
       };
     }
   | {

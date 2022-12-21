@@ -18,7 +18,7 @@ const CheckOnboardingRequirements = () => {
   const { t } = useTranslation('pages.check-onboarding-requirements');
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken, tenant },
+    onboardingContext: { authToken },
   } = state.context;
   const [error, setError] = useState(false);
 
@@ -59,7 +59,7 @@ const CheckOnboardingRequirements = () => {
     setError(true);
   };
 
-  useGetOnboardingStatus(authToken, tenant.pk, {
+  useGetOnboardingStatus(authToken, {
     onSuccess: handleSuccess,
     onError: handleError,
   });

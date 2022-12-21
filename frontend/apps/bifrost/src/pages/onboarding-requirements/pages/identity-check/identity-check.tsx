@@ -28,7 +28,7 @@ const IdentityCheck = () => {
       return;
     }
     startKycMutation.mutate(
-      { authToken, tenantPk: tenant.pk },
+      { authToken },
       {
         onSuccess: () => {
           setKycPending(true);
@@ -59,7 +59,7 @@ const IdentityCheck = () => {
     }
   };
 
-  useGetKycStatus(kycPending, authToken ?? '', tenant?.pk ?? '', {
+  useGetKycStatus(kycPending, authToken ?? '', {
     onSuccess: response => handleKycStatus(response.status),
     onError: handleError,
   });

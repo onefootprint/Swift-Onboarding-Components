@@ -11,7 +11,7 @@ const TRANSITION_DELAY = 6000;
 const Unavailable = () => {
   const { t } = useTranslation('pages.unavailable');
   const [state, send] = useLivenessMachine();
-  const { authToken, tenant } = state.context;
+  const { authToken } = state.context;
   const skipLivenessMutation = useSkipLiveness();
   const handleLivenessSkipped = () => {
     setTimeout(() => {
@@ -22,9 +22,9 @@ const Unavailable = () => {
   };
 
   useEffectOnce(() => {
-    if (authToken && tenant?.pk) {
+    if (authToken) {
       skipLivenessMutation.mutate(
-        { authToken, tenantPk: tenant.pk },
+        { authToken },
         { onSuccess: handleLivenessSkipped },
       );
     }

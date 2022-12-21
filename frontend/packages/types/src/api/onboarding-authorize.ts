@@ -1,6 +1,5 @@
 export type OnboardingAuthorizeRequest = {
   authToken: string;
-  tenantPk: string;
 };
 
 export type OnboardingAuthorizeResponse = {

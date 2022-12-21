@@ -14,7 +14,7 @@ import useMobileMachine, {
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.mobile.new-tab-requested');
   const [state, send] = useMobileMachine();
-  const { authToken, scopedAuthToken, tenant } = state.context;
+  const { authToken, scopedAuthToken } = state.context;
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken();
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const NewTabRequest = () => {
 
   const handleClick = () => {
     const tab = window.open(
-      createHandoffUrl({ authToken: scopedAuthToken, tenantPk: tenant?.pk }),
+      createHandoffUrl({ authToken: scopedAuthToken }),
       '_blank',
     );
     if (tab) {

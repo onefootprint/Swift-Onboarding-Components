@@ -119,11 +119,9 @@ const createIdDocMachine = () =>
       actions: {
         [Actions.assignContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, tenant, documentRequestId } =
-              event.payload;
+            const { authToken, device, documentRequestId } = event.payload;
             context.authToken = authToken;
             context.device = { ...device };
-            context.tenant = { ...tenant };
             context.documentRequestId = documentRequestId;
           }
           return context;

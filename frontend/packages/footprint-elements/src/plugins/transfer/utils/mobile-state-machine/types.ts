@@ -1,5 +1,4 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { TenantInfo } from '@onefootprint/types';
 
 export enum States {
   init = 'init',
@@ -15,7 +14,6 @@ export type MachineContext = {
   device: DeviceInfo;
   authToken: string;
   scopedAuthToken: string;
-  tenant?: TenantInfo;
   tab?: Window;
 };
 
@@ -44,7 +42,6 @@ export type MachineEvents =
       payload: {
         device: DeviceInfo;
         authToken: string;
-        tenant: TenantInfo;
       };
     }
   | {

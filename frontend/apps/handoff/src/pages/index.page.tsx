@@ -16,7 +16,7 @@ import Init from './init';
 
 const Root = () => {
   const [state, send] = useHandoffMachine();
-  const { authToken, device, tenant, requirements } = state.context;
+  const { authToken, device, requirements } = state.context;
 
   const handleSuccess = (data: GetD2PResponse) => {
     send({
@@ -58,7 +58,7 @@ const Root = () => {
     return <CheckRequirements />;
   }
   if (state.matches(States.liveness)) {
-    if (!authToken || !device || !tenant) {
+    if (!authToken || !device) {
       return null;
     }
     return (
@@ -66,7 +66,6 @@ const Root = () => {
         context={{
           authToken,
           device,
-          tenant,
         }}
         onDone={() => {
           send({ type: Events.livenessCompleted });
@@ -75,7 +74,7 @@ const Root = () => {
     );
   }
   if (state.matches(States.idDoc)) {
-    if (!authToken || !device || !tenant) {
+    if (!authToken || !device) {
       return null;
     }
     return (
@@ -83,7 +82,6 @@ const Root = () => {
         context={{
           authToken,
           device,
-          tenant,
           customData: {
             documentRequestId: requirements?.idDocRequestId ?? '',
           },

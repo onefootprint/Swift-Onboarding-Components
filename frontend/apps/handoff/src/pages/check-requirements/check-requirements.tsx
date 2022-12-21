@@ -11,9 +11,9 @@ import { Events } from 'src/utils/state-machine';
 
 const CheckRequirements = () => {
   const [state, send] = useHandoffMachine();
-  const { authToken, tenant } = state.context;
+  const { authToken } = state.context;
 
-  useGetOnboardingStatus(authToken ?? '', tenant?.pk ?? '', {
+  useGetOnboardingStatus(authToken ?? '', {
     onSuccess: (response: OnboardingStatusResponse) => {
       const { requirements } = response;
       let missingLiveness = false;

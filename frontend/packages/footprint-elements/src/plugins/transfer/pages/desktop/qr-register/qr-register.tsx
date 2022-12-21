@@ -19,7 +19,7 @@ const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
-  const { authToken, scopedAuthToken, tenant, device } = state.context;
+  const { authToken, scopedAuthToken, device } = state.context;
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken();
   useEffect(() => {
@@ -42,7 +42,6 @@ const QRRegister = () => {
 
   const url = createHandoffUrl({
     authToken: scopedAuthToken ?? '',
-    tenantPk: tenant?.pk,
     opener: device?.type,
   });
 

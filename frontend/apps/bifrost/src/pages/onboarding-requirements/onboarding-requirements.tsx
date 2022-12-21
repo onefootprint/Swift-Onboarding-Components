@@ -18,7 +18,7 @@ import IdentityCheck from './pages/identity-check';
 const OnboardingRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken, device, tenant, userFound },
+    onboardingContext: { authToken, device, userFound },
     receivedRequirements: { kycData, liveness, idDocRequestId },
   } = state.context;
 
@@ -40,7 +40,6 @@ const OnboardingRequirements = () => {
         context={{
           authToken,
           device,
-          tenant,
           customData: {
             missingAttributes: kycData,
             userFound,
@@ -56,7 +55,6 @@ const OnboardingRequirements = () => {
         context={{
           authToken,
           device,
-          tenant,
           customData: {
             missingRequirements: {
               liveness,
@@ -74,7 +72,6 @@ const OnboardingRequirements = () => {
         context={{
           authToken,
           device,
-          tenant,
           customData: {
             documentRequestId: idDocRequestId ?? '',
           },

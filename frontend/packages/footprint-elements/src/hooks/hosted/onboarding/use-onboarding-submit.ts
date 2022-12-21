@@ -5,10 +5,7 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import {
-  AUTH_HEADER,
-  ONBOARDING_CONFIG_KEY_HEADER,
-} from '../../../config/constants';
+import { AUTH_HEADER } from '../../../config/constants';
 
 const onboardingSubmit = async (payload: OnboardingSubmitRequest) => {
   const response = await request<OnboardingSubmitResponse>({
@@ -16,7 +13,6 @@ const onboardingSubmit = async (payload: OnboardingSubmitRequest) => {
     url: '/hosted/onboarding/submit',
     headers: {
       [AUTH_HEADER]: payload.authToken,
-      [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk,
     },
   });
   return response.data;

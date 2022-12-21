@@ -58,10 +58,10 @@ const Authorize = () => {
   const [collectedDocs, setCollectedDocs] = useState<IdDocType[]>();
   const {
     authToken,
-    tenant: { pk: tenantPk, canAccessData, name: tenantName },
+    tenant: { canAccessData, name: tenantName },
   } = state.context;
 
-  const statusQuery = useGetOnboardingStatus(authToken, tenantPk, {
+  const statusQuery = useGetOnboardingStatus(authToken, {
     onSuccess: ({ fieldsToAuthorize }) => {
       setCollectedDocs(fieldsToAuthorize?.identityDocumentTypes ?? []);
     },
@@ -77,7 +77,7 @@ const Authorize = () => {
 
   const handleClick = () => {
     onboardingAuthorizeMutation.mutate(
-      { authToken, tenantPk },
+      { authToken },
       {
         onSuccess: ({ validationToken }) => {
           send({

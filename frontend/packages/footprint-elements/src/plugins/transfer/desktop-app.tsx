@@ -14,7 +14,7 @@ const i18n = configureI18next();
 
 const DesktopApp = ({ context, onDone }: TransferProps) => {
   const [, send] = useDesktopMachine();
-  const { authToken, device, customData, tenant } = context;
+  const { authToken, device, customData } = context;
 
   useEffectOnce(() => {
     if (!customData) {
@@ -25,7 +25,6 @@ const DesktopApp = ({ context, onDone }: TransferProps) => {
       payload: {
         authToken,
         device,
-        tenant,
         missingRequirements: { ...customData.missingRequirements },
       },
     });
