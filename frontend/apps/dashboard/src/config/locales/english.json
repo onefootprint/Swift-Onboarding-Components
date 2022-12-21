@@ -322,6 +322,10 @@
           "id-doc-images": {
             "show": "See document",
             "hide": "Hide document"
+          },
+          "preview": {
+            "front-alt": "Front image of the ID Doc",
+            "back-alt": "Back image of the ID Doc"
           }
         },
         "risks": {

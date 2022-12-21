@@ -3,7 +3,9 @@ import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
 import { IdDocDataValue } from 'src/hooks/use-user';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+import ImagesPreview from '../images-preview';
 
 export type ImageDataRowProps = {
   title: string;
@@ -25,23 +27,30 @@ const ImageDataRow = ({
 
   return (
     <DataRowContainer>
-      <Typography variant="label-3" color="tertiary">
-        {title}
-      </Typography>
-      {data === null && <EncryptedCell />}
-      {data === undefined && (
-        <Typography
-          variant="body-3"
-          color="primary"
-          sx={{ whiteSpace: 'nowrap' }}
-        >
-          -
+      <TitleContainer>
+        <Typography variant="label-3" color="tertiary">
+          {title}
         </Typography>
-      )}
-      {hasImageData && (
-        <LinkButton onClick={onToggleImageVisibility} size="compact">
-          {imagesVisible ? t('hide') : t('show')}
-        </LinkButton>
+        {data === null && <EncryptedCell />}
+        {data === undefined && (
+          <Typography
+            variant="body-3"
+            color="primary"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            -
+          </Typography>
+        )}
+        {hasImageData && (
+          <LinkButton onClick={onToggleImageVisibility} size="compact">
+            {imagesVisible ? t('hide') : t('show')}
+          </LinkButton>
+        )}
+      </TitleContainer>
+      {hasImageData && imagesVisible && (
+        <ImagesContainer>
+          <ImagesPreview images={data} />
+        </ImagesContainer>
       )}
     </DataRowContainer>
   );
@@ -49,8 +58,20 @@ const ImageDataRow = ({
 
 const DataRowContainer = styled.div`
   display: flex;
+  flex-direction: column;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
   flex-direction: column wrap;
   justify-content: space-between;
+  width: 100%;
+`;
+
+const ImagesContainer = styled.div`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[5]};
+  `}
 `;
 
 export default ImageDataRow;
