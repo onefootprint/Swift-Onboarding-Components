@@ -356,6 +356,8 @@ table! {
         _updated_at -> Timestamptz,
         logo_url -> Nullable<Text>,
         sandbox_restricted -> Bool,
+        website_url -> Nullable<Text>,
+        company_size -> Nullable<Text>,
     }
 }
 

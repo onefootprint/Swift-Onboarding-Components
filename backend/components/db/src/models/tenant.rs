@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
-use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
+use newtypes::{CompanySize, EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -23,6 +23,8 @@ pub struct Tenant {
     pub _updated_at: DateTime<Utc>,
     pub logo_url: Option<String>,
     pub sandbox_restricted: bool,
+    pub website_url: Option<String>,
+    pub company_size: Option<CompanySize>,
 }
 
 #[derive(Debug, Clone, Insertable)]
