@@ -69,7 +69,7 @@ const IdDocSection = () => {
           key={type}
           {...register(`idDoc.${type}`)}
           disabled={fieldsState[type].disabled}
-          label={allT('collected-id-doc-attributes.id-doc-image')}
+          label={allT(`id-doc-type.${type}`)}
         />
       ))}
     </DataSection>

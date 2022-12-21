@@ -32,7 +32,7 @@ const IdDocSection = () => {
       {docTypes.map(type => (
         <ImageDataRow
           key={type}
-          title={allT('collected-id-doc-attributes.id-doc-image')}
+          title={allT(`id-doc-type.${type}`)}
           data={idDoc[type]}
           imagesVisible={idDocTypeVisible.get(type)}
           onToggleImageVisibility={() => handleToggleIdDocVisibility(type)}
