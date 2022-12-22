@@ -194,3 +194,45 @@ pub struct Counts {
     pub unique_count: u32,
     pub unique_share_percent: u32,
 }
+
+fn get_score_by_name(scores: &[Score], name: String) -> Option<f32> {
+    scores.iter().find(|s| s.name == name).map(|s| s.score)
+}
+
+impl SocureIDPlusResponse {
+    pub fn sigma_fraud_score(&self) -> Option<f32> {
+        self.fraud
+            .as_ref()
+            .and_then(|m| get_score_by_name(&m.scores, "sigma".to_owned()))
+    }
+
+    pub fn sigma_synthetic_score(&self) -> Option<f32> {
+        self.synthetic
+            .as_ref()
+            .and_then(|m| get_score_by_name(&m.scores, "sigma".to_owned()))
+    }
+
+    pub fn email_risk_score(&self) -> Option<f32> {
+        self.email_risk.as_ref().map(|e| e.score)
+    }
+
+    pub fn phone_risk_score(&self) -> Option<f32> {
+        self.phone_risk.as_ref().map(|e| e.score)
+    }
+
+    pub fn all_device_reason_codes(&self) -> Vec<String> {
+        let device_risk_reason_codes: Vec<String> = self
+            .device_risk
+            .as_ref()
+            .map(|m| m.reason_codes.clone())
+            .unwrap_or_default();
+
+        let device_identity_correlation_reason_codes: Vec<String> = self
+            .device_identity_correlation
+            .as_ref()
+            .map(|m| m.reason_codes.clone())
+            .unwrap_or_default();
+
+        [device_risk_reason_codes, device_identity_correlation_reason_codes].concat()
+    }
+}

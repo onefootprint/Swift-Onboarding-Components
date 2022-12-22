@@ -1,12 +1,12 @@
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
 use idv::{
-    idology::expectid::response::IDologySuccess, socure::response::SocureIDPlusResponse, ParsedResponse,
+    idology::expectid::response::IDologySuccess, ParsedResponse,
 };
 
 use newtypes::{DecisionStatus, Signal, VerificationResultId};
 
-use super::vendor::vendor_result::VendorResult;
+use super::vendor::{socure::SocureFeatures, vendor_result::VendorResult};
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -35,12 +35,6 @@ pub struct TwilioFeatures {
     pub verification_result: VerificationResultId,
 }
 
-// TODO: translate SocureKycReponse into a more digestible struct of features like Idology does?
-#[derive(Clone, Debug)]
-pub struct SocureFeatures {
-    pub idplus_response: SocureIDPlusResponse,
-}
-
 #[derive(Clone, Default, Debug)]
 pub struct FeatureVector {
     pub idology_features: Option<IDologyFeatures>,
@@ -63,21 +57,6 @@ impl FeatureVector {
 }
 
 impl FeatureVector {
-    // A helper to expose all the top level statuses from the individual vendors
-    pub fn statuses(&self) -> Vec<Option<DecisionStatus>> {
-        let idology_status = self.idology_features.as_ref().map(|i| i.status);
-
-        vec![idology_status]
-    }
-
-    pub fn create_manual_review(&self) -> bool {
-        if let Some(ref idology_features) = self.idology_features {
-            idology_features.create_manual_review
-        } else {
-            false
-        }
-    }
-
     // A helper to expose all the verification_results
     pub fn verification_results(&self) -> Vec<VerificationResultId> {
         let idology_verification_result = self
@@ -88,11 +67,19 @@ impl FeatureVector {
             .twilio_features
             .as_ref()
             .map(|i| i.verification_result.clone());
+        let socure_verification_result = self
+            .socure_features
+            .as_ref()
+            .map(|i| i.verification_result.clone());
 
-        vec![idology_verification_result, twilio_verification_result]
-            .into_iter()
-            .flatten()
-            .collect()
+        vec![
+            idology_verification_result,
+            twilio_verification_result,
+            socure_verification_result,
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
     }
 }
 
@@ -128,10 +115,10 @@ impl From<VendorResult> for FeatureVector {
                 }),
                 socure_features: None,
             },
-            ParsedResponse::Socure(idplus_response) => Self {
+            ParsedResponse::Socure(ref idplus_response) => Self {
                 idology_features: None,
                 twilio_features: None,
-                socure_features: Some(SocureFeatures { idplus_response }),
+                socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
             },
         }
     }

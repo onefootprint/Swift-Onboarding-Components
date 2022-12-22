@@ -77,7 +77,6 @@ pub struct DecisionOutput {
     pub create_manual_review: bool,
 }
 fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> ApiResult<DecisionOutput> {
-    let result_statuses: Vec<Option<DecisionStatus>> = features.statuses();
     // v0 Super basic logic
     //    1) If we need an ID doc for idology. OB status = Failed, verification status = NeedsIDDocument
     //    2) If we don't, fall back to `result_statuses`
@@ -87,19 +86,29 @@ fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> A
     let decision_status = if maybe_id_doc_number.is_some() {
         DecisionStatus::StepUpRequired
     } else {
-        result_statuses
-            .into_iter()
-            .flatten()
-            .min()
-            // Should never end up in a situation with no decision
+        features
+            .idology_features
+            .as_ref()
+            .map(|i| i.status)
             .ok_or(OnboardingError::NoDecisionMade)?
     };
+
+    let create_manual_review = features
+        .idology_features
+        .as_ref()
+        .map(|i| i.create_manual_review)
+        .unwrap_or(false)
+        || features
+            .socure_features
+            .as_ref()
+            .map(|i| i.create_manual_review)
+            .unwrap_or(false);
 
     let output = DecisionOutput {
         decision_status,
         id_number: maybe_id_doc_number,
         onboarding_id: current_onboarding.id,
-        create_manual_review: features.create_manual_review(),
+        create_manual_review,
     };
     Ok(output)
 }
