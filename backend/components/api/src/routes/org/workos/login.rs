@@ -10,7 +10,7 @@ use crate::{errors::ApiError, types::response::ResponseData};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
-use db::models::tenant_user::TenantUser;
+use db::models::tenant_user::{TenantUser, TenantUserUpdate};
 use db::tenant::get_opt_by_workos_org_id;
 use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Schema;
@@ -95,7 +95,31 @@ async fn find_or_create_user(
         .db_query(move |conn| TenantUser::login_by_email(conn, email.into()))
         .await??;
     if let Some((tenant_user, tenant)) = existing_user {
-        return Ok((tenant, tenant_user, false));
+        // upate tenant_user's name if they currently do not have a name and one is given to us by profile
+        let updated_tenant_user = if tenant_user.first_name.is_none()
+            && tenant_user.last_name.is_none()
+            && (profile.first_name.is_some() || profile.last_name.is_some())
+        {
+            let update = TenantUserUpdate {
+                first_name: profile.first_name.clone(),
+                last_name: profile.last_name.clone(),
+                ..TenantUserUpdate::default()
+            };
+            let tenant_user_id = tenant_user.id.clone();
+            let tenant_id = tenant.id.clone();
+            let name_update_result = state
+                .db_pool
+                .db_transaction(move |conn| TenantUser::update(conn, &tenant_id, &tenant_user_id, update))
+                .await;
+            name_update_result.ok() // don't hard error if name update fails
+        } else {
+            None
+        };
+        return Ok((
+            tenant.clone(),
+            updated_tenant_user.unwrap_or_else(|| tenant_user.clone()),
+            false,
+        ));
     }
 
     // Otherwise, find or create the tenant and create a new TenantUser

@@ -176,4 +176,6 @@ struct NewTenantUser {
 pub struct TenantUserUpdate {
     pub tenant_role_id: Option<TenantRoleId>,
     pub deactivated_at: Option<Option<DateTime<Utc>>>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
 }
