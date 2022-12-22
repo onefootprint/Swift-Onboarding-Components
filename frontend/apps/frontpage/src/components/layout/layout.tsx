@@ -3,12 +3,10 @@ import { media } from '@onefootprint/ui';
 import { createPopup } from '@typeform/embed';
 import { useRouter } from 'next/router';
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
+import Footer from '../footer';
 import Navbar from '../navbar';
-import Footer from './components/footer';
-import GetStartedSection from './components/get-started-section';
-import InvestorsSection from './components/investors-section';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
@@ -18,9 +16,7 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
   const { t } = useTranslation('components');
-
   const router = useRouter();
-  const footerVariant = router.asPath === '/' ? 'large' : 'default';
   const navVariant = router.asPath === '/footprint-live' ? 'min' : 'default';
 
   return (
@@ -32,57 +28,8 @@ const Layout = ({ children }: LayoutProps) => {
           onClick: toggleTypeform,
         }}
       />
-
       <Content>{children}</Content>
-      <FooterContainer data-variant={footerVariant}>
-        {footerVariant === 'default' ? null : (
-          <>
-            <InvestorsSection
-              imgAlt={t('investors.img-alt')}
-              imgSrc="/footer/investors.png"
-              subtitle={t('investors.subtitle')}
-              title={t('investors.title')}
-            />
-            <GetStartedSection
-              cta={t('get-started.cta')}
-              onCtaClick={toggleTypeform}
-              subtitle={t('get-started.subtitle')}
-              title={t('get-started.title')}
-            />
-          </>
-        )}
-        <Footer
-          variant={footerVariant}
-          copyright={t('footer.copyright')}
-          links={[
-            {
-              text: t('footer.links.terms-of-service.text'),
-              href: t('footer.links.terms-of-service.href'),
-              newWindow: false,
-            },
-            {
-              text: t('footer.links.privacy-policy.text'),
-              href: t('footer.links.privacy-policy.href'),
-              newWindow: false,
-            },
-            {
-              text: t('footer.links.docs.text'),
-              href: t('footer.links.docs.href'),
-              newWindow: true,
-            },
-            {
-              text: t('footer.links.status.text'),
-              href: t('footer.links.status.href'),
-              newWindow: true,
-            },
-            {
-              text: t('footer.links.twitter.text'),
-              href: t('footer.links.twitter.href'),
-              newWindow: true,
-            },
-          ]}
-        />
-      </FooterContainer>
+      <Footer />
     </>
   );
 };
@@ -104,26 +51,6 @@ const Content = styled.section`
         
     `}
   }
-`;
-
-const FooterContainer = styled.section`
-  ${({ theme }) => css`
-    padding-top: ${theme.spacing[10]};
-    background: ${theme.backgroundColor.tertiary};
-
-    &[data-variant='default'] {
-      background: ${theme.backgroundColor.primary};
-      padding-top: 0;
-    }
-
-    ${media.greaterThan('lg')`
-      padding-top: ${theme.spacing[10]};
-
-      &[data-variant='default'] {
-        padding-top: 0;
-      }
-    `}
-  `}
 `;
 
 export default Layout;

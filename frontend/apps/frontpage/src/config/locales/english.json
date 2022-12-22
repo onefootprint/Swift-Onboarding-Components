@@ -45,7 +45,7 @@
           "text": "Company",
           "links": {
             "about": {
-              "text": "About Footprint",
+              "text": "About us",
               "href": "/company",
               "subtext": "Learn more about our company & team"
             },
@@ -88,26 +88,74 @@
     },
     "footer": {
       "copyright": "One Footprint Inc.",
+      "twitter": {
+        "href": "https://twitter.com/footprint_hq",
+        "text": "Twitter"
+      },
+      "linkedin": {
+        "href": "https://www.linkedin.com/company/onefootprint/",
+        "text": "Linkedin"
+      },
       "links": {
-        "terms-of-service": {
-          "href": "/terms-of-service",
-          "text": "Terms"
+        "product": {
+          "title": "Product",
+          "compare": {
+            "text": "Compare",
+            "href": "/compare"
+          },
+          "pricing": {
+            "text": "Pricing",
+            "href": "/pricing"
+          },
+          "faq": {
+            "text": "FAQ",
+            "href": "/faq"
+          }
         },
-        "privacy-policy": {
-          "href": "/privacy-policy",
-          "text": "Privacy"
+        "company": {
+          "title": "Company",
+          "about": {
+            "text": "About us",
+            "href": "/company"
+          },
+          "join-us": {
+            "text": "Join us",
+            "href": "https://jobs.ashbyhq.com/footprint"
+          },
+          "blog": {
+            "text": "Blog",
+            "href": "/blog"
+          },
+          "investor-updates": {
+            "text": "Investor Updates",
+            "href": "/investor-updates"
+          },
+          "library": {
+            "text": "Library",
+            "href": "/library"
+          }
         },
-        "docs": {
-          "href": "https://docs.onefootprint.com/",
-          "text": "Docs"
+        "resources": {
+          "title": "Resources",
+          "terms-of-service": {
+            "href": "/terms-of-service",
+            "text": "Terms"
+          },
+          "privacy-policy": {
+            "href": "/privacy-policy",
+            "text": "Privacy"
+          }
         },
-        "status": {
-          "href": "https://footprint.instatus.com/",
-          "text": "Status"
-        },
-        "twitter": {
-          "href": "https://twitter.com/footprint_hq",
-          "text": "Twitter"
+        "developers": {
+          "title": "Developers",
+          "docs": {
+            "href": "https://docs.onefootprint.com/",
+            "text": "Docs"
+          },
+          "status": {
+            "href": "https://footprint.instatus.com/",
+            "text": "Status"
+          }
         }
       }
     }
