@@ -11,7 +11,7 @@ const StyledContent = styled(RadixNavigationMenu.Content)`
     display: flex;
     flex-direction: column;
     background: ${theme.backgroundColor.primary};
-    border: 1px solid ${theme.borderColor.tertiary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.14);
     border-radius: ${theme.borderRadius.default};
     padding: ${theme.spacing[5]};

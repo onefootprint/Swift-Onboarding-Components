@@ -71,7 +71,7 @@ const Container = styled.div`
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    border: 1px solid ${theme.borderColor.tertiary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
   `};
 `;

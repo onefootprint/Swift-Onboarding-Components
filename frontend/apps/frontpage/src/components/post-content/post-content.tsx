@@ -47,13 +47,14 @@ const Content = styled.div`
     table {
       border-collapse: separate;
       border-radius: ${theme.borderRadius.default};
-      border: 1px solid ${theme.borderColor.tertiary};
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
       margin-bottom: ${theme.spacing[9]};
       table-layout: fixed;
       width: 100%;
 
       tr:not(:last-child) td {
-        border-bottom: 1px solid ${theme.borderColor.tertiary};
+        border-bottom: ${theme.borderWidth[1]} solid
+          ${theme.borderColor.tertiary};
       }
 
       th,

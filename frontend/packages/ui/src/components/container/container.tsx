@@ -46,8 +46,10 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
 
 const StyledContainer = styled.div<{ sx: SXStyles }>`
   ${({ theme, sx }) => css`
+    position: relative;
     margin-left: auto;
     margin-right: auto;
+
     ${sx};
 
     &[data-fluid='true'] {

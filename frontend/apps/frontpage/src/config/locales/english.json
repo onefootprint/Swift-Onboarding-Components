@@ -114,107 +114,153 @@
   },
   "pages": {
     "home": {
-      "html-title": "Footprint - one-click KYC & PII vault",
+      "html-title": "Frictionless Identity Verification and PII Vaulting",
       "hero": {
-        "title": "Frictionless Identity Verification",
-        "subtitle": "Onboard users with the click of a button. Offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
-        "request-access": "Request early access",
-        "watch-demo": "Watch demo video",
-        "img-alt": "An image of Footprint System"
+        "title": "Frictionless Identity Verification and PII Vaulting",
+        "subtitle": "Onboard users with the click of a button, offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
+        "desktop-img-alt": "desktop mockup",
+        "mobile-img-alt": "mobile mockup",
+        "primary-button": "Request early access",
+        "secondary-button": "Watch demo",
+        "demo-video-close": "Close"
       },
-      "playground": {
-        "title": "Bringing back trust.",
-        "subtitle": "Why Footprint?",
-        "instructions": "Hover over the boxes, will ya? 😎",
-        "tooltips": [
-          "Privacy is a human right",
-          "Selfie Checks aren’t liveness checks",
-          "We got you covered 😇",
-          "Focus on your company, we’ll handle the PII",
-          "We don't sell complexity, we sell results",
-          "Get more good actors in",
-          "Fraud detection should not be a moment in time",
-          "Without biometrics, how do you know who you’re letting in?",
-          "Accuracy and friction should not be a toggle",
-          "PII vaults made in 2022, not 2015",
-          "BaaS companies aren't KYC companies"
-        ]
+      "new-approach-section": {
+        "title": "A new approach to KYC & PII storage",
+        "subtitle": "With a security-first approach, we remove the toggle between friction and accuracy.",
+        "features": {
+          "feature-1": {
+            "title": "Increased conversion",
+            "body": "Our one-click flow increases conversion by dramatically reducing time to account creation."
+          },
+          "feature-2": {
+            "title": "Decreased cost",
+            "body": "Say goodbye to needing separate KYC and Tokenization tools. We do both in-one, and pass along the savings."
+          },
+          "feature-3": {
+            "title": "Enhanced dev experience",
+            "body": "With a few lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple."
+          },
+          "feature-4": {
+            "title": "Designed to the last pixel",
+            "body": "Our polished interface and intuitive user experience make KYC and PII storage a breeze."
+          },
+          "alt": "image of a phone with confirmation screen"
+        }
       },
-      "qualities": {
+      "customizable-section": {
+        "title": "Beautiful, modern, customizable",
+        "subtitle": "Customize the look and feel of your onboarding flow to perfectly match your brand.",
+        "features": {
+          "feature-1": {
+            "title": "Make it your own",
+            "body": "Match your brand's font-family, colors, border radius, and more."
+          },
+          "feature-2": {
+            "title": "Easy & flexible",
+            "body": "We offer 80+ variables that can be customized as you'd like."
+          },
+          "feature-3": {
+            "title": "Fine-tune component styles",
+            "body": "Need to go a step further? Missing something?You can use CSS to arbitrarily style individual components."
+          },
+          "feature-4": {
+            "title": "Well documented",
+            "body": "Everything you need to customize your onboarding flow can be found in our docs. Still need help? No problem! We're here for you."
+          }
+        }
+      },
+      "accurate-section": {
         "title": "Accurate, portable, and secure user verification",
-        "subtitle": "An enhanced experience",
-        "items": {
-          "security": {
-            "content": "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Our secure patent-pending PII vault protects your user's data while saving you time and money.",
-            "img-alt": "",
-            "title": "Best-in-class security"
+        "subtitle": "Footprint's goal is to label good actors and enrich their identity over time, resulting in a more aligned business model that gets more actors in at a lower cost.",
+        "features": {
+          "feature-1": {
+            "title": "Best-in-class security",
+            "body": "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Utilize our PII vault which by default uses secure enclaves to store data instead of building your own."
           },
-          "accuracy": {
-            "content": "Footprint leverages cutting-edge biometric scans, patent-pending liveness checks, and peer-to-peer verification to validate real people in real time. Our ecosystem keeps bad actors out while creating a seamless experience for real users.",
-            "img-alt": "",
-            "title": "Unprecedented accuracy"
+          "feature-2": {
+            "title": "Unprecedented accuracy",
+            "body": "Footprint's ecosystem creates a feedback loop to increase accuracy through peer-to-peer verification. Our liveness checks use cutting edge biometrics to ensure only real people make accounts."
           },
-          "cheaper": {
-            "content": "Footprint’s technology combines storage and verification. Our solution is up to 2x cheaper than traditional methods to verify and store PII because we are able to condense what today requires multiple tools into one.",
-            "img-alt": "",
-            "title": "More functionality, less dollars"
+          "feature-3": {
+            "title": "More functionality, less dollars",
+            "body": "Footprint’s technology combines storage and verification. Our solution is up to 2x cheaper than traditional methods to verify and store PII because we are able to condense what today requires multiple tools into one."
+          },
+          "alt": "image of footprint's audit trail visualization"
+        }
+      },
+      "own-data-section": {
+        "title": "Own the data, disown the risk",
+        "subtitle": "Footprint gives companies 24/7 permissioned access to data, but adds zero trust security to mitigate risk of breach.",
+        "features": {
+          "feature-1": {
+            "title": "Private & secure",
+            "body": "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment."
+          },
+          "feature-2": {
+            "title": "Zero-trust by design",
+            "body": "Our permissioned API ensures only the right parties can access the data they're allowed to see. PII data is never stored in plaintext."
+          },
+          "feature-3": {
+            "title": "Granular data access",
+            "body": "Limit the exposure, only access the bare minimum data you need. Nothing else leaves our enclave-backed vaults."
+          },
+          "feature-4": {
+            "title": "Secure enclave backed",
+            "body": "Our system guarantees that all PII data is always encrypted to our network gapped, storage/cpu/memory isolated Nitro Enclaves."
+          },
+          "alt": "image of footprint's process for decrypting data"
+        }
+      },
+      "identity-wallet": {
+        "title": "An identity wallet built for transparency",
+        "subtitle": "One third of people admit to dropping sign-up due to worry over how their data will be stored. Footprint reduces this by giving people peace of mind over how their data will be handled.",
+        "features": {
+          "feature-1": {
+            "title": "Decrease drop-off",
+            "body": "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment."
+          },
+          "feature-2": {
+            "title": "Real-time information",
+            "body": "People have the ability to update information such as their address in Footprint, helping to more accurately maintain records on a population that increasingly moves cities resulting in false negative KYC fails."
+          },
+          "feature-3": {
+            "title": "Trust as a competitive advantage",
+            "body": "Become a more trusted brand by putting your users in control of their data. Not only does this help conversion and offload your own risk, but it is a way to do right by your consumers."
           }
         }
       },
-      "advantages": {
-        "title": "A new, comprehensive approach to KYC & PII storage",
-        "subtitle": "Our advantages",
-        "items": {
-          "conversion": {
-            "content": "Our one-click flow increases conversion by dramatically reducing time to account creation.",
-            "img-alt": "",
-            "title": "12x faster"
+      "everything-you-need-section": {
+        "title": "Everything you need. More than you expect.",
+        "subtitle": "One tool to unify account creation, continuous auth and monitoring, and company security.",
+        "features": {
+          "feature-1": {
+            "title": "Fraud & Risk",
+            "body": "By tying security to fraud to KYC, we can create a bar to enter the digital ecosystem, and once cleared in a second let people create accounts with certainty.",
+            "alt-1": "Risk insights screen"
           },
-          "dev": {
-            "content": "With a few lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple.",
-            "img-alt": "",
-            "title": "10x dev experience"
+          "feature-2": {
+            "title": "Security logs",
+            "body": "Each time data is accessed in the enclave, it automatically gets appended in our security logs, which are always accessible via API.",
+            "alt": "Image showing security logs in the product"
           },
-          "cost": {
-            "content": "Say goodbye to needing separate KYC and Tokenization tools. We do both in-one, and pass along the savings.",
-            "img-alt": "",
-            "title": "2x cheaper"
+          "feature-3": {
+            "title": "ID Scan + Selfie",
+            "body": "Leveraging FaceID biometrics natively built into smartphones, we combine an incredible onboarding experience with the most accurate attestation of liveness.",
+            "alt-1": "Scan ID screen",
+            "alt-2": "Submitting drivers license screen"
+          },
+          "feature-4": {
+            "title": "Auth & IAM",
+            "body": "Leveraging FaceID biometrics natively built into smartphones, we combine an incredible onboarding experience with the most accurate attestation of liveness.",
+            "alt-1": "Create role screen",
+            "alt-2": "Background table view"
           }
         }
       },
-      "testimonial": {
-        "quote": "Footprint is the first identity company I’ve come across to make onboarding frictionless while handling both KYC and PII storage. I’m very excited to use the product to make our onboarding experience better at DoNotPay.",
-        "author": {
-          "name": "Joshua Browder",
-          "img-alt": "Picture of Joshua Browder",
-          "role": "Founder & CEO of DoNotPay"
-        }
-      },
-      "vault": {
-        "title": "Own the data, disown the risk.",
-        "subtitle": "PII vault",
-        "description": "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment.",
-        "articles": {
-          "main": {
-            "img-alt": "Image of a system",
-            "title": "Privacy and security at your engineering team's fingertips",
-            "content": "Instead of building or buying your own data vaulting system, use Footprint's integrated vaulting to achieve strong cryptographic protection for your most sensitive data."
-          },
-          "secondaries": {
-            "trust": {
-              "title": "Zero-trust by design",
-              "content": "Our permissioned API ensures only the right parties can access the data they're allowed to see. PII data is never stored in plaintext."
-            },
-            "access": {
-              "title": "Granular data access",
-              "content": "Limit the exposure, only access the bare minimum data you need. Nothing else leaves our enclave-backed vaults."
-            },
-            "secure": {
-              "title": "Secure enclave backed",
-              "content": "Our system guarantees that all PII data is always encrypted to our network gapped, storage / cpu / memory isolated Nitro Enclaves."
-            }
-          }
-        }
+      "banner": {
+        "title": "The last identity form you'll ever fill",
+        "cta": "Request early access",
+        "alt": "Our penguin mascot"
       }
     },
     "company": {

@@ -67,7 +67,7 @@ const Posts = styled.div`
     gap: ${theme.spacing[9]};
 
     > :not(:last-child) {
-      border-bottom: 1px solid ${theme.borderColor.tertiary};
+      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }
   `}
 `;

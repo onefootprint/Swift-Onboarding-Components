@@ -88,6 +88,7 @@ const Layout = ({ children }: LayoutProps) => {
 };
 
 const Content = styled.section`
+  overflow: hidden;
   --desktop-padding-top: calc(
     var(--desktop-header-height) + var(--desktop-spacing)
   );
@@ -100,6 +101,7 @@ const Content = styled.section`
 
     ${media.greaterThan('lg')`
         padding-top: var(--desktop-padding-top);
+        
     `}
   }
 `;
