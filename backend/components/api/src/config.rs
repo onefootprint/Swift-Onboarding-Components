@@ -101,6 +101,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub socure_config: SocureConfig,
+
+    #[envconfig(from = "LAUNCH_DARKLY_SDK_KEY")]
+    pub launch_darkly_sdk_key: String,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {

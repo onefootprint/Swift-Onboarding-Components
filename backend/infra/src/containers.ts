@@ -129,6 +129,7 @@ export abstract class ServiceContainers {
         secretsStore.enclaveProxySecret.arn,
         secretsStore.socureSandboxApiKey.arn,
         secretsStore.socureCertificationApiKey.arn,
+        secretsStore.launchDarklySdkKey.arn,
       ])
       .apply(
         ([
@@ -148,6 +149,7 @@ export abstract class ServiceContainers {
           enclaveProxySecret,
           socureSandboxApiKey,
           socureCertificationApiKey,
+          launchDarklySdkKey,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -205,6 +207,10 @@ export abstract class ServiceContainers {
               {
                 name: 'SOCURE_CERTIFICATION_API_KEY',
                 valueFrom: socureCertificationApiKey,
+              },
+              {
+                name: 'LAUNCH_DARKLY_SDK_KEY',
+                valueFrom: launchDarklySdkKey,
               },
             ],
             environment: [

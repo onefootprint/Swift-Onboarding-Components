@@ -30,6 +30,7 @@ export interface StaticSecrets {
   airplaneApiToken: pulumi.Output<string>;
   socureSandboxApiKey: aws.ssm.Parameter;
   socureCertificationApiKey: aws.ssm.Parameter;
+  launchDarklySdkKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -41,6 +42,7 @@ interface SecretConstants {
   grafana: Grafana;
   airplane: Airplane;
   socure: Socure;
+  launchDarkly: LaunchDarkly;
 }
 
 interface ElasticSecrets {
@@ -77,6 +79,10 @@ interface Grafana {
 
 interface Airplane {
   apiToken: string;
+}
+
+interface LaunchDarkly {
+  launchDarklySdkKey: string;
 }
 
 export async function LoadSecrets(
@@ -199,6 +205,10 @@ export async function LoadSecrets(
     socureCertificationApiKey: createSecretParameter(
       `socureCertificationApiKey-${stack}`,
       secretConstants.socure.certificationApiKey,
+    ),
+    launchDarklySdkKey: createSecretParameter(
+      `launchDarklySdkKey-${stack}`,
+      secretConstants.launchDarkly.launchDarklySdkKey,
     ),
   };
 }

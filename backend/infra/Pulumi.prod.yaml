@@ -31,6 +31,9 @@ config:
         secure: v1:FuonFinPvhkd8VS4:XdgsQaXmXU9CUpVxDHjRrQ0ZRIhJXL+WDIZuy40q
       username:
         secure: v1:NEqw0MouOxGP42dR:a0d2x8IXLNbOg4d24tE4Y6N7+09CsiKqCQ4DeZlYKfT0
+    launchDarkly:
+      launchDarklySdkKey:
+        secure: v1:n4OkCVT3u9IPs9ww:ZgDp/7u0VcDo4C7gb3VwDprwQ/1UJbbuHKE54fYcTLoX2eK+468RzKSmmWowpCR/Ohq9y6RNOzk=
     resources:
       cpuUnits: 256
       instances: 2

@@ -106,6 +106,8 @@ pub enum ApiError {
     InvalidFieldForDecryption(String),
     #[error("Unexpected: {0}")]
     AssertionError(String),
+    #[error("Feature Flag error: {0}")]
+    FeatureFlagError(#[from] crate::feature_flag::FeatureFlagError),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -218,6 +220,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::PrivacyPassError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Custom(_) => StatusCode::BAD_REQUEST,
             ApiError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

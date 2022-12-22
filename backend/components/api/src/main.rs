@@ -14,6 +14,7 @@ mod auth;
 mod decision;
 mod enclave_client;
 mod errors;
+mod feature_flag;
 mod routes;
 mod serializers;
 use self::routes::*;
