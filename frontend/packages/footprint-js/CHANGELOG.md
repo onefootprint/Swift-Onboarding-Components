@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 1.0.2
+
+### Patch Changes
+
+- 96b18cc3: Fix race conditions when sending user data as option
+
 ## 1.0.1
 
 ### Patch Changes

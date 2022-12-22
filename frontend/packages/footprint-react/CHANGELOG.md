@@ -1,5 +1,13 @@
 # @onefootprint/footprint-react
 
+## 2.0.1
+
+### Patch Changes
+
+- 96b18cc3: Fix race conditions when sending user data as option
+- Updated dependencies [96b18cc3]
+  - @onefootprint/footprint-js@1.0.2
+
 ## 2.0.0
 
 ### Patch Changes
