@@ -9,25 +9,11 @@ import {
 import EventEmitter from '../utils/event-emitter/event-emmiter';
 
 class IframeAdapter implements FootprintClient {
-  postmate: Postmate.ChildAPI | null = null;
+  private postmate: Postmate.ChildAPI | null = null;
 
-  eventEmitter = new EventEmitter();
+  private eventEmitter = new EventEmitter();
 
-  constructor() {
-    this.init();
-  }
-
-  sendEvent = (eventName: string, data?: any) => {
-    if (this.postmate) {
-      this.postmate.emit(eventName, data);
-    } else {
-      console.warn(
-        `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
-      );
-    }
-  };
-
-  async init() {
+  async load() {
     const postmate = await new Postmate.Model({
       [FootprintInternalEvent.bootstrapDataReceived]: (data?: any) => {
         this.eventEmitter.emit(
@@ -37,6 +23,7 @@ class IframeAdapter implements FootprintClient {
       },
     });
     this.postmate = postmate;
+    this.start();
   }
 
   close() {
@@ -47,8 +34,8 @@ class IframeAdapter implements FootprintClient {
     this.sendEvent(FootprintPublicEvent.canceled);
   }
 
-  ready() {
-    this.sendEvent(FootprintInternalEvent.ready);
+  start() {
+    this.sendEvent(FootprintInternalEvent.started);
   }
 
   complete({ validationToken, closeDelay = 0 }: CompletePayload) {
@@ -60,6 +47,16 @@ class IframeAdapter implements FootprintClient {
 
   on(name: string, callback: (result: unknown) => void) {
     return this.eventEmitter.on(name, callback);
+  }
+
+  private sendEvent(eventName: string, data?: any) {
+    if (this.postmate) {
+      this.postmate.emit(eventName, data);
+    } else {
+      console.warn(
+        `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
+      );
+    }
   }
 }
 

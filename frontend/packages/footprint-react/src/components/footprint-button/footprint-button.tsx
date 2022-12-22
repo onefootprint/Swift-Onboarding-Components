@@ -10,7 +10,7 @@ export type FootprintButtonProps = {
   onCanceled?: () => void;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onCompleted?: (validationToken: string) => void;
-  publicKey: string;
+  publicKey?: string;
   testID?: string;
   userData?: UserData;
 };
@@ -25,8 +25,7 @@ const FootprintButton = ({
   testID,
   userData,
 }: FootprintButtonProps) => {
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onClick?.(event);
+  const openFootprint = () => {
     footprint.open({
       appearance,
       onCanceled,
@@ -34,6 +33,13 @@ const FootprintButton = ({
       publicKey,
       userData,
     });
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    if (publicKey) {
+      openFootprint();
+    }
   };
 
   return (

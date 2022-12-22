@@ -9,6 +9,10 @@ type UseFootprintProvider = {
 };
 
 const useFootprintProvider = ({ client }: UseFootprintProvider) => {
+  const cancel = () => {
+    client.cancel();
+  };
+
   const close = () => {
     client.close();
   };
@@ -17,23 +21,19 @@ const useFootprintProvider = ({ client }: UseFootprintProvider) => {
     client.complete(payload);
   };
 
-  const cancel = () => {
-    client.cancel();
-  };
-
   const on = (name: FootprintInternalEvent, callback: (data?: any) => void) =>
     client.on(name, callback);
 
-  const ready = () => {
-    client.ready();
+  const load = () => {
+    client.load();
   };
 
   return {
-    ready,
+    cancel,
     close,
     complete,
-    cancel,
     on,
+    load,
   };
 };
 

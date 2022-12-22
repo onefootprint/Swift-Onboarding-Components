@@ -42,7 +42,7 @@ class FootprintIframe {
     );
 
     this.child.on(FootprintPublicEvent.closed, () => this.close());
-    this.child.on(FootprintInternalEvent.ready, () => {
+    this.child.on(FootprintInternalEvent.started, () => {
       this.bootstrap(userData);
     });
   }

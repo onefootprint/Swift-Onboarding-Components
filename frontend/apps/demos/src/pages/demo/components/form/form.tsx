@@ -112,7 +112,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
             or
           </Typography>
         </OrDivider>
-        <FootprintButton publicKey={publicKey} />
+        <FootprintButton onClick={showFootprint} />
       </FormContainer>
     </Container>
   );

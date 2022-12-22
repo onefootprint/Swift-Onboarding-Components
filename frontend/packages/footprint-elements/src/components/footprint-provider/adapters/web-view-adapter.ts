@@ -17,15 +17,12 @@ class WebView implements FootprintClient {
     window.location.href = `${this.redirectUrl}?${params.toString()}`;
   };
 
+  load(): void {}
+
   close(): void {}
 
   cancel(): void {
     this.setLocation({ canceled: true });
-  }
-
-  ready(): void {
-    // TODO: FP-2012
-    // https://linear.app/footprint/issue/FP-2012/allow-to-pass-emailphone-via-webview
   }
 
   on() {

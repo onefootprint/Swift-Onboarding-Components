@@ -14,7 +14,7 @@ const getBranchAsSlug = (branchName?: string) => {
 
 const getBifrostUrl = (isLocal: boolean) => {
   if (isLocal) {
-    return 'http://localhost:3000/';
+    return 'http://localhost:3000';
   }
   if (isDevelopment) {
     return 'https://id.preview.onefootprint.com';
@@ -28,7 +28,7 @@ const getBifrostUrl = (isLocal: boolean) => {
 
 const getApiUrl = (isLocal: boolean) => {
   if (isLocal) {
-    return 'http://localhost:8000/';
+    return 'http://localhost:8000';
   }
   if (isDevelopment || isPreview) {
     return 'https://api.dev.onefootprint.com';

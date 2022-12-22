@@ -12,9 +12,7 @@ const useBootstrapData = (
 ) => {
   const footprintProvider = useFootprintProvider();
 
-  useEffectOnce(() => {
-    footprintProvider.ready();
-
+  const waitBootstrapDataOrStart = () => {
     const expirationTimeout = setTimeout(() => {
       unsubscribe();
       onSuccess({ email: undefined, phoneNumber: undefined });
@@ -23,10 +21,19 @@ const useBootstrapData = (
     const unsubscribe = footprintProvider.on(
       FootprintInternalEvent.bootstrapDataReceived,
       data => {
-        onSuccess({ email: data.email, phoneNumber: data.phoneNumber });
         clearTimeout(expirationTimeout);
+        onSuccess({ email: data.email, phoneNumber: data.phoneNumber });
       },
     );
+  };
+
+  const load = async () => {
+    await footprintProvider.load();
+    waitBootstrapDataOrStart();
+  };
+
+  useEffectOnce(() => {
+    load();
   });
 };
 

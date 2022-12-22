@@ -179,7 +179,7 @@ export enum FootprintPublicEvent {
 
 export enum FootprintInternalEvent {
   bootstrapDataReceived = 'bootstrapDataReceived',
-  ready = 'ready',
+  started = 'started',
 }
 
 export type UserData = {
