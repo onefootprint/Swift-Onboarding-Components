@@ -32,7 +32,7 @@ const NewTabRequest = () => {
       return;
     }
     const tab = window.open(
-      createHandoffUrl({ authToken: scopedAuthToken }),
+      createHandoffUrl({ authToken: scopedAuthToken, opener: 'mobile' }),
       '_blank',
     );
     if (tab) {

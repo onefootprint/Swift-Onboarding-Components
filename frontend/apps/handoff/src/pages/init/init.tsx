@@ -1,5 +1,4 @@
 import {
-  HandoffUrlQuery,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/footprint-elements';
@@ -15,8 +14,7 @@ const Init = () => {
   const updateD2PStatusMutation = useUpdateD2PStatus();
 
   useParseHandoffUrl({
-    onSuccess: (query: HandoffUrlQuery) => {
-      const { authToken } = query;
+    onSuccess: (authToken: string) => {
       // Tell the api that d2p is in progress now
       updateD2PStatusMutation.mutate(
         {

@@ -1,10 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import { HandoffUrlQuery } from './types';
-
 const useParseHandoffUrl = (options: {
-  onSuccess?: (query: HandoffUrlQuery) => void;
+  onSuccess?: (authToken: string) => void;
   onError?: () => void;
 }) => {
   const router = useRouter();
@@ -15,8 +13,8 @@ const useParseHandoffUrl = (options: {
       return;
     }
     try {
-      const query = JSON.parse(decodeURI(parts[1])) as HandoffUrlQuery;
-      options.onSuccess?.(query);
+      const authToken = decodeURI(parts[1]);
+      options.onSuccess?.(authToken);
     } catch {
       options.onError?.();
     }
