@@ -24,6 +24,7 @@ pub(crate) struct SocureRequest {
     user_consent: bool,
     consent_timestamp: DateTime<Utc>,
     device_session_id: Option<String>,
+    ip_address: Option<PiiString>,
 }
 
 /// identify request and vec of modules we want to use
@@ -33,6 +34,7 @@ impl SocureRequest {
         modules: Vec<String>,
         idv_data: IdvData,
         device_session_id: Option<String>,
+        ip_address: Option<PiiString>,
     ) -> Result<Self, crate::socure::Error> {
         let IdvData {
             first_name,
@@ -82,6 +84,7 @@ impl SocureRequest {
             user_consent: true, // TODO: can we hardcode to true or do we need to more explicitly route the users consent to here
             consent_timestamp: Utc::now(), // TODO: same as above
             device_session_id,
+            ip_address,
         })
     }
 }

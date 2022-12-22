@@ -1,6 +1,6 @@
 use crate::socure::conversion::SocureRequest;
 use crate::socure::SocureReqwestError;
-use newtypes::IdvData;
+use newtypes::{IdvData, PiiString};
 use reqwest::header;
 
 use std::time::Duration;
@@ -54,12 +54,13 @@ impl SocureClient {
         &self,
         idv_data: IdvData,
         device_session_id: Option<String>,
+        ip_address: Option<PiiString>,
     ) -> Result<serde_json::Value, crate::socure::Error> {
         // TODO: For now this just tries 1 time. We need to differentiate retriable errors from other errors
         //  and match on that and then enable this to retry multiple times
         let retry_strategy = ExponentialBackoff::from_millis(10).map(jitter).take(0);
         let result = Retry::spawn(retry_strategy, || {
-            self.attempt_idplus(idv_data.clone(), device_session_id.clone())
+            self.attempt_idplus(idv_data.clone(), device_session_id.clone(), ip_address.clone())
         })
         .await?;
 
@@ -70,6 +71,7 @@ impl SocureClient {
         &self,
         idv_data: IdvData,
         device_session_id: Option<String>,
+        ip_address: Option<PiiString>,
     ) -> Result<serde_json::Value, crate::socure::Error> {
         let present_data_kinds = IdvData::present_data_attributes(&idv_data);
         let modules = requirements::modules_for_idplus_request(&present_data_kinds, &device_session_id)
@@ -77,7 +79,7 @@ impl SocureClient {
             .map(|m| m.to_string())
             .collect::<Vec<String>>();
 
-        let req = SocureRequest::new(modules, idv_data, device_session_id)?;
+        let req = SocureRequest::new(modules, idv_data, device_session_id, ip_address)?;
         tracing::info!(req = format!("{:?}", req), "SocureClient req");
         let response = self
             .client
@@ -159,8 +161,12 @@ mod tests {
         };
 
         let device_session_id = Some(String::from("placeholder"));
+        let ip_address = Some(PiiString::from("1.2.3.4"));
 
-        let res = socure_client.idplus(idv_data, device_session_id).await.unwrap();
+        let res = socure_client
+            .idplus(idv_data, device_session_id, ip_address)
+            .await
+            .unwrap();
         tracing::info!(res = format!("{:?}", res), "res");
         let parsed_res = crate::socure::parse_response(res).unwrap();
         tracing::info!(parsed_res = format!("{:?}", parsed_res), "parsed_res");

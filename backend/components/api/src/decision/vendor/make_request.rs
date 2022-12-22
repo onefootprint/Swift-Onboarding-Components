@@ -1,8 +1,14 @@
 use super::*;
 use crate::{errors::ApiError, State};
-use db::models::{socure_device_session::SocureDeviceSession, verification_request::VerificationRequest};
+use db::{
+    models::{
+        insight_event::InsightEvent, socure_device_session::SocureDeviceSession,
+        verification_request::VerificationRequest,
+    },
+    DbError,
+};
 use idv::VendorResponse;
-use newtypes::{IdvData, Vendor};
+use newtypes::{IdvData, PiiString, Vendor};
 
 /// Branch on vendor and send requests to vendors
 pub async fn send_idv_request(
@@ -25,17 +31,31 @@ pub async fn send_idv_request(
             .await
             .map_err(idv::Error::from)?,
         Vendor::Socure => {
-            let socure_device_session_id = state
+            let (socure_device_session_id, ip_address) = state
                 .db_pool
-                .db_query(move |conn| {
-                    SocureDeviceSession::latest_for_onboarding(conn, &request.onboarding_id)
-                })
-                .await??
-                .map(|d| d.device_session_id);
+                .db_query(
+                    move |conn| -> Result<(Option<String>, Option<PiiString>), DbError> {
+                        let socure_device_session_id =
+                            SocureDeviceSession::latest_for_onboarding(conn, &request.onboarding_id)?
+                                .map(|d| d.device_session_id);
 
-            idv::socure::send_idplus_request(&state.socure_sandbox_client, data, socure_device_session_id)
-                .await
-                .map_err(idv::Error::from)?
+                        let ip_address = InsightEvent::get_by_onboarding_id(conn, &request.onboarding_id)?
+                            .ip_address
+                            .map(PiiString::from);
+
+                        Ok((socure_device_session_id, ip_address))
+                    },
+                )
+                .await??;
+
+            idv::socure::send_idplus_request(
+                &state.socure_sandbox_client,
+                data,
+                socure_device_session_id,
+                ip_address,
+            )
+            .await
+            .map_err(idv::Error::from)?
         }
         _ => return Err(ApiError::NotImplemented),
     };

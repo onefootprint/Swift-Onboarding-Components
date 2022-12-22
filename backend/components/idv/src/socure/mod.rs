@@ -1,6 +1,6 @@
 pub mod client;
 mod conversion;
-use newtypes::{IdvData, Vendor};
+use newtypes::{IdvData, PiiString, Vendor};
 pub mod reason_code;
 pub mod requirements;
 pub mod response;
@@ -16,8 +16,11 @@ pub async fn send_idplus_request(
     socure_client: &SocureClient,
     idv_data: IdvData,
     device_session_id: Option<String>,
+    ip_address: Option<PiiString>,
 ) -> Result<VendorResponse, Error> {
-    let response = socure_client.idplus(idv_data, device_session_id).await?;
+    let response = socure_client
+        .idplus(idv_data, device_session_id, ip_address)
+        .await?;
     let parsed_response = parse_response(response.clone())?;
 
     Ok(VendorResponse {
