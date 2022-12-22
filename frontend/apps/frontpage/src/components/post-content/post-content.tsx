@@ -13,10 +13,6 @@ const Content = styled.div`
   ${({ theme }) => css`
     color: ${theme.color.secondary};
 
-    ${media.greaterThan('sm')`
-      padding: 0 ${theme.spacing[11]};
-    `}
-
     figure {
       display: flex;
       justify-content: center;
@@ -32,8 +28,7 @@ const Content = styled.div`
       height: auto;
 
       ${media.greaterThan('sm')`
-        max-width: calc(100% + ${theme.spacing[11]} + ${theme.spacing[11]});
-        margin: ${theme.spacing[9]} -${theme.spacing[11]};
+        width: 100%;
       `}
     }
 
