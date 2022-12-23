@@ -11,6 +11,9 @@ pub use self::phone_number::*;
 pub mod idv;
 pub use idv::*;
 
+pub mod docv;
+pub use docv::*;
+
 pub mod fields;
 pub use fields::*;
 

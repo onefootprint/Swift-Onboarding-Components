@@ -1,10 +1,5 @@
 use std::sync::Arc;
 
-use crypto::aead::ScopedSealingKey;
-use db::DbPool;
-use idv::{idology::client::IdologyClient, socure::client::SocureClient};
-use workos::{ApiKey, WorkOs};
-
 use crate::{
     config::Config,
     enclave_client::EnclaveClient,
@@ -14,6 +9,10 @@ use crate::{
     signed_hash::SignedHashClient,
     utils::{email::SendgridClient, twilio::TwilioClient},
 };
+use crypto::aead::ScopedSealingKey;
+use db::DbPool;
+use idv::{idology::client::IdologyClient, socure::client::SocureClient};
+use workos::{ApiKey, WorkOs};
 
 #[derive(Clone)]
 pub struct State {
@@ -27,7 +26,6 @@ pub struct State {
     pub(crate) challenge_sealing_key: ScopedSealingKey,
     pub(crate) session_sealing_key: ScopedSealingKey,
     pub(crate) idology_client: IdologyClient,
-    #[allow(unused)]
     pub(crate) s3_client: s3::S3Client,
     #[allow(unused)]
     pub(crate) socure_sandbox_client: SocureClient,

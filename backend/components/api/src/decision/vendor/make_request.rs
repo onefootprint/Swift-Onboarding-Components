@@ -8,7 +8,7 @@ use db::{
     DbError,
 };
 use idv::VendorResponse;
-use newtypes::{IdvData, PiiString, Vendor};
+use newtypes::{IdvData, PiiString, VendorAPI};
 
 /// Branch on vendor and send requests to vendors
 pub async fn send_idv_request(
@@ -25,12 +25,14 @@ pub async fn send_idv_request(
     // Make the request to the IDV vendor
 
     // TODO: query for SocureDeviceSession:latest_for_onboard and pass along to Socure request
-    let result = match request.vendor {
-        Vendor::Idology => idv::idology::send_expectid_request(&state.idology_client, data).await?,
-        Vendor::Twilio => idv::twilio::lookup_v2(&state.twilio_client.client, data)
+    let result = match request.vendor_api {
+        VendorAPI::IdologyExpectID => {
+            idv::idology::send_expectid_request(&state.idology_client, data).await?
+        }
+        VendorAPI::TwilioLookupV2 => idv::twilio::lookup_v2(&state.twilio_client.client, data)
             .await
             .map_err(idv::Error::from)?,
-        Vendor::Socure => {
+        VendorAPI::SocureIDPlus => {
             let (socure_device_session_id, ip_address) = state
                 .db_pool
                 .db_query(

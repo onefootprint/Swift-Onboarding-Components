@@ -1,7 +1,8 @@
 use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
-use idology::expectid::response::IDologyResponse;
+use idology::expectid::response::ExpectIDAPIResponse;
+use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
 use newtypes::Vendor;
 use socure::response::SocureIDPlusResponse;
 
@@ -13,28 +14,30 @@ pub mod twilio;
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum ParsedResponse {
-    IDology(IDologyResponse),
-    Twilio(LookupV2Response),
-    Socure(SocureIDPlusResponse),
+    IDologyExpectID(ExpectIDAPIResponse),
+    IDologyScanVerify(ScanVerifyAPIResponse),
+    IDologyScanVerifySubmission(ScanVerifySubmissionAPIResponse),
+    TwilioLookupV2(LookupV2Response),
+    SocureIDPlus(SocureIDPlusResponse),
 }
 
 impl ParsedResponse {
     pub fn from_idology_expectid_response(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed = crate::idology::expectid::response::parse_response(raw_response).map_err(Error::from)?;
 
-        Ok(Self::IDology(parsed))
+        Ok(Self::IDologyExpectID(parsed))
     }
 
     pub fn from_twilio_lookupv2_response(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed = ::twilio::response::parse_response(raw_response).map_err(Error::from)?;
 
-        Ok(Self::Twilio(parsed))
+        Ok(Self::TwilioLookupV2(parsed))
     }
 
     pub fn from_socure_idplus_response(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed = crate::socure::parse_response(raw_response).map_err(Error::from)?;
 
-        Ok(Self::Socure(parsed))
+        Ok(Self::SocureIDPlus(parsed))
     }
 }
 

@@ -1,10 +1,12 @@
-use crate::idology::error as IdologyError;
+use crate::idology::{
+    error as IdologyError,
+    response_common::{IDologyQualifiers, KeyResponse},
+};
 use newtypes::{DecisionStatus, ReasonCode};
-use std::str::FromStr;
 
 // Given a raw response, deserialize
-pub fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, IdologyError::Error> {
-    let response: IDologyResponse = serde_json::value::from_value(value)?;
+pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDAPIResponse, IdologyError::Error> {
+    let response: ExpectIDAPIResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }
 
@@ -12,13 +14,12 @@ pub fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, Idolo
 pub type IdNumber = u64;
 
 #[derive(Debug, Clone, serde::Deserialize)]
-pub struct IDologyResponse {
-    pub response: IDologySuccess,
+pub struct ExpectIDAPIResponse {
+    pub response: ExpectIDResponse,
 }
-
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
-pub struct IDologySuccess {
+pub struct ExpectIDResponse {
     pub qualifiers: Option<IDologyQualifiers>,
     // TODO should these be options?
     pub results: Option<KeyResponse>,
@@ -29,7 +30,7 @@ pub struct IDologySuccess {
 
 type CreateManualReview = bool;
 
-impl IDologySuccess {
+impl ExpectIDResponse {
     /// IDology-determined status for verifying the customer
     pub fn status(&self) -> (DecisionStatus, CreateManualReview) {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
@@ -62,50 +63,6 @@ impl IDologySuccess {
         } else {
             vec![]
         }
-    }
-}
-
-#[derive(Debug, Clone, serde::Deserialize)]
-pub struct IDologyQualifiers {
-    pub qualifier: serde_json::Value,
-}
-
-#[derive(Debug, Clone, serde::Deserialize)]
-pub struct KeyResponse {
-    pub key: String,
-}
-
-impl KeyResponse {
-    fn parse_key(value: serde_json::Value) -> Option<String> {
-        let response: Self = serde_json::value::from_value(value).ok()?;
-        Some(response.key)
-    }
-}
-
-impl IDologyQualifiers {
-    fn parse_qualifiers(&self) -> Vec<ReasonCode> {
-        // In the IDology API, the key named `qualifier` can either be a list of qualifiers OR
-        // a single qualifier. Parse both cases here
-        match self.qualifier {
-            serde_json::Value::Object(_) => {
-                if let Some(qualifier) = Self::parse_qualifier(self.qualifier.clone()) {
-                    vec![qualifier]
-                } else {
-                    vec![]
-                }
-            }
-            serde_json::Value::Array(ref qualifier_list) => qualifier_list
-                .iter()
-                .cloned()
-                .flat_map(Self::parse_qualifier)
-                .collect(),
-            _ => vec![],
-        }
-    }
-
-    fn parse_qualifier(qualifier: serde_json::Value) -> Option<ReasonCode> {
-        let key = KeyResponse::parse_key(qualifier)?;
-        ReasonCode::from_str(key.as_str()).ok()
     }
 }
 

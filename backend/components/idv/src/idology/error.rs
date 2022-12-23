@@ -9,6 +9,8 @@ pub enum Error {
     ReqwestError(#[from] ReqwestError),
     #[error("Json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
+    #[error("Request serialization error: {0}")]
+    SerializationError(#[from] SerializationError),
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -19,14 +21,28 @@ pub enum ConversionError {
     MissingLastName,
     #[error("Address must be provided")]
     MissingAddress,
+    #[error("ReferenceId must be provided")]
+    MissingReferenceId,
+    #[error("Front image must be provided")]
+    MissingFrontImage,
+    #[error("Back image must be provided")]
+    MissingBackImage,
+    #[error("Country must be provided")]
+    MissingCountry,
+    #[error("DocumentType must be provided")]
+    MissingDocumentType,
     #[error("Could not parse DOB")]
     CantParseDob,
     #[error("zip code is unsupported length for socure API validation")]
     UnsupportedZipFormat,
     #[error("phone number must be 10 digits")]
     UnsupportedPhoneNumber(ValidatedPhoneNumber),
-    #[error("unsupported country, country must be US")]
+    #[error("unsupported country {0}, country must be US")]
     UnsupportedCountry(String),
+    #[error("Invalid country code: must be 3 characters")]
+    InvalidCountryCode,
+    #[error("DocumentType unsupported for ScanVerify")]
+    UnsupportedDocumentType,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -37,4 +53,10 @@ pub enum ReqwestError {
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("error sending request to socure api: {0}")]
     SendError(String),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum SerializationError {
+    #[error("error serializing request: {0}")]
+    UrlEncodingSerializationError(#[from] serde_urlencoded::ser::Error),
 }

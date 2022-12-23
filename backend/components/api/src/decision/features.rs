@@ -1,8 +1,6 @@
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
-use idv::{
-    idology::expectid::response::IDologySuccess, ParsedResponse,
-};
+use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse};
 
 use newtypes::{DecisionStatus, Signal, VerificationResultId};
 
@@ -21,7 +19,7 @@ pub struct IDologyFeatures {
 }
 
 impl IDologyFeatures {
-    fn signals_from_response_qualifiers(response: IDologySuccess) -> Vec<Signal> {
+    fn signals_from_response_qualifiers(response: ExpectIDResponse) -> Vec<Signal> {
         let qualifiers = response.parse_qualifiers();
 
         // TODO move this logic into decision engine
@@ -88,7 +86,7 @@ impl From<VendorResult> for FeatureVector {
         let response = result.response;
         let verification_result_id = result.verification_result_id;
         match response.response {
-            ParsedResponse::IDology(resp) => {
+            ParsedResponse::IDologyExpectID(resp) => {
                 let r = resp.response;
 
                 let (status, create_manual_review) = r.status();
@@ -108,17 +106,30 @@ impl From<VendorResult> for FeatureVector {
                 }
             }
             // TODO!
-            ParsedResponse::Twilio(_) => Self {
+            ParsedResponse::TwilioLookupV2(_) => Self {
                 idology_features: None,
                 twilio_features: Some(TwilioFeatures {
                     verification_result: verification_result_id,
                 }),
                 socure_features: None,
             },
-            ParsedResponse::Socure(ref idplus_response) => Self {
+            ParsedResponse::SocureIDPlus(ref idplus_response) => Self {
                 idology_features: None,
                 twilio_features: None,
                 socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
+            },
+
+            // TODO
+            ParsedResponse::IDologyScanVerify(_) => Self {
+                idology_features: None,
+                twilio_features: None,
+                socure_features: None,
+            },
+            // TODO
+            ParsedResponse::IDologyScanVerifySubmission(_) => Self {
+                idology_features: None,
+                twilio_features: None,
+                socure_features: None,
             },
         }
     }
@@ -182,7 +193,7 @@ mod tests {
     use super::*;
     use idv::{
         idology::error::Error as IdologyError,
-        idology::expectid::response::{self as idology_verification, IDologyResponse},
+        idology::expectid::response::{self as idology_verification, ExpectIDAPIResponse},
         ParsedResponse, VendorResponse,
     };
     use newtypes::{OldSignalSeverity, SignalScope, Vendor, VerificationRequestId};
@@ -272,11 +283,11 @@ mod tests {
           }
         }});
 
-        let parsed_response: IDologyResponse = idology_verification::parse_response(raw.clone())?;
+        let parsed_response: ExpectIDAPIResponse = idology_verification::parse_response(raw.clone())?;
 
         let res = VendorResponse {
             vendor: Vendor::Idology,
-            response: ParsedResponse::IDology(parsed_response),
+            response: ParsedResponse::IDologyExpectID(parsed_response),
             raw_response: raw,
         };
         let result = VendorResult {
