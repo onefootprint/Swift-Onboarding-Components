@@ -37,10 +37,10 @@ export const RequirementCompletedTransitions: TransitionsConfig<
   MachineEvents
 > = {
   [Events.requirementCompleted]: [
-    ...RequirementTargets,
     {
       target: States.checkOnboardingRequirements,
     },
+    ...RequirementTargets,
   ],
 };
 
