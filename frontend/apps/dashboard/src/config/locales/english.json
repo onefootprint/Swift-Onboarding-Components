@@ -90,6 +90,9 @@
     "decrypt_custom": "Decrypt all data"
   },
   "components": {
+    "timeline": {
+      "empty": "No items"
+    },
     "private-layout": {
       "nav": {
         "users": "Users",
@@ -101,9 +104,6 @@
         "title": "Sandbox mode.",
         "disable": "Disable",
         "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
-      },
-      "timeline": {
-        "empty": "No items"
       },
       "manual-review-banner": {
         "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
