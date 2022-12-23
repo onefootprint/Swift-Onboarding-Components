@@ -103,6 +103,10 @@ pub enum SocureReqwestError {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
+    use crate::socure::response::{GlobalWatchlist, GlobalWatchlistMatch, GlobalWatchlistMatchComment};
+
     use super::*;
     use serde_json::{json, Value};
 
@@ -203,5 +207,134 @@ mod tests {
         let decoded_response = parse_response(response_json).expect("Failed to parse!!");
         println!("{:?}", decoded_response);
     }
-    //decode_response
+
+    #[test]
+    fn watchlist_response_parsing() {
+        let response_json: Value = json!({
+          "referenceId": "da6b24ce-de30-4fdf-8536-723569e5300c",
+          "globalWatchlist": {
+            "reasonCodes": [
+              "R184",
+              "R186"
+            ],
+            "matches": {
+              "PEP Data": [
+                {
+                  "entityId": "ZaP+/U4QWUgpfG5fDlsPzz3ul+37G0Q",
+                  "matchFields": [
+                    "nameEquivalent"
+                  ],
+                  "sourceUrls": [
+                    "https://www.socure.com"
+                  ],
+                  "comments": {
+                    "name": [
+                      "John C. Doe"
+                    ],
+                    "originalCountryText": [
+                      "EN, Politician"
+                    ],
+                    "aka": [
+                      "John Doe"
+                    ],
+                    "politicalPosition": [
+                      "Child of Henry Doe (Politician)"
+                    ],
+                    "offense": [
+                      "Pep,Pep Class 2,Pep Class 4"
+                    ]
+                  },
+                  "matchScore": 98
+                },
+                {
+                  "entityId": "ZaP+/U4QWUgjZmsjDltrtDGFl5D6Alw",
+                  "matchFields": [
+                    "nameExact"
+                  ],
+                  "sourceUrls": [
+                    "https://www.example.org/members/current/ministers"
+                  ],
+                  "comments": {
+                    "name": [
+                      "John Doe"
+                    ],
+                    "originalCountryText": [
+                      "Any Country"
+                    ],
+                    "country": [
+                      "Any Country"
+                    ],
+                    "chamber": [
+                      "Cabinet of Ministers"
+                    ],
+                    "sourceName": [
+                      "Any Country State Cabinet"
+                    ],
+                    "locationurl": [
+                      "https://www.example.org/members/all/john_doe"
+                    ],
+                    "aka": [
+                      "Doe John",
+                      "Jack Doe"
+                    ],
+                    "politicalPosition": [
+                      "Member of the Cabinet of Ministers"
+                    ],
+                    "region": [
+                      "Ontario"
+                    ],
+                    "offense": [
+                      "Pep Class 2"
+                    ],
+                    "otherInfo": [
+                      "Premier"
+                    ]
+                  },
+                  "matchScore": 97
+                }
+              ]
+            }
+          }
+        }
+        );
+
+        let decoded_response = parse_response(response_json).expect("Failed to parse!!");
+        assert_eq!(
+            Some(GlobalWatchlist {
+                reason_codes: vec!["R184".to_owned(), "R186".to_owned()],
+                matches: HashMap::from([(
+                    "PEP Data".to_owned(),
+                    vec![
+                        GlobalWatchlistMatch {
+                            entity_id: "ZaP+/U4QWUgpfG5fDlsPzz3ul+37G0Q".to_owned(),
+                            match_fields: vec!["nameEquivalent".to_owned()],
+                            source_urls: vec!["https://www.socure.com".to_owned()],
+                            comments: GlobalWatchlistMatchComment {
+                                name: vec!["John C. Doe".to_owned()],
+                                original_country_text: vec!["EN, Politician".to_owned()],
+                                aka: vec!["John Doe".to_owned()],
+                                political_position: vec!["Child of Henry Doe (Politician)".to_owned()],
+                                offense: vec!["Pep,Pep Class 2,Pep Class 4".to_owned()]
+                            },
+                            match_score: 98.0
+                        },
+                        GlobalWatchlistMatch {
+                            entity_id: "ZaP+/U4QWUgjZmsjDltrtDGFl5D6Alw".to_owned(),
+                            match_fields: vec!["nameExact".to_owned()],
+                            source_urls: vec!["https://www.example.org/members/current/ministers".to_owned()],
+                            comments: GlobalWatchlistMatchComment {
+                                name: vec!["John Doe".to_owned()],
+                                original_country_text: vec!["Any Country".to_owned()],
+                                aka: vec!["Doe John".to_owned(), "Jack Doe".to_owned()],
+                                political_position: vec!["Member of the Cabinet of Ministers".to_owned()],
+                                offense: vec!["Pep Class 2".to_owned()]
+                            },
+                            match_score: 97.0
+                        }
+                    ]
+                )])
+            }),
+            decoded_response.global_watchlist
+        );
+    }
 }

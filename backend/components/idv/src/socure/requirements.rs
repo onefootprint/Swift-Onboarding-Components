@@ -9,7 +9,7 @@ pub enum SocureModule {
     AlertList,
     EmailRisk,
     KYC,
-    WatchlistPremier,
+    WatchlistPlus,
     PhoneRisk,
     DeviceRisk,
     Fraud,
@@ -48,7 +48,7 @@ impl SocureModule {
                 required: vec![FirstName, LastName, Country],
                 one_of: vec![vec![AddressLine1, City, State, Zip], vec![Ssn9], vec![Dob]],
             },
-            SocureModule::WatchlistPremier => Requirements {
+            SocureModule::WatchlistPlus => Requirements {
                 required: vec![FirstName, LastName],
                 one_of: vec![],
             },
@@ -161,15 +161,15 @@ mod tests {
 
         let present_data_kinds = IdvData::present_data_attributes(&idv_data);
         assert_eq!(
-            vec![KYC, WatchlistPremier, Synthetic],
+            vec![KYC, WatchlistPlus, Synthetic],
             modules_meeting_pii_requirements(&present_data_kinds)
         );
         assert_eq!(
-            vec![KYC, WatchlistPremier, Synthetic, DeviceRisk],
+            vec![KYC, WatchlistPlus, Synthetic, DeviceRisk],
             modules_for_idplus_request(&present_data_kinds, &Some(String::from("device123")))
         );
         assert_eq!(
-            vec![KYC, WatchlistPremier, Synthetic],
+            vec![KYC, WatchlistPlus, Synthetic],
             modules_for_idplus_request(&present_data_kinds, &None)
         );
     }

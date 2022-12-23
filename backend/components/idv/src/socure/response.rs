@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 // https://developer.socure.com/reference#tag/ID+
 // https://developer.socure.com/docs/idplus/modules/modules-overview
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -109,11 +111,43 @@ pub struct AlertListMatch {
     pub reported_count: String,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GlobalWatchlist {
     pub reason_codes: Vec<String>,
-    pub matches: serde_json::Value, // TODO: this ones pretty intense and the schema isn't clear will defer for now
+    pub matches: HashMap<String, Vec<GlobalWatchlistMatch>>, // key is the watchlist name (eg: "PEP Data", "OFAC SDN List")
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GlobalWatchlistMatch {
+    pub entity_id: String,
+    pub match_fields: Vec<String>,
+    pub source_urls: Vec<String>,
+    pub comments: GlobalWatchlistMatchComment,
+    pub match_score: f32,
+}
+
+impl Eq for GlobalWatchlistMatch {}
+// just implemented because f32 doesn't have a built in Eq impl
+impl PartialEq for GlobalWatchlistMatch {
+    fn eq(&self, other: &Self) -> bool {
+        self.entity_id == other.entity_id
+            && self.match_fields == other.match_fields
+            && self.source_urls == other.source_urls
+            && self.comments == other.comments
+            && (self.match_score - other.match_score).abs() < f32::EPSILON
+    }
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GlobalWatchlistMatchComment {
+    pub name: Vec<String>,
+    pub original_country_text: Vec<String>,
+    pub aka: Vec<String>,
+    pub political_position: Vec<String>,
+    pub offense: Vec<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
