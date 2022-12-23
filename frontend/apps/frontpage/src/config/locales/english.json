@@ -164,8 +164,8 @@
     "home": {
       "html-title": "Frictionless Identity Verification and PII Vaulting",
       "hero": {
-        "title": "Frictionless Identity Verification and PII Vaulting",
-        "subtitle": "Onboard users with the click of a button, offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
+        "title": "Frictionless identity verification and PII vaulting",
+        "subtitle": "Onboard users with the click of a button and offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
         "desktop-img-alt": "desktop mockup",
         "mobile-img-alt": "mobile mockup",
         "primary-button": "Request early access",
@@ -182,11 +182,11 @@
           },
           "feature-2": {
             "title": "Decreased cost",
-            "body": "Say goodbye to needing separate KYC and Tokenization tools. We do both in-one, and pass along the savings."
+            "body": "Say goodbye to separate KYC and tokenization tools. We do both in one, and pass along the savings."
           },
           "feature-3": {
             "title": "Enhanced dev experience",
-            "body": "With a few lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple."
+            "body": "With a few lines of code, you'll have KYC and PII vaulting running in less than a day. It's that simple."
           },
           "feature-4": {
             "title": "Designed to the last pixel",
@@ -209,10 +209,10 @@
           },
           "feature-3": {
             "title": "Fine-tune component styles",
-            "body": "Need to go a step further? Missing something?You can use CSS to arbitrarily style individual components."
+            "body": "Need to go a step further? Missing something? You can use CSS to arbitrarily style individual components."
           },
           "feature-4": {
-            "title": "Well documented",
+            "title": "Well-documented",
             "body": "Everything you need to customize your onboarding flow can be found in our docs. Still need help? No problem! We're here for you."
           }
         }
@@ -223,7 +223,7 @@
         "features": {
           "feature-1": {
             "title": "Best-in-class security",
-            "body": "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Utilize our PII vault which by default uses secure enclaves to store data instead of building your own."
+            "body": "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Utilize our PII vault which uses secure enclaves to store data instead of building your own."
           },
           "feature-2": {
             "title": "Unprecedented accuracy",
@@ -231,7 +231,7 @@
           },
           "feature-3": {
             "title": "More functionality, less dollars",
-            "body": "Footprint’s technology combines storage and verification. Our solution is up to 2x cheaper than traditional methods to verify and store PII because we are able to condense what today requires multiple tools into one."
+            "body": "By condensing multiple tools into one, our solution is up to 2x cheaper than tradition methods to verify and store PII."
           },
           "alt": "image of footprint's audit trail visualization"
         }
@@ -242,7 +242,7 @@
         "features": {
           "feature-1": {
             "title": "Private & secure",
-            "body": "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment."
+            "body": "Our advanced PII vaults are built on top of secure nitro enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment."
           },
           "feature-2": {
             "title": "Zero-trust by design",
@@ -250,18 +250,18 @@
           },
           "feature-3": {
             "title": "Granular data access",
-            "body": "Limit the exposure, only access the bare minimum data you need. Nothing else leaves our enclave-backed vaults."
+            "body": "Limit the exposure, and only access the bare minimum data you need. Nothing else leaves our enclave-backed vaults."
           },
           "feature-4": {
             "title": "Secure enclave backed",
-            "body": "Our system guarantees that all PII data is always encrypted to our network gapped, storage/cpu/memory isolated Nitro Enclaves."
+            "body": "Our system guarantees that all PII data is always encrypted to our network-gapped, storage-, CPU-, and memory-isolated nitro enclaves."
           },
           "alt": "image of footprint's process for decrypting data"
         }
       },
       "identity-wallet": {
         "title": "An identity wallet built for transparency",
-        "subtitle": "One third of people admit to dropping sign-up due to worry over how their data will be stored. Footprint reduces this by giving people peace of mind over how their data will be handled.",
+        "subtitle": "One third of people admit to aborting sign-up due to worry over how their data will be stored. Footprint reduces this by giving people peace of mind over how their data will be handled.",
         "features": {
           "feature-1": {
             "title": "Decrease drop-off",
@@ -283,12 +283,12 @@
         "features": {
           "feature-1": {
             "title": "Fraud & Risk",
-            "body": "By tying security to fraud to KYC, we can create a bar to enter the digital ecosystem, and once cleared in a second let people create accounts with certainty.",
+            "body": "By tying security, fraud, and KYC together, we can create a bar to enter the digital ecosystem. It only takes one second to prove your identity and create accounts with certainty.",
             "alt-1": "Risk insights screen"
           },
           "feature-2": {
             "title": "Security logs",
-            "body": "Each time data is accessed in the enclave, it automatically gets appended in our security logs, which are always accessible via API.",
+            "body": "Each time data is accessed in the enclave, it automatically gets appended in our security logs - which are always accessible via API.",
             "alt": "Image showing security logs in the product"
           },
           "feature-3": {
@@ -299,14 +299,14 @@
           },
           "feature-4": {
             "title": "Auth & IAM",
-            "body": "Leveraging FaceID biometrics natively built into smartphones, we combine an incredible onboarding experience with the most accurate attestation of liveness.",
+            "body": "Identity should not be limited to onboarding. Footprint helps you bridge the identity gap from onboarding to auth to IAM.",
             "alt-1": "Create role screen",
             "alt-2": "Background table view"
           }
         }
       },
       "banner": {
-        "title": "The last identity form you'll ever fill",
+        "title": "The last identity form you'll ever fill out",
         "cta": "Request early access",
         "alt": "Our penguin mascot"
       }

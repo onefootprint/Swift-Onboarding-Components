@@ -1,11 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button, Container, media, Typography } from '@onefootprint/ui';
+import { createPopup } from '@typeform/embed';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 const PenguinBanner = () => {
   const { t } = useTranslation('pages.home.banner');
+  const { toggle: toggleTypeform } = createPopup('COZNk70C');
   return (
     <Clipper>
       <ColorBackground />
@@ -28,7 +30,7 @@ const PenguinBanner = () => {
               {t('title')}
             </Typography>
           </ResponsiveHide>
-          <Button> {t('cta')}</Button>
+          <Button onClick={toggleTypeform}> {t('cta')}</Button>
         </ContentWrapper>
       </Container>
     </Clipper>
@@ -54,7 +56,7 @@ const Clipper = styled.div`
 
 const ContentWrapper = styled.div`
   ${({ theme }) => css`
-    max-width: 523px;
+    max-width: 720px;
     margin: auto;
     display: flex;
     flex-direction: column;
