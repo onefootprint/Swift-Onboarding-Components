@@ -37,6 +37,7 @@ struct DashboardAuthorizationResponse {
     created_new_tenant: bool,
     tenant_name: String,
     sandbox_restricted: bool,
+    requires_onboarding: bool,
 }
 
 #[api_v2_operation(
@@ -62,11 +63,14 @@ async fn handler(
 
     tracing::info!(profile =?profile, "workos login");
 
-    let (tenant, tenant_user, is_new) = find_or_create_user(&state, profile).await?;
+    let (tenant, tenant_user, tenant_role, is_new) = find_or_create_user(&state, profile).await?;
 
     // Save tenant login in session data into the DB
     let session_data = AuthSessionData::WorkOs(tenant_user.clone().into());
     let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
+
+    let requires_onboarding =
+        tenant_role.permissions.is_admin() && (tenant.website_url.is_none() || tenant.company_size.is_none());
 
     Ok(Json(ResponseData {
         data: DashboardAuthorizationResponse {
@@ -77,6 +81,7 @@ async fn handler(
             created_new_tenant: is_new,
             tenant_name: tenant.name,
             sandbox_restricted: tenant.sandbox_restricted,
+            requires_onboarding,
         },
     }))
 }
@@ -86,7 +91,7 @@ type IsNewTenant = bool;
 async fn find_or_create_user(
     state: &State,
     profile: &Profile,
-) -> ApiResult<(Tenant, TenantUser, IsNewTenant)> {
+) -> ApiResult<(Tenant, TenantUser, TenantRole, IsNewTenant)> {
     // See if a TenantUser with this email exists. If so, log them into the Tenant
     let email = profile.email.clone();
     let email2 = profile.email.clone();
@@ -94,7 +99,7 @@ async fn find_or_create_user(
         .db_pool
         .db_query(move |conn| TenantUser::login_by_email(conn, email.into()))
         .await??;
-    if let Some((tenant_user, tenant)) = existing_user {
+    if let Some((tenant_role, tenant_user, tenant)) = existing_user {
         // upate tenant_user's name if they currently do not have a name and one is given to us by profile
         let updated_tenant_user = if tenant_user.first_name.is_none()
             && tenant_user.last_name.is_none()
@@ -118,6 +123,7 @@ async fn find_or_create_user(
         return Ok((
             tenant.clone(),
             updated_tenant_user.unwrap_or_else(|| tenant_user.clone()),
+            tenant_role,
             false,
         ));
     }
@@ -127,24 +133,24 @@ async fn find_or_create_user(
     let first_name = profile.first_name.clone();
     let last_name = profile.last_name.clone();
     let tenant_id = tenant.id.clone();
-    let tenant_user = state
+    let (tenant_user, tenant_role) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<TenantUser> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             // Get or create the admin role for this tenant
             // TODO: we shouldn't always give a new user admin permissions
             let admin_role = TenantRole::get_or_create_admin_role(conn, tenant_id)?;
             let (tenant_user, _) = TenantUser::create(
                 conn,
                 email2.into(),
-                admin_role.tenant_id,
-                admin_role.id,
+                admin_role.tenant_id.clone(),
+                admin_role.id.clone(),
                 first_name,
                 last_name,
             )?;
-            Ok(tenant_user)
+            Ok((tenant_user, admin_role))
         })
         .await?;
-    Ok((tenant, tenant_user, is_new_tenant))
+    Ok((tenant, tenant_user, tenant_role, is_new_tenant))
 }
 
 async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tenant, IsNewTenant), ApiError> {

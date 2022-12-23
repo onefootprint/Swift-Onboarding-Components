@@ -3,9 +3,10 @@ export type OrgAuthLoginResponse = {
   email: string;
   firstName: string | null;
   lastName: string | null;
-  newTenant: boolean;
+  newTenant: boolean; // TODO: shouldnt this be createdNewTenant
   sandboxRestricted: boolean;
   tenantName: string;
+  requiresOnboarding: boolean;
 };
 
 export type OrgAuthLoginRequest = string;

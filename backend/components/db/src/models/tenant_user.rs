@@ -32,7 +32,7 @@ impl TenantUser {
     pub fn login_by_email(
         conn: &mut PgConnection,
         email: OrgMemberEmail,
-    ) -> DbResult<Option<(TenantUser, Tenant)>> {
+    ) -> DbResult<Option<(TenantRole, TenantUser, Tenant)>> {
         use crate::schema::tenant;
         let result: Option<(TenantRole, TenantUser, Tenant)> = tenant_role::table
             .inner_join(tenant_user::table)
@@ -47,7 +47,7 @@ impl TenantUser {
                 .set(tenant_user::last_login_at.eq(Utc::now()))
                 .get_result::<TenantUser>(conn)?;
         }
-        Ok(result.map(|(_, tenant_user, tenant)| (tenant_user, tenant)))
+        Ok(result)
     }
 
     pub fn login_by_id(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<(Tenant, TenantRole, Self)> {
