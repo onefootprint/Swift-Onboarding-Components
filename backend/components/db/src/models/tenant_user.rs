@@ -28,37 +28,57 @@ pub struct TenantUser {
     pub last_name: Option<String>,
 }
 
+pub type TenantUserInfo = (TenantUser, TenantRole, Tenant);
+
 impl TenantUser {
-    pub fn login_by_email(
-        conn: &mut PgConnection,
-        email: OrgMemberEmail,
-    ) -> DbResult<Option<(TenantRole, TenantUser, Tenant)>> {
-        use crate::schema::tenant;
-        let result: Option<(TenantRole, TenantUser, Tenant)> = tenant_role::table
-            .inner_join(tenant_user::table)
-            .inner_join(tenant::table)
+    /// Get the list of TenantUserIds that have this email address.
+    /// Could be multiple if a user has been invited to multiple tenants.
+    pub fn list_by_email(conn: &mut PgConnection, email: OrgMemberEmail) -> DbResult<Vec<TenantUserId>> {
+        let results: Vec<TenantUserId> = tenant_user::table
             .filter(tenant_user::email.eq(email))
-            .first(conn)
-            .optional()?;
-        if let Some((r, u, _)) = result.as_ref() {
-            u.validate_login(r)?;
-            diesel::update(tenant_user::table)
-                .filter(tenant_user::id.eq(&u.id))
-                .set(tenant_user::last_login_at.eq(Utc::now()))
-                .get_result::<TenantUser>(conn)?;
-        }
-        Ok(result)
+            .select(tenant_user::id)
+            .get_results(conn)?;
+        Ok(results)
     }
 
-    pub fn login_by_id(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<(Tenant, TenantRole, Self)> {
+    /// Fetches TenantUserInfo by TenantUserId when logging them in via a workos auth token, and
+    /// validates invariants for the TenantUser
+    pub fn get_by_id(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<TenantUserInfo> {
         use crate::schema::tenant;
-        let (role, tenant, user): (_, _, Self) = tenant_role::table
+        let (user, role, tenant): TenantUserInfo = tenant_user::table
+            .inner_join(tenant_role::table)
             .inner_join(tenant::table)
-            .inner_join(tenant_user::table)
             .filter(tenant_user::id.eq(id))
             .first(conn)?;
         user.validate_login(&role)?;
-        Ok((tenant, role, user))
+        Ok((user, role, tenant))
+    }
+
+    /// Log into a given TenantUserId
+    pub fn login_by_id(
+        conn: &mut TxnPgConnection,
+        id: &TenantUserId,
+        workos_first_name: Option<String>,
+        workos_last_name: Option<String>,
+    ) -> DbResult<TenantUserInfo> {
+        let (user, role, tenant) = Self::get_by_id(conn, id)?;
+
+        // Update the name if there's no name on the tenant_user
+        let tenant_user_has_no_name = user.first_name.is_none() && user.last_name.is_none();
+        let (first_name, last_name) = if tenant_user_has_no_name {
+            (workos_first_name, workos_last_name)
+        } else {
+            (None, None)
+        };
+        let update = TenantUserUpdate {
+            first_name,
+            last_name,
+            // Always set last_login_at to show when this user was logged into
+            last_login_at: Some(Utc::now()),
+            ..TenantUserUpdate::default()
+        };
+        let user = Self::update(conn, &user.tenant_id, &user.id, update)?;
+        Ok((user, role, tenant))
     }
 
     fn validate_login(&self, role: &TenantRole) -> DbResult<()> {
@@ -74,7 +94,8 @@ impl TenantUser {
         Ok(())
     }
 
-    pub fn get_by_email(
+    /// Only used when create integration test tenant users
+    pub fn get_by_email_for_test(
         conn: &mut PgConnection,
         email: &OrgMemberEmail,
         tenant_id: &TenantId,
@@ -178,4 +199,5 @@ pub struct TenantUserUpdate {
     pub deactivated_at: Option<Option<DateTime<Utc>>>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
+    pub last_login_at: Option<DateTime<Utc>>,
 }

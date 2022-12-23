@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use crate::auth::session::AuthSessionData;
+use crate::errors::tenant::TenantError;
 use crate::errors::workos_login::WorkOsLoginError;
 use crate::errors::ApiResult;
 use crate::utils::email_domain;
@@ -10,9 +11,9 @@ use crate::{errors::ApiError, types::response::ResponseData};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
-use db::models::tenant_user::{TenantUser, TenantUserUpdate};
+use db::models::tenant_user::TenantUser;
 use db::tenant::get_opt_by_workos_org_id;
-use newtypes::SessionAuthToken;
+use newtypes::{SessionAuthToken, TenantUserId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::organizations::{
@@ -60,10 +61,38 @@ async fn handler(
             code: &AuthorizationCode::from(code.to_owned()),
         })
         .await?;
-
     tracing::info!(profile =?profile, "workos login");
 
-    let (tenant, tenant_user, tenant_role, is_new) = find_or_create_user(&state, profile).await?;
+    // First, get all matching tenant users.
+    let email = profile.email.clone();
+    let matching_tenant_users = state
+        .db_pool
+        .db_query(move |conn| TenantUser::list_by_email(conn, email.into()))
+        .await??;
+
+    let (matching_tenant_users, is_new_tenant) = if !matching_tenant_users.is_empty() {
+        (matching_tenant_users, false)
+    } else {
+        // If there are no users with this email, make a new one.
+        // The new user will be associated with the tenant that owns the email address's domain OR
+        // with a brand new tenant named after the user's email
+        let (tenant_user_id, is_new_tenant) = create_tenant_user(&state, profile).await?;
+        (vec![tenant_user_id], is_new_tenant)
+    };
+
+    // TODO one day support multiple TenantUsers (if you have been invited to another tenant)
+    let tenant_user_id = matching_tenant_users
+        .into_iter()
+        .next()
+        .ok_or(TenantError::TenantUserDoesNotExist)?;
+
+    // Log into the user, updating the last_login_at and name (if new)
+    let first_name = profile.first_name.clone();
+    let last_name = profile.last_name.clone();
+    let (tenant_user, tenant_role, tenant) = state
+        .db_pool
+        .db_transaction(move |conn| TenantUser::login_by_id(conn, &tenant_user_id, first_name, last_name))
+        .await?;
 
     // Save tenant login in session data into the DB
     let session_data = AuthSessionData::WorkOs(tenant_user.clone().into());
@@ -74,11 +103,11 @@ async fn handler(
 
     Ok(Json(ResponseData {
         data: DashboardAuthorizationResponse {
-            email: profile.email.clone(),
+            email: tenant_user.email.0,
             auth: auth_token,
             first_name: tenant_user.first_name,
             last_name: tenant_user.last_name,
-            created_new_tenant: is_new,
+            created_new_tenant: is_new_tenant,
             tenant_name: tenant.name,
             sandbox_restricted: tenant.sandbox_restricted,
             requires_onboarding,
@@ -88,52 +117,14 @@ async fn handler(
 
 type IsNewTenant = bool;
 
-async fn find_or_create_user(
-    state: &State,
-    profile: &Profile,
-) -> ApiResult<(Tenant, TenantUser, TenantRole, IsNewTenant)> {
-    // See if a TenantUser with this email exists. If so, log them into the Tenant
-    let email = profile.email.clone();
-    let email2 = profile.email.clone();
-    let existing_user = state
-        .db_pool
-        .db_query(move |conn| TenantUser::login_by_email(conn, email.into()))
-        .await??;
-    if let Some((tenant_role, tenant_user, tenant)) = existing_user {
-        // upate tenant_user's name if they currently do not have a name and one is given to us by profile
-        let updated_tenant_user = if tenant_user.first_name.is_none()
-            && tenant_user.last_name.is_none()
-            && (profile.first_name.is_some() || profile.last_name.is_some())
-        {
-            let update = TenantUserUpdate {
-                first_name: profile.first_name.clone(),
-                last_name: profile.last_name.clone(),
-                ..TenantUserUpdate::default()
-            };
-            let tenant_user_id = tenant_user.id.clone();
-            let tenant_id = tenant.id.clone();
-            let name_update_result = state
-                .db_pool
-                .db_transaction(move |conn| TenantUser::update(conn, &tenant_id, &tenant_user_id, update))
-                .await;
-            name_update_result.ok() // don't hard error if name update fails
-        } else {
-            None
-        };
-        return Ok((
-            tenant.clone(),
-            updated_tenant_user.unwrap_or_else(|| tenant_user.clone()),
-            tenant_role,
-            false,
-        ));
-    }
-
+async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(TenantUserId, IsNewTenant)> {
     // Otherwise, find or create the tenant and create a new TenantUser
     let (tenant, is_new_tenant) = find_or_create_tenant(state, profile).await?;
     let first_name = profile.first_name.clone();
     let last_name = profile.last_name.clone();
+    let email = profile.email.clone();
     let tenant_id = tenant.id.clone();
-    let (tenant_user, tenant_role) = state
+    let tenant_user = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Get or create the admin role for this tenant
@@ -141,16 +132,17 @@ async fn find_or_create_user(
             let admin_role = TenantRole::get_or_create_admin_role(conn, tenant_id)?;
             let (tenant_user, _) = TenantUser::create(
                 conn,
-                email2.into(),
-                admin_role.tenant_id.clone(),
-                admin_role.id.clone(),
+                email.into(),
+                admin_role.tenant_id,
+                admin_role.id,
                 first_name,
                 last_name,
             )?;
-            Ok((tenant_user, admin_role))
+            Ok(tenant_user)
         })
         .await?;
-    Ok((tenant, tenant_user, tenant_role, is_new_tenant))
+    // Only give the TenantUserId here to make sure we log into the tenant
+    Ok((tenant_user.id, is_new_tenant))
 }
 
 async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tenant, IsNewTenant), ApiError> {

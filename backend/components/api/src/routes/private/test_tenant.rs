@@ -87,7 +87,7 @@ async fn post(
             // Get or create the TenantUser
             //
             let email = OrgMemberEmail::from("integrationtests@onefootprint.com".to_owned());
-            let tenant_user = match TenantUser::get_by_email(conn, &email, &tenant.id) {
+            let tenant_user = match TenantUser::get_by_email_for_test(conn, &email, &tenant.id) {
                 Ok(tenant_user) => tenant_user,
                 Err(e) => {
                     if !e.is_not_found() {
