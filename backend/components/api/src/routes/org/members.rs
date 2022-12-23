@@ -3,7 +3,7 @@ use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
-use crate::org::workos::magic_link::create_and_send_magic_link;
+use crate::org::auth::magic_link::create_and_send_magic_link;
 use crate::types::EmptyRequest;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
