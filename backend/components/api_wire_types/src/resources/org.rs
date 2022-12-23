@@ -8,5 +8,7 @@ pub struct Organization {
     pub name: String,
     pub logo_url: Option<String>,
     pub is_sandbox_restricted: bool,
+    pub website_url: Option<String>,
+    pub company_size: Option<CompanySize>,
 }
 export_schema!(Organization);

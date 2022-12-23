@@ -8,12 +8,16 @@ impl DbToApi<Tenant> for api_wire_types::Organization {
             name,
             logo_url,
             sandbox_restricted,
+            website_url,
+            company_size,
             ..
         } = t;
         Self {
             name,
             logo_url,
             is_sandbox_restricted: sandbox_restricted,
+            website_url,
+            company_size,
         }
     }
 }
