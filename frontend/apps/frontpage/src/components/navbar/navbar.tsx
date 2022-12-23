@@ -132,7 +132,7 @@ const Inner = styled.div`
     padding: ${theme.spacing[6]} 0 ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
-      padding:  ${theme.spacing[4]};
+      padding:  ${theme.spacing[4]} 0;
     `}
   `}
   &[data-variant='min'] {
