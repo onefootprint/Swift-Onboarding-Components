@@ -1,6 +1,6 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::WorkOsAuthContext;
+use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::request::PaginatedRequest;
@@ -40,7 +40,7 @@ type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
 

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::WorkOsAuthContext;
+use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::serializers::UserDetail;
@@ -36,7 +36,7 @@ type UsersListResponse = Vec<UsersDetailResponse>;
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<ListUsersRequest, i64>>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<UsersListResponse, i64>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant = auth.tenant();
@@ -137,7 +137,7 @@ pub async fn get(
 pub async fn get_detail(
     state: web::Data<State>,
     footprint_user_id: web::Path<FootprintUserId>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<JsonApiResponse<UsersDetailResponse>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant = auth.tenant();

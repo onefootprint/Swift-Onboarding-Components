@@ -95,7 +95,7 @@ async fn handler(
         .await?;
 
     // Save tenant login in session data into the DB
-    let session_data = AuthSessionData::WorkOs(tenant_user.clone().into());
+    let session_data = AuthSessionData::TenantUser(tenant_user.clone().into());
     let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
 
     let requires_onboarding =

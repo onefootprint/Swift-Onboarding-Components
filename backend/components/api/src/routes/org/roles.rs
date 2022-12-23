@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantPermissions;
-use crate::auth::tenant::WorkOsAuthContext;
+use crate::auth::tenant::TenantUserAuthContext;
 
 use crate::errors::ApiResult;
 use crate::types::EmptyRequest;
@@ -22,7 +22,7 @@ type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::Organization
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let tenant = auth.tenant();
@@ -55,7 +55,7 @@ struct CreateTenantRoleRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantRoleRequest>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
@@ -83,7 +83,7 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
@@ -105,7 +105,7 @@ async fn patch(
 async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();

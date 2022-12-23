@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::{
-    tenant::{CheckTenantPermissions, TenantAuth, WorkOsAuthContext},
+    tenant::{CheckTenantPermissions, TenantAuth, TenantUserAuthContext},
     AuthError, Either,
 };
 use crate::errors::ApiResult;
@@ -133,7 +133,7 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDataResponse> {
     get_internal(state, path, request, tenant_auth).await
 }
@@ -142,7 +142,7 @@ pub(super) async fn get_internal(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDataResponse> {
     let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::Users])?;
     let footprint_user_id = path.into_inner();
@@ -198,7 +198,7 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityFieldsRequest>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
     post_decrypt_internal(state, path, request, auth, insights).await
@@ -208,7 +208,7 @@ pub(super) async fn post_decrypt_internal(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityFieldsRequest>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
     let request = request.into_inner();

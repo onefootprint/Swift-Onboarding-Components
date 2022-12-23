@@ -5,8 +5,8 @@ mod secret_key;
 pub use secret_key::*;
 mod ob_session;
 pub use ob_session::*;
-mod workos;
-pub use self::workos::*;
+mod tenant_user;
+pub use self::tenant_user::*;
 
 use super::AuthError;
 use crate::errors::ApiError;

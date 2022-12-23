@@ -2,7 +2,9 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, TenantAuth, WorkOsAuthContext};
+use crate::auth::tenant::{
+    CheckTenantPermissions, SecretTenantAuthContext, TenantAuth, TenantUserAuthContext,
+};
 use crate::auth::Either;
 
 use crate::errors::ApiResult;
@@ -106,7 +108,7 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetCustomDataResponse> {
     get_internal(state, path, request, tenant_auth).await
 }
@@ -115,7 +117,7 @@ pub(super) async fn get_internal(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetCustomDataResponse> {
     let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::Users])?;
     let footprint_user_id = path.into_inner();
@@ -169,7 +171,7 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptCustomFieldsRequest>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
     post_decrypt_internal(state, path, request, tenant_auth, insights).await
@@ -179,7 +181,7 @@ pub(super) async fn post_decrypt_internal(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptCustomFieldsRequest>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
     let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::DecryptCustom])?;

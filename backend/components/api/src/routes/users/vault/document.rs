@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 /// Decrypt document data for a footprint user
 ///   2022-11-28: We do not support PUT operations (interested customers should use custom vault for document data they wish to store)
 use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext};
-use crate::auth::{tenant::WorkOsAuthContext, Either};
+use crate::auth::{tenant::TenantUserAuthContext, Either};
 
 use crate::errors::ApiError;
 use crate::routes::hosted::user::DecryptDocumentResult;
@@ -34,7 +34,7 @@ pub async fn get(
     path: Path<FootprintUserId>,
     // TODO: is there a way to make this typed?
     request: Query<GetQueryParam>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDocumentForDecryptResponse> {
     get_internal(state, path, request, tenant_auth).await
 }
@@ -43,7 +43,7 @@ pub(super) async fn get_internal(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<GetQueryParam>,
-    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDocumentForDecryptResponse> {
     // TODO: DRY
     let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::Users])?;
@@ -105,7 +105,7 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityDocumentRequest>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
     post_internal(state, path, request, auth, insights).await
@@ -115,7 +115,7 @@ pub(super) async fn post_internal(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityDocumentRequest>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
     let request = request.into_inner();

@@ -1,6 +1,6 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::WorkOsAuthContext;
+use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 
 use crate::types::response::ResponseData;
@@ -30,7 +30,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Path<FootprintUserId>,
     filters: web::Query<RiskSignalFilters>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();
@@ -90,7 +90,7 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
 pub async fn get_detail(
     state: web::Data<State>,
     request: web::Path<(FootprintUserId, RiskSignalId)>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsDetailResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();

@@ -18,7 +18,7 @@ impl AuthSessionData {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum AuthSessionData {
     /// workos login to tenant admin
-    WorkOs(crate::auth::tenant::WorkOsSession),
+    TenantUser(crate::auth::tenant::TenantUserSession),
 
     /// user-specific sessions
     User(crate::auth::user::UserSession),

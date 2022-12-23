@@ -106,7 +106,7 @@ async fn post(
                 }
             };
             // Create a new workos session for the integration test tenant user
-            let session_data = AuthSessionData::WorkOs(tenant_user.into());
+            let session_data = AuthSessionData::TenantUser(tenant_user.into());
             let auth_token = AuthSession::create_sync(conn, &key, session_data, Duration::minutes(15))?;
 
             //

@@ -1,6 +1,6 @@
 use crate::auth::tenant::AuthActor;
 use crate::auth::tenant::CheckTenantPermissions;
-use crate::auth::tenant::WorkOsAuthContext;
+use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::org::workos::magic_link::create_and_send_magic_link;
@@ -28,7 +28,7 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> actix_web::Result<
     Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
     ApiError,
@@ -70,7 +70,7 @@ struct CreateTenantUserRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantUserRequest>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
@@ -108,7 +108,7 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantUserRequest>,
     user_id: web::Path<TenantUserId>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
@@ -132,7 +132,7 @@ async fn patch(
 async fn deactivate(
     state: web::Data<State>,
     user_id: web::Path<TenantUserId>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();

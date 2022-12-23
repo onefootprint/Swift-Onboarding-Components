@@ -1,6 +1,6 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::WorkOsAuthContext;
+use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 
 use crate::types::response::ResponseData;
@@ -24,7 +24,7 @@ type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FootprintUserId>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<TimelineEventsResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();

@@ -1,4 +1,4 @@
-use crate::auth::tenant::{CheckTenantPermissions, WorkOsAuthContext};
+use crate::auth::tenant::{CheckTenantPermissions, TenantUserAuthContext};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
@@ -19,7 +19,7 @@ pub struct GetTenantResponse {
 #[actix::get("/org/settings")]
 pub async fn get(
     state: web::Data<State>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<GetTenantResponse>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let tenant = auth.tenant();

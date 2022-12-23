@@ -15,19 +15,19 @@ use paperclip::actix::Apiv2Security;
 use super::{AuthActor, CheckTenantPermissions, TenantAuth};
 
 #[derive(Debug, Clone)]
-pub struct WorkOs {
+pub struct TenantUserAuth {
     tenant: Tenant,
     tenant_role: TenantRole,
     #[allow(dead_code)]
     tenant_user: TenantUser,
-    data: WorkOsSession,
+    data: TenantUserSession,
 }
 
-/// Nests a private WorkOs and implements traits required to extract this session from an
+/// Nests a private TenantUserAuth and implements traits required to extract this session from an
 /// actix request.
-/// Notably, this struct isn't very useful since the entire nested WorkOs is hidden. If you
+/// Notably, this struct isn't very useful since the entire nested TenantUserAuth is hidden. If you
 /// want to do something useful, you likely have to enforce permissions by calling
-/// `check_permissions`, which will give you the more useful nested WorkOs
+/// `check_permissions`, which will give you the more useful nested TenantUserAuth
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
@@ -35,17 +35,17 @@ pub struct WorkOs {
     name = "X-Fp-Dashboard-Authorization",
     description = "Auth token for a dashboard user"
 )]
-pub struct ParsedWorkOs(WorkOs);
+pub struct ParsedTenantUserAuth(TenantUserAuth);
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-pub struct WorkOsSession {
+pub struct TenantUserSession {
     pub email: String,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub tenant_user_id: TenantUserId,
 }
 
-impl From<TenantUser> for WorkOsSession {
+impl From<TenantUser> for TenantUserSession {
     fn from(tu: TenantUser) -> Self {
         Self {
             email: tu.email.0,
@@ -56,14 +56,14 @@ impl From<TenantUser> for WorkOsSession {
     }
 }
 
-impl ExtractableAuthSession for ParsedWorkOs {
+impl ExtractableAuthSession for ParsedTenantUserAuth {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
     fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError> {
         let data = match auth_session {
-            AuthSessionData::WorkOs(data) => data,
+            AuthSessionData::TenantUser(data) => data,
             _ => {
                 return Err(AuthError::SessionTypeError.into());
             }
@@ -72,7 +72,7 @@ impl ExtractableAuthSession for ParsedWorkOs {
 
         tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tenant_role.id, tenant_user_id=%tenant_user.id, "authenticated");
 
-        Ok(Self(WorkOs {
+        Ok(Self(TenantUserAuth {
             data,
             tenant,
             tenant_role,
@@ -81,8 +81,8 @@ impl ExtractableAuthSession for ParsedWorkOs {
     }
 }
 
-impl ParsedWorkOs {
-    pub fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<WorkOs, AuthError> {
+impl ParsedTenantUserAuth {
+    pub fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<TenantUserAuth, AuthError> {
         if let Some(missing_permission) = permissions
             .into_iter()
             .find(|p| !self.0.tenant_role.permissions.has_permission(p))
@@ -93,7 +93,7 @@ impl ParsedWorkOs {
         }
     }
 
-    pub fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<WorkOs, AuthError> {
+    pub fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<TenantUserAuth, AuthError> {
         if self.0.tenant_role.permissions.can_decrypt(attributes) {
             Ok(self.0)
         } else {
@@ -102,7 +102,7 @@ impl ParsedWorkOs {
     }
 }
 
-impl WorkOs {
+impl TenantUserAuth {
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
     }
@@ -122,10 +122,10 @@ impl WorkOs {
 }
 
 /// A shorthand for the commonly used ParsedWorkOs context
-pub type WorkOsAuthContext = SessionContext<ParsedWorkOs>;
+pub type TenantUserAuthContext = SessionContext<ParsedTenantUserAuth>;
 
-impl CheckTenantPermissions for WorkOsAuthContext {
-    /// Verifies that the auth token has one of the required scopes. If so, returns a WorkOs
+impl CheckTenantPermissions for TenantUserAuthContext {
+    /// Verifies that the auth token has one of the required scopes. If so, returns a TenantUserAuth
     /// that is accessible
     fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError> {
         let result = self.map(|c| c.check_permissions(permissions))?;
@@ -138,7 +138,7 @@ impl CheckTenantPermissions for WorkOsAuthContext {
     }
 }
 
-impl TenantAuth for SessionContext<WorkOs> {
+impl TenantAuth for SessionContext<TenantUserAuth> {
     fn is_live(&self) -> Result<bool, ApiError> {
         let is_live: Option<bool> = self
             .headers

@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::auth::tenant::ObPkAuth;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::{
-    tenant::{CheckTenantPermissions, WorkOsAuthContext},
+    tenant::{CheckTenantPermissions, TenantUserAuthContext},
     Either,
 };
 use crate::errors::tenant::TenantError;
@@ -50,7 +50,7 @@ pub fn get_detail(
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<
     Json<PaginatedResponseData<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
     ApiError,
@@ -151,7 +151,7 @@ impl CreateOnboardingConfigurationRequest {
 #[post("/org/onboarding_configs")]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
@@ -206,7 +206,7 @@ struct UpdateObConfigRequest {
 #[patch("/org/onboarding_configs/{id}")]
 async fn patch(
     state: web::Data<State>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {

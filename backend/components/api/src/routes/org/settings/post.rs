@@ -1,4 +1,4 @@
-use crate::auth::tenant::{CheckTenantPermissions, WorkOsAuthContext};
+use crate::auth::tenant::{CheckTenantPermissions, TenantUserAuthContext};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
@@ -24,7 +24,7 @@ pub struct UpdateRequest {
 pub async fn post(
     state: web::Data<State>,
     request: Json<UpdateRequest>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let request = request.into_inner();

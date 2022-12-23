@@ -1,4 +1,4 @@
-use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, WorkOsAuthContext};
+use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, TenantUserAuthContext};
 use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::PaginatedRequest;
@@ -25,7 +25,7 @@ type ApiKeysResponse = Json<PaginatedResponseData<Vec<api_wire_types::SecretApiK
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> ApiResult<ApiKeysResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let page_size = request.page_size(&state);
@@ -71,7 +71,7 @@ pub struct CreateApiKeyRequest {
 #[actix::post("/org/api_keys")]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
@@ -113,7 +113,7 @@ pub struct UpdateApiKeyRequest {
 #[patch("/org/api_keys/{id}")]
 pub async fn patch(
     state: web::Data<State>,
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {

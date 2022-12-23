@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantPermissions;
-use crate::auth::tenant::WorkOsAuthContext;
+use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
@@ -24,7 +24,7 @@ pub async fn post(
     state: web::Data<State>,
     fp_user_id: web::Path<FootprintUserId>,
     request: web::Json<DecisionRequest>,
-    auth: WorkOsAuthContext,
+    auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::ManualReview])?;
     let tenant_id = auth.tenant().id.clone();

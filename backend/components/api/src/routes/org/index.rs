@@ -1,5 +1,5 @@
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::{CheckTenantPermissions, WorkOsAuthContext};
+use crate::auth::tenant::{CheckTenantPermissions, TenantUserAuthContext};
 use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
@@ -12,7 +12,7 @@ use paperclip::actix::{self, api_v2_operation, web::Json};
 )]
 #[actix::get("/org")]
 pub async fn get(
-    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<api_wire_types::Organization> {
     let auth = auth.check_permissions(vec![])?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
