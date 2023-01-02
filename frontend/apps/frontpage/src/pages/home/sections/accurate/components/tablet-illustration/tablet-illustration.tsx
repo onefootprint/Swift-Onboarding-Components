@@ -36,11 +36,11 @@ const IllustrationWrapper = styled(BaseIllustration)`
   }
 
   ${media.greaterThan('sm')`
-      display: block;
+    display: block;
   `}
 
   ${media.greaterThan('md')`
-      display: none;
+    display: none;
   `}
 `;
 

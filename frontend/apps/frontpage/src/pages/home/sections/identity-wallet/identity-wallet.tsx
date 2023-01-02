@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoDatabase24, IcoEye24, IcoLock24 } from '@onefootprint/icons';
+import { IcoActivity24, IcoFilter24, IcoStar24 } from '@onefootprint/icons';
 import { Container } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import React from 'react';
@@ -32,19 +32,19 @@ const IdentityWallet = () => {
             title={t('features.feature-1.title')}
             body={t('features.feature-1.body')}
           >
-            <IcoLock24 />
+            <IcoFilter24 />
           </FeatureElement>
           <FeatureElement
             title={t('features.feature-2.title')}
             body={t('features.feature-2.body')}
           >
-            <IcoEye24 />
+            <IcoActivity24 />
           </FeatureElement>
           <FeatureElement
             title={t('features.feature-3.title')}
             body={t('features.feature-3.body')}
           >
-            <IcoDatabase24 />
+            <IcoStar24 />
           </FeatureElement>
         </FeatureStack>
         <DynamicDesktopIllustration />
