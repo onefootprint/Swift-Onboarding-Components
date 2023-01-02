@@ -4,7 +4,7 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import { States } from '../../utils/state-machine/types';
 import CountryAndTypeSelection from '../country-and-type-selection';
 import Failure from '../failure';
-import ProcessingPhoto from '../processing-photo';
+import ProcessingDocuments from '../processing-documents';
 import RetryBackPhoto from '../retry-back-photo';
 import RetryFrontPhoto from '../retry-front-photo';
 import TakeOrUploadBackPhoto from '../take-or-upload-back-photo';
@@ -34,7 +34,7 @@ const Router = ({ onDone }: RouterProps) => {
     return <TakeOrUploadBackPhoto />;
   }
   if (state.matches(States.processingPhoto)) {
-    return <ProcessingPhoto />;
+    return <ProcessingDocuments />;
   }
   if (state.matches(States.retryFrontPhoto)) {
     return <RetryFrontPhoto />;
