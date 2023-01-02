@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IlluLightPhoneWithId } from '@onefootprint/icons';
 import { BottomSheet, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -21,7 +20,6 @@ const MissingPermissions = ({
   return (
     <BottomSheet open={open} onClose={onClose} title="">
       <Body>
-        <IlluLightPhoneWithId />
         <TextContainer>
           <HeaderTitle
             title={t('title', { permissionName })}
@@ -35,7 +33,7 @@ const MissingPermissions = ({
             variant="body-2"
             sx={{ textAlign: 'center', marginTop: 9 }}
           >
-            {t('action-required', { permissionName })}
+            {t('action-required')}
           </Typography>
         </TextContainer>
       </Body>
