@@ -155,6 +155,8 @@ export { default as IcoSearch16 } from './ico-search-16';
 export { default as IcoSearch24 } from './ico-search-24';
 export { default as IcoSearchSmall16 } from './ico-search-small-16';
 export { default as IcoSearchSmall24 } from './ico-search-small-24';
+export { default as IcoSelfie16 } from './ico-selfie-16';
+export { default as IcoSelfie24 } from './ico-selfie-24';
 export { default as IcoSelfie40 } from './ico-selfie-40';
 export { default as IcoSettings16 } from './ico-settings-16';
 export { default as IcoSettings24 } from './ico-settings-24';
