@@ -5,8 +5,8 @@
   "components": {
     "missing-permissions": {
       "title": "Allow access to your {{permissionName}}",
-      "subtitle": "This lets you submit photos of your document, and we can use them to properly verify your ID.",
-      "action-required": "Open settings to update {{permissionName}} permissions."
+      "subtitle": "This lets you submit photos of your documents, and we can use them to verify your identity.",
+      "action-required": "Open settings"
     },
     "scan-guidelines": {
       "check-lighting": {
