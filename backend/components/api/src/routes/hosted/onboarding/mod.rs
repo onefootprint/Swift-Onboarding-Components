@@ -80,13 +80,20 @@ pub fn get_requirements(
     // RELATED: FP-1802 and FP-1800
     let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.user_vault.id)?;
 
+    // See if we need to run identity checks and ultimately produce a decision. We do this in 2 scenarios:
+    //   1. we have not done it at all (!idv_reqs_initiated)
+    //   2. we need to re-run the decision engine to produce a decision after a step up (!has_final_decision)\
+    //
+    // TODO this is slightly overloaded and maybe we need another requirement?
+    let identity_check_required = !(onboarding.idv_reqs_initiated && onboarding.has_final_decision);
+
     let requirements = vec![
         (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData { missing_attributes }),
         // check if we have liveness events
         liveness_events
             .is_empty()
             .then_some(OnboardingRequirement::Liveness),
-        (!onboarding.idv_reqs_initiated).then_some(OnboardingRequirement::IdentityCheck),
+        (identity_check_required).then_some(OnboardingRequirement::IdentityCheck),
     ]
     .into_iter()
     .flatten()

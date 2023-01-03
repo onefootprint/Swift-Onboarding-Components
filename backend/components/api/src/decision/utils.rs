@@ -59,7 +59,10 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             if ob.idv_reqs_initiated {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
-            let ob = ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
+            let ob = ob.update(
+                conn,
+                OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
+            )?;
 
             // Create ManualReview row if requested
             if create_manual_review {

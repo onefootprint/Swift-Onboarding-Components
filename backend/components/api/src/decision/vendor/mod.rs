@@ -32,7 +32,13 @@ pub fn build_verification_requests_and_checkpoint(
     // Once we set idv_reqs_initiated below, this lock will make sure we can't save multiple sets of VerificationRequests
     // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
     if ob.idv_reqs_initiated {
-        return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+        // In the case of a step up (for similar race condition related reasons) we notate on the OB whether we _do_ need
+        // to produce a new decision, despite not needing to initiate verification requests again.
+        if !ob.has_final_decision {
+            return Ok(vec![]);
+        } else {
+            return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+        }
     }
     // Always set the idv_reqs_initiated to true in order to checkpoint
     ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;

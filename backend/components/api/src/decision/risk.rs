@@ -2,7 +2,7 @@ use newtypes::{DbActor, DecisionStatus, OnboardingId};
 
 use db::models::{
     manual_review::ManualReview,
-    onboarding::Onboarding,
+    onboarding::{Onboarding, OnboardingUpdate},
     onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
 };
 
@@ -27,7 +27,13 @@ pub async fn create_final_decision(
         .db_transaction(move |conn| -> ApiResult<_> {
             Onboarding::lock(conn, &ob_id)?;
             let (current_ob, scoped_user, _, _) = Onboarding::get(conn, &ob_id)?;
-            let decision = final_decision(&features, current_ob)?;
+
+            // prevent race conditions from producing 2 decisions
+            if current_ob.has_final_decision {
+                return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
+            }
+
+            let decision = final_decision(&features, current_ob.id.clone())?;
 
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision.decision_status == DecisionStatus::Pass {
@@ -49,7 +55,12 @@ pub async fn create_final_decision(
                 actor: DbActor::Footprint,
                 seqno,
             };
-            OnboardingDecision::create(conn, onboarding_decision)?;
+            let obd = OnboardingDecision::create(conn, onboarding_decision)?;
+
+            // If we are done, we no longer need a decision
+            if !obd.status.new_decision_required() {
+                current_ob.update(conn, OnboardingUpdate::has_final_decision(true))?;
+            }
 
             // Create ManualReview row if requested
             if decision.create_manual_review {
@@ -76,7 +87,7 @@ pub struct DecisionOutput {
     pub onboarding_id: OnboardingId,
     pub create_manual_review: bool,
 }
-fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> ApiResult<DecisionOutput> {
+fn final_decision(features: &FeatureVector, onboarding_id: OnboardingId) -> ApiResult<DecisionOutput> {
     // v0 Super basic logic
     //    1) If we need an ID doc for idology. OB status = Failed, verification status = NeedsIDDocument
     //    2) If we don't, fall back to `result_statuses`
@@ -107,7 +118,7 @@ fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> A
     let output = DecisionOutput {
         decision_status,
         id_number: maybe_id_doc_number,
-        onboarding_id: current_onboarding.id,
+        onboarding_id,
         create_manual_review,
     };
     Ok(output)

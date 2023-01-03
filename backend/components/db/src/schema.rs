@@ -233,6 +233,7 @@ table! {
         insight_event_id -> Text,
         is_authorized -> Bool,
         idv_reqs_initiated -> Bool,
+        has_final_decision -> Bool,
     }
 }
 

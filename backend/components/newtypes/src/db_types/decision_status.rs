@@ -35,6 +35,13 @@ pub enum DecisionStatus {
 
 crate::util::impl_enum_str_diesel!(DecisionStatus);
 
+impl DecisionStatus {
+    /// We need to re-run identity check logic if the user is still in "StepUpRequired" state
+    pub fn new_decision_required(&self) -> bool {
+        matches!(self, Self::StepUpRequired)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use test_case::test_case;

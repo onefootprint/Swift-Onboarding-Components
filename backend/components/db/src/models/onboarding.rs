@@ -31,6 +31,7 @@ pub struct Onboarding {
     pub insight_event_id: InsightEventId,
     pub is_authorized: bool,
     pub idv_reqs_initiated: bool,
+    pub has_final_decision: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -42,6 +43,7 @@ struct NewOnboarding {
     insight_event_id: InsightEventId,
     is_authorized: bool,
     idv_reqs_initiated: bool,
+    has_final_decision: bool,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -49,6 +51,7 @@ struct NewOnboarding {
 pub struct OnboardingUpdate {
     pub is_authorized: Option<bool>,
     pub idv_reqs_initiated: Option<bool>,
+    pub has_final_decision: Option<bool>,
 }
 
 pub struct OnboardingCreateArgs {
@@ -69,6 +72,21 @@ impl OnboardingUpdate {
     pub fn idv_reqs_initiated(idv_reqs_initiated: bool) -> Self {
         Self {
             idv_reqs_initiated: Some(idv_reqs_initiated),
+            ..Self::default()
+        }
+    }
+
+    pub fn has_final_decision(has_final_decision: bool) -> Self {
+        Self {
+            has_final_decision: Some(has_final_decision),
+            ..Self::default()
+        }
+    }
+
+    pub fn idv_reqs_and_has_final_decision(has_final_decision: bool, idv_reqs_initiated: bool) -> Self {
+        Self {
+            idv_reqs_initiated: Some(idv_reqs_initiated),
+            has_final_decision: Some(has_final_decision),
             ..Self::default()
         }
     }
@@ -288,6 +306,7 @@ impl Onboarding {
             insight_event_id: insight_event.id,
             is_authorized: false,
             idv_reqs_initiated: false,
+            has_final_decision: false,
         };
         let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)
