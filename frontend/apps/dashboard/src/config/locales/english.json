@@ -50,7 +50,7 @@
   },
   "id-doc-type": {
     "id_card": "ID card",
-    "drivers_license": "Driver's License",
+    "driver_license": "Driver's License",
     "passport": "Passport"
   },
   "vendors": {

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 flat_api_object_map_type!(
     GetIdentityDocumentForDecryptResponse<String, bool>,
     description="A key-value map indicating what document_types are present",
-    example=r#"{ "drivers_license": true, "passport": false }"#
+    example=r#"{ "driver_license": true, "passport": false }"#
 );
 #[derive(Debug, Deserialize, Clone, Apiv2Schema)]
 pub struct GetQueryParam {
