@@ -11,7 +11,7 @@ type H3Props = {
 const H3 = ({ children }: H3Props) => {
   const id = kebabCase(children);
   return (
-    <Anchor id={id} href={`#${id}`} rel="noopener">
+    <Anchor id={id} href={`#${id}`} rel="noopener noreferrer">
       <Typography as="h3" color="primary" variant="label-1">
         {children}
         <IcoLink16 />

@@ -11,7 +11,7 @@ type H1Props = {
 const H1 = ({ children }: H1Props) => {
   const id = kebabCase(children);
   return (
-    <Anchor id={id} href={`#${id}`} rel="noopener">
+    <Anchor id={id} href={`#${id}`} rel="noopener noreferrer">
       <Typography as="h1" color="primary" variant="heading-2">
         {children}
         <IcoLink16 />
