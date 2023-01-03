@@ -7,7 +7,9 @@ import {
 } from '@onefootprint/icons';
 import { Container } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import React from 'react';
+import { Trans } from 'react-i18next';
 
 import Blob from '../../components/blobs/blobs';
 import FeatureElement from '../../components/feature-element';
@@ -53,7 +55,20 @@ const Customizable = () => {
           </FeatureElement>
           <FeatureElement
             title={t('features.feature-4.title')}
-            body={t('features.feature-4.body')}
+            body={
+              <Trans
+                i18nKey="pages.home.customizable-section.features.feature-4.body"
+                components={{
+                  a: (
+                    <Link
+                      href="http://docs.onefootprint.com"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    />
+                  ),
+                }}
+              />
+            }
           >
             <IcoFileText224 />
           </FeatureElement>

@@ -3,8 +3,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 type FeatureElementType = {
-  title: string;
-  body: string;
+  title: React.ReactNode;
+  body: React.ReactNode;
   children: React.ReactNode;
 };
 

@@ -213,7 +213,7 @@
           },
           "feature-4": {
             "title": "Well-documented",
-            "body": "Everything you need to customize your onboarding flow can be found in our docs. Still need help? No problem! We're here for you."
+            "body": "Everything you need to customize your onboarding flow can be found in <a>our docs</a>. Still need help? No problem! We're here for you."
           }
         }
       },
