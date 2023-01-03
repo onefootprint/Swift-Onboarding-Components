@@ -63,7 +63,7 @@
         "cta": "Continue"
       }
     },
-    "take-or-upload-photo": {
+    "id-doc-photo": {
       "front": {
         "title": "Submit your {{type}} (FRONT)",
         "subtitle": "Upload or take a photo of the front of your {{type}}."

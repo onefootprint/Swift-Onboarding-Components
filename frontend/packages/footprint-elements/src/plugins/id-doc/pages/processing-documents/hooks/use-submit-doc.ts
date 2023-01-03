@@ -11,11 +11,11 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     backImage,
     documentType,
     countryCode,
-    documentRequestId,
+    requestId,
   } = payload;
   const response = await request<SubmitDocResponse>({
     method: 'POST',
-    url: `/hosted/user/document/${documentRequestId}`,
+    url: `/hosted/user/document/${requestId}`,
     data: {
       frontImage,
       backImage,

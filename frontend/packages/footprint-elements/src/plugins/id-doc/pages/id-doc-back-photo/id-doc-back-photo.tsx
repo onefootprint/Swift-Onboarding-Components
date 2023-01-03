@@ -2,21 +2,23 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
-import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
-const RetryFrontPhoto = () => {
+const IdDocBackPhoto = () => {
+  const { t } = useTranslation('pages.id-doc-photo.back');
   const [state, send] = useIdDocMachine();
-  const { t } = useTranslation('pages.retry-photo.front');
-  const { frontImageError, type } = state.context;
-  if (!frontImageError || !type) {
+  const {
+    idDoc: { type },
+  } = state.context;
+
+  if (!type) {
     return null;
   }
 
   const handleComplete = (image: string) => {
     send({
-      type: Events.receivedFrontImage,
+      type: Events.receivedIdDocBackImage,
       payload: {
         image,
       },
@@ -28,10 +30,13 @@ const RetryFrontPhoto = () => {
       title={t('title', {
         type: IdDocTypeToLabel[type],
       })}
-      subtitle={BadImageErrorLabel[frontImageError]}
+      subtitle={t('subtitle', {
+        type: IdDocTypeToLabel[type],
+      })}
+      showGuidelines
       onComplete={handleComplete}
     />
   );
 };
 
-export default RetryFrontPhoto;
+export default IdDocBackPhoto;

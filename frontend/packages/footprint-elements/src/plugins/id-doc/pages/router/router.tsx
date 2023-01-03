@@ -2,13 +2,13 @@ import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import { States } from '../../utils/state-machine/types';
-import CountryAndTypeSelection from '../country-and-type-selection';
 import Failure from '../failure';
+import IdDocBackPhoto from '../id-doc-back-photo';
+import IdDocCountryAndType from '../id-doc-country-and-type';
+import IdDocFrontPhoto from '../id-doc-front-photo';
 import ProcessingDocuments from '../processing-documents';
-import RetryBackPhoto from '../retry-back-photo';
-import RetryFrontPhoto from '../retry-front-photo';
-import TakeOrUploadBackPhoto from '../take-or-upload-back-photo';
-import TakeOrUploadFrontPhoto from '../take-or-upload-front-photo';
+import RetryIdDocBackPhoto from '../retry-id-doc-back-photo';
+import RetryIdDocFrontPhoto from '../retry-id-doc-front-photo';
 
 type RouterProps = {
   onDone: () => void;
@@ -24,23 +24,23 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches(States.idCountryAndTypeSelection)) {
-    return <CountryAndTypeSelection />;
+  if (state.matches(States.idDocCountryAndType)) {
+    return <IdDocCountryAndType />;
   }
-  if (state.matches(States.takeOrUploadFrontPhoto)) {
-    return <TakeOrUploadFrontPhoto />;
+  if (state.matches(States.idDocFrontPhoto)) {
+    return <IdDocFrontPhoto />;
   }
-  if (state.matches(States.takeOrUploadBackPhoto)) {
-    return <TakeOrUploadBackPhoto />;
+  if (state.matches(States.idDocBackPhoto)) {
+    return <IdDocBackPhoto />;
   }
-  if (state.matches(States.processingPhoto)) {
+  if (state.matches(States.processingDocuments)) {
     return <ProcessingDocuments />;
   }
-  if (state.matches(States.retryFrontPhoto)) {
-    return <RetryFrontPhoto />;
+  if (state.matches(States.retryIdDocFrontPhoto)) {
+    return <RetryIdDocFrontPhoto />;
   }
-  if (state.matches(States.retryBackPhoto)) {
-    return <RetryBackPhoto />;
+  if (state.matches(States.retryIdDocBackPhoto)) {
+    return <RetryIdDocBackPhoto />;
   }
   if (state.matches(States.failure)) {
     return <Failure />;

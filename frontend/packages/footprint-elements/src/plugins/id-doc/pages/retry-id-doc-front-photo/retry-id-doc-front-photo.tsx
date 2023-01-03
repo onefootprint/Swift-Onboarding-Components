@@ -6,17 +6,19 @@ import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
-const RetryBackPhoto = () => {
+const RetryIdDocFrontPhoto = () => {
   const [state, send] = useIdDocMachine();
-  const { t } = useTranslation('pages.retry-photo.back');
-  const { backImageError, type } = state.context;
-  if (!backImageError || !type) {
+  const { t } = useTranslation('pages.retry-photo.front');
+  const {
+    idDoc: { frontImageError, type },
+  } = state.context;
+  if (!frontImageError || !type) {
     return null;
   }
 
   const handleComplete = (image: string) => {
     send({
-      type: Events.receivedBackImage,
+      type: Events.receivedIdDocFrontImage,
       payload: {
         image,
       },
@@ -28,10 +30,10 @@ const RetryBackPhoto = () => {
       title={t('title', {
         type: IdDocTypeToLabel[type],
       })}
-      subtitle={BadImageErrorLabel[backImageError]}
+      subtitle={BadImageErrorLabel[frontImageError]}
       onComplete={handleComplete}
     />
   );
 };
 
-export default RetryBackPhoto;
+export default RetryIdDocFrontPhoto;

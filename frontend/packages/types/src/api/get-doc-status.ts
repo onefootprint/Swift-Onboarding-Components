@@ -2,7 +2,7 @@ import { IdDocBadImageError } from '../data';
 
 export type GetDocStatusRequest = {
   authToken: string;
-  documentRequestId: string;
+  requestId: string;
 };
 
 export enum DocStatusKind {

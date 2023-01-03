@@ -16,9 +16,10 @@ import { Events } from './utils/state-machine/types';
 const App = ({ context, onDone }: IdDocProps) => {
   const [, send] = useIdDocMachine();
   const { authToken, device, customData } = context;
-  const documentRequestId = customData?.documentRequestId;
+  const requestId = customData?.requestId;
+
   useEffectOnce(() => {
-    if (!documentRequestId) {
+    if (!requestId) {
       return;
     }
     send({
@@ -26,7 +27,7 @@ const App = ({ context, onDone }: IdDocProps) => {
       payload: {
         authToken,
         device,
-        documentRequestId,
+        requestId,
       },
     });
   });

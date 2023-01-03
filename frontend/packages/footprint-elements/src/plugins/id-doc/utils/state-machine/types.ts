@@ -7,46 +7,49 @@ import {
 
 export enum States {
   init = 'init',
-  idCountryAndTypeSelection = 'idCountryAndTypeSelection',
-  takeOrUploadFrontPhoto = 'takeOrUploadFrontPhoto',
-  takeOrUploadBackPhoto = 'takeOrUploadBackPhoto',
-  processingPhoto = 'processingPhoto',
-  retryFrontPhoto = 'retryFrontPhoto',
-  retryBackPhoto = 'retryBackPhoto',
+  idDocCountryAndType = 'idDocCountryAndType',
+  idDocFrontPhoto = 'idDocFrontPhoto',
+  idDocBackPhoto = 'idDocBackPhoto',
+  processingDocuments = 'processingDocuments',
+  retryIdDocFrontPhoto = 'retryIdDocFrontPhoto',
+  retryIdDocBackPhoto = 'retryIdDocBackPhoto',
   success = 'success',
   failure = 'failure',
 }
 
 export enum Events {
   receivedContext = 'receivedContext',
-  idCountryAndTypeSelected = 'idCountryAndTypeSelected',
-  receivedFrontImage = 'receivedFrontImage',
-  receivedBackImage = 'receivedBackImage',
-  imageSucceeded = 'imageSucceeded',
-  imageErrored = 'imageErrored',
+  idDocCountryAndTypeSelected = 'idDocCountryAndTypeSelected',
+  receivedIdDocFrontImage = 'receivedIdDocFrontImage',
+  receivedIdDocBackImage = 'receivedIdDocBackImage',
+  succeeded = 'succeeded',
+  errored = 'errored',
   retryLimitExceeded = 'retryLimitExceeded',
 }
 
 export enum Actions {
   assignContext = 'assignContext',
-  assignIdCountryAndType = 'assignIdCountryAndType',
-  assignFrontImage = 'assignFrontImage',
-  assignBackImage = 'assignBackImage',
-  assignImageErrors = 'assignImageErrors',
+  assignIdDocCountryAndType = 'assignIdDocCountryAndType',
+  assignIdDocFrontImage = 'assignIdDocFrontImage',
+  assignIdDocBackImage = 'assignIdDocBackImage',
+  assignIdDocImageErrors = 'assignIdDocImageErrors',
 }
 
 export type MachineContext = {
-  // Plugin context
   authToken?: string;
   device?: DeviceInfo;
-  documentRequestId?: string;
-  // Machine generated
-  type?: IdDocType;
-  country?: CountryCode3;
-  frontImage?: string; // Base64 encoded
-  backImage?: string; // Base64 encoded
-  frontImageError?: IdDocBadImageError;
-  backImageError?: IdDocBadImageError;
+  requestId?: string;
+  idDoc: {
+    type?: IdDocType;
+    country?: CountryCode3;
+    frontImage?: string; // Base64 encoded
+    backImage?: string; // Base64 encoded
+    frontImageError?: IdDocBadImageError;
+    backImageError?: IdDocBadImageError;
+  };
+  selfie: {
+    image?: string; // Base64 encoded
+  };
 };
 
 export type MachineEvents =
@@ -55,36 +58,36 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
-        documentRequestId: string;
+        requestId?: string;
       };
     }
   | {
-      type: Events.idCountryAndTypeSelected;
+      type: Events.idDocCountryAndTypeSelected;
       payload: {
         type: IdDocType;
         country: CountryCode3;
       };
     }
   | {
-      type: Events.receivedFrontImage;
+      type: Events.receivedIdDocFrontImage;
       payload: {
         image: string;
       };
     }
   | {
-      type: Events.receivedBackImage;
+      type: Events.receivedIdDocBackImage;
       payload: {
         image: string;
       };
     }
   | {
-      type: Events.imageSucceeded;
+      type: Events.succeeded;
     }
   | { type: Events.retryLimitExceeded }
   | {
-      type: Events.imageErrored;
+      type: Events.errored;
       payload: {
-        frontImageError?: IdDocBadImageError;
-        backImageError?: IdDocBadImageError;
+        idDocFrontImageError?: IdDocBadImageError;
+        idDocBackImageError?: IdDocBadImageError;
       };
     };

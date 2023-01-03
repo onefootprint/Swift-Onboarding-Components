@@ -5,10 +5,12 @@ import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
-const TakeOrUploadFrontPhoto = () => {
-  const { t } = useTranslation('pages.take-or-upload-photo.front');
+const IdDocFrontPhoto = () => {
+  const { t } = useTranslation('pages.id-doc-photo.front');
   const [state, send] = useIdDocMachine();
-  const { type } = state.context;
+  const {
+    idDoc: { type },
+  } = state.context;
 
   if (!type) {
     return null;
@@ -16,7 +18,7 @@ const TakeOrUploadFrontPhoto = () => {
 
   const handleComplete = (image: string) => {
     send({
-      type: Events.receivedFrontImage,
+      type: Events.receivedIdDocFrontImage,
       payload: {
         image,
       },
@@ -37,4 +39,4 @@ const TakeOrUploadFrontPhoto = () => {
   );
 };
 
-export default TakeOrUploadFrontPhoto;
+export default IdDocFrontPhoto;

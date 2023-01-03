@@ -15,65 +15,70 @@ const createIdDocMachine = () =>
       predictableActionArguments: true,
       id: 'idDoc',
       initial: States.init,
-      context: {},
+      context: {
+        idDoc: {},
+        selfie: {},
+      },
       states: {
         [States.init]: {
           on: {
             [Events.receivedContext]: {
-              target: States.idCountryAndTypeSelection,
+              target: States.idDocCountryAndType,
               actions: Actions.assignContext,
             },
           },
         },
-        [States.idCountryAndTypeSelection]: {
+        [States.idDocCountryAndType]: {
           on: {
-            [Events.idCountryAndTypeSelected]: {
-              target: States.takeOrUploadFrontPhoto,
-              actions: Actions.assignIdCountryAndType,
+            [Events.idDocCountryAndTypeSelected]: {
+              target: States.idDocFrontPhoto,
+              actions: Actions.assignIdDocCountryAndType,
             },
           },
         },
-        [States.takeOrUploadFrontPhoto]: {
+        [States.idDocFrontPhoto]: {
           on: {
-            [Events.receivedFrontImage]: [
+            [Events.receivedIdDocFrontImage]: [
               {
-                target: States.takeOrUploadBackPhoto,
-                actions: Actions.assignFrontImage,
+                target: States.idDocBackPhoto,
+                actions: Actions.assignIdDocFrontImage,
                 cond: context => {
-                  const { type } = context;
+                  const {
+                    idDoc: { type },
+                  } = context;
                   return type ? !!ImagesRequiredByIdDocType[type].back : false;
                 },
               },
               {
-                target: States.processingPhoto,
-                actions: Actions.assignFrontImage,
+                target: States.processingDocuments,
+                actions: Actions.assignIdDocFrontImage,
               },
             ],
           },
         },
-        [States.takeOrUploadBackPhoto]: {
+        [States.idDocBackPhoto]: {
           on: {
-            [Events.receivedBackImage]: {
-              target: States.processingPhoto,
-              actions: Actions.assignBackImage,
+            [Events.receivedIdDocBackImage]: {
+              target: States.processingDocuments,
+              actions: Actions.assignIdDocBackImage,
             },
           },
         },
-        [States.processingPhoto]: {
+        [States.processingDocuments]: {
           on: {
-            [Events.imageSucceeded]: {
+            [Events.succeeded]: {
               target: States.success,
             },
-            [Events.imageErrored]: [
+            [Events.errored]: [
               {
-                target: States.retryFrontPhoto,
-                actions: [Actions.assignImageErrors],
-                cond: (context, event) => !!event.payload.frontImageError,
+                target: States.retryIdDocFrontPhoto,
+                actions: [Actions.assignIdDocImageErrors],
+                cond: (context, event) => !!event.payload.idDocFrontImageError,
               },
               {
-                target: States.retryBackPhoto,
-                actions: [Actions.assignImageErrors],
-                cond: (context, event) => !!event.payload.backImageError,
+                target: States.retryIdDocBackPhoto,
+                actions: [Actions.assignIdDocImageErrors],
+                cond: (context, event) => !!event.payload.idDocBackImageError,
               },
               {
                 target: States.failure,
@@ -84,26 +89,26 @@ const createIdDocMachine = () =>
             },
           },
         },
-        [States.retryFrontPhoto]: {
+        [States.retryIdDocFrontPhoto]: {
           on: {
-            [Events.receivedFrontImage]: [
+            [Events.receivedIdDocFrontImage]: [
               {
-                target: States.takeOrUploadBackPhoto,
-                actions: Actions.assignFrontImage,
-                cond: context => !!context.backImageError,
+                target: States.idDocBackPhoto,
+                actions: Actions.assignIdDocFrontImage,
+                cond: context => !!context.idDoc.backImageError,
               },
               {
-                target: States.processingPhoto,
-                actions: Actions.assignFrontImage,
+                target: States.processingDocuments,
+                actions: Actions.assignIdDocFrontImage,
               },
             ],
           },
         },
-        [States.retryBackPhoto]: {
+        [States.retryIdDocBackPhoto]: {
           on: {
-            [Events.receivedBackImage]: {
-              target: States.processingPhoto,
-              actions: Actions.assignBackImage,
+            [Events.receivedIdDocBackImage]: {
+              target: States.processingDocuments,
+              actions: Actions.assignIdDocBackImage,
             },
           },
         },
@@ -119,36 +124,36 @@ const createIdDocMachine = () =>
       actions: {
         [Actions.assignContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, documentRequestId } = event.payload;
+            const { authToken, device, requestId } = event.payload;
             context.authToken = authToken;
             context.device = { ...device };
-            context.documentRequestId = documentRequestId;
+            context.requestId = requestId;
           }
           return context;
         }),
-        [Actions.assignIdCountryAndType]: assign((context, event) => {
-          if (event.type === Events.idCountryAndTypeSelected) {
-            context.type = event.payload.type;
-            context.country = event.payload.country;
+        [Actions.assignIdDocCountryAndType]: assign((context, event) => {
+          if (event.type === Events.idDocCountryAndTypeSelected) {
+            context.idDoc.type = event.payload.type;
+            context.idDoc.country = event.payload.country;
           }
           return context;
         }),
-        [Actions.assignFrontImage]: assign((context, event) => {
-          if (event.type === Events.receivedFrontImage) {
-            context.frontImage = event.payload.image;
+        [Actions.assignIdDocFrontImage]: assign((context, event) => {
+          if (event.type === Events.receivedIdDocFrontImage) {
+            context.idDoc.frontImage = event.payload.image;
           }
           return context;
         }),
-        [Actions.assignBackImage]: assign((context, event) => {
-          if (event.type === Events.receivedBackImage) {
-            context.backImage = event.payload.image;
+        [Actions.assignIdDocBackImage]: assign((context, event) => {
+          if (event.type === Events.receivedIdDocBackImage) {
+            context.idDoc.backImage = event.payload.image;
           }
           return context;
         }),
-        [Actions.assignImageErrors]: assign((context, event) => {
-          if (event.type === Events.imageErrored) {
-            context.frontImageError = event.payload.frontImageError;
-            context.backImageError = event.payload.backImageError;
+        [Actions.assignIdDocImageErrors]: assign((context, event) => {
+          if (event.type === Events.errored) {
+            context.idDoc.frontImageError = event.payload.idDocFrontImageError;
+            context.idDoc.backImageError = event.payload.idDocBackImageError;
           }
           return context;
         }),

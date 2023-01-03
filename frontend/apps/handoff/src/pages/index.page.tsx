@@ -83,7 +83,7 @@ const Root = () => {
           authToken,
           device,
           customData: {
-            documentRequestId: requirements?.idDocRequestId ?? '',
+            requestId: requirements?.idDocRequestId ?? '',
           },
         }}
         onDone={() => {

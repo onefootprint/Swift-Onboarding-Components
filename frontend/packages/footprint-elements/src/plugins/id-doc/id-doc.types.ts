@@ -1,7 +1,7 @@
 import { BasePluginProps } from '../base-plugin';
 
 type IdDocCustomData = {
-  documentRequestId: string;
+  requestId?: string;
 };
 
 export type IdDocProps = BasePluginProps<IdDocCustomData>;

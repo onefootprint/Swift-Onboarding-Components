@@ -27,7 +27,7 @@ const getCountryFromCode = (countryCode: CountryCode) => {
   return match;
 };
 
-const CountryAndTypeSelection = () => {
+const IdDocCountryAndType = () => {
   const [, send] = useIdDocMachine();
   const [country, setCountry] = useState<CountryRecord>(DEFAULT_COUNTRY);
   const [docType, setDocType] = useState<IdDocType>(IdDocType.passport);
@@ -72,7 +72,7 @@ const CountryAndTypeSelection = () => {
 
   const handleSubmit = () => {
     send({
-      type: Events.idCountryAndTypeSelected,
+      type: Events.idDocCountryAndTypeSelected,
       payload: {
         type: docType,
         country:
@@ -116,4 +116,4 @@ const Container = styled.div`
   `}
 `;
 
-export default CountryAndTypeSelection;
+export default IdDocCountryAndType;

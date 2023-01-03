@@ -6,7 +6,7 @@ export type SubmitDocRequest = {
   backImage?: string;
   documentType: IdDocType;
   countryCode: CountryCode3;
-  documentRequestId: string;
+  requestId: string;
 };
 
 export type SubmitDocResponse = {};

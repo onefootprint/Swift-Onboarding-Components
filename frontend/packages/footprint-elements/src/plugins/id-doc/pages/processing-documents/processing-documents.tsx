@@ -26,15 +26,18 @@ const TRANSITION_DELAY = 3000;
 const ProcessingDocuments = () => {
   const { t } = useTranslation('pages.processing-documents');
   const [state, send] = useIdDocMachine();
-  const { type, country, authToken, frontImage, backImage, documentRequestId } =
-    state.context;
+  const {
+    idDoc: { type, country, frontImage, backImage },
+    authToken,
+    requestId,
+  } = state.context;
   const [displayStatus, setDisplayStatus] = useState<DisplayStatus>(
     DisplayStatus.loading,
   );
   const submitDocMutation = useSubmitDoc();
 
   useEffectOnce(() => {
-    if (!frontImage || !authToken || !type || !country || !documentRequestId) {
+    if (!frontImage || !authToken || !type || !country || !requestId) {
       return;
     }
     submitDocMutation.mutate({
@@ -43,7 +46,7 @@ const ProcessingDocuments = () => {
       authToken,
       documentType: type,
       countryCode: country,
-      documentRequestId,
+      requestId,
     });
   });
 
@@ -71,7 +74,7 @@ const ProcessingDocuments = () => {
     setDisplayStatus(DisplayStatus.success);
     setTimeout(() => {
       send({
-        type: Events.imageSucceeded,
+        type: Events.succeeded,
       });
     }, TRANSITION_DELAY);
   };
@@ -83,10 +86,10 @@ const ProcessingDocuments = () => {
     setDisplayStatus(DisplayStatus.error);
     setTimeout(() => {
       send({
-        type: Events.imageErrored,
+        type: Events.errored,
         payload: {
-          frontImageError,
-          backImageError,
+          idDocFrontImageError: frontImageError,
+          idDocBackImageError: backImageError,
         },
       });
     }, TRANSITION_DELAY);
