@@ -26,7 +26,7 @@
     "@tanstack/react-query": "^4.20.4",
     "@tryghost/content-api": "^1.11.5",
     "@typeform/embed": "^1.35.1",
-    "axios": "^1.2.1",
+    "axios": "^1.2.2",
     "fathom-client": "^3.5.0",
     "lodash": "^4.17.21",
     "next": "13.0.6",

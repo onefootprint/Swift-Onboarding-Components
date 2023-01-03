@@ -26,7 +26,7 @@
     "@onefootprint/ui": "*",
     "@sentry/nextjs": "^7.28.1",
     "@testing-library/react": "^13.4.0",
-    "axios": "^1.2.1",
+    "axios": "^1.2.2",
     "axios-case-converter": "^0.9.0",
     "base64url": "^3.0.1",
     "focus-trap-react": "^10.0.2",

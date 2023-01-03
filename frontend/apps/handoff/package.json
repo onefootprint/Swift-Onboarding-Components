@@ -24,7 +24,7 @@
     "@sentry/nextjs": "^7.28.1",
     "@tanstack/react-query": "^4.20.4",
     "@xstate/react": "^3.0.1",
-    "axios": "^1.2.1",
+    "axios": "^1.2.2",
     "axios-case-converter": "^0.9.0",
     "base64url": "^3.0.1",
     "constate": "^3.3.2",
