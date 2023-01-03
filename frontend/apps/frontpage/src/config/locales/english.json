@@ -293,7 +293,7 @@
           },
           "feature-3": {
             "title": "ID Scan + Selfie",
-            "body": "Leveraging FaceID biometrics natively built into smartphones, we combine an incredible onboarding experience with the most accurate attestation of liveness.",
+            "body": "Combining identity document and selfie collection with smartphone biometric authentication methods like FaceID or TouchID, we create an incredible onboarding experience with the most accurate attestation of liveness.",
             "alt-1": "Scan ID screen",
             "alt-2": "Submitting drivers license screen"
           },
