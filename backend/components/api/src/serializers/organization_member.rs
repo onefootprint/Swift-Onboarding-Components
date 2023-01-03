@@ -9,6 +9,8 @@ impl DbToApi<(TenantUser, TenantRole)> for api_wire_types::OrganizationMember {
             email,
             last_login_at,
             created_at,
+            first_name,
+            last_name,
             ..
         } = user;
         let TenantRole {
@@ -19,6 +21,8 @@ impl DbToApi<(TenantUser, TenantRole)> for api_wire_types::OrganizationMember {
         Self {
             id,
             email: email.0,
+            first_name,
+            last_name,
             last_login_at,
             created_at,
             role_name,

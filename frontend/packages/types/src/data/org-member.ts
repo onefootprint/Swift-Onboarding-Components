@@ -1,8 +1,10 @@
 export type OrgMember = {
-  createdAt: string;
-  email: string;
   id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
   lastLoginAt: string | null;
-  roleId: string;
+  createdAt: string;
   roleName: string;
+  roleId: string;
 };

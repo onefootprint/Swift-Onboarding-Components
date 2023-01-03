@@ -17,7 +17,10 @@ impl AuthSessionData {
 /// in its encrypted session store
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum AuthSessionData {
-    /// workos login to tenant admin
+    /// proven to own an email address via workos auth
+    WorkOs(crate::auth::tenant::WorkOsSession),
+
+    /// authed as a user at a tenant for admin dashboard
     TenantUser(crate::auth::tenant::TenantUserSession),
 
     /// user-specific sessions

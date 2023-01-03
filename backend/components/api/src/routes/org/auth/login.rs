@@ -1,20 +1,23 @@
 use std::collections::HashSet;
 
 use crate::auth::session::AuthSessionData;
+use crate::auth::tenant::WorkOsSession;
 use crate::errors::tenant::TenantError;
 use crate::errors::workos_login::WorkOsLoginError;
 use crate::errors::ApiResult;
+use crate::utils::db2api::DbToApi;
 use crate::utils::email_domain;
 use crate::utils::session::AuthSession;
 use crate::State;
 use crate::{errors::ApiError, types::response::ResponseData};
+use api_wire_types::{OrgLoginRequest, OrgLoginResponse};
+use api_wire_types::{Organization, OrganizationMember};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::TenantUser;
 use db::tenant::get_opt_by_workos_org_id;
-use newtypes::{SessionAuthToken, TenantUserId};
-use paperclip::actix::Apiv2Schema;
+use newtypes::TenantUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::organizations::{
     CreateOrganization, CreateOrganizationParams, DomainFilters, ListOrganizations, ListOrganizationsParams,
@@ -24,23 +27,6 @@ use workos::sso::{
     Profile,
 };
 
-#[derive(serde::Serialize, serde::Deserialize, Apiv2Schema)]
-struct Code {
-    code: String,
-}
-
-#[derive(serde::Serialize, Apiv2Schema)]
-struct DashboardAuthorizationResponse {
-    email: String,
-    auth: SessionAuthToken,
-    first_name: Option<String>,
-    last_name: Option<String>,
-    created_new_tenant: bool,
-    tenant_name: String,
-    sandbox_restricted: bool,
-    requires_onboarding: bool,
-}
-
 #[api_v2_operation(
     tags(Private),
     description = "Called from the front-end with the WorkOS code. Returns the authorization \
@@ -49,16 +35,16 @@ struct DashboardAuthorizationResponse {
 #[post("/org/auth/login")]
 async fn handler(
     state: web::Data<State>,
-    code: web::Json<Code>,
-) -> actix_web::Result<Json<ResponseData<DashboardAuthorizationResponse>>, ApiError> {
-    let code = &code.code;
+    request: web::Json<OrgLoginRequest>,
+) -> actix_web::Result<Json<ResponseData<OrgLoginResponse>>, ApiError> {
+    let code = request.into_inner().code;
 
     let GetProfileAndTokenResponse { profile, .. } = &state
         .workos_client
         .sso()
         .get_profile_and_token(&GetProfileAndTokenParams {
             client_id: &ClientId::from(state.config.workos_client_id.as_str()),
-            code: &AuthorizationCode::from(code.to_owned()),
+            code: &AuthorizationCode::from(code),
         })
         .await?;
     tracing::info!(profile =?profile, "workos login");
@@ -70,49 +56,62 @@ async fn handler(
         .db_query(move |conn| TenantUser::list_by_email(conn, email.into()))
         .await??;
 
-    let (matching_tenant_users, is_new_tenant) = if !matching_tenant_users.is_empty() {
+    let (matching_tenant_users, created_new_tenant) = if !matching_tenant_users.is_empty() {
         (matching_tenant_users, false)
     } else {
         // If there are no users with this email, make a new one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
-        let (tenant_user_id, is_new_tenant) = create_tenant_user(&state, profile).await?;
-        (vec![tenant_user_id], is_new_tenant)
+        let (tenant_user_id, created_new_tenant) = create_tenant_user(&state, profile).await?;
+        (vec![tenant_user_id], created_new_tenant)
     };
 
-    // TODO one day support multiple TenantUsers (if you have been invited to another tenant)
-    let tenant_user_id = matching_tenant_users
-        .into_iter()
-        .next()
-        .ok_or(TenantError::TenantUserDoesNotExist)?;
+    let data = if matching_tenant_users.len() == 1 {
+        // If one user, log into it and create a TenantUser ssession
+        let tenant_user_id = matching_tenant_users
+            .into_iter()
+            .next()
+            .ok_or(TenantError::TenantUserDoesNotExist)?;
 
-    // Log into the user, updating the last_login_at and name (if new)
-    let first_name = profile.first_name.clone();
-    let last_name = profile.last_name.clone();
-    let (tenant_user, tenant_role, tenant) = state
-        .db_pool
-        .db_transaction(move |conn| TenantUser::login_by_id(conn, &tenant_user_id, first_name, last_name))
-        .await?;
+        // Log into the user, updating the last_login_at and name (if new)
+        let first_name = profile.first_name.clone();
+        let last_name = profile.last_name.clone();
+        let (tenant_user, tenant_role, tenant) = state
+            .db_pool
+            .db_transaction(move |conn| TenantUser::login_by_id(conn, &tenant_user_id, first_name, last_name))
+            .await?;
 
-    // Save tenant login in session data into the DB
-    let session_data = AuthSessionData::TenantUser(tenant_user.clone().into());
-    let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
+        // Save tenant login in session data into the DB
+        let session_data = AuthSessionData::TenantUser(tenant_user.clone().into());
+        let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
 
-    let requires_onboarding =
-        tenant_role.permissions.is_admin() && (tenant.website_url.is_none() || tenant.company_size.is_none());
-
-    Ok(Json(ResponseData {
-        data: DashboardAuthorizationResponse {
-            email: tenant_user.email.0,
-            auth: auth_token,
-            first_name: tenant_user.first_name,
-            last_name: tenant_user.last_name,
-            created_new_tenant: is_new_tenant,
-            tenant_name: tenant.name,
-            sandbox_restricted: tenant.sandbox_restricted,
+        let requires_onboarding = tenant_role.permissions.is_admin()
+            && (tenant.website_url.is_none() || tenant.company_size.is_none());
+        OrgLoginResponse {
+            auth_token,
+            created_new_tenant,
             requires_onboarding,
-        },
-    }))
+            user: Some(OrganizationMember::from_db((tenant_user, tenant_role))),
+            tenant: Some(Organization::from_db(tenant)),
+        }
+    } else {
+        // If multiple users, create a WorkOsSession that just shows the email that was proven to be owned.
+        // This token lets the user choose which tenant they'd like to auth as. Only give them 10
+        // mins to do so.
+        // TODO one day support footprint firm employees
+        let session_data = AuthSessionData::WorkOs(WorkOsSession {
+            email: profile.email.clone(),
+        });
+        let auth_token = AuthSession::create(&state, session_data, Duration::minutes(10)).await?;
+        OrgLoginResponse {
+            auth_token,
+            created_new_tenant,
+            requires_onboarding: false,
+            user: None,
+            tenant: None,
+        }
+    };
+    ResponseData { data }.json()
 }
 
 type IsNewTenant = bool;

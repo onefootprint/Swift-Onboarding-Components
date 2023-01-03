@@ -7,6 +7,8 @@ use crate::*;
 pub struct OrganizationMember {
     pub id: TenantUserId,
     pub email: String,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
     pub last_login_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
     pub role_name: String,

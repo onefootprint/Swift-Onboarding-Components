@@ -1,4 +1,6 @@
 mod ob_public_key;
+mod workos;
+pub use self::workos::*;
 use db::models::tenant::Tenant;
 pub use ob_public_key::*;
 mod secret_key;

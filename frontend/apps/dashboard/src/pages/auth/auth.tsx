@@ -29,26 +29,23 @@ const Auth = () => {
       return;
     }
     login.mutate(code, {
-      onSuccess({
-        auth,
-        email,
-        tenantName,
-        sandboxRestricted,
-        firstName,
-        lastName,
-      }: OrgAuthLoginResponse) {
+      onSuccess({ authToken, user, tenant }: OrgAuthLoginResponse) {
+        if (!user || !tenant) {
+          return;
+        }
+        // TODO handle workos short-lived token
         logIn({
           user: {
-            firstName,
-            lastName,
-            email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
           },
           org: {
-            name: tenantName,
-            sandboxRestricted,
-            isLive: !sandboxRestricted,
+            name: tenant.name,
+            sandboxRestricted: tenant.isSandboxRestricted,
+            isLive: !tenant.isSandboxRestricted,
           },
-          auth,
+          auth: authToken,
         });
         router.push('/users');
       },
