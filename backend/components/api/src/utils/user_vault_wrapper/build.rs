@@ -119,23 +119,24 @@ impl UserVaultWrapper {
     // TODO: TENANT ACCESS
     // In order to minimize database queries, we would like to be able to bulk fetch
     // various data elements for a set of Users.
+    // Note: it is possible that there are multiple scoped users for each user vault
     pub fn multi_get_for_tenant(
         conn: &mut PgConnection,
         users: Vec<(ScopedUser, UserVault)>,
         tenant_id: &TenantId,
     ) -> Result<Vec<Self>, DbError> {
         let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();
-        let mut uv_id_to_active_lifetimes =
+        let uv_id_to_active_lifetimes =
             DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
         let active_lifetime_list: Vec<_> = uv_id_to_active_lifetimes.values().flatten().collect();
 
         // For each data source, fetch data _for all users_ in the `user_vaults` list.
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
         // UserVaultWrapper for each User
-        let mut uvds = UserVaultData::bulk_get(conn, &active_lifetime_list)?;
-        let mut phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
-        let mut emails = Email::bulk_get(conn, &active_lifetime_list)?;
-        let mut identity_document_map = IdentityDocument::bulk_get(conn, &active_lifetime_list)?;
+        let uvds = UserVaultData::bulk_get(conn, &active_lifetime_list)?;
+        let phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
+        let emails = Email::bulk_get(conn, &active_lifetime_list)?;
+        let identity_document_map = IdentityDocument::bulk_get(conn, &active_lifetime_list)?;
 
         // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
         Ok(users
@@ -146,11 +147,16 @@ impl UserVaultWrapper {
                     uv,
                     None,
                     Some(su.id),
-                    uvds.remove(&uv_id).unwrap_or_default(),
-                    phone_numbers.remove(&uv_id).unwrap_or_default(),
-                    emails.remove(&uv_id).unwrap_or_default(),
-                    identity_document_map.remove(&uv_id).unwrap_or_default(),
-                    uv_id_to_active_lifetimes.remove(&uv_id).unwrap_or_default(),
+                    // Fetch data by UserVaultId. It is possible that multiple ScopedUsers have the
+                    // same UserVaultId.
+                    // TODO: all of these should really be keyed on ScopedUserId, otherwise
+                    // speculative data for ScopedUser A will show for ScopedUser B within the same
+                    // tenant
+                    uvds.get(&uv_id).cloned().unwrap_or_default(),
+                    phone_numbers.get(&uv_id).cloned().unwrap_or_default(),
+                    emails.get(&uv_id).cloned().unwrap_or_default(),
+                    identity_document_map.get(&uv_id).cloned().unwrap_or_default(),
+                    uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
                 )
             })
             .collect())

@@ -20,7 +20,6 @@ use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
-use newtypes::UserVaultId;
 use newtypes::{DataLifetimeKind, Fingerprint, Fingerprinter};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -102,20 +101,18 @@ pub async fn get(
         .cursor_item(&state, &scoped_users)
         .map(|(su, _)| su.ordering_id);
 
-    // Since we zip these Vecs together, we should ensure they are in the same order.
-    // scoped_users.sort_by_key(|su| su.user_vault_id.clone());
-    let uvw_map: HashMap<UserVaultId, UserVaultWrapper> = uvws
+    let uvw_map: HashMap<_, _> = uvws
         .into_iter()
-        .map(move |uvw| (uvw.user_vault.id.clone(), uvw))
+        // scoped_user_id should be non-null for all of these
+        .flat_map(|uvw| (uvw.scoped_user_id().cloned().map(move |su_id| (su_id, uvw))))
         .collect();
 
     let scoped_users = scoped_users
         .into_iter()
         .take(page_size)
         .map(|(su, _)| {
-            // If there is a duplicate scoped_user
             let uvw = uvw_map
-                .get(&su.user_vault_id)
+                .get(&su.id)
                 .ok_or_else(|| ApiError::AssertionError("UVW not found".to_owned()))?;
             let ob_configs = ob_config_map
                 .get(&su.id)
