@@ -6,6 +6,7 @@ export const LOGGED_OUT_ROUTES = [
   '/login/email',
   '/login/link-sent',
   '/auth',
+  '/organizations',
 ];
 export const DEFAULT_LOGGED_IN_ROUTE = '/users';
 export const DEFAULT_LOGGED_OUT_ROUTE = '/login';

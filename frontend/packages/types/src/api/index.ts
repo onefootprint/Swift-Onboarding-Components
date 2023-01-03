@@ -25,6 +25,7 @@ export * from './onboarding-status';
 export * from './onboarding-submit';
 export * from './org-api-key-reveal';
 export * from './org-api-key-update';
+export * from './org-assume-role';
 export * from './org-auth-login';
 export * from './org-auth-magic-link';
 export * from './org-create-api-key';

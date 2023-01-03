@@ -1,3 +1,4 @@
+import { Organization, OrgMember } from '@onefootprint/types';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -56,8 +57,20 @@ const useSession = () => {
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(isLive),
   } as AuthHeaders;
 
-  const logIn = (nextData: Session) => {
-    update(nextData);
+  const logIn = (authToken: string, user: OrgMember, tenant: Organization) => {
+    update({
+      auth: authToken,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
+      org: {
+        name: tenant.name,
+        sandboxRestricted: tenant.isSandboxRestricted,
+        isLive: !tenant.isSandboxRestricted,
+      },
+    });
   };
 
   const logOut = () => {

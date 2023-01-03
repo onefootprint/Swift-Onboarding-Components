@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Button, GoogleButton, LinkButton, Typography } from '@onefootprint/ui';
+import { Button, GoogleButton } from '@onefootprint/ui';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import TermsAndConditions from 'src/components/terms-and-conditions';
 import styled, { css } from 'styled-components';
 
 import LogoAndText from '../../components/logo-and-text';
@@ -40,24 +40,7 @@ const Login = () => {
           >
             {t('email')}
           </Button>
-          <TextContainer>
-            <Typography variant="caption-2" color="tertiary">
-              By continuing you agree to our
-            </Typography>
-            <Link href="https://onefootprint.com/terms-of-service" passHref>
-              <LinkButton size="xxTiny" target="_blank">
-                Terms of Service
-              </LinkButton>
-            </Link>
-            <Typography variant="caption-2" color="tertiary">
-              and
-            </Typography>
-            <Link href="https://onefootprint.com/privacy-policy" passHref>
-              <LinkButton size="xxTiny" target="_blank">
-                Privacy Policy.
-              </LinkButton>
-            </Link>
-          </TextContainer>
+          <TermsAndConditions />
         </Inner>
       </Container>
     </>
@@ -79,15 +62,6 @@ const Inner = styled.div`
     flex-direction: column;
     row-gap: ${theme.spacing[5]};
   `}
-`;
-
-const TextContainer = styled.div`
-  text-align: center;
-
-  > * {
-    display: inline;
-    margin-right: ${({ theme }) => theme.spacing[2]};
-  }
 `;
 
 export default Login;

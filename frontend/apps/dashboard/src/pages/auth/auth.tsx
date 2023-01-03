@@ -22,6 +22,7 @@ const Auth = () => {
       isLoggedIn ||
       login.isLoading ||
       login.isError ||
+      login.isSuccess ||
       !isReady ||
       !code ||
       Array.isArray(code)
@@ -31,22 +32,11 @@ const Auth = () => {
     login.mutate(code, {
       onSuccess({ authToken, user, tenant }: OrgAuthLoginResponse) {
         if (!user || !tenant) {
+          router.push({ pathname: '/organizations', query: { authToken } });
           return;
         }
-        // TODO handle workos short-lived token
-        logIn({
-          user: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-          },
-          org: {
-            name: tenant.name,
-            sandboxRestricted: tenant.isSandboxRestricted,
-            isLive: !tenant.isSandboxRestricted,
-          },
-          auth: authToken,
-        });
+
+        logIn(authToken, user, tenant);
         router.push('/users');
       },
     });

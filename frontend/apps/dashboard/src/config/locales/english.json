@@ -119,6 +119,10 @@
       "google": "Continue with Google",
       "email": "Continue with email"
     },
+    "organizations": {
+      "page-title": "Footprint Login | Select an Organization",
+      "title": "Select an organization"
+    },
     "email-login": {
       "page-title": "Footprint Login | Sign in to the Footprint Dashboard",
       "title": "Sign up or Log in",
