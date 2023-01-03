@@ -51,24 +51,23 @@ const mockup = {
 const DesktopIllustration = () => {
   const { t } = useTranslation('pages.home.hero');
   return (
-    <DesktopImageWrapper
+    <Container
       as={motion.div}
       variants={wrapper}
       initial="hidden"
       animate="visible"
     >
-      <OuterMockupWrapper>
-        <MockupWrapper as={motion.div} variants={mockup} key={2}>
+      <OuterMockupContainer>
+        <MockupContainer as={motion.div} variants={mockup} key={2}>
           <Image
             src="/new-home/hero/dashboard.png"
             fill
             alt={t('desktop-img-alt')}
             priority
           />
-        </MockupWrapper>
-      </OuterMockupWrapper>
-
-      <PhoneWrapper as={motion.div} variants={phone} key={3}>
+        </MockupContainer>
+      </OuterMockupContainer>
+      <PhoneContainer as={motion.div} variants={phone} key={3}>
         <Image
           src="/new-home/hero/phone.png"
           height={575}
@@ -77,8 +76,7 @@ const DesktopIllustration = () => {
           id="mobile-phone"
           priority
         />
-      </PhoneWrapper>
-
+      </PhoneContainer>
       <LineDraw
         height={0.2}
         width={100}
@@ -109,11 +107,11 @@ const DesktopIllustration = () => {
         variants={line}
         key={6}
       />
-    </DesktopImageWrapper>
+    </Container>
   );
 };
 
-const DesktopImageWrapper = styled.div`
+const Container = styled.div`
   ${({ theme }) => css`
     position: relative;
     display: none;
@@ -127,14 +125,14 @@ const DesktopImageWrapper = styled.div`
   `}
 `;
 
-const PhoneWrapper = styled.div`
+const PhoneContainer = styled.div`
   position: relative;
   z-index: 2;
   width: fit-content;
   will-change: opacity, transform;
 `;
 
-const OuterMockupWrapper = styled.div`
+const OuterMockupContainer = styled.div`
   ${({ theme }) => css`
     position: relative;
     width: 100%;
@@ -144,7 +142,7 @@ const OuterMockupWrapper = styled.div`
   `}
 `;
 
-const MockupWrapper = styled.div`
+const MockupContainer = styled.div`
   ${({ theme }) => css`
     height: 100%;
     width: 100%;

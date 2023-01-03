@@ -16,7 +16,7 @@ const FootprintLive = () => {
   return (
     <>
       <SEO title={t('html-title')} slug="/footprint-live" />
-      <Wrapper>
+      <Container>
         <BlurredBackground>
           <Blob color="#CBC1F6" width={70} height={60} top={0} left={0} />
           <Blob color="#F6D1C1" width={30} height={24} top={-10} left={50} />
@@ -33,10 +33,10 @@ const FootprintLive = () => {
             <Typography as="h1" variant="display-4">
               {t('subtitle')}
             </Typography>
-            <ActionsWrapper>
+            <ActionsContainer>
               <FootprintButton publicKey={publicKey} label={t('cta')} />
               <LinkButton>Try the sandbox</LinkButton>
-            </ActionsWrapper>
+            </ActionsContainer>
             <PromoSentence>
               <Typography as="p" variant="caption-2">
                 {t('promo')}
@@ -54,12 +54,12 @@ const FootprintLive = () => {
             </ImageOffset>
           </ImageSection>
         </HeroContainer>
-      </Wrapper>
+      </Container>
     </>
   );
 };
 
-const Wrapper = styled.div`
+const Container = styled.div`
   max-width: 95%;
   margin: auto;
   isolation: isolate;
@@ -114,7 +114,7 @@ const ContentSection = styled.div`
   `}
 `;
 
-const ActionsWrapper = styled.div`
+const ActionsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

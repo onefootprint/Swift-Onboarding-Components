@@ -7,16 +7,16 @@ import styled, { css } from 'styled-components';
 const TabletIllustration = () => {
   const { t } = useTranslation('pages.home.hero');
   return (
-    <TabletImageWrapper>
-      <OuterWrapper>
-        <MockupWrapper>
+    <Container>
+      <Inner>
+        <MockupContainer>
           <Image
             src="/new-home/hero/dashboard.png"
             alt={t('desktop-img-alt')}
             priority
             fill
           />
-        </MockupWrapper>
+        </MockupContainer>
         <Image
           src="/new-home/hero/phone.png"
           height={480}
@@ -25,12 +25,12 @@ const TabletIllustration = () => {
           id="mobile-phone"
           priority
         />
-      </OuterWrapper>
-    </TabletImageWrapper>
+      </Inner>
+    </Container>
   );
 };
 
-const TabletImageWrapper = styled.div`
+const Container = styled.div`
   display: none;
   position: relative;
   width: 100%;
@@ -47,7 +47,7 @@ const TabletImageWrapper = styled.div`
     `}
 `;
 
-const OuterWrapper = styled.div`
+const Inner = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
@@ -60,7 +60,7 @@ const OuterWrapper = styled.div`
   }
 `;
 
-const MockupWrapper = styled.div`
+const MockupContainer = styled.div`
   ${({ theme }) => css`
     height: 100%;
     width: 100%;

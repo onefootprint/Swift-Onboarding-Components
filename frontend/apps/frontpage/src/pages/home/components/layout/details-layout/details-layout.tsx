@@ -17,8 +17,8 @@ const DetailsLayout = ({
   type,
   background,
 }: DetailsLayoutTypes) => (
-  <LayoutWrapper>
-    <TitleWrapper data-background={background}>
+  <Container>
+    <TitleContainer data-background={background}>
       <ResponsiveHide data-viewport="tablet-desktop">
         <Typography as="h2" color="primary" variant="display-1">
           {title}
@@ -32,16 +32,16 @@ const DetailsLayout = ({
       <Typography as="h3" color="primary" variant="display-4">
         {subtitle}
       </Typography>
-    </TitleWrapper>
+    </TitleContainer>
     {type === 'regular' ? (
       <RegularGrid>{children}</RegularGrid>
     ) : (
-      <ContentAndImageWrapper>{children}</ContentAndImageWrapper>
+      <ContentAndImageContainer>{children}</ContentAndImageContainer>
     )}
-  </LayoutWrapper>
+  </Container>
 );
 
-const LayoutWrapper = styled.div`
+const Container = styled.div`
   ${({ theme }) => css`
     position: relative;
     display: flex;
@@ -57,7 +57,7 @@ const LayoutWrapper = styled.div`
   `}
 `;
 
-const TitleWrapper = styled.div`
+const TitleContainer = styled.div`
   ${({ theme }) => css`
     max-width: 95%;
     display: flex;
@@ -89,7 +89,7 @@ const ResponsiveHide = styled.span`
   }
 `;
 
-const ContentAndImageWrapper = styled.div`
+const ContentAndImageContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
     gap: ${theme.spacing[9]};

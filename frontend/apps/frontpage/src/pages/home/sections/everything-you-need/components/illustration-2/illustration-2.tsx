@@ -8,7 +8,7 @@ const Illustration2 = () => {
   const { t } = useTranslation('pages.home.everything-you-need-section');
 
   return (
-    <ImageWrapper>
+    <ImageContainer>
       <Image
         src="/new-home/everything-you-need-section/feature-2/security-logs.png"
         alt={t('features.feature-2.alt')}
@@ -16,11 +16,11 @@ const Illustration2 = () => {
         width={698}
         id="main-image"
       />
-    </ImageWrapper>
+    </ImageContainer>
   );
 };
 
-const ImageWrapper = styled.div`
+const ImageContainer = styled.div`
   position: relative;
 
   #main-image {

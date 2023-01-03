@@ -9,7 +9,7 @@ import BaseIllustration from '../../../../components/base-illustration';
 const MobileIllustration = () => {
   const { t } = useTranslation('pages.home.accurate-section');
   return (
-    <IllustrationWrapper>
+    <IllustrationContainer>
       <Image
         src="/new-home/accurate-section/audit-trail.png"
         height={349}
@@ -17,11 +17,11 @@ const MobileIllustration = () => {
         alt={t('alt')}
         data-type="main"
       />
-    </IllustrationWrapper>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   ${({ theme }) => css`
     position: relative;
     display: block;

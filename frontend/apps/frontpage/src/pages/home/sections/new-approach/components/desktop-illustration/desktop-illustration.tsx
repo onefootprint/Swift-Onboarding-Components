@@ -54,7 +54,7 @@ const DesktopIllustration = () => {
     }
   }, [controls, isInView]);
   return (
-    <IllustrationWrapper ref={ref}>
+    <IllustrationContainer ref={ref}>
       <motion.div
         animate={controls}
         initial="hidden"
@@ -84,11 +84,11 @@ const DesktopIllustration = () => {
           priority
         />
       </motion.div>
-    </IllustrationWrapper>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   display: none;
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),
     radial-gradient(at 0% 100%, #f2f9ff 0%, rgba(200, 228, 255, 0) 100%),

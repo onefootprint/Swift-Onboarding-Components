@@ -8,7 +8,7 @@ import styled from 'styled-components';
 const MobileIllustration = () => {
   const { t } = useTranslation('pages.home.identity-wallet');
   return (
-    <IllustrationWrapper>
+    <IllustrationContainer>
       <Image
         src="/new-home/id-wallet/id-wallet.png"
         height={740}
@@ -16,11 +16,11 @@ const MobileIllustration = () => {
         alt={t('alt')}
         className="main-img"
       />
-    </IllustrationWrapper>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   position: relative;
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),
     radial-gradient(at 0% 100%, #f2f9ff 0%, rgba(200, 228, 255, 0) 100%),

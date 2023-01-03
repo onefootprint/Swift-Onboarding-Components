@@ -37,7 +37,7 @@ const StripedBackground = ({ color }: StripedBackgroundType) => {
   }, [controls, isInView]);
 
   return (
-    <Wrapper
+    <Container
       ref={ref}
       as={motion.div}
       animate={controls}
@@ -71,11 +71,11 @@ const StripedBackground = ({ color }: StripedBackgroundType) => {
         ))}
       </CenterWrap>
       <LineDraw height={100} width={0.2} color={color} position="relative" />
-    </Wrapper>
+    </Container>
   );
 };
 
-const Wrapper = styled.div`
+const Container = styled.div`
   position: absolute;
   transform: translate(0%, 50%);
   top: 15%;

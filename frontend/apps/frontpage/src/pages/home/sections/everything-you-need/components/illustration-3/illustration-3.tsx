@@ -8,7 +8,7 @@ const Illustration3 = () => {
   const { t } = useTranslation('pages.home.everything-you-need-section');
   return (
     <>
-      <ImageWrapper data-viewport="desktop">
+      <IllustrationContainer data-viewport="desktop">
         <Image
           src="/new-home/everything-you-need-section/feature-3/scan-id.png"
           alt={t('features.feature-3.alt-1')}
@@ -23,8 +23,8 @@ const Illustration3 = () => {
           width={269}
           data-type="phone-right"
         />
-      </ImageWrapper>
-      <ImageWrapper data-viewport="tablet">
+      </IllustrationContainer>
+      <IllustrationContainer data-viewport="tablet">
         <Image
           src="/new-home/everything-you-need-section/feature-3/scan-id.png"
           alt={t('features.feature-3.alt-1')}
@@ -39,8 +39,8 @@ const Illustration3 = () => {
           width={269}
           data-type="phone-right"
         />
-      </ImageWrapper>
-      <ImageWrapper data-viewport="mobile">
+      </IllustrationContainer>
+      <IllustrationContainer data-viewport="mobile">
         <Image
           src="/new-home/everything-you-need-section/feature-3/scan-id.png"
           alt={t('features.feature-3.alt-1')}
@@ -55,12 +55,12 @@ const Illustration3 = () => {
           width={169}
           data-type="phone-right"
         />
-      </ImageWrapper>
+      </IllustrationContainer>
     </>
   );
 };
 
-const ImageWrapper = styled.div`
+const IllustrationContainer = styled.div`
   position: relative;
 
   &[data-viewport='desktop'] [data-type='phone-left'] {

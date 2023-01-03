@@ -13,7 +13,7 @@ const PenguinBanner = () => {
       <ColorBackground />
       <NoiseLayer />
       <Container as="section" id="penguin-banner">
-        <ContentWrapper>
+        <Content>
           <Image
             src="/new-home/banner/penguin.png"
             height={190}
@@ -31,7 +31,7 @@ const PenguinBanner = () => {
             </Typography>
           </ResponsiveHide>
           <Button onClick={toggleTypeform}> {t('cta')}</Button>
-        </ContentWrapper>
+        </Content>
       </Container>
     </Clipper>
   );
@@ -54,7 +54,7 @@ const Clipper = styled.div`
   `}
 `;
 
-const ContentWrapper = styled.div`
+const Content = styled.div`
   ${({ theme }) => css`
     max-width: 720px;
     margin: auto;

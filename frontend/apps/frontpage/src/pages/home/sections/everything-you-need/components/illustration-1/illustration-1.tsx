@@ -8,7 +8,7 @@ const Illustration1 = () => {
   const { t } = useTranslation('pages.home.everything-you-need-section');
   return (
     <>
-      <ImageWrapper data-viewport="desktop">
+      <ImageContainer data-viewport="desktop">
         <Image
           src="/new-home/everything-you-need-section/feature-1/multiple-names.png"
           alt="{t('features.feature-1.alt-1')}"
@@ -23,9 +23,9 @@ const Illustration1 = () => {
           width={659}
           data-type="background"
         />
-      </ImageWrapper>
+      </ImageContainer>
 
-      <ImageWrapper data-viewport="tablet">
+      <ImageContainer data-viewport="tablet">
         <Image
           src="/new-home/everything-you-need-section/feature-1/multiple-names.png"
           alt={t('features.feature-1.alt-1')}
@@ -40,9 +40,9 @@ const Illustration1 = () => {
           width={659}
           data-type="background"
         />
-      </ImageWrapper>
+      </ImageContainer>
 
-      <ImageWrapper data-viewport="mobile">
+      <ImageContainer data-viewport="mobile">
         <Image
           src="/new-home/everything-you-need-section/feature-1/multiple-names.png"
           alt={t('features.feature-1.alt-1')}
@@ -57,12 +57,12 @@ const Illustration1 = () => {
           width={659}
           data-type="background"
         />
-      </ImageWrapper>
+      </ImageContainer>
     </>
   );
 };
 
-const ImageWrapper = styled.div`
+const ImageContainer = styled.div`
   ${({ theme }) => css`
     position: relative;
 

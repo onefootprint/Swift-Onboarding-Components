@@ -7,16 +7,16 @@ import styled, { css } from 'styled-components';
 const MobileIllustration = () => {
   const { t } = useTranslation('pages.home.hero');
   return (
-    <MobileImageWrapper>
-      <OuterWrapper>
-        <MockupWrapper>
+    <Container>
+      <Inner>
+        <MockupContainer>
           <Image
             src="/new-home/hero/dashboard.png"
             fill
             alt={t('desktop-img-alt')}
             priority
           />
-        </MockupWrapper>
+        </MockupContainer>
         <Image
           src="/new-home/hero/phone.png"
           height={292.8}
@@ -25,12 +25,12 @@ const MobileIllustration = () => {
           id="mobile-phone"
           priority
         />
-      </OuterWrapper>
-    </MobileImageWrapper>
+      </Inner>
+    </Container>
   );
 };
 
-const MobileImageWrapper = styled.div`
+const Container = styled.div`
   display: block;
   position: relative;
   width: 100%;
@@ -42,7 +42,7 @@ const MobileImageWrapper = styled.div`
   `}
 `;
 
-const OuterWrapper = styled.div`
+const Inner = styled.div`
   ${({ theme }) => css`
     position: relative;
     overflow: hidden;
@@ -59,7 +59,7 @@ const OuterWrapper = styled.div`
   `}
 `;
 
-const MockupWrapper = styled.div`
+const MockupContainer = styled.div`
   height: 100%;
   width: 100%;
   position: relative;

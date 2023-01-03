@@ -15,20 +15,20 @@ const SquaredFeatureCard = ({
   body,
   background,
 }: SquaredFeatureCardType) => (
-  <CardWrapper data-background={background}>
-    <TextWrapper>
+  <Container data-background={background}>
+    <Inner>
       <Typography as="h3" color="primary" variant="label-2">
         {title}
       </Typography>
       <Typography as="p" color="secondary" variant="body-2">
         {body}
       </Typography>
-    </TextWrapper>
+    </Inner>
     {children}
-  </CardWrapper>
+  </Container>
 );
 
-const CardWrapper = styled.div`
+const Container = styled.div`
   ${({ theme }) => css`
     position: relative;
     display: flex;
@@ -55,7 +55,7 @@ const CardWrapper = styled.div`
   `}
 `;
 
-const TextWrapper = styled.div`
+const Inner = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

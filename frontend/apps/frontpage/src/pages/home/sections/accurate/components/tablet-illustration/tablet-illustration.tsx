@@ -9,7 +9,7 @@ import BaseIllustration from '../../../../components/base-illustration';
 const TabletIllustration = () => {
   const { t } = useTranslation('pages.home.accurate-section');
   return (
-    <IllustrationWrapper>
+    <IllustrationContainer>
       <Image
         src="/new-home/accurate-section/audit-trail.png"
         height={394}
@@ -17,11 +17,11 @@ const TabletIllustration = () => {
         alt={t('alt')}
         data-type="main"
       />
-    </IllustrationWrapper>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   position: relative;
   display: none;
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),

@@ -9,20 +9,20 @@ type FeatureElementType = {
 };
 
 const FeatureElement = ({ children, title, body }: FeatureElementType) => (
-  <CardWrapper>
-    <TitleWrapper>
+  <Container>
+    <TitleContainer>
       {children}
       <Typography as="h3" color="primary" variant="label-2">
         {title}
       </Typography>
-    </TitleWrapper>
+    </TitleContainer>
     <Typography as="p" color="secondary" variant="body-2">
       {body}
     </Typography>
-  </CardWrapper>
+  </Container>
 );
 
-const CardWrapper = styled.div`
+const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -32,7 +32,7 @@ const CardWrapper = styled.div`
   `}
 `;
 
-const TitleWrapper = styled.div`
+const TitleContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: row;

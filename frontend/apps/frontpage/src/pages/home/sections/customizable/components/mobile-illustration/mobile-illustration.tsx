@@ -6,54 +6,54 @@ import styled from 'styled-components';
 import BaseIllustration from '../../../../components/base-illustration';
 
 const MobileIllustration = () => (
-  <IllustrationWrapper>
-    <ImageWrapper data-position="center">
+  <IllustrationContainer>
+    <ImageContainer data-position="center">
       <Image
         src="/new-home/customizable/1.png"
         height={240}
         width={300}
         alt="illustration"
       />
-    </ImageWrapper>
-    <ImageWrapper data-position="top-right">
+    </ImageContainer>
+    <ImageContainer data-position="top-right">
       <Image
         src="/new-home/customizable/2.png"
         height={200}
         width={250}
         alt="illustration"
       />
-    </ImageWrapper>
+    </ImageContainer>
 
-    <ImageWrapper data-position="bottom-right">
+    <ImageContainer data-position="bottom-right">
       <Image
         src="/new-home/customizable/3.png"
         height={200}
         width={250}
         alt="illustration"
       />
-    </ImageWrapper>
+    </ImageContainer>
 
-    <ImageWrapper data-position="top-left">
+    <ImageContainer data-position="top-left">
       <Image
         src="/new-home/customizable/4.png"
         height={200}
         width={250}
         alt="illustration"
       />
-    </ImageWrapper>
+    </ImageContainer>
 
-    <ImageWrapper data-position="bottom-left">
+    <ImageContainer data-position="bottom-left">
       <Image
         src="/new-home/customizable/5.png"
         height={200}
         width={250}
         alt="illustration"
       />
-    </ImageWrapper>
-  </IllustrationWrapper>
+    </ImageContainer>
+  </IllustrationContainer>
 );
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   display: block;
 
   ${media.greaterThan('sm')`
@@ -61,7 +61,7 @@ const IllustrationWrapper = styled(BaseIllustration)`
    `};
 `;
 
-const ImageWrapper = styled.div`
+const ImageContainer = styled.div`
   position: relative;
 
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),

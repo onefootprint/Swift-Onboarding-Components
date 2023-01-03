@@ -44,7 +44,7 @@ const DesktopIllustration = () => {
   }, [controls, isInView]);
 
   return (
-    <IllustrationWrapper ref={ref}>
+    <IlllustrationContainer ref={ref}>
       <motion.div
         className="main-img"
         animate={controls}
@@ -58,7 +58,7 @@ const DesktopIllustration = () => {
           alt={t('alt')}
         />
       </motion.div>
-      <ImageWrapper
+      <ImageContainer
         as={motion.div}
         className="secondary-img"
         animate={controls}
@@ -71,12 +71,12 @@ const DesktopIllustration = () => {
           width={750}
           alt={t('alt')}
         />
-      </ImageWrapper>
-    </IllustrationWrapper>
+      </ImageContainer>
+    </IlllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IlllustrationContainer = styled(BaseIllustration)`
   display: none;
   justify-content: center;
   align-items: center;
@@ -100,7 +100,7 @@ const IllustrationWrapper = styled(BaseIllustration)`
   `}
 `;
 
-const ImageWrapper = styled.div`
+const ImageContainer = styled.div`
   will-change: opacity, transform;
 `;
 

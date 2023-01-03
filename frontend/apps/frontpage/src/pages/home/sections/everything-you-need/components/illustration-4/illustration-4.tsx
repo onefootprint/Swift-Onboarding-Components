@@ -9,7 +9,7 @@ const Illustration4 = () => {
 
   return (
     <>
-      <ImageWrapper data-viewport="desktop">
+      <ImageContainer data-viewport="desktop">
         <Image
           src="/new-home/everything-you-need-section/feature-4/create-role.png"
           alt={t('features.feature-4.alt-1')}
@@ -24,9 +24,8 @@ const Illustration4 = () => {
           width={800}
           data-type="background"
         />
-      </ImageWrapper>
-
-      <ImageWrapper data-viewport="tablet">
+      </ImageContainer>
+      <ImageContainer data-viewport="tablet">
         <Image
           src="/new-home/everything-you-need-section/feature-4/create-role.png"
           alt={t('features.feature-4.alt-1')}
@@ -41,9 +40,8 @@ const Illustration4 = () => {
           width={800}
           data-type="background"
         />
-      </ImageWrapper>
-
-      <ImageWrapper data-viewport="mobile">
+      </ImageContainer>
+      <ImageContainer data-viewport="mobile">
         <Image
           src="/new-home/everything-you-need-section/feature-4/create-role.png"
           alt={t('features.feature-4.alt-1')}
@@ -58,12 +56,12 @@ const Illustration4 = () => {
           width={800}
           data-type="background"
         />
-      </ImageWrapper>
+      </ImageContainer>
     </>
   );
 };
 
-const ImageWrapper = styled.div`
+const ImageContainer = styled.div`
   ${({ theme }) => css`
     position: relative;
 

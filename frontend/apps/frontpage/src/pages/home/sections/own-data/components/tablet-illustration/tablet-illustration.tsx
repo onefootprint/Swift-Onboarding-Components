@@ -9,7 +9,7 @@ import BaseIllustration from '../../../../components/base-illustration/base-illu
 const TabletIllustration = () => {
   const { t } = useTranslation('pages.home.own-data-section');
   return (
-    <IllustrationWrapper>
+    <IllustrationContainer>
       <Image
         src="/new-home/own-data/decrypt-data.png"
         height={468}
@@ -24,11 +24,11 @@ const TabletIllustration = () => {
         alt={t('alt')}
         className="secondary-img"
       />
-    </IllustrationWrapper>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   position: relative;
   display: none;
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),

@@ -117,8 +117,8 @@ const DesktopIllustration = () => {
   }, [controls, isInView]);
 
   return (
-    <IllustrationWrapper ref={ref}>
-      <ElementWrapper
+    <IllustrationContainer ref={ref}>
+      <ImageContainer
         as={motion.div}
         data-position="center"
         initial="initial"
@@ -131,8 +131,8 @@ const DesktopIllustration = () => {
           width={500}
           alt="slider"
         />
-      </ElementWrapper>
-      <ElementWrapper
+      </ImageContainer>
+      <ImageContainer
         as={motion.div}
         variants={topRight}
         initial="initial"
@@ -145,8 +145,8 @@ const DesktopIllustration = () => {
           width={380}
           alt="slider"
         />
-      </ElementWrapper>
-      <ElementWrapper
+      </ImageContainer>
+      <ImageContainer
         as={motion.div}
         variants={topLeft}
         initial="initial"
@@ -159,8 +159,8 @@ const DesktopIllustration = () => {
           width={380}
           alt="slider"
         />
-      </ElementWrapper>
-      <ElementWrapper
+      </ImageContainer>
+      <ImageContainer
         as={motion.div}
         variants={bottomLeft}
         initial="initial"
@@ -173,8 +173,8 @@ const DesktopIllustration = () => {
           width={380}
           alt="slider"
         />
-      </ElementWrapper>
-      <ElementWrapper
+      </ImageContainer>
+      <ImageContainer
         as={motion.div}
         variants={bottomRight}
         initial="initial"
@@ -187,12 +187,12 @@ const DesktopIllustration = () => {
           width={380}
           alt="slider"
         />
-      </ElementWrapper>
-    </IllustrationWrapper>
+      </ImageContainer>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   position: relative;
   display: none;
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),
@@ -207,7 +207,7 @@ const IllustrationWrapper = styled(BaseIllustration)`
     `}
 `;
 
-const ElementWrapper = styled.div`
+const ImageContainer = styled.div`
   ${({ theme }) => css`
     position: relative;
 

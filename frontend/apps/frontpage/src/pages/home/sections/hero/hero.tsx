@@ -43,17 +43,17 @@ const Hero = () => {
   };
 
   return (
-    <HeroOuterWrapper>
+    <HeroContainer>
       <HeroBackground />
       <NoiseLayer />
       <Container as="section" id="hero">
-        <HeroInnerWrapper
+        <Inner
           as={motion.div}
           variants={containerMotion}
           initial="hidden"
           animate="visible"
         >
-          <ContentWrapper>
+          <Content>
             <ResponsiveHide data-viewport="tablet-desktop">
               <Typography as="h1" color="primary" variant="display-1">
                 {t('title')}
@@ -67,20 +67,19 @@ const Hero = () => {
             <Typography as="h2" color="primary" variant="display-4">
               {t('subtitle')}
             </Typography>
-
             <DynamicMobileIllustration />
             <DynamicTabletIllustration />
-            <ButtonsWrapper>
+            <ButtonsContainer>
               <Button onClick={toggleTypeform}> {t('primary-button')}</Button>
               <Button onClick={toggleDemo} variant="secondary">
                 {t('secondary-button')}
               </Button>
-            </ButtonsWrapper>
-          </ContentWrapper>
-          <ImagesWrapper>
+            </ButtonsContainer>
+          </Content>
+          <ImagesContainer>
             <DynamicDesktopIllustration />
-          </ImagesWrapper>
-        </HeroInnerWrapper>
+          </ImagesContainer>
+        </Inner>
       </Container>
       <DemoVideo
         link={DEMO_LINK}
@@ -88,11 +87,11 @@ const Hero = () => {
         title="Footprint Demo"
         open={isDemoVisible}
       />
-    </HeroOuterWrapper>
+    </HeroContainer>
   );
 };
 
-const HeroOuterWrapper = styled.div`
+const HeroContainer = styled.div`
   background-size: cover;
   position: relative;
   width: 100%;
@@ -103,7 +102,7 @@ const HeroOuterWrapper = styled.div`
   }
 `;
 
-const HeroInnerWrapper = styled.div`
+const Inner = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -112,7 +111,7 @@ const HeroInnerWrapper = styled.div`
   `}
 `;
 
-const ContentWrapper = styled.div`
+const Content = styled.div`
   ${({ theme }) => css`
     max-width: 820px;
     display: flex;
@@ -124,13 +123,13 @@ const ContentWrapper = styled.div`
   `}
 `;
 
-const ImagesWrapper = styled.div`
+const ImagesContainer = styled.div`
   position: relative; 
   width 100%;
   z-index: 2;
 `;
 
-const ButtonsWrapper = styled.div`
+const ButtonsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

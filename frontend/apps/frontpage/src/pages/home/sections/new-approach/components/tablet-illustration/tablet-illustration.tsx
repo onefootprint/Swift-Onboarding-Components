@@ -9,7 +9,7 @@ import BaseIllustration from '../../../../components/base-illustration';
 const DesktopIllustration = () => {
   const { t } = useTranslation('pages.home.new-approach-section');
   return (
-    <IllustrationWrapper>
+    <IllustrationContainer>
       <Image
         src="/new-home/new-approach-illu/phone.png"
         height={694.5}
@@ -26,11 +26,11 @@ const DesktopIllustration = () => {
         className="code-image"
         priority
       />
-    </IllustrationWrapper>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   display: none;
   position: relative;
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),

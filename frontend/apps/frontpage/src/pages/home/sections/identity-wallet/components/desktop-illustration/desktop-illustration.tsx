@@ -33,8 +33,8 @@ const DesktopIllustration = () => {
   }, [controls, isInView]);
 
   return (
-    <IllustrationWrapper ref={ref}>
-      <ImageWrapper
+    <IllustrationContainer ref={ref}>
+      <ImageContainer
         as={motion.div}
         id="main-img"
         animate={controls}
@@ -47,12 +47,12 @@ const DesktopIllustration = () => {
           width={1020}
           alt={t('alt')}
         />
-      </ImageWrapper>
-    </IllustrationWrapper>
+      </ImageContainer>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   position: relative;
   display: none;
   background: radial-gradient(at 0% 0%, #fff6f3 16%, rgba(246, 209, 193, 0) 50%),
@@ -71,7 +71,7 @@ const IllustrationWrapper = styled(BaseIllustration)`
   `}
 `;
 
-const ImageWrapper = styled.div`
+const ImageContainer = styled.div`
   will-change: transform, opacity;
 `;
 

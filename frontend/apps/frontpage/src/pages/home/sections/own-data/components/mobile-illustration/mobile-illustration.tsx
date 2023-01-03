@@ -9,7 +9,7 @@ import BaseIllustration from '../../../../components/base-illustration/base-illu
 const MobileIllustration = () => {
   const { t } = useTranslation('pages.home.own-data-section');
   return (
-    <IllustrationWrapper>
+    <IllustrationContainer>
       <Image
         src="/new-home/own-data/decrypt-data.png"
         height={312}
@@ -24,11 +24,11 @@ const MobileIllustration = () => {
         alt={t('alt')}
         className="secondary-img"
       />
-    </IllustrationWrapper>
+    </IllustrationContainer>
   );
 };
 
-const IllustrationWrapper = styled(BaseIllustration)`
+const IllustrationContainer = styled(BaseIllustration)`
   display: flex;
   justify-content: center;
   align-items: center;
