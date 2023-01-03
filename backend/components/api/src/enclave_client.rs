@@ -20,6 +20,7 @@ pub struct EnclaveClient {
 }
 
 impl EnclaveClient {
+    #[allow(clippy::expect_used)]
     /// initialize a new enclave client with a pool of connections
     pub async fn new(config: Config) -> Self {
         let sealed_ikek = hex::decode(&config.enclave_config.enclave_sealed_ikek_hex)

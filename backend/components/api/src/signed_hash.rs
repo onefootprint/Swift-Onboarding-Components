@@ -40,7 +40,11 @@ impl SignedHashClient {
             .send()
             .await?;
 
-        Ok(result.mac().unwrap().as_ref().to_vec())
+        Ok(result
+            .mac()
+            .ok_or(KmsSignError::MacDataNotReturned)?
+            .as_ref()
+            .to_vec())
     }
 }
 

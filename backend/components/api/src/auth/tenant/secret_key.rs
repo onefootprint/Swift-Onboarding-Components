@@ -48,6 +48,7 @@ impl FromRequest for SecretTenantAuthContext {
         // get the tenant header
         let tenant_sk_input = parse_auth_key(req);
 
+        #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
         Box::pin(async move {

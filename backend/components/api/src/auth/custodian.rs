@@ -32,6 +32,7 @@ impl FromRequest for CustodianAuthContext {
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
             .ok_or(AuthError::MissingCustodianAuthHeader);
 
+        #[allow(clippy::unwrap_used)]
         let expected_custodian_key = req
             .app_data::<web::Data<State>>()
             .unwrap()

@@ -5,6 +5,7 @@ use gethostname::gethostname;
 
 use crate::config::Config;
 
+#[allow(clippy::expect_used)]
 pub fn init(config: &Config) -> PrometheusMetrics {
     let labels = HashMap::from_iter([
         ("server_version".to_string(), crate::GIT_HASH.to_string()),

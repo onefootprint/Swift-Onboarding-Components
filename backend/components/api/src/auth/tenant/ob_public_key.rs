@@ -43,6 +43,7 @@ impl FromRequest for PublicOnboardingContext {
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
             .ok_or(AuthError::MissingClientPublicAuthHeader);
 
+        #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
         Box::pin(async move {

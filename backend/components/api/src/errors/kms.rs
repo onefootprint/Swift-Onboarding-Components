@@ -19,4 +19,6 @@ pub enum KmsSignError {
     VerifyMacError(#[from] KmsSdkError<VerifyMacError>),
     #[error("crypto error: {0}")]
     Crypto(#[from] crypto::Error),
+    #[error("data not available")]
+    MacDataNotReturned
 }

@@ -43,6 +43,7 @@ impl State {
         Self::init_or_die(config).await
     }
 
+    #[allow(clippy::expect_used)]
     pub async fn init_or_die(mut config: Config) -> Self {
         let feature_flag_client = FeatureFlagClient::new();
         let feature_flag_client = match feature_flag_client.init(&config.launch_darkly_sdk_key).await {
@@ -93,13 +94,14 @@ impl State {
             config.idology_config.username.clone().into(),
             config.idology_config.password.clone().into(),
         )
-        .unwrap();
+        .expect("failed to build idology client");
 
-        let socure_sandbox_client =
-            SocureClient::new(config.socure_config.sandbox_api_key.clone(), true).unwrap();
+        let socure_sandbox_client = SocureClient::new(config.socure_config.sandbox_api_key.clone(), true)
+            .expect("failed to build socure sandbox client");
 
         let socure_certification_client =
-            SocureClient::new(config.socure_config.certification_api_key.clone(), false).unwrap();
+            SocureClient::new(config.socure_config.certification_api_key.clone(), false)
+                .expect("failed to build socure certification client");
 
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
@@ -108,10 +110,12 @@ impl State {
         // dbg!(crypto::hex::encode(&out));
 
         // run migrations
-        db::run_migrations(&config.database_url).unwrap();
+        db::run_migrations(&config.database_url).expect("failed to run migrations");
 
         // then create the pool
-        let db_pool = db::init(&config.database_url).map_err(ApiError::from).unwrap();
+        let db_pool = db::init(&config.database_url)
+            .map_err(ApiError::from)
+            .expect("failed to init db pool");
 
         // our session key
         let (challenge_sealing_key, session_sealing_key) = {

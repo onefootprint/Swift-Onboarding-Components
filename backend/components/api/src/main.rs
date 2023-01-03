@@ -1,3 +1,6 @@
+#![warn(clippy::unwrap_used)]
+#![warn(clippy::expect_used)]
+
 use actix_web::{middleware::Logger, App, HttpServer, ResponseError};
 use idv::socure::reason_code::check_reason_code_api::query_socure_reason_code_endpoint_and_compare_against_enum;
 
@@ -32,6 +35,7 @@ lazy_static::lazy_static! {
     pub static ref GIT_HASH:&'static str = env!("GIT_HASH");
 }
 
+#[allow(clippy::expect_used)]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");

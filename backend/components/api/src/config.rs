@@ -174,6 +174,7 @@ pub struct ServiceEnvironmentConfig {
 
 lazy_static::lazy_static! {
     pub static ref SERVICE_CONFIG:ServiceEnvironmentConfig = {
+        #[allow(clippy::expect_used)]
         ServiceEnvironmentConfig::load_from_env().expect("failed to load service config")
     };
 }
