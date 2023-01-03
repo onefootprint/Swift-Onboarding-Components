@@ -68,7 +68,7 @@ impl ExtractableAuthSession for ParsedTenantUserAuth {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (tenant_user, tenant_role, tenant) = TenantUser::get_by_id(conn, &data.tenant_user_id)?;
+        let (tenant_user, tenant_role, tenant) = TenantUser::get(conn, &data.tenant_user_id)?;
 
         tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tenant_role.id, tenant_user_id=%tenant_user.id, "authenticated");
 

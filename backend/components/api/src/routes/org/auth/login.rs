@@ -66,7 +66,7 @@ async fn handler(
         (vec![tenant_user_id], created_new_tenant)
     };
 
-    let data = if matching_tenant_users.len() == 1 {
+    let (session_data, requires_onboarding, user, tenant) = if matching_tenant_users.len() == 1 {
         // If one user, log into it and create a TenantUser ssession
         let tenant_user_id = matching_tenant_users
             .into_iter()
@@ -78,22 +78,16 @@ async fn handler(
         let last_name = profile.last_name.clone();
         let (tenant_user, tenant_role, tenant) = state
             .db_pool
-            .db_transaction(move |conn| TenantUser::login_by_id(conn, &tenant_user_id, first_name, last_name))
+            .db_transaction(move |conn| TenantUser::login(conn, &tenant_user_id, first_name, last_name))
             .await?;
 
-        // Save tenant login in session data into the DB
         let session_data = AuthSessionData::TenantUser(tenant_user.clone().into());
-        let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
 
         let requires_onboarding = tenant_role.permissions.is_admin()
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
-        OrgLoginResponse {
-            auth_token,
-            created_new_tenant,
-            requires_onboarding,
-            user: Some(OrganizationMember::from_db((tenant_user, tenant_role))),
-            tenant: Some(Organization::from_db(tenant)),
-        }
+        let user = Some(OrganizationMember::from_db((tenant_user, tenant_role)));
+        let tenant = Some(Organization::from_db(tenant));
+        (session_data, requires_onboarding, user, tenant)
     } else {
         // If multiple users, create a WorkOsSession that just shows the email that was proven to be owned.
         // This token lets the user choose which tenant they'd like to auth as. Only give them 10
@@ -102,14 +96,16 @@ async fn handler(
         let session_data = AuthSessionData::WorkOs(WorkOsSession {
             email: profile.email.clone(),
         });
-        let auth_token = AuthSession::create(&state, session_data, Duration::minutes(10)).await?;
-        OrgLoginResponse {
-            auth_token,
-            created_new_tenant,
-            requires_onboarding: false,
-            user: None,
-            tenant: None,
-        }
+        (session_data, false, None, None)
+    };
+    // Save tenant login in session data into the DB
+    let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
+    let data = OrgLoginResponse {
+        auth_token,
+        created_new_tenant,
+        requires_onboarding,
+        user,
+        tenant,
     };
     ResponseData { data }.json()
 }

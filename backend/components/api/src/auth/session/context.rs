@@ -44,7 +44,7 @@ where
     /// Replace the session data for the session used to authenticate this SessionContext with the
     /// new provided data
     pub fn update_session(
-        &mut self,
+        self, // Intentionally consume to prevent reading stale value
         conn: &mut PgConnection,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,

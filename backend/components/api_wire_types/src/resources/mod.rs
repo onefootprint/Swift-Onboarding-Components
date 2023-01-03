@@ -48,3 +48,6 @@ pub use self::actor::*;
 
 pub mod login;
 pub use self::login::*;
+
+pub mod assume_role;
+pub use self::assume_role::*;

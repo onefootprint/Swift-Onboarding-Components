@@ -38,7 +38,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
-    let mut user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
     let uv_id = user_auth.user_vault_id();
 
     let session_key = state.session_sealing_key.clone();

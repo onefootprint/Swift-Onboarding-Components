@@ -30,12 +30,30 @@ pub struct TenantUser {
 
 pub type TenantUserInfo = (TenantUser, TenantRole, Tenant);
 
+pub enum TenantUserIdentifier<'a> {
+    Id(&'a TenantUserId),
+    Email(&'a OrgMemberEmail, &'a TenantId),
+}
+
+impl<'a> From<&'a TenantUserId> for TenantUserIdentifier<'a> {
+    fn from(value: &'a TenantUserId) -> Self {
+        Self::Id(value)
+    }
+}
+
+impl<'a> From<(&'a OrgMemberEmail, &'a TenantId)> for TenantUserIdentifier<'a> {
+    fn from((email, tenant_id): (&'a OrgMemberEmail, &'a TenantId)) -> Self {
+        Self::Email(email, tenant_id)
+    }
+}
+
 impl TenantUser {
-    /// Get the list of TenantUserIds that have this email address.
+    /// Get the list of active TenantUserIds that have this email address.
     /// Could be multiple if a user has been invited to multiple tenants.
     pub fn list_by_email(conn: &mut PgConnection, email: OrgMemberEmail) -> DbResult<Vec<TenantUserId>> {
         let results: Vec<TenantUserId> = tenant_user::table
             .filter(tenant_user::email.eq(email))
+            .filter(tenant_user::deactivated_at.is_null())
             .select(tenant_user::id)
             .get_results(conn)?;
         Ok(results)
@@ -43,25 +61,41 @@ impl TenantUser {
 
     /// Fetches TenantUserInfo by TenantUserId when logging them in via a workos auth token, and
     /// validates invariants for the TenantUser
-    pub fn get_by_id(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<TenantUserInfo> {
+    pub fn get<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<TenantUserInfo>
+    where
+        T: Into<TenantUserIdentifier<'a>>,
+    {
         use crate::schema::tenant;
-        let (user, role, tenant): TenantUserInfo = tenant_user::table
+        let mut query = tenant_user::table
             .inner_join(tenant_role::table)
             .inner_join(tenant::table)
-            .filter(tenant_user::id.eq(id))
-            .first(conn)?;
+            .into_boxed();
+        match id.into() {
+            TenantUserIdentifier::Id(id) => {
+                query = query.filter(tenant_user::id.eq(id));
+            }
+            TenantUserIdentifier::Email(email, tenant_id) => {
+                query = query
+                    .filter(tenant_user::email.eq(email))
+                    .filter(tenant_user::tenant_id.eq(tenant_id));
+            }
+        }
+        let (user, role, tenant): TenantUserInfo = query.first(conn)?;
         user.validate_login(&role)?;
         Ok((user, role, tenant))
     }
 
-    /// Log into a given TenantUserId
-    pub fn login_by_id(
+    /// Log into a given TenantUser
+    pub fn login<'a, T>(
         conn: &mut TxnPgConnection,
-        id: &TenantUserId,
+        id: T,
         workos_first_name: Option<String>,
         workos_last_name: Option<String>,
-    ) -> DbResult<TenantUserInfo> {
-        let (user, role, tenant) = Self::get_by_id(conn, id)?;
+    ) -> DbResult<TenantUserInfo>
+    where
+        T: Into<TenantUserIdentifier<'a>>,
+    {
+        let (user, role, tenant) = Self::get(conn, id)?;
 
         // Update the name if there's no name on the tenant_user
         let tenant_user_has_no_name = user.first_name.is_none() && user.last_name.is_none();

@@ -68,7 +68,7 @@ impl AuthSession {
     }
 
     pub fn update(
-        &mut self,
+        self, // Intentionally consume to prevent reading stale values
         conn: &mut PgConnection,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
@@ -76,7 +76,6 @@ impl AuthSession {
         let sealed_session_data = data.seal(session_sealing_key)?;
         // Keep the same expiration date and primary key in the DB - just update the data
         Session::update_or_create(conn, self.key.clone(), sealed_session_data.0, self.expires_at)?;
-        self.data = data;
         Ok(())
     }
 }
