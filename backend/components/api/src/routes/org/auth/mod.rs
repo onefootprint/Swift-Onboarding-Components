@@ -10,5 +10,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(login::handler)
         .service(magic_link::handler)
         .service(oauth::handler)
-        .service(assume_role::handler);
+        .service(assume_role::get)
+        .service(assume_role::post);
 }

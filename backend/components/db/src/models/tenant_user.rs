@@ -50,11 +50,16 @@ impl<'a> From<(&'a OrgMemberEmail, &'a TenantId)> for TenantUserIdentifier<'a> {
 impl TenantUser {
     /// Get the list of active TenantUserIds that have this email address.
     /// Could be multiple if a user has been invited to multiple tenants.
-    pub fn list_by_email(conn: &mut PgConnection, email: OrgMemberEmail) -> DbResult<Vec<TenantUserId>> {
-        let results: Vec<TenantUserId> = tenant_user::table
+    pub fn list_by_email(
+        conn: &mut PgConnection,
+        email: &OrgMemberEmail,
+    ) -> DbResult<Vec<(TenantUserId, Tenant)>> {
+        use crate::schema::tenant;
+        let results = tenant_user::table
+            .inner_join(tenant::table)
             .filter(tenant_user::email.eq(email))
             .filter(tenant_user::deactivated_at.is_null())
-            .select(tenant_user::id)
+            .select((tenant_user::id, tenant::all_columns))
             .get_results(conn)?;
         Ok(results)
     }

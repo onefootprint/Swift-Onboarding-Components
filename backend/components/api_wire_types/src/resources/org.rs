@@ -5,6 +5,7 @@ use crate::*;
 #[schemars(rename_all = "camelCase")]
 
 pub struct Organization {
+    pub id: TenantId,
     pub name: String,
     pub logo_url: Option<String>,
     pub is_sandbox_restricted: bool,

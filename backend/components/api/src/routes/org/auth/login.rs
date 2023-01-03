@@ -17,7 +17,7 @@ use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::TenantUser;
 use db::tenant::get_opt_by_workos_org_id;
-use newtypes::TenantUserId;
+use newtypes::{OrgMemberEmail, TenantUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::organizations::{
     CreateOrganization, CreateOrganizationParams, DomainFilters, ListOrganizations, ListOrganizationsParams,
@@ -50,11 +50,14 @@ async fn handler(
     tracing::info!(profile =?profile, "workos login");
 
     // First, get all matching tenant users.
-    let email = profile.email.clone();
-    let matching_tenant_users = state
+    let email = OrgMemberEmail::from(profile.email.clone());
+    let matching_tenant_users: Vec<_> = state
         .db_pool
-        .db_query(move |conn| TenantUser::list_by_email(conn, email.into()))
-        .await??;
+        .db_query(move |conn| TenantUser::list_by_email(conn, &email))
+        .await??
+        .into_iter()
+        .map(|(id, _)| id)
+        .collect();
 
     let (matching_tenant_users, created_new_tenant) = if !matching_tenant_users.is_empty() {
         (matching_tenant_users, false)

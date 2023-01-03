@@ -8,16 +8,15 @@ use crate::State;
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
 use db::models::tenant_user::TenantUser;
 use newtypes::OrgMemberEmail;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
 #[api_v2_operation(
-    description = "After the user has proven they own an email address, 
-    login. Once the user clicks the magic link, WorkOs will call the /workos/callback endpoint, \
-    at which point we authenticate the user",
+    description = "After the user has proven they own an email address, allow them to assume an
+    auth role for any tenant, to which the email address has access.",
     tags(Private)
 )]
 #[post("/org/auth/assume_role")]
-fn handler(
+fn post(
     state: web::Data<State>,
     request: Json<AssumeRoleRequest>,
     auth: SessionContext<WorkOsSession>,
@@ -44,5 +43,28 @@ fn handler(
         user: OrganizationMember::from_db((tenant_user, tenant_role)),
         tenant: Organization::from_db(tenant),
     };
+    ResponseData::ok(data).json()
+}
+
+pub type RolesResponse = Vec<Organization>;
+
+#[api_v2_operation(
+    description = "Return the list of tenants that can be inherited by the authed user",
+    tags(Private)
+)]
+#[get("/org/auth/roles")]
+fn get(
+    state: web::Data<State>,
+    auth: SessionContext<WorkOsSession>,
+) -> actix_web::Result<Json<ResponseData<RolesResponse>>, ApiError> {
+    let email = OrgMemberEmail::from(auth.data.email.clone());
+    let tenants = state
+        .db_pool
+        .db_query(move |conn| TenantUser::list_by_email(conn, &email))
+        .await??
+        .into_iter()
+        .map(|(_, tenant)| tenant);
+
+    let data = tenants.map(Organization::from_db).collect();
     ResponseData::ok(data).json()
 }
