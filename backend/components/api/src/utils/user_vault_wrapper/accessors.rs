@@ -94,11 +94,11 @@ impl UserVaultWrapper {
         &self,
         // Ideally we'd take a scoped user and calculate this here,
         // but /users does some bulk fetching and this makes it easier
-        ob_configs: Vec<ObConfiguration>,
+        ob_configs: &[ObConfiguration],
     ) -> Vec<DataLifetimeKind> {
         // As of 2022-11, ob<>scoped user is 1-1
         let intent_to_collect_attributes: HashSet<DataLifetimeKind> = ob_configs
-            .into_iter()
+            .iter()
             .flat_map(|x| x.intent_to_collect_fields())
             .collect();
         let fields_present_in_vault: HashSet<DataLifetimeKind> =
@@ -116,7 +116,7 @@ impl UserVaultWrapper {
     ///    This is what we display in /users, and it would be a little weird to collect, but then not display the info we collected anywhere.
     pub fn get_accessible_populated_fields(
         &self,
-        ob_configs: Vec<ObConfiguration>,
+        ob_configs: &[ObConfiguration],
     ) -> (Vec<DataLifetimeKind>, Vec<String>) {
         let accessible_fields: HashSet<DataLifetimeKind> = HashSet::from_iter(
             self.data_fields_tenant_requested_to_collect(ob_configs)

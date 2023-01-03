@@ -5,6 +5,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use crate::serializers::UserDetail;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::PaginatedResponseData;
@@ -76,7 +77,7 @@ pub async fn get(
         timestamp_lte,
         timestamp_gte,
     };
-    let (scoped_users, mut obs, uvws, count, mut ob_config_map) = state
+    let (scoped_users, mut obs, uvws, count, ob_config_map) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_users = db::scoped_user::list_authorized_for_tenant(
@@ -103,7 +104,7 @@ pub async fn get(
 
     // Since we zip these Vecs together, we should ensure they are in the same order.
     // scoped_users.sort_by_key(|su| su.user_vault_id.clone());
-    let mut uvw_map: HashMap<UserVaultId, UserVaultWrapper> = uvws
+    let uvw_map: HashMap<UserVaultId, UserVaultWrapper> = uvws
         .into_iter()
         .map(move |uvw| (uvw.user_vault.id.clone(), uvw))
         .collect();
@@ -112,19 +113,25 @@ pub async fn get(
         .into_iter()
         .take(page_size)
         .map(|(su, _)| {
-            let uvw = uvw_map.remove(&su.user_vault_id).unwrap();
-            let ob_configs = ob_config_map.remove(&su.id).unwrap();
+            // If there is a duplicate scoped_user
+            let uvw = uvw_map
+                .get(&su.user_vault_id)
+                .ok_or_else(|| ApiError::AssertionError("UVW not found".to_owned()))?;
+            let ob_configs = ob_config_map
+                .get(&su.id)
+                .ok_or_else(|| ApiError::AssertionError("Ob config not found".to_owned()))?;
             // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
             let (data_attributes, document_types) = uvw.get_accessible_populated_fields(ob_configs);
-            <api_wire_types::User as DbToApi<UserDetail>>::from_db((
+            let result = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
                 data_attributes,
                 document_types,
                 obs.remove(&su.id),
                 su,
                 uvw.user_vault.is_portable,
-            ))
+            ));
+            Ok(result)
         })
-        .collect();
+        .collect::<ApiResult<_>>()?;
 
     Ok(Json(PaginatedResponseData::ok(scoped_users, cursor, count)))
 }
@@ -168,7 +175,7 @@ pub async fn get_detail(
         .await??;
     let (_, ob_config, _, _, _, _) = &ob;
     // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
-    let (data_attributes, document_types) = uvw.get_accessible_populated_fields(vec![ob_config.clone()]);
+    let (data_attributes, document_types) = uvw.get_accessible_populated_fields(&[ob_config.clone()]);
 
     let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
         data_attributes,
