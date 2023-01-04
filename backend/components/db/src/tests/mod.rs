@@ -12,3 +12,8 @@ mod data_lifetime;
 
 #[cfg(test)]
 mod ob_configuration;
+
+/// Only compiles when running doctests. Contains some tests that can't be performed in normal
+/// unit tests.
+#[cfg(doctest)]
+mod test_db_query;
