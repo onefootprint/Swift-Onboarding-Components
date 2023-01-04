@@ -69,7 +69,7 @@ exporters:
   prometheusremotewrite/observe:
     endpoint: 'https://collect.observeinc.com/v1/prometheus'
     headers:
-      'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
+      'Authorization': 'Bearer 189225732777 ds17JEl56KdqAO6MYQaJ:HxEdwLlbfEp2NBQCnVJBEpA-BI8wh1VU'
 
 service:
   pipelines:
