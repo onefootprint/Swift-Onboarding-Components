@@ -25,7 +25,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(roles::patch)
         .service(roles::deactivate)
         .service(settings::get)
-        .service(settings::post)
         .service(access_events::get);
 
     auth::routes(config);

@@ -1,5 +1,5 @@
 use crate::schema::tenant;
-use crate::{DbPool, DbResult, TxnPgConnection};
+use crate::{DbResult, TxnPgConnection};
 use diesel::insertable::CanInsertInSingleQuery;
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -70,26 +70,22 @@ impl Tenant {
             .get_result(conn)?;
         Ok(tenant)
     }
+
+    pub fn update(conn: &mut PgConnection, id: TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
+        let result = diesel::update(tenant::table)
+            .filter(tenant::id.eq(id))
+            .set(update_tenant)
+            .get_result(conn)?;
+
+        Ok(result)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset)]
 #[diesel(table_name = tenant)]
-pub struct UpdateTenantNameOrLogo {
-    pub id: TenantId,
+pub struct UpdateTenant {
     pub name: Option<String>,
     pub logo_url: Option<String>,
-}
-
-impl UpdateTenantNameOrLogo {
-    pub async fn update(self, pool: &DbPool) -> DbResult<()> {
-        let _ = pool
-            .db_query(move |conn| {
-                diesel::update(tenant::table)
-                    .filter(tenant::id.eq(&self.id))
-                    .set(&self)
-                    .execute(conn)
-            })
-            .await??;
-        Ok(())
-    }
+    pub website_url: Option<String>,
+    pub company_size: Option<CompanySize>,
 }
