@@ -1,5 +1,4 @@
 use super::SocureConversionError;
-use chrono::{DateTime, Utc};
 use newtypes::dob::DateOfBirth;
 use newtypes::*;
 use std::fmt::Debug;
@@ -21,8 +20,6 @@ pub(crate) struct SocureRequest {
     state: Option<PiiString>, // 2 digit ISO 3166-2
     zip: Option<PiiString>,   // 5 or 9 digit
     country: Option<PiiString>,
-    user_consent: bool,
-    consent_timestamp: DateTime<Utc>,
     device_session_id: Option<String>,
     ip_address: Option<PiiString>,
 }
@@ -81,8 +78,6 @@ impl SocureRequest {
             state,
             zip,
             country,
-            user_consent: true, // TODO: can we hardcode to true or do we need to more explicitly route the users consent to here
-            consent_timestamp: Utc::now(), // TODO: same as above
             device_session_id,
             ip_address,
         })
