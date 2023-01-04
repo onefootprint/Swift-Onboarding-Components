@@ -171,16 +171,8 @@ impl ExtractableAuthSession for ParsedUserSession {
 }
 
 impl ParsedUserSession {
-    pub fn check_permissions<T>(self, scopes: Vec<T>) -> Result<UserSession, AuthError>
-    where
-        T: Into<UserAuthScopeDiscriminant>,
-    {
-        let scope_discriminants: Vec<_> = scopes.into_iter().map(|x| x.into()).collect();
-        if scope_discriminants.iter().any(|s| self.0.has_scope(s)) {
-            Ok(self.0)
-        } else {
-            Err(AuthError::MissingScope(scope_discriminants))
-        }
+    fn are_permissions_met(&self, requested_permissions: &[UserAuthScopeDiscriminant]) -> bool {
+        requested_permissions.iter().any(|s| self.0.has_scope(s))
     }
 }
 
@@ -190,10 +182,18 @@ pub type UserAuthContext = SessionContext<ParsedUserSession>;
 impl UserAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth
     /// that is accessible
-    pub fn check_permissions<T>(self, scopes: Vec<T>) -> Result<SessionContext<UserSession>, AuthError>
+    pub fn check_permissions<T>(
+        self,
+        requested_permissions: Vec<T>,
+    ) -> Result<SessionContext<UserSession>, AuthError>
     where
         T: Into<UserAuthScopeDiscriminant>,
     {
-        self.map(|c| c.check_permissions(scopes))
+        let requested_permissions: Vec<_> = requested_permissions.into_iter().map(|x| x.into()).collect();
+        if self.data.are_permissions_met(&requested_permissions) {
+            Ok(self.map(|d| d.0))
+        } else {
+            Err(AuthError::MissingScope(requested_permissions))
+        }
     }
 }

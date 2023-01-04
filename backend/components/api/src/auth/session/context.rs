@@ -115,9 +115,9 @@ where
 }
 
 impl<A> SessionContext<A> {
-    pub fn map<B, F, E>(self, f: F) -> Result<SessionContext<B>, E>
+    pub fn map<B, F>(self, f: F) -> SessionContext<B>
     where
-        F: FnOnce(A) -> Result<B, E>,
+        F: FnOnce(A) -> B,
     {
         let SessionContext {
             data,
@@ -126,13 +126,12 @@ impl<A> SessionContext<A> {
             session,
             phantom,
         } = self;
-        let result = SessionContext {
-            data: f(data)?,
+        SessionContext {
+            data: f(data),
             auth_token,
             headers,
             session,
             phantom,
-        };
-        Ok(result)
+        }
     }
 }

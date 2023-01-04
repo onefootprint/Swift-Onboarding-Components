@@ -9,10 +9,10 @@ use db::{
     models::{tenant::Tenant, tenant_role::TenantRole, tenant_user::TenantUser},
     PgConnection,
 };
-use newtypes::{DataLifetimeKind, TenantPermission, TenantUserId};
+use newtypes::{TenantPermission, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
-use super::{AuthActor, CheckTenantPermissions, TenantAuth};
+use super::{AuthActor, CanCheckTenantPermissions, TenantAuth};
 
 #[derive(Debug, Clone)]
 pub struct TenantUserAuth {
@@ -81,27 +81,6 @@ impl ExtractableAuthSession for ParsedTenantUserAuth {
     }
 }
 
-impl ParsedTenantUserAuth {
-    pub fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<TenantUserAuth, AuthError> {
-        if let Some(missing_permission) = permissions
-            .into_iter()
-            .find(|p| !self.0.tenant_role.permissions.has_permission(p))
-        {
-            Err(AuthError::MissingTenantPermission(missing_permission.into()))
-        } else {
-            Ok(self.0)
-        }
-    }
-
-    pub fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<TenantUserAuth, AuthError> {
-        if self.0.tenant_role.permissions.can_decrypt(attributes) {
-            Ok(self.0)
-        } else {
-            Err(AuthError::RoleMissingDecryptPermission)
-        }
-    }
-}
-
 impl TenantUserAuth {
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
@@ -124,17 +103,13 @@ impl TenantUserAuth {
 /// A shorthand for the commonly used ParsedWorkOs context
 pub type TenantUserAuthContext = SessionContext<ParsedTenantUserAuth>;
 
-impl CheckTenantPermissions for TenantUserAuthContext {
-    /// Verifies that the auth token has one of the required scopes. If so, returns a TenantUserAuth
-    /// that is accessible
-    fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError> {
-        let result = self.map(|c| c.check_permissions(permissions))?;
-        Ok(Box::new(result))
+impl CanCheckTenantPermissions for TenantUserAuthContext {
+    fn token_scopes(&self) -> &[TenantPermission] {
+        &self.data.0.tenant_role.permissions
     }
 
-    fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<Box<dyn TenantAuth>, AuthError> {
-        let result = self.map(|c| c.can_decrypt(attributes))?;
-        Ok(Box::new(result))
+    fn tenant_auth(self) -> Box<dyn TenantAuth> {
+        Box::new(self.map(|d| d.0))
     }
 }
 

@@ -45,7 +45,7 @@ impl TenantRole {
         let result = NewTenantRole {
             tenant_id,
             name,
-            permissions: permissions.into(),
+            permissions: TenantPermissionList(permissions),
             created_at: Utc::now(),
         }
         .save(conn)?;
@@ -98,11 +98,11 @@ impl TenantRole {
         tenant_id: &TenantId,
         id: &TenantRoleId,
         name: Option<String>,
-        permissions: Option<TenantPermissionList>,
+        permissions: Option<Vec<TenantPermission>>,
     ) -> DbResult<Self> {
         let update = TenantRoleUpdate {
             name,
-            permissions,
+            permissions: permissions.map(TenantPermissionList),
             ..TenantRoleUpdate::default()
         };
         let results: Vec<Self> = diesel::update(tenant_role::table)

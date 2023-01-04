@@ -24,7 +24,7 @@ async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -57,7 +57,7 @@ async fn post(
     request: web::Json<CreateTenantRoleRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -85,12 +85,11 @@ async fn patch(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
     let UpdateTenantRoleRequest { name, permissions } = request.into_inner();
-    let permissions = permissions.map(|p| p.into());
     let result = state
         .db_pool
         .db_transaction(move |conn| TenantRole::update(conn, &tenant_id, &role_id, name, permissions))
@@ -107,7 +106,7 @@ async fn deactivate(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
 

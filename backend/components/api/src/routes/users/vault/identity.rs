@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::{CanDecrypt, SecretTenantAuthContext};
 use crate::auth::{
     tenant::{CheckTenantPermissions, TenantAuth, TenantUserAuthContext},
     AuthError, Either,
@@ -145,7 +145,7 @@ pub(super) async fn get_internal(
     request: Query<FieldsParams>,
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDataResponse> {
-    let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::Users])?;
+    let tenant_auth = tenant_auth.check_permissions(TenantPermission::Users)?;
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
@@ -220,7 +220,7 @@ pub(super) async fn post_decrypt_internal(
             "IdentityDocument",
         )));
     }
-    let auth = auth.can_decrypt(fields.iter().cloned().collect())?;
+    let auth = auth.check_permissions(CanDecrypt::new(fields.iter().cloned().collect()))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();

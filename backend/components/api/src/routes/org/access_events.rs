@@ -42,7 +42,7 @@ async fn get(
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
 
     let page_size = request.page_size(&state);
     let cursor = request.cursor;

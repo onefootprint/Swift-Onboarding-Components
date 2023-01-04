@@ -21,7 +21,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: TenantUserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<GetTenantResponse>>, ApiError> {
-    let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
     let tenant = auth.tenant();
 
     let email_domains = if let Some(org_id) = tenant.workos_id.as_ref() {

@@ -37,7 +37,7 @@ pub async fn get(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<AnnotationsListResponse> {
     // TODO paginate?
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = fp_user_id.into_inner();
@@ -67,7 +67,7 @@ async fn patch(
     path: web::Path<UpdateAnnotationPath>,
     request: web::Json<UpdateAnnotationRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     let tenant = auth.tenant();
     let is_live = auth.is_live()?;
     let UpdateAnnotationPath {
@@ -116,7 +116,7 @@ pub fn post(
     footprint_user_id: web::Path<FootprintUserId>,
     request: Json<CreateAnnotationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     request.validate()?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();

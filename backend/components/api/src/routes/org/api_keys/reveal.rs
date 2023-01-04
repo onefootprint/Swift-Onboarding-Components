@@ -28,7 +28,7 @@ async fn get(
     request: web::Path<RevealRequest>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {
-    let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
+    let auth = auth.check_permissions(TenantPermission::ApiKeys)?;
     // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();

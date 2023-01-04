@@ -7,7 +7,7 @@ use crate::*;
 pub struct OrganizationRole {
     pub id: TenantRoleId,
     pub name: String,
-    pub permissions: TenantPermissionList,
+    pub permissions: Vec<TenantPermission>,
     pub created_at: DateTime<Utc>,
 }
 export_schema!(OrganizationRole);

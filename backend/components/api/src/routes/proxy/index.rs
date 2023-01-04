@@ -31,7 +31,6 @@ use newtypes::DataIdentifier;
 use newtypes::PiiString;
 use newtypes::TenantPermission;
 
-
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
 use reqwest::header::HeaderName;
 use reqwest::header::HeaderValue;
@@ -48,7 +47,6 @@ const PROXY_DESTINATION_URL_HEADER_NAME: &str = "x-fp-proxy-target";
 const PROXY_DESTINATION_METHOD_HEADER_NAME: &str = "x-fp-proxy-method";
 const PROXY_ACCESS_REASON: &str = "x-fp-proxy-access-reason";
 
-
 #[tracing::instrument(skip(state, body_bytes, request))]
 #[api_v2_operation(
     description = "Proxy decrypt user vault data to a target HTTPS destination",
@@ -62,7 +60,7 @@ pub async fn post(
     body_bytes: web::Bytes,
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     let is_live = auth.is_live()?;
 
     let body_bytes = body_bytes.to_vec();

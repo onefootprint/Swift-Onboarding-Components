@@ -26,7 +26,7 @@ pub async fn post(
     request: web::Json<DecisionRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::ManualReview])?;
+    let auth = auth.check_permissions(TenantPermission::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
     let _actor = auth.actor();
     let is_live = auth.is_live()?;

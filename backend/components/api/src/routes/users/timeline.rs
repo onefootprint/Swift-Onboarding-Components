@@ -26,7 +26,7 @@ pub async fn get(
     request: web::Path<FootprintUserId>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<TimelineEventsResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();

@@ -1,7 +1,5 @@
-use crate::auth::{
-    tenant::{CheckTenantPermissions, TenantAuth},
-    AuthError,
-};
+use super::{AuthActor, CanCheckTenantPermissions};
+use crate::auth::{tenant::TenantAuth, AuthError};
 use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
@@ -9,13 +7,9 @@ use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
 use futures_util::Future;
-
-use newtypes::secret_api_key::SecretApiKey;
-use newtypes::DataLifetimeKind;
+use newtypes::{secret_api_key::SecretApiKey, TenantPermission};
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
-
-use super::AuthActor;
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
@@ -106,17 +100,14 @@ impl TenantAuth for SecretTenantAuthContext {
     }
 }
 
-impl CheckTenantPermissions for SecretTenantAuthContext {
-    fn check_permissions(
-        self,
-        _permissions: Vec<newtypes::TenantPermission>,
-    ) -> Result<Box<dyn TenantAuth>, AuthError> {
-        // TODO permissions for API keys
-        Ok(Box::new(self))
+impl CanCheckTenantPermissions for SecretTenantAuthContext {
+    fn token_scopes(&self) -> &[TenantPermission] {
+        // Every secret API key is able to perform any action
+        // TODO IAM for API keys
+        &[TenantPermission::Admin]
     }
 
-    fn can_decrypt(self, _attributes: Vec<DataLifetimeKind>) -> Result<Box<dyn TenantAuth>, AuthError> {
-        // TODO permissions for API keys
-        Ok(Box::new(self))
+    fn tenant_auth(self) -> Box<dyn TenantAuth> {
+        Box::new(self)
     }
 }

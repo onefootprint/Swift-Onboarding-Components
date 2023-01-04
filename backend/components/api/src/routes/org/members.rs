@@ -33,7 +33,7 @@ async fn get(
     Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
     ApiError,
 > {
-    let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -72,7 +72,7 @@ async fn post(
     request: web::Json<CreateTenantUserRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
-    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -110,7 +110,7 @@ async fn patch(
     user_id: web::Path<TenantUserId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -134,7 +134,7 @@ async fn deactivate(
     user_id: web::Path<TenantUserId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
     let user_id = user_id.into_inner();

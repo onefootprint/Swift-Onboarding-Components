@@ -3,14 +3,10 @@ use std::pin::Pin;
 use actix_web::FromRequest;
 use db::models::tenant::Tenant;
 use futures_util::Future;
-use newtypes::DataLifetimeKind;
 
 use crate::errors::ApiError;
 
-use super::{
-    tenant::{CheckTenantPermissions, TenantAuth},
-    AuthError,
-};
+use super::{tenant::TenantAuth, AuthError};
 
 #[derive(Debug, Clone)]
 /// Abstract Session Context Type
@@ -125,29 +121,6 @@ where
         match self {
             Either::Left(l) => l.actor(),
             Either::Right(r) => r.actor(),
-        }
-    }
-}
-
-impl<A, B> CheckTenantPermissions for Either<A, B>
-where
-    A: CheckTenantPermissions,
-    B: CheckTenantPermissions,
-{
-    fn check_permissions(
-        self,
-        permissions: Vec<newtypes::TenantPermission>,
-    ) -> Result<Box<dyn TenantAuth>, AuthError> {
-        match self {
-            Either::Left(l) => l.check_permissions(permissions),
-            Either::Right(r) => r.check_permissions(permissions),
-        }
-    }
-
-    fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<Box<dyn TenantAuth>, AuthError> {
-        match self {
-            Either::Left(l) => l.can_decrypt(attributes),
-            Either::Right(r) => r.can_decrypt(attributes),
         }
     }
 }

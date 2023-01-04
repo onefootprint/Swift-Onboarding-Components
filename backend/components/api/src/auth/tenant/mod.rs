@@ -1,4 +1,8 @@
 mod ob_public_key;
+mod permissions;
+use std::fmt::Display;
+
+pub use self::permissions::*;
 mod workos;
 pub use self::workos::*;
 use db::models::tenant::Tenant;
@@ -12,7 +16,7 @@ pub use self::tenant_user::*;
 
 use super::AuthError;
 use crate::errors::ApiError;
-use newtypes::{DataLifetimeKind, DbActor, TenantApiKeyId, TenantPermission, TenantUserId};
+use newtypes::{DbActor, TenantApiKeyId, TenantPermission, TenantUserId};
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
@@ -50,7 +54,71 @@ impl From<AuthActor> for DbActor {
     }
 }
 
+pub trait IsPermissionMet: Display {
+    /// Given the `token_scopes` that exist on the auth token, checks if the required permission
+    /// represented by self is met.
+    #[allow(clippy::wrong_self_convention)]
+    fn is_met(self, token_scopes: &[TenantPermission]) -> bool;
+
+    /// Returns a permission that is met if self OR t is met
+    fn or<T>(self, t: T) -> permissions::Or<Self, T>
+    where
+        Self: Sized,
+        T: Sized,
+    {
+        permissions::Or(self, t)
+    }
+
+    /// Shorthand to returns a permission that is met if self is met OR if TenantPermission::Admin
+    /// is met
+    fn or_admin(self) -> permissions::Or<Self, TenantPermission>
+    where
+        Self: Sized,
+    {
+        self.or(TenantPermission::Admin)
+    }
+}
+
+/// A trait to be implemented for any form of tenant auth class.
+/// Requires implementing `token_permissions()` and `tenant_auth()`, and then provides a default
+/// implementation to check whether a requested_permission is met by the token_permissions() and
+/// yield the tenant auth if so.
+/// Purposefully private to prevent calling these methods outside of this module
+trait CanCheckTenantPermissions: Sized {
+    /// The list of TenantPermissions scopes that are allowed by this auth token
+    fn token_scopes(&self) -> &[TenantPermission];
+
+    /// The boxed TenantAuth trait object that can be utilized once permissions are checked
+    fn tenant_auth(self) -> Box<dyn TenantAuth>;
+}
+
+/// Implemented for tenant TAuthExtractors. Provides one function, check_permissions, that
+/// _must_ be called in order to use the tenant auth class.
+/// The implementation of this trait first checks that the TAuthExtractor tenant auth class's scopes are
+/// sufficient to perform the requested_permission.
+/// If so, returns a usable boxed TenantAuth. Otherwise, returns an AuthError.
 pub trait CheckTenantPermissions {
-    fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError>;
-    fn can_decrypt(self, attributes: Vec<DataLifetimeKind>) -> Result<Box<dyn TenantAuth>, AuthError>;
+    fn check_permissions<T>(self, requested_permission: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    where
+        T: IsPermissionMet;
+}
+
+impl<TAuthExtractor> CheckTenantPermissions for TAuthExtractor
+where
+    TAuthExtractor: CanCheckTenantPermissions,
+{
+    /// Checks if the requested_permission is met by self.token_permissions().
+    /// If so, returns self.tenant_auth(), otherwise returns
+    fn check_permissions<T>(self, requested_permission: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    where
+        T: IsPermissionMet,
+    {
+        let requested_permission_str = format!("{}", requested_permission);
+        let permission_to_check = requested_permission.or_admin(); // Admin user can always do anything
+        if permission_to_check.is_met(self.token_scopes()) {
+            Ok(self.tenant_auth())
+        } else {
+            Err(AuthError::MissingTenantPermission(requested_permission_str))
+        }
+    }
 }

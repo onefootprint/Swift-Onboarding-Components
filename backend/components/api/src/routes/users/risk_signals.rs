@@ -32,7 +32,7 @@ pub async fn get(
     filters: web::Query<RiskSignalFilters>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();
@@ -92,7 +92,7 @@ pub async fn get_detail(
     request: web::Path<(FootprintUserId, RiskSignalId)>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsDetailResponse> {
-    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let (footprint_user_id, risk_signal_id) = request.into_inner();
