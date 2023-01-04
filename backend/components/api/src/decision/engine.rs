@@ -45,7 +45,15 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
     // Make requests
     let raw_results = vendor::make_request::make_vendor_requests(state, requests).await?;
     // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
-    if raw_results.iter().any(|r| r.is_err()) {
+    let error_results = raw_results
+        .iter()
+        .filter_map(|r| r.as_ref().err())
+        .collect::<Vec<&ApiError>>();
+
+    if !error_results.is_empty() {
+        error_results
+            .iter()
+            .for_each(|err| tracing::warn!(err = format!("{:?}", err), "VerificationRequest failed"));
         return Err(ApiError::VendorRequestFailed);
     }
 

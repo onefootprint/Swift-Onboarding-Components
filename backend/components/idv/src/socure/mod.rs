@@ -34,7 +34,9 @@ pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -
     if response.status().is_success() {
         Ok(response.json().await?)
     } else {
-        Err(Error::Api(response.json().await?))
+        let text = response.text().await?;
+        let api_error_response = serde_json::from_str::<ApiErrorResponse>(&text).map(Error::Api);
+        Err(api_error_response.unwrap_or(Error::SocureErrorResponse(text)))
     }
 }
 

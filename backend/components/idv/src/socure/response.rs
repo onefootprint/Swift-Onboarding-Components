@@ -103,12 +103,12 @@ pub struct AlertList {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AlertListMatch {
-    pub element: String,
-    pub dataset_name: String,
-    pub reason: String,
-    pub industry_name: String,
-    pub last_reported_date: String,
-    pub reported_count: String,
+    pub element: Option<String>,
+    pub dataset_name: Option<String>,
+    pub reason: Option<String>,
+    pub industry_name: Option<String>,
+    pub last_reported_date: Option<String>,
+    pub reported_count: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
@@ -160,38 +160,38 @@ pub struct DeviceRisk {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceData {
-    pub information: Information,
-    pub geolocation: Geolocation,
-    pub observations: Observations,
-    pub velocity_metrics: VelocityMetrics,
+    pub information: Option<Information>,
+    pub geolocation: Option<Geolocation>,
+    pub observations: Option<Observations>,
+    pub velocity_metrics: Option<VelocityMetrics>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Information {
-    pub device_manufacturer: String,
-    pub device_model_number: String,
-    pub operating_system: String,
-    pub operating_system_version: String,
-    pub browser_type: String,
-    pub browser_version: String,
+    pub device_manufacturer: Option<String>,
+    pub device_model_number: Option<String>,
+    pub operating_system: Option<String>,
+    pub operating_system_version: Option<String>,
+    pub browser_type: Option<String>,
+    pub browser_version: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Geolocation {
-    pub ip_geolocation: IpGeolocation,
-    pub gps_geolocation: GpsGeolocation,
+    pub ip_geolocation: Option<IpGeolocation>,
+    pub gps_geolocation: Option<GpsGeolocation>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct IpGeolocation {
-    pub coordinates: String,
-    pub city: String,
-    pub state: String,
-    pub zip: String,
-    pub country: String,
+    pub coordinates: Option<String>,
+    pub city: Option<String>,
+    pub state: Option<String>,
+    pub zip: Option<String>,
+    pub country: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -216,10 +216,10 @@ pub struct VelocityMetrics {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HistoricalCount {
-    pub email: Counts,
-    pub mobile_number: Counts,
-    pub sur_name: Counts,
-    pub first_name: Counts,
+    pub email: Option<Counts>,
+    pub mobile_number: Option<Counts>,
+    pub sur_name: Option<Counts>,
+    pub first_name: Option<Counts>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
