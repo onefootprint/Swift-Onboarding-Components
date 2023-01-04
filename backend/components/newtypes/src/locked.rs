@@ -18,6 +18,22 @@ impl NotSyncMarker {
 /// This can be used to ensure that objects aren't passed back from diesel database operations,
 /// which is useful to make sure locked objects aren't use outside of the connection in which they
 /// are fetched.
+///
+/// The following should not compile:
+/// ```compile_fail
+/// use newtypes::Locked;
+/// let _: Box<dyn Send> = Box::new(Locked::new(1));
+/// ```
+/// ```compile_fail
+/// use newtypes::Locked;
+/// let _: Box<dyn Sync> = Box::new(Locked::new(1));
+/// ```
+///
+/// But this is fine:
+/// ```
+/// use newtypes::Locked;
+/// let _: Box<Locked<i32>> = Box::new(Locked::new(1));
+/// ```
 #[derive(Debug)]
 pub struct Locked<T>(T, NotSyncMarker);
 
