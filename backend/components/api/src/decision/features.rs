@@ -131,6 +131,13 @@ impl From<VendorResult> for FeatureVector {
                 twilio_features: None,
                 socure_features: None,
             },
+
+            // TODO
+            ParsedResponse::IDologyScanOnboarding(_) => Self {
+                idology_features: None,
+                twilio_features: None,
+                socure_features: None,
+            },
         }
     }
 }

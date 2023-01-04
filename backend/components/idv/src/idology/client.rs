@@ -1,4 +1,4 @@
-use super::{error as IdologyError, expectid, scan_verify};
+use super::{error as IdologyError, expectid, scan_onboarding, scan_verify};
 use newtypes::{DocVData, IdvData, PiiString};
 
 #[derive(Debug, Clone)]
@@ -119,6 +119,43 @@ impl IdologyClient {
             .await
             .map_err(IdologyError::ReqwestError::InternalError)?;
 
+        Ok(idology_response)
+    }
+
+    /// Scan onboarding
+    pub(super) async fn submit_to_scan_onboarding(
+        &self,
+        docv_data: DocVData,
+    ) -> Result<serde_json::Value, IdologyError::Error> {
+        // TODO load these as env or something else
+        let url = "https://web.idologylive.com/api/scan-capture.svc";
+        let req_data = scan_onboarding::request::SubmissionRequestData::try_from(docv_data)?;
+        let req = serde_urlencoded::to_string(scan_onboarding::request::SubmissionRequest {
+            username: self.username.clone(),
+            password: self.password.clone(),
+            data: req_data,
+        })
+        .map_err(IdologyError::SerializationError::from)?;
+
+        let response = self
+            .client
+            .post(url)
+            .body(req)
+            .headers(reqwest::header::HeaderMap::from_iter(
+                vec![(
+                    reqwest::header::CONTENT_TYPE,
+                    "application/x-www-form-urlencoded".parse().unwrap(),
+                )]
+                .into_iter(),
+            ))
+            .send()
+            .await
+            .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;
+
+        let idology_response = response
+            .json::<serde_json::Value>()
+            .await
+            .map_err(IdologyError::ReqwestError::InternalError)?;
         Ok(idology_response)
     }
 }

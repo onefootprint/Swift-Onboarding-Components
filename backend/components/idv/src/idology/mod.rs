@@ -3,6 +3,7 @@ pub mod error;
 pub mod expectid;
 pub(crate) mod fixtures;
 pub(self) mod response_common;
+pub mod scan_onboarding;
 pub mod scan_verify;
 
 use newtypes::{DocVData, IdvData};
@@ -12,6 +13,7 @@ use crate::{ParsedResponse, VendorResponse};
 use crate::idology::client::IdologyClient;
 use expectid::response::ExpectIDAPIResponse;
 use newtypes::Vendor;
+use scan_onboarding::response::APIResponse as ScanOnboardingAPIResponse;
 use scan_verify::response::ScanVerifyAPIResponse;
 
 use self::scan_verify::response::ScanVerifySubmissionAPIResponse;
@@ -74,20 +76,42 @@ pub async fn poll_scan_verify_results_request(
     })
 }
 
+/// Scan onboarding
+pub async fn send_scan_onboarding_request(
+    client: &IdologyClient,
+    data: DocVData,
+) -> Result<VendorResponse, crate::Error> {
+    let response = client
+        .submit_to_scan_onboarding(data)
+        .await
+        .map_err(crate::idology::error::Error::from)?;
+    let parsed_response: ScanOnboardingAPIResponse =
+        scan_onboarding::response::parse_response(response.clone())
+            .map_err(crate::idology::error::Error::from)?;
+    Ok(VendorResponse {
+        // TODO: Change this?
+        vendor: Vendor::Idology,
+        raw_response: response,
+        response: ParsedResponse::IDologyScanOnboarding(parsed_response),
+    })
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::idology::fixtures;
     use newtypes::{DocVData, IdvData, PiiString};
 
+    fn map_pii(s: String) -> Option<PiiString> {
+        Some(PiiString::from(s))
+    }
+
     #[ignore]
     #[tokio::test]
     async fn test_e2e_scan_verify() {
         // First get a queryID from expectID
-        fn map_pii(s: String) -> Option<PiiString> {
-            Some(PiiString::from(s))
-        }
-        let test_data = fixtures::expect_id::ExpectIDTestData::load_passing_sandbox_data();
+
+        let test_data = fixtures::test_data::ExpectIDTestData::load_passing_sandbox_data();
         let client =
             super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
                 .unwrap();
@@ -153,6 +177,40 @@ mod test {
         //         .unwrap()
         //         .id_scan_city
         //         .unwrap(),
+        //     "ATLANTA".to_string()
+        // );
+    }
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_scan_onboarding() {
+        let test_data = fixtures::test_data::ScanOnboardingTestData::load_passing_sandbox_data();
+        let docv_data = DocVData {
+            reference_id: None,
+            front_image: map_pii(fixtures::images::scan_onboarding_test_image_document_accepted()),
+            back_image: map_pii(fixtures::images::scan_onboarding_test_image_document_accepted()),
+            country_code: map_pii(test_data.country_code),
+            document_type: Some(test_data.scan_document_type),
+        };
+
+        let client =
+            super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
+                .unwrap();
+
+        let scan_ob_res = send_scan_onboarding_request(&client, docv_data).await.unwrap();
+
+        let ParsedResponse::IDologyScanOnboarding(scan_ob_response) = scan_ob_res.response else {
+            panic!("incorrect scan onboarding results response type")
+        };
+
+        assert_eq!(
+            scan_ob_response.response.capture_result.unwrap().key,
+            "capture.completed"
+        );
+
+        // TODO put this back in
+        // assert_eq!(
+        //     scan_ob_response.response.capture_data.unwrap().city.unwrap(),
         //     "ATLANTA".to_string()
         // );
     }

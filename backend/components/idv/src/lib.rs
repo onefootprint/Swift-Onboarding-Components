@@ -2,6 +2,7 @@ use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
 use idology::expectid::response::ExpectIDAPIResponse;
+use idology::scan_onboarding::response::APIResponse as ScanOnboardingAPIResponse;
 use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
 use newtypes::Vendor;
 use socure::response::SocureIDPlusResponse;
@@ -17,6 +18,7 @@ pub enum ParsedResponse {
     IDologyExpectID(ExpectIDAPIResponse),
     IDologyScanVerify(ScanVerifyAPIResponse),
     IDologyScanVerifySubmission(ScanVerifySubmissionAPIResponse),
+    IDologyScanOnboarding(ScanOnboardingAPIResponse),
     TwilioLookupV2(LookupV2Response),
     SocureIDPlus(SocureIDPlusResponse),
 }
