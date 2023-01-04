@@ -30,8 +30,8 @@ export type MachineContext = {
     device: DeviceInfo;
     authToken: string;
   };
+  startedDataCollection: boolean;
   requirements: Requirements;
-  receivedRequirements: Requirements;
   kycData: UserData; // Filled user data
 };
 
@@ -42,10 +42,7 @@ export enum Events {
 
 export enum Actions {
   assignRequirements = 'assignRequirements',
-  startKycData = 'startKycData',
-  startTransfer = 'startTransfer',
-  startIdDoc = 'startIdDoc',
-  startIdentityCheck = 'startIdentityCheckRequirement',
+  startDataCollection = 'startDataCollection',
 }
 
 export type MachineEvents =

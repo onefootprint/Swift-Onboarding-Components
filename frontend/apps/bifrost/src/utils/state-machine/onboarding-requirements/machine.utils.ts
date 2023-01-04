@@ -1,12 +1,4 @@
-import { TransitionsConfig } from 'xstate';
-
-import {
-  Events,
-  MachineContext,
-  MachineEvents,
-  Requirements,
-  States,
-} from './types';
+import { MachineContext, States } from './types';
 
 type MachineTarget = {
   target: States;
@@ -32,21 +24,17 @@ export const RequirementTargets: MachineTarget[] = [
   },
 ];
 
-export const RequirementCompletedTransitions: TransitionsConfig<
-  MachineContext,
-  MachineEvents
-> = {
-  [Events.requirementCompleted]: [
-    {
-      target: States.checkOnboardingRequirements,
-    },
-    ...RequirementTargets,
-  ],
-};
-
-export const areRequirementsEmpty = (requirements: Requirements) => {
-  const { kycData, liveness, idDocRequestId, identityCheck } = requirements;
-  return kycData.length === 0 && !liveness && !idDocRequestId && !identityCheck;
+export const requiresAdditionalInfo = (context: MachineContext) => {
+  const {
+    onboardingContext: { userFound },
+    requirements: { kycData, idDocRequestId, liveness },
+    startedDataCollection,
+  } = context;
+  return (
+    !startedDataCollection &&
+    userFound &&
+    (kycData.length > 0 || !!idDocRequestId || !!liveness)
+  );
 };
 
 const shouldRunCollectKycData = (context: MachineContext) =>
@@ -73,14 +61,6 @@ const shouldRunTransfer = (context: MachineContext) => {
     return !!liveness;
   }
   return !!idDocRequestId || !!liveness;
-};
-
-export const requiresAdditionalInfo = (context: MachineContext) => {
-  const {
-    onboardingContext: { userFound },
-    requirements: { kycData, idDocRequestId },
-  } = context;
-  return userFound && (kycData.length > 0 || !!idDocRequestId);
 };
 
 const shouldRunIdentityCheck = (context: MachineContext) =>

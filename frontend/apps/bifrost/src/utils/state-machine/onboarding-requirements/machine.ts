@@ -2,12 +2,7 @@ import { DeviceInfo } from '@onefootprint/hooks';
 import { TenantInfo } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import {
-  areRequirementsEmpty,
-  RequirementCompletedTransitions,
-  RequirementTargets,
-  requiresAdditionalInfo,
-} from './machine.utils';
+import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
 import {
   Actions,
   Events,
@@ -49,30 +44,24 @@ const createOnboardingRequirementsMachine = ({
           authToken,
           tenant,
         },
-        requirements: defaultRequirements,
-        receivedRequirements: defaultRequirements,
+        requirements: { ...defaultRequirements },
         kycData: {},
+        startedDataCollection: false,
       },
       states: {
         [States.checkOnboardingRequirements]: {
           on: {
-            [Events.onboardingRequirementsReceived]: [
-              {
-                target: States.success,
-                cond: (context, event) => areRequirementsEmpty(event.payload),
-              },
-              {
-                target: States.router,
-                actions: [Actions.assignRequirements],
-              },
-            ],
+            [Events.onboardingRequirementsReceived]: {
+              target: States.router,
+              actions: [Actions.assignRequirements],
+            },
           },
         },
         [States.router]: {
           always: [
             {
-              cond: context => requiresAdditionalInfo(context),
               target: States.additionalInfoRequired,
+              cond: context => requiresAdditionalInfo(context),
             },
             ...RequirementTargets,
             {
@@ -81,32 +70,42 @@ const createOnboardingRequirementsMachine = ({
           ],
         },
         [States.additionalInfoRequired]: {
+          entry: [Actions.startDataCollection],
           on: {
-            ...RequirementCompletedTransitions,
+            [Events.requirementCompleted]: [
+              ...RequirementTargets,
+              {
+                target: States.success,
+              },
+            ],
           },
         },
         [States.kycData]: {
-          entry: [Actions.startKycData],
           on: {
-            ...RequirementCompletedTransitions,
+            [Events.requirementCompleted]: {
+              target: States.checkOnboardingRequirements,
+            },
           },
         },
         [States.transfer]: {
-          entry: [Actions.startTransfer],
           on: {
-            ...RequirementCompletedTransitions,
+            [Events.requirementCompleted]: {
+              target: States.checkOnboardingRequirements,
+            },
           },
         },
         [States.idDoc]: {
-          entry: [Actions.startIdDoc],
           on: {
-            ...RequirementCompletedTransitions,
+            [Events.requirementCompleted]: {
+              target: States.checkOnboardingRequirements,
+            },
           },
         },
         [States.identityCheck]: {
-          entry: [Actions.startIdentityCheck],
           on: {
-            ...RequirementCompletedTransitions,
+            [Events.requirementCompleted]: {
+              target: States.checkOnboardingRequirements,
+            },
           },
         },
         [States.success]: {
@@ -118,29 +117,12 @@ const createOnboardingRequirementsMachine = ({
       actions: {
         [Actions.assignRequirements]: assign((context, event) => {
           if (event.type === Events.onboardingRequirementsReceived) {
-            context.receivedRequirements = { ...event.payload };
             context.requirements = { ...event.payload };
           }
           return context;
         }),
-        [Actions.startKycData]: assign(context => {
-          context.requirements.kycData = [];
-          return context;
-        }),
-        [Actions.startTransfer]: assign(context => {
-          context.requirements.liveness = false;
-          // If we are on mobile, idDoc plugin will run separately
-          if (context.onboardingContext.device.type !== 'mobile') {
-            context.requirements.idDocRequestId = undefined;
-          }
-          return context;
-        }),
-        [Actions.startIdDoc]: assign(context => {
-          context.requirements.idDocRequestId = undefined;
-          return context;
-        }),
-        [Actions.startIdentityCheck]: assign(context => {
-          context.requirements.identityCheck = false;
+        [Actions.startDataCollection]: assign(context => {
+          context.startedDataCollection = true;
           return context;
         }),
       },
