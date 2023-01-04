@@ -18,6 +18,7 @@ impl NotSyncMarker {
 /// This can be used to ensure that objects aren't passed back from diesel database operations,
 /// which is useful to make sure locked objects aren't use outside of the connection in which they
 /// are fetched.
+#[derive(Debug)]
 pub struct Locked<T>(T, NotSyncMarker);
 
 impl<T> Locked<T> {

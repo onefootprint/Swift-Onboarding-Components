@@ -87,8 +87,9 @@ async fn authorize_privacy_pass(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let ob_info = user_auth.assert_onboarding(conn)?;
             let ob_config = ob_info.ob_config;
-            let (onboarding, _) = Onboarding::lock_by_config(conn, &ob_info.user_vault_id, &ob_config.id)?
-                .ok_or(OnboardingError::NoOnboarding)?;
+            let onboarding = Onboarding::lock_by_config(conn, &ob_info.user_vault_id, &ob_config.id)?
+                .ok_or(OnboardingError::NoOnboarding)?
+                .into_inner();
 
             if onboarding.is_authorized {
                 return Err(ApiError::Custom("Cannot edit completed onboarding".to_owned()));

@@ -4,6 +4,7 @@ use db::models::{
     manual_review::ManualReview,
     onboarding::{Onboarding, OnboardingUpdate},
     onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
+    scoped_user::ScopedUser,
 };
 
 use super::features::*;
@@ -25,19 +26,19 @@ pub async fn create_final_decision(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            Onboarding::lock(conn, &ob_id)?;
-            let (current_ob, scoped_user, _, _) = Onboarding::get(conn, &ob_id)?;
+            let ob = Onboarding::lock(conn, &ob_id)?;
+            let scoped_user = ScopedUser::get(conn, &ob.scoped_user_id)?;
 
             // prevent race conditions from producing 2 decisions
-            if current_ob.has_final_decision {
+            if ob.has_final_decision {
                 return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
             }
 
-            let decision = final_decision(&features, current_ob.id.clone())?;
+            let decision = final_decision(&features, ob.id.clone())?;
 
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision.decision_status == DecisionStatus::Pass {
-                let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
+                let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob.scoped_user_id)?;
                 let seqno = uvw.commit_data_for_tenant(conn)?;
                 Some(seqno)
             } else {
@@ -47,7 +48,7 @@ pub async fn create_final_decision(
             // Create decision
             let onboarding_decision = OnboardingDecisionCreateArgs {
                 user_vault_id: scoped_user.user_vault_id,
-                onboarding_id: ob_id.clone(),
+                onboarding: &ob,
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 status: decision.decision_status,
                 result_ids: features.verification_results(),
@@ -59,7 +60,8 @@ pub async fn create_final_decision(
 
             // If we are done, we no longer need a decision
             if !obd.status.new_decision_required() {
-                current_ob.update(conn, OnboardingUpdate::has_final_decision(true))?;
+                let ob = ob.into_inner();
+                ob.update(conn, OnboardingUpdate::has_final_decision(true))?;
             }
 
             // Create ManualReview row if requested

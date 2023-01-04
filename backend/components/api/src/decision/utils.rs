@@ -59,19 +59,15 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             if ob.idv_reqs_initiated {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
-            let ob = ob.update(
-                conn,
-                OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
-            )?;
 
             // Create ManualReview row if requested
             if create_manual_review {
-                ManualReview::create(conn, ob_id.clone())?;
+                ManualReview::create(conn, ob.id.clone())?;
             }
 
             // Create some mock verification request and results
             let request =
-                VerificationRequest::bulk_create(conn, ob_id.clone(), vec![VendorAPI::IdologyExpectID])?
+                VerificationRequest::bulk_create(conn, ob.id.clone(), vec![VendorAPI::IdologyExpectID])?
                     .pop()
                     .ok_or(ApiError::ResourceNotFound)?;
             let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
@@ -92,7 +88,7 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
             // commit the data there? Would dedupe this logic between tests + prod
             let new_decision = OnboardingDecisionCreateArgs {
                 user_vault_id: uvw.user_vault.id.clone(),
-                onboarding_id: ob_id,
+                onboarding: &ob,
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 status: decision_status,
                 result_ids: vec![result.id],
@@ -101,6 +97,11 @@ pub(super) async fn should_initiate_idv_or_else_setup_test_fixtures(
                 seqno,
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
+
+            ob.into_inner().update(
+                conn,
+                OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
+            )?;
 
             // Create some mock risk signals that are somewhat consistent with the mock decision
             let reason_codes = match (decision_status, create_manual_review) {

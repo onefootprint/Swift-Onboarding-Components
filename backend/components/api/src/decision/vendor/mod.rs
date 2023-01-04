@@ -41,6 +41,7 @@ pub fn build_verification_requests_and_checkpoint(
         }
     }
     // Always set the idv_reqs_initiated to true in order to checkpoint
+    let ob = ob.into_inner();
     ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
     // From the data in the vault, figure out which vendors we need to send to
     let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(uvw);

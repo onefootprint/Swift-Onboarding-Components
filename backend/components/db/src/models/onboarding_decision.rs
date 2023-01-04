@@ -13,8 +13,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo,
-    OnboardingId, OnboardingStatus, UserVaultId, VerificationResultId,
+    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, Locked, OnboardingDecisionId,
+    OnboardingDecisionInfo, OnboardingId, OnboardingStatus, UserVaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -57,9 +57,9 @@ pub struct OnboardingDecisionJunction {
 }
 
 #[derive(Debug)]
-pub struct OnboardingDecisionCreateArgs {
+pub struct OnboardingDecisionCreateArgs<'a> {
     pub user_vault_id: UserVaultId,
-    pub onboarding_id: OnboardingId,
+    pub onboarding: &'a Locked<Onboarding>,
     pub logic_git_hash: String,
     pub status: DecisionStatus,
     pub result_ids: Vec<VerificationResultId>,
@@ -81,19 +81,16 @@ impl OnboardingDecision {
     }
 
     pub fn create(conn: &mut TxnPgConnection, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
-        // Lock Onboarding so a new decision isn't added while we deactivate the old
-        let ob = Onboarding::lock(conn, &args.onboarding_id)?;
-
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
-            .filter(onboarding_decision::onboarding_id.eq(&args.onboarding_id))
+            .filter(onboarding_decision::onboarding_id.eq(&args.onboarding.id))
             .filter(onboarding_decision::deactivated_at.is_null())
             .set(onboarding_decision::deactivated_at.eq(Utc::now()))
             .execute(conn.conn())?;
 
         // Create the new decision
         let new = NewOnboardingDecisionRow {
-            onboarding_id: args.onboarding_id.clone(),
+            onboarding_id: args.onboarding.id.clone(),
             logic_git_hash: args.logic_git_hash,
             created_at: Utc::now(),
             status: args.status,
@@ -125,7 +122,7 @@ impl OnboardingDecision {
                 annotation_id: args.annotation_id,
             },
             args.user_vault_id,
-            Some(ob.scoped_user_id),
+            Some(args.onboarding.scoped_user_id.clone()),
         )?;
         Ok(result)
     }

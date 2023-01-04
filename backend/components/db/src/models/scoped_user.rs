@@ -43,6 +43,9 @@ struct NewScopedUser {
 pub enum ScopedUserIdentifier<'a> {
     Id {
         id: &'a ScopedUserId,
+    },
+    User {
+        id: &'a ScopedUserId,
         uv_id: &'a UserVaultId,
     },
     FpUserId {
@@ -52,9 +55,15 @@ pub enum ScopedUserIdentifier<'a> {
     },
 }
 
+impl<'a> From<&'a ScopedUserId> for ScopedUserIdentifier<'a> {
+    fn from(id: &'a ScopedUserId) -> Self {
+        Self::Id { id }
+    }
+}
+
 impl<'a> From<(&'a ScopedUserId, &'a UserVaultId)> for ScopedUserIdentifier<'a> {
     fn from((id, uv_id): (&'a ScopedUserId, &'a UserVaultId)) -> Self {
-        Self::Id { id, uv_id }
+        Self::User { id, uv_id }
     }
 }
 
@@ -150,7 +159,8 @@ impl ScopedUser {
         let mut query = scoped_user::table.into_boxed();
 
         match id.into() {
-            ScopedUserIdentifier::Id { id, uv_id } => {
+            ScopedUserIdentifier::Id { id } => query = query.filter(scoped_user::id.eq(id)),
+            ScopedUserIdentifier::User { id, uv_id } => {
                 query = query
                     .filter(scoped_user::id.eq(id))
                     .filter(scoped_user::user_vault_id.eq(uv_id))

@@ -13,8 +13,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    FootprintUserId, InsightEventId, ObConfigurationId, OnboardingDecisionId, OnboardingId, ScopedUserId,
-    TenantId, UserVaultId,
+    FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
+    ScopedUserId, TenantId, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -147,15 +147,10 @@ where
 pub type SerializableOnboardingInfo = OnboardingInfo<(OnboardingDecision, SaturatedActor)>;
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
-pub type BasicOnboardingInfo = (
-    Onboarding,
-    ScopedUser,
-    Option<ManualReview>,
-    Option<OnboardingDecision>,
-);
+pub type BasicOnboardingInfo<ObT> = (ObT, ScopedUser, Option<ManualReview>, Option<OnboardingDecision>);
 
 impl Onboarding {
-    pub fn get<'a, T>(conn: &'a mut PgConnection, id: T) -> DbResult<BasicOnboardingInfo>
+    pub fn get<'a, T>(conn: &'a mut PgConnection, id: T) -> DbResult<BasicOnboardingInfo<Onboarding>>
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
@@ -198,14 +193,17 @@ impl Onboarding {
         conn: &mut TxnPgConnection,
         user_vault_id: &UserVaultId,
         ob_configuration_id: &ObConfigurationId,
-    ) -> DbResult<Option<(Onboarding, ScopedUser)>> {
-        let result = onboarding::table
-            .inner_join(scoped_user::table)
+    ) -> DbResult<Option<Locked<Onboarding>>> {
+        let su_ids = scoped_user::table
             .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .select(scoped_user::id);
+        let result = onboarding::table
+            .filter(onboarding::scoped_user_id.eq_any(su_ids))
             .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
             .for_no_key_update()
             .first(conn.conn())
             .optional()?;
+        let result = result.map(Locked::new);
         Ok(result)
     }
 
@@ -214,27 +212,29 @@ impl Onboarding {
         fp_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> DbResult<BasicOnboardingInfo> {
+    ) -> DbResult<BasicOnboardingInfo<Locked<Onboarding>>> {
         let scoped_user_ids = scoped_user::table
             .filter(scoped_user::fp_user_id.eq(fp_user_id))
             .filter(scoped_user::tenant_id.eq(tenant_id))
             .filter(scoped_user::is_live.eq(is_live))
             .select(scoped_user::id);
+        // Lock first, then grab the related info
         let ob = onboarding::table
             .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
             .for_no_key_update()
             .first::<Onboarding>(conn.conn())?;
 
         // It's a bit precarious to make a FOR UPDATE statement with joins
-        Self::get(conn, &ob.id)
+        let result = Self::get(conn, &ob.id)?;
+        Ok((Locked::new(result.0), result.1, result.2, result.3))
     }
 
-    pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> DbResult<Self> {
+    pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> DbResult<Locked<Self>> {
         let result = onboarding::table
             .filter(onboarding::id.eq(id))
             .for_no_key_update()
             .get_result(conn.conn())?;
-        Ok(result)
+        Ok(Locked::new(result))
     }
 
     pub fn get_for_scoped_users(

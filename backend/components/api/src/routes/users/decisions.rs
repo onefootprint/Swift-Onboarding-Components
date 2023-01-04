@@ -60,7 +60,7 @@ pub async fn post(
                 // Create a new decision if the status is different
                 let new_decision = OnboardingDecisionCreateArgs {
                     user_vault_id: su.user_vault_id,
-                    onboarding_id: ob.id,
+                    onboarding: &ob,
                     logic_git_hash: crate::GIT_HASH.to_string(),
                     result_ids: vec![],
                     status: status.into(),
