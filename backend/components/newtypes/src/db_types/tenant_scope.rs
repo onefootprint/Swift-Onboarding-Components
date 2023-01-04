@@ -25,7 +25,7 @@ use strum_macros::Display;
 #[diesel(sql_type = Jsonb)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
-pub enum TenantPermission {
+pub enum TenantScope {
     Admin,
     OnboardingConfiguration,
     ApiKeys,
@@ -43,11 +43,11 @@ pub enum TenantPermission {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, AsJsonb, JsonSchema)]
 #[serde(transparent)]
-/// Util wrapper around Vec<TenantPermission> to make it easier to operate on as DB value
-pub struct TenantPermissionList(pub Vec<TenantPermission>);
+/// Util wrapper around Vec<TenantScope> to make it easier to operate on as DB value
+pub struct TenantScopeList(pub Vec<TenantScope>);
 
-impl std::ops::Deref for TenantPermissionList {
-    type Target = Vec<TenantPermission>;
+impl std::ops::Deref for TenantScopeList {
+    type Target = Vec<TenantScope>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

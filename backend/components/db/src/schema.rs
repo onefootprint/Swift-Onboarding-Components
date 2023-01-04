@@ -401,7 +401,7 @@ table! {
         id -> Text,
         tenant_id -> Text,
         name -> Text,
-        permissions -> Jsonb,
+        scopes -> Jsonb,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
@@ -425,6 +425,16 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         first_name -> Nullable<Text>,
         last_name -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    test_table (id) {
+        id -> Int4,
+        custom_enum -> Text,
     }
 }
 
@@ -589,6 +599,7 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_log,
     tenant_role,
     tenant_user,
+    test_table,
     user_timeline,
     user_vault,
     user_vault_data,

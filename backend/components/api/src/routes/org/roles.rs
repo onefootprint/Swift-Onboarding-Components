@@ -11,7 +11,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_role::TenantRole;
-use newtypes::{TenantPermission, TenantRoleId};
+use newtypes::{TenantRoleId, TenantScope};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
@@ -24,7 +24,7 @@ async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
+    let auth = auth.check_permissions(TenantScope::OrgSettings)?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -47,7 +47,7 @@ async fn get(
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct CreateTenantRoleRequest {
     name: String,
-    permissions: Vec<TenantPermission>,
+    permissions: Vec<TenantScope>,
 }
 
 #[api_v2_operation(tags(Private), description = "Create a new IAM role for the tenant.")]
@@ -57,7 +57,7 @@ async fn post(
     request: web::Json<CreateTenantRoleRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantPermission::Admin)?;
+    let auth = auth.check_permissions(TenantScope::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -74,7 +74,7 @@ async fn post(
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct UpdateTenantRoleRequest {
     name: Option<String>,
-    permissions: Option<Vec<TenantPermission>>,
+    permissions: Option<Vec<TenantScope>>,
 }
 
 #[api_v2_operation(tags(Private), description = "Updates the provided role.")]
@@ -85,7 +85,7 @@ async fn patch(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantPermission::Admin)?;
+    let auth = auth.check_permissions(TenantScope::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -106,7 +106,7 @@ async fn deactivate(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantPermission::Admin)?;
+    let auth = auth.check_permissions(TenantScope::Admin)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
 

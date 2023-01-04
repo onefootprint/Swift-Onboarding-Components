@@ -28,7 +28,7 @@ use db::models::scoped_user::ScopedUser;
 use newtypes::csv::Csv;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataIdentifier, DataLifetimeKind, Fingerprint,
-    FootprintUserId, PiiString, TenantPermission, UvdKind,
+    FootprintUserId, PiiString, TenantScope, UvdKind,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -145,7 +145,7 @@ pub(super) async fn get_internal(
     request: Query<FieldsParams>,
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDataResponse> {
-    let tenant_auth = tenant_auth.check_permissions(TenantPermission::Users)?;
+    let tenant_auth = tenant_auth.check_permissions(TenantScope::Users)?;
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;

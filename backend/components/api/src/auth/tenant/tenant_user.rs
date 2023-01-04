@@ -9,7 +9,7 @@ use db::{
     models::{tenant::Tenant, tenant_role::TenantRole, tenant_user::TenantUser},
     PgConnection,
 };
-use newtypes::{TenantPermission, TenantUserId};
+use newtypes::{TenantScope, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
 use super::{AuthActor, CanCheckTenantPermissions, TenantAuth};
@@ -104,8 +104,8 @@ impl TenantUserAuth {
 pub type TenantUserAuthContext = SessionContext<ParsedTenantUserAuth>;
 
 impl CanCheckTenantPermissions for TenantUserAuthContext {
-    fn token_scopes(&self) -> &[TenantPermission] {
-        &self.data.0.tenant_role.permissions
+    fn token_scopes(&self) -> &[TenantScope] {
+        &self.data.0.tenant_role.scopes
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {

@@ -16,7 +16,7 @@ pub use self::tenant_user::*;
 
 use super::AuthError;
 use crate::errors::ApiError;
-use newtypes::{DbActor, TenantApiKeyId, TenantPermission, TenantUserId};
+use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
@@ -58,7 +58,7 @@ pub trait IsPermissionMet: Display {
     /// Given the `token_scopes` that exist on the auth token, checks if the required permission
     /// represented by self is met.
     #[allow(clippy::wrong_self_convention)]
-    fn is_met(self, token_scopes: &[TenantPermission]) -> bool;
+    fn is_met(self, token_scopes: &[TenantScope]) -> bool;
 
     /// Returns a permission that is met if self OR t is met
     fn or<T>(self, t: T) -> permissions::Or<Self, T>
@@ -71,11 +71,11 @@ pub trait IsPermissionMet: Display {
 
     /// Shorthand to returns a permission that is met if self is met OR if TenantPermission::Admin
     /// is met
-    fn or_admin(self) -> permissions::Or<Self, TenantPermission>
+    fn or_admin(self) -> permissions::Or<Self, TenantScope>
     where
         Self: Sized,
     {
-        self.or(TenantPermission::Admin)
+        self.or(TenantScope::Admin)
     }
 }
 
@@ -86,7 +86,7 @@ pub trait IsPermissionMet: Display {
 /// Purposefully private to prevent calling these methods outside of this module
 trait CanCheckTenantPermissions: Sized {
     /// The list of TenantPermissions scopes that are allowed by this auth token
-    fn token_scopes(&self) -> &[TenantPermission];
+    fn token_scopes(&self) -> &[TenantScope];
 
     /// The boxed TenantAuth trait object that can be utilized once permissions are checked
     fn tenant_auth(self) -> Box<dyn TenantAuth>;

@@ -12,7 +12,7 @@ use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use newtypes::DbActor;
 use newtypes::FootprintUserId;
-use newtypes::TenantPermission;
+use newtypes::TenantScope;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -26,7 +26,7 @@ pub async fn post(
     request: web::Json<DecisionRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(TenantPermission::ManualReview)?;
+    let auth = auth.check_permissions(TenantScope::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
     let _actor = auth.actor();
     let is_live = auth.is_live()?;

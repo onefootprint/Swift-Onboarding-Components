@@ -3,7 +3,7 @@ use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{TenantId, TenantPermission, TenantPermissionList, TenantRoleId};
+use newtypes::{TenantId, TenantRoleId, TenantScope, TenantScopeList};
 
 use super::tenant::Tenant;
 
@@ -13,7 +13,7 @@ pub struct TenantRole {
     pub id: TenantRoleId,
     pub tenant_id: TenantId,
     pub name: String,
-    pub permissions: TenantPermissionList,
+    pub scopes: TenantScopeList,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
@@ -25,13 +25,13 @@ impl TenantRole {
         Tenant::lock(conn, &tenant_id)?;
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(&tenant_id))
-            .filter(tenant_role::permissions.eq(TenantPermissionList(vec![TenantPermission::Admin])))
+            .filter(tenant_role::scopes.eq(TenantScopeList(vec![TenantScope::Admin])))
             .first::<Self>(conn.conn())
             .optional()?;
         let role = if let Some(role) = role {
             role
         } else {
-            Self::create(conn, tenant_id, "Admin".to_owned(), vec![TenantPermission::Admin])?
+            Self::create(conn, tenant_id, "Admin".to_owned(), vec![TenantScope::Admin])?
         };
         Ok(role)
     }
@@ -40,12 +40,12 @@ impl TenantRole {
         conn: &mut PgConnection,
         tenant_id: TenantId,
         name: String,
-        permissions: Vec<TenantPermission>,
+        scopes: Vec<TenantScope>,
     ) -> DbResult<Self> {
         let result = NewTenantRole {
             tenant_id,
             name,
-            permissions: TenantPermissionList(permissions),
+            scopes: TenantScopeList(scopes),
             created_at: Utc::now(),
         }
         .save(conn)?;
@@ -98,11 +98,11 @@ impl TenantRole {
         tenant_id: &TenantId,
         id: &TenantRoleId,
         name: Option<String>,
-        permissions: Option<Vec<TenantPermission>>,
+        scopes: Option<Vec<TenantScope>>,
     ) -> DbResult<Self> {
         let update = TenantRoleUpdate {
             name,
-            permissions: permissions.map(TenantPermissionList),
+            scopes: scopes.map(TenantScopeList),
             ..TenantRoleUpdate::default()
         };
         let results: Vec<Self> = diesel::update(tenant_role::table)
@@ -144,7 +144,7 @@ impl TenantRole {
 pub struct NewTenantRole {
     pub tenant_id: TenantId,
     pub name: String,
-    pub permissions: TenantPermissionList,
+    pub scopes: TenantScopeList,
     pub created_at: DateTime<Utc>,
 }
 
@@ -161,6 +161,6 @@ impl NewTenantRole {
 #[diesel(table_name = tenant_role)]
 struct TenantRoleUpdate {
     name: Option<String>,
-    permissions: Option<TenantPermissionList>,
+    scopes: Option<TenantScopeList>,
     deactivated_at: Option<Option<DateTime<Utc>>>,
 }

@@ -4,7 +4,7 @@ export_schema!(AccessEventKind);
 export_schema!(DataLifetimeKind);
 export_schema!(CollectedDataOption);
 export_schema!(CollectedData);
-export_schema!(TenantPermission);
+export_schema!(TenantScope);
 export_schema!(ApiKeyStatus);
 export_schema!(VerificationStatus);
 export_schema!(ComplianceStatus);

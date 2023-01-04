@@ -20,7 +20,7 @@ use api_wire_types::{
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
-use newtypes::{AccessEventKind, DataIdentifier, DataLifetimeKind, FootprintUserId, TenantPermission};
+use newtypes::{AccessEventKind, DataIdentifier, DataLifetimeKind, FootprintUserId, TenantScope};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Query};
 
@@ -46,7 +46,7 @@ pub(super) async fn get_internal(
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDocumentForDecryptResponse> {
     // TODO: DRY
-    let tenant_auth = tenant_auth.check_permissions(TenantPermission::Users)?;
+    let tenant_auth = tenant_auth.check_permissions(TenantScope::Users)?;
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;

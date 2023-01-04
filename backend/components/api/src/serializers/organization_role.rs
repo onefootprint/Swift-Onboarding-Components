@@ -7,7 +7,7 @@ impl DbToApi<TenantRole> for api_wire_types::OrganizationRole {
         let TenantRole {
             id,
             name,
-            permissions,
+            scopes: permissions,
             created_at,
             ..
         } = target;

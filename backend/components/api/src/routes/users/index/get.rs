@@ -19,7 +19,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::FootprintUserId;
-use newtypes::TenantPermission;
+use newtypes::TenantScope;
 use newtypes::{DataLifetimeKind, Fingerprint, Fingerprinter};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -38,7 +38,7 @@ pub async fn get(
     request: web::Query<PaginatedRequest<ListUsersRequest, i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<UsersListResponse, i64>>, ApiError> {
-    let auth = auth.check_permissions(TenantPermission::Users)?;
+    let auth = auth.check_permissions(TenantScope::Users)?;
     let tenant = auth.tenant();
 
     let cursor = request.cursor;
@@ -143,7 +143,7 @@ pub async fn get_detail(
     footprint_user_id: web::Path<FootprintUserId>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<JsonApiResponse<UsersDetailResponse>, ApiError> {
-    let auth = auth.check_permissions(TenantPermission::Users)?;
+    let auth = auth.check_permissions(TenantScope::Users)?;
     let tenant = auth.tenant();
 
     let query_params = OnboardingListQueryParams {

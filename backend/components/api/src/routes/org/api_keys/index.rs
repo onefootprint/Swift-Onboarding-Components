@@ -11,7 +11,7 @@ use db::models::tenant_api_key::{ApiKeyListQuery, TenantApiKey};
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use db::DbError;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{ApiKeyStatus, TenantApiKeyId, TenantPermission};
+use newtypes::{ApiKeyStatus, TenantApiKeyId, TenantScope};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, patch, web, web::Json};
 
@@ -27,7 +27,7 @@ pub async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> ApiResult<ApiKeysResponse> {
-    let auth = auth.check_permissions(TenantPermission::ApiKeys)?;
+    let auth = auth.check_permissions(TenantScope::ApiKeys)?;
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
 
@@ -74,7 +74,7 @@ pub async fn post(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {
-    let auth = auth.check_permissions(TenantPermission::ApiKeys)?;
+    let auth = auth.check_permissions(TenantScope::ApiKeys)?;
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
     let tenant = auth.tenant();
@@ -117,7 +117,7 @@ pub async fn patch(
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {
-    let auth = auth.check_permissions(TenantPermission::ApiKeys)?;
+    let auth = auth.check_permissions(TenantScope::ApiKeys)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let UpdateApiKeyPath { id } = path.into_inner();

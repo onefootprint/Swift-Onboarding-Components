@@ -29,7 +29,7 @@ use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 
 use newtypes::PiiString;
-use newtypes::TenantPermission;
+use newtypes::TenantScope;
 
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
 use reqwest::header::HeaderName;
@@ -60,7 +60,7 @@ pub async fn post(
     body_bytes: web::Bytes,
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
-    let auth = auth.check_permissions(TenantPermission::Users)?;
+    let auth = auth.check_permissions(TenantScope::Users)?;
     let is_live = auth.is_live()?;
 
     let body_bytes = body_bytes.to_vec();

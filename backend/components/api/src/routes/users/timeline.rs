@@ -11,7 +11,7 @@ use crate::State;
 
 use db::models::user_timeline::UserTimeline;
 use newtypes::FootprintUserId;
-use newtypes::TenantPermission;
+use newtypes::TenantScope;
 use paperclip::actix::{api_v2_operation, get, web};
 
 type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
@@ -26,7 +26,7 @@ pub async fn get(
     request: web::Path<FootprintUserId>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<TimelineEventsResponse> {
-    let auth = auth.check_permissions(TenantPermission::Users)?;
+    let auth = auth.check_permissions(TenantScope::Users)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();

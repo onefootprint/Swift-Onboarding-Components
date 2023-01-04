@@ -7,7 +7,7 @@ use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
 use futures_util::Future;
-use newtypes::{secret_api_key::SecretApiKey, TenantPermission};
+use newtypes::{secret_api_key::SecretApiKey, TenantScope};
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -101,10 +101,10 @@ impl TenantAuth for SecretTenantAuthContext {
 }
 
 impl CanCheckTenantPermissions for SecretTenantAuthContext {
-    fn token_scopes(&self) -> &[TenantPermission] {
+    fn token_scopes(&self) -> &[TenantScope] {
         // Every secret API key is able to perform any action
         // TODO IAM for API keys
-        &[TenantPermission::Admin]
+        &[TenantScope::Admin]
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {

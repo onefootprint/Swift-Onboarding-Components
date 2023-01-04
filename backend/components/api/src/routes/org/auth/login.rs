@@ -17,7 +17,7 @@ use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::TenantUser;
 use db::tenant::get_opt_by_workos_org_id;
-use newtypes::{OrgMemberEmail, TenantPermission, TenantUserId};
+use newtypes::{OrgMemberEmail, TenantScope, TenantUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::organizations::{
     CreateOrganization, CreateOrganizationParams, DomainFilters, ListOrganizations, ListOrganizationsParams,
@@ -86,7 +86,7 @@ async fn handler(
 
         let session_data = AuthSessionData::TenantUser(tenant_user.clone().into());
 
-        let requires_onboarding = tenant_role.permissions.contains(&TenantPermission::Admin)
+        let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
         let user = Some(OrganizationMember::from_db((tenant_user, tenant_role)));
         let tenant = Some(Organization::from_db(tenant));

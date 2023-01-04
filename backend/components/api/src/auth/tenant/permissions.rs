@@ -1,6 +1,6 @@
 use super::{CanCheckTenantPermissions, IsPermissionMet, TenantAuth};
 use crate::auth::Either;
-use newtypes::{DataLifetimeKind, TenantPermission};
+use newtypes::{DataLifetimeKind, TenantScope};
 use std::collections::HashSet;
 use std::fmt;
 
@@ -22,7 +22,7 @@ where
     Left: IsPermissionMet,
     Right: IsPermissionMet,
 {
-    fn is_met(self, token_scopes: &[TenantPermission]) -> bool {
+    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         self.0.is_met(token_scopes) || self.1.is_met(token_scopes)
     }
 }
@@ -37,7 +37,7 @@ impl fmt::Display for Any {
 }
 
 impl IsPermissionMet for Any {
-    fn is_met(self, _token_scopes: &[TenantPermission]) -> bool {
+    fn is_met(self, _token_scopes: &[TenantScope]) -> bool {
         true
     }
 }
@@ -63,11 +63,11 @@ impl fmt::Display for CanDecrypt {
 }
 
 impl IsPermissionMet for CanDecrypt {
-    fn is_met(self, token_scopes: &[TenantPermission]) -> bool {
+    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         let can_access: HashSet<_> = token_scopes
             .iter()
             .filter_map(|p| match p {
-                TenantPermission::Decrypt { attributes } => Some(attributes),
+                TenantScope::Decrypt { attributes } => Some(attributes),
                 _ => None,
             })
             .flatten()
@@ -77,8 +77,8 @@ impl IsPermissionMet for CanDecrypt {
     }
 }
 
-impl IsPermissionMet for TenantPermission {
-    fn is_met(self, token_scopes: &[TenantPermission]) -> bool {
+impl IsPermissionMet for TenantScope {
+    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         match self {
             // TODO it's weird to specify the request decryption in terms of CollectedDataOptions here
             // since we could only be requesting a specific attribute. Maybe we just map the attributes
@@ -100,7 +100,7 @@ where
     A: CanCheckTenantPermissions,
     B: CanCheckTenantPermissions,
 {
-    fn token_scopes(&self) -> &[newtypes::TenantPermission] {
+    fn token_scopes(&self) -> &[newtypes::TenantScope] {
         match self {
             Either::Left(l) => l.token_scopes(),
             Either::Right(r) => r.token_scopes(),
@@ -120,11 +120,11 @@ where
 mod test {
     use super::{Any, CanDecrypt};
     use crate::auth::tenant::IsPermissionMet;
-    use newtypes::{DataLifetimeKind, TenantPermission};
+    use newtypes::{DataLifetimeKind, TenantScope};
     use test_case::test_case;
 
-    #[test_case(TenantPermission::Users.or_admin() => "Or<Users,Admin>")]
-    #[test_case(CanDecrypt(vec![DataLifetimeKind::Ssn9, DataLifetimeKind::FirstName]).or(TenantPermission::ApiKeys) => "Or<CanDecrypt<[Ssn9, FirstName]>,ApiKeys>")]
+    #[test_case(TenantScope::Users.or_admin() => "Or<Users,Admin>")]
+    #[test_case(CanDecrypt(vec![DataLifetimeKind::Ssn9, DataLifetimeKind::FirstName]).or(TenantScope::ApiKeys) => "Or<CanDecrypt<[Ssn9, FirstName]>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
     fn test_display<T: IsPermissionMet>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met
