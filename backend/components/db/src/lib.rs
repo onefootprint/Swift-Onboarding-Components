@@ -222,8 +222,8 @@ pub async fn private_cleanup_integration_tests(
                 access_event, annotation, data_lifetime, document_request, email, fingerprint,
                 identity_document, liveness_event, manual_review, onboarding, onboarding_decision,
                 onboarding_decision_verification_result_junction, phone_number, risk_signal, scoped_user,
-                user_timeline, user_vault, user_vault_data, verification_request, verification_result,
-                webauthn_credential,
+                socure_device_session, user_timeline, user_vault, user_vault_data, verification_request,
+                verification_result, webauthn_credential,
             };
             let mut deleted_rows = 0;
 
@@ -297,6 +297,10 @@ pub async fn private_cleanup_integration_tests(
 
                     deleted_rows += diesel::delete(manual_review::table)
                         .filter(manual_review::onboarding_id.eq_any(ob_ids))
+                        .execute(conn.conn())?;
+
+                    deleted_rows += diesel::delete(socure_device_session::table)
+                        .filter(socure_device_session::onboarding_id.eq_any(ob_ids))
                         .execute(conn.conn())?;
 
                     // Onboarding decisions
