@@ -84,6 +84,7 @@ const Root = () => {
           device,
           customData: {
             requestId: requirements?.idDocRequestId ?? '',
+            shouldCollectIdDoc: true,
           },
         }}
         onDone={() => {

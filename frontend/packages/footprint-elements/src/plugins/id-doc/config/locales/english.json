@@ -8,21 +8,9 @@
       "subtitle": "This lets you submit photos of your documents, and we can use them to verify your identity.",
       "action-required": "Open settings"
     },
-    "scan-guidelines": {
-      "check-lighting": {
-        "title": "Check your lighting",
-        "description": "It can't be too bright or too dark."
-      },
-      "device-steady": {
-        "title": "Hold your device steady",
-        "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
-      },
-      "whole-document": {
-        "title": "Get the whole document in the photo",
-        "description": "We recommend that you place your document on a flat surface."
-      }
-    },
-    "take-or-upload-photo": {
+    "id-doc-photo-prompt": {
+      "title": "Submit your {{type}} ({{side}})",
+      "subtitle": "Upload or take a photo of the {{side}} of your {{type}}.",
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
       "take-photo": {
@@ -34,7 +22,26 @@
         "title": "Upload photo",
         "reupload": "Upload another photo"
       },
-      "continue": "Continue"
+      "guidelines": {
+        "check-lighting": {
+          "title": "Check your lighting",
+          "description": "It can't be too bright or too dark."
+        },
+        "device-steady": {
+          "title": "Hold your device steady",
+          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+        },
+        "whole-document": {
+          "title": "Get the whole document in the photo",
+          "description": "We recommend that you place your document on a flat surface."
+        }
+      }
+    },
+    "selfie-consent": {
+      "title": "Allow Footprint to collect and use your biometric data",
+      "subtitle": "Footprint will collect, use, and share this data with third party providers to confirm your identity and improve its systems and security.",
+      "cta": "Allow and continue",
+      "footer": "By continuing you are agree to Footprint and third-party vendors' <a>privacy policies.</a>"
     }
   },
   "pages": {
@@ -63,14 +70,25 @@
         "cta": "Continue"
       }
     },
-    "id-doc-photo": {
-      "front": {
-        "title": "Submit your {{type}} (FRONT)",
-        "subtitle": "Upload or take a photo of the front of your {{type}}."
-      },
-      "back": {
-        "title": "Submit your {{type}} (BACK)",
-        "subtitle": "Upload or take a photo of the back of your {{type}}."
+    "selfie-photo-prompt": {
+      "title": "Take a selfie",
+      "subtitle": "This will allow us to validate the ID document you uploaded in the previous step.",
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
+      "cta": "Take photo",
+      "guidelines": {
+        "check-lighting": {
+          "title": "Check your lighting",
+          "description": "It can't be too bright or too dark."
+        },
+        "device-steady": {
+          "title": "Hold your device steady",
+          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+        },
+        "whole-face": {
+          "title": "Make sure your face is clearly visible and centered",
+          "description": "You should face the camera directly and capture your whole head."
+        }
       }
     },
     "processing-documents": {

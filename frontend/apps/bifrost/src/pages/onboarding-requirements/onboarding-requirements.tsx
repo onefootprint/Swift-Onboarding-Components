@@ -74,6 +74,7 @@ const OnboardingRequirements = () => {
           device,
           customData: {
             requestId: idDocRequestId ?? '',
+            shouldCollectIdDoc: true,
           },
         }}
         onDone={handleRequirementCompleted}

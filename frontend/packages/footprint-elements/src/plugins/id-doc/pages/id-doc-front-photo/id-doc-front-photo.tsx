@@ -1,12 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { IcoIdFront40 } from '@onefootprint/icons';
 import React from 'react';
 
-import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
-import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
+import IdDocPhotoPrompt from '../../components/id-doc-photo-prompt';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
 const IdDocFrontPhoto = () => {
-  const { t } = useTranslation('pages.id-doc-photo.front');
   const [state, send] = useIdDocMachine();
   const {
     idDoc: { type },
@@ -26,14 +24,11 @@ const IdDocFrontPhoto = () => {
   };
 
   return (
-    <TakeOrUploadPhoto
-      title={t('title', {
-        type: IdDocTypeToLabel[type],
-      })}
-      subtitle={t('subtitle', {
-        type: IdDocTypeToLabel[type],
-      })}
+    <IdDocPhotoPrompt
+      iconComponent={IcoIdFront40}
       showGuidelines
+      side="front"
+      type={type}
       onComplete={handleComplete}
     />
   );

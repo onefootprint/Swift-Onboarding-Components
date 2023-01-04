@@ -1,14 +1,11 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { IcoIdBack40 } from '@onefootprint/icons';
 import React from 'react';
 
-import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
-import BadImageErrorLabel from '../../constants/bad-image-error-label';
-import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
+import IdDocPhotoPrompt from '../../components/id-doc-photo-prompt';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
 const RetryIdDocBackPhoto = () => {
   const [state, send] = useIdDocMachine();
-  const { t } = useTranslation('pages.retry-photo.back');
   const {
     idDoc: { backImageError, type },
   } = state.context;
@@ -26,11 +23,11 @@ const RetryIdDocBackPhoto = () => {
   };
 
   return (
-    <TakeOrUploadPhoto
-      title={t('title', {
-        type: IdDocTypeToLabel[type],
-      })}
-      subtitle={BadImageErrorLabel[backImageError]}
+    <IdDocPhotoPrompt
+      iconComponent={IcoIdBack40}
+      side="back"
+      type={type}
+      error={backImageError}
       onComplete={handleComplete}
     />
   );

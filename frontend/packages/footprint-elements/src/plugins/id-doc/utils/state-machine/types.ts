@@ -10,6 +10,8 @@ export enum States {
   idDocCountryAndType = 'idDocCountryAndType',
   idDocFrontPhoto = 'idDocFrontPhoto',
   idDocBackPhoto = 'idDocBackPhoto',
+  selfiePrompt = 'selfiePrompt',
+  selfiePhoto = 'selfiePhoto',
   processingDocuments = 'processingDocuments',
   retryIdDocFrontPhoto = 'retryIdDocFrontPhoto',
   retryIdDocBackPhoto = 'retryIdDocBackPhoto',
@@ -22,6 +24,8 @@ export enum Events {
   idDocCountryAndTypeSelected = 'idDocCountryAndTypeSelected',
   receivedIdDocFrontImage = 'receivedIdDocFrontImage',
   receivedIdDocBackImage = 'receivedIdDocBackImage',
+  startSelfieCapture = 'startSelfieCapture',
+  receivedSelfieImage = 'receivedSelfieImage',
   succeeded = 'succeeded',
   errored = 'errored',
   retryLimitExceeded = 'retryLimitExceeded',
@@ -33,6 +37,7 @@ export enum Actions {
   assignIdDocFrontImage = 'assignIdDocFrontImage',
   assignIdDocBackImage = 'assignIdDocBackImage',
   assignIdDocImageErrors = 'assignIdDocImageErrors',
+  assignSelfie = 'assignSelfie',
 }
 
 export type MachineContext = {
@@ -40,6 +45,7 @@ export type MachineContext = {
   device?: DeviceInfo;
   requestId?: string;
   idDoc: {
+    required?: boolean;
     type?: IdDocType;
     country?: CountryCode3;
     frontImage?: string; // Base64 encoded
@@ -48,6 +54,8 @@ export type MachineContext = {
     backImageError?: IdDocBadImageError;
   };
   selfie: {
+    required?: boolean;
+    requiresConsent?: boolean;
     image?: string; // Base64 encoded
   };
 };
@@ -59,6 +67,9 @@ export type MachineEvents =
         authToken: string;
         device: DeviceInfo;
         requestId?: string;
+        selfieRequired?: boolean;
+        idDocRequired?: boolean;
+        selfieRequiresConsent?: boolean;
       };
     }
   | {
@@ -76,6 +87,15 @@ export type MachineEvents =
     }
   | {
       type: Events.receivedIdDocBackImage;
+      payload: {
+        image: string;
+      };
+    }
+  | {
+      type: Events.startSelfieCapture;
+    }
+  | {
+      type: Events.receivedSelfieImage;
       payload: {
         image: string;
       };

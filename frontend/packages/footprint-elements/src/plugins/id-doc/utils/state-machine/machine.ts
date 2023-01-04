@@ -58,9 +58,31 @@ const createIdDocMachine = () =>
         },
         [States.idDocBackPhoto]: {
           on: {
-            [Events.receivedIdDocBackImage]: {
+            [Events.receivedIdDocBackImage]: [
+              {
+                target: States.selfiePrompt,
+                cond: context => !!context.selfie.required,
+                actions: Actions.assignIdDocBackImage,
+              },
+              {
+                target: States.processingDocuments,
+                actions: Actions.assignIdDocBackImage,
+              },
+            ],
+          },
+        },
+        [States.selfiePrompt]: {
+          on: {
+            [Events.startSelfieCapture]: {
+              target: States.selfiePhoto,
+            },
+          },
+        },
+        [States.selfiePhoto]: {
+          on: {
+            [Events.receivedSelfieImage]: {
               target: States.processingDocuments,
-              actions: Actions.assignIdDocBackImage,
+              actions: Actions.assignSelfie,
             },
           },
         },
@@ -72,12 +94,12 @@ const createIdDocMachine = () =>
             [Events.errored]: [
               {
                 target: States.retryIdDocFrontPhoto,
-                actions: [Actions.assignIdDocImageErrors],
+                actions: Actions.assignIdDocImageErrors,
                 cond: (context, event) => !!event.payload.idDocFrontImageError,
               },
               {
                 target: States.retryIdDocBackPhoto,
-                actions: [Actions.assignIdDocImageErrors],
+                actions: Actions.assignIdDocImageErrors,
                 cond: (context, event) => !!event.payload.idDocBackImageError,
               },
               {
@@ -124,10 +146,20 @@ const createIdDocMachine = () =>
       actions: {
         [Actions.assignContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, requestId } = event.payload;
+            const {
+              authToken,
+              device,
+              requestId,
+              idDocRequired,
+              selfieRequired,
+              selfieRequiresConsent,
+            } = event.payload;
             context.authToken = authToken;
             context.device = { ...device };
             context.requestId = requestId;
+            context.idDoc.required = idDocRequired;
+            context.selfie.required = selfieRequired;
+            context.selfie.requiresConsent = selfieRequiresConsent;
           }
           return context;
         }),
@@ -147,6 +179,12 @@ const createIdDocMachine = () =>
         [Actions.assignIdDocBackImage]: assign((context, event) => {
           if (event.type === Events.receivedIdDocBackImage) {
             context.idDoc.backImage = event.payload.image;
+          }
+          return context;
+        }),
+        [Actions.assignSelfie]: assign((context, event) => {
+          if (event.type === Events.receivedSelfieImage) {
+            context.selfie.image = event.payload.image;
           }
           return context;
         }),

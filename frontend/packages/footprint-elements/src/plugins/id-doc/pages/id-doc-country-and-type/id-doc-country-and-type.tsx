@@ -5,7 +5,12 @@ import {
   DEFAULT_COUNTRY,
 } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoCar24, IcoIdCard24, IcoPassport24 } from '@onefootprint/icons';
+import {
+  IcoCar24,
+  IcoIdCard24,
+  IcoIdGeneric40,
+  IcoPassport24,
+} from '@onefootprint/icons';
 import { CountryCode, IdDocType } from '@onefootprint/types';
 import {
   Button,
@@ -83,6 +88,7 @@ const IdDocCountryAndType = () => {
 
   return (
     <Container>
+      <IcoIdGeneric40 />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <CountrySelect
         label={t('form.country')}
@@ -110,7 +116,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
 
-    > * {
+    > div {
       width: 100%;
     }
   `}

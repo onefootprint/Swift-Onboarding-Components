@@ -16,7 +16,12 @@ import { Events } from './utils/state-machine/types';
 const App = ({ context, onDone }: IdDocProps) => {
   const [, send] = useIdDocMachine();
   const { authToken, device, customData } = context;
-  const requestId = customData?.requestId;
+  const {
+    requestId,
+    shouldCollectIdDoc,
+    shouldCollectSelfie,
+    shouldCollectSelfieConsent,
+  } = customData || {};
 
   useEffectOnce(() => {
     if (!requestId) {
@@ -28,6 +33,9 @@ const App = ({ context, onDone }: IdDocProps) => {
         authToken,
         device,
         requestId,
+        idDocRequired: !!shouldCollectIdDoc,
+        selfieRequired: !!shouldCollectSelfie,
+        selfieRequiresConsent: !!shouldCollectSelfieConsent,
       },
     });
   });

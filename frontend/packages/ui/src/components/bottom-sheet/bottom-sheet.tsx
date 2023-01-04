@@ -117,9 +117,7 @@ const Sheet = styled.div`
   ${({ theme }) => css`
     width: 100%;
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.large} ${
-    theme.borderRadius.large
-  }px 0 0;
+    border-radius: ${theme.borderRadius.large} ${theme.borderRadius.large} 0 0;
     z-index: ${theme.zIndex.overlay + 1};
     align-self: end;
     transition: all 0.2s linear;
