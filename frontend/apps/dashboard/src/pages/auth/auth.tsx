@@ -32,7 +32,10 @@ const Auth = () => {
     login.mutate(code, {
       onSuccess({ authToken, user, tenant }: OrgAuthLoginResponse) {
         if (!user || !tenant) {
-          router.push({ pathname: '/organizations', query: { authToken } });
+          router.push({
+            pathname: '/organizations',
+            query: { token: authToken },
+          });
           return;
         }
 

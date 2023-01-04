@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Organization } from '@onefootprint/types';
 import { OrgAssumeRoleResponse } from '@onefootprint/types/src/api/org-assume-role';
-import { LoadingIndicator, Table, TableRow } from '@onefootprint/ui';
+import { Table, TableRow } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -17,7 +17,7 @@ import useGetRoles from './hooks/use-get-roles';
 const Organizations = () => {
   const { t } = useTranslation('pages.organizations');
   const router = useRouter();
-  const authToken = (router.query.authToken || '') as string;
+  const authToken = (router.query.token || '') as string;
   const getRoles = useGetRoles(authToken);
   const { logIn } = useSession();
   const assumeRole = useAssumeRole();
@@ -34,9 +34,6 @@ const Organizations = () => {
     );
   };
 
-  if (getRoles.isLoading) {
-    <LoadingIndicator />;
-  }
   return (
     <>
       <Head>
@@ -48,7 +45,8 @@ const Organizations = () => {
           <TableContainer>
             <Table<Organization>
               aria-label="flerp"
-              columns={[]}
+              columns={[{ text: 'Name' }]}
+              hideThead
               items={getRoles.data}
               isLoading={getRoles.isLoading}
               getKeyForRow={(item: Organization) => item.id}
