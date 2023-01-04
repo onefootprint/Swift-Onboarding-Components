@@ -59,7 +59,7 @@ exporters:
   otlphttp:
     endpoint: 'https://collect.observeinc.com/v1/otel'
     headers:
-      'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
+      'Authorization': 'Bearer 189225732777 ds1BDO1OhDoXvlDOv6aY:9o_nM2E4K83AJuNMWkIKoRaEBlOaWFZr'
 
   prometheusremotewrite:
     endpoint: 'https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push'
