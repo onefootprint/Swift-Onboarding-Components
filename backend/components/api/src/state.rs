@@ -37,6 +37,7 @@ pub struct State {
 impl State {
     /// initialize global state in test context
     #[cfg(test)]
+    #[allow(clippy::expect_used)]
     pub async fn test_state(enclave_proxy_port: u16) -> Self {
         let mut config = Config::load_from_env().expect("failed to load config");
         config.enclave_config.enclave_proxy_endpoint = format!("http://localhost:{}", enclave_proxy_port);

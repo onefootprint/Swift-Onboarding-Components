@@ -141,7 +141,7 @@ export async function CreateApiService(
       taskDefinition: taskDefinition.arn,
       deploymentController: {
         type: 'ECS',
-      },
+      },  
       deploymentCircuitBreaker: {
         enable: true,
         rollback: true,

@@ -242,7 +242,7 @@ pub(super) async fn post_decrypt_internal(
     let DecryptFieldsResult {
         decrypted_data_attributes,
         result_map,
-    } = crate::hosted::user::decrypt(&state, uvw, fields.into_iter().collect()).await?;
+    } = crate::hosted::user::decrypt(&state, &uvw, fields.into_iter().collect()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {

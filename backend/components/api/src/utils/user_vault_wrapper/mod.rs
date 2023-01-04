@@ -58,5 +58,7 @@ pub struct UserVaultWrapper {
 /// to us using the stale data.
 pub type LockedUserVaultWrapper = Locked<UserVaultWrapper>;
 
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests;

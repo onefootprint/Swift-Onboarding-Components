@@ -181,11 +181,11 @@ fn test_get_active(conn: &mut TestPgConnection) {
     let c = TestData::build(conn);
     // Query for su_id, should return all active lifetimes
     let results = DataLifetime::get_active(conn, &c.uv_id, Some(&c.su_id), None).unwrap();
-    assert_eq!(ids(&results), ids(vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]));
+    assert_eq!(ids(results), ids(vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]));
 
     // Query for only committed data (not scoped to any tenant), should only return committed lifetimes
     let results = DataLifetime::get_active(conn, &c.uv_id, None, None).unwrap();
-    assert_eq!(ids(&results), ids(vec![&c.lifetime2, &c.lifetime4]));
+    assert_eq!(ids(results), ids(vec![&c.lifetime2, &c.lifetime4]));
 }
 
 #[db_test]
@@ -235,7 +235,7 @@ fn test_get_active_at_for_tenant(conn: &mut TestPgConnection) {
     for test in tests {
         let (seqno, expected_results) = test;
         let results = DataLifetime::get_active_at(conn, &c.uv_id, Some(&c.su_id), seqno, None).unwrap();
-        assert_eq!(ids(&results), ids(expected_results));
+        assert_eq!(ids(results), ids(expected_results));
     }
 }
 
@@ -255,6 +255,6 @@ fn test_get_active_at_only_committed(conn: &mut TestPgConnection) {
     for test in tests {
         let (seqno, expected_results) = test;
         let results = DataLifetime::get_active_at(conn, &c.uv_id, None, seqno, None).unwrap();
-        assert_eq!(ids(&results), ids(expected_results));
+        assert_eq!(ids(results), ids(expected_results));
     }
 }

@@ -45,7 +45,7 @@ fn post(
     let DecryptFieldsResult {
         decrypted_data_attributes: _,
         result_map,
-    } = decrypt(&state, uvw, request.attributes.clone()).await?;
+    } = decrypt(&state, &uvw, request.attributes.clone()).await?;
 
     let result_map = result_map
         .into_iter()

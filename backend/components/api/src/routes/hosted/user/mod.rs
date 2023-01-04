@@ -57,8 +57,8 @@ pub struct DecryptDocumentResult {
 
 /// TODO: potentially move this to UVW
 pub async fn decrypt(
-    state: &web::Data<State>,
-    uvw: UserVaultWrapper,
+    state: &State,
+    uvw: &UserVaultWrapper,
     data_attributes: Vec<DataLifetimeKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     // Filter out fields that don't have values set on the user vault

@@ -18,6 +18,8 @@
     "COSE",
     "creds",
     "deadpool",
+    "detokenized",
+    "detokens",
     "ecies",
     "envconfig",
     "fingerprintable",
@@ -83,7 +85,7 @@
     "editor.semanticHighlighting.enabled": true,
     "editor.formatOnSave": true
   },
-  "python.formatting.provider": "black",
+  "python.formatting.provider": "autopep8",
   "rust-analyzer.checkOnSave.command": "clippy",
   "cSpell.diagnosticLevel": "Hint",
   "files.exclude": {
@@ -117,5 +119,8 @@
     "backend"
   ],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "rust-analyzer.cargo.features": [
+  
+  ]
 }

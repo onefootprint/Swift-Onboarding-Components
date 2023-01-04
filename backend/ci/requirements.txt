@@ -21,3 +21,5 @@ platformdirs==2.5.2
 fido2==0.8.1
 cryptography==37.0.2
 twilio==7.9.2
+aiohttp==3.8.3
+asyncio==3.4.3

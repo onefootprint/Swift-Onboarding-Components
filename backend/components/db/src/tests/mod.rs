@@ -7,9 +7,13 @@ pub mod prelude;
 /// Contains utils to create fixture data when running tests
 pub mod fixtures;
 
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod data_lifetime;
 
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod ob_configuration;
 

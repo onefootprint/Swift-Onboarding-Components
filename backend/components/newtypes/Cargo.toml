@@ -22,6 +22,7 @@ lazy_static = "1.0"
 uuid = { workspace = true }
 schemars = { workspace = true }
 itertools = { workspace = true }
+reqwest = { workspace = true }
 
 # diesel
 diesel = { workspace = true }

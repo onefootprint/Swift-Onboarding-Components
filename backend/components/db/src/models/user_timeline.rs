@@ -222,7 +222,7 @@ mod tests {
             scoped_user.id.clone(),
             user_vault_id,
             DbActor::TenantApiKey {
-                id: tenant_api_key.id,
+                id: tenant_api_key.id.clone(),
             },
         )
         .0;
@@ -262,8 +262,8 @@ mod tests {
         };
         assert_eq!(ut3.0.id, annotation3.id);
         match ut3.1 {
-            SaturatedActor::TenantApiKey(ref tenant_api_key) => {
-                assert_eq!(tenant_api_key.id, tenant_api_key.id)
+            SaturatedActor::TenantApiKey(ref tenant_api_key2) => {
+                assert_eq!(tenant_api_key.id, tenant_api_key2.id)
             }
             _ => unreachable!(),
         };

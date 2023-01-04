@@ -2,6 +2,7 @@ use actix_web::{
     error::{JsonPayloadError, QueryPayloadError, UrlencodedError},
     http::StatusCode,
 };
+
 use db::errors::DbError;
 use newtypes::Uuid;
 use paperclip::actix::api_v2_errors;
@@ -13,6 +14,7 @@ pub mod enclave;
 pub mod handoff;
 pub mod kms;
 pub mod onboarding;
+pub mod proxy;
 pub mod tenant;
 pub mod user;
 pub mod workos_login;
@@ -108,6 +110,12 @@ pub enum ApiError {
     AssertionError(String),
     #[error("Feature Flag error: {0}")]
     FeatureFlagError(#[from] crate::feature_flag::FeatureFlagError),
+    #[error("Invalid body: proxy requests must contain utf8 only")]
+    InvalidProxyBody,
+    #[error("Missing required header: {0}")]
+    MissingRequiredHeader(&'static str),
+    #[error("vault proxy request error: {0}")]
+    VaultProxyError(#[from] proxy::VaultProxyError),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -221,6 +229,9 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Custom(_) => StatusCode::BAD_REQUEST,
             ApiError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::InvalidProxyBody => StatusCode::BAD_REQUEST,
+            ApiError::VaultProxyError(_) => StatusCode::BAD_REQUEST,
+            ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
         }
     }
 

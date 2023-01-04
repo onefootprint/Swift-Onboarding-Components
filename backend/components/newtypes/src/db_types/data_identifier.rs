@@ -24,7 +24,7 @@ pub enum DataIdentifier {
 string_api_data_type_alias!(DataIdentifier);
 
 #[derive(Debug, Error)]
-pub enum Error {
+pub enum DataIdentifierParsingError {
     #[error("Cannot parse: {0}")]
     CannotParse(String),
     #[error("Cannot parse prefix: {0}")]
@@ -45,20 +45,20 @@ impl std::fmt::Display for DataIdentifier {
 }
 
 impl FromStr for DataIdentifier {
-    type Err = Error;
+    type Err = DataIdentifierParsingError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let idx = s.find('.').ok_or_else(|| Error::CannotParse(s.to_owned()))?;
+        let idx = s.find('.').ok_or_else(|| DataIdentifierParsingError::CannotParse(s.to_owned()))?;
         let prefix = &s[..idx];
         let suffix = &s[(idx + 1)..];
         let prefix = DataIdentifierDiscriminants::from_str(prefix)
-            .map_err(|_| Error::CannotParsePrefix(prefix.to_owned()))?;
+            .map_err(|_| DataIdentifierParsingError::CannotParsePrefix(prefix.to_owned()))?;
         let result = match prefix {
             DataIdentifierDiscriminants::Identity => Self::Identity(
                 DataLifetimeKind::from_str(suffix)
-                    .map_err(|_| Error::CannotParseSuffix(suffix.to_owned()))?,
+                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
             DataIdentifierDiscriminants::Custom => Self::Custom(
-                KvDataKey::from_str(suffix).map_err(|_| Error::CannotParseSuffix(suffix.to_owned()))?,
+                KvDataKey::from_str(suffix).map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
         };
         Ok(result)

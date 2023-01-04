@@ -122,6 +122,12 @@ impl Debug for ScrubbedPiiString {
     }
 }
 
+impl From<PiiString> for reqwest::Body {
+    fn from(v: PiiString) -> Self {
+        Self::from(v.0)
+    }
+}
+
 string_api_data_type_alias!(PiiString);
 
 pub struct NewData {

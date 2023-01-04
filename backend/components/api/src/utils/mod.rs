@@ -10,5 +10,7 @@ pub mod twilio;
 pub mod user_vault_wrapper;
 pub mod validate_request;
 
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
 #[cfg(test)]
 pub(crate) mod mock_enclave;
