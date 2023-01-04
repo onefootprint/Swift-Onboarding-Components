@@ -1,8 +1,8 @@
-use std::{marker::PhantomData, rc::Rc};
+use std::marker::PhantomData;
 
 pub use accessors::*;
 use db::models::user_vault::UserVault;
-use newtypes::{DataLifetimeSeqno, ScopedUserId};
+use newtypes::{DataLifetimeSeqno, Locked, ScopedUserId};
 
 use self::uvw_data::UvwData;
 pub mod checks;
@@ -16,6 +16,8 @@ mod identity_document;
 mod uvd_builder;
 mod uvw_data;
 
+pub use add_data::UvwAddData;
+pub use commit_data::UvwCommitData;
 pub use decrypt::DecryptRequest;
 
 /// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
@@ -41,18 +43,6 @@ pub struct UserVaultWrapper {
     is_hydrated: PhantomData<()>,
 }
 
-/// Simple struct to ensure we cannot synchronize LockedUserVaultWrapper across threads
-/// This works because Rc is not Send/Sync (since it's non-atomically counting references which is amenable to race conditions across threads)
-/// TODO: impl !Sync for LockedUserVaultWrapper once this feature is out of rust nightly
-#[derive(Debug, Clone)]
-pub struct NotSyncMarker(Rc<()>);
-
-impl NotSyncMarker {
-    pub fn new() -> Self {
-        Self(Rc::new(()))
-    }
-}
-
 /// Context:
 ///
 /// UserVaultWrapper is a rather powerful structure since it is the gate keeper to viewing a user's vault AND to updating the vault.
@@ -66,35 +56,7 @@ impl NotSyncMarker {
 ///
 /// Since LockedUserVaultWrapper is not Sync/Send, we know that it cannot enter multiple threads at once AND (more importantly) it cannot be returned from a closure, leading
 /// to us using the stale data.
-#[derive(Debug, Clone)]
-pub struct LockedUserVaultWrapper {
-    user_vault_wrapper: UserVaultWrapper,
-    // A struct is !Sync/!Send if any of the fields are !Sync/!Send
-    _l: NotSyncMarker,
-}
-
-impl LockedUserVaultWrapper {
-    pub fn new(uvw: UserVaultWrapper) -> Self {
-        Self {
-            user_vault_wrapper: uvw,
-            _l: NotSyncMarker::new(),
-        }
-    }
-
-    /// Consumes self and returns unlocked UVW
-    pub fn into_inner(self) -> UserVaultWrapper {
-        self.user_vault_wrapper
-    }
-}
-
-/// Through dereference coercion, functions that want a &UserVaultWrapper can accept a &LockedUserVaultWrapper
-impl std::ops::Deref for LockedUserVaultWrapper {
-    type Target = UserVaultWrapper;
-
-    fn deref(&self) -> &Self::Target {
-        &self.user_vault_wrapper
-    }
-}
+pub type LockedUserVaultWrapper = Locked<UserVaultWrapper>;
 
 #[cfg(test)]
 mod tests;

@@ -5,7 +5,7 @@ use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::email::send_email_challenge;
 use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwAddData};
 use crate::State;
 
 use newtypes::email::Email as EmailData;

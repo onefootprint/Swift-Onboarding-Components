@@ -6,14 +6,12 @@ use crate::auth::tenant::{
     CheckTenantPermissions, SecretTenantAuthContext, TenantAuth, TenantUserAuthContext,
 };
 use crate::auth::Either;
-
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
-
 use crate::utils::headers::InsightHeaders;
+use crate::utils::user_vault_wrapper::UvwAddData;
 use crate::utils::user_vault_wrapper::{LockedUserVaultWrapper, UserVaultWrapper};
 use crate::{errors::ApiError, State};
-
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::kv_data::KeyValueData;
@@ -25,7 +23,6 @@ use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, KvDataKey, PiiString,
     TenantPermission,
 };
-
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Query};
 use serde::{Deserialize, Serialize};

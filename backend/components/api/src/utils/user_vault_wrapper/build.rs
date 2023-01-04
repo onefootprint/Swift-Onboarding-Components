@@ -1,3 +1,4 @@
+use super::add_data::UvwAddData;
 use super::uvw_data::UvwData;
 use super::LockedUserVaultWrapper;
 use super::UserVaultWrapper;

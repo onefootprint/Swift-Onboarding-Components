@@ -7,8 +7,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::phone_number::{NewPhoneNumberArgs, PhoneNumber};
 use db::models::user_timeline::UserTimeline;
-use db::HasDataAttributeFields;
-use db::TxnPgConnection;
+use db::{HasDataAttributeFields, TxnPgConnection};
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, EmailId, Fingerprint, KvDataKey,
@@ -16,9 +15,38 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
-impl LockedUserVaultWrapper {
-    /// Currently only used in UserVaultWrapper::create
-    pub(super) fn add_verified_phone_number(
+// Need a trait to define functions on Locked<T>, which is defined outside the crate.
+pub trait UvwAddData {
+    fn add_verified_phone_number(
+        self, // Intentionally consume to prevent using stale UVW
+        conn: &mut TxnPgConnection,
+        args: NewPhoneNumberArgs,
+    ) -> ApiResult<()>;
+
+    fn add_email(
+        self, // Intentionally consume to prevent using stale UVW
+        conn: &mut TxnPgConnection,
+        email: NewtypeEmail,
+        fingerprint: Fingerprint,
+    ) -> ApiResult<EmailId>;
+
+    fn update_identity_data(
+        self, // consume self, since we don't want stale data getting used
+        conn: &mut TxnPgConnection,
+        update: IdentityDataUpdate,
+        fingerprints: Vec<(UvdKind, Fingerprint)>,
+    ) -> ApiResult<()>;
+
+    fn update_custom_data(
+        &self, // Doesn't need to consume since we don't currently store custom data on UVW
+        conn: &mut TxnPgConnection,
+        tenant_id: TenantId,
+        update: HashMap<KvDataKey, PiiString>,
+    ) -> ApiResult<()>;
+}
+
+impl UvwAddData for LockedUserVaultWrapper {
+    fn add_verified_phone_number(
         self, // Intentionally consume to prevent using stale UVW
         conn: &mut TxnPgConnection,
         args: NewPhoneNumberArgs,
@@ -41,7 +69,7 @@ impl LockedUserVaultWrapper {
         Ok(())
     }
 
-    pub fn add_email(
+    fn add_email(
         self, // Intentionally consume to prevent using stale UVW
         conn: &mut TxnPgConnection,
         email: NewtypeEmail,
@@ -81,7 +109,7 @@ impl LockedUserVaultWrapper {
         Ok(email.id)
     }
 
-    pub fn update_identity_data(
+    fn update_identity_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
@@ -106,7 +134,7 @@ impl LockedUserVaultWrapper {
         Ok(())
     }
 
-    pub fn update_custom_data(
+    fn update_custom_data(
         &self, // Doesn't need to consume since we don't currently store custom data on UVW
         conn: &mut TxnPgConnection,
         tenant_id: TenantId,

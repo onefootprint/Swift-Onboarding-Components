@@ -7,6 +7,7 @@ use crate::types::EmptyResponse;
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::UvwAddData;
 use crate::{errors::ApiError, State};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 

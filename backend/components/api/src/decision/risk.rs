@@ -9,7 +9,7 @@ use db::models::{
 use super::features::*;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
-    utils::user_vault_wrapper::UserVaultWrapper,
+    utils::user_vault_wrapper::{UserVaultWrapper, UvwCommitData},
     State,
 };
 

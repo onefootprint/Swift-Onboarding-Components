@@ -11,6 +11,7 @@ use crate::errors::ApiResult;
 use crate::hosted::user::DecryptFieldsResult;
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
+use crate::utils::user_vault_wrapper::UvwAddData;
 
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;

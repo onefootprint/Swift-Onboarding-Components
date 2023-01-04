@@ -36,6 +36,9 @@ pub mod secret_api_key;
 pub mod reason_code;
 pub use reason_code::*;
 
+pub mod locked;
+pub use locked::*;
+
 pub use uuid::Uuid;
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {

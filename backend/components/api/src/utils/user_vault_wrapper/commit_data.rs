@@ -61,11 +61,16 @@ fn decide_data_to_commit(data: CurrentData) -> DataToCommit {
     }
 }
 
-impl LockedUserVaultWrapper {
+// Need a trait to define functions on Locked<T>, which is defined outside the crate.
+pub trait UvwCommitData {
+    fn commit_data_for_tenant(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno>;
+}
+
+impl UvwCommitData for LockedUserVaultWrapper {
     /// Marks all speculative data
     /// speculative data and make it portable after it is verified by an approved onboarding.
     /// Intentionally consumes the UVW to prevent using a stale reference
-    pub fn commit_data_for_tenant(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
+    fn commit_data_for_tenant(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
         // TODO unit tests. Fun case: have a committed FullAddress with StreetAddress2, then try to
         // commit a speculative FullAddress without StreetAddress2
         let uvw = self.into_inner();
