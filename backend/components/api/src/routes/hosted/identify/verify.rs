@@ -77,7 +77,11 @@ pub async fn post(
             .db_pool
             // This already happens if we make a UserVault. But if we are logging into an existing
             // user vault to onboard onto a new ob config, we need to make the ScopedUser
-            .db_transaction(move |conn| ScopedUser::get_or_create(conn, user_vault_id, ob_config.id))
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let uv = UserVault::lock(conn, &user_vault_id)?;
+                let result = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
+                Ok(result)
+            })
             .await?;
         let token_scopes = vec![
             UserAuthScope::SignUp,
@@ -171,7 +175,10 @@ async fn create_new_user_vault(
     };
     let user = state
         .db_pool
-        .db_transaction(|conn| UserVaultWrapper::create_user_vault(conn, user_info, ob_config, phone_info))
+        .db_transaction(|conn| -> ApiResult<_> {
+            let uv = UserVaultWrapper::create_user_vault(conn, user_info, ob_config, phone_info)?;
+            Ok(uv.into_inner())
+        })
         .await?;
 
     Ok(user)

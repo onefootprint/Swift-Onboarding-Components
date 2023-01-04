@@ -164,7 +164,7 @@ mod tests {
     #[db_test]
     fn test_list(conn: &mut TestPgConnection) {
         let is_live = true;
-        let user_vault = fixtures::user_vault::create(conn);
+        let user_vault = fixtures::user_vault::create(conn).into_inner();
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
 

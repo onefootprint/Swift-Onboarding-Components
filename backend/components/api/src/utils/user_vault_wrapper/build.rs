@@ -19,6 +19,7 @@ use db::HasLifetime;
 use db::TxnPgConnection;
 use db::{errors::DbError, PgConnection};
 use newtypes::DataLifetimeKind;
+use newtypes::Locked;
 use newtypes::UserVaultId;
 use newtypes::{DataLifetimeSeqno, ScopedUserId, TenantId};
 use std::marker::PhantomData;
@@ -170,7 +171,7 @@ impl UserVaultWrapper {
         user_info: NewUserInfo,
         ob_config: Option<ObConfiguration>,
         phone_args: NewPhoneNumberArgs,
-    ) -> ApiResult<UserVault> {
+    ) -> ApiResult<Locked<UserVault>> {
         let new_user_vault = db::models::user_vault::NewUserVaultArgs {
             e_private_key: user_info.e_private_key,
             public_key: user_info.public_key,
@@ -179,7 +180,7 @@ impl UserVaultWrapper {
         };
         let uv = UserVault::create(conn, new_user_vault)?;
         let su = if let Some(ob_config) = ob_config {
-            let su = ScopedUser::get_or_create(conn, uv.id.clone(), ob_config.id)?;
+            let su = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
             Some(su)
         } else {
             None
@@ -266,7 +267,7 @@ impl UserVaultWrapper {
         scoped_user_id: &ScopedUserId,
     ) -> Result<LockedUserVaultWrapper, DbError> {
         let user_vault = UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
-        let uvw = Self::build_single(conn, user_vault, Some(scoped_user_id), None, false)?;
+        let uvw = Self::build_single(conn, user_vault.into_inner(), Some(scoped_user_id), None, false)?;
 
         Ok(LockedUserVaultWrapper::new(uvw))
     }

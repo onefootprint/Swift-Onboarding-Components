@@ -10,7 +10,7 @@ use crate::{
     },
     schema,
 };
-use crate::{test_helpers, TxnPgConnection};
+use crate::{test_helpers, DbResult, TxnPgConnection};
 use diesel::prelude::*;
 
 use newtypes::{
@@ -140,9 +140,12 @@ async fn test_db() {
         is_live: false,
         is_portable: true,
     };
-    pool.db_transaction(|conn| UserVault::create(conn, new_user))
-        .await
-        .expect("couldn't init user vault");
+    pool.db_transaction(|conn| -> DbResult<_> {
+        let result = UserVault::create(conn, new_user)?.into_inner();
+        Ok(result)
+    })
+    .await
+    .expect("couldn't init user vault");
 
     // TODO find_by_phone_number and find_by_email
 }

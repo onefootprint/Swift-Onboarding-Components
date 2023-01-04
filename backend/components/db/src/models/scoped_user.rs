@@ -3,7 +3,7 @@ use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, ObConfigurationId, ScopedUserId, TenantId, UserVaultId};
+use newtypes::{FootprintUserId, Locked, ObConfigurationId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::{IsLive, ObConfiguration};
@@ -72,12 +72,10 @@ impl ScopedUser {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
     pub fn get_or_create(
         conn: &mut TxnPgConnection,
-        user_vault_id: UserVaultId,
+        uv: &Locked<UserVault>,
         // OR should we take in the ObConfiguration?
         ob_configuration_id: ObConfigurationId,
     ) -> DbResult<Self> {
-        // TODO maybe pass in locked user vault instead of re-locking here
-        let uv = UserVault::lock(conn, &user_vault_id)?;
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
         if uv.is_live != ob_config.is_live {
             return Err(DbError::SandboxMismatch);
@@ -88,7 +86,7 @@ impl ScopedUser {
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_user = scoped_user::table
-            .filter(scoped_user::user_vault_id.eq(&user_vault_id))
+            .filter(scoped_user::user_vault_id.eq(&uv.id))
             .filter(scoped_user::ob_configuration_id.eq(&ob_configuration_id))
             .first(conn.conn())
             .optional()?;
@@ -97,7 +95,7 @@ impl ScopedUser {
         }
         // Row doesn't exist for user_vault_id, tenant_id - create a new one
         let new = NewScopedUser {
-            user_vault_id,
+            user_vault_id: uv.id.clone(),
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
             is_live: ob_config.is_live,
@@ -112,17 +110,18 @@ impl ScopedUser {
     /// Used to create a ScopedUser for a non-portable vault
     pub fn create_non_portable(
         conn: &mut TxnPgConnection,
-        user_vault: UserVault,
+        uv: Locked<UserVault>,
         tenant_id: TenantId,
     ) -> DbResult<Self> {
-        if user_vault.is_portable {
+        let uv = uv.into_inner();
+        if uv.is_portable {
             return Err(DbError::CannotCreatedScopedUser);
         }
         let new = NewScopedUser {
-            user_vault_id: user_vault.id,
+            user_vault_id: uv.id,
             start_timestamp: Utc::now(),
             tenant_id,
-            is_live: user_vault.is_live,
+            is_live: uv.is_live,
             ob_configuration_id: None,
         };
         let ob = diesel::insert_into(scoped_user::table)

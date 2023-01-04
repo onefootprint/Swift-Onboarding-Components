@@ -6,7 +6,7 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    EncryptedVaultPrivateKey, FootprintUserId, ScopedUserId, TenantId, UserVaultId, VaultPublicKey,
+    EncryptedVaultPrivateKey, FootprintUserId, Locked, ScopedUserId, TenantId, UserVaultId, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -93,15 +93,15 @@ impl UserVault {
         Ok(user)
     }
 
-    pub fn lock(conn: &mut TxnPgConnection, id: &UserVaultId) -> DbResult<Self> {
+    pub fn lock(conn: &mut TxnPgConnection, id: &UserVaultId) -> DbResult<Locked<Self>> {
         let user = user_vault::table
             .filter(user_vault::id.eq(id))
             .for_no_key_update()
             .first(conn.conn())?;
-        Ok(user)
+        Ok(Locked::new(user))
     }
 
-    pub fn lock_by_scoped_user(conn: &mut TxnPgConnection, su_id: &ScopedUserId) -> DbResult<Self> {
+    pub fn lock_by_scoped_user(conn: &mut TxnPgConnection, su_id: &ScopedUserId) -> DbResult<Locked<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq(su_id))
             .select(scoped_user::user_vault_id);
@@ -109,7 +109,7 @@ impl UserVault {
             .filter(user_vault::id.eq_any(uv_ids))
             .for_no_key_update()
             .first(conn.conn())?;
-        Ok(user)
+        Ok(Locked::new(user))
     }
 
     pub fn multi_get(conn: &mut PgConnection, ids: Vec<&ScopedUserId>) -> DbResult<Vec<Self>> {
@@ -122,11 +122,11 @@ impl UserVault {
         Ok(users)
     }
 
-    pub fn create(conn: &mut PgConnection, new_user: NewUserVaultArgs) -> DbResult<UserVault> {
+    pub fn create(conn: &mut PgConnection, new_user: NewUserVaultArgs) -> DbResult<Locked<UserVault>> {
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user)
             .get_result::<UserVault>(conn)?;
-        Ok(user_vault)
+        Ok(Locked::new(user_vault))
     }
 }
 
