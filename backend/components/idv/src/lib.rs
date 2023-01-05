@@ -62,4 +62,6 @@ pub enum Error {
     NotImplemented,
     #[error("Socure error: {0}")]
     SocureError(#[from] socure::Error),
+    #[error("Calls to vendor disabled via circuit breaker feature flag")]
+    VendorCallsDisabledError,
 }

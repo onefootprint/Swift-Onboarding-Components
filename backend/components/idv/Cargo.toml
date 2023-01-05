@@ -24,7 +24,6 @@ strum = { workspace = true }
 strum_macros = { workspace = true }
 serde_urlencoded ="0.7.1"
 
-
 [dev-dependencies]
 test-case = "2.1.0"
 actix-rt = "2.7.0"

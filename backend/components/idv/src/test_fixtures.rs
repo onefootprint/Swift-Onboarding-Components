@@ -99,3 +99,53 @@ pub fn test_twilio_lookupv2_response() -> serde_json::Value {
       "url": "https://lookups.twilio.com/v2/PhoneNumbers/+447772000001"}
     )
 }
+
+pub fn socure_idplus_fake_passing_response() -> serde_json::Value {
+    serde_json::json!({
+       "referenceId":"1234-abcd-5678",
+       "nameAddressCorrelation":{
+          "reasonCodes":[],
+          "score":0.01
+       },
+       "namePhoneCorrelation":{
+          "reasonCodes":[],
+          "score":0.01
+       },
+       "fraud":{
+          "reasonCodes":[],
+          "scores":[
+             {
+                "name":"sigma",
+                "version":"1.0",
+                "score":0.01
+             }
+          ]
+       },
+       "kyc":{
+          "reasonCodes":[],
+          "correlationIndices":{
+             "nameAddressPhoneIndex":0.0,
+             "nameAddressSsnIndex":0.0
+          },
+          "fieldValidations":{
+             "firstName":0.99,
+             "surName":0.99,
+             "streetAddress":0.99,
+             "city":0.99,
+             "state":0.99,
+             "zip":0.99,
+             "mobileNumber":0.99,
+             "dob":0.99,
+             "ssn":0.99
+          }
+       },
+       "addressRisk":{
+          "reasonCodes":[],
+          "score":0.01
+       },
+       "phoneRisk":{
+          "reasonCodes":[],
+          "score":0.01
+       }
+    })
+}

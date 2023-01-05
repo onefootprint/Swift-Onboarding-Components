@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
+
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
-use newtypes::{TenantId, Uuid};
+use newtypes::{ObConfigurationKey, TenantId, Uuid};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -56,6 +57,22 @@ impl FeatureFlagClient {
         tenant_id: &TenantId,
     ) -> Result<bool, FeatureFlagError> {
         let context = ContextBuilder::new(tenant_id.clone())
+            .build()
+            .map_err(FeatureFlagError::LaunchDarklyError)?;
+        let flag_value = self
+            .launch_darkly_client
+            .as_ref()
+            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)
+            .map(|c| c.bool_variation(&context, flag_key, false));
+        flag_value
+    }
+
+    pub fn bool_flag_by_ob_configuration_key(
+        &self,
+        flag_key: &str,
+        ob_configuration_key: &ObConfigurationKey,
+    ) -> Result<bool, FeatureFlagError> {
+        let context = ContextBuilder::new(ob_configuration_key.clone())
             .build()
             .map_err(FeatureFlagError::LaunchDarklyError)?;
         let flag_value = self

@@ -9,9 +9,9 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
-use newtypes::ScopedUserId;
 use newtypes::{ApiKeyStatus, DataLifetimeKind};
 use newtypes::{CollectedDataOption, ObConfigurationId, ObConfigurationKey, TenantId};
+use newtypes::{OnboardingId, ScopedUserId};
 use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
@@ -240,6 +240,16 @@ impl ObConfiguration {
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
+    }
+
+    pub fn get_by_onboarding_id(conn: &mut PgConnection, onboarding_id: &OnboardingId) -> DbResult<Self> {
+        let ob_config: ObConfiguration = onboarding::table
+            .inner_join(ob_configuration::table)
+            .filter(onboarding::id.eq(onboarding_id))
+            .select(ob_configuration::all_columns)
+            .get_result(conn)?;
+
+        Ok(ob_config)
     }
 }
 

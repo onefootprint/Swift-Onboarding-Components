@@ -27,7 +27,7 @@ impl SocureClient {
         let idplus_url = if sandbox {
             "https://sandbox.socure.com/api/3.0/EmailAuthScore"
         } else {
-            "https://socure.com/api/3.0/EmailAuthScore"
+            "https://service.socure.com/api/3.0/EmailAuthScore"
         };
         let reason_code_url = "https://service.socure.com/api/3.0/reasoncodes";
         let mut headers = header::HeaderMap::new();

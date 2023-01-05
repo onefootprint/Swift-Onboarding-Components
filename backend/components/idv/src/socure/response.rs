@@ -210,7 +210,7 @@ pub struct Observations {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VelocityMetrics {
-    pub historical_count: HistoricalCount,
+    pub historical_count: Option<HistoricalCount>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
