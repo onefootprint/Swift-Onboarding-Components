@@ -14,7 +14,7 @@ impl DbToApi<TenantRole> for api_wire_types::OrganizationRole {
         Self {
             id,
             name,
-            permissions: permissions.0,
+            scopes: permissions.0,
             created_at,
         }
     }

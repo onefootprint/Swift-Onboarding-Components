@@ -10,7 +10,7 @@ type RoleRowProps = {
 
 const RoleRow = ({ role }: RoleRowProps) => {
   const { allT } = useTranslation();
-  const permissions = role.permissions.map((p: OrgRolePermission) =>
+  const scopes = role.scopes.map((p: OrgRolePermission) =>
     allT(`org-role-permissions.${p.kind}`),
   );
 
@@ -23,7 +23,7 @@ const RoleRow = ({ role }: RoleRowProps) => {
         <Typography variant="body-3">{role.createdAt}</Typography>
       </td>
       <td>
-        <Typography variant="body-3">{createTagList(permissions)}</Typography>
+        <Typography variant="body-3">{createTagList(scopes)}</Typography>
       </td>
     </>
   );

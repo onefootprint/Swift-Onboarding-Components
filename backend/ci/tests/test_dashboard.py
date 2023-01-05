@@ -501,12 +501,12 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        permissions=[dict(kind="users"), dict(kind="api_keys")],
+        scopes=[dict(kind="users"), dict(kind="api_keys")],
     )
     body = post("org/roles", role_data, sandbox_tenant.auth_token)
     assert body["name"] == role_data["name"]
-    assert set(i["kind"] for i in body["permissions"]) == set(
-        i["kind"] for i in role_data["permissions"]
+    assert set(i["kind"] for i in body["scopes"]) == set(
+        i["kind"] for i in role_data["scopes"]
     )
     return body
 
@@ -515,7 +515,7 @@ def limited_role(sandbox_tenant):
 def admin_role(sandbox_tenant):
     body = get("org/roles", None, sandbox_tenant.auth_token)
     roles = body["data"]
-    return next(i for i in roles if i["permissions"][0]["kind"] == "admin")
+    return next(i for i in roles if i["scopes"][0]["kind"] == "admin")
 
 
 @pytest.fixture(scope="session")
@@ -537,7 +537,7 @@ class TestDashboardAdminUsers:
         suffix = _gen_random_n_digit_number(10)
         patch_data = dict(
             name=f"New role name {suffix}",
-            permissions=[{"kind": "onboarding_configuration"}],
+            scopes=[{"kind": "onboarding_configuration"}],
         )
         patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token)
 
@@ -547,8 +547,8 @@ class TestDashboardAdminUsers:
         assert admin_role["id"] in role_ids
         role = next(r for r in body["data"] if r["id"] == role_id)
         assert role["name"] == patch_data["name"]
-        assert set(i["kind"] for i in role["permissions"]) == set(
-            i["kind"] for i in patch_data["permissions"]
+        assert set(i["kind"] for i in role["scopes"]) == set(
+            i["kind"] for i in patch_data["scopes"]
         )
 
     def test_update_user_role(self, sandbox_tenant, tenant_user, limited_role):

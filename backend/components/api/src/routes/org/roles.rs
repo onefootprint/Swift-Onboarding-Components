@@ -50,7 +50,7 @@ async fn get(
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct CreateTenantRoleRequest {
     name: String,
-    permissions: Vec<TenantScope>,
+    scopes: Vec<TenantScope>,
 }
 
 #[api_v2_operation(tags(Private), description = "Create a new IAM role for the tenant.")]
@@ -64,10 +64,10 @@ async fn post(
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
-    let CreateTenantRoleRequest { name, permissions } = request.into_inner();
+    let CreateTenantRoleRequest { name, scopes } = request.into_inner();
     let result = state
         .db_pool
-        .db_query(move |conn| TenantRole::create(conn, tenant_id, name, permissions))
+        .db_query(move |conn| TenantRole::create(conn, tenant_id, name, scopes))
         .await??;
 
     let result = api_wire_types::OrganizationRole::from_db(result);
@@ -77,7 +77,7 @@ async fn post(
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct UpdateTenantRoleRequest {
     name: Option<String>,
-    permissions: Option<Vec<TenantScope>>,
+    scopes: Option<Vec<TenantScope>>,
 }
 
 #[api_v2_operation(tags(Private), description = "Updates the provided role.")]
@@ -92,10 +92,10 @@ async fn patch(
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
-    let UpdateTenantRoleRequest { name, permissions } = request.into_inner();
+    let UpdateTenantRoleRequest { name, scopes } = request.into_inner();
     let result = state
         .db_pool
-        .db_transaction(move |conn| TenantRole::update(conn, &tenant_id, &role_id, name, permissions))
+        .db_transaction(move |conn| TenantRole::update(conn, &tenant_id, &role_id, name, scopes))
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);

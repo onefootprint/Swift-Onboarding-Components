@@ -7,13 +7,13 @@ import { useMutation } from '@tanstack/react-query';
 import { DASHBOARD_AUTHORIZATION_HEADER } from 'src/config/constants';
 
 const createOrgRole = async (payload: CreateOrgRoleRequest) => {
-  const { name, permissions, authToken } = payload;
+  const { name, scopes, authToken } = payload;
   const response = await request<CreateOrgRoleResponse>({
     method: 'POST',
     url: '/org/roles',
     data: {
       name,
-      permissions,
+      scopes,
     },
     headers: {
       [DASHBOARD_AUTHORIZATION_HEADER]: authToken,

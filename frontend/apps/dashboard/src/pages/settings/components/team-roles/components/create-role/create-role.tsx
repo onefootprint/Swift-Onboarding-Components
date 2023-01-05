@@ -26,7 +26,7 @@ const CreateRole = ({ open, onClose }: CreateRoleProps) => {
     }
     const { auth: authToken } = data;
     const { name, ...rest } = formData;
-    const permissions = Object.entries(rest)
+    const scopes = Object.entries(rest)
       .filter(entry => {
         const permissionOn = !!entry[1];
         return permissionOn;
@@ -39,7 +39,7 @@ const CreateRole = ({ open, onClose }: CreateRoleProps) => {
       }) as OrgRolePermission[];
 
     orgRoleMutation.mutate(
-      { authToken, name, permissions },
+      { authToken, name, scopes },
       {
         onSuccess({ name: roleName }) {
           toast.show({
