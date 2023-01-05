@@ -34,6 +34,8 @@ pub struct ObConfiguration {
     pub can_access_data: Vec<CollectedDataOption>,
     pub must_collect_identity_document: bool,
     pub can_access_identity_document_images: bool,
+    pub must_collect_selfie: bool,
+    pub can_access_selfie_image: bool,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
@@ -50,6 +52,9 @@ struct NewObConfiguration {
 
     must_collect_identity_document: bool,
     can_access_identity_document_images: bool,
+
+    must_collect_selfie: bool,
+    can_access_selfie_image: bool,
 }
 
 #[derive(Debug)]
@@ -199,19 +204,23 @@ impl ObConfiguration {
         can_access_data: Vec<CollectedDataOption>,
         must_collect_identity_document: bool,
         can_access_identity_document_images: bool,
+        must_collect_selfie: bool,
+        can_access_selfie_image: bool,
         is_live: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
             name,
             tenant_id,
-            must_collect_data,
-            must_collect_identity_document,
-            can_access_identity_document_images,
-            can_access_data,
             is_live,
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
+            must_collect_data,
+            can_access_data,
+            must_collect_identity_document,
+            can_access_identity_document_images,
+            must_collect_selfie,
+            can_access_selfie_image,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

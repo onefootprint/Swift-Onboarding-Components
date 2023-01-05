@@ -95,6 +95,8 @@ pub struct CreateOnboardingConfigurationRequest {
     must_collect_identity_document: bool,
     #[serde(default)]
     can_access_identity_document_images: bool,
+    must_collect_selfie: bool,
+    can_access_selfie_image: bool,
 }
 
 const REQUIRED_FIELDS: [CollectedDataOption; 4] = [
@@ -165,6 +167,8 @@ pub async fn post(
         can_access_data,
         must_collect_identity_document,
         can_access_identity_document_images,
+        must_collect_selfie,
+        can_access_selfie_image,
     } = request.into_inner();
 
     let is_live = auth.is_live()?;
@@ -180,6 +184,8 @@ pub async fn post(
                 can_access_data,
                 must_collect_identity_document,
                 can_access_identity_document_images,
+                must_collect_selfie,
+                can_access_selfie_image,
                 is_live,
             )
         })

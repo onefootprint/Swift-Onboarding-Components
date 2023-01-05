@@ -12,6 +12,8 @@ pub fn create(conn: &mut PgConnection, tenant_id: &TenantId) -> ObConfiguration 
         vec![CollectedDataOption::PhoneNumber],
         false,
         false,
+        false,
+        false,
         true,
     )
     .expect("Could not create ob config")
