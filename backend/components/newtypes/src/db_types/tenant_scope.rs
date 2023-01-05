@@ -37,7 +37,7 @@ pub enum TenantScope {
     DecryptCustom,
     // Similarly to how we store permissions on an OnboardingConfiguration, we denote the set of
     // decryptable fields with CollectedDataOption
-    Decrypt { attributes: Vec<CollectedDataOption> },
+    Decrypt(Vec<CollectedDataOption>),
     ManualReview,
 }
 
@@ -53,44 +53,3 @@ impl std::ops::Deref for TenantScopeList {
         &self.0
     }
 }
-
-// TODO rewrite tests
-/*
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::{CollectedDataOption, DataLifetimeKind};
-    use test_case::test_case;
-    use CollectedDataOption::*;
-    use TenantPermission::*;
-
-    #[test_case(vec![ApiKeys, OnboardingConfiguration], Users => false)]
-    #[test_case(vec![OnboardingConfiguration], ApiKeys => false)]
-    #[test_case(vec![ApiKeys, OnboardingConfiguration], ApiKeys => true)]
-    #[test_case(vec![ApiKeys, OnboardingConfiguration], OnboardingConfiguration => true)]
-    #[test_case(vec![ApiKeys, OnboardingConfiguration], DecryptCustom => false)]
-    #[test_case(vec![], OnboardingConfiguration => false)]
-    #[test_case(vec![Admin], OnboardingConfiguration => true)]
-    fn test_has_permission(granted: Vec<TenantPermission>, requested: TenantPermission) -> bool {
-        TenantPermissionList(granted).has_permission(&requested)
-    }
-
-    #[test_case(vec![ApiKeys], vec![] => true)]
-    #[test_case(vec![ApiKeys], vec![DataLifetimeKind::Ssn9] => false)]
-    #[test_case(vec![Admin], vec![DataLifetimeKind::Ssn9, DataLifetimeKind::FirstName, DataLifetimeKind::Email] => true)]
-    #[test_case(vec![Decrypt{attributes: vec![Name]}, Decrypt{attributes: vec![FullAddress]}], vec![DataLifetimeKind::FirstName, DataLifetimeKind::City] => true)]
-    fn test_can_decrypt_basic(granted: Vec<TenantPermission>, requested: Vec<DataLifetimeKind>) -> bool {
-        TenantPermissionList(granted).can_decrypt(requested)
-    }
-
-    #[test_case(vec![Ssn9], vec![DataLifetimeKind::Ssn9] => true)]
-    #[test_case(vec![Ssn9], vec![DataLifetimeKind::Ssn4] => true)]
-    #[test_case(vec![Name], vec![DataLifetimeKind::Ssn4] => false)]
-    #[test_case(vec![Name, FullAddress], vec![DataLifetimeKind::FirstName, DataLifetimeKind::Zip] => true)]
-    #[test_case(vec![Name, FullAddress], vec![DataLifetimeKind::FirstName, DataLifetimeKind::Email] => false)]
-    #[test_case(vec![], vec![DataLifetimeKind::FirstName] => false)]
-    fn test_can_decrypt(granted: Vec<CollectedDataOption>, requested: Vec<DataLifetimeKind>) -> bool {
-        TenantPermissionList(vec![Decrypt { attributes: granted }]).can_decrypt(requested)
-    }
-}
-*/

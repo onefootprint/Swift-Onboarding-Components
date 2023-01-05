@@ -103,7 +103,7 @@ impl IsPermissionMet for CanDecrypt {
         let can_access: HashSet<_> = token_scopes
             .iter()
             .filter_map(|p| match p {
-                TenantScope::Decrypt { attributes } => Some(attributes),
+                TenantScope::Decrypt(attributes) => Some(attributes),
                 _ => None,
             })
             .flatten()
@@ -136,13 +136,57 @@ where
 // TODO unit tests
 #[cfg(test)]
 mod test {
-    use super::{Any, CanDecrypt, TenantPermission};
+    use super::{Any, CanDecrypt, TenantPermission as TP};
     use crate::auth::tenant::IsPermissionMet;
-    use newtypes::DataLifetimeKind;
+    use newtypes::{CollectedDataOption as CDO, DataLifetimeKind as DLK, TenantScope as TS};
     use test_case::test_case;
+    //
+    // Basic TenantPermission enum
+    //
+    #[test_case(&[TS::ApiKeys, TS::OnboardingConfiguration], TP::Users => false)]
+    #[test_case(&[TS::OnboardingConfiguration], TP::ApiKeys => false)]
+    #[test_case(&[TS::ApiKeys, TS::OnboardingConfiguration], TP::ApiKeys => true)]
+    #[test_case(&[TS::ApiKeys, TS::OnboardingConfiguration], TP::OnboardingConfiguration => true)]
+    #[test_case(&[TS::ApiKeys, TS::OnboardingConfiguration], TP::DecryptCustom => false)]
+    #[test_case(&[], TP::OnboardingConfiguration => false)]
+    //
+    // Test CanDecrypt
+    //
+    #[test_case(&[TS::ApiKeys], CanDecrypt(vec![DLK::Ssn9]) => false)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name]), TS::Decrypt(vec![CDO::FullAddress]), TS::Users], CanDecrypt(vec![DLK::FirstName, DLK::City]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![DLK::Ssn9]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![DLK::Ssn4]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![DLK::Ssn4, DLK::FirstName]) => false)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name])], CanDecrypt(vec![DLK::Ssn4]) => false)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name, CDO::FullAddress])], CanDecrypt(vec![DLK::FirstName, DLK::Zip]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name, CDO::FullAddress])], CanDecrypt(vec![DLK::FirstName, DLK::Email]) => false)]
+    #[test_case(&[TS::Decrypt(vec![])], CanDecrypt(vec![DLK::FirstName]) => false)]
+    //
+    // Test Or
+    //
+    #[test_case(&[TS::OnboardingConfiguration], TP::OnboardingConfiguration.or(TP::Admin) => true)]
+    #[test_case(&[TS::OnboardingConfiguration], TP::Admin.or(TP::OnboardingConfiguration) => true)]
+    #[test_case(&[TS::Admin], TP::OnboardingConfiguration.or_admin() => true)]
+    #[test_case(&[TS::Admin], CanDecrypt(vec![DLK::Ssn9, DLK::FirstName, DLK::Email]).or_admin() => true)]
+    #[test_case(&[TS::OnboardingConfiguration], TP::Users.or_admin() => false)]
+    #[test_case(&[TS::OnboardingConfiguration], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => false)]
+    #[test_case(&[TS::Users], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => true)]
+    #[test_case(&[TS::ApiKeys], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => true)]
+    #[test_case(&[TS::OrgSettings], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => true)]
+    //
+    // Test Any
+    //
+    #[test_case(&[TS::ApiKeys], Any => true)]
+    #[test_case(&[], Any => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], Any => true)]
+    /// Test that the token_scopes associated with an authentication method gives access to perform
+    /// the requested_permission
+    fn test_is_permission_met<T: IsPermissionMet>(token_scopes: &[TS], requested_permission: T) -> bool {
+        requested_permission.is_met(token_scopes)
+    }
 
-    #[test_case(TenantPermission::Users.or_admin() => "Or<Users,Admin>")]
-    #[test_case(CanDecrypt(vec![DataLifetimeKind::Ssn9, DataLifetimeKind::FirstName]).or(TenantPermission::ApiKeys) => "Or<CanDecrypt<[Ssn9, FirstName]>,ApiKeys>")]
+    #[test_case(TP::Users.or_admin() => "Or<Users,Admin>")]
+    #[test_case(CanDecrypt(vec![DLK::Ssn9, DLK::FirstName]).or(TP::ApiKeys) => "Or<CanDecrypt<[Ssn9, FirstName]>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
     fn test_display<T: IsPermissionMet>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met
