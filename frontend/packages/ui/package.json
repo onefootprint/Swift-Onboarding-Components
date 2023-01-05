@@ -35,7 +35,7 @@
     "lodash": "^4.17.21",
     "react-day-picker": "^8.3.0",
     "react-highlight-words": "^0.18.0",
-    "react-hook-form": "^7.41.3",
+    "react-hook-form": "^7.41.5",
     "react-merge-refs": "^1.1.0",
     "react-popper": "^2.3.0",
     "react-select": "^5.3.2",
