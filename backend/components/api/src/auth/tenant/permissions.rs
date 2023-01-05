@@ -3,6 +3,42 @@ use crate::auth::Either;
 use newtypes::{DataLifetimeKind, TenantScope};
 use std::collections::HashSet;
 use std::fmt;
+use strum::Display;
+
+/// Represents a simple permission that is required to execute an HTTP handler.
+/// We don't use TenantScope to represent permissions required by an HTTP handler because some
+/// scopes give access to more than one permission, like Decrypt.
+#[derive(Display)]
+pub enum TenantPermission {
+    Admin,
+    OnboardingConfiguration,
+    ApiKeys,
+    OrgSettings,
+    Users,
+    DecryptCustom,
+    ManualReview,
+}
+
+impl TenantPermission {
+    /// Maps a TenantPermission to the TenantScope that grants this permission
+    fn granting_scope(&self) -> TenantScope {
+        match self {
+            Self::Admin => TenantScope::Admin,
+            Self::OnboardingConfiguration => TenantScope::OnboardingConfiguration,
+            Self::ApiKeys => TenantScope::ApiKeys,
+            Self::OrgSettings => TenantScope::OrgSettings,
+            Self::Users => TenantScope::Users,
+            Self::DecryptCustom => TenantScope::DecryptCustom,
+            Self::ManualReview => TenantScope::ManualReview,
+        }
+    }
+}
+
+impl IsPermissionMet for TenantPermission {
+    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+        token_scopes.contains(&self.granting_scope())
+    }
+}
 
 /// Represents a permission that is met if either its Left or Right permission is met
 pub struct Or<Left, Right>(pub(crate) Left, pub(crate) Right);
@@ -77,24 +113,6 @@ impl IsPermissionMet for CanDecrypt {
     }
 }
 
-impl IsPermissionMet for TenantScope {
-    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
-        match self {
-            // TODO it's weird to specify the request decryption in terms of CollectedDataOptions here
-            // since we could only be requesting a specific attribute. Maybe we just map the attributes
-            // to the minimal owning option?
-            // Or we make a new DecryptTenantPermissions struct of attributes and just don't impl
-            // this trait for Self::Decrypt
-            Self::Decrypt { .. } => {
-                // Should instead us TenantDecryptPermission
-                unimplemented!("Shouldn't reach here");
-            }
-            // Check if the permissions on the auth token contain this permission
-            s => token_scopes.contains(&s),
-        }
-    }
-}
-
 impl<A, B> CanCheckTenantPermissions for Either<A, B>
 where
     A: CanCheckTenantPermissions,
@@ -118,13 +136,13 @@ where
 // TODO unit tests
 #[cfg(test)]
 mod test {
-    use super::{Any, CanDecrypt};
+    use super::{Any, CanDecrypt, TenantPermission};
     use crate::auth::tenant::IsPermissionMet;
-    use newtypes::{DataLifetimeKind, TenantScope};
+    use newtypes::DataLifetimeKind;
     use test_case::test_case;
 
-    #[test_case(TenantScope::Users.or_admin() => "Or<Users,Admin>")]
-    #[test_case(CanDecrypt(vec![DataLifetimeKind::Ssn9, DataLifetimeKind::FirstName]).or(TenantScope::ApiKeys) => "Or<CanDecrypt<[Ssn9, FirstName]>,ApiKeys>")]
+    #[test_case(TenantPermission::Users.or_admin() => "Or<Users,Admin>")]
+    #[test_case(CanDecrypt(vec![DataLifetimeKind::Ssn9, DataLifetimeKind::FirstName]).or(TenantPermission::ApiKeys) => "Or<CanDecrypt<[Ssn9, FirstName]>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
     fn test_display<T: IsPermissionMet>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met

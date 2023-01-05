@@ -1,5 +1,6 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantPermission;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
@@ -13,7 +14,6 @@ use newtypes::csv::deserialize_stringified_list;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
-use newtypes::TenantScope;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -42,7 +42,7 @@ async fn get(
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
-    let auth = auth.check_permissions(TenantScope::Users)?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
 
     let page_size = request.page_size(&state);
     let cursor = request.cursor;

@@ -71,11 +71,11 @@ pub trait IsPermissionMet: Display {
 
     /// Shorthand to returns a permission that is met if self is met OR if TenantPermission::Admin
     /// is met
-    fn or_admin(self) -> permissions::Or<Self, TenantScope>
+    fn or_admin(self) -> permissions::Or<Self, TenantPermission>
     where
         Self: Sized,
     {
-        self.or(TenantScope::Admin)
+        self.or(TenantPermission::Admin)
     }
 }
 

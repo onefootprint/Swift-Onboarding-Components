@@ -1,4 +1,5 @@
 use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::TenantPermission;
 use crate::auth::tenant::TenantUserAuthContext;
 
 use crate::errors::ApiResult;
@@ -11,7 +12,8 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_role::TenantRole;
-use newtypes::{TenantRoleId, TenantScope};
+use newtypes::TenantRoleId;
+use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
@@ -24,7 +26,7 @@ async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
-    let auth = auth.check_permissions(TenantScope::OrgSettings)?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -57,7 +59,7 @@ async fn post(
     request: web::Json<CreateTenantRoleRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantScope::Admin)?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -85,7 +87,7 @@ async fn patch(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantScope::Admin)?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -106,7 +108,7 @@ async fn deactivate(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantScope::Admin)?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
 

@@ -1,4 +1,5 @@
 use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::TenantPermission;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
@@ -12,7 +13,6 @@ use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use newtypes::DbActor;
 use newtypes::FootprintUserId;
-use newtypes::TenantScope;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -26,7 +26,7 @@ pub async fn post(
     request: web::Json<DecisionRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(TenantScope::ManualReview)?;
+    let auth = auth.check_permissions(TenantPermission::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
     let _actor = auth.actor();
     let is_live = auth.is_live()?;

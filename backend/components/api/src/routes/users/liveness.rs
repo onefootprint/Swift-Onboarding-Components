@@ -1,5 +1,6 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantPermission;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
@@ -7,7 +8,6 @@ use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use newtypes::FootprintUserId;
-use newtypes::TenantScope;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
@@ -20,7 +20,7 @@ pub async fn get(
     request: web::Path<FootprintUserId>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<Vec<api_wire_types::LivenessEvent>>>, ApiError> {
-    let auth = auth.check_permissions(TenantScope::Users)?;
+    let auth = auth.check_permissions(TenantPermission::Users)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();

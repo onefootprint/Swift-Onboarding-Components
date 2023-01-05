@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use crate::auth::tenant::ObPkAuth;
 use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantPermission;
 use crate::auth::{
     tenant::{CheckTenantPermissions, TenantUserAuthContext},
     Either,
@@ -20,9 +21,9 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
 use itertools::Itertools;
+use newtypes::ApiKeyStatus;
 use newtypes::CollectedDataOption;
 use newtypes::ObConfigurationId;
-use newtypes::{ApiKeyStatus, TenantScope};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
@@ -55,7 +56,7 @@ async fn get(
     Json<PaginatedResponseData<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
     ApiError,
 > {
-    let auth = auth.check_permissions(TenantScope::OnboardingConfiguration)?;
+    let auth = auth.check_permissions(TenantPermission::OnboardingConfiguration)?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -154,7 +155,7 @@ pub async fn post(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
-    let auth = auth.check_permissions(TenantScope::OnboardingConfiguration)?;
+    let auth = auth.check_permissions(TenantPermission::OnboardingConfiguration)?;
     request.validate()?;
     let tenant = auth.tenant().clone();
     let CreateOnboardingConfigurationRequest {
@@ -210,7 +211,7 @@ async fn patch(
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
-    let auth = auth.check_permissions(TenantScope::OnboardingConfiguration)?;
+    let auth = auth.check_permissions(TenantPermission::OnboardingConfiguration)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
     let UpdateObConfigPath { id } = path.into_inner();

@@ -25,12 +25,12 @@ use strum_macros::Display;
 #[diesel(sql_type = Jsonb)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
+/// Represents a scope that is granted to TenantUsers in a specific TenantRole
 pub enum TenantScope {
     Admin,
     OnboardingConfiguration,
     ApiKeys,
     OrgSettings,
-    SecurityLogs,
     Users,
     // Allows decrypting all custom attributes
     // TODO more fine-grained decryption controls

@@ -1,4 +1,4 @@
-use crate::auth::tenant::{Any, SecretTenantAuthContext};
+use crate::auth::tenant::{Any, SecretTenantAuthContext, TenantPermission};
 use crate::auth::tenant::{CheckTenantPermissions, TenantUserAuthContext};
 use crate::auth::Either;
 use crate::errors::ApiError;
@@ -9,7 +9,6 @@ use crate::State;
 use actix_web::web;
 use api_wire_types::UpdateTenantRequest;
 use db::models::tenant::{Tenant, UpdateTenant};
-use newtypes::TenantScope;
 use paperclip::actix::patch;
 use paperclip::actix::{self, api_v2_operation, web::Json};
 
@@ -36,7 +35,7 @@ async fn patch(
     request: web::Json<UpdateTenantRequest>,
     auth: TenantUserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let auth = auth.check_permissions(TenantScope::Admin)?;
+    let auth = auth.check_permissions(TenantPermission::Admin)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();

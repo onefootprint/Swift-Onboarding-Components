@@ -4,6 +4,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 
 use crate::auth::tenant::CheckTenantPermissions;
 
+use crate::auth::tenant::TenantPermission;
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 
@@ -14,7 +15,6 @@ use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 use newtypes::SessionAuthToken;
-use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -39,7 +39,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<CreateOnboardingSessionRequest>,
 ) -> JsonApiResponse<ObConfigSessionToken> {
-    let auth = auth.check_permissions(TenantScope::OnboardingConfiguration)?;
+    let auth = auth.check_permissions(TenantPermission::OnboardingConfiguration)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
 
