@@ -59,24 +59,6 @@ pub trait IsPermissionMet: Display {
     /// represented by self is met.
     #[allow(clippy::wrong_self_convention)]
     fn is_met(self, token_scopes: &[TenantScope]) -> bool;
-
-    /// Returns a permission that is met if self OR t is met
-    fn or<T>(self, t: T) -> permissions::Or<Self, T>
-    where
-        Self: Sized,
-        T: Sized,
-    {
-        permissions::Or(self, t)
-    }
-
-    /// Shorthand to returns a permission that is met if self is met OR if TenantPermission::Admin
-    /// is met
-    fn or_admin(self) -> permissions::Or<Self, TenantPermission>
-    where
-        Self: Sized,
-    {
-        self.or(TenantPermission::Admin)
-    }
 }
 
 /// A trait to be implemented for any form of tenant auth class.
@@ -122,3 +104,19 @@ where
         }
     }
 }
+
+/// Contains some useful util methods for everything that implements IsPermissionMet
+pub trait TenantPermissionDsl: Sized {
+    /// Returns a permission that is met if self OR t is met
+    fn or<U: Sized>(self, u: U) -> permissions::Or<Self, U> {
+        permissions::Or(self, u)
+    }
+
+    /// Shorthand to returns a permission that is met if self is met OR if TenantPermission::Admin
+    /// is met
+    fn or_admin(self) -> permissions::Or<Self, TenantPermission> {
+        self.or(TenantPermission::Admin)
+    }
+}
+
+impl<T> TenantPermissionDsl for T where T: IsPermissionMet {}

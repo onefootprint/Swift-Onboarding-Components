@@ -137,7 +137,7 @@ where
 #[cfg(test)]
 mod test {
     use super::{Any, CanDecrypt, TenantPermission as TP};
-    use crate::auth::tenant::IsPermissionMet;
+    use crate::auth::tenant::{IsPermissionMet, TenantPermissionDsl};
     use newtypes::{CollectedDataOption as CDO, DataLifetimeKind as DLK, TenantScope as TS};
     use test_case::test_case;
     //
