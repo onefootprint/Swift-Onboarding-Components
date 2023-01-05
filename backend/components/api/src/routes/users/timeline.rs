@@ -1,6 +1,7 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantPermissionDsl;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 
@@ -26,7 +27,7 @@ pub async fn get(
     request: web::Path<FootprintUserId>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<TimelineEventsResponse> {
-    let auth = auth.check_permissions(TenantPermission::Users)?;
+    let auth = auth.check_permissions(TenantPermission::Users.or_ro())?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();

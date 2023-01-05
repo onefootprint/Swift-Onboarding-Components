@@ -11,6 +11,7 @@ use strum::Display;
 #[derive(Display)]
 pub enum TenantPermission {
     Admin,
+    ReadOnly,
     OnboardingConfiguration,
     ApiKeys,
     OrgSettings,
@@ -24,6 +25,7 @@ impl TenantPermission {
     fn granting_scope(&self) -> TenantScope {
         match self {
             Self::Admin => TenantScope::Admin,
+            Self::ReadOnly => TenantScope::ReadOnly,
             Self::OnboardingConfiguration => TenantScope::OnboardingConfiguration,
             Self::ApiKeys => TenantScope::ApiKeys,
             Self::OrgSettings => TenantScope::OrgSettings,
@@ -168,6 +170,8 @@ mod test {
     #[test_case(&[TS::OnboardingConfiguration], TP::Admin.or(TP::OnboardingConfiguration) => true)]
     #[test_case(&[TS::Admin], TP::OnboardingConfiguration.or_admin() => true)]
     #[test_case(&[TS::Admin], CanDecrypt(vec![DLK::Ssn9, DLK::FirstName, DLK::Email]).or_admin() => true)]
+    #[test_case(&[TS::ReadOnly], CanDecrypt(vec![DLK::Ssn9, DLK::FirstName, DLK::Email]).or_admin() => false)]
+    #[test_case(&[TS::ReadOnly], TP::Users.or_ro() => true)]
     #[test_case(&[TS::OnboardingConfiguration], TP::Users.or_admin() => false)]
     #[test_case(&[TS::OnboardingConfiguration], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => false)]
     #[test_case(&[TS::Users], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => true)]

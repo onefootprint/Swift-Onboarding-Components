@@ -1,5 +1,6 @@
 use crate::auth::tenant::{
-    CheckTenantPermissions, SecretTenantAuthContext, TenantPermission, TenantUserAuthContext,
+    CheckTenantPermissions, SecretTenantAuthContext, TenantPermission, TenantPermissionDsl,
+    TenantUserAuthContext,
 };
 use crate::auth::Either;
 use crate::errors::ApiResult;
@@ -29,7 +30,7 @@ pub async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> ApiResult<ApiKeysResponse> {
-    let auth = auth.check_permissions(TenantPermission::ApiKeys)?;
+    let auth = auth.check_permissions(TenantPermission::ApiKeys.or_ro())?;
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
 

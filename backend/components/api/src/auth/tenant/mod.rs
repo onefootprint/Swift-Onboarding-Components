@@ -112,10 +112,16 @@ pub trait TenantPermissionDsl: Sized {
         permissions::Or(self, u)
     }
 
-    /// Shorthand to returns a permission that is met if self is met OR if TenantPermission::Admin
+    /// Shorthand to return a permission that is met if self is met OR if TenantPermission::Admin
     /// is met
     fn or_admin(self) -> permissions::Or<Self, TenantPermission> {
         self.or(TenantPermission::Admin)
+    }
+
+    /// Shorthand to return a permission that is met if self is met OR if TenantPermission::ReadOnly
+    /// is met
+    fn or_ro(self) -> permissions::Or<Self, TenantPermission> {
+        self.or(TenantPermission::ReadOnly)
     }
 }
 

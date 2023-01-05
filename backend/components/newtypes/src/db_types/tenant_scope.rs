@@ -27,16 +27,20 @@ use strum_macros::Display;
 #[serde(tag = "kind")]
 /// Represents a scope that is granted to TenantUsers in a specific TenantRole
 pub enum TenantScope {
+    /// A special scope that gives permission to perform all actions
     Admin,
+    /// A special scope that gives permission to endpoints that only require a ReadOnly permission
+    ReadOnly,
+
     OnboardingConfiguration,
     ApiKeys,
     OrgSettings,
     Users,
-    // Allows decrypting all custom attributes
-    // TODO more fine-grained decryption controls
+    /// Allows decrypting all custom attributes
+    /// TODO more fine-grained decryption controls
     DecryptCustom,
-    // Similarly to how we store permissions on an OnboardingConfiguration, we denote the set of
-    // decryptable fields with CollectedDataOption
+    /// Similarly to how we store permissions on an OnboardingConfiguration, we denote the set of
+    /// decryptable fields with CollectedDataOption
     Decrypt(Vec<CollectedDataOption>),
     ManualReview,
 }

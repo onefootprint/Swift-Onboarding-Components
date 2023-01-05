@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use crate::auth::tenant::ObPkAuth;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantPermissionDsl;
 use crate::auth::{
     tenant::{CheckTenantPermissions, TenantUserAuthContext},
     Either,
@@ -56,7 +57,7 @@ async fn get(
     Json<PaginatedResponseData<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
     ApiError,
 > {
-    let auth = auth.check_permissions(TenantPermission::OnboardingConfiguration)?;
+    let auth = auth.check_permissions(TenantPermission::OnboardingConfiguration.or_ro())?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);

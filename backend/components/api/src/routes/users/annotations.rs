@@ -1,6 +1,7 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantPermissionDsl;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::tenant::TenantError;
@@ -37,7 +38,7 @@ pub async fn get(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<AnnotationsListResponse> {
     // TODO paginate?
-    let auth = auth.check_permissions(TenantPermission::Users)?;
+    let auth = auth.check_permissions(TenantPermission::Users.or_ro())?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = fp_user_id.into_inner();

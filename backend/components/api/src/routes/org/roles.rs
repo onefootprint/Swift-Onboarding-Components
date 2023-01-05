@@ -1,5 +1,6 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantPermissionDsl;
 use crate::auth::tenant::TenantUserAuthContext;
 
 use crate::errors::ApiResult;
@@ -26,7 +27,7 @@ async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings.or_ro())?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);

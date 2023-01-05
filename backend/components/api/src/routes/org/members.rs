@@ -1,6 +1,7 @@
 use crate::auth::tenant::AuthActor;
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantPermissionDsl;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
@@ -33,7 +34,7 @@ async fn get(
     Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
     ApiError,
 > {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings.or_ro())?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);

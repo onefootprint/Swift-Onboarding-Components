@@ -24,6 +24,7 @@ struct RevealRequest {
     description = "Decrypts a specific tenant secret API key.",
     tags(Organization, PublicApi)
 )]
+// TODO this should be a POST
 #[get("/org/api_keys/{id}/reveal")]
 async fn get(
     state: web::Data<State>,
