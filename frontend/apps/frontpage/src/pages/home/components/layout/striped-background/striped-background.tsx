@@ -1,5 +1,6 @@
 import { media } from '@onefootprint/ui';
 import { motion, useAnimation, useInView } from 'framer-motion';
+import times from 'lodash/times';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
@@ -19,11 +20,8 @@ const layoutAnimationVariants = {
   },
 };
 
-const DESKTOP_LINE_COUNT = 350;
-const desktopLines = [...Array(DESKTOP_LINE_COUNT)];
-
+const DESKTOP_LINE_COUNT = 360;
 const MOBILE_LINE_COUNT = 80;
-const mobileLines = [...Array(MOBILE_LINE_COUNT)];
 
 const StripedBackground = ({ color }: StripedBackgroundType) => {
   const ref = useRef(null);
@@ -47,26 +45,24 @@ const StripedBackground = ({ color }: StripedBackgroundType) => {
     >
       <LineDraw height={100} width={0.2} color={color} position="relative" />
       <CenterWrap data-type="desktop">
-        {desktopLines.map(i => (
+        {times(DESKTOP_LINE_COUNT).map(value => (
           <LineDraw
             height={100}
             width={0.2}
             color={color}
-            key={Math.floor(Math.random() * 10000000)}
+            key={value}
             position="relative"
-            id={i}
           />
         ))}
       </CenterWrap>
       <CenterWrap data-type="mobile">
-        {mobileLines.map(i => (
+        {times(MOBILE_LINE_COUNT).map(value => (
           <LineDraw
             height={100}
             width={0.3}
             color={color}
-            key={Math.floor(Math.random() * 10000000)}
+            key={value}
             position="relative"
-            id={i}
           />
         ))}
       </CenterWrap>
