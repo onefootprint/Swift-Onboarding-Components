@@ -6,7 +6,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import Blob from './components/blobs';
 
 const publicKey = 'ob_test_CnzlAM1i4ce9IV5EsIxFbn';
 
@@ -17,14 +16,7 @@ const FootprintLive = () => {
     <>
       <SEO title={t('html-title')} slug="/footprint-live" />
       <Container>
-        <BlurredBackground>
-          <Blob color="#CBC1F6" width={70} height={60} top={0} left={0} />
-          <Blob color="#F6D1C1" width={30} height={24} top={-10} left={50} />
-          <Blob color="#C8E4FF" width={40} height={40} top={0} left={100} />
-          <Blob color="#76FBDB" width={40} height={40} top={0} left={65} />
-          <Blob color="#76FBDB" width={100} height={40} top={0} left={0} />
-          <Blob color="#E5F6C1" width={50} height={50} top={0} left={50} />
-        </BlurredBackground>
+        <BlurredBackground />
         <HeroContainer>
           <ContentSection>
             <Typography as="h1" variant="display-2">
@@ -170,11 +162,20 @@ const ImageOffset = styled.div`
 `;
 
 const BlurredBackground = styled.div`
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #b0ffbf 0%, transparent 100%);
+  background: linear-gradient(
+      180deg,
+      rgba(176, 255, 191, 0.4) 0%,
+      rgba(176, 255, 191, 0) 100%
+    ),
+    radial-gradient(at 50% 15%, #e5f6c1 2%, rgba(255, 255, 255, 0) 50%),
+    radial-gradient(at 0% 60%, #cbc1f6 0%, rgba(255, 255, 255, 0) 80%),
+    radial-gradient(at 0% 0%, #c1c2f6 0%, rgba(255, 255, 255, 0) 48%),
+    radial-gradient(at 100% 0%, #c8e4ff 0%, rgba(200, 228, 255, 0) 40%),
+    linear-gradient(180deg, #b0ffbf 0%, rgba(176, 255, 191, 0) 100%);
   overflow: hidden;
 
   :after {
