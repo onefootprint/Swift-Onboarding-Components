@@ -2,7 +2,10 @@
 #![warn(clippy::expect_used)]
 
 use actix_web::{middleware::Logger, App, HttpServer, ResponseError};
-use idv::socure::reason_code::check_reason_code_api::query_socure_reason_code_endpoint_and_compare_against_enum;
+use idv::socure::{
+    client::SocureClient,
+    reason_code::check_reason_code_api::query_socure_reason_code_endpoint_and_compare_against_enum,
+};
 
 use std::borrow::Cow;
 use telemetry::TelemetrySpanBuilder;
@@ -72,23 +75,7 @@ async fn main() -> std::io::Result<()> {
 
     // only perform Socure Reason Code API check on prod startups
     if config.service_config.is_production() {
-        tracing::info!("[Socure Reason Code check] Beginning check");
-        match query_socure_reason_code_endpoint_and_compare_against_enum(&state.socure_certification_client)
-            .await
-        {
-            Ok(reason_code_discrepancies) => {
-                if reason_code_discrepancies.missing_reason_codes.is_empty()
-                    && reason_code_discrepancies
-                        .differing_description_reason_codes
-                        .is_empty()
-                {
-                    tracing::info!("[Socure Reason Code check] no discrepancies between latest API response and defined enum detected");
-                } else {
-                    tracing::warn!(reason_code_discrepancies = format!("{:?}", reason_code_discrepancies), "[Socure Reason Code check] found discrepancies between latest API response and defined enum");
-                }
-            }
-            Err(err) => tracing::warn!(err = format!("{:?}", err), "[Socure Reason Code check] Error"),
-        }
+        socure_reason_code_check(&state.socure_certification_client).await;
     }
 
     log::info!("starting server on port {}", config.port);
@@ -154,4 +141,23 @@ async fn main() -> std::io::Result<()> {
 
 async fn default_not_found() -> impl actix_web::Responder {
     ApiError::EndpointNotFound.error_response()
+}
+
+#[tracing::instrument]
+async fn socure_reason_code_check(socure_client: &SocureClient) {
+    tracing::info!("[Socure Reason Code check] Beginning check");
+    match query_socure_reason_code_endpoint_and_compare_against_enum(socure_client).await {
+        Ok(reason_code_discrepancies) => {
+            if reason_code_discrepancies.missing_reason_codes.is_empty()
+                && reason_code_discrepancies
+                    .differing_description_reason_codes
+                    .is_empty()
+            {
+                tracing::info!("[Socure Reason Code check] no discrepancies between latest API response and defined enum detected");
+            } else {
+                tracing::warn!(reason_code_discrepancies = format!("{:?}", reason_code_discrepancies), "[Socure Reason Code check] found discrepancies between latest API response and defined enum");
+            }
+        }
+        Err(err) => tracing::warn!(err = format!("{:?}", err), "[Socure Reason Code check] Error"),
+    }
 }
