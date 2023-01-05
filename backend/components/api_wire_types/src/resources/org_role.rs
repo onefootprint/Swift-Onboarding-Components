@@ -8,6 +8,7 @@ pub struct OrganizationRole {
     pub id: TenantRoleId,
     pub name: String,
     pub scopes: Vec<TenantScope>,
+    pub is_immutable: bool,
     pub created_at: DateTime<Utc>,
 }
 export_schema!(OrganizationRole);

@@ -156,7 +156,7 @@ impl TenantUser {
     ) -> DbResult<(Self, TenantRole)> {
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
-        let tenant_role = TenantRole::get_active(conn, &tenant_role_id, &tenant_id)?;
+        let tenant_role = TenantRole::lock_active(conn, &tenant_role_id, &tenant_id)?;
         let new_user = NewTenantUser {
             tenant_role_id: tenant_role.id.clone(),
             email,
@@ -181,7 +181,7 @@ impl TenantUser {
     ) -> DbResult<Self> {
         if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
-            TenantRole::get_active(conn, tenant_role_id, tenant_id)?;
+            TenantRole::lock_active(conn, tenant_role_id, tenant_id)?;
         }
         let results: Vec<Self> = diesel::update(tenant_user::table)
             .filter(tenant_user::deactivated_at.is_null())

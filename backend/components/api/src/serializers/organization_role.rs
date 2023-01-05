@@ -8,6 +8,7 @@ impl DbToApi<TenantRole> for api_wire_types::OrganizationRole {
             id,
             name,
             scopes: permissions,
+            is_immutable,
             created_at,
             ..
         } = target;
@@ -15,6 +16,7 @@ impl DbToApi<TenantRole> for api_wire_types::OrganizationRole {
             id,
             name,
             scopes: permissions.0,
+            is_immutable,
             created_at,
         }
     }

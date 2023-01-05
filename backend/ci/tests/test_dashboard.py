@@ -551,6 +551,14 @@ class TestDashboardAdminUsers:
             i["kind"] for i in patch_data["scopes"]
         )
 
+    def test_cant_update_admin_role(self, sandbox_tenant, admin_role):
+        role_id = admin_role["id"]
+        suffix = _gen_random_n_digit_number(10)
+        patch_data = dict(
+            name=f"New role name {suffix}",
+        )
+        patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token, status_code=400)
+
     def test_update_user_role(self, sandbox_tenant, tenant_user, limited_role):
         user_id = tenant_user["id"]
         user_data = dict(role_id=limited_role["id"])

@@ -7,6 +7,8 @@ use newtypes::{TenantId, TenantRoleId, TenantScope, TenantScopeList};
 
 use super::tenant::Tenant;
 
+pub type IsImmutable = bool;
+
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_role)]
 pub struct TenantRole {
@@ -18,6 +20,10 @@ pub struct TenantRole {
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
+    /// Denotes whether this is a default TenantRole that cannot be changed by a tenant.
+    /// Each Tenant will have an immutable read-only and immutable admin role
+    /// TODO include in HTTP response
+    pub is_immutable: IsImmutable,
 }
 
 impl TenantRole {
@@ -26,12 +32,19 @@ impl TenantRole {
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(&tenant_id))
             .filter(tenant_role::scopes.eq(TenantScopeList(vec![TenantScope::Admin])))
+            .filter(tenant_role::is_immutable.eq(true))
             .first::<Self>(conn.conn())
             .optional()?;
         let role = if let Some(role) = role {
             role
         } else {
-            Self::create(conn, tenant_id, "Admin".to_owned(), vec![TenantScope::Admin])?
+            Self::create(
+                conn,
+                tenant_id,
+                "Admin".to_owned(),
+                vec![TenantScope::Admin],
+                true,
+            )?
         };
         Ok(role)
     }
@@ -41,18 +54,26 @@ impl TenantRole {
         tenant_id: TenantId,
         name: String,
         scopes: Vec<TenantScope>,
+        is_immutable: IsImmutable,
     ) -> DbResult<Self> {
-        let result = NewTenantRole {
+        let new = NewTenantRoleRow {
             tenant_id,
             name,
             scopes: TenantScopeList(scopes),
             created_at: Utc::now(),
-        }
-        .save(conn)?;
+            is_immutable,
+        };
+        let result = diesel::insert_into(tenant_role::table)
+            .values(new)
+            .get_result(conn)?;
         Ok(result)
     }
 
-    pub fn get_active(conn: &mut TxnPgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
+    pub fn lock_active(
+        conn: &mut TxnPgConnection,
+        id: &TenantRoleId,
+        tenant_id: &TenantId,
+    ) -> DbResult<Self> {
         let role: TenantRole = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::id.eq(id))
@@ -66,7 +87,10 @@ impl TenantRole {
 
     pub fn deactivate(conn: &mut TxnPgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
         use crate::schema::tenant_user;
-        let role = Self::get_active(conn, id, tenant_id)?;
+        let role = Self::lock_active(conn, id, tenant_id)?;
+        if role.is_immutable {
+            return Err(DbError::CannotUpdateImmutableRole(role.name));
+        }
         // Make sure there are no users using this role before deactivating
         let num_active_users: i64 = tenant_user::table
             .filter(tenant_user::tenant_role_id.eq(&role.id))
@@ -83,6 +107,8 @@ impl TenantRole {
         let results: Vec<Self> = diesel::update(tenant_role::table)
             .filter(tenant_role::id.eq(id))
             .filter(tenant_role::tenant_id.eq(tenant_id))
+            // Don't allow updating an immutable role
+            .filter(tenant_role::is_immutable.eq(false))
             .set(update)
             .load(conn.conn())?;
 
@@ -105,9 +131,15 @@ impl TenantRole {
             scopes: scopes.map(TenantScopeList),
             ..TenantRoleUpdate::default()
         };
+        let role = Self::lock_active(conn, id, tenant_id)?;
+        if role.is_immutable {
+            return Err(DbError::CannotUpdateImmutableRole(role.name));
+        }
         let results: Vec<Self> = diesel::update(tenant_role::table)
             .filter(tenant_role::id.eq(id))
             .filter(tenant_role::tenant_id.eq(tenant_id))
+            // Don't allow updating an immutable role
+            .filter(tenant_role::is_immutable.eq(false))
             .set(update)
             .load(conn.conn())?;
 
@@ -141,20 +173,12 @@ impl TenantRole {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant_role)]
-pub struct NewTenantRole {
-    pub tenant_id: TenantId,
-    pub name: String,
-    pub scopes: TenantScopeList,
-    pub created_at: DateTime<Utc>,
-}
-
-impl NewTenantRole {
-    pub fn save(&self, conn: &mut PgConnection) -> DbResult<TenantRole> {
-        let result = diesel::insert_into(tenant_role::table)
-            .values(self)
-            .get_result(conn)?;
-        Ok(result)
-    }
+struct NewTenantRoleRow {
+    tenant_id: TenantId,
+    name: String,
+    scopes: TenantScopeList,
+    created_at: DateTime<Utc>,
+    is_immutable: IsImmutable,
 }
 
 #[derive(AsChangeset, Default)]

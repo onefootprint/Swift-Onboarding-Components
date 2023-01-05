@@ -94,6 +94,8 @@ pub enum DbError {
 
     #[error("Only portable vaults can be linked to an ob config")]
     CannotCreatedScopedUser,
+    #[error("Cannot update an immutable role {0}")]
+    CannotUpdateImmutableRole(String),
 }
 
 impl DbError {
