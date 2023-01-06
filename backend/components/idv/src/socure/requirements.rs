@@ -2,6 +2,8 @@ use newtypes::DataLifetimeKind::{self, *};
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
+use crate::requirements::SocureRequirements;
+
 #[derive(Debug, Clone, EnumIter, PartialEq, Eq, Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum SocureModule {
@@ -16,11 +18,6 @@ pub enum SocureModule {
     Synthetic,
 }
 
-struct Requirements {
-    required: Vec<DataLifetimeKind>,
-    one_of: Vec<Vec<DataLifetimeKind>>,
-}
-
 impl SocureModule {
     // Whether or not the Socure module requires certain pieces of PII data
     fn requires_pii_data(&self) -> bool {
@@ -30,37 +27,37 @@ impl SocureModule {
         }
     }
 
-    fn pii_data_requirements(&self) -> Requirements {
+    fn pii_data_requirements(&self) -> SocureRequirements {
         match self {
-            SocureModule::AddressRisk => Requirements {
+            SocureModule::AddressRisk => SocureRequirements {
                 required: vec![FirstName, LastName, AddressLine1, Country],
                 one_of: vec![vec![City, State], vec![Zip]],
             },
-            SocureModule::AlertList => Requirements {
+            SocureModule::AlertList => SocureRequirements {
                 required: vec![],
                 one_of: vec![vec![Ssn9], vec![Email], vec![PhoneNumber]],
             },
-            SocureModule::EmailRisk => Requirements {
+            SocureModule::EmailRisk => SocureRequirements {
                 required: vec![Email],
                 one_of: vec![],
             },
-            SocureModule::KYC => Requirements {
+            SocureModule::KYC => SocureRequirements {
                 required: vec![FirstName, LastName, Country],
                 one_of: vec![vec![AddressLine1, City, State, Zip], vec![Ssn9], vec![Dob]],
             },
-            SocureModule::WatchlistPlus => Requirements {
+            SocureModule::WatchlistPlus => SocureRequirements {
                 required: vec![FirstName, LastName],
                 one_of: vec![],
             },
-            SocureModule::PhoneRisk => Requirements {
+            SocureModule::PhoneRisk => SocureRequirements {
                 required: vec![PhoneNumber, Country],
                 one_of: vec![],
             },
-            SocureModule::DeviceRisk => Requirements {
+            SocureModule::DeviceRisk => SocureRequirements {
                 required: vec![],
                 one_of: vec![],
             },
-            SocureModule::Fraud => Requirements {
+            SocureModule::Fraud => SocureRequirements {
                 required: vec![FirstName, LastName, Country],
                 one_of: vec![
                     vec![AddressLine1, City, State, Zip],
@@ -71,7 +68,7 @@ impl SocureModule {
                     vec![Email],
                 ],
             },
-            SocureModule::Synthetic => Requirements {
+            SocureModule::Synthetic => SocureRequirements {
                 required: vec![FirstName, LastName, Country],
                 one_of: vec![
                     vec![AddressLine1, City, State, Zip],

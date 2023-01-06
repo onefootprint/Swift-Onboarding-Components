@@ -43,6 +43,5 @@ use db::models::ob_configuration::ObConfiguration;
 pub mod engine;
 pub(self) mod features;
 pub mod risk;
-pub mod user_vault_helper;
 pub(self) mod utils;
 pub mod vendor;

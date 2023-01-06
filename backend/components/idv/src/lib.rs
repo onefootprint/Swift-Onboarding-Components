@@ -9,6 +9,7 @@ use socure::response::SocureIDPlusResponse;
 
 pub mod idology;
 pub mod lexis;
+pub mod requirements;
 pub mod socure;
 pub mod test_fixtures;
 pub mod twilio;

@@ -8,11 +8,9 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         verification_request::VerificationRequest,
     },
-    TxnPgConnection,
+    HasDataAttributeFields, TxnPgConnection,
 };
-use newtypes::{OnboardingId, VendorAPI};
-
-use super::user_vault_helper;
+use newtypes::OnboardingId;
 
 pub(super) mod build_request;
 pub(super) mod make_request;
@@ -44,15 +42,14 @@ pub fn build_verification_requests_and_checkpoint(
     let ob = ob.into_inner();
     ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
     // From the data in the vault, figure out which vendors we need to send to
-    let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(uvw);
-    // From the possible vendors, select which ones we're sending to (logic TBD)
-    let vendor_apis = choose_vendor_apis(available_vendor_apis);
+    let vendor_apis = idv::requirements::available_vendor_apis(uvw.get_populated_fields().as_slice());
+    if vendor_apis.is_empty() {
+        return Err(ApiError::AssertionError(
+            "Not enough information to send to any vendors".into(),
+        ));
+    } // probably should add some more validations in the future, like make sure we are _at least_ sending to a KYC vendor
+
     let requests_to_initiate = VerificationRequest::bulk_create(conn, ob_id.clone(), vendor_apis)?;
 
     Ok(requests_to_initiate)
-}
-
-/// Placeholder for more dynamically choosing which APIs to route to based on available data
-fn choose_vendor_apis(available_vendor_apis_from_vault_data: Vec<VendorAPI>) -> Vec<VendorAPI> {
-    available_vendor_apis_from_vault_data
 }
