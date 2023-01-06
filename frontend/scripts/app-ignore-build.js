@@ -18,6 +18,10 @@ const abortBuild = () => {
 const dirArray = process.argv[2] || '';
 const dirSet = new Set(dirArray.split(',').map(d => d.trim()));
 
+const hasChanged = (fileNameList, folder) => {
+  fileNameList.some(file => file.startsWith(folder));
+};
+
 const stepCheck = () => {
   if (process.env.DISABLE_PROD_BUILD === 'true') {
     return abortBuild();
@@ -25,25 +29,32 @@ const stepCheck = () => {
   if (!dirSet.size) {
     return abortBuild();
   }
-  if (process.env.VERCEL_ENV === 'production') {
-    return continueBuild();
-  }
-
   const fileNameList = childProcess
     .execSync('git diff --name-only HEAD~1')
     .toString()
     .trim()
     .split('\n');
 
-  // Changes to any files in this app should trigger re-building
-  const hasChangedApp = fileNameList.some(file =>
+  // We don't want to build the frontend if only the backend has changed
+  const hasBackendChanged = hasChanged(fileNameList, 'backend');
+  const hasFrontendChanged = hasChanged(fileNameList, 'frontend');
+  if (hasBackendChanged && !hasFrontendChanged) {
+    return abortBuild();
+  }
+
+  // If a PR was merged to master and we had any frontend changes
+  // we'll rebuild all the frontend apps
+  if (hasFrontendChanged && process.env.VERCEL_ENV === 'production') {
+    return continueBuild();
+  }
+
+  // We only want to build the frontend if the frontend packages or the
+  // app itself has changed
+  const hasAppChanged = fileNameList.some(file =>
     Array.from(dirSet).some(dir => file.startsWith(dir)),
   );
-  // Changes to packages (ui components, types, hooks, etc.) should trigger building all apps
-  const hasChangedPackages = fileNameList.some(file =>
-    file.startsWith('frontend/packages'),
-  );
-  const shouldBuild = hasChangedApp || hasChangedPackages;
+  const hasPackagesChanged = hasChanged(fileNameList, 'frontend/packages');
+  const shouldBuild = hasAppChanged || hasPackagesChanged;
   return shouldBuild ? continueBuild() : abortBuild();
 };
 
