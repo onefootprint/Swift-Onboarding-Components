@@ -2,6 +2,8 @@ use std::str::FromStr;
 
 use newtypes::ReasonCode;
 
+use super::error::RequestError;
+
 /// This file holds common structures used to work with Idology APIs
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct KeyResponse {
@@ -43,5 +45,28 @@ impl IDologyQualifiers {
     fn parse_qualifier(qualifier: serde_json::Value) -> Option<ReasonCode> {
         let key = KeyResponse::parse_key(qualifier)?;
         ReasonCode::from_str(key.as_str()).ok()
+    }
+}
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct SubmissionResponseError {
+    pub error: Option<String>,
+}
+pub struct IdologyResponseHelpers;
+impl IdologyResponseHelpers {
+    pub fn parse_idology_error(error: String) -> RequestError {
+        RequestError::from(error)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case("Invalid Username or Password".into() => RequestError::InvalidUserNameOrPassword)]
+    #[test_case("Your IP Address is not registered, please provide a lock of hair to the Gods to pay the eternal price of registration".into() => RequestError::IpAddressNotRegistered)]
+    #[test_case("Sorry no can do".into() => RequestError::UnknownError("Sorry no can do".into()))]
+    fn test_parse_idology_error(error: String) -> RequestError {
+        IdologyResponseHelpers::parse_idology_error(error)
     }
 }

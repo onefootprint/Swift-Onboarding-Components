@@ -1,5 +1,6 @@
 use newtypes::{DocumentRequestStatus, PiiString};
 use paperclip::actix::Apiv2Schema;
+
 /// POST request body for sending Footprint identity document images
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct DocumentRequest {

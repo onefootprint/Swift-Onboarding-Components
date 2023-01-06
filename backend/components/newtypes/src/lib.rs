@@ -39,6 +39,9 @@ pub use reason_code::*;
 pub mod locked;
 pub use locked::*;
 
+pub mod status_code;
+pub use status_code::*;
+
 pub use uuid::Uuid;
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {

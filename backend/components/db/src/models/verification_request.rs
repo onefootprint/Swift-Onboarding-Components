@@ -3,7 +3,9 @@ use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection};
-use newtypes::{DataLifetimeSeqno, OnboardingId, Vendor, VendorAPI, VerificationRequestId};
+use newtypes::{
+    DataLifetimeSeqno, IdentityDocumentId, OnboardingId, Vendor, VendorAPI, VerificationRequestId,
+};
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
@@ -22,6 +24,9 @@ pub struct VerificationRequest {
     // The current seqno when this VerificationRequest was created.
     // This is used to reconstruct the UserVaultWrapper at the time the request was sent.
     pub uvw_snapshot_seqno: DataLifetimeSeqno,
+    // If we are verifying an identity document, we want to know exactly which one we were verifying since there
+    // could be multiple in the vault, seqno doesn't help us
+    pub identity_document_id: Option<IdentityDocumentId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -32,6 +37,7 @@ struct NewVerificationRequestRow {
     timestamp: DateTime<Utc>,
     vendor_api: VendorAPI,
     uvw_snapshot_seqno: DataLifetimeSeqno,
+    identity_document_id: Option<IdentityDocumentId>,
 }
 
 impl VerificationRequest {
@@ -49,6 +55,7 @@ impl VerificationRequest {
                 vendor: Vendor::from(vendor_api),
                 timestamp: Utc::now(),
                 uvw_snapshot_seqno: seqno,
+                identity_document_id: None,
             })
             .collect();
         let result = diesel::insert_into(verification_request::table)

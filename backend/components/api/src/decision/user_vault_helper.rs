@@ -41,6 +41,6 @@ fn available_vendor_api_from_scope(attribute: DataLifetimeKind) -> Vec<VendorAPI
         DataLifetimeKind::Country => vec![VendorAPI::IdologyExpectID],
         DataLifetimeKind::Email => vec![VendorAPI::IdologyExpectID],
         DataLifetimeKind::PhoneNumber => vec![VendorAPI::TwilioLookupV2],
-        DataLifetimeKind::IdentityDocument => vec![VendorAPI::IdologyScanVerify],
+        DataLifetimeKind::IdentityDocument => vec![VendorAPI::IdologyScanVerifySubmission],
     }
 }

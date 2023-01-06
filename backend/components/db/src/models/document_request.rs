@@ -5,12 +5,13 @@ use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{DocumentRequestId, DocumentRequestStatus, ScopedUserId};
 use serde::{Deserialize, Serialize};
 
+pub type DocRefId = String;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
     pub scoped_user_id: ScopedUserId,
-    pub ref_id: Option<String>,
+    pub ref_id: Option<DocRefId>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,

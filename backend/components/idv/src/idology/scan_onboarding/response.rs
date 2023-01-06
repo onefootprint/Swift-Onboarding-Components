@@ -3,12 +3,12 @@ use crate::idology::{
     response_common::{IDologyQualifiers, KeyResponse},
 };
 
-pub fn parse_response(value: serde_json::Value) -> Result<APIResponse, IdologyError::Error> {
-    let response: APIResponse = serde_json::value::from_value(value)?;
+pub fn parse_response(value: serde_json::Value) -> Result<ScanOnboardingAPIResponse, IdologyError::Error> {
+    let response: ScanOnboardingAPIResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }
 #[derive(Debug, Clone, serde::Deserialize)]
-pub struct APIResponse {
+pub struct ScanOnboardingAPIResponse {
     pub response: ScanOnboardingResponse,
 }
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -29,6 +29,7 @@ pub struct ScanOnboardingResponse {
     pub qualifiers: Option<IDologyQualifiers>,
     // TODO: put this back in once we have a story around PII in raw vendor responses
     // pub capture_data: Option<CaptureData>,
+    pub error: Option<String>,
 }
 
 /// Represents the OCRd information off of the license

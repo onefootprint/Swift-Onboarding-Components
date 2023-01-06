@@ -1,4 +1,4 @@
-use crate::schema::{data_lifetime, identity_document};
+use crate::schema::{data_lifetime, document_request, identity_document};
 use crate::{DbResult, HasLifetime, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
@@ -12,6 +12,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
+use super::document_request::DocumentRequest;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = identity_document)]
@@ -125,13 +126,17 @@ impl IdentityDocument {
         Ok(result)
     }
 
-    pub fn get(conn: &mut PgConnection, id: &IdentityDocumentId) -> DbResult<Self> {
-        let res: Self = identity_document::table
+    /// Get the identity document, and the associated document request
+    pub fn get(conn: &mut PgConnection, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
+        let res: (Self, DocumentRequest) = identity_document::table
             .filter(identity_document::id.eq(id))
-            .first(conn)?;
+            .inner_join(document_request::table)
+            .select((identity_document::all_columns, document_request::all_columns))
+            .get_result(conn)?;
 
         Ok(res)
     }
+
     /// Get all the documents collected for a given onboarding
     pub fn get_for_scoped_user_id(
         conn: &mut PgConnection,
@@ -171,7 +176,7 @@ mod tests {
                     SealedVaultDataKey::default(),
                 )?;
 
-                let id_doc_from_db = IdentityDocument::get(conn.conn(), &id_doc.id)?;
+                let (id_doc_from_db, _) = IdentityDocument::get(conn.conn(), &id_doc.id)?;
                 assert_eq!(&id_doc.id, &id_doc_from_db.id);
 
                 Ok(())

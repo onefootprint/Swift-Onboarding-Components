@@ -433,16 +433,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    test_table (id) {
-        id -> Int4,
-        custom_enum -> Text,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     user_timeline (id) {
         id -> Text,
         scoped_user_id -> Nullable<Text>,
@@ -496,6 +486,7 @@ table! {
         onboarding_id -> Text,
         vendor_api -> Text,
         uvw_snapshot_seqno -> Int8,
+        identity_document_id -> Nullable<Text>,
     }
 }
 
@@ -569,6 +560,7 @@ joinable!(tenant_user -> tenant_role (tenant_role_id));
 joinable!(user_timeline -> scoped_user (scoped_user_id));
 joinable!(user_timeline -> user_vault (user_vault_id));
 joinable!(user_vault_data -> data_lifetime (lifetime_id));
+joinable!(verification_request -> identity_document (identity_document_id));
 joinable!(verification_request -> onboarding (onboarding_id));
 joinable!(verification_result -> verification_request (request_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
@@ -600,7 +592,6 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_log,
     tenant_role,
     tenant_user,
-    test_table,
     user_timeline,
     user_vault,
     user_vault_data,

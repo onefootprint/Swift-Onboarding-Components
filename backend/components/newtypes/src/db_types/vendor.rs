@@ -60,7 +60,9 @@ impl_enum_str_diesel!(Vendor);
 /// Represents the API for the request we'll make
 pub enum VendorAPI {
     IdologyExpectID,
-    IdologyScanVerify,
+    IdologyScanVerifySubmission,
+    IdologyScanVerifyResults,
+    IdologyScanOnboarding,
     TwilioLookupV2,
     SocureIDPlus,
 }
@@ -70,7 +72,9 @@ impl From<VendorAPI> for Vendor {
     fn from(api: VendorAPI) -> Self {
         match api {
             VendorAPI::IdologyExpectID => Self::Idology,
-            VendorAPI::IdologyScanVerify => Self::Idology,
+            VendorAPI::IdologyScanVerifySubmission => Self::Idology,
+            VendorAPI::IdologyScanVerifyResults => Self::Idology,
+            VendorAPI::IdologyScanOnboarding => Self::Idology,
             VendorAPI::TwilioLookupV2 => Self::Twilio,
             VendorAPI::SocureIDPlus => Self::Socure,
         }

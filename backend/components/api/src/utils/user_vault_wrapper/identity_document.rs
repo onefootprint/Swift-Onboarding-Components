@@ -16,7 +16,7 @@ pub struct IdentityDocumentImages {
     pub e_data_key: SealedVaultDataKey,
 }
 
-async fn internal_fetch_image(
+pub async fn fetch_image(
     state: &State,
     identity_document: IdentityDocument,
 ) -> Result<IdentityDocumentImages, ApiError> {
@@ -59,7 +59,7 @@ impl UserVaultWrapper {
             .identity_documents()
             .iter()
             .filter(|i| i.document_type == document_type)
-            .map(|doc| internal_fetch_image(state, doc.clone()));
+            .map(|doc| fetch_image(state, doc.clone()));
 
         futures::future::join_all(futures).await
     }

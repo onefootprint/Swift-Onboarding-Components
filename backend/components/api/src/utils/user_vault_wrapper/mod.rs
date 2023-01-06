@@ -12,7 +12,7 @@ mod add_data;
 mod build;
 mod commit_data;
 mod decrypt;
-mod identity_document;
+pub mod identity_document;
 mod uvd_builder;
 mod uvw_data;
 

@@ -13,7 +13,7 @@ use crate::{ParsedResponse, VendorResponse};
 use crate::idology::client::IdologyClient;
 use expectid::response::ExpectIDAPIResponse;
 use newtypes::Vendor;
-use scan_onboarding::response::APIResponse as ScanOnboardingAPIResponse;
+use scan_onboarding::response::ScanOnboardingAPIResponse;
 use scan_verify::response::ScanVerifyAPIResponse;
 
 use self::scan_verify::response::ScanVerifySubmissionAPIResponse;
@@ -49,7 +49,6 @@ pub async fn send_scan_verify_request(
             .map_err(crate::idology::error::Error::from)?;
 
     Ok(VendorResponse {
-        // TODO: Change this?
         vendor: Vendor::Idology,
         raw_response: response,
         response: ParsedResponse::IDologyScanVerifySubmission(parsed_response),
@@ -68,15 +67,18 @@ pub async fn poll_scan_verify_results_request(
     let parsed_response: ScanVerifyAPIResponse = scan_verify::response::parse_response(response.clone())
         .map_err(crate::idology::error::Error::from)?;
 
+    // Validate we have a response we can use
+    parsed_response.response.validate()?;
+
     Ok(VendorResponse {
-        // TODO: Change this?
         vendor: Vendor::Idology,
         raw_response: response,
-        response: ParsedResponse::IDologyScanVerify(parsed_response),
+        response: ParsedResponse::IDologyScanVerifyResult(parsed_response),
     })
 }
 
 /// Scan onboarding
+/// As of 2023-01-06, acc to their API docs, we don't need to poll /shrug
 pub async fn send_scan_onboarding_request(
     client: &IdologyClient,
     data: DocVData,
@@ -89,7 +91,6 @@ pub async fn send_scan_onboarding_request(
         scan_onboarding::response::parse_response(response.clone())
             .map_err(crate::idology::error::Error::from)?;
     Ok(VendorResponse {
-        // TODO: Change this?
         vendor: Vendor::Idology,
         raw_response: response,
         response: ParsedResponse::IDologyScanOnboarding(parsed_response),
@@ -152,7 +153,7 @@ mod test {
             panic!("incorrect scan verify submission type")
         };
 
-        assert_eq!(scan_verify_response.status, "Request Submitted".to_string());
+        assert!(scan_verify_response.upload_status_is_success());
 
         // ////////////
         // Fetch Results
@@ -161,7 +162,7 @@ mod test {
             .await
             .unwrap();
 
-        let ParsedResponse::IDologyScanVerify(scan_verify_response) = results.response else {
+        let ParsedResponse::IDologyScanVerifyResult(scan_verify_response) = results.response else {
             panic!("incorrect scan verify results response type")
         };
 

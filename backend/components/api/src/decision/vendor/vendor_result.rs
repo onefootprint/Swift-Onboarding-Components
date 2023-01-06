@@ -23,12 +23,20 @@ impl VendorResult {
                     newtypes::VendorAPI::IdologyExpectID => {
                         ParsedResponse::from_idology_expectid_response(result.response.clone())?
                     }
-                    newtypes::VendorAPI::IdologyScanVerify => todo!(),
+                    newtypes::VendorAPI::IdologyScanVerifySubmission => {
+                        ParsedResponse::from_idology_scan_verify_submission(result.response.clone())?
+                    }
+                    newtypes::VendorAPI::IdologyScanVerifyResults => {
+                        ParsedResponse::from_idology_scan_verify_results(result.response.clone())?
+                    }
                     newtypes::VendorAPI::TwilioLookupV2 => {
                         ParsedResponse::from_twilio_lookupv2_response(result.response.clone())?
                     }
                     newtypes::VendorAPI::SocureIDPlus => {
                         ParsedResponse::from_socure_idplus_response(result.response.clone())?
+                    }
+                    newtypes::VendorAPI::IdologyScanOnboarding => {
+                        ParsedResponse::from_idology_scan_onboarding(result.response.clone())?
                     }
                 };
                 let res = VendorResult {

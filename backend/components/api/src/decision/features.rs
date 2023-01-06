@@ -118,13 +118,6 @@ impl From<VendorResult> for FeatureVector {
                 twilio_features: None,
                 socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
             },
-
-            // TODO
-            ParsedResponse::IDologyScanVerify(_) => Self {
-                idology_features: None,
-                twilio_features: None,
-                socure_features: None,
-            },
             // TODO
             ParsedResponse::IDologyScanVerifySubmission(_) => Self {
                 idology_features: None,
@@ -138,6 +131,7 @@ impl From<VendorResult> for FeatureVector {
                 twilio_features: None,
                 socure_features: None,
             },
+            _ => unimplemented!(),
         }
     }
 }

@@ -9,7 +9,7 @@ use db::{
     DbError,
 };
 use idv::{idology::expectid::response::ExpectIDAPIResponse, ParsedResponse, VendorResponse};
-use newtypes::{IdvData, ObConfigurationKey, PiiString, Vendor, VendorAPI};
+use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, Vendor, VendorAPI};
 
 /// Branch on vendor and send requests to vendors
 pub async fn send_idv_request(
@@ -31,6 +31,40 @@ pub async fn send_idv_request(
             .await
             .map_err(idv::Error::from)?,
         VendorAPI::SocureIDPlus => send_socure_idv_request(state, request, data).await?,
+        _ => return Err(ApiError::NotImplemented),
+    };
+
+    Ok(result)
+}
+
+/// Send a request to vendors for document verification
+#[allow(dead_code)]
+pub async fn send_docv_request(
+    state: &State,
+    request: VerificationRequest,
+    data: DocVData,
+) -> Result<VendorResponse, ApiError> {
+    tracing::info!(
+        msg = "Sending verification request",
+        request_id = request.id.clone().to_string(),
+        vendor_api = request.vendor_api.clone().to_string(),
+        onboarding_id = request.onboarding_id.to_string(),
+    );
+    // Make the request to the DocV vendor
+
+    let result = match request.vendor_api {
+        VendorAPI::IdologyScanVerifySubmission => {
+            idv::idology::send_scan_verify_request(&state.idology_client, data).await?
+        }
+        VendorAPI::IdologyScanVerifyResults => {
+            let Some(ref_id) = data.reference_id else {
+                return Err(idv::Error::from(idv::idology::error::Error::MissingReferenceId).into())
+            };
+            idv::idology::poll_scan_verify_results_request(&state.idology_client, ref_id).await?
+        }
+        VendorAPI::IdologyScanOnboarding => {
+            idv::idology::send_scan_onboarding_request(&state.idology_client, data).await?
+        }
         _ => return Err(ApiError::NotImplemented),
     };
 
@@ -140,7 +174,7 @@ pub async fn send_socure_idv_request(
 }
 
 /// Make our requests to a vendor, building data from the cached VerificationRequest
-async fn make_idv_request(
+pub async fn make_idv_request(
     state: &State,
     request: VerificationRequest,
 ) -> Result<vendor_result::VendorResult, ApiError> {
@@ -149,6 +183,37 @@ async fn make_idv_request(
     let data = build_request::build_idv_data_from_verification_request(state, request.clone()).await?;
 
     let vendor_response = make_request::send_idv_request(state, request, data).await?;
+
+    let verification_result =
+        verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
+            .await?;
+
+    let result = vendor_result::VendorResult {
+        response: vendor_response,
+        verification_result_id: verification_result.id,
+        verification_request_id: request_id,
+    };
+
+    Ok(result)
+}
+
+/// Make our requests to a vendor, building data from the cached VerificationRequest
+///
+/// A note on usage: Doc verification is different from other vendor requests in that we run the request synchronously in bifrost
+/// in order to communicate potential issues with the uploaded image back to the customer. Because of this,
+/// we have VerificationResults _before_ the decision engine would run
+#[allow(dead_code)]
+pub async fn make_docv_request(
+    state: &State,
+    request: VerificationRequest,
+) -> Result<vendor_result::VendorResult, ApiError> {
+    let request_id = request.id.clone();
+
+    let data =
+        build_request::build_docv_data_for_submission_from_verification_request(state, request.clone())
+            .await?;
+
+    let vendor_response = make_request::send_docv_request(state, request, data).await?;
 
     let verification_result =
         verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
