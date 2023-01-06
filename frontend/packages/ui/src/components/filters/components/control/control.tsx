@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useId, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -5,9 +6,14 @@ import Box from '../../../box';
 import type { FilterControl, FilterSelectedOption } from '../../filters.types';
 import AddPill from './components/add-pill';
 import ClearPill from './components/clear-pill';
+import DateForm from './components/date-form';
+import MultiSelectForm from './components/multi-select-form';
+import MultiSelectGroupedForm from './components/multi-select-grouped-form';
 import Popover from './components/popover';
 import SelectedPill from './components/selected-pill';
+import useDateOptions from './hooks/use-date-options';
 import usePopper from './hooks/use-popper';
+import getDateLabel from './utils/get-date-label';
 import getMultiSelectGroupedLabel from './utils/get-multi-select-grouped-label';
 import getMultiSelectLabel from './utils/get-multi-select-label';
 
@@ -26,6 +32,7 @@ const Control = ({
 }: ControlProps) => {
   const [open, setOpen] = useState(false);
   const popoverId = useId();
+  const dateOptions = useDateOptions();
   const { query, kind, label, options, selectedOptions } = control;
   const hasSelectedOptions = selectedOptions.length > 0;
   const { styles, attributes, setReferenceElement, setPopperElement } =
@@ -35,16 +42,17 @@ const Control = ({
     setOpen(prevOpen => !prevOpen);
   };
 
-  const handleClose = () => {
+  const close = () => {
     setOpen(false);
   };
 
-  const handleClear = () => {
+  const clear = () => {
     onChange(query, []);
   };
 
-  const handleChange = (newSelectedOptions: FilterSelectedOption[]) => {
+  const handleSubmit = (newSelectedOptions: FilterSelectedOption[]) => {
     onChange(query, newSelectedOptions);
+    setOpen(false);
   };
 
   return (
@@ -52,7 +60,7 @@ const Control = ({
       <Box ref={setReferenceElement}>
         {hasSelectedOptions ? (
           <PillGroup>
-            <ClearPill onClick={handleClear}>{label}</ClearPill>
+            <ClearPill onClick={clear}>{label}</ClearPill>
             <SelectedPill
               aria-controls={popoverId}
               aria-expanded={open}
@@ -63,6 +71,7 @@ const Control = ({
                 getMultiSelectLabel(options, selectedOptions)}
               {kind === 'multi-select-grouped' &&
                 getMultiSelectGroupedLabel(options, selectedOptions)}
+              {kind === 'date' && getDateLabel(dateOptions, selectedOptions)}
             </SelectedPill>
           </PillGroup>
         ) : (
@@ -78,19 +87,38 @@ const Control = ({
       </Box>
       {open ? (
         <div
-          // eslint-disable-next-line react/jsx-props-no-spreading
           {...attributes.popper}
           ref={setPopperElement}
           style={styles.popper}
         >
           <Popover
-            control={control}
             id={popoverId}
-            onChange={handleChange}
-            onClose={handleClose}
+            onClose={close}
             primaryButtonLabel={primaryButtonLabel}
             secondaryButtonLabel={secondaryButtonLabel}
-          />
+            title={control.label}
+          >
+            {kind === 'multi-select' && (
+              <MultiSelectForm
+                onSubmit={handleSubmit}
+                options={options}
+                selectedOptions={selectedOptions}
+              />
+            )}
+            {kind === 'multi-select-grouped' && (
+              <MultiSelectGroupedForm
+                onSubmit={handleSubmit}
+                options={options}
+                selectedOptions={selectedOptions}
+              />
+            )}
+            {kind === 'date' && (
+              <DateForm
+                onSubmit={handleSubmit}
+                selectedOptions={selectedOptions}
+              />
+            )}
+          </Popover>
         </div>
       ) : null}
     </>

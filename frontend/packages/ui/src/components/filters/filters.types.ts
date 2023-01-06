@@ -19,10 +19,16 @@ export type FilterMultiSelect = {
 export type FilterMultiSelectGrouped = {
   kind: 'multi-select-grouped';
   options: FilterGroupOption[];
+  selectedOptions: [];
+};
+
+export type FilterDate = {
+  kind: 'date';
+  options?: FilterOption[];
   selectedOptions: FilterSelectedOption[];
 };
 
 export type FilterControl = {
   query: string;
   label: string;
-} & (FilterMultiSelect | FilterMultiSelectGrouped);
+} & (FilterMultiSelect | FilterMultiSelectGrouped | FilterDate);

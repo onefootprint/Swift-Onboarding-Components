@@ -2,13 +2,26 @@ import {
   customRender,
   screen,
   userEvent,
+  waitFor,
+  waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
+import MockDate from 'mockdate';
 import React from 'react';
 
 import Filters, { FiltersProps } from './filters';
 
+const testDate = new Date('2023-01-04');
+
 describe('<Filters />', () => {
+  beforeAll(() => {
+    MockDate.set(testDate);
+  });
+
+  afterAll(() => {
+    MockDate.reset();
+  });
+
   const renderFilters = ({
     controls = [
       {
@@ -54,7 +67,7 @@ describe('<Filters />', () => {
       { label: 'Id required', value: 'id_required' },
     ];
 
-    const renderMultiSelectFilters = ({ onChange }: Partial<FiltersProps>) => {
+    const renderMultiSelectFilters = ({ onChange }: Partial<FiltersProps>) =>
       renderFilters({
         controls: [
           {
@@ -67,14 +80,13 @@ describe('<Filters />', () => {
         ],
         onChange,
       });
-    };
 
     describe('when clicking on the filter label', () => {
-      it('should open the popover with the options', async () => {
+      it('should open the popover and display the options', async () => {
         renderMultiSelectFilters({});
 
-        const filterButton = screen.getByRole('button', { name: 'Status' });
-        await userEvent.click(filterButton);
+        const trigger = screen.getByRole('button', { name: 'Status' });
+        await userEvent.click(trigger);
 
         const popover = screen.getByRole('dialog');
         defaulOptions.forEach(option => {
@@ -87,12 +99,12 @@ describe('<Filters />', () => {
     });
 
     describe('when selecting an option', () => {
-      it('should trigger onChange and close the popover', async () => {
+      it('should trigger onChange with the selected option and close the popover', async () => {
         const onChange = jest.fn();
         renderMultiSelectFilters({ onChange });
 
-        const filterButton = screen.getByRole('button', { name: 'Status' });
-        await userEvent.click(filterButton);
+        const trigger = screen.getByRole('button', { name: 'Status' });
+        await userEvent.click(trigger);
 
         const firstCheckbox = screen.getByRole('checkbox', {
           name: 'Verified',
@@ -111,15 +123,13 @@ describe('<Filters />', () => {
 
     describe('when clicking on the cancel button', () => {
       it('should close the popover', async () => {
-        const onChange = jest.fn();
-        renderMultiSelectFilters({ onChange });
+        renderMultiSelectFilters({});
 
-        const filterButton = screen.getByRole('button', { name: 'Status' });
-        await userEvent.click(filterButton);
+        const trigger = screen.getByRole('button', { name: 'Status' });
+        await userEvent.click(trigger);
 
-        const cancelButton = screen.getByRole('button', { name: 'Apply' });
+        const cancelButton = screen.getByRole('button', { name: 'Cancel' });
         await userEvent.click(cancelButton);
-        expect(onChange).toHaveBeenCalledWith('status', []);
 
         const popover = screen.queryByRole('dialog');
         expect(popover).not.toBeInTheDocument();
@@ -155,11 +165,11 @@ describe('<Filters />', () => {
     };
 
     describe('when clicking on the filter label', () => {
-      it('should open the popover with the options', async () => {
+      it('should open the popover and display the options', async () => {
         renderMultiSelectFilters({});
 
-        const filterButton = screen.getByRole('button', { name: 'Attributes' });
-        await userEvent.click(filterButton);
+        const trigger = screen.getByRole('button', { name: 'Attributes' });
+        await userEvent.click(trigger);
 
         const popover = screen.getByRole('dialog');
         defaulOptions.forEach(group => {
@@ -177,14 +187,14 @@ describe('<Filters />', () => {
     });
 
     describe('when selecting an option', () => {
-      it('should trigger onChange and close the popover', async () => {
+      it('should trigger onChange with the selected option and close the popover', async () => {
         const onChange = jest.fn();
         renderMultiSelectFilters({ onChange });
 
-        const filterButton = screen.getByRole('button', {
+        const trigger = screen.getByRole('button', {
           name: 'Attributes',
         });
-        await userEvent.click(filterButton);
+        await userEvent.click(trigger);
 
         const firstCheckbox = screen.getByRole('checkbox', {
           name: 'Full name',
@@ -203,17 +213,141 @@ describe('<Filters />', () => {
 
     describe('when clicking on the cancel button', () => {
       it('should close the popover', async () => {
-        const onChange = jest.fn();
-        renderMultiSelectFilters({ onChange });
+        renderMultiSelectFilters({});
 
-        const filterButton = screen.getByRole('button', {
-          name: 'Attributes',
-        });
-        await userEvent.click(filterButton);
+        const trigger = screen.getByRole('button', { name: 'Attributes' });
+        await userEvent.click(trigger);
 
-        const cancelButton = screen.getByRole('button', { name: 'Apply' });
+        const cancelButton = screen.getByRole('button', { name: 'Cancel' });
         await userEvent.click(cancelButton);
-        expect(onChange).toHaveBeenCalledWith('attributes', []);
+
+        const popover = screen.queryByRole('dialog');
+        expect(popover).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('date variant', () => {
+    const renderDateFilter = ({ onChange }: Partial<FiltersProps>) =>
+      renderFilters({
+        controls: [
+          {
+            query: 'date',
+            label: 'Date',
+            kind: 'date',
+            selectedOptions: [],
+          },
+        ],
+        onChange,
+      });
+
+    describe('when clicking on the filter label', () => {
+      it('should open the popover and display the options', async () => {
+        renderDateFilter({});
+
+        const trigger = screen.getByRole('button', { name: 'Date' });
+        await userEvent.click(trigger);
+
+        const popover = screen.getByRole('dialog');
+        expect(popover).toBeInTheDocument();
+
+        const allTime = screen.getByRole('radio', { name: 'All-time' });
+        expect(allTime).toBeInTheDocument();
+
+        const today = screen.getByRole('radio', { name: 'Today' });
+        expect(today).toBeInTheDocument();
+
+        const last7days = screen.getByRole('radio', { name: 'Last 7 days' });
+        expect(last7days).toBeInTheDocument();
+
+        const currentMonth = screen.getByRole('radio', {
+          name: 'Current month',
+        });
+        expect(currentMonth).toBeInTheDocument();
+
+        const custom = screen.getByRole('radio', { name: 'Custom' });
+        expect(custom).toBeInTheDocument();
+      });
+    });
+
+    describe('when selecting an option', () => {
+      it('should trigger onChange with the selected option and close the popover', async () => {
+        const onChange = jest.fn();
+        renderDateFilter({ onChange });
+
+        const trigger = screen.getByRole('button', { name: 'Date' });
+        await userEvent.click(trigger);
+
+        await waitFor(() => {
+          const popover = screen.getByRole('dialog');
+          expect(popover).toBeInTheDocument();
+        });
+
+        const today = screen.getByRole('radio', { name: 'Today' });
+        await userEvent.click(today);
+
+        const submitButton = screen.getByRole('button', { name: 'Apply' });
+        await userEvent.click(submitButton);
+        expect(onChange).toHaveBeenCalledWith('date', ['today']);
+
+        const popover = screen.queryByRole('dialog');
+        expect(popover).not.toBeInTheDocument();
+      });
+    });
+
+    describe('when selecing the custom option', () => {
+      it('should trigger onChange with the dates and close the popover', async () => {
+        const onChange = jest.fn();
+        renderDateFilter({ onChange });
+
+        const trigger = screen.getByRole('button', { name: 'Date' });
+        await userEvent.click(trigger);
+
+        await waitFor(() => {
+          const popover = screen.getByRole('dialog');
+          expect(popover).toBeInTheDocument();
+        });
+
+        const custom = screen.getByRole('radio', { name: 'Custom' });
+        await userEvent.click(custom);
+
+        const calendarTrigger = screen.getByRole('button', {
+          name: '1/4/2023',
+        });
+        await userEvent.click(calendarTrigger);
+
+        const day5 = screen.getByRole('button', {
+          name: '5th January (Thursday)',
+        });
+        await userEvent.click(day5);
+
+        const day12 = screen.getByRole('button', {
+          name: '12th January (Thursday)',
+        });
+        await userEvent.click(day12);
+
+        const submitButton = screen.getByRole('button', { name: 'Apply' });
+        await userEvent.click(submitButton);
+        expect(onChange).toHaveBeenCalledWith('date', [
+          '2023-01-05T00:00:00.000Z',
+          '2023-01-12T00:00:00.000Z',
+        ]);
+
+        await waitForElementToBeRemoved(screen.queryByRole('dialog'));
+        const popover = screen.queryByRole('dialog');
+        expect(popover).not.toBeInTheDocument();
+      });
+    });
+
+    describe('when clicking on the cancel button', () => {
+      it('should close the popover', async () => {
+        renderDateFilter({});
+
+        const trigger = screen.getByRole('button', { name: 'Date' });
+        await userEvent.click(trigger);
+
+        const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+        await userEvent.click(cancelButton);
 
         const popover = screen.queryByRole('dialog');
         expect(popover).not.toBeInTheDocument();

@@ -27,11 +27,13 @@ export default {
 
 const Template: Story = () => {
   const [filters, setFilters] = useState<{
-    statuses: string[];
+    statuses: [];
     attributes: [];
+    dateRange: [];
   }>({
     statuses: [],
     attributes: [],
+    dateRange: [],
   });
 
   return (
@@ -82,6 +84,12 @@ const Template: Story = () => {
             },
           ],
           selectedOptions: filters.attributes,
+        },
+        {
+          query: 'dateRange',
+          label: 'Date',
+          kind: 'date',
+          selectedOptions: filters.dateRange,
         },
       ]}
       onChange={(query, options) => {

@@ -1,6 +1,5 @@
 import FocusTrap from 'focus-trap-react';
 import React, { useId, useRef } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 import {
   useEventListener,
@@ -10,35 +9,24 @@ import {
 
 import Button from '../../../../../button';
 import Typography from '../../../../../typography';
-import type {
-  FilterControl,
-  FilterSelectedOption,
-} from '../../../../filters.types';
-import MultiSelectGroupedOptions from './components/multi-select-grouped-options';
-import MultiSelectOptions from './components/multi-select-options';
-
-type FormData = {
-  filter: FilterSelectedOption[];
-};
 
 export type PopoverProps = {
-  control: FilterControl;
+  children: React.ReactNode;
   id: string;
   onClose: () => void;
-  onChange: (newFilters: FilterSelectedOption[]) => void;
   primaryButtonLabel?: string;
   secondaryButtonLabel?: string;
+  title: string;
 };
 
 const Popover = ({
+  children,
   id,
   onClose,
-  onChange,
   primaryButtonLabel = 'Apply',
   secondaryButtonLabel = 'Cancel',
-  control,
+  title,
 }: PopoverProps) => {
-  const { options, kind, selectedOptions, label: title } = control;
   const headerId = useId();
   const bodyId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -49,17 +37,6 @@ const Popover = ({
       onClose();
     }
   });
-  const methods = useForm<FormData>({
-    defaultValues: {
-      filter: selectedOptions,
-    },
-  });
-  const { handleSubmit } = methods;
-
-  const handleAfterSubmit = (formData: FormData) => {
-    onChange(formData.filter);
-    onClose();
-  };
 
   return (
     <FocusTrap>
@@ -74,26 +51,7 @@ const Popover = ({
         <Header id={headerId}>
           <Typography variant="label-3">{title}</Typography>
         </Header>
-        <Body id={bodyId}>
-          <FormProvider {...methods}>
-            <form id="filter-form" onSubmit={handleSubmit(handleAfterSubmit)}>
-              {kind === 'multi-select' && (
-                <MultiSelectOptions
-                  kind={kind}
-                  options={options}
-                  selectedOptions={selectedOptions}
-                />
-              )}
-              {kind === 'multi-select-grouped' && (
-                <MultiSelectGroupedOptions
-                  kind={kind}
-                  options={options}
-                  selectedOptions={selectedOptions}
-                />
-              )}
-            </form>
-          </FormProvider>
-        </Body>
+        <Body id={bodyId}>{children}</Body>
         <Footer>
           <Button onClick={onClose} size="small" variant="secondary">
             {secondaryButtonLabel}
