@@ -15,7 +15,7 @@ const revealApiKey = async (
 ) => {
   const response = await request<OrgApiKeyRevealResponse>({
     headers: authHeaders,
-    method: 'GET',
+    method: 'POST',
     url: `/org/api_keys/${params.id}/reveal`,
   });
   return response.data;

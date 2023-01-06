@@ -464,7 +464,7 @@ class TestDashboardApiKeys:
         assert key["last_used_at"]
 
     def test_api_key_reveal(self, secret_key):
-        body = get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
+        body = post(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
         key = body
         assert key["key"] == secret_key.key.value
         assert key["status"] == "enabled"
@@ -483,12 +483,12 @@ class TestDashboardApiKeys:
         assert key["status"] == "disabled"
 
         # Verify the update, using the reveal endpoint as the detail endpoint
-        body = get(f"org/api_keys/{secret_key.id}/reveal", None, sandbox_tenant.sk.key)
+        body = post(f"org/api_keys/{secret_key.id}/reveal", None, sandbox_tenant.sk.key)
         assert body["name"] == new_name
         assert body["status"] == "disabled"
 
         # Verify we can't use the disabled API key for anything anymore
-        get(
+        post(
             f"org/api_keys/{secret_key.id}/reveal",
             None,
             secret_key.key,

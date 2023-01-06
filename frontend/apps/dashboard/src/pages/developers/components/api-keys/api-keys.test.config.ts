@@ -62,7 +62,7 @@ export const withCreateApiKeysError = () =>
 
 export const withApiReveal = (apiKey: any, key: string) =>
   mockRequest({
-    method: 'get',
+    method: 'post',
     path: `/org/api_keys/${apiKey.id}/reveal`,
     response: {
       ...apiKey,

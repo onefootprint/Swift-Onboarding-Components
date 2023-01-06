@@ -12,7 +12,7 @@ use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use enclave_proxy::DataTransform;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantApiKeyId;
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 struct RevealRequest {
@@ -24,9 +24,10 @@ struct RevealRequest {
     description = "Decrypts a specific tenant secret API key.",
     tags(Organization, PublicApi)
 )]
-// TODO this should be a POST
-#[get("/org/api_keys/{id}/reveal")]
-async fn get(
+#[post("/org/api_keys/{id}/reveal")]
+/// Note, we make this a post because it does a decrypt operation. In the future, we may
+/// make an access event for it
+async fn post(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
