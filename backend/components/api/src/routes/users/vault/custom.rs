@@ -3,8 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::auth::tenant::{
-    CheckTenantPermissions, SecretTenantAuthContext, TenantAuth, TenantPermission, TenantPermissionDsl,
-    TenantUserAuthContext,
+    CheckTenantPermissions, SecretTenantAuthContext, TenantAuth, TenantPermission, TenantUserAuthContext,
 };
 use crate::auth::Either;
 use crate::errors::ApiResult;
@@ -116,7 +115,7 @@ pub(super) async fn get_internal(
     request: Query<FieldsParams>,
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetCustomDataResponse> {
-    let tenant_auth = tenant_auth.check_permissions(TenantPermission::Users.or_ro())?;
+    let tenant_auth = tenant_auth.check_permissions(TenantPermission::Read)?;
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
 

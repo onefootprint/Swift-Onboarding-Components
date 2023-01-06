@@ -27,21 +27,27 @@ use strum_macros::Display;
 #[serde(tag = "kind")]
 /// Represents a scope that is granted to TenantUsers in a specific TenantRole
 pub enum TenantScope {
-    /// A special scope that gives permission to perform all actions
+    /// Every token that exists must have minimum this Read scope. This allows basic access to most
+    /// GET endpoints
+    Read,
+    /// A special scope that gives permission to perform all actions.
     Admin,
-    /// A special scope that gives permission to endpoints that only require a ReadOnly permission
-    ReadOnly,
-
+    //
+    //
+    // CAREFUL: The below scopes allow WRITE access to various related endpoints.
+    //
+    //
+    /// Allows adding and editing onboarding configurations
     OnboardingConfiguration,
+    /// Allows adding, editing, and decrypting tenant API keys
     ApiKeys,
+    /// Allows updating org settings, roles, and users
     OrgSettings,
-    Users,
-    /// Allows decrypting all custom attributes
-    /// TODO more fine-grained decryption controls
+    /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
-    /// Similarly to how we store permissions on an OnboardingConfiguration, we denote the set of
-    /// decryptable fields with CollectedDataOption
+    /// Allows decrypting identity data attributes belonging to the listed CollectedDataOptions
     Decrypt(Vec<CollectedDataOption>),
+    /// Allows performing manual review actions on users, like making a new decision or adding an annotation
     ManualReview,
 }
 

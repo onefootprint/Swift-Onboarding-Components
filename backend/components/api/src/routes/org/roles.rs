@@ -1,6 +1,5 @@
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::TenantPermission;
-use crate::auth::tenant::TenantPermissionDsl;
 use crate::auth::tenant::TenantUserAuthContext;
 
 use crate::errors::ApiResult;
@@ -27,7 +26,7 @@ async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings.or_ro())?;
+    let auth = auth.check_permissions(TenantPermission::Read)?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -60,7 +59,7 @@ async fn post(
     request: web::Json<CreateTenantRoleRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantPermission::Admin)?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -88,7 +87,7 @@ async fn patch(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantPermission::Admin)?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -109,7 +108,7 @@ async fn deactivate(
     role_id: web::Path<TenantRoleId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_permissions(TenantPermission::Admin)?;
+    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
 

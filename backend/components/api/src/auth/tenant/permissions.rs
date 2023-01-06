@@ -11,11 +11,10 @@ use strum::Display;
 #[derive(Display)]
 pub enum TenantPermission {
     Admin,
-    ReadOnly,
+    Read,
     OnboardingConfiguration,
     ApiKeys,
     OrgSettings,
-    Users,
     DecryptCustom,
     ManualReview,
 }
@@ -25,11 +24,10 @@ impl TenantPermission {
     fn granting_scope(&self) -> TenantScope {
         match self {
             Self::Admin => TenantScope::Admin,
-            Self::ReadOnly => TenantScope::ReadOnly,
+            Self::Read => TenantScope::Read,
             Self::OnboardingConfiguration => TenantScope::OnboardingConfiguration,
             Self::ApiKeys => TenantScope::ApiKeys,
             Self::OrgSettings => TenantScope::OrgSettings,
-            Self::Users => TenantScope::Users,
             Self::DecryptCustom => TenantScope::DecryptCustom,
             Self::ManualReview => TenantScope::ManualReview,
         }
@@ -145,7 +143,6 @@ mod test {
     //
     // Basic TenantPermission enum
     //
-    #[test_case(&[TS::ApiKeys, TS::OnboardingConfiguration], TP::Users => false)]
     #[test_case(&[TS::OnboardingConfiguration], TP::ApiKeys => false)]
     #[test_case(&[TS::ApiKeys, TS::OnboardingConfiguration], TP::ApiKeys => true)]
     #[test_case(&[TS::ApiKeys, TS::OnboardingConfiguration], TP::OnboardingConfiguration => true)]
@@ -155,7 +152,7 @@ mod test {
     // Test CanDecrypt
     //
     #[test_case(&[TS::ApiKeys], CanDecrypt(vec![DLK::Ssn9]) => false)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Name]), TS::Decrypt(vec![CDO::FullAddress]), TS::Users], CanDecrypt(vec![DLK::FirstName, DLK::City]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name]), TS::Decrypt(vec![CDO::FullAddress]), TS::ApiKeys], CanDecrypt(vec![DLK::FirstName, DLK::City]) => true)]
     #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![DLK::Ssn9]) => true)]
     #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![DLK::Ssn4]) => true)]
     #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![DLK::Ssn4, DLK::FirstName]) => false)]
@@ -170,13 +167,13 @@ mod test {
     #[test_case(&[TS::OnboardingConfiguration], TP::Admin.or(TP::OnboardingConfiguration) => true)]
     #[test_case(&[TS::Admin], TP::OnboardingConfiguration.or_admin() => true)]
     #[test_case(&[TS::Admin], CanDecrypt(vec![DLK::Ssn9, DLK::FirstName, DLK::Email]).or_admin() => true)]
-    #[test_case(&[TS::ReadOnly], CanDecrypt(vec![DLK::Ssn9, DLK::FirstName, DLK::Email]).or_admin() => false)]
-    #[test_case(&[TS::ReadOnly], TP::Users.or_ro() => true)]
-    #[test_case(&[TS::OnboardingConfiguration], TP::Users.or_admin() => false)]
-    #[test_case(&[TS::OnboardingConfiguration], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => false)]
-    #[test_case(&[TS::Users], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => true)]
-    #[test_case(&[TS::ApiKeys], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => true)]
-    #[test_case(&[TS::OrgSettings], TP::Users.or(TP::ApiKeys).or(TP::OrgSettings) => true)]
+    #[test_case(&[TS::Read], CanDecrypt(vec![DLK::Ssn9, DLK::FirstName, DLK::Email]).or_admin() => false)]
+    #[test_case(&[TS::Read], TP::ApiKeys.or(TP::Read) => true)]
+    #[test_case(&[TS::OnboardingConfiguration], TP::ApiKeys.or_admin() => false)]
+    #[test_case(&[TS::OnboardingConfiguration], TP::ApiKeys.or(TP::ApiKeys).or(TP::OrgSettings) => false)]
+    #[test_case(&[TS::ApiKeys], TP::ApiKeys.or(TP::ManualReview).or(TP::OrgSettings) => true)]
+    #[test_case(&[TS::ManualReview], TP::ApiKeys.or(TP::ManualReview).or(TP::OrgSettings) => true)]
+    #[test_case(&[TS::OrgSettings], TP::ApiKeys.or(TP::ManualReview).or(TP::OrgSettings) => true)]
     //
     // Test Any
     //
@@ -189,7 +186,7 @@ mod test {
         requested_permission.is_met(token_scopes)
     }
 
-    #[test_case(TP::Users.or_admin() => "Or<Users,Admin>")]
+    #[test_case(TP::ApiKeys.or_admin() => "Or<ApiKeys,Admin>")]
     #[test_case(CanDecrypt(vec![DLK::Ssn9, DLK::FirstName]).or(TP::ApiKeys) => "Or<CanDecrypt<[Ssn9, FirstName]>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
     fn test_display<T: IsPermissionMet>(t: T) -> String {

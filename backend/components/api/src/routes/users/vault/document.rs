@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 /// Decrypt document data for a footprint user
 ///   2022-11-28: We do not support PUT operations (interested customers should use custom vault for document data they wish to store)
 use crate::auth::tenant::{
-    CanDecrypt, CheckTenantPermissions, SecretTenantAuthContext, TenantPermission, TenantPermissionDsl,
+    CanDecrypt, CheckTenantPermissions, SecretTenantAuthContext, TenantPermission,
 };
 use crate::auth::{tenant::TenantUserAuthContext, Either};
 
@@ -48,7 +48,7 @@ pub(super) async fn get_internal(
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDocumentForDecryptResponse> {
     // TODO: DRY
-    let tenant_auth = tenant_auth.check_permissions(TenantPermission::Users.or_ro())?;
+    let tenant_auth = tenant_auth.check_permissions(TenantPermission::Read)?;
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;

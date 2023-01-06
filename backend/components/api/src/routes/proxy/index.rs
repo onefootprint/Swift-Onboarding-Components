@@ -60,7 +60,8 @@ pub async fn post(
     body_bytes: web::Bytes,
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
-    let auth = auth.check_permissions(TenantPermission::Users)?;
+    // Will eventually require the permission to decrypt attributes
+    let auth = auth.check_permissions(TenantPermission::Admin)?; // TODO auth for secret key
     let is_live = auth.is_live()?;
 
     let body_bytes = body_bytes.to_vec();

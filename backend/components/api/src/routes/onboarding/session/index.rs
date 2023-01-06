@@ -1,10 +1,10 @@
 use crate::auth::session::AuthSessionData;
+use crate::auth::tenant::Any;
 use crate::auth::tenant::OnboardingSession;
 use crate::auth::tenant::SecretTenantAuthContext;
 
 use crate::auth::tenant::CheckTenantPermissions;
 
-use crate::auth::tenant::TenantPermission;
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 
@@ -39,7 +39,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<CreateOnboardingSessionRequest>,
 ) -> JsonApiResponse<ObConfigSessionToken> {
-    let auth = auth.check_permissions(TenantPermission::OnboardingConfiguration)?;
+    let auth = auth.check_permissions(Any)?; // TODO add permissions when we have IAM for secret keys
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
 
