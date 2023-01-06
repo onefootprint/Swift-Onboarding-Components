@@ -197,26 +197,33 @@ impl TenantUser {
         Ok(result)
     }
 
-    pub fn list_active(
+    pub fn list(
         conn: &mut PgConnection,
-        tenant_id: &TenantId,
-        cursor: Option<DateTime<Utc>>,
-        page_size: i64,
+        filters: TenantUserListFilters,
     ) -> DbResult<Vec<(Self, TenantRole)>> {
         let mut query = tenant_user::table
             .inner_join(tenant_role::table)
-            .filter(tenant_user::tenant_id.eq(tenant_id))
-            .filter(tenant_user::deactivated_at.is_null())
+            .filter(tenant_user::tenant_id.eq(filters.tenant_id))
             .into_boxed()
             .order_by(tenant_user::created_at.asc())
-            .limit(page_size);
+            .limit(filters.page_size);
 
-        if let Some(cursor) = cursor {
-            query = query.filter(tenant_user::created_at.ge(cursor))
+        if filters.only_active {
+            query = query.filter(tenant_user::deactivated_at.is_null())
+        }
+        if let Some(cursor) = filters.cursor {
+            query = query.filter(tenant_user::created_at.ge(cursor));
         }
         let results = query.get_results(conn)?;
         Ok(results)
     }
+}
+
+pub struct TenantUserListFilters<'a> {
+    pub tenant_id: &'a TenantId,
+    pub only_active: bool,
+    pub cursor: Option<DateTime<Utc>>,
+    pub page_size: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

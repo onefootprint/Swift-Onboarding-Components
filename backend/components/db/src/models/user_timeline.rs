@@ -168,7 +168,7 @@ mod tests {
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
 
-        let tenant_role = test_tenant_admin_role(conn, tenant.id.clone());
+        let tenant_role = test_tenant_admin_role(conn, &tenant.id);
         let scoped_user = fixtures::scoped_user::create(conn, &user_vault.id, &ob_config.id);
 
         let tenant_user1 = test_tenant_user(

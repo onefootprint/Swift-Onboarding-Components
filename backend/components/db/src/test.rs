@@ -44,8 +44,8 @@ pub(crate) fn test_tenant(conn: &mut PgConnection) -> Tenant {
         .expect("failed to create user vault")
 }
 
-pub(crate) fn test_tenant_admin_role(conn: &mut TxnPgConnection, tenant_id: TenantId) -> TenantRole {
-    TenantRole::get_or_create_admin_role(conn, tenant_id).unwrap()
+pub(crate) fn test_tenant_admin_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> TenantRole {
+    TenantRole::get_or_create_admin_role(conn, &tenant_id).unwrap()
 }
 
 pub(crate) fn test_tenant_user(

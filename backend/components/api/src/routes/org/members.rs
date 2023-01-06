@@ -4,6 +4,7 @@ use crate::auth::tenant::TenantPermission;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use crate::org::auth::magic_link::create_and_send_magic_link;
 use crate::types::EmptyRequest;
 use crate::types::EmptyResponse;
@@ -14,6 +15,7 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
+use db::models::tenant_user::TenantUserListFilters;
 use db::models::tenant_user::{TenantUser, TenantUserUpdate};
 use newtypes::TenantRoleId;
 use newtypes::TenantUserId;
@@ -41,7 +43,16 @@ async fn get(
     let tenant_id = tenant.id.clone();
     let results = state
         .db_pool
-        .db_query(move |conn| TenantUser::list_active(conn, &tenant_id, cursor, (page_size + 1) as i64))
+        .db_query(move |conn| -> ApiResult<_> {
+            let filters = TenantUserListFilters {
+                tenant_id: &tenant_id,
+                cursor,
+                page_size: (page_size + 1) as i64,
+                only_active: true,
+            };
+            let result = TenantUser::list(conn, filters)?;
+            Ok(result)
+        })
         .await??;
 
     let cursor = request.cursor_item(&state, &results).map(|x| x.0.created_at);

@@ -1,0 +1,1 @@
+DELETE FROM tenant_role WHERE name = 'Read-only' AND scopes->0->>'kind' = 'read' AND is_immutable = 't';

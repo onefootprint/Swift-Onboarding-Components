@@ -93,7 +93,8 @@ async fn post(
                     if !e.is_not_found() {
                         return Err(e.into()); // Real error, return
                     }
-                    let admin_role = TenantRole::get_or_create_admin_role(conn, tenant.id.clone())?;
+                    let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant.id)?;
+                    let _ro_role = TenantRole::get_or_create_ro_role(conn, &tenant.id)?;
                     let (tenant_user, _) = TenantUser::create(
                         conn,
                         email, // Always create with the same email so we find it next time

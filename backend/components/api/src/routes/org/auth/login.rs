@@ -15,7 +15,7 @@ use api_wire_types::{Organization, OrganizationMember};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
-use db::models::tenant_user::TenantUser;
+use db::models::tenant_user::{TenantUser, TenantUserListFilters};
 use db::tenant::get_opt_by_workos_org_id;
 use newtypes::{OrgMemberEmail, TenantScope, TenantUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -125,17 +125,21 @@ async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(Tena
     let tenant_user = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            // Get or create the admin role for this tenant
-            // TODO: we shouldn't always give a new user admin permissions
-            let admin_role = TenantRole::get_or_create_admin_role(conn, tenant_id)?;
-            let (tenant_user, _) = TenantUser::create(
-                conn,
-                email.into(),
-                admin_role.tenant_id,
-                admin_role.id,
-                first_name,
-                last_name,
-            )?;
+            // Get or create the default admin and read-only role for this tenant
+            let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant_id)?;
+            let ro_role = TenantRole::get_or_create_ro_role(conn, &tenant_id)?;
+            // If the tenant was just created and has no users, give the user admin perms.
+            // Otherwise, read-only perms
+            let filters = TenantUserListFilters {
+                tenant_id: &tenant_id,
+                cursor: None,
+                page_size: 1,
+                only_active: false,
+            };
+            let are_no_users = TenantUser::list(conn, filters)?.is_empty();
+            let role_id = if are_no_users { admin_role.id } else { ro_role.id };
+            let (tenant_user, _) =
+                TenantUser::create(conn, email.into(), tenant_id, role_id, first_name, last_name)?;
             Ok(tenant_user)
         })
         .await?;
@@ -181,7 +185,6 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
             if let Some(tenant) = tenant {
                 // The tenant exists inside the DB
                 tracing::info!("matched workos auth by domain");
-                // TODO use a basic role with minimal permissions instead of the admin role
                 return Ok((tenant, false));
             } else {
                 // Tenant doesn't exist in the DB. This will only happen when, say, creating a local

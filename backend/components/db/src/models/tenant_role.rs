@@ -27,26 +27,36 @@ pub struct TenantRole {
 }
 
 impl TenantRole {
-    pub fn get_or_create_admin_role(conn: &mut TxnPgConnection, tenant_id: TenantId) -> DbResult<Self> {
-        Tenant::lock(conn, &tenant_id)?;
+    fn get_or_create_immutable_role(
+        conn: &mut TxnPgConnection,
+        tenant_id: &TenantId,
+        name: &str,
+        scopes: Vec<TenantScope>,
+    ) -> DbResult<Self> {
+        Tenant::lock(conn, tenant_id)?;
         let role = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(&tenant_id))
-            .filter(tenant_role::scopes.eq(TenantScopeList(vec![TenantScope::Admin])))
+            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(tenant_role::name.eq(name))
+            .filter(tenant_role::scopes.eq(TenantScopeList(scopes.clone())))
             .filter(tenant_role::is_immutable.eq(true))
             .first::<Self>(conn.conn())
             .optional()?;
         let role = if let Some(role) = role {
             role
         } else {
-            Self::create(
-                conn,
-                tenant_id,
-                "Admin".to_owned(),
-                vec![TenantScope::Admin],
-                true,
-            )?
+            Self::create(conn, tenant_id.clone(), name.to_owned(), scopes, true)?
         };
         Ok(role)
+    }
+
+    /// Every tenant is created with an admin role - this gets or creates that role
+    pub fn get_or_create_admin_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> DbResult<Self> {
+        Self::get_or_create_immutable_role(conn, tenant_id, "Admin", vec![TenantScope::Admin])
+    }
+
+    /// Every tenant is created with a read-only role - this gets or creates that role
+    pub fn get_or_create_ro_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> DbResult<Self> {
+        Self::get_or_create_immutable_role(conn, tenant_id, "Read-only", vec![TenantScope::Read])
     }
 
     pub fn create(
@@ -60,8 +70,8 @@ impl TenantRole {
             tenant_id,
             name,
             scopes: TenantScopeList(scopes),
-            created_at: Utc::now(),
             is_immutable,
+            created_at: Utc::now(),
         };
         let result = diesel::insert_into(tenant_role::table)
             .values(new)
