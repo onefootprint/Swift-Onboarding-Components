@@ -11,10 +11,15 @@ use newtypes::{DocVData, IdvData};
 use crate::{ParsedResponse, VendorResponse};
 
 use crate::idology::client::IdologyClient;
+use crate::idology::error as IdologyError;
 use expectid::response::ExpectIDAPIResponse;
 use newtypes::Vendor;
 use scan_onboarding::response::ScanOnboardingAPIResponse;
-use scan_verify::response::ScanVerifyAPIResponse;
+
+use tokio_retry::{
+    strategy::{jitter, ExponentialBackoff},
+    RetryIf,
+};
 
 use self::scan_verify::response::ScanVerifySubmissionAPIResponse;
 
@@ -55,25 +60,36 @@ pub async fn send_scan_verify_request(
     })
 }
 
-// TODO polling
 pub async fn poll_scan_verify_results_request(
     client: &IdologyClient,
     query_id: u64,
 ) -> Result<VendorResponse, crate::Error> {
-    let response = client
-        .get_scan_verify_results(query_id)
-        .await
-        .map_err(crate::idology::error::Error::from)?;
-    let parsed_response: ScanVerifyAPIResponse = scan_verify::response::parse_response(response.clone())
-        .map_err(crate::idology::error::Error::from)?;
+    // Retry logic
+    //
+    // Note: IDology does not recommend polling the service until at least five seconds have passed
+    // and then only polling at five second intervals thereafter once the link to the customer has been displayed/delivered
+    //
+    // 2023-01-05, we aren't using scan verify yet, but should expect to need to configure this time
+    // See: https://web.idologylive.com/api_portal.php#step-3-obtaining-scan-verify-results-subtitle-step-3-scan-verify
+    let retry_strategy = ExponentialBackoff::from_millis(100).map(jitter).take(3);
+    let response = RetryIf::spawn(
+        retry_strategy,
+        || client.get_scan_verify_results(query_id),
+        should_retry_request,
+    )
+    .await
+    .map_err(IdologyError::Error::from)?;
+
+    let parsed =
+        scan_verify::response::parse_response(response.clone()).map_err(IdologyError::Error::from)?;
 
     // Validate we have a response we can use
-    parsed_response.response.validate()?;
+    parsed.response.validate()?;
 
     Ok(VendorResponse {
         vendor: Vendor::Idology,
         raw_response: response,
-        response: ParsedResponse::IDologyScanVerifyResult(parsed_response),
+        response: ParsedResponse::IDologyScanVerifyResult(parsed),
     })
 }
 
@@ -95,6 +111,10 @@ pub async fn send_scan_onboarding_request(
         raw_response: response,
         response: ParsedResponse::IDologyScanOnboarding(parsed_response),
     })
+}
+
+fn should_retry_request(err: &IdologyError::Error) -> bool {
+    err.should_retry_request()
 }
 
 #[cfg(test)]

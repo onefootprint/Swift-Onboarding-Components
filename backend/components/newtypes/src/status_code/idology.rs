@@ -22,6 +22,9 @@ pub enum IDologyScanVerifyResultCode {
     #[strum(to_string = "id.scan.time.out")]
     #[doc = "Consumer timed out"]
     ConsumerTimedOut,
+    #[strum(to_string = "id.scan.pending")]
+    #[doc = "Results are still pending"]
+    ResultsPending,
 }
 
 /// Status codes returned by Scan Verify Results API call

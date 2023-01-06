@@ -68,6 +68,15 @@ pub struct ScanVerifyAPIResponse {
     pub response: ScanVerifyResponse,
 }
 
+impl ScanVerifyAPIResponse {
+    pub fn needs_retry(&self) -> bool {
+        self.response
+            .scan_result()
+            .map(|r| matches!(r, IDologyScanVerifyResultCode::ResultsPending))
+            .unwrap_or_default()
+    }
+}
+
 /// https://web.idologylive.com/api_portal.php#step-3-obtaining-scan-verify-results-subtitle-step-3-scan-verify
 #[derive(Debug, Clone, serde::Deserialize, Default)]
 #[serde(rename_all = "kebab-case")]

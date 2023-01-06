@@ -119,6 +119,22 @@ impl IdologyClient {
             .await
             .map_err(IdologyError::ReqwestError::InternalError)?;
 
+        // Here we parse the response in order to determine if we need to retry
+        let parsed = scan_verify::response::parse_response(idology_response.clone())
+            .map_err(IdologyError::Error::from)?;
+
+        // Retry if results aren't ready. This error will cause us to retry
+        if parsed.needs_retry() {
+            let id_number = parsed
+                .response
+                .id_number
+                .map(|i| format!("{:?}", i))
+                // i don't think we need to error here if we are inside this conditional branch already
+                .unwrap_or_else(|| "No id number found".into());
+            tracing::info!(query_id=%id_number, "ScanVerify requires retry");
+            return Err(IdologyError::Error::DocumentResultsNotReady);
+        }
+
         Ok(idology_response)
     }
 

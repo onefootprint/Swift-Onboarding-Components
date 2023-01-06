@@ -19,6 +19,14 @@ pub enum Error {
     NoStatusFound,
     #[error("Missing reference id for request")]
     MissingReferenceId,
+    #[error("Document results are not ready")]
+    DocumentResultsNotReady,
+}
+
+impl Error {
+    pub fn should_retry_request(&self) -> bool {
+        matches!(&self, Error::DocumentResultsNotReady | Error::ReqwestError(_))
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
