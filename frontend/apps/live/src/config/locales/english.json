@@ -1,0 +1,24 @@
+{
+  "home": {
+    "html-title": "The last identity form you'll ever fill out",
+    "title": "The last identity form you'll ever fill out",
+    "subtitle": "Create a portable digital identity that can be re-used in multiple companies when you need to verify your identity. All it takes is one click.",
+    "cta": "Create your account",
+    "legal-documents": {
+      "terms-of-service": {
+        "title": "Terms of service"
+      },
+      "privacy-policy": {
+        "title": "Privacy Policy"
+      }
+    }
+  },
+  "404": {
+    "html-title": "Oops! Page not found.",
+    "title": "Oops! Page not found.",
+    "description": "We're sorry, but the requested page doesn't exist or was removed.",
+    "image": {
+      "alt": "An image of a penguin using a smartphone"
+    }
+  }
+}

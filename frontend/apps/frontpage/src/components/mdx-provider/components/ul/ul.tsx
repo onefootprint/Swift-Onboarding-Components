@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 const ul = styled.ul`
   ${({ theme }) => css`
     color: ${theme.color.secondary};
-    font: ${createFontStyles('body-2')};
+    ${createFontStyles('body-2')};
     margin-bottom: ${theme.spacing[9]};
     margin-left: ${theme.spacing[7]};
 

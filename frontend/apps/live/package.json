@@ -1,0 +1,39 @@
+{
+  "name": "live",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3008",
+    "build": "next build",
+    "build:analyze": "ANALYZE=true yarn build",
+    "start": "next start -p 3003",
+    "lint": "eslint src --fix",
+    "typecheck": "yarn tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
+    "set:dot-env": "sh ../../scripts/set-dot-env.sh"
+  },
+  "dependencies": {
+    "@onefootprint/global-constants": "*",
+    "@onefootprint/hooks": "*",
+    "@onefootprint/icons": "*",
+    "@onefootprint/design-tokens": "*",
+    "@onefootprint/ui": "*",
+    "@onefootprint/footprint-js": "*",
+    "@onefootprint/footprint-react": "*",
+    "next": "13.0.6",
+    "react": "18.2.0",
+    "styled-components": "^5.3.6"
+  },
+  "devDependencies": {
+    "@onefootprint/jest-presets": "*",
+    "@types/react-dom": "^18.0.10",
+    "eslint-config-footprint": "*",
+    "i18next": "^21.8.4",
+    "react-i18next": "^12.0.0",
+    "tsconfig": "*",
+    "typescript": "4.8.4"
+  },
+  "jest": {
+    "preset": "@onefootprint/jest-presets/jest/web"
+  }
+}
