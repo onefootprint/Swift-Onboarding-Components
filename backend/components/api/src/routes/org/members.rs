@@ -23,7 +23,7 @@ use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
 #[api_v2_operation(
-    tags(Private),
+    tags(OrgSettings),
     description = "Returns a list of dashboard members for the tenant."
 )]
 #[get("/org/members")]
@@ -74,7 +74,7 @@ struct CreateTenantUserRequest {
 }
 
 #[api_v2_operation(
-    tags(Private),
+    tags(OrgSettings),
     description = "Create a new IAM user for the tenant. Sends an invite link via WorkOs"
 )]
 #[post("/org/members")]
@@ -113,7 +113,7 @@ struct UpdateTenantUserRequest {
     role_id: Option<TenantRoleId>,
 }
 
-#[api_v2_operation(tags(Private), description = "Updates the provided user.")]
+#[api_v2_operation(tags(OrgSettings), description = "Updates the provided user.")]
 #[patch("/org/members/{tenant_user_id}")]
 async fn patch(
     state: web::Data<State>,
@@ -138,7 +138,7 @@ async fn patch(
     EmptyResponse::ok().json()
 }
 
-#[api_v2_operation(tags(Private), description = "Updates the provided user.")]
+#[api_v2_operation(tags(OrgSettings), description = "Deactivates the provided user.")]
 #[post("/org/members/{tenant_user_id}/deactivate")]
 async fn deactivate(
     state: web::Data<State>,
