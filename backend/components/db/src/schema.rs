@@ -544,16 +544,29 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    tenant_rolebinding (id) {
+        id -> Text,
+        tenant_user_id -> Text,
+        tenant_role_id -> Text,
+        tenant_id -> Text,
+        last_login_at -> Nullable<Timestamptz>,
+        deactivated_at -> Nullable<Timestamptz>,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     tenant_user (id) {
         id -> Text,
-        tenant_role_id -> Text,
         email -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
-        last_login_at -> Nullable<Timestamptz>,
-        tenant_id -> Text,
-        deactivated_at -> Nullable<Timestamptz>,
         first_name -> Nullable<Text>,
         last_name -> Nullable<Text>,
     }
@@ -709,8 +722,9 @@ joinable!(socure_device_session -> onboarding (onboarding_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
-joinable!(tenant_user -> tenant (tenant_id));
-joinable!(tenant_user -> tenant_role (tenant_role_id));
+joinable!(tenant_rolebinding -> tenant (tenant_id));
+joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
+joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
 joinable!(user_consent -> insight_event (insight_event_id));
 joinable!(user_consent -> onboarding (onboarding_id));
 joinable!(user_timeline -> scoped_user (scoped_user_id));
@@ -754,6 +768,7 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key,
     tenant_api_key_access_log,
     tenant_role,
+    tenant_rolebinding,
     tenant_user,
     user_consent,
     user_timeline,
