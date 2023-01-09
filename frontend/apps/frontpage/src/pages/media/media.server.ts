@@ -5,6 +5,18 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '8',
+      url: 'https://www.fastcompany.com/90831259/this-gen-z-tech-ceo-wants-to-build-the-apple-pay-of-identity-a-one-stop-shop-for-your-data',
+      imageUrl: '/media/fast-co.png',
+      imageAlt: 'Our founder and CEO, Eli Wachs.',
+      createdAt: 'Jan 7, 2023',
+      website: 'Fast Company',
+      title:
+        'This Gen-Z tech CEO wants to build the Apple Pay of identity—a one-stop shop for your data',
+      excerpt:
+        'Eli Wachs, cofounder of Footprint, is finding success in the verification business at a time when consumer trust is increasingly hard to come by.',
+    },
+    {
       id: '7',
       url: 'https://open.spotify.com/show/6k1YLBvORRMyosKy3x1xIl',
       imageUrl: '/media/not-boring.png',

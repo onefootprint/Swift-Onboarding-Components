@@ -66,6 +66,9 @@ const Content = styled.div`
 
 const Picture = styled.div`
   display: none;
+  img {
+    object-fit: cover;
+  }
 
   ${media.greaterThan('md')`
     display: block;
