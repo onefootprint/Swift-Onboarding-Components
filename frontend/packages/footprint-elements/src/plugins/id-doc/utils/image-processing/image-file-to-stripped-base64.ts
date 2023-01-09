@@ -1,4 +1,4 @@
-const convertImageToBase64 = (image: File) =>
+const imageFileToStrippedBase64 = (image: File) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -14,4 +14,4 @@ const convertImageToBase64 = (image: File) =>
     reader.readAsDataURL(image);
   });
 
-export default convertImageToBase64;
+export default imageFileToStrippedBase64;

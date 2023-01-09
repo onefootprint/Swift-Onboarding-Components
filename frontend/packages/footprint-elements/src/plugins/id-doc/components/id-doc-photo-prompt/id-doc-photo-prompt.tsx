@@ -14,7 +14,7 @@ import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import convertImageToBase64 from '../../utils/image-processing/image-to-base64';
+import imageFileToStrippedBase64 from '../../utils/image-processing/image-file-to-stripped-base64';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
@@ -42,7 +42,7 @@ const IdDocPhotoPrompt = ({
     if (!files?.length) {
       return;
     }
-    const imageString = (await convertImageToBase64(files[0])) as string;
+    const imageString = (await imageFileToStrippedBase64(files[0])) as string;
     onComplete(imageString);
   };
 
