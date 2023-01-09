@@ -22,10 +22,21 @@ const createIdDocMachine = () =>
       states: {
         [States.init]: {
           on: {
-            [Events.receivedContext]: {
-              target: States.idDocCountryAndType,
-              actions: Actions.assignContext,
-            },
+            [Events.receivedContext]: [
+              {
+                target: States.idDocCountryAndType,
+                actions: Actions.assignContext,
+                cond: (context, event) => !!event.payload.idDocRequired,
+              },
+              {
+                target: States.selfiePrompt,
+                actions: Actions.assignContext,
+                cond: (context, event) => !!event.payload.selfieRequired,
+              },
+              {
+                target: States.success,
+              },
+            ],
           },
         },
         [States.idDocCountryAndType]: {
