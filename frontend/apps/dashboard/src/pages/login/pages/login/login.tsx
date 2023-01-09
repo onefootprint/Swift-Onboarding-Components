@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Button, GoogleButton } from '@onefootprint/ui';
+import { Box, Button, GoogleButton } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -24,7 +24,9 @@ const Login = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Container>
-        <LogoAndText text={t('title')} />
+        <Box sx={{ width: '350px' }}>
+          <LogoAndText text={t('title')} />
+        </Box>
         <Inner>
           <GoogleButton
             fullWidth

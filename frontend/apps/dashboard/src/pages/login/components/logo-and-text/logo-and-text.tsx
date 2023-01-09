@@ -10,7 +10,7 @@ export type LogoAndTextProps = {
 const LogoAndText = ({ text }: LogoAndTextProps) => (
   <Container>
     <LogoFpDefault />
-    <Typography variant="heading-3" color="primary" sx={{ marginY: 8 }}>
+    <Typography variant="label-1" color="primary" sx={{ marginY: 8 }}>
       {text}
     </Typography>
   </Container>

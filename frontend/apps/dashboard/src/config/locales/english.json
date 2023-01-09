@@ -114,16 +114,13 @@
       }
     },
     "terms-and-conditions": {
-      "by-continuing": "By continuing you agree to our",
-      "terms-of-service": "Terms of Service",
-      "and": "and",
-      "privacy-policy": "Privacy Policy."
+      "text": "By continuing you agree to our <a1>Terms of Service</a1> and <a2>Privacy Policy</a2>."
     }
   },
   "pages": {
     "login": {
       "page-title": "Footprint Login | Sign in to the Footprint Dashboard",
-      "title": "Sign up or Log in",
+      "title": "Sign up or log in to your company's dashboard",
       "google": "Continue with Google",
       "email": "Continue with email"
     },
