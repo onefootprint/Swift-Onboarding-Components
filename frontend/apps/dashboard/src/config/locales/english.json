@@ -61,7 +61,9 @@
     "twilio": "Twilio"
   },
   "collected-id-doc-attributes": {
-    "id-doc-image": "ID Document"
+    "id-doc-image": "ID Document",
+    "selfie-image": "Selfie",
+    "id-doc-image-with-selfie": "ID Document & Selfie"
   },
   "signal-attributes": {
     "name": "Full name",
@@ -615,12 +617,6 @@
           "required-data": {
             "label": "Required data to be collected",
             "tooltip": "These are the data attributes you require us to collect during onboarding to verify the user's identity."
-          },
-          "id-doc": {
-            "label": "ID document",
-            "tooltip": "We might still need to ask some users to share their ID as part of our step-up verification flow.",
-            "required": "Required",
-            "not-required": "Not required"
           },
           "access-data": {
             "label": "Access permission scope",

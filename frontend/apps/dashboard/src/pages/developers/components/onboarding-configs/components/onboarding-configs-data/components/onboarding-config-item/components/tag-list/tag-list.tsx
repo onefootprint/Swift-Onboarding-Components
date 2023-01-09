@@ -1,18 +1,16 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
 import { Tag } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 type TagListProps = {
-  dataList: CollectedKycDataOption[];
-  getLabel: (data: CollectedKycDataOption) => string;
+  items: string[];
   testID: string;
 };
 
-const TagList = ({ dataList, testID, getLabel }: TagListProps) => (
+const TagList = ({ testID, items }: TagListProps) => (
   <Container data-testid={testID}>
-    {dataList.map(data => (
-      <Tag key={`${testID}-${data}`}>{getLabel(data)}</Tag>
+    {items.map(item => (
+      <Tag key={`${testID}-${item}`}>{item}</Tag>
     ))}
   </Container>
 );

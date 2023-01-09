@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
-import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 import { Box, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -13,10 +13,24 @@ type RequiredDataToBeCollectedRowProps = {
 const RequiredDataToBeCollectedRow = ({
   data,
 }: RequiredDataToBeCollectedRowProps) => {
-  const { id, mustCollectData } = data;
+  const {
+    id,
+    mustCollectData,
+    mustCollectIdentityDocument,
+    mustCollectSelfie,
+  } = data;
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.list-item.required-data',
   );
+  const items = mustCollectData.map(dataAttr =>
+    allT(`collected-kyc-data-options.${dataAttr}`),
+  );
+  // It is not possible to collect selfie alone.
+  if (mustCollectIdentityDocument && mustCollectSelfie) {
+    items.push(allT('collected-id-doc-attributes.id-doc-image-with-selfie'));
+  } else if (mustCollectIdentityDocument) {
+    items.push(allT('collected-id-doc-attributes.id-doc-image'));
+  }
 
   return (
     <tr>
@@ -40,13 +54,7 @@ const RequiredDataToBeCollectedRow = ({
         </Box>
       </td>
       <td>
-        <TagList
-          dataList={mustCollectData}
-          getLabel={(tag: CollectedKycDataOption) =>
-            allT(`collected-kyc-data-options.${tag}`)
-          }
-          testID={`must-collect-data-${id}`}
-        />
+        <TagList items={items} testID={`must-collect-data-${id}`} />
       </td>
       <td />
     </tr>

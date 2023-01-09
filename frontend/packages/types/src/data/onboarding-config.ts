@@ -1,15 +1,18 @@
 import { CollectedKycDataOption } from './collected-kyc-data-option';
 
 export type OnboardingConfig = {
-  canAccessData: CollectedKycDataOption[];
   createdAt: string;
   id: string;
   isLive: boolean;
   key: string;
   logoUrl: string | null;
-  mustCollectData: CollectedKycDataOption[];
-  mustCollectIdentityDocument: boolean;
   name: string;
   orgName: string;
   status: 'enabled' | 'disabled';
+  mustCollectData: CollectedKycDataOption[];
+  mustCollectIdentityDocument: boolean;
+  mustCollectSelfie: boolean; // Frontend placeholder until the backend implementation
+  canAccessData: CollectedKycDataOption[];
+  canAccessIdentityDocumentImages: boolean;
+  canAccessSelfie: boolean; // Frontend placeholder until the backend implementation
 };

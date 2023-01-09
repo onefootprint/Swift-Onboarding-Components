@@ -86,24 +86,18 @@ describe('<OnboardingConfigs />', () => {
           expect(
             within(mustCollectList).getByText('Full name'),
           ).toBeInTheDocument();
+          expect(
+            within(mustCollectList).getByText('ID Document'),
+          ).toBeInTheDocument();
           const canAccessList = within(item).getByTestId(
             `can-access-data-${onboardingConfig.id}`,
           );
 
-          const idDocRowTitle = within(item).getByTestId(
-            `id-doc-${onboardingConfig.id}`,
-          );
-          expect(idDocRowTitle).toBeInTheDocument();
-          expect(idDocRowTitle.textContent).toEqual('ID document');
-
-          const idDocRowStatus = within(item).getByTestId(
-            `id-doc-status-${onboardingConfig.id}`,
-          );
-          expect(idDocRowStatus).toBeInTheDocument();
-          expect(idDocRowStatus.textContent).toEqual('Required');
-
           expect(
             within(canAccessList).getByText('Date of Birth'),
+          ).toBeInTheDocument();
+          expect(
+            within(canAccessList).getByText('ID Document'),
           ).toBeInTheDocument();
           const onboardingKey = within(item).getByText(onboardingConfig.key);
           expect(onboardingKey).toBeInTheDocument();
