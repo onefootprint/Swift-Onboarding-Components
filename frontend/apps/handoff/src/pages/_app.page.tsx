@@ -8,7 +8,7 @@ import Head from 'next/head';
 import React from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
-import Header from '../components/header';
+import Layout from '../components/layout';
 import MachineProvider from '../components/machine-provider';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
@@ -38,8 +38,9 @@ const App = ({ Component, pageProps }: AppProps) => (
               />
             )} */}
         </Head>
-        <Header />
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </DesignSystemProvider>
     </MachineProvider>
   </QueryClientProvider>
@@ -56,7 +57,8 @@ const GlobalStyle = createGlobalStyle`
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: ${theme.spacing[5]} ${theme.spacing[6]};
+      padding: ${theme.spacing[5]} ${theme.spacing[6]} ${theme.spacing[11]}
+        ${theme.spacing[6]};
     }
   `}`;
 

@@ -2,7 +2,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import SecuredByFootprint from './components/secured-by-footprint';
+import SecuredByFootprint from '../secured-by-footprint';
 import type { Link } from './footprint-footer.types';
 
 const FootprintFooter = () => {
