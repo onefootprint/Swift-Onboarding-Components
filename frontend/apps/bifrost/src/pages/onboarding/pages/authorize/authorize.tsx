@@ -23,7 +23,6 @@ import {
   Typography,
   useToast,
 } from '@onefootprint/ui';
-import { useIsMutating } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import { Events } from 'src/utils/state-machine/onboarding/types';
@@ -53,7 +52,6 @@ const Authorize = () => {
   const onboardingAuthorizeMutation = useOnboardingAuthorize();
   const toast = useToast();
   const { t } = useTranslation('pages.authorize');
-  const isMutating = useIsMutating();
   const [state, send] = useOnboardingMachine();
   const [collectedDocs, setCollectedDocs] = useState<IdDocType[]>();
   const {
@@ -145,7 +143,7 @@ const Authorize = () => {
         </CategoriesContainer>
         <FootprintButton
           fullWidth
-          loading={isMutating > 0}
+          loading={onboardingAuthorizeMutation.isLoading}
           onClick={handleClick}
           text={t('cta')}
         />
