@@ -55,7 +55,6 @@ export type MachineContext = {
   };
   selfie: {
     required?: boolean;
-    requiresConsent?: boolean;
     image?: string; // Base64 encoded
   };
 };
@@ -69,7 +68,6 @@ export type MachineEvents =
         requestId?: string;
         selfieRequired?: boolean;
         idDocRequired?: boolean;
-        selfieRequiresConsent?: boolean;
       };
     }
   | {

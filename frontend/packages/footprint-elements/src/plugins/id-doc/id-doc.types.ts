@@ -4,7 +4,6 @@ type IdDocCustomData = {
   requestId?: string;
   shouldCollectIdDoc?: boolean;
   shouldCollectSelfie?: boolean;
-  shouldCollectSelfieConsent?: boolean;
 };
 
 export type IdDocProps = BasePluginProps<IdDocCustomData>;

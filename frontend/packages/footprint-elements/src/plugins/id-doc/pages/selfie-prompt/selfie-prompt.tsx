@@ -15,10 +15,7 @@ import SelfieConsent from '../../components/selfie-consent';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
 const SelfiePrompt = () => {
-  const [state, send] = useIdDocMachine();
-  const {
-    selfie: { requiresConsent },
-  } = state.context;
+  const [, send] = useIdDocMachine();
   const { t } = useTranslation('pages.selfie-photo-prompt');
   const [consentVisible, setConsentVisible] = useState(false);
 
@@ -32,11 +29,7 @@ const SelfiePrompt = () => {
   };
 
   const handleClick = () => {
-    if (requiresConsent) {
-      setConsentVisible(true);
-    } else {
-      send({ type: Events.startSelfieCapture });
-    }
+    setConsentVisible(true);
   };
 
   return (
