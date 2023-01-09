@@ -6,35 +6,21 @@ import Filter from './filters';
 export default {
   title: 'Patterns/Filters',
   component: Filter,
-  argTypes: {
-    children: {
-      control: 'text',
-      description: 'Content to be rendered within the component',
-      name: 'Children *',
-      required: true,
-    },
-    as: {
-      control: 'select',
-      options: ['div', 'section', 'article', 'main'],
-      table: { defaultValue: { summary: 'div' } },
-    },
-    testID: {
-      control: 'text',
-      description: 'Append an attribute data-testid for testing purposes',
-    },
-  },
+  argTypes: {},
 } as ComponentMeta<typeof Filter>;
 
-const Template: Story = () => {
-  const [filters, setFilters] = useState<{
-    statuses: [];
-    attributes: [];
-    dateRange: [];
-  }>({
-    statuses: [],
-    attributes: [],
-    dateRange: [],
-  });
+const defaultFilters: {
+  statuses: [];
+  attributes: [];
+  dateRange: [];
+} = {
+  statuses: [],
+  attributes: [],
+  dateRange: [],
+};
+
+const Template: Story = ({ onClear, onChange }) => {
+  const [filters, setFilters] = useState(defaultFilters);
 
   return (
     <Filter
@@ -92,15 +78,27 @@ const Template: Story = () => {
           selectedOptions: filters.dateRange,
         },
       ]}
-      onChange={(query, options) => {
+      onClear={() => {
+        setFilters(defaultFilters);
+        onClear?.();
+      }}
+      onChange={(query, newOptions) => {
         setFilters(prevFilters => ({
           ...prevFilters,
-          [query]: options,
+          [query]: newOptions,
         }));
+        onChange?.(query, newOptions);
       }}
     />
   );
 };
 
 export const Base = Template.bind({});
-Base.args = {};
+Base.args = {
+  onChange: (query: string, newOptions: string[]) => {
+    console.log('changed', { query, newOptions });
+  },
+  onClear: () => {
+    console.log('clear');
+  },
+};

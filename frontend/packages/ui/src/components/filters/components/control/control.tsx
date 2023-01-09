@@ -20,16 +20,9 @@ import getMultiSelectLabel from './utils/get-multi-select-label';
 export type ControlProps = {
   control: FilterControl;
   onChange: (query: string, newSelectedOptions: FilterSelectedOption[]) => void;
-  primaryButtonLabel: string;
-  secondaryButtonLabel: string;
 };
 
-const Control = ({
-  control,
-  onChange,
-  primaryButtonLabel,
-  secondaryButtonLabel,
-}: ControlProps) => {
+const Control = ({ control, onChange }: ControlProps) => {
   const [open, setOpen] = useState(false);
   const popoverId = useId();
   const dateOptions = useDateOptions();
@@ -91,13 +84,7 @@ const Control = ({
           ref={setPopperElement}
           style={styles.popper}
         >
-          <Popover
-            id={popoverId}
-            onClose={close}
-            primaryButtonLabel={primaryButtonLabel}
-            secondaryButtonLabel={secondaryButtonLabel}
-            title={control.label}
-          >
+          <Popover id={popoverId} onClose={close} title={control.label}>
             {kind === 'multi-select' && (
               <MultiSelectForm
                 onSubmit={handleSubmit}

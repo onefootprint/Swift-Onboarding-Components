@@ -37,26 +37,45 @@ describe('<Filters />', () => {
         selectedOptions: [],
       },
     ],
-    label = 'Filter by',
     onChange,
-    primaryButtonLabel = 'Apply',
-    secondaryButtonLabel = 'Cancel',
+    onClear,
   }: Partial<FiltersProps>) =>
     customRender(
-      <Filters
-        controls={controls}
-        label={label}
-        onChange={onChange}
-        primaryButtonLabel={primaryButtonLabel}
-        secondaryButtonLabel={secondaryButtonLabel}
-      />,
+      <Filters controls={controls} onChange={onChange} onClear={onClear} />,
     );
 
-  it('should render the label', () => {
-    renderFilters({ label: 'Filter by' });
-    const label = screen.getByText('Filter by');
+  it('should not render the clear button when there is no selectedOption', () => {
+    renderFilters({});
+    const clearButton = screen.queryByRole('button', {
+      name: 'Clear filters',
+    });
+    expect(clearButton).not.toBeInTheDocument();
+  });
 
-    expect(label).toBeInTheDocument();
+  describe('when there is a selectedOption', () => {
+    it('should trigger onClear when clicking on the clear button', async () => {
+      const onClear = jest.fn();
+      renderFilters({
+        onClear,
+        controls: [
+          {
+            query: 'status',
+            label: 'Status',
+            kind: 'multi-select',
+            options: [
+              { label: 'Verified', value: 'verified' },
+              { label: 'Failed', value: 'failed' },
+              { label: 'Review required', value: 'review_required' },
+              { label: 'Id required', value: 'id_required' },
+            ],
+            selectedOptions: ['verified'],
+          },
+        ],
+      });
+      const clearButton = screen.getByRole('button', { name: 'Clear filters' });
+      await userEvent.click(clearButton);
+      expect(onClear).toHaveBeenCalled();
+    });
   });
 
   describe('multi-select variant', () => {

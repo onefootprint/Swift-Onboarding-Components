@@ -14,19 +14,10 @@ export type PopoverProps = {
   children: React.ReactNode;
   id: string;
   onClose: () => void;
-  primaryButtonLabel?: string;
-  secondaryButtonLabel?: string;
   title: string;
 };
 
-const Popover = ({
-  children,
-  id,
-  onClose,
-  primaryButtonLabel = 'Apply',
-  secondaryButtonLabel = 'Cancel',
-  title,
-}: PopoverProps) => {
+const Popover = ({ children, id, onClose, title }: PopoverProps) => {
   const headerId = useId();
   const bodyId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +45,7 @@ const Popover = ({
         <Body id={bodyId}>{children}</Body>
         <Footer>
           <Button onClick={onClose} size="small" variant="secondary">
-            {secondaryButtonLabel}
+            Cancel
           </Button>
           <Button
             form="filter-form"
@@ -62,7 +53,7 @@ const Popover = ({
             type="submit"
             variant="primary"
           >
-            {primaryButtonLabel}
+            Apply
           </Button>
         </Footer>
       </PopoverContainer>
