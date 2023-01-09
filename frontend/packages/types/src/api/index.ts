@@ -4,6 +4,7 @@ export * from './d2p-generate';
 export * from './d2p-sms';
 export * from './decrypt-id-doc';
 export * from './decrypt-kyc-data';
+export * from './get-auth-roles';
 export * from './get-d2p-status';
 export * from './get-doc-status';
 export * from './get-kyc-status';

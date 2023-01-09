@@ -20,10 +20,10 @@ const Organizations = () => {
   const authToken = (router.query.token || '') as string;
   const getRoles = useGetRoles(authToken);
   const { logIn } = useSession();
-  const assumeRole = useAssumeRole();
+  const assumeRoleMutation = useAssumeRole();
 
   const handleTenantSelect = (tenantId: string) => {
-    assumeRole.mutate(
+    assumeRoleMutation.mutate(
       { tenantId, authToken },
       {
         onSuccess({ user, tenant }: OrgAssumeRoleResponse) {
@@ -44,7 +44,7 @@ const Organizations = () => {
         <Inner>
           <TableContainer>
             <Table<Organization>
-              aria-label="flerp"
+              aria-label={t('table.aria-label')}
               columns={[{ text: 'Name' }]}
               hideThead
               items={getRoles.data}

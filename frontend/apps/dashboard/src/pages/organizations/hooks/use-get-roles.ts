@@ -1,14 +1,10 @@
 import request, { RequestError } from '@onefootprint/request';
-import { Organization } from '@onefootprint/types';
+import { GetAuthRolesRequest, Organization } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 
-type GetRolesRequest = {
-  authToken: string;
-};
-
-const getRolesRequest = async ({ authToken }: GetRolesRequest) => {
+const getRolesRequest = async ({ authToken }: GetAuthRolesRequest) => {
   const { data } = await request<Organization[]>({
     method: 'GET',
     url: '/org/auth/roles',
@@ -21,8 +17,12 @@ const getRolesRequest = async ({ authToken }: GetRolesRequest) => {
 };
 
 const useGetRoles = (authToken: string) =>
-  useQuery<Organization[], RequestError>(['get-roles', authToken], () =>
-    getRolesRequest({ authToken }),
+  useQuery<Organization[], RequestError>(
+    ['get-roles', authToken],
+    () => getRolesRequest({ authToken }),
+    {
+      enabled: !!authToken,
+    },
   );
 
 export default useGetRoles;

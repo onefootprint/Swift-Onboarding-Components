@@ -112,6 +112,12 @@
         "failed-needs-review": "This user could not be verified and needs to be manually reviewed.",
         "see-audit-trail": "See audit trail"
       }
+    },
+    "terms-and-conditions": {
+      "by-continuing": "By continuing you agree to our",
+      "terms-of-service": "Terms of Service",
+      "and": "and",
+      "privacy-policy": "Privacy Policy."
     }
   },
   "pages": {
@@ -123,7 +129,10 @@
     },
     "organizations": {
       "page-title": "Footprint Login | Select an Organization",
-      "title": "Select an organization"
+      "title": "Select an organization",
+      "table": {
+        "aria-label": "Table of organizations"
+      }
     },
     "email-login": {
       "page-title": "Footprint Login | Sign in to the Footprint Dashboard",
