@@ -10,7 +10,7 @@ import styled, { css } from 'styled-components';
 import SEO from '../../components/seo';
 import Footer from './components/footer';
 
-const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY;
 
 const Live = () => {
   const { t } = useTranslation('home');
