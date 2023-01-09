@@ -15,6 +15,7 @@ export type KycDataFormData = {
   [CollectedKycDataOption.name]?: boolean;
 };
 
-export type IdDocFormData = {
+export type DocumentsFormData = {
   idDoc: boolean;
+  selfie?: boolean;
 };

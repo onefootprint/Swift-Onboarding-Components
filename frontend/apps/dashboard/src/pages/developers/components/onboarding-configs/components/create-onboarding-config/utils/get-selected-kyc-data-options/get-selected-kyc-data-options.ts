@@ -1,6 +1,6 @@
 import { CollectedKycDataOption } from '@onefootprint/types';
 
-export const getSelectedDataOptionsList = (
+export const getSelectedKycDataOptionsList = (
   formData: Record<string, boolean | string | number> = {},
 ) => {
   const dataOptionsToShow: CollectedKycDataOption[] = [];
@@ -12,11 +12,11 @@ export const getSelectedDataOptionsList = (
   return dataOptionsToShow;
 };
 
-export const getSelectedDataOptions = (
+export const getSelectedKycDataOptions = (
   formData: Record<string, boolean | string | number> = {},
 ) => {
   const dataOptionsToShow = new Map();
-  getSelectedDataOptionsList(formData).forEach(k =>
+  getSelectedKycDataOptionsList(formData).forEach(k =>
     dataOptionsToShow.set(k, true),
   );
   return dataOptionsToShow;

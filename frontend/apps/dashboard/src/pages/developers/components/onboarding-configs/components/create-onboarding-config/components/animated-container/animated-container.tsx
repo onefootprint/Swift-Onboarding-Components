@@ -2,15 +2,15 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 
-type RadioGroupContainerProps = {
+type AnimatedContainerProps = {
   isExpanded: boolean;
   children: React.ReactNode;
 };
 
-const RadioGroupContainer = ({
+const AnimatedContainer = ({
   isExpanded,
   children,
-}: RadioGroupContainerProps) => {
+}: AnimatedContainerProps) => {
   const [animate] = useAutoAnimate<HTMLDivElement>();
   return (
     <Box ref={animate}>
@@ -23,4 +23,4 @@ const RadioGroupContainer = ({
   );
 };
 
-export default RadioGroupContainer;
+export default AnimatedContainer;

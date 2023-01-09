@@ -1,20 +1,22 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
-import { Box, Checkbox, Divider, Radio, Toggle } from '@onefootprint/ui';
+import { Box, Checkbox, Radio, Typography } from '@onefootprint/ui';
+import Link from 'next/link';
 import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type {
-  IdDocFormData,
+  DocumentsFormData,
   KycDataFormData,
 } from '../../create-onboarding-config.types';
+import AnimatedContainer from '../animated-container';
 import FormTitle from '../form-title';
-import RadioGroupContainer from './components/radio-group-container';
 
 export type CollectFormData = {
   kycData: KycDataFormData;
-  idDoc: IdDocFormData;
+  documents: DocumentsFormData;
 };
 
 type FormData = {
@@ -22,7 +24,9 @@ type FormData = {
     showSSNOptions: boolean;
     ssnKind?: UserDataAttribute.ssn4 | UserDataAttribute.ssn9;
   };
-  idDoc: IdDocFormData;
+  documents: DocumentsFormData & {
+    showSelfie: boolean;
+  };
 };
 
 type CollectFormProps = {
@@ -35,10 +39,11 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     'pages.developers.onboarding-configs.create.collect-form',
   );
   const defaultKycData = defaultValues.kycData;
-  const defaultIdDocData = defaultValues.idDoc;
+  const defaultDocumentData = defaultValues.documents;
   const [innerFields, setInnerFields] = useState({
     ssn: defaultKycData.ssn4 || defaultKycData.ssn9,
     address: defaultKycData.full_address || defaultKycData.partial_address,
+    idDoc: !!defaultDocumentData.idDoc,
   });
 
   const getInitialSSNKind = () => {
@@ -51,15 +56,16 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     return undefined;
   };
 
-  const { setValue, register, handleSubmit, control } = useForm<FormData>({
+  const { setValue, register, handleSubmit } = useForm<FormData>({
     defaultValues: {
       kycData: {
         ...defaultKycData,
         showSSNOptions: innerFields.ssn,
         ssnKind: getInitialSSNKind(),
       },
-      idDoc: {
-        ...defaultIdDocData,
+      documents: {
+        ...defaultDocumentData,
+        showSelfie: innerFields.idDoc,
       },
     },
   });
@@ -70,8 +76,14 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     setValue('kycData.ssnKind', checked ? UserDataAttribute.ssn9 : undefined);
   };
 
+  const handleIdDocChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setInnerFields(prevState => ({ ...prevState, idDoc: checked }));
+    setValue('documents.showSelfie', checked);
+  };
+
   const handleBeforeSubmit = (formData: FormData) => {
-    const { kycData, idDoc } = formData;
+    const { kycData, documents: idDoc } = formData;
     const submittedData = {
       kycData: {
         [CollectedKycDataOption.email]: true,
@@ -82,7 +94,10 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         [UserDataAttribute.ssn4]: kycData.ssnKind === UserDataAttribute.ssn4,
         [UserDataAttribute.ssn9]: kycData.ssnKind === UserDataAttribute.ssn9,
       },
-      idDoc,
+      documents: {
+        idDoc: idDoc.idDoc,
+        selfie: idDoc.selfie,
+      },
     };
     onSubmit(submittedData);
   };
@@ -123,7 +138,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
             {...register('kycData.showSSNOptions')}
             onChange={handleSSNKindsChange}
           />
-          <RadioGroupContainer isExpanded={!!innerFields.ssn}>
+          <AnimatedContainer isExpanded={!!innerFields.ssn}>
             <Radio
               value={UserDataAttribute.ssn9}
               label={t('collected-data.ssn_full')}
@@ -134,55 +149,60 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
               label={t('collected-data.ssn_last_4')}
               {...register('kycData.ssnKind')}
             />
-          </RadioGroupContainer>
+          </AnimatedContainer>
         </Box>
         {/* TODO: https://linear.app/footprint/issue/FP-1696/relax-the-constraints-on-dashboard-onboarding-config-creation-collect */}
         <Box>
           <Checkbox label={t('collected-data.address')} disabled checked />
         </Box>
-      </CheckboxContainer>
-      <StyledDivider />
-      <FormTitle
-        title={t('id-doc.title')}
-        description={t('id-doc.description')}
-      />
-      {/* TODO: https://linear.app/footprint/issue/FP-1607/improve-toggle-react-hook-form-integration */}
-      <Controller
-        control={control}
-        name="idDoc.idDoc"
-        render={({ field }) => (
-          <Toggle
-            onBlur={field.onBlur}
-            onChange={nextValue => {
-              field.onChange(nextValue);
-            }}
-            label={t('id-doc.toggle-label')}
-            checked={field.value}
-            sx={{ justifyContent: 'flex-start' }}
+        <Box>
+          <Checkbox
+            label={t('documents.id-doc')}
+            {...register(`documents.idDoc`)}
+            onChange={handleIdDocChange}
           />
-        )}
-      />
-      {/* TODO: https://linear.app/footprint/issue/FP-1595/create-pdf-with-supported-doc-types-and-countries-that-we-can-link */}
-      {/* <Typography variant="caption-1" color="tertiary" sx={{ marginTop: 6 }}>
-        {t('id-doc.supported-docs')}&nbsp;
-        <Link href="/" target="_blank" rel="noreferrer noopener">
-          {t('id-doc.supported-docs-link')}
-        </Link>
-      </Typography> */}
+          {!innerFields.idDoc && (
+            <IdDocDescription>
+              <Typography variant="body-3" color="tertiary">
+                <Trans
+                  i18nKey="pages.developers.onboarding-configs.create.collect-form.documents.id-doc-description"
+                  components={{
+                    // https://linear.app/footprint/issue/FP-1595/create-website-page-with-supported-doc-types-and-countries-that-we-can
+                    a: (
+                      <Link
+                        href="http://www.onefootprint.com/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      />
+                    ),
+                  }}
+                />
+              </Typography>
+            </IdDocDescription>
+          )}
+          <AnimatedContainer isExpanded={innerFields.idDoc}>
+            <Checkbox
+              label={t('documents.selfie')}
+              {...register(`documents.selfie`)}
+            />
+          </AnimatedContainer>
+        </Box>
+      </CheckboxContainer>
     </form>
   );
 };
-
-const StyledDivider = styled(Divider)`
-  ${({ theme }) => css`
-    margin: ${theme.spacing[8]} 0;
-  `}
-`;
 
 const CheckboxContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
     gap: ${theme.spacing[3]};
+  `}
+`;
+
+const IdDocDescription = styled.div`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[2]};
+    margin-left: calc(${theme.spacing[2]} + ${theme.spacing[7]});
   `}
 `;
 

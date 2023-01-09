@@ -2,7 +2,7 @@ import { CollectedKycDataOption } from '@onefootprint/types';
 import { useReducer } from 'react';
 
 import type {
-  IdDocFormData,
+  DocumentsFormData,
   KycDataFormData,
 } from '../create-onboarding-config.types';
 
@@ -20,7 +20,7 @@ type Action =
 type StateData = {
   name: string;
   kycData: KycDataFormData;
-  idDoc: IdDocFormData;
+  documents: DocumentsFormData;
 };
 
 type State = {
@@ -38,7 +38,7 @@ const initialState: State = {
       [CollectedKycDataOption.fullAddress]: true,
       [CollectedKycDataOption.name]: true,
     },
-    idDoc: {
+    documents: {
       idDoc: false,
     },
   },

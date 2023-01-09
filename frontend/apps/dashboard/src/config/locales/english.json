@@ -657,12 +657,10 @@
               "full_address": "Full",
               "partial_address": "Country & Zip Code"
             },
-            "id-doc": {
-              "title": "ID Document",
-              "description": "If you wish, you may always require an ID document to be collected during onboarding. If you decide not to, please be aware that we might still need to ask some users to do so as part of our step-up verification flow.",
-              "toggle-label": "Always require",
-              "supported-docs": "For the full list of countries and document types we support, please go",
-              "supported-docs-link": "here."
+            "documents": {
+              "id-doc": "ID Document",
+              "id-doc-description": "We might still need to ask some users to capture their ID Document as part of our step-up verification flow. For the full list of countries and document types we support, please go <a>here.</a>",
+              "selfie": "Selfie"
             }
           },
           "access-form": {

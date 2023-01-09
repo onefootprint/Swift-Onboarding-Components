@@ -1,39 +1,68 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { CollectedKycDataOption } from '@onefootprint/types';
-import { Checkbox } from '@onefootprint/ui';
-import React from 'react';
+import { Box, Checkbox } from '@onefootprint/ui';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import type {
-  IdDocFormData,
+  DocumentsFormData,
   KycDataFormData,
 } from '../../create-onboarding-config.types';
+import AnimatedContainer from '../animated-container/animated-container';
 import FormTitle from '../form-title';
 
 export type AccessFormData = {
   kycData: KycDataFormData;
-  idDoc: IdDocFormData;
+  documents: DocumentsFormData;
 };
 
 type AccessFormProps = {
-  defaultValues?: AccessFormData;
+  defaultValues: AccessFormData;
   fields: {
     kycData: Map<CollectedKycDataOption, boolean>;
-    idDoc: boolean;
+    documents: {
+      idDoc: boolean;
+      selfie?: boolean;
+    };
   };
   onSubmit: (formData: AccessFormData) => void;
+};
+
+type FormData = {
+  kycData: KycDataFormData;
+  documents: DocumentsFormData & {
+    showSelfie: boolean;
+  };
 };
 
 const AccessForm = ({
   defaultValues,
   onSubmit,
-  fields: { kycData, idDoc },
+  fields: { kycData, documents },
 }: AccessFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create',
   );
-  const { register, handleSubmit } = useForm<AccessFormData>({ defaultValues });
+  const defaultKycData = defaultValues?.kycData;
+  const defaultDocumentData = defaultValues?.documents;
+  const [innerFields, setInnerFields] = useState({
+    idDoc: !!defaultDocumentData.idDoc,
+  });
+  const { setValue, register, handleSubmit } = useForm<FormData>({
+    defaultValues: {
+      kycData: defaultKycData,
+      documents: {
+        ...defaultDocumentData,
+        showSelfie: innerFields.idDoc,
+      },
+    },
+  });
+  const handleIdDocChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setInnerFields(prevState => ({ ...prevState, idDoc: checked }));
+    setValue('documents.showSelfie', checked);
+  };
 
   return (
     <form
@@ -89,12 +118,21 @@ const AccessForm = ({
             {...register(`kycData.${CollectedKycDataOption.fullAddress}`)}
           />
         )}
-        {idDoc && (
-          <Checkbox
-            label={allT('collected-id-doc-attributes.id-doc-image')}
-            {...register(`idDoc.idDoc`)}
-          />
-        )}
+        <Box>
+          {documents.idDoc && (
+            <Checkbox
+              label={allT('collected-id-doc-attributes.id-doc-image')}
+              {...register(`documents.idDoc`)}
+              onChange={handleIdDocChange}
+            />
+          )}
+          <AnimatedContainer isExpanded={innerFields.idDoc}>
+            <Checkbox
+              label={allT('collected-id-doc-attributes.selfie-image')}
+              {...register(`documents.selfie`)}
+            />
+          </AnimatedContainer>
+        </Box>
       </CheckboxContainer>
     </form>
   );

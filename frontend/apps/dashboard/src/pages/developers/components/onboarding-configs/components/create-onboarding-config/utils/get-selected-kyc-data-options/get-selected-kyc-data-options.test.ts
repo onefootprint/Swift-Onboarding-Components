@@ -1,9 +1,9 @@
-import { getSelectedDataOptions } from './get-selected-data-options';
+import { getSelectedKycDataOptions } from './get-selected-kyc-data-options';
 
-describe('getSelectedDataOptions', () => {
+describe('getSelectedKycDataOptions', () => {
   it('should return the expected value', () => {
     const response0 = Object.fromEntries(
-      getSelectedDataOptions({
+      getSelectedKycDataOptions({
         full_address: true,
         dob: true,
         ssn9: true,
@@ -21,7 +21,7 @@ describe('getSelectedDataOptions', () => {
     });
 
     const response1 = Object.fromEntries(
-      getSelectedDataOptions({
+      getSelectedKycDataOptions({
         full_address: true,
         dob: true,
         ssn4: true,
@@ -39,7 +39,7 @@ describe('getSelectedDataOptions', () => {
     });
 
     const response2 = Object.fromEntries(
-      getSelectedDataOptions({
+      getSelectedKycDataOptions({
         full_address: false,
         dob: false,
         ssn4: false,
@@ -49,7 +49,7 @@ describe('getSelectedDataOptions', () => {
     );
     expect(response2).toEqual({});
 
-    const response3 = Object.fromEntries(getSelectedDataOptions({}));
+    const response3 = Object.fromEntries(getSelectedKycDataOptions({}));
     expect(response3).toEqual({});
   });
 });

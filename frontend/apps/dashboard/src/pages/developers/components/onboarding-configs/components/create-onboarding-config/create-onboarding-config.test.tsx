@@ -187,8 +187,13 @@ describe('<CreateDialog />', () => {
     it('should show id document if it was collected', async () => {
       await renderCreateDialogOnTheCollectDataSection();
 
-      const idDocToggle = screen.getByRole('switch');
-      await userEvent.click(idDocToggle);
+      let idDocCheckbox = screen.getByLabelText('ID Document');
+      await userEvent.click(idDocCheckbox);
+
+      await waitFor(() => {
+        const selfieCheckbox = screen.getByLabelText('Selfie');
+        expect(selfieCheckbox).toBeInTheDocument();
+      });
 
       const nextButton = screen.getByRole('button', { name: 'Next' });
       await userEvent.click(nextButton);
@@ -197,8 +202,13 @@ describe('<CreateDialog />', () => {
         expect(screen.getByTestId('access-form')).toBeVisible();
       });
 
-      const idDocCheckbox = screen.getByLabelText('ID Document');
+      idDocCheckbox = screen.getByLabelText('ID Document');
       expect(idDocCheckbox).toBeInTheDocument();
+
+      await waitFor(() => {
+        const selfieCheckbox = screen.getByLabelText('Selfie');
+        expect(selfieCheckbox).toBeInTheDocument();
+      });
     });
 
     describe('when selecting the ssn', () => {

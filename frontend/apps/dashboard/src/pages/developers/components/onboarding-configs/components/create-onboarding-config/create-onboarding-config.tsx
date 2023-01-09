@@ -10,9 +10,9 @@ import type { NameFormData } from './create-onboarding-config.types';
 import useCreateOnboardingConfig from './hooks/use-create-onboarding-config';
 import useCreateState, { Actions } from './hooks/use-create-state';
 import {
-  getSelectedDataOptions,
-  getSelectedDataOptionsList,
-} from './utils/get-selected-data-options';
+  getSelectedKycDataOptions,
+  getSelectedKycDataOptionsList,
+} from './utils/get-selected-kyc-data-options';
 
 export type CreateOnboardingConfigProps = {
   open: boolean;
@@ -76,13 +76,13 @@ const CreateOnboardingConfig = ({
   };
 
   const handleSubmitCollect = (formData: CollectFormData) => {
-    const { kycData, idDoc } = formData;
+    const { kycData, documents } = formData;
     dispatch({
       type: Actions.next,
       payload: {
         data: {
           kycData,
-          idDoc,
+          documents,
         },
       },
     });
@@ -92,10 +92,10 @@ const CreateOnboardingConfig = ({
     mutation.mutate(
       {
         name: state.data.name,
-        mustCollectData: getSelectedDataOptionsList(state.data.kycData),
-        mustCollectIdentityDocument: !!state.data.idDoc.idDoc,
-        canAccessData: getSelectedDataOptionsList(accessFormData.kycData),
-        canAccessIdentityDocumentImages: accessFormData.idDoc.idDoc,
+        mustCollectData: getSelectedKycDataOptionsList(state.data.kycData),
+        mustCollectIdentityDocument: !!state.data.documents.idDoc,
+        canAccessData: getSelectedKycDataOptionsList(accessFormData.kycData),
+        canAccessIdentityDocumentImages: accessFormData.documents.idDoc,
       },
       {
         onSuccess: () => {
@@ -144,7 +144,7 @@ const CreateOnboardingConfig = ({
           onSubmit={handleSubmitCollect}
           defaultValues={{
             kycData: state.data.kycData,
-            idDoc: state.data.idDoc,
+            documents: state.data.documents,
           }}
         />
       )}
@@ -152,15 +152,19 @@ const CreateOnboardingConfig = ({
         <AccessForm
           onSubmit={handleSubmitAccess}
           fields={{
-            kycData: getSelectedDataOptions(state.data.kycData),
-            idDoc: !!state.data.idDoc.idDoc,
+            kycData: getSelectedKycDataOptions(state.data.kycData),
+            documents: {
+              idDoc: !!state.data.documents.idDoc,
+              selfie: !!state.data.documents.selfie,
+            },
           }}
           defaultValues={{
             kycData: Object.fromEntries(
-              getSelectedDataOptions(state.data.kycData),
+              getSelectedKycDataOptions(state.data.kycData),
             ),
-            idDoc: {
-              idDoc: !!state.data.idDoc.idDoc,
+            documents: {
+              idDoc: !!state.data.documents.idDoc,
+              selfie: !!state.data.documents.selfie,
             },
           }}
         />
