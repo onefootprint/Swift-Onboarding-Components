@@ -19,7 +19,6 @@ const Layout = ({ children }: LayoutProps) => (
 const LayoutContainer = styled.div`
   ${({ theme }) => css`
     background: ${theme.components.bifrost.dialog.bg};
-    border-radius: ${theme.components.bifrost.dialog.borderRadius};
     display: flex;
     flex-direction: column;
     height: 100vh;

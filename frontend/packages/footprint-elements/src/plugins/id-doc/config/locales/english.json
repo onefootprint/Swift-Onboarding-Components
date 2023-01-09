@@ -91,6 +91,16 @@
         }
       }
     },
+    "selfie-photo": {
+      "camera": {
+        "instructions": "Center your face in the area",
+        "take": "Take photo"
+      },
+      "preview": {
+        "retake": "Retake",
+        "confirm": "Use photo"
+      }
+    },
     "processing-documents": {
       "title": "Processing your documents",
       "subtitle": "This should only take a few seconds.",
