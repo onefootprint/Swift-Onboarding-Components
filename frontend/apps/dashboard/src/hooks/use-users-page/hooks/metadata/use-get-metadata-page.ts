@@ -79,6 +79,9 @@ const useGetMetadataPage = (
   if (filters.fingerprint) {
     params.fingerprint = filters.fingerprint;
   }
+  if (filters.cursors) {
+    params.cursors = filters.cursors;
+  }
 
   return useQuery(
     ['get-metadata-page', params, authHeaders, pageSize],
