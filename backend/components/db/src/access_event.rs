@@ -7,6 +7,7 @@ use crate::models::scoped_user::*;
 use crate::models::tenant::Tenant;
 use crate::schema;
 use crate::DbPool;
+use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::AccessEventKind;
@@ -44,8 +45,8 @@ impl AccessEventListItemForTenant {
         cursor: Option<i64>,
         page_size: i64,
     ) -> Result<Vec<Self>, DbError> {
-        let result: Vec<(AccessEvent, ScopedUser, Option<InsightEvent>, Option<Tenant>)> = pool
-            .db_query(move |conn| {
+        let list_items = pool
+            .db_query(move |conn| -> DbResult<_> {
                 let mut results = schema::access_event::table
                     .inner_join(schema::scoped_user::table)
                     .left_join(schema::insight_event::table)
@@ -92,16 +93,13 @@ impl AccessEventListItemForTenant {
                     results = results.filter(schema::access_event::ordering_id.le(cursor));
                 }
 
-                results.load(conn)
-            })
-            .await??;
+                let results: Vec<(AccessEvent, ScopedUser, Option<InsightEvent>, Option<Tenant>)> =
+                    results.load(conn)?;
 
-        let list_items: Vec<AccessEventListItemForTenant> = pool // TODO: would it be better to do this in the above db_query?
-            .db_query(move |conn| {
-                let access_events: Vec<AccessEvent> = result.clone().into_iter().map(|r| r.0).collect();
-                let access_event_infos = actor::saturate_actors(conn, access_events).unwrap();
-
-                result
+                // Saturate the actors from the DB
+                let access_events: Vec<AccessEvent> = results.iter().map(|r| r.0.clone()).collect();
+                let access_event_infos = actor::saturate_actors(conn, access_events)?;
+                let results = results
                     .into_iter()
                     .zip(access_event_infos.into_iter())
                     .map(|((_, scoped_user, insight_event, _), access_event_info)| Self {
@@ -109,9 +107,11 @@ impl AccessEventListItemForTenant {
                         scoped_user,
                         insight: insight_event,
                     })
-                    .collect::<Vec<AccessEventListItemForTenant>>()
+                    .collect();
+
+                Ok(results)
             })
-            .await?;
+            .await??;
 
         Ok(list_items)
     }
@@ -126,29 +126,22 @@ pub struct AccessEventListItemForUser {
 
 impl AccessEventListItemForUser {
     /// get access events for a user
-    pub async fn get(
-        pool: &DbPool,
-        user_vault_id: UserVaultId,
-    ) -> Result<Vec<AccessEventListItemForUser>, DbError> {
-        let result: Vec<(AccessEvent, ScopedUser, Tenant)> = pool
-            .db_query(move |conn| {
-                schema::access_event::table
+    pub async fn get(pool: &DbPool, user_vault_id: UserVaultId) -> Result<Vec<Self>, DbError> {
+        let list_items = pool
+            .db_query(move |conn| -> DbResult<_> {
+                let results: Vec<(AccessEvent, ScopedUser, Tenant)> = schema::access_event::table
                     .inner_join(schema::scoped_user::table)
                     .inner_join(
                         schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_user::tenant_id)),
                     )
                     .order_by(schema::access_event::timestamp.desc())
                     .filter(schema::scoped_user::user_vault_id.eq(user_vault_id))
-                    .load(conn)
-            })
-            .await??;
+                    .load(conn)?;
 
-        let list_items: Vec<AccessEventListItemForUser> = pool
-            .db_query(move |conn| {
-                let access_events = result.clone().into_iter().map(|e| e.0).collect();
-                let access_event_infos = actor::saturate_actors(conn, access_events).unwrap();
-
-                result
+                // Saturate the actors on the access events
+                let access_events = results.iter().map(|e| e.0.clone()).collect();
+                let access_event_infos = actor::saturate_actors(conn, access_events)?;
+                let results = results
                     .into_iter()
                     .zip(access_event_infos.into_iter())
                     .map(|((_, scoped_user, tenant), access_event_info)| Self {
@@ -156,9 +149,10 @@ impl AccessEventListItemForUser {
                         scoped_user,
                         tenant_name: tenant.name,
                     })
-                    .collect::<Vec<AccessEventListItemForUser>>()
+                    .collect();
+                Ok(results)
             })
-            .await?;
+            .await??;
 
         Ok(list_items)
     }
