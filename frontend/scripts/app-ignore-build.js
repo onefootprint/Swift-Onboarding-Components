@@ -19,7 +19,7 @@ const dirArray = process.argv[2] || '';
 const dirSet = new Set(dirArray.split(',').map(d => d.trim()));
 
 const hasChanged = (fileNameList, folder) => {
-  fileNameList.some(file => file.startsWith(folder));
+  return fileNameList.some(file => file.startsWith(folder));
 };
 
 const stepCheck = () => {
@@ -38,6 +38,7 @@ const stepCheck = () => {
   // We don't want to build the frontend if only the backend has changed
   const hasBackendChanged = hasChanged(fileNameList, 'backend');
   const hasFrontendChanged = hasChanged(fileNameList, 'frontend');
+
   if (hasBackendChanged && !hasFrontendChanged) {
     return abortBuild();
   }
