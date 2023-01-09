@@ -1,12 +1,9 @@
 import { RiskSignal } from '../data';
 
 export type GetRiskSignalsRequest = {
-  userId: string;
-  authHeaders: {
-    'x-fp-dashboard-authorization': string;
-    'x-is-live': string;
-  };
-  params: Record<string, string | undefined>;
+  scope?: string;
+  description?: string;
+  severity?: string;
 };
 
 export type GetRiskSignalsResponse = RiskSignal[];

@@ -10,7 +10,7 @@ type RowProps = {
 };
 
 const Row = ({ riskSignal }: RowProps) => {
-  const { t } = useTranslation('pages.user-details.signals.severity');
+  const { t } = useTranslation('pages.user-details.risk-signals.severity');
 
   return (
     <>

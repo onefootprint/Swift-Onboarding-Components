@@ -11,7 +11,7 @@ import { useDecryptMachine } from '../decrypt-machine-provider';
 import AuditTrail from './components/audit-trail';
 import Insights from './components/insights';
 import PinnedNotes from './components/pinned-notes';
-import RiskSignals from './components/signals';
+import RiskSignals from './components/risk-signals';
 import UserHeader from './components/user-header';
 import VaultData from './components/vault-data';
 

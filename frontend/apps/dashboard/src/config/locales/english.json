@@ -437,7 +437,7 @@
           "disclaimer": "Please note that all data attribute access are logged for security reasons."
         }
       },
-      "signals": {
+      "risk-signals": {
         "title": "Risk signals",
         "empty-state": "No risk signals found",
         "severity": {
