@@ -1,20 +1,72 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { Button } from '@onefootprint/ui';
 import React from 'react';
-import { useEffectOnce } from 'usehooks-ts';
+import styled, { css } from 'styled-components';
 
 type PreviewProps = {
-  image: string;
+  imageSrc: string;
   onRetake: () => void;
   onConfirm: () => void;
 };
 
-const Preview = ({ image, onRetake, onConfirm }: PreviewProps) => {
-  // TODO: implement this! Below is a placeholder
-  useEffectOnce(() => {
-    onRetake();
-    onConfirm();
-  });
+const Preview = ({ imageSrc, onRetake, onConfirm }: PreviewProps) => {
+  const { t } = useTranslation('pages.selfie-photo.preview');
 
-  return <div>{image}</div>;
+  return (
+    <Container>
+      <PreviewContainer>
+        <ImagePreview src={imageSrc} />
+      </PreviewContainer>
+      <ButtonsContainer>
+        <Button fullWidth onClick={onConfirm} variant="primary">
+          {t('confirm')}
+        </Button>
+        <Button fullWidth onClick={onRetake} variant="secondary">
+          {t('retake')}
+        </Button>
+      </ButtonsContainer>
+    </Container>
+  );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    row-gap: ${theme.spacing[5]};
+  `}
+`;
+
+const PreviewContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  flex-grow: 1;
+`;
+
+const ButtonsContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    row-gap: ${theme.spacing[5]};
+  `}
+`;
+
+const ImagePreview = styled.img`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadius.default};
+    max-height: 100%;
+    width: 100%;
+    transform: scaleX(-1); // Mirror images feel more natural to the user
+  `}
+`;
 
 export default Preview;

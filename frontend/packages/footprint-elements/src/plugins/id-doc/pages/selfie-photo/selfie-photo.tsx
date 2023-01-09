@@ -29,7 +29,11 @@ const SelfiePhoto = () => {
   };
 
   return image ? (
-    <Preview image={image} onRetake={handleRetake} onConfirm={handleConfirm} />
+    <Preview
+      imageSrc={image}
+      onRetake={handleRetake}
+      onConfirm={handleConfirm}
+    />
   ) : (
     <Camera onCapture={handleCapture} />
   );
