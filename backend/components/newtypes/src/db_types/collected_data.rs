@@ -141,7 +141,7 @@ impl CollectedDataOption {
     pub fn required_attributes(&self) -> Vec<DataLifetimeKind> {
         self.attributes()
             .into_iter()
-            .filter(|k| k.is_required())
+            .filter(|k| !k.is_optional())
             .collect()
     }
 

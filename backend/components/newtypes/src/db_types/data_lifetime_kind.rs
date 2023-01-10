@@ -70,9 +70,11 @@ impl DataLifetimeKind {
         matches!(self, DataLifetimeKind::IdentityDocument)
     }
 
-    // TODO rename to is_optional, misnomer right now since there are more than just ID data kinds
-    pub fn is_required(&self) -> bool {
-        !matches!(self, DataLifetimeKind::AddressLine2)
+    pub fn is_optional(&self) -> bool {
+        matches!(
+            self,
+            DataLifetimeKind::AddressLine2 | DataLifetimeKind::IdentityDocument | DataLifetimeKind::Custom
+        )
     }
 
     pub fn fingerprintable() -> impl Iterator<Item = DataLifetimeKind> {
