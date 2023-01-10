@@ -130,8 +130,8 @@
     "organizations": {
       "page-title": "Footprint Login | Select an Organization",
       "title": "Select an organization",
-      "table": {
-        "aria-label": "Table of organizations"
+      "errors": {
+        "no-auth-token": "No auth token provided. Please, log in again."
       }
     },
     "email-login": {

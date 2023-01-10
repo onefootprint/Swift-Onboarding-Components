@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types/src/api/org-assume-role';
 import { useMutation } from '@tanstack/react-query';
 
-import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
+import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../../../config/constants';
 
 const assumeRole = async ({ tenantId, authToken }: OrgAssumeRoleRequest) => {
   const response = await request<OrgAssumeRoleResponse>({

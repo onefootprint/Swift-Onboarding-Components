@@ -17,6 +17,8 @@ const tenant = {
   name: 'Acme',
   logoUrl: null,
   isSandboxRestricted: false,
+  websiteUrl: null,
+  companySize: null,
 };
 
 describe('useSession', () => {
