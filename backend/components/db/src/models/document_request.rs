@@ -21,6 +21,7 @@ pub struct DocumentRequest {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub idv_reqs_initiated: bool,
+    pub should_collect_selfie: bool,
 }
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
@@ -50,6 +51,7 @@ impl DocumentRequest {
         conn: &mut PgConnection,
         scoped_user_id: ScopedUserId,
         ref_id: Option<String>,
+        should_collect_selfie: bool,
     ) -> DbResult<Self> {
         let new = NewDocumentRequest {
             scoped_user_id,
@@ -57,6 +59,7 @@ impl DocumentRequest {
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
             idv_reqs_initiated: false,
+            should_collect_selfie,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -156,4 +159,5 @@ pub struct NewDocumentRequest {
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
     pub idv_reqs_initiated: bool,
+    pub should_collect_selfie: bool,
 }

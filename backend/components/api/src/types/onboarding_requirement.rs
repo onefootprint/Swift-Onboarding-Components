@@ -17,5 +17,6 @@ pub enum OnboardingRequirement {
     IdentityCheck,
     CollectDocument {
         document_request_id: DocumentRequestId,
+        should_collect_selfie: bool,
     },
 }

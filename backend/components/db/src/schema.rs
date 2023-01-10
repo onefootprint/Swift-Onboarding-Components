@@ -66,6 +66,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         idv_reqs_initiated -> Bool,
+        should_collect_selfie -> Bool,
     }
 }
 
@@ -107,6 +108,7 @@ table! {
         request_id -> Text,
         front_image_s3_url -> Nullable<Text>,
         back_image_s3_url -> Nullable<Text>,
+        selfie_image_s3_url -> Nullable<Text>,
         document_type -> Text,
         country_code -> Text,
         created_at -> Timestamptz,

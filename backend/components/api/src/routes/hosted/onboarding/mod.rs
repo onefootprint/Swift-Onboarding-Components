@@ -74,6 +74,7 @@ pub fn get_requirements(
         .into_iter()
         .map(|request| OnboardingRequirement::CollectDocument {
             document_request_id: request.id,
+            should_collect_selfie: request.should_collect_selfie,
         });
 
     // TODO: force liveness checks to be re-done and not shared across tenants
@@ -110,6 +111,7 @@ pub fn get_requirements(
 pub struct AuthorizeFields {
     collected_data: Vec<CollectedDataOption>,
     identity_document_types: Vec<String>,
+    selfie_collected: bool,
 }
 pub fn get_fields_to_authorize(
     conn: &mut PgConnection,
@@ -118,19 +120,29 @@ pub fn get_fields_to_authorize(
 ) -> ApiResult<AuthorizeFields> {
     let (onboarding, _, _, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
 
-    let mut identity_documents: Vec<String> = vec![];
+    let mut identity_document_types: Vec<String> = vec![];
+    let mut selfie_collected = false;
     if ob_config.can_access_identity_document_images {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-        identity_documents = IdentityDocument::get_for_scoped_user_id(conn, &onboarding.scoped_user_id)?
-            .into_iter()
-            .map(|id| id.document_type)
+        let identity_documents = IdentityDocument::get_for_scoped_user_id(conn, &onboarding.scoped_user_id)?;
+
+        identity_document_types = identity_documents
+            .iter()
+            .map(|id| id.document_type.clone())
             .unique()
-            .collect()
+            .collect::<Vec<String>>();
+
+        if ob_config.can_access_selfie_image {
+            selfie_collected = identity_documents
+                .iter()
+                .any(|id| id.selfie_image_s3_url.is_some())
+        }
     }
 
     let res = AuthorizeFields {
         collected_data: ob_config.can_access_data.clone(),
-        identity_document_types: identity_documents,
+        identity_document_types,
+        selfie_collected,
     };
 
     Ok(res)

@@ -129,11 +129,19 @@ impl CreateOnboardingConfigurationRequest {
             return Err(TenantError::ValidationError(
                 "Decryptable fields must be a subset of collected fields".to_owned(),
             ));
+        } else if self.must_collect_selfie && !self.must_collect_identity_document {
+            return Err(TenantError::ValidationError(
+                "Cannot collect selfie without collecting a document".to_owned(),
+            ));
         } else if self.can_access_identity_document_images && !self.must_collect_identity_document {
             return Err(TenantError::ValidationError(
                 "Cannot access document images without collecting them".to_owned(),
             ));
-        }
+        } else if self.can_access_selfie_image && !self.must_collect_selfie {
+            return Err(TenantError::ValidationError(
+                "Cannot access selfie images without collecting them".to_owned(),
+            ));
+        };
         let missing_required_fields: Vec<_> = REQUIRED_FIELDS
             .into_iter()
             .filter(|x| !self.must_collect_data.contains(x))

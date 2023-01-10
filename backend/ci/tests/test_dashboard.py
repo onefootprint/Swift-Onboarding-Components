@@ -416,6 +416,39 @@ class TestDashboardObConfigs:
             status_code=expected_status,
         )
 
+    @pytest.mark.parametrize(
+        "must_collect_identity_document,must_collect_selfie,can_access_identity_document_images,can_access_selfie_image,expected_status",
+        [
+            (True, True, True, True, 200),
+            (False, True, True, False, 400), # can't access doc if not collecting
+            (True, False, True, True, 400), # can't access selfie if not collecting
+            (False, True, False, False, 400) # can't collect selfie if not collecting doc
+        ]
+    )
+    def test_config_create_doc_fields_validation(
+        self, sandbox_tenant, must_collect_data, can_access_data,      
+        must_collect_identity_document,
+        must_collect_selfie,
+        can_access_identity_document_images,
+        can_access_selfie_image, 
+        expected_status,
+    ):
+        data = dict(
+            name="Acme Bank Loan",
+            must_collect_data=must_collect_data,
+            can_access_data=can_access_data,
+            must_collect_identity_document=must_collect_identity_document,
+            must_collect_selfie=must_collect_selfie,
+            can_access_identity_document_images=can_access_identity_document_images,
+            can_access_selfie_image=can_access_selfie_image,
+        )
+        post(
+            "org/onboarding_configs",
+            data,
+            sandbox_tenant.sk.key,
+            status_code=expected_status,
+        )
+
     def test_config_update(self, sandbox_tenant, ob_configuration):
         # Test failing to update
         new_name = "Updated ob config name"

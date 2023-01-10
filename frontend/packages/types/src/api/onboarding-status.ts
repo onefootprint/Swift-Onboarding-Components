@@ -16,6 +16,7 @@ export type CollectKycDataRequirement = {
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   documentRequestId: string;
+  shouldCollectSelfie: boolean;
 };
 
 export type LivenessRequirement = {
@@ -39,6 +40,7 @@ export type OnboardingStatusRequest = {
 export type AuthorizeFields = {
   collectedData: CollectedKycDataOption[];
   identityDocumentTypes: IdDocType[];
+  selfieCollected: boolean;
 };
 
 export type OnboardingStatusResponse = {

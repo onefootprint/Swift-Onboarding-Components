@@ -59,6 +59,7 @@ pub struct OnboardingCreateArgs {
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: CreateInsightEvent,
     pub should_create_document_request: bool,
+    pub should_collect_selfie: bool,
 }
 
 impl OnboardingUpdate {
@@ -314,7 +315,7 @@ impl Onboarding {
 
         // To prevent duplicate document requests, only create a doc request if the onboarding is new
         if args.should_create_document_request {
-            DocumentRequest::create(conn, ob.scoped_user_id.clone(), None)?;
+            DocumentRequest::create(conn, ob.scoped_user_id.clone(), None, args.should_collect_selfie)?;
         }
 
         Ok(ob)

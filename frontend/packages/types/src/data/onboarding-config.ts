@@ -14,5 +14,5 @@ export type OnboardingConfig = {
   mustCollectSelfie: boolean; // Frontend placeholder until the backend implementation
   canAccessData: CollectedKycDataOption[];
   canAccessIdentityDocumentImages: boolean;
-  canAccessSelfie: boolean; // Frontend placeholder until the backend implementation
+  canAccessSelfieImage: boolean; // Frontend placeholder until the backend implementation
 };

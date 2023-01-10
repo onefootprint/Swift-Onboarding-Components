@@ -14,6 +14,8 @@ pub struct OnboardingConfiguration {
     pub can_access_data: Vec<CollectedDataOption>,
     pub must_collect_identity_document: bool,
     pub can_access_identity_document_images: bool,
+    pub must_collect_selfie: bool,
+    pub can_access_selfie_image: bool,
     pub is_live: bool,
     pub created_at: DateTime<Utc>,
     pub status: ApiKeyStatus,

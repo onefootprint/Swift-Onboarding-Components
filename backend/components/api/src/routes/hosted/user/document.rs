@@ -279,6 +279,7 @@ async fn handle_scan_onboarding_request(
         )),
     }?;
 
+    let should_collect_selfie = document_request.should_collect_selfie;
     state
         .db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
@@ -292,7 +293,7 @@ async fn handle_scan_onboarding_request(
 
                 // Create a new document request.
                 // ref_id is None here since we are retrying scan onboarding!
-                DbDocumentRequest::create(conn, scoped_user_id, None)?;
+                DbDocumentRequest::create(conn, scoped_user_id, None, should_collect_selfie)?;
             } else {
                 let completed_update = DocumentRequestUpdate {
                     status: Some(DocumentRequestStatus::Complete),

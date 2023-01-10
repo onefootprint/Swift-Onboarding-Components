@@ -60,6 +60,7 @@ pub async fn post(
 
             let insight_event = CreateInsightEvent::from(insights);
             let should_create_document_request = ob_config.must_collect_identity_document;
+            let should_collect_selfie = ob_config.must_collect_selfie;
 
             let ob_create_args = OnboardingCreateArgs {
                 scoped_user_id: scoped_user.id,
@@ -68,6 +69,7 @@ pub async fn post(
                 // Create a `DocumentRequest` if specified in the ob config.
                 // We do this inside the OB creation to make this route more idempotent
                 should_create_document_request,
+                should_collect_selfie,
             };
 
             let ob = Onboarding::get_or_create(conn, ob_create_args)?;

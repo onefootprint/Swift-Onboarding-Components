@@ -24,6 +24,7 @@ from tests.utils import (
     build_user_data,
     identify_verify,
     get_requirement_from_requirements,
+    create_ob_config
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -36,8 +37,15 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 def non_sandbox_auth_token(twilio, tenant):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
     data = dict(phone_number=PHONE_NUMBER)
-    body = post("hosted/identify/signup_challenge", data)
-    challenge_token = body["challenge_data"]["challenge_token"]
+  
+    def initiate_challenge():
+        body = post("hosted/identify/signup_challenge", data)
+        return body["challenge_data"]["challenge_token"]
+
+    challenge_token = try_until_success(
+        initiate_challenge, 5
+    )
+
     return try_until_success(
         lambda: identify_verify(
             twilio, PHONE_NUMBER, challenge_token, tenant.default_ob_config.key
@@ -200,6 +208,75 @@ class TestBifrost:
             non_sandbox_auth_token,
             status_code=400,
         )
+
+    @pytest.mark.parametrize(
+        "must_collect_identity_document,must_collect_selfie,can_access_identity_document_images,can_access_selfie_image",
+        [
+            (True, True, True, True),
+            (True, False, True, False),
+            (True, True, False, False),
+            (False, False, False, False),
+        ]
+    )
+    def test_onboarding_config_document_requirements(
+        self,
+        tenant,
+        must_collect_data,
+        can_access_data,
+        twilio,
+        non_sandbox_auth_token,
+        must_collect_identity_document,
+        must_collect_selfie,
+        can_access_identity_document_images,
+        can_access_selfie_image,
+    ):
+        # Not used in test, but want to make sure the user has been created before running this test
+        non_sandbox_auth_token
+
+        # Create an ob_config 
+
+        ob_conf_data = {
+            "name": "Flerp Config",
+            "must_collect_data": must_collect_data,
+            "can_access_data": can_access_data,
+            "must_collect_identity_document": must_collect_identity_document,
+            "must_collect_selfie": must_collect_selfie,
+            "can_access_identity_document_images": can_access_identity_document_images,
+            "can_access_selfie_image": can_access_selfie_image,
+        }
+        ob_config = create_ob_config(tenant.sk, ob_conf_data)
+
+        # The new ob_config retrieved via org/onboarding_configs has the correct doc requirements 
+        onboarding_configs_res = get("org/onboarding_configs", None, tenant.sk.key)
+        listed_ob_config = next(obc for obc in onboarding_configs_res['data'] if obc["id"] == ob_config.id)
+        assert(listed_ob_config['must_collect_identity_document'] == must_collect_identity_document)
+        assert(listed_ob_config['must_collect_selfie'] == must_collect_selfie)
+        assert(listed_ob_config['can_access_identity_document_images'] == can_access_identity_document_images)
+        assert(listed_ob_config['can_access_selfie_image'] == can_access_selfie_image)
+
+        # Create a user and begin onboarding
+        auth_token = create_inherited_non_sandbox_user(
+            twilio,
+            ob_config.key,
+        )
+
+        post(
+            "hosted/onboarding",
+            None,
+            ob_config.key,
+            auth_token,
+        )
+
+        # The correct doc requirements are given by hosted/onboarding/status
+        body = get("hosted/onboarding/status", None, auth_token)
+        collect_document_req = get_requirement_from_requirements(
+            "collect_document", body["requirements"]
+        )
+        if must_collect_identity_document:
+            assert collect_document_req['should_collect_selfie'] == must_collect_selfie
+        else:
+            assert collect_document_req is None
+
 
     def test_skip_liveness(self, non_sandbox_auth_token, tenant):
         # Liveness requirement exists
