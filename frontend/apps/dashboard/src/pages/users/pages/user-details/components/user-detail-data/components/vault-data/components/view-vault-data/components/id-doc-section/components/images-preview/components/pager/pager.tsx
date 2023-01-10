@@ -1,4 +1,3 @@
-import { media } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -44,10 +43,6 @@ const Container = styled.div`
     display: inline-flex;
     gap: ${theme.spacing[2]};
     padding: ${theme.spacing[3]};
-
-    ${media.greaterThan('md')`
-      display: none;
-    `}
   `}
 `;
 
