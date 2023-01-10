@@ -1,6 +1,6 @@
 use crate::auth::tenant::AuthActor;
-use crate::auth::tenant::CheckTenantPermissions;
-use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
@@ -35,7 +35,7 @@ async fn get(
     Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
     ApiError,
 > {
-    let auth = auth.check_permissions(TenantPermission::Read)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -83,7 +83,7 @@ async fn post(
     request: web::Json<CreateTenantUserRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
+    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -121,7 +121,7 @@ async fn patch(
     user_id: web::Path<TenantUserId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
+    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
@@ -145,7 +145,7 @@ async fn deactivate(
     user_id: web::Path<TenantUserId>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
+    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
     let user_id = user_id.into_inner();

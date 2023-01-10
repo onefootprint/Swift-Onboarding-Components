@@ -1,4 +1,4 @@
-use super::{AuthActor, CanCheckTenantPermissions};
+use super::{AuthActor, CanCheckTenantGuard};
 use crate::auth::{tenant::TenantAuth, AuthError};
 use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
@@ -100,7 +100,7 @@ impl TenantAuth for SecretTenantAuthContext {
     }
 }
 
-impl CanCheckTenantPermissions for SecretTenantAuthContext {
+impl CanCheckTenantGuard for SecretTenantAuthContext {
     fn token_scopes(&self) -> &[TenantScope] {
         // Every secret API key is able to perform any action
         // TODO IAM for API keys

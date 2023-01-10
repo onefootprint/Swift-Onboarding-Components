@@ -1,8 +1,8 @@
+mod guards;
 mod ob_public_key;
-mod permissions;
 use std::fmt::Display;
 
-pub use self::permissions::*;
+pub use self::guards::*;
 mod workos;
 pub use self::workos::*;
 use db::models::tenant::Tenant;
@@ -54,7 +54,7 @@ impl From<AuthActor> for DbActor {
     }
 }
 
-pub trait IsPermissionMet: Display {
+pub trait IsGuardMet: Display {
     /// Given the `token_scopes` that exist on the auth token, checks if the required permission
     /// represented by self is met.
     #[allow(clippy::wrong_self_convention)]
@@ -63,10 +63,10 @@ pub trait IsPermissionMet: Display {
 
 /// A trait to be implemented for any form of tenant auth class.
 /// Requires implementing `token_permissions()` and `tenant_auth()`, and then provides a default
-/// implementation to check whether a requested_permission is met by the token_permissions() and
+/// implementation to check whether a guard is met by the token_permissions() and
 /// yield the tenant auth if so.
 /// Purposefully private to prevent calling these methods outside of this module
-trait CanCheckTenantPermissions: Sized {
+trait CanCheckTenantGuard: Sized {
     /// The list of TenantPermissions scopes that are allowed by this auth token
     fn token_scopes(&self) -> &[TenantScope];
 
@@ -77,26 +77,26 @@ trait CanCheckTenantPermissions: Sized {
 /// Implemented for tenant TAuthExtractors. Provides one function, check_permissions, that
 /// _must_ be called in order to use the tenant auth class.
 /// The implementation of this trait first checks that the TAuthExtractor tenant auth class's scopes are
-/// sufficient to perform the requested_permission.
+/// sufficient to meet the guard.
 /// If so, returns a usable boxed TenantAuth. Otherwise, returns an AuthError.
-pub trait CheckTenantPermissions {
-    fn check_permissions<T>(self, requested_permission: T) -> Result<Box<dyn TenantAuth>, AuthError>
+pub trait CheckTenantGuard {
+    fn check_guard<T>(self, gaurd: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
-        T: IsPermissionMet;
+        T: IsGuardMet;
 }
 
-impl<TAuthExtractor> CheckTenantPermissions for TAuthExtractor
+impl<TAuthExtractor> CheckTenantGuard for TAuthExtractor
 where
-    TAuthExtractor: CanCheckTenantPermissions,
+    TAuthExtractor: CanCheckTenantGuard,
 {
-    /// Checks if the requested_permission is met by self.token_permissions().
+    /// Checks if the gaurd is met by self.token_permissions().
     /// If so, returns self.tenant_auth(), otherwise returns
-    fn check_permissions<T>(self, requested_permission: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    fn check_guard<T>(self, gaurd: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
-        T: IsPermissionMet,
+        T: IsGuardMet,
     {
-        let requested_permission_str = format!("{}", requested_permission);
-        let permission_to_check = requested_permission.or_admin(); // Admin user can always do anything
+        let requested_permission_str = format!("{}", gaurd);
+        let permission_to_check = gaurd.or_admin(); // Admin user can always do anything
         if permission_to_check.is_met(self.token_scopes()) {
             Ok(self.tenant_auth())
         } else {
@@ -105,18 +105,18 @@ where
     }
 }
 
-/// Contains some useful util methods for everything that implements IsPermissionMet
-pub trait TenantPermissionDsl: Sized {
+/// Contains some useful util methods for everything that implements IsGuardMet
+pub trait TenantGuardDsl: Sized {
     /// Returns a permission that is met if self OR t is met
-    fn or<U: Sized>(self, u: U) -> permissions::Or<Self, U> {
-        permissions::Or(self, u)
+    fn or<U: Sized>(self, u: U) -> guards::Or<Self, U> {
+        guards::Or(self, u)
     }
 
-    /// Shorthand to return a permission that is met if self is met OR if TenantPermission::Admin
+    /// Shorthand to return a permission that is met if self is met OR if TenantGuard::Admin
     /// is met
-    fn or_admin(self) -> permissions::Or<Self, TenantPermission> {
-        self.or(TenantPermission::Admin)
+    fn or_admin(self) -> guards::Or<Self, TenantGuard> {
+        self.or(TenantGuard::Admin)
     }
 }
 
-impl<T> TenantPermissionDsl for T where T: IsPermissionMet {}
+impl<T> TenantGuardDsl for T where T: IsGuardMet {}

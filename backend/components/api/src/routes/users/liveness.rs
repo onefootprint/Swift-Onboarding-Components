@@ -1,6 +1,6 @@
-use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
@@ -20,7 +20,7 @@ pub async fn get(
     request: web::Path<FootprintUserId>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<Vec<api_wire_types::LivenessEvent>>>, ApiError> {
-    let auth = auth.check_permissions(TenantPermission::Read)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();

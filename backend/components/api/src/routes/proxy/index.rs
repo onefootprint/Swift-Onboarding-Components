@@ -3,11 +3,11 @@ use std::collections::HashSet;
 
 use std::str::FromStr;
 
-use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 
 use crate::auth::tenant::TenantAuth;
-use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantGuard;
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
@@ -61,7 +61,7 @@ pub async fn post(
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
     // Will eventually require the permission to decrypt attributes
-    let auth = auth.check_permissions(TenantPermission::Admin)?; // TODO auth for secret key
+    let auth = auth.check_guard(TenantGuard::Admin)?; // TODO auth for secret key
     let is_live = auth.is_live()?;
 
     let body_bytes = body_bytes.to_vec();

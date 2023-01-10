@@ -1,6 +1,6 @@
-use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 
@@ -32,7 +32,7 @@ pub async fn get(
     filters: web::Query<RiskSignalFilters>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
-    let auth = auth.check_permissions(TenantPermission::Read)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();
@@ -92,7 +92,7 @@ pub async fn get_detail(
     request: web::Path<(FootprintUserId, RiskSignalId)>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsDetailResponse> {
-    let auth = auth.check_permissions(TenantPermission::Read)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let (footprint_user_id, risk_signal_id) = request.into_inner();

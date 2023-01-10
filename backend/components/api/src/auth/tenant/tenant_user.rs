@@ -12,7 +12,7 @@ use db::{
 use newtypes::{TenantScope, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
-use super::{AuthActor, CanCheckTenantPermissions, TenantAuth};
+use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
 
 #[derive(Debug, Clone)]
 pub struct TenantUserAuth {
@@ -103,7 +103,7 @@ impl TenantUserAuth {
 /// A shorthand for the commonly used ParsedWorkOs context
 pub type TenantUserAuthContext = SessionContext<ParsedTenantUserAuth>;
 
-impl CanCheckTenantPermissions for TenantUserAuthContext {
+impl CanCheckTenantGuard for TenantUserAuthContext {
     fn token_scopes(&self) -> &[TenantScope] {
         &self.data.0.tenant_role.scopes
     }

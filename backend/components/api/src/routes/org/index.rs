@@ -1,5 +1,5 @@
-use crate::auth::tenant::{CheckTenantPermissions, TenantUserAuthContext};
-use crate::auth::tenant::{SecretTenantAuthContext, TenantPermission};
+use crate::auth::tenant::{CheckTenantGuard, TenantUserAuthContext};
+use crate::auth::tenant::{SecretTenantAuthContext, TenantGuard};
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -20,7 +20,7 @@ use paperclip::actix::{self, api_v2_operation, web::Json};
 pub async fn get(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<api_wire_types::Organization> {
-    let auth = auth.check_permissions(TenantPermission::Read)?; // No permissions needed to access this endpoint
+    let auth = auth.check_guard(TenantGuard::Read)?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
@@ -38,7 +38,7 @@ async fn patch(
     request: web::Json<UpdateTenantRequest>,
     auth: TenantUserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let auth = auth.check_permissions(TenantPermission::OrgSettings)?;
+    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();

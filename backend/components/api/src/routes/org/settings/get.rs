@@ -1,4 +1,4 @@
-use crate::auth::tenant::{CheckTenantPermissions, TenantPermission, TenantUserAuthContext};
+use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantUserAuthContext};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
@@ -20,7 +20,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: TenantUserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<GetTenantResponse>>, ApiError> {
-    let auth = auth.check_permissions(TenantPermission::Read)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
     let email_domains = if let Some(org_id) = tenant.workos_id.as_ref() {

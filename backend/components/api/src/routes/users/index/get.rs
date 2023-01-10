@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
@@ -38,7 +38,7 @@ pub async fn get(
     request: web::Query<PaginatedRequest<ListUsersRequest, i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<UsersListResponse, i64>>, ApiError> {
-    let auth = auth.check_permissions(TenantPermission::Read)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
     let cursor = request.cursor;
@@ -143,7 +143,7 @@ pub async fn get_detail(
     footprint_user_id: web::Path<FootprintUserId>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<JsonApiResponse<UsersDetailResponse>, ApiError> {
-    let auth = auth.check_permissions(TenantPermission::Read)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
     let query_params = OnboardingListQueryParams {

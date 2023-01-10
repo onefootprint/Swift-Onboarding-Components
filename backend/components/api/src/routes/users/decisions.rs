@@ -1,5 +1,5 @@
-use crate::auth::tenant::CheckTenantPermissions;
-use crate::auth::tenant::TenantPermission;
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
@@ -26,7 +26,7 @@ pub async fn post(
     request: web::Json<DecisionRequest>,
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_permissions(TenantPermission::ManualReview)?;
+    let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
     let _actor = auth.actor();
     let is_live = auth.is_live()?;
