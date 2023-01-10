@@ -131,7 +131,7 @@ impl UvdBuilder {
         DataLifetime::bulk_deactivate_uncommitted(conn, &scoped_user_id, kinds_to_deactivate, seqno)?;
 
         // Create the new UVDs
-        let uvds = UserVaultData::bulk_create(conn, user_vault_id, Some(scoped_user_id), self.data, seqno)?;
+        let uvds = UserVaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding UVD row
         let kind_to_lifetime: HashMap<_, _> =

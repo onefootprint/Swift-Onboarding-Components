@@ -44,8 +44,8 @@ pub struct NewUserVaultDataRow {
 impl UserVaultData {
     pub fn bulk_create(
         conn: &mut TxnPgConnection,
-        user_vault_id: UserVaultId,
-        scoped_user_id: Option<ScopedUserId>,
+        user_vault_id: &UserVaultId,
+        scoped_user_id: Option<&ScopedUserId>,
         data: Vec<NewUserVaultData>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {

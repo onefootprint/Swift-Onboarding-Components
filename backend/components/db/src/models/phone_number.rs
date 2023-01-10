@@ -72,10 +72,10 @@ impl PhoneNumber {
 
     pub fn create_verified(
         conn: &mut TxnPgConnection,
-        uv_id: UserVaultId,
+        uv_id: &UserVaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
-        su_id: Option<ScopedUserId>,
+        su_id: Option<&ScopedUserId>,
     ) -> DbResult<PhoneNumber> {
         // Create a committed lifetime - once the phone number is verified and bound to a vault
         // it should be immediately portable, even though it isn't verified by vendors.

@@ -132,12 +132,12 @@ mod tests {
     //!     - multiple fp_ids
     //!     - multiple matches
     use super::*;
-    use newtypes::{DataIdentifier, DataLifetimeKind::*, KvDataKey};
+    use newtypes::{DataIdentifier, DataLifetimeKind as DLK, KvDataKey};
     use test_case::test_case;
-    use DataIdentifier::*;
+    use DataIdentifier as DI;
 
     fn custom(raw: &'static str) -> DataIdentifier {
-        Custom(KvDataKey::from_str(raw).unwrap())
+        DI::Custom(KvDataKey::from_str(raw).unwrap())
     }
 
     fn token(fp_id: &str, data_kind: DataIdentifier) -> ProxyToken {
@@ -165,21 +165,23 @@ mod tests {
     #[test]
     fn test_correct_body_parser() {
         let result = ProxyTokenParser::parse(VALID_JSON_BODY).expect("failed to parse");
-        assert!(result.matches.contains_key(&token("fp_id_abcd", Identity(Ssn9))));
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", Identity(LastName))));
+            .contains_key(&token("fp_id_abcd", DI::Identity(DLK::Ssn9))));
+        assert!(result
+            .matches
+            .contains_key(&token("fp_id_abcd", DI::Identity(DLK::LastName))));
         assert!(result
             .matches
             .contains_key(&token("fp_id_abcd", custom("credit_card"))));
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", Identity(FirstName))));
+            .contains_key(&token("fp_id_abcd", DI::Identity(DLK::FirstName))));
         // test that we found two matches for this token
         assert_eq!(
             result
                 .matches
-                .get(&token("fp_id_abcd", Identity(LastName)))
+                .get(&token("fp_id_abcd", DI::Identity(DLK::LastName)))
                 .expect("missing token")
                 .len(),
             2
@@ -197,9 +199,12 @@ mod tests {
         };
 
         let detokens = HashMap::from_iter(vec![
-            (token("fp_id_abcd", Identity(Ssn9)), test.ssn.into()),
-            (token("fp_id_abcd", Identity(LastName)), test.last_name.into()),
-            (token("fp_id_abcd", Identity(FirstName)), "Elon".into()),
+            (token("fp_id_abcd", DI::Identity(DLK::Ssn9)), test.ssn.into()),
+            (
+                token("fp_id_abcd", DI::Identity(DLK::LastName)),
+                test.last_name.into(),
+            ),
+            (token("fp_id_abcd", DI::Identity(DLK::FirstName)), "Elon".into()),
             (
                 token("fp_id_abcd", custom("credit_card")),
                 test.credit_card.into(),
@@ -212,10 +217,10 @@ mod tests {
         assert_eq!(test, result);
     }
 
-    #[test_case("$fp_id_abcd.identity.ssn9", "fp_id_abcd", Identity(Ssn9) => true)]
-    #[test_case("$fp_id_abcdsdfsdfs.identity.last_name", "fp_id_abcdsdfsdfs", Identity(LastName) => true)]
-    #[test_case("$fp_id_abcd.identity.ssn4", "fp_id_abcd", Identity(Ssn9) => false)]
-    #[test_case("$fp_id_abcd.identity.sdfb.ssn4", "fp_id_abcd", Identity(Ssn4) => false)]
+    #[test_case("$fp_id_abcd.identity.ssn9", "fp_id_abcd", DI::Identity(DLK::Ssn9) => true)]
+    #[test_case("$fp_id_abcdsdfsdfs.identity.last_name", "fp_id_abcdsdfsdfs", DI::Identity(DLK::LastName) => true)]
+    #[test_case("$fp_id_abcd.identity.ssn4", "fp_id_abcd", DI::Identity(DLK::Ssn9) => false)]
+    #[test_case("$fp_id_abcd.identity.sdfb.ssn4", "fp_id_abcd", DI::Identity(DLK::Ssn4) => false)]
     #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("credit_card") => true)]
     #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("ach_account") => false)]
     fn test_proxy_parse_token(raw: &str, fp_id: &str, data_kind: DataIdentifier) -> bool {

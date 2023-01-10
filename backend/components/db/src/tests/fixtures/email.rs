@@ -11,11 +11,11 @@ pub fn create(
 ) -> Email {
     Email::create(
         conn,
-        uv_id.clone(),
+        uv_id,
         SealedVaultBytes(vec![]),
         Fingerprint(vec![]),
         DataPriority::Primary,
-        su_id.clone(),
+        su_id,
         seqno,
     )
     .unwrap()

@@ -100,12 +100,12 @@ impl IdentityDocument {
     pub fn create(
         conn: &mut TxnPgConnection,
         request_id: DocumentRequestId,
-        uv_id: UserVaultId,
+        uv_id: &UserVaultId,
         front_image_s3_url: Option<String>,
         back_image_s3_url: Option<String>,
         document_type: String,
         country_code: String,
-        su_id: Option<ScopedUserId>,
+        su_id: Option<&ScopedUserId>,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -167,7 +167,7 @@ mod tests {
                 let id_doc = IdentityDocument::create(
                     conn,
                     DocumentRequestId::from(String::from("dr_id")),
-                    UserVaultId::from(String::from("uv_id")),
+                    &UserVaultId::from(String::from("uv_id")),
                     Some("s3_123".to_string()),
                     Some("s3_345".to_string()),
                     "doc_type".to_string(),

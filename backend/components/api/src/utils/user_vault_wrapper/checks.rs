@@ -19,7 +19,7 @@ pub fn pre_add_data_checks(
         // We have an auth token created with the tenant PK - the scoped user should already exist
         su.id
     } else {
-        return Err(UserError::NotAllowedOutsideOnboarding.into());
+        return Err(UserError::NotAllowedWithoutTenant.into());
     };
     if let Some(ob) = user_auth.onboarding(conn)? {
         if ob.onboarding.idv_reqs_initiated {

@@ -128,8 +128,9 @@ impl UvwData {
             DataLifetimeKind::Email => email.map(|email| email as &dyn HasLifetime),
             // phone
             DataLifetimeKind::PhoneNumber => phone.map(|phone| phone as &dyn HasLifetime),
-            // We need to handle identity document separately since users can have multiple identity documents (for now, there's an open item https://linear.app/footprint/issue/FP-1968/de-chonk-the-identitydocument-dataattribute)
+            // We need to handle identity document/custom data separately since users can have multiple identity documents (for now, there's an open item https://linear.app/footprint/issue/FP-1968/de-chonk-the-identitydocument-dataattribute)
             DataLifetimeKind::IdentityDocument => None,
+            DataLifetimeKind::Custom => None,
         }
     }
 

@@ -3,13 +3,7 @@ use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
-use crate::{
-    models::{
-        tenant::{NewTenant, Tenant},
-        user_vault::{NewUserVaultArgs, UserVault},
-    },
-    schema,
-};
+use crate::models::{tenant::Tenant, user_vault::UserVault};
 use crate::{test_helpers, DbResult, TxnPgConnection};
 use diesel::prelude::*;
 
@@ -18,34 +12,8 @@ use newtypes::{
     TenantRoleId, UserVaultId, VaultPublicKey,
 };
 
-pub(crate) fn test_user_vault(conn: &mut PgConnection, is_portable: bool) -> UserVault {
-    diesel::insert_into(schema::user_vault::table)
-        .values(&NewUserVaultArgs {
-            e_private_key: EncryptedVaultPrivateKey(vec![]),
-            public_key: VaultPublicKey::unvalidated(vec![]),
-            is_live: true,
-            is_portable,
-        })
-        .get_result(conn)
-        .expect("failed to create user vault")
-}
-
-pub(crate) fn test_tenant(conn: &mut PgConnection) -> Tenant {
-    diesel::insert_into(schema::tenant::table)
-        .values(&NewTenant {
-            name: "TestTenant".into(),
-            public_key: VaultPublicKey::unvalidated(vec![]),
-            e_private_key: EncryptedVaultPrivateKey(vec![]),
-            workos_id: None,
-            logo_url: None,
-            sandbox_restricted: false,
-        })
-        .get_result(conn)
-        .expect("failed to create user vault")
-}
-
 pub(crate) fn test_tenant_admin_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> TenantRole {
-    TenantRole::get_or_create_admin_role(conn, &tenant_id).unwrap()
+    TenantRole::get_or_create_admin_role(conn, tenant_id).unwrap()
 }
 
 pub(crate) fn test_tenant_user(

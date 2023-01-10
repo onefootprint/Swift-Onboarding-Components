@@ -156,13 +156,11 @@ table! {
 
     kv_data (id) {
         id -> Text,
-        user_vault_id -> Text,
-        tenant_id -> Text,
         data_key -> Text,
         e_data -> Bytea,
-        deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        lifetime_id -> Text,
     }
 }
 
@@ -535,8 +533,6 @@ joinable!(email -> data_lifetime (lifetime_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(identity_document -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
-joinable!(kv_data -> tenant (tenant_id));
-joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_user (scoped_user_id));
 joinable!(manual_review -> onboarding (onboarding_id));
@@ -561,7 +557,6 @@ joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
 joinable!(user_timeline -> scoped_user (scoped_user_id));
 joinable!(user_timeline -> user_vault (user_vault_id));
-joinable!(user_vault_data -> data_lifetime (lifetime_id));
 joinable!(verification_request -> identity_document (identity_document_id));
 joinable!(verification_request -> onboarding (onboarding_id));
 joinable!(verification_result -> verification_request (request_id));

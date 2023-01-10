@@ -12,12 +12,5 @@ pub fn create(conn: &mut TxnPgConnection, uv_id: &UserVaultId, su_id: Option<&Sc
         sh_phone_number: Fingerprint(vec![]),
         e_phone_country: SealedVaultBytes(vec![]),
     };
-    PhoneNumber::create_verified(
-        conn,
-        uv_id.clone(),
-        phone_info,
-        DataPriority::Primary,
-        su_id.cloned(),
-    )
-    .unwrap()
+    PhoneNumber::create_verified(conn, uv_id, phone_info, DataPriority::Primary, su_id).unwrap()
 }

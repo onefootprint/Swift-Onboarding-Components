@@ -11,7 +11,7 @@ use db::{HasDataAttributeFields, TxnPgConnection};
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, EmailId, Fingerprint, KvDataKey,
-    PiiString, TenantId, UvdKind,
+    PiiString, UvdKind,
 };
 use std::collections::HashMap;
 
@@ -40,7 +40,6 @@ pub trait UvwAddData {
     fn update_custom_data(
         &self, // Doesn't need to consume since we don't currently store custom data on UVW
         conn: &mut TxnPgConnection,
-        tenant_id: TenantId,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()>;
 }
@@ -60,10 +59,10 @@ impl UvwAddData for LockedUserVaultWrapper {
 
         PhoneNumber::create_verified(
             conn,
-            uvw.user_vault.id,
+            &uvw.user_vault.id,
             args,
             DataPriority::Primary,
-            uvw.scoped_user_id,
+            uvw.scoped_user_id.as_ref(),
         )?;
 
         Ok(())
@@ -83,7 +82,7 @@ impl UvwAddData for LockedUserVaultWrapper {
         let scoped_user_id = uvw
             .scoped_user_id
             .clone()
-            .ok_or(UserError::NotAllowedOutsideOnboarding)?;
+            .ok_or(UserError::NotAllowedWithoutTenant)?;
 
         uvw.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
 
@@ -98,11 +97,11 @@ impl UvwAddData for LockedUserVaultWrapper {
         let user_vault_id = uvw.user_vault.id;
         let email = db::models::email::Email::create(
             conn,
-            user_vault_id,
+            &user_vault_id,
             e_data,
             fingerprint,
             DataPriority::Primary,
-            scoped_user_id,
+            &scoped_user_id,
             seqno,
         )?;
 
@@ -117,9 +116,7 @@ impl UvwAddData for LockedUserVaultWrapper {
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_fields();
         let uv = self.user_vault();
-        let scoped_user_id = self
-            .scoped_user_id()
-            .ok_or(UserError::NotAllowedOutsideOnboarding)?;
+        let scoped_user_id = self.scoped_user_id().ok_or(UserError::NotAllowedWithoutTenant)?;
 
         let builder = UvdBuilder::build(update, uv.public_key.clone())?;
         let created_cd_options = builder.validate_and_save(
@@ -137,10 +134,12 @@ impl UvwAddData for LockedUserVaultWrapper {
     fn update_custom_data(
         &self, // Doesn't need to consume since we don't currently store custom data on UVW
         conn: &mut TxnPgConnection,
-        tenant_id: TenantId,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()> {
-        let update = update
+        let scoped_user_id = self.scoped_user_id().ok_or(UserError::NotAllowedWithoutTenant)?;
+
+        let keys: Vec<_> = update.keys().cloned().collect();
+        let updates = update
             .into_iter()
             .map(|(data_key, pii)| {
                 let e_data = self.user_vault().public_key.seal_pii(&pii)?;
@@ -148,7 +147,12 @@ impl UvwAddData for LockedUserVaultWrapper {
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
 
-        KeyValueData::update_or_insert(conn, self.user_vault().id.clone(), tenant_id, update)?;
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        // Should we use bulk_deactivate_uncommitted here? When we denormalize `key` onto DataLifetimeKind
+        let existing_data = KeyValueData::get_all(conn, scoped_user_id, &keys)?;
+        let existing_lifetime_ids = existing_data.into_iter().map(|d| d.lifetime_id).collect();
+        DataLifetime::bulk_deactivate(conn, existing_lifetime_ids, seqno)?;
+        KeyValueData::bulk_create(conn, &self.user_vault().id, scoped_user_id, updates, seqno)?;
         Ok(())
     }
 }

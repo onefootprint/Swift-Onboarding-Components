@@ -77,7 +77,7 @@ impl UvwCommitData for LockedUserVaultWrapper {
         let scoped_user_id = uvw
             .scoped_user_id
             .as_ref()
-            .ok_or(UserError::NotAllowedOutsideOnboarding)?;
+            .ok_or(UserError::NotAllowedWithoutTenant)?;
 
         // Use the same seqno to deactivate old data and commit new data
         let seqno = DataLifetime::get_next_seqno(conn)?;

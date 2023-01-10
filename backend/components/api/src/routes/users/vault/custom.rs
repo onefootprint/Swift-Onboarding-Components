@@ -78,7 +78,7 @@ pub fn put_internal(
         targets: update.keys().cloned().map(DataIdentifier::Custom).collect(),
     }
     .create(conn)?;
-    uvw.update_custom_data(conn, tenant_auth.tenant().id.clone(), update.into())?;
+    uvw.update_custom_data(conn, update.into())?;
     Ok(())
 }
 
@@ -126,8 +126,8 @@ pub(super) async fn get_internal(
     let results = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let user_vault = UserVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let found = KeyValueData::get_all(conn, user_vault.id, tenant_id, &fields_copy)?;
+            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let found = KeyValueData::get_all(conn, &scoped_user.id, &fields_copy)?;
             Ok(found)
         })
         .await??;
@@ -192,7 +192,7 @@ pub(super) async fn post_decrypt_internal(
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let user_vault = UserVault::get(conn, &scoped_user.user_vault_id)?;
-            let found = KeyValueData::get_all(conn, user_vault.id.clone(), tenant_id, &fields_copy)?;
+            let found = KeyValueData::get_all(conn, &scoped_user.id, &fields_copy)?;
             Ok((user_vault, scoped_user, found))
         })
         .await??;

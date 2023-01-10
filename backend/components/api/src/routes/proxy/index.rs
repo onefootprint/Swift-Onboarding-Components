@@ -208,8 +208,7 @@ async fn detokenize(
                 let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
                 uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
-                let kv_data =
-                    KeyValueData::get_all(conn, uvw.user_vault.id.clone(), tenant_id, &custom_fields)?;
+                let kv_data = KeyValueData::get_all(conn, &scoped_user.id, &custom_fields)?;
 
                 Ok((uvw, scoped_user, kv_data))
             })

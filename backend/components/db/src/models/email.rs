@@ -52,11 +52,11 @@ impl Email {
 
     pub fn create(
         conn: &mut TxnPgConnection,
-        uv_id: UserVaultId,
+        uv_id: &UserVaultId,
         e_data: SealedVaultBytes,
         fingerprint: FingerprintData,
         priority: DataPriority,
-        su_id: ScopedUserId,
+        su_id: &ScopedUserId,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Email> {
         let lifetime = DataLifetime::create(conn, uv_id, Some(su_id), DataLifetimeKind::Email, seqno)?;

@@ -49,7 +49,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let uvds = UserVaultData::bulk_create(conn, uv.id.clone(), Some(su.id.clone()), data, seqno).unwrap();
+    let uvds = UserVaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
     for uvd in uvds {
         data_kind_to_lifetime_id.insert(uvd.kind.into(), uvd.lifetime_id);
     }

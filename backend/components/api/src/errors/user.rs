@@ -9,6 +9,6 @@ pub enum UserError {
     InvalidDataUpdate,
     #[error("Cannot add {0} when user vault already has full data")]
     PartialUpdateNotAllowed(CollectedDataOption),
-    #[error("Data update is temporarily not allowed outside of onboarding")]
-    NotAllowedOutsideOnboarding,
+    #[error("Data update is not allowed without providing the associated tenant")]
+    NotAllowedWithoutTenant,
 }

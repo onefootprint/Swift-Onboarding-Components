@@ -46,6 +46,7 @@ pub enum DataLifetimeKind {
     PhoneNumber,
     Ssn4,
     IdentityDocument,
+    Custom,
 }
 
 crate::util::impl_enum_str_diesel!(DataLifetimeKind);
@@ -69,6 +70,7 @@ impl DataLifetimeKind {
         matches!(self, DataLifetimeKind::IdentityDocument)
     }
 
+    // TODO rename to is_optional, misnomer right now since there are more than just ID data kinds
     pub fn is_required(&self) -> bool {
         !matches!(self, DataLifetimeKind::AddressLine2)
     }

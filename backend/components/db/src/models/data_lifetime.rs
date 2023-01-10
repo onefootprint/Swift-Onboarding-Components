@@ -130,8 +130,8 @@ impl DataLifetime {
     /// Creates a new DataLifetime rows with the same created_seqno and created_at for each kind in `kinds`
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConnection,
-        user_vault_id: UserVaultId,
-        scoped_user_id: Option<ScopedUserId>,
+        user_vault_id: &UserVaultId,
+        scoped_user_id: Option<&ScopedUserId>,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -139,7 +139,7 @@ impl DataLifetime {
             .into_iter()
             .map(|k| NewDataLifetime {
                 user_vault_id: user_vault_id.clone(),
-                scoped_user_id: scoped_user_id.clone(),
+                scoped_user_id: scoped_user_id.cloned(),
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 kind: k,
@@ -154,8 +154,8 @@ impl DataLifetime {
     /// Creates a single new DataLifetime row
     pub(crate) fn create(
         conn: &mut TxnPgConnection,
-        user_vault_id: UserVaultId,
-        scoped_user_id: Option<ScopedUserId>,
+        user_vault_id: &UserVaultId,
+        scoped_user_id: Option<&ScopedUserId>,
         kind: DataLifetimeKind,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {

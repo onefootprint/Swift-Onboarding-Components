@@ -113,14 +113,14 @@ pub async fn post(
             IdentityDocument::create(
                 conn,
                 doc_request_id,
-                uv.id,
+                &uv.id,
                 Some(s3_path_front_image),
                 s3_path_back_image,
                 // TODO: should be from vendor response
                 request.document_type.clone(),
                 // TODO: should be from vendor response
                 request.country_code.clone(),
-                Some(scoped_user_id),
+                Some(&scoped_user_id),
                 e_data_key,
             )
             .map_err(ApiError::from)

@@ -47,6 +47,7 @@ impl IdvData {
                     DataLifetimeKind::PhoneNumber => self.phone_number.as_ref(),
                     DataLifetimeKind::Ssn4 => self.ssn4.as_ref(),
                     DataLifetimeKind::IdentityDocument => None, // not part of IdvData
+                    DataLifetimeKind::Custom => None,           // not part of IdvData
                 }
                 .is_some()
                 .then_some(attr)

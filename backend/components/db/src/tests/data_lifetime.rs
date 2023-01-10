@@ -20,16 +20,10 @@ fn build_lifetime(
     deactivated_seqno: Option<DataLifetimeSeqno>,
     kind: DataLifetimeKind,
 ) -> DataLifetime {
-    let mut lifetime = DataLifetime::bulk_create(
-        conn,
-        uv_id.clone(),
-        Some(su_id.clone()),
-        vec![kind],
-        created_seqno,
-    )
-    .unwrap()
-    .pop()
-    .unwrap();
+    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, Some(su_id), vec![kind], created_seqno)
+        .unwrap()
+        .pop()
+        .unwrap();
     if let Some(committed_seqno) = committed_seqno {
         lifetime = lifetime.commit(conn, committed_seqno).unwrap();
     }
