@@ -195,6 +195,7 @@ export { default as IcoUsers16 } from './ico-users-16';
 export { default as IcoUsers24 } from './ico-users-24';
 export { default as IcoWarning16 } from './ico-warning-16';
 export { default as IcoWarning24 } from './ico-warning-24';
+export { default as IcoWarning40 } from './ico-warning-40';
 export { default as IcoWriting16 } from './ico-writing-16';
 export { default as IcoWriting24 } from './ico-writing-24';
 export { default as IlluLightPhoneWithId } from './illu-light-phone-with-id-colored';
