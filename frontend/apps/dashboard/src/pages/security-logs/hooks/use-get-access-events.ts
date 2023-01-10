@@ -5,7 +5,6 @@ import {
 } from '@onefootprint/types';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
-import { useDebounce } from 'usehooks-ts';
 
 import useSecurityLogsFilters from './use-security-logs-filters';
 
@@ -27,17 +26,17 @@ const getAccessEventsRequest = async (
 const useGetAccessEvents = () => {
   const { authHeaders } = useSession();
   const filters = useSecurityLogsFilters();
-  const debouncedParams = useDebounce(filters.requestParams, 500);
 
   return useInfiniteQuery(
-    ['accessEvents', debouncedParams, authHeaders],
+    ['accessEvents', filters.requestParams, authHeaders],
     ({ pageParam }) =>
       getAccessEventsRequest(
-        { ...debouncedParams, cursor: pageParam },
+        { ...filters.requestParams, cursor: pageParam },
         authHeaders,
       ),
     {
       getNextPageParam: lastPage => lastPage.meta.next,
+      enabled: filters.isReady,
     },
   );
 };

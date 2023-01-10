@@ -23,6 +23,7 @@ const useFilters = <T>(defaultQueryParams: ParsedUrlQuery) => {
 
   return {
     query: router.query as T,
+    isReady: router.isReady,
     push,
     clear,
   };

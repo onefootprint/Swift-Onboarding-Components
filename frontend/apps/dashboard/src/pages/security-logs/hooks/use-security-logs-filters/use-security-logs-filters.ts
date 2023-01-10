@@ -16,6 +16,7 @@ const useSecurityLogsFilters = () => {
   const requestParams = useRequestParams(values);
 
   return {
+    isReady: filters.isReady,
     clear: filters.clear,
     push: filters.push,
     query: filters.query,
