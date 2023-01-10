@@ -436,6 +436,23 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    user_consent (id) {
+        id -> Text,
+        user_vault_id -> Text,
+        scoped_user_id -> Text,
+        timestamp -> Timestamptz,
+        document_request_id -> Text,
+        insight_event_id -> Text,
+        consent_language_text -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     user_timeline (id) {
         id -> Text,
         scoped_user_id -> Nullable<Text>,
@@ -558,6 +575,10 @@ joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
+joinable!(user_consent -> document_request (document_request_id));
+joinable!(user_consent -> insight_event (insight_event_id));
+joinable!(user_consent -> scoped_user (scoped_user_id));
+joinable!(user_consent -> user_vault (user_vault_id));
 joinable!(user_timeline -> scoped_user (scoped_user_id));
 joinable!(user_timeline -> user_vault (user_vault_id));
 joinable!(verification_request -> identity_document (identity_document_id));
@@ -592,6 +613,7 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_log,
     tenant_role,
     tenant_user,
+    user_consent,
     user_timeline,
     user_vault,
     user_vault_data,

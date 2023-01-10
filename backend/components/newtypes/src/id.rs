@@ -128,6 +128,7 @@ define_newtype_id!(
     String,
     "Identifier for a socure_device_session"
 );
+define_newtype_id!(UserConsentId, String, "Identifier for a UserConsent");
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

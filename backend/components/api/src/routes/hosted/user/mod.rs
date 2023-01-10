@@ -8,6 +8,7 @@ use std::collections::HashMap;
 pub mod access_events;
 pub mod authorized_orgs;
 pub mod biometric;
+pub mod consent;
 pub mod decrypt;
 pub mod document;
 pub mod email;
@@ -41,7 +42,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(token::get)
         .service(email::post)
         .service(email::verify::post)
-        .service(email::challenge::post);
+        .service(email::challenge::post)
+        .service(consent::post);
 }
 
 pub struct DecryptFieldsResult {
