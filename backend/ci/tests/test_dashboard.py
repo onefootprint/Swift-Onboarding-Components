@@ -501,7 +501,7 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        scopes=[dict(kind="org_settings"), dict(kind="api_keys")],
+        scopes=[dict(kind="read"), dict(kind="api_keys")],
     )
     body = post("org/roles", role_data, sandbox_tenant.auth_token)
     assert body["name"] == role_data["name"]
@@ -537,7 +537,7 @@ class TestDashboardAdminUsers:
         suffix = _gen_random_n_digit_number(10)
         patch_data = dict(
             name=f"New role name {suffix}",
-            scopes=[{"kind": "onboarding_configuration"}],
+            scopes=[dict(kind="read"), dict(kind="onboarding_configuration")],
         )
         patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token)
 

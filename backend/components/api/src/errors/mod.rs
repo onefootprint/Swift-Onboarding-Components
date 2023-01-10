@@ -167,6 +167,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::SandboxMismatch => StatusCode::BAD_REQUEST,
         DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
+        DbError::NewtypesError(_) => StatusCode::BAD_REQUEST,
     }
 }
 

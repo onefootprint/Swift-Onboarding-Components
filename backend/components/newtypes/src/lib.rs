@@ -43,6 +43,7 @@ pub mod status_code;
 pub use status_code::*;
 
 pub use uuid::Uuid;
+
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
     #[error("invalid length ssn")]
@@ -59,6 +60,16 @@ pub enum Error {
     SerdeError,
     #[error("Error deserializing")]
     DeserializeError,
+    #[error("{0}")]
+    TenantError(#[from] TenantError),
+}
+
+pub type NtResult<T> = Result<T, Error>;
+
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum TenantError {
+    #[error("Role scopes must include at least Read")]
+    InsufficientScopes,
 }
 
 #[derive(Debug, Clone, thiserror::Error)]

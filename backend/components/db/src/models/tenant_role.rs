@@ -37,7 +37,7 @@ impl TenantRole {
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::name.eq(name))
-            .filter(tenant_role::scopes.eq(TenantScopeList(scopes.clone())))
+            .filter(tenant_role::scopes.eq(TenantScopeList::new(scopes.clone())?))
             .filter(tenant_role::is_immutable.eq(true))
             .first::<Self>(conn.conn())
             .optional()?;
@@ -69,7 +69,7 @@ impl TenantRole {
         let new = NewTenantRoleRow {
             tenant_id,
             name,
-            scopes: TenantScopeList(scopes),
+            scopes: TenantScopeList::new(scopes)?,
             is_immutable,
             created_at: Utc::now(),
         };
@@ -138,7 +138,7 @@ impl TenantRole {
     ) -> DbResult<Self> {
         let update = TenantRoleUpdate {
             name,
-            scopes: scopes.map(TenantScopeList),
+            scopes: scopes.map(TenantScopeList::new).transpose()?,
             ..TenantRoleUpdate::default()
         };
         let role = Self::lock_active(conn, id, tenant_id)?;

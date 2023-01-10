@@ -1,4 +1,4 @@
-use crate::CollectedDataOption;
+use crate::{CollectedDataOption, NtResult, TenantError};
 use diesel::sql_types::Jsonb;
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -54,12 +54,27 @@ pub enum TenantScope {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, AsJsonb, JsonSchema)]
 #[serde(transparent)]
 /// Util wrapper around Vec<TenantScope> to make it easier to operate on as DB value
-pub struct TenantScopeList(pub Vec<TenantScope>);
+pub struct TenantScopeList(Vec<TenantScope>);
 
 impl std::ops::Deref for TenantScopeList {
     type Target = Vec<TenantScope>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl TenantScopeList {
+    /// Constructs a new TenantScopeList and validates its contents
+    pub fn new(scopes: Vec<TenantScope>) -> NtResult<Self> {
+        if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
+            // Every role must have at least Read permissions for now
+            return Err(TenantError::InsufficientScopes.into());
+        }
+        Ok(Self(scopes))
+    }
+
+    pub fn into_inner(self) -> Vec<TenantScope> {
+        self.0
     }
 }

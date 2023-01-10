@@ -96,6 +96,8 @@ pub enum DbError {
     CannotCreatedScopedUser,
     #[error("Cannot update an immutable role {0}")]
     CannotUpdateImmutableRole(String),
+    #[error("{0}")]
+    NewtypesError(#[from] newtypes::Error),
 }
 
 impl DbError {
