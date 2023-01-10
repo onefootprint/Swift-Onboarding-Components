@@ -23,6 +23,8 @@ pub enum Error {
     DocumentResultsNotReady,
     #[error("Document results are not ready")]
     RequestError(#[from] RequestError),
+    #[error("Scan Verify document submission was not successful")]
+    ScanVerifyDocumentSubmissionNotSuccessful,
 }
 
 impl Error {

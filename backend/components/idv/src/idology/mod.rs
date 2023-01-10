@@ -34,6 +34,9 @@ pub async fn send_expectid_request(
     let parsed_response: ExpectIDAPIResponse =
         expectid::response::parse_response(response.clone()).map_err(crate::idology::error::Error::from)?;
 
+    // Validate there are no errors (related to UN/PW, submitted fields, whitelisted IPs etc)
+    parsed_response.response.validate()?;
+
     Ok(VendorResponse {
         vendor: Vendor::Idology,
         raw_response: response,
@@ -52,6 +55,9 @@ pub async fn send_scan_verify_request(
     let parsed_response: ScanVerifySubmissionAPIResponse =
         scan_verify::response::parse_submission_response(response.clone())
             .map_err(crate::idology::error::Error::from)?;
+
+    // Validate there are no errors (related to UN/PW, submitted fields, whitelisted IPs etc)
+    parsed_response.validate()?;
 
     Ok(VendorResponse {
         vendor: Vendor::Idology,

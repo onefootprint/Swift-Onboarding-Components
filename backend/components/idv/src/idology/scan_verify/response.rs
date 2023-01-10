@@ -61,6 +61,19 @@ impl ScanVerifySubmissionAPIResponse {
             None
         }
     }
+
+    pub fn validate(&self) -> Result<(), IdologyError::Error> {
+        // see if we have any errors
+        if let Some(error) = self.error() {
+            return Err(error.into());
+        }
+        // make sure we have a result
+        if !self.upload_status_is_success() {
+            return Err(IdologyError::Error::ScanVerifyDocumentSubmissionNotSuccessful);
+        }
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]

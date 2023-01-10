@@ -75,8 +75,6 @@ pub async fn send_idology_idv_request(
     request: VerificationRequest,
     data: IdvData,
 ) -> Result<VendorResponse, ApiError> {
-    let feature_flag_client = &state.feature_flag_client;
-
     let onboarding_id = request.onboarding_id.clone();
     let ob_configuration_key = state
         .db_pool
@@ -85,7 +83,8 @@ pub async fn send_idology_idv_request(
         .key;
 
     if state.config.service_config.is_production()
-        || feature_flag_client
+        || state
+            .feature_flag_client
             .bool_flag_by_ob_configuration_key(
                 "EnableIdologyIdvCallsInNonProdEnvironment",
                 &ob_configuration_key,

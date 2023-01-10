@@ -1,6 +1,7 @@
 use crate::idology::{
     error as IdologyError,
-    response_common::{IDologyQualifiers, KeyResponse},
+    response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
+    IdologyError::RequestError,
 };
 use newtypes::{DecisionStatus, ReasonCode};
 
@@ -26,6 +27,7 @@ pub struct ExpectIDResponse {
     pub summary_result: Option<KeyResponse>,
     pub id_number: Option<IdNumber>,
     pub id_scan: Option<String>,
+    pub error: Option<String>,
 }
 
 type CreateManualReview = bool;
@@ -63,6 +65,21 @@ impl ExpectIDResponse {
         } else {
             vec![]
         }
+    }
+
+    fn error(&self) -> Option<RequestError> {
+        self.error
+            .clone()
+            .map(IdologyResponseHelpers::parse_idology_error)
+    }
+
+    pub fn validate(&self) -> Result<(), IdologyError::Error> {
+        // see if we have any errors
+        if let Some(error) = self.error() {
+            return Err(error.into());
+        }
+
+        Ok(())
     }
 }
 
