@@ -9,11 +9,11 @@ use db::models::user_vault_data::UserVaultData;
 use db::tests::fixtures;
 use db::tests::prelude::*;
 use db::HasDataAttributeFields;
+use itertools::Itertools;
 use macros::db_test;
 use newtypes::address::{Address, AddressLine, City, Country, FullAddressOrZip, State, Zip, ZipAndCountry};
 use newtypes::dob::DateOfBirth;
 use newtypes::email::Email;
-use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeKind;
 use newtypes::Fingerprint;
 use newtypes::SealedVaultBytes;
@@ -22,6 +22,7 @@ use newtypes::{
     ssn::{Ssn, Ssn4, Ssn9},
     PiiString, UvdKind,
 };
+use newtypes::{DataLifetimeId, KvDataKey};
 use std::str::FromStr;
 
 #[db_test]
@@ -147,7 +148,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
     assert!(uvw.has_field(DataLifetimeKind::FirstName));
     assert!(uvw.has_field(DataLifetimeKind::LastName));
     assert!(uvw.has_field(DataLifetimeKind::Email));
-    uvw.commit_data_for_tenant(conn).unwrap();
+    uvw.commit_identity_data(conn).unwrap();
 
     // Now we should see the committed name and email
     let uvw = UserVaultWrapper::build_for_user(conn, &uv.id).unwrap();
@@ -368,11 +369,11 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
 
     // Commit data for tenant2
     let uvw = UserVaultWrapper::lock_for_tenant(conn, &su2.id).unwrap();
-    uvw.commit_data_for_tenant(conn).unwrap();
+    uvw.commit_identity_data(conn).unwrap();
 
     // Commit data for tenant1 - the new ssn4 should _not_ be committed
     let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
-    uvw.commit_data_for_tenant(conn).unwrap();
+    uvw.commit_identity_data(conn).unwrap();
 
     // Now, when getting committed data, we should still see the ssn9 added for tenant 2
     let uvw = UserVaultWrapper::build_for_user(conn, &uv.id).unwrap();
@@ -428,4 +429,77 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
     assert!(uvw.has_field(DataLifetimeKind::State));
     assert!(uvw.has_field(DataLifetimeKind::Zip));
     assert!(uvw.has_field(DataLifetimeKind::Country));
+}
+
+// TODO test adding custom data after we fetch custom data through the UVW
+
+#[db_test]
+fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
+    // We haven't figured out the portability story for custom data or identity documents yet, so
+    // for now, let's make sure we never commit them through the UVW
+    let uv = fixtures::user_vault::create(conn);
+    let tenant = fixtures::tenant::create(conn);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+
+    // Add some identity data
+    let update = IdentityDataUpdate {
+        ssn: Some(Ssn::Ssn4(Ssn4::from_str("0987").unwrap())),
+        ..IdentityDataUpdate::default()
+    };
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    uvw.update_identity_data(conn, update, vec![]).unwrap();
+
+    // Also add an identity document
+    fixtures::identity_document::create(conn, &uv.id, Some(&su.id));
+
+    // Also add some custom data
+    let custom_data = HashMap::from_iter([
+        (KvDataKey::from_str("blerp").unwrap(), PiiString::from("BLERP")),
+        (KvDataKey::from_str("flerp").unwrap(), PiiString::from("FLERP")),
+    ]);
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    uvw.update_custom_data(conn, custom_data).unwrap();
+
+    // Commit the identity data
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    uvw.commit_identity_data(conn).unwrap();
+
+    // Build a map map of DataLifetimeKind -> CommittedCounts
+    struct CommittedCounts {
+        committed: usize,
+        not_committed: usize,
+    }
+    let kind_to_counts = DataLifetime::get_active(conn, &uv.id, Some(&su.id), None)
+        .unwrap()
+        .into_iter()
+        .into_group_map_by(|dl| dl.kind)
+        .into_iter()
+        .map(|(kind, v)| {
+            let (committed, not_committed): (Vec<_>, _) = v
+                .into_iter()
+                .map(|dl| dl.committed_at.is_some())
+                .partition(|x| *x);
+            let counts = CommittedCounts {
+                committed: committed.len(),
+                not_committed: not_committed.len(),
+            };
+            (kind, counts)
+        })
+        .collect::<HashMap<_, _>>();
+
+    // Assert all custom DLs are not committed
+    let custom = kind_to_counts.get(&DataLifetimeKind::Custom).unwrap();
+    assert_eq!(custom.committed, 0);
+    assert_eq!(custom.not_committed, 2);
+
+    // Assert identity doc DL is not committed
+    let id_doc = kind_to_counts.get(&DataLifetimeKind::IdentityDocument).unwrap();
+    assert_eq!(id_doc.committed, 0);
+    assert_eq!(id_doc.not_committed, 1);
+
+    // But identity data should be committed
+    let ssn4 = kind_to_counts.get(&DataLifetimeKind::Ssn4).unwrap();
+    assert_eq!(ssn4.committed, 1);
+    assert_eq!(ssn4.not_committed, 0);
 }

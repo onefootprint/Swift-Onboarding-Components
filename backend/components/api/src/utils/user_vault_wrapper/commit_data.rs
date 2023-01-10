@@ -63,16 +63,16 @@ fn decide_data_to_commit(data: CurrentData) -> DataToCommit {
 
 // Need a trait to define functions on Locked<T>, which is defined outside the crate.
 pub trait UvwCommitData {
-    fn commit_data_for_tenant(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno>;
+    fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno>;
 }
 
 impl UvwCommitData for LockedUserVaultWrapper {
-    /// Marks all speculative data
-    /// speculative data and make it portable after it is verified by an approved onboarding.
+    /// Marks all speculative identity data data as committed in order to make it portable after
+    /// it is verified by an approved onboarding.
     /// Intentionally consumes the UVW to prevent using a stale reference
-    fn commit_data_for_tenant(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
-        // TODO unit tests. Fun case: have a committed FullAddress with StreetAddress2, then try to
-        // commit a speculative FullAddress without StreetAddress2
+    /// NOTE: this DOES NOT commit custom data or identity documents since we haven't figured out
+    /// the portability story for those types of data
+    fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
         let uvw = self.into_inner();
         let scoped_user_id = uvw
             .scoped_user_id
@@ -82,6 +82,8 @@ impl UvwCommitData for LockedUserVaultWrapper {
         // Use the same seqno to deactivate old data and commit new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
 
+        // NOTE: this does nothing to Custom data or Identity documents since they don't fit into
+        // the CollectedDataOption model
         let d = decide_data_to_commit(CurrentData {
             speculative: CollectedDataOption::list_from(uvw.speculative.get_populated_fields()),
             committed: CollectedDataOption::list_from(uvw.committed.get_populated_fields()),

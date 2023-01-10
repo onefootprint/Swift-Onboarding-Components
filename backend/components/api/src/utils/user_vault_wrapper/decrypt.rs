@@ -13,6 +13,7 @@ pub struct DecryptRequest {
 }
 
 impl UserVaultWrapper {
+    // TODO make an access event here too
     pub async fn decrypt(
         &self,
         state: &State,

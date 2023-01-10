@@ -114,7 +114,6 @@ impl CreateOnboardingConfigurationRequest {
             .iter()
             .cloned()
             .map(|x| (x.parent(), x))
-            .sorted()
             .into_group_map()
             .into_iter()
             // Find the CollectedDataOption parents that have more than one option specified
