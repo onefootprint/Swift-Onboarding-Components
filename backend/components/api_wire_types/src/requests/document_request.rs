@@ -1,5 +1,7 @@
-use newtypes::{DocumentRequestStatus, PiiString};
+use crate::export_schema;
+use newtypes::{idology::IdologyImageCaptureErrors, DocumentRequestStatus, PiiString};
 use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
 
 /// POST request body for sending Footprint identity document images
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
@@ -43,6 +45,7 @@ pub enum DocumentErrorReason {
     // TODO(argoff): These are just temporary values to test frontend
     Blurry,
     Invalid,
+    ImageError,
 }
 
 /// Response for a identity document request. Errors are non-optional if the identity vendor
@@ -50,6 +53,40 @@ pub enum DocumentErrorReason {
 #[derive(Debug, Apiv2Schema, serde::Serialize)]
 pub struct DocumentResponse {
     pub status: DocumentResponseStatus,
-    pub front_image_error: Option<DocumentErrorReason>,
-    pub back_image_error: Option<DocumentErrorReason>,
+    pub errors: Vec<DocumentImageError>,
+    // To be Deprecated
+    pub front_image_error: Option<String>,
+    pub back_image_error: Option<String>,
+}
+
+/// Image errors from idology. See status_code/idology.rs for descriptions
+#[derive(Debug, Apiv2Schema, JsonSchema, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DocumentImageError {
+    ImageTooSmall,
+    DocumentMissingFourCorners,
+    DocumentTooSmall,
+    DocumentBorderTooSmall,
+    FaceImageNotDetected,
+    BarcodeNotDetected,
+    ImageError,
+    InvalidJpeg,
+    DocumentIsSkewed,
+}
+export_schema!(DocumentImageError);
+
+impl From<IdologyImageCaptureErrors> for DocumentImageError {
+    fn from(err: IdologyImageCaptureErrors) -> Self {
+        match err {
+            IdologyImageCaptureErrors::ImageTooSmall => Self::ImageTooSmall,
+            IdologyImageCaptureErrors::DocumentMissingFourCorners => Self::DocumentMissingFourCorners,
+            IdologyImageCaptureErrors::DocumentTooSmall => Self::DocumentTooSmall,
+            IdologyImageCaptureErrors::DocumentBorderTooSmall => Self::DocumentBorderTooSmall,
+            IdologyImageCaptureErrors::FaceImageNotDetected => Self::FaceImageNotDetected,
+            IdologyImageCaptureErrors::BarcodeNotDetected => Self::BarcodeNotDetected,
+            IdologyImageCaptureErrors::ImageError => Self::ImageError,
+            IdologyImageCaptureErrors::InvalidJpeg => Self::InvalidJpeg,
+            IdologyImageCaptureErrors::DocumentIsSkewed => Self::DocumentIsSkewed,
+        }
+    }
 }

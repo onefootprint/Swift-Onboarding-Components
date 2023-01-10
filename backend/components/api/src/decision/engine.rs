@@ -38,6 +38,7 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
                     }
                 })
                 .collect();
+
             Ok((requests, ob.id, previous_results))
         })
         .await?;
@@ -87,7 +88,8 @@ pub async fn perform_pre_run_operations(
         .await??;
 
     let should_initiate_verification_requests =
-        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob.id.clone()).await?;
+        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob.id.clone(), true)
+            .await?;
     if !should_initiate_verification_requests {
         return Ok(false);
     }

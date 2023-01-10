@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
 use newtypes::{ObConfigurationKey, TenantId, Uuid};
 use thiserror::Error;
@@ -67,6 +66,7 @@ impl FeatureFlagClient {
         flag_value
     }
 
+    #[allow(unused)]
     pub fn bool_flag_by_ob_configuration_key(
         &self,
         flag_key: &str,

@@ -38,7 +38,6 @@ pub async fn send_idv_request(
 }
 
 /// Send a request to vendors for document verification
-#[allow(dead_code)]
 pub async fn send_docv_request(
     state: &State,
     request: VerificationRequest,
@@ -202,7 +201,6 @@ pub async fn make_idv_request(
 /// A note on usage: Doc verification is different from other vendor requests in that we run the request synchronously in bifrost
 /// in order to communicate potential issues with the uploaded image back to the customer. Because of this,
 /// we have VerificationResults _before_ the decision engine would run
-#[allow(dead_code)]
 pub async fn make_docv_request(
     state: &State,
     request: VerificationRequest,

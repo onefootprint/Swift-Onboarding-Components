@@ -2,7 +2,7 @@
 /// we can use to make decisions
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse};
 
-use newtypes::{DecisionStatus, Signal, VerificationResultId};
+use newtypes::{idology::IdologyScanOnboardingCaptureResult, DecisionStatus, Signal, VerificationResultId};
 
 use super::vendor::{socure::SocureFeatures, vendor_result::VendorResult};
 
@@ -27,6 +27,12 @@ impl IDologyFeatures {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IDologyScanOnboardingFeatures {
+    pub status: DecisionStatus,
+    pub verification_result: VerificationResultId,
+}
+
 // TODO!
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct TwilioFeatures {
@@ -36,6 +42,7 @@ pub struct TwilioFeatures {
 #[derive(Clone, Default, Debug)]
 pub struct FeatureVector {
     pub idology_features: Option<IDologyFeatures>,
+    pub idology_scan_onboarding_features: Option<IDologyScanOnboardingFeatures>,
     pub twilio_features: Option<TwilioFeatures>,
     pub socure_features: Option<SocureFeatures>,
 }
@@ -48,6 +55,9 @@ impl FeatureVector {
     fn merge(self, other: FeatureVector) -> Self {
         Self {
             idology_features: self.idology_features.or(other.idology_features),
+            idology_scan_onboarding_features: self
+                .idology_scan_onboarding_features
+                .or(other.idology_scan_onboarding_features),
             twilio_features: self.twilio_features.or(other.twilio_features),
             socure_features: self.socure_features.or(other.socure_features),
         }
@@ -61,6 +71,10 @@ impl FeatureVector {
             .idology_features
             .as_ref()
             .map(|i| i.verification_result.clone());
+        let idology_scan_onboarding_verification_result = self
+            .idology_scan_onboarding_features
+            .as_ref()
+            .map(|i| i.verification_result.clone());
         let twilio_verification_result = self
             .twilio_features
             .as_ref()
@@ -72,6 +86,7 @@ impl FeatureVector {
 
         vec![
             idology_verification_result,
+            idology_scan_onboarding_verification_result,
             twilio_verification_result,
             socure_verification_result,
         ]
@@ -101,6 +116,7 @@ impl From<VendorResult> for FeatureVector {
                 };
                 Self {
                     idology_features: Some(idology_features),
+                    idology_scan_onboarding_features: None,
                     twilio_features: None,
                     socure_features: None,
                 }
@@ -108,6 +124,7 @@ impl From<VendorResult> for FeatureVector {
             // TODO!
             ParsedResponse::TwilioLookupV2(_) => Self {
                 idology_features: None,
+                idology_scan_onboarding_features: None,
                 twilio_features: Some(TwilioFeatures {
                     verification_result: verification_result_id,
                 }),
@@ -115,22 +132,58 @@ impl From<VendorResult> for FeatureVector {
             },
             ParsedResponse::SocureIDPlus(ref idplus_response) => Self {
                 idology_features: None,
+                idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
             },
             // TODO
             ParsedResponse::IDologyScanVerifySubmission(_) => Self {
                 idology_features: None,
+                idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
             },
 
-            // TODO
-            ParsedResponse::IDologyScanOnboarding(_) => Self {
-                idology_features: None,
-                twilio_features: None,
-                socure_features: None,
-            },
+            // Writing down some context for future us:
+            //
+            // We send and handle Scan Onboarding requests in bifrost backend API.
+            //  - This INCLUDES figuring out if `capture_result` includes an image error.
+            //  - Capture result ONLY returns `complete`, `image_error`, `internal_error`
+            //  - Document backend route will keep retrying if it sees an image or internal error
+            //  - therefore, if we are in this codepath, we've already received a `complete` result (since we haven't implemented our own retry limit as of this writing)
+            // That is, all this field gets us is whether the capturing was successful (not that the data is verified). This
+            // makes sense since Scan Onboarding is mostly about collecting information and forwarding on to ExpectID.
+            //
+            // Therefore, we need to enable and use the `capture_decision` field in the Idology portal to actually get useful decisions from scan OB.
+            // Alternatively, we need to parse the qualifiers and make out own risk based decision in risk.
+            //
+            // TLDR;
+            // For now, let's just punt on incorporating scan OB status into our footprint decision, and can revisit when we have tenants. We'll defer to expectID response since we'll send along the scan OB
+            // results to that. I'll keep this around since it's useful to save to PG (when we do that)
+            ParsedResponse::IDologyScanOnboarding(ref scan_ob_resp) => {
+                let status = scan_ob_resp
+                    .response
+                    .capture_result()
+                    .map(|r| {
+                        if r == IdologyScanOnboardingCaptureResult::Completed {
+                            DecisionStatus::Pass
+                        } else {
+                            DecisionStatus::Fail
+                        }
+                    })
+                    .unwrap_or(DecisionStatus::Fail);
+
+                let features = IDologyScanOnboardingFeatures {
+                    status,
+                    verification_result: verification_result_id,
+                };
+                Self {
+                    idology_features: None,
+                    idology_scan_onboarding_features: Some(features),
+                    twilio_features: None,
+                    socure_features: None,
+                }
+            }
             _ => unimplemented!(),
         }
     }
@@ -234,6 +287,7 @@ mod tests {
         };
         let expected_feature_vector = FeatureVector {
             idology_features: Some(expected_idology_features),
+            idology_scan_onboarding_features: None,
             twilio_features: None,
             socure_features: None,
         };

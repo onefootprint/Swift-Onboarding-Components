@@ -1,9 +1,11 @@
-use crate::schema::scoped_user;
+use crate::schema::{onboarding, scoped_user};
 use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, Locked, ObConfigurationId, ScopedUserId, TenantId, UserVaultId};
+use newtypes::{
+    FootprintUserId, Locked, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, UserVaultId,
+};
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::{IsLive, ObConfiguration};
@@ -177,6 +179,20 @@ impl ScopedUser {
             }
         }
         let result = query.first(conn)?;
+        Ok(result)
+    }
+
+    pub fn get_by_onboarding_id(
+        conn: &mut PgConnection,
+        onboarding_id: &OnboardingId,
+    ) -> DbResult<ScopedUser> {
+        let result = onboarding::table
+            .into_boxed()
+            .filter(onboarding::id.eq(onboarding_id))
+            .inner_join(scoped_user::table)
+            .select(scoped_user::all_columns)
+            .get_result(conn)?;
+
         Ok(result)
     }
 }

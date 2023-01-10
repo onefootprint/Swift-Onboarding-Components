@@ -106,6 +106,10 @@ pub async fn send_scan_onboarding_request(
     let parsed_response: ScanOnboardingAPIResponse =
         scan_onboarding::response::parse_response(response.clone())
             .map_err(crate::idology::error::Error::from)?;
+
+    // validate no errors
+    parsed_response.response.validate()?;
+
     Ok(VendorResponse {
         vendor: Vendor::Idology,
         raw_response: response,

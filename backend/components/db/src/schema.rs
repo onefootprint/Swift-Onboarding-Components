@@ -65,6 +65,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        idv_reqs_initiated -> Bool,
     }
 }
 

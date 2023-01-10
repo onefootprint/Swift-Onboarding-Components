@@ -83,4 +83,25 @@ impl VerificationRequest {
 
         Ok(req_and_res)
     }
+
+    pub fn create_document_verification_request(
+        conn: &mut PgConnection,
+        vendor_api: VendorAPI,
+        onboarding_id: OnboardingId,
+        identity_document_id: IdentityDocumentId,
+    ) -> DbResult<Self> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let new_row = NewVerificationRequestRow {
+            onboarding_id,
+            vendor_api,
+            vendor: Vendor::from(vendor_api),
+            timestamp: Utc::now(),
+            uvw_snapshot_seqno: seqno,
+            identity_document_id: Some(identity_document_id),
+        };
+        let result = diesel::insert_into(verification_request::table)
+            .values(new_row)
+            .get_result(conn)?;
+        Ok(result)
+    }
 }

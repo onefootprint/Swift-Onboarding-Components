@@ -598,6 +598,7 @@ class TestBifrost:
         # We always move to complete now, this will change once we have vendor integrations
         expected = {
             "status": {"kind": "complete"},
+            "errors": [],
             "front_image_error": None,
             "back_image_error": None,
         }

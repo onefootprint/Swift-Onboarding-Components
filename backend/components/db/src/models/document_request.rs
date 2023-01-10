@@ -1,9 +1,13 @@
+use crate::schema::{identity_document, verification_request, verification_result};
+use crate::TxnPgConnection;
 use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{DocumentRequestId, DocumentRequestStatus, ScopedUserId};
+use newtypes::{DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, Locked, ScopedUserId};
 use serde::{Deserialize, Serialize};
+
+use super::verification_result::VerificationResult;
 
 pub type DocRefId = String;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -16,16 +20,28 @@ pub struct DocumentRequest {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub idv_reqs_initiated: bool,
 }
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequestUpdate {
     pub status: Option<DocumentRequestStatus>,
+    pub idv_reqs_initiated: Option<bool>,
 }
 
 impl DocumentRequestUpdate {
     pub fn status(status: DocumentRequestStatus) -> Self {
-        Self { status: Some(status) }
+        Self {
+            status: Some(status),
+            ..Default::default()
+        }
+    }
+
+    pub fn idv_reqs_initiated() -> Self {
+        Self {
+            idv_reqs_initiated: Some(true),
+            status: Some(DocumentRequestStatus::Uploaded),
+        }
     }
 }
 
@@ -40,6 +56,7 @@ impl DocumentRequest {
             ref_id,
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
+            idv_reqs_initiated: false,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -89,6 +106,41 @@ impl DocumentRequest {
             .get_result(conn)?;
         Ok(result)
     }
+
+    pub fn get_with_verification_result(
+        conn: &mut PgConnection,
+        scoped_user_id: &ScopedUserId,
+        id: &DocumentRequestId,
+    ) -> DbResult<(DocumentRequest, Option<VerificationResult>)> {
+        let (doc_request, identity_doc): (Self, IdentityDocumentId) = document_request::table
+            .filter(document_request::id.eq(id))
+            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .inner_join(identity_document::table)
+            .select((document_request::all_columns, identity_document::id))
+            .get_result(conn)?;
+
+        let verif_result: Option<VerificationResult> = verification_request::table
+            .filter(verification_request::identity_document_id.eq(Some(identity_doc)))
+            .inner_join(verification_result::table)
+            .select(verification_result::all_columns)
+            .get_result::<VerificationResult>(conn)
+            .ok();
+
+        Ok((doc_request, verif_result))
+    }
+
+    pub fn lock(
+        conn: &mut TxnPgConnection,
+        scoped_user_id: &ScopedUserId,
+        id: &DocumentRequestId,
+    ) -> DbResult<Locked<Self>> {
+        let result = document_request::table
+            .filter(document_request::id.eq(id))
+            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
+    }
 }
 
 impl DocumentRequest {
@@ -103,4 +155,5 @@ pub struct NewDocumentRequest {
     pub ref_id: Option<String>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
+    pub idv_reqs_initiated: bool,
 }

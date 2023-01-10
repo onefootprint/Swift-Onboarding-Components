@@ -1,24 +1,20 @@
-//////////////////////////////////////////
-/// [Note]
-/// As of 2022-11-08 we don't have vendor access and there's a bit of decision engine work to be done, so at the risk of diminishing marginal returns,
-/// checkpointing the work here with some TODOs.
-///
-/// TODOs:
-/// Notion: https://www.notion.so/onefootprint/Document-Request-TODOs-75f3131f609d4010a4e52799d9700525
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
-use crate::State;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::{decision, State};
 use actix_web::web::Path;
-use api_wire_types::document_request::{
-    DocumentErrorReason, DocumentRequest, DocumentResponse, DocumentResponseStatus,
-};
+use api_wire_types::document_request::DocumentRequest;
+use api_wire_types::{DocumentImageError, DocumentResponse};
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
 use db::models::user_vault::UserVault;
-use newtypes::{DocumentRequestId, DocumentRequestStatus, SealedVaultDataKey};
+use db::models::verification_request::VerificationRequest;
+use idv::ParsedResponse;
+use newtypes::idology::IdologyImageCaptureErrors;
+use newtypes::{DocumentRequestId, DocumentRequestStatus, ScopedUserId, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /// Backend APIs for working with identity documents.
@@ -35,27 +31,26 @@ pub async fn post(
     let uv_id = user_auth.user_vault_id();
     let request_id = DocumentRequestId::from(path.into_inner());
 
-    let (uv, db_document_request, scoped_user_id) = state
+    let (uv, db_document_request, auth_info) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let Some(scoped_user_id) = user_auth.scoped_user(conn)?.map(|o| o.id) else {
-                    return Err(ApiError::from(OnboardingError::NoOnboarding))
-                };
+            let Some(auth_info) = user_auth.onboarding(conn)? else {
+                return Err(ApiError::from(OnboardingError::NoOnboarding))
+            };
 
-            // TODO::9
             // This will error if no doc request is found
-            let db_document_request = DbDocumentRequest::get(conn, &scoped_user_id, &request_id)?;
+            let db_document_request = DbDocumentRequest::lock(conn, &auth_info.scoped_user.id, &request_id)?;
+            // Check request is pending. If not, there's nothing to do here
+            if !db_document_request.is_pending() {
+                return Err(ApiError::from(OnboardingError::NoPendingDocumentRequestFound(
+                    db_document_request.id.clone(),
+                )));
+            }
             let uv = UserVault::get(conn, &uv_id)?;
 
-            Ok((uv, db_document_request, scoped_user_id))
+            Ok((uv, db_document_request.into_inner(), auth_info))
         })
         .await?;
-    // Check request is pending. If not, there's nothing to do here
-    if !db_document_request.is_pending() {
-        return Err(ApiError::from(OnboardingError::NoPendingDocumentRequestFound(
-            db_document_request.id,
-        )));
-    }
 
     // generate a sealed data key (with its plaintext)
     let (e_data_key, data_key) =
@@ -66,7 +61,6 @@ pub async fn post(
     let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
 
     // Encrypt the image using the UserVault
-    // TODO::8
     let sealed_front = IdentityDocument::seal_with_data_key(request.front_image.leak(), &data_key)?;
 
     // Save to s3
@@ -107,7 +101,9 @@ pub async fn post(
 
     // write a identity_document
     let doc_request_id = db_document_request.id.clone();
-    let _ = state
+    let su_id = auth_info.scoped_user.id.clone();
+    let suid = auth_info.scoped_user.id.clone();
+    let identity_document = state
         .db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, ApiError> {
             IdentityDocument::create(
@@ -116,114 +112,198 @@ pub async fn post(
                 &uv.id,
                 Some(s3_path_front_image),
                 s3_path_back_image,
-                // TODO: should be from vendor response
                 request.document_type.clone(),
-                // TODO: should be from vendor response
                 request.country_code.clone(),
-                Some(&scoped_user_id),
+                Some(&su_id),
                 e_data_key,
             )
             .map_err(ApiError::from)
         })
         .await?;
 
-    let update = DocumentRequestUpdate {
-        // For now, just move this to Uploaded here to clear the requirement
-        status: Some(DocumentRequestStatus::Uploaded),
-    };
-
-    // TODO::1, TODO::2, TODO::3
-    state
+    // Check if we should be initiating requests (e.g. check if we are testing)
+    let uvw = state
         .db_pool
-        .db_transaction(move |conn| -> Result<(), ApiError> {
-            db_document_request.update(conn, update)?;
-
-            Ok(())
-        })
+        .db_query(move |conn| UserVaultWrapper::build_for_onboarding(conn, &suid))
+        .await??;
+    let should_initiate_verification_requests =
+        decision::utils::should_initiate_idv_or_else_setup_test_fixtures(
+            &state,
+            uvw,
+            auth_info.onboarding.id.clone(),
+            // TODO: generate fixture data for identity documents
+            false,
+        )
         .await?;
+    // TODO: more vendors!
+    let api = newtypes::VendorAPI::IdologyScanOnboarding;
+    if db_document_request.ref_id.is_some() {
+        return Err(ApiError::AssertionError(
+            "ref_id found for document request".into(),
+        ));
+    }
+
+    // Save Verification Requests and run our vendor requests
+    if should_initiate_verification_requests {
+        // Save our verification request
+        let ob_id = auth_info.onboarding.id.clone();
+        let (document_verification_request, doc_request) = state
+            .db_pool
+            .db_transaction(
+                move |conn| -> Result<(VerificationRequest, DbDocumentRequest), ApiError> {
+                    // Protect against race conditions
+                    let doc_request = DbDocumentRequest::lock(
+                        conn,
+                        &db_document_request.scoped_user_id,
+                        &db_document_request.id,
+                    )?;
+                    if doc_request.idv_reqs_initiated {
+                        return Err(ApiError::AssertionError(
+                            "Document request already initiated".into(),
+                        ));
+                    }
+
+                    let res = decision::utils::create_document_verification_request(
+                        conn.conn(),
+                        api,
+                        ob_id,
+                        identity_document.id,
+                    )?;
+
+                    // Move our status to uploaded since we have generated a doc verification request
+                    let update = DocumentRequestUpdate::idv_reqs_initiated();
+                    let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
+
+                    Ok((res, doc_request))
+                },
+            )
+            .await?;
+
+        // Make our request!
+        handle_scan_onboarding_request(
+            &state,
+            doc_request,
+            document_verification_request,
+            auth_info.scoped_user.id.clone(),
+        )
+        .await?;
+    } else {
+        // mark as complete if we are testing
+        state
+            .db_pool
+            .db_query(move |conn| -> Result<(), ApiError> {
+                let update = DocumentRequestUpdate {
+                    status: Some(DocumentRequestStatus::Complete),
+                    ..Default::default()
+                };
+                db_document_request.update(conn, update)?;
+
+                Ok(())
+            })
+            .await??;
+    }
 
     EmptyResponse::ok().json()
 }
 
 #[api_v2_operation(description = "GET a document request status", tags(Hosted))]
-#[actix::get("/hosted/user/document/{document_request_id}/{response_option}")]
+#[actix::get("/hosted/user/document/{document_request_id}/status")]
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-    path: Path<(String, String)>,
+    path: Path<String>,
 ) -> actix_web::Result<Json<ResponseData<DocumentResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
-    // response_option is temporary, just so we can do frontend
-    let (id, response_option) = path.into_inner();
-    let document_request_id = DocumentRequestId::from(id);
+    let id = path.into_inner();
+    let request_id = DocumentRequestId::from(id);
 
-    // TODO::5
-    // Temporary while testing
-    if response_option == "status" {
-        let doc_req = state
-            .db_pool
-            .db_transaction(move |conn| -> Result<DbDocumentRequest, ApiError> {
-                let Some(scoped_user_id) = user_auth.scoped_user(conn)?.map(|su| su.id) else {
-                    return Err(ApiError::from(OnboardingError::NoOnboarding))
-                };
-                // This will error if no doc request is found
-                let db_document_request =
-                    DbDocumentRequest::get(conn, &scoped_user_id, &document_request_id)?;
+    // Load our document request and check the status
+    let (document_request, errors) = state
+        .db_pool
+        .db_query(move |conn| -> Result<(DbDocumentRequest, Vec<_>), ApiError> {
+            let Some(auth_info) = user_auth.onboarding(conn)? else {
+                return Err(ApiError::from(OnboardingError::NoOnboarding))
+            };
+            // Get document request, and potentially the result (if it's done)
+            let (request, verification_result) = DbDocumentRequest::get_with_verification_result(
+                conn,
+                &auth_info.scoped_user.id,
+                &request_id,
+            )?;
 
-                Ok(db_document_request)
-            })
-            .await?;
+            // Return errors related to images
+            let errors: Vec<IdologyImageCaptureErrors> = if let Some(result) = verification_result {
+                let parsed = idv::idology::scan_onboarding::response::parse_response(result.response)
+                    .map_err(|_| {
+                        ApiError::AssertionError("Could not parse ScanOnboarding response".into())
+                    })?;
+                if let Some((None, image_errors)) = parsed.response.error() {
+                    image_errors
+                } else {
+                    vec![]
+                }
+            } else {
+                vec![]
+            };
 
-        // TODO::4
-        return ResponseData::ok(DocumentResponse {
-            status: doc_req.status.into(),
-            front_image_error: None,
-            back_image_error: None,
+            Ok((request, errors))
         })
-        .json();
-    }
-    // Similar to how we parse email/phone for sandbox
-    ResponseData::ok(get_response_for_testing(response_option.as_str())).json()
+        .await??;
+
+    ResponseData::ok(DocumentResponse {
+        status: document_request.status.into(),
+        errors: errors.into_iter().map(DocumentImageError::from).collect(),
+        // TODO: Remove these fields
+        front_image_error: None,
+        back_image_error: None,
+    })
+    .json()
 }
 
-// TODO::5
-// Temporary - just for testing
-fn get_response_for_testing(error_requested: &str) -> DocumentResponse {
-    match error_requested {
-        "front_error" => DocumentResponse {
-            status: DocumentResponseStatus::Error,
-            front_image_error: Some(DocumentErrorReason::Blurry),
-            back_image_error: None,
-        },
-        "back_error" => DocumentResponse {
-            status: DocumentResponseStatus::Error,
-            front_image_error: None,
-            back_image_error: Some(DocumentErrorReason::Blurry),
-        },
-        "both_error" => DocumentResponse {
-            status: DocumentResponseStatus::Error,
-            front_image_error: Some(DocumentErrorReason::Invalid),
-            back_image_error: Some(DocumentErrorReason::Blurry),
-        },
-        "complete" => DocumentResponse {
-            status: DocumentResponseStatus::Complete,
-            front_image_error: None,
-            back_image_error: None,
-        },
-        "pending" => DocumentResponse {
-            status: DocumentResponseStatus::Pending,
-            front_image_error: None,
-            back_image_error: None,
-        },
-        "retry_limit" => DocumentResponse {
-            status: DocumentResponseStatus::RetryLimitExceeded,
-            front_image_error: None,
-            back_image_error: None,
-        },
-        _ => DocumentResponse {
-            status: DocumentResponseStatus::Complete,
-            front_image_error: None,
-            back_image_error: None,
-        },
-    }
+async fn handle_scan_onboarding_request(
+    state: &State,
+    document_request: DbDocumentRequest,
+    document_verification_request: VerificationRequest,
+    scoped_user_id: ScopedUserId,
+) -> Result<(), ApiError> {
+    // Make document verification request
+    // TODO: spawn a thread to make this request, but scan onboarding returns immediately (allegedly) so it's fine for now
+    let vendor_result =
+        decision::vendor::make_request::make_docv_request(state, document_verification_request).await?;
+
+    // Handle request
+    let response = match vendor_result.response.response {
+        ParsedResponse::IDologyScanOnboarding(response) => Ok(response),
+        _ => Err(ApiError::AssertionError(
+            "wrong document vendor response received".into(),
+        )),
+    }?;
+
+    state
+        .db_pool
+        .db_transaction(move |conn| -> Result<(), ApiError> {
+            if response.response.needs_retry() {
+                // Move our status to failed since we need a new doc verification request
+                let failed_update = DocumentRequestUpdate {
+                    status: Some(DocumentRequestStatus::Failed),
+                    ..Default::default()
+                };
+                document_request.update(conn.conn(), failed_update)?;
+
+                // Create a new document request.
+                // ref_id is None here since we are retrying scan onboarding!
+                DbDocumentRequest::create(conn, scoped_user_id, None)?;
+            } else {
+                let completed_update = DocumentRequestUpdate {
+                    status: Some(DocumentRequestStatus::Complete),
+                    ..Default::default()
+                };
+                document_request.update(conn.conn(), completed_update)?;
+            }
+
+            Ok(())
+        })
+        .await?;
+
+    Ok(())
 }

@@ -85,41 +85,23 @@ pub struct DecisionOutput {
     // pub verification_status: VerificationStatus,
     // pub compliance_status: ComplianceStatus,
     pub decision_status: DecisionStatus,
-    pub id_number: Option<u64>,
     pub onboarding_id: OnboardingId,
     pub create_manual_review: bool,
 }
 fn final_decision(features: &FeatureVector, onboarding_id: OnboardingId) -> ApiResult<DecisionOutput> {
-    // v0 Super basic logic
-    //    1) If we need an ID doc for idology. OB status = Failed, verification status = NeedsIDDocument
-    //    2) If we don't, fall back to `result_statuses`
-    let idology_features = features.idology_features.to_owned();
-    let maybe_id_doc_number = idology_features.and_then(|i| i.id_number_for_scan_required);
-
-    let decision_status = if maybe_id_doc_number.is_some() {
-        DecisionStatus::StepUpRequired
-    } else {
-        features
-            .idology_features
-            .as_ref()
-            .map(|i| i.status)
-            .ok_or(OnboardingError::NoDecisionMade)?
-    };
-
-    let create_manual_review = features
+    // For now, we just take idology's decision
+    let decision_status = features
         .idology_features
         .as_ref()
-        .map(|i| i.create_manual_review)
-        .unwrap_or(false)
-        || features
-            .socure_features
-            .as_ref()
-            .map(|i| i.create_manual_review)
-            .unwrap_or(false);
+        .map(|i| i.status)
+        .ok_or(OnboardingError::NoDecisionMade)?;
+
+    // For now, we just queue up failures so we can see until we have a better sense of
+    // what reviews we want to be doing
+    let create_manual_review = decision_status == DecisionStatus::Fail;
 
     let output = DecisionOutput {
         decision_status,
-        id_number: maybe_id_doc_number,
         onboarding_id,
         create_manual_review,
     };

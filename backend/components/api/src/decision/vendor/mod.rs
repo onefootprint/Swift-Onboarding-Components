@@ -13,7 +13,7 @@ use db::{
 use newtypes::OnboardingId;
 
 pub(super) mod build_request;
-pub(super) mod make_request;
+pub mod make_request;
 pub mod socure;
 pub mod vendor_result;
 mod verification_result;

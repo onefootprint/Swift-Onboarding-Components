@@ -43,5 +43,5 @@ use db::models::ob_configuration::ObConfiguration;
 pub mod engine;
 pub(self) mod features;
 pub mod risk;
-pub(self) mod utils;
+pub mod utils;
 pub mod vendor;

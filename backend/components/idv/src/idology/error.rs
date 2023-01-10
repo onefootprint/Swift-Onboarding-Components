@@ -21,6 +21,8 @@ pub enum Error {
     MissingReferenceId,
     #[error("Document results are not ready")]
     DocumentResultsNotReady,
+    #[error("Document results are not ready")]
+    RequestError(#[from] RequestError),
 }
 
 impl Error {
@@ -79,15 +81,15 @@ pub enum SerializationError {
 
 // Errors we may get
 // https://web.idologylive.com/api_portal.php#error-messages-subtitle-error-messages-scan-verify
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug, thiserror::Error)]
 pub enum RequestError {
-    // There is an issue with the username/password submitted.
+    #[error("Credentials are incorrect")]
     InvalidUserNameOrPassword,
-    // The submitted image doesn't contain characters found within base64 encoding for front image.
+    #[error("Bad front image string")]
     InvalidImageFront,
-    // The submitted image doesn't contain characters found within base64 encoding for front image.
+    #[error("Bad back image string")]
     InvalidImageBack,
-    // The base64 received for 'faceImage' is exactly the same as the 'image'.
+    #[error("The base64 received for 'faceImage' is exactly the same as the 'image'.")]
     ImageSameAsDocumentImage,
     // This result may be returned for any of the following reasons:
     //  - The entire request with all images exceeds 17MB (too large).
@@ -95,13 +97,16 @@ pub enum RequestError {
     //  - Missing Request Parameters.
     //  - Invalid or malformed image string(s).
     //  - Image strings are not URL MIME encoded.
+    #[error("Null arguments")]
     NullArguments,
-    // The IP Address is not white-listed by IDology.
+    #[error("IP address not registered")]
     IpAddressNotRegistered,
+    #[error("Invalid query_id/reference_number/id_number")]
     // The query_id/reference_number/id_number sent to ScanVerify is not valid.
     // This usually means Idology wasn't expecting to receive a document
     InvalidTransactionRequest,
     // Catchall
+    #[error("Error: {0}")]
     UnknownError(String),
 }
 
