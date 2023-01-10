@@ -1,5 +1,6 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::onboarding::OnboardingError;
+use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -52,6 +53,13 @@ pub async fn post(
         })
         .await?;
 
+    if !db_document_request.should_collect_selfie && request.selfie_image.is_some() {
+        return Err(TenantError::ValidationError(
+            "Document request is not expecting selfie_image".to_owned(),
+        )
+        .into());
+    }
+
     // generate a sealed data key (with its plaintext)
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
@@ -99,6 +107,26 @@ pub async fn post(
         );
     }
 
+    let mut s3_path_selfie_image: Option<String> = None;
+    if let Some(selfie_image) = &request.selfie_image {
+        let encrypted_selfie_image = IdentityDocument::seal_with_data_key(selfie_image.leak(), &data_key)?;
+
+        s3_path_selfie_image = Some(
+            state
+                .s3_client
+                .put_object(
+                    bucket,
+                    &IdentityDocument::s3_path_for_document_image(
+                        "selfie",
+                        db_document_request.id.clone(),
+                        uv.id.clone(),
+                    ),
+                    encrypted_selfie_image.0,
+                )
+                .await?,
+        );
+    }
+
     // write a identity_document
     let doc_request_id = db_document_request.id.clone();
     let su_id = auth_info.scoped_user.id.clone();
@@ -112,6 +140,8 @@ pub async fn post(
                 &uv.id,
                 Some(s3_path_front_image),
                 s3_path_back_image,
+                s3_path_selfie_image,
+                // TODO: should be from vendor response
                 request.document_type.clone(),
                 request.country_code.clone(),
                 Some(&su_id),
