@@ -622,7 +622,7 @@
           },
           "required-data": {
             "label": "Required data to be collected",
-            "tooltip": "These are the data attributes you require us to collect during onboarding to verify the user's identity."
+            "tooltip": "These are the data attributes you require us to collect during onboarding to verify the user's identity. Even if ID Document collection is not required, we might still need to ask some users to scan their ID as part of our step-up verification flow."
           },
           "access-data": {
             "label": "Access permission scope",
