@@ -16,7 +16,7 @@ const useRiskSignalsOverviewFilters = () => {
     query: {
       signal_id: filters.query.signal_id,
     },
-    reset: filters.reset,
+    clear: filters.clear,
   };
 };
 

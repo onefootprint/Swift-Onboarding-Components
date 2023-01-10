@@ -19,7 +19,7 @@ export type FilterMultiSelect = {
 export type FilterMultiSelectGrouped = {
   kind: 'multi-select-grouped';
   options: FilterGroupOption[];
-  selectedOptions: [];
+  selectedOptions: FilterSelectedOption[];
 };
 
 export type FilterDate = {
@@ -32,3 +32,11 @@ export type FilterControl = {
   query: string;
   label: string;
 } & (FilterMultiSelect | FilterMultiSelectGrouped | FilterDate);
+
+export enum FilterDateRange {
+  AllTime = 'all-time',
+  Today = 'today',
+  Last7Days = 'last-7-days',
+  Last30Days = 'last-30-days',
+  Custom = 'custom',
+}

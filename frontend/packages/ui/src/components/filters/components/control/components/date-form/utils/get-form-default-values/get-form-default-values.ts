@@ -1,5 +1,7 @@
-import { FilterSelectedOption } from '../../../../../../filters.types';
-import { Period } from '../../../../hooks/use-date-options';
+import {
+  FilterDateRange,
+  FilterSelectedOption,
+} from '../../../../../../filters.types';
 
 type Response = {
   period: string;
@@ -27,7 +29,7 @@ const getFormDefaultValue = (
   const isEmpty = selectedOptions.length === 0;
   if (isEmpty) {
     return {
-      period: Period.AllTime,
+      period: FilterDateRange.AllTime,
       customDate: defaultCustomDate,
     };
   }
@@ -36,7 +38,7 @@ const getFormDefaultValue = (
   if (isRange) {
     const [from, to] = selectedOptions;
     return {
-      period: Period.Custom,
+      period: FilterDateRange.Custom,
       customDate: {
         from: new Date(from),
         to: new Date(to),

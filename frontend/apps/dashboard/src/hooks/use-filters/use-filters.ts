@@ -15,7 +15,7 @@ const useFilters = <T>(defaultQueryParams: ParsedUrlQuery) => {
     );
   };
 
-  const reset = () => {
+  const clear = () => {
     router.push({ query: clean(router.query, defaultQueryParams) }, undefined, {
       shallow: true,
     });
@@ -24,7 +24,7 @@ const useFilters = <T>(defaultQueryParams: ParsedUrlQuery) => {
   return {
     query: router.query as T,
     push,
-    reset,
+    clear,
   };
 };
 

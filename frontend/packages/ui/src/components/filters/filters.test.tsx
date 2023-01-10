@@ -276,13 +276,13 @@ describe('<Filters />', () => {
         const today = screen.getByRole('radio', { name: 'Today' });
         expect(today).toBeInTheDocument();
 
-        const last7days = screen.getByRole('radio', { name: 'Last 7 days' });
-        expect(last7days).toBeInTheDocument();
+        const last7Days = screen.getByRole('radio', { name: 'Last 7 days' });
+        expect(last7Days).toBeInTheDocument();
 
-        const currentMonth = screen.getByRole('radio', {
-          name: 'Current month',
+        const last30Days = screen.getByRole('radio', {
+          name: 'Last 30 days',
         });
-        expect(currentMonth).toBeInTheDocument();
+        expect(last30Days).toBeInTheDocument();
 
         const custom = screen.getByRole('radio', { name: 'Custom' });
         expect(custom).toBeInTheDocument();

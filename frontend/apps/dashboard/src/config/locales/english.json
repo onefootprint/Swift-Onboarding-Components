@@ -26,6 +26,9 @@
   },
   "cancel": "Cancel",
   "user-data-attributes": {
+    "name": "Name",
+    "phone-number": "Phone number",
+    "email": "Email",
     "first-name": "First name",
     "last-name": "Last name",
     "ssn9": "SSN (Full)",
@@ -534,7 +537,27 @@
       }
     },
     "security-logs": {
-      "page-title": "Footprint | Security logs"
+      "page-title": "Footprint | Security logs",
+      "header": {
+        "title": "Security logs"
+      },
+      "filters": {
+        "date-attributes": {
+          "label": "Data attributes",
+          "basic": {
+            "title": "Basic data"
+          },
+          "identity": {
+            "title": "Identity data"
+          },
+          "address": {
+            "title": "Address data"
+          }
+        },
+        "date-range": {
+          "label": "Date"
+        }
+      }
     },
     "developers": {
       "page-title": "Footprint | Developers",

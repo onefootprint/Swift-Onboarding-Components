@@ -4,18 +4,18 @@ import { Box, SearchInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Dot from './components/dot';
-import FilterDialog from './components/filter-dialog';
 import SecurityLogBody from './components/security-log-body';
 import SecurityLogHeader from './components/security-log-header';
-import { useFilters } from './hooks/use-filters';
+import SecurityLogsFilters from './components/security-logs-filters';
 import useGetAccessEvents from './hooks/use-get-access-events';
+import useSecurityLogsFilters from './hooks/use-security-logs-filters';
 
 const SecurityLogs = () => {
   const { t } = useTranslation('pages.security-logs');
-  const { filters, setFilter } = useFilters();
+  const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
   const accessEvents =
     (getAccessEvents.data?.pages || []).reduce(
@@ -56,16 +56,16 @@ const SecurityLogs = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
-        Security logs
+        {t('header.title')}
       </Typography>
-      <SearchAndFilterContainer>
+      <FiltersContainer>
         <SearchInput
-          sx={{ width: '300px' }}
-          onChangeText={value => setFilter({ search: value })}
-          value={filters.search || ''}
+          sx={{ width: '232px' }}
+          onChangeText={value => filters.push({ search: value })}
+          value={filters.query.search || ''}
         />
-        <FilterDialog />
-      </SearchAndFilterContainer>
+        <SecurityLogsFilters />
+      </FiltersContainer>
       <Box sx={{ marginTop: 9, marginBottom: 9 }} />
       <Timeline
         connectorVariant="tight"
@@ -78,9 +78,11 @@ const SecurityLogs = () => {
   );
 };
 
-const SearchAndFilterContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
+const FiltersContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[7]};
+  `}
 `;
 
 export default SecurityLogs;

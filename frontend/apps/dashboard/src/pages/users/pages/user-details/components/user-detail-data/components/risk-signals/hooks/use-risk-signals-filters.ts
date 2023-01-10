@@ -35,6 +35,7 @@ const useRiskSignalsFilters = () => {
   };
 
   return {
+    requestParams,
     count: getFiltersCount(),
     push: filters.push,
     query: {
@@ -43,8 +44,7 @@ const useRiskSignalsFilters = () => {
       signal_description: filters.query.signal_description,
       signal_severity: filters.query.signal_severity,
     },
-    reset: filters.reset,
-    requestParams,
+    clear: filters.clear,
   };
 };
 

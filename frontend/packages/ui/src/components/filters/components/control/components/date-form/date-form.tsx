@@ -5,8 +5,8 @@ import styled, { css } from 'styled-components';
 
 import InputDateRangePicker from '../../../../../input-date-range-picker';
 import Radio from '../../../../../radio';
-import type { FilterDate } from '../../../../filters.types';
-import useDateOptions, { Period } from '../../hooks/use-date-options';
+import { FilterDate, FilterDateRange } from '../../../../filters.types';
+import useDateOptions from '../../hooks/use-date-options';
 import getFormDefaultValue from './utils/get-form-default-values';
 
 type FormData = {
@@ -25,10 +25,10 @@ const DateForm = ({ onSubmit, selectedOptions }: DateFormProps) => {
   const { control, handleSubmit, register, watch } = useForm<FormData>({
     defaultValues: getFormDefaultValue(selectedOptions),
   });
-  const shouldShowDatePicker = watch('period') === Period.Custom;
+  const shouldShowDatePicker = watch('period') === FilterDateRange.Custom;
 
   const handleAfterSubmit = (formData: FormData) => {
-    if (formData.period === Period.Custom) {
+    if (formData.period === FilterDateRange.Custom) {
       const newFrom = formData.customDate.from.toISOString();
       const newTo = formData.customDate.to.toISOString();
       onSubmit([newFrom, newTo]);

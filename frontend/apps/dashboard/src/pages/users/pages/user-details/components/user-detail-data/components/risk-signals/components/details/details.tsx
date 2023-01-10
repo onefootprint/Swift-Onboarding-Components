@@ -11,7 +11,7 @@ import useRiskSignalDetails from './hooks/use-risk-signal-details';
 
 const Details = () => {
   const { t } = useTranslation();
-  const { query, reset } = useRiskSignalsFilters();
+  const { query, clear } = useRiskSignalsFilters();
   const isOpen = !!query.signal_id;
   const { data, isLoading, error } = useRiskSignalDetails(query.signal_id);
 
@@ -23,7 +23,7 @@ const Details = () => {
   };
 
   return (
-    <Drawer open={isOpen} title={getDrawerTitle()} onClose={reset}>
+    <Drawer open={isOpen} title={getDrawerTitle()} onClose={clear}>
       <>
         {data && <Data riskSignal={data} />}
         {isLoading && <Loading />}

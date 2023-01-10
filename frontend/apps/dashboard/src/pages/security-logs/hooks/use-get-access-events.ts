@@ -1,70 +1,42 @@
-import request, {
-  PaginatedRequestResponse,
-  RequestError,
-} from '@onefootprint/request';
-import { AccessEvent } from '@onefootprint/types';
+import request, { PaginatedRequestResponse } from '@onefootprint/request';
 import {
-  QueryFunctionContext,
-  QueryKey,
-  useInfiniteQuery,
-} from '@tanstack/react-query';
+  GetAccessEventsRequest,
+  GetAccessEventsResponse,
+} from '@onefootprint/types';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
-import {
-  AccessEventFilters,
-  useFilters,
-} from 'src/pages/security-logs/hooks/use-filters';
-import { dateRangeToFilterParams } from 'src/utils/date-range';
 import { useDebounce } from 'usehooks-ts';
 
-type AccessEventsResponse = AccessEvent[];
+import useSecurityLogsFilters from './use-security-logs-filters';
 
-type AccessEventQueryKey = [string, AccessEventFilters, AuthHeaders];
-
-const getAccessEventsRequest = async ({
-  queryKey,
-  pageParam,
-}: QueryFunctionContext<QueryKey, string>) => {
-  const [, filters, authHeaders] = queryKey as AccessEventQueryKey;
-  const dateRangeFilters = dateRangeToFilterParams(filters);
-  // Map the selected data kinds to the targets expected by the backend
-  const targets = filters.dataKinds?.split(',').map(kind => `identity.${kind}`);
-  // Join filter request args with the pageParam
-  const params = {
-    ...filters,
-    ...dateRangeFilters,
-    targets,
-    kind: 'decrypt',
-    cursor: pageParam,
-  };
+const getAccessEventsRequest = async (
+  params: GetAccessEventsRequest,
+  authHeaders: AuthHeaders,
+) => {
   const response = await request<
-    PaginatedRequestResponse<AccessEventsResponse>
+    PaginatedRequestResponse<GetAccessEventsResponse>
   >({
-    method: 'GET',
-    url: '/org/access_events',
-    params,
     headers: authHeaders,
+    method: 'GET',
+    params,
+    url: '/org/access_events',
   });
   return response.data;
 };
 
 const useGetAccessEvents = () => {
   const { authHeaders } = useSession();
-  const { filters } = useFilters();
+  const filters = useSecurityLogsFilters();
+  const debouncedParams = useDebounce(filters.requestParams, 500);
 
-  const debouncedFilters = useDebounce(filters, 500);
-
-  return useInfiniteQuery<
-    PaginatedRequestResponse<AccessEventsResponse>,
-    RequestError
-  >(
-    [
-      'paginatedAccessEvents',
-      debouncedFilters,
-      authHeaders,
-    ] as AccessEventQueryKey,
-    getAccessEventsRequest,
+  return useInfiniteQuery(
+    ['accessEvents', debouncedParams, authHeaders],
+    ({ pageParam }) =>
+      getAccessEventsRequest(
+        { ...debouncedParams, cursor: pageParam },
+        authHeaders,
+      ),
     {
-      retry: false,
       getNextPageParam: lastPage => lastPage.meta.next,
     },
   );
