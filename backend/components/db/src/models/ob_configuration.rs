@@ -265,9 +265,14 @@ impl ObConfiguration {
 impl ObConfiguration {
     // returns which fields this ObConfiguration (upon authorization!) grant a tenant decrypt access to
     // Don't use this on Onboardings that have not been authorized
+    // TODO DataIdentifier
     pub fn can_access_fields(&self) -> Vec<DataLifetimeKind> {
-        let mut fields: Vec<DataLifetimeKind> =
-            self.can_access_data.iter().flat_map(|x| x.attributes()).collect();
+        let mut fields: Vec<DataLifetimeKind> = self
+            .can_access_data
+            .iter()
+            .flat_map(|x| x.attributes())
+            .map(DataLifetimeKind::from)
+            .collect();
 
         if self.can_access_identity_document_images {
             fields.push(DataLifetimeKind::IdentityDocument)
@@ -278,11 +283,13 @@ impl ObConfiguration {
 
     // returns which fields this ObConfiguration tried to collect
     // Don't use this on Onboardings that have not been authorized
+    // TODO DataIdentifier
     pub fn intent_to_collect_fields(&self) -> Vec<DataLifetimeKind> {
         let mut fields: Vec<DataLifetimeKind> = self
             .must_collect_data
             .iter()
             .flat_map(|x| x.attributes())
+            .map(DataLifetimeKind::from)
             .collect();
 
         if self.must_collect_identity_document {

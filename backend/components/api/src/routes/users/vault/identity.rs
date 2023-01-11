@@ -27,7 +27,7 @@ use db::models::scoped_user::ScopedUser;
 use newtypes::csv::Csv;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataIdentifier, DataLifetimeKind, Fingerprint,
-    FootprintUserId, PiiString, UvdKind,
+    FootprintUserId, IdentityDataKind, PiiString, UvdKind,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -115,11 +115,11 @@ pub fn put_internal(
 pub struct FieldsParams {
     /// Comma separated list of fields to check
     #[openapi(example = "last_name, dob, ssn9")]
-    pub fields: Csv<DataLifetimeKind>,
+    pub fields: Csv<IdentityDataKind>,
 }
 
 flat_api_object_map_type!(
-    GetIdentityDataResponse<DataLifetimeKind, bool>,
+    GetIdentityDataResponse<IdentityDataKind, bool>,
     description="A key-value map indicating what identity fields are present",
     example=r#"{ "last_name": true, "dob": true, "ssn9": false }"#
 );
@@ -148,7 +148,7 @@ pub(super) async fn get_internal(
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
-    let fields = HashSet::from_iter(request.into_inner().fields.0);
+    let fields: HashSet<_> = request.into_inner().fields.0.into_iter().collect();
 
     let fields_clone = fields.clone();
     let uvw = state
@@ -157,7 +157,8 @@ pub(super) async fn get_internal(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
+            let fields = fields_clone.into_iter().map(DataLifetimeKind::from).collect();
+            uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok(uvw)
         })
@@ -177,14 +178,14 @@ pub(super) async fn get_internal(
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct DecryptIdentityFieldsRequest {
     /// attributes to decrypt
-    pub fields: HashSet<DataLifetimeKind>,
+    pub fields: HashSet<IdentityDataKind>,
 
     /// reason for the data decryption
     pub reason: String,
 }
 
 flat_api_object_map_type!(
-    DecryptIdentityDataResponse<DataLifetimeKind, Option<PiiString>>,
+    DecryptIdentityDataResponse<IdentityDataKind, Option<PiiString>>,
     description="A key-value map with the corresponding decrypted identity data values",
     example=r#"{ "last_name": "smith", "ssn9": "121121212", "dob": "12-12-1990" }"#
 );
@@ -212,27 +213,21 @@ pub(super) async fn post_decrypt_internal(
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
     let request = request.into_inner();
-    let fields = request.fields;
-    // TODO: fix this
-    if fields.contains(&DataLifetimeKind::IdentityDocument) {
-        return Err(ApiError::InvalidFieldForDecryption(String::from(
-            "IdentityDocument",
-        )));
-    }
-    let auth = auth.check_guard(CanDecrypt::new(fields.iter().cloned().collect()))?;
+    let fields = request.fields.clone();
+    let dlk_fields: Vec<_> = request.fields.into_iter().map(DataLifetimeKind::from).collect();
+    let auth = auth.check_guard(CanDecrypt::new(dlk_fields.clone()))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let fields_clone = fields.clone();
     let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
+            uvw.ensure_scope_allows_access(conn, &scoped_user, dlk_fields.into_iter().collect())?;
 
             Ok((uvw, scoped_user))
         })

@@ -9,7 +9,7 @@ use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwAddData};
 use crate::State;
 
 use newtypes::email::Email as EmailData;
-use newtypes::{DataLifetimeKind, Fingerprinter};
+use newtypes::{IdentityDataKind, Fingerprinter};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -42,7 +42,7 @@ pub async fn post(
     let email = request.into_inner().email;
     let sh_data = state
         .compute_fingerprint(
-            DataLifetimeKind::Email,
+            IdentityDataKind::Email,
             email.to_piistring().clean_for_fingerprint(),
         )
         .await?;

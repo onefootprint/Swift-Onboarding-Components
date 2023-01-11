@@ -8,17 +8,17 @@ use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use crate::State;
-use newtypes::DataLifetimeKind;
+use newtypes::IdentityDataKind;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
-    attributes: Vec<DataLifetimeKind>,
+    attributes: Vec<IdentityDataKind>,
 }
 
-type UserDecryptResponse = HashMap<DataLifetimeKind, Option<String>>;
+type UserDecryptResponse = HashMap<IdentityDataKind, Option<String>>;
 
 #[api_v2_operation(
     tags(Hosted),
@@ -30,7 +30,7 @@ fn post(
     user_auth: UserAuthContext,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ResponseData<UserDecryptResponse>>, ApiError> {
-    let required_scope = if request.attributes.contains(&DataLifetimeKind::Ssn9) {
+    let required_scope = if request.attributes.contains(&IdentityDataKind::Ssn9) {
         UserAuthScope::ExtendedProfile
     } else {
         UserAuthScope::BasicProfile

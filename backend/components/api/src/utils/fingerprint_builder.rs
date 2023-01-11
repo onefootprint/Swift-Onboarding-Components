@@ -3,7 +3,7 @@ use newtypes::{
     address::{Address, FullAddressOrZip, ZipAndCountry},
     name::FullName,
     ssn::Ssn,
-    DataLifetimeKind, Fingerprint, Fingerprinter, PiiString, UvdKind,
+    Fingerprint, Fingerprinter, IdentityDataKind, PiiString, UvdKind,
 };
 use std::convert::Into;
 
@@ -46,7 +46,7 @@ impl FingerprintBuilder {
         let fut_fingerprints = builder.fingerprints.into_iter().map(|(kind, pii)| {
             let pii = pii.clean_for_fingerprint();
             state
-                .compute_fingerprint(Into::<DataLifetimeKind>::into(kind), pii)
+                .compute_fingerprint(IdentityDataKind::from(kind), pii)
                 .map_ok(move |sh_data| (kind, sh_data))
         });
         let fingerprints = futures::future::try_join_all(fut_fingerprints).await?;

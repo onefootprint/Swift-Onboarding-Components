@@ -5,8 +5,8 @@ use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
 use db::HasLifetime;
-use newtypes::KvDataKey;
-use newtypes::{DataLifetimeId, DataLifetimeKind, SealedVaultBytes};
+use newtypes::{DataLifetimeId, SealedVaultBytes};
+use newtypes::{IdentityDataKind, KvDataKey};
 use std::collections::{HashMap, HashSet};
 use std::convert::Into;
 use strum::IntoEnumIterator;
@@ -117,72 +117,62 @@ impl UvwData {
             lifetimes,
         }
     }
+}
 
-    fn uvd(&self, kind: DataLifetimeKind) -> Option<&UserVaultData> {
+impl UvwData {
+    fn uvd(&self, kind: IdentityDataKind) -> Option<&UserVaultData> {
         self.uvd
             .iter()
-            .find(|d| Into::<DataLifetimeKind>::into(d.kind) == kind)
+            .find(|d| Into::<IdentityDataKind>::into(d.kind) == kind)
     }
 
     /// Dispatch queries for a piece of data with a given DataAttribute kind to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub(super) fn get(&self, kind: &DataLifetimeKind) -> Option<&dyn HasLifetime> {
+    pub(super) fn get(&self, kind: &IdentityDataKind) -> Option<&dyn HasLifetime> {
         let email = self.emails.first();
         let phone = self.phone_numbers.first();
         match kind {
             // uvd
-            DataLifetimeKind::FirstName
-            | DataLifetimeKind::LastName
-            | DataLifetimeKind::Dob
-            | DataLifetimeKind::Ssn9
-            | DataLifetimeKind::AddressLine1
-            | DataLifetimeKind::AddressLine2
-            | DataLifetimeKind::City
-            | DataLifetimeKind::State
-            | DataLifetimeKind::Zip
-            | DataLifetimeKind::Country
-            | DataLifetimeKind::Ssn4 => self.uvd(*kind).map(|uvd| uvd as &dyn HasLifetime),
+            IdentityDataKind::FirstName
+            | IdentityDataKind::LastName
+            | IdentityDataKind::Dob
+            | IdentityDataKind::Ssn4
+            | IdentityDataKind::Ssn9
+            | IdentityDataKind::AddressLine1
+            | IdentityDataKind::AddressLine2
+            | IdentityDataKind::City
+            | IdentityDataKind::State
+            | IdentityDataKind::Zip
+            | IdentityDataKind::Country => self.uvd(*kind).map(|uvd| uvd as &dyn HasLifetime),
             // email
-            DataLifetimeKind::Email => email.map(|email| email as &dyn HasLifetime),
+            IdentityDataKind::Email => email.map(|email| email as &dyn HasLifetime),
             // phone
-            DataLifetimeKind::PhoneNumber => phone.map(|phone| phone as &dyn HasLifetime),
-            // We need to handle identity document/custom data separately since users can have multiple identity documents (for now, there's an open item https://linear.app/footprint/issue/FP-1968/de-chonk-the-identitydocument-dataattribute)
-            DataLifetimeKind::IdentityDocument => None,
-            DataLifetimeKind::Custom => None,
+            IdentityDataKind::PhoneNumber => phone.map(|phone| phone as &dyn HasLifetime),
         }
     }
 
-    pub(super) fn get_lifetime(&self, kind: &DataLifetimeKind) -> Option<&DataLifetime> {
+    fn get_id_lifetime(&self, kind: &IdentityDataKind) -> Option<&DataLifetime> {
         self.get(kind).and_then(|d| {
             let lifetime_id = d.lifetime_id();
             self.lifetimes.get(lifetime_id)
         })
     }
 
-    pub(super) fn get_lifetimes<'a, T>(&self, kinds: T) -> Vec<&DataLifetime>
+    pub(super) fn get_id_lifetimes<'a, T>(&self, kinds: T) -> Vec<&DataLifetime>
     where
-        T: IntoIterator<Item = &'a DataLifetimeKind>,
+        T: IntoIterator<Item = &'a IdentityDataKind>,
     {
-        kinds.into_iter().flat_map(|k| self.get_lifetime(k)).collect()
+        kinds.into_iter().flat_map(|k| self.get_id_lifetime(k)).collect()
     }
-}
 
-impl UvwData {
-    pub fn get_identity_e_field(&self, kind: DataLifetimeKind) -> Option<&SealedVaultBytes> {
-        if matches!(
-            kind,
-            DataLifetimeKind::IdentityDocument | DataLifetimeKind::Custom
-        ) {
-            return None;
-        }
-
+    pub fn get_identity_e_field(&self, kind: IdentityDataKind) -> Option<&SealedVaultBytes> {
         let value = self.get(&kind);
         value.map(|v| v.e_data())
     }
 
-    pub fn get_populated_identity_fields(&self) -> Vec<DataLifetimeKind> {
-        DataLifetimeKind::iter()
+    pub fn get_populated_identity_fields(&self) -> Vec<IdentityDataKind> {
+        IdentityDataKind::iter()
             .filter(|k| self.get_identity_e_field(*k).is_some())
             .collect()
     }

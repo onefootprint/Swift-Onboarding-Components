@@ -1,5 +1,5 @@
-use crate::DataIdentifier;
-use crate::{api_schema_helper::string_api_data_type_alias, DataLifetimeKind, KvDataKey};
+use crate::{api_schema_helper::string_api_data_type_alias, KvDataKey};
+use crate::{DataIdentifier, IdentityDataKind};
 use derive_more::Deref;
 use serde::de::IntoDeserializer;
 use serde::de::{self, DeserializeOwned};
@@ -22,7 +22,7 @@ impl<T: DeserializeOwned> IntoIterator for Csv<T> {
 }
 
 string_api_data_type_alias!(Csv<KvDataKey>);
-string_api_data_type_alias!(Csv<DataLifetimeKind>);
+string_api_data_type_alias!(Csv<IdentityDataKind>);
 string_api_data_type_alias!(Csv<DataIdentifier>);
 
 /// serde_urlencoded, used by actix's web::Query, isn't very good at deserializing Vecs:

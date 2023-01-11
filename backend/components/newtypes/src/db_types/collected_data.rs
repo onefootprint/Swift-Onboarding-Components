@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use strum::{EnumIter, IntoEnumIterator};
 use strum_macros::{AsRefStr, EnumString};
 
-use super::DataLifetimeKind;
+use crate::IdentityDataKind;
 
 #[derive(
     Debug,
@@ -118,27 +118,27 @@ impl CollectedDataOption {
         }
     }
 
-    pub fn attributes(&self) -> Vec<DataLifetimeKind> {
+    pub fn attributes(&self) -> Vec<IdentityDataKind> {
         match self {
-            Self::Name => vec![DataLifetimeKind::FirstName, DataLifetimeKind::LastName],
-            Self::Dob => vec![DataLifetimeKind::Dob],
-            Self::Ssn9 => vec![DataLifetimeKind::Ssn9, DataLifetimeKind::Ssn4],
-            Self::Ssn4 => vec![DataLifetimeKind::Ssn4],
+            Self::Name => vec![IdentityDataKind::FirstName, IdentityDataKind::LastName],
+            Self::Dob => vec![IdentityDataKind::Dob],
+            Self::Ssn9 => vec![IdentityDataKind::Ssn9, IdentityDataKind::Ssn4],
+            Self::Ssn4 => vec![IdentityDataKind::Ssn4],
             Self::FullAddress => vec![
-                DataLifetimeKind::AddressLine1,
-                DataLifetimeKind::AddressLine2,
-                DataLifetimeKind::City,
-                DataLifetimeKind::State,
-                DataLifetimeKind::Zip,
-                DataLifetimeKind::Country,
+                IdentityDataKind::AddressLine1,
+                IdentityDataKind::AddressLine2,
+                IdentityDataKind::City,
+                IdentityDataKind::State,
+                IdentityDataKind::Zip,
+                IdentityDataKind::Country,
             ],
-            Self::PartialAddress => vec![DataLifetimeKind::Zip, DataLifetimeKind::Country],
-            Self::Email => vec![DataLifetimeKind::Email],
-            Self::PhoneNumber => vec![DataLifetimeKind::PhoneNumber],
+            Self::PartialAddress => vec![IdentityDataKind::Zip, IdentityDataKind::Country],
+            Self::Email => vec![IdentityDataKind::Email],
+            Self::PhoneNumber => vec![IdentityDataKind::PhoneNumber],
         }
     }
 
-    pub fn required_attributes(&self) -> Vec<DataLifetimeKind> {
+    pub fn required_attributes(&self) -> Vec<IdentityDataKind> {
         self.attributes()
             .into_iter()
             .filter(|k| !k.is_optional())
@@ -147,7 +147,7 @@ impl CollectedDataOption {
 
     /// Given a list of DataLifetimeKinds (maybe collected via API), computes the set of
     /// CollectedDataOptions represented by this list of DataLifetimeKinds
-    pub fn list_from(kinds: Vec<DataLifetimeKind>) -> HashSet<Self> {
+    pub fn list_from(kinds: Vec<IdentityDataKind>) -> HashSet<Self> {
         let kinds: HashSet<_> = kinds.into_iter().collect();
         // For each CollectedData variant, figure out which of the options (if any) is represented
         // in the list of kinds
@@ -181,8 +181,8 @@ mod test {
     use strum::IntoEnumIterator;
     use test_case::test_case;
 
-    use crate::{CollectedData, CollectedDataOption as CDO, DataLifetimeKind};
-    use DataLifetimeKind::*;
+    use crate::{CollectedData, CollectedDataOption as CDO, IdentityDataKind};
+    use IdentityDataKind::*;
 
     #[test]
     fn test_collected_data_options() {
@@ -227,7 +227,7 @@ mod test {
     #[test_case(vec![Zip, Ssn4, LastName, Country, FirstName] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name]))]
     #[test_case(vec![Zip, Ssn4, LastName, Country, FirstName, Dob, Email, PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
     #[test_case(vec![City, State, Zip, Ssn4, LastName, Country, FirstName, Dob, Email, PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
-    fn test_parse_list_of_kinds(kinds: Vec<DataLifetimeKind>) -> HashSet<CDO> {
+    fn test_parse_list_of_kinds(kinds: Vec<IdentityDataKind>) -> HashSet<CDO> {
         CDO::list_from(kinds)
     }
 }

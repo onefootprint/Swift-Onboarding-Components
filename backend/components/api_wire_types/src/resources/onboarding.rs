@@ -15,7 +15,7 @@ pub struct Onboarding {
     pub is_liveness_skipped: bool,
     pub insight_event: InsightEvent,
     pub can_access_data: Vec<CollectedDataOption>,
-    pub can_access_data_attributes: Vec<DataLifetimeKind>,
+    pub can_access_data_attributes: Vec<IdentityDataKind>,
     pub can_access_identity_document_images: bool,
 
     pub latest_decision: Option<OnboardingDecision>,

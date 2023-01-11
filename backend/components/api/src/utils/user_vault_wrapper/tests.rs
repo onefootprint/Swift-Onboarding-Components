@@ -13,15 +13,15 @@ use macros::db_test;
 use newtypes::address::{Address, AddressLine, City, Country, FullAddressOrZip, State, Zip, ZipAndCountry};
 use newtypes::dob::DateOfBirth;
 use newtypes::email::Email;
-use newtypes::DataLifetimeKind;
 use newtypes::Fingerprint;
+use newtypes::KvDataKey;
 use newtypes::SealedVaultBytes;
 use newtypes::{
     name::{FullName, Name},
     ssn::{Ssn, Ssn4, Ssn9},
     PiiString, UvdKind,
 };
-use newtypes::{DataLifetimeId, KvDataKey};
+use newtypes::{DataLifetimeKind, IdentityDataKind};
 use std::str::FromStr;
 
 #[db_test]
@@ -30,8 +30,6 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
-
-    let mut data_kind_to_lifetime_id = HashMap::<DataLifetimeKind, DataLifetimeId>::new();
 
     // Add identity data
     let data = vec![
@@ -49,34 +47,29 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let uvds = UserVaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
-    for uvd in uvds {
-        data_kind_to_lifetime_id.insert(uvd.kind.into(), uvd.lifetime_id);
-    }
+    UserVaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
 
     // Create email
     let email = fixtures::email::create(conn, &uv.id, &su.id, seqno);
-    data_kind_to_lifetime_id.insert(DataLifetimeKind::Email, email.lifetime_id);
 
     // Create phone number
     let phone_number = fixtures::phone_number::create(conn, &uv.id, Some(&su.id));
-    data_kind_to_lifetime_id.insert(DataLifetimeKind::PhoneNumber, phone_number.lifetime_id);
 
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
     let tests = vec![
-        (DataLifetimeKind::FirstName, Some(SealedVaultBytes(vec![1]))),
-        (DataLifetimeKind::LastName, Some(SealedVaultBytes(vec![2]))),
-        (DataLifetimeKind::Ssn4, Some(SealedVaultBytes(vec![3]))),
-        (DataLifetimeKind::Email, Some(email.e_data)),
-        (DataLifetimeKind::PhoneNumber, Some(phone_number.e_e164.clone())),
-        (DataLifetimeKind::Dob, None),
-        (DataLifetimeKind::AddressLine1, None),
-        (DataLifetimeKind::AddressLine2, None),
-        (DataLifetimeKind::City, None),
-        (DataLifetimeKind::State, None),
-        (DataLifetimeKind::Zip, None),
-        (DataLifetimeKind::Country, None),
-        (DataLifetimeKind::Ssn9, None),
+        (IdentityDataKind::FirstName, Some(SealedVaultBytes(vec![1]))),
+        (IdentityDataKind::LastName, Some(SealedVaultBytes(vec![2]))),
+        (IdentityDataKind::Ssn4, Some(SealedVaultBytes(vec![3]))),
+        (IdentityDataKind::Email, Some(email.e_data)),
+        (IdentityDataKind::PhoneNumber, Some(phone_number.e_e164.clone())),
+        (IdentityDataKind::Dob, None),
+        (IdentityDataKind::AddressLine1, None),
+        (IdentityDataKind::AddressLine2, None),
+        (IdentityDataKind::City, None),
+        (IdentityDataKind::State, None),
+        (IdentityDataKind::Zip, None),
+        (IdentityDataKind::Country, None),
+        (IdentityDataKind::Ssn9, None),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -86,19 +79,19 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     // build_for_user should only show the phone number
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
     let tests = vec![
-        (DataLifetimeKind::FirstName, None),
-        (DataLifetimeKind::LastName, None),
-        (DataLifetimeKind::Ssn4, None),
-        (DataLifetimeKind::Email, None),
-        (DataLifetimeKind::PhoneNumber, Some(phone_number.e_e164)),
-        (DataLifetimeKind::Dob, None),
-        (DataLifetimeKind::AddressLine1, None),
-        (DataLifetimeKind::AddressLine2, None),
-        (DataLifetimeKind::City, None),
-        (DataLifetimeKind::State, None),
-        (DataLifetimeKind::Zip, None),
-        (DataLifetimeKind::Country, None),
-        (DataLifetimeKind::Ssn9, None),
+        (IdentityDataKind::FirstName, None),
+        (IdentityDataKind::LastName, None),
+        (IdentityDataKind::Ssn4, None),
+        (IdentityDataKind::Email, None),
+        (IdentityDataKind::PhoneNumber, Some(phone_number.e_e164)),
+        (IdentityDataKind::Dob, None),
+        (IdentityDataKind::AddressLine1, None),
+        (IdentityDataKind::AddressLine2, None),
+        (IdentityDataKind::City, None),
+        (IdentityDataKind::State, None),
+        (IdentityDataKind::Zip, None),
+        (IdentityDataKind::Country, None),
+        (IdentityDataKind::Ssn9, None),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -138,22 +131,22 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
 
     // Make the user can't see the name and email until it's committed
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert!(!uvw.has_identity_field(DataLifetimeKind::FirstName));
-    assert!(!uvw.has_identity_field(DataLifetimeKind::LastName));
-    assert!(!uvw.has_identity_field(DataLifetimeKind::Email));
+    assert!(!uvw.has_identity_field(IdentityDataKind::FirstName));
+    assert!(!uvw.has_identity_field(IdentityDataKind::LastName));
+    assert!(!uvw.has_identity_field(IdentityDataKind::Email));
 
     // Commit
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    assert!(uvw.has_identity_field(DataLifetimeKind::FirstName));
-    assert!(uvw.has_identity_field(DataLifetimeKind::LastName));
-    assert!(uvw.has_identity_field(DataLifetimeKind::Email));
+    assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
+    assert!(uvw.has_identity_field(IdentityDataKind::LastName));
+    assert!(uvw.has_identity_field(IdentityDataKind::Email));
     uvw.commit_identity_data(conn).unwrap();
 
     // Now we should see the committed name and email
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert!(uvw.has_identity_field(DataLifetimeKind::FirstName));
-    assert!(uvw.has_identity_field(DataLifetimeKind::LastName));
-    assert!(uvw.has_identity_field(DataLifetimeKind::Email));
+    assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
+    assert!(uvw.has_identity_field(IdentityDataKind::LastName));
+    assert!(uvw.has_identity_field(IdentityDataKind::Email));
 }
 
 // Some impls to make test code cleaner
@@ -353,8 +346,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 as was written by tenant 1
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
-    let ssn4_tenant1 = uvw.get_identity_e_field(DataLifetimeKind::Ssn4);
-    assert!(!uvw.has_identity_field(DataLifetimeKind::Ssn9));
+    let ssn4_tenant1 = uvw.get_identity_e_field(IdentityDataKind::Ssn4);
+    assert!(!uvw.has_identity_field(IdentityDataKind::Ssn9));
 
     // Add speculative ssn9 by tenant 2
     let update = Ssn::Ssn9(Ssn9::from_str("123121234").unwrap()).into();
@@ -362,8 +355,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su2.id)).unwrap();
-    let ssn4_tenant2 = uvw.get_identity_e_field(DataLifetimeKind::Ssn4);
-    let ssn9_tenant2 = uvw.get_identity_e_field(DataLifetimeKind::Ssn9);
+    let ssn4_tenant2 = uvw.get_identity_e_field(IdentityDataKind::Ssn4);
+    let ssn9_tenant2 = uvw.get_identity_e_field(IdentityDataKind::Ssn9);
     assert_ne!(ssn4_tenant1, ssn4_tenant2);
 
     // Commit data for tenant2
@@ -376,11 +369,11 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
 
     // Now, when getting committed data, we should still see the ssn9 added for tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert_eq!(uvw.get_identity_e_field(DataLifetimeKind::Ssn4), ssn4_tenant2);
-    assert_eq!(uvw.get_identity_e_field(DataLifetimeKind::Ssn9), ssn9_tenant2);
+    assert_eq!(uvw.get_identity_e_field(IdentityDataKind::Ssn4), ssn4_tenant2);
+    assert_eq!(uvw.get_identity_e_field(IdentityDataKind::Ssn9), ssn9_tenant2);
     // But, we should still have the name that was committed by tenant 1
-    assert!(uvw.has_identity_field(DataLifetimeKind::FirstName));
-    assert!(uvw.has_identity_field(DataLifetimeKind::LastName));
+    assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
+    assert!(uvw.has_identity_field(IdentityDataKind::LastName));
 }
 
 #[db_test]
@@ -421,13 +414,13 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
         uvw.update_identity_data(conn, update.into(), vec![]).unwrap();
     }
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
-    assert!(uvw.has_identity_field(DataLifetimeKind::AddressLine1));
+    assert!(uvw.has_identity_field(IdentityDataKind::AddressLine1));
     // We should have cleared out line2 in the last update
-    assert!(!uvw.has_identity_field(DataLifetimeKind::AddressLine2));
-    assert!(uvw.has_identity_field(DataLifetimeKind::City));
-    assert!(uvw.has_identity_field(DataLifetimeKind::State));
-    assert!(uvw.has_identity_field(DataLifetimeKind::Zip));
-    assert!(uvw.has_identity_field(DataLifetimeKind::Country));
+    assert!(!uvw.has_identity_field(IdentityDataKind::AddressLine2));
+    assert!(uvw.has_identity_field(IdentityDataKind::City));
+    assert!(uvw.has_identity_field(IdentityDataKind::State));
+    assert!(uvw.has_identity_field(IdentityDataKind::Zip));
+    assert!(uvw.has_identity_field(IdentityDataKind::Country));
 }
 
 #[db_test]

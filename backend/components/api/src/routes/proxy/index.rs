@@ -28,6 +28,7 @@ use db::models::scoped_user::ScopedUser;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeKind;
 
 use newtypes::PiiString;
 
@@ -193,11 +194,11 @@ async fn detokenize(
         // TODO: remove this partition whence we fold kvdata into new data model
         let (identity_tokens, custom_tokens): (Vec<_>, Vec<_>) =
             tokens.into_iter().partition_map(|token| match token {
-                DataIdentifier::Identity(dlk) => itertools::Either::Left(dlk),
+                DataIdentifier::Identity(idk) => itertools::Either::Left(idk),
                 DataIdentifier::Custom(kvdk) => itertools::Either::Right(kvdk),
             });
 
-        let fields = HashSet::from_iter(identity_tokens.clone());
+        let fields = HashSet::from_iter(identity_tokens.clone().into_iter().map(DataLifetimeKind::from));
         let custom_fields = custom_tokens.clone();
 
         let (uvw, scoped_user) = state

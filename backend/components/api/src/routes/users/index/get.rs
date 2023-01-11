@@ -21,7 +21,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::FootprintUserId;
-use newtypes::{DataLifetimeKind, Fingerprint, Fingerprinter};
+use newtypes::{Fingerprint, Fingerprinter, IdentityDataKind};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 type UsersDetailResponse = api_wire_types::User;
@@ -58,7 +58,7 @@ pub async fn get(
         Some(fingerprint) => {
             let cleaned_data = fingerprint.clean_for_fingerprint();
 
-            let fut_fingerprints = DataLifetimeKind::fingerprintable()
+            let fut_fingerprints = IdentityDataKind::fingerprintable()
                 .map(|kind| state.compute_fingerprint(kind, cleaned_data.clone()));
             let fingerprints: Vec<Fingerprint> = futures::future::try_join_all(fut_fingerprints).await?;
             Some(fingerprints)

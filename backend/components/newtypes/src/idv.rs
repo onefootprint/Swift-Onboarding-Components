@@ -1,4 +1,4 @@
-use crate::{DataLifetimeKind, PiiString};
+use crate::{IdentityDataKind, PiiString};
 use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, Default)]
@@ -29,25 +29,23 @@ impl IdvData {
         }
     }
 
-    pub fn present_data_attributes(&self) -> Vec<DataLifetimeKind> {
-        DataLifetimeKind::iter()
+    pub fn present_data_attributes(&self) -> Vec<IdentityDataKind> {
+        IdentityDataKind::iter()
             .flat_map(|attr| {
                 match attr {
-                    DataLifetimeKind::FirstName => self.first_name.as_ref(),
-                    DataLifetimeKind::LastName => self.last_name.as_ref(),
-                    DataLifetimeKind::Dob => self.dob.as_ref(),
-                    DataLifetimeKind::Ssn9 => self.ssn9.as_ref(),
-                    DataLifetimeKind::AddressLine1 => self.address_line1.as_ref(),
-                    DataLifetimeKind::AddressLine2 => self.address_line2.as_ref(),
-                    DataLifetimeKind::City => self.city.as_ref(),
-                    DataLifetimeKind::State => self.state.as_ref(),
-                    DataLifetimeKind::Zip => self.zip.as_ref(),
-                    DataLifetimeKind::Country => self.country.as_ref(),
-                    DataLifetimeKind::Email => self.email.as_ref(),
-                    DataLifetimeKind::PhoneNumber => self.phone_number.as_ref(),
-                    DataLifetimeKind::Ssn4 => self.ssn4.as_ref(),
-                    DataLifetimeKind::IdentityDocument => None, // not part of IdvData
-                    DataLifetimeKind::Custom => None,           // not part of IdvData
+                    IdentityDataKind::FirstName => self.first_name.as_ref(),
+                    IdentityDataKind::LastName => self.last_name.as_ref(),
+                    IdentityDataKind::Dob => self.dob.as_ref(),
+                    IdentityDataKind::Ssn4 => self.ssn4.as_ref(),
+                    IdentityDataKind::Ssn9 => self.ssn9.as_ref(),
+                    IdentityDataKind::AddressLine1 => self.address_line1.as_ref(),
+                    IdentityDataKind::AddressLine2 => self.address_line2.as_ref(),
+                    IdentityDataKind::City => self.city.as_ref(),
+                    IdentityDataKind::State => self.state.as_ref(),
+                    IdentityDataKind::Zip => self.zip.as_ref(),
+                    IdentityDataKind::Country => self.country.as_ref(),
+                    IdentityDataKind::Email => self.email.as_ref(),
+                    IdentityDataKind::PhoneNumber => self.phone_number.as_ref(),
                 }
                 .is_some()
                 .then_some(attr)

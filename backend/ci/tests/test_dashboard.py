@@ -103,15 +103,11 @@ class TestDashboardOnboardings:
             "fields": ["identity_document"],
             "reason": "Let me see the face of the man or woman who wronged me",
         }
-        resp = post(
+        post(
             f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
             data,
             tenant.sk.key,
             status_code=400,
-        )
-        assert (
-            resp["error"]["message"]
-            == "Cannot decrypt field IdentityDocument with this endpoint"
         )
 
     #########################
@@ -420,17 +416,23 @@ class TestDashboardObConfigs:
         "must_collect_identity_document,must_collect_selfie,can_access_identity_document_images,can_access_selfie_image,expected_status",
         [
             (True, True, True, True, 200),
-            (False, True, True, False, 400), # can't access doc if not collecting
-            (True, False, True, True, 400), # can't access selfie if not collecting
-            (False, True, False, False, 400) # can't collect selfie if not collecting doc
-        ]
+            # can't access doc if not collecting
+            (False, True, True, False, 400),
+            # can't access selfie if not collecting
+            (True, False, True, True, 400),
+            # can't collect selfie if not collecting doc
+            (False, True, False, False, 400),
+        ],
     )
     def test_config_create_doc_fields_validation(
-        self, sandbox_tenant, must_collect_data, can_access_data,      
+        self,
+        sandbox_tenant,
+        must_collect_data,
+        can_access_data,
         must_collect_identity_document,
         must_collect_selfie,
         can_access_identity_document_images,
-        can_access_selfie_image, 
+        can_access_selfie_image,
         expected_status,
     ):
         data = dict(
@@ -590,7 +592,12 @@ class TestDashboardAdminUsers:
         patch_data = dict(
             name=f"New role name {suffix}",
         )
-        patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token, status_code=400)
+        patch(
+            f"org/roles/{role_id}",
+            patch_data,
+            sandbox_tenant.auth_token,
+            status_code=400,
+        )
 
     def test_update_user_role(self, sandbox_tenant, tenant_user, limited_role):
         user_id = tenant_user["id"]

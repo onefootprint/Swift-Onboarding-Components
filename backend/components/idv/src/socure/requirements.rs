@@ -1,4 +1,4 @@
-use newtypes::DataLifetimeKind::{self, *};
+use newtypes::IdentityDataKind::{self, *};
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
@@ -83,7 +83,7 @@ impl SocureModule {
         }
     }
 
-    fn meets_requirements_for_module(&self, present_data_kinds: &[DataLifetimeKind]) -> bool {
+    fn meets_requirements_for_module(&self, present_data_kinds: &[IdentityDataKind]) -> bool {
         let requirements_for_module = self.pii_data_requirements();
 
         let required_met = requirements_for_module
@@ -104,7 +104,7 @@ impl SocureModule {
     }
 }
 
-fn modules_meeting_pii_requirements(present_data_kinds: &[DataLifetimeKind]) -> Vec<SocureModule> {
+fn modules_meeting_pii_requirements(present_data_kinds: &[IdentityDataKind]) -> Vec<SocureModule> {
     SocureModule::iter()
         .filter(|sm| sm.requires_pii_data())
         .filter(|sm| sm.meets_requirements_for_module(present_data_kinds))
@@ -112,7 +112,7 @@ fn modules_meeting_pii_requirements(present_data_kinds: &[DataLifetimeKind]) -> 
 }
 
 pub fn modules_for_idplus_request(
-    present_data_kinds: &[DataLifetimeKind],
+    present_data_kinds: &[IdentityDataKind],
     device_session_id: &Option<String>,
 ) -> Vec<SocureModule> {
     let mut modules_meeting_requirement = modules_meeting_pii_requirements(present_data_kinds);
@@ -125,7 +125,7 @@ pub fn modules_for_idplus_request(
     modules_meeting_requirement
 }
 
-pub fn meets_requirements_for_idplus_request(present_data_kinds: &[DataLifetimeKind]) -> bool {
+pub fn meets_requirements_for_idplus_request(present_data_kinds: &[IdentityDataKind]) -> bool {
     let modules_meeting_requirements = modules_meeting_pii_requirements(present_data_kinds);
 
     !modules_meeting_requirements.is_empty()

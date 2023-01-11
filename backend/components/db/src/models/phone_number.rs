@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{
-    DataLifetimeId, DataLifetimeKind, DataPriority, Fingerprint as FingerprintData, PhoneNumberId,
+    DataLifetimeId, DataPriority, Fingerprint as FingerprintData, IdentityDataKind, PhoneNumberId,
     ScopedUserId, SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
@@ -80,7 +80,7 @@ impl PhoneNumber {
         // Create a committed lifetime - once the phone number is verified and bound to a vault
         // it should be immediately portable, even though it isn't verified by vendors.
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        let lifetime = DataLifetime::create(conn, uv_id, su_id, DataLifetimeKind::PhoneNumber, seqno)?;
+        let lifetime = DataLifetime::create(conn, uv_id, su_id, IdentityDataKind::PhoneNumber.into(), seqno)?;
         let seqno = lifetime.created_seqno;
         let lifetime = lifetime.commit(conn, seqno)?;
         let new_row = NewPhoneNumberRow {
@@ -98,16 +98,12 @@ impl PhoneNumber {
         // same DataLifetime
         let new_fingerprint = NewFingerprint {
             sh_data: args.sh_phone_number,
-            kind: DataLifetimeKind::PhoneNumber,
+            kind: IdentityDataKind::PhoneNumber,
             lifetime_id: lifetime.id,
         };
         Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
 
         Ok(phone_number)
-    }
-
-    pub fn data_items(self) -> Vec<(DataLifetimeKind, SealedVaultBytes)> {
-        vec![(DataLifetimeKind::PhoneNumber, self.e_e164)]
     }
 }
 

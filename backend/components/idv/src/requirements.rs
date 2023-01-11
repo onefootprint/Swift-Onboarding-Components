@@ -1,5 +1,5 @@
 use crate::socure::requirements::meets_requirements_for_idplus_request;
-use newtypes::DataLifetimeKind;
+use newtypes::IdentityDataKind;
 use newtypes::VendorAPI;
 use strum::IntoEnumIterator;
 
@@ -8,11 +8,11 @@ use strum::IntoEnumIterator;
 /// Some vendors (like Socure) have sub-modules that have their own sets of Requirements
 pub struct MinimumIDVRequirements {
     // The kinds that a required (minimum)
-    required: Vec<DataLifetimeKind>,
+    required: Vec<IdentityDataKind>,
 }
 
 impl MinimumIDVRequirements {
-    pub fn are_satisfied(&self, present_data_lifetime_kinds: &[DataLifetimeKind]) -> bool {
+    pub fn are_satisfied(&self, present_data_lifetime_kinds: &[IdentityDataKind]) -> bool {
         let required_met = self
             .required
             .iter()
@@ -24,25 +24,25 @@ impl MinimumIDVRequirements {
 
 pub struct SocureRequirements {
     // The kinds that a required (minimum)
-    pub required: Vec<DataLifetimeKind>,
+    pub required: Vec<IdentityDataKind>,
     // at least one of these sets of kinds are required
-    pub one_of: Vec<Vec<DataLifetimeKind>>,
+    pub one_of: Vec<Vec<IdentityDataKind>>,
 }
 
 /// Based on the VendorAPI and the available data in the vault, determine if we are able make a request to a particular API
 fn vendor_api_requirements_are_satisfied(
     vendor_api: &VendorAPI,
-    present_data_lifetime_kinds: &[DataLifetimeKind],
+    present_data_lifetime_kinds: &[IdentityDataKind],
 ) -> bool {
     let expectid_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
         required: vec![
-            DataLifetimeKind::FirstName,
-            DataLifetimeKind::LastName,
-            DataLifetimeKind::AddressLine1,
+            IdentityDataKind::FirstName,
+            IdentityDataKind::LastName,
+            IdentityDataKind::AddressLine1,
         ],
     };
     let twilio_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
-        required: vec![DataLifetimeKind::PhoneNumber],
+        required: vec![IdentityDataKind::PhoneNumber],
     };
 
     match vendor_api {
@@ -57,7 +57,7 @@ fn vendor_api_requirements_are_satisfied(
 }
 
 /// All the available apis based on the data we have
-pub fn available_vendor_apis(present_data_lifetime_kinds: &[DataLifetimeKind]) -> Vec<VendorAPI> {
+pub fn available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -> Vec<VendorAPI> {
     VendorAPI::iter()
         .filter(|v| vendor_api_requirements_are_satisfied(v, present_data_lifetime_kinds))
         .collect()
@@ -70,10 +70,10 @@ mod tests {
     use test_case::test_case;
 
     // Socure requirements are tested in socure/requirements.rs
-    #[test_case(&[DataLifetimeKind::FirstName, DataLifetimeKind::LastName] => vec![VendorAPI::SocureIDPlus])]
-    #[test_case(&[DataLifetimeKind::FirstName, DataLifetimeKind::LastName, DataLifetimeKind::AddressLine1] => vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus])]
-    #[test_case(&[DataLifetimeKind::FirstName, DataLifetimeKind::LastName, DataLifetimeKind::AddressLine1, DataLifetimeKind::PhoneNumber, DataLifetimeKind::IdentityDocument] => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2, VendorAPI::SocureIDPlus])]
-    fn test_available_vendor_apis(present_data_lifetime_kinds: &[DataLifetimeKind]) -> Vec<VendorAPI> {
+    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName] => vec![VendorAPI::SocureIDPlus])]
+    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1] => vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus])]
+    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1, IdentityDataKind::PhoneNumber] => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2, VendorAPI::SocureIDPlus])]
+    fn test_available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -> Vec<VendorAPI> {
         available_vendor_apis(present_data_lifetime_kinds)
     }
 }

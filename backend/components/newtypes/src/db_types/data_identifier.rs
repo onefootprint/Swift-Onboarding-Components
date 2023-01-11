@@ -6,7 +6,7 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
 use thiserror::Error;
 
 use crate::{
-    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, DataLifetimeKind, KvDataKey,
+    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, IdentityDataKind, KvDataKey,
 };
 
 /// Identifies a piece of data for a user vault
@@ -17,8 +17,9 @@ use crate::{
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DataIdentifier {
-    Identity(DataLifetimeKind),
+    Identity(IdentityDataKind),
     Custom(KvDataKey),
+    // TODO add identity documents here
 }
 
 string_api_data_type_alias!(DataIdentifier);
@@ -47,18 +48,21 @@ impl std::fmt::Display for DataIdentifier {
 impl FromStr for DataIdentifier {
     type Err = DataIdentifierParsingError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let idx = s.find('.').ok_or_else(|| DataIdentifierParsingError::CannotParse(s.to_owned()))?;
+        let idx = s
+            .find('.')
+            .ok_or_else(|| DataIdentifierParsingError::CannotParse(s.to_owned()))?;
         let prefix = &s[..idx];
         let suffix = &s[(idx + 1)..];
         let prefix = DataIdentifierDiscriminants::from_str(prefix)
             .map_err(|_| DataIdentifierParsingError::CannotParsePrefix(prefix.to_owned()))?;
         let result = match prefix {
             DataIdentifierDiscriminants::Identity => Self::Identity(
-                DataLifetimeKind::from_str(suffix)
+                IdentityDataKind::from_str(suffix)
                     .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
             DataIdentifierDiscriminants::Custom => Self::Custom(
-                KvDataKey::from_str(suffix).map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
+                KvDataKey::from_str(suffix)
+                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
         };
         Ok(result)
@@ -85,7 +89,7 @@ impl serde::Serialize for DataIdentifier {
 }
 
 impl DataIdentifier {
-    pub fn list(attributes: Vec<DataLifetimeKind>) -> Vec<Self> {
+    pub fn list(attributes: Vec<IdentityDataKind>) -> Vec<Self> {
         attributes.into_iter().map(Self::Identity).collect()
     }
 }
@@ -97,16 +101,16 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case(DataIdentifier::Identity(DataLifetimeKind::PhoneNumber) => "identity.phone_number")]
-    #[test_case(DataIdentifier::Identity(DataLifetimeKind::Email) => "identity.email")]
+    #[test_case(DataIdentifier::Identity(IdentityDataKind::PhoneNumber) => "identity.phone_number")]
+    #[test_case(DataIdentifier::Identity(IdentityDataKind::Email) => "identity.email")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
 
-    #[test_case("identity.phone_number" => DataIdentifier::Identity(DataLifetimeKind::PhoneNumber))]
-    #[test_case("identity.email" => DataIdentifier::Identity(DataLifetimeKind::Email))]
+    #[test_case("identity.phone_number" => DataIdentifier::Identity(IdentityDataKind::PhoneNumber))]
+    #[test_case("identity.email" => DataIdentifier::Identity(IdentityDataKind::Email))]
     #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]

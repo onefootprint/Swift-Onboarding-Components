@@ -4,7 +4,7 @@ use crypto::aead::AeadSealedBytes;
 use db::models::document_request::DocRefId;
 use db::models::identity_document::IdentityDocument;
 use db::models::verification_request::VerificationRequest;
-use newtypes::{email::Email, DataLifetimeKind, IdvData, PhoneNumber};
+use newtypes::{email::Email, IdentityDataKind, IdvData, PhoneNumber};
 use newtypes::{DocVData, Base64Data, PiiString};
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -20,33 +20,33 @@ pub async fn build_idv_data_from_verification_request(
         .db_query(|conn| UserVaultWrapper::build(conn, UvwArgs::Idv(request)))
         .await??;
 
-    let (keys, encrypted_values): (Vec<_>, Vec<_>) = DataLifetimeKind::iter()
+    let (keys, encrypted_values): (Vec<_>, Vec<_>) = IdentityDataKind::iter()
         .flat_map(|a| uvw.get_identity_e_field(a).map(|v| (a, v)))
         .unzip();
     let decrypted_values = uvw.decrypt(state, encrypted_values).await?;
-    let mut decrypted_values: HashMap<DataLifetimeKind, _> =
+    let mut decrypted_values: HashMap<IdentityDataKind, _> =
         keys.into_iter().zip(decrypted_values.into_iter()).collect();
     // Remove sandbox suffixes
     let email = decrypted_values
-        .remove(&DataLifetimeKind::Email)
+        .remove(&IdentityDataKind::Email)
         .map(|x| Email::from_str(x.leak()).map(|x| x.email))
         .transpose()?;
     let phone_number = decrypted_values
-        .remove(&DataLifetimeKind::PhoneNumber)
+        .remove(&IdentityDataKind::PhoneNumber)
         .map(|x| PhoneNumber::from_str(x.leak()).map(|x| x.number))
         .transpose()?;
     let request = IdvData {
-        first_name: decrypted_values.remove(&DataLifetimeKind::FirstName),
-        last_name: decrypted_values.remove(&DataLifetimeKind::LastName),
-        address_line1: decrypted_values.remove(&DataLifetimeKind::AddressLine1),
-        address_line2: decrypted_values.remove(&DataLifetimeKind::AddressLine2),
-        city: decrypted_values.remove(&DataLifetimeKind::City),
-        state: decrypted_values.remove(&DataLifetimeKind::State),
-        zip: decrypted_values.remove(&DataLifetimeKind::Zip),
-        country: decrypted_values.remove(&DataLifetimeKind::Country),
-        ssn4: decrypted_values.remove(&DataLifetimeKind::Ssn4),
-        ssn9: decrypted_values.remove(&DataLifetimeKind::Ssn9),
-        dob: decrypted_values.remove(&DataLifetimeKind::Dob),
+        first_name: decrypted_values.remove(&IdentityDataKind::FirstName),
+        last_name: decrypted_values.remove(&IdentityDataKind::LastName),
+        address_line1: decrypted_values.remove(&IdentityDataKind::AddressLine1),
+        address_line2: decrypted_values.remove(&IdentityDataKind::AddressLine2),
+        city: decrypted_values.remove(&IdentityDataKind::City),
+        state: decrypted_values.remove(&IdentityDataKind::State),
+        zip: decrypted_values.remove(&IdentityDataKind::Zip),
+        country: decrypted_values.remove(&IdentityDataKind::Country),
+        ssn4: decrypted_values.remove(&IdentityDataKind::Ssn4),
+        ssn9: decrypted_values.remove(&IdentityDataKind::Ssn9),
+        dob: decrypted_values.remove(&IdentityDataKind::Dob),
         email,
         phone_number,
     };

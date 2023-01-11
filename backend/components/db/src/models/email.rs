@@ -5,7 +5,7 @@ use crate::{
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::DataLifetimeKind;
+use newtypes::IdentityDataKind;
 use newtypes::{DataLifetimeId, DataLifetimeSeqno};
 use newtypes::{
     DataPriority, EmailId, Fingerprint as FingerprintData, ScopedUserId, SealedVaultBytes, UserVaultId,
@@ -59,7 +59,7 @@ impl Email {
         su_id: &ScopedUserId,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Email> {
-        let lifetime = DataLifetime::create(conn, uv_id, Some(su_id), DataLifetimeKind::Email, seqno)?;
+        let lifetime = DataLifetime::create(conn, uv_id, Some(su_id), IdentityDataKind::Email.into(), seqno)?;
         let new_row = NewEmail {
             e_data,
             is_verified: false,
@@ -74,7 +74,7 @@ impl Email {
         // same DataLifetime
         let new_fingerprint = NewFingerprint {
             sh_data: fingerprint,
-            kind: DataLifetimeKind::Email,
+            kind: IdentityDataKind::Email,
             lifetime_id: lifetime.id,
         };
         // TODO: ensure that the fingerprint tuple of (user_vault_id, fingerprint) is unique
@@ -104,10 +104,6 @@ impl Email {
             .set(email::is_verified.eq(true))
             .execute(conn)?;
         Ok(())
-    }
-
-    pub fn data_items(self) -> Vec<(DataLifetimeKind, SealedVaultBytes)> {
-        vec![(DataLifetimeKind::Email, self.e_data)]
     }
 }
 

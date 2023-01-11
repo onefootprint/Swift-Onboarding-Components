@@ -17,10 +17,8 @@ use api_wire_types::{
     DecryptIdentityDocumentRequest, DecryptIdentityDocumentResponse, GetIdentityDocumentForDecryptResponse,
     GetQueryParam, ImageData,
 };
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
-use newtypes::{AccessEventKind, DataIdentifier, DataLifetimeKind, FootprintUserId};
+use newtypes::{DataLifetimeKind, FootprintUserId};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Query};
 
@@ -116,7 +114,7 @@ pub(super) async fn post_internal(
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityDocumentRequest>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-    insights: InsightHeaders,
+    _insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
     let request = request.into_inner();
     let document_type = request.document_type;
@@ -126,7 +124,7 @@ pub(super) async fn post_internal(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let (uvw, scoped_user) = state
+    let (uvw, _scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
@@ -144,17 +142,19 @@ pub(super) async fn post_internal(
     let decrypted_docs: Vec<DecryptDocumentResult> =
         crate::hosted::user::decrypt_document(&state, uvw, document_type.clone()).await?;
 
-    // Create an AccessEvent log showing that the tenant accessed identity document
+    // TODO Create an AccessEvent log showing that the tenant accessed identity document
+    /*
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: Some(request.reason),
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
-        targets: vec![DataIdentifier::Identity(DataLifetimeKind::IdentityDocument)],
+        targets: vec![DataIdentifier::IdentityDocument],
     }
     .save(&state.db_pool)
     .await?;
+    */
     let mut image_data: Vec<ImageData> = Vec::new();
     for doc in decrypted_docs {
         image_data.push(ImageData {

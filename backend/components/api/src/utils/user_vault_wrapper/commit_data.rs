@@ -98,7 +98,8 @@ impl UvwCommitData for LockedUserVaultWrapper {
         //
         let lifetime_ids_to_deactivate = {
             // For everything that we're about to commit, deactivate the old data if exists
-            let committed_lifetimes_to_deactivate = uvw.committed.get_lifetimes(&speculative_kinds_to_commit);
+            let committed_lifetimes_to_deactivate =
+                uvw.committed.get_id_lifetimes(&speculative_kinds_to_commit);
             let is_all_data_committed = committed_lifetimes_to_deactivate
                 .iter()
                 .all(|l| l.committed_seqno.is_some());
@@ -110,7 +111,7 @@ impl UvwCommitData for LockedUserVaultWrapper {
             }
             // And, grab the IDs of speculative data that we're deactivating.
             let speculative_lifetimes_to_deactivate =
-                uvw.speculative.get_lifetimes(&speculative_kinds_to_deactivate);
+                uvw.speculative.get_id_lifetimes(&speculative_kinds_to_deactivate);
             if !speculative_lifetimes_to_deactivate.is_empty() {
                 // For now, we only deactivate speculative data if committing it would otherwise
                 // replace more full data on the user vault.
@@ -135,7 +136,8 @@ impl UvwCommitData for LockedUserVaultWrapper {
         // NOTE: this isn't committing identity documents since we never return IdentityDocument
         // from get_populated_fields
         let lifetime_ids_to_commit = {
-            let speculative_lifetimes_to_commit = uvw.speculative.get_lifetimes(&speculative_kinds_to_commit);
+            let speculative_lifetimes_to_commit =
+                uvw.speculative.get_id_lifetimes(&speculative_kinds_to_commit);
             let all_data_is_speculative_and_belongs_to_scoped_user = speculative_lifetimes_to_commit
                 .iter()
                 .all(|l| l.committed_seqno.is_none() && l.scoped_user_id == uvw.scoped_user_id);

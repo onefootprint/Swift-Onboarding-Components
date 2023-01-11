@@ -2,7 +2,7 @@ use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use newtypes::{DataLifetimeKind, Fingerprinter};
+use newtypes::{IdentityDataKind, Fingerprinter};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -56,7 +56,7 @@ async fn post(
     let twilio_client = &state.twilio_client;
     let phone_number = twilio_client.standardize(&requested_number).await?;
     let sh_data = state
-        .compute_fingerprint(DataLifetimeKind::PhoneNumber, phone_number.to_piistring())
+        .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.to_piistring())
         .await?;
     let num_deleted_rows = db::private_cleanup_integration_tests(&state.db_pool, sh_data).await?;
 

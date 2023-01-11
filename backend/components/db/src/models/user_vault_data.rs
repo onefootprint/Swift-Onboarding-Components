@@ -6,6 +6,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
+use newtypes::IdentityDataKind;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
 use newtypes::UserVaultId;
@@ -54,7 +55,9 @@ impl UserVaultData {
             conn,
             user_vault_id,
             scoped_user_id,
-            data.iter().map(|d| DataLifetimeKind::from(d.kind)).collect(),
+            data.iter()
+                .map(|d| DataLifetimeKind::from(IdentityDataKind::from(d.kind)))
+                .collect(),
             seqno,
         )?;
         let new_rows: Vec<_> = data

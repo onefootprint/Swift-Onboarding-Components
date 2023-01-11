@@ -80,6 +80,7 @@ impl IsGuardMet for Any {
 
 /// Represents a permission that is only met when the tenant auth token contains a scope that allows
 /// decrypting the provided attributes
+/// TODO DataIdentifier
 pub struct CanDecrypt(Vec<DataLifetimeKind>);
 
 impl CanDecrypt {
@@ -108,6 +109,7 @@ impl IsGuardMet for CanDecrypt {
             })
             .flatten()
             .flat_map(|cdo| cdo.attributes())
+            .map(DataLifetimeKind::from)
             .collect();
         can_access.is_superset(&HashSet::from_iter(self.0.into_iter()))
     }
