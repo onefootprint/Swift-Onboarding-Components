@@ -21,7 +21,6 @@ use crate::{errors::ApiError, State};
 use actix_web::web::Query;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::HasDataAttributeFields;
 use db::TxnPgConnection;
 
 use db::models::scoped_user::ScopedUser;
@@ -165,7 +164,7 @@ pub(super) async fn get_internal(
         .await??;
 
     let output = HashMap::from_iter(fields.into_iter().map(|field| {
-        let exists = uvw.has_field(field);
+        let exists = uvw.has_identity_field(field);
         (field, exists)
     }));
 

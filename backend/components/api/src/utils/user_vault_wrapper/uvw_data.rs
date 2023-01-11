@@ -4,12 +4,12 @@ use db::models::identity_document::IdentityDocument;
 use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
-use db::HasDataAttributeFields;
 use db::HasLifetime;
 use newtypes::KvDataKey;
 use newtypes::{DataLifetimeId, DataLifetimeKind, SealedVaultBytes};
 use std::collections::{HashMap, HashSet};
 use std::convert::Into;
+use strum::IntoEnumIterator;
 
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
@@ -168,22 +168,22 @@ impl UvwData {
     }
 }
 
-impl HasDataAttributeFields for UvwData {
-    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
-        // NOTE: this prevents us from ever committing IdentityDocuments
-        if data_attribute.disallows_e_data() {
+impl UvwData {
+    pub fn get_identity_e_field(&self, kind: DataLifetimeKind) -> Option<&SealedVaultBytes> {
+        if matches!(
+            kind,
+            DataLifetimeKind::IdentityDocument | DataLifetimeKind::Custom
+        ) {
             return None;
         }
 
-        let value = self.get(&data_attribute);
+        let value = self.get(&kind);
         value.map(|v| v.e_data())
     }
 
-    fn has_field(&self, data_attribute: DataLifetimeKind) -> bool {
-        match data_attribute {
-            // UVData is stored differently than IdentityDocuments
-            DataLifetimeKind::IdentityDocument => !self.identity_documents.is_empty(),
-            _ => self.get_e_field(data_attribute).is_some(),
-        }
+    pub fn get_populated_identity_fields(&self) -> Vec<DataLifetimeKind> {
+        DataLifetimeKind::iter()
+            .filter(|k| self.get_identity_e_field(*k).is_some())
+            .collect()
     }
 }

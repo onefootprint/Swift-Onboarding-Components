@@ -25,10 +25,8 @@ pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
 use errors::TransactionError;
-use newtypes::{DataLifetimeKind, Fingerprint, SealedVaultBytes};
+use newtypes::Fingerprint;
 use user_vault::get_by_fingerprint;
-
-use strum::IntoEnumIterator;
 
 #[allow(unused_imports)]
 pub mod schema;
@@ -360,17 +358,6 @@ pub async fn private_cleanup_integration_tests(
         })
         .await?;
     Ok(deleted_rows)
-}
-
-/// helper trait to access e_fields and metadata
-pub trait HasDataAttributeFields {
-    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes>;
-
-    fn has_field(&self, data_attribute: DataLifetimeKind) -> bool;
-
-    fn get_populated_fields(&self) -> Vec<DataLifetimeKind> {
-        DataLifetimeKind::iter().filter(|k| self.has_field(*k)).collect()
-    }
 }
 
 sql_function!(fn nextval(a: diesel::sql_types::VarChar) -> diesel::sql_types::BigInt);

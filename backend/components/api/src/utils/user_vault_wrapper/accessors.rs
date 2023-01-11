@@ -7,7 +7,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
-use db::HasDataAttributeFields;
 use db::PgConnection;
 use newtypes::KvDataKey;
 use newtypes::ScopedUserId;
@@ -15,13 +14,18 @@ use newtypes::{CollectedDataOption, DataLifetimeKind, SealedVaultBytes};
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::convert::Into;
+use strum::IntoEnumIterator;
 
 impl UserVaultWrapper {
     pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
         ob_config
             .must_collect_data
             .iter()
-            .filter(|cdo| cdo.required_attributes().iter().any(|d| !self.has_field(*d)))
+            .filter(|cdo| {
+                cdo.required_attributes()
+                    .iter()
+                    .any(|d| !self.has_identity_field(*d))
+            })
             .cloned()
             .collect()
     }
@@ -59,15 +63,22 @@ impl UserVaultWrapper {
     }
 }
 
-impl HasDataAttributeFields for UserVaultWrapper {
-    fn get_e_field(&self, data_attribute: DataLifetimeKind) -> Option<&SealedVaultBytes> {
+impl UserVaultWrapper {
+    // TODO replace all of these to only have identity data kinds instead of DataLifetimeKinds
+    pub fn get_identity_e_field(&self, kind: DataLifetimeKind) -> Option<&SealedVaultBytes> {
         self.speculative
-            .get_e_field(data_attribute)
-            .or_else(|| self.committed.get_e_field(data_attribute))
+            .get_identity_e_field(kind)
+            .or_else(|| self.committed.get_identity_e_field(kind))
     }
 
-    fn has_field(&self, data_attribute: DataLifetimeKind) -> bool {
-        self.speculative.has_field(data_attribute) || self.committed.has_field(data_attribute)
+    pub fn has_identity_field(&self, kind: DataLifetimeKind) -> bool {
+        self.get_identity_e_field(kind).is_some()
+    }
+
+    pub fn get_populated_identity_fields(&self) -> Vec<DataLifetimeKind> {
+        DataLifetimeKind::iter()
+            .filter(|k| self.has_identity_field(*k))
+            .collect()
     }
 }
 
@@ -104,13 +115,12 @@ impl UserVaultWrapper {
         // but /users does some bulk fetching and this makes it easier
         ob_configs: &[ObConfiguration],
     ) -> Vec<DataLifetimeKind> {
-        // As of 2022-11, ob<>scoped user is 1-1
         let intent_to_collect_attributes: HashSet<DataLifetimeKind> = ob_configs
             .iter()
             .flat_map(|x| x.intent_to_collect_fields())
             .collect();
         let fields_present_in_vault: HashSet<DataLifetimeKind> =
-            HashSet::from_iter(self.get_populated_fields().into_iter());
+            HashSet::from_iter(self.get_populated_identity_fields().into_iter());
 
         (intent_to_collect_attributes.intersection(&fields_present_in_vault))
             .into_iter()
@@ -136,7 +146,7 @@ impl UserVaultWrapper {
             vec![]
         };
         let data_attributes: Vec<DataLifetimeKind> =
-            HashSet::from_iter(self.get_populated_fields().iter().cloned())
+            HashSet::from_iter(self.get_populated_identity_fields().iter().cloned())
                 .intersection(&accessible_fields)
                 .into_iter()
                 .cloned()

@@ -4,7 +4,6 @@ use crypto::aead::AeadSealedBytes;
 use db::models::document_request::DocRefId;
 use db::models::identity_document::IdentityDocument;
 use db::models::verification_request::VerificationRequest;
-use db::HasDataAttributeFields;
 use newtypes::{email::Email, DataLifetimeKind, IdvData, PhoneNumber};
 use newtypes::{DocVData, Base64Data, PiiString};
 use std::{collections::HashMap, str::FromStr};
@@ -22,7 +21,7 @@ pub async fn build_idv_data_from_verification_request(
         .await??;
 
     let (keys, encrypted_values): (Vec<_>, Vec<_>) = DataLifetimeKind::iter()
-        .flat_map(|a| uvw.get_e_field(a).map(|v| (a, v)))
+        .flat_map(|a| uvw.get_identity_e_field(a).map(|v| (a, v)))
         .unzip();
     let decrypted_values = uvw.decrypt(state, encrypted_values).await?;
     let mut decrypted_values: HashMap<DataLifetimeKind, _> =

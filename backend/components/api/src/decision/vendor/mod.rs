@@ -8,7 +8,7 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         verification_request::VerificationRequest,
     },
-    HasDataAttributeFields, TxnPgConnection,
+    TxnPgConnection,
 };
 use newtypes::OnboardingId;
 
@@ -42,7 +42,8 @@ pub fn build_verification_requests_and_checkpoint(
     let ob = ob.into_inner();
     ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
     // From the data in the vault, figure out which vendors we need to send to
-    let vendor_apis = idv::requirements::available_vendor_apis(uvw.get_populated_fields().as_slice());
+    let vendor_apis =
+        idv::requirements::available_vendor_apis(uvw.get_populated_identity_fields().as_slice());
     if vendor_apis.is_empty() {
         return Err(ApiError::AssertionError(
             "Not enough information to send to any vendors".into(),

@@ -5,7 +5,6 @@ use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
-use db::HasDataAttributeFields;
 use db::TxnPgConnection;
 use newtypes::CollectedDataOption;
 use newtypes::DataLifetimeSeqno;
@@ -85,8 +84,8 @@ impl UvwCommitData for LockedUserVaultWrapper {
         // NOTE: this does nothing to Custom data or Identity documents since they don't fit into
         // the CollectedDataOption model
         let d = decide_data_to_commit(CurrentData {
-            speculative: CollectedDataOption::list_from(uvw.speculative.get_populated_fields()),
-            committed: CollectedDataOption::list_from(uvw.committed.get_populated_fields()),
+            speculative: CollectedDataOption::list_from(uvw.speculative.get_populated_identity_fields()),
+            committed: CollectedDataOption::list_from(uvw.committed.get_populated_identity_fields()),
         });
         let speculative_kinds_to_commit: Vec<_> =
             d.to_commit.into_iter().flat_map(|o| o.attributes()).collect();

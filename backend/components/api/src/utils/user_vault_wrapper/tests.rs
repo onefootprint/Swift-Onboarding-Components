@@ -8,7 +8,6 @@ use db::models::user_vault_data::NewUserVaultData;
 use db::models::user_vault_data::UserVaultData;
 use db::tests::fixtures;
 use db::tests::prelude::*;
-use db::HasDataAttributeFields;
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::address::{Address, AddressLine, City, Country, FullAddressOrZip, State, Zip, ZipAndCountry};
@@ -81,7 +80,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(uvw.get_e_field(attribute), expected_value.as_ref());
+        assert_eq!(uvw.get_identity_e_field(attribute), expected_value.as_ref());
     }
 
     // build_for_user should only show the phone number
@@ -103,7 +102,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(uvw.get_e_field(attribute), expected_value.as_ref());
+        assert_eq!(uvw.get_identity_e_field(attribute), expected_value.as_ref());
     }
 }
 
@@ -139,22 +138,22 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
 
     // Make the user can't see the name and email until it's committed
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert!(!uvw.has_field(DataLifetimeKind::FirstName));
-    assert!(!uvw.has_field(DataLifetimeKind::LastName));
-    assert!(!uvw.has_field(DataLifetimeKind::Email));
+    assert!(!uvw.has_identity_field(DataLifetimeKind::FirstName));
+    assert!(!uvw.has_identity_field(DataLifetimeKind::LastName));
+    assert!(!uvw.has_identity_field(DataLifetimeKind::Email));
 
     // Commit
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    assert!(uvw.has_field(DataLifetimeKind::FirstName));
-    assert!(uvw.has_field(DataLifetimeKind::LastName));
-    assert!(uvw.has_field(DataLifetimeKind::Email));
+    assert!(uvw.has_identity_field(DataLifetimeKind::FirstName));
+    assert!(uvw.has_identity_field(DataLifetimeKind::LastName));
+    assert!(uvw.has_identity_field(DataLifetimeKind::Email));
     uvw.commit_identity_data(conn).unwrap();
 
     // Now we should see the committed name and email
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert!(uvw.has_field(DataLifetimeKind::FirstName));
-    assert!(uvw.has_field(DataLifetimeKind::LastName));
-    assert!(uvw.has_field(DataLifetimeKind::Email));
+    assert!(uvw.has_identity_field(DataLifetimeKind::FirstName));
+    assert!(uvw.has_identity_field(DataLifetimeKind::LastName));
+    assert!(uvw.has_identity_field(DataLifetimeKind::Email));
 }
 
 // Some impls to make test code cleaner
@@ -354,8 +353,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 as was written by tenant 1
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
-    let ssn4_tenant1 = uvw.get_e_field(DataLifetimeKind::Ssn4);
-    assert!(!uvw.has_field(DataLifetimeKind::Ssn9));
+    let ssn4_tenant1 = uvw.get_identity_e_field(DataLifetimeKind::Ssn4);
+    assert!(!uvw.has_identity_field(DataLifetimeKind::Ssn9));
 
     // Add speculative ssn9 by tenant 2
     let update = Ssn::Ssn9(Ssn9::from_str("123121234").unwrap()).into();
@@ -363,8 +362,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su2.id)).unwrap();
-    let ssn4_tenant2 = uvw.get_e_field(DataLifetimeKind::Ssn4);
-    let ssn9_tenant2 = uvw.get_e_field(DataLifetimeKind::Ssn9);
+    let ssn4_tenant2 = uvw.get_identity_e_field(DataLifetimeKind::Ssn4);
+    let ssn9_tenant2 = uvw.get_identity_e_field(DataLifetimeKind::Ssn9);
     assert_ne!(ssn4_tenant1, ssn4_tenant2);
 
     // Commit data for tenant2
@@ -377,11 +376,11 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
 
     // Now, when getting committed data, we should still see the ssn9 added for tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert_eq!(uvw.get_e_field(DataLifetimeKind::Ssn4), ssn4_tenant2);
-    assert_eq!(uvw.get_e_field(DataLifetimeKind::Ssn9), ssn9_tenant2);
+    assert_eq!(uvw.get_identity_e_field(DataLifetimeKind::Ssn4), ssn4_tenant2);
+    assert_eq!(uvw.get_identity_e_field(DataLifetimeKind::Ssn9), ssn9_tenant2);
     // But, we should still have the name that was committed by tenant 1
-    assert!(uvw.has_field(DataLifetimeKind::FirstName));
-    assert!(uvw.has_field(DataLifetimeKind::LastName));
+    assert!(uvw.has_identity_field(DataLifetimeKind::FirstName));
+    assert!(uvw.has_identity_field(DataLifetimeKind::LastName));
 }
 
 #[db_test]
@@ -422,13 +421,13 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
         uvw.update_identity_data(conn, update.into(), vec![]).unwrap();
     }
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
-    assert!(uvw.has_field(DataLifetimeKind::AddressLine1));
+    assert!(uvw.has_identity_field(DataLifetimeKind::AddressLine1));
     // We should have cleared out line2 in the last update
-    assert!(!uvw.has_field(DataLifetimeKind::AddressLine2));
-    assert!(uvw.has_field(DataLifetimeKind::City));
-    assert!(uvw.has_field(DataLifetimeKind::State));
-    assert!(uvw.has_field(DataLifetimeKind::Zip));
-    assert!(uvw.has_field(DataLifetimeKind::Country));
+    assert!(!uvw.has_identity_field(DataLifetimeKind::AddressLine2));
+    assert!(uvw.has_identity_field(DataLifetimeKind::City));
+    assert!(uvw.has_identity_field(DataLifetimeKind::State));
+    assert!(uvw.has_identity_field(DataLifetimeKind::Zip));
+    assert!(uvw.has_identity_field(DataLifetimeKind::Country));
 }
 
 #[db_test]

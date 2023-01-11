@@ -7,7 +7,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::phone_number::{NewPhoneNumberArgs, PhoneNumber};
 use db::models::user_timeline::UserTimeline;
-use db::{HasDataAttributeFields, TxnPgConnection};
+use db::TxnPgConnection;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, EmailId, Fingerprint, KvDataKey,
@@ -114,7 +114,7 @@ impl UvwAddData for LockedUserVaultWrapper {
         update: IdentityDataUpdate,
         fingerprints: Vec<(UvdKind, Fingerprint)>,
     ) -> Result<(), ApiError> {
-        let existing_fields = self.get_populated_fields();
+        let existing_fields = self.get_populated_identity_fields();
         let uv = self.user_vault();
         let scoped_user_id = self.scoped_user_id().ok_or(UserError::NotAllowedWithoutTenant)?;
 

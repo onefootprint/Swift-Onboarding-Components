@@ -65,11 +65,6 @@ impl DataLifetimeKind {
         )
     }
 
-    /// Returns true if the DataAttribute supports accessing e_data
-    pub fn disallows_e_data(&self) -> bool {
-        matches!(self, DataLifetimeKind::IdentityDocument)
-    }
-
     pub fn is_optional(&self) -> bool {
         matches!(
             self,
