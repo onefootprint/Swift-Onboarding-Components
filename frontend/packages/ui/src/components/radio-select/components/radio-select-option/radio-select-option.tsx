@@ -100,6 +100,10 @@ const Option = styled.button<{ selected?: boolean }>`
         ${theme.borderRadius.default};
     }
 
+    &:first-child:last-child {
+      border-radius: ${theme.borderRadius.default};
+    }
+
     &:not(:first-child) {
       margin-top: -1px; // because of the borders
     }
