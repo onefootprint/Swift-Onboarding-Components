@@ -56,16 +56,12 @@ const ProcessingDocuments = () => {
     onSuccess: (response: GetDocStatusResponse) => {
       const {
         status: { kind },
-        frontImageError,
-        backImageError,
+        errors,
       } = response;
       if (kind === DocStatusKind.retryLimitExceeded) {
         handleRetryLimitExceeded();
-      } else if (
-        kind === DocStatusKind.error &&
-        (frontImageError || backImageError)
-      ) {
-        handleDocError(frontImageError, backImageError);
+      } else if (kind === DocStatusKind.error && !!errors?.length) {
+        handleDocErrors(errors);
       } else if (kind === DocStatusKind.complete) {
         handleDocSuccess();
       }
@@ -81,17 +77,13 @@ const ProcessingDocuments = () => {
     }, TRANSITION_DELAY);
   };
 
-  const handleDocError = (
-    frontImageError?: IdDocBadImageError,
-    backImageError?: IdDocBadImageError,
-  ) => {
+  const handleDocErrors = (errors: IdDocBadImageError[]) => {
     setDisplayStatus(DisplayStatus.error);
     setTimeout(() => {
       send({
         type: Events.errored,
         payload: {
-          idDocFrontImageError: frontImageError,
-          idDocBackImageError: backImageError,
+          errors,
         },
       });
     }, TRANSITION_DELAY);

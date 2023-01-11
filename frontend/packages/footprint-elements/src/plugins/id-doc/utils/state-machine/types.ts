@@ -8,13 +8,12 @@ import {
 export enum States {
   init = 'init',
   idDocCountryAndType = 'idDocCountryAndType',
-  idDocFrontPhoto = 'idDocFrontPhoto',
-  idDocBackPhoto = 'idDocBackPhoto',
+  idDocFrontImage = 'idDocFrontImage',
+  idDocBackImage = 'idDocBackImage',
   selfiePrompt = 'selfiePrompt',
-  selfiePhoto = 'selfiePhoto',
+  selfieImage = 'selfieImage',
   processingDocuments = 'processingDocuments',
-  retryIdDocFrontPhoto = 'retryIdDocFrontPhoto',
-  retryIdDocBackPhoto = 'retryIdDocBackPhoto',
+  error = 'error',
   success = 'success',
   failure = 'failure',
 }
@@ -28,6 +27,7 @@ export enum Events {
   receivedSelfieImage = 'receivedSelfieImage',
   succeeded = 'succeeded',
   errored = 'errored',
+  resubmitIdDocImages = 'resubmitIdDocImages',
   retryLimitExceeded = 'retryLimitExceeded',
 }
 
@@ -50,8 +50,7 @@ export type MachineContext = {
     country?: CountryCode3;
     frontImage?: string; // Base64 encoded
     backImage?: string; // Base64 encoded
-    frontImageError?: IdDocBadImageError;
-    backImageError?: IdDocBadImageError;
+    errors?: IdDocBadImageError[];
   };
   selfie: {
     required?: boolean;
@@ -105,7 +104,9 @@ export type MachineEvents =
   | {
       type: Events.errored;
       payload: {
-        idDocFrontImageError?: IdDocBadImageError;
-        idDocBackImageError?: IdDocBadImageError;
+        errors: IdDocBadImageError[];
       };
+    }
+  | {
+      type: Events.resubmitIdDocImages;
     };

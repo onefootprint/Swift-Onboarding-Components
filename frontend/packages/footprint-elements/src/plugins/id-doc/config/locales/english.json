@@ -108,13 +108,10 @@
       "success": "Documents successfully verified!",
       "error": "An error occurred."
     },
-    "retry-photo": {
-      "front": {
-        "title": "Resubmit your {{type}} (FRONT)"
-      },
-      "back": {
-        "title": "Resubmit your {{type}} (BACK)"
-      }
+    "error": {
+      "title": "We couldn't process your images",
+      "description": "Please submit new images considering:",
+      "cta": "Resubmit images"
     },
     "failure": {
       "title": "Document couldn't be verified",

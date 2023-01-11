@@ -42,16 +42,16 @@ const createIdDocMachine = () =>
         [States.idDocCountryAndType]: {
           on: {
             [Events.idDocCountryAndTypeSelected]: {
-              target: States.idDocFrontPhoto,
+              target: States.idDocFrontImage,
               actions: Actions.assignIdDocCountryAndType,
             },
           },
         },
-        [States.idDocFrontPhoto]: {
+        [States.idDocFrontImage]: {
           on: {
             [Events.receivedIdDocFrontImage]: [
               {
-                target: States.idDocBackPhoto,
+                target: States.idDocBackImage,
                 actions: Actions.assignIdDocFrontImage,
                 cond: context => {
                   const {
@@ -67,7 +67,7 @@ const createIdDocMachine = () =>
             ],
           },
         },
-        [States.idDocBackPhoto]: {
+        [States.idDocBackImage]: {
           on: {
             [Events.receivedIdDocBackImage]: [
               {
@@ -85,11 +85,11 @@ const createIdDocMachine = () =>
         [States.selfiePrompt]: {
           on: {
             [Events.startSelfieCapture]: {
-              target: States.selfiePhoto,
+              target: States.selfieImage,
             },
           },
         },
-        [States.selfiePhoto]: {
+        [States.selfieImage]: {
           on: {
             [Events.receivedSelfieImage]: {
               target: States.processingDocuments,
@@ -104,14 +104,9 @@ const createIdDocMachine = () =>
             },
             [Events.errored]: [
               {
-                target: States.retryIdDocFrontPhoto,
+                target: States.error,
                 actions: Actions.assignIdDocImageErrors,
-                cond: (context, event) => !!event.payload.idDocFrontImageError,
-              },
-              {
-                target: States.retryIdDocBackPhoto,
-                actions: Actions.assignIdDocImageErrors,
-                cond: (context, event) => !!event.payload.idDocBackImageError,
+                cond: (context, event) => !!event.payload.errors,
               },
               {
                 target: States.failure,
@@ -122,26 +117,10 @@ const createIdDocMachine = () =>
             },
           },
         },
-        [States.retryIdDocFrontPhoto]: {
+        [States.error]: {
           on: {
-            [Events.receivedIdDocFrontImage]: [
-              {
-                target: States.idDocBackPhoto,
-                actions: Actions.assignIdDocFrontImage,
-                cond: context => !!context.idDoc.backImageError,
-              },
-              {
-                target: States.processingDocuments,
-                actions: Actions.assignIdDocFrontImage,
-              },
-            ],
-          },
-        },
-        [States.retryIdDocBackPhoto]: {
-          on: {
-            [Events.receivedIdDocBackImage]: {
-              target: States.processingDocuments,
-              actions: Actions.assignIdDocBackImage,
+            [Events.resubmitIdDocImages]: {
+              target: States.idDocFrontImage,
             },
           },
         },
@@ -199,8 +178,9 @@ const createIdDocMachine = () =>
         }),
         [Actions.assignIdDocImageErrors]: assign((context, event) => {
           if (event.type === Events.errored) {
-            context.idDoc.frontImageError = event.payload.idDocFrontImageError;
-            context.idDoc.backImageError = event.payload.idDocBackImageError;
+            context.idDoc.errors = event.payload.errors;
+            context.idDoc.frontImage = undefined;
+            context.idDoc.backImage = undefined;
           }
           return context;
         }),

@@ -5,14 +5,13 @@ import {
   IcoSquareFrame24,
   IcoSun24,
 } from '@onefootprint/icons';
-import { IdDocBadImageError, IdDocType } from '@onefootprint/types';
+import { IdDocType } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
-import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import imageFileToStrippedBase64 from '../../utils/image-processing/image-file-to-stripped-base64';
 
@@ -22,7 +21,6 @@ type IdDocPhotoPromptProps = {
   iconComponent: Icon;
   side: 'front' | 'back';
   onComplete: (image: string) => void;
-  error?: IdDocBadImageError;
 };
 
 const IdDocPhotoPrompt = ({
@@ -31,7 +29,6 @@ const IdDocPhotoPrompt = ({
   iconComponent: Icon,
   type,
   side,
-  error,
 }: IdDocPhotoPromptProps) => {
   const { t } = useTranslation('components.id-doc-photo-prompt');
   const takePhotoRef = useRef<HTMLInputElement | undefined>();
@@ -62,11 +59,7 @@ const IdDocPhotoPrompt = ({
           type: IdDocTypeToLabel[type],
           side: side.toUpperCase(),
         })}
-        subtitle={
-          error
-            ? BadImageErrorLabel[error]
-            : t('subtitle', { type: IdDocTypeToLabel[type], side })
-        }
+        subtitle={t('subtitle', { type: IdDocTypeToLabel[type], side })}
       />
       {showGuidelines && (
         <InfoBox

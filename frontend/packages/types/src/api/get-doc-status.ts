@@ -14,6 +14,5 @@ export enum DocStatusKind {
 
 export type GetDocStatusResponse = {
   status: { kind: DocStatusKind };
-  frontImageError?: IdDocBadImageError;
-  backImageError?: IdDocBadImageError;
+  errors?: IdDocBadImageError[];
 };
