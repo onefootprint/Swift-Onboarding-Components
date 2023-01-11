@@ -1,13 +1,18 @@
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
+use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
 use db::HasDataAttributeFields;
 use db::HasLifetime;
+use newtypes::KvDataKey;
 use newtypes::{DataLifetimeId, DataLifetimeKind, SealedVaultBytes};
 use std::collections::{HashMap, HashSet};
 use std::convert::Into;
+
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 
 #[derive(Clone, Debug)]
 pub(super) struct UvwData {
@@ -16,6 +21,7 @@ pub(super) struct UvwData {
     pub(super) emails: Vec<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
     pub(super) identity_documents: Vec<IdentityDocument>,
+    pub(super) kv_data: HashMap<KvDataKey, KeyValueData>,
 
     // A map of all of the DataLifetimes for this data.
     lifetimes: HashMap<DataLifetimeId, DataLifetime>,
@@ -27,8 +33,9 @@ impl UvwData {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocument>,
+        kv_data: Vec<KeyValueData>,
         all_lifetimes: Vec<DataLifetime>,
-    ) -> (Self, Self) {
+    ) -> ApiResult<(Self, Self)> {
         let speculative_lifetime_ids: HashSet<_> = all_lifetimes
             .iter()
             .filter(|l| l.committed_seqno.is_some())
@@ -49,12 +56,20 @@ impl UvwData {
         let (committed_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
         let (committed_identity_documents, speculative_identity_documents) =
             partition(identity_documents, &speculative_lifetime_ids);
+        let (committed_kv_data, speculative_kv_data) = partition(kv_data, &speculative_lifetime_ids);
+
+        if !committed_kv_data.is_empty() {
+            // We don't commit kv_data yet because we don't want it to be portable. Error if we find
+            // any
+            return Err(ApiError::AssertionError("Found committed kv_data".to_owned()));
+        }
 
         let committed = Self::build(
             committed_uvd,
             committed_phone_numbers,
             committed_emails,
             committed_identity_documents,
+            committed_kv_data,
             &all_lifetimes,
         );
         let speculative = Self::build(
@@ -62,9 +77,10 @@ impl UvwData {
             speculative_phone_numbers,
             speculative_emails,
             speculative_identity_documents,
+            speculative_kv_data,
             &all_lifetimes,
         );
-        (committed, speculative)
+        Ok((committed, speculative))
     }
 
     fn build(
@@ -72,6 +88,7 @@ impl UvwData {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocument>,
+        kv_data: Vec<KeyValueData>,
         all_lifetimes: &[DataLifetime],
     ) -> Self {
         let lifetime_ids: Vec<Vec<_>> = vec![
@@ -79,6 +96,7 @@ impl UvwData {
             phone_numbers.iter().map(|d| d.lifetime_id()).collect(),
             emails.iter().map(|d| d.lifetime_id()).collect(),
             identity_documents.iter().map(|d| d.lifetime_id()).collect(),
+            kv_data.iter().map(|d| d.lifetime_id()).collect(),
         ];
         let lifetime_ids: HashSet<_> = lifetime_ids.into_iter().flatten().collect();
         // Since all_lifetimes contains a superset of lifetimes represented by the data in this
@@ -95,6 +113,7 @@ impl UvwData {
             phone_numbers,
             emails,
             identity_documents,
+            kv_data: kv_data.into_iter().map(|d| (d.data_key.clone(), d)).collect(),
             lifetimes,
         }
     }

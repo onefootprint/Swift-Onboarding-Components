@@ -22,7 +22,6 @@ use actix_web::http::header::HeaderMap;
 
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::kv_data::KeyValueData;
 use db::models::scoped_user::ScopedUser;
 
 use itertools::Itertools;
@@ -200,17 +199,17 @@ async fn detokenize(
         let fields = HashSet::from_iter(identity_tokens.clone());
         let custom_fields = custom_tokens.clone();
 
-        let (uvw, scoped_user, kv_data) = state
+        let (uvw, scoped_user) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 // 2.1 split data by data kind
                 let scoped_user = ScopedUser::get(conn, (&fp_id, &tenant_id, is_live))?;
                 let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+                // TODO how do we check perms for custom data? feels like always allowed, only gated
+                // by tenant_role
                 uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
-                let kv_data = KeyValueData::get_all(conn, &scoped_user.id, &custom_fields)?;
-
-                Ok((uvw, scoped_user, kv_data))
+                Ok((uvw, scoped_user))
             })
             .await??;
 
@@ -236,12 +235,16 @@ async fn detokenize(
 
         // detokenize the kv data
         {
-            let e_datas = kv_data.iter().map(|kv| &kv.e_data).collect();
+            // TODO use more uniform decryt utils (on UVW) instead of doing this logic in multiple places
+            let (existing_keys, e_datas): (Vec<_>, Vec<_>) = custom_fields
+                .iter()
+                .flat_map(|k| uvw.kv_data().get(k))
+                .map(|d| (d.data_key.clone(), &d.e_data))
+                .unzip();
             // Actually decrypt the fields
             let decrypted = uvw.decrypt(state, e_datas).await?;
-            let results = kv_data
+            let results = existing_keys
                 .into_iter()
-                .map(|kv| kv.data_key)
                 .map(|k| ProxyToken {
                     fp_id: scoped_user.fp_user_id.clone(),
                     data_kind: DataIdentifier::Custom(k),

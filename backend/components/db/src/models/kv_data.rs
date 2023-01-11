@@ -1,5 +1,5 @@
-use crate::TxnPgConnection;
 use crate::{schema::kv_data, DbError};
+use crate::{DbResult, HasLifetime, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
@@ -37,23 +37,6 @@ pub struct NewKeyValueDataArgs {
 }
 
 impl KeyValueData {
-    pub fn get_all(
-        conn: &mut PgConnection,
-        scoped_user_id: &ScopedUserId,
-        data_keys: &[KvDataKey],
-    ) -> Result<Vec<Self>, DbError> {
-        // TODO don't use this custom method anymore, go through UVW
-        use crate::schema::data_lifetime;
-        let lifetime_ids = data_lifetime::table
-            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
-            .filter(data_lifetime::deactivated_at.is_null())
-            .select(data_lifetime::id);
-        Ok(kv_data::table
-            .filter(kv_data::lifetime_id.eq_any(lifetime_ids))
-            .filter(kv_data::data_key.eq_any(data_keys))
-            .get_results(conn)?)
-    }
-
     pub fn bulk_create(
         conn: &mut TxnPgConnection,
         user_vault_id: &UserVaultId,
@@ -89,49 +72,21 @@ impl KeyValueData {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use std::str::FromStr;
+impl HasLifetime for KeyValueData {
+    fn lifetime_id(&self) -> &DataLifetimeId {
+        &self.lifetime_id
+    }
 
-    use super::*;
-    use crate::tests::fixtures;
-    use crate::tests::prelude::*;
-    use macros::db_test;
+    /// Don't want this implemented since this codepath is for identity data
+    /// TODO: might have to make a different trait for id docs and key value data
+    fn e_data(&self) -> &SealedVaultBytes {
+        unimplemented!()
+    }
 
-    #[db_test]
-    fn test_update_or_insert(conn: &mut TestPgConnection) {
-        let user_vault = fixtures::user_vault::create(conn).into_inner();
-        let tenant = fixtures::tenant::create(conn);
-        let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
-        let su = fixtures::scoped_user::create(conn, &user_vault.id, &ob_config.id);
-
-        let data_key = KvDataKey::from_str("custom.test1").unwrap();
-        let data_keys = vec![data_key.clone()];
-        let e_data1 = SealedVaultBytes(vec![0x01, 0x02, 0x03]);
-        let e_data2 = SealedVaultBytes(vec![0x04, 0x05, 0x06]);
-
-        let value1 = NewKeyValueDataArgs {
-            data_key: data_key.clone(),
-            e_data: e_data1.clone(),
-        };
-
-        let value2 = NewKeyValueDataArgs {
-            data_key,
-            e_data: e_data2.clone(),
-        };
-
-        // Insert the value
-        let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-        KeyValueData::bulk_create(conn, &user_vault.id, &su.id, vec![value1], seqno).unwrap();
-        let result1 = KeyValueData::get_all(conn, &su.id, &data_keys).expect("failed to get data 1");
-        let result1 = result1.into_iter().next().unwrap();
-        assert_eq!(result1.e_data, e_data1);
-
-        // Update the value
-        let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-        DataLifetime::bulk_deactivate(conn, vec![result1.lifetime_id], seqno).unwrap();
-        KeyValueData::bulk_create(conn, &user_vault.id, &su.id, vec![value2], seqno).unwrap();
-        let result2 = KeyValueData::get_all(conn, &su.id, &data_keys).expect("failed to get data 2");
-        assert_eq!(result2.into_iter().next().unwrap().e_data, e_data2);
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
+        let results = kv_data::table
+            .filter(kv_data::lifetime_id.eq_any(lifetime_ids))
+            .get_results(conn)?;
+        Ok(results)
     }
 }

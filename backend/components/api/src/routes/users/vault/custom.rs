@@ -14,9 +14,7 @@ use crate::utils::user_vault_wrapper::{LockedUserVaultWrapper, UserVaultWrapper}
 use crate::{errors::ApiError, State};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::kv_data::KeyValueData;
 use db::models::scoped_user::ScopedUser;
-use db::models::user_vault::UserVault;
 use db::TxnPgConnection;
 use newtypes::csv::Csv;
 use newtypes::{
@@ -52,7 +50,7 @@ pub async fn put(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
-            put_internal(conn, &uvw, &tenant_auth, &scoped_user, insight, update)?;
+            put_internal(conn, uvw, &tenant_auth, &scoped_user, insight, update)?;
             Ok(())
         })
         .await?;
@@ -62,7 +60,7 @@ pub async fn put(
 
 pub fn put_internal(
     conn: &mut TxnPgConnection,
-    uvw: &LockedUserVaultWrapper,
+    uvw: LockedUserVaultWrapper,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,
@@ -122,18 +120,17 @@ pub(super) async fn get_internal(
     let tenant_id = tenant_auth.tenant().id.clone();
     let fields: Vec<KvDataKey> = request.into_inner().fields.0;
 
-    let fields_copy = fields.clone();
-    let results = state
+    let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let found = KeyValueData::get_all(conn, &scoped_user.id, &fields_copy)?;
-            Ok(found)
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            Ok(uvw)
         })
         .await??;
 
     // and these are the ones that have values in our vault
-    let result_fields: HashSet<KvDataKey> = HashSet::from_iter(results.into_iter().map(|kv| kv.data_key));
+    let result_fields: HashSet<_> = uvw.kv_data().keys().collect();
 
     let output = HashMap::from_iter(fields.into_iter().map(|field| {
         let exists = result_fields.contains(&field);
@@ -186,19 +183,24 @@ pub(super) async fn post_decrypt_internal(
     let tenant_id = tenant_auth.tenant().id.clone();
     let DecryptCustomFieldsRequest { fields, reason } = request.into_inner();
 
-    let fields_copy = fields.clone();
-    let (user_vault, scoped_user, results) = state
+    let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let user_vault = UserVault::get(conn, &scoped_user.user_vault_id)?;
-            let found = KeyValueData::get_all(conn, &scoped_user.id, &fields_copy)?;
-            Ok((user_vault, scoped_user, found))
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            Ok((uvw, scoped_user))
         })
         .await??;
 
-    let decrypted = decrypt_inner(&state, user_vault, &results).await?;
-    let output: HashMap<_, _> = results.into_iter().map(|kv| kv.data_key).zip(decrypted).collect();
+    let (existing_keys, e_datas): (Vec<_>, Vec<_>) = fields
+        .iter()
+        .flat_map(|k| uvw.kv_data().get(k))
+        .map(|d| (&d.data_key, &d.e_data))
+        .unzip();
+
+    // Since this is custom data, requester has access to everything committed in the vault
+    let decrypted = uvw.decrypt(&state, e_datas).await?;
+    let output: HashMap<_, _> = existing_keys.into_iter().cloned().zip(decrypted).collect();
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
@@ -213,21 +215,4 @@ pub(super) async fn post_decrypt_internal(
     .await?;
 
     ResponseData::ok(DecryptCustomDataResponse::from(output)).json()
-}
-
-async fn decrypt_inner(
-    state: &State,
-    user_vault: UserVault,
-    kv_data: &[KeyValueData],
-) -> Result<Vec<PiiString>, ApiError> {
-    // Since this is custom data, requester has access to everything committed in the vault
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| UserVaultWrapper::build_for_user(conn, &user_vault.id))
-        .await??;
-
-    let e_datas = kv_data.iter().map(|kv| &kv.e_data).collect();
-    // Actually decrypt the fields
-    let decrypt_response = uvw.decrypt(state, e_datas).await?;
-    Ok(decrypt_response)
 }

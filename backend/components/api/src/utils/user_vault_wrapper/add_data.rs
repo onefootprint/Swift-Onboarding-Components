@@ -38,7 +38,7 @@ pub trait UvwAddData {
     ) -> ApiResult<()>;
 
     fn update_custom_data(
-        &self, // Doesn't need to consume since we don't currently store custom data on UVW
+        self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConnection,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()>;
@@ -132,13 +132,17 @@ impl UvwAddData for LockedUserVaultWrapper {
     }
 
     fn update_custom_data(
-        &self, // Doesn't need to consume since we don't currently store custom data on UVW
+        self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConnection,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()> {
         let scoped_user_id = self.scoped_user_id().ok_or(UserError::NotAllowedWithoutTenant)?;
 
-        let keys: Vec<_> = update.keys().cloned().collect();
+        let existing_lifetime_ids = update
+            .keys()
+            .flat_map(|k| self.kv_data().get(k))
+            .map(|k| k.lifetime_id.clone())
+            .collect();
         let updates = update
             .into_iter()
             .map(|(data_key, pii)| {
@@ -148,9 +152,7 @@ impl UvwAddData for LockedUserVaultWrapper {
             .collect::<Result<Vec<_>, ApiError>>()?;
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        // Should we use bulk_deactivate_uncommitted here? When we denormalize `key` onto DataLifetimeKind
-        let existing_data = KeyValueData::get_all(conn, scoped_user_id, &keys)?;
-        let existing_lifetime_ids = existing_data.into_iter().map(|d| d.lifetime_id).collect();
+        // TODO: Should we use bulk_deactivate_uncommitted here? When we denormalize `key` onto DataLifetimeKind
         DataLifetime::bulk_deactivate(conn, existing_lifetime_ids, seqno)?;
         KeyValueData::bulk_create(conn, &self.user_vault().id, scoped_user_id, updates, seqno)?;
         Ok(())

@@ -2,14 +2,17 @@ use super::UserVaultWrapper;
 use crate::errors::ApiResult;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
+use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
 use db::HasDataAttributeFields;
 use db::PgConnection;
+use newtypes::KvDataKey;
 use newtypes::ScopedUserId;
 use newtypes::{CollectedDataOption, DataLifetimeKind, SealedVaultBytes};
+use std::collections::HashMap;
 use std::collections::HashSet;
 use std::convert::Into;
 
@@ -48,6 +51,11 @@ impl UserVaultWrapper {
         } else {
             &self.committed.identity_documents
         }
+    }
+
+    pub fn kv_data(&self) -> &HashMap<KvDataKey, KeyValueData> {
+        // We don't currently support committed kv data
+        &self.speculative.kv_data
     }
 }
 

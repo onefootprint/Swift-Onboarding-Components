@@ -431,7 +431,51 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
     assert!(uvw.has_field(DataLifetimeKind::Country));
 }
 
-// TODO test adding custom data after we fetch custom data through the UVW
+#[db_test]
+fn test_commit_custom_data(conn: &mut TestPgConnection) {
+    // We haven't figured out the portability story for custom data or identity documents yet, so
+    // for now, let's make sure we never commit them through the UVW
+    let uv = fixtures::user_vault::create(conn);
+    let tenant = fixtures::tenant::create(conn);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+
+    let k1 = KvDataKey::from_str("blerp").unwrap();
+    let k2 = KvDataKey::from_str("flerp").unwrap();
+
+    // Add some custom data
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    let custom_data = HashMap::from_iter([
+        (k1.clone(), PiiString::from("BLERP")),
+        (k2.clone(), PiiString::from("FLERP")),
+    ]);
+    uvw.update_custom_data(conn, custom_data).unwrap();
+
+    // Update k1 and make sure only it changed
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    let v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
+    let v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
+    let custom_data = HashMap::from_iter([(k1.clone(), PiiString::from("MERP"))]);
+    uvw.update_custom_data(conn, custom_data).unwrap();
+
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    let new_v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
+    let new_v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
+    assert_ne!(new_v1, v1);
+    assert_eq!(new_v2, v2);
+
+    // Update k1 and k2 again and make sure they both changed
+    let custom_data = HashMap::from_iter([
+        (k1.clone(), PiiString::from("hi")),
+        (k2.clone(), PiiString::from("bye")),
+    ]);
+    uvw.update_custom_data(conn, custom_data).unwrap();
+    let uvw = UserVaultWrapper::lock_for_tenant(conn, &su.id).unwrap();
+    let newest_v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
+    let newest_v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
+    assert_ne!(newest_v1, new_v1);
+    assert_ne!(newest_v2, new_v2);
+}
 
 #[db_test]
 fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
