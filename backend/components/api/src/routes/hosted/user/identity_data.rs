@@ -33,7 +33,7 @@ async fn post(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user_id = pre_add_data_checks(&user_auth, conn)?;
-            let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user_id)?;
+            let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
             uvw.update_identity_data(conn, update, fingerprints)?;
 
             Ok(())

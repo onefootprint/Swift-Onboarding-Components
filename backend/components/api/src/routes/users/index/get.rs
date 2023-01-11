@@ -14,6 +14,7 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::UvwArgs;
 use crate::State;
 use api_wire_types::ListUsersRequest;
 use db::models::ob_configuration::ObConfiguration;
@@ -162,7 +163,7 @@ pub async fn get_detail(
             let (su, _) = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let uvw = UserVaultWrapper::build_for_tenant(conn, &su.id)?;
+            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id))?;
             let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
                 .remove(&su.id)
                 .ok_or(ApiError::ResourceNotFound)?;

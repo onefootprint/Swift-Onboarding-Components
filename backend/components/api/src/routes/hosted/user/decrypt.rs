@@ -6,6 +6,7 @@ use crate::hosted::user::decrypt;
 use crate::hosted::user::DecryptFieldsResult;
 use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::UvwArgs;
 use crate::State;
 use newtypes::DataLifetimeKind;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -39,7 +40,7 @@ fn post(
     let uv_id = user_vault.id.clone();
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build_for_user(conn, &uv_id))
+        .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::User(&uv_id)))
         .await??;
 
     let DecryptFieldsResult {

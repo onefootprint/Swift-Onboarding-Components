@@ -1,7 +1,7 @@
 #[allow(clippy::module_inception)]
 pub mod identify;
 pub mod login_challenge;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
 use db::models::webauthn_credential::WebauthnCredential;
 use db::HasDataAttributeFields;
 pub mod signup_challenge;
@@ -128,7 +128,7 @@ async fn get_user_challenge_context(
     let (uvw, creds) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let uvw = UserVaultWrapper::build_for_user(conn, &existing_user.id)?;
+            let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&existing_user.id))?;
             let creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
             Ok((uvw, creds))
         })

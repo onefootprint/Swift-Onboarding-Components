@@ -73,7 +73,7 @@ pub async fn put(
 
             // TODO can we use the same UVW to add both kinds of data?
             if let Some(custom_update) = request.custom {
-                let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
+                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
                 custom::put_internal(
                     conn,
                     uvw,
@@ -84,7 +84,7 @@ pub async fn put(
                 )?;
             }
             if let Some(update) = update {
-                let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user.id)?;
+                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
                 identity::put_internal(
                     conn,
                     uvw,

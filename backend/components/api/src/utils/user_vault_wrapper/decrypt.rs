@@ -14,6 +14,7 @@ pub struct DecryptRequest {
 
 impl UserVaultWrapper {
     // TODO make an access event here too
+    // take in identifier (identity, custom, or doc request id)
     pub async fn decrypt(
         &self,
         state: &State,
@@ -39,6 +40,7 @@ impl UserVaultWrapper {
         Ok(decrypted_results)
     }
 
+    // TODO don't want this to make an access event
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<ValidatedPhoneNumber, ApiError> {
         let number = self
             .phone_numbers()

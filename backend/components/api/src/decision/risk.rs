@@ -38,7 +38,7 @@ pub async fn create_final_decision(
 
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision.decision_status == DecisionStatus::Pass {
-                let uvw = UserVaultWrapper::lock_for_tenant(conn, &ob.scoped_user_id)?;
+                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
                 let seqno = uvw.commit_identity_data(conn)?;
                 Some(seqno)
             } else {

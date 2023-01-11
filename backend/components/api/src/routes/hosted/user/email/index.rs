@@ -53,7 +53,7 @@ pub async fn post(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user_id = pre_add_data_checks(&user_auth, conn)?;
 
-            let uvw = UserVaultWrapper::lock_for_tenant(conn, &scoped_user_id)?;
+            let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
 
             // Enforce that sandbox emails are used for sandbox users
             if email.is_live() != uvw.user_vault().is_live {

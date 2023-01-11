@@ -1,6 +1,6 @@
 use crate::{
     errors::{onboarding::OnboardingError, ApiError},
-    utils::user_vault_wrapper::UserVaultWrapper,
+    utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs},
     State,
 };
 
@@ -84,7 +84,7 @@ pub async fn perform_pre_run_operations(
 ) -> Result<ShouldRunDecisionEngine, ApiError> {
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build_for_onboarding(conn, &ob.scoped_user_id))
+        .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::Onboarding(&ob.scoped_user_id)))
         .await??;
 
     let should_initiate_verification_requests =

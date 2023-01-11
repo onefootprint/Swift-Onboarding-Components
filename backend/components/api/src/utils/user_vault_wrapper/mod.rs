@@ -9,6 +9,7 @@ pub mod checks;
 
 mod accessors;
 mod add_data;
+mod args;
 mod build;
 mod commit_data;
 mod decrypt;
@@ -17,6 +18,7 @@ mod uvd_builder;
 mod uvw_data;
 
 pub use add_data::UvwAddData;
+pub use args::UvwArgs;
 pub use commit_data::UvwCommitData;
 pub use decrypt::DecryptRequest;
 

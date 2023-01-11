@@ -1,7 +1,7 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -32,15 +32,17 @@ pub async fn handler(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let su = user_auth.scoped_user(conn)?;
-            let uvw = if let Some(su) = su {
+            let uv_id = user_auth.user_vault_id();
+            let args = if let Some(ref su) = su {
                 // If the auth token is during an onboarding session, create a UVW that sees all
                 // speculative data for the tenant in order to see an uncommitted phone number
                 // that was added by this tenant.
-                UserVaultWrapper::build_for_onboarding(conn, &su.id)?
+                UvwArgs::Onboarding(&su.id)
             } else {
                 // Otherwise, create a UVW that only sees committed data
-                UserVaultWrapper::build_for_user(conn, &user_auth.user_vault_id())?
+                UvwArgs::User(&uv_id)
             };
+            let uvw = UserVaultWrapper::build(conn, args)?;
             Ok(uvw)
         })
         .await??;

@@ -1,4 +1,4 @@
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
 use crate::{errors::ApiError, State};
 use crypto::aead::AeadSealedBytes;
 use db::models::document_request::DocRefId;
@@ -18,7 +18,7 @@ pub async fn build_idv_data_from_verification_request(
     // the pointers to pieces of user data saved on the VerificationRequest
     let uvw = state
         .db_pool
-        .db_query(|conn| UserVaultWrapper::build_for_idv(conn, request))
+        .db_query(|conn| UserVaultWrapper::build(conn, UvwArgs::Idv(request)))
         .await??;
 
     let (keys, encrypted_values): (Vec<_>, Vec<_>) = DataLifetimeKind::iter()
@@ -71,7 +71,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
         .db_query(
             move |conn| -> Result<(IdentityDocument, Option<String>, UserVaultWrapper), ApiError> {
                 let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
-                let uvw = UserVaultWrapper::build_for_idv(conn, request)?;
+                let uvw = UserVaultWrapper::build(conn, UvwArgs::Idv(request))?;
                 Ok((doc, ref_id.ref_id, uvw))
             },
         )
