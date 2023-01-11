@@ -18,6 +18,7 @@ const CheckRequirements = () => {
       const { requirements } = response;
       let missingLiveness = false;
       let idDocRequestId;
+      let missingSelfie = false;
 
       requirements.forEach((req: OnboardingRequirement) => {
         if (req.kind === OnboardingRequirementKind.liveness) {
@@ -25,12 +26,15 @@ const CheckRequirements = () => {
         }
         if (req.kind === OnboardingRequirementKind.idDoc) {
           idDocRequestId = req.documentRequestId;
+          missingSelfie = req.shouldCollectSelfie;
         }
       });
+
       send({
         type: Events.requirementsReceived,
         payload: {
           idDocRequestId,
+          missingSelfie,
           missingLiveness,
         },
       });

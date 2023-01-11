@@ -83,8 +83,9 @@ const Root = () => {
           authToken,
           device,
           customData: {
-            requestId: requirements?.idDocRequestId ?? '',
             shouldCollectIdDoc: true,
+            requestId: requirements?.idDocRequestId ?? '',
+            shouldCollectSelfie: requirements?.missingSelfie,
           },
         }}
         onDone={() => {

@@ -19,7 +19,7 @@ const OnboardingRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, device, userFound },
-    requirements: { kycData, liveness, idDocRequestId },
+    requirements: { kycData, liveness, idDocRequestId, selfie },
   } = state.context;
 
   const handleRequirementCompleted = () => {
@@ -73,8 +73,9 @@ const OnboardingRequirements = () => {
           authToken,
           device,
           customData: {
-            requestId: idDocRequestId ?? '',
             shouldCollectIdDoc: true,
+            requestId: idDocRequestId ?? '',
+            shouldCollectSelfie: selfie,
           },
         }}
         onDone={handleRequirementCompleted}

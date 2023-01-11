@@ -31,6 +31,7 @@ export type MachineContext = {
   requirements?: {
     idDocRequestId?: string;
     missingLiveness?: boolean;
+    missingSelfie?: boolean;
   };
 };
 
@@ -56,6 +57,7 @@ export type MachineEvents =
       type: Events.requirementsReceived;
       payload: {
         idDocRequestId?: string;
+        missingSelfie?: boolean;
         missingLiveness?: boolean;
       };
     }

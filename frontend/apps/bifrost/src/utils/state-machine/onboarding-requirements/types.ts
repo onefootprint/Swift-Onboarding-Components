@@ -20,6 +20,7 @@ export type Requirements = {
   identityCheck: boolean;
   liveness: boolean;
   idDocRequestId?: string;
+  selfie?: boolean;
   kycData: readonly CollectedKycDataOption[];
 };
 

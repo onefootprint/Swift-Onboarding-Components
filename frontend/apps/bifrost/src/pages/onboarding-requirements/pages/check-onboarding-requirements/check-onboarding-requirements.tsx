@@ -24,11 +24,12 @@ const CheckOnboardingRequirements = () => {
 
   const handleSuccess = (response: OnboardingStatusResponse) => {
     const { requirements } = response;
-
     let liveness = false;
     let idDocRequestId;
+    let selfie = false;
     let kycData: CollectedKycDataOption[] = [];
     let identityCheck = false;
+
     requirements.forEach((req: OnboardingRequirement) => {
       if (req.kind === OnboardingRequirementKind.collectKycData) {
         kycData = req.missingAttributes;
@@ -38,6 +39,7 @@ const CheckOnboardingRequirements = () => {
       }
       if (req.kind === OnboardingRequirementKind.idDoc) {
         idDocRequestId = req.documentRequestId;
+        selfie = req.shouldCollectSelfie;
       }
       if (req.kind === OnboardingRequirementKind.identityCheck) {
         identityCheck = true;
@@ -49,6 +51,7 @@ const CheckOnboardingRequirements = () => {
       payload: {
         liveness,
         idDocRequestId,
+        selfie,
         kycData,
         identityCheck,
       },
