@@ -1,9 +1,26 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
 import { BifrostContext, BifrostEvent, Events } from '../../types';
 import initContextComplete from './init-context-complete';
 
 describe('initContextComplete', () => {
+  const TestOnboardingConfig: OnboardingConfig = {
+    createdAt: 'date',
+    id: 'id',
+    isLive: true,
+    key: 'key',
+    logoUrl: 'url',
+    name: 'tenant',
+    orgName: 'tenantOrg',
+    status: 'enabled',
+    mustCollectData: [CollectedKycDataOption.name],
+    mustCollectIdentityDocument: false,
+    mustCollectSelfie: false,
+    canAccessData: [CollectedKycDataOption.name],
+    canAccessIdentityDocumentImages: false,
+    canAccessSelfieImage: false,
+  };
+
   describe('when init context info is complete', () => {
     it('when all data is in the machine context', () => {
       const context: BifrostContext = {
@@ -11,14 +28,7 @@ describe('initContextComplete', () => {
           type: 'mobile',
           hasSupportForWebauthn: true,
         },
-        tenant: {
-          isLive: true,
-          pk: 'key',
-          name: 'tenant',
-          mustCollectData: [CollectedKycDataOption.name],
-          canAccessData: [CollectedKycDataOption.name],
-          orgName: 'tenantOrg',
-        },
+        config: { ...TestOnboardingConfig },
         bootstrapData: {},
       };
       const event: BifrostEvent = {
@@ -30,14 +40,7 @@ describe('initContextComplete', () => {
 
     it('when some data is in the machine context and some in the event payload', () => {
       const context: BifrostContext = {
-        tenant: {
-          isLive: true,
-          pk: 'key',
-          name: 'tenant',
-          mustCollectData: [CollectedKycDataOption.name],
-          canAccessData: [CollectedKycDataOption.name],
-          orgName: 'tenantOrg',
-        },
+        config: { ...TestOnboardingConfig },
         bootstrapData: {},
       };
       const event: BifrostEvent = {

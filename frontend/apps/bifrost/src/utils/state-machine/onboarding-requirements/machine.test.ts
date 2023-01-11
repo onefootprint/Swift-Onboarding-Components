@@ -1,4 +1,4 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createOnboardingRequirementsMachine, {
@@ -10,6 +10,23 @@ describe('Onboarding Requirements Machine Tests', () => {
   const createMachine = (args: OnboardingRequirementsMachineArgs) =>
     createOnboardingRequirementsMachine(args);
 
+  const TestOnboardingConfig: OnboardingConfig = {
+    createdAt: 'date',
+    id: 'id',
+    isLive: true,
+    key: 'key',
+    logoUrl: 'url',
+    name: 'tenant',
+    orgName: 'tenantOrg',
+    status: 'enabled',
+    mustCollectData: [CollectedKycDataOption.name],
+    mustCollectIdentityDocument: false,
+    mustCollectSelfie: false,
+    canAccessData: [CollectedKycDataOption.name],
+    canAccessIdentityDocumentImages: false,
+    canAccessSelfieImage: false,
+  };
+
   describe('with an existing user', () => {
     it('successfully completes when requirements are empty', () => {
       const machine = interpret(
@@ -20,14 +37,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: true,
           authToken: 'token',
-          tenant: {
-            isLive: true,
-            pk: 'key',
-            name: 'tenant',
-            mustCollectData: [CollectedKycDataOption.name],
-            canAccessData: [CollectedKycDataOption.name],
-            orgName: 'tenantOrg',
-          },
+          config: { ...TestOnboardingConfig },
         }),
       );
 
@@ -55,14 +65,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         },
         userFound: true,
         authToken: 'token',
-        tenant: {
-          isLive: true,
-          pk: 'key',
-          name: 'tenant',
-          mustCollectData: [CollectedKycDataOption.name],
-          canAccessData: [CollectedKycDataOption.name],
-          orgName: 'tenantOrg',
-        },
+        config: { ...TestOnboardingConfig },
       });
 
       state = machine.send({
@@ -86,14 +89,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: true,
           authToken: 'token',
-          tenant: {
-            isLive: true,
-            pk: 'key',
-            name: 'tenant',
-            mustCollectData: [CollectedKycDataOption.name],
-            canAccessData: [CollectedKycDataOption.name],
-            orgName: 'tenantOrg',
-          },
+          config: { ...TestOnboardingConfig },
         }),
       );
 
@@ -204,14 +200,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: true,
           authToken: 'token',
-          tenant: {
-            isLive: true,
-            pk: 'key',
-            name: 'tenant',
-            mustCollectData: [CollectedKycDataOption.name],
-            canAccessData: [CollectedKycDataOption.name],
-            orgName: 'tenantOrg',
-          },
+          config: { ...TestOnboardingConfig },
         }),
       );
 
@@ -268,14 +257,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: false,
           authToken: 'token',
-          tenant: {
-            isLive: true,
-            pk: 'key',
-            name: 'tenant',
-            mustCollectData: [CollectedKycDataOption.name],
-            canAccessData: [CollectedKycDataOption.name],
-            orgName: 'tenantOrg',
-          },
+          config: { ...TestOnboardingConfig },
         }),
       );
 

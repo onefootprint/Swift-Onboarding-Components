@@ -4,8 +4,8 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-const TenantInvalid = () => {
-  const { t } = useTranslation('pages.tenant-invalid');
+const ConfigInvalid = () => {
+  const { t } = useTranslation('pages.config-invalid');
   return (
     <>
       <NavigationHeader button={{ variant: 'close' }} />
@@ -29,4 +29,4 @@ const Container = styled.div`
   text-align: center;
 `;
 
-export default TenantInvalid;
+export default ConfigInvalid;

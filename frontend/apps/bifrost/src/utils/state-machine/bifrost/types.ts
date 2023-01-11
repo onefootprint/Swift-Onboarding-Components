@@ -1,10 +1,10 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { TenantInfo } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 
 export enum States {
   init = 'Init',
   identify = 'identify',
-  tenantInvalid = 'tenantInvalid',
+  configInvalid = 'configInvalid',
   authenticationSuccess = 'authenticationSuccess',
   onboarding = 'onboarding',
   success = 'success',
@@ -12,7 +12,7 @@ export enum States {
 
 export enum Events {
   initContextUpdated = 'initContextUpdated',
-  tenantInfoRequestFailed = 'tenantInfoRequestFailed',
+  configRequestFailed = 'configRequestFailed',
   authenticationSucceeded = 'authenticationSucceeded',
   identifyCompleted = 'done.invoke.identify',
   onboardingCompleted = 'done.invoke.onboarding',
@@ -33,7 +33,7 @@ export type BootstrapData = {
 export type BifrostContext = {
   authToken?: string;
   device?: DeviceInfo;
-  tenant?: TenantInfo;
+  config?: OnboardingConfig;
   userFound?: boolean;
   validationToken?: string;
   bootstrapData?: BootstrapData;
@@ -43,13 +43,13 @@ export type BifrostEvent =
   | {
       type: Events.initContextUpdated;
       payload: {
-        tenant?: TenantInfo;
+        config?: OnboardingConfig;
         device?: DeviceInfo;
         bootstrapData?: BootstrapData;
       };
     }
   | {
-      type: Events.tenantInfoRequestFailed;
+      type: Events.configRequestFailed;
     }
   | {
       type: Events.identifyCompleted;

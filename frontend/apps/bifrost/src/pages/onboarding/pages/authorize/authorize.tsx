@@ -56,7 +56,7 @@ const Authorize = () => {
   const [collectedDocs, setCollectedDocs] = useState<IdDocType[]>();
   const {
     authToken,
-    tenant: { canAccessData, name: tenantName },
+    config: { canAccessData, name: tenantName },
   } = state.context;
 
   const statusQuery = useGetOnboardingStatus(authToken, {

@@ -18,13 +18,13 @@ const IdentityCheck = () => {
   const [kycPending, setKycPending] = useState(false);
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { tenant, authToken },
+    onboardingContext: { config, authToken },
   } = state.context;
   const startKycMutation = useOnboardingSubmit();
   const toast = useToast();
 
   useEffectOnce(() => {
-    if (!tenant || !authToken) {
+    if (!config || !authToken) {
       return;
     }
     startKycMutation.mutate(

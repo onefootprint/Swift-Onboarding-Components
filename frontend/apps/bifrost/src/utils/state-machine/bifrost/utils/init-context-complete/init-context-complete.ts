@@ -5,11 +5,11 @@ const initContextComplete = (context: BifrostContext, event: BifrostEvent) => {
     return false;
   }
   const device = context.device || event.payload.device;
-  const tenant = context.tenant || event.payload.tenant;
+  const config = context.config || event.payload.config;
   const bootstrapData = context.bootstrapData || event.payload.bootstrapData;
 
   return (
-    device !== undefined && tenant !== undefined && bootstrapData !== undefined
+    device !== undefined && config !== undefined && bootstrapData !== undefined
   );
 };
 

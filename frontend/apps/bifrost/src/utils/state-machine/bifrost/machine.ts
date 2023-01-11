@@ -14,8 +14,8 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
     states: {
       [States.init]: {
         on: {
-          [Events.tenantInfoRequestFailed]: {
-            target: States.tenantInvalid,
+          [Events.configRequestFailed]: {
+            target: States.configInvalid,
           },
           [Events.initContextUpdated]: [
             {
@@ -38,13 +38,13 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             createIdentifyMachine({
               device: { ...context.device! },
               bootstrapData: context.bootstrapData ?? {},
-              tenantPk: context.tenant?.pk,
+              tenantPk: context.config?.key,
             }),
           onDone: [
             {
               target: States.onboarding,
               actions: [Actions.assignAuthToken, Actions.assignUserFound],
-              cond: context => !!context.tenant,
+              cond: context => !!context.config,
             },
             {
               target: States.authenticationSuccess,
@@ -61,7 +61,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               userFound: context.userFound!,
               device: context.device!,
               authToken: context.authToken!,
-              tenant: context.tenant!,
+              config: context.config!,
             }),
           onDone: {
             target: States.success,
@@ -69,7 +69,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           },
         },
       },
-      [States.tenantInvalid]: {
+      [States.configInvalid]: {
         type: 'final',
       },
       [States.authenticationSuccess]: {
@@ -86,9 +86,9 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (event.type !== Events.initContextUpdated) {
           return context;
         }
-        const { device, tenant, bootstrapData } = event.payload;
+        const { device, config, bootstrapData } = event.payload;
         context.device = device !== undefined ? device : context.device;
-        context.tenant = tenant !== undefined ? tenant : context.tenant;
+        context.config = config !== undefined ? config : context.config;
         context.bootstrapData =
           bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
 

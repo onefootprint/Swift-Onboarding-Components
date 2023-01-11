@@ -1,6 +1,9 @@
 import { useGetOnboardingConfig } from '@onefootprint/footprint-elements';
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
-import { CollectedKycDataOptionLabels } from '@onefootprint/types';
+import {
+  CollectedKycDataOptionLabels,
+  OnboardingConfig,
+} from '@onefootprint/types';
 import React from 'react';
 import InitShimmer from 'src/components/init-shimmer';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
@@ -23,19 +26,16 @@ const Init = () => {
   });
 
   useGetOnboardingConfig(tenantPk, {
-    onSuccess: ({ orgName, name, isLive, mustCollectData, canAccessData }) => {
+    onSuccess: (config: OnboardingConfig) => {
       send({
         type: Events.initContextUpdated,
         payload: {
-          tenant: {
-            pk: tenantPk,
-            orgName,
-            name,
-            isLive,
-            mustCollectData: mustCollectData.map(
+          config: {
+            ...config,
+            mustCollectData: config.mustCollectData.map(
               (attr: string) => CollectedKycDataOptionLabels[attr],
             ),
-            canAccessData: canAccessData.map(
+            canAccessData: config.canAccessData.map(
               (attr: string) => CollectedKycDataOptionLabels[attr],
             ),
           },
@@ -44,7 +44,7 @@ const Init = () => {
     },
     onError: () => {
       send({
-        type: Events.tenantInfoRequestFailed,
+        type: Events.configRequestFailed,
       });
     },
   });

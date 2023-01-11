@@ -1,7 +1,7 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedKycDataOption,
-  TenantInfo,
+  OnboardingConfig,
   UserData,
 } from '@onefootprint/types';
 
@@ -26,7 +26,7 @@ export type Requirements = {
 export type MachineContext = {
   onboardingContext: {
     userFound: boolean;
-    tenant: TenantInfo;
+    config: OnboardingConfig;
     device: DeviceInfo;
     authToken: string;
   };

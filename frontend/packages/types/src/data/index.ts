@@ -38,7 +38,6 @@ export { default as ReviewStatus } from './review-status';
 export * from './risk-signal';
 export * from './scoped-user';
 export { default as SignalAttribute } from './signal-attribute';
-export * from './tenant-info';
 export * from './timeline';
 export * from './user-data';
 export * from './user-data-attribute';

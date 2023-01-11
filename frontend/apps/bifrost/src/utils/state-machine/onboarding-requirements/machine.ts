@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { TenantInfo } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
@@ -15,7 +15,7 @@ import {
 export type OnboardingRequirementsMachineArgs = {
   userFound: boolean;
   device: DeviceInfo;
-  tenant: TenantInfo;
+  config: OnboardingConfig;
   authToken: string;
 };
 
@@ -30,7 +30,7 @@ const createOnboardingRequirementsMachine = ({
   userFound,
   device,
   authToken,
-  tenant,
+  config,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
@@ -42,7 +42,7 @@ const createOnboardingRequirementsMachine = ({
           userFound,
           device,
           authToken,
-          tenant,
+          config,
         },
         requirements: { ...defaultRequirements },
         kycData: {},

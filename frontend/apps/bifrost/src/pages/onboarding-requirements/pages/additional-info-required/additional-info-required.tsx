@@ -15,7 +15,7 @@ const AdditionalInfoRequired = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: {
-      tenant: { name },
+      config: { name },
     },
   } = state.context;
   const handleClick = () => {

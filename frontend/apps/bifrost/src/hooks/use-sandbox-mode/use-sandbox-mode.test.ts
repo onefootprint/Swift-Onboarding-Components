@@ -1,22 +1,32 @@
 import { renderHook } from '@onefootprint/test-utils';
-import { CollectedKycDataOption, TenantInfo } from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
 import { BifrostMachineProvider } from '../../components/bifrost-machine-provider';
 import bifrostMachine from '../../utils/state-machine/bifrost';
 import useSandboxMode from './use-sandbox-mode';
 
 describe('useSandboxMode', () => {
+  const getOnboardingConfig = (isLive: boolean): OnboardingConfig => ({
+    isLive,
+    createdAt: 'date',
+    id: 'id',
+    key: 'key',
+    logoUrl: 'url',
+    name: 'tenant',
+    orgName: 'tenantOrg',
+    status: 'enabled',
+    mustCollectData: [CollectedKycDataOption.name],
+    mustCollectIdentityDocument: false,
+    mustCollectSelfie: false,
+    canAccessData: [CollectedKycDataOption.name],
+    canAccessIdentityDocumentImages: false,
+    canAccessSelfieImage: false,
+  });
+
   describe('when it is using a live key', () => {
     it('should return false', () => {
-      const tenant: TenantInfo = {
-        isLive: true,
-        pk: 'key',
-        name: 'tenant',
-        mustCollectData: [CollectedKycDataOption.name],
-        canAccessData: [CollectedKycDataOption.name],
-        orgName: 'tenantOrg',
-      };
-      bifrostMachine.context.tenant = tenant;
+      const config = getOnboardingConfig(true);
+      bifrostMachine.context.config = config;
       const { result } = renderHook(() => useSandboxMode(), {
         wrapper: BifrostMachineProvider,
       });
@@ -26,15 +36,8 @@ describe('useSandboxMode', () => {
 
   describe('when it is using a sandbox key', () => {
     it('should return false', () => {
-      const tenant: TenantInfo = {
-        isLive: false,
-        pk: 'key',
-        name: 'tenant',
-        mustCollectData: [CollectedKycDataOption.name],
-        canAccessData: [CollectedKycDataOption.name],
-        orgName: 'tenantOrg',
-      };
-      bifrostMachine.context.tenant = tenant;
+      const config = getOnboardingConfig(false);
+      bifrostMachine.context.config = config;
       const { result } = renderHook(() => useSandboxMode(), {
         wrapper: BifrostMachineProvider,
       });

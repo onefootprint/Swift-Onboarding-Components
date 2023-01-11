@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { TenantInfo } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 
 export enum States {
   initOnboarding = 'initOnboarding',
@@ -10,7 +10,7 @@ export enum States {
 
 export type MachineContext = {
   userFound: boolean;
-  tenant: TenantInfo;
+  config: OnboardingConfig;
   device: DeviceInfo;
   authToken: string;
   validationToken?: string;

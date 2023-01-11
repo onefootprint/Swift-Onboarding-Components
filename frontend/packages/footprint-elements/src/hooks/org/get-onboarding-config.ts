@@ -25,11 +25,15 @@ const useGetOnboardingConfig = (
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
-  useQuery(['tenantInfo', tenantPk], () => getOnboardingConfig({ tenantPk }), {
-    enabled: !!tenantPk,
-    onSuccess: options.onSuccess,
-    onError: options.onError,
-  });
+  useQuery(
+    ['get-onboarding-config', tenantPk],
+    () => getOnboardingConfig({ tenantPk }),
+    {
+      enabled: !!tenantPk,
+      onSuccess: options.onSuccess,
+      onError: options.onError,
+    },
+  );
 };
 
 export default useGetOnboardingConfig;

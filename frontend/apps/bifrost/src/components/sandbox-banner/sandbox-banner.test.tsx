@@ -1,5 +1,5 @@
 import { customRender, screen } from '@onefootprint/test-utils';
-import { CollectedKycDataOption, TenantInfo } from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
 import bifrostMachine from '../../utils/state-machine/bifrost';
@@ -8,15 +8,24 @@ import SandboxBanner from './sandbox-banner';
 
 describe('<SandboxBanner />', () => {
   const renderSandboxBanner = (options: { isLive: boolean }) => {
-    const tenant: TenantInfo = {
+    const config: OnboardingConfig = {
+      createdAt: 'date',
+      id: 'id',
       isLive: options.isLive,
-      pk: 'key',
+      key: 'key',
+      logoUrl: 'url',
       name: 'tenant',
-      mustCollectData: [CollectedKycDataOption.name],
-      canAccessData: [CollectedKycDataOption.name],
       orgName: 'tenantOrg',
+      status: 'enabled',
+      mustCollectData: [CollectedKycDataOption.name],
+      mustCollectIdentityDocument: false,
+      mustCollectSelfie: false,
+      canAccessData: [CollectedKycDataOption.name],
+      canAccessIdentityDocumentImages: false,
+      canAccessSelfieImage: false,
     };
-    bifrostMachine.context.tenant = tenant;
+
+    bifrostMachine.context.config = config;
     customRender(
       <BifrostMachineProvider>
         <SandboxBanner />
