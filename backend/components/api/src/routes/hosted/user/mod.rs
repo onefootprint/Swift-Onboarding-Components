@@ -1,8 +1,7 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use crypto::aead::AeadSealedBytes;
-use newtypes::{Base64Data, IdentityDataKind, IdentityDocumentId, PiiString, SealedVaultBytes};
+use newtypes::{Base64Data, IdentityDocumentId, PiiString};
 use paperclip::actix::web;
-use std::collections::HashMap;
 
 pub mod access_events;
 pub mod authorized_orgs;
@@ -45,46 +44,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(consent::post);
 }
 
-pub struct DecryptFieldsResult {
-    pub decrypted_data_attributes: Vec<IdentityDataKind>,
-    pub result_map: HashMap<IdentityDataKind, Option<PiiString>>,
-}
-
 pub struct DecryptDocumentResult {
     pub identity_document_id: IdentityDocumentId,
     pub front: PiiString,
     pub back: Option<PiiString>,
-}
-
-/// TODO: potentially move this to UVW
-pub async fn decrypt(
-    state: &State,
-    uvw: &UserVaultWrapper,
-    data_attributes: Vec<IdentityDataKind>,
-) -> Result<DecryptFieldsResult, ApiError> {
-    // Filter out fields that don't have values set on the user vault
-    let (fields_to_decrypt, e_datas): (Vec<IdentityDataKind>, Vec<&SealedVaultBytes>) = data_attributes
-        .iter()
-        .filter_map(|kind| uvw.get_identity_e_field(*kind).map(|data| (kind, data)))
-        .unzip();
-
-    // Actually decrypt the fields
-    let decrypt_response = uvw.decrypt(state, e_datas).await?;
-    let decrypted_data: HashMap<IdentityDataKind, PiiString> = decrypt_response
-        .into_iter()
-        .enumerate()
-        .map(|(i, result)| (fields_to_decrypt[i], result))
-        .collect();
-    let result_map: HashMap<IdentityDataKind, Option<PiiString>> = data_attributes
-        .into_iter()
-        .enumerate()
-        .map(|(_, data_attribute)| (data_attribute, decrypted_data.get(&data_attribute).cloned()))
-        .collect();
-    let decrypted_data_attributes = result_map.keys().copied().collect();
-    Ok(DecryptFieldsResult {
-        decrypted_data_attributes,
-        result_map,
-    })
 }
 
 /// TODO: potentially move this to UVW

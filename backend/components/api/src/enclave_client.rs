@@ -1,8 +1,4 @@
-use crypto::{
-    aead::{SealingKey},
-    hex,
-    seal::EciesP256Sha256AesGcmSealed,
-};
+use crypto::{aead::SealingKey, hex, seal::EciesP256Sha256AesGcmSealed};
 use enclave_proxy::{
     http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, EnclavePayload,
     EnvelopeDecryptRequest, FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,

@@ -3,8 +3,9 @@ use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
 use enclave_proxy::DataTransform;
-use newtypes::{PiiString, SealedVaultBytes, SealedVaultDataKey, ValidatedPhoneNumber};
+use newtypes::{DataIdentifier, PiiString, SealedVaultBytes, SealedVaultDataKey, ValidatedPhoneNumber};
 use paperclip::actix::Apiv2Schema;
+use std::collections::HashMap;
 use std::convert::Into;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -15,7 +16,7 @@ pub struct DecryptRequest {
 impl UserVaultWrapper {
     // TODO make an access event here too
     // take in identifier (identity, custom, or doc request id)
-    pub async fn decrypt(
+    pub async fn old_decrypt(
         &self,
         state: &State,
         data: Vec<&SealedVaultBytes>,
@@ -25,6 +26,33 @@ impl UserVaultWrapper {
             .decrypt_bytes_batch(data, &self.user_vault.e_private_key, DataTransform::Identity)
             .await?;
         Ok(decrypted_results)
+    }
+
+    pub async fn decrypt(
+        &self,
+        state: &State,
+        ids: &[DataIdentifier],
+    ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
+        let (ids, e_datas): (Vec<_>, Vec<_>) = ids
+            .iter()
+            .filter_map(|di| {
+                match di.clone() {
+                    DataIdentifier::Custom(k) => self.kv_data().get(&k).map(|kvd| &kvd.e_data),
+                    DataIdentifier::Identity(idk) => self.get_identity_e_field(idk),
+                    // Decrypt key here
+                    DataIdentifier::IdentityDocument => todo!(),
+                }
+                .map(|e_data| (di, e_data))
+            })
+            .unzip();
+
+        let decrypted_results = state
+            .enclave_client
+            .decrypt_bytes_batch(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
+            .await?;
+        let results: HashMap<_, _> = ids.into_iter().cloned().zip(decrypted_results).collect();
+        // TODO create access event, sometimes
+        Ok(results)
     }
 
     pub async fn decrypt_data_keys(
@@ -49,7 +77,7 @@ impl UserVaultWrapper {
             .ok_or(ApiError::NoPhoneNumberForVault)?;
 
         let decrypt_response = self
-            .decrypt(state, vec![&number.e_e164, &number.e_country])
+            .old_decrypt(state, vec![&number.e_e164, &number.e_country])
             .await?;
         let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
         let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();

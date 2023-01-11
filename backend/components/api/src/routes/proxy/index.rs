@@ -26,7 +26,6 @@ use db::models::scoped_user::ScopedUser;
 
 use itertools::Itertools;
 use newtypes::AccessEventKind;
-use newtypes::DataIdentifier;
 
 use newtypes::PiiString;
 
@@ -34,8 +33,6 @@ use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpR
 use reqwest::header::HeaderName;
 use reqwest::header::HeaderValue;
 use reqwest::Method;
-
-use crate::hosted::user::DecryptFieldsResult;
 
 use super::token_parser::ProxyToken;
 
@@ -180,92 +177,49 @@ async fn detokenize(
     // split tokens by fp_id
     let tokens = tokens
         .into_iter()
-        .map(|tok| (tok.fp_id, tok.data_kind))
+        .map(|tok| (tok.fp_id, tok.identifier))
         .into_group_map();
 
-    for (fp_id, tokens) in tokens {
+    for (fp_id, targets) in tokens {
         let tenant_id = auth.tenant().id.clone();
         let is_live = auth.is_live()?;
 
-        let accessed_fields = tokens.clone();
-
-        // TODO: remove this partition whence we fold kvdata into new data model
-        let (identity_tokens, custom_tokens): (Vec<_>, Vec<_>) =
-            tokens.into_iter().partition_map(|token| match token {
-                DataIdentifier::Identity(idk) => itertools::Either::Left(idk),
-                DataIdentifier::Custom(kvdk) => itertools::Either::Right(kvdk),
-                DataIdentifier::IdentityDocument => todo!(),
-            });
-
-        let fields = identity_tokens
-            .clone()
-            .into_iter()
-            .map(DataIdentifier::Identity)
-            .collect();
-        let custom_fields = custom_tokens.clone();
-
+        let targets_clone = targets.clone();
         let (uvw, scoped_user) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
-                // 2.1 split data by data kind
                 let scoped_user = ScopedUser::get(conn, (&fp_id, &tenant_id, is_live))?;
                 let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
                 // TODO how do we check perms for custom data? feels like always allowed, only gated
-                // by tenant_role
-                uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
+                // by tenant_role. I think this will break rn
+                uvw.ensure_scope_allows_access(conn, &scoped_user, targets_clone)?;
 
                 Ok((uvw, scoped_user))
             })
             .await??;
 
-        // detokenize identity fields
-        {
-            let DecryptFieldsResult {
-                decrypted_data_attributes: _,
-                result_map,
-            } = crate::hosted::user::decrypt(state, &uvw, identity_tokens.clone()).await?;
-
-            let results = result_map.into_iter().filter_map(|(k, v)| {
-                Some((
-                    ProxyToken {
-                        fp_id: scoped_user.fp_user_id.clone(),
-                        data_kind: DataIdentifier::Identity(k),
-                    },
-                    v?,
-                ))
-            });
-
-            out.extend(results);
-        }
-
-        // detokenize the kv data
-        {
-            // TODO use more uniform decryt utils (on UVW) instead of doing this logic in multiple places
-            let (existing_keys, e_datas): (Vec<_>, Vec<_>) = custom_fields
-                .iter()
-                .flat_map(|k| uvw.kv_data().get(k))
-                .map(|d| (d.data_key.clone(), &d.e_data))
-                .unzip();
-            // Actually decrypt the fields
-            let decrypted = uvw.decrypt(state, e_datas).await?;
-            let results = existing_keys
-                .into_iter()
-                .map(|k| ProxyToken {
+        let results = uvw
+            .decrypt(state, &targets)
+            .await?
+            .into_iter()
+            .map(|(identifier, v)| {
+                let token = ProxyToken {
                     fp_id: scoped_user.fp_user_id.clone(),
-                    data_kind: DataIdentifier::Custom(k),
-                })
-                .zip(decrypted);
-            out.extend(results);
-        }
+                    identifier,
+                };
+                (token, v)
+            });
+        out.extend(results);
 
         // record the access event
+        // TODO do this in decrypt util
         NewAccessEvent {
             scoped_user_id: scoped_user.id.clone(),
             reason: reason.clone(),
             principal: auth.actor().into(),
             insight: CreateInsightEvent::from(insight.clone()),
             kind: AccessEventKind::Decrypt,
-            targets: accessed_fields,
+            targets,
         }
         .save(&state.db_pool)
         .await?;

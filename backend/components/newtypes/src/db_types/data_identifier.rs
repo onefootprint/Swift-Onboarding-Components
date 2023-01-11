@@ -104,6 +104,7 @@ impl serde::Serialize for DataIdentifier {
 }
 
 impl DataIdentifier {
+    // TODO can delete this function?
     pub fn list(attributes: Vec<IdentityDataKind>) -> Vec<Self> {
         attributes.into_iter().map(Self::Identity).collect()
     }

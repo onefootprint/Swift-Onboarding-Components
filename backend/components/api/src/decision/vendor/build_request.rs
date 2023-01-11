@@ -23,7 +23,7 @@ pub async fn build_idv_data_from_verification_request(
     let (keys, encrypted_values): (Vec<_>, Vec<_>) = IdentityDataKind::iter()
         .flat_map(|a| uvw.get_identity_e_field(a).map(|v| (a, v)))
         .unzip();
-    let decrypted_values = uvw.decrypt(state, encrypted_values).await?;
+    let decrypted_values = uvw.old_decrypt(state, encrypted_values).await?;
     let mut decrypted_values: HashMap<IdentityDataKind, _> =
         keys.into_iter().zip(decrypted_values.into_iter()).collect();
     // Remove sandbox suffixes

@@ -199,7 +199,7 @@ pub(super) async fn post_decrypt_internal(
         .unzip();
 
     // Since this is custom data, requester has access to everything committed in the vault
-    let decrypted = uvw.decrypt(&state, e_datas).await?;
+    let decrypted = uvw.old_decrypt(&state, e_datas).await?;
     let output: HashMap<_, _> = existing_keys.into_iter().cloned().zip(decrypted).collect();
 
     // Create an AccessEvent log showing that the tenant accessed these fields

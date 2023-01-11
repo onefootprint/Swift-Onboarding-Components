@@ -8,7 +8,6 @@ use crate::auth::{
     AuthError, Either,
 };
 use crate::errors::ApiResult;
-use crate::hosted::user::DecryptFieldsResult;
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 use crate::utils::user_vault_wrapper::{UvwAddData, UvwArgs};
@@ -213,42 +212,48 @@ pub(super) async fn post_decrypt_internal(
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
     let request = request.into_inner();
-    let fields = request.fields.clone();
-    let identifiers: Vec<_> = request.fields.into_iter().map(DataIdentifier::Identity).collect();
-    let auth = auth.check_guard(CanDecrypt::new(identifiers.clone()))?;
+    let idks: Vec<_> = request.fields.into_iter().collect();
+    let fields: Vec<_> = idks.iter().cloned().map(DataIdentifier::Identity).collect();
+    let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
+    let fields_clone = fields.clone();
     let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
-            uvw.ensure_scope_allows_access(conn, &scoped_user, identifiers)?;
+            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 
             Ok((uvw, scoped_user))
         })
         .await??;
 
-    let DecryptFieldsResult {
-        decrypted_data_attributes,
-        result_map,
-    } = crate::hosted::user::decrypt(&state, &uvw, fields.into_iter().collect()).await?;
+    let results = uvw.decrypt(&state, &fields).await?;
 
-    // Create an AccessEvent log showing that the tenant accessed these fields
+    // TODO do this in decrypt util
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: Some(request.reason),
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
-        targets: DataIdentifier::list(decrypted_data_attributes.clone()),
+        targets: fields.clone(),
     }
     .save(&state.db_pool)
     .await?;
 
-    ResponseData::ok(DecryptIdentityDataResponse::from(result_map)).json()
+    let results: HashMap<_, _> = idks
+        .into_iter()
+        .map(|idk| {
+            let value = results.get(&DataIdentifier::Identity(idk)).cloned();
+            (idk, value)
+        })
+        .collect();
+
+    ResponseData::ok(DecryptIdentityDataResponse::from(results)).json()
 }

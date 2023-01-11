@@ -2,12 +2,11 @@ use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
-use crate::hosted::user::decrypt;
-use crate::hosted::user::DecryptFieldsResult;
 use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use crate::State;
+use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
@@ -30,7 +29,8 @@ fn post(
     user_auth: UserAuthContext,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ResponseData<UserDecryptResponse>>, ApiError> {
-    let required_scope = if request.attributes.contains(&IdentityDataKind::Ssn9) {
+    let UserDecryptRequest { attributes } = request.into_inner();
+    let required_scope = if attributes.contains(&IdentityDataKind::Ssn9) {
         UserAuthScope::ExtendedProfile
     } else {
         UserAuthScope::BasicProfile
@@ -43,14 +43,17 @@ fn post(
         .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::User(&uv_id)))
         .await??;
 
-    let DecryptFieldsResult {
-        decrypted_data_attributes: _,
-        result_map,
-    } = decrypt(&state, &uvw, request.attributes.clone()).await?;
+    let ids: Vec<_> = attributes.iter().cloned().map(DataIdentifier::Identity).collect();
+    let results = uvw.decrypt(&state, &ids).await?;
 
-    let result_map = result_map
+    let results = attributes
         .into_iter()
-        .map(|(k, v)| (k, v.map(|x| x.leak_to_string())))
+        .map(|idk| {
+            let value = results
+                .get(&DataIdentifier::Identity(idk))
+                .map(|v| v.leak_to_string());
+            (idk, value)
+        })
         .collect();
-    Ok(Json(ResponseData { data: result_map }))
+    Ok(Json(ResponseData { data: results }))
 }

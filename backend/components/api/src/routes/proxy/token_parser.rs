@@ -68,7 +68,7 @@ impl<'a> ProxyTokenParser<'a> {
         if !not_found.is_empty() {
             let failed = not_found
                 .into_iter()
-                .map(|tok| format!("${}.{}", tok.fp_id, tok.data_kind))
+                .map(|tok| format!("${}.{}", tok.fp_id, tok.identifier))
                 .join(", ");
 
             return Err(VaultProxyError::DataIdentifiersNotFound(failed))?;
@@ -95,7 +95,7 @@ impl<'a> ProxyTokenParser<'a> {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ProxyToken {
     pub fp_id: FootprintUserId,
-    pub data_kind: DataIdentifier,
+    pub identifier: DataIdentifier,
 }
 
 impl ProxyToken {
@@ -115,7 +115,7 @@ impl ProxyToken {
 
         Ok(Self {
             fp_id: FootprintUserId::from(fp_id.to_string()),
-            data_kind: DataIdentifier::from_str(&data_identifier)?,
+            identifier: DataIdentifier::from_str(&data_identifier)?,
         })
     }
 }
@@ -143,7 +143,7 @@ mod tests {
     fn token(fp_id: &str, data_kind: DataIdentifier) -> ProxyToken {
         ProxyToken {
             fp_id: FootprintUserId::from_str(fp_id).unwrap(),
-            data_kind,
+            identifier: data_kind,
         }
     }
 
@@ -223,10 +223,10 @@ mod tests {
     #[test_case("$fp_id_abcd.identity.sdfb.ssn4", "fp_id_abcd", DI::Identity(IDK::Ssn4) => false)]
     #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("credit_card") => true)]
     #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("ach_account") => false)]
-    fn test_proxy_parse_token(raw: &str, fp_id: &str, data_kind: DataIdentifier) -> bool {
+    fn test_proxy_parse_token(raw: &str, fp_id: &str, identifier: DataIdentifier) -> bool {
         let expected = ProxyToken {
             fp_id: FootprintUserId::from_str(fp_id).unwrap(),
-            data_kind,
+            identifier,
         };
         let Ok(token) = ProxyToken::parse(raw) else {
         return false
