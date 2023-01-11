@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
 use self::api_schema_helper::string_api_data_type_alias;
-use crate::DataLifetimeKind;
 
 pub mod address;
 pub mod csv;
@@ -129,26 +128,3 @@ impl From<PiiString> for reqwest::Body {
 }
 
 string_api_data_type_alias!(PiiString);
-
-pub struct NewData {
-    pub data_attribute: DataLifetimeKind,
-    pub data: PiiString,
-}
-
-impl NewData {
-    pub fn list<P: Into<PiiString>>(data: Vec<(DataLifetimeKind, P)>) -> Vec<Self> {
-        data.into_iter()
-            .map(|(data_attribute, pii)| Self {
-                data_attribute,
-                data: pii.into(),
-            })
-            .collect()
-    }
-
-    pub fn single<P: Into<PiiString>>(data_attribute: DataLifetimeKind, pii: P) -> Vec<Self> {
-        vec![Self {
-            data_attribute,
-            data: pii.into(),
-        }]
-    }
-}

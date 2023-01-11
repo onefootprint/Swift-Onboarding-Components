@@ -6,7 +6,7 @@ use crate::*;
 pub struct User {
     pub id: FootprintUserId,
     pub is_portable: bool,
-    pub identity_data_attributes: Vec<DataLifetimeKind>,
+    pub identity_data_attributes: Vec<IdentityDataKind>,
     pub identity_document_types: Vec<String>,
     pub start_timestamp: DateTime<Utc>,
     pub onboarding: Option<Onboarding>,

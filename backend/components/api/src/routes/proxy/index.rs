@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::collections::HashSet;
 
 use std::str::FromStr;
 
@@ -28,7 +27,6 @@ use db::models::scoped_user::ScopedUser;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeKind;
 
 use newtypes::PiiString;
 
@@ -196,9 +194,14 @@ async fn detokenize(
             tokens.into_iter().partition_map(|token| match token {
                 DataIdentifier::Identity(idk) => itertools::Either::Left(idk),
                 DataIdentifier::Custom(kvdk) => itertools::Either::Right(kvdk),
+                DataIdentifier::IdentityDocument => todo!(),
             });
 
-        let fields = HashSet::from_iter(identity_tokens.clone().into_iter().map(DataLifetimeKind::from));
+        let fields = identity_tokens
+            .clone()
+            .into_iter()
+            .map(DataIdentifier::Identity)
+            .collect();
         let custom_fields = custom_tokens.clone();
 
         let (uvw, scoped_user) = state

@@ -8,10 +8,12 @@ use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
 use db::PgConnection;
+use itertools::Itertools;
+use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind;
 use newtypes::KvDataKey;
 use newtypes::ScopedUserId;
-use newtypes::{CollectedDataOption, DataLifetimeKind, SealedVaultBytes};
+use newtypes::{CollectedDataOption, SealedVaultBytes};
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::convert::Into;
@@ -51,6 +53,7 @@ impl UserVaultWrapper {
 
     /// Return speculative identity_documents if exist, otherwise committed. There should only be one
     pub fn identity_documents(&self) -> &[IdentityDocument] {
+        // TODO but do we support committed ID docs?
         if !self.speculative.identity_documents.is_empty() {
             &self.speculative.identity_documents
         } else {
@@ -82,6 +85,7 @@ impl UserVaultWrapper {
     }
 }
 
+// TODO: confusing when to use these. Do we need them after new decrypt utils?
 impl UserVaultWrapper {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
@@ -89,49 +93,22 @@ impl UserVaultWrapper {
         &self,
         conn: &mut PgConnection,
         scoped_user: &ScopedUser,
-        // TODO DataIdentifier
-        fields: HashSet<DataLifetimeKind>,
+        fields: Vec<DataIdentifier>,
     ) -> ApiResult<()> {
-        // tenant's can do what they wish with NON-portable vaults they own
+        // tenants can do what they wish with NON-portable vaults they own
         if !self.user_vault.is_portable {
             return Ok(());
         }
 
         let ob_configs = ObConfiguration::list_authorized_for_user(conn, scoped_user.id.clone())?;
-        let can_access_attributes: HashSet<_> = ob_configs
-            .into_iter()
-            .flat_map(|x| x.can_access_fields())
-            .collect();
-        if !can_access_attributes.is_superset(&fields) {
+        let can_access: HashSet<_> = ob_configs.into_iter().flat_map(|x| x.can_access()).collect();
+        if !fields.iter().all(|x| can_access.contains(x)) {
             return Err(crate::auth::AuthError::ObConfigMissingDecryptPermission.into());
         }
 
         Ok(())
     }
 
-    /// We don't allow a tenant to know if data is in the Vault without having an authorized OBConfig that wanted to collect those fields
-    pub fn data_fields_tenant_requested_to_collect(
-        &self,
-        // Ideally we'd take a scoped user and calculate this here,
-        // but /users does some bulk fetching and this makes it easier
-        ob_configs: &[ObConfiguration],
-        // TODO DataIdentifier
-    ) -> Vec<DataLifetimeKind> {
-        let intent_to_collect_attributes: HashSet<DataLifetimeKind> = ob_configs
-            .iter()
-            .flat_map(|x| x.intent_to_collect_fields())
-            .collect();
-        let fields_present_in_vault: HashSet<DataLifetimeKind> = HashSet::from_iter(
-            self.get_populated_identity_fields()
-                .into_iter()
-                .map(DataLifetimeKind::from),
-        );
-
-        (intent_to_collect_attributes.intersection(&fields_present_in_vault))
-            .into_iter()
-            .cloned()
-            .collect::<Vec<_>>()
-    }
     /// Retrieve the fields that the tenant has requested/gotten authorized access to collect
     ///
     /// Note: This is not checking `READ` permissions of data, e.g. fields that the tenant can actually decrypt.
@@ -140,29 +117,24 @@ impl UserVaultWrapper {
     pub fn get_accessible_populated_fields(
         &self,
         ob_configs: &[ObConfiguration],
-        // TODO DataIdentifier
-    ) -> (Vec<DataLifetimeKind>, Vec<String>) {
-        let accessible_fields: HashSet<DataLifetimeKind> = HashSet::from_iter(
-            self.data_fields_tenant_requested_to_collect(ob_configs)
-                .into_iter(),
-        );
-        let document_types = if accessible_fields.contains(&DataLifetimeKind::IdentityDocument) {
-            self.get_identity_document_types()
+    ) -> (Vec<IdentityDataKind>, Vec<String>) {
+        let must_collect: HashSet<_> = ob_configs.iter().flat_map(|x| x.must_collect()).collect();
+
+        let accessible_id_data = self
+            .get_populated_identity_fields()
+            .into_iter()
+            .filter(|x| must_collect.contains(&DataIdentifier::Identity(*x)))
+            .collect();
+        let accessible_document_types = if must_collect.contains(&DataIdentifier::IdentityDocument) {
+            self.identity_documents()
+                .iter()
+                .map(|i| i.document_type.clone())
+                .unique()
+                .collect()
         } else {
             vec![]
         };
-        let data_attributes: Vec<DataLifetimeKind> = HashSet::from_iter(
-            self.get_populated_identity_fields()
-                .iter()
-                .cloned()
-                .map(DataLifetimeKind::from),
-        )
-        .intersection(&accessible_fields)
-        .into_iter()
-        .cloned()
-        .collect::<Vec<_>>();
-
-        (data_attributes, document_types)
+        (accessible_id_data, accessible_document_types)
     }
 }
 

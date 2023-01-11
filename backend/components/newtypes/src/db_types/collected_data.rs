@@ -92,7 +92,7 @@ impl CollectedData {
 /// Represent the options of allowed CollectedData.
 /// Some CollectedData variants only have a single allowable CollectedDataOption.
 /// Other CollectedData variants may have multiple Options of assortments of data that can be collected.
-/// Each CollectedDataOption maps to a list of DataLifetimeKinds that are represented by the CDO
+/// Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by the CDO
 pub enum CollectedDataOption {
     Name,
     Dob,
@@ -145,8 +145,8 @@ impl CollectedDataOption {
             .collect()
     }
 
-    /// Given a list of DataLifetimeKinds (maybe collected via API), computes the set of
-    /// CollectedDataOptions represented by this list of DataLifetimeKinds
+    /// Given a list of IdentityDataKinds (maybe collected via API), computes the set of
+    /// CollectedDataOptions represented by this list of IdentityDataKinds
     pub fn list_from(kinds: Vec<IdentityDataKind>) -> HashSet<Self> {
         let kinds: HashSet<_> = kinds.into_iter().collect();
         // For each CollectedData variant, figure out which of the options (if any) is represented

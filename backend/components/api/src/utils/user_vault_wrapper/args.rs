@@ -93,7 +93,8 @@ impl<'a> UvwArgs<'a> {
 
             let accessible_kinds: Vec<_> = authorized_obcs
                 .into_iter()
-                .flat_map(|x| x.intent_to_collect_fields())
+                .flat_map(|x| x.must_collect())
+                .map(DataLifetimeKind::from)
                 // Since we have a scoped_user, we should be able to see custom data for the tenant
                 .chain([DataLifetimeKind::Custom])
                 .collect();

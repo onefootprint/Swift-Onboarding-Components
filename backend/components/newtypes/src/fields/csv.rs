@@ -50,12 +50,12 @@ where
 mod tests {
     use super::Csv;
 
-    use crate::DataLifetimeKind;
+    use crate::IdentityDataKind;
     #[test]
     fn test_data_kinds() {
         #[derive(serde::Serialize, serde::Deserialize)]
         struct Test {
-            fields: Csv<DataLifetimeKind>,
+            fields: Csv<IdentityDataKind>,
         }
         let test = r#"{ "fields": "last_name, first_name, address_line1,city" }"#;
         let test: Test = serde_json::from_str(test).unwrap();
@@ -63,10 +63,10 @@ mod tests {
         assert_eq!(
             test.fields.0,
             vec![
-                DataLifetimeKind::LastName,
-                DataLifetimeKind::FirstName,
-                DataLifetimeKind::AddressLine1,
-                DataLifetimeKind::City
+                IdentityDataKind::LastName,
+                IdentityDataKind::FirstName,
+                IdentityDataKind::AddressLine1,
+                IdentityDataKind::City
             ]
         );
     }

@@ -3,7 +3,6 @@ use crate::errors::ApiError;
 use crate::s3::S3Error;
 use crate::State;
 use db::models::identity_document::IdentityDocument;
-use itertools::Itertools;
 use newtypes::{IdentityDocumentId, SealedVaultBytes, SealedVaultDataKey};
 
 pub struct IdentityDocumentImages {
@@ -62,15 +61,5 @@ impl UserVaultWrapper {
             .map(|doc| fetch_image(state, doc.clone()));
 
         futures::future::join_all(futures).await
-    }
-
-    pub fn get_identity_document_types(&self) -> Vec<String> {
-        self.identity_documents()
-            .iter()
-            .map(|i| i.document_type.clone())
-            .collect::<Vec<String>>()
-            .into_iter()
-            .unique()
-            .collect::<Vec<String>>()
     }
 }

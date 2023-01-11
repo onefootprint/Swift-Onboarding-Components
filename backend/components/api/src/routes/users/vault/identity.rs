@@ -26,8 +26,8 @@ use db::TxnPgConnection;
 use db::models::scoped_user::ScopedUser;
 use newtypes::csv::Csv;
 use newtypes::{
-    flat_api_object_map_type, AccessEventKind, DataIdentifier, DataLifetimeKind, Fingerprint,
-    FootprintUserId, IdentityDataKind, PiiString, UvdKind,
+    flat_api_object_map_type, AccessEventKind, DataIdentifier, Fingerprint, FootprintUserId,
+    IdentityDataKind, PiiString, UvdKind,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -148,7 +148,7 @@ pub(super) async fn get_internal(
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
-    let fields: HashSet<_> = request.into_inner().fields.0.into_iter().collect();
+    let fields: Vec<_> = request.into_inner().fields.0.into_iter().collect();
 
     let fields_clone = fields.clone();
     let uvw = state
@@ -157,7 +157,7 @@ pub(super) async fn get_internal(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
-            let fields = fields_clone.into_iter().map(DataLifetimeKind::from).collect();
+            let fields = fields_clone.into_iter().map(DataIdentifier::Identity).collect();
             uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok(uvw)
@@ -214,8 +214,8 @@ pub(super) async fn post_decrypt_internal(
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
     let request = request.into_inner();
     let fields = request.fields.clone();
-    let dlk_fields: Vec<_> = request.fields.into_iter().map(DataLifetimeKind::from).collect();
-    let auth = auth.check_guard(CanDecrypt::new(dlk_fields.clone()))?;
+    let identifiers: Vec<_> = request.fields.into_iter().map(DataIdentifier::Identity).collect();
+    let auth = auth.check_guard(CanDecrypt::new(identifiers.clone()))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
@@ -227,7 +227,7 @@ pub(super) async fn post_decrypt_internal(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
-            uvw.ensure_scope_allows_access(conn, &scoped_user, dlk_fields.into_iter().collect())?;
+            uvw.ensure_scope_allows_access(conn, &scoped_user, identifiers)?;
 
             Ok((uvw, scoped_user))
         })

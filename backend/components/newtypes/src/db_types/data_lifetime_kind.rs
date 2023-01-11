@@ -1,4 +1,4 @@
-use crate::{PiiString, SaltedFingerprint, UvdKind};
+use crate::{DataIdentifier, PiiString, SaltedFingerprint, UvdKind};
 use crypto::sha256;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -155,6 +155,16 @@ impl From<IdentityDataKind> for DataLifetimeKind {
             IdentityDataKind::Country => Self::Country,
             IdentityDataKind::Email => Self::Email,
             IdentityDataKind::PhoneNumber => Self::PhoneNumber,
+        }
+    }
+}
+
+impl From<DataIdentifier> for DataLifetimeKind {
+    fn from(value: DataIdentifier) -> Self {
+        match value {
+            DataIdentifier::Identity(id) => id.into(),
+            DataIdentifier::Custom(_) => Self::Custom,
+            DataIdentifier::IdentityDocument => Self::IdentityDocument,
         }
     }
 }

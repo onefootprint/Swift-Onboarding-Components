@@ -17,8 +17,10 @@ use api_wire_types::{
     DecryptIdentityDocumentRequest, DecryptIdentityDocumentResponse, GetIdentityDocumentForDecryptResponse,
     GetQueryParam, ImageData,
 };
+use db::models::access_event::NewAccessEvent;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
-use newtypes::{DataLifetimeKind, FootprintUserId};
+use newtypes::{AccessEventKind, DataIdentifier, FootprintUserId};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Query};
 
@@ -55,7 +57,7 @@ pub(super) async fn get_internal(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let user_vault_wrapper = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
             // Important to check requester has access
-            let fields = HashSet::from_iter([DataLifetimeKind::IdentityDocument]);
+            let fields = vec![DataIdentifier::IdentityDocument];
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok(user_vault_wrapper)
@@ -114,24 +116,24 @@ pub(super) async fn post_internal(
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityDocumentRequest>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-    _insights: InsightHeaders,
+    insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
     let request = request.into_inner();
     let document_type = request.document_type;
-    let auth = auth.check_guard(CanDecrypt::single(DataLifetimeKind::IdentityDocument))?;
+    let auth = auth.check_guard(CanDecrypt::single(DataIdentifier::IdentityDocument))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let (uvw, _scoped_user) = state
+    let (uvw, scoped_user) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
             // Important to check requester has access
-            let fields = HashSet::from_iter([DataLifetimeKind::IdentityDocument]);
+            let fields = vec![DataIdentifier::IdentityDocument];
             uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok((uvw, scoped_user))
@@ -142,8 +144,6 @@ pub(super) async fn post_internal(
     let decrypted_docs: Vec<DecryptDocumentResult> =
         crate::hosted::user::decrypt_document(&state, uvw, document_type.clone()).await?;
 
-    // TODO Create an AccessEvent log showing that the tenant accessed identity document
-    /*
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: Some(request.reason),
@@ -154,7 +154,6 @@ pub(super) async fn post_internal(
     }
     .save(&state.db_pool)
     .await?;
-    */
     let mut image_data: Vec<ImageData> = Vec::new();
     for doc in decrypted_docs {
         image_data.push(ImageData {

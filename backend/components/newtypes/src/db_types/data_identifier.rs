@@ -19,10 +19,16 @@ use crate::{
 pub enum DataIdentifier {
     Identity(IdentityDataKind),
     Custom(KvDataKey),
-    // TODO add identity documents here
+    IdentityDocument,
 }
 
 string_api_data_type_alias!(DataIdentifier);
+
+impl From<IdentityDataKind> for DataIdentifier {
+    fn from(value: IdentityDataKind) -> Self {
+        Self::Identity(value)
+    }
+}
 
 #[derive(Debug, Error)]
 pub enum DataIdentifierParsingError {
@@ -38,23 +44,31 @@ impl std::fmt::Display for DataIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = self.as_ref();
         let suffix = match self {
-            Self::Identity(s) => s.to_string(),
-            Self::Custom(s) => s.to_string(),
+            Self::Identity(s) => Some(s.to_string()),
+            Self::Custom(s) => Some(s.to_string()),
+            Self::IdentityDocument => None,
         };
-        write!(f, "{}.{}", prefix, suffix)
+        if let Some(suffix) = suffix {
+            write!(f, "{}.{}", prefix, suffix)
+        } else {
+            write!(f, "{}", prefix)
+        }
     }
 }
 
 impl FromStr for DataIdentifier {
     type Err = DataIdentifierParsingError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let idx = s
-            .find('.')
-            .ok_or_else(|| DataIdentifierParsingError::CannotParse(s.to_owned()))?;
-        let prefix = &s[..idx];
-        let suffix = &s[(idx + 1)..];
+        let (prefix, suffix) = if let Some(period_idx) = s.find('.') {
+            let prefix = &s[..period_idx];
+            let suffix = &s[(period_idx + 1)..];
+            (prefix, suffix)
+        } else {
+            (s, "")
+        };
         let prefix = DataIdentifierDiscriminants::from_str(prefix)
             .map_err(|_| DataIdentifierParsingError::CannotParsePrefix(prefix.to_owned()))?;
+        // Parse the suffix differently depending on the prefix
         let result = match prefix {
             DataIdentifierDiscriminants::Identity => Self::Identity(
                 IdentityDataKind::from_str(suffix)
@@ -64,6 +78,7 @@ impl FromStr for DataIdentifier {
                 KvDataKey::from_str(suffix)
                     .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
+            DataIdentifierDiscriminants::IdentityDocument => Self::IdentityDocument,
         };
         Ok(result)
     }
@@ -105,6 +120,7 @@ mod tests {
     #[test_case(DataIdentifier::Identity(IdentityDataKind::Email) => "identity.email")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
+    #[test_case(DataIdentifier::IdentityDocument => "identity_document")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -114,6 +130,7 @@ mod tests {
     #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
+    #[test_case("identity_document" => DataIdentifier::IdentityDocument)]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

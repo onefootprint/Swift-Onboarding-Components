@@ -20,8 +20,10 @@ use actix_web::web::Query;
 
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
+use either::Either::{Left, Right};
+use itertools::Itertools;
 use newtypes::csv::Csv;
-use newtypes::{DataIdentifier, FootprintUserId, IdentityDataKind, KvDataKey};
+use newtypes::{DataIdentifier, FootprintUserId};
 
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
@@ -135,17 +137,12 @@ pub async fn get(
     let footprint_id = path.into_inner();
     let request = request.into_inner();
 
-    let mut requested_identity_fields: Vec<IdentityDataKind> = Vec::new();
-    let mut requested_custom_fields: Vec<KvDataKey> = Vec::new();
-
-    request.fields.into_iter().for_each(|f| match f {
-        DataIdentifier::Identity(attr) => {
-            requested_identity_fields.push(attr);
-        }
-        DataIdentifier::Custom(data_key) => {
-            requested_custom_fields.push(data_key);
-        }
-    });
+    let (requested_identity_fields, requested_custom_fields) =
+        request.fields.into_iter().partition_map(|f| match f {
+            DataIdentifier::Identity(attr) => Left(attr),
+            DataIdentifier::Custom(data_key) => Right(data_key),
+            DataIdentifier::IdentityDocument => todo!(),
+        });
 
     let id_results_fut = identity::get_internal(
         state.clone(),
@@ -207,17 +204,12 @@ pub async fn post_decrypt(
     let footprint_id = path.into_inner();
     let request = request.into_inner();
 
-    let mut requested_identity_fields: HashSet<IdentityDataKind> = HashSet::new();
-    let mut requested_custom_fields: Vec<KvDataKey> = Vec::new();
-
-    request.fields.into_iter().for_each(|f| match f {
-        DataIdentifier::Identity(attr) => {
-            requested_identity_fields.insert(attr);
-        }
-        DataIdentifier::Custom(data_key) => {
-            requested_custom_fields.push(data_key);
-        }
-    });
+    let (requested_identity_fields, requested_custom_fields) =
+        request.fields.into_iter().partition_map(|f| match f {
+            DataIdentifier::Identity(attr) => Left(attr),
+            DataIdentifier::Custom(data_key) => Right(data_key),
+            DataIdentifier::IdentityDocument => todo!(),
+        });
 
     let id_results_fut = identity::post_decrypt_internal(
         state.clone(),
