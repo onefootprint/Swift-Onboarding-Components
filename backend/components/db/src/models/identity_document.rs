@@ -21,7 +21,6 @@ pub struct IdentityDocument {
     pub request_id: DocumentRequestId,
     pub front_image_s3_url: Option<String>,
     pub back_image_s3_url: Option<String>,
-    pub selfie_image_s3_url: Option<String>,
     pub document_type: String,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
@@ -29,6 +28,7 @@ pub struct IdentityDocument {
     pub _updated_at: DateTime<Utc>,
     pub e_data_key: SealedVaultDataKey,
     pub lifetime_id: DataLifetimeId,
+    pub selfie_image_s3_url: Option<String>,
 }
 
 impl HasLifetime for IdentityDocument {

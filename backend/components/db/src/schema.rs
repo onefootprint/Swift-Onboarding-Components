@@ -108,7 +108,6 @@ table! {
         request_id -> Text,
         front_image_s3_url -> Nullable<Text>,
         back_image_s3_url -> Nullable<Text>,
-        selfie_image_s3_url -> Nullable<Text>,
         document_type -> Text,
         country_code -> Text,
         created_at -> Timestamptz,
@@ -116,6 +115,7 @@ table! {
         _updated_at -> Timestamptz,
         e_data_key -> Bytea,
         lifetime_id -> Text,
+        selfie_image_s3_url -> Nullable<Text>,
     }
 }
 
