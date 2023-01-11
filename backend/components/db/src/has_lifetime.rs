@@ -12,8 +12,6 @@ pub trait HasLifetime {
     /// Get the lifetime_id associated with this row.
     fn lifetime_id(&self) -> &DataLifetimeId;
 
-    fn e_data(&self) -> &SealedVaultBytes;
-
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to a single user vault.
     fn get_for(conn: &mut PgConnection, lifetimes: &[DataLifetimeId]) -> DbResult<Vec<Self>>
@@ -53,4 +51,9 @@ pub trait HasLifetime {
             .into_group_map();
         Ok(results)
     }
+}
+
+/// Implemented by all models that hold identity data: PhoneNumber, Email, and UserVaultData
+pub trait HasSealedIdentityData: HasLifetime {
+    fn e_data(&self) -> &SealedVaultBytes;
 }

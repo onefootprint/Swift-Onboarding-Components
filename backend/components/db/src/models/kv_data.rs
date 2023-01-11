@@ -77,12 +77,6 @@ impl HasLifetime for KeyValueData {
         &self.lifetime_id
     }
 
-    /// Don't want this implemented since this codepath is for identity data
-    /// TODO: might have to make a different trait for id docs and key value data
-    fn e_data(&self) -> &SealedVaultBytes {
-        unimplemented!()
-    }
-
     fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
         let results = kv_data::table
             .filter(kv_data::lifetime_id.eq_any(lifetime_ids))

@@ -1,6 +1,7 @@
 use crate::schema::user_vault_data;
 use crate::DbResult;
 use crate::HasLifetime;
+use crate::HasSealedIdentityData;
 use crate::TxnPgConnection;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -81,10 +82,6 @@ impl HasLifetime for UserVaultData {
         &self.lifetime_id
     }
 
-    fn e_data(&self) -> &SealedVaultBytes {
-        &self.e_data
-    }
-
     fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,
@@ -93,5 +90,11 @@ impl HasLifetime for UserVaultData {
             .filter(user_vault_data::lifetime_id.eq_any(lifetime_ids))
             .get_results(conn)?;
         Ok(results)
+    }
+}
+
+impl HasSealedIdentityData for UserVaultData {
+    fn e_data(&self) -> &SealedVaultBytes {
+        &self.e_data
     }
 }

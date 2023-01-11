@@ -8,7 +8,7 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{DbResult, HasLifetime, TxnPgConnection};
+use crate::{DbResult, HasLifetime, HasSealedIdentityData, TxnPgConnection};
 
 use super::{
     data_lifetime::DataLifetime,
@@ -112,9 +112,6 @@ impl HasLifetime for PhoneNumber {
         &self.lifetime_id
     }
 
-    fn e_data(&self) -> &SealedVaultBytes {
-        &self.e_e164
-    }
     /// Note: only returns primary phone numbers
     fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
@@ -125,5 +122,11 @@ impl HasLifetime for PhoneNumber {
             .filter(phone_number::priority.eq(DataPriority::Primary))
             .get_results(conn)?;
         Ok(results)
+    }
+}
+
+impl HasSealedIdentityData for PhoneNumber {
+    fn e_data(&self) -> &SealedVaultBytes {
+        &self.e_e164
     }
 }

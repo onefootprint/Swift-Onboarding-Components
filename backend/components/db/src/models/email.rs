@@ -1,6 +1,6 @@
 use crate::{
     schema::{data_lifetime, email},
-    DbResult, HasLifetime, TxnPgConnection,
+    DbResult, HasLifetime, HasSealedIdentityData, TxnPgConnection,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -112,10 +112,6 @@ impl HasLifetime for Email {
         &self.lifetime_id
     }
 
-    fn e_data(&self) -> &SealedVaultBytes {
-        &self.e_data
-    }
-
     /// Note: only returns primary emails
     fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
@@ -126,5 +122,11 @@ impl HasLifetime for Email {
             .filter(email::priority.eq(DataPriority::Primary))
             .get_results(conn)?;
         Ok(results)
+    }
+}
+
+impl HasSealedIdentityData for Email {
+    fn e_data(&self) -> &SealedVaultBytes {
+        &self.e_data
     }
 }

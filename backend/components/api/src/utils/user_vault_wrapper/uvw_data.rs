@@ -4,7 +4,7 @@ use db::models::identity_document::IdentityDocument;
 use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
-use db::HasLifetime;
+use db::{HasLifetime, HasSealedIdentityData};
 use newtypes::{DataLifetimeId, SealedVaultBytes};
 use newtypes::{IdentityDataKind, KvDataKey};
 use std::collections::{HashMap, HashSet};
@@ -129,7 +129,7 @@ impl UvwData {
     /// Dispatch queries for a piece of data with a given DataAttribute kind to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub(super) fn get(&self, kind: &IdentityDataKind) -> Option<&dyn HasLifetime> {
+    pub(super) fn get(&self, kind: &IdentityDataKind) -> Option<&dyn HasSealedIdentityData> {
         let email = self.emails.first();
         let phone = self.phone_numbers.first();
         match kind {
@@ -144,11 +144,11 @@ impl UvwData {
             | IdentityDataKind::City
             | IdentityDataKind::State
             | IdentityDataKind::Zip
-            | IdentityDataKind::Country => self.uvd(*kind).map(|uvd| uvd as &dyn HasLifetime),
+            | IdentityDataKind::Country => self.uvd(*kind).map(|uvd| uvd as &dyn HasSealedIdentityData),
             // email
-            IdentityDataKind::Email => email.map(|email| email as &dyn HasLifetime),
+            IdentityDataKind::Email => email.map(|email| email as &dyn HasSealedIdentityData),
             // phone
-            IdentityDataKind::PhoneNumber => phone.map(|phone| phone as &dyn HasLifetime),
+            IdentityDataKind::PhoneNumber => phone.map(|phone| phone as &dyn HasSealedIdentityData),
         }
     }
 

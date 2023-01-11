@@ -7,7 +7,7 @@ use diesel::{Insertable, PgConnection, Queryable};
 
 use newtypes::{
     Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdentityDocumentId, ScopedUserId,
-    SealedVaultBytes, SealedVaultDataKey, UserVaultId,
+    SealedVaultDataKey, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -34,14 +34,6 @@ pub struct IdentityDocument {
 impl HasLifetime for IdentityDocument {
     fn lifetime_id(&self) -> &DataLifetimeId {
         &self.lifetime_id
-    }
-    // The actual underlying e_data lives in S3 and this method of accessing
-    // is really only for data kinds that are more like point lookups, so we panic.
-    //
-    // Alternatively, we could make e_data -> Option<SealedVaultBytes>, but this feels like
-    // enough of a special case for now.
-    fn e_data(&self) -> &SealedVaultBytes {
-        unimplemented!()
     }
 
     fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
