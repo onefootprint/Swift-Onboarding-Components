@@ -112,6 +112,7 @@ export { default as IcoIdFront40 } from './ico-id-front-40';
 export { default as IcoIdGeneric40 } from './ico-id-generic-40';
 export { default as IcoInfo16 } from './ico-info-16';
 export { default as IcoInfo24 } from './ico-info-24';
+export { default as IcoInfo40 } from './ico-info-40';
 export { default as IcoLaptop16 } from './ico-laptop-16';
 export { default as IcoLaptop24 } from './ico-laptop-24';
 export { default as IcoLayer0116 } from './ico-layer01-16';
