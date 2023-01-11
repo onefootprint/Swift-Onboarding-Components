@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import useUserId from '../../../../../hooks/use-user-id';
-import useRiskSiganlsFilters from './use-risk-signals-filters';
+import useRiskSignalsFilters from './use-risk-signals-filters';
 
 const getRiskSignalsRequest = async (
   params: GetRiskSignalsRequest,
@@ -24,14 +24,14 @@ const getRiskSignalsRequest = async (
 };
 
 const useRiskSignals = () => {
-  const filters = useRiskSiganlsFilters();
+  const filters = useRiskSignalsFilters();
   const { authHeaders } = useSession();
   const userId = useUserId();
 
   return useQuery(
     ['userRiskSignalsList', authHeaders, userId, filters.requestParams],
     () => getRiskSignalsRequest(filters.requestParams, userId, authHeaders),
-    { enabled: !!userId },
+    { enabled: !!userId && filters.isReady },
   );
 };
 

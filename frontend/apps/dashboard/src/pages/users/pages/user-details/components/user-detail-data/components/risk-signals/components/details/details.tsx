@@ -12,8 +12,8 @@ import useRiskSignalDetails from './hooks/use-risk-signal-details';
 const Details = () => {
   const { t } = useTranslation();
   const { query, clear } = useRiskSignalsFilters();
-  const isOpen = !!query.signal_id;
-  const { data, isLoading, error } = useRiskSignalDetails(query.signal_id);
+  const isOpen = !!query.risk_signal_id;
+  const { data, isLoading, error } = useRiskSignalDetails(query.risk_signal_id);
 
   const getDrawerTitle = () => {
     if (data) {

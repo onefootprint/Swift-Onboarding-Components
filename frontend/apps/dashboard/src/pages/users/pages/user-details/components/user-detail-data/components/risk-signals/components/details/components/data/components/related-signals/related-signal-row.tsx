@@ -25,7 +25,7 @@ const RelatedSignals = ({ relatedSignals }: RelatedSignalsProps) => {
   ];
 
   const handleClick = (relatedSignal: RiskSignal) => {
-    filters.push({ signal_id: relatedSignal.id });
+    filters.push({ risk_signal_id: relatedSignal.id });
   };
 
   return (

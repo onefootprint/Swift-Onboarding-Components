@@ -20,7 +20,7 @@ describe('<Details />', () => {
     useRouterSpy({
       pathname: `/users/detail`,
       query: {
-        signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
+        risk_signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
         footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
       },
     });

@@ -30,7 +30,7 @@ const TableFilter = ({
     <TableFilterContainer>
       <SearchInput
         onChangeText={handleChangeText}
-        sx={{ width: '300px' }}
+        sx={{ width: '232px' }}
         value={search}
       />
       {children}
@@ -41,8 +41,8 @@ const TableFilter = ({
 const TableFilterContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
-    justify-content: space-between;
     margin-bottom: ${theme.spacing[5]};
+    gap: ${theme.spacing[5]};
   `}
 `;
 

@@ -88,7 +88,7 @@ describe('<RiskSignals />', () => {
       });
 
       describe('when clicking on the table row', () => {
-        it('should append signal_id', async () => {
+        it('should append risk_signal_id', async () => {
           const pushMockFn = jest.fn();
           useRouterSpy({
             pathname: '/users/detail',
@@ -104,7 +104,7 @@ describe('<RiskSignals />', () => {
           expect(pushMockFn).toHaveBeenCalledWith(
             {
               query: {
-                signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
+                risk_signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
                 footprint_user_id: footprintUserId,
               },
             },
@@ -116,7 +116,7 @@ describe('<RiskSignals />', () => {
 
       describe('when filtering', () => {
         describe('when typing on the table search', () => {
-          it('should append signal_description', async () => {
+          it('should append risk_signal_description', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
               pathname: '/users/detail',
@@ -134,7 +134,7 @@ describe('<RiskSignals />', () => {
                 {
                   query: {
                     footprint_user_id: footprintUserId,
-                    signal_description: 'lorem',
+                    risk_signal_description: 'lorem',
                   },
                 },
                 undefined,
@@ -144,16 +144,14 @@ describe('<RiskSignals />', () => {
           });
         });
 
-        describe('when there is a signal_description', () => {
+        describe('when there is a risk_signal_description', () => {
           it('should display the text on the table search', async () => {
-            const pushMockFn = jest.fn();
             useRouterSpy({
               pathname: '/users/detail',
               query: {
                 footprint_user_id: footprintUserId,
-                signal_description: 'lorem',
+                risk_signal_description: 'lorem',
               },
-              push: pushMockFn,
             });
             await renderRiskSignalsAndWaitData();
 
@@ -163,7 +161,7 @@ describe('<RiskSignals />', () => {
         });
 
         describe('when selecting a severity', () => {
-          it('should append a signal_severity', async () => {
+          it('should append a risk_signal_severity', async () => {
             const pushMockFn = jest.fn();
             useRouterSpy({
               pathname: '/users/detail',
@@ -174,26 +172,20 @@ describe('<RiskSignals />', () => {
             });
             await renderRiskSignalsAndWaitData();
 
-            const filterButton = screen.getByRole('button', {
-              name: 'Filters',
-            });
-            await userEvent.click(filterButton);
+            const trigger = screen.getByRole('button', { name: 'Severity' });
+            await userEvent.click(trigger);
 
-            const dialog = screen.getByRole('dialog', { name: 'Filters' });
-            const mediumSeverityCheckbox =
-              within(dialog).getByLabelText('Medium');
-            await userEvent.click(mediumSeverityCheckbox);
+            const highSeverity = screen.getByRole('checkbox', { name: 'High' });
+            await userEvent.click(highSeverity);
 
-            const submitButton = within(dialog).getByRole('button', {
-              name: 'Apply',
-            });
-            await userEvent.click(submitButton);
+            const applyButton = screen.getByRole('button', { name: 'Apply' });
+            await userEvent.click(applyButton);
 
             expect(pushMockFn).toHaveBeenCalledWith(
               {
                 query: {
                   footprint_user_id: footprintUserId,
-                  signal_severity: 'medium',
+                  risk_signal_severity: ['high'],
                 },
               },
               undefined,
@@ -214,25 +206,20 @@ describe('<RiskSignals />', () => {
             });
             await renderRiskSignalsAndWaitData();
 
-            const filterButton = screen.getByRole('button', {
-              name: 'Filters',
-            });
-            await userEvent.click(filterButton);
+            const trigger = screen.getByRole('button', { name: 'Scope' });
+            await userEvent.click(trigger);
 
-            const dialog = screen.getByRole('dialog', { name: 'Filters' });
-            const scope = within(dialog).getByLabelText('Email');
-            await userEvent.click(scope);
+            const email = screen.getByRole('checkbox', { name: 'Email' });
+            await userEvent.click(email);
 
-            const submitButton = within(dialog).getByRole('button', {
-              name: 'Apply',
-            });
-            await userEvent.click(submitButton);
+            const applyButton = screen.getByRole('button', { name: 'Apply' });
+            await userEvent.click(applyButton);
 
             expect(pushMockFn).toHaveBeenCalledWith(
               {
                 query: {
                   footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
-                  signal_scope: 'email',
+                  risk_signal_scope: ['email'],
                 },
               },
               undefined,
@@ -242,23 +229,22 @@ describe('<RiskSignals />', () => {
         });
 
         describe('when there are risk signal filters in the URL', () => {
-          it('should indicate the number of filters selected', async () => {
-            const pushMockFn = jest.fn();
+          it('should indicate the filters selected', async () => {
             useRouterSpy({
               pathname: '/users/detail',
               query: {
-                signal_scope: 'email',
-                signal_severity: 'high',
+                risk_signal_scope: 'email',
+                risk_signal_severity: 'high',
                 footprint_user_id: footprintUserId,
               },
-              push: pushMockFn,
             });
             await renderRiskSignalsAndWaitData();
 
-            const filterButton = screen.getByRole('button', {
-              name: 'Filters · 2',
-            });
-            expect(filterButton).toBeInTheDocument();
+            const high = screen.getByRole('button', { name: 'High' });
+            expect(high).toBeInTheDocument();
+
+            const email = screen.getByRole('button', { name: 'Email' });
+            expect(email).toBeInTheDocument();
           });
         });
 
@@ -268,30 +254,16 @@ describe('<RiskSignals />', () => {
             useRouterSpy({
               pathname: '/users/detail',
               query: {
-                signal_scope: 'email',
-                signal_severity: 'high',
+                risk_signal_scope: 'email',
+                risk_signal_severity: 'high',
                 footprint_user_id: footprintUserId,
               },
               push: pushMockFn,
             });
             await renderRiskSignalsAndWaitData();
 
-            const filterButton = screen.getByRole('button', {
-              name: 'Filters · 2',
-            });
-            await userEvent.click(filterButton);
-
-            const dialog = screen.getByRole('dialog', { name: 'Filters' });
-
-            const resetButton = within(dialog).getByRole('button', {
-              name: 'Clear',
-            });
-            await userEvent.click(resetButton);
-
-            const submitButton = within(dialog).getByRole('button', {
-              name: 'Apply',
-            });
-            await userEvent.click(submitButton);
+            const clear = screen.getByRole('button', { name: 'Clear filters' });
+            await userEvent.click(clear);
 
             expect(pushMockFn).toHaveBeenCalledWith(
               {

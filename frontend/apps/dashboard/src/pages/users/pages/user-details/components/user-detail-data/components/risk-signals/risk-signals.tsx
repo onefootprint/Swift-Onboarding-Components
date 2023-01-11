@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { RiskSignal } from '@onefootprint/types';
-import { Button, Table, TableRow, Typography } from '@onefootprint/ui';
+import { Table, TableRow, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -14,7 +14,7 @@ import useRiskSignalsFilters from './hooks/use-risk-signals-filters';
 const renderTr = ({ item }: TableRow<RiskSignal>) => <Row signal={item} />;
 
 const RiskSignals = () => {
-  const { t, allT } = useTranslation('pages.user-details.risk-signals');
+  const { t } = useTranslation('pages.user-details.risk-signals');
   const { isLoading, error, data } = useRiskSignals();
   const filters = useRiskSignalsFilters();
   const columns = [
@@ -24,11 +24,11 @@ const RiskSignals = () => {
   ];
 
   const handleRowClick = (riskSignal: RiskSignal) => {
-    filters.push({ signal_id: riskSignal.id });
+    filters.push({ risk_signal_id: riskSignal.id });
   };
 
   const handleSearchChange = (search: string) => {
-    filters.push({ signal_description: search });
+    filters.push({ risk_signal_description: search });
   };
 
   return (
@@ -47,17 +47,9 @@ const RiskSignals = () => {
         items={data}
         onChangeSearchText={handleSearchChange}
         onRowClick={handleRowClick}
-        renderActions={() => (
-          <Filters
-            renderCta={({ onClick, filtersCount }) => (
-              <Button size="small" variant="secondary" onClick={onClick}>
-                {allT('filters.cta', { count: filtersCount })}
-              </Button>
-            )}
-          />
-        )}
+        renderActions={() => <Filters />}
         renderTr={renderTr}
-        initialSearch={filters.query.signal_description}
+        initialSearch={filters.query.risk_signal_description}
       />
       <Details />
     </section>

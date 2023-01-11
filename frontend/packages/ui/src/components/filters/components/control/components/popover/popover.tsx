@@ -67,7 +67,6 @@ const PopoverContainer = styled.div`
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[3]};
     width: 300px;
-    z-index: ${theme.zIndex.dialog};
   `}
 `;
 

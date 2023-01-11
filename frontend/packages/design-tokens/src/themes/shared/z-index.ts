@@ -6,6 +6,7 @@ const zIndexes: ZIndexes = {
   dropdown: 10,
   overlay: 15,
   dialog: 20,
+  popover: 20,
   drawer: 25,
   toast: 30,
 };

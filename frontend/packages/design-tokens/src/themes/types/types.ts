@@ -202,6 +202,7 @@ export type ZIndexes = {
   tooltip: number;
   sticky: number;
   dialog: number;
+  popover: number;
   overlay: number;
   drawer: number;
   toast: number;

@@ -465,10 +465,10 @@
         },
         "filters": {
           "severity": {
-            "title": "Severity"
+            "label": "Severity"
           },
           "scope": {
-            "title": "Scope"
+            "label": "Scope"
           }
         },
         "details": {

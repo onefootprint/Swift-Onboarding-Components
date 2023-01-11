@@ -1,69 +1,100 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Dialog } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { SignalAttribute } from '@onefootprint/types';
+import { Filters } from '@onefootprint/ui';
+import React from 'react';
 
-import useFilters, {
-  stringToArray,
-} from '../../hooks/use-risk-signals-filters';
-import Form, { FormData } from './components/signal-filters-form';
+import useRiskSignalsFilters from '../../hooks/use-risk-signals-filters';
 
-type FiltersProps = {
-  renderCta: (options: {
-    onClick: () => void;
-    filtersCount: number;
-  }) => React.ReactNode;
-};
-
-const Filters = ({ renderCta }: FiltersProps) => {
-  const { t } = useTranslation();
-  const filters = useFilters();
-  const [open, setOpen] = useState(false);
-
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = (formData: FormData) => {
-    filters.push({
-      signal_severity: formData.severity.toString(),
-      signal_scope: formData.scope.toString(),
-    });
-    handleClose();
-  };
+const RiskSignalsFilters = () => {
+  const { t, allT } = useTranslation('pages.user-details.risk-signals');
+  const filters = useRiskSignalsFilters();
 
   return (
-    <Box>
-      <Dialog
-        title={t('filters.title')}
-        size="compact"
-        primaryButton={{
-          form: 'signals-filters',
-          label: t('filters.apply'),
-          type: 'submit',
-        }}
-        linkButton={{
-          form: 'signals-filters',
-          label: t('filters.clear'),
-          type: 'reset',
-        }}
-        onClose={handleClose}
-        open={open}
-      >
-        <Form
-          onSubmit={handleSubmit}
-          defaultValues={{
-            severity: stringToArray(filters.query.signal_severity),
-            scope: stringToArray(filters.query.signal_scope),
-          }}
-        />
-      </Dialog>
-      {renderCta({ onClick: handleToggle, filtersCount: filters.count })}
-    </Box>
+    <Filters
+      controls={[
+        {
+          query: 'risk_signal_severity',
+          label: t('filters.severity.label'),
+          kind: 'multi-select',
+          options: [
+            {
+              label: t('severity.high'),
+              value: 'high',
+            },
+            {
+              label: t('severity.medium'),
+              value: 'medium',
+            },
+            {
+              label: t('severity.low'),
+              value: 'low',
+            },
+          ],
+          selectedOptions: filters.values.severity,
+        },
+        {
+          query: 'risk_signal_scope',
+          label: t('filters.scope.label'),
+          kind: 'multi-select',
+          options: [
+            {
+              label: allT('signal-attributes.name'),
+              value: SignalAttribute.name,
+            },
+            {
+              label: allT('signal-attributes.email'),
+              value: SignalAttribute.email,
+            },
+            {
+              label: allT('signal-attributes.phone_number'),
+              value: SignalAttribute.phoneNumber,
+            },
+            {
+              label: allT('signal-attributes.dob'),
+              value: SignalAttribute.dob,
+            },
+            {
+              label: allT('signal-attributes.ssn'),
+              value: SignalAttribute.ssn,
+            },
+            {
+              label: allT('signal-attributes.document'),
+              value: SignalAttribute.document,
+            },
+            {
+              label: allT('signal-attributes.address'),
+              value: SignalAttribute.address,
+            },
+            {
+              label: allT('signal-attributes.street_address'),
+              value: SignalAttribute.streetAddress,
+            },
+            {
+              label: allT('signal-attributes.city'),
+              value: SignalAttribute.city,
+            },
+            {
+              label: allT('signal-attributes.state'),
+              value: SignalAttribute.state,
+            },
+            {
+              label: allT('signal-attributes.zip'),
+              value: SignalAttribute.zip,
+            },
+            {
+              label: allT('signal-attributes.ip_address'),
+              value: SignalAttribute.ipAddress,
+            },
+          ],
+          selectedOptions: filters.values.scope,
+        },
+      ]}
+      onChange={(queryKey, queryValue) => {
+        filters.push({ [queryKey]: queryValue });
+      }}
+      onClear={filters.clear}
+    />
   );
 };
 
-export default Filters;
+export default RiskSignalsFilters;

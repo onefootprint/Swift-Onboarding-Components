@@ -1,5 +1,6 @@
 import { UserDataAttribute } from '@onefootprint/types';
 import { useMemo } from 'react';
+import { queryToArray } from 'src/hooks/use-filters';
 
 import {
   SecurityLogsFilterValues,
@@ -11,11 +12,9 @@ const useFilterValues = (
 ): SecurityLogsFilterValues => {
   const filterValues = useMemo(() => {
     const search = query.search || '';
+    const dateRange = queryToArray(query.date_range);
+    let dataAttributes = queryToArray(query.data_attributes);
 
-    let dataAttributes = query.data_attributes || [];
-    if (typeof dataAttributes === 'string') {
-      dataAttributes = [dataAttributes];
-    }
     if (dataAttributes.includes('name')) {
       dataAttributes = [
         ...dataAttributes,
@@ -27,10 +26,6 @@ const useFilterValues = (
       dataAttributes = [...dataAttributes, UserDataAttribute.ssn4];
     }
 
-    let dateRange = query.date_range || [];
-    if (typeof dateRange === 'string') {
-      dateRange = [dateRange];
-    }
     return {
       dataAttributes,
       search,

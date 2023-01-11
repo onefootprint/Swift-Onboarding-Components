@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useId, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Box from '../../../box';
 import type { FilterControl, FilterSelectedOption } from '../../filters.types';
@@ -23,6 +23,7 @@ export type ControlProps = {
 };
 
 const Control = ({ control, onChange }: ControlProps) => {
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const popoverId = useId();
   const dateOptions = useDateOptions();
@@ -82,7 +83,10 @@ const Control = ({ control, onChange }: ControlProps) => {
         <div
           {...attributes.popper}
           ref={setPopperElement}
-          style={styles.popper}
+          style={{
+            ...styles.popper,
+            zIndex: theme.zIndex.dialog,
+          }}
         >
           <Popover id={popoverId} onClose={close} title={control.label}>
             {kind === 'multi-select' && (
