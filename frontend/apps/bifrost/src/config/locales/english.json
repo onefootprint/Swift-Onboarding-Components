@@ -133,7 +133,8 @@
         "address-partial": "Country & Zip Code",
         "id-card": "ID Card",
         "passport": "Passport",
-        "driversLicense": "Driver's License"
+        "driversLicense": "Driver's License",
+        "selfie": "Selfie"
       }
     },
     "config-invalid": {

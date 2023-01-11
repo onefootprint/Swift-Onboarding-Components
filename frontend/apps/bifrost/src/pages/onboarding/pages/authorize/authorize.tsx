@@ -14,6 +14,7 @@ import {
   IcoIdCard24,
   IcoPassport24,
   IcoPhone24,
+  IcoSelfie24,
   IcoUserCircle24,
 } from '@onefootprint/icons';
 import { CollectedKycDataOption, IdDocType } from '@onefootprint/types';
@@ -53,15 +54,15 @@ const Authorize = () => {
   const toast = useToast();
   const { t } = useTranslation('pages.authorize');
   const [state, send] = useOnboardingMachine();
-  const [collectedDocs, setCollectedDocs] = useState<IdDocType[]>();
+  const [collectedIdDocTypes, setCollectedIdDocTypes] = useState<IdDocType[]>();
   const {
     authToken,
-    config: { canAccessData, name: tenantName },
+    config: { canAccessData, name: tenantName, canAccessSelfieImage },
   } = state.context;
 
   const statusQuery = useGetOnboardingStatus(authToken, {
     onSuccess: ({ fieldsToAuthorize }) => {
-      setCollectedDocs(fieldsToAuthorize?.identityDocumentTypes ?? []);
+      setCollectedIdDocTypes(fieldsToAuthorize?.identityDocumentTypes ?? []);
     },
   });
 
@@ -96,7 +97,6 @@ const Authorize = () => {
     );
   };
 
-  const requiredCategories = canAccessData;
   const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
     [CollectedKycDataOption.name]: t('data-labels.name'),
     [CollectedKycDataOption.email]: t('data-labels.email'),
@@ -122,7 +122,7 @@ const Authorize = () => {
           subtitle={t('subtitle', { tenantName })}
         />
         <CategoriesContainer>
-          {requiredCategories.map((kycDataOpt: CollectedKycDataOption) => (
+          {canAccessData.map((kycDataOpt: CollectedKycDataOption) => (
             <Category key={kycDataOpt}>
               <IconContainer>
                 {IconByCollectedKycDataOption[kycDataOpt]}
@@ -132,7 +132,7 @@ const Authorize = () => {
               </Typography>
             </Category>
           ))}
-          {collectedDocs?.map((collectedDoc: IdDocType) => (
+          {collectedIdDocTypes?.map((collectedDoc: IdDocType) => (
             <Category key={collectedDoc}>
               <IconContainer>{IconByIdDocType[collectedDoc]}</IconContainer>
               <Typography variant="label-3">
@@ -140,6 +140,16 @@ const Authorize = () => {
               </Typography>
             </Category>
           ))}
+          {canAccessSelfieImage && (
+            <Category key="selfie">
+              <IconContainer>
+                <IcoSelfie24 />
+              </IconContainer>
+              <Typography variant="label-3">
+                {t('data-labels.selfie')}
+              </Typography>
+            </Category>
+          )}
         </CategoriesContainer>
         <FootprintButton
           fullWidth
