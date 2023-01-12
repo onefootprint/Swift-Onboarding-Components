@@ -89,12 +89,15 @@ impl UserVaultWrapper {
 impl UserVaultWrapper {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
-    pub fn ensure_scope_allows_access(
+    pub fn ensure_scope_allows_access<T>(
         &self,
         conn: &mut PgConnection,
         scoped_user: &ScopedUser,
-        fields: Vec<DataIdentifier>,
-    ) -> ApiResult<()> {
+        fields: Vec<T>,
+    ) -> ApiResult<()>
+    where
+        T: Into<DataIdentifier>,
+    {
         // tenants can do what they wish with NON-portable vaults they own
         if !self.user_vault.is_portable {
             return Ok(());
@@ -102,7 +105,7 @@ impl UserVaultWrapper {
 
         let ob_configs = ObConfiguration::list_authorized_for_user(conn, scoped_user.id.clone())?;
         let can_access: HashSet<_> = ob_configs.into_iter().flat_map(|x| x.can_access()).collect();
-        if !fields.iter().all(|x| can_access.contains(x)) {
+        if !fields.into_iter().all(|x| can_access.contains(&x.into())) {
             return Err(crate::auth::AuthError::ObConfigMissingDecryptPermission.into());
         }
 

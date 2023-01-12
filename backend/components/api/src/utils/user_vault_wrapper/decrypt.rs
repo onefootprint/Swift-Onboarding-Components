@@ -7,6 +7,7 @@ use newtypes::{DataIdentifier, PiiString, SealedVaultBytes, SealedVaultDataKey, 
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
 use std::convert::Into;
+use std::hash::Hash;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 pub struct DecryptRequest {
@@ -28,21 +29,20 @@ impl UserVaultWrapper {
         Ok(decrypted_results)
     }
 
-    pub async fn decrypt(
-        &self,
-        state: &State,
-        ids: &[DataIdentifier],
-    ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
+    pub async fn decrypt<T>(&self, state: &State, ids: &[T]) -> ApiResult<HashMap<T, PiiString>>
+    where
+        T: Into<DataIdentifier> + Clone + Hash + Eq,
+    {
         let (ids, e_datas): (Vec<_>, Vec<_>) = ids
             .iter()
             .filter_map(|di| {
-                match di.clone() {
+                match Into::<DataIdentifier>::into(di.clone()) {
                     DataIdentifier::Custom(k) => self.kv_data().get(&k).map(|kvd| &kvd.e_data),
                     DataIdentifier::Identity(idk) => self.get_identity_e_field(idk),
                     // Decrypt key here
                     DataIdentifier::IdentityDocument => todo!(),
                 }
-                .map(|e_data| (di, e_data))
+                .map(|e_data| (di.clone(), e_data))
             })
             .unzip();
 
@@ -50,7 +50,7 @@ impl UserVaultWrapper {
             .enclave_client
             .decrypt_bytes_batch(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
             .await?;
-        let results: HashMap<_, _> = ids.into_iter().cloned().zip(decrypted_results).collect();
+        let results: HashMap<_, _> = ids.into_iter().zip(decrypted_results).collect();
         // TODO create access event, sometimes
         Ok(results)
     }

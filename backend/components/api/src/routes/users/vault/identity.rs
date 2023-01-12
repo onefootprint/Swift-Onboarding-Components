@@ -147,7 +147,7 @@ pub(super) async fn get_internal(
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
-    let fields: Vec<_> = request.into_inner().fields.0.into_iter().collect();
+    let fields = request.into_inner().fields.0;
 
     let fields_clone = fields.clone();
     let uvw = state
@@ -156,8 +156,7 @@ pub(super) async fn get_internal(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
-            let fields = fields_clone.into_iter().map(DataIdentifier::Identity).collect();
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
+            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 
             Ok(uvw)
         })
@@ -212,8 +211,7 @@ pub(super) async fn post_decrypt_internal(
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
     let request = request.into_inner();
-    let idks: Vec<_> = request.fields.into_iter().collect();
-    let fields: Vec<_> = idks.iter().cloned().map(DataIdentifier::Identity).collect();
+    let fields: Vec<_> = request.fields.into_iter().collect();
     let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
     let footprint_user_id = path.into_inner();
@@ -234,6 +232,13 @@ pub(super) async fn post_decrypt_internal(
         .await??;
 
     let results = uvw.decrypt(&state, &fields).await?;
+    let results: HashMap<_, _> = fields
+        .iter()
+        .map(|idk| {
+            let value = results.get(idk).cloned();
+            (*idk, value)
+        })
+        .collect();
 
     // TODO do this in decrypt util
     NewAccessEvent {
@@ -242,18 +247,10 @@ pub(super) async fn post_decrypt_internal(
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
-        targets: fields.clone(),
+        targets: fields.into_iter().map(DataIdentifier::Identity).collect(),
     }
     .save(&state.db_pool)
     .await?;
-
-    let results: HashMap<_, _> = idks
-        .into_iter()
-        .map(|idk| {
-            let value = results.get(&DataIdentifier::Identity(idk)).cloned();
-            (idk, value)
-        })
-        .collect();
 
     ResponseData::ok(DecryptIdentityDataResponse::from(results)).json()
 }

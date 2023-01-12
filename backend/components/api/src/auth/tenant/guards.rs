@@ -83,12 +83,15 @@ impl IsGuardMet for Any {
 pub struct CanDecrypt(Vec<DataIdentifier>);
 
 impl CanDecrypt {
-    pub fn new(l: Vec<DataIdentifier>) -> Self {
-        Self(l)
+    pub fn new<T>(l: Vec<T>) -> Self
+    where
+        DataIdentifier: From<T>,
+    {
+        Self(l.into_iter().map(DataIdentifier::from).collect())
     }
 
-    pub fn single(k: DataIdentifier) -> Self {
-        Self(vec![k])
+    pub fn single<T: Into<DataIdentifier>>(k: T) -> Self {
+        Self(vec![k.into()])
     }
 }
 
@@ -138,12 +141,8 @@ where
 mod test {
     use super::{Any, CanDecrypt, TenantGuard as TG};
     use crate::auth::tenant::{IsGuardMet, TenantGuardDsl};
-    use newtypes::{CollectedDataOption as CDO, DataIdentifier, IdentityDataKind as IDK, TenantScope as TS};
+    use newtypes::{CollectedDataOption as CDO, IdentityDataKind as IDK, TenantScope as TS};
     use test_case::test_case;
-
-    fn di(kind: IDK) -> DataIdentifier {
-        DataIdentifier::from(kind)
-    }
 
     //
     // Basic TenantPermission enum
@@ -156,23 +155,23 @@ mod test {
     //
     // Test CanDecrypt
     //
-    #[test_case(&[TS::ApiKeys], CanDecrypt(vec![di(IDK::Ssn9)]) => false)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Name]), TS::Decrypt(vec![CDO::FullAddress]), TS::ApiKeys], CanDecrypt(vec![di(IDK::FirstName), di(IDK::City)]) => true)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![di(IDK::Ssn9)]) => true)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![di(IDK::Ssn4)]) => true)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt(vec![di(IDK::Ssn4), di(IDK::FirstName)]) => false)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Name])], CanDecrypt(vec![di(IDK::Ssn4)]) => false)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Name, CDO::FullAddress])], CanDecrypt(vec![di(IDK::FirstName), di(IDK::Zip)]) => true)]
-    #[test_case(&[TS::Decrypt(vec![CDO::Name, CDO::FullAddress])], CanDecrypt(vec![di(IDK::FirstName), di(IDK::Email)]) => false)]
-    #[test_case(&[TS::Decrypt(vec![])], CanDecrypt(vec![di(IDK::FirstName)]) => false)]
+    #[test_case(&[TS::ApiKeys], CanDecrypt::new(vec![IDK::Ssn9]) => false)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name]), TS::Decrypt(vec![CDO::FullAddress]), TS::ApiKeys], CanDecrypt::new(vec![IDK::FirstName, IDK::City]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![IDK::Ssn9]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![IDK::Ssn4]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![IDK::Ssn4, IDK::FirstName]) => false)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name])], CanDecrypt::new(vec![IDK::Ssn4]) => false)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name, CDO::FullAddress])], CanDecrypt::new(vec![IDK::FirstName, IDK::Zip]) => true)]
+    #[test_case(&[TS::Decrypt(vec![CDO::Name, CDO::FullAddress])], CanDecrypt::new(vec![IDK::FirstName, IDK::Email]) => false)]
+    #[test_case(&[TS::Decrypt(vec![])], CanDecrypt::new(vec![IDK::FirstName]) => false)]
     //
     // Test Or
     //
     #[test_case(&[TS::OnboardingConfiguration], TG::OnboardingConfiguration.or(TG::Admin) => true)]
     #[test_case(&[TS::OnboardingConfiguration], TG::Admin.or(TG::OnboardingConfiguration) => true)]
     #[test_case(&[TS::Admin], TG::OnboardingConfiguration.or_admin() => true)]
-    #[test_case(&[TS::Admin], CanDecrypt(vec![di(IDK::Ssn9), di(IDK::FirstName), di(IDK::Email)]).or_admin() => true)]
-    #[test_case(&[TS::Read], CanDecrypt(vec![di(IDK::Ssn9), di(IDK::FirstName), di(IDK::Email)]).or_admin() => false)]
+    #[test_case(&[TS::Admin], CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName, IDK::Email]).or_admin() => true)]
+    #[test_case(&[TS::Read], CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName, IDK::Email]).or_admin() => false)]
     #[test_case(&[TS::Read], TG::ApiKeys.or(TG::Read) => true)]
     #[test_case(&[TS::OnboardingConfiguration], TG::ApiKeys.or_admin() => false)]
     #[test_case(&[TS::OnboardingConfiguration], TG::ApiKeys.or(TG::ApiKeys).or(TG::OrgSettings) => false)]
@@ -192,7 +191,7 @@ mod test {
     }
 
     #[test_case(TG::ApiKeys.or_admin() => "Or<ApiKeys,Admin>")]
-    #[test_case(CanDecrypt(vec![di(IDK::Ssn9), di(IDK::FirstName)]).or(TG::ApiKeys) => "Or<CanDecrypt<[Identity(Ssn9), Identity(FirstName)]>,ApiKeys>")]
+    #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<[Identity(Ssn9), Identity(FirstName)]>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
     fn test_display<T: IsGuardMet>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met
