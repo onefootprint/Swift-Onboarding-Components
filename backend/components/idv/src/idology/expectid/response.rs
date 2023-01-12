@@ -34,11 +34,18 @@ type CreateManualReview = bool;
 
 impl ExpectIDResponse {
     /// IDology-determined status for verifying the customer
-    pub fn status(&self) -> (DecisionStatus, CreateManualReview) {
+    pub fn summary_status(&self) -> (DecisionStatus, CreateManualReview) {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
             Some("id.success") => (DecisionStatus::Pass, false),
             Some("id.failure") => (DecisionStatus::Fail, false),
             _ => (DecisionStatus::Fail, true),
+        }
+    }
+
+    pub fn status(&self) -> (DecisionStatus, CreateManualReview) {
+        match self.id_located() {
+            true => (DecisionStatus::Pass, false),
+            false => (DecisionStatus::Fail, false),
         }
     }
 
