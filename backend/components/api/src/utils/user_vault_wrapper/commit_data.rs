@@ -73,10 +73,7 @@ impl UvwCommitData for LockedUserVaultWrapper {
     /// the portability story for those types of data
     fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
         let uvw = self.into_inner();
-        let scoped_user_id = uvw
-            .scoped_user_id
-            .as_ref()
-            .ok_or(UserError::NotAllowedWithoutTenant)?;
+        let scoped_user_id = uvw.scoped_user_id_or_else(|| UserError::NotAllowedWithoutTenant)?;
 
         // Use the same seqno to deactivate old data and commit new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -153,7 +150,7 @@ impl UvwCommitData for LockedUserVaultWrapper {
                 .map(|l| l.id.clone())
                 .collect()
         };
-        DataLifetime::bulk_commit_for_tenant(conn, lifetime_ids_to_commit, scoped_user_id.clone(), seqno)?;
+        DataLifetime::bulk_commit_for_tenant(conn, lifetime_ids_to_commit, scoped_user_id, seqno)?;
 
         Ok(seqno)
     }

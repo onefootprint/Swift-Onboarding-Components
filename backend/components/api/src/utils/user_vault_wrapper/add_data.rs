@@ -79,10 +79,7 @@ impl UvwAddData for LockedUserVaultWrapper {
             // We don't currently support adding a secondary email
             return Err(UserError::InvalidDataUpdate.into());
         }
-        let scoped_user_id = uvw
-            .scoped_user_id
-            .clone()
-            .ok_or(UserError::NotAllowedWithoutTenant)?;
+        let scoped_user_id = uvw.scoped_user_id_or_else(|| UserError::NotAllowedWithoutTenant)?;
 
         uvw.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
 

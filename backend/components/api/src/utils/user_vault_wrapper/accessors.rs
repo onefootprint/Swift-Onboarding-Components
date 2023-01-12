@@ -151,4 +151,12 @@ impl UserVaultWrapper {
     pub fn scoped_user_id(&self) -> Option<&ScopedUserId> {
         self.scoped_user_id.as_ref()
     }
+
+    /// Shorthand to convert the Option self.scoped_user_id into a Result
+    pub fn scoped_user_id_or_else<F, E>(&self, f: F) -> Result<ScopedUserId, E>
+    where
+        F: FnOnce() -> E,
+    {
+        self.scoped_user_id.clone().ok_or_else(f)
+    }
 }

@@ -103,10 +103,8 @@ impl UserVaultWrapper {
                 })
             })
             .collect::<ApiResult<_>>()?;
-        let scoped_user_id = self
-            .scoped_user_id
-            .clone()
-            .ok_or_else(|| ApiError::AssertionError("Expected scoped_user_id".to_owned()))?;
+        let scoped_user_id =
+            self.scoped_user_id_or_else(|| ApiError::AssertionError("Expected scoped_user_id".to_owned()))?;
         req.create_access_event(state, scoped_user_id, vec![DataIdentifier::IdentityDocument])
             .await?;
         Ok(res)
