@@ -1,25 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { ReviewStatus } from '@onefootprint/types';
-import {
-  Divider,
-  Select,
-  SelectOption,
-  TextArea,
-  Toggle,
-  Typography,
-} from '@onefootprint/ui';
+import { Divider, TextArea, Toggle, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 export type ManualReviewFormData = {
-  reason: string;
   note: string;
   isPinned: boolean;
 };
 
 type FormData = {
-  reason: SelectOption;
   note: string;
   isPinned: boolean;
 };
@@ -31,13 +22,17 @@ type ManualReviewFormProps = {
 
 const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
   const { t } = useTranslation('pages.user-details.manual-review');
-  const { register, handleSubmit, control } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: { note: '', isPinned: false },
   });
   const handleBeforeSubmit = (data: FormData) => {
     onSubmit({
       ...data,
-      reason: data.reason.value,
     });
   };
 
@@ -49,39 +44,12 @@ const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
       <Typography variant="label-2">
         {t('dialog.form.prompt', { status: t(`status.${status}`) })}
       </Typography>
-      <Controller
-        control={control}
-        name="reason"
-        rules={{ required: true }}
-        render={({ field, fieldState }) => (
-          <Select
-            label={t('dialog.form.reason.label')}
-            hasError={!!fieldState.error}
-            hint={fieldState.error && t('dialog.form.reason.errors.required')}
-            onBlur={field.onBlur}
-            onChange={field.onChange}
-            options={[
-              {
-                value: t('dialog.form.reason.options.identity-theft'),
-                label: t('dialog.form.reason.options.identity-theft'),
-              },
-              {
-                value: t(
-                  'dialog.form.reason.options.could-not-verify-identity',
-                ),
-                label: t(
-                  'dialog.form.reason.options.could-not-verify-identity',
-                ),
-              },
-            ]}
-            value={field.value}
-          />
-        )}
-      />
       <TextArea
         label={t('dialog.form.note.label')}
         placeholder={t('dialog.form.note.placeholder')}
-        {...register('note')}
+        hasError={!!errors.note}
+        hint={errors.note && t('dialog.form.note.errors.required')}
+        {...register('note', { required: true })}
       />
       <Controller
         control={control}

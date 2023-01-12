@@ -4,37 +4,23 @@ import React from 'react';
 import PinnedNote, { PinnedNoteProps } from './pinned-note';
 
 describe('<PinnedNote />', () => {
-  const renderPinnedNote = ({ reason, author, note }: PinnedNoteProps) =>
-    customRender(<PinnedNote reason={reason} author={author} note={note} />);
-
-  it('renders title correctly', () => {
-    renderPinnedNote({ reason: 'Some reason' });
-    expect(screen.getByText('Pinned note')).toBeInTheDocument();
-    expect(screen.getByText('Some reason')).toBeInTheDocument();
-  });
-
-  it('renders reason correctly', () => {
-    renderPinnedNote({ reason: 'Some reason' });
-    expect(screen.getByText('Some reason')).toBeInTheDocument();
-  });
+  const renderPinnedNote = ({ author, note }: PinnedNoteProps) =>
+    customRender(<PinnedNote author={author} note={note} />);
 
   it('renders note correctly', () => {
-    renderPinnedNote({ reason: 'Some reason', note: 'Some note' });
-    const reasonWithNote = screen.getByText('Some reason', { exact: false });
-    expect(reasonWithNote).toBeInTheDocument();
-
+    renderPinnedNote({ note: 'Some note' });
     const note = screen.getByText('Some note');
-    expect(note).toHaveTextContent('Some note');
+    expect(note).toBeInTheDocument();
   });
 
   it('renders author correctly', () => {
     renderPinnedNote({
-      reason: 'Some reason',
+      note: 'Some note',
       author: 'belce@onefootprint.com',
     });
     expect(
       screen.getByText('Pinned note from belce@onefootprint.com'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Some reason')).toBeInTheDocument();
+    expect(screen.getByText('Some note')).toBeInTheDocument();
   });
 });

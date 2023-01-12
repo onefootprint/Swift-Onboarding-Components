@@ -382,20 +382,12 @@
           "cancel": "Cancel",
           "form": {
             "prompt": "Why are you marking this user as {{status}}?",
-            "reason": {
-              "label": "Reason",
-              "placeholder": "Select one...",
-              "options": {
-                "identity-theft": "Identity theft",
-                "could-not-verify-identity": "Could not verify identity"
-              },
-              "errors": {
-                "required": "A reason is needed"
-              }
-            },
             "note": {
-              "label": "Note (Optional)",
-              "placeholder": "Type here..."
+              "label": "Note",
+              "placeholder": "Type here...",
+              "errors": {
+                "required": "A note is required"
+              }
             },
             "toggle": {
               "label": "Pin note to the top of the page"
@@ -527,7 +519,6 @@
                 "decision": "Decision",
                 "reviewer": "Reviewer",
                 "date": "Date",
-                "reason": "Reason",
                 "note": "Note",
                 "pin-note": "Pin note to the top of the page"
               }

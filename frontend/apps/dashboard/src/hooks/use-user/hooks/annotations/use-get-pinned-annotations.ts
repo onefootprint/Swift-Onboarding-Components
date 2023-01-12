@@ -9,7 +9,6 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 import useUserStore from 'src/hooks/use-user-store';
-import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 
 const getPinnedAnnotations = async (
   { authHeaders, userId }: GetPinnedAnnotationsRequest,
@@ -24,15 +23,10 @@ const getPinnedAnnotations = async (
     },
   });
 
-  return response.data.map((annotation: DecisionAnnotation) => {
-    const { reason, note } = parseAnnotationNote(annotation.note);
-    return {
-      ...annotation,
-      reason,
-      note,
-      timestamp: dateFormatFn(new Date(annotation.timestamp)),
-    };
-  });
+  return response.data.map((annotation: DecisionAnnotation) => ({
+    ...annotation,
+    timestamp: dateFormatFn(new Date(annotation.timestamp)),
+  }));
 };
 
 const useGetPinnedAnnotations = (userId: string) => {

@@ -2,7 +2,6 @@ import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
-import { stringifyAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 
 import useUserId from '../../../../../../../../hooks/use-user-id/use-user-id';
 import ManualReviewForm, {
@@ -27,14 +26,14 @@ const ManualReviewDialog = ({
   const footprintUserId = useUserId();
 
   const handleSubmit = (data: ManualReviewFormData) => {
-    const { reason, isPinned, note } = data;
+    const { isPinned, note } = data;
     submitReviewMutation.mutate(
       {
         footprintUserId,
         status,
         annotation: {
           isPinned,
-          note: stringifyAnnotationNote({ reason, note }),
+          note,
         },
       },
       {

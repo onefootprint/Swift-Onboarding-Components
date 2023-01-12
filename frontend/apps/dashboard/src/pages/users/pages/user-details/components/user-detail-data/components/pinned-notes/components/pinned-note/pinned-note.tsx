@@ -5,15 +5,14 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 export type PinnedNoteProps = {
-  reason: string;
-  note?: string;
+  note: string;
   author?: string;
 };
 
-const PinnedNote = ({ reason, note, author }: PinnedNoteProps) => {
+const PinnedNote = ({ note, author }: PinnedNoteProps) => {
   const { t } = useTranslation('pages.user-details.pinned-notes');
 
-  return reason.length > 0 ? (
+  return note.length > 0 ? (
     <Container>
       <TitleContainer>
         <IcoPin24 />
@@ -22,12 +21,8 @@ const PinnedNote = ({ reason, note, author }: PinnedNoteProps) => {
           {author && t('title-by-author', { author })}
         </Typography>
       </TitleContainer>
-      <Typography variant="label-3" color="secondary" as="span">
-        {reason}
-        {note && ': '}
-        <Typography variant="body-3" color="secondary" as="span">
-          {note}
-        </Typography>
+      <Typography variant="body-3" color="secondary">
+        {note}
       </Typography>
     </Container>
   ) : null;

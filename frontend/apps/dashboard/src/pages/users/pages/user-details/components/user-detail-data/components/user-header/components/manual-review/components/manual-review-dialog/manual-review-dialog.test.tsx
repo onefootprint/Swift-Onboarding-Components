@@ -64,14 +64,14 @@ describe('<ManualReviewDialog />', () => {
       ).toBeInTheDocument();
     });
 
-    it('should show error if no reason selected', async () => {
+    it('should show error if no note input', async () => {
       renderManualReviewDialog({ status: ReviewStatus.pass });
 
       const completeButton = screen.getByRole('button', { name: 'Complete' });
       await userEvent.click(completeButton);
 
       await waitFor(() => {
-        const errorMessage = screen.getByText('A reason is needed');
+        const errorMessage = screen.getByText('A note is required');
         expect(errorMessage).toBeInTheDocument();
       });
     });

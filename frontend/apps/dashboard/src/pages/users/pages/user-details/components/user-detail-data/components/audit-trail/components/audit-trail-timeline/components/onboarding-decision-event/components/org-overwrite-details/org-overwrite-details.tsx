@@ -7,7 +7,6 @@ import {
 import { Drawer, LinkButton, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useUser from 'src/hooks/use-user';
-import { parseAnnotationNote } from 'src/pages/users/pages/user-details/components/user-detail-data/utils/annotation-note-utils';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import styled, { css } from 'styled-components';
 
@@ -55,7 +54,6 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
   if (!annotation) {
     return null;
   }
-  const { reason, note } = parseAnnotationNote(annotation.note);
 
   return (
     <>
@@ -105,28 +103,18 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
               })}
             </Typography>
           </ItemContainer>
-          <ItemContainer>
-            <Typography variant="label-3" color="tertiary">
-              {t('org-overwrite.drawer.reason')}
-            </Typography>
-            <Typography variant="body-3">{reason ?? '-'}</Typography>
-          </ItemContainer>
         </GridContainer>
         <NoteContainer>
-          {note && (
-            <>
-              <Typography
-                variant="label-3"
-                color="tertiary"
-                sx={{ marginBottom: 2 }}
-              >
-                {t('org-overwrite.drawer.note')}
-              </Typography>
-              <Typography variant="body-3" sx={{ marginBottom: 6 }}>
-                {note}
-              </Typography>
-            </>
-          )}
+          <Typography
+            variant="label-3"
+            color="tertiary"
+            sx={{ marginBottom: 2 }}
+          >
+            {t('org-overwrite.drawer.note')}
+          </Typography>
+          <Typography variant="body-3" sx={{ marginBottom: 6 }}>
+            {annotation.note}
+          </Typography>
           <Toggle
             checked={isNotePinned}
             onChange={handlePinNoteChange}

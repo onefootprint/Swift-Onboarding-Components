@@ -14,9 +14,8 @@ const PinnedNotes = () => {
 
   return annotations?.entries ? (
     <Container>
-      {annotations?.entries.map(({ reason, note, id, source }) => (
+      {annotations?.entries.map(({ note, id, source }) => (
         <PinnedNote
-          reason={reason}
           note={note}
           key={id}
           author={
