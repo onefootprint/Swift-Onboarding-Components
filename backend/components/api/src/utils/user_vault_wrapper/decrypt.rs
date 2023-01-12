@@ -2,24 +2,28 @@ use super::UserVaultWrapper;
 use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
+use db::models::access_event::NewAccessEvent;
+use db::models::insight_event::CreateInsightEvent;
 use enclave_proxy::DataTransform;
-use newtypes::{DataIdentifier, PiiString, SealedVaultDataKey, ValidatedPhoneNumber};
-use paperclip::actix::Apiv2Schema;
+use newtypes::{
+    AccessEventKind, DataIdentifier, DbActor, PiiString, ScopedUserId, SealedVaultDataKey,
+    ValidatedPhoneNumber,
+};
 use std::collections::HashMap;
 use std::convert::Into;
 use std::hash::Hash;
-
-#[derive(Debug, Clone, Eq, PartialEq, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-pub struct DecryptRequest {
-    pub reason: String,
-}
 
 impl UserVaultWrapper {
     /// Util to decrypt a list of T where T represents a DataIdentifier. Returns a hashmap of T to
     /// the decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
     /// doesn't have any associated data on the UVW.
-    pub async fn decrypt<T>(&self, state: &State, ids: &[T]) -> ApiResult<HashMap<T, PiiString>>
+    pub async fn decrypt<T>(
+        &self,
+        state: &State,
+        ids: &[T],
+        req: Option<DecryptRequest>,
+    ) -> ApiResult<HashMap<T, PiiString>>
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
     {
@@ -40,8 +44,16 @@ impl UserVaultWrapper {
             .enclave_client
             .batch_decrypt_to_piistring(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
             .await?;
+        let targets = ids.clone().into_iter().map(|id| id.into()).collect();
         let results: HashMap<_, _> = ids.into_iter().zip(decrypted_results).collect();
-        // TODO create access event, sometimes
+
+        if let Some(req) = req {
+            // If the UVW was created from a tenant's perspective, create an access event for the decrypt
+            let scoped_user_id = self.scoped_user_id.clone().ok_or_else(|| {
+                ApiError::AssertionError("Don't need reason for non-tenant decrypt".to_owned())
+            })?;
+            req.create_access_event(state, scoped_user_id, targets).await?;
+        }
         Ok(results)
     }
 
@@ -79,5 +91,36 @@ impl UserVaultWrapper {
 
         let validated_phone_number = ValidatedPhoneNumber::__build_from_vault(e164, country)?;
         Ok(validated_phone_number)
+    }
+}
+
+pub struct DecryptRequest {
+    pub reason: String,
+    pub principal: DbActor,
+    pub insight: CreateInsightEvent,
+}
+
+impl DecryptRequest {
+    pub(super) async fn create_access_event(
+        self,
+        state: &State,
+        scoped_user_id: ScopedUserId,
+        targets: Vec<DataIdentifier>,
+    ) -> ApiResult<()> {
+        let DecryptRequest {
+            reason,
+            principal,
+            insight,
+        } = self;
+        let event = NewAccessEvent {
+            scoped_user_id,
+            reason: Some(reason),
+            principal,
+            insight,
+            kind: AccessEventKind::Decrypt,
+            targets,
+        };
+        state.db_pool.db_query(|conn| event.create(conn)).await??;
+        Ok(())
     }
 }

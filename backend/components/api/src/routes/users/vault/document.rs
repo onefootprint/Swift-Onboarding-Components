@@ -9,17 +9,16 @@ use crate::errors::ApiError;
 use crate::types::{JsonApiResponse, ResponseData};
 
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
+use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper, UvwArgs};
 use crate::State;
 
 use api_wire_types::{
     DecryptIdentityDocumentRequest, DecryptIdentityDocumentResponse, GetIdentityDocumentForDecryptResponse,
     GetQueryParam, ImageData,
 };
-use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
-use newtypes::{AccessEventKind, DataIdentifier, FootprintUserId};
+use newtypes::{DataIdentifier, FootprintUserId};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path, web::Query};
 
@@ -117,15 +116,17 @@ pub(super) async fn post_internal(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
-    let request = request.into_inner();
-    let document_type = request.document_type;
+    let DecryptIdentityDocumentRequest {
+        document_type,
+        reason,
+    } = request.into_inner();
     let auth = auth.check_guard(CanDecrypt::single(DataIdentifier::IdentityDocument))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let (uvw, scoped_user) = state
+    let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
@@ -135,23 +136,18 @@ pub(super) async fn post_internal(
             let fields = vec![DataIdentifier::IdentityDocument];
             uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
-            Ok((uvw, scoped_user))
+            Ok(uvw)
         })
         .await??;
 
-    // As of 2022-11-28: It's possible a user has more than 1 document of a given document_type
-    let decrypted_docs = uvw.decrypt_document(&state, document_type.clone()).await?;
-
-    NewAccessEvent {
-        scoped_user_id: scoped_user.id.clone(),
-        reason: Some(request.reason),
+    let req = DecryptRequest {
+        reason,
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
-        kind: AccessEventKind::Decrypt,
-        targets: vec![DataIdentifier::IdentityDocument],
-    }
-    .save(&state.db_pool)
-    .await?;
+    };
+    // As of 2022-11-28: It's possible a user has more than 1 document of a given document_type
+    let decrypted_docs = uvw.decrypt_document(&state, document_type.clone(), req).await?;
+
     let images = decrypted_docs
         .into_iter()
         .map(|doc| ImageData {

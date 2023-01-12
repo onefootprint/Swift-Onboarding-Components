@@ -1,10 +1,10 @@
-use super::UserVaultWrapper;
+use super::{DecryptRequest, UserVaultWrapper};
 use crate::errors::{ApiError, ApiResult};
 use crate::s3::S3Error;
 use crate::State;
 use crypto::aead::AeadSealedBytes;
 use db::models::identity_document::IdentityDocument;
-use newtypes::{IdentityDocumentId, PiiBytes, SealedVaultBytes, SealedVaultDataKey};
+use newtypes::{DataIdentifier, IdentityDocumentId, PiiBytes, SealedVaultBytes, SealedVaultDataKey};
 
 pub struct IdentityDocumentImages {
     pub identity_document_id: IdentityDocumentId,
@@ -78,6 +78,7 @@ impl UserVaultWrapper {
         &self,
         state: &State,
         document_type: String,
+        req: DecryptRequest,
     ) -> ApiResult<Vec<DecryptDocumentResult>> {
         let images = self.get_encrypted_images_from_s3(state, document_type).await?;
 
@@ -102,6 +103,12 @@ impl UserVaultWrapper {
                 })
             })
             .collect::<ApiResult<_>>()?;
+        let scoped_user_id = self
+            .scoped_user_id
+            .clone()
+            .ok_or_else(|| ApiError::AssertionError("Expected scoped_user_id".to_owned()))?;
+        req.create_access_event(state, scoped_user_id, vec![DataIdentifier::IdentityDocument])
+            .await?;
         Ok(res)
     }
 }

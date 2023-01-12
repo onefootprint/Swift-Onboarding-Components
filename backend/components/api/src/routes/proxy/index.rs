@@ -11,21 +11,21 @@ use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 
+use crate::errors::tenant::TenantError;
 use crate::routes::proxy::token_parser::ProxyTokenParser;
 use crate::utils::headers::get_header;
 use crate::utils::headers::get_required_header;
 use crate::utils::headers::InsightHeaders;
+use crate::utils::user_vault_wrapper::DecryptRequest;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use crate::State;
 use actix_web::http::header::HeaderMap;
 
-use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
 
 use itertools::Itertools;
-use newtypes::AccessEventKind;
 
 use newtypes::PiiString;
 
@@ -87,7 +87,9 @@ pub async fn post(
     let parser = ProxyTokenParser::parse(body)?;
 
     // get decrypt reason
-    let proxy_access_reason = get_header(PROXY_ACCESS_REASON, request.headers());
+    let proxy_access_reason = get_header(PROXY_ACCESS_REASON, request.headers()).ok_or_else(|| {
+        TenantError::ValidationError("Decryption reason required to make proxy request".to_owned())
+    })?;
 
     let detokens = detokenize(
         &state,
@@ -169,7 +171,7 @@ async fn detokenize(
     state: &State,
     auth: Box<dyn TenantAuth>,
     tokens: Vec<ProxyToken>,
-    reason: Option<String>,
+    reason: String,
     insight: InsightHeaders,
 ) -> ApiResult<HashMap<ProxyToken, PiiString>> {
     let mut out = HashMap::new();
@@ -198,8 +200,13 @@ async fn detokenize(
             })
             .await??;
 
+        let req = DecryptRequest {
+            reason: reason.clone(),
+            principal: auth.actor().into(),
+            insight: CreateInsightEvent::from(insight.clone()),
+        };
         let results = uvw
-            .decrypt(state, &targets)
+            .decrypt(state, &targets, Some(req))
             .await?
             .into_iter()
             .map(|(identifier, v)| {
@@ -210,19 +217,6 @@ async fn detokenize(
                 (token, v)
             });
         out.extend(results);
-
-        // record the access event
-        // TODO do this in decrypt util
-        NewAccessEvent {
-            scoped_user_id: scoped_user.id.clone(),
-            reason: reason.clone(),
-            principal: auth.actor().into(),
-            insight: CreateInsightEvent::from(insight.clone()),
-            kind: AccessEventKind::Decrypt,
-            targets,
-        }
-        .save(&state.db_pool)
-        .await?;
     }
 
     Ok(out)

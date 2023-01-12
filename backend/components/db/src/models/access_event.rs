@@ -1,7 +1,6 @@
 use crate::schema::access_event;
-use crate::DbPool;
 use chrono::{DateTime, Utc};
-use diesel::{Connection, Insertable, PgConnection, Queryable, RunQueryDsl};
+use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
 use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedUserId};
 use serde::{Deserialize, Serialize};
 
@@ -45,12 +44,6 @@ struct NewAccessEventWithInsight {
 }
 
 impl NewAccessEvent {
-    pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
-        pool.db_query(move |conn| conn.transaction(|conn| self.create(conn)))
-            .await??;
-        Ok(())
-    }
-
     pub fn create(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
         let insight_ev = self.insight.insert_with_conn(conn)?;
         let event = NewAccessEventWithInsight {

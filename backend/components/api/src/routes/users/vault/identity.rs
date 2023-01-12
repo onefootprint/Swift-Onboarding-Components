@@ -10,7 +10,7 @@ use crate::auth::{
 use crate::errors::ApiResult;
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
-use crate::utils::user_vault_wrapper::{UvwAddData, UvwArgs};
+use crate::utils::user_vault_wrapper::{DecryptRequest, UvwAddData, UvwArgs};
 
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
@@ -210,8 +210,8 @@ pub(super) async fn post_decrypt_internal(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
-    let request = request.into_inner();
-    let fields: Vec<_> = request.fields.into_iter().collect();
+    let DecryptIdentityFieldsRequest { reason, fields } = request.into_inner();
+    let fields: Vec<_> = fields.into_iter().collect();
     let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
     let footprint_user_id = path.into_inner();
@@ -219,7 +219,7 @@ pub(super) async fn post_decrypt_internal(
     let is_live = auth.is_live()?;
 
     let fields_clone = fields.clone();
-    let (uvw, scoped_user) = state
+    let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
@@ -227,11 +227,16 @@ pub(super) async fn post_decrypt_internal(
 
             uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 
-            Ok((uvw, scoped_user))
+            Ok(uvw)
         })
         .await??;
 
-    let results = uvw.decrypt(&state, &fields).await?;
+    let req = DecryptRequest {
+        reason,
+        principal: auth.actor().into(),
+        insight: CreateInsightEvent::from(insights),
+    };
+    let results = uvw.decrypt(&state, &fields, Some(req)).await?;
     let results: HashMap<_, _> = fields
         .iter()
         .map(|idk| {
@@ -239,18 +244,6 @@ pub(super) async fn post_decrypt_internal(
             (*idk, value)
         })
         .collect();
-
-    // TODO do this in decrypt util
-    NewAccessEvent {
-        scoped_user_id: scoped_user.id.clone(),
-        reason: Some(request.reason),
-        principal: auth.actor().into(),
-        insight: CreateInsightEvent::from(insights),
-        kind: AccessEventKind::Decrypt,
-        targets: fields.into_iter().map(DataIdentifier::Identity).collect(),
-    }
-    .save(&state.db_pool)
-    .await?;
 
     ResponseData::ok(DecryptIdentityDataResponse::from(results)).json()
 }

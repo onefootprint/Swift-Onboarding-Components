@@ -9,7 +9,7 @@ use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::{LockedUserVaultWrapper, UserVaultWrapper};
+use crate::utils::user_vault_wrapper::{DecryptRequest, LockedUserVaultWrapper, UserVaultWrapper};
 use crate::utils::user_vault_wrapper::{UvwAddData, UvwArgs};
 use crate::{errors::ApiError, State};
 use db::models::access_event::NewAccessEvent;
@@ -183,29 +183,21 @@ pub(super) async fn post_decrypt_internal(
     let tenant_id = tenant_auth.tenant().id.clone();
     let DecryptCustomFieldsRequest { fields, reason } = request.into_inner();
 
-    let (uvw, scoped_user) = state
+    let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
-            Ok((uvw, scoped_user))
+            Ok(uvw)
         })
         .await??;
 
-    let results = uvw.decrypt(&state, &fields).await?;
-
-    // Create an AccessEvent log showing that the tenant accessed these fields
-    // TODO do this in the decrypt util
-    NewAccessEvent {
-        scoped_user_id: scoped_user.id.clone(),
-        reason: Some(reason),
+    let req = DecryptRequest {
+        reason,
         principal: tenant_auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
-        kind: AccessEventKind::Decrypt,
-        targets: fields.into_iter().map(DataIdentifier::Custom).collect(),
-    }
-    .save(&state.db_pool)
-    .await?;
+    };
+    let results = uvw.decrypt(&state, &fields, Some(req)).await?;
 
     ResponseData::ok(DecryptCustomDataResponse::from(results)).json()
 }
