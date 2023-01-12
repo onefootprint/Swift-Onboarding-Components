@@ -27,7 +27,7 @@ const useRequestParams = ({
     if (dataAttributes.length) {
       // We don't want to send "name"
       const filteredDataAttrs = dataAttributes.filter(attr => attr !== 'name');
-      params.targets = filteredDataAttrs.map(kind => `identity.${kind}`).join();
+      params.targets = filteredDataAttrs.map(kind => `id.${kind}`).join();
     }
     return params;
   }, [dateRange, search, dataAttributes]);

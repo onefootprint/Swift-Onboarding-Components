@@ -22,9 +22,9 @@ impl UserVaultWrapper {
         HashMap::from_iter(ids.iter().filter_map(|di| {
             match Into::<DataIdentifier>::into(di.clone()) {
                 DataIdentifier::Custom(k) => self.kv_data().get(&k).map(|kvd| &kvd.e_data),
-                DataIdentifier::Identity(idk) => self.get_identity_e_field(idk),
+                DataIdentifier::Id(idk) => self.get_identity_e_field(idk),
                 // Decrypt key here
-                DataIdentifier::IdentityDocument => todo!(),
+                DataIdentifier::IdDocument => todo!(),
             }
             .map(|e_data| (di.clone(), e_data))
         }))

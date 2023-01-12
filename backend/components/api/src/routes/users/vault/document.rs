@@ -55,7 +55,7 @@ pub(super) async fn get_internal(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let user_vault_wrapper = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
             // Important to check requester has access
-            let fields = vec![DataIdentifier::IdentityDocument];
+            let fields = vec![DataIdentifier::IdDocument];
             user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok(user_vault_wrapper)
@@ -120,7 +120,7 @@ pub(super) async fn post_internal(
         document_type,
         reason,
     } = request.into_inner();
-    let auth = auth.check_guard(CanDecrypt::single(DataIdentifier::IdentityDocument))?;
+    let auth = auth.check_guard(CanDecrypt::single(DataIdentifier::IdDocument))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
@@ -133,7 +133,7 @@ pub(super) async fn post_internal(
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
             // Important to check requester has access
-            let fields = vec![DataIdentifier::IdentityDocument];
+            let fields = vec![DataIdentifier::IdDocument];
             uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
             Ok(uvw)

@@ -105,10 +105,10 @@ impl IsGuardMet for CanDecrypt {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         let (identity, other): (Vec<_>, Vec<_>) = self.0.into_iter().partition_map(|di| match di {
             // Identity data permissions are handled differently
-            DataIdentifier::Identity(idk) => Left(idk),
+            DataIdentifier::Id(idk) => Left(idk),
             // While Custom + Document permissions are very easy to determine
             DataIdentifier::Custom(_) => Right(token_scopes.contains(&TenantScope::DecryptCustom)),
-            DataIdentifier::IdentityDocument => Right(token_scopes.contains(&TenantScope::DecryptDocuments)),
+            DataIdentifier::IdDocument => Right(token_scopes.contains(&TenantScope::DecryptDocuments)),
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different
@@ -184,14 +184,14 @@ mod test {
     #[test_case(&[TS::Decrypt(vec![CDO::Name])], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => false)]
     #[test_case(&[TS::DecryptDocuments], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => false)]
     #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => true)]
-    #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![DI::IdentityDocument]) => false)]
-    #[test_case(&[TS::DecryptDocuments], CanDecrypt::new(vec![DI::IdentityDocument]) => true)]
+    #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![DI::IdDocument]) => false)]
+    #[test_case(&[TS::DecryptDocuments], CanDecrypt::new(vec![DI::IdDocument]) => true)]
     // CanDecrypt complex
-    #[test_case(&[TS::DecryptCustom, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Identity(IDK::Ssn4), DI::IdentityDocument]) => false)]
-    #[test_case(&[TS::DecryptCustom, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Identity(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocuments, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Identity(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocuments, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Identity(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::IdentityDocument]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocuments, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Identity(IDK::FirstName), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::IdentityDocument]) => false)]
+    #[test_case(&[TS::DecryptCustom, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::IdDocument]) => false)]
+    #[test_case(&[TS::DecryptCustom, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocuments, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocuments, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::IdDocument]) => true)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocuments, TS::Decrypt(vec![CDO::Ssn9])], CanDecrypt::new(vec![DI::Id(IDK::FirstName), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::IdDocument]) => false)]
     //
     // Test Or
     //
@@ -219,7 +219,7 @@ mod test {
     }
 
     #[test_case(TG::ApiKeys.or_admin() => "Or<ApiKeys,Admin>")]
-    #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<[Identity(Ssn9), Identity(FirstName)]>,ApiKeys>")]
+    #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<[Id(Ssn9), Id(FirstName)]>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
     fn test_display<T: IsGuardMet>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met

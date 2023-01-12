@@ -12,7 +12,7 @@ const FieldTagList = ({ targets }: FieldTagListProps) => (
       const parts = target.split('.');
       const prefix = parts[0];
       let text;
-      if (prefix === 'identity') {
+      if (prefix === 'id') {
         const dataAttribute = parts[parts.length - 1];
         text = dataKindToDisplayName[dataAttribute];
       } else if (prefix === 'custom') {

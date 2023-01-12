@@ -97,7 +97,7 @@ pub fn put_internal(
         targets: fingerprints
             .iter()
             .map(|fp| fp.0.into())
-            .map(DataIdentifier::Identity)
+            .map(DataIdentifier::Id)
             .collect(),
     }
     .create(conn)?;

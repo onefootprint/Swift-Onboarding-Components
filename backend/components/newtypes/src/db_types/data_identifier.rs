@@ -17,16 +17,16 @@ use crate::{
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DataIdentifier {
-    Identity(IdentityDataKind),
+    Id(IdentityDataKind),
     Custom(KvDataKey),
-    IdentityDocument,
+    IdDocument,
 }
 
 string_api_data_type_alias!(DataIdentifier);
 
 impl From<IdentityDataKind> for DataIdentifier {
     fn from(value: IdentityDataKind) -> Self {
-        Self::Identity(value)
+        Self::Id(value)
     }
 }
 
@@ -50,9 +50,9 @@ impl std::fmt::Display for DataIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = self.as_ref();
         let suffix = match self {
-            Self::Identity(s) => Some(s.to_string()),
+            Self::Id(s) => Some(s.to_string()),
             Self::Custom(s) => Some(s.to_string()),
-            Self::IdentityDocument => None,
+            Self::IdDocument => None,
         };
         if let Some(suffix) = suffix {
             write!(f, "{}.{}", prefix, suffix)
@@ -76,7 +76,7 @@ impl FromStr for DataIdentifier {
             .map_err(|_| DataIdentifierParsingError::CannotParsePrefix(prefix.to_owned()))?;
         // Parse the suffix differently depending on the prefix
         let result = match prefix {
-            DataIdentifierDiscriminants::Identity => Self::Identity(
+            DataIdentifierDiscriminants::Id => Self::Id(
                 IdentityDataKind::from_str(suffix)
                     .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
@@ -84,7 +84,7 @@ impl FromStr for DataIdentifier {
                 KvDataKey::from_str(suffix)
                     .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
-            DataIdentifierDiscriminants::IdentityDocument => Self::IdentityDocument,
+            DataIdentifierDiscriminants::IdDocument => Self::IdDocument,
         };
         Ok(result)
     }
@@ -109,13 +109,6 @@ impl serde::Serialize for DataIdentifier {
     }
 }
 
-impl DataIdentifier {
-    // TODO can delete this function?
-    pub fn list(attributes: Vec<IdentityDataKind>) -> Vec<Self> {
-        attributes.into_iter().map(Self::Identity).collect()
-    }
-}
-
 impl_enum_string_diesel!(DataIdentifier);
 
 #[cfg(test)]
@@ -123,21 +116,21 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case(DataIdentifier::Identity(IdentityDataKind::PhoneNumber) => "identity.phone_number")]
-    #[test_case(DataIdentifier::Identity(IdentityDataKind::Email) => "identity.email")]
+    #[test_case(DataIdentifier::Id(IdentityDataKind::PhoneNumber) => "id.phone_number")]
+    #[test_case(DataIdentifier::Id(IdentityDataKind::Email) => "id.email")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
-    #[test_case(DataIdentifier::IdentityDocument => "identity_document")]
+    #[test_case(DataIdentifier::IdDocument => "id_document")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
 
-    #[test_case("identity.phone_number" => DataIdentifier::Identity(IdentityDataKind::PhoneNumber))]
-    #[test_case("identity.email" => DataIdentifier::Identity(IdentityDataKind::Email))]
+    #[test_case("id.phone_number" => DataIdentifier::Id(IdentityDataKind::PhoneNumber))]
+    #[test_case("id.email" => DataIdentifier::Id(IdentityDataKind::Email))]
     #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
-    #[test_case("identity_document" => DataIdentifier::IdentityDocument)]
+    #[test_case("id_document" => DataIdentifier::IdDocument)]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

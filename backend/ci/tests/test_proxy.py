@@ -9,6 +9,7 @@ import asyncio
 import threading
 import os
 
+
 class FwdTestHeader(BaseAuth):
     HEADER_NAME = "x-fpp-test-header"
 
@@ -46,10 +47,10 @@ class TestVaultProxy:
 
         # send the proxy request
         data = {
-            "full_name": f"::${fp_id}.identity.first_name:: ::${fp_id}.identity.last_name::",
+            "full_name": f"::${fp_id}.id.first_name:: ::${fp_id}.id.last_name::",
             "last4_credit_card": f"::${fp_id}.custom.cc4::",
             "ach": f"::${fp_id}.custom.ach_account_number::",
-            "ssn": f"::${fp_id}.identity.ssn9::",
+            "ssn": f"::${fp_id}.id.ssn9::",
         }
         response = _make_request(
             method=requests.post,
@@ -61,7 +62,7 @@ class TestVaultProxy:
                 sandbox_tenant.sk.key,
                 FwdTestHeader("test1234"),
                 ProxyDestinationHeader(ditto_url),
-                ProxyAccessReason("test reason")
+                ProxyAccessReason("test reason"),
             ],
         )
 
@@ -90,6 +91,7 @@ def start_ditto_server_or_use_remote_server():
 
     return remote_ditto_url
 
+
 # This starts up a simple "ditto" server that
 # simply echos headers + body from the request
 # to simplify testing
@@ -110,12 +112,19 @@ def start_ditto_server(port):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(runner.setup())
-        site = web.TCPSite(runner, 'localhost', port)
+        site = web.TCPSite(runner, "localhost", port)
         loop.run_until_complete(site.start())
         loop.run_forever()
 
     app = server()
-    t = threading.Thread(target=run_server, args=(app, port,), daemon=True)
+    t = threading.Thread(
+        target=run_server,
+        args=(
+            app,
+            port,
+        ),
+        daemon=True,
+    )
     t.start()
 
     return t

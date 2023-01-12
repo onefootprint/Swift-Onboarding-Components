@@ -258,7 +258,7 @@ class TestDashboardOnboardings:
         access_events = body["data"]
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
-            expected_targets = [f"identity.{k}" for k in expected_fields]
+            expected_targets = [f"id.{k}" for k in expected_fields]
             access_events[i]["kind"] == "decrypt"
             assert set(access_events[i]["targets"]) == set(expected_targets)
 
@@ -266,14 +266,14 @@ class TestDashboardOnboardings:
         # that contain at least one of these fields
         params = dict(
             footprint_user_id=sandbox_user.fp_user_id,
-            targets=",".join(["identity.email", "identity.address_line1"]),
+            targets=",".join(["id.email", "id.address_line1"]),
             kind="decrypt",
         )
         body = get("org/access_events", params, tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == 2
-        assert "identity.email" in set(access_events[0]["targets"])
-        assert "identity.address_line1" in set(access_events[1]["targets"])
+        assert "id.email" in set(access_events[0]["targets"])
+        assert "id.address_line1" in set(access_events[1]["targets"])
 
         # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
         params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())

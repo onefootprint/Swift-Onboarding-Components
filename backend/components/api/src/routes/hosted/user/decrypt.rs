@@ -43,15 +43,13 @@ fn post(
         .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::User(&uv_id)))
         .await??;
 
-    let ids: Vec<_> = attributes.iter().cloned().map(DataIdentifier::Identity).collect();
+    let ids: Vec<_> = attributes.iter().cloned().map(DataIdentifier::Id).collect();
     let results = uvw.decrypt(&state, &ids, None).await?;
 
     let results = attributes
         .into_iter()
         .map(|idk| {
-            let value = results
-                .get(&DataIdentifier::Identity(idk))
-                .map(|v| v.leak_to_string());
+            let value = results.get(&DataIdentifier::Id(idk)).map(|v| v.leak_to_string());
             (idk, value)
         })
         .collect();

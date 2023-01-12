@@ -270,11 +270,11 @@ impl ObConfiguration {
             .can_access_data
             .iter()
             .flat_map(|x| x.attributes())
-            .map(DataIdentifier::Identity)
+            .map(DataIdentifier::Id)
             .collect();
 
         if self.can_access_identity_document_images {
-            fields.push(DataIdentifier::IdentityDocument)
+            fields.push(DataIdentifier::IdDocument)
         }
 
         fields
@@ -287,11 +287,11 @@ impl ObConfiguration {
             .must_collect_data
             .iter()
             .flat_map(|x| x.attributes())
-            .map(DataIdentifier::Identity)
+            .map(DataIdentifier::Id)
             .collect();
 
         if self.must_collect_identity_document {
-            fields.push(DataIdentifier::IdentityDocument)
+            fields.push(DataIdentifier::IdDocument)
         }
 
         fields

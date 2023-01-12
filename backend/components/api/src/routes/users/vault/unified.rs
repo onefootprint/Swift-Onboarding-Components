@@ -104,14 +104,14 @@ pub async fn put(
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
 pub struct FieldsParams {
     /// Comma separated list of fields to check
-    #[openapi(example = "identity.last_name, custom.ach_account, identity.dob, identity.ssn9")]
+    #[openapi(example = "id.last_name, custom.ach_account, id.dob, id.ssn9")]
     fields: Csv<DataIdentifier>,
 }
 
 flat_api_object_map_type!(
     GetUnifiedResponse<DataIdentifier, bool>,
     description="A key-value map of identifier to whether the identifier exists in the vault",
-    example=r#"{ "identity.last_name": "smith", "identity.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
+    example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
 
 #[api_v2_operation(
@@ -170,7 +170,7 @@ pub struct DecryptUnifiedFieldsRequest {
 flat_api_object_map_type!(
     DecryptUnifiedResponse<DataIdentifier, Option<PiiString>>,
     description="A key-value map with the corresponding decrypted values",
-    example=r#"{ "identity.last_name": "smith", "identity.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
+    example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
 
 #[api_v2_operation(tags(Vault, PublicApi, Users), description = "Decrypts items from the vault")]
@@ -182,7 +182,7 @@ pub async fn post_decrypt(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptUnifiedResponse> {
-    // TODO if we get only identity data here, don't require the `identity.` prefix
+    // TODO if we get only id data here, don't require the `id.` prefix
     let footprint_user_id = path.into_inner();
 
     let request = request.into_inner();

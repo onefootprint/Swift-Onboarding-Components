@@ -8,7 +8,7 @@ for i in {1..1000}
 do 
     curl -u "${KEY}": \
         -X POST "${BASE_URL}/users/${FP_ID}/decrypt" \
-        -d '{"reason": "test", "fields": ["identity.first_name", "identity.ssn9", "custom.ach_account_number", "custom.cc4"]}' &
+        -d '{"reason": "test", "fields": ["id.first_name", "id.ssn9", "custom.ach_account_number", "custom.cc4"]}' &
     
     pids[${i}]=$!
 done

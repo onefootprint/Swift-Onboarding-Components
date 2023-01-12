@@ -162,9 +162,9 @@ impl From<IdentityDataKind> for DataLifetimeKind {
 impl From<DataIdentifier> for DataLifetimeKind {
     fn from(value: DataIdentifier) -> Self {
         match value {
-            DataIdentifier::Identity(id) => id.into(),
+            DataIdentifier::Id(id) => id.into(),
             DataIdentifier::Custom(_) => Self::Custom,
-            DataIdentifier::IdentityDocument => Self::IdentityDocument,
+            DataIdentifier::IdDocument => Self::IdentityDocument,
         }
     }
 }

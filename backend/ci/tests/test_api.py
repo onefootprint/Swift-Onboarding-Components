@@ -70,9 +70,9 @@ class TestNonPortableVaultApi:
         access_events = body["data"]
         assert access_events[0]["kind"] == "decrypt"
         assert set(access_events[0]["targets"]) == {
-            "identity.first_name",
-            "identity.zip",
-            "identity.city",
+            "id.first_name",
+            "id.zip",
+            "id.city",
         }
 
     def test_custom_data(self, sandbox_tenant):
@@ -144,13 +144,13 @@ class TestUnifiedVaultApi:
 
         # check that the data is there now
         params = {
-            "fields": "identity.last_name, identity.ssn9, custom.ach_account_number,custom.cc4, custom.insurance_id"
+            "fields": "id.last_name, id.ssn9, custom.ach_account_number,custom.cc4, custom.insurance_id"
         }
 
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
         # TODO update these to serialized DataIdentifiers
-        assert response["identity.last_name"] == True
-        assert response["identity.ssn9"] == True
+        assert response["id.last_name"] == True
+        assert response["id.ssn9"] == True
         assert response["custom.ach_account_number"] == True
         assert response["custom.cc4"] == True
         assert response["custom.insurance_id"] == False
@@ -159,16 +159,16 @@ class TestUnifiedVaultApi:
         data = dict(
             reason="test",
             fields=[
-                "identity.first_name",
-                "identity.zip",
+                "id.first_name",
+                "id.zip",
                 "custom.ach_account_number",
                 "custom.cc4",
             ],
         )
         body = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         data = body
-        assert data["identity.first_name"] == "Sandbox"
-        assert data["identity.zip"] == "10009"
+        assert data["id.first_name"] == "Sandbox"
+        assert data["id.zip"] == "10009"
         assert data["custom.ach_account_number"] == "123467890"
         assert data["custom.cc4"] == "4242"
 
@@ -183,8 +183,8 @@ class TestUnifiedVaultApi:
 
         events = set(access_events[0]["targets"])
         assert events == {
-            "identity.first_name",
-            "identity.zip",
+            "id.first_name",
+            "id.zip",
             "custom.ach_account_number",
             "custom.cc4",
         }

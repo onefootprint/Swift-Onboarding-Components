@@ -56,7 +56,7 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 Check what fields exist on a user's vault.
 
 ```bash
-curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault?fields=identity.ssn9,custom.ach_account \
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault?fields=id.ssn9,custom.ach_account \
   	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
 
@@ -80,7 +80,7 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 	-X POST \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
-			"fields": ["identity.last_name", "identity.dob", "identity.ssn9", "custom.ach_account"],
+			"fields": ["id.last_name", "id.dob", "id.ssn9", "custom.ach_account"],
 			"reason": "direct deposit verification"
 		}'
 ```

@@ -126,9 +126,9 @@ impl UserVaultWrapper {
         let accessible_id_data = self
             .get_populated_identity_fields()
             .into_iter()
-            .filter(|x| must_collect.contains(&DataIdentifier::Identity(*x)))
+            .filter(|x| must_collect.contains(&DataIdentifier::Id(*x)))
             .collect();
-        let accessible_document_types = if must_collect.contains(&DataIdentifier::IdentityDocument) {
+        let accessible_document_types = if must_collect.contains(&DataIdentifier::IdDocument) {
             self.identity_documents()
                 .iter()
                 .map(|i| i.document_type.clone())

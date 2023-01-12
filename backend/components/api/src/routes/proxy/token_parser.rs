@@ -83,14 +83,14 @@ impl<'a> ProxyTokenParser<'a> {
 /// ::$<fp_id>.<data_kind>.<attribute_name>::
 ///
 /// Example:
-/// ::$fp_id_Gysdl9zxbBfrbSvfc0xCz.identity.ssn9::
+/// ::$fp_id_Gysdl9zxbBfrbSvfc0xCz.id.ssn9::
 ///
 /// Rules:
 /// - Whitespaces are ignored
 /// - Case SENSITIVE
 ///
 ///
-/// Future work: support filters / transformations, i.e: :: $<fp_id>.identity.last_name | uppercase ::
+/// Future work: support filters / transformations, i.e: :: $<fp_id>.id.last_name | uppercase ::
 ///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ProxyToken {
@@ -148,10 +148,10 @@ mod tests {
     }
 
     const VALID_JSON_BODY: &str = r#"{
-    "ssn": "::$fp_id_abcd.identity.ssn9::",
-    "last_name": "::   $fp_id_abcd.identity.last_name ::",
+    "ssn": "::$fp_id_abcd.id.ssn9::",
+    "last_name": "::   $fp_id_abcd.id.last_name ::",
     "credit_card": "::$fp_id_abcd.custom.credit_card ::",
-    "full_name": "::$fp_id_abcd.identity.first_name:: ::$fp_id_abcd.identity.last_name::"
+    "full_name": "::$fp_id_abcd.id.first_name:: ::$fp_id_abcd.id.last_name::"
 }"#;
 
     #[derive(serde::Deserialize, PartialEq, Eq, Debug, Clone)]
@@ -167,21 +167,21 @@ mod tests {
         let result = ProxyTokenParser::parse(VALID_JSON_BODY).expect("failed to parse");
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", DI::Identity(IDK::Ssn9))));
+            .contains_key(&token("fp_id_abcd", DI::Id(IDK::Ssn9))));
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", DI::Identity(IDK::LastName))));
+            .contains_key(&token("fp_id_abcd", DI::Id(IDK::LastName))));
         assert!(result
             .matches
             .contains_key(&token("fp_id_abcd", custom("credit_card"))));
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", DI::Identity(IDK::FirstName))));
+            .contains_key(&token("fp_id_abcd", DI::Id(IDK::FirstName))));
         // test that we found two matches for this token
         assert_eq!(
             result
                 .matches
-                .get(&token("fp_id_abcd", DI::Identity(IDK::LastName)))
+                .get(&token("fp_id_abcd", DI::Id(IDK::LastName)))
                 .expect("missing token")
                 .len(),
             2
@@ -199,12 +199,9 @@ mod tests {
         };
 
         let detokens = HashMap::from_iter(vec![
-            (token("fp_id_abcd", DI::Identity(IDK::Ssn9)), test.ssn.into()),
-            (
-                token("fp_id_abcd", DI::Identity(IDK::LastName)),
-                test.last_name.into(),
-            ),
-            (token("fp_id_abcd", DI::Identity(IDK::FirstName)), "Elon".into()),
+            (token("fp_id_abcd", DI::Id(IDK::Ssn9)), test.ssn.into()),
+            (token("fp_id_abcd", DI::Id(IDK::LastName)), test.last_name.into()),
+            (token("fp_id_abcd", DI::Id(IDK::FirstName)), "Elon".into()),
             (
                 token("fp_id_abcd", custom("credit_card")),
                 test.credit_card.into(),
@@ -217,10 +214,10 @@ mod tests {
         assert_eq!(test, result);
     }
 
-    #[test_case("$fp_id_abcd.identity.ssn9", "fp_id_abcd", DI::Identity(IDK::Ssn9) => true)]
-    #[test_case("$fp_id_abcdsdfsdfs.identity.last_name", "fp_id_abcdsdfsdfs", DI::Identity(IDK::LastName) => true)]
-    #[test_case("$fp_id_abcd.identity.ssn4", "fp_id_abcd", DI::Identity(IDK::Ssn9) => false)]
-    #[test_case("$fp_id_abcd.identity.sdfb.ssn4", "fp_id_abcd", DI::Identity(IDK::Ssn4) => false)]
+    #[test_case("$fp_id_abcd.id.ssn9", "fp_id_abcd", DI::Id(IDK::Ssn9) => true)]
+    #[test_case("$fp_id_abcdsdfsdfs.id.last_name", "fp_id_abcdsdfsdfs", DI::Id(IDK::LastName) => true)]
+    #[test_case("$fp_id_abcd.id.ssn4", "fp_id_abcd", DI::Id(IDK::Ssn9) => false)]
+    #[test_case("$fp_id_abcd.id.sdfb.ssn4", "fp_id_abcd", DI::Id(IDK::Ssn4) => false)]
     #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("credit_card") => true)]
     #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("ach_account") => false)]
     fn test_proxy_parse_token(raw: &str, fp_id: &str, identifier: DataIdentifier) -> bool {
