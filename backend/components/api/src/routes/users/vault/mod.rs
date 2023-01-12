@@ -15,7 +15,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(identity::post_decrypt)
         .service(document::get)
         .service(document::post_decrypt)
-        .service(custom::put)
-        .service(custom::get)
-        .service(custom::post_decrypt);
+        .service(custom::put);
 }

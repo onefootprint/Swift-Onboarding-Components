@@ -100,20 +100,18 @@ class TestNonPortableVaultApi:
         }
 
         # check status of the data
-        params = {"fields": "cc4,ach_account_number, insurance_id"}
-        response = get(f"users/{fp_id}/vault/custom", params, sandbox_tenant.sk.key)
-        assert response["ach_account_number"] == True
-        assert response["cc4"] == True
-        assert response["insurance_id"] == False
+        params = {"fields": "custom.cc4,custom.ach_account_number, custom.insurance_id"}
+        response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
+        assert response["custom.ach_account_number"] == True
+        assert response["custom.cc4"] == True
+        assert response["custom.insurance_id"] == False
 
         # decrypt the data
         # check status of the data
-        data = dict(reason="test", fields=["cc4", "ach_account_number"])
-        response = post(
-            f"users/{fp_id}/vault/custom/decrypt", data, sandbox_tenant.sk.key
-        )
-        assert response["ach_account_number"] == "123467890"
-        assert response["cc4"] == "4242"
+        data = dict(reason="test", fields=["custom.cc4", "custom.ach_account_number"])
+        response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+        assert response["custom.ach_account_number"] == "123467890"
+        assert response["custom.cc4"] == "4242"
 
         # verify access events created
         body = get(
