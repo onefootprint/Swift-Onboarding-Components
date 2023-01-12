@@ -45,6 +45,8 @@ pub enum TenantScope {
     OrgSettings,
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
+    /// Allows decrypting identity documents
+    DecryptDocuments,
     /// Allows decrypting identity data attributes belonging to the listed CollectedDataOptions
     Decrypt(Vec<CollectedDataOption>),
     /// Allows performing manual review actions on users, like making a new decision or adding an annotation

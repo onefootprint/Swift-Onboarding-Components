@@ -3,7 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::auth::tenant::{
-    CheckTenantGuard, SecretTenantAuthContext, TenantAuth, TenantGuard, TenantUserAuthContext,
+    CanDecrypt, CheckTenantGuard, SecretTenantAuthContext, TenantAuth, TenantUserAuthContext,
 };
 use crate::auth::Either;
 use crate::errors::ApiResult;
@@ -113,12 +113,11 @@ pub(super) async fn get_internal(
     request: Query<FieldsParams>,
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetCustomDataResponse> {
-    let tenant_auth = tenant_auth.check_guard(TenantGuard::Read)?;
-    let footprint_user_id = path.into_inner();
-    let is_live = tenant_auth.is_live()?;
-
-    let tenant_id = tenant_auth.tenant().id.clone();
     let fields: Vec<KvDataKey> = request.into_inner().fields.0;
+    let tenant_auth = tenant_auth.check_guard(CanDecrypt::new(fields.clone()))?;
+    let is_live = tenant_auth.is_live()?;
+    let tenant_id = tenant_auth.tenant().id.clone();
+    let footprint_user_id = path.into_inner();
 
     let uvw = state
         .db_pool
@@ -167,11 +166,11 @@ pub async fn post_decrypt(
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
-    let tenant_auth = tenant_auth.check_guard(TenantGuard::DecryptCustom)?;
-    let footprint_user_id = path.into_inner();
+    let DecryptCustomFieldsRequest { fields, reason } = request.into_inner();
+    let tenant_auth = tenant_auth.check_guard(CanDecrypt::new(fields.clone()))?;
     let is_live = tenant_auth.is_live()?;
     let tenant_id = tenant_auth.tenant().id.clone();
-    let DecryptCustomFieldsRequest { fields, reason } = request.into_inner();
+    let footprint_user_id = path.into_inner();
 
     let uvw = state
         .db_pool

@@ -2,7 +2,7 @@
 
 use super::custom::{self, GetCustomDataResponse, PutCustomDataRequest};
 use super::identity::{self, GetIdentityDataResponse};
-use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
+use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{
     tenant::{TenantAuth, TenantUserAuthContext},
     Either,
@@ -196,11 +196,7 @@ pub async fn post_decrypt(
     let DecryptUnifiedFieldsRequest { fields, reason } = request;
     let fields = fields.clone().into_iter().collect_vec();
 
-    // TODO make And for tenant permission
-    // or can i just include custom in here
-    auth.clone().check_guard(TenantGuard::DecryptCustom)?;
     let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
-
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 
