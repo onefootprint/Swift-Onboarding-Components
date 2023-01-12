@@ -1,3 +1,4 @@
+use newtypes::FootprintReasonCode;
 use strum::Display;
 use strum_macros::EnumString;
 
@@ -24,7 +25,7 @@ macro_rules! reason_code_enum {
 }
 
 reason_code_enum! {
-    #[derive(Debug, Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString)]
+    #[derive(Debug, Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, Hash)]
     #[serde(try_from = "&str")]
     pub enum SocureReasonCode {
         #[description = "Social networks match"]
@@ -1139,6 +1140,19 @@ reason_code_enum! {
 
         #[description = "Identity decease verified by SSA"]
         R999
+    }
+}
+
+impl From<&SocureReasonCode> for Option<FootprintReasonCode> {
+    // Describes how we translate from Socure reason codes to our generic FootprintReasonCodes
+    // We don't necessarily want to create a FootprintReasonCode for every single Socure code, so that's why this is Option<FootprintReasonCode>
+    // TODO: flesh out mapping of all Socure reason codes into what we want for FootprintReasonCodes
+    fn from(socure_reason_code: &SocureReasonCode) -> Self {
+        match socure_reason_code {
+            SocureReasonCode::R212 => Some(FootprintReasonCode::LastNameDoesNotMatch),
+            SocureReasonCode::R202 => Some(FootprintReasonCode::SubjectDeceased),
+            _ => None,
+        }
     }
 }
 

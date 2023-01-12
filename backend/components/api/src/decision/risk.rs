@@ -1,15 +1,19 @@
-use newtypes::{DbActor, DecisionStatus, OnboardingId};
+use newtypes::{DbActor, DecisionStatus, OnboardingDecisionId, OnboardingId, TenantId, VendorAPI};
 
-use db::models::{
-    manual_review::ManualReview,
-    onboarding::{Onboarding, OnboardingUpdate},
-    onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
-    scoped_user::ScopedUser,
+use db::{
+    models::{
+        manual_review::ManualReview,
+        onboarding::{Onboarding, OnboardingUpdate},
+        onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
+        risk_signal::RiskSignal,
+        scoped_user::ScopedUser,
+    }, TxnPgConnection,
 };
 
 use super::features::*;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
+    feature_flag::FeatureFlagClient,
     utils::user_vault_wrapper::{UserVaultWrapper, UvwCommitData},
     State,
 };
@@ -23,6 +27,7 @@ pub async fn create_final_decision(
     // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: Create our risk signals!
     // Save status
+    let feature_flag_client = state.feature_flag_client.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -69,6 +74,14 @@ pub async fn create_final_decision(
                 ManualReview::create(conn, ob_id)?;
             }
 
+            write_risk_signals(
+                conn,
+                &features,
+                obd.id,
+                &feature_flag_client,
+                &scoped_user.tenant_id,
+            )?;
+
             // TODO: uncomment this shortly
             // Action decision, if applicable
             // action_decision(conn, decision)?;
@@ -106,6 +119,34 @@ fn final_decision(features: &FeatureVector, onboarding_id: OnboardingId) -> ApiR
         create_manual_review,
     };
     Ok(output)
+}
+
+fn write_risk_signals(
+    conn: &mut TxnPgConnection,
+    feature_vector: &FeatureVector,
+    onboarding_decision_id: OnboardingDecisionId,
+    feature_flag_client: &FeatureFlagClient,
+    tenant_id: &TenantId,
+) -> ApiResult<()> {
+    let mut vendor_apis = vec![
+        VendorAPI::IdologyExpectID,
+        VendorAPI::IdologyScanVerifySubmission,
+        VendorAPI::IdologyScanVerifyResults,
+        VendorAPI::IdologyScanOnboarding,
+        VendorAPI::TwilioLookupV2,
+    ];
+
+    // For now, our Socure contract only allows Footprint to view or use Socure data
+    if feature_flag_client
+        .bool_flag_by_tenant_id("TenantCanViewSocureRiskSignal", tenant_id)
+        .unwrap_or(false)
+    {
+        vendor_apis.push(VendorAPI::SocureIDPlus);
+    }
+
+    let reason_codes = feature_vector.consolidated_reason_codes(vendor_apis);
+    RiskSignal::bulk_create(conn, onboarding_decision_id, reason_codes)?;
+    Ok(())
 }
 
 // Based on our decision, do any necessary actions (creating Requirements, manual reviews, etc)

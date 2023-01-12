@@ -3,7 +3,7 @@ use crate::idology::{
     response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
     IdologyError::RequestError,
 };
-use newtypes::{DecisionStatus, ReasonCode};
+use newtypes::{DecisionStatus, IDologyReasonCode};
 
 // Given a raw response, deserialize
 pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDAPIResponse, IdologyError::Error> {
@@ -59,7 +59,7 @@ impl ExpectIDResponse {
         }
     }
 
-    pub fn parse_qualifiers(&self) -> Vec<ReasonCode> {
+    pub fn parse_qualifiers(&self) -> Vec<IDologyReasonCode> {
         if let Some(ref qualifiers) = self.qualifiers {
             qualifiers.parse_qualifiers()
         } else {
@@ -114,10 +114,7 @@ mod tests {
         );
         let response = parse_response(response).expect("Could not parse response");
         let reason_codes = response.response.qualifiers.unwrap().parse_qualifiers();
-        assert_eq!(
-            reason_codes,
-            vec![ReasonCode::IDology(IDologyReasonCode::IpNotLocated)],
-        )
+        assert_eq!(reason_codes, vec![IDologyReasonCode::IpNotLocated],)
     }
 
     #[test]
@@ -126,8 +123,8 @@ mod tests {
         let response = parse_response(response).expect("Could not parse response");
         let reason_codes = response.response.qualifiers.unwrap().parse_qualifiers();
         let expected = vec![
-            ReasonCode::IDology(IDologyReasonCode::IpNotLocated),
-            ReasonCode::IDology(IDologyReasonCode::StreetNameDoesNotMatch),
+            IDologyReasonCode::IpNotLocated,
+            IDologyReasonCode::StreetNameDoesNotMatch,
         ];
         assert_eq!(reason_codes, expected);
     }

@@ -1,3 +1,5 @@
+use crate::FootprintReasonCode;
+
 use super::{OldSignalSeverity, Signal, SignalScope};
 use strum_macros::EnumString;
 
@@ -527,6 +529,19 @@ impl IDologyReasonCode {
             kind,
             scopes: attributes,
             note: self.to_string(),
+        }
+    }
+}
+
+impl From<&IDologyReasonCode> for Option<FootprintReasonCode> {
+    // Describes how we translate from Idology reason codes to our generic FootprintReasonCodes
+    // We don't necessarily want to create a FootprintReasonCode for every single Idology code, so that's why this is Option<FootprintReasonCode>
+    // TODO: flesh out mapping of all Idology reason codes into what we want for FootprintReasonCodes
+    fn from(idology_reason_code: &IDologyReasonCode) -> Self {
+        match idology_reason_code {
+            IDologyReasonCode::SubjectDeceased => Some(FootprintReasonCode::SubjectDeceased),
+            IDologyReasonCode::LastNameDoesNotMatch => Some(FootprintReasonCode::LastNameDoesNotMatch),
+            _ => None,
         }
     }
 }

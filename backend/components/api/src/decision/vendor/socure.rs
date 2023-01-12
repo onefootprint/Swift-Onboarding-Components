@@ -1,5 +1,5 @@
 use idv::socure::{reason_code::reason_codes::SocureReasonCode, response::SocureIDPlusResponse};
-use newtypes::{DecisionStatus, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
@@ -10,6 +10,8 @@ pub struct SocureFeatures {
     pub decision_status: DecisionStatus,
     pub create_manual_review: bool,
     pub verification_result: VerificationResultId,
+    pub reason_codes: Vec<SocureReasonCode>,
+    pub footprint_reason_codes: Vec<FootprintReasonCode>,
 }
 
 impl SocureFeatures {
@@ -26,12 +28,19 @@ impl SocureFeatures {
             SocureBaselineIdPlusLogicV6Result::Accept => (DecisionStatus::Pass, false),
         };
 
+        let reason_codes = idplus_response.all_unique_reason_codes();
+        let footprint_reason_codes = reason_codes
+            .iter()
+            .flat_map(Into::<Option<FootprintReasonCode>>::into)
+            .collect();
         Self {
             idplus_response: idplus_response.clone(),
             baseline_id_plus_logic_v6_result,
             decision_status,
             create_manual_review,
             verification_result: verification_result_id,
+            reason_codes,
+            footprint_reason_codes,
         }
     }
 }

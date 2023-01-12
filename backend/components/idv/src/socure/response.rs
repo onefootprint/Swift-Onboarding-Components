@@ -1,8 +1,12 @@
 use std::collections::HashMap;
 
+use itertools::Itertools;
+
+use super::reason_code::reason_codes::SocureReasonCode;
+
 // https://developer.socure.com/reference#tag/ID+
 // https://developer.socure.com/docs/idplus/modules/modules-overview
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SocureIDPlusResponse {
     pub reference_id: String,
@@ -268,5 +272,107 @@ impl SocureIDPlusResponse {
             .unwrap_or_default();
 
         [device_risk_reason_codes, device_identity_correlation_reason_codes].concat()
+    }
+
+    fn parse_reason_codes(reason_codes: &[String]) -> Vec<SocureReasonCode> {
+        reason_codes
+            .iter()
+            .flat_map(|src| SocureReasonCode::try_from(src.as_str()).ok())
+            .collect()
+    }
+
+    pub fn name_address_correlation_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.name_address_correlation
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn name_phone_correlation_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.name_phone_correlation
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn fraud_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.fraud
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn kyc_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.kyc
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn synthetic_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.synthetic
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn address_risk_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.address_risk
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn email_risk_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.email_risk
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn phone_risk_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.phone_risk
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn alert_list_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.alert_list
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn global_watchlist_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.global_watchlist
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn device_risk_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.device_risk
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    pub fn device_identity_correlation_reason_codes(&self) -> Option<Vec<SocureReasonCode>> {
+        self.device_identity_correlation
+            .as_ref()
+            .map(|n| Self::parse_reason_codes(&n.reason_codes))
+    }
+
+    // all reason codes in response from all modules
+    pub fn all_unique_reason_codes(&self) -> Vec<SocureReasonCode> {
+        vec![
+            self.name_address_correlation_reason_codes(),
+            self.name_phone_correlation_reason_codes(),
+            self.fraud_reason_codes(),
+            self.kyc_reason_codes(),
+            self.synthetic_reason_codes(),
+            self.address_risk_reason_codes(),
+            self.email_risk_reason_codes(),
+            self.phone_risk_reason_codes(),
+            self.alert_list_reason_codes(),
+            self.global_watchlist_reason_codes(),
+            self.device_risk_reason_codes(),
+            self.device_identity_correlation_reason_codes(),
+        ]
+        .into_iter()
+        .flatten()
+        .flatten()
+        .unique() // Different modules can return the same reason codes
+        .collect()
     }
 }

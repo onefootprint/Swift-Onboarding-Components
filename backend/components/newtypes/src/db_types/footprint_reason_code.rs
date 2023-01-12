@@ -20,6 +20,8 @@ use crate::SignalScope;
     FromSqlRow,
     AsRefStr,
     JsonSchema,
+    PartialEq,
+    Eq,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -63,6 +65,8 @@ impl FootprintReasonCode {
             Self::CorporateEmailDomain =>  "Indicates that the domain of the email address has been identified as belonging to a corporate entity.",
             Self::SsnDoesNotMatchWithinTolerance => "This indicates a discrepancy of one digit between the SSN submitted and the SSN located. If the SSN submitted is off by one digit from the located SSN, the ID Note is presented.",
             Self::LastNameDoesNotMatch => "This indicates that the located last name does not match the input last name.",
+            
+            
         }.to_owned()
     }
 
@@ -73,7 +77,7 @@ impl FootprintReasonCode {
             Self::MobileNumber => SignalSeverity::Low,
             Self::CorporateEmailDomain => SignalSeverity::Low,
             Self::SsnDoesNotMatchWithinTolerance => SignalSeverity::Medium,
-            Self::LastNameDoesNotMatch => SignalSeverity::Medium,
+            Self::LastNameDoesNotMatch => SignalSeverity::Medium,            
         }
     }
 }

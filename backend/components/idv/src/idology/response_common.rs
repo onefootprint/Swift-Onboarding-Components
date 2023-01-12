@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use newtypes::ReasonCode;
+use newtypes::{IDologyReasonCode};
 
 use super::error::RequestError;
 
@@ -22,7 +22,7 @@ pub struct IDologyQualifiers {
 }
 
 impl IDologyQualifiers {
-    pub fn parse_qualifiers(&self) -> Vec<ReasonCode> {
+    pub fn parse_qualifiers(&self) -> Vec<IDologyReasonCode> {
         // In the IDology API, the key named `qualifier` can either be a list of qualifiers OR
         // a single qualifier. Parse both cases here
         match self.qualifier {
@@ -42,9 +42,9 @@ impl IDologyQualifiers {
         }
     }
 
-    fn parse_qualifier(qualifier: serde_json::Value) -> Option<ReasonCode> {
+    fn parse_qualifier(qualifier: serde_json::Value) -> Option<IDologyReasonCode> {
         let key = KeyResponse::parse_key(qualifier)?;
-        ReasonCode::from_str(key.as_str()).ok()
+        IDologyReasonCode::from_str(key.as_str()).ok()
     }
 }
 #[derive(Debug, Clone, serde::Deserialize)]

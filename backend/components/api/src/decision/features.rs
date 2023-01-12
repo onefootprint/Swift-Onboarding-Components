@@ -2,7 +2,11 @@
 /// we can use to make decisions
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse};
 
-use newtypes::{idology::IdologyScanOnboardingCaptureResult, DecisionStatus, Signal, VerificationResultId};
+use itertools::Itertools;
+use newtypes::{
+    idology::IdologyScanOnboardingCaptureResult, DecisionStatus, FootprintReasonCode, IDologyReasonCode,
+    Signal, Vendor, VendorAPI, VerificationResultId,
+};
 
 use super::vendor::{socure::SocureFeatures, vendor_result::VendorResult};
 
@@ -10,7 +14,8 @@ use super::vendor::{socure::SocureFeatures, vendor_result::VendorResult};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IDologyFeatures {
     pub status: DecisionStatus,
-    pub signals: Vec<Signal>,
+    pub reason_codes: Vec<IDologyReasonCode>,
+    pub footprint_reason_codes: Vec<FootprintReasonCode>,
     pub id_located: bool,
     pub id_number_for_scan_required: Option<u64>,
     pub is_id_scan_required: bool,
@@ -19,6 +24,7 @@ pub struct IDologyFeatures {
 }
 
 impl IDologyFeatures {
+    #[allow(unused)]
     fn signals_from_response_qualifiers(response: ExpectIDResponse) -> Vec<Signal> {
         let qualifiers = response.parse_qualifiers();
 
@@ -94,6 +100,54 @@ impl FeatureVector {
         .flatten()
         .collect()
     }
+
+    pub fn reason_codes_for_vendor_api(&self, vendor_api: &VendorAPI) -> Option<Vec<FootprintReasonCode>> {
+        match vendor_api {
+            VendorAPI::IdologyExpectID => self
+                .idology_features
+                .as_ref()
+                .map(|i| i.footprint_reason_codes.clone()),
+            VendorAPI::IdologyScanVerifySubmission => None,
+            VendorAPI::IdologyScanVerifyResults => None,
+            VendorAPI::IdologyScanOnboarding => None,
+            VendorAPI::TwilioLookupV2 => None,
+            VendorAPI::SocureIDPlus => self
+                .socure_features
+                .as_ref()
+                .map(|f| f.footprint_reason_codes.clone()),
+        }
+    }
+
+    pub fn consolidated_reason_codes(
+        &self,
+        vendor_apis_to_include: Vec<VendorAPI>,
+    ) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+        let all_codes = vendor_apis_to_include
+            .iter()
+            .flat_map(|v| {
+                self.reason_codes_for_vendor_api(v).map(|rcs| {
+                    rcs.iter()
+                        .map(|rc| (Vendor::from(v.to_owned()), rc.to_owned()))
+                        .collect::<Vec<(Vendor, FootprintReasonCode)>>()
+                })
+            })
+            .flatten();
+
+        all_codes
+            .into_iter()
+            .group_by(|t| t.1)
+            .into_iter()
+            .map(|(footprint_reason_code, group)| {
+                (
+                    footprint_reason_code,
+                    group
+                        .into_iter()
+                        .map(|(vendor, _)| vendor)
+                        .collect::<Vec<Vendor>>(),
+                )
+            })
+            .collect()
+    }
 }
 
 impl From<VendorResult> for FeatureVector {
@@ -105,14 +159,20 @@ impl From<VendorResult> for FeatureVector {
                 let r = resp.response;
 
                 let (status, create_manual_review) = r.status();
+                let reason_codes = r.parse_qualifiers();
+                let footprint_reason_codes = reason_codes
+                    .iter()
+                    .flat_map(Into::<Option<FootprintReasonCode>>::into)
+                    .collect();
                 let idology_features = IDologyFeatures {
                     status,
                     create_manual_review,
                     id_located: r.id_located(),
                     is_id_scan_required: r.is_id_scan_required(),
                     id_number_for_scan_required: r.id_number,
-                    signals: IDologyFeatures::signals_from_response_qualifiers(r),
                     verification_result: verification_result_id,
+                    reason_codes,
+                    footprint_reason_codes,
                 };
                 Self {
                     idology_features: Some(idology_features),
@@ -246,13 +306,16 @@ mod helpers {
 mod tests {
     use std::str::FromStr;
 
+    use crate::decision::vendor::socure::SocureBaselineIdPlusLogicV6Result;
+
     use super::*;
     use idv::{
         idology::error::Error as IdologyError,
         idology::expectid::response::{self as idology_verification, ExpectIDAPIResponse},
+        socure::response::SocureIDPlusResponse,
         ParsedResponse, VendorResponse,
     };
-    use newtypes::{OldSignalSeverity, SignalScope, Vendor, VerificationRequestId};
+    use newtypes::{Vendor, VerificationRequestId};
     use serde_json::json;
     use test_case::test_case;
     // Feature tests
@@ -271,18 +334,11 @@ mod tests {
             id_located: true,
             is_id_scan_required: false,
             id_number_for_scan_required: Some(3010453),
-            signals: vec![
-                Signal {
-                    kind: OldSignalSeverity::NotFound,
-                    scopes: vec![SignalScope::IpAddress],
-                    note: "resultcode.ip.not.located".to_string(),
-                },
-                Signal {
-                    kind: OldSignalSeverity::Alert(2),
-                    scopes: vec![SignalScope::StreetAddress],
-                    note: "resultcode.street.name.does.not.match".to_string(),
-                },
+            reason_codes: vec![
+                IDologyReasonCode::IpNotLocated,
+                IDologyReasonCode::StreetNameDoesNotMatch,
             ],
+            footprint_reason_codes: vec![],
             verification_result: idology_result.verification_result_id,
         };
         let expected_feature_vector = FeatureVector {
@@ -356,5 +412,72 @@ mod tests {
         };
 
         Ok(result)
+    }
+
+    #[test]
+    fn test_consolidated_reason_codes() {
+        let feature_vector = FeatureVector {
+            idology_features: Some(IDologyFeatures {
+                status: DecisionStatus::Pass,
+                reason_codes: vec![],
+                footprint_reason_codes: vec![
+                    FootprintReasonCode::LastNameDoesNotMatch,
+                    FootprintReasonCode::SubjectDeceased,
+                ],
+                id_located: false,
+                id_number_for_scan_required: None,
+                is_id_scan_required: false,
+                verification_result: VerificationResultId::from("123".to_owned()),
+                create_manual_review: false,
+            }),
+            idology_scan_onboarding_features: None,
+            twilio_features: None,
+            socure_features: Some(SocureFeatures {
+                idplus_response: SocureIDPlusResponse {
+                    reference_id: String::from("abc"),
+                    ..Default::default()
+                },
+                baseline_id_plus_logic_v6_result: SocureBaselineIdPlusLogicV6Result::Accept,
+                decision_status: DecisionStatus::Pass,
+                create_manual_review: false,
+                verification_result: VerificationResultId::from("456".to_owned()),
+                reason_codes: vec![],
+                footprint_reason_codes: vec![
+                    FootprintReasonCode::SubjectDeceased,
+                    FootprintReasonCode::SsnIssuedPriorToDob,
+                ],
+            }),
+        };
+        // no output when no input VendorAPI's are specified
+        assert_eq!(0, feature_vector.consolidated_reason_codes(vec![]).len());
+        // only reason codes from specified VendorAPI's are included in output
+        assert!(have_same_elements(
+            vec![
+                (FootprintReasonCode::SubjectDeceased, vec![Vendor::Idology]),
+                (FootprintReasonCode::LastNameDoesNotMatch, vec![Vendor::Idology]),
+            ],
+            feature_vector.consolidated_reason_codes(vec![VendorAPI::IdologyExpectID])
+        ));
+
+        // correctly consolidates by vendor
+        assert!(have_same_elements(
+            vec![
+                (
+                    FootprintReasonCode::SubjectDeceased,
+                    vec![Vendor::Idology, Vendor::Socure]
+                ),
+                (FootprintReasonCode::LastNameDoesNotMatch, vec![Vendor::Idology]),
+                (FootprintReasonCode::SsnIssuedPriorToDob, vec![Vendor::Socure]),
+            ],
+            feature_vector
+                .consolidated_reason_codes(vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus])
+        ));
+    }
+
+    fn have_same_elements<T>(l: Vec<T>, r: Vec<T>) -> bool
+    where
+        T: Eq,
+    {
+        l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()
     }
 }
