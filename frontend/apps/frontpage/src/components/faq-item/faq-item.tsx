@@ -32,6 +32,7 @@ const Details = styled.details`
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     cursor: pointer;
+    background-color: ${theme.backgroundColor.primary}
 
     &:hover {
       border-color: ${theme.borderColor.primary};

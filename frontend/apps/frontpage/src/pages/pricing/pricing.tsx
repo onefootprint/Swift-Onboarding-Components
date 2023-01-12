@@ -5,7 +5,8 @@ import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import Faq from './components/faq';
-import Plans from './components/plans';
+import AddOns from './components/plan-tables/add-ons/add-ons';
+import CorePlan from './components/plan-tables/core-plan/core-plan';
 
 const Pricing = () => {
   const { t } = useTranslation('pages.pricing');
@@ -19,21 +20,14 @@ const Pricing = () => {
           <Typography
             as="h1"
             sx={{ maxWidth: '700px', marginBottom: 5 }}
-            variant="display-1"
+            variant="display-2"
           >
             {t('hero.title')}
           </Typography>
-          <Typography
-            as="h2"
-            color="secondary"
-            sx={{ maxWidth: '830px' }}
-            variant="display-4"
-          >
-            {t('hero.subtitle')}
-          </Typography>
         </HeroContainer>
         <PlansContainer>
-          <Plans />
+          <CorePlan />
+          <AddOns />
         </PlansContainer>
         <Faq
           title={t('faq.title')}
@@ -91,19 +85,35 @@ const Pricing = () => {
           ]}
         />
       </Container>
+      <Background />
     </>
   );
 };
+
+const Background = styled.span`
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-size: cover;
+  background: radial-gradient(at 70% 38%, #e8faff 0%, transparent 30%),
+    radial-gradient(at 30% 20%, #ecfff4 0%, transparent 10%),
+    radial-gradient(at 30% 40%, #ffedfe 0%, transparent 32%);
+`;
 
 const Container = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
     max-width: 992px;
     padding: ${theme.spacing[5]};
+    z-index: 1;
 
-    ${media.greaterThan('md')`
+    ${media.greaterThan('sm')`
       padding: 0;
-    `}
+    `};
   `}
 `;
 
@@ -123,10 +133,14 @@ const HeroContainer = styled.div`
 
 const PlansContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]};
+    max-width: 596px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
 
-    ${media.greaterThan('md')`
-    margin-bottom: ${theme.spacing[12]};
+    ${media.greaterThan('sm')`
+      gap: ${theme.spacing[8]};
     `}
   `}
 `;

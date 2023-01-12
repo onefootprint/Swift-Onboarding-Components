@@ -13,7 +13,7 @@ type FaqProps = {
 };
 
 const Faq = ({ title, items }: FaqProps) => (
-  <>
+  <FaqContainer>
     <TitleContainer>
       <Typography variant="display-3" as="h4">
         {title}
@@ -28,25 +28,32 @@ const Faq = ({ title, items }: FaqProps) => (
         />
       ))}
     </QuestionsContainer>
-  </>
+  </FaqContainer>
 );
 
-const TitleContainer = styled.div`
+const FaqContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]};
-    text-align: center;
-
-    ${media.greaterThan('md')`
-      margin-bottom: ${theme.spacing[8]};
-    `}
+    margin: ${theme.spacing[11]} auto;
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[9]};
   `}
+`;
+
+const TitleContainer = styled.div`
+  text-align: center;
 `;
 
 const QuestionsContainer = styled.div`
   ${({ theme }) => css`
+    margin: auto;
     display: grid;
     gap: ${theme.spacing[5]};
     margin-bottom: ${theme.spacing[10]};
+
+    ${media.greaterThan('sm')`
+      width: 720px;
+    `}
   `}
 `;
 
