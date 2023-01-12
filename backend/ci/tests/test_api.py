@@ -151,11 +151,11 @@ class TestUnifiedVaultApi:
 
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
         # TODO update these to serialized DataIdentifiers
-        assert response["identity"]["last_name"] == True
-        assert response["identity"]["ssn9"] == True
-        assert response["custom"]["ach_account_number"] == True
-        assert response["custom"]["cc4"] == True
-        assert response["custom"]["insurance_id"] == False
+        assert response["identity.last_name"] == True
+        assert response["identity.ssn9"] == True
+        assert response["custom.ach_account_number"] == True
+        assert response["custom.cc4"] == True
+        assert response["custom.insurance_id"] == False
 
         # decrypt the data
         data = dict(

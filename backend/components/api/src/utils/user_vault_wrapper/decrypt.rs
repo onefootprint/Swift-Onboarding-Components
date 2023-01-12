@@ -6,7 +6,7 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use enclave_proxy::DataTransform;
 use newtypes::{
-    AccessEventKind, DataIdentifier, DbActor, PiiString, ScopedUserId, SealedVaultDataKey,
+    AccessEventKind, DataIdentifier, DbActor, PiiString, ScopedUserId, SealedVaultBytes, SealedVaultDataKey,
     ValidatedPhoneNumber,
 };
 use std::collections::HashMap;
@@ -14,6 +14,22 @@ use std::convert::Into;
 use std::hash::Hash;
 
 impl UserVaultWrapper {
+    /// Retrieve the e_data for each of the provided DataIdentifiers, if exists
+    pub fn get_e_datas<T>(&self, ids: &[T]) -> HashMap<T, &SealedVaultBytes>
+    where
+        T: Into<DataIdentifier> + Clone + Hash + Eq,
+    {
+        HashMap::from_iter(ids.iter().filter_map(|di| {
+            match Into::<DataIdentifier>::into(di.clone()) {
+                DataIdentifier::Custom(k) => self.kv_data().get(&k).map(|kvd| &kvd.e_data),
+                DataIdentifier::Identity(idk) => self.get_identity_e_field(idk),
+                // Decrypt key here
+                DataIdentifier::IdentityDocument => todo!(),
+            }
+            .map(|e_data| (di.clone(), e_data))
+        }))
+    }
+
     /// Util to decrypt a list of T where T represents a DataIdentifier. Returns a hashmap of T to
     /// the decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
@@ -27,18 +43,7 @@ impl UserVaultWrapper {
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
     {
-        let (ids, e_datas): (Vec<_>, Vec<_>) = ids
-            .iter()
-            .filter_map(|di| {
-                match Into::<DataIdentifier>::into(di.clone()) {
-                    DataIdentifier::Custom(k) => self.kv_data().get(&k).map(|kvd| &kvd.e_data),
-                    DataIdentifier::Identity(idk) => self.get_identity_e_field(idk),
-                    // Decrypt key here
-                    DataIdentifier::IdentityDocument => todo!(),
-                }
-                .map(|e_data| (di.clone(), e_data))
-            })
-            .unzip();
+        let (ids, e_datas): (Vec<_>, _) = self.get_e_datas(ids).into_iter().unzip();
 
         let decrypted_results = state
             .enclave_client

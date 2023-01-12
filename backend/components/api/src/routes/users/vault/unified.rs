@@ -1,7 +1,7 @@
 //! Add/get/decrypt identity data to a NON-portable user vault
 
-use super::custom::{self, GetCustomDataResponse, PutCustomDataRequest};
-use super::identity::{self, GetIdentityDataResponse};
+use super::custom::{self, PutCustomDataRequest};
+use super::identity::{self};
 use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{
     tenant::{TenantAuth, TenantUserAuthContext},
@@ -16,7 +16,6 @@ use crate::{errors::ApiError, State};
 use actix_web::web::Query;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
-use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::csv::Csv;
 use newtypes::{flat_api_object_map_type, PiiString};
@@ -109,13 +108,11 @@ pub struct FieldsParams {
     fields: Csv<DataIdentifier>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
-pub struct UnifiedUserVaultGetDataResponse {
-    /// identity data
-    identity: GetIdentityDataResponse,
-    /// custom data fields
-    custom: GetCustomDataResponse,
-}
+flat_api_object_map_type!(
+    GetUnifiedResponse<DataIdentifier, bool>,
+    description="A key-value map of identifier to whether the identifier exists in the vault",
+    example=r#"{ "identity.last_name": "smith", "identity.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
+);
 
 #[api_v2_operation(
     description = "Check for the existence of items in a vault",
@@ -126,42 +123,38 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-) -> JsonApiResponse<UnifiedUserVaultGetDataResponse> {
-    let footprint_id = path.into_inner();
+    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+) -> JsonApiResponse<GetUnifiedResponse> {
+    let footprint_user_id = path.into_inner();
+
     let request = request.into_inner();
+    let FieldsParams { fields } = request;
+    let fields = fields.clone().into_iter().collect_vec();
 
-    let (requested_identity_fields, requested_custom_fields) =
-        request.fields.into_iter().partition_map(|f| match f {
-            DataIdentifier::Identity(attr) => Left(attr),
-            DataIdentifier::Custom(data_key) => Right(data_key),
-            DataIdentifier::IdentityDocument => todo!(),
-        });
+    let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
+    let is_live = auth.is_live()?;
+    let tenant_id = auth.tenant().id.clone();
 
-    let id_results_fut = identity::get_internal(
-        state.clone(),
-        Path::from(footprint_id.clone()),
-        Query(identity::FieldsParams {
-            fields: Csv(requested_identity_fields),
-        }),
-        tenant_auth.clone(),
+    let fields_clone = fields.clone();
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            // TODO bake this access checking into get_e_datas, when decrypting for a tenant.
+            // Shouldn't be allowed to gete_datas without doing this
+            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
+            Ok(uvw)
+        })
+        .await??;
+
+    let mut results = uvw.get_e_datas(&fields);
+    let results = HashMap::from_iter(
+        fields
+            .into_iter()
+            .map(|di| (di.clone(), results.remove(&di).is_some())),
     );
-
-    let custom_results_fut = custom::get_internal(
-        state,
-        Path::from(footprint_id),
-        Query(custom::FieldsParams {
-            fields: Csv(requested_custom_fields),
-        }),
-        tenant_auth,
-    );
-
-    let (id_results, custom_results) = futures::try_join!(id_results_fut, custom_results_fut)?;
-
-    let out = UnifiedUserVaultGetDataResponse {
-        identity: id_results.into_inner().data,
-        custom: custom_results.into_inner().data,
-    };
+    let out = GetUnifiedResponse { map: results };
 
     ResponseData::ok(out).json()
 }
