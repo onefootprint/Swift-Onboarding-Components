@@ -1,4 +1,5 @@
 use super::UserVaultWrapper;
+use crate::auth::AuthError;
 use crate::errors::ApiResult;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
@@ -105,8 +106,13 @@ impl UserVaultWrapper {
 
         let ob_configs = ObConfiguration::list_authorized_for_user(conn, scoped_user.id.clone())?;
         let can_access: HashSet<_> = ob_configs.into_iter().flat_map(|x| x.can_access()).collect();
-        if !fields.into_iter().all(|x| can_access.contains(&x.into())) {
-            return Err(crate::auth::AuthError::ObConfigMissingDecryptPermission.into());
+        let cannot_access_fields = fields
+            .into_iter()
+            .map(|x| x.into())
+            .filter(|x| !can_access.contains(x))
+            .collect_vec();
+        if !cannot_access_fields.is_empty() {
+            return Err(AuthError::ObConfigMissingDecryptPermission(cannot_access_fields).into());
         }
 
         Ok(())
