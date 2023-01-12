@@ -66,6 +66,8 @@ pub async fn build_docv_data_for_submission_from_verification_request(
         .db_query(
             move |conn| -> Result<(IdentityDocument, Option<String>, UserVaultWrapper), ApiError> {
                 let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
+                // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
+                // This would allow us to re-use the uvw util to decrypt an image
                 let uvw = UserVaultWrapper::build(conn, UvwArgs::Idv(request))?;
                 Ok((doc, ref_id.ref_id, uvw))
             },

@@ -1,9 +1,10 @@
 use super::UserVaultWrapper;
-use crate::errors::ApiError;
+use crate::errors::{ApiError, ApiResult};
 use crate::s3::S3Error;
 use crate::State;
+use crypto::aead::AeadSealedBytes;
 use db::models::identity_document::IdentityDocument;
-use newtypes::{IdentityDocumentId, SealedVaultBytes, SealedVaultDataKey};
+use newtypes::{IdentityDocumentId, PiiBytes, SealedVaultBytes, SealedVaultDataKey};
 
 pub struct IdentityDocumentImages {
     pub identity_document_id: IdentityDocumentId,
@@ -13,6 +14,12 @@ pub struct IdentityDocumentImages {
     // not all documents have backs
     pub back_image: Option<SealedVaultBytes>,
     pub e_data_key: SealedVaultDataKey,
+}
+
+pub struct DecryptDocumentResult {
+    pub identity_document_id: IdentityDocumentId,
+    pub front: PiiBytes,
+    pub back: Option<PiiBytes>,
 }
 
 pub async fn fetch_image(
@@ -53,13 +60,48 @@ impl UserVaultWrapper {
         &self,
         state: &State,
         document_type: String,
-    ) -> Vec<Result<IdentityDocumentImages, ApiError>> {
+    ) -> ApiResult<Vec<IdentityDocumentImages>> {
         let futures = self
             .identity_documents()
             .iter()
             .filter(|i| i.document_type == document_type)
             .map(|doc| fetch_image(state, doc.clone()));
 
-        futures::future::join_all(futures).await
+        let result = futures::future::join_all(futures)
+            .await
+            .into_iter()
+            .collect::<ApiResult<_>>()?;
+        Ok(result)
+    }
+
+    pub async fn decrypt_document(
+        &self,
+        state: &State,
+        document_type: String,
+    ) -> ApiResult<Vec<DecryptDocumentResult>> {
+        let images = self.get_encrypted_images_from_s3(state, document_type).await?;
+
+        let sealed_keys = images.iter().map(|i| i.e_data_key.clone()).collect();
+        let unsealed_keys = self.decrypt_data_keys(state, sealed_keys).await?;
+        let res = images
+            .into_iter()
+            .zip(unsealed_keys.iter())
+            .map(|(image, key)| -> ApiResult<_> {
+                let front = PiiBytes::new(key.unseal_bytes(AeadSealedBytes(image.front_image.0))?);
+                // Back is optional for some documents
+                let back = image
+                    .back_image
+                    .map(|b| key.unseal_bytes(AeadSealedBytes(b.0)))
+                    .transpose()?
+                    .map(PiiBytes::new);
+
+                Ok(DecryptDocumentResult {
+                    identity_document_id: image.identity_document_id,
+                    front,
+                    back,
+                })
+            })
+            .collect::<ApiResult<_>>()?;
+        Ok(res)
     }
 }

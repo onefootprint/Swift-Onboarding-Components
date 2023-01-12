@@ -6,7 +6,6 @@ use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext,
 use crate::auth::{tenant::TenantUserAuthContext, Either};
 
 use crate::errors::ApiError;
-use crate::routes::hosted::user::DecryptDocumentResult;
 use crate::types::{JsonApiResponse, ResponseData};
 
 use crate::utils::headers::InsightHeaders;
@@ -141,8 +140,7 @@ pub(super) async fn post_internal(
         .await??;
 
     // As of 2022-11-28: It's possible a user has more than 1 document of a given document_type
-    let decrypted_docs: Vec<DecryptDocumentResult> =
-        crate::hosted::user::decrypt_document(&state, uvw, document_type.clone()).await?;
+    let decrypted_docs = uvw.decrypt_document(&state, document_type.clone()).await?;
 
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
@@ -154,17 +152,17 @@ pub(super) async fn post_internal(
     }
     .save(&state.db_pool)
     .await?;
-    let mut image_data: Vec<ImageData> = Vec::new();
-    for doc in decrypted_docs {
-        image_data.push(ImageData {
-            front: doc.front.leak_to_string(),
-            back: doc.back.map(|p| p.leak_to_string()),
+    let images = decrypted_docs
+        .into_iter()
+        .map(|doc| ImageData {
+            front: doc.front.into_leak_base64().to_string_standard(),
+            back: doc.back.map(|p| p.into_leak_base64().to_string_standard()),
         })
-    }
+        .collect();
 
     let res = DecryptIdentityDocumentResponse {
         document_type,
-        images: image_data,
+        images,
     };
 
     ResponseData::ok(res).json()

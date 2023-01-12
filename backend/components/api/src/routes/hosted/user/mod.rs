@@ -1,6 +1,4 @@
-use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
-use crypto::aead::AeadSealedBytes;
-use newtypes::{Base64Data, IdentityDocumentId, PiiString};
+use crate::errors::ApiError;
 use paperclip::actix::web;
 
 pub mod access_events;
@@ -42,47 +40,4 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(email::verify::post)
         .service(email::challenge::post)
         .service(consent::post);
-}
-
-pub struct DecryptDocumentResult {
-    pub identity_document_id: IdentityDocumentId,
-    pub front: PiiString,
-    pub back: Option<PiiString>,
-}
-
-/// TODO: potentially move this to UVW
-pub async fn decrypt_document(
-    state: &web::Data<State>,
-    uvw: UserVaultWrapper,
-    document_type: String,
-) -> Result<Vec<DecryptDocumentResult>, ApiError> {
-    let images = uvw
-        .get_encrypted_images_from_s3(state, document_type)
-        .await
-        .into_iter()
-        .collect::<Result<Vec<_>, _>>()?; // Error with whatever the first error is
-
-    let sealed_keys = images.iter().map(|i| i.e_data_key.clone()).collect();
-    let unsealed_keys = uvw.decrypt_data_keys(state, sealed_keys).await?;
-    let res: Result<Vec<DecryptDocumentResult>, _> = images
-        .into_iter()
-        .zip(unsealed_keys.iter())
-        .map(|(image, key)| -> Result<DecryptDocumentResult, _> {
-            let front = Base64Data(key.unseal_bytes(AeadSealedBytes(image.front_image.0))?);
-            // Back is optional for some documents
-            let mut back: Option<Base64Data> = None;
-            if let Some(b) = image.back_image {
-                back = Some(Base64Data(key.unseal_bytes(AeadSealedBytes(b.0))?));
-            }
-
-            Ok(DecryptDocumentResult {
-                identity_document_id: image.identity_document_id.clone(),
-                // TODO: perhaps we should have a PiiBase64Bytes type
-                front: PiiString::from(front.to_string_standard()),
-                back: back.map(|b| PiiString::from(b.to_string_standard())),
-            })
-        })
-        .collect();
-
-    res
 }

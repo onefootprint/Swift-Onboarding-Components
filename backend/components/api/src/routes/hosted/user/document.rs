@@ -40,6 +40,7 @@ pub async fn post(
             };
 
             // This will error if no doc request is found
+            // TODO this lock doesn't do anything
             let db_document_request = DbDocumentRequest::lock(conn, &auth_info.scoped_user.id, &request_id)?;
             // Check request is pending. If not, there's nothing to do here
             if !db_document_request.is_pending() {

@@ -1,3 +1,5 @@
+use crate::Base64Data;
+
 use super::api_schema_helper::string_api_data_type_alias;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -19,6 +21,10 @@ pub struct PiiBytes(Vec<u8>);
 impl PiiBytes {
     pub fn new(data: Vec<u8>) -> Self {
         Self(data)
+    }
+
+    pub fn into_leak_base64(self) -> Base64Data {
+        Base64Data(self.0)
     }
 
     pub fn into_leak(self) -> Vec<u8> {
