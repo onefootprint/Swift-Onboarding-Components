@@ -138,7 +138,7 @@ async fn post(
     // Get the actual raw API key value
     let decrypted_api_key = state
         .enclave_client
-        .decrypt_bytes(
+        .decrypt_to_piistring(
             &api_key.e_secret_api_key,
             &tenant.e_private_key,
             enclave_proxy::DataTransform::Identity,

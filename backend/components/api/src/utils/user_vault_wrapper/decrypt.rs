@@ -38,7 +38,7 @@ impl UserVaultWrapper {
 
         let decrypted_results = state
             .enclave_client
-            .decrypt_bytes_batch(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
+            .batch_decrypt_to_piistring(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
             .await?;
         let results: HashMap<_, _> = ids.into_iter().zip(decrypted_results).collect();
         // TODO create access event, sometimes
@@ -72,7 +72,7 @@ impl UserVaultWrapper {
         // this to not return a ValidatedPhoneNumber
         let decrypt_response = state
             .enclave_client
-            .decrypt_bytes_batch(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
+            .batch_decrypt_to_piistring(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
             .await?;
         let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
         let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();

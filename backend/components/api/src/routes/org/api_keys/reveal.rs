@@ -48,7 +48,7 @@ async fn post(
     let tenant = auth.tenant();
     let decrypted_secret_key = state
         .enclave_client
-        .decrypt_bytes(
+        .decrypt_to_piistring(
             &key.e_secret_api_key,
             &tenant.e_private_key,
             DataTransform::Identity,

@@ -4,7 +4,10 @@ use enclave_proxy::{
     EnvelopeDecryptRequest, FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
     GeneratedDataKeyPair, GeneratedSealedDataKey, KmsCredentials, RpcPayload, RpcRequest, SealedIkek,
 };
-use newtypes::{EncryptedVaultPrivateKey, PiiString, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey};
+use itertools::Itertools;
+use newtypes::{
+    EncryptedVaultPrivateKey, PiiBytes, PiiString, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
+};
 
 use crate::{config::Config, errors::enclave::EnclaveError};
 
@@ -105,22 +108,76 @@ impl EnclaveClient {
         Ok(encrypted_data_key)
     }
 
-    /// generates a new sealed data key with the plaintext key
+    /// Decryptes the provided list of SealedVaultDataKeys into SealingKeys
     pub async fn decrypt_sealed_vault_data_key(
         &self,
         sealed_data_keys: &[SealedVaultDataKey],
         sealed_key: &EncryptedVaultPrivateKey,
     ) -> Result<Vec<SealingKey>, EnclaveError> {
-        let requests = sealed_data_keys
+        let sealed_data = sealed_data_keys
             .iter()
-            .map(|k| -> Result<DecryptRequest, EnclaveError> {
-                Ok(DecryptRequest {
-                    sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(&k.0)?,
-                    transform: DataTransform::Identity,
-                })
-            })
+            .map(|key| EciesP256Sha256AesGcmSealed::from_bytes(&key.0))
+            .collect::<Result<_, _>>()?;
+        let decrypted_keys = self
+            .batch_decrypt_to_piibytes(sealed_data, sealed_key, DataTransform::Identity)
+            .await?;
+        let response = decrypted_keys
+            .into_iter()
+            .map(|b| SealingKey::new(b.into_leak()))
             .collect::<Result<Vec<_>, _>>()?;
+        Ok(response)
+    }
 
+    /// Decrypts the provided SealedVaultBytes into PiiString
+    pub async fn decrypt_to_piistring(
+        &self,
+        sealed_data: &SealedVaultBytes,
+        sealed_key: &EncryptedVaultPrivateKey,
+        transform: DataTransform,
+    ) -> Result<PiiString, EnclaveError> {
+        self.batch_decrypt_to_piistring(vec![sealed_data], sealed_key, transform)
+            .await?
+            .into_iter()
+            .next()
+            .ok_or(EnclaveError::InvalidEnclaveDecryptResponse)
+    }
+
+    /// Decrypts the provided list of SealedVaultBytes into PiiStrings
+    pub async fn batch_decrypt_to_piistring(
+        &self,
+        sealed_data: Vec<&SealedVaultBytes>,
+        sealed_key: &EncryptedVaultPrivateKey,
+        transform: DataTransform,
+    ) -> Result<Vec<PiiString>, EnclaveError> {
+        let sealed_data: Vec<_> = sealed_data
+            .iter()
+            .map(|b| EciesP256Sha256AesGcmSealed::from_bytes(b.as_ref()))
+            .collect::<Result<_, _>>()?;
+        let results = self
+            .batch_decrypt_to_piibytes(sealed_data, sealed_key, transform)
+            .await?
+            .into_iter()
+            .map(PiiString::try_from)
+            .collect::<Result<_, _>>()?;
+        Ok(results)
+    }
+
+    /// Util for batch decrypting many EciesP256Sha256AesGcmSealed values with the same key and transform
+    /// into PiiBytes
+    async fn batch_decrypt_to_piibytes(
+        &self,
+        sealed_data: Vec<EciesP256Sha256AesGcmSealed>,
+        sealed_key: &EncryptedVaultPrivateKey,
+        transform: DataTransform,
+    ) -> Result<Vec<PiiBytes>, EnclaveError> {
+        let requests = sealed_data
+            .into_iter()
+            .map(|sealed_data| DecryptRequest {
+                sealed_data,
+                transform,
+            })
+            .collect_vec();
+        let num_requests = requests.len();
         let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecryptRequest {
             kms_creds: self.kms_creds.clone(),
             sealed_ikek: self.sealed_ikek.clone(),
@@ -129,79 +186,16 @@ impl EnclaveClient {
         }));
 
         let response = self.send(req).await?;
-
         let response = FnDecryption::try_from(response)?;
-        let response = response
-            .results
-            .into_iter()
-            .map(|r| -> Result<_, crypto::Error> {
-                let k = SealingKey::new(r.data)?;
-                Ok(k)
-            })
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(|_| EnclaveError::InvalidEnclaveDecryptResponse)?;
-
-        Ok(response)
-    }
-
-    pub async fn decrypt_bytes(
-        &self,
-        sealed_data: &SealedVaultBytes,
-        sealed_key: &EncryptedVaultPrivateKey,
-        transform: DataTransform,
-    ) -> Result<PiiString, EnclaveError> {
-        self.decrypt_bytes_batch(vec![sealed_data], sealed_key, transform)
-            .await?
-            .into_iter()
-            .next()
-            .ok_or(EnclaveError::InvalidEnclaveDecryptResponse)
-    }
-
-    pub async fn decrypt_bytes_batch(
-        &self,
-        sealed_data: Vec<&SealedVaultBytes>,
-        sealed_key: &EncryptedVaultPrivateKey,
-        transform: DataTransform,
-    ) -> Result<Vec<PiiString>, EnclaveError> {
-        let requests = sealed_data
-            .into_iter()
-            .map(|d| {
-                Ok(DecryptRequest {
-                    sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(d.as_ref())?,
-                    transform,
-                })
-            })
-            .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
-        let results = self.decrypt(requests, sealed_key).await?;
-        Ok(results)
-    }
-
-    pub async fn decrypt(
-        &self,
-        requests: Vec<DecryptRequest>,
-        sealed_key: &EncryptedVaultPrivateKey,
-    ) -> Result<Vec<PiiString>, EnclaveError> {
-        let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecryptRequest {
-            kms_creds: self.kms_creds.clone(),
-            sealed_ikek: self.sealed_ikek.clone(),
-            sealed_key: crypto::aead::AeadSealedBytes(sealed_key.0.clone()),
-            requests: requests.clone(),
-        }));
-
-        let response = self.send(req).await?;
-
-        let response = FnDecryption::try_from(response)?;
-        let decrypted_results = response
-            .results
-            .into_iter()
-            .map(|r| Ok(std::str::from_utf8(&r.data)?.to_string()))
-            .map(|x| x.map(PiiString::from))
-            .collect::<Result<Vec<PiiString>, EnclaveError>>()?;
-
-        if decrypted_results.len() != requests.len() {
+        if response.results.len() != num_requests {
             return Err(EnclaveError::InvalidEnclaveDecryptResponse);
         }
 
-        Ok(decrypted_results)
+        let results = response
+            .results
+            .into_iter()
+            .map(|r| PiiBytes::new(r.data))
+            .collect();
+        Ok(results)
     }
 }

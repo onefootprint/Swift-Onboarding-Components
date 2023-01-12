@@ -1,41 +1,13 @@
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-use std::fmt::{Debug, Display};
-
-use self::api_schema_helper::string_api_data_type_alias;
-
 pub mod address;
 pub mod csv;
 pub mod dob;
 pub mod email;
 pub mod name;
 pub mod phone_number;
+mod pii;
 pub mod sandbox;
 pub mod ssn;
-
-/// Represents a string that hides PII
-#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema)]
-#[serde(transparent)]
-pub struct PiiString(String);
-
-/// Like PiiString, but scrubs the serde::Serialize implementation
-#[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-#[serde(transparent)]
-pub struct ScrubbedPiiString(#[serde(serialize_with = "scrubbed_str")] PiiString);
-
-fn scrubbed_str<S>(_v: &PiiString, s: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    s.serialize_str("<SCRUBBED>")
-}
-
-impl std::ops::Deref for ScrubbedPiiString {
-    type Target = PiiString;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
+pub use pii::*;
 
 /// helper macro to convert to PiiString
 pub mod pii_helper {
@@ -76,55 +48,3 @@ pub mod api_schema_helper {
     pub(crate) use api_data_type_alias;
     pub(crate) use string_api_data_type_alias;
 }
-
-impl<T> From<T> for PiiString
-where
-    T: Display,
-{
-    fn from(pii: T) -> Self {
-        Self(format!("{}", pii))
-    }
-}
-
-impl PiiString {
-    pub fn new(pii: String) -> Self {
-        Self(pii)
-    }
-
-    pub fn leak(&self) -> &str {
-        &self.0
-    }
-
-    pub fn leak_to_string(&self) -> String {
-        self.0.clone()
-    }
-
-    /// compare PII to string
-    pub fn equals(&self, s: &str) -> bool {
-        self.0 == s
-    }
-
-    pub fn clean_for_fingerprint(&self) -> PiiString {
-        PiiString(self.0.trim().to_lowercase())
-    }
-}
-
-impl Debug for PiiString {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<redacted>")
-    }
-}
-
-impl Debug for ScrubbedPiiString {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl From<PiiString> for reqwest::Body {
-    fn from(v: PiiString) -> Self {
-        Self::from(v.0)
-    }
-}
-
-string_api_data_type_alias!(PiiString);

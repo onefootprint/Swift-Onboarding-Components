@@ -39,7 +39,7 @@ pub async fn post(
     }
     let email = state
         .enclave_client
-        .decrypt_bytes(
+        .decrypt_to_piistring(
             &email_row.e_data,
             &user_vault.e_private_key,
             enclave_proxy::DataTransform::Identity,
