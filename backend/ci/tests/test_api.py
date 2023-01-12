@@ -150,6 +150,7 @@ class TestUnifiedVaultApi:
         }
 
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
+        # TODO update these to serialized DataIdentifiers
         assert response["identity"]["last_name"] == True
         assert response["identity"]["ssn9"] == True
         assert response["custom"]["ach_account_number"] == True
@@ -168,10 +169,10 @@ class TestUnifiedVaultApi:
         )
         body = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         data = body
-        assert data["identity"]["first_name"] == "Sandbox"
-        assert data["identity"]["zip"] == "10009"
-        assert data["custom"]["ach_account_number"] == "123467890"
-        assert data["custom"]["cc4"] == "4242"
+        assert data["identity.first_name"] == "Sandbox"
+        assert data["identity.zip"] == "10009"
+        assert data["custom.ach_account_number"] == "123467890"
+        assert data["custom.cc4"] == "4242"
 
         # verify access events created
         body = get(
@@ -182,7 +183,7 @@ class TestUnifiedVaultApi:
         access_events = body["data"]
         assert access_events[0]["kind"] == "decrypt"
 
-        events = set(access_events[0]["targets"]) | set(access_events[1]["targets"])
+        events = set(access_events[0]["targets"])
         assert events == {
             "identity.first_name",
             "identity.zip",

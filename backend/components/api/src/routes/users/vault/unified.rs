@@ -1,36 +1,30 @@
 //! Add/get/decrypt identity data to a NON-portable user vault
 
-use std::collections::HashSet;
-
-use crate::auth::tenant::SecretTenantAuthContext;
+use super::custom::{self, GetCustomDataResponse, PutCustomDataRequest};
+use super::identity::{self, GetIdentityDataResponse};
+use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
 use crate::auth::{
     tenant::{TenantAuth, TenantUserAuthContext},
     Either,
 };
-
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
-
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper, UvwArgs};
 use crate::{errors::ApiError, State};
-
 use actix_web::web::Query;
-
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::csv::Csv;
+use newtypes::{flat_api_object_map_type, PiiString};
 use newtypes::{DataIdentifier, FootprintUserId};
-
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use serde::{Deserialize, Serialize};
-
-use super::custom::{self, DecryptCustomDataResponse, GetCustomDataResponse, PutCustomDataRequest};
-use super::identity::{self, DecryptIdentityDataResponse, GetIdentityDataResponse};
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct UnifiedUserVaultPutRequest {
@@ -172,25 +166,19 @@ pub async fn get(
     ResponseData::ok(out).json()
 }
 
-/**
- * Decryt data kinds
- */
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct DecryptUnifiedFieldsRequest {
-    /// attributes to decrypt
+    /// list of data identifiers to decrypt
     fields: HashSet<DataIdentifier>,
-
     /// reason for the data decryption
     reason: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
-pub struct UnifiedUserVaultDecryptResponse {
-    /// identity data
-    identity: DecryptIdentityDataResponse,
-    /// custom data fields
-    custom: DecryptCustomDataResponse,
-}
+flat_api_object_map_type!(
+    DecryptUnifiedResponse<DataIdentifier, Option<PiiString>>,
+    description="A key-value map with the corresponding decrypted values",
+    example=r#"{ "identity.last_name": "smith", "identity.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
+);
 
 #[api_v2_operation(tags(Vault, PublicApi, Users), description = "Decrypts items from the vault")]
 #[actix::post("/users/{footprint_user_id}/vault/decrypt")]
@@ -200,45 +188,44 @@ pub async fn post_decrypt(
     request: Json<DecryptUnifiedFieldsRequest>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
-) -> JsonApiResponse<UnifiedUserVaultDecryptResponse> {
-    let footprint_id = path.into_inner();
+) -> JsonApiResponse<DecryptUnifiedResponse> {
+    // TODO if we get only identity data here, don't require the `identity.` prefix
+    let footprint_user_id = path.into_inner();
+
     let request = request.into_inner();
+    let DecryptUnifiedFieldsRequest { fields, reason } = request;
+    let fields = fields.clone().into_iter().collect_vec();
 
-    let (requested_identity_fields, requested_custom_fields) =
-        request.fields.into_iter().partition_map(|f| match f {
-            DataIdentifier::Identity(attr) => Left(attr),
-            DataIdentifier::Custom(data_key) => Right(data_key),
-            DataIdentifier::IdentityDocument => todo!(),
-        });
+    // TODO make And for tenant permission
+    // or can i just include custom in here
+    auth.clone().check_guard(TenantGuard::DecryptCustom)?;
+    let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
-    let id_results_fut = identity::post_decrypt_internal(
-        state.clone(),
-        Path::from(footprint_id.clone()),
-        Json(identity::DecryptIdentityFieldsRequest {
-            fields: requested_identity_fields,
-            reason: request.reason.clone(),
-        }),
-        auth.clone(),
-        insights.clone(),
-    );
+    let is_live = auth.is_live()?;
+    let tenant_id = auth.tenant().id.clone();
 
-    let custom_results_fut = custom::post_decrypt_internal(
-        state,
-        Path::from(footprint_id),
-        Json(custom::DecryptCustomFieldsRequest {
-            fields: requested_custom_fields,
-            reason: request.reason,
-        }),
-        auth,
-        insights,
-    );
+    let fields_clone = fields.clone();
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            // TODO bake this access checking into decrypt, when decrypting for a tenant.
+            // Shouldn't be allowed to decrypt without doing this
+            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
+            Ok(uvw)
+        })
+        .await??;
 
-    let (id_results, custom_results) = futures::try_join!(id_results_fut, custom_results_fut)?;
-
-    let out = UnifiedUserVaultDecryptResponse {
-        identity: id_results.into_inner().data,
-        custom: custom_results.into_inner().data,
+    let req = DecryptRequest {
+        reason,
+        principal: auth.actor().into(),
+        insight: CreateInsightEvent::from(insights),
     };
+    let mut results = uvw.decrypt(&state, &fields, Some(req)).await?;
+    // Is this step necessary? Every key is present in the response if it was in the request?
+    let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.remove(&di))));
+    let out = DecryptUnifiedResponse { map: results };
 
     ResponseData::ok(out).json()
 }

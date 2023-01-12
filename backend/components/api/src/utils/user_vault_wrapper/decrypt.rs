@@ -49,6 +49,7 @@ impl UserVaultWrapper {
 
         if let Some(req) = req {
             // If the UVW was created from a tenant's perspective, create an access event for the decrypt
+            // TODO util for scoped_user_id_or()?
             let scoped_user_id = self.scoped_user_id.clone().ok_or_else(|| {
                 ApiError::AssertionError("Don't need reason for non-tenant decrypt".to_owned())
             })?;

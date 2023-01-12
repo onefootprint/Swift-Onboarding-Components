@@ -200,17 +200,7 @@ pub async fn post_decrypt(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
-    post_decrypt_internal(state, path, request, auth, insights).await
-}
-
-pub(super) async fn post_decrypt_internal(
-    state: web::Data<State>,
-    path: Path<FootprintUserId>,
-    request: Json<DecryptIdentityFieldsRequest>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-    insights: InsightHeaders,
-) -> JsonApiResponse<DecryptIdentityDataResponse> {
-    let DecryptIdentityFieldsRequest { reason, fields } = request.into_inner();
+    let DecryptIdentityFieldsRequest { fields, reason } = request.into_inner();
     let fields: Vec<_> = fields.into_iter().collect();
     let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
@@ -236,14 +226,8 @@ pub(super) async fn post_decrypt_internal(
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
     };
-    let results = uvw.decrypt(&state, &fields, Some(req)).await?;
-    let results: HashMap<_, _> = fields
-        .iter()
-        .map(|idk| {
-            let value = results.get(idk).cloned();
-            (*idk, value)
-        })
-        .collect();
+    let mut results = uvw.decrypt(&state, &fields, Some(req)).await?;
+    let results = HashMap::from_iter(fields.into_iter().map(|di| (di, results.remove(&di))));
 
     ResponseData::ok(DecryptIdentityDataResponse::from(results)).json()
 }

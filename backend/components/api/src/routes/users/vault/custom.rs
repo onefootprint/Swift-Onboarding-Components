@@ -167,16 +167,6 @@ pub async fn post_decrypt(
     tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
-    post_decrypt_internal(state, path, request, tenant_auth, insights).await
-}
-
-pub(super) async fn post_decrypt_internal(
-    state: web::Data<State>,
-    path: Path<FootprintUserId>,
-    request: Json<DecryptCustomFieldsRequest>,
-    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-    insights: InsightHeaders,
-) -> JsonApiResponse<DecryptCustomDataResponse> {
     let tenant_auth = tenant_auth.check_guard(TenantGuard::DecryptCustom)?;
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
