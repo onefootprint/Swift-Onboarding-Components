@@ -6,7 +6,7 @@ use db::models::identity_document::IdentityDocument;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{email::Email, IdentityDataKind, IdvData, PhoneNumber};
 use newtypes::{DocVData, Base64Data, PiiString};
-use std::{collections::HashMap, str::FromStr};
+use std::{str::FromStr};
 use strum::IntoEnumIterator;
 
 pub async fn build_idv_data_from_verification_request(
@@ -20,12 +20,8 @@ pub async fn build_idv_data_from_verification_request(
         .db_query(|conn| UserVaultWrapper::build(conn, UvwArgs::Idv(request)))
         .await??;
 
-    let (keys, encrypted_values): (Vec<_>, Vec<_>) = IdentityDataKind::iter()
-        .flat_map(|a| uvw.get_identity_e_field(a).map(|v| (a, v)))
-        .unzip();
-    let decrypted_values = uvw.old_decrypt(state, encrypted_values).await?;
-    let mut decrypted_values: HashMap<IdentityDataKind, _> =
-        keys.into_iter().zip(decrypted_values.into_iter()).collect();
+    let all_identity_data_kinds: Vec<_> = IdentityDataKind::iter().collect();
+    let mut decrypted_values = uvw.decrypt(state, &all_identity_data_kinds).await?;
     // Remove sandbox suffixes
     let email = decrypted_values
         .remove(&IdentityDataKind::Email)

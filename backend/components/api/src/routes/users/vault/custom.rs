@@ -192,17 +192,10 @@ pub(super) async fn post_decrypt_internal(
         })
         .await??;
 
-    let (existing_keys, e_datas): (Vec<_>, Vec<_>) = fields
-        .iter()
-        .flat_map(|k| uvw.kv_data().get(k))
-        .map(|d| (&d.data_key, &d.e_data))
-        .unzip();
-
-    // Since this is custom data, requester has access to everything committed in the vault
-    let decrypted = uvw.old_decrypt(&state, e_datas).await?;
-    let output: HashMap<_, _> = existing_keys.into_iter().cloned().zip(decrypted).collect();
+    let results = uvw.decrypt(&state, &fields).await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
+    // TODO do this in the decrypt util
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         reason: Some(reason),
@@ -214,5 +207,5 @@ pub(super) async fn post_decrypt_internal(
     .save(&state.db_pool)
     .await?;
 
-    ResponseData::ok(DecryptCustomDataResponse::from(output)).json()
+    ResponseData::ok(DecryptCustomDataResponse::from(results)).json()
 }

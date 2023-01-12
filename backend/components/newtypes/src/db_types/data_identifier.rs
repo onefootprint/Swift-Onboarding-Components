@@ -30,6 +30,12 @@ impl From<IdentityDataKind> for DataIdentifier {
     }
 }
 
+impl From<KvDataKey> for DataIdentifier {
+    fn from(value: KvDataKey) -> Self {
+        Self::Custom(value)
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum DataIdentifierParsingError {
     #[error("Cannot parse: {0}")]

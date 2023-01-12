@@ -3,7 +3,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
 use enclave_proxy::DataTransform;
-use newtypes::{DataIdentifier, PiiString, SealedVaultBytes, SealedVaultDataKey, ValidatedPhoneNumber};
+use newtypes::{DataIdentifier, PiiString, SealedVaultDataKey, ValidatedPhoneNumber};
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
 use std::convert::Into;
@@ -15,20 +15,10 @@ pub struct DecryptRequest {
 }
 
 impl UserVaultWrapper {
-    // TODO make an access event here too
-    // take in identifier (identity, custom, or doc request id)
-    pub async fn old_decrypt(
-        &self,
-        state: &State,
-        data: Vec<&SealedVaultBytes>,
-    ) -> Result<Vec<PiiString>, ApiError> {
-        let decrypted_results = state
-            .enclave_client
-            .decrypt_bytes_batch(data, &self.user_vault.e_private_key, DataTransform::Identity)
-            .await?;
-        Ok(decrypted_results)
-    }
-
+    /// Util to decrypt a list of T where T represents a DataIdentifier. Returns a hashmap of T to
+    /// the decrypted PiiString.
+    /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
+    /// doesn't have any associated data on the UVW.
     pub async fn decrypt<T>(&self, state: &State, ids: &[T]) -> ApiResult<HashMap<T, PiiString>>
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
@@ -68,7 +58,6 @@ impl UserVaultWrapper {
         Ok(decrypted_results)
     }
 
-    // TODO don't want this to make an access event
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<ValidatedPhoneNumber, ApiError> {
         let number = self
             .phone_numbers()
@@ -76,8 +65,14 @@ impl UserVaultWrapper {
             .next()
             .ok_or(ApiError::NoPhoneNumberForVault)?;
 
-        let decrypt_response = self
-            .old_decrypt(state, vec![&number.e_e164, &number.e_country])
+        let e_datas = vec![&number.e_e164, &number.e_country];
+        // TODO get rid of this bespoke decryption code. We need it right now because this function
+        // returns a ValidatedPhoneNumber, which contains the decrypted PhoneNumber.e_country.
+        // I don't think any codepaths that use this really need the e_country, so we can refactor
+        // this to not return a ValidatedPhoneNumber
+        let decrypt_response = state
+            .enclave_client
+            .decrypt_bytes_batch(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
             .await?;
         let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
         let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();
