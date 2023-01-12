@@ -29,7 +29,7 @@ const useRiskSignals = () => {
   const userId = useUserId();
 
   return useQuery(
-    ['userRiskSignalsList', authHeaders, userId, filters.requestParams],
+    ['user', userId, 'riskSignals', filters.requestParams],
     () => getRiskSignalsRequest(filters.requestParams, userId, authHeaders),
     { enabled: !!userId && filters.isReady },
   );

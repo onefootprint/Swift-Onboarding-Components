@@ -1,15 +1,17 @@
 import { IdDocType } from '@onefootprint/types';
 import { Control, FieldValues, useWatch } from 'react-hook-form';
-import { User } from 'src/hooks/use-user/types';
+import { User, UserVaultData } from 'src/pages/users/users.types';
 
 import isCheckboxDisabled from '../../../utils/is-checkbox-disabled';
 
 const useFormState = ({
   control,
   user,
+  vaultData,
 }: {
   control: Control<FieldValues>;
   user: User;
+  vaultData: UserVaultData;
 }) => {
   const passport = useWatch({
     control,
@@ -26,24 +28,21 @@ const useFormState = ({
     name: `idDoc.${IdDocType.driversLicense}`,
   });
 
-  const { metadata, vaultData } = user;
   const fieldsState = {
     [IdDocType.passport]: {
-      visible: metadata?.identityDocumentTypes.includes(IdDocType.passport),
+      visible: user.identityDocumentTypes.includes(IdDocType.passport),
       checked: !!passport,
-      disabled: isCheckboxDisabled(vaultData?.idDoc[IdDocType.passport]),
+      disabled: isCheckboxDisabled(vaultData.idDoc[IdDocType.passport]),
     },
     [IdDocType.idCard]: {
-      visible: metadata?.identityDocumentTypes.includes(IdDocType.idCard),
+      visible: user.identityDocumentTypes.includes(IdDocType.idCard),
       checked: !!idCard,
-      disabled: isCheckboxDisabled(vaultData?.idDoc[IdDocType.idCard]),
+      disabled: isCheckboxDisabled(vaultData.idDoc[IdDocType.idCard]),
     },
     [IdDocType.driversLicense]: {
-      visible: metadata?.identityDocumentTypes.includes(
-        IdDocType.driversLicense,
-      ),
+      visible: user.identityDocumentTypes.includes(IdDocType.driversLicense),
       checked: !!driversLicense,
-      disabled: isCheckboxDisabled(vaultData?.idDoc[IdDocType.driversLicense]),
+      disabled: isCheckboxDisabled(vaultData.idDoc[IdDocType.driversLicense]),
     },
   };
 

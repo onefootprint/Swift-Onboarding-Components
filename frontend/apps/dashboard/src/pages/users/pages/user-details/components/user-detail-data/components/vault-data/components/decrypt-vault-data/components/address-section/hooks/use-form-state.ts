@@ -1,15 +1,17 @@
 import { UserDataAttribute } from '@onefootprint/types';
 import { Control, FieldValues, useWatch } from 'react-hook-form';
-import { User } from 'src/hooks/use-user/types';
+import { User, UserVaultData } from 'src/pages/users/users.types';
 
 import isCheckboxDisabled from '../../../utils/is-checkbox-disabled';
 
 const useFormState = ({
   control,
   user,
+  vaultData,
 }: {
   control: Control<FieldValues>;
   user: User;
+  vaultData: UserVaultData;
 }) => {
   const country = useWatch({
     control,
@@ -36,53 +38,46 @@ const useFormState = ({
     name: `kycData.${UserDataAttribute.state}`,
   });
 
-  const { metadata, vaultData } = user;
   const fieldsState = {
     [UserDataAttribute.country]: {
-      visible: metadata?.identityDataAttributes.includes(
-        UserDataAttribute.country,
-      ),
+      visible: user.identityDataAttributes.includes(UserDataAttribute.country),
       checked: !!country,
       disabled: isCheckboxDisabled(
-        vaultData?.kycData[UserDataAttribute.country],
+        vaultData.kycData[UserDataAttribute.country],
       ),
     },
     [UserDataAttribute.addressLine1]: {
-      visible: metadata?.identityDataAttributes.includes(
+      visible: user.identityDataAttributes.includes(
         UserDataAttribute.addressLine1,
       ),
       checked: !!addressLine1,
       disabled: isCheckboxDisabled(
-        vaultData?.kycData[UserDataAttribute.addressLine1],
+        vaultData.kycData[UserDataAttribute.addressLine1],
       ),
     },
     [UserDataAttribute.addressLine2]: {
-      visible: metadata?.identityDataAttributes.includes(
+      visible: user.identityDataAttributes.includes(
         UserDataAttribute.addressLine2,
       ),
       checked: !!addressLine2,
       disabled: isCheckboxDisabled(
-        vaultData?.kycData[UserDataAttribute.addressLine2],
+        vaultData.kycData[UserDataAttribute.addressLine2],
       ),
     },
     [UserDataAttribute.city]: {
-      visible: metadata?.identityDataAttributes.includes(
-        UserDataAttribute.city,
-      ),
+      visible: user.identityDataAttributes.includes(UserDataAttribute.city),
       checked: !!city,
-      disabled: isCheckboxDisabled(vaultData?.kycData[UserDataAttribute.city]),
+      disabled: isCheckboxDisabled(vaultData.kycData[UserDataAttribute.city]),
     },
     [UserDataAttribute.zip]: {
-      visible: metadata?.identityDataAttributes.includes(UserDataAttribute.zip),
+      visible: user.identityDataAttributes.includes(UserDataAttribute.zip),
       checked: !!zip,
-      disabled: isCheckboxDisabled(vaultData?.kycData[UserDataAttribute.zip]),
+      disabled: isCheckboxDisabled(vaultData.kycData[UserDataAttribute.zip]),
     },
     [UserDataAttribute.state]: {
-      visible: metadata?.identityDataAttributes.includes(
-        UserDataAttribute.state,
-      ),
+      visible: user.identityDataAttributes.includes(UserDataAttribute.state),
       checked: !!state,
-      disabled: isCheckboxDisabled(vaultData?.kycData[UserDataAttribute.state]),
+      disabled: isCheckboxDisabled(vaultData.kycData[UserDataAttribute.state]),
     },
   };
 

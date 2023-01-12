@@ -6,11 +6,10 @@ import {
 } from '@onefootprint/types';
 import { Drawer, LinkButton, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import useUser from 'src/hooks/use-user';
+import useRefetchUser from 'src/pages/users/pages/user-details/hooks/use-refetch-user';
+import useUpdateAnnotation from 'src/pages/users/pages/user-details/hooks/use-update-annotation';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import styled, { css } from 'styled-components';
-
-import useUpdateAnnotation from '../../../../../../hooks/use-update-annotation';
 
 type OrgOverwriteDetailsProps = {
   data: OnboardingDecisionEventData;
@@ -22,7 +21,8 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
   const userId = useUserId();
-  const { refresh } = useUser(userId);
+  const refetchUser = useRefetchUser(userId);
+
   const {
     decision: { timestamp, status },
     annotation,
@@ -44,7 +44,7 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
       },
       {
         onSuccess: () => {
-          refresh();
+          refetchUser();
         },
       },
     );

@@ -4,14 +4,6 @@
     "error": "Uh-oh!",
     "success": "Yay!"
   },
-  "filters": {
-    "title": "Filters",
-    "apply": "Apply",
-    "clear": "Clear",
-    "cta_zero": "Filters",
-    "cta_one": "Filters · {{count}}",
-    "cta_other": "Filters · {{count}}"
-  },
   "save": "Save",
   "skip": "Skip",
   "close": "Close",
@@ -113,7 +105,7 @@
       "manual-review-banner": {
         "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
         "failed-needs-review": "This user could not be verified and needs to be manually reviewed.",
-        "see-audit-trail": "See audit trail"
+        "see-timeline": "See timeline"
       }
     },
     "terms-and-conditions": {
@@ -250,29 +242,15 @@
         "title": "Users"
       },
       "filters": {
-        "cta_zero": "Filters",
-        "cta_one": "Filters · {{count}}",
-        "cta_other": "Filters · {{count}}",
-        "dialog": {
-          "title": "Filters",
-          "clear": "Clear",
-          "cta": "Apply",
-          "form": {
-            "status": {
-              "title": "Status",
-              "verified": "Verified",
-              "failed": "Failed"
-            },
-            "date-range": {
-              "title": "Date range",
-              "all-time": "All time",
-              "today": "Today",
-              "current-month": "Current month",
-              "last-week": "Last week",
-              "last-month": "Last month",
-              "custom": "Custom"
-            }
+        "status": {
+          "label": "Status",
+          "options": {
+            "verified": "Verified",
+            "failed": "Failed"
           }
+        },
+        "date-range": {
+          "label": "Date range"
         }
       },
       "table": {
@@ -486,7 +464,7 @@
       },
       "audit-trail": {
         "title": "Audit trail",
-        "empty": "No audit trail entries",
+        "empty": "No entries",
         "timeline": {
           "liveness-event": {
             "success-title": "Liveness check succeeded",
@@ -748,31 +726,15 @@
             "empty-state": "No members found"
           },
           "filters": {
-            "cta_zero": "Filters",
-            "cta_one": "Filters · {{count}}",
-            "cta_other": "Filters · {{count}}",
-            "dialog": {
-              "title": "Filters",
-              "clear": "Clear",
-              "cta": "Apply",
-              "form": {
-                "status": {
-                  "title": "Status",
-                  "new": "New",
-                  "manual-review": "Manual Review",
-                  "processing": "Processing",
-                  "failed": "Failed"
-                },
-                "date-range": {
-                  "title": "Date range",
-                  "all-time": "All time",
-                  "today": "Today",
-                  "current-month": "Current month",
-                  "last-week": "Last week",
-                  "last-month": "Last month",
-                  "custom": "Custom"
-                }
-              }
+            "status": {
+              "label": "Status",
+              "new": "New",
+              "manual-review": "Manual Review",
+              "processing": "Processing",
+              "failed": "Failed"
+            },
+            "date-range": {
+              "label": "Date range"
             }
           }
         },
@@ -785,17 +747,6 @@
               "permissions": "Permissions"
             },
             "empty-state": "No roles found"
-          },
-          "filters": {
-            "cta_zero": "Filters",
-            "cta_one": "Filters · {{count}}",
-            "cta_other": "Filters · {{count}}",
-            "dialog": {
-              "title": "Filters",
-              "clear": "Clear",
-              "cta": "Apply",
-              "form": {}
-            }
           }
         },
         "tabs": {

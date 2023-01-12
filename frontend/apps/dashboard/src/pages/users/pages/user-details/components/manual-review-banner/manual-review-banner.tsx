@@ -28,7 +28,7 @@ const ManualReviewBanner = ({
         : t('verified-needs-review')}
       {onClickAuditTrailLink && (
         <LinkButton onClick={onClickAuditTrailLink} sx={{ marginLeft: 2 }}>
-          {t('see-audit-trail')}
+          {t('see-timeline')}
         </LinkButton>
       )}
     </InlineAlert>

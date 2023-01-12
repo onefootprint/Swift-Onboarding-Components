@@ -4,16 +4,9 @@ import {
   screen,
 } from '@onefootprint/test-utils';
 import React from 'react';
-import { UserStoreProvider } from 'src/hooks/use-user-store';
 
 import AuditTrail from './audit-trail';
-import {
-  withAnnotations,
-  withLiveness,
-  withMetadata,
-  withRiskSignals,
-  withTimeline,
-} from './audit-trail.test.config';
+import { withTimeline } from './audit-trail.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -27,19 +20,10 @@ describe('<AuditTrail />', () => {
         footprint_user_id: footprintUserId,
       },
     });
-    withMetadata(footprintUserId);
-    withRiskSignals(footprintUserId);
-    withAnnotations(footprintUserId);
-    withLiveness(footprintUserId);
     withTimeline(footprintUserId);
   });
 
-  const renderAuditTrail = () =>
-    customRender(
-      <UserStoreProvider>
-        <AuditTrail />
-      </UserStoreProvider>,
-    );
+  const renderAuditTrail = () => customRender(<AuditTrail />);
 
   it('renders container and title correctly', () => {
     useRouterSpy({

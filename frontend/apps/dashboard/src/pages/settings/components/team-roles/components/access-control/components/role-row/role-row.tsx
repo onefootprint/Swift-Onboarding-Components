@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { OrgRole, OrgRolePermission } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import createTagList from 'src/pages/users/pages/user-details/components/user-detail-data/components/audit-trail/components/audit-trail-timeline/utils/create-tag-list';
+import createTagList from 'src/utils/create-tag-list';
 
 type RoleRowProps = {
   role: OrgRole;

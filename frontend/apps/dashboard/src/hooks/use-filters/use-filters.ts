@@ -37,14 +37,6 @@ export const stringToArray = (value?: string) => {
   return value.split(',');
 };
 
-// TODO: This should be removed once we remove the old filters
-export const countString = (value?: any) => {
-  if (value && typeof value === 'string') {
-    return value.split(',').length;
-  }
-  return 0;
-};
-
 export const queryToArray = (value?: string | string[]) => {
   if (!value) return [];
   if (typeof value === 'string') {

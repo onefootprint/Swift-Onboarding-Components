@@ -9,15 +9,9 @@ type PeopleTableProps = {
   members: OrgMember[];
   isLoading?: boolean;
   onFilter: (roles: string) => void;
-  renderActions: () => React.ReactNode;
 };
 
-const PeopleTable = ({
-  members,
-  isLoading,
-  onFilter,
-  renderActions,
-}: PeopleTableProps) => {
+const PeopleTable = ({ members, isLoading, onFilter }: PeopleTableProps) => {
   const { t } = useTranslation('pages.settings.team-roles.people');
   const columns = [
     { id: 'email', text: t('table.header.email'), width: '25%' },
@@ -34,7 +28,6 @@ const PeopleTable = ({
       getKeyForRow={(member: OrgMember) => member.id}
       isLoading={isLoading}
       items={members as OrgMember[]}
-      renderActions={renderActions}
       renderTr={({ item }: TableRow<OrgMember>) => <MemberRow member={item} />}
     />
   );

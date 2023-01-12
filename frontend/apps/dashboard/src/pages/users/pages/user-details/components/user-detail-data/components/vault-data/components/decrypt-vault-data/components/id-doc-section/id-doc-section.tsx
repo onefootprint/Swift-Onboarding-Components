@@ -4,24 +4,26 @@ import { IdDocType } from '@onefootprint/types';
 import { Checkbox, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import useUser from 'src/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { User, UserVaultData } from 'src/pages/users/users.types';
 
 import DataSection from '../../../data-section';
 import useFormState from './hooks/use-form-state';
 
-const IdDocSection = () => {
-  const { t, allT } = useTranslation('pages.user-details.user-info');
-  const userId = useUserId();
-  const { user } = useUser(userId);
-  const { idDoc } = user.vaultData ?? {};
-  const docTypes = Object.keys(idDoc ?? {}) as IdDocType[];
+type IdDocSectionProps = {
+  user: User;
+  vaultData: UserVaultData;
+};
 
+const IdDocSection = ({ user, vaultData }: IdDocSectionProps) => {
+  const { t, allT } = useTranslation('pages.user-details.user-info');
+  const { idDoc } = vaultData;
+  const docTypes = Object.keys(idDoc ?? {}) as IdDocType[];
   const { register, setValue, control } = useFormContext();
   const { areAllFieldsSelected, areAllFieldsDisabled, fieldsState } =
     useFormState({
       control,
       user,
+      vaultData,
     });
 
   if (!idDoc || !docTypes.length) {

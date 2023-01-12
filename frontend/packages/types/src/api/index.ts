@@ -18,6 +18,7 @@ export * from './get-risk-signal-details';
 export * from './get-risk-signals';
 export * from './get-timeline';
 export * from './get-user';
+export * from './get-users';
 export * from './identify';
 export * from './identify-verify';
 export * from './login-challenge';

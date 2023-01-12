@@ -10,14 +10,6 @@ const DecryptControls = () => {
   const { t } = useTranslation('pages.user-details.decrypt.controls');
   const [state, send] = useDecryptMachine();
 
-  const handleStart = () => {
-    send(Event.started);
-  };
-
-  const handleCancel = () => {
-    send(Event.canceled);
-  };
-
   const decryptReasonDialogOpen =
     state.matches(State.confirmingReason) || state.matches(State.decrypting);
   const decryptSelectionInProgress =
@@ -26,6 +18,14 @@ const DecryptControls = () => {
     state.matches(State.decrypting);
   const decryptIdle = state.matches(State.idle);
   const decryptLoading = state.matches(State.decrypting);
+
+  const handleStart = () => {
+    send(Event.started);
+  };
+
+  const handleCancel = () => {
+    send(Event.canceled);
+  };
 
   return (
     <>

@@ -44,33 +44,37 @@ const UserDetailsLoading = () => (
           <Shimmer sx={{ height: '28px', width: '112px' }} />
           <Shimmer sx={{ height: '28px', width: '245px' }} />
         </Box>
-        <Box id="decrypt-button">
+        <HeaderActionsButton>
           <Shimmer sx={{ height: '28px', width: '114px' }} />
-        </Box>
+          <Shimmer sx={{ height: '28px', width: '114px' }} />
+        </HeaderActionsButton>
       </Box>
     </header>
-    <Box
-      sx={{
-        marginY: 5,
-      }}
-    >
+    <Box sx={{ marginY: 5 }}>
       <Divider />
     </Box>
     <DataGrid>
       <Box id="basic-data">
-        <Shimmer sx={{ height: '212px', width: '632px' }} />
+        <Shimmer sx={{ height: '204px', width: '632px' }} />
       </Box>
       <Box id="identity-data">
-        <Shimmer sx={{ height: '212px', width: '632px' }} />
+        <Shimmer sx={{ height: '204px', width: '632px' }} />
       </Box>
       <Box
         id="address-data"
         sx={{
-          gridRow: '1 / span 2',
-          gridColumn: '2 / 2',
+          gridArea: '1 / 2 / span 2 / 2',
         }}
       >
-        <Shimmer sx={{ height: '440px', width: '632px' }} />
+        <Shimmer sx={{ height: '424px', width: '632px' }} />
+      </Box>
+      <Box
+        id="id-doc"
+        sx={{
+          gridArea: '3 / 1 / 3 / 3',
+        }}
+      >
+        <Shimmer sx={{ height: '93px', width: '100%' }} />
       </Box>
     </DataGrid>
   </Box>
@@ -81,6 +85,15 @@ const DataGrid = styled.div`
     display: grid;
     gap: ${theme.spacing[5]};
     grid-template-columns: repeat(2, 1fr);
+  `};
+`;
+
+const HeaderActionsButton = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: ${theme.spacing[3]};
   `};
 `;
 

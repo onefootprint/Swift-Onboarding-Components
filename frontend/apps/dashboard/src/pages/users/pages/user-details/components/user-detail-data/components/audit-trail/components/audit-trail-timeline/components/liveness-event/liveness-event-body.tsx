@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { LivenessEventData } from '@onefootprint/types';
 import React from 'react';
+import createStringList from 'src/utils/create-string-list';
 
-import createStringList from '../../utils/create-string-list';
 import EventBodyEntry from '../event-body-entry';
 
 type LivenessEventBodyProps = {

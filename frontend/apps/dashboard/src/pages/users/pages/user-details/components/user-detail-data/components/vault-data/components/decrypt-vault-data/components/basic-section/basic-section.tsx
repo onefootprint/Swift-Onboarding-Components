@@ -4,22 +4,25 @@ import { UserDataAttribute } from '@onefootprint/types';
 import { Checkbox, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import useUser from 'src/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { User, UserVaultData } from 'src/pages/users/users.types';
 
 import DataSection from '../../../data-section';
-import RiskSignals from '../../../risk-signals';
+import RiskSignals from '../../../risk-signals-overview';
 import useFormState from './hooks/use-form-state';
 
-const BasicSection = () => {
+type BasicSectionProps = {
+  user: User;
+  vaultData: UserVaultData;
+};
+
+const BasicSection = ({ user, vaultData }: BasicSectionProps) => {
   const { t, allT } = useTranslation('pages.user-details.user-info');
-  const userId = useUserId();
-  const { user } = useUser(userId);
   const { register, setValue, control } = useFormContext();
   const { areAllFieldsSelected, areAllFieldsDisabled, fieldsState } =
     useFormState({
       control,
       user,
+      vaultData,
     });
 
   const selectValue = (value: boolean) => {

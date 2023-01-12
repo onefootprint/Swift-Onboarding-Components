@@ -1,15 +1,17 @@
 import { UserDataAttribute } from '@onefootprint/types';
 import { Control, FieldValues, useWatch } from 'react-hook-form';
-import { User } from 'src/hooks/use-user';
+import { User, UserVaultData } from 'src/pages/users/users.types';
 
 import isCheckboxDisabled from '../../../utils/is-checkbox-disabled';
 
 const useFormState = ({
   control,
   user,
+  vaultData,
 }: {
   control: Control<FieldValues>;
   user: User;
+  vaultData: UserVaultData;
 }) => {
   const fullName = useWatch({
     control,
@@ -26,30 +28,26 @@ const useFormState = ({
 
   const fieldsState = {
     [UserDataAttribute.firstName]: {
-      visible: user.metadata?.identityDataAttributes.includes(
+      visible: user.identityDataAttributes.includes(
         UserDataAttribute.firstName,
       ),
       checked: !!fullName,
       disabled: isCheckboxDisabled(
-        user.vaultData?.kycData[UserDataAttribute.firstName],
+        vaultData.kycData[UserDataAttribute.firstName],
       ),
     },
     [UserDataAttribute.email]: {
-      visible: user.metadata?.identityDataAttributes.includes(
-        UserDataAttribute.email,
-      ),
+      visible: user.identityDataAttributes.includes(UserDataAttribute.email),
       checked: !!email,
-      disabled: isCheckboxDisabled(
-        user.vaultData?.kycData[UserDataAttribute.email],
-      ),
+      disabled: isCheckboxDisabled(vaultData.kycData[UserDataAttribute.email]),
     },
     [UserDataAttribute.phoneNumber]: {
-      visible: user.metadata?.identityDataAttributes.includes(
+      visible: user.identityDataAttributes.includes(
         UserDataAttribute.phoneNumber,
       ),
       checked: !!phoneNumber,
       disabled: isCheckboxDisabled(
-        user.vaultData?.kycData[UserDataAttribute.phoneNumber],
+        vaultData.kycData[UserDataAttribute.phoneNumber],
       ),
     },
   };

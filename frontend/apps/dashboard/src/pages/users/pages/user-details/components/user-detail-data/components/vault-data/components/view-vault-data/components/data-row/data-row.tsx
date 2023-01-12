@@ -1,7 +1,7 @@
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import { KycDataValue } from 'src/hooks/use-user';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
+import { KycDataValue } from 'src/pages/users/users.types';
 import styled from 'styled-components';
 
 export type DataRowProps = {

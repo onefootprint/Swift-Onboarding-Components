@@ -5,8 +5,7 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-
-import createTagList from '../../utils/create-tag-list';
+import createTagList from 'src/utils/create-tag-list';
 
 type KycDataCollectedEventHeaderProps = {
   data: CollectedKycDataEventData;

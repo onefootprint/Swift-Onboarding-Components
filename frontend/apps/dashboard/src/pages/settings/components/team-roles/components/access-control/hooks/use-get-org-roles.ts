@@ -8,7 +8,6 @@ import {
 } from '@tanstack/react-query';
 import omit from 'lodash/omit';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
-import { dateRangeToFilterParams } from 'src/utils/date-range';
 
 import useOrgRolesFilters, {
   getCursors,
@@ -21,14 +20,12 @@ const getOrgRolesRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, params, authHeaders, pageSize] = queryKey as OrgRolesQueryKey;
-  const dateRangeFilters = dateRangeToFilterParams(params);
 
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
   const cursors = getCursors(params);
   const req = {
     ...omit(params, 'cursors', 'dateRange'),
-    ...dateRangeFilters,
     cursor: cursors[cursors.length - 1],
     pageSize,
   };

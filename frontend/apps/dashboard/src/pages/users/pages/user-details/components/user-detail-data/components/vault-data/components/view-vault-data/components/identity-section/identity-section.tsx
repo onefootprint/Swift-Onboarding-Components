@@ -2,23 +2,21 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import useUser from 'src/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { UserVaultData } from 'src/pages/users/users.types';
 
 import DataSection from '../../../data-section';
-import RiskSignals from '../../../risk-signals';
+import RiskSignals from '../../../risk-signals-overview';
 import DataRow from '../data-row';
 
-const IdentitySection = () => {
+type IdentitySectionProps = {
+  kycData: UserVaultData['kycData'];
+};
+
+const IdentitySection = ({ kycData }: IdentitySectionProps) => {
   const { t, allT } = useTranslation('pages.user-details.user-info.identity');
-  const userId = useUserId();
-  const {
-    user: { vaultData },
-  } = useUser(userId);
-  const { kycData } = vaultData ?? {};
-  const ssn9 = kycData?.[UserDataAttribute.ssn9];
-  const ssn4 = kycData?.[UserDataAttribute.ssn4];
-  const dob = kycData?.[UserDataAttribute.dob];
+  const ssn9 = kycData[UserDataAttribute.ssn9];
+  const ssn4 = kycData[UserDataAttribute.ssn4];
+  const dob = kycData[UserDataAttribute.dob];
 
   return (
     <DataSection

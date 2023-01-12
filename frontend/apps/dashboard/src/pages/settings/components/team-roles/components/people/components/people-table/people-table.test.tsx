@@ -21,7 +21,6 @@ describe('<PeopleTable />', () => {
         members={members}
         isLoading={isLoading}
         onFilter={onFilter}
-        renderActions={() => <div />}
       />,
     );
 

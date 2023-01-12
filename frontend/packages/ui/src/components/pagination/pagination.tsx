@@ -29,6 +29,7 @@ const Pagination = ({
     (pageIndex + 1) * pageSize,
     totalNumResults,
   );
+
   return (
     <Box
       sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}

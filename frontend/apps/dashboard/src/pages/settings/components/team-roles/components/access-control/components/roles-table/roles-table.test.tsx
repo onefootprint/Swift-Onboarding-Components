@@ -17,12 +17,7 @@ describe('<RolesTable />', () => {
     onFilter = jest.fn(),
   ) =>
     customRender(
-      <RolesTable
-        roles={roles}
-        isLoading={isLoading}
-        onFilter={onFilter}
-        renderActions={() => <div />}
-      />,
+      <RolesTable roles={roles} isLoading={isLoading} onFilter={onFilter} />,
     );
 
   describe('when there are no roles', () => {

@@ -1,16 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { Button, Pagination } from '@onefootprint/ui';
+import { Pagination } from '@onefootprint/ui';
 import React from 'react';
 
-import MemberFilters from './components/member-filters';
 import PeopleTable from './components/people-table';
 import useOrgMembers from './hooks/use-org-members';
 
 const PAGE_SIZE = 10;
 
 const People = () => {
-  const { allT } = useTranslation('pages.settings.team-roles.people');
-
   const {
     members,
     totalNumResults,
@@ -23,23 +19,12 @@ const People = () => {
     setFilter,
   } = useOrgMembers(PAGE_SIZE);
 
-  const renderTableActions = () => (
-    <MemberFilters
-      renderCta={({ onClick, filtersCount }) => (
-        <Button size="small" variant="secondary" onClick={onClick}>
-          {allT('filters.cta', { count: filtersCount })}
-        </Button>
-      )}
-    />
-  );
-
   return (
     <section>
       <PeopleTable
         members={members}
         isLoading={isLoading}
         onFilter={emails => setFilter({ emails })}
-        renderActions={renderTableActions}
       />
       {totalNumResults > 0 && (
         <Pagination

@@ -1,6 +1,7 @@
 import { OnboardingStatus, ReviewStatus } from '@onefootprint/types';
 import React, { useState } from 'react';
-import useUser from 'src/hooks/use-user';
+import useRefetchUser from 'src/pages/users/pages/user-details/hooks/use-refetch-user';
+import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
 import ManualReviewDialog from './components/manual-review-dialog';
@@ -8,21 +9,12 @@ import ManualReviewOptionalButton from './components/manual-review-optional-butt
 import ManualReviewRequiredButton from './components/manual-review-required-button';
 
 const ManualReview = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
   const userId = useUserId();
-  const {
-    user: { metadata },
-    refresh,
-  } = useUser(userId);
+  const { data } = useUser(userId);
+  const refetchUser = useRefetchUser(userId);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
-  if (!metadata) {
-    return null;
-  }
-
-  const { status, requiresManualReview } = metadata;
-  if (status === OnboardingStatus.vaultOnly) {
-    return null;
-  }
+  const shouldRender = data && data.status !== OnboardingStatus.vaultOnly;
 
   const handleOpenDialog = (dialogStatus: ReviewStatus) => {
     setReviewStatus(dialogStatus);
@@ -33,20 +25,20 @@ const ManualReview = () => {
     setDialogOpen(false);
     setReviewStatus(undefined);
     if (isComplete) {
-      refresh();
+      refetchUser();
     }
   };
 
-  return (
+  return shouldRender ? (
     <>
-      {requiresManualReview ? (
+      {data.requiresManualReview ? (
         <ManualReviewRequiredButton
-          status={status}
+          status={data.status}
           onOpenDialog={handleOpenDialog}
         />
       ) : (
         <ManualReviewOptionalButton
-          status={status}
+          status={data.status}
           onOpenDialog={handleOpenDialog}
         />
       )}
@@ -58,7 +50,7 @@ const ManualReview = () => {
         />
       )}
     </>
-  );
+  ) : null;
 };
 
 export default ManualReview;

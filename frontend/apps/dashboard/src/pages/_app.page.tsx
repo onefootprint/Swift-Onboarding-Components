@@ -7,7 +7,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
-import { UserStoreProvider } from 'src/hooks/use-user-store';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Layout from '../components/layout';
@@ -33,14 +32,12 @@ const App = ({ Component, pageProps }: AppProps) => {
         <DesignSystemProvider theme={themes.light}>
           <ReactQueryDevtools />
           <FootprintDevTools />
-          <UserStoreProvider>
-            <GlobalStyle />
-            <PageGuard>
-              <Layout name={pageProps.layout}>
-                <Component />
-              </Layout>
-            </PageGuard>
-          </UserStoreProvider>
+          <GlobalStyle />
+          <PageGuard>
+            <Layout name={pageProps.layout}>
+              <Component />
+            </Layout>
+          </PageGuard>
         </DesignSystemProvider>
       </ReactQueryProvider>
     </>

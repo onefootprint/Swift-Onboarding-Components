@@ -1,7 +1,6 @@
 import { Box } from '@onefootprint/ui';
 import React from 'react';
-import useUser from 'src/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { UserVaultData } from 'src/pages/users/users.types';
 import styled, { css } from 'styled-components';
 
 import getSectionsVisibility from '../../utils/get-sections-visibility';
@@ -10,18 +9,18 @@ import BasicSection from './components/basic-section';
 import IdDocSection from './components/id-doc-section';
 import IdentitySection from './components/identity-section';
 
-const ViewVaultData = () => {
-  const userId = useUserId();
-  const {
-    user: { vaultData },
-  } = useUser(userId);
+type ViewVaultDataProps = {
+  vaultData: UserVaultData;
+};
+
+const ViewVaultData = ({ vaultData }: ViewVaultDataProps) => {
   const sectionsVisibility = getSectionsVisibility(vaultData);
   const { identitySection, addressSection, idDocSection } = sectionsVisibility;
 
   return (
     <DataGrid>
-      <BasicSection />
-      {identitySection && <IdentitySection />}
+      <BasicSection kycData={vaultData.kycData} />
+      {identitySection && <IdentitySection kycData={vaultData.kycData} />}
       {addressSection && (
         <Box
           sx={{
@@ -29,7 +28,7 @@ const ViewVaultData = () => {
             gridColumn: '2 / 2',
           }}
         >
-          <AddressSection />
+          <AddressSection kycData={vaultData.kycData} />
         </Box>
       )}
       {idDocSection && (
@@ -39,7 +38,7 @@ const ViewVaultData = () => {
             gridColumn: '1 / 3',
           }}
         >
-          <IdDocSection />
+          <IdDocSection idDoc={vaultData.idDoc} />
         </Box>
       )}
     </DataGrid>

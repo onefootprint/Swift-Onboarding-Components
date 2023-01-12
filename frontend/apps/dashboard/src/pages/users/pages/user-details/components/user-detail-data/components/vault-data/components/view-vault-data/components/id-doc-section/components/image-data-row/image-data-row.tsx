@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
-import { IdDocDataValue } from 'src/hooks/use-user';
+import { IdDocDataValue } from 'src/pages/users/users.types';
 import styled, { css } from 'styled-components';
 
 import ImagesPreview from '../images-preview';

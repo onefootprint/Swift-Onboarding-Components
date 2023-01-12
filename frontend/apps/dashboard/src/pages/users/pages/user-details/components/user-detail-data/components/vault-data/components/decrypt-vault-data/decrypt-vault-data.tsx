@@ -3,20 +3,17 @@ import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import useUser from 'src/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { User, UserVaultData } from 'src/pages/users/users.types';
 import getAttrListFromFields from 'src/utils/get-attr-list-from-fields';
 import styled, { css } from 'styled-components';
 
 import { Event, Fields } from '../../../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../../../decrypt-machine-provider';
 import getSectionsVisibility from '../../utils/get-sections-visibility';
-import {
-  AddressSection,
-  BasicSection,
-  IdDocSection,
-  IdentitySection,
-} from './components';
+import AddressSection from './components/address-section';
+import BasicSection from './components/basic-section';
+import IdDocSection from './components/id-doc-section';
+import IdentitySection from './components/identity-section';
 
 // Only add first name in the form as a checkbox, combine first & last to show when decrypted
 type FormKycAttributes = Exclude<UserDataAttribute, UserDataAttribute.lastName>;
@@ -27,12 +24,13 @@ type FormData = {
   idDoc: Partial<Record<IdDocType, boolean>>;
 };
 
-const DecryptVaultData = () => {
+type DecryptVaultDataProps = {
+  user: User;
+  vaultData: UserVaultData;
+};
+
+const DecryptVaultData = ({ user, vaultData }: DecryptVaultDataProps) => {
   const { t } = useTranslation('pages.user-details');
-  const userId = useUserId();
-  const {
-    user: { vaultData },
-  } = useUser(userId);
   const [state, send] = useDecryptMachine();
   const formMethods = useForm<FormData>({
     defaultValues: state.context.fields || {
@@ -88,8 +86,10 @@ const DecryptVaultData = () => {
     <form onSubmit={handleSubmit(handleBeforeSubmit)} id="decrypt-form">
       <FormProvider {...formMethods}>
         <DataGrid>
-          <BasicSection />
-          {identitySection && <IdentitySection />}
+          <BasicSection user={user} vaultData={vaultData} />
+          {identitySection && (
+            <IdentitySection user={user} vaultData={vaultData} />
+          )}
           {addressSection && (
             <Box
               sx={{
@@ -97,7 +97,7 @@ const DecryptVaultData = () => {
                 gridColumn: '2 / 2',
               }}
             >
-              <AddressSection />
+              <AddressSection user={user} vaultData={vaultData} />
             </Box>
           )}
           {idDocSection && (
@@ -107,7 +107,7 @@ const DecryptVaultData = () => {
                 gridColumn: '1 / 3',
               }}
             >
-              <IdDocSection />
+              <IdDocSection user={user} vaultData={vaultData} />
             </Box>
           )}
         </DataGrid>

@@ -2,20 +2,18 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24 } from '@onefootprint/icons';
 import { IdDocType } from '@onefootprint/types';
 import React from 'react';
-import useUser from 'src/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { UserVaultData } from 'src/pages/users/users.types';
 import { useMap } from 'usehooks-ts';
 
 import DataSection from '../../../data-section';
 import ImageDataRow from './components/image-data-row';
 
-const IdDocSection = () => {
+type IdDocSectionProps = {
+  idDoc: UserVaultData['idDoc'];
+};
+
+const IdDocSection = ({ idDoc }: IdDocSectionProps) => {
   const { t, allT } = useTranslation('pages.user-details.user-info.id-doc');
-  const userId = useUserId();
-  const {
-    user: { vaultData },
-  } = useUser(userId);
-  const { idDoc } = vaultData ?? {};
   const [idDocTypeVisible, { set }] = useMap<IdDocType, boolean>(new Map());
   const docTypes = Object.keys(idDoc ?? {}) as IdDocType[];
   if (!idDoc || !docTypes.length) {

@@ -1,12 +1,7 @@
-import { UserDataAttribute } from '@onefootprint/types';
-import { KycDataValue, UserVaultData } from 'src/hooks/use-user';
-
 const getFullNameDataValue = (
-  attributes?: Pick<UserVaultData, 'kycData'>,
-): KycDataValue | undefined => {
-  const { kycData } = attributes ?? {};
-  const firstName = kycData?.[UserDataAttribute.firstName];
-  const lastName = kycData?.[UserDataAttribute.lastName];
+  firstName?: string | null,
+  lastName?: string | null,
+) => {
   if (firstName === undefined && lastName === undefined) {
     return undefined;
   }

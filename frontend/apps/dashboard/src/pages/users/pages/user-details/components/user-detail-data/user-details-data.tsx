@@ -1,64 +1,21 @@
-import { IdDocType, UserDataAttribute } from '@onefootprint/types';
 import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
-import useUser, { IdDocDataValue, KycDataValue } from 'src/hooks/use-user';
-import { useEffectOnce } from 'usehooks-ts';
+import { UserWithVaultData } from 'src/pages/users/users.types';
 
-import useUserId from '../../hooks/use-user-id';
-import { Event } from '../../utils/decrypt-state-machine';
-import { Fields } from '../../utils/decrypt-state-machine/types';
-import { useDecryptMachine } from '../decrypt-machine-provider';
-import AuditTrail from './components/audit-trail';
+import Timeline from './components/audit-trail';
 import Insights from './components/insights';
 import PinnedNotes from './components/pinned-notes';
 import RiskSignals from './components/risk-signals';
 import UserHeader from './components/user-header';
 import VaultData from './components/vault-data';
+import hydrateDecriptionFields from './hooks/use-hydrate-decryption-fields';
 
-const UserDetailsData = () => {
-  const [, send] = useDecryptMachine();
-  const userId = useUserId();
-  const {
-    user: { vaultData, metadata },
-  } = useUser(userId);
+type UserDetailsDataProps = {
+  user: UserWithVaultData;
+};
 
-  const hydrateFields = () => {
-    const { kycData, idDoc } = vaultData ?? {};
-    const fields: Fields = {
-      kycData: {},
-      idDoc: {},
-    };
-
-    if (kycData) {
-      Object.entries(kycData).forEach(entry => {
-        const attr = entry[0] as UserDataAttribute;
-        const value = entry[1] as KycDataValue;
-        if (value !== null) {
-          fields.kycData[attr] = true;
-        }
-      });
-    }
-
-    if (idDoc) {
-      Object.entries(idDoc).forEach(entry => {
-        const attr = entry[0] as IdDocType;
-        const value = entry[1] as IdDocDataValue;
-        if (value !== null) {
-          fields.idDoc[attr] = true;
-        }
-      });
-    }
-
-    const hasData =
-      Object.keys(fields.kycData).length > 0 ||
-      Object.keys(fields.idDoc).length > 0;
-
-    if (hasData) {
-      send({ type: Event.hydrated, payload: { fields } });
-    }
-  };
-
-  useEffectOnce(hydrateFields);
+const UserDetailsData = ({ user }: UserDetailsDataProps) => {
+  hydrateDecriptionFields(user.vaultData);
 
   return (
     <>
@@ -70,10 +27,10 @@ const UserDetailsData = () => {
       <Box sx={{ marginBottom: 9 }}>
         <VaultData />
       </Box>
-      {metadata?.isPortable ? (
+      {user.isPortable ? (
         <>
           <Box sx={{ marginBottom: 9 }}>
-            <AuditTrail />
+            <Timeline />
           </Box>
           <Box sx={{ marginBottom: 9 }}>
             <RiskSignals />

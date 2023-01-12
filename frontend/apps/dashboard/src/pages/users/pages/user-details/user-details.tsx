@@ -3,24 +3,26 @@ import { Box, Breadcrumb, BreadcrumbItem } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
-import useUser from 'src/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import useUserVault from 'src/pages/users/pages/user-details/hooks/use-user-vault';
 
 import DecryptMachineProvider from './components/decrypt-machine-provider';
 import ManualReviewBanner from './components/manual-review-banner';
 import UserDetailsData from './components/user-detail-data';
 import UserDetailEmptyState from './components/user-detail-empty-state';
 import UserDetailsLoading from './components/user-detail-loading';
-import useUserId from './hooks/use-user-id';
+import useUser from './hooks/use-user';
 
 const UserDetails = () => {
   const { t } = useTranslation('pages.user-details');
   const userId = useUserId();
-  const { user, loadingStates } = useUser(userId);
-  const { metadata } = user;
-  const shouldShowData = metadata && !loadingStates.metadata;
-  const shouldShowEmptyState = !metadata && !loadingStates.metadata;
+  const userQuery = useUser(userId);
+  const userVaultDataQuery = useUserVault(userId, userQuery.data);
+  const shouldShowData = userQuery.isSuccess && userVaultDataQuery.isSuccess;
+  const shouldShowLoading = userQuery.isLoading || userVaultDataQuery.isLoading;
+  const shouldShowEmptyState = !userQuery.data && !userQuery.isLoading;
   const shouldShowManualReviewBanner =
-    shouldShowData && metadata?.requiresManualReview;
+    shouldShowData && userQuery.data.requiresManualReview;
 
   const handleClickAuditTrailLink = () => {
     const auditTrail = document.getElementById('audit-trail');
@@ -35,7 +37,7 @@ const UserDetails = () => {
       {shouldShowManualReviewBanner && (
         <Box sx={{ marginBottom: 7 }}>
           <ManualReviewBanner
-            status={metadata.status}
+            status={userQuery.data.status}
             onClickAuditTrailLink={handleClickAuditTrailLink}
           />
         </Box>
@@ -49,8 +51,12 @@ const UserDetails = () => {
         </Breadcrumb>
       </Box>
       <DecryptMachineProvider>
-        {loadingStates.metadata && <UserDetailsLoading />}
-        {shouldShowData && <UserDetailsData />}
+        {shouldShowLoading && <UserDetailsLoading />}
+        {shouldShowData && (
+          <UserDetailsData
+            user={{ ...userQuery.data, vaultData: userVaultDataQuery.data }}
+          />
+        )}
         {shouldShowEmptyState && <UserDetailEmptyState />}
       </DecryptMachineProvider>
     </>

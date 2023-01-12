@@ -9,15 +9,9 @@ type RolesTableProps = {
   roles: OrgRole[];
   isLoading?: boolean;
   onFilter: (roles: string) => void;
-  renderActions: () => React.ReactNode;
 };
 
-const RolesTable = ({
-  roles,
-  isLoading,
-  onFilter,
-  renderActions,
-}: RolesTableProps) => {
+const RolesTable = ({ roles, isLoading, onFilter }: RolesTableProps) => {
   const { t } = useTranslation('pages.settings.team-roles.access-control');
   const columns = [
     { id: 'role', text: t('table.header.role'), width: '25%' },
@@ -34,7 +28,6 @@ const RolesTable = ({
       getKeyForRow={(role: OrgRole) => role.id}
       isLoading={isLoading}
       items={roles as OrgRole[]}
-      renderActions={renderActions}
       renderTr={({ item }: TableRow<OrgRole>) => <RoleRow role={item} />}
     />
   );

@@ -2,24 +2,13 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Pagination, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
-import useUsersPage from 'src/hooks/use-users-page';
 
 import UsersTable from './components/users-table/users-table';
-
-const PAGE_SIZE = 10;
+import useUsers from './hooks/use-users';
 
 const Users = () => {
   const { t } = useTranslation('pages.users');
-  const {
-    users,
-    isLoading,
-    totalNumUsers,
-    pageIndex,
-    loadNextPage,
-    loadPrevPage,
-    hasNextPage,
-    hasPrevPage,
-  } = useUsersPage(PAGE_SIZE);
+  const { data: response, isLoading, pagination } = useUsers();
 
   return (
     <>
@@ -29,16 +18,16 @@ const Users = () => {
       <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
         {t('header.title')}
       </Typography>
-      <UsersTable users={users} isLoading={isLoading} />
-      {totalNumUsers > 0 && (
+      <UsersTable users={response?.data} isLoading={isLoading} />
+      {response && response.meta.count > 0 && (
         <Pagination
-          totalNumResults={totalNumUsers}
-          pageSize={PAGE_SIZE}
-          pageIndex={pageIndex}
-          onNextPage={loadNextPage}
-          onPrevPage={loadPrevPage}
-          hasNextPage={hasNextPage}
-          hasPrevPage={hasPrevPage}
+          hasNextPage={pagination.hasNextPage}
+          hasPrevPage={pagination.hasPrevPage}
+          onNextPage={pagination.loadNextPage}
+          onPrevPage={pagination.loadPrevPage}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          totalNumResults={response.meta.count}
         />
       )}
     </>

@@ -1,4 +1,4 @@
-import { IdDocDataValue, KycDataValue } from 'src/hooks/use-user';
+import { IdDocDataValue, KycDataValue } from 'src/pages/users/users.types';
 
 const isCheckboxDisabled = (value?: KycDataValue | IdDocDataValue) =>
   value !== undefined && value !== null;

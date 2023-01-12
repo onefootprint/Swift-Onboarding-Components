@@ -1,5 +1,9 @@
 import { isLogoutError } from '@onefootprint/request';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
@@ -8,9 +12,11 @@ type ReactQueryProviderProps = {
   children: React.ReactNode;
 };
 
+const queryCache = new QueryCache();
+
 const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
-  const { logOut } = useSession();
   const router = useRouter();
+  const { logOut } = useSession();
 
   const handleError = (error: unknown) => {
     if (isLogoutError(error)) {
@@ -20,6 +26,7 @@ const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
   };
 
   const queryClient = new QueryClient({
+    queryCache,
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,

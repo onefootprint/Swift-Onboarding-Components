@@ -1,25 +1,22 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Button, Table, TableRow } from '@onefootprint/ui';
+import { Table } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { User } from 'src/hooks/use-user';
+import { User } from 'src/pages/users/users.types';
 
-import useUserFilters from '../../hooks/use-users-filters';
-import Filters from '../filters';
-import UsersTableRow from './components/users-table-row';
+import useUsersFilters from '../../hooks/use-users-filters';
+import Filters from './components/filters';
+import Row from './components/row';
 
 type UsersTableProps = {
   users?: User[];
   isLoading: boolean;
 };
 
-type UserWithMetadata = Omit<User, 'metadata'> &
-  Required<Pick<User, 'metadata'>>;
-
 const UsersTable = ({ isLoading, users }: UsersTableProps) => {
   const router = useRouter();
-  const { setFilter, filters } = useUserFilters();
-  const { t, allT } = useTranslation('pages.users');
+  const filters = useUsersFilters();
+  const { t } = useTranslation('pages.users');
   const columns = [
     { text: t('table.header.name'), width: '14%' },
     { text: t('table.header.token'), width: '18%' },
@@ -29,41 +26,33 @@ const UsersTable = ({ isLoading, users }: UsersTableProps) => {
     { text: t('table.header.phone-number'), width: '14%' },
     { text: t('table.header.start'), width: '14%' },
   ];
-  const usersWithMetadata = (users?.filter((user: User) => !!user.metadata) ??
-    []) as UserWithMetadata[];
 
-  return (
-    <Table<UserWithMetadata>
-      initialSearch={filters.fingerprint}
-      onChangeSearchText={fingerprint => {
-        setFilter({ fingerprint });
-      }}
-      renderActions={() => (
-        <Filters
-          renderCta={({ onClick, filtersCount }) => (
-            <Button size="small" variant="secondary" onClick={onClick}>
-              {allT('filters.cta', { count: filtersCount })}
-            </Button>
-          )}
-        />
-      )}
+  const handleRowClick = (user: User) => {
+    router.push({
+      pathname: 'users/detail',
+      query: { footprint_user_id: user.id },
+    });
+  };
+
+  const handleSearchChange = (search: string) => {
+    filters.push({ search });
+  };
+
+  return router.isReady ? (
+    <Table<User>
       aria-label={t('table.aria-label')}
-      emptyStateText={t('table.empty-state')}
-      items={usersWithMetadata}
-      isLoading={isLoading}
-      getKeyForRow={(item: UserWithMetadata) => item.metadata.id}
-      onRowClick={(item: UserWithMetadata) => {
-        router.push({
-          pathname: 'users/detail',
-          query: { footprint_user_id: item.metadata.id },
-        });
-      }}
       columns={columns}
-      renderTr={({ item }: TableRow<UserWithMetadata>) => (
-        <UsersTableRow user={item} />
-      )}
+      emptyStateText={t('table.empty-state')}
+      getKeyForRow={(user: User) => user.id}
+      initialSearch={filters.query.search}
+      isLoading={isLoading}
+      items={users}
+      onChangeSearchText={handleSearchChange}
+      onRowClick={handleRowClick}
+      renderActions={() => <Filters />}
+      renderTr={({ item: user }) => <Row user={user} />}
     />
-  );
+  ) : null;
 };
 
 export default UsersTable;

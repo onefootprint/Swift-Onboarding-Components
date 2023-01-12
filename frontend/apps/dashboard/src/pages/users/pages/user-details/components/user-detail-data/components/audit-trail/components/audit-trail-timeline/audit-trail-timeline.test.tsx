@@ -27,7 +27,7 @@ describe('<AuditTrailTimeline />', () => {
   describe('when timeline is empty', () => {
     it('should render empty message', () => {
       renderAuditTrailTimeline({ timeline: [] });
-      expect(screen.getByText('No audit trail entries')).toBeInTheDocument();
+      expect(screen.getByText('No entries')).toBeInTheDocument();
     });
   });
 

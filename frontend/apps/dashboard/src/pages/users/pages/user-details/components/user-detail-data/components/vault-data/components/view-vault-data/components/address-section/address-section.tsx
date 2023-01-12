@@ -2,26 +2,24 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import useUser from 'src/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
+import { UserVaultData } from 'src/pages/users/users.types';
 
 import DataSection from '../../../data-section';
-import RiskSignals from '../../../risk-signals';
+import RiskSignals from '../../../risk-signals-overview';
 import DataRow from '../data-row';
 
-const AddressSection = () => {
+type AddressSectionProps = {
+  kycData: UserVaultData['kycData'];
+};
+
+const AddressSection = ({ kycData }: AddressSectionProps) => {
   const { t, allT } = useTranslation('pages.user-details.user-info.address');
-  const userId = useUserId();
-  const {
-    user: { vaultData },
-  } = useUser(userId);
-  const { kycData } = vaultData ?? {};
-  const country = kycData?.[UserDataAttribute.country];
-  const addressLine1 = kycData?.[UserDataAttribute.addressLine1];
-  const addressLine2 = kycData?.[UserDataAttribute.addressLine2];
-  const city = kycData?.[UserDataAttribute.city];
-  const zip = kycData?.[UserDataAttribute.zip];
-  const state = kycData?.[UserDataAttribute.state];
+  const country = kycData[UserDataAttribute.country];
+  const addressLine1 = kycData[UserDataAttribute.addressLine1];
+  const addressLine2 = kycData[UserDataAttribute.addressLine2];
+  const city = kycData[UserDataAttribute.city];
+  const zip = kycData[UserDataAttribute.zip];
+  const state = kycData[UserDataAttribute.state];
 
   return (
     <DataSection

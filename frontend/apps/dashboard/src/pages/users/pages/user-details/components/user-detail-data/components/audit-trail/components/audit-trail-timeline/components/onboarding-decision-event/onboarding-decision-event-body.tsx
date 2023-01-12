@@ -6,9 +6,9 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import createStringList from 'src/utils/create-string-list';
+import createTagList from 'src/utils/create-tag-list';
 
-import createStringList from '../../utils/create-string-list';
-import createTagList from '../../utils/create-tag-list';
 import EventBodyEntry from '../event-body-entry';
 
 type OnboardingDecisionEventBodyProps = {

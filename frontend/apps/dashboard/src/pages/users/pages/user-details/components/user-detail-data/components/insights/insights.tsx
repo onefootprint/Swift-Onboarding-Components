@@ -2,23 +2,26 @@ import { IcoCheckCircle16, IcoClose16 } from '@onefootprint/icons';
 import { Box, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import GoogleMapReact from 'google-map-react';
 import React from 'react';
-import useUser from 'src/hooks/use-user';
+import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
+import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';
 
-import useUserId from '../../../../hooks/use-user-id';
 import MapMarker from './components/map-marker';
+import useUserLiveness from './hooks/use-user-liveness';
 import mapStyles from './insight.styles';
 
 const Insights = () => {
   const userId = useUserId();
-  const {
-    user: { metadata, liveness },
-    loadingStates,
-  } = useUser(userId);
+  const userQuery = useUser(userId);
+  const livenessQuery = useUserLiveness();
 
-  const biometricCred = liveness?.events[0];
+  if (!livenessQuery.data) {
+    return null;
+  }
+
+  const [biometricCred] = livenessQuery.data;
 
   // If there's a biometric credential, use the insight event from it since it will most likely be the mobile device.
   // If there's no biometric credential, use the insight event from the onboarding, which is when the user finished
@@ -26,7 +29,7 @@ const Insights = () => {
   // If there's no onboarding, use the insight event from the scoped user, which is when the user started signing up.
   // We only show `Biometric: Verified` if the user has a biometric credential
   const insightEvent =
-    biometricCred?.insightEvent || metadata?.onboarding?.insightEvent;
+    biometricCred?.insightEvent || userQuery.data?.onboarding?.insightEvent;
 
   if (!insightEvent) {
     return null;
@@ -47,7 +50,7 @@ const Insights = () => {
       >
         <Divider />
       </Box>
-      {loadingStates.liveness ? (
+      {livenessQuery.isLoading ? (
         <Shimmer sx={{ height: '384px' }} />
       ) : (
         <Box
