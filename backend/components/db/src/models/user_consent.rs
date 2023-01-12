@@ -9,9 +9,9 @@ use serde::{Deserialize, Serialize};
 #[diesel(table_name = user_consent)]
 pub struct UserConsent {
     pub id: UserConsentId,
+    pub timestamp: DateTime<Utc>,
     pub user_vault_id: UserVaultId,
     pub scoped_user_id: ScopedUserId,
-    pub timestamp: DateTime<Utc>,
     pub document_request_id: DocumentRequestId,
     pub insight_event_id: InsightEventId,
     pub consent_language_text: String,

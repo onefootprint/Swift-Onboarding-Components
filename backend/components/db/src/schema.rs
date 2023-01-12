@@ -65,8 +65,8 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        idv_reqs_initiated -> Bool,
         should_collect_selfie -> Bool,
+        idv_reqs_initiated -> Bool,
     }
 }
 
@@ -438,9 +438,9 @@ table! {
 
     user_consent (id) {
         id -> Text,
+        timestamp -> Timestamptz,
         user_vault_id -> Text,
         scoped_user_id -> Text,
-        timestamp -> Timestamptz,
         document_request_id -> Text,
         insight_event_id -> Text,
         consent_language_text -> Text,

@@ -20,8 +20,8 @@ pub struct DocumentRequest {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub idv_reqs_initiated: bool,
     pub should_collect_selfie: bool,
+    pub idv_reqs_initiated: bool,
 }
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
