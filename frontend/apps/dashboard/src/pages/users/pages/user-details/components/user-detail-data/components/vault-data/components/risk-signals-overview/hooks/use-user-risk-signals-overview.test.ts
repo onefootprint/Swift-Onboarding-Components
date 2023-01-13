@@ -32,7 +32,11 @@ describe('useUserRiskSignalsOverview', () => {
         scopes: [SignalAttribute.ssn],
         severity: RiskSignalSeverity.High,
       });
-      const riskSignalsResponse = [email, dob, ssn];
+      const document = createRiskSignal({
+        scopes: [SignalAttribute.document],
+        severity: RiskSignalSeverity.High,
+      });
+      const riskSignalsResponse = [email, dob, ssn, document];
       withRiskSignals(riskSignalsResponse);
 
       const userId = 'fp_id_yCZehsWNeywHnk5JqL20u';
@@ -58,6 +62,11 @@ describe('useUserRiskSignalsOverview', () => {
           low: [],
           medium: [],
           high: [],
+        },
+        document: {
+          low: [],
+          medium: [],
+          high: [document],
         },
       });
     });

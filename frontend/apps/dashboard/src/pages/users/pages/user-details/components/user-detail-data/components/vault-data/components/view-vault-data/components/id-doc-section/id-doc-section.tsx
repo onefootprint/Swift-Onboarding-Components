@@ -6,6 +6,7 @@ import { UserVaultData } from 'src/pages/users/users.types';
 import { useMap } from 'usehooks-ts';
 
 import DataSection from '../../../data-section';
+import RiskSignalsOverview from '../../../risk-signals-overview';
 import ImageDataRow from './components/image-data-row';
 
 type IdDocSectionProps = {
@@ -26,7 +27,11 @@ const IdDocSection = ({ idDoc }: IdDocSectionProps) => {
   };
 
   return (
-    <DataSection iconComponent={IcoIdCard24} title={t('title')}>
+    <DataSection
+      iconComponent={IcoIdCard24}
+      title={t('title')}
+      footer={<RiskSignalsOverview type="document" />}
+    >
       {docTypes.map(type => (
         <ImageDataRow
           key={type}

@@ -5,10 +5,12 @@ const groupBySection = (risksSignals: RiskSignal[]) => {
     basic: RiskSignal[];
     identity: RiskSignal[];
     address: RiskSignal[];
+    document: RiskSignal[];
   } = {
     basic: [],
     identity: [],
     address: [],
+    document: [],
   };
   risksSignals.forEach(riskSignal => {
     riskSignal.scopes.forEach(signalAttribute => {
@@ -20,6 +22,9 @@ const groupBySection = (risksSignals: RiskSignal[]) => {
       }
       if (isAddress(signalAttribute)) {
         sections.address.push(riskSignal);
+      }
+      if (isDocument(signalAttribute)) {
+        sections.document.push(riskSignal);
       }
     });
   });
@@ -60,5 +65,8 @@ const isAddress = (signalAttribute: SignalAttribute) => {
   }
   return false;
 };
+
+const isDocument = (signalAttribute: SignalAttribute) =>
+  signalAttribute === SignalAttribute.document;
 
 export default groupBySection;

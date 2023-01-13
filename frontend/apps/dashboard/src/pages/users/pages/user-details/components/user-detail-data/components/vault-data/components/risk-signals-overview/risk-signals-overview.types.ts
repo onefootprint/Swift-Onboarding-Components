@@ -10,4 +10,5 @@ export type RiskSignalsSummary = {
   basic: RiskSignalSeverityGrouping;
   identity: RiskSignalSeverityGrouping;
   address: RiskSignalSeverityGrouping;
+  document: RiskSignalSeverityGrouping;
 };

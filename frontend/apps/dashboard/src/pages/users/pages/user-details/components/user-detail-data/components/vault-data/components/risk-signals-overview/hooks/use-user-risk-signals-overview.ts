@@ -28,6 +28,7 @@ export const groupBySectionAndSeverity = (
     basic: groupBySeverity(sections.basic),
     identity: groupBySeverity(sections.identity),
     address: groupBySeverity(sections.address),
+    document: groupBySeverity(sections.document),
   };
 };
 
