@@ -1,21 +1,16 @@
-use super::UserVaultWrapper;
+use super::{DecryptRequest, TenantUvw, UserVaultWrapper};
 use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
 use enclave_proxy::DataTransform;
-use newtypes::{
-    AccessEventKind, DataIdentifier, DbActor, PiiString, ScopedUserId, SealedVaultBytes, SealedVaultDataKey,
-    ValidatedPhoneNumber,
-};
+use newtypes::{DataIdentifier, PiiString, SealedVaultBytes, SealedVaultDataKey, ValidatedPhoneNumber};
 use std::collections::HashMap;
 use std::convert::Into;
 use std::hash::Hash;
 
 impl UserVaultWrapper {
     /// Retrieve the e_data for each of the provided DataIdentifiers, if exists
-    pub fn get_e_datas<T>(&self, ids: &[T]) -> HashMap<T, &SealedVaultBytes>
+    fn get_e_datas<T>(&self, ids: &[T]) -> HashMap<T, &SealedVaultBytes>
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
     {
@@ -28,6 +23,36 @@ impl UserVaultWrapper {
             }
             .map(|e_data| (di.clone(), e_data))
         }))
+    }
+
+    /// Util to decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
+    /// event.
+    ///
+    /// Returns a hashmap of identifiers to their decrypted PiiString.
+    /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
+    /// doesn't exist in the UVW.
+    pub async fn decrypt_unsafe<T>(&self, state: &State, ids: &[T]) -> ApiResult<HashMap<T, PiiString>>
+    where
+        T: Into<DataIdentifier> + Clone + Hash + Eq,
+    {
+        let (ids, e_datas): (Vec<_>, _) = self.get_e_datas(ids).into_iter().unzip();
+
+        let decrypted_results = state
+            .enclave_client
+            .batch_decrypt_to_piistring(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
+            .await?;
+        let results: HashMap<_, _> = ids.into_iter().zip(decrypted_results).collect();
+        Ok(results)
+    }
+}
+
+impl TenantUvw {
+    /// Returns a list of DataIdentifiers that exist in the vault
+    pub fn get_populated_values<T>(&self, ids: &[T]) -> Vec<T>
+    where
+        T: Into<DataIdentifier> + Clone + Hash + Eq,
+    {
+        self.get_e_datas(ids).into_keys().collect()
     }
 
     /// Util to decrypt a list of T where T represents a DataIdentifier. Returns a hashmap of T to
@@ -43,24 +68,18 @@ impl UserVaultWrapper {
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
     {
-        let (ids, e_datas): (Vec<_>, _) = self.get_e_datas(ids).into_iter().unzip();
-
-        let decrypted_results = state
-            .enclave_client
-            .batch_decrypt_to_piistring(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
-            .await?;
-        let targets = ids.clone().into_iter().map(|id| id.into()).collect();
-        let results: HashMap<_, _> = ids.into_iter().zip(decrypted_results).collect();
-
+        let results = self.uvw.decrypt_unsafe(state, ids).await?;
         if let Some(req) = req {
-            let scoped_user_id = self.scoped_user_id_or_else(|| {
-                ApiError::AssertionError("Don't need reason for non-tenant decrypt".to_owned())
-            })?;
-            req.create_access_event(state, scoped_user_id, targets).await?;
+            let targets = ids.iter().cloned().map(|x| x.into()).collect();
+            req.create_access_event(state, self.scoped_user_id.clone(), targets)
+                .await?;
         }
         Ok(results)
     }
+}
 
+// TODO should we gate these permissions somehow? Make access events in these?
+impl UserVaultWrapper {
     pub async fn decrypt_data_keys(
         &self,
         state: &State,
@@ -95,36 +114,5 @@ impl UserVaultWrapper {
 
         let validated_phone_number = ValidatedPhoneNumber::__build_from_vault(e164, country)?;
         Ok(validated_phone_number)
-    }
-}
-
-pub struct DecryptRequest {
-    pub reason: String,
-    pub principal: DbActor,
-    pub insight: CreateInsightEvent,
-}
-
-impl DecryptRequest {
-    pub(super) async fn create_access_event(
-        self,
-        state: &State,
-        scoped_user_id: ScopedUserId,
-        targets: Vec<DataIdentifier>,
-    ) -> ApiResult<()> {
-        let DecryptRequest {
-            reason,
-            principal,
-            insight,
-        } = self;
-        let event = NewAccessEvent {
-            scoped_user_id,
-            reason: Some(reason),
-            principal,
-            insight,
-            kind: AccessEventKind::Decrypt,
-            targets,
-        };
-        state.db_pool.db_query(|conn| event.create(conn)).await??;
-        Ok(())
     }
 }

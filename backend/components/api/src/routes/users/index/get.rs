@@ -87,8 +87,7 @@ pub async fn get(
                 (page_size + 1) as i64,
             )?;
             let count = db::scoped_user::count_authorized_for_tenant(conn, query_params).map(Some)?;
-            let uvws: Vec<UserVaultWrapper> =
-                UserVaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
+            let uvws = UserVaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
             let scoped_user_ids: Vec<_> = scoped_users.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
             let ob_config_map = ObConfiguration::list_authorized_for_users(conn, scoped_user_ids)?;
@@ -104,8 +103,8 @@ pub async fn get(
 
     let uvw_map: HashMap<_, _> = uvws
         .into_iter()
-        // scoped_user_id should be non-null for all of these
-        .flat_map(|uvw| (uvw.scoped_user_id().cloned().map(move |su_id| (su_id, uvw))))
+        .map(|uvw| uvw.into_inner())
+        .map(|(uvw, su_id)| (su_id, uvw))
         .collect();
 
     let scoped_users = scoped_users

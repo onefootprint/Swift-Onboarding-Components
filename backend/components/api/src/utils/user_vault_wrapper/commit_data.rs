@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-use super::LockedUserVaultWrapper;
-use crate::errors::user::UserError;
+use super::LockedTenantUvw;
+use super::TenantUvw;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
@@ -65,15 +65,14 @@ pub trait UvwCommitData {
     fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno>;
 }
 
-impl UvwCommitData for LockedUserVaultWrapper {
+impl UvwCommitData for LockedTenantUvw {
     /// Marks all speculative identity data data as committed in order to make it portable after
     /// it is verified by an approved onboarding.
     /// Intentionally consumes the UVW to prevent using a stale reference
     /// NOTE: this DOES NOT commit custom data or identity documents since we haven't figured out
     /// the portability story for those types of data
     fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
-        let uvw = self.into_inner();
-        let scoped_user_id = uvw.scoped_user_id_or_else(|| UserError::NotAllowedWithoutTenant)?;
+        let TenantUvw { uvw, scoped_user_id } = self.into_inner();
 
         // Use the same seqno to deactivate old data and commit new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -137,7 +136,7 @@ impl UvwCommitData for LockedUserVaultWrapper {
                 uvw.speculative.get_id_lifetimes(&speculative_kinds_to_commit);
             let all_data_is_speculative_and_belongs_to_scoped_user = speculative_lifetimes_to_commit
                 .iter()
-                .all(|l| l.committed_seqno.is_none() && l.scoped_user_id == uvw.scoped_user_id);
+                .all(|l| l.committed_seqno.is_none() && l.scoped_user_id == Some(scoped_user_id.clone()));
             if !all_data_is_speculative_and_belongs_to_scoped_user {
                 // Just a sanity check filter that we don't commit other data - all results should match
                 // this filter

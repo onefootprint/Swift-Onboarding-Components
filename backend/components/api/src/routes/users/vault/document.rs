@@ -9,7 +9,7 @@ use crate::errors::ApiError;
 use crate::types::{JsonApiResponse, ResponseData};
 
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper, UvwArgs};
+use crate::utils::user_vault_wrapper::{DecryptRequest, TenantUvw, UserVaultWrapper};
 use crate::State;
 
 use api_wire_types::{
@@ -53,12 +53,12 @@ pub(super) async fn get_internal(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let user_vault_wrapper = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             // Important to check requester has access
             let fields = vec![DataIdentifier::IdDocument];
-            user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields)?;
+            uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
 
-            Ok(user_vault_wrapper)
+            Ok(uvw)
         })
         .await??;
     let document_types_available: HashSet<String> =
@@ -130,7 +130,7 @@ pub(super) async fn post_internal(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
 
             // Important to check requester has access
             let fields = vec![DataIdentifier::IdDocument];
@@ -166,7 +166,7 @@ pub(super) async fn post_internal(
 
 /// Splitting out since we may in the future want to filter on things like
 /// expired/is_valid etc
-fn available_images_from_uvw(uvw: &UserVaultWrapper) -> Vec<String> {
+fn available_images_from_uvw(uvw: &TenantUvw) -> Vec<String> {
     uvw.identity_documents()
         .iter()
         .map(|i| i.document_type.clone())

@@ -21,7 +21,7 @@ pub async fn build_idv_data_from_verification_request(
         .await??;
 
     let all_identity_data_kinds: Vec<_> = IdentityDataKind::iter().collect();
-    let mut decrypted_values = uvw.decrypt(state, &all_identity_data_kinds, None).await?;
+    let mut decrypted_values = uvw.decrypt_unsafe(state, &all_identity_data_kinds).await?;
     // Remove sandbox suffixes
     let email = decrypted_values
         .remove(&IdentityDataKind::Email)

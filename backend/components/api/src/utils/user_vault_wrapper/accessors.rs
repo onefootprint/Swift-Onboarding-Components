@@ -13,7 +13,6 @@ use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind;
 use newtypes::KvDataKey;
-use newtypes::ScopedUserId;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -127,6 +126,7 @@ impl UserVaultWrapper {
         &self,
         ob_configs: &[ObConfiguration],
     ) -> (Vec<IdentityDataKind>, Vec<String>) {
+        // TODO maybe put this on ObUserVaultWrapper and pre-load ob configs
         let must_collect: HashSet<_> = ob_configs.iter().flat_map(|x| x.must_collect()).collect();
 
         let accessible_id_data = self
@@ -151,18 +151,5 @@ impl UserVaultWrapper {
     /// helper to expose a reference/deref coercion to the underlying UV (normally from a LockedUserVaultWrapper)
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault
-    }
-
-    /// helper to expose a reference/deref coercion to the underlying UV (normally from a LockedUserVaultWrapper)
-    pub fn scoped_user_id(&self) -> Option<&ScopedUserId> {
-        self.scoped_user_id.as_ref()
-    }
-
-    /// Shorthand to convert the Option self.scoped_user_id into a Result
-    pub fn scoped_user_id_or_else<F, E>(&self, f: F) -> Result<ScopedUserId, E>
-    where
-        F: FnOnce() -> E,
-    {
-        self.scoped_user_id.clone().ok_or_else(f)
     }
 }

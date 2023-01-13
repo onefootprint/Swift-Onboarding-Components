@@ -1,6 +1,6 @@
-use super::add_data::UvwAddData;
 use super::uvw_data::UvwData;
-use super::LockedUserVaultWrapper;
+use super::LockedTenantUvw;
+use super::TenantUvw;
 use super::UserVaultWrapper;
 use super::UvwArgs;
 use crate::errors::ApiResult;
@@ -12,12 +12,16 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
+use db::models::user_timeline::UserTimeline;
 use db::models::user_vault::NewUserInfo;
 use db::models::user_vault::UserVault;
 use db::models::user_vault_data::UserVaultData;
 use db::HasLifetime;
 use db::PgConnection;
 use db::TxnPgConnection;
+use newtypes::CollectedDataOption;
+use newtypes::DataCollectedInfo;
+use newtypes::DataPriority;
 use newtypes::Locked;
 use newtypes::{DataLifetimeSeqno, ScopedUserId, TenantId};
 use std::marker::PhantomData;
@@ -27,7 +31,6 @@ impl UserVaultWrapper {
     fn build_internal(
         user_vault: UserVault,
         seqno: Option<DataLifetimeSeqno>,
-        scoped_user_id: Option<ScopedUserId>,
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
@@ -38,7 +41,7 @@ impl UserVaultWrapper {
         let (committed, speculative) =
             UvwData::partition(uvd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
         tracing::info!(
-            user_vault_id=%user_vault.id, scoped_user_id=%format!("{:?}", scoped_user_id), seqno=%format!("{:?}", seqno.as_ref()),
+            user_vault_id=%user_vault.id, seqno=%format!("{:?}", seqno.as_ref()),
             "Built UserVaultWrapper"
         );
         let result = Self {
@@ -46,7 +49,6 @@ impl UserVaultWrapper {
             committed,
             speculative,
             _seqno: seqno,
-            scoped_user_id,
             is_hydrated: PhantomData,
         };
         Ok(result)
@@ -72,7 +74,6 @@ impl UserVaultWrapper {
         let result = Self::build_internal(
             uv,
             seqno,
-            su_id,
             data,
             phone_numbers,
             emails,
@@ -81,6 +82,71 @@ impl UserVaultWrapper {
             active_lifetimes,
         )?;
         Ok(result)
+    }
+}
+
+impl UserVaultWrapper {
+    /// Custom util function to create a user vault, its phone number, and optionally associate it
+    /// with a provided ob_config
+    pub fn create_user_vault(
+        conn: &mut TxnPgConnection,
+        user_info: NewUserInfo,
+        ob_config: Option<ObConfiguration>,
+        phone_args: NewPhoneNumberArgs,
+    ) -> ApiResult<Locked<UserVault>> {
+        let new_user_vault = db::models::user_vault::NewUserVaultArgs {
+            e_private_key: user_info.e_private_key,
+            public_key: user_info.public_key,
+            is_live: user_info.is_live,
+            is_portable: true,
+        };
+        let uv = UserVault::create(conn, new_user_vault)?;
+        let su_id = if let Some(ob_config) = ob_config {
+            let su = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
+            Some(su.id)
+        } else {
+            None
+        };
+        // Primary since we just made the UVW and there can't already be another phone
+        PhoneNumber::create_verified(conn, &uv.id, phone_args, DataPriority::Primary, su_id.as_ref())?;
+        let data_collected_info = DataCollectedInfo {
+            attributes: vec![CollectedDataOption::PhoneNumber],
+        };
+        // Create a log of the piece of data being added
+        UserTimeline::create(conn, data_collected_info, uv.id.clone(), su_id)?;
+
+        Ok(uv)
+    }
+}
+
+// The below use cases make tenant-specific UVWs that have some extra capabilities
+
+impl UserVaultWrapper {
+    /// Builds a locked UVW that sees committed data AND speculative data for the tenant.
+    /// This should be used during onboarding operations in order to allow the tenant to see
+    /// uncommitted data that has been added by previous operations
+    pub fn lock_for_onboarding(
+        conn: &mut TxnPgConnection,
+        scoped_user_id: &ScopedUserId,
+    ) -> ApiResult<LockedTenantUvw> {
+        // Lock the UserVault in this transaction, then build the UVW
+        UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
+        let uvw = Self::build(conn, UvwArgs::Onboarding(scoped_user_id))?;
+        let ob_uvw = TenantUvw {
+            uvw,
+            scoped_user_id: scoped_user_id.clone(),
+        };
+        Ok(LockedTenantUvw::new(ob_uvw))
+    }
+}
+
+impl UserVaultWrapper {
+    pub fn build_for_tenant(conn: &mut PgConnection, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
+        let uvw = Self::build(conn, UvwArgs::Tenant(su_id))?;
+        Ok(TenantUvw {
+            uvw,
+            scoped_user_id: su_id.clone(),
+        })
     }
 
     // TODO: TENANT ACCESS
@@ -91,7 +157,7 @@ impl UserVaultWrapper {
         conn: &mut PgConnection,
         users: Vec<(ScopedUser, UserVault)>,
         tenant_id: &TenantId,
-    ) -> ApiResult<Vec<Self>> {
+    ) -> ApiResult<Vec<TenantUvw>> {
         let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();
         let uv_id_to_active_lifetimes =
             DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
@@ -111,10 +177,9 @@ impl UserVaultWrapper {
             .into_iter()
             .map(move |(su, uv)| {
                 let uv_id = uv.id.clone();
-                Self::build_internal(
+                let uvw = Self::build_internal(
                     uv,
                     None,
-                    Some(su.id),
                     // Fetch data by UserVaultId. It is possible that multiple ScopedUsers have the
                     // same UserVaultId.
                     // TODO: all of these should really be keyed on ScopedUserId, otherwise
@@ -127,63 +192,14 @@ impl UserVaultWrapper {
                     identity_document_map.get(&uv_id).cloned().unwrap_or_default(),
                     kv_data_map.get(&uv_id).cloned().unwrap_or_default(),
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
-                )
+                )?;
+                let uvw = TenantUvw {
+                    uvw,
+                    scoped_user_id: su.id,
+                };
+                Ok(uvw)
             })
             .collect::<ApiResult<_>>()?;
         Ok(results)
-    }
-}
-
-impl UserVaultWrapper {
-    pub fn create_user_vault(
-        conn: &mut TxnPgConnection,
-        user_info: NewUserInfo,
-        ob_config: Option<ObConfiguration>,
-        phone_args: NewPhoneNumberArgs,
-    ) -> ApiResult<Locked<UserVault>> {
-        let new_user_vault = db::models::user_vault::NewUserVaultArgs {
-            e_private_key: user_info.e_private_key,
-            public_key: user_info.public_key,
-            is_live: user_info.is_live,
-            is_portable: true,
-        };
-        let uv = UserVault::create(conn, new_user_vault)?;
-        let su = if let Some(ob_config) = ob_config {
-            let su = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
-            Some(su)
-        } else {
-            None
-        };
-        // Create a wrapper around this new UserVault that has no data associated with it
-        let wrapper = Self::build_internal(
-            uv.clone(),
-            None,
-            su.map(|su| su.id),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-        )?;
-        // Safe to make a LockedUVW here because no other transaction can see this UserVault
-        let wrapper = LockedUserVaultWrapper::new(wrapper);
-        wrapper.add_verified_phone_number(conn, phone_args)?;
-        Ok(uv)
-    }
-}
-
-impl UserVaultWrapper {
-    /// Builds a locked UVW that sees committed data AND speculative data for the tenant.
-    /// This should be used during onboarding operations in order to allow the tenant to see
-    /// uncommitted data that has been added by previous operations
-    pub fn lock_for_onboarding(
-        conn: &mut TxnPgConnection,
-        scoped_user_id: &ScopedUserId,
-    ) -> ApiResult<LockedUserVaultWrapper> {
-        // Lock the UserVault in this transaction, then build the UVW
-        UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
-        let uvw = Self::build(conn, UvwArgs::Onboarding(scoped_user_id))?;
-        Ok(LockedUserVaultWrapper::new(uvw))
     }
 }

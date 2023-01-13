@@ -1,4 +1,4 @@
-use super::{DecryptRequest, UserVaultWrapper};
+use super::{DecryptRequest, TenantUvw};
 use crate::errors::{ApiError, ApiResult};
 use crate::s3::S3Error;
 use crate::State;
@@ -52,7 +52,7 @@ pub async fn fetch_image(
 }
 
 /// Impl for helpers related to fetching documents
-impl UserVaultWrapper {
+impl TenantUvw {
     /// Given a document_type, fetch from S3
     /// ALERT ALERT : this function assumes you have already check if the requester
     /// can access the image!
@@ -103,8 +103,7 @@ impl UserVaultWrapper {
                 })
             })
             .collect::<ApiResult<_>>()?;
-        let scoped_user_id =
-            self.scoped_user_id_or_else(|| ApiError::AssertionError("Expected scoped_user_id".to_owned()))?;
+        let scoped_user_id = self.scoped_user_id.clone();
         req.create_access_event(state, scoped_user_id, vec![DataIdentifier::IdDocument])
             .await?;
         Ok(res)

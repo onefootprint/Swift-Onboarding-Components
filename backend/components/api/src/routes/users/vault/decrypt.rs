@@ -2,7 +2,7 @@ use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext}
 use crate::auth::{tenant::TenantUserAuthContext, Either};
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper, UvwArgs};
+use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper};
 use crate::{errors::ApiError, State};
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
@@ -53,7 +53,7 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             // TODO bake this access checking into decrypt, when decrypting for a tenant.
             // Shouldn't be allowed to decrypt without doing this
             uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;

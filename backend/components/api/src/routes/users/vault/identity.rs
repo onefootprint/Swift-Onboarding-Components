@@ -10,11 +10,11 @@ use crate::auth::{
 use crate::errors::ApiResult;
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
-use crate::utils::user_vault_wrapper::{DecryptRequest, UvwAddData, UvwArgs};
+use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper, UvwAddData, UvwArgs};
 
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::{LockedUserVaultWrapper, UserVaultWrapper};
+use crate::utils::user_vault_wrapper::LockedTenantUvw;
 use crate::{errors::ApiError, State};
 
 use actix_web::web::Query;
@@ -76,7 +76,7 @@ pub async fn put(
 
 pub fn put_internal(
     conn: &mut TxnPgConnection,
-    uvw: LockedUserVaultWrapper,
+    uvw: LockedTenantUvw,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,
@@ -213,7 +213,7 @@ pub async fn post_decrypt(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
 
             uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
 

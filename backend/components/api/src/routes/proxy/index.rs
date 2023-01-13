@@ -18,7 +18,6 @@ use crate::utils::headers::get_required_header;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::DecryptRequest;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
-use crate::utils::user_vault_wrapper::UvwArgs;
 use crate::State;
 use actix_web::http::header::HeaderMap;
 
@@ -191,7 +190,7 @@ async fn detokenize(
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let scoped_user = ScopedUser::get(conn, (&fp_id, &tenant_id, is_live))?;
-                let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+                let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
                 // TODO how do we check perms for custom data? feels like always allowed, only gated
                 // by tenant_role. I think this will break rn
                 uvw.ensure_scope_allows_access(conn, &scoped_user, targets_clone)?;
