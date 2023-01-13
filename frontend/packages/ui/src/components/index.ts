@@ -2,6 +2,8 @@ export * from './accordion';
 export { default as Accordion } from './accordion';
 export * from './address-input';
 export { default as AddressInput } from './address-input';
+export * from './avatar';
+export { default as Avatar } from './avatar';
 export * from './badge';
 export { default as Badge } from './badge';
 export * from './banner';
