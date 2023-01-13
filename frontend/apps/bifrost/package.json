@@ -33,7 +33,6 @@
     "isemail": "^3.2.0",
     "mockdate": "^3.0.5",
     "qrcode.react": "^3.0.2",
-    "react-confetti": "^6.1.0",
     "use-places-autocomplete": "^4.0.0",
     "usehooks-ts": "^2.7.2"
   },
@@ -50,6 +49,7 @@
     "eslint-config-footprint": "*",
     "i18next": "^22.0.4",
     "lodash": "^4.17.21",
+    "lottie-react": "^2.3.1",
     "next": "13.1.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",

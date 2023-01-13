@@ -8,12 +8,11 @@ import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { OnboardingStatus } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
-import Confetti from 'react-confetti';
-import useConfettiState from 'src/hooks/use-confetti-state';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useBifrostMachine from '../../hooks/use-bifrost-machine/use-bifrost-machine';
+import ConfettiAnimation from './confetti/confetti';
 
 const CLOSE_DELAY = 6000;
 
@@ -22,7 +21,6 @@ const Complete = () => {
   const footprint = useFootprintProvider();
   const [state] = useBifrostMachine();
   const { validationToken, status } = state.context;
-  const { running, width, height } = useConfettiState();
   const isVerified = status === OnboardingStatus.verified;
 
   useEffectOnce(() => {
@@ -40,20 +38,13 @@ const Complete = () => {
 
   return (
     <>
-      {isVerified && (
-        <Confetti
-          height={height}
-          numberOfPieces={50}
-          recycle={running}
-          width={width}
-        />
-      )}
       <NavigationHeader
         button={{
           variant: 'close',
         }}
       />
       <Container>
+        {isVerified && <ConfettiAnimation />}
         <Box sx={{ marginBottom: 8 }}>
           <IcoCheckCircle40 color="success" />
         </Box>
