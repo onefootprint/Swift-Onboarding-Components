@@ -3,11 +3,11 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { States } from 'src/utils/state-machine/bifrost';
 
 import AuthenticationSuccess from './authentication-success';
+import Complete from './complete';
 import ConfigInvalid from './config-invalid';
 import Identify from './identify';
 import Init from './init';
 import Onboarding from './onboarding';
-import Success from './success';
 
 const Root = () => {
   const [state] = useBifrostMachine();
@@ -20,14 +20,14 @@ const Root = () => {
   if (state.matches(States.identify)) {
     return <Identify />;
   }
-  if (state.matches(States.success)) {
-    return <Success />;
-  }
   if (state.matches(States.onboarding)) {
     return <Onboarding />;
   }
   if (state.matches(States.authenticationSuccess)) {
     return <AuthenticationSuccess />;
+  }
+  if (state.matches(States.complete)) {
+    return <Complete />;
   }
   // TODO: SHOW 404
   return null;

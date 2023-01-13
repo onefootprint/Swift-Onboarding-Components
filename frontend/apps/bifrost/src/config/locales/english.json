@@ -147,18 +147,14 @@
         "description": "There was an error while completing this request. Please contact the site admin."
       }
     },
-    "success": {
-      "new-user": {
+    "complete": {
+      "success": {
         "title": "You're verified!  🎉",
-        "body": {
-          "view-on-my-footprint": "You can view your personal data and the companies that have access to it on",
-          "one-click": "Next time, you can just sign in using Footprint with one-click!"
-        }
+        "subtitle": "Next time you need to verify your identity, you can just sign in using Footprint and do it in one click!"
       },
-      "existing-user": {
-        "title": "You're all set! 🎉",
-        "description": "Your identity has been successfully verified.",
-        "cta": "Return to site"
+      "failure": {
+        "title": "Submission completed!",
+        "subtitle": "Thanks for using Footprint to verify your identity."
       }
     }
   }

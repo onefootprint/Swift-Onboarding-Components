@@ -34,6 +34,7 @@ export * from './org-auth-magic-link';
 export * from './org-create-api-key';
 export * from './org-onboarding-configs-create';
 export * from './org-onboarding-configs-update';
+export * from './session-validate';
 export * from './signup-challenge';
 export * from './skip-liveness';
 export * from './socure-device-session-d';

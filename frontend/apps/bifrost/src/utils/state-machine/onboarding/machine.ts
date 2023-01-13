@@ -76,7 +76,7 @@ const createOnboardingMachine = ({
           on: {
             [Events.authorized]: {
               target: States.success,
-              actions: [Actions.assignValidationToken],
+              actions: [Actions.assignValidationToken, Actions.assignStatus],
             },
           },
         },
@@ -85,6 +85,7 @@ const createOnboardingMachine = ({
           data: {
             validationToken: (context: MachineContext) =>
               context.validationToken,
+            status: (context: MachineContext) => context.status,
           },
         },
       },
@@ -97,6 +98,12 @@ const createOnboardingMachine = ({
             event.type === Events.authorized
           ) {
             context.validationToken = event.payload.validationToken;
+          }
+          return context;
+        }),
+        [Actions.assignStatus]: assign((context, event) => {
+          if (event.type === Events.authorized) {
+            context.status = event.payload.status;
           }
           return context;
         }),

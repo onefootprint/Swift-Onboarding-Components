@@ -64,8 +64,8 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               config: context.config!,
             }),
           onDone: {
-            target: States.success,
-            actions: [Actions.assignValidationToken],
+            target: States.complete,
+            actions: [Actions.assignValidationToken, Actions.assignStatus],
           },
         },
       },
@@ -75,7 +75,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [States.authenticationSuccess]: {
         type: 'final',
       },
-      [States.success]: {
+      [States.complete]: {
         type: 'final',
       },
     },
@@ -109,6 +109,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignValidationToken]: assign((context, event) => {
         if (event.type === Events.onboardingCompleted) {
           context.validationToken = event.data.validationToken;
+        }
+        return context;
+      }),
+      [Actions.assignStatus]: assign((context, event) => {
+        if (event.type === Events.onboardingCompleted) {
+          context.status = event.data.status;
         }
         return context;
       }),

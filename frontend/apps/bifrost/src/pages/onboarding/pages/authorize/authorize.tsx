@@ -78,11 +78,12 @@ const Authorize = () => {
     onboardingAuthorizeMutation.mutate(
       { authToken },
       {
-        onSuccess: ({ validationToken }) => {
+        onSuccess: ({ validationToken, status }) => {
           send({
             type: Events.authorized,
             payload: {
               validationToken,
+              status,
             },
           });
         },

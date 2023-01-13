@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig, OnboardingStatus } from '@onefootprint/types';
 
 export enum States {
   init = 'Init',
@@ -7,7 +7,7 @@ export enum States {
   configInvalid = 'configInvalid',
   authenticationSuccess = 'authenticationSuccess',
   onboarding = 'onboarding',
-  success = 'success',
+  complete = 'complete',
 }
 
 export enum Events {
@@ -23,6 +23,7 @@ export enum Actions {
   assignUserFound = 'assignUserFound',
   assignAuthToken = 'assignAuthToken',
   assignValidationToken = 'assignValidationToken',
+  assignStatus = 'assignStatus',
 }
 
 export type BootstrapData = {
@@ -37,6 +38,7 @@ export type BifrostContext = {
   userFound?: boolean;
   validationToken?: string;
   bootstrapData?: BootstrapData;
+  status?: OnboardingStatus;
 };
 
 export type BifrostEvent =
@@ -62,5 +64,6 @@ export type BifrostEvent =
       type: Events.onboardingCompleted;
       data: {
         validationToken?: string;
+        status?: OnboardingStatus;
       };
     };

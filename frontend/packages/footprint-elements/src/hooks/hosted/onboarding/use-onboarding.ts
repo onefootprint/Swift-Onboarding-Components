@@ -12,6 +12,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
       [AUTH_HEADER]: payload.authToken,
     },
   });
+
   return response.data;
 };
 

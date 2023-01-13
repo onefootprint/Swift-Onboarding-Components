@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig, OnboardingStatus } from '@onefootprint/types';
 
 export enum States {
   initOnboarding = 'initOnboarding',
@@ -14,6 +14,7 @@ export type MachineContext = {
   device: DeviceInfo;
   authToken: string;
   validationToken?: string;
+  status?: OnboardingStatus;
 };
 
 export enum Events {
@@ -24,6 +25,7 @@ export enum Events {
 
 export enum Actions {
   assignValidationToken = 'assignValidationToken',
+  assignStatus = 'assignStatus',
 }
 
 export type MachineEvents =
@@ -39,6 +41,7 @@ export type MachineEvents =
   | {
       type: Events.authorized;
       payload: {
-        validationToken?: string;
+        validationToken: string;
+        status: OnboardingStatus;
       };
     };
