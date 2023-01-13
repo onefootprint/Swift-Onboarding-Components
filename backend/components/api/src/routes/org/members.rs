@@ -111,6 +111,8 @@ async fn post(
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct UpdateTenantUserRequest {
     role_id: Option<TenantRoleId>,
+    first_name: Option<String>,
+    last_name: Option<String>,
 }
 
 #[api_v2_operation(tags(OrgSettings), description = "Updates the provided user.")]
@@ -125,9 +127,28 @@ async fn patch(
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
-    let UpdateTenantUserRequest { role_id } = request.into_inner();
+    let user_id = user_id.into_inner();
+    let UpdateTenantUserRequest {
+        role_id,
+        first_name,
+        last_name,
+    } = request.into_inner();
+
+    if first_name.is_some() || last_name.is_some() {
+        let actor = auth.actor();
+        if let AuthActor::TenantUser(tenant_user_id) = actor {
+            if tenant_user_id != user_id {
+                return Err(
+                    TenantError::ValidationError("Cannot change another user's name".to_owned()).into(),
+                );
+            }
+        }
+    }
+
     let update = TenantUserUpdate {
         tenant_role_id: role_id,
+        first_name,
+        last_name,
         ..TenantUserUpdate::default()
     };
     state
