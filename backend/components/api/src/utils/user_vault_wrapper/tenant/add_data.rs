@@ -1,5 +1,5 @@
+use super::super::LockedTenantUvw;
 use super::uvd_builder::UvdBuilder;
-use super::LockedTenantUvw;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::identity_data_request::IdentityDataUpdate;

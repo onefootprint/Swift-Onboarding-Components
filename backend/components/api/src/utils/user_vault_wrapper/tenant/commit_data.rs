@@ -157,14 +157,11 @@ impl UvwCommitData for LockedTenantUvw {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashSet;
-
-    use test_case::test_case;
-
-    use crate::utils::user_vault_wrapper::commit_data::CurrentData;
-
     use super::decide_data_to_commit;
+    use super::CurrentData;
     use newtypes::CollectedDataOption;
+    use std::collections::HashSet;
+    use test_case::test_case;
     use CollectedDataOption::*;
 
     #[test_case(

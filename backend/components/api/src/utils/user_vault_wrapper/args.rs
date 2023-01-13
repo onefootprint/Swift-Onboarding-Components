@@ -45,6 +45,10 @@ impl<'a> UvwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConnection) -> ApiResult<(Args, Vec<DataLifetime>)> {
         let args = self.args(conn)?;
         let active_lifetimes = Self::get_active_lifetimes(conn, &args)?;
+        tracing::info!(
+            user_vault_id=%args.0.id, scoped_user_id=%format!("{:?}", args.1), seqno=%format!("{:?}", args.2.as_ref()),
+            "Building UserVaultWrapper"
+        );
         Ok((args, active_lifetimes))
     }
 
