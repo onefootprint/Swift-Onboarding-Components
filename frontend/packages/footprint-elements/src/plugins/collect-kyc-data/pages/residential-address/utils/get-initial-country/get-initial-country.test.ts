@@ -3,9 +3,12 @@ import getInitialCountry from './get-initial-country';
 describe('getInitialCountry', () => {
   it('should return the default country if no country is passed in', () => {
     expect(getInitialCountry()).toEqual({
+      label: 'United States of America',
       value: 'US',
-      label: 'United States',
       value3: 'USA',
+      passport: true,
+      idCard: true,
+      driversLicense: true,
     });
   });
 
@@ -14,6 +17,9 @@ describe('getInitialCountry', () => {
       value: 'BR',
       label: 'Brazil',
       value3: 'BRA',
+      passport: true,
+      idCard: true,
+      driversLicense: true,
     });
   });
 });

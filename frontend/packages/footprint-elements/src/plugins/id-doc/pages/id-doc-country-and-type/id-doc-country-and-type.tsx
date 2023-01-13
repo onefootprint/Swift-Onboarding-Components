@@ -1,5 +1,4 @@
 import {
-  AcceptedIdDocTypesByCountry,
   COUNTRIES,
   CountryRecord,
   DEFAULT_COUNTRY,
@@ -26,6 +25,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../components/header-title';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { Events } from '../../utils/state-machine/types';
+import IdDocTypesByCountry from './id-doc-types-by-country.constants';
 
 const getCountryFromCode = (countryCode: CountryCode) => {
   const match = COUNTRIES.find(country => country.value === countryCode);
@@ -70,7 +70,7 @@ const IdDocCountryAndType = () => {
     },
   };
 
-  const types: IdDocType[] = AcceptedIdDocTypesByCountry[country.value3];
+  const types: IdDocType[] = IdDocTypesByCountry[country.value3];
   const options: RadioSelectOptionFields[] = types.map(
     type => optionByDocType[type],
   );

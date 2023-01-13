@@ -73,9 +73,12 @@ describe('<CountrySelect />', () => {
       const onChange = jest.fn();
       renderCountrySelect({ onChange });
       const trigger = screen.getByRole('button', { name: 'Select' });
-      await selectEvents.select(trigger, 'United States');
+      await selectEvents.select(trigger, 'United States of America');
       expect(onChange).toHaveBeenCalledWith({
-        label: 'United States',
+        driversLicense: true,
+        idCard: true,
+        label: 'United States of America',
+        passport: true,
         value: 'US',
         value3: 'USA',
       });
@@ -86,7 +89,7 @@ describe('<CountrySelect />', () => {
     it('should render the label of the selected item', () => {
       const [selectedOption] = options;
       renderCountrySelect({ value: selectedOption });
-      expect(screen.getByText('United States')).toBeInTheDocument();
+      expect(screen.getByText('United States of America')).toBeInTheDocument();
     });
   });
 

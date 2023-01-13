@@ -67,10 +67,6 @@ const Footer = () => {
                 text={t('links.product.pricing.text')}
                 href={t('links.product.pricing.href')}
               />
-              <FooterLink
-                text={t('links.product.faq.text')}
-                href={t('links.product.faq.href')}
-              />
             </SectionColumn>
             <SectionColumn>
               <Typography variant="label-3">
@@ -108,6 +104,14 @@ const Footer = () => {
               <FooterLink
                 text={t('links.resources.privacy-policy.text')}
                 href={t('links.resources.privacy-policy.href')}
+              />
+              <FooterLink
+                text={t('links.resources.faq.text')}
+                href={t('links.resources.faq.href')}
+              />
+              <FooterLink
+                text={t('links.resources.supported-id-documents.text')}
+                href={t('links.resources.supported-id-documents.href')}
               />
             </SectionColumn>
             <SectionColumn>

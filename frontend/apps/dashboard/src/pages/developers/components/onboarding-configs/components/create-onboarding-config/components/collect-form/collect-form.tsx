@@ -167,10 +167,9 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
                 <Trans
                   i18nKey="pages.developers.onboarding-configs.create.collect-form.documents.id-doc-description"
                   components={{
-                    // https://linear.app/footprint/issue/FP-1595/create-website-page-with-supported-doc-types-and-countries-that-we-can
                     a: (
                       <Link
-                        href="http://www.onefootprint.com/"
+                        href="http://www.onefootprint.com/supported-id-documents"
                         rel="noopener noreferrer"
                         target="_blank"
                       />

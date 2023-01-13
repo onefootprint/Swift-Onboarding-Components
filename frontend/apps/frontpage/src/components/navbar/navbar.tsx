@@ -49,7 +49,6 @@ const Navbar = ({ cta, navVariant }: NavbarProps) => {
         },
       ],
     },
-    { text: t('entries.faq.text'), href: t('entries.faq.href') },
     {
       text: t('entries.writing.text'),
       items: [

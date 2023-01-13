@@ -56,10 +56,6 @@
             }
           }
         },
-        "faq": {
-          "text": "FAQ",
-          "href": "/faq"
-        },
         "media": {
           "text": "Media",
           "href": "/media"
@@ -106,10 +102,6 @@
           "pricing": {
             "text": "Pricing",
             "href": "/pricing"
-          },
-          "faq": {
-            "text": "FAQ",
-            "href": "/faq"
           }
         },
         "company": {
@@ -144,6 +136,14 @@
           "privacy-policy": {
             "href": "/privacy-policy",
             "text": "Privacy"
+          },
+          "faq": {
+            "text": "FAQ",
+            "href": "/faq"
+          },
+          "supported-id-documents": {
+            "text": "Supported ID Documents",
+            "href": "/supported-id-documents"
           }
         },
         "developers": {
@@ -727,6 +727,25 @@
       "subtitle": "Create a portable digital identity that can be re-used in multiple companies when you need to verify your identity. All it takes is one click.",
       "promo": "Verify for a chance of winning a $500 gift card 🤑",
       "cta": "Validate your ID"
+    },
+    "supported-id-documents": {
+      "html-title": "Footprint - Supported ID Documents",
+      "title": "Supported ID Documents",
+      "subtitle": "Footprint KYC flows support document verification in 200+ countries and jurisdictions.",
+      "contact": {
+        "title": "If there are other countries or document types you need, let us know.",
+        "subtitle": "We'll get back to you as soon as possible.",
+        "cta": "Contact us"
+      },
+      "table-headers": {
+        "country": "country",
+        "passport": "passport",
+        "id-card": {
+          "text": "ID Card",
+          "tooltip": "Accepted IDs include Resident Permit, Visa, Travel Document, Photo, Club, Social Security, Sex Offender Document, Military and Biometric ID."
+        },
+        "drivers-license": "Driver's License"
+      }
     },
     "404": {
       "html-title": "Oops! Page not found.",
