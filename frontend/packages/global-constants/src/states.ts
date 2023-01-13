@@ -32,6 +32,10 @@ const states = [
     value: 'DE',
   },
   {
+    label: 'District of Columbia',
+    value: 'DC',
+  },
+  {
     label: 'Florida',
     value: 'FL',
   },
