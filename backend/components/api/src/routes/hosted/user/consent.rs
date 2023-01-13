@@ -1,7 +1,5 @@
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScopeDiscriminant;
-use crate::errors::onboarding::OnboardingError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
@@ -25,28 +23,22 @@ pub async fn post(
     request: Json<ConsentRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
-    let user_vault_id = user_auth.user_vault_id();
 
     let ConsentRequest {
         consent_language_text,
-        document_request_id,
     } = request.into_inner();
 
     state
         .db_pool
         .db_test_transaction(move |conn| -> ApiResult<_> {
-            let Some(scoped_user_id) = user_auth.scoped_user(conn)?.map(|su| su.id) else {
-                return Err(ApiError::from(OnboardingError::NoOnboarding))
-            };
+            let ob_info = user_auth.assert_onboarding(conn)?;
 
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let _user_consent = UserConsent::create(
                 conn,
-                user_vault_id,
-                scoped_user_id,
                 Utc::now(),
-                document_request_id,
+                ob_info.onboarding.id,
                 insight_event.id,
                 consent_language_text,
             )?;
