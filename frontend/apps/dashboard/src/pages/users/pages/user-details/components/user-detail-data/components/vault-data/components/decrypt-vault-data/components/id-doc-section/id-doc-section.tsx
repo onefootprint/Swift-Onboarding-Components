@@ -7,6 +7,7 @@ import { useFormContext } from 'react-hook-form';
 import { User, UserVaultData } from 'src/pages/users/users.types';
 
 import DataSection from '../../../data-section';
+import RiskSignalsOverview from '../../../risk-signals-overview';
 import useFormState from './hooks/use-form-state';
 
 type IdDocSectionProps = {
@@ -54,6 +55,7 @@ const IdDocSection = ({ user, vaultData }: IdDocSectionProps) => {
     <DataSection
       iconComponent={IcoIdCard24}
       title={t('id-doc.title')}
+      footer={<RiskSignalsOverview type="document" />}
       renderCta={() =>
         areAllFieldsDisabled ? null : (
           <LinkButton
