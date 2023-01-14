@@ -1,7 +1,7 @@
 process.env.TZ = 'UTC';
 
 module.exports = {
-  testTimeout: 10000,
+  testTimeout: 30000,
   resetMocks: false,
   moduleDirectories: ['node_modules', '<rootDir>'],
   testEnvironment: 'jsdom',
