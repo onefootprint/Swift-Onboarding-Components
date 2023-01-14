@@ -19,7 +19,8 @@ const UserDetails = () => {
   const userQuery = useUser(userId);
   const userVaultDataQuery = useUserVault(userId, userQuery.data);
   const shouldShowData = userQuery.isSuccess && userVaultDataQuery.isSuccess;
-  const shouldShowLoading = userQuery.isLoading || userVaultDataQuery.isLoading;
+  const shouldShowLoading =
+    userQuery.isLoading || (!!userQuery.data && userVaultDataQuery.isLoading);
   const shouldShowEmptyState = !userQuery.data && !userQuery.isLoading;
   const shouldShowManualReviewBanner =
     shouldShowData && userQuery.data.requiresManualReview;
