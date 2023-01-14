@@ -154,7 +154,7 @@
   --fp-typography-body-body-default: 400 16px/24px "DM Sans";
   --fp-typography-body-body-compact: 400 15px/20px "DM Sans";
   --fp-typography-body-body-tiny: 400 14px/20px "DM Sans";
-  --fp-border-radius-full: 100%;
+  --fp-border-radius-full: 100px;
   --fp-border-radius-large: 16px;
   --fp-border-radius-default: 6px;
   --fp-border-radius-compact: 4px;
