@@ -40,6 +40,10 @@ describe('<Organizations />', () => {
 
     it('should show an error message', () => {
       renderOrganizations();
+
+      const loader = screen.queryByTestId('organizations-loading');
+      expect(loader).not.toBeInTheDocument();
+
       const errorMessage = screen.getByText(
         'No auth token provided. Please, log in again.',
       );
@@ -61,6 +65,7 @@ describe('<Organizations />', () => {
 
     it('should show an error message', async () => {
       renderOrganizations();
+
       await waitFor(() => {
         expect(screen.getByText('Something went wrong')).toBeInTheDocument();
       });

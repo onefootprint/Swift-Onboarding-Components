@@ -9,7 +9,7 @@ const Loading = () => {
   const { t } = useTranslation('pages.organizations');
 
   return (
-    <Box aria-busy testID="organizations-loading">
+    <Box testID="organizations-loading" sx={{ width: '100%' }}>
       <Typography
         variant="label-1"
         color="primary"

@@ -5,6 +5,7 @@ const ButtonGroup = styled.div<{ isLoading?: boolean }>`
   ${({ theme, isLoading = false }) => css`
     display: flex;
     flex-direction: column;
+    width: 100%;
 
     button {
       ${createFontStyles('label-2')};

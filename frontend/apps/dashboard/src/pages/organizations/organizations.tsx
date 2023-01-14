@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
+import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
-import TermsAndConditions from 'src/components/terms-and-conditions';
 import styled, { css } from 'styled-components';
 
 import Data from './components/data';
@@ -16,7 +16,8 @@ const Organizations = () => {
   const { t } = useTranslation('pages.organizations');
   const { query, isReady } = useRouter();
   const authToken = isReady ? (query.token as string) : '';
-  const rolesQuery = useGetRoles(authToken);
+  const hasToken = isReady && authToken;
+  const { isLoading, error, data } = useGetRoles(authToken);
 
   return (
     <>
@@ -24,21 +25,19 @@ const Organizations = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Container>
-        <LogoFpDefault />
-        <Inner>
-          <>
-            {isReady && !authToken && (
-              <Error message={t('errors.no-auth-token')} />
-            )}
-            {rolesQuery.isLoading && <Loading />}
-            {rolesQuery.error && (
-              <Error message={getErrorMessage(rolesQuery.error)} />
-            )}
-            {rolesQuery.data && (
-              <Data authToken={authToken} organizations={rolesQuery.data} />
-            )}
-            <TermsAndConditions />
-          </>
+        <Inner aria-busy={isLoading} aria-live="polite">
+          {hasToken ? (
+            <>
+              <Box>
+                <LogoFpDefault />
+              </Box>
+              {isLoading && <Loading />}
+              {error && <Error message={getErrorMessage(error)} />}
+              {data && <Data authToken={authToken} organizations={data} />}
+            </>
+          ) : (
+            <Error message={t('errors.no-auth-token')} />
+          )}
         </Inner>
       </Container>
     </>
@@ -58,6 +57,7 @@ const Inner = styled.div`
     width: 350px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     row-gap: ${theme.spacing[5]};
   `}
 `;
