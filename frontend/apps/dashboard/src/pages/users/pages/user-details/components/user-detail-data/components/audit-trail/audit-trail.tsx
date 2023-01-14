@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import useUserTimeline from 'src/pages/users/pages/user-details/hooks/use-user-timeline';
 
+import Header from '../header';
 import AuditTrailTimeline from './components/audit-trail-timeline';
 
 const AuditTrail = () => {
@@ -15,12 +15,7 @@ const AuditTrail = () => {
   // auto-scrolling this component into view
   return (
     <div id="audit-trail">
-      <Typography variant="label-1" as="h2">
-        {t('title')}
-      </Typography>
-      <Box sx={{ marginTop: 5, marginBottom: 5 }}>
-        <Divider />
-      </Box>
+      <Header title={t('title')} />
       <AuditTrailTimeline timeline={data} isLoading={isLoading} />
     </div>
   );

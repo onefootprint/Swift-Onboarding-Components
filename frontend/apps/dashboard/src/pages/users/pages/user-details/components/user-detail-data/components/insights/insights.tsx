@@ -1,5 +1,5 @@
 import { IcoCheckCircle16, IcoClose16 } from '@onefootprint/icons';
-import { Box, Divider, Shimmer, Typography } from '@onefootprint/ui';
+import { Box, Shimmer, Typography } from '@onefootprint/ui';
 import GoogleMapReact from 'google-map-react';
 import React from 'react';
 import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
@@ -8,6 +8,7 @@ import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';
 
+import Header from '../header';
 import MapMarker from './components/map-marker';
 import useUserLiveness from './hooks/use-user-liveness';
 import mapStyles from './insight.styles';
@@ -39,17 +40,7 @@ const Insights = () => {
 
   return (
     <>
-      <Typography variant="label-1" as="h2">
-        Device insights
-      </Typography>
-      <Box
-        sx={{
-          marginTop: 5,
-          marginBottom: 5,
-        }}
-      >
-        <Divider />
-      </Box>
+      <Header title="Device insights" />
       {livenessQuery.isLoading ? (
         <Shimmer sx={{ height: '384px' }} />
       ) : (

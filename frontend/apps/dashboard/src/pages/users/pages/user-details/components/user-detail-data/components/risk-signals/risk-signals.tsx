@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { RiskSignal } from '@onefootprint/types';
-import { Table, TableRow, Typography } from '@onefootprint/ui';
+import { Table, TableRow } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
+import Header from '../header';
 import Details from './components/details';
 import Filters from './components/filters';
 import Row from './components/row';
@@ -33,11 +33,7 @@ const RiskSignals = () => {
 
   return (
     <section>
-      <Header>
-        <Typography as="h2" variant="label-1">
-          {t('title')}
-        </Typography>
-      </Header>
+      <Header title={t('title')} />
       <Table<RiskSignal>
         aria-label={t('table.aria-label')}
         columns={columns}
@@ -55,11 +51,5 @@ const RiskSignals = () => {
     </section>
   );
 };
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]};
-  `}
-`;
 
 export default RiskSignals;
