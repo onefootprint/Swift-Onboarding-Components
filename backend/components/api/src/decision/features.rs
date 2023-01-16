@@ -253,6 +253,7 @@ impl From<VendorResult> for FeatureVector {
 // 2022-10-15: This won't be the way we do this forever, but let's start here and revisit as we have a better idea on how we want
 //   to aggregate and compute features. once we have more complex features and scoring (aggregations/models and so on) we'll likely want a separate
 //   risk features/scoring service
+#[tracing::instrument(skip_all)]
 pub fn create_features(results: Vec<VendorResult>) -> FeatureVector {
     let base_features = FeatureVector::default();
 

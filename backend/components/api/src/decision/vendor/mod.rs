@@ -20,6 +20,7 @@ mod verification_result;
 
 /// Build verification requests from the UserVaultWrapper and save.
 /// We save so that if something happens, we can always replay the requests
+#[tracing::instrument(skip(conn, uvw))]
 pub fn build_verification_requests_and_checkpoint(
     conn: &mut TxnPgConnection,
     uvw: &UserVaultWrapper,

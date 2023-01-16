@@ -77,6 +77,7 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
 type ShouldRunDecisionEngine = bool;
 
 /// Determine if we are in a position to run IDV checks and produce a Decision. Otherwise, set up some testing data
+#[tracing::instrument(skip(state, ob_config))]
 pub async fn perform_pre_run_operations(
     state: &State,
     ob: Onboarding,

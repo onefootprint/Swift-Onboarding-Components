@@ -7,7 +7,8 @@ use db::{
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         risk_signal::RiskSignal,
         scoped_user::ScopedUser,
-    }, TxnPgConnection,
+    },
+    TxnPgConnection,
 };
 
 use super::features::*;
@@ -19,6 +20,7 @@ use crate::{
 };
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
+#[tracing::instrument(skip(state, features))]
 pub async fn create_final_decision(
     state: &State,
     ob_id: OnboardingId,

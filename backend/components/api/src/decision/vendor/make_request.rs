@@ -225,6 +225,7 @@ pub async fn make_docv_request(
     Ok(result)
 }
 
+#[tracing::instrument(skip(state))]
 pub async fn make_vendor_requests(
     state: &State,
     requests: Vec<VerificationRequest>,
