@@ -41,16 +41,19 @@ const StyledContent = styled(NavigationMenu.Content)`
 `;
 
 const StyledTrigger = styled(NavigationMenu.Trigger)`
-  display: flex;
-  cursor: pointer;
+  ${({ theme }) => css`
+    display: flex;
+    cursor: pointer;
+    margin-right: calc(-1 * ${theme.spacing[5]});
 
-  &[data-state='open'] {
-    text-decoration: underline;
+    &[data-state='open'] {
+      text-decoration: underline;
 
-    svg {
-      transform: rotate(180deg);
+      svg {
+        transform: rotate(180deg);
+      }
     }
-  }
+  `}
 `;
 
 const IconContainer = styled.div`
