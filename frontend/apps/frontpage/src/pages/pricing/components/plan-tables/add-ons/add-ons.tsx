@@ -48,6 +48,10 @@ const AddOns = () => {
         title={t('add-ons.features.continuous-ofac.title')}
         labelRight={t('labels.contact-us')}
       />
+      <FeatureRow
+        title={t('add-ons.features.ach-verification.title')}
+        labelRight={t('labels.contact-us')}
+      />
     </TableContainer>
   );
 };

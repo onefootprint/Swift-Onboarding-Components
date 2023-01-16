@@ -503,6 +503,9 @@
           },
           "continuous-ofac": {
             "title": "Continuous OFAC monitoring"
+          },
+          "ach-verification": {
+            "title": "ACH verification"
           }
         }
       },
