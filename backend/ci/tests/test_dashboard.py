@@ -301,8 +301,8 @@ class TestDashboardOnboardings:
 
         # ensure we cannot change data in a portable vault
         put(
-            f"users/{sandbox_user.fp_user_id}/vault/identity",
-            data,
+            f"users/{sandbox_user.fp_user_id}/vault",
+            dict(identity=data),
             sandbox_user.tenant.sk.key,
             status_code=401,
         )

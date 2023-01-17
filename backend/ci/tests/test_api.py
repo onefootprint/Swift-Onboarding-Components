@@ -26,8 +26,8 @@ class TestNonPortableVaultApi:
         assert fp_id
 
         put(
-            f"users/{fp_id}/vault/identity",
-            data,
+            f"users/{fp_id}/vault",
+            dict(identity=data),
             sandbox_tenant.sk.key,
             status_code=400,
         )
@@ -41,7 +41,7 @@ class TestNonPortableVaultApi:
 
         # post data to it
         data = build_user_data()
-        put(f"users/{fp_id}/vault/identity", data, sandbox_tenant.sk.key)
+        put(f"users/{fp_id}/vault", dict(identity=data), sandbox_tenant.sk.key)
         # check that the data is there now
         params = {"fields": "id.first_name, id.last_name, id.zip, id.ssn9, id.city"}
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
@@ -84,8 +84,8 @@ class TestNonPortableVaultApi:
         assert fp_id
 
         # post data to it
-        data = {"ach_account_number": "123467890", "cc4": "4242"}
-        put(f"users/{fp_id}/vault/custom", data, sandbox_tenant.sk.key)
+        data = dict(ach_account_number="123467890", cc4="4242")
+        put(f"users/{fp_id}/vault", dict(custom=data), sandbox_tenant.sk.key)
 
         # verify access events created
         body = get(
