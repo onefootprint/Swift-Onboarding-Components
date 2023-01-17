@@ -38,6 +38,7 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             reference_id: _,
             front_image,
             back_image,
+            selfie_image,
             country_code,
             document_type,
         } = d;
@@ -56,7 +57,7 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             back_image,
             scan_document_type: document_type.into(),
             // TODO one day
-            face_image: None,
+            face_image: selfie_image,
             // TODO
             ip_address: None,
             output: String::from("json"),

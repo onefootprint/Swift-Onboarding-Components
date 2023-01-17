@@ -386,6 +386,10 @@ pub enum IDologyReasonCode {
     #[strum(to_string = "resultcode.input.phone.number.does.not.match.ip.state")]
     #[doc = "The area code for the phone number provided does not match the state detected through the IP Address provided."]
     InputPhoneNumberDoesNotMatchIpState,
+
+    #[strum(to_string = "resultcode.scan.capture.face.compare.alert")]
+    #[doc = "Indicates that the customer's Face Compare Score is beneath the Facial Match Score allowed by the enterprise."]
+    FaceCompareAlert,
 }
 
 impl serde::Serialize for IDologyReasonCode {
@@ -524,6 +528,7 @@ impl IDologyReasonCode {
             InputPhoneNumberDoesNotMatchInputState => (Info, vec![PhoneNumber, State]),
             InputPhoneNumberDoesNotMatchLocatedStateHistory => (Info, vec![PhoneNumber, State]),
             InputPhoneNumberDoesNotMatchIpState => (Alert(1), vec![PhoneNumber, IpAddress]),
+            FaceCompareAlert => (Alert(5), vec![Document]),
         };
         Signal {
             kind,

@@ -86,6 +86,10 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     if let Some(b) = images.back_image {
         back = Some(Base64Data(key.unseal_bytes(AeadSealedBytes(b.0))?));
     }
+    let mut selfie: Option<Base64Data> = None;
+    if let Some(b) = images.selfie_image {
+        selfie = Some(Base64Data(key.unseal_bytes(AeadSealedBytes(b.0))?));
+    }
     // Get the reference id for idology
     let parsed_reference_id = parse_reference_id_for_scan_verify(ref_id)?;
     
@@ -93,6 +97,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
         reference_id: parsed_reference_id,
         front_image: Some(PiiString::from(front.to_string_standard())),
         back_image: back.map(|b| PiiString::from(b.to_string_standard())),
+        selfie_image: selfie.map(|b| PiiString::from(b.to_string_standard())),
         country_code: Some(images.document_country.into()),
         document_type: Some(images.document_type),
     })

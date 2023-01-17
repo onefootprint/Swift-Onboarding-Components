@@ -8,6 +8,7 @@ pub struct DocVData {
     pub front_image: Option<PiiString>,
     /// back image
     pub back_image: Option<PiiString>,
+    pub selfie_image: Option<PiiString>,
     // ISO 3166 Alpha-3 country code.
     pub country_code: Option<PiiString>,
     pub document_type: Option<IdDocKind>,

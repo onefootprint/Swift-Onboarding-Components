@@ -132,7 +132,7 @@ fn should_retry_request(err: &IdologyError::Error) -> bool {
 mod test {
     use super::*;
     use crate::idology::fixtures;
-    use newtypes::{DocVData, IdDocKind, IdvData, PiiString};
+    use newtypes::{DocVData, IDologyReasonCode, IdDocKind, IdvData, PiiString};
 
     fn map_pii(s: String) -> Option<PiiString> {
         Some(PiiString::from(s))
@@ -174,6 +174,7 @@ mod test {
             reference_id: query_id,
             front_image: map_pii(fixtures::images::scan_verify_test_image_document_verified()),
             back_image: map_pii(fixtures::images::scan_verify_test_image_document_verified()),
+            selfie_image: None, // TODO: add selfie to this test or add another
             country_code: map_pii("USA".to_string()),
             document_type: Some(IdDocKind::DriverLicense),
         };
@@ -221,6 +222,7 @@ mod test {
             reference_id: None,
             front_image: map_pii(fixtures::images::scan_onboarding_test_image_document_accepted()),
             back_image: map_pii(fixtures::images::scan_onboarding_test_image_document_accepted()),
+            selfie_image: None,
             country_code: map_pii(test_data.country_code),
             document_type: Some(test_data.scan_document_type),
         };
@@ -245,5 +247,38 @@ mod test {
         //     scan_ob_response.response.capture_data.unwrap().city.unwrap(),
         //     "ATLANTA".to_string()
         // );
+    }
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_scan_onboarding_with_selfie() {
+        let test_data = fixtures::test_data::ScanOnboardingTestData::load_passing_sandbox_data();
+        let docv_data = DocVData {
+            reference_id: None,
+            front_image: map_pii(fixtures::images::scan_onboarding_test_image_document_accepted()),
+            back_image: map_pii(fixtures::images::scan_onboarding_test_image_document_accepted()),
+            selfie_image: map_pii(fixtures::images::scan_onboarding_test_image_face_15_match_score()),
+            country_code: map_pii(test_data.country_code),
+            document_type: Some(test_data.scan_document_type),
+        };
+
+        let client =
+            super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
+                .unwrap();
+
+        let scan_ob_res = send_scan_onboarding_request(&client, docv_data).await.unwrap();
+        let ParsedResponse::IDologyScanOnboarding(scan_ob_response) = scan_ob_res.response else {
+            panic!("incorrect scan onboarding results response type")
+        };
+        tracing::info!(scan_ob_response = format!("{:?}", scan_ob_response));
+
+        assert_eq!(
+            scan_ob_response.response.capture_result.unwrap().key,
+            "capture.completed"
+        );
+        assert_eq!(
+            vec![IDologyReasonCode::FaceCompareAlert],
+            scan_ob_response.response.qualifiers.unwrap().parse_qualifiers()
+        );
     }
 }

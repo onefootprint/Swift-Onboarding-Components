@@ -85,6 +85,7 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             reference_id,
             front_image,
             back_image,
+            selfie_image: _,
             country_code,
             document_type,
         } = d;
@@ -105,7 +106,7 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             back_image,
             scan_document_type: document_type.into(),
             // TODO one day
-            face_image: None,
+            face_image: None, // For now, we can only have Selfie enabled for Scan Onboard but not Scan Verify
             // TODO
             ip_address: None,
             output: String::from("json"),
