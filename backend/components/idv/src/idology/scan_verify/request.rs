@@ -1,7 +1,5 @@
-use std::str::FromStr;
-
 use crate::idology::error as IdologyError;
-use newtypes::{DocVData, PiiString};
+use newtypes::{DocVData, IdDocKind, PiiString};
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -67,14 +65,12 @@ pub enum ScanDocumentType {
     Passport,
 }
 
-impl FromStr for ScanDocumentType {
-    type Err = IdologyError::ConversionError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "drivers_license" => Ok(Self::DriverLicense),
-            "passport" => Ok(Self::Passport),
-            "id_card" => Ok(Self::IdCard),
-            _ => Err(IdologyError::ConversionError::UnsupportedDocumentType),
+impl From<IdDocKind> for ScanDocumentType {
+    fn from(value: IdDocKind) -> Self {
+        match value {
+            IdDocKind::DriverLicense => Self::DriverLicense,
+            IdDocKind::IdCard => Self::IdCard,
+            IdDocKind::Passport => Self::Passport,
         }
     }
 }
@@ -100,16 +96,14 @@ impl TryFrom<DocVData> for SubmissionRequestData {
         if country_code.leak_to_string().len() != 3 {
             return Err(IdologyError::ConversionError::InvalidCountryCode);
         }
-        let document_type_internal =
-            document_type.ok_or(IdologyError::ConversionError::MissingDocumentType)?;
-        let document_type = ScanDocumentType::from_str(document_type_internal.as_str())?;
+        let document_type = document_type.ok_or(IdologyError::ConversionError::MissingDocumentType)?;
 
         Ok(Self {
             query_id: reference_id,
             country_code,
             image: front_image,
             back_image,
-            scan_document_type: document_type,
+            scan_document_type: document_type.into(),
             // TODO one day
             face_image: None,
             // TODO

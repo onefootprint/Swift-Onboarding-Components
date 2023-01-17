@@ -4,11 +4,13 @@ use crate::s3::S3Error;
 use crate::State;
 use crypto::aead::AeadSealedBytes;
 use db::models::identity_document::IdentityDocument;
-use newtypes::{DataIdentifier, IdentityDocumentId, PiiBytes, SealedVaultBytes, SealedVaultDataKey};
+use newtypes::{
+    DataIdentifier, IdDocKind, IdentityDocumentId, PiiBytes, SealedVaultBytes, SealedVaultDataKey,
+};
 
 pub struct IdentityDocumentImages {
     pub identity_document_id: IdentityDocumentId,
-    pub document_type: String,
+    pub document_type: IdDocKind,
     pub document_country: String,
     pub front_image: SealedVaultBytes,
     // not all documents have backs
@@ -59,7 +61,7 @@ impl TenantUvw {
     pub async fn get_encrypted_images_from_s3(
         &self,
         state: &State,
-        document_type: String,
+        document_type: IdDocKind,
     ) -> ApiResult<Vec<IdentityDocumentImages>> {
         let futures = self
             .identity_documents()
@@ -77,7 +79,7 @@ impl TenantUvw {
     pub async fn decrypt_document(
         &self,
         state: &State,
-        document_type: String,
+        document_type: IdDocKind,
         req: DecryptRequest,
     ) -> ApiResult<Vec<DecryptDocumentResult>> {
         let images = self.get_encrypted_images_from_s3(state, document_type).await?;

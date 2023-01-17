@@ -1,4 +1,4 @@
-use crate::PiiString;
+use crate::{IdDocKind, PiiString};
 
 #[derive(Debug, Default)]
 pub struct DocVData {
@@ -10,5 +10,5 @@ pub struct DocVData {
     pub back_image: Option<PiiString>,
     // ISO 3166 Alpha-3 country code.
     pub country_code: Option<PiiString>,
-    pub document_type: Option<String>,
+    pub document_type: Option<IdDocKind>,
 }

@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use newtypes::{DataIdentifier, IdentityDataKind};
+use newtypes::{DataIdentifier, IdDocKind, IdentityDataKind};
 
 use super::TenantUvw;
 
@@ -11,7 +11,7 @@ impl TenantUvw {
     ///    For that, use `ensure_scope_allows_access`. This is just for displaying what data the tenant _collected_.
     ///    This is what we display in /users, and it would be a little weird to collect, but then not display the info we collected anywhere.
     /// TODO migrate to DataIdentifier and DocumentType
-    pub fn get_visible_populated_fields(&self) -> (Vec<IdentityDataKind>, Vec<String>) {
+    pub fn get_visible_populated_fields(&self) -> (Vec<IdentityDataKind>, Vec<IdDocKind>) {
         let must_collect = self
             .authorized_ob_configs
             .iter()
@@ -26,7 +26,7 @@ impl TenantUvw {
         let accessible_document_types = if must_collect.contains(&DataIdentifier::IdDocument) {
             self.identity_documents()
                 .iter()
-                .map(|i| i.document_type.clone())
+                .map(|i| i.document_type)
                 .unique()
                 .collect()
         } else {

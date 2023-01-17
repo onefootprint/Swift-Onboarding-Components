@@ -150,39 +150,13 @@ class TestDashboardOnboardings:
     # Check which things are available in the vault
     def test_tenant_document_get_decrypt(self, user_with_documents):
         tenant = user_with_documents.tenant
-        requested_doc_types = "passport,horse_license"
-
-        resp = get(
-            f"users/{user_with_documents.fp_user_id}/vault/identity/document?document_types={requested_doc_types}",
-            None,
-            tenant.sk.key,
-            status_code=200,
-        )
-        expected = {"horse_license": False, "passport": True}  # unfortunately
-
-        assert resp == expected
-
-        # now with no query
         resp = get(
             f"users/{user_with_documents.fp_user_id}/vault/identity/document",
             None,
             tenant.sk.key,
             status_code=200,
         )
-        # Check empty query key
-        resp2 = get(
-            f"users/{user_with_documents.fp_user_id}/vault/identity/document?document_types=",
-            None,
-            tenant.sk.key,
-            status_code=200,
-        )
         expected = {"passport": True}
-
-        assert resp == expected
-        assert resp2 == expected
-
-        expected = {"passport": True}
-
         assert resp == expected
 
     # Test decryption of vaulted documents

@@ -7,7 +7,7 @@ use db::{
     },
     DbError, PgConnection,
 };
-use newtypes::{CollectedDataOption, OnboardingId, SessionAuthToken, UserVaultId};
+use newtypes::{CollectedDataOption, IdDocKind, OnboardingId, SessionAuthToken, UserVaultId};
 use paperclip::actix::web;
 
 use crate::{
@@ -122,7 +122,7 @@ pub fn get_requirements(
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct AuthorizeFields {
     collected_data: Vec<CollectedDataOption>,
-    identity_document_types: Vec<String>,
+    identity_document_types: Vec<IdDocKind>,
     selfie_collected: bool,
 }
 pub fn get_fields_to_authorize(
@@ -132,7 +132,7 @@ pub fn get_fields_to_authorize(
 ) -> ApiResult<AuthorizeFields> {
     let (onboarding, _, _, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
 
-    let mut identity_document_types: Vec<String> = vec![];
+    let mut identity_document_types: Vec<_> = vec![];
     let mut selfie_collected = false;
     if ob_config.can_access_identity_document_images {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
@@ -140,9 +140,9 @@ pub fn get_fields_to_authorize(
 
         identity_document_types = identity_documents
             .iter()
-            .map(|id| id.document_type.clone())
+            .map(|id| id.document_type)
             .unique()
-            .collect::<Vec<String>>();
+            .collect();
 
         if ob_config.can_access_selfie_image {
             selfie_collected = identity_documents

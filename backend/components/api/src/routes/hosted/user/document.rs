@@ -180,7 +180,7 @@ pub async fn post(
                 s3_path_back_image,
                 s3_path_selfie_image,
                 // TODO: should be from vendor response
-                request.document_type.clone(),
+                request.document_type,
                 request.country_code.clone(),
                 Some(&su_id),
                 e_data_key,

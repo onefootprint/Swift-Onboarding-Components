@@ -1,5 +1,5 @@
 use crate::export_schema;
-use newtypes::{idology::IdologyImageCaptureErrors, DocumentRequestStatus, PiiString};
+use newtypes::{idology::IdologyImageCaptureErrors, DocumentRequestStatus, IdDocKind, PiiString};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 
@@ -12,7 +12,7 @@ pub struct DocumentRequest {
     pub back_image: Option<PiiString>,
     pub selfie_image: Option<PiiString>,
     /// type of document
-    pub document_type: String,
+    pub document_type: IdDocKind,
     /// country of document
     pub country_code: String,
 }

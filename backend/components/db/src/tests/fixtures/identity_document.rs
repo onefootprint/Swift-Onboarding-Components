@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::{models::identity_document::IdentityDocument, TxnPgConnection};
-use newtypes::{DocumentRequestId, ScopedUserId, SealedVaultDataKey, UserVaultId};
+use newtypes::{DocumentRequestId, IdDocKind, ScopedUserId, SealedVaultDataKey, UserVaultId};
 
 pub fn create(
     conn: &mut TxnPgConnection,
@@ -15,7 +15,7 @@ pub fn create(
         None,
         None,
         None,
-        "Flerp type".to_owned(),
+        IdDocKind::DriverLicense,
         "Flerp country code".to_owned(),
         su_id,
         SealedVaultDataKey(vec![]),

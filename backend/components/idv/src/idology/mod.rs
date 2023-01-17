@@ -132,7 +132,7 @@ fn should_retry_request(err: &IdologyError::Error) -> bool {
 mod test {
     use super::*;
     use crate::idology::fixtures;
-    use newtypes::{DocVData, IdvData, PiiString};
+    use newtypes::{DocVData, IdDocKind, IdvData, PiiString};
 
     fn map_pii(s: String) -> Option<PiiString> {
         Some(PiiString::from(s))
@@ -175,7 +175,7 @@ mod test {
             front_image: map_pii(fixtures::images::scan_verify_test_image_document_verified()),
             back_image: map_pii(fixtures::images::scan_verify_test_image_document_verified()),
             country_code: map_pii("USA".to_string()),
-            document_type: Some("drivers_license".to_string()),
+            document_type: Some(IdDocKind::DriverLicense),
         };
 
         let scan_res = send_scan_verify_request(&client, docv_data).await.unwrap();

@@ -6,22 +6,22 @@ use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdentityDocumentId, ScopedUserId,
-    SealedVaultDataKey, UserVaultId,
+    Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdDocKind, IdentityDocumentId,
+    ScopedUserId, SealedVaultDataKey, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
 use super::document_request::DocumentRequest;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = identity_document)]
 pub struct IdentityDocument {
     pub id: IdentityDocumentId,
     pub request_id: DocumentRequestId,
     pub front_image_s3_url: Option<String>,
     pub back_image_s3_url: Option<String>,
-    pub document_type: String,
+    pub document_type: IdDocKind,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -75,14 +75,14 @@ impl IdentityDocument {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = identity_document)]
 pub struct NewIdentityDocument {
     pub request_id: DocumentRequestId,
     pub front_image_s3_url: Option<String>,
     pub back_image_s3_url: Option<String>,
     pub selfie_image_s3_url: Option<String>,
-    pub document_type: String,
+    pub document_type: IdDocKind,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
     pub e_data_key: SealedVaultDataKey,
@@ -98,7 +98,7 @@ impl IdentityDocument {
         front_image_s3_url: Option<String>,
         back_image_s3_url: Option<String>,
         selfie_image_s3_url: Option<String>,
-        document_type: String,
+        document_type: IdDocKind,
         country_code: String,
         su_id: Option<&ScopedUserId>,
         e_data_key: SealedVaultDataKey,
@@ -167,7 +167,7 @@ mod tests {
                     Some("s3_123".to_string()),
                     Some("s3_345".to_string()),
                     Some("s3_678".to_string()),
-                    "doc_type".to_string(),
+                    IdDocKind::IdCard,
                     "usa".to_string(),
                     None,
                     SealedVaultDataKey::default(),

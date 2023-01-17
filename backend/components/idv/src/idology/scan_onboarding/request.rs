@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::idology::error as IdologyError;
 use newtypes::{DocVData, PiiString};
 
@@ -50,15 +48,13 @@ impl TryFrom<DocVData> for SubmissionRequestData {
         if country_code.leak_to_string().len() != 3 {
             return Err(IdologyError::ConversionError::InvalidCountryCode);
         }
-        let document_type_internal =
-            document_type.ok_or(IdologyError::ConversionError::MissingDocumentType)?;
-        let document_type = ScanDocumentType::from_str(document_type_internal.as_str())?;
+        let document_type = document_type.ok_or(IdologyError::ConversionError::MissingDocumentType)?;
 
         Ok(Self {
             country_code,
             image: front_image,
             back_image,
-            scan_document_type: document_type,
+            scan_document_type: document_type.into(),
             // TODO one day
             face_image: None,
             // TODO
