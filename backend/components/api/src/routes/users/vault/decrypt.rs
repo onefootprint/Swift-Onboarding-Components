@@ -52,15 +52,11 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 
-    let fields_clone = fields.clone();
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            // TODO bake this access checking into decrypt, when decrypting for a tenant.
-            // Shouldn't be allowed to decrypt without doing this
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
             Ok(uvw)
         })
         .await??;

@@ -54,13 +54,12 @@ pub(super) async fn get_internal(
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            // Important to check requester has access
-            let fields = vec![DataIdentifier::IdDocument];
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
-
             Ok(uvw)
         })
         .await??;
+
+    uvw.ensure_scope_allows_access(&[DataIdentifier::IdDocument])?;
+
     let document_types_available: HashSet<String> =
         HashSet::from_iter(available_images_from_uvw(&uvw).into_iter());
     let document_types_requested: HashSet<String> = HashSet::from_iter(
@@ -131,14 +130,13 @@ pub(super) async fn post_internal(
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-
-            // Important to check requester has access
-            let fields = vec![DataIdentifier::IdDocument];
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields)?;
-
             Ok(uvw)
         })
         .await??;
+
+    // Important to check requester has access. TODO is there a better way to have type safety here?
+    // Can we put in decrypt_document?
+    uvw.ensure_scope_allows_access(&[DataIdentifier::IdDocument])?;
 
     let req = DecryptRequest {
         reason,

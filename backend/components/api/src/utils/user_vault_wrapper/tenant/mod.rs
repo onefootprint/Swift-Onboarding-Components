@@ -1,3 +1,4 @@
+mod accessors;
 mod add_data;
 mod build;
 mod commit_data;
@@ -10,6 +11,7 @@ pub mod identity_document;
 
 pub use add_data::UvwAddData;
 pub use commit_data::UvwCommitData;
+use db::models::ob_configuration::ObConfiguration;
 pub use decrypt_request::DecryptRequest;
 
 use super::UserVaultWrapper;
@@ -20,6 +22,7 @@ use newtypes::{Locked, ScopedUserId};
 pub struct TenantUvw {
     uvw: UserVaultWrapper,
     scoped_user_id: ScopedUserId,
+    authorized_ob_configs: Vec<ObConfiguration>,
 }
 
 /// Allow calling any Uvw functions from TenantUvw
@@ -28,13 +31,6 @@ impl std::ops::Deref for TenantUvw {
 
     fn deref(&self) -> &Self::Target {
         &self.uvw
-    }
-}
-
-impl TenantUvw {
-    /// Decompose the TenantUvw into its parts
-    pub fn into_inner(self) -> (UserVaultWrapper, ScopedUserId) {
-        (self.uvw, self.scoped_user_id)
     }
 }
 

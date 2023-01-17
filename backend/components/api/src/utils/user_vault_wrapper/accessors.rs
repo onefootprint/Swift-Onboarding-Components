@@ -1,22 +1,14 @@
 use super::UserVaultWrapper;
-use crate::auth::AuthError;
-use crate::errors::ApiResult;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
 use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
-use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
-use db::PgConnection;
-use itertools::Itertools;
-use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind;
 use newtypes::KvDataKey;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
 use std::collections::HashMap;
-use std::collections::HashSet;
-use std::convert::Into;
 use strum::IntoEnumIterator;
 
 impl UserVaultWrapper {
@@ -82,68 +74,6 @@ impl UserVaultWrapper {
         IdentityDataKind::iter()
             .filter(|k| self.has_identity_field(*k))
             .collect()
-    }
-}
-
-// TODO: confusing when to use these. Do we need them after new decrypt utils?
-impl UserVaultWrapper {
-    /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
-    /// don't allow the tenant to know if data is set without having permission for the the value
-    pub fn ensure_scope_allows_access<T>(
-        &self,
-        conn: &mut PgConnection,
-        scoped_user: &ScopedUser,
-        fields: Vec<T>,
-    ) -> ApiResult<()>
-    where
-        T: Into<DataIdentifier>,
-    {
-        // tenants can do what they wish with NON-portable vaults they own
-        if !self.user_vault.is_portable {
-            return Ok(());
-        }
-
-        let ob_configs = ObConfiguration::list_authorized_for_user(conn, scoped_user.id.clone())?;
-        let can_access: HashSet<_> = ob_configs.into_iter().flat_map(|x| x.can_access()).collect();
-        let cannot_access_fields = fields
-            .into_iter()
-            .map(|x| x.into())
-            .filter(|x| !can_access.contains(x))
-            .collect_vec();
-        if !cannot_access_fields.is_empty() {
-            return Err(AuthError::ObConfigMissingDecryptPermission(cannot_access_fields).into());
-        }
-
-        Ok(())
-    }
-
-    /// Retrieve the fields that the tenant has requested/gotten authorized access to collect
-    ///
-    /// Note: This is not checking `READ` permissions of data, e.g. fields that the tenant can actually decrypt.
-    ///    For that, use `ensure_scope_allows_access`. This is just for displaying what data the tenant _collected_.
-    ///    This is what we display in /users, and it would be a little weird to collect, but then not display the info we collected anywhere.
-    pub fn get_accessible_populated_fields(
-        &self,
-        ob_configs: &[ObConfiguration],
-    ) -> (Vec<IdentityDataKind>, Vec<String>) {
-        // TODO maybe put this on ObUserVaultWrapper and pre-load ob configs
-        let must_collect: HashSet<_> = ob_configs.iter().flat_map(|x| x.must_collect()).collect();
-
-        let accessible_id_data = self
-            .get_populated_identity_fields()
-            .into_iter()
-            .filter(|x| must_collect.contains(&DataIdentifier::Id(*x)))
-            .collect();
-        let accessible_document_types = if must_collect.contains(&DataIdentifier::IdDocument) {
-            self.identity_documents()
-                .iter()
-                .map(|i| i.document_type.clone())
-                .unique()
-                .collect()
-        } else {
-            vec![]
-        };
-        (accessible_id_data, accessible_document_types)
     }
 }
 

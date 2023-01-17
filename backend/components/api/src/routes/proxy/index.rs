@@ -185,7 +185,6 @@ async fn detokenize(
         let tenant_id = auth.tenant().id.clone();
         let is_live = auth.is_live()?;
 
-        let targets_clone = targets.clone();
         let (uvw, scoped_user) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
@@ -193,8 +192,6 @@ async fn detokenize(
                 let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
                 // TODO how do we check perms for custom data? feels like always allowed, only gated
                 // by tenant_role. I think this will break rn
-                uvw.ensure_scope_allows_access(conn, &scoped_user, targets_clone)?;
-
                 Ok((uvw, scoped_user))
             })
             .await??;

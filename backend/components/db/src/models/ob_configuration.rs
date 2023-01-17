@@ -135,7 +135,7 @@ impl ObConfiguration {
 
     pub fn list_authorized_for_user(
         conn: &mut PgConnection,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: &ScopedUserId,
     ) -> DbResult<Vec<Self>> {
         // For now, this will be either 0 or 1 result
         let obcs = ob_configuration::table

@@ -93,7 +93,7 @@ impl<'a> UvwArgs<'a> {
         // or is okay to retroactively give tenants info? Probably the latter?
         let filter_scoped_user_id = check_ob_access.then_some(su_id).flatten();
         let accessible_lifetime_kinds = if let Some(su_id) = filter_scoped_user_id {
-            let authorized_obcs = ObConfiguration::list_authorized_for_user(conn, su_id.clone())?;
+            let authorized_obcs = ObConfiguration::list_authorized_for_user(conn, su_id)?;
 
             let accessible_kinds: Vec<_> = authorized_obcs
                 .into_iter()

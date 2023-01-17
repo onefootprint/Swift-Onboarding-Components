@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
@@ -14,10 +12,8 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
-use crate::utils::user_vault_wrapper::UvwArgs;
 use crate::State;
 use api_wire_types::ListUsersRequest;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::FootprintUserId;
@@ -77,7 +73,7 @@ pub async fn get(
         timestamp_lte,
         timestamp_gte,
     };
-    let (scoped_users, mut obs, uvws, count, ob_config_map) = state
+    let (scoped_users, mut obs, uvws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_users = db::scoped_user::list_authorized_for_tenant(
@@ -90,9 +86,7 @@ pub async fn get(
             let uvws = UserVaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
             let scoped_user_ids: Vec<_> = scoped_users.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
-            let ob_config_map = ObConfiguration::list_authorized_for_users(conn, scoped_user_ids)?;
-
-            Ok((scoped_users, obs, uvws, count, ob_config_map))
+            Ok((scoped_users, obs, uvws, count))
         })
         .await??;
 
@@ -101,24 +95,15 @@ pub async fn get(
         .cursor_item(&state, &scoped_users)
         .map(|(su, _)| su.ordering_id);
 
-    let uvw_map: HashMap<_, _> = uvws
-        .into_iter()
-        .map(|uvw| uvw.into_inner())
-        .map(|(uvw, su_id)| (su_id, uvw))
-        .collect();
-
     let scoped_users = scoped_users
         .into_iter()
         .take(page_size)
         .map(|(su, _)| {
-            let uvw = uvw_map
+            let uvw = uvws
                 .get(&su.id)
                 .ok_or_else(|| ApiError::AssertionError("UVW not found".to_owned()))?;
-            let ob_configs = ob_config_map
-                .get(&su.id)
-                .ok_or_else(|| ApiError::AssertionError("Ob config not found".to_owned()))?;
             // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
-            let (data_attributes, document_types) = uvw.get_accessible_populated_fields(ob_configs);
+            let (data_attributes, document_types) = uvw.get_visible_populated_fields();
             let result = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
                 data_attributes,
                 document_types,
@@ -162,7 +147,7 @@ pub async fn get_detail(
             let (su, _) = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id))?;
+            let uvw = UserVaultWrapper::build_for_tenant(conn, &su.id)?;
             let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
                 .remove(&su.id)
                 .ok_or(ApiError::ResourceNotFound)?;
@@ -170,9 +155,8 @@ pub async fn get_detail(
             Ok((su, ob, uvw))
         })
         .await??;
-    let (_, ob_config, _, _, _, _) = &ob;
     // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
-    let (data_attributes, document_types) = uvw.get_accessible_populated_fields(&[ob_config.clone()]);
+    let (data_attributes, document_types) = uvw.get_visible_populated_fields();
 
     let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
         data_attributes,

@@ -72,7 +72,9 @@ impl UvwCommitData for LockedTenantUvw {
     /// NOTE: this DOES NOT commit custom data or identity documents since we haven't figured out
     /// the portability story for those types of data
     fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
-        let TenantUvw { uvw, scoped_user_id } = self.into_inner();
+        let TenantUvw {
+            uvw, scoped_user_id, ..
+        } = self.into_inner();
 
         // Use the same seqno to deactivate old data and commit new data
         let seqno = DataLifetime::get_next_seqno(conn)?;

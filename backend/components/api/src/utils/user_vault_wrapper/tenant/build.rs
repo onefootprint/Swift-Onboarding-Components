@@ -7,6 +7,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocument;
 use db::models::kv_data::KeyValueData;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
@@ -15,6 +16,7 @@ use db::HasLifetime;
 use db::PgConnection;
 use db::TxnPgConnection;
 use newtypes::{ScopedUserId, TenantId};
+use std::collections::HashMap;
 
 impl UserVaultWrapper {
     /// Builds a locked UVW that sees committed data AND speculative data for the tenant.
@@ -30,6 +32,8 @@ impl UserVaultWrapper {
         let ob_uvw = TenantUvw {
             uvw,
             scoped_user_id: scoped_user_id.clone(),
+            // TODO these UVWs are built for adding data, so we don't need to check ob configs
+            authorized_ob_configs: vec![],
         };
         Ok(LockedTenantUvw::new(ob_uvw))
     }
@@ -38,9 +42,11 @@ impl UserVaultWrapper {
 impl UserVaultWrapper {
     pub fn build_for_tenant(conn: &mut PgConnection, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
         let uvw = Self::build(conn, UvwArgs::Tenant(su_id))?;
+        let ob_configs = ObConfiguration::list_authorized_for_user(conn, su_id)?;
         Ok(TenantUvw {
             uvw,
             scoped_user_id: su_id.clone(),
+            authorized_ob_configs: ob_configs,
         })
     }
 
@@ -52,7 +58,7 @@ impl UserVaultWrapper {
         conn: &mut PgConnection,
         users: Vec<(ScopedUser, UserVault)>,
         tenant_id: &TenantId,
-    ) -> ApiResult<Vec<TenantUvw>> {
+    ) -> ApiResult<HashMap<ScopedUserId, TenantUvw>> {
         let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();
         let uv_id_to_active_lifetimes =
             DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
@@ -66,6 +72,8 @@ impl UserVaultWrapper {
         let emails = Email::bulk_get(conn, &active_lifetime_list)?;
         let identity_document_map = IdentityDocument::bulk_get(conn, &active_lifetime_list)?;
         let kv_data_map = KeyValueData::bulk_get(conn, &active_lifetime_list)?;
+        let scoped_user_ids = users.iter().map(|(su, _)| &su.id).collect();
+        let ob_config_map = ObConfiguration::list_authorized_for_users(conn, scoped_user_ids)?;
 
         // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
         let results = users
@@ -90,9 +98,10 @@ impl UserVaultWrapper {
                 )?;
                 let uvw = TenantUvw {
                     uvw,
-                    scoped_user_id: su.id,
+                    scoped_user_id: su.id.clone(),
+                    authorized_ob_configs: ob_config_map.get(&su.id).cloned().unwrap_or_default(),
                 };
-                Ok(uvw)
+                Ok((su.id, uvw))
             })
             .collect::<ApiResult<_>>()?;
         Ok(results)
