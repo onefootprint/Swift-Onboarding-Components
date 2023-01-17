@@ -95,6 +95,7 @@
         "users": "Users",
         "security-logs": "Security Logs",
         "developers": "Developers",
+        "settings": "Settings",
         "log-out": "Log out"
       },
       "sandbox-banner": {
@@ -689,7 +690,7 @@
       }
     },
     "settings": {
-      "page-title": "Settings",
+      "page-title": "Footprint | Settings",
       "header": {
         "title": "Settings"
       },
@@ -699,14 +700,19 @@
           "subtitle": "Manage your business details"
         },
         "logo": {
-          "alt": "Company logo",
-          "change-logo": "Change logo"
+          "change": "Change logo"
         },
-        "company": {
-          "name": "Company name",
-          "address": "Address",
-          "edit": "Edit"
-        }
+        "name": {
+          "label": "Company name",
+          "add": "Add company name",
+          "edit": "Edit company name"
+        },
+        "website": {
+          "label": "Website",
+          "add": "Add website",
+          "edit": "Edit website"
+        },
+        "edit": "Edit"
       },
       "team-roles": {
         "header": {

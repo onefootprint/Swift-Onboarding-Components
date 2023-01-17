@@ -11,6 +11,7 @@ export * from './get-doc-status';
 export * from './get-kyc-status';
 export * from './get-liveness';
 export * from './get-onboarding-config';
+export * from './get-org';
 export * from './get-org-members';
 export * from './get-org-roles';
 export * from './get-pinned-annotations';

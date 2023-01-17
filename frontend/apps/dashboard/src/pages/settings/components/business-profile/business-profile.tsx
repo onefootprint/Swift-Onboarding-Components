@@ -1,18 +1,17 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Divider, LinkButton, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import { getErrorMessage } from '@onefootprint/request';
+import { Box, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
-import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
+
+import Data from './components/data';
+import Error from './components/error';
+import Loading from './components/loading';
+import useOrg from './hooks/use-org';
 
 const BusinessProfile = () => {
   const { t } = useTranslation('pages.settings.business-profile');
-  const { dangerouslyCastedData } = useOrgSession();
-
-  // TODO: https://linear.app/footprint/issue/FP-1712/implement-editing-name-icon-and-address-on-business-profile-section
-  const handleChangeLogo = () => {};
-  const handleEditName = () => {};
-  const handleEditAddress = () => {};
+  const { isLoading, error, data } = useOrg();
 
   return (
     <section data-testid="business-profile-section">
@@ -27,55 +26,12 @@ const BusinessProfile = () => {
       <Box sx={{ marginY: 5 }}>
         <StyledDivider />
       </Box>
-      <Container>
-        <LogoContainer>
-          <Logo>
-            <Image
-              alt={t('logo.alt')}
-              height={20}
-              width={20}
-              // TODO: https://linear.app/footprint/issue/FP-1735/add-usetenant-hook-for-fetching-tenant-data
-              // src={data?.tenant.logoUrl || ''}
-              src="/404.png"
-            />
-          </Logo>
-          <LinkButton onClick={handleChangeLogo} sx={{ marginLeft: 5 }}>
-            {t('logo.change-logo')}
-          </LinkButton>
-        </LogoContainer>
-        <ProfileContainer>
-          <ProfileInfo>
-            <Typography
-              variant="label-3"
-              color="tertiary"
-              sx={{ marginBottom: 2 }}
-            >
-              {t('company.name')}
-            </Typography>
-            {/* TODO: https://linear.app/footprint/issue/FP-1735/add-usetenant-hook-for-fetching-tenant-data */}
-            <Typography variant="body-3">
-              {dangerouslyCastedData.name}
-            </Typography>
-          </ProfileInfo>
-          <LinkButton onClick={handleEditName}>{t('company.edit')}</LinkButton>
-        </ProfileContainer>
-        <ProfileContainer>
-          <ProfileInfo>
-            <Typography
-              variant="label-3"
-              color="tertiary"
-              sx={{ marginBottom: 2 }}
-            >
-              {t('company.address')}
-            </Typography>
-            {/* TODO: https://linear.app/footprint/issue/FP-1735/add-usetenant-hook-for-fetching-tenant-data */}
-            <Typography variant="label-3">158 West 23 Street</Typography>
-            <Typography variant="body-3">New York, NY 10011 US</Typography>
-          </ProfileInfo>
-          <LinkButton onClick={handleEditAddress}>
-            {t('company.edit')}
-          </LinkButton>
-        </ProfileContainer>
+      <Container aria-busy={isLoading} aria-live="polite">
+        <>
+          {isLoading && <Loading />}
+          {error && <Error message={getErrorMessage(error)} />}
+          {data && <Data organization={data} />}
+        </>
       </Container>
     </section>
   );
@@ -95,39 +51,8 @@ const Container = styled.div`
     display: flex;
     justify-content: center;
     flex-direction: column;
-    row-gap: ${theme.spacing[8]};
+    gap: ${theme.spacing[8]};
   `}
-`;
-
-const Logo = styled.div`
-  ${({ theme }) => css`
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    border: 1px solid ${theme.borderColor.tertiary};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `}
-`;
-
-const LogoContainer = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
-const ProfileContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 350px;
-`;
-
-const ProfileInfo = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
 `;
 
 const StyledDivider = styled(Divider)`

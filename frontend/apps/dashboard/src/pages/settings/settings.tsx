@@ -5,7 +5,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import BusinessProfile from './components/business-profile';
-import TeamRoles from './components/team-roles';
 
 const Settings = () => {
   const { t } = useTranslation('pages.settings');
@@ -16,15 +15,12 @@ const Settings = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Header>
-        <Typography variant="heading-3" as="h2" sx={{ marginBottom: 2 }}>
+        <Typography variant="heading-2" as="h2">
           {t('header.title')}
         </Typography>
       </Header>
-      <Box sx={{ marginBottom: 10 }}>
-        <BusinessProfile />
-      </Box>
       <Box>
-        <TeamRoles />
+        <BusinessProfile />
       </Box>
     </>
   );
@@ -35,7 +31,7 @@ const Header = styled.header`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[9]};
+    margin-bottom: ${theme.spacing[7]};
   `};
 `;
 
