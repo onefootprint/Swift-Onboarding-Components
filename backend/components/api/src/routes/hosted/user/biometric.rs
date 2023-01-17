@@ -52,7 +52,7 @@ pub async fn init_post(
 ) -> actix_web::Result<Json<ResponseData<WebAuthnInitResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
 
-    let user_vault_id = user_auth.user_vault_id();
+    let user_vault_id = user_auth.user_vault_id().clone();
     let creds = state
         .db_pool
         .db_query(move |conn| WebauthnCredential::list(conn, &user_vault_id))
@@ -215,8 +215,8 @@ pub async fn complete_post(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             // Protect against someone adding a webauthn credential while we verify that there's
             // only one
-            UserVault::lock(conn, &user_auth.user_vault_id())?;
-            let creds = WebauthnCredential::list(conn, &user_auth.user_vault_id())?;
+            UserVault::lock(conn, user_auth.user_vault_id())?;
+            let creds = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
             if !creds.is_empty() {
                 return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
             }
@@ -255,13 +255,13 @@ pub async fn complete_post(
                     LivenessInfo {
                         id: liveness_event.id,
                     },
-                    user_auth.user_vault_id(),
+                    user_auth.user_vault_id().clone(),
                     Some(su.id.clone()),
                 )?;
             }
 
             let _ = NewWebauthnCredential {
-                user_vault_id: user_auth.user_vault_id(),
+                user_vault_id: user_auth.user_vault_id().clone(),
                 credential_id: cred.cred_id.0,
                 public_key,
                 attestation_data,

@@ -40,7 +40,7 @@ pub async fn handler(
                 UvwArgs::Onboarding(&su.id)
             } else {
                 // Otherwise, create a UVW that only sees committed data
-                UvwArgs::User(&uv_id)
+                UvwArgs::User(uv_id)
             };
             let uvw = UserVaultWrapper::build(conn, args)?;
             Ok(uvw)

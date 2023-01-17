@@ -39,13 +39,12 @@ pub async fn post(
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
-    let uv_id = user_auth.user_vault_id();
 
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            UserVault::lock(conn, &uv_id)?;
+            UserVault::lock(conn, user_auth.user_vault_id())?;
             // By the time we call POST /hosted/onboarding, we expect that the user auth token was
             // created with a tenant's onboarding config PK. This will have already created a
             // ScopedUser and associated it with the user auth token.

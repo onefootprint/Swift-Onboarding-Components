@@ -134,8 +134,8 @@ impl SessionContext<UserSession> {
 }
 
 impl UserAuth for UserSession {
-    fn user_vault_id(&self) -> UserVaultId {
-        self.user_vault_id.clone()
+    fn user_vault_id(&self) -> &UserVaultId {
+        &self.user_vault_id
     }
 }
 

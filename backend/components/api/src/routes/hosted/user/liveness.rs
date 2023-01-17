@@ -22,7 +22,7 @@ pub async fn get(
 
     let creds = state
         .db_pool
-        .db_query(move |conn| LivenessEvent::get_by_user_vault_id(conn, &user_auth.user_vault_id()))
+        .db_query(move |conn| LivenessEvent::get_by_user_vault_id(conn, user_auth.user_vault_id()))
         .await??;
 
     let response = creds

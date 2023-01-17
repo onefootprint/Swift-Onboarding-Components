@@ -20,7 +20,7 @@ pub async fn get(
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::BasicProfile])?;
 
     Ok(Json(ResponseData::ok(TokenResponse {
-        user_vault_id: user_auth.user_vault_id(),
+        user_vault_id: user_auth.user_vault_id().clone(),
         expires_at: user_auth.expires_at(),
         scopes: user_auth.data.scopes(),
     })))

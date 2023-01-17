@@ -32,7 +32,7 @@ pub async fn post(
 
     let (email_row, user_vault) = state
         .db_pool
-        .db_query(move |conn| Email::get(conn, &request.id, &user_auth.user_vault_id()))
+        .db_query(move |conn| Email::get(conn, &request.id, user_auth.user_vault_id()))
         .await??;
     if email_row.is_verified {
         return Err(ChallengeError::EmailAlreadyVerified.into());

@@ -3,7 +3,7 @@ use crate::models::user_vault::{NewUserVaultArgs, UserVault};
 use crate::{errors::DbError, models::user_vault::NewNonPortableUserVaultReq};
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{Fingerprint, UserVaultId};
+use newtypes::{Fingerprint};
 
 // TODO modernize these utils
 /// a NON-portable, tenant-scoped vault + a scoped user for the tenant and the vault
@@ -34,11 +34,6 @@ pub async fn create_non_portable(
         })
         .await?;
     Ok(scoped_user)
-}
-
-pub async fn get(pool: &crate::DbPool, uv_id: UserVaultId) -> Result<UserVault, DbError> {
-    let user = pool.db_query(move |conn| UserVault::get(conn, &uv_id)).await??;
-    Ok(user)
 }
 
 #[tracing::instrument(skip(pool, sh_data))]

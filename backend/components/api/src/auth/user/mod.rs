@@ -1,5 +1,5 @@
 use super::SessionContext;
-use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use async_trait::async_trait;
 use db::{models::user_vault::UserVault, DbPool};
 use newtypes::{ScopedUserId, UserVaultId};
@@ -36,11 +36,12 @@ pub enum UserAuthScope {
 /// A helper trait to extract a user vault id on combined types
 #[async_trait]
 pub trait UserAuth {
-    // TODO make this return a reference
-    fn user_vault_id(&self) -> UserVaultId;
+    fn user_vault_id(&self) -> &UserVaultId;
 
-    async fn user_vault(&self, pool: &DbPool) -> Result<UserVault, ApiError> {
-        Ok(db::user_vault::get(pool, self.user_vault_id()).await?)
+    async fn user_vault(&self, pool: &DbPool) -> ApiResult<UserVault> {
+        let uv_id = self.user_vault_id().clone();
+        let result = pool.db_query(move |conn| UserVault::get(conn, &uv_id)).await??;
+        Ok(result)
     }
 }
 
@@ -48,7 +49,7 @@ impl<A> UserAuth for SessionContext<A>
 where
     A: UserAuth,
 {
-    fn user_vault_id(&self) -> UserVaultId {
+    fn user_vault_id(&self) -> &UserVaultId {
         self.data.user_vault_id()
     }
 }

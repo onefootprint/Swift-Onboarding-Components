@@ -57,7 +57,7 @@ pub async fn get(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&user_auth.user_vault_id()))?;
+            let uvw = UserVaultWrapper::build(conn, UvwArgs::User(user_auth.user_vault_id()))?;
             Ok(uvw)
         })
         .await??;

@@ -33,7 +33,6 @@ pub async fn post(
     request: web::Json<DocumentRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
-    let uv_id = user_auth.user_vault_id();
 
     let (uv, db_document_request, auth_info) = state
         .db_pool
@@ -54,7 +53,7 @@ pub async fn post(
             // Move our request to Uploaded so any subsequent POSTs will fail
             let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
             let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
-            let uv = UserVault::get(conn, &uv_id)?;
+            let uv = UserVault::get(conn, user_auth.user_vault_id())?;
 
             Ok((uv, db_document_request, auth_info))
         })

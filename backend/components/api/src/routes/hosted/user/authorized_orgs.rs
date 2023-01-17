@@ -25,11 +25,10 @@ pub async fn get(
 ) -> actix_web::Result<Json<ResponseData<AuthorizedOrgsResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 
-    let user_vault_id = user_auth.user_vault_id();
     let (scoped_users, mut obs) = state
         .db_pool
         .db_query(move |conn| -> Result<_, db::DbError> {
-            let scoped_users = ScopedUser::list_for_user_vault(conn, &user_vault_id)?;
+            let scoped_users = ScopedUser::list_for_user_vault(conn, user_auth.user_vault_id())?;
             let scoped_user_ids = scoped_users.iter().map(|x| &x.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
             Ok((scoped_users, obs))

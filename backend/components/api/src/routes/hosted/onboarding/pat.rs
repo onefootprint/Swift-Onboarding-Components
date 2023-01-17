@@ -113,7 +113,7 @@ async fn authorize_privacy_pass(
                 LivenessInfo {
                     id: liveness_event.id,
                 },
-                user_auth.user_vault_id(),
+                user_auth.user_vault_id().clone(),
                 Some(onboarding.scoped_user_id),
             )?;
 
