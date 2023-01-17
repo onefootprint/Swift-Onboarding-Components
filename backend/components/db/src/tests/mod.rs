@@ -21,3 +21,7 @@ mod ob_configuration;
 /// unit tests.
 #[cfg(doctest)]
 mod test_db_query;
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod document_request;
