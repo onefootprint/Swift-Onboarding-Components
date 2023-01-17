@@ -17,6 +17,7 @@ export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   documentRequestId: string;
   shouldCollectSelfie: boolean;
+  shouldCollectConsent: boolean;
 };
 
 export type LivenessRequirement = {

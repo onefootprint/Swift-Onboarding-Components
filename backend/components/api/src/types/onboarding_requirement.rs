@@ -18,5 +18,6 @@ pub enum OnboardingRequirement {
     CollectDocument {
         document_request_id: DocumentRequestId,
         should_collect_selfie: bool,
+        should_collect_consent: bool,
     },
 }

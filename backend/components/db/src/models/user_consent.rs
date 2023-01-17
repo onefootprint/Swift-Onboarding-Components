@@ -1,4 +1,5 @@
 use crate::schema::user_consent;
+use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
@@ -46,5 +47,18 @@ impl UserConsent {
             .get_result::<UserConsent>(conn)?;
 
         Ok(new_user_consent)
+    }
+
+    pub fn latest_for_onboarding(
+        conn: &mut PgConnection,
+        onboarding_id: &OnboardingId,
+    ) -> DbResult<Option<UserConsent>> {
+        let res = user_consent::table
+            .filter(user_consent::onboarding_id.eq(onboarding_id))
+            .order_by(user_consent::timestamp.desc())
+            .first(conn)
+            .optional()?;
+
+        Ok(res)
     }
 }

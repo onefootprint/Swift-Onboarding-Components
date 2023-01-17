@@ -4,6 +4,7 @@ use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
         liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
+        user_consent::UserConsent,
     },
     DbError, PgConnection,
 };
@@ -73,6 +74,9 @@ pub fn get_requirements(
     // In various places in the codebase, we will determine if a DocumentRequest should be created
     //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
     //      we will create a DocumentRequest row.
+
+    let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding.id)?;
+
     let doc_request_result = DocumentRequest::get_active(conn, scoped_user_id);
     // Handle not finding an active request differently than other db errors
     let document_request_requirements = match doc_request_result {
@@ -86,6 +90,7 @@ pub fn get_requirements(
         Ok(doc_request) => Ok(vec![OnboardingRequirement::CollectDocument {
             document_request_id: doc_request.id,
             should_collect_selfie: doc_request.should_collect_selfie,
+            should_collect_consent: doc_request.should_collect_selfie && user_consent.is_none(),
         }]),
     }?;
 
