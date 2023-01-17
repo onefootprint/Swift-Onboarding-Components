@@ -15,7 +15,7 @@ use super::features::*;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     feature_flag::FeatureFlagClient,
-    utils::user_vault_wrapper::{UserVaultWrapper, UvwCommitData},
+    utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
 

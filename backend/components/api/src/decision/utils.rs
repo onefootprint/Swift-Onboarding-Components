@@ -19,7 +19,7 @@ use newtypes::{
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     feature_flag::FeatureFlagClient,
-    utils::user_vault_wrapper::{UserVaultWrapper, UvwCommitData},
+    utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
 

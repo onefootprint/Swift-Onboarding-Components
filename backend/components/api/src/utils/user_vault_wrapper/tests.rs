@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::UserVaultWrapper;
 use crate::types::identity_data_request::IdentityDataUpdate;
-use crate::utils::user_vault_wrapper::{UvwAddData, UvwArgs, UvwCommitData};
+use crate::utils::user_vault_wrapper::UvwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_vault_data::NewUserVaultData;
 use db::models::user_vault_data::UserVaultData;

@@ -7,9 +7,8 @@ use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdat
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::LockedTenantUvw;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
-use crate::utils::user_vault_wrapper::UvwAddData;
+use crate::utils::user_vault_wrapper::WriteableUvw;
 use crate::{errors::ApiError, State};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -61,7 +60,7 @@ pub async fn put(
 
 pub fn put_internal(
     conn: &mut TxnPgConnection,
-    uvw: LockedTenantUvw,
+    uvw: WriteableUvw,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,
     insight: CreateInsightEvent,

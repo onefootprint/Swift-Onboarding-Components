@@ -1,13 +1,11 @@
-use std::collections::HashSet;
-
-use super::LockedTenantUvw;
-use super::TenantUvw;
+use super::WriteableUvw;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::TxnPgConnection;
 use newtypes::CollectedDataOption;
 use newtypes::DataLifetimeSeqno;
+use std::collections::HashSet;
 
 struct CurrentData {
     speculative: HashSet<CollectedDataOption>,
@@ -60,21 +58,14 @@ fn decide_data_to_commit(data: CurrentData) -> DataToCommit {
     }
 }
 
-// Need a trait to define functions on Locked<T>, which is defined outside the crate.
-pub trait UvwCommitData {
-    fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno>;
-}
-
-impl UvwCommitData for LockedTenantUvw {
+impl WriteableUvw {
     /// Marks all speculative identity data data as committed in order to make it portable after
     /// it is verified by an approved onboarding.
     /// Intentionally consumes the UVW to prevent using a stale reference
     /// NOTE: this DOES NOT commit custom data or identity documents since we haven't figured out
     /// the portability story for those types of data
-    fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
-        let TenantUvw {
-            uvw, scoped_user_id, ..
-        } = self.into_inner();
+    pub fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
+        let Self { uvw, scoped_user_id } = self;
 
         // Use the same seqno to deactivate old data and commit new data
         let seqno = DataLifetime::get_next_seqno(conn)?;

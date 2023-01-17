@@ -1,4 +1,3 @@
-use super::LockedTenantUvw;
 use super::TenantUvw;
 use super::UserVaultWrapper;
 use crate::errors::ApiResult;
@@ -14,30 +13,8 @@ use db::models::user_vault::UserVault;
 use db::models::user_vault_data::UserVaultData;
 use db::HasLifetime;
 use db::PgConnection;
-use db::TxnPgConnection;
 use newtypes::{ScopedUserId, TenantId};
 use std::collections::HashMap;
-
-impl UserVaultWrapper {
-    /// Builds a locked UVW that sees committed data AND speculative data for the tenant.
-    /// This should be used during onboarding operations in order to allow the tenant to see
-    /// uncommitted data that has been added by previous operations
-    pub fn lock_for_onboarding(
-        conn: &mut TxnPgConnection,
-        scoped_user_id: &ScopedUserId,
-    ) -> ApiResult<LockedTenantUvw> {
-        // Lock the UserVault in this transaction, then build the UVW
-        UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
-        let uvw = Self::build(conn, UvwArgs::Onboarding(scoped_user_id))?;
-        let ob_uvw = TenantUvw {
-            uvw,
-            scoped_user_id: scoped_user_id.clone(),
-            // TODO these UVWs are built for adding data, so we don't need to check ob configs
-            authorized_ob_configs: vec![],
-        };
-        Ok(LockedTenantUvw::new(ob_uvw))
-    }
-}
 
 impl UserVaultWrapper {
     pub fn build_for_tenant(conn: &mut PgConnection, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {

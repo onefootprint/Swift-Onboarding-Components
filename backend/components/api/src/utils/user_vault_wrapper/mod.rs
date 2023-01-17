@@ -12,9 +12,11 @@ mod build;
 mod decrypt;
 mod tenant;
 mod uvw_data;
+mod writeable;
 
 pub use args::UvwArgs;
 pub use tenant::*;
+pub use writeable::*;
 
 /// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
 /// about a particular user.

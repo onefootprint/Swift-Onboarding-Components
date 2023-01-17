@@ -5,11 +5,11 @@ use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::email::send_email_challenge;
 use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwAddData};
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
 use newtypes::email::Email as EmailData;
-use newtypes::{IdentityDataKind, Fingerprinter};
+use newtypes::{Fingerprinter, IdentityDataKind};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 

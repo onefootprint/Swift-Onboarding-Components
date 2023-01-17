@@ -1,5 +1,5 @@
-use super::super::LockedTenantUvw;
 use super::uvd_builder::UvdBuilder;
+use super::WriteableUvw;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::identity_data_request::IdentityDataUpdate;
@@ -14,47 +14,17 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
-// Need a trait to define functions on Locked<T>, which is defined outside the crate.
-pub trait UvwAddData {
-    fn add_email(
-        self, // Intentionally consume to prevent using stale UVW
-        conn: &mut TxnPgConnection,
-        email: NewtypeEmail,
-        fingerprint: Fingerprint,
-    ) -> ApiResult<EmailId>;
-
-    fn update_identity_data(
-        self, // consume self, since we don't want stale data getting used
-        conn: &mut TxnPgConnection,
-        update: IdentityDataUpdate,
-        fingerprints: Vec<(UvdKind, Fingerprint)>,
-    ) -> ApiResult<()>;
-
-    fn update_custom_data(
-        self, // consume self, since we don't want stale data getting used
-        conn: &mut TxnPgConnection,
-        update: HashMap<KvDataKey, PiiString>,
-    ) -> ApiResult<()>;
-
-    fn add_user_timeline(
-        &self,
-        conn: &mut TxnPgConnection,
-        attributes: Vec<CollectedDataOption>,
-    ) -> ApiResult<()>;
-}
-
 // Right now, we only allow adding data to a user vault inside of a locked transaction and when
 // we have built the UserVaultWrapper for a specific tenant.
-impl UvwAddData for LockedTenantUvw {
-    fn add_email(
+impl WriteableUvw {
+    pub fn add_email(
         self, // Intentionally consume to prevent using stale UVW
         conn: &mut TxnPgConnection,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
         self.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
-        let uvw = self.into_inner();
-        if !uvw.committed.emails.is_empty() {
+        if !self.committed.emails.is_empty() {
             // We don't currently support adding a secondary email
             return Err(UserError::InvalidDataUpdate.into());
         }
@@ -62,25 +32,25 @@ impl UvwAddData for LockedTenantUvw {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         // Deactivate the old speculative email, if exists
         let kinds = vec![DataLifetimeKind::Email];
-        DataLifetime::bulk_deactivate_uncommitted(conn, &uvw.scoped_user_id, kinds, seqno)?;
+        DataLifetime::bulk_deactivate_uncommitted(conn, &self.scoped_user_id, kinds, seqno)?;
 
         // Add the new speculative email
         let email = email.to_piistring();
-        let e_data = uvw.user_vault.public_key.seal_pii(&email)?;
+        let e_data = self.user_vault.public_key.seal_pii(&email)?;
         let email = db::models::email::Email::create(
             conn,
-            &uvw.user_vault.id,
+            &self.user_vault.id,
             e_data,
             fingerprint,
             DataPriority::Primary,
-            &uvw.scoped_user_id,
+            &self.scoped_user_id,
             seqno,
         )?;
 
         Ok(email.id)
     }
 
-    fn update_identity_data(
+    pub fn update_identity_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
@@ -102,7 +72,7 @@ impl UvwAddData for LockedTenantUvw {
         Ok(())
     }
 
-    fn update_custom_data(
+    pub fn update_custom_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConnection,
         update: HashMap<KvDataKey, PiiString>,
