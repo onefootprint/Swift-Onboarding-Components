@@ -54,24 +54,24 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
 class TestDashboardOnboardings:
     def test_tenant_decrypt(self, sandbox_user):
         tenant = sandbox_user.tenant
-        expected_data = dict(
-            first_name=sandbox_user.first_name,
-            last_name=sandbox_user.last_name,
-            email=sandbox_user.email,
-            address_line1=sandbox_user.address_line1,
-            address_line2=sandbox_user.address_line2,
-            zip=sandbox_user.zip,
-            country=sandbox_user.country,
-            ssn9=sandbox_user.ssn,
-            ssn4=sandbox_user.ssn[-4:],
-        )
+        expected_data = {
+            "id.first_name": sandbox_user.first_name,
+            "id.last_name": sandbox_user.last_name,
+            "id.email": sandbox_user.email,
+            "id.address_line1": sandbox_user.address_line1,
+            "id.address_line2": sandbox_user.address_line2,
+            "id.zip": sandbox_user.zip,
+            "id.country": sandbox_user.country,
+            "id.ssn9": sandbox_user.ssn,
+            "id.ssn4": sandbox_user.ssn[-4:],
+        }
         for attributes in FIELDS_TO_DECRYPT:
             data = {
                 "fields": attributes,
                 "reason": "Doing a hecking decrypt",
             }
             body = post(
-                f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
+                f"users/{sandbox_user.fp_user_id}/vault/decrypt",
                 data,
                 tenant.sk.key,
             )
@@ -85,13 +85,14 @@ class TestDashboardOnboardings:
     def test_tenant_decrypt_no_permissions(self, sandbox_user):
         tenant = sandbox_user.tenant
         data = {
-            "fields": ["dob"],
+            "fields": ["id.dob"],
             "reason": "Not doing a hecking decrypt",
         }
         post(
-            f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
+            f"users/{sandbox_user.fp_user_id}/vault/decrypt",
             data,
             tenant.sk.key,
+            # Uh oh - we should be checking ensure_scope_allows_access
             status_code=401,
         )
 
@@ -104,7 +105,7 @@ class TestDashboardOnboardings:
             "reason": "Let me see the face of the man or woman who wronged me",
         }
         post(
-            f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
+            f"users/{sandbox_user.fp_user_id}/vault/decrypt",
             data,
             tenant.sk.key,
             status_code=400,
@@ -281,13 +282,13 @@ class TestDashboardOnboardings:
         assert not body["data"]
 
     def test_portable_failed_data_write(self, sandbox_user):
-        data = dict(reason="test", fields=["first_name", "ssn9"])
+        data = dict(reason="test", fields=["id.first_name", "id.ssn9"])
         body = post(
-            f"users/{sandbox_user.fp_user_id}/vault/identity/decrypt",
+            f"users/{sandbox_user.fp_user_id}/vault/decrypt",
             data,
             sandbox_user.tenant.sk.key,
         )
-        assert body["first_name"]
+        assert body["id.first_name"]
 
         data = {
             "dob": {

@@ -1,5 +1,6 @@
 use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{tenant::TenantUserAuthContext, Either};
+use crate::errors::tenant::TenantError;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper};
@@ -37,12 +38,15 @@ pub async fn post(
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptUnifiedResponse> {
-    // TODO if we get only id data here, don't require the `id.` prefix
     let footprint_user_id = path.into_inner();
 
     let request = request.into_inner();
     let DecryptUnifiedFieldsRequest { fields, reason } = request;
     let fields = fields.clone().into_iter().collect_vec();
+
+    if fields.contains(&DataIdentifier::IdDocument) {
+        return Err(TenantError::CannotDecryptDocument.into());
+    }
 
     let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
     let is_live = auth.is_live()?;

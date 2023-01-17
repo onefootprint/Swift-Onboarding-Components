@@ -43,23 +43,24 @@ class TestNonPortableVaultApi:
         data = build_user_data()
         put(f"users/{fp_id}/vault/identity", data, sandbox_tenant.sk.key)
         # check that the data is there now
-        params = {"fields": "first_name, last_name, zip, ssn9, city"}
-        response = get(f"users/{fp_id}/vault/identity", params, sandbox_tenant.sk.key)
-        assert response["first_name"] == True
-        assert response["last_name"] == True
-        assert response["zip"] == True
-        assert response["ssn9"] == True
-        assert response["city"] == True
+        params = {"fields": "id.first_name, id.last_name, id.zip, id.ssn9, id.city"}
+        response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
+        assert response["id.first_name"] == True
+        assert response["id.last_name"] == True
+        assert response["id.zip"] == True
+        assert response["id.ssn9"] == True
+        assert response["id.city"] == True
 
         # decrypt the data
-        data = dict(reason="test", fields=["first_name", "zip", "city"])
-        body = post(
-            f"users/{fp_id}/vault/identity/decrypt", data, sandbox_tenant.sk.key
+        data = dict(
+            reason="test",
+            fields=["id.first_name", "id.zip", "id.city"],
         )
+        body = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         data = body
-        assert data["first_name"] == "Sandbox"
-        assert data["zip"] == "10009"
-        assert data["city"] == "Enclave"
+        assert data["id.first_name"] == "Sandbox"
+        assert data["id.zip"] == "10009"
+        assert data["id.city"] == "Enclave"
 
         # verify access events created
         body = get(

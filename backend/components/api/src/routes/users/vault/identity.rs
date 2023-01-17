@@ -1,37 +1,22 @@
-//! Add/get/decrypt identity data to a NON-portable user vault
+//! Add identity data to a NON-portable user vault
 
-use std::collections::{HashMap, HashSet};
-
-use crate::auth::tenant::{CanDecrypt, SecretTenantAuthContext, TenantGuard};
-use crate::auth::{
-    tenant::{CheckTenantGuard, TenantAuth, TenantUserAuthContext},
-    AuthError, Either,
-};
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::{tenant::TenantAuth, AuthError};
 use crate::errors::ApiResult;
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
-use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
-use crate::utils::user_vault_wrapper::{DecryptRequest, UserVaultWrapper, UvwAddData, UvwArgs};
-
+use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::LockedTenantUvw;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::user_vault_wrapper::UvwAddData;
 use crate::{errors::ApiError, State};
-
-use actix_web::web::Query;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::TxnPgConnection;
-
 use db::models::scoped_user::ScopedUser;
-use newtypes::csv::Csv;
-use newtypes::{
-    flat_api_object_map_type, AccessEventKind, DataIdentifier, Fingerprint, FootprintUserId,
-    IdentityDataKind, PiiString, UvdKind,
-};
-
-use paperclip::actix::Apiv2Schema;
+use db::TxnPgConnection;
+use newtypes::{AccessEventKind, DataIdentifier, Fingerprint, FootprintUserId, UvdKind};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
-use serde::{Deserialize, Serialize};
 
 #[api_v2_operation(
     description = "Updates data in the user's identity vault.",
@@ -104,130 +89,4 @@ pub fn put_internal(
     uvw.update_identity_data(conn, update, fingerprints)?;
 
     Ok(())
-}
-
-/**
- * Fetch status of data kinds
- */
-
-#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
-pub struct FieldsParams {
-    /// Comma separated list of fields to check
-    #[openapi(example = "last_name, dob, ssn9")]
-    pub fields: Csv<IdentityDataKind>,
-}
-
-flat_api_object_map_type!(
-    GetIdentityDataResponse<IdentityDataKind, bool>,
-    description="A key-value map indicating what identity fields are present",
-    example=r#"{ "last_name": true, "dob": true, "ssn9": false }"#
-);
-
-#[api_v2_operation(
-    description = "Checks existence if items in the identity vault.",
-    tags(Vault, PublicApi, Users)
-)]
-#[actix::get("/users/{footprint_user_id}/vault/identity")]
-pub async fn get(
-    state: web::Data<State>,
-    path: Path<FootprintUserId>,
-    request: Query<FieldsParams>,
-    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-) -> JsonApiResponse<GetIdentityDataResponse> {
-    get_internal(state, path, request, tenant_auth).await
-}
-
-pub(super) async fn get_internal(
-    state: web::Data<State>,
-    path: Path<FootprintUserId>,
-    request: Query<FieldsParams>,
-    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-) -> JsonApiResponse<GetIdentityDataResponse> {
-    let tenant_auth = tenant_auth.check_guard(TenantGuard::Read)?;
-    let footprint_user_id = path.into_inner();
-    let tenant_id = tenant_auth.tenant().id.clone();
-    let is_live = tenant_auth.is_live()?;
-    let fields = request.into_inner().fields.0;
-
-    let fields_clone = fields.clone();
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
-
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
-
-            Ok(uvw)
-        })
-        .await??;
-
-    let output = HashMap::from_iter(fields.into_iter().map(|field| {
-        let exists = uvw.has_identity_field(field);
-        (field, exists)
-    }));
-
-    ResponseData::ok(GetIdentityDataResponse::from(output)).json()
-}
-
-/**
- * Decryt data kinds
- */
-#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
-pub struct DecryptIdentityFieldsRequest {
-    /// attributes to decrypt
-    pub fields: HashSet<IdentityDataKind>,
-
-    /// reason for the data decryption
-    pub reason: String,
-}
-
-flat_api_object_map_type!(
-    DecryptIdentityDataResponse<IdentityDataKind, Option<PiiString>>,
-    description="A key-value map with the corresponding decrypted identity data values",
-    example=r#"{ "last_name": "smith", "ssn9": "121121212", "dob": "12-12-1990" }"#
-);
-
-#[api_v2_operation(
-    description = "Decrypts data from the identity vault",
-    tags(Vault, PublicApi, Users)
-)]
-#[actix::post("/users/{footprint_user_id}/vault/identity/decrypt")]
-pub async fn post_decrypt(
-    state: web::Data<State>,
-    path: Path<FootprintUserId>,
-    request: Json<DecryptIdentityFieldsRequest>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-    insights: InsightHeaders,
-) -> JsonApiResponse<DecryptIdentityDataResponse> {
-    let DecryptIdentityFieldsRequest { fields, reason } = request.into_inner();
-    let fields: Vec<_> = fields.into_iter().collect();
-    let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
-
-    let footprint_user_id = path.into_inner();
-    let tenant_id = auth.tenant().id.clone();
-    let is_live = auth.is_live()?;
-
-    let fields_clone = fields.clone();
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-
-            uvw.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
-
-            Ok(uvw)
-        })
-        .await??;
-
-    let req = DecryptRequest {
-        reason,
-        principal: auth.actor().into(),
-        insight: CreateInsightEvent::from(insights),
-    };
-    let mut results = uvw.decrypt(&state, &fields, Some(req)).await?;
-    let results = HashMap::from_iter(fields.into_iter().map(|di| (di, results.remove(&di))));
-
-    ResponseData::ok(DecryptIdentityDataResponse::from(results)).json()
 }

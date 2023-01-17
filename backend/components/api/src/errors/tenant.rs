@@ -10,4 +10,6 @@ pub enum TenantError {
     TenantUserDoesNotExist,
     #[error("Cannot inherit credentials for a non-integration test tenant")]
     NotIntegrationTestTenant,
+    #[error("Cannot decrypt identity document in this endpoint")]
+    CannotDecryptDocument,
 }

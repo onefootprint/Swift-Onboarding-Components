@@ -1,5 +1,6 @@
 use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{tenant::TenantUserAuthContext, Either};
+use crate::errors::tenant::TenantError;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
@@ -43,6 +44,10 @@ pub async fn get(
     let request = request.into_inner();
     let FieldsParams { fields } = request;
     let fields = fields.clone().into_iter().collect_vec();
+
+    if fields.contains(&DataIdentifier::IdDocument) {
+        return Err(TenantError::CannotDecryptDocument.into());
+    }
 
     let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
     let is_live = auth.is_live()?;
