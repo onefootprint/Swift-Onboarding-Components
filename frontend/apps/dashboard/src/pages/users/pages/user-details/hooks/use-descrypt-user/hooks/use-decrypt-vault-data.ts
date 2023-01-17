@@ -1,19 +1,19 @@
 import {
-  DecryptedUserDataAttributes,
+  DecryptDataResponse,
   IdDocType,
   UserDataAttribute,
 } from '@onefootprint/types';
 import { UserVaultData } from 'src/pages/users/users.types';
 
+import useDecryptData from './hooks/use-decrypt-data';
 import useDecryptIdDoc from './hooks/use-decrypt-id-doc';
-import useDecryptKycData from './hooks/use-decrypt-kyc-data';
 
 // The backend stores base64 images with the prefix stripped. To display
 // decrypted images in the dashboard UI, convert it back to valid base64 first
 const addBase64Prefix = (imageData: string) => `data:png;base64,${imageData}`;
 
 const useDecryptVaultData = (userId: string) => {
-  const decryptKycData = useDecryptKycData();
+  const decryptData = useDecryptData();
   const decryptIdDoc = useDecryptIdDoc();
 
   return (
@@ -35,22 +35,21 @@ const useDecryptVaultData = (userId: string) => {
     const promises = [];
 
     if (kycData.length) {
-      const decryptKycDataPromise = decryptKycData.mutateAsync(
-        { userId, fields: kycData, reason },
+      const dataIdentifiers = kycData.map(f => `id.${f}`);
+      const decryptKycDataPromise = decryptData.mutateAsync(
+        { userId, fields: dataIdentifiers, reason },
         {
-          onSuccess: decryptedKycData => {
-            // Convert camel case key from api to match UserDataAttribute keys
-            const keys = Object.keys(
-              decryptedKycData,
-            ) as unknown as (keyof DecryptedUserDataAttributes)[];
-            keys.forEach(key => {
-              const value = decryptedKycData[key];
-              if (value !== undefined) {
-                const attrKey = (UserDataAttribute as any)[
-                  key
-                ] as UserDataAttribute;
+          onSuccess: (decrypytedData: DecryptDataResponse) => {
+            Object.entries(decrypytedData).forEach(entry => {
+              // The key from the backend has and `id.` prefix for any identity data, which
+              // is the only kind of data we decrypt now
+              const [key, value] = entry;
+              const keyParts = key.split('.');
+              if (value !== undefined && keyParts[0] === 'id') {
+                const attrKey = keyParts[1] as UserDataAttribute;
                 decryptedVaultData.kycData[attrKey] = value;
               }
+              // TODO handle decrypting custom data
             });
           },
         },

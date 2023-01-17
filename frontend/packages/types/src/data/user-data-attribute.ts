@@ -1,3 +1,4 @@
+// Same as IdentityDataKind on backend
 export enum UserDataAttribute {
   firstName = 'first_name',
   lastName = 'last_name',

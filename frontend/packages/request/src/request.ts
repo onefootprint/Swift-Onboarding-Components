@@ -58,10 +58,9 @@ export const getErrorMessage = (error: unknown | Error): string => {
   return 'Something went wrong';
 };
 
-const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
+const getRequestOptions = (requestConfig: AxiosRequestConfig) => {
   const sessionId = getSessionId();
-  const client = applyCaseMiddleware(axios.create());
-  return client.request<Response>({
+  return {
     baseURL: getCustomEnvVariable(
       'NEXT_PUBLIC_API_BASE_URL',
       process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -73,7 +72,21 @@ const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
       'x-fp-session-id': sessionId,
       ...requestConfig.headers,
     },
-  });
+  };
+};
+
+const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
+  const client = applyCaseMiddleware(axios.create());
+  const options = getRequestOptions(requestConfig);
+  return client.request<Response>(options);
+};
+
+export const requestWithoutCaseConverter = <Response = any>(
+  requestConfig: AxiosRequestConfig = {},
+) => {
+  const client = axios.create();
+  const options = getRequestOptions(requestConfig);
+  return client.request<Response>(options);
 };
 
 export default request;
