@@ -1,4 +1,4 @@
-import requestWithoutCaseConverter from '@onefootprint/request';
+import { requestWithoutCaseConverter } from '@onefootprint/request';
 import { DecryptDataRequest, DecryptDataResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
