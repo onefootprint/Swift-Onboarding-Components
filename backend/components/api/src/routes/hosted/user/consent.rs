@@ -30,7 +30,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_test_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(conn)?;
 
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
