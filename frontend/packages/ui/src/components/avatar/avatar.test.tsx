@@ -5,11 +5,14 @@ import Avatar, { AvatarProps } from './avatar';
 
 describe('<Avatar />', () => {
   const renderAvatar = ({
+    loading = false,
     name = 'Jane Doe',
-    src,
     size = 'default',
+    src,
   }: Partial<AvatarProps>) =>
-    customRender(<Avatar name={name} size={size} src={src} />);
+    customRender(
+      <Avatar loading={loading} name={name} size={size} src={src} />,
+    );
 
   describe('when the src is not defined', () => {
     it('should render the name first letter', () => {
@@ -18,6 +21,13 @@ describe('<Avatar />', () => {
 
       expect(fallback).toBeInTheDocument();
       expect(fallback.textContent).toEqual('J');
+    });
+
+    it('should show a loading state', () => {
+      renderAvatar({ name: 'Jane Doe', loading: true });
+
+      const loading = screen.getByRole('progressbar');
+      expect(loading).toBeInTheDocument();
     });
   });
 
@@ -31,6 +41,17 @@ describe('<Avatar />', () => {
 
       expect(image).toBeInTheDocument();
       expect(image).toHaveAttribute('src', 'https://i.pravatar.cc/150?img=35');
+    });
+
+    it('should show a loading state', () => {
+      renderAvatar({
+        name: 'Jane Doe',
+        src: 'https://i.pravatar.cc/150?img=35',
+        loading: true,
+      });
+
+      const loading = screen.getByRole('progressbar');
+      expect(loading).toBeInTheDocument();
     });
   });
 });

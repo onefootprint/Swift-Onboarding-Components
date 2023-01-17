@@ -23,17 +23,28 @@ export default {
       description: 'Avatar image source',
       required: false,
     },
+    loading: {
+      control: 'boolean',
+      description: 'Shows a loading state',
+      required: false,
+    },
   },
 } as Meta;
 
-const Template: Story<AvatarProps> = ({ src, name, size }: AvatarProps) => (
-  <Avatar src={src} name={name} size={size} />
+const Template: Story<AvatarProps> = ({
+  loading,
+  name,
+  size,
+  src,
+}: AvatarProps) => (
+  <Avatar loading={loading} name={name} size={size} src={src} />
 );
 
 export const Base = Template.bind({});
 Base.args = {
   name: 'Jane Doe',
   size: 'default',
+  loading: false,
 };
 
 export const WithImage = Template.bind({});
@@ -41,4 +52,5 @@ WithImage.args = {
   name: 'Jane Doe',
   size: 'default',
   src: 'https://i.pravatar.cc/150?img=35',
+  loading: false,
 };
