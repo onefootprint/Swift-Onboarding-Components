@@ -27,8 +27,8 @@ export enum Events {
   receivedSelfieImage = 'receivedSelfieImage',
   succeeded = 'succeeded',
   errored = 'errored',
-  resubmitIdDocImages = 'resubmitIdDocImages',
   retryLimitExceeded = 'retryLimitExceeded',
+  resubmitIdDocImages = 'resubmitIdDocImages',
 }
 
 export enum Actions {

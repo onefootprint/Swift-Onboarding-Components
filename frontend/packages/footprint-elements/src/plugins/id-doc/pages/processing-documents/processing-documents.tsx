@@ -1,40 +1,42 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { IcoCheckCircle40, IcoClose40 } from '@onefootprint/icons';
-import {
-  DocStatusKind,
-  GetDocStatusResponse,
-  IdDocBadImageError,
-} from '@onefootprint/types';
-import { LoadingIndicator, Typography } from '@onefootprint/ui';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { DocStatusKind } from '@onefootprint/types';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useEffectOnce } from 'usehooks-ts';
+import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import HeaderTitle from '../../../../components/header-title';
-import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
-import useGetDocStatus from './hooks/use-get-doc-status';
+import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import Error from './components/error';
+import Loading from './components/loading/loading';
+import RetryLimitExceeded from './components/retry-limit-exceeded';
+import Success from './components/success';
+import usePollDocStatus from './hooks/use-poll-doc-status';
 import useSubmitDoc from './hooks/use-submit-doc';
 
-enum DisplayStatus {
-  loading,
-  success,
-  error,
-}
-
-const TRANSITION_DELAY = 3000;
+const LOADING_TIMEOUT = 10000;
 
 const ProcessingDocuments = () => {
   const { t } = useTranslation('pages.processing-documents');
-  const [state, send] = useIdDocMachine();
+  const [state] = useIdDocMachine();
   const {
     idDoc: { type, country, frontImage, backImage },
     authToken,
     requestId,
   } = state.context;
-  const [displayStatus, setDisplayStatus] = useState<DisplayStatus>(
-    DisplayStatus.loading,
-  );
+
   const submitDocMutation = useSubmitDoc();
+  const showRequestErrorToast = useRequestErrorToast();
+  const [status, setStatus] = useState<DocStatusKind>(DocStatusKind.pending);
+  const { start, stop, result } = usePollDocStatus({
+    onSuccess: response => {
+      setStatus(response.status.kind);
+    },
+    // Polling errored out in an unrecoverable way: show error page, let user retry uploading
+    onError: (error: unknown) => {
+      showRequestErrorToast(error);
+      setStatus(DocStatusKind.error);
+    },
+  });
 
   useEffectOnce(() => {
     if (!frontImage || !authToken || !type || !country || !requestId) {
@@ -42,87 +44,43 @@ const ProcessingDocuments = () => {
     }
     // TODO: Submit selfie to the backend
     // https://linear.app/footprint/issue/FP-1996/integrate-with-bifrost-apis
-    submitDocMutation.mutate({
-      frontImage,
-      backImage,
-      authToken,
-      documentType: type,
-      countryCode: country,
-      requestId,
-    });
-  });
-
-  useGetDocStatus({
-    onSuccess: (response: GetDocStatusResponse) => {
-      const {
-        status: { kind },
-        errors,
-      } = response;
-      if (kind === DocStatusKind.retryLimitExceeded) {
-        handleRetryLimitExceeded();
-      } else if (kind === DocStatusKind.error && !!errors?.length) {
-        handleDocErrors(errors);
-      } else if (kind === DocStatusKind.complete) {
-        handleDocSuccess();
-      }
-    },
-  });
-
-  const handleDocSuccess = () => {
-    setDisplayStatus(DisplayStatus.success);
-    setTimeout(() => {
-      send({
-        type: Events.succeeded,
-      });
-    }, TRANSITION_DELAY);
-  };
-
-  const handleDocErrors = (errors: IdDocBadImageError[]) => {
-    setDisplayStatus(DisplayStatus.error);
-    setTimeout(() => {
-      send({
-        type: Events.errored,
-        payload: {
-          errors,
+    submitDocMutation.mutate(
+      {
+        frontImage,
+        backImage,
+        authToken,
+        documentType: type,
+        countryCode: country,
+        requestId,
+      },
+      {
+        // Only start polling after the document upload is successful
+        onSuccess: () => start(),
+        // If there is an unrecoverable error, show error page & let user retry uploading
+        onError: error => {
+          showRequestErrorToast(error);
+          setStatus(DocStatusKind.error);
         },
-      });
-    }, TRANSITION_DELAY);
-  };
+      },
+    );
+  });
 
-  const handleRetryLimitExceeded = () => {
-    setDisplayStatus(DisplayStatus.error);
-    setTimeout(() => {
-      send({
-        type: Events.retryLimitExceeded,
-      });
-    }, TRANSITION_DELAY);
-  };
+  // If we are stuck in loading state for 10 seconds, error out & retry uploading
+  useTimeout(
+    () => {
+      stop();
+      setStatus(DocStatusKind.error);
+    },
+    status === DocStatusKind.pending ? LOADING_TIMEOUT : null,
+  );
 
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      {displayStatus === DisplayStatus.loading && (
-        <>
-          <LoadingIndicator />
-          <Typography variant="label-3">{t('loading')}</Typography>
-        </>
-      )}
-      {displayStatus === DisplayStatus.success && (
-        <>
-          <IcoCheckCircle40 color="success" />
-          <Typography variant="label-3" color="success">
-            {t('success')}
-          </Typography>
-        </>
-      )}
-      {displayStatus === DisplayStatus.error && (
-        <>
-          <IcoClose40 color="error" />
-          <Typography variant="label-3" color="error">
-            {t('error')}
-          </Typography>
-        </>
-      )}
+      {status === DocStatusKind.pending && <Loading />}
+      {status === DocStatusKind.complete && <Success />}
+      {status === DocStatusKind.error && <Error errors={result.data?.errors} />}
+      {status === DocStatusKind.retryLimitExceeded && <RetryLimitExceeded />}
     </Container>
   );
 };

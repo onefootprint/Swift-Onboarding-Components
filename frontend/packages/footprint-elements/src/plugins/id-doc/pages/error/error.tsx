@@ -18,12 +18,14 @@ const Error = () => {
     });
   };
   // In case backend sends us error codes we don't expect
-  const cleanedErrors = errors?.filter(error => !!BadImageErrorLabel[error]);
+  const cleanedErrors =
+    errors?.filter(error => !!BadImageErrorLabel[error]) ?? [];
+  const hasErrors = cleanedErrors.length > 0;
 
-  return cleanedErrors?.length ? (
+  return hasErrors ? (
     <Container>
       <IcoWarning40 color="error" />
-      <HeaderTitle title={t('title')} subtitle={t('description')} />
+      <HeaderTitle title={t('title')} subtitle={t('description-with-errors')} />
       <ErrorsContainer>
         {cleanedErrors.map(error => (
           <Typography key={error} variant="body-2" color="secondary" as="li">
@@ -35,7 +37,15 @@ const Error = () => {
         {t('cta')}
       </Button>
     </Container>
-  ) : null;
+  ) : (
+    <Container>
+      <IcoWarning40 color="error" />
+      <HeaderTitle title={t('title')} subtitle={t('description')} />
+      <Button fullWidth onClick={handleClick}>
+        {t('cta')}
+      </Button>
+    </Container>
+  );
 };
 
 const Container = styled.div`

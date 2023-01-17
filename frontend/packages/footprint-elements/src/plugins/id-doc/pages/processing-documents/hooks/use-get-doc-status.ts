@@ -20,6 +20,7 @@ const getDocStatus = async (payload: GetDocStatusRequest) => {
 };
 
 const useGetDocStatus = (
+  enabled: boolean,
   options: {
     onSuccess?: (data: GetDocStatusResponse) => void;
     onError?: (error: RequestError) => void;
@@ -34,7 +35,7 @@ const useGetDocStatus = (
     () => getDocStatus({ authToken, requestId }),
     {
       refetchInterval: DOC_STATUS_FETCH_INTERVAL,
-      enabled: !!authToken,
+      enabled: !!authToken && !!enabled,
       onSuccess: options.onSuccess,
       onError: options.onError,
     },

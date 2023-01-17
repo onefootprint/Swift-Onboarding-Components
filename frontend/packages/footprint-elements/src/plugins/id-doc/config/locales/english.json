@@ -110,7 +110,8 @@
     },
     "error": {
       "title": "We couldn't process your images",
-      "description": "Please submit new images considering:",
+      "description": "Please submit new images.",
+      "description-with-errors": "Please submit new images considering:",
       "cta": "Resubmit images"
     },
     "failure": {

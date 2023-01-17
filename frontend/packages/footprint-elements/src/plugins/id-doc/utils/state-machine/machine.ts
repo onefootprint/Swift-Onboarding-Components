@@ -106,10 +106,6 @@ const createIdDocMachine = () =>
               {
                 target: States.error,
                 actions: Actions.assignIdDocImageErrors,
-                cond: (context, event) => !!event.payload.errors,
-              },
-              {
-                target: States.failure,
               },
             ],
             [Events.retryLimitExceeded]: {
