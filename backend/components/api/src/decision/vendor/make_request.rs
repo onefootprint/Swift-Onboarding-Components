@@ -230,19 +230,35 @@ pub async fn make_vendor_requests(
     state: &State,
     requests: Vec<VerificationRequest>,
 ) -> Result<Vec<Result<vendor_result::VendorResult, ApiError>>, ApiError> {
-    // Build our IDV Vendor requests
-    let raw_futures = requests.into_iter().map(|r| make_idv_request(state, r));
+    let raw_futures_with_vendors = requests
+        .into_iter()
+        .map(|r| (r.vendor_api, make_idv_request(state, r)));
 
     // Make requests
+    let (vendor_apis, raw_futures): (Vec<_>, Vec<_>) = raw_futures_with_vendors.into_iter().unzip();
     let mut futures: Vec<_> = raw_futures.into_iter().map(Box::pin).collect();
     let mut results: Vec<Result<vendor_result::VendorResult, ApiError>> = vec![];
 
     while !futures.is_empty() {
-        let (result, _, remaining) = futures::future::select_all(futures).await;
-        results.push(result);
-        futures = remaining;
+        let (result, idx, remaining) = futures::future::select_all(futures).await;
 
-        // TODO: log
+        match result {
+            Err(ref e) => {
+                // return the api that failed
+                let api = vendor_apis[idx];
+                tracing::warn!(
+                    vendor_api = %api,
+                    err = format!("{:?}", e),
+                    "VerificationRequest failed"
+                );
+
+                results.push(Err(ApiError::VendorRequestFailed(api)))
+            }
+            Ok(_) => {
+                results.push(result);
+            }
+        }
+        futures = remaining;
     }
 
     Ok(results)

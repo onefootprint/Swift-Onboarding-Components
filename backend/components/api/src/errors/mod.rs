@@ -4,7 +4,7 @@ use actix_web::{
 };
 
 use db::errors::DbError;
-use newtypes::Uuid;
+use newtypes::{Uuid, VendorAPI};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
@@ -102,8 +102,10 @@ pub enum ApiError {
     S3Error(#[from] crate::s3::S3Error),
     #[error("privacy pass token error: {0}")]
     PrivacyPassError(#[from] privacy_pass::Error),
+    #[error("Vendor request failed {0}")]
+    VendorRequestFailed(VendorAPI),
     #[error("One or more vendor requests failed")]
-    VendorRequestFailed,
+    VendorRequestsFailed,
     #[error("Cannot decrypt field {0} with this endpoint")]
     InvalidFieldForDecryption(String),
     #[error("Unexpected: {0}")]
@@ -214,7 +216,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidFieldForDecryption(_) => StatusCode::BAD_REQUEST,
             ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::VendorRequestFailed => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::VendorRequestFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::VendorRequestsFailed => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_)
             | ApiError::InvalidJsonBody(_)
             | ApiError::InvalidFormError(_)

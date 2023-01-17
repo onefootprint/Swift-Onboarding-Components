@@ -46,16 +46,23 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
     // Make requests
     let raw_results = vendor::make_request::make_vendor_requests(state, requests).await?;
     // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
-    let error_results = raw_results
+    let has_errors = raw_results
         .iter()
         .filter_map(|r| r.as_ref().err())
-        .collect::<Vec<&ApiError>>();
+        .find(|&err| match err {
+            &ApiError::VendorRequestFailed(vendor_api) => {
+                if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api) {
+                    true
+                } else {
+                    tracing::warn!(vendor_api=%vendor_api, "Vendor request failed, but not bailing out of decision engine run");
+                    false
+                }
+            }
+            _ => true,
+        });
 
-    if !error_results.is_empty() {
-        error_results
-            .iter()
-            .for_each(|err| tracing::warn!(err = format!("{:?}", err), "VerificationRequest failed"));
-        return Err(ApiError::VendorRequestFailed);
+    if has_errors.is_some() {
+        return Err(ApiError::VendorRequestsFailed);
     }
 
     let results = raw_results

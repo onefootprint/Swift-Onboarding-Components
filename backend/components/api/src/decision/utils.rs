@@ -210,6 +210,12 @@ pub(self) async fn should_send_prod_idv_requests(
     Ok(false)
 }
 
+// If socure fails, we shouldn't fail the DE run
+pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &VendorAPI) -> bool {
+    // Socure plus isn't used by anyone except Footprint (at this time)
+    !matches!(vendor_api, VendorAPI::SocureIDPlus)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
