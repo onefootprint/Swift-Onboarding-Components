@@ -20,6 +20,7 @@ impl UserVaultWrapper {
                 DataIdentifier::Id(idk) => self.get_identity_e_field(idk),
                 // Decrypt key here
                 DataIdentifier::IdDocument => todo!(),
+                DataIdentifier::Selfie => todo!(),
             }
             .map(|e_data| (di.clone(), e_data))
         }))

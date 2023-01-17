@@ -15,6 +15,7 @@ pub struct IdentityDocumentImages {
     pub front_image: SealedVaultBytes,
     // not all documents have backs
     pub back_image: Option<SealedVaultBytes>,
+    pub selfie_image: Option<SealedVaultBytes>,
     pub e_data_key: SealedVaultDataKey,
 }
 
@@ -22,6 +23,7 @@ pub struct DecryptDocumentResult {
     pub identity_document_id: IdentityDocumentId,
     pub front: PiiBytes,
     pub back: Option<PiiBytes>,
+    pub selfie: Option<PiiBytes>,
 }
 
 pub async fn fetch_image(
@@ -29,7 +31,7 @@ pub async fn fetch_image(
     identity_document: IdentityDocument,
 ) -> Result<IdentityDocumentImages, ApiError> {
     // require at least front to be non-None
-    let (Some(front_path), back_path) = (identity_document.front_image_s3_url, identity_document.back_image_s3_url) else {
+    let (Some(front_path), back_path, selfie_path) = (identity_document.front_image_s3_url, identity_document.back_image_s3_url, identity_document.selfie_image_s3_url) else {
         // TODO is this really the right error?
         return Err(ApiError::S3Error(S3Error::InvalidS3Url))
     };
@@ -42,6 +44,15 @@ pub async fn fetch_image(
     if let Some(b) = back_path {
         back = Some(state.s3_client.get_object_from_s3_url(b.as_str()).await?);
     }
+    let mut selfie: Option<actix_web::web::Bytes> = None;
+    if let Some(selfie_path) = selfie_path {
+        selfie = Some(
+            state
+                .s3_client
+                .get_object_from_s3_url(selfie_path.as_str())
+                .await?,
+        );
+    }
 
     Ok(IdentityDocumentImages {
         identity_document_id: identity_document.id,
@@ -49,6 +60,7 @@ pub async fn fetch_image(
         document_country: identity_document.country_code,
         front_image: SealedVaultBytes(front.to_vec()),
         back_image: back.map(|b| SealedVaultBytes(b.to_vec())),
+        selfie_image: selfie.map(|sp| SealedVaultBytes(sp.to_vec())),
         e_data_key: identity_document.e_data_key,
     })
 }
@@ -98,10 +110,17 @@ impl TenantUvw {
                     .transpose()?
                     .map(PiiBytes::new);
 
+                let selfie = image
+                    .selfie_image
+                    .map(|b| key.unseal_bytes(AeadSealedBytes(b.0)))
+                    .transpose()?
+                    .map(PiiBytes::new);
+
                 Ok(DecryptDocumentResult {
                     identity_document_id: image.identity_document_id,
                     front,
                     back,
+                    selfie,
                 })
             })
             .collect::<ApiResult<_>>()?;

@@ -1,6 +1,7 @@
 import arrow
 import pytest
 from urllib.parse import quote
+from tests.utils import create_ob_config
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
@@ -13,11 +14,12 @@ from tests.utils import (
     _gen_random_n_digit_number,
 )
 from tests.types import SecretApiKey, ObConfiguration
-from tests.bifrost_client import BifrostClient
+from tests.bifrost_client import BifrostClient, DocumentDataOptions
 from .auth import (
     PublishableOnboardingKey,
     DashboardAuthIsLive,
 )
+from tests.test_bifrost import non_sandbox_auth_token
 
 
 @pytest.fixture(scope="session")
@@ -46,7 +48,7 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
     """
     bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
     bifrost_client.init_user_for_onboarding(
-        twilio, build_user_data(), document_data="both"
+        twilio, build_user_data(), document_data=DocumentDataOptions.front_back
     )
     return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
@@ -180,6 +182,73 @@ class TestDashboardOnboardings:
         assert resp["document_type"] == requested_doc_type
         assert resp["images"][0]["front"] == test_image
         assert resp["images"][0]["back"] == test_image
+
+    @pytest.mark.parametrize(
+        "can_access_selfie_image,expected_status_code,expected_message",
+        [
+            (True, 200, ""),
+            (
+                False,
+                401,
+                "Auth error: Not allowed: onboarding configuration does not have permissions to decrypt attributes: [Selfie]",
+            ),
+        ],
+    )
+    def test_tenant_selfie_decrypt(
+        self,
+        sandbox_tenant,
+        must_collect_data,
+        can_access_data,
+        twilio,
+        can_access_selfie_image,
+        expected_status_code,
+        expected_message,
+    ):
+        from .image_fixtures import test_image
+
+        ob_conf_data = {
+            "name": "Flerp Config",
+            "must_collect_data": must_collect_data,
+            "can_access_data": can_access_data,
+            "must_collect_identity_document": True,
+            "must_collect_selfie": True,
+            "can_access_identity_document_images": True,
+            "can_access_selfie_image": can_access_selfie_image,
+        }
+        ob_config = create_ob_config(sandbox_tenant.sk, ob_conf_data)
+
+        bifrost_client = BifrostClient(ob_config)
+        bifrost_client.init_user_for_onboarding(
+            twilio,
+            build_user_data(),
+            document_data=DocumentDataOptions.front_back_selfie,
+        )
+        user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
+
+        # TODO: I can't figure out how to log in a tenant_user in a test so not sure how to test the tenant_user permissions
+        # tenant_role = create_tenant_role(sandbox_tenant, ["read"])
+        # tenant_user = create_tenant_user_with_role(sandbox_tenant, tenant_role["id"])
+
+        data = {
+            "document_type": "passport",
+            "reason": "Responding to a customer request",
+            "include_selfie": True,
+        }
+
+        resp = post(
+            f"users/{user.fp_user_id}/vault/identity/document/decrypt",
+            data,
+            sandbox_tenant.sk.key,
+            status_code=expected_status_code,
+        )
+
+        if expected_status_code == 200:
+            assert resp["document_type"] == "passport"
+            assert resp["images"][0]["front"] == test_image
+            assert resp["images"][0]["back"] == test_image
+            assert resp["images"][0]["selfie"] == test_image
+        else:
+            assert expected_message == resp["error"]["message"]
 
     ##############################
     # End document tests
@@ -538,6 +607,32 @@ def tenant_user(sandbox_tenant, admin_role):
     body = post("org/members", user_data, sandbox_tenant.auth_token)
     assert not body["last_login_at"]
     assert body["role_id"] == admin_role["id"]
+    return body
+
+
+def create_tenant_role(tenant, scope_kinds):
+    suffix = _gen_random_n_digit_number(10)
+    role_data = dict(
+        name=f"Test limited role {suffix}",
+        scopes=[dict(kind=k) for k in scope_kinds],
+    )
+    body = post("org/roles", role_data, tenant.auth_token)
+    assert body["name"] == role_data["name"]
+    assert set(i["kind"] for i in body["scopes"]) == set(
+        i["kind"] for i in role_data["scopes"]
+    )
+    return body
+
+
+def create_tenant_user_with_role(tenant, role_id):
+    user_data = dict(
+        email="integrationtest+1@onefootprint.com",
+        role_id=role_id,
+        redirect_url="http://localhost:3001/auth",
+    )
+    body = post("org/members", user_data, tenant.auth_token)
+    assert not body["last_login_at"]
+    assert body["role_id"] == role_id
     return body
 
 

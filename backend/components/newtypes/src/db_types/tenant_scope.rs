@@ -51,6 +51,8 @@ pub enum TenantScope {
     Decrypt(Vec<CollectedDataOption>),
     /// Allows performing manual review actions on users, like making a new decision or adding an annotation
     ManualReview,
+    // Allows decrypting selfie images
+    DecryptSelfie,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, AsJsonb, JsonSchema)]

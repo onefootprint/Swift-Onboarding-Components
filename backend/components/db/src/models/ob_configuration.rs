@@ -277,6 +277,10 @@ impl ObConfiguration {
             fields.push(DataIdentifier::IdDocument)
         }
 
+        if self.can_access_selfie_image {
+            fields.push(DataIdentifier::Selfie)
+        }
+
         fields
     }
 

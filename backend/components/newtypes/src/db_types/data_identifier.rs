@@ -20,6 +20,7 @@ pub enum DataIdentifier {
     Id(IdentityDataKind),
     Custom(KvDataKey),
     IdDocument,
+    Selfie,
 }
 
 string_api_data_type_alias!(DataIdentifier);
@@ -53,6 +54,7 @@ impl std::fmt::Display for DataIdentifier {
             Self::Id(s) => Some(s.to_string()),
             Self::Custom(s) => Some(s.to_string()),
             Self::IdDocument => None,
+            Self::Selfie => None,
         };
         if let Some(suffix) = suffix {
             write!(f, "{}.{}", prefix, suffix)
@@ -85,6 +87,7 @@ impl FromStr for DataIdentifier {
                     .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
             DataIdentifierDiscriminants::IdDocument => Self::IdDocument,
+            DataIdentifierDiscriminants::Selfie => Self::Selfie,
         };
         Ok(result)
     }
@@ -121,6 +124,7 @@ mod tests {
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataIdentifier::IdDocument => "id_document")]
+    #[test_case(DataIdentifier::Selfie => "selfie")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -131,6 +135,7 @@ mod tests {
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
     #[test_case("id_document" => DataIdentifier::IdDocument)]
+    #[test_case("selfie" => DataIdentifier::Selfie)]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

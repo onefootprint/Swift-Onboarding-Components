@@ -159,12 +159,13 @@ impl From<IdentityDataKind> for DataLifetimeKind {
     }
 }
 
-impl From<DataIdentifier> for DataLifetimeKind {
+impl From<DataIdentifier> for Option<DataLifetimeKind> {
     fn from(value: DataIdentifier) -> Self {
         match value {
-            DataIdentifier::Id(id) => id.into(),
-            DataIdentifier::Custom(_) => Self::Custom,
-            DataIdentifier::IdDocument => Self::IdentityDocument,
+            DataIdentifier::Id(id) => Some(id.into()),
+            DataIdentifier::Custom(_) => Some(DataLifetimeKind::Custom),
+            DataIdentifier::IdDocument => Some(DataLifetimeKind::IdentityDocument),
+            DataIdentifier::Selfie => None,
         }
     }
 }

@@ -109,6 +109,7 @@ def identify_verify(
     twilio, phone_number, challenge_token, tenant_pk=None, expected_kind="user_created"
 ):
     messages = twilio.messages.list(to=phone_number, limit=6)
+
     for message in messages:
         try:
             code = str(re.search("\\d{6}", message.body).group(0))

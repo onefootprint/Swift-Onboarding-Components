@@ -90,6 +90,7 @@ impl CanDecrypt {
         Self(l.into_iter().map(DataIdentifier::from).collect())
     }
 
+    #[allow(unused)]
     pub fn single<T: Into<DataIdentifier>>(k: T) -> Self {
         Self(vec![k.into()])
     }
@@ -109,6 +110,7 @@ impl IsGuardMet for CanDecrypt {
             // While Custom + Document permissions are very easy to determine
             DataIdentifier::Custom(_) => Right(token_scopes.contains(&TenantScope::DecryptCustom)),
             DataIdentifier::IdDocument => Right(token_scopes.contains(&TenantScope::DecryptDocuments)),
+            DataIdentifier::Selfie => Right(token_scopes.contains(&TenantScope::DecryptSelfie)),
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different

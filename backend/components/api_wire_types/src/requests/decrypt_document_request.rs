@@ -16,6 +16,8 @@ pub struct DecryptIdentityDocumentRequest {
     pub document_type: IdDocKind,
     // Reason for the decryption
     pub reason: String,
+    #[serde(default)]
+    pub include_selfie: bool,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]
@@ -24,6 +26,8 @@ pub struct ImageData {
     pub front: String,
     // Base64 encoded string
     pub back: Option<String>,
+    // Base64 encoded string
+    pub selfie: Option<String>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]

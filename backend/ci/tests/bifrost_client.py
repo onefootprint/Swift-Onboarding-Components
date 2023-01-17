@@ -3,7 +3,7 @@ import os
 
 from .types import User
 from .webauthn_simulator import SoftWebauthnDevice
-
+from enum import Enum
 from .utils import (
     _sandbox_email,
     create_basic_sandbox_user,
@@ -17,6 +17,19 @@ from .utils import (
 
 class InsufficientArgsForOnboarding(Exception):
     pass
+
+
+class DocumentDataOptions(Enum):
+    front = 1
+    front_back = 2
+    front_selfie = 3
+    front_back_selfie = 4
+
+    def has_back(self):
+        return self in [DocumentDataOptions.front_back, DocumentDataOptions.front_back_selfie]
+    
+    def has_selfie(self):
+        return self in [DocumentDataOptions.front_selfie, DocumentDataOptions.front_back_selfie]
 
 
 class BifrostClient:
@@ -94,20 +107,20 @@ class BifrostClient:
         # stash the request id since we need it for the POST
         document_request_id = req["document_request_id"]
 
-        if self.document_data == "front_only":
-            data = {
+        data = {
                 "front_image": test_image,
                 "back_image": None,
+                "selfie_image": None,
                 "document_type": "passport",
                 "country_code": "USA",
             }
-        else:
-            data = {
-                "front_image": test_image,
-                "back_image": test_image,
-                "document_type": "passport",
-                "country_code": "USA",
-            }
+        
+        if self.document_data.has_back():
+            data["back_image"] = test_image
+
+        if self.document_data.has_selfie():
+            data["selfie_image"] = test_image
+
         post(
             f"hosted/user/document/{document_request_id}",
             data,
