@@ -12,6 +12,7 @@ pub mod settings;
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(index::get)
+        .service(index::patch)
         .service(ob_config::get)
         .service(ob_config::get_detail)
         .service(ob_config::patch)
