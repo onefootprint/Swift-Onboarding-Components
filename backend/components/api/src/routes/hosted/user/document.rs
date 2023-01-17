@@ -5,32 +5,35 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
 use crate::{decision, State};
-use actix_web::web::Path;
 use api_wire_types::document_request::DocumentRequest;
-use api_wire_types::{DocumentImageError, DocumentResponse};
+use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
 use db::models::user_vault::UserVault;
 use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::{DbError, DbResult};
+use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
 use newtypes::{DocumentRequestId, DocumentRequestStatus, ScopedUserId, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
+const FRONT: &str = "front";
+const BACK: &str = "back";
+const SELFIE: &str = "selfie";
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
 #[api_v2_operation(description = "POSTs a document to footprint servers", tags(Hosted))]
-#[actix::post("/hosted/user/document/{document_request_id}")]
+#[actix::post("/hosted/user/document/{document_request_id}")] // document_request_id is going away here
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     request: web::Json<DocumentRequest>,
-    path: Path<String>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
     let uv_id = user_auth.user_vault_id();
-    let request_id = DocumentRequestId::from(path.into_inner());
 
     let (uv, db_document_request, auth_info) = state
         .db_pool
@@ -39,18 +42,21 @@ pub async fn post(
                 return Err(ApiError::from(OnboardingError::NoOnboarding))
             };
 
-            // This will error if no doc request is found
-            // TODO this lock doesn't do anything
-            let db_document_request = DbDocumentRequest::lock(conn, &auth_info.scoped_user.id, &request_id)?;
-            // Check request is pending. If not, there's nothing to do here
-            if !db_document_request.is_pending() {
-                return Err(ApiError::from(OnboardingError::NoPendingDocumentRequestFound(
-                    db_document_request.id.clone(),
-                )));
-            }
+            // If there's no pending doc requests, nothing to do here
+            let db_document_request = DbDocumentRequest::lock_active(conn, &auth_info.scoped_user.id)
+                .map_err(|e| {
+                    if e.is_not_found() {
+                        ApiError::from(OnboardingError::NoPendingDocumentRequestFound)
+                    } else {
+                        ApiError::from(e)
+                    }
+                })?;
+            // Move our request to Uploaded so any subsequent POSTs will fail
+            let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
+            let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
             let uv = UserVault::get(conn, &uv_id)?;
 
-            Ok((uv, db_document_request.into_inner(), auth_info))
+            Ok((uv, db_document_request, auth_info))
         })
         .await?;
 
@@ -71,61 +77,92 @@ pub async fn post(
 
     // Encrypt the image using the UserVault
     let sealed_front = IdentityDocument::seal_with_data_key(request.front_image.leak(), &data_key)?;
-
+    // ////////////////////
     // Save to s3
+    // //////////////////
     let bucket = &state.config.document_s3_bucket.clone();
-    let s3_path_front_image = state
+    let mut s3_upload_futures = vec![];
+    // Front
+    let s3_path_front_result = state
         .s3_client
         .put_object(
             bucket,
-            &IdentityDocument::s3_path_for_document_image(
-                "front",
+            IdentityDocument::s3_path_for_document_image(
+                FRONT,
                 db_document_request.id.clone(),
                 uv.id.clone(),
             ),
             sealed_front.0,
         )
-        .await?;
+        .into_future();
 
-    // Not all documents have backs
-    let mut s3_path_back_image: Option<String> = None;
+    s3_upload_futures.push((FRONT, s3_path_front_result));
+
     if let Some(back_image) = &request.back_image {
         let sealed_back = IdentityDocument::seal_with_data_key(back_image.leak(), &data_key)?;
 
-        s3_path_back_image = Some(
-            state
-                .s3_client
-                .put_object(
-                    bucket,
-                    &IdentityDocument::s3_path_for_document_image(
-                        "back",
-                        db_document_request.id.clone(),
-                        uv.id.clone(),
-                    ),
-                    sealed_back.0,
-                )
-                .await?,
-        );
+        let s3_path_back_result = state
+            .s3_client
+            .put_object(
+                bucket,
+                IdentityDocument::s3_path_for_document_image(
+                    BACK,
+                    db_document_request.id.clone(),
+                    uv.id.clone(),
+                ),
+                sealed_back.0,
+            )
+            .into_future();
+
+        s3_upload_futures.push((BACK, s3_path_back_result));
     }
 
-    let mut s3_path_selfie_image: Option<String> = None;
     if let Some(selfie_image) = &request.selfie_image {
         let encrypted_selfie_image = IdentityDocument::seal_with_data_key(selfie_image.leak(), &data_key)?;
 
-        s3_path_selfie_image = Some(
-            state
-                .s3_client
-                .put_object(
-                    bucket,
-                    &IdentityDocument::s3_path_for_document_image(
-                        "selfie",
-                        db_document_request.id.clone(),
-                        uv.id.clone(),
-                    ),
-                    encrypted_selfie_image.0,
-                )
-                .await?,
-        );
+        let s3_path_selfie_result = state
+            .s3_client
+            .put_object(
+                bucket,
+                IdentityDocument::s3_path_for_document_image(
+                    SELFIE,
+                    db_document_request.id.clone(),
+                    uv.id.clone(),
+                ),
+                encrypted_selfie_image.0,
+            )
+            .into_future();
+
+        s3_upload_futures.push((SELFIE, s3_path_selfie_result));
+    }
+
+    let (doc_types, futures): (Vec<_>, Vec<_>) = s3_upload_futures.into_iter().unzip();
+    // This returned future will 1) return an error if any underlying futures error and 2)
+    // will preserve ordering of the original vec of futures
+    let results: Vec<String> = match futures::future::try_join_all(futures).await {
+        Ok(s) => Ok(s),
+        Err(e) => {
+            handle_s3_upload_error(
+                &state,
+                db_document_request.id.clone(),
+                auth_info.scoped_user.id.clone(),
+            )
+            .await?;
+
+            Err(e)
+        }
+    }?;
+
+    let mut s3_path_front_image = None;
+    let mut s3_path_back_image = None;
+    let mut s3_path_selfie_image = None;
+    for (idx, dt) in doc_types.into_iter().enumerate() {
+        match dt {
+            FRONT => s3_path_front_image = Some(results[idx].to_owned()),
+            BACK => s3_path_back_image = Some(results[idx].to_owned()),
+            SELFIE => s3_path_selfie_image = Some(results[idx].to_owned()),
+            _ => {}
+        }
     }
 
     // write a identity_document
@@ -139,7 +176,7 @@ pub async fn post(
                 conn,
                 doc_request_id,
                 &uv.id,
-                Some(s3_path_front_image),
+                s3_path_front_image,
                 s3_path_back_image,
                 s3_path_selfie_image,
                 // TODO: should be from vendor response
@@ -178,16 +215,13 @@ pub async fn post(
     if should_initiate_verification_requests {
         // Save our verification request
         let ob_id = auth_info.onboarding.id.clone();
+        let su_id = auth_info.scoped_user.id.clone();
         let (document_verification_request, doc_request) = state
             .db_pool
             .db_transaction(
                 move |conn| -> Result<(VerificationRequest, DbDocumentRequest), ApiError> {
                     // Protect against race conditions
-                    let doc_request = DbDocumentRequest::lock(
-                        conn,
-                        &db_document_request.scoped_user_id,
-                        &db_document_request.id,
-                    )?;
+                    let doc_request = DbDocumentRequest::lock(conn, &su_id, &db_document_request.id)?;
                     if doc_request.idv_reqs_initiated {
                         return Err(ApiError::AssertionError(
                             "Document request already initiated".into(),
@@ -237,53 +271,84 @@ pub async fn post(
     EmptyResponse::ok().json()
 }
 
+// This just can pull the latest for the scoped_user_id and lock
 #[api_v2_operation(description = "GET a document request status", tags(Hosted))]
-#[actix::get("/hosted/user/document/{document_request_id}/status")]
+#[actix::get("/hosted/user/document/{document_request_id}/status")] // request id going away
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-    path: Path<String>,
 ) -> actix_web::Result<Json<ResponseData<DocumentResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
-    let id = path.into_inner();
-    let request_id = DocumentRequestId::from(id);
 
     // Load our document request and check the status
-    let (document_request, errors) = state
+    let (latest_request, previous_request_verification_result) = state
         .db_pool
-        .db_query(move |conn| -> Result<(DbDocumentRequest, Vec<_>), ApiError> {
-            let Some(auth_info) = user_auth.onboarding(conn)? else {
+        .db_query(
+            move |conn| -> Result<(DbDocumentRequest, Option<VerificationResult>), ApiError> {
+                let Some(auth_info) = user_auth.onboarding(conn)? else {
                 return Err(ApiError::from(OnboardingError::NoOnboarding))
             };
-            // Get document request, and potentially the result (if it's done)
-            let (request, verification_result) = DbDocumentRequest::get_with_verification_result(
-                conn,
-                &auth_info.scoped_user.id,
-                &request_id,
-            )?;
+                // Get the latest document request for the scoped user, and the previous result (for errors).
+                // We don't just stash the errors on the document request because with multiple vendors, we'll need
+                // to handle each set of errors appropriately
+                let (latest_request, previous_request_verification_result) =
+                    DbDocumentRequest::get_latest_with_verification_result(conn, &auth_info.scoped_user.id)?;
 
-            // Return errors related to images
-            let errors: Vec<IdologyImageCaptureErrors> = if let Some(result) = verification_result {
-                let parsed = idv::idology::scan_onboarding::response::parse_response(result.response)
-                    .map_err(|_| {
-                        ApiError::AssertionError("Could not parse ScanOnboarding response".into())
-                    })?;
-                if let Some((None, image_errors)) = parsed.response.error() {
-                    image_errors
-                } else {
-                    vec![]
-                }
-            } else {
-                vec![]
-            };
-
-            Ok((request, errors))
-        })
+                Ok((latest_request, previous_request_verification_result))
+            },
+        )
         .await??;
 
+    // Assemble our response
+    // +------------------------------+---------------------------------------------+--------------------------------------------+
+    // | Latest DocumentRequestStatus | Previous DocumentRequest VerificationResult |                Explanation                 |
+    // +------------------------------+---------------------------------------------+--------------------------------------------+
+    // | Pending                      | N                                           | New doc request                            |
+    // | Pending                      | Y                                           | there were errors and we need to recollect |
+    // | Complete                     | -                                           | We are done                                |
+    // | Uploaded                     | -                                           | Waiting on vendor                          |
+    // | Failed                       | -                                           | terminal failure (exceeded retries)        |
+    // +------------------------------+---------------------------------------------+--------------------------------------------+
+    let should_return_errors = matches!(
+        latest_request.status,
+        DocumentRequestStatus::Pending | DocumentRequestStatus::UploadFailed
+    );
+    let mut previous_request_errors: Vec<IdologyImageCaptureErrors> = vec![];
+    let mut current_request_internal_errors_needing_retry: Vec<DocumentImageError> = vec![];
+    let mut status = latest_request.status.into();
+    if should_return_errors {
+        if let Some(result) = previous_request_verification_result {
+            let parsed = idv::idology::scan_onboarding::response::parse_response(result.response)
+                .map_err(|_| ApiError::AssertionError("Could not parse ScanOnboarding response".into()))?;
+            if let Some((None, image_errors)) = parsed.response.error() {
+                previous_request_errors = image_errors;
+                // If we actually have errors, we should tell the frontend that there's an error, even
+                // though we have a pending doc request
+                status = DocumentResponseStatus::Error;
+            }
+
+            // we don't get image errors for internal errors, but still want to return an error.
+            if parsed.response.capture_result_is_internal_error() {
+                status = DocumentResponseStatus::Error;
+                previous_request_errors = vec![IdologyImageCaptureErrors::ImageError]
+            }
+        }
+
+        // If s3 or postgres errors when writing an identity document, we should ask client to retry
+        if latest_request.status == DocumentRequestStatus::UploadFailed {
+            current_request_internal_errors_needing_retry.push(DocumentImageError::InternalError)
+        }
+    };
+
+    // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
+    // otherwise, we'll pass through the status
     ResponseData::ok(DocumentResponse {
-        status: document_request.status.into(),
-        errors: errors.into_iter().map(DocumentImageError::from).collect(),
+        status,
+        errors: previous_request_errors
+            .into_iter()
+            .map(DocumentImageError::from)
+            .chain(current_request_internal_errors_needing_retry.into_iter())
+            .collect(),
         // TODO: Remove these fields
         front_image_error: None,
         back_image_error: None,
@@ -299,37 +364,59 @@ async fn handle_scan_onboarding_request(
 ) -> Result<(), ApiError> {
     // Make document verification request
     // TODO: spawn a thread to make this request, but scan onboarding returns immediately (allegedly) so it's fine for now
+    let verification_request_id = document_verification_request.id.clone();
     let vendor_result =
-        decision::vendor::make_request::make_docv_request(state, document_verification_request).await?;
+        decision::vendor::make_request::make_docv_request(state, document_verification_request).await;
 
-    // Handle request
-    let response = match vendor_result.response.response {
-        ParsedResponse::IDologyScanOnboarding(response) => Ok(response),
-        _ => Err(ApiError::AssertionError(
-            "wrong document vendor response received".into(),
-        )),
-    }?;
+    // Our vendor request could fail for some reason. We handle most errors in the vendor request code, but if
+    // some anticipated error arises, if we don't catch the error here, we introduce a potential loophole for someone to get through
+    // doc verification by somehow inducing a failure on the vendor side
+    let needs_retry = match vendor_result {
+        Err(_) => {
+            tracing::warn!(verification_request=%verification_request_id, "Document vendor request failed for unknown reason");
+            true
+        }
+        Ok(result) => {
+            // Handle request
+            let response = match result.response.response {
+                ParsedResponse::IDologyScanOnboarding(response) => Ok(response),
+                _ => Err(ApiError::AssertionError(
+                    "wrong document vendor response received".into(),
+                )),
+            }?;
 
-    let should_collect_selfie = document_request.should_collect_selfie;
+            response.response.needs_retry()
+        }
+    };
+
     state
         .db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
-            if response.response.needs_retry() {
+            if needs_retry {
                 // Move our status to failed since we need a new doc verification request
                 let failed_update = DocumentRequestUpdate {
                     status: Some(DocumentRequestStatus::Failed),
                     ..Default::default()
                 };
+                let should_collect_selfie = document_request.should_collect_selfie;
+                let current_doc_request_id = document_request.id.clone();
                 document_request.update(conn.conn(), failed_update)?;
 
                 // Create a new document request.
                 // ref_id is None here since we are retrying scan onboarding!
-                DbDocumentRequest::create(conn, scoped_user_id, None, should_collect_selfie)?;
+                DbDocumentRequest::create(
+                    conn,
+                    scoped_user_id,
+                    None,
+                    should_collect_selfie,
+                    Some(current_doc_request_id),
+                )?;
             } else {
                 let completed_update = DocumentRequestUpdate {
                     status: Some(DocumentRequestStatus::Complete),
                     ..Default::default()
                 };
+
                 document_request.update(conn.conn(), completed_update)?;
             }
 
@@ -338,4 +425,33 @@ async fn handle_scan_onboarding_request(
         .await?;
 
     Ok(())
+}
+
+async fn handle_s3_upload_error(
+    state: &State,
+    document_request_id: DocumentRequestId,
+    scoped_user_id: ScopedUserId,
+) -> DbResult<()> {
+    // In the case of an s3 error, we move our status to UploadFailed
+    state
+        .db_pool
+        .db_transaction(move |conn| -> Result<(), DbError> {
+            let doc = DbDocumentRequest::lock(conn, &scoped_user_id, &document_request_id)?;
+
+            let update = DocumentRequestUpdate::status(DocumentRequestStatus::UploadFailed);
+            let current_doc = doc.into_inner().update(conn, update)?;
+
+            // Create a new document request.
+            // ref_id is None here since we are retrying scan onboarding!
+            DbDocumentRequest::create(
+                conn,
+                scoped_user_id,
+                None,
+                current_doc.should_collect_selfie,
+                Some(current_doc.id),
+            )?;
+
+            Ok(())
+        })
+        .await
 }

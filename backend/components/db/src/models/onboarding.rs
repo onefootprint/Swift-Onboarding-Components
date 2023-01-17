@@ -315,7 +315,13 @@ impl Onboarding {
 
         // To prevent duplicate document requests, only create a doc request if the onboarding is new
         if args.should_create_document_request {
-            DocumentRequest::create(conn, ob.scoped_user_id.clone(), None, args.should_collect_selfie)?;
+            DocumentRequest::create(
+                conn,
+                ob.scoped_user_id.clone(),
+                None,
+                args.should_collect_selfie,
+                None,
+            )?;
         }
 
         Ok(ob)

@@ -22,6 +22,8 @@ pub struct DocumentRequest {
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
     pub idv_reqs_initiated: bool,
+    // We keep track of the previous document request in the case we want to not recollect selfie, we can copy over the s3 path
+    pub previous_document_request_id: Option<DocumentRequestId>,
 }
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
@@ -41,7 +43,7 @@ impl DocumentRequestUpdate {
     pub fn idv_reqs_initiated() -> Self {
         Self {
             idv_reqs_initiated: Some(true),
-            status: Some(DocumentRequestStatus::Uploaded),
+            ..Default::default()
         }
     }
 }
@@ -52,6 +54,7 @@ impl DocumentRequest {
         scoped_user_id: ScopedUserId,
         ref_id: Option<String>,
         should_collect_selfie: bool,
+        previous_document_request_id: Option<DocumentRequestId>,
     ) -> DbResult<Self> {
         let new = NewDocumentRequest {
             scoped_user_id,
@@ -60,23 +63,32 @@ impl DocumentRequest {
             created_at: Utc::now(),
             idv_reqs_initiated: false,
             should_collect_selfie,
+            previous_document_request_id,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
             .get_result::<DocumentRequest>(conn)?;
         Ok(result)
     }
-
-    pub fn get_active_requests(
-        conn: &mut PgConnection,
-        scoped_user_id: &ScopedUserId,
-    ) -> DbResult<Vec<Self>> {
-        let results = document_request::table
+    /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
+    pub fn lock_active(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> DbResult<Locked<Self>> {
+        let result = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
-            .load::<Self>(conn)?;
+            .for_no_key_update()
+            .first::<Self>(conn)?;
 
-        Ok(results)
+        Ok(Locked::new(result))
+    }
+
+    /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
+    pub fn get_active(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> DbResult<Self> {
+        let result = document_request::table
+            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::status.eq(DocumentRequestStatus::Pending))
+            .first::<Self>(conn)?;
+
+        Ok(result)
     }
 
     pub fn get(
@@ -110,26 +122,36 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    pub fn get_with_verification_result(
+    pub fn get_latest_with_verification_result(
         conn: &mut PgConnection,
         scoped_user_id: &ScopedUserId,
-        id: &DocumentRequestId,
     ) -> DbResult<(DocumentRequest, Option<VerificationResult>)> {
-        let (doc_request, identity_doc): (Self, IdentityDocumentId) = document_request::table
-            .filter(document_request::id.eq(id))
+        let latest_doc_request: Self = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
-            .inner_join(identity_document::table)
-            .select((document_request::all_columns, identity_document::id))
-            .get_result(conn)?;
+            .order_by(document_request::created_at.desc())
+            .first(conn)?;
 
-        let verif_result: Option<VerificationResult> = verification_request::table
-            .filter(verification_request::identity_document_id.eq(Some(identity_doc)))
+        if let Some(previous_doc_request_id) = latest_doc_request.previous_document_request_id.clone() {
+            let previous_identity_doc: Option<IdentityDocumentId> = document_request::table
+                .filter(document_request::id.eq(previous_doc_request_id))
+                .filter(document_request::scoped_user_id.eq(scoped_user_id))
+                .inner_join(identity_document::table)
+                .select(identity_document::id)
+                .first::<IdentityDocumentId>(conn)
+                .ok();
+
+            // TODO: this breaks when we have more than 1 verification result corresponding to a single identity document
+            let previous_verif_result: Option<VerificationResult> = verification_request::table
+            .filter(verification_request::identity_document_id.eq(previous_identity_doc))
             .inner_join(verification_result::table)
             .select(verification_result::all_columns)
-            .get_result::<VerificationResult>(conn)
+            .first::<VerificationResult>(conn) // <-- this needs to go away with multiple vendors, and we should return a vec of results
             .ok();
 
-        Ok((doc_request, verif_result))
+            Ok((latest_doc_request, previous_verif_result))
+        } else {
+            Ok((latest_doc_request, None))
+        }
     }
 
     pub fn lock(
@@ -158,6 +180,69 @@ pub struct NewDocumentRequest {
     pub ref_id: Option<String>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
-    pub idv_reqs_initiated: bool,
     pub should_collect_selfie: bool,
+    pub idv_reqs_initiated: bool,
+    pub previous_document_request_id: Option<DocumentRequestId>,
+}
+
+#[cfg(test)]
+mod tests {
+    use newtypes::{OnboardingId, SealedVaultDataKey, UserVaultId, VendorAPI};
+
+    use super::*;
+    use crate::{
+        models::{identity_document::IdentityDocument, verification_request::VerificationRequest},
+        test_helpers::test_db_pool,
+        DbError,
+    };
+    #[tokio::test]
+    async fn test_get_latest_verification_result() -> Result<(), DbError> {
+        let db_pool = test_db_pool();
+
+        db_pool
+            .db_test_transaction(move |conn| -> Result<(), DbError> {
+                let uv_id = UserVaultId::from("uv1".to_string());
+                let su_id: ScopedUserId = "su1".to_string().into();
+
+                // Create the first document request -> id doc -> verification request -> verification result
+                let dr1 = DocumentRequest::create(conn.conn(), su_id.clone(), None, false, None)?;
+                let id1 = IdentityDocument::create(
+                    conn,
+                    dr1.id.clone(),
+                    &uv_id,
+                    None,
+                    None,
+                    None,
+                    "driver_license".into(),
+                    "USA".into(),
+                    Some(&su_id),
+                    SealedVaultDataKey(vec![]),
+                )?;
+                let vr1 = VerificationRequest::create_document_verification_request(
+                    conn,
+                    VendorAPI::IdologyScanOnboarding,
+                    OnboardingId::from("ob1".to_string()),
+                    id1.id,
+                )?;
+                let vr1_result =
+                    VerificationResult::create(conn, vr1.id, serde_json::json!({"test": "response"}))?;
+                let update = DocumentRequestUpdate::idv_reqs_initiated();
+                let dr1 = dr1.update(conn.conn(), update)?;
+
+                // Now create second one
+                let dr2 = DocumentRequest::create(conn.conn(), su_id.clone(), None, false, Some(dr1.id))?;
+
+                let (latest_doc, previous_result) =
+                    DocumentRequest::get_latest_with_verification_result(conn.conn(), &su_id)?;
+
+                // Assert everything worked
+                assert_eq!(latest_doc.id, dr2.id);
+                assert_eq!(vr1_result.id, previous_result.unwrap().id);
+                Ok(())
+            })
+            .await
+            .ok();
+
+        Ok(())
+    }
 }

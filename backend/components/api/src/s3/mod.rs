@@ -47,7 +47,7 @@ impl S3Client {
     #[allow(unused)]
     /// Put an object in S3 at the path specified by `s3://{bucket}/{key}`
     ///    - Note: S3 is a flat heirarchy, but key can use `/` in the name to mimic a directory structure
-    pub async fn put_object<T>(&self, bucket: &String, key: &String, object: T) -> Result<String, S3Error>
+    pub async fn put_object<T>(&self, bucket: &String, key: String, object: T) -> Result<String, S3Error>
     where
         aws_sdk_s3::types::ByteStream: std::convert::From<T>,
     {
@@ -57,7 +57,7 @@ impl S3Client {
         self.client
             .put_object()
             .bucket(bucket)
-            .key(key)
+            .key(key.clone())
             .body(body)
             .send()
             .await?;

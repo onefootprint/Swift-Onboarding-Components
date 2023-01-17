@@ -73,12 +73,21 @@ pub fn get_requirements(
     // In various places in the codebase, we will determine if a DocumentRequest should be created
     //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
     //      we will create a DocumentRequest row.
-    let document_request_requirements = DocumentRequest::get_active_requests(conn, scoped_user_id)?
-        .into_iter()
-        .map(|request| OnboardingRequirement::CollectDocument {
-            document_request_id: request.id,
-            should_collect_selfie: request.should_collect_selfie,
-        });
+    let doc_request_result = DocumentRequest::get_active(conn, scoped_user_id);
+    // Handle not finding an active request differently than other db errors
+    let document_request_requirements = match doc_request_result {
+        Err(e) => {
+            if e.is_not_found() {
+                Ok(vec![])
+            } else {
+                Err(e)
+            }
+        }
+        Ok(doc_request) => Ok(vec![OnboardingRequirement::CollectDocument {
+            document_request_id: doc_request.id,
+            should_collect_selfie: doc_request.should_collect_selfie,
+        }]),
+    }?;
 
     // TODO: force liveness checks to be re-done and not shared across tenants
     // RELATED: FP-1802 and FP-1800

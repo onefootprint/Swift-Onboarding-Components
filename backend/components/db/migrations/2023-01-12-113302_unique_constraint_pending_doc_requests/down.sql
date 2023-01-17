@@ -1,0 +1,2 @@
+ALTER TABLE document_request DROP COLUMN previous_document_request_id;
+DROP INDEX IF EXISTS document_request_pending_scoped_user_unique_idx;

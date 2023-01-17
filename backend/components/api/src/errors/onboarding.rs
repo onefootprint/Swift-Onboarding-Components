@@ -1,4 +1,4 @@
-use newtypes::{CollectedDataOption, DocumentRequestId};
+use newtypes::CollectedDataOption;
 use thiserror::Error;
 
 use crate::types::onboarding_requirement::OnboardingRequirementDiscriminant;
@@ -27,8 +27,8 @@ pub enum OnboardingError {
     MissingAttributes(Vec<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
     NonTerminalState,
-    #[error("No pending document request found: {0}")]
-    NoPendingDocumentRequestFound(DocumentRequestId),
+    #[error("No pending document request found")]
+    NoPendingDocumentRequestFound,
     #[error("No decision can be made from decision engine")]
     NoDecisionMade,
     #[error("Cannot onboard a non-portable scoped user onto any ob config")]

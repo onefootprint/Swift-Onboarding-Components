@@ -39,6 +39,9 @@ enum IdDocBadImageError {
 
   // The document corner is rotated more than 100 degrees.
   documentIsSkewed = 'document_is_skewed',
+
+  // internal error related to processing the image
+  internalError = 'internal_error',
 }
 
 export default IdDocBadImageError;

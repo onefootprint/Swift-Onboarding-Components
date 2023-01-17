@@ -18,7 +18,7 @@ pub struct ScanOnboardingAPIResponse {
 #[derive(Debug, Clone, serde::Deserialize, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct ScanOnboardingResponse {
-    pub query_id: i64,
+    pub query_id: Option<i64>,
     /// The ExpectID Scan Onboard result.
     /// This value indicates if the ID is valid and able to be processed, and can be one of three possible results:
     ///   capture.completed
@@ -44,6 +44,12 @@ impl ScanOnboardingResponse {
 
         IdologyScanOnboardingCaptureResult::try_from(result.key.as_str())
             .map_err(|e| IdologyError::Error::UnknownResponseStatus(e.to_string()))
+    }
+
+    pub fn capture_result_is_internal_error(&self) -> bool {
+        self.capture_result()
+            .map(|r| matches!(r, IdologyScanOnboardingCaptureResult::InternalError))
+            .unwrap_or_default()
     }
 
     pub fn capture_decision(&self) -> Result<IdologyScanOnboardingCaptureDecision, IdologyError::Error> {

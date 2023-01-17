@@ -19,6 +19,9 @@ const BadImageErrorLabel: Record<IdDocBadImageError, string> = {
     'The image was submitted in a format that cannot be processed. Please submit a JPEG.',
   [IdDocBadImageError.documentIsSkewed]:
     'The document corner is rotated more than 100 degrees.',
+
+  [IdDocBadImageError.internalError]:
+    'There was an error processing your document. Please try again.',
 };
 
 export default BadImageErrorLabel;

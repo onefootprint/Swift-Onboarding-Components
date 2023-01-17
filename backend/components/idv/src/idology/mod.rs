@@ -109,6 +109,7 @@ pub async fn send_scan_onboarding_request(
         .submit_to_scan_onboarding(data)
         .await
         .map_err(crate::idology::error::Error::from)?;
+
     let parsed_response: ScanOnboardingAPIResponse =
         scan_onboarding::response::parse_response(response.clone())
             .map_err(crate::idology::error::Error::from)?;

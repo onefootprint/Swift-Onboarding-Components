@@ -35,7 +35,9 @@ impl From<DocumentRequestStatus> for DocumentResponseStatus {
             DocumentRequestStatus::Failed => Self::Error,
             DocumentRequestStatus::Complete => Self::Complete,
             // We still are waiting for vendor when in Uploaded, but for now just map to Complete
-            DocumentRequestStatus::Uploaded => Self::Complete,
+            DocumentRequestStatus::Uploaded => Self::Pending,
+            // Something happened on footprint side that caused a failure
+            DocumentRequestStatus::UploadFailed => Self::Error,
         }
     }
 }
@@ -73,6 +75,7 @@ pub enum DocumentImageError {
     ImageError,
     InvalidJpeg,
     DocumentIsSkewed,
+    InternalError,
 }
 export_schema!(DocumentImageError);
 
