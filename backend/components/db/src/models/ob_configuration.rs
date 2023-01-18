@@ -9,7 +9,7 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
-use newtypes::{ApiKeyStatus, DataIdentifier};
+use newtypes::{ApiKeyStatus, TenantScope};
 use newtypes::{CollectedDataOption, ObConfigurationId, ObConfigurationKey, TenantId};
 use newtypes::{OnboardingId, ScopedUserId};
 use serde::{Deserialize, Serialize};
@@ -263,41 +263,31 @@ impl ObConfiguration {
 }
 
 impl ObConfiguration {
-    /// returns which DataIdentifiers this ObConfiguration (upon authorization!) grant a tenant decrypt access to
+    /// returns the TenantScopes to which this ObConfiguration (upon authorization!) grants access
+    /// to decrypt.
     /// Don't use this on Onboardings that have not been authorized
-    pub fn can_access(&self) -> Vec<DataIdentifier> {
-        let mut fields: Vec<DataIdentifier> = self
-            .can_access_data
-            .iter()
-            .flat_map(|x| x.attributes())
-            .map(DataIdentifier::Id)
-            .collect();
-
-        if self.can_access_identity_document_images {
-            fields.push(DataIdentifier::IdDocument)
-        }
-
-        if self.can_access_selfie_image {
-            fields.push(DataIdentifier::Selfie)
-        }
-
-        fields
+    pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
+        let scopes = [
+            Some(TenantScope::Decrypt(self.can_access_data.clone())),
+            self.can_access_identity_document_images
+                .then_some(TenantScope::DecryptDocuments),
+            self.can_access_selfie_image.then_some(TenantScope::DecryptSelfie),
+        ];
+        scopes.into_iter().flatten().collect()
     }
 
-    /// returns which DataIdentifiers this ObConfiguration tried to collect
+    /// Returns the TenantScopes that represent the data this ObConfiguration grants access to see.
+    /// NOTE: this is not the same as the data that is allowed to be decrypted.
+    /// If an ob config intended to collect a field, a tenant is able to see that it exists whether
+    /// or not they can decrypt it.
     /// Don't use this on Onboardings that have not been authorized
-    pub fn must_collect(&self) -> Vec<DataIdentifier> {
-        let mut fields: Vec<DataIdentifier> = self
-            .must_collect_data
-            .iter()
-            .flat_map(|x| x.attributes())
-            .map(DataIdentifier::Id)
-            .collect();
-
-        if self.must_collect_identity_document {
-            fields.push(DataIdentifier::IdDocument)
-        }
-
-        fields
+    pub fn visible_scopes(&self) -> Vec<TenantScope> {
+        let scopes = [
+            Some(TenantScope::Decrypt(self.must_collect_data.clone())),
+            self.must_collect_identity_document
+                .then_some(TenantScope::DecryptDocuments),
+            self.must_collect_selfie.then_some(TenantScope::DecryptSelfie),
+        ];
+        scopes.into_iter().flatten().collect()
     }
 }

@@ -46,7 +46,7 @@ pub async fn get(
         })
         .await??;
 
-    uvw.ensure_scope_allows_access(&[DataIdentifier::IdDocument])?;
+    uvw.check_ob_config_access(&[DataIdentifier::IdDocument])?;
 
     // TODO migrate this to a list instead of a hashmap
     let response = GetIdentityDocumentForDecryptResponse::from(HashMap::from_iter(
@@ -97,7 +97,7 @@ pub async fn post_decrypt(
             } else {
                 vec![DataIdentifier::IdDocument]
             };
-            uvw.ensure_scope_allows_access(&data_identifiers)?;
+            uvw.check_ob_config_access(&data_identifiers)?;
 
             Ok(uvw)
         })
@@ -105,7 +105,7 @@ pub async fn post_decrypt(
 
     // Important to check requester has access. TODO is there a better way to have type safety here?
     // Can we put in decrypt_document?
-    uvw.ensure_scope_allows_access(&[DataIdentifier::IdDocument])?;
+    uvw.check_ob_config_access(&[DataIdentifier::IdDocument])?;
 
     let req = DecryptRequest {
         reason,

@@ -1,10 +1,9 @@
+use crate::errors::ApiResult;
 use db::{
     models::{onboarding::Onboarding, user_vault::UserVault, verification_request::VerificationRequest},
     PgConnection,
 };
 use newtypes::{DataLifetimeSeqno, ScopedUserId, UserVaultId};
-
-use crate::errors::ApiResult;
 
 /// There are a lot of places we build UVWs, under varying circumstances. Things to consider:
 ///   - Committed and Speculative data:

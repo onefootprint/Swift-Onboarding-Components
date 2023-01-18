@@ -1,15 +1,16 @@
 use super::{DecryptRequest, TenantUvw};
+use crate::auth::tenant::{CanDecrypt, IsGuardMet};
 use crate::auth::AuthError;
 use crate::{errors::ApiResult, State};
 use itertools::Itertools;
-use newtypes::{DataIdentifier, PiiString};
-use std::collections::{HashMap, HashSet};
+use newtypes::{DataIdentifier, PiiString, TenantScope};
+use std::collections::HashMap;
 use std::hash::Hash;
 
 impl TenantUvw {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
-    pub fn ensure_scope_allows_access<T>(&self, ids: &[T]) -> ApiResult<()>
+    pub fn check_ob_config_access<T>(&self, ids: &[T]) -> ApiResult<()>
     where
         T: Into<DataIdentifier> + Clone,
     {
@@ -18,17 +19,18 @@ impl TenantUvw {
             return Ok(());
         }
 
-        let can_access: HashSet<_> = self
+        let can_decrypt_scopes: Vec<_> = self
             .authorized_ob_configs
             .iter()
-            .flat_map(|x| x.can_access())
+            .flat_map(|x| x.can_decrypt_scopes())
+            // All custom data belonging to the tenant is allowed to be decrypted
+            .chain([TenantScope::DecryptCustom])
             .collect();
+
         let cannot_access_fields = ids
             .iter()
             .map(|x| (x.clone()).into())
-            // All custom data belonging to the tenant is allowed to be decrypted
-            .filter(|x| !matches!(x, DataIdentifier::Custom(_)))
-            .filter(|x| !can_access.contains(x))
+            .filter(|x| !CanDecrypt::single(x.clone()).is_met(&can_decrypt_scopes))
             .collect_vec();
         if !cannot_access_fields.is_empty() {
             return Err(AuthError::ObConfigMissingDecryptPermission(cannot_access_fields).into());
@@ -42,7 +44,9 @@ impl TenantUvw {
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
     {
-        self.ensure_scope_allows_access(ids)?;
+        // This is a little extra restricted - it hides fields that were collected (and exist on the vault)
+        // but aren't decryptable.
+        self.check_ob_config_access(ids)?;
         let results = self.get_e_datas(ids).into_keys().collect();
         Ok(results)
     }
@@ -60,7 +64,7 @@ impl TenantUvw {
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
     {
-        self.ensure_scope_allows_access(ids)?;
+        self.check_ob_config_access(ids)?;
         let results = self.uvw.decrypt_unsafe(state, ids).await?;
         if let Some(req) = req {
             let targets = ids.iter().cloned().map(|x| x.into()).collect();

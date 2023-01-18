@@ -11,17 +11,38 @@ use crate::types::response::PaginatedResponseData;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
+use crate::utils::user_vault_wrapper::TenantUvw;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use api_wire_types::ListUsersRequest;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
+use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
+use newtypes::IdDocKind;
 use newtypes::{Fingerprint, Fingerprinter, IdentityDataKind};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 type UsersDetailResponse = api_wire_types::User;
 type UsersListResponse = Vec<UsersDetailResponse>;
+
+/// The UVW util to get_visible_populated_fields() has been updated to only return the more
+/// modern DataIdentifiers.
+/// This partition map logic converts the modern DataIdentifiers into the legacy IdentityDataKind
+/// and IdDocKind. This will be removed when `GET /users` is modernized to return a list of
+/// DataIdentifiers
+fn get_visible_populated_fields(uvw: &TenantUvw) -> (Vec<IdentityDataKind>, Vec<IdDocKind>) {
+    // TODO this will change in next PR
+    let (dis, doc_kinds) = uvw.get_visible_populated_fields();
+    let dis = dis
+        .into_iter()
+        .filter_map(|di| match di {
+            DataIdentifier::Id(idk) => Some(idk),
+            _ => None,
+        })
+        .collect();
+    (dis, doc_kinds)
+}
 
 #[api_v2_operation(
     description = "Allows a tenant to view a list of their Onboardings, effectively showing all \
@@ -103,9 +124,9 @@ pub async fn get(
                 .get(&su.id)
                 .ok_or_else(|| ApiError::AssertionError("UVW not found".to_owned()))?;
             // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
-            let (data_attributes, document_types) = uvw.get_visible_populated_fields();
+            let (identity_data_kinds, document_types) = get_visible_populated_fields(uvw);
             let result = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
-                data_attributes,
+                identity_data_kinds,
                 document_types,
                 obs.remove(&su.id),
                 su,
@@ -156,10 +177,10 @@ pub async fn get_detail(
         })
         .await??;
     // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
-    let (data_attributes, document_types) = uvw.get_visible_populated_fields();
+    let (identity_data_kinds, document_types) = get_visible_populated_fields(&uvw);
 
     let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
-        data_attributes,
+        identity_data_kinds,
         document_types,
         Some(ob),
         su,

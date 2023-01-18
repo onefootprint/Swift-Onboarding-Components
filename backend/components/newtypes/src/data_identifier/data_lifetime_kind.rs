@@ -1,4 +1,4 @@
-use crate::{DataIdentifier, IdentityDataKind};
+use crate::IdentityDataKind;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -63,18 +63,6 @@ impl From<IdentityDataKind> for DataLifetimeKind {
             IdentityDataKind::Country => Self::Country,
             IdentityDataKind::Email => Self::Email,
             IdentityDataKind::PhoneNumber => Self::PhoneNumber,
-        }
-    }
-}
-
-// Used to determine which DLs to load from the DB for a list of DataIdentifiers
-impl From<DataIdentifier> for Option<DataLifetimeKind> {
-    fn from(value: DataIdentifier) -> Self {
-        match value {
-            DataIdentifier::Id(id) => Some(id.into()),
-            DataIdentifier::Custom(_) => Some(DataLifetimeKind::Custom),
-            DataIdentifier::IdDocument => Some(DataLifetimeKind::IdentityDocument),
-            DataIdentifier::Selfie => None,
         }
     }
 }
