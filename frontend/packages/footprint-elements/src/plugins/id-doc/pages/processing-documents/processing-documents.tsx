@@ -20,6 +20,7 @@ const ProcessingDocuments = () => {
   const [state] = useIdDocMachine();
   const {
     idDoc: { type, country, frontImage, backImage },
+    selfie: { image: selfieImage },
     authToken,
     requestId,
   } = state.context;
@@ -42,12 +43,11 @@ const ProcessingDocuments = () => {
     if (!frontImage || !authToken || !type || !country || !requestId) {
       return;
     }
-    // TODO: Submit selfie to the backend
-    // https://linear.app/footprint/issue/FP-1996/integrate-with-bifrost-apis
     submitDocMutation.mutate(
       {
         frontImage,
         backImage,
+        selfieImage,
         authToken,
         documentType: type,
         countryCode: country,

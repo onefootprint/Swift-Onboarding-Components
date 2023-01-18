@@ -9,6 +9,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     authToken,
     frontImage,
     backImage,
+    selfieImage,
     documentType,
     countryCode,
     requestId,
@@ -19,6 +20,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     data: {
       frontImage,
       backImage,
+      selfieImage,
       documentType,
       countryCode,
     },
