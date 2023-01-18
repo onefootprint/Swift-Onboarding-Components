@@ -35,7 +35,7 @@ pub enum Error {
     #[error("Invalid utf8")]
     InvalidUtf8(#[from] Utf8Error),
 
-    #[error("ecc error {0}")]
+    #[error("ecc error")]
     Ecc(#[from] p256::elliptic_curve::Error),
 
     #[error("Invalid der public key")]

@@ -136,25 +136,16 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::PoolInit(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::ConnectionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::InvalidTenantAuth => StatusCode::UNAUTHORIZED,
-        DbError::ChallengeDataMismatch => StatusCode::BAD_REQUEST,
-        DbError::ChallengeCodeMismatch => StatusCode::BAD_REQUEST,
-        DbError::ChallengeExpired => StatusCode::BAD_REQUEST,
-        DbError::ChallengeInactive => StatusCode::BAD_REQUEST,
-        DbError::InvalidSessionForOperation => StatusCode::UNAUTHORIZED,
         DbError::IncorrectNumberOfRowsUpdated => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::ObjectNotFound => StatusCode::NOT_FOUND,
         DbError::UpdateTargetNotFound => StatusCode::NOT_FOUND,
         DbError::RelatedObjectNotFound => StatusCode::NOT_FOUND,
         DbError::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::InvalidDataGroupForKind => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::CouldNotCreateGroupUuid => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
         DbError::TenantUserDeactivated => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleMismatch => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleDeactivated => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleHasUsers(_) => StatusCode::BAD_REQUEST,
-        DbError::NotInTransaction => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::TransactionRollbackTest => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::SandboxMismatch => StatusCode::BAD_REQUEST,
         DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
@@ -166,15 +157,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
 impl ApiError {
     fn message(&self) -> String {
         match self {
-            // omit database errors always
-            ApiError::Database(e) => if e.is_not_found() {
-                "data not found"
-            } else if e.is_constraint_violation() {
-                "operation not allowed: constraint violation"
-            } else {
-                "something went wrong"
-            }
-            .to_string(),
+            ApiError::Database(e) => e.message(),
             _ => self.to_string(),
         }
     }

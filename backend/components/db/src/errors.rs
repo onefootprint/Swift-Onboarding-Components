@@ -8,96 +8,59 @@ pub enum TransactionError<E> {
 }
 
 #[derive(Debug, Error)]
+/// Note: the error messages here are publicly visible to the API
 pub enum DbError {
-    #[error("db_interact: {0}")]
+    // Wrapped errors
+    #[error("Db interact error")]
     DbInteract(#[from] deadpool_diesel::InteractError),
-
-    #[error("db_error: {0}")]
+    #[error("Db error")]
     DbError(#[from] diesel::result::Error),
-
-    #[error("pool_get: {0}")]
+    #[error("Pool error")]
     PoolGet(#[from] deadpool_diesel::PoolError),
-
-    #[error("pool_init: {0}")]
+    #[error("Pool init error")]
     PoolInit(#[from] deadpool::managed::BuildError<deadpool_diesel::Error>),
-
-    #[error("connection_error: {0}")]
+    #[error("Connection error")]
     ConnectionError(#[from] diesel::ConnectionError),
-
-    #[error("migration_error: {0}")]
+    #[error("Migration error")]
     MigrationError(#[from] diesel_migrations::MigrationError),
+    #[error("Migration failed")]
+    MigrationFailed(Box<dyn std::error::Error + Send + Sync>),
 
-    #[error("invalid_session")]
-    InvalidSessionForOperation,
-
-    #[error("invalid_tenant_auth")]
-    InvalidTenantAuth,
-
-    #[error("challenge_data_mismatch")]
-    ChallengeDataMismatch,
-
-    #[error("challenge_code_mismatch")]
-    ChallengeCodeMismatch,
-
-    #[error("challenge_expired")]
-    ChallengeExpired,
-
-    #[error("challenge_inactive")]
-    ChallengeInactive,
-
+    // Application errors
     #[error("Incorrect number of rows updated")]
     IncorrectNumberOfRowsUpdated,
     #[error("Update target not found")]
     UpdateTargetNotFound,
-
     #[error("Related object not found")]
     RelatedObjectNotFound,
-
     #[error("Object not found")]
     ObjectNotFound,
-
-    #[error("Invalid data group set for data kind. For instance, data group address may be set for ssn")]
-    InvalidDataGroupForKind,
-
-    #[error("Could not create uuid -- group uuid already exists")]
-    CouldNotCreateGroupUuid,
-
-    #[error("migration failed: {0}")]
-    MigrationFailed(Box<dyn std::error::Error + Send + Sync>),
-
-    #[error("crypto error: {0}")]
-    CryptoError(#[from] crypto::Error),
-
     #[error("This API key is disabled")]
     ApiKeyDisabled,
-
     #[error("User is deactivated. Please contact your administor for assistance.")]
     TenantUserDeactivated,
-
     #[error("Role used by this user is deactivated. Please contact your administor for assistance.")]
     TenantRoleDeactivated,
-
     #[error("Cannot deactivate a role while users are using it. There are {0} active users with this role.")]
     TenantRoleHasUsers(i64),
-
     #[error("User and role belong to different tenants.")]
     TenantRoleMismatch,
-
-    #[error("Not in transaction")]
-    NotInTransaction,
-
-    #[error("Transaction rollback in a unit test")]
-    TransactionRollbackTest,
-
     #[error("Scoped user is_live doesn't match UserVault is_live")]
     SandboxMismatch,
-
     #[error("Only portable vaults can be linked to an ob config")]
     CannotCreatedScopedUser,
     #[error("Cannot update an immutable role {0}")]
     CannotUpdateImmutableRole(String),
+
+    // Pass-through errors from other crates
     #[error("{0}")]
     NewtypesError(#[from] newtypes::Error),
+    #[error("{0}")]
+    CryptoError(#[from] crypto::Error),
+
+    // Testing-only error
+    #[error("Transaction rollback in a unit test")]
+    TransactionRollbackTest,
 }
 
 impl DbError {
@@ -116,5 +79,15 @@ impl DbError {
         } else {
             false
         }
+    }
+
+    pub fn message(&self) -> String {
+        if self.is_not_found() {
+            return "Data not found".to_owned();
+        }
+        if self.is_constraint_violation() {
+            return "Operation not allowed: constraint violation".to_owned();
+        }
+        self.to_string()
     }
 }
