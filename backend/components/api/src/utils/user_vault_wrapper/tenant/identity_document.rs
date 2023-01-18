@@ -125,7 +125,8 @@ impl TenantUvw {
             })
             .collect::<ApiResult<_>>()?;
         let scoped_user_id = self.scoped_user_id.clone();
-        req.create_access_event(state, scoped_user_id, vec![DataIdentifier::IdDocument])
+        let identifier = DataIdentifier::IdDocument(document_type);
+        req.create_access_event(state, scoped_user_id, vec![identifier])
             .await?;
         Ok(res)
     }

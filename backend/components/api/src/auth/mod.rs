@@ -1,4 +1,3 @@
-use newtypes::DataIdentifier;
 use thiserror::Error;
 
 use self::user::UserAuthScopeDiscriminant;
@@ -43,8 +42,8 @@ pub enum AuthError {
     MissingTenantPermission(String),
     #[error("Not allowed: role does not have permissions to decrypt attributes")]
     RoleMissingDecryptPermission,
-    #[error("Not allowed: onboarding configuration does not have permissions to decrypt attributes: {0:?}")]
-    ObConfigMissingDecryptPermission(Vec<DataIdentifier>),
+    #[error("Not allowed: onboarding configuration does not have permissions to decrypt attributes: {0}")]
+    ObConfigMissingDecryptPermission(String),
     #[error("Cannot modify global properties on portable user")]
     CannotModifyPortableUser,
     #[error("Not allowed: handoff tokens cannot create other handoff tokens")]

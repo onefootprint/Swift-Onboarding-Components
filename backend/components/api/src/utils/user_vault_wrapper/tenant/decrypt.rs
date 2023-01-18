@@ -33,7 +33,8 @@ impl TenantUvw {
             .filter(|x| !CanDecrypt::single(x.clone()).is_met(&can_decrypt_scopes))
             .collect_vec();
         if !cannot_access_fields.is_empty() {
-            return Err(AuthError::ObConfigMissingDecryptPermission(cannot_access_fields).into());
+            let cannot_access_fields_str = cannot_access_fields.into_iter().map(|x| x.to_string()).join(", ");
+            return Err(AuthError::ObConfigMissingDecryptPermission(cannot_access_fields_str).into());
         }
 
         Ok(())

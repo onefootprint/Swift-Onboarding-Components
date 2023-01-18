@@ -88,7 +88,7 @@ impl TryFrom<&str> for IngressRule {
         // TODO: support non-portable ID vaulting
         match proxy_token.identifier {
             DataIdentifier::Custom(_) => {}
-            DataIdentifier::Selfie | DataIdentifier::Id(_) | DataIdentifier::IdDocument => {
+            DataIdentifier::Selfie(_) | DataIdentifier::Id(_) | DataIdentifier::IdDocument(_) => {
                 return Err(VaultProxyError::CannotProxyVaultNonCustomData)?
             }
         }

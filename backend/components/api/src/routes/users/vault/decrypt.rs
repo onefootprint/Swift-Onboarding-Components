@@ -44,7 +44,10 @@ pub async fn post(
     let DecryptUnifiedFieldsRequest { fields, reason } = request;
     let fields = fields.clone().into_iter().collect_vec();
 
-    if fields.contains(&DataIdentifier::IdDocument) {
+    if fields
+        .iter()
+        .any(|f| matches!(f, DataIdentifier::IdDocument(_) | DataIdentifier::Selfie(_)))
+    {
         return Err(TenantError::CannotDecryptDocument.into());
     }
 

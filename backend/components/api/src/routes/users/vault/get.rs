@@ -45,7 +45,10 @@ pub async fn get(
     let FieldsParams { fields } = request;
     let fields = fields.clone().into_iter().collect_vec();
 
-    if fields.contains(&DataIdentifier::IdDocument) {
+    if fields
+        .iter()
+        .any(|f| matches!(f, DataIdentifier::IdDocument(_) | DataIdentifier::Selfie(_)))
+    {
         return Err(TenantError::CannotDecryptDocument.into());
     }
 

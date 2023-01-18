@@ -2,7 +2,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, Display, EnumString};
+use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 #[derive(
     Debug,
@@ -14,10 +14,13 @@ use strum_macros::{AsRefStr, Display, EnumString};
     Apiv2Schema,
     PartialEq,
     Eq,
+    Ord,
+    PartialOrd,
     Hash,
     AsExpression,
     FromSqlRow,
     EnumString,
+    EnumIter,
     AsRefStr,
     JsonSchema,
 )]

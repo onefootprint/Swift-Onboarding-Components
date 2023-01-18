@@ -18,9 +18,11 @@ use api_wire_types::{
 };
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
+use itertools::Itertools;
 use newtypes::{DataIdentifier, FootprintUserId, IdDocKind};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
+use strum::IntoEnumIterator;
 
 #[api_v2_operation(
     description = "Checks existence if items in the document vault.",
@@ -46,7 +48,8 @@ pub async fn get(
         })
         .await??;
 
-    uvw.check_ob_config_access(&[DataIdentifier::IdDocument])?;
+    let targets = IdDocKind::iter().map(DataIdentifier::IdDocument).collect_vec();
+    uvw.check_ob_config_access(&targets)?;
 
     // TODO migrate this to a list instead of a hashmap
     let response = GetIdentityDocumentForDecryptResponse::from(HashMap::from_iter(
@@ -73,13 +76,15 @@ pub async fn post_decrypt(
         include_selfie,
     } = request.into_inner();
 
-    let data_identifiers = if include_selfie {
-        vec![DataIdentifier::IdDocument, DataIdentifier::Selfie]
-    } else {
-        vec![DataIdentifier::IdDocument]
-    };
+    let targets = [
+        Some(DataIdentifier::IdDocument(document_type)),
+        include_selfie.then_some(DataIdentifier::Selfie(document_type)),
+    ]
+    .into_iter()
+    .flatten()
+    .collect_vec();
 
-    let auth = auth.check_guard(CanDecrypt::new(data_identifiers))?;
+    let auth = auth.check_guard(CanDecrypt::new(targets.clone()))?;
 
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
@@ -91,21 +96,13 @@ pub async fn post_decrypt(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
 
-            // Important to check requester has access
-            let data_identifiers = if include_selfie {
-                vec![DataIdentifier::IdDocument, DataIdentifier::Selfie]
-            } else {
-                vec![DataIdentifier::IdDocument]
-            };
-            uvw.check_ob_config_access(&data_identifiers)?;
-
             Ok(uvw)
         })
         .await??;
 
     // Important to check requester has access. TODO is there a better way to have type safety here?
     // Can we put in decrypt_document?
-    uvw.check_ob_config_access(&[DataIdentifier::IdDocument])?;
+    uvw.check_ob_config_access(&targets)?;
 
     let req = DecryptRequest {
         reason,

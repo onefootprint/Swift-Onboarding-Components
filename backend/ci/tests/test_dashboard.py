@@ -143,7 +143,7 @@ class TestDashboardOnboardings:
         assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
 
         get(
-            f"users/{sandbox_user.fp_user_id}/vault/identity/document?document_types=",
+            f"users/{sandbox_user.fp_user_id}/vault/identity/document",
             None,
             tenant.sk.key,
             status_code=401,
@@ -190,7 +190,7 @@ class TestDashboardOnboardings:
             (
                 False,
                 401,
-                "Auth error: Not allowed: onboarding configuration does not have permissions to decrypt attributes: [Selfie]",
+                "Auth error: Not allowed: onboarding configuration does not have permissions to decrypt attributes: selfie.passport",
             ),
         ],
     )

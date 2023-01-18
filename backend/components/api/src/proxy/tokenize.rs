@@ -49,7 +49,9 @@ pub async fn vault_pii(
                 let custom: HashMap<KvDataKey, _> = values
                     .iter()
                     .filter_map(|(di, value)| match di {
-                        DataIdentifier::Selfie | DataIdentifier::Id(_) | DataIdentifier::IdDocument => None,
+                        DataIdentifier::Selfie(_) | DataIdentifier::Id(_) | DataIdentifier::IdDocument(_) => {
+                            None
+                        }
                         DataIdentifier::Custom(k) => Some((k.clone(), value.clone())),
                     })
                     .collect();

@@ -11,7 +11,7 @@
 //!      `IdentityDataKind` that represents data that is stored only in the `UserVaultData` table.
 //! - `KvDataKey`: A subset of DataIdentifier that refers to custom, key-value data. A KvDataKey is just
 //!    a wrapper around a free-form string.
-//! - `IdDocumentKind` represents the type of an identity document.
+//! - `IdDocKind` represents the type of an identity document.
 //!
 //! `DataLifetimeKind` is a tangential identifier. It mostly intersects with the types represented by
 //! `DataIdentifier`, but its purpose is more targeted: `DataLifetimeKind` is purely used in the `kind`
@@ -37,15 +37,12 @@ mod uvd_kind;
 pub use self::{
     collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*, uvd_kind::*,
 };
-
-use std::str::FromStr;
-
+use crate::{api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, KvDataKey};
 pub use derive_more::Display;
 use diesel::{pg::Pg, sql_types::Text, AsExpression, FromSqlRow};
+use std::str::FromStr;
 use strum_macros::{AsRefStr, EnumDiscriminants};
 use thiserror::Error;
-
-use crate::{api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, KvDataKey};
 
 #[derive(
     Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, AsExpression, FromSqlRow, AsRefStr, EnumDiscriminants,
@@ -59,8 +56,8 @@ use crate::{api_schema_helper::string_api_data_type_alias, util::impl_enum_strin
 pub enum DataIdentifier {
     Id(IdentityDataKind),
     Custom(KvDataKey),
-    IdDocument,
-    Selfie,
+    IdDocument(IdDocKind),
+    Selfie(IdDocKind),
 }
 
 string_api_data_type_alias!(DataIdentifier);
@@ -91,29 +88,23 @@ impl std::fmt::Display for DataIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = self.as_ref();
         let suffix = match self {
-            Self::Id(s) => Some(s.to_string()),
-            Self::Custom(s) => Some(s.to_string()),
-            Self::IdDocument => None,
-            Self::Selfie => None,
+            Self::Id(s) => s.to_string(),
+            Self::Custom(s) => s.to_string(),
+            Self::IdDocument(s) => s.to_string(),
+            Self::Selfie(s) => s.to_string(),
         };
-        if let Some(suffix) = suffix {
-            write!(f, "{}.{}", prefix, suffix)
-        } else {
-            write!(f, "{}", prefix)
-        }
+        write!(f, "{}.{}", prefix, suffix)
     }
 }
 
 impl FromStr for DataIdentifier {
     type Err = DataIdentifierParsingError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (prefix, suffix) = if let Some(period_idx) = s.find('.') {
-            let prefix = &s[..period_idx];
-            let suffix = &s[(period_idx + 1)..];
-            (prefix, suffix)
-        } else {
-            (s, "")
-        };
+        let period_idx = s
+            .find('.')
+            .ok_or_else(|| DataIdentifierParsingError::CannotParse(s.to_owned()))?;
+        let prefix = &s[..period_idx];
+        let suffix = &s[(period_idx + 1)..];
         let prefix = DataIdentifierDiscriminants::from_str(prefix)
             .map_err(|_| DataIdentifierParsingError::CannotParsePrefix(prefix.to_owned()))?;
         // Parse the suffix differently depending on the prefix
@@ -126,8 +117,14 @@ impl FromStr for DataIdentifier {
                 KvDataKey::from_str(suffix)
                     .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
             ),
-            DataIdentifierDiscriminants::IdDocument => Self::IdDocument,
-            DataIdentifierDiscriminants::Selfie => Self::Selfie,
+            DataIdentifierDiscriminants::IdDocument => Self::IdDocument(
+                IdDocKind::from_str(suffix)
+                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
+            ),
+            DataIdentifierDiscriminants::Selfie => Self::Selfie(
+                IdDocKind::from_str(suffix)
+                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
+            ),
         };
         Ok(result)
     }
@@ -163,8 +160,8 @@ mod tests {
     #[test_case(DataIdentifier::Id(IdentityDataKind::Email) => "id.email")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
-    #[test_case(DataIdentifier::IdDocument => "id_document")]
-    #[test_case(DataIdentifier::Selfie => "selfie")]
+    #[test_case(DataIdentifier::IdDocument(IdDocKind::IdCard) => "id_document.id_card")]
+    #[test_case(DataIdentifier::Selfie(IdDocKind::IdCard) => "selfie.id_card")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -174,8 +171,8 @@ mod tests {
     #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
-    #[test_case("id_document" => DataIdentifier::IdDocument)]
-    #[test_case("selfie" => DataIdentifier::Selfie)]
+    #[test_case("id_document.driver_license" => DataIdentifier::IdDocument(IdDocKind::DriverLicense))]
+    #[test_case("selfie.passport" => DataIdentifier::Selfie(IdDocKind::Passport))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
