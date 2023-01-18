@@ -134,6 +134,8 @@ def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_
         "can_access_data": can_access_data,
         "must_collect_identity_document": True,
         "can_access_identity_document_images": True,
+        "must_collect_selfie": True,
+        "can_access_selfie_image": True,
     }
     return create_ob_config(sandbox_tenant.sk, ob_conf_data)
 

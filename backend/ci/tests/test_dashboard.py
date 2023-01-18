@@ -48,12 +48,22 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
     """
     bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
     bifrost_client.init_user_for_onboarding(
-        twilio, build_user_data(), document_data=DocumentDataOptions.front_back
+        twilio, build_user_data(), document_data=DocumentDataOptions.front_back_selfie
     )
     return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
 
-class TestDashboardOnboardings:
+def latest_access_event_for(user):
+    body = get(
+        "org/access_events",
+        dict(footprint_user_id=user.fp_user_id),
+        user.tenant.sk.key,
+    )
+    access_events = body["data"]
+    return access_events[0]
+
+
+class TestDashboardDecrypt:
     def test_tenant_decrypt(self, sandbox_user):
         tenant = sandbox_user.tenant
         expected_data = {
@@ -80,6 +90,9 @@ class TestDashboardOnboardings:
             attributes = body
             for attribute, value in attributes.items():
                 assert expected_data[attribute] == value
+
+            access_event = latest_access_event_for(sandbox_user)
+            assert set(access_event["targets"]) == set(attributes)
 
     # Note: `sandbox_user` was onboarded onto `sandbox_user.tenant` with an ob configuration
     # that required the collection of DOB, but not the access. See the pytest fixture setup for the tenant associated
@@ -182,6 +195,10 @@ class TestDashboardOnboardings:
         assert resp["document_type"] == requested_doc_type
         assert resp["images"][0]["front"] == test_image
         assert resp["images"][0]["back"] == test_image
+        assert not resp["images"][0]["selfie"]
+
+        access_event = latest_access_event_for(user_with_documents)
+        assert set(access_event["targets"]) == {"id_document.passport"}
 
     @pytest.mark.parametrize(
         "can_access_selfie_image,expected_status_code,expected_message",
@@ -247,13 +264,17 @@ class TestDashboardOnboardings:
             assert resp["images"][0]["front"] == test_image
             assert resp["images"][0]["back"] == test_image
             assert resp["images"][0]["selfie"] == test_image
+
+            access_event = latest_access_event_for(user)
+            assert set(access_event["targets"]) == {
+                "id_document.passport",
+                "selfie.passport",
+            }
         else:
             assert expected_message == resp["error"]["message"]
 
-    ##############################
-    # End document tests
-    ###################################
 
+class TestDashboardOnboardings:
     def test_get_org(self, sandbox_user):
         body = get("org", None, sandbox_user.tenant.sk.key)
         tenant = body

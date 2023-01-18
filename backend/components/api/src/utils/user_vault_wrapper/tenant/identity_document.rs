@@ -92,6 +92,7 @@ impl TenantUvw {
         &self,
         state: &State,
         document_type: IdDocKind,
+        include_selfie: bool,
         req: DecryptRequest,
     ) -> ApiResult<Vec<DecryptDocumentResult>> {
         let images = self.get_encrypted_images_from_s3(state, document_type).await?;
@@ -110,11 +111,15 @@ impl TenantUvw {
                     .transpose()?
                     .map(PiiBytes::new);
 
-                let selfie = image
-                    .selfie_image
-                    .map(|b| key.unseal_bytes(AeadSealedBytes(b.0)))
-                    .transpose()?
-                    .map(PiiBytes::new);
+                let selfie = if include_selfie {
+                    image
+                        .selfie_image
+                        .map(|b| key.unseal_bytes(AeadSealedBytes(b.0)))
+                        .transpose()?
+                        .map(PiiBytes::new)
+                } else {
+                    None
+                };
 
                 Ok(DecryptDocumentResult {
                     identity_document_id: image.identity_document_id,
@@ -125,9 +130,14 @@ impl TenantUvw {
             })
             .collect::<ApiResult<_>>()?;
         let scoped_user_id = self.scoped_user_id.clone();
-        let identifier = DataIdentifier::IdDocument(document_type);
-        req.create_access_event(state, scoped_user_id, vec![identifier])
-            .await?;
+        let targets = [
+            Some(DataIdentifier::IdDocument(document_type)),
+            include_selfie.then_some(DataIdentifier::Selfie(document_type)),
+        ]
+        .into_iter()
+        .flatten()
+        .collect();
+        req.create_access_event(state, scoped_user_id, targets).await?;
         Ok(res)
     }
 }
