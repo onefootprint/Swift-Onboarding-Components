@@ -2,7 +2,7 @@ use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use newtypes::{IdentityDataKind, Fingerprinter};
+use newtypes::{Fingerprinter, IdentityDataKind};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -51,7 +51,9 @@ async fn post(
         || requested_number.leak().split('#').next()
             == Some(state.config.integration_test_phone_number.leak()))
     {
-        return Err(ApiError::NotImplemented);
+        return Err(ApiError::AssertionError(
+            "Cannot clean up provided number".to_owned(),
+        ));
     }
     let twilio_client = &state.twilio_client;
     let phone_number = twilio_client.standardize(&requested_number).await?;

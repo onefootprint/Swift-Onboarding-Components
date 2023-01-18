@@ -78,8 +78,14 @@ impl UserVaultWrapper {
             .enclave_client
             .batch_decrypt_to_piistring(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
             .await?;
-        let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
-        let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();
+        let e164 = decrypt_response
+            .get(0)
+            .ok_or_else(|| ApiError::AssertionError("No e164 found".to_owned()))?
+            .clone();
+        let country = decrypt_response
+            .get(1)
+            .ok_or_else(|| ApiError::AssertionError("No country found".to_owned()))?
+            .clone();
 
         let validated_phone_number = ValidatedPhoneNumber::__build_from_vault(e164, country)?;
         Ok(validated_phone_number)

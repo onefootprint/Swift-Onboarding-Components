@@ -148,7 +148,7 @@ impl UvdBuilder {
                     sh_data,
                     lifetime_id: kind_to_lifetime
                         .get(&kind)
-                        .ok_or(ApiError::NotImplemented)?
+                        .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?
                         .clone(),
                 })
             })

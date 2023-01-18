@@ -30,7 +30,7 @@ pub async fn post(
                 .ok_or(OnboardingError::NoOnboarding)?
                 .into_inner();
             if onboarding.is_authorized {
-                return Err(ApiError::Custom("Cannot edit completed onboarding".to_owned()));
+                return Err(OnboardingError::AlreadyCompleted.into());
             }
 
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;

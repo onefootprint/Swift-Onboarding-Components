@@ -62,8 +62,6 @@ pub enum ApiError {
     Webauthn(#[from] WebauthnError),
     #[error("no phone number for vault")]
     NoPhoneNumberForVault,
-    #[error("not implemented")]
-    NotImplemented,
     #[error("external request error: {0}")]
     ReqwestError(#[from] reqwest::Error),
     #[error("error from sendgrid api: {0}")]
@@ -84,20 +82,14 @@ pub enum ApiError {
     SerdeCbor(#[from] serde_cbor::Error),
     #[error("twilio error: {0}")]
     Twilio(#[from] twilio::error::Error),
-    #[error("Not running in locked transaction")]
-    UserNotLocked,
     #[error("Endpoint not found")]
     EndpointNotFound,
     #[error("Resource not found")]
     ResourceNotFound,
-    #[error("Method not allowed for endpoint")]
-    MethodNotAllowed,
     #[error("Idv error: {0}")]
     IdvError(#[from] idv::Error),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
-    #[error("{0}")]
-    Custom(String),
     #[error("S3 error: {0}")]
     S3Error(#[from] crate::s3::S3Error),
     #[error("privacy pass token error: {0}")]
@@ -106,8 +98,6 @@ pub enum ApiError {
     VendorRequestFailed(VendorAPI),
     #[error("One or more vendor requests failed")]
     VendorRequestsFailed,
-    #[error("Cannot decrypt field {0} with this endpoint")]
-    InvalidFieldForDecryption(String),
     #[error("Unexpected: {0}")]
     AssertionError(String),
     #[error("Feature Flag error: {0}")]
@@ -202,7 +192,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::NotImplemented => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Twilio(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -214,7 +203,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::InvalidFieldForDecryption(_) => StatusCode::BAD_REQUEST,
             ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::VendorRequestFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::VendorRequestsFailed => StatusCode::INTERNAL_SERVER_ERROR,
@@ -225,13 +213,10 @@ impl actix_web::ResponseError for ApiError {
             | ApiError::SerdeJson(_)
             | ApiError::SerdeCbor(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsLoginError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::UserNotLocked => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EndpointNotFound => StatusCode::NOT_FOUND,
             ApiError::ResourceNotFound => StatusCode::NOT_FOUND,
-            ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
             ApiError::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::PrivacyPassError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Custom(_) => StatusCode::BAD_REQUEST,
             ApiError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidProxyBody => StatusCode::BAD_REQUEST,

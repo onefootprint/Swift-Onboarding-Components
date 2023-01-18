@@ -125,5 +125,5 @@ async fn panic_handler(_: CustodianAuthContext) -> StringResponse {
 #[get("/fail")]
 async fn fail_handler() -> StringResponse {
     tracing::debug!("about to fail");
-    Err(ApiError::NotImplemented)
+    Err(ApiError::AssertionError("Hit /fail endpoint".to_owned()))
 }

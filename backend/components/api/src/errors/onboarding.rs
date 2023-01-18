@@ -5,11 +5,9 @@ use crate::types::onboarding_requirement::OnboardingRequirementDiscriminant;
 
 #[derive(Debug, Error)]
 pub enum OnboardingError {
-    #[error("token invalid or not found")]
+    #[error("Token invalid or not found")]
     ValidateTokenInvalidOrNotFound,
-    #[error("onboarding for tenant, user pair does not exist")]
-    OnboardingForTenantDoesNotExist,
-    #[error("webauthn credential not set")]
+    #[error("Webauthn credential not set")]
     WebauthnCredentialsNotSet,
     #[error("Sandbox users must be used in sandbox mode")]
     InvalidSandboxState,
@@ -33,4 +31,6 @@ pub enum OnboardingError {
     NoDecisionMade,
     #[error("Cannot onboard a non-portable scoped user onto any ob config")]
     NonPortableScopedUser,
+    #[error("Cannot edit completed onboarding")]
+    AlreadyCompleted,
 }

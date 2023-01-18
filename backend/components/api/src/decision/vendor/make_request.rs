@@ -31,7 +31,10 @@ pub async fn send_idv_request(
             .await
             .map_err(idv::Error::from)?,
         VendorAPI::SocureIDPlus => send_socure_idv_request(state, request, data).await?,
-        _ => return Err(ApiError::NotImplemented),
+        api => {
+            let err = format!("send_idv_request not implemented for {}", api);
+            return Err(ApiError::AssertionError(err));
+        }
     };
 
     Ok(result)
@@ -64,7 +67,10 @@ pub async fn send_docv_request(
         VendorAPI::IdologyScanOnboarding => {
             idv::idology::send_scan_onboarding_request(&state.idology_client, data).await?
         }
-        _ => return Err(ApiError::NotImplemented),
+        api => {
+            let err = format!("send_docv_request not implemented for {}", api);
+            return Err(ApiError::AssertionError(err));
+        }
     };
 
     Ok(result)
