@@ -4,6 +4,7 @@ import {
   screen,
   userEvent,
   waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 import { UserSession, useStore } from 'src/hooks/use-session-user';
@@ -222,13 +223,22 @@ describe('<LoginAndSecurity />', () => {
       expect(screen.getByText('+1 (305) 541-3102')).toBeInTheDocument();
     });
 
-    it('should show biometrics is not verified', () => {
+    it('should show biometrics is not verified', async () => {
       withEmptyLivenessQuery();
       withUserQuery();
       renderLoginAndSecurity();
-      expect(screen.getByText('Not verified')).toBeInTheDocument();
-      expect(screen.getByTestId('verify-biometrics')).toBeInTheDocument();
-      expect(screen.getByText('Verify')).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(screen.getByText('Not verified')).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        const verifySection = screen.getByTestId('verify-biometrics');
+        const button = within(verifySection).getByRole('button', {
+          name: 'Verify',
+        });
+        expect(button).toBeInTheDocument();
+      });
     });
   });
 

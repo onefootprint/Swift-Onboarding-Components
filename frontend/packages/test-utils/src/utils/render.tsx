@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  QueryCache,
+} from '@tanstack/react-query';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
@@ -9,7 +13,14 @@ import { DesignSystemProvider } from '@onefootprint/ui';
 
 import throwOnConsoleErrors from './console-error';
 
+const queryCache = new QueryCache();
+
+beforeEach(() => {
+  queryCache.clear();
+});
+
 const queryClient = new QueryClient({
+  queryCache,
   logger: {
     log: console.log,
     warn: console.warn,

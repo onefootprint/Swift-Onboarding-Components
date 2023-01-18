@@ -39,17 +39,13 @@ const VerifyBiometrics = () => {
   };
 
   return (
-    <Box>
+    <Box testID="verify-biometrics">
       {isLoading ? (
         <Box>
           <LoadingIndicator aria-label={t('loading')} />
         </Box>
       ) : (
-        <LinkButton
-          testID="verify-biometrics"
-          size="compact"
-          onClick={handleStartLivenessCheck}
-        >
+        <LinkButton size="compact" onClick={handleStartLivenessCheck}>
           {t('cta')}
         </LinkButton>
       )}
