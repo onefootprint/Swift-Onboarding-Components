@@ -23,7 +23,7 @@ const IcoIdFront40 = ({ color = 'primary', className, testID }: IconProps) => {
         fill={theme.color[color]}
       />
       <ellipse
-        cx={18.546}
+        cx={18.545}
         cy={13.455}
         rx={1.455}
         ry={1.454}

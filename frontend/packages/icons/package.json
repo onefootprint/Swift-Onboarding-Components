@@ -13,7 +13,7 @@
     "generate:icos": "node ./src/scripts/icos/generate.js",
     "generate:flags": "node ./src/scripts/flags/generate.js",
     "generate": "yarn generate:icos && yarn generate:flags",
-    "postgenerate": "yarn format:fix && yarn lint:fix",
+    "postgenerate": "yarn lint:fix && yarn format:fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {

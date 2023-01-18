@@ -5,8 +5,8 @@ import type { FlagProps } from '../types';
 const FlagAn = ({ className, testID }: FlagProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={20}
-    height={15}
+    width={16}
+    height={11}
     fill="none"
     data-testid={testID}
     className={className}
