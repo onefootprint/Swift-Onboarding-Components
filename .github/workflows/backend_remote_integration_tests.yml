@@ -25,6 +25,11 @@ on:
         default: false
         required: false
 
+      expectedCommitHash:
+        description: 'hash of commit that we expect to be deployed'
+        type: string
+        required: false
+
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER:
         required: true
@@ -45,7 +50,7 @@ jobs:
     env:
       PR_NUMBER: ${{ inputs.prNumber }}
       TEST_URL: ${{ inputs.testUrl }}
-      EXPECTED_SERVER_VERSION: ${{ github.sha }}
+      EXPECTED_SERVER_VERSION: ${{ inputs.expectedCommitHash || github.sha }}
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
       TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
