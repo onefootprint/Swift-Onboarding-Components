@@ -314,8 +314,8 @@
         "id-doc": {
           "title": "ID Document",
           "id-doc-images": {
-            "show": "See document",
-            "hide": "Hide document"
+            "show": "Show",
+            "hide": "Hide"
           },
           "preview": {
             "front-alt": "Front image of the ID Doc",
