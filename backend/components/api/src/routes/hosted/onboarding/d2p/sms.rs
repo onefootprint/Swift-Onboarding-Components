@@ -37,7 +37,7 @@ pub async fn handler(
                 // If the auth token is during an onboarding session, create a UVW that sees all
                 // speculative data for the tenant in order to see an uncommitted phone number
                 // that was added by this tenant.
-                UvwArgs::Onboarding(&su.id)
+                UvwArgs::Tenant(&su.id)
             } else {
                 // Otherwise, create a UVW that only sees committed data
                 UvwArgs::User(uv_id)

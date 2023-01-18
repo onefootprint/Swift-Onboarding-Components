@@ -49,8 +49,14 @@ impl UserVaultWrapper {
     }
 
     pub fn build(conn: &mut PgConnection, args: UvwArgs) -> ApiResult<Self> {
-        let (args, active_lifetimes) = args.build(conn)?;
-        let (uv, su_id, seqno, _) = args;
+        let (uv, su_id, seqno) = args.build(conn)?;
+        let active_lifetimes = if let Some(seqno) = seqno {
+            // We are reconstructing the UVW as it appeared at a given seqno
+            DataLifetime::get_active_at(conn, &uv.id, su_id.as_ref(), seqno)?
+        } else {
+            // We are constructing the UVW as it appears right now
+            DataLifetime::get_active(conn, &uv.id, su_id.as_ref())?
+        };
         let active_lifetime_ids: Vec<_> = active_lifetimes.iter().map(|l| l.id.clone()).collect();
 
         // Fetch all the data related to the active lifetimes

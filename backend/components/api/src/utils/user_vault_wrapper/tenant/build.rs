@@ -27,7 +27,6 @@ impl UserVaultWrapper {
         })
     }
 
-    // TODO: TENANT ACCESS
     // In order to minimize database queries, we would like to be able to bulk fetch
     // various data elements for a set of Users.
     // Note: it is possible that there are multiple scoped users for each user vault

@@ -253,7 +253,6 @@ impl DataLifetime {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
-        accessible_kinds: Option<Vec<DataLifetimeKind>>,
     ) -> DbResult<Vec<Self>> {
         let mut query = data_lifetime::table
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
@@ -271,11 +270,6 @@ impl DataLifetime {
             // Only fetch committed, portable data
             query = query.filter(q_is_committed)
         }
-
-        // Filter to specific kinds
-        if let Some(kinds) = accessible_kinds {
-            query = query.filter(data_lifetime::kind.eq_any(kinds));
-        };
 
         let results = query.get_results(conn)?;
         Ok(results)
@@ -320,7 +314,6 @@ impl DataLifetime {
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
         seqno: DataLifetimeSeqno,
-        accessible_kinds: Option<Vec<DataLifetimeKind>>,
     ) -> DbResult<Vec<Self>> {
         // This is kind of unnecessarily similar to `get_active`, but it's hard to combine
         // this logic in diesel
@@ -346,11 +339,6 @@ impl DataLifetime {
             // Only fetch committed, portable data
             query = query.filter(q_is_committed)
         }
-
-        // Filter to specific kinds
-        if let Some(kinds) = accessible_kinds {
-            query = query.filter(data_lifetime::kind.eq_any(kinds));
-        };
 
         let results = query.get_results(conn)?;
         Ok(results)

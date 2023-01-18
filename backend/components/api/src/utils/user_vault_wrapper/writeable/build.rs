@@ -18,7 +18,7 @@ impl UserVaultWrapper {
     ) -> ApiResult<WriteableUvw> {
         // Lock the UserVault in this transaction, then build the UVW
         UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
-        let uvw = Self::build(conn, UvwArgs::Onboarding(scoped_user_id))?;
+        let uvw = Self::build(conn, UvwArgs::Tenant(scoped_user_id))?;
         let ob_uvw = WriteableUvw {
             uvw: Locked::new(uvw),
             scoped_user_id: scoped_user_id.clone(),

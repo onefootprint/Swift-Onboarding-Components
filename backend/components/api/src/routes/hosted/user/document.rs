@@ -191,7 +191,7 @@ pub async fn post(
     // Check if we should be initiating requests (e.g. check if we are testing)
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::Onboarding(&suid)))
+        .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::Tenant(&suid)))
         .await??;
     let should_initiate_verification_requests =
         decision::utils::should_initiate_idv_or_else_setup_test_fixtures(

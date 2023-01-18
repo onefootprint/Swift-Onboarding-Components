@@ -55,7 +55,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     // Create phone number
     let phone_number = fixtures::phone_number::create(conn, &uv.id, Some(&su.id));
 
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
+    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![
         (IdentityDataKind::FirstName, Some(SealedVaultBytes(vec![1]))),
         (IdentityDataKind::LastName, Some(SealedVaultBytes(vec![2]))),
@@ -345,7 +345,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 as was written by tenant 1
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
+    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
     let ssn4_tenant1 = uvw.get_identity_e_field(IdentityDataKind::Ssn4);
     assert!(!uvw.has_identity_field(IdentityDataKind::Ssn9));
 
@@ -354,7 +354,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su2.id)).unwrap();
+    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su2.id)).unwrap();
     let ssn4_tenant2 = uvw.get_identity_e_field(IdentityDataKind::Ssn4);
     let ssn9_tenant2 = uvw.get_identity_e_field(IdentityDataKind::Ssn9);
     assert_ne!(ssn4_tenant1, ssn4_tenant2);
@@ -413,7 +413,7 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
         let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
         uvw.update_identity_data(conn, update.into(), vec![]).unwrap();
     }
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Onboarding(&su.id)).unwrap();
+    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
     assert!(uvw.has_identity_field(IdentityDataKind::AddressLine1));
     // We should have cleared out line2 in the last update
     assert!(!uvw.has_identity_field(IdentityDataKind::AddressLine2));
@@ -506,7 +506,7 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
         committed: usize,
         not_committed: usize,
     }
-    let kind_to_counts = DataLifetime::get_active(conn, &uv.id, Some(&su.id), None)
+    let kind_to_counts = DataLifetime::get_active(conn, &uv.id, Some(&su.id))
         .unwrap()
         .into_iter()
         .into_group_map_by(|dl| dl.kind)
