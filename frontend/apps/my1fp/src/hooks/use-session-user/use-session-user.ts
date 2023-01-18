@@ -1,5 +1,5 @@
 import { InsightEvent } from '@onefootprint/types';
-import create from 'zustand';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type UserSessionBiometric = InsightEvent[];

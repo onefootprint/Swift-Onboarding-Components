@@ -1,5 +1,5 @@
 import { Organization, OrgMember } from '@onefootprint/types';
-import create from 'zustand';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import {
