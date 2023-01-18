@@ -9,6 +9,7 @@ export type DataSectionProps = {
   renderCta?: () => React.ReactNode;
   footer?: React.ReactNode;
   title: string;
+  testID?: string;
 };
 
 const DataSection = ({
@@ -17,8 +18,9 @@ const DataSection = ({
   renderCta,
   footer,
   title,
+  testID,
 }: DataSectionProps) => (
-  <DataSectionContainer>
+  <DataSectionContainer data-testid={testID}>
     <Box>
       <Header>
         <Title>

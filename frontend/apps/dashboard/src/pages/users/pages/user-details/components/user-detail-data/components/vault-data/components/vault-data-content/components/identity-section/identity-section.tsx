@@ -72,6 +72,7 @@ const IdentitySection = ({
       title={t('identity.title')}
       footer={<RiskSignals type="identity" />}
       renderCta={renderCta}
+      testID="identity-section"
     >
       {fieldsState[UserDataAttribute.ssn9].exists && (
         <DataRow

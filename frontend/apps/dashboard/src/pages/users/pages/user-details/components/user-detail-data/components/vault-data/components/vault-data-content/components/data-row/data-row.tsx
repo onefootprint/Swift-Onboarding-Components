@@ -22,9 +22,9 @@ const DataRow = ({ label, data, checkbox }: DataRowProps) => {
     <DataRowContainer>
       {visible ? (
         <Checkbox
-          checked={disabled || checked}
+          checked={!!disabled || !!checked}
           {...register}
-          disabled={disabled}
+          disabled={!!disabled}
           label={label}
         />
       ) : (

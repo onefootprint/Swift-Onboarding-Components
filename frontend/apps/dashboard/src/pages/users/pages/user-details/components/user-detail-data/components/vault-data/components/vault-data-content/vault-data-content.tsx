@@ -19,7 +19,7 @@ export type FormData = {
   idDoc: Partial<Record<IdDocType, boolean>>;
 };
 
-type VaultDataContentProps = {
+export type VaultDataContentProps = {
   user: User;
   vaultData: UserVaultData;
   isDecrypting: boolean;

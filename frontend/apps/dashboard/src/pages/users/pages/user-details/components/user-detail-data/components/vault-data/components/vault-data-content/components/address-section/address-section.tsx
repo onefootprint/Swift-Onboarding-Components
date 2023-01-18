@@ -80,6 +80,7 @@ const AddressSection = ({
       title={t('address.title')}
       footer={<RiskSignals type="address" />}
       renderCta={renderCta}
+      testID="address-section"
     >
       {fieldsState[UserDataAttribute.addressLine1].exists && (
         <DataRow

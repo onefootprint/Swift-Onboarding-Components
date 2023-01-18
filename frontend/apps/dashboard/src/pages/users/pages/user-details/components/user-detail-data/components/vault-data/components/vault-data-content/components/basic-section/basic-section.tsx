@@ -68,6 +68,7 @@ const BasicSection = ({ user, vaultData, isDecrypting }: BasicSectionProps) => {
       title={t('basic.title')}
       footer={<RiskSignals type="basic" />}
       renderCta={renderCta}
+      testID="basic-section"
     >
       {fieldsState[UserDataAttribute.firstName].exists && (
         <DataRow

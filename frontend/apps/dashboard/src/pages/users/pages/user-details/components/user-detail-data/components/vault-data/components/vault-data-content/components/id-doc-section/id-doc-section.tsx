@@ -73,6 +73,7 @@ const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
       title={t('id-doc.title')}
       footer={<RiskSignalsOverview type="document" />}
       renderCta={renderCta}
+      testID="document-section"
     >
       {docTypes.map(type => (
         <ImageDataRow
