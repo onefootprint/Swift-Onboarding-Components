@@ -1,3 +1,43 @@
+//! This module contains all of the different ways that we identify data stored inside of a UserVault.
+//! It is a little complex, so we describe all of them here:
+//!
+//! `DataIdentifier`: the top level identitfier of a piece of data. Given a UVW and a `DataIdentifier`,
+//! we should be able to locate the underlying piece of data that is requested. `DataIdentifier`s are
+//! also used in access events to designate which pieces of data were decrypted.
+//! - `IdentityDataKind`: A subset of DataIdentifier that refers to what we colloquially have been calling
+//!   "identity data." This is the set of data that shows up on your virtual, Footprint ID card. It is the
+//!   set of data that we send to be verified by our KYC data vendors.
+//!    - Identity data is stored inside of a handful of different tables. `UvdKind` is a subset of
+//!      `IdentityDataKind` that represents data that is stored only in the `UserVaultData` table.
+//! - `KvDataKey`: A subset of DataIdentifier that refers to custom, key-value data. A KvDataKey is just
+//!    a wrapper around a free-form string.
+//! - `IdDocumentKind` represents the type of an identity document.
+//!
+//! `DataLifetimeKind` is a tangential identifier. It mostly intersects with the types represented by
+//! `DataIdentifier`, but its purpose is more targeted: `DataLifetimeKind` is purely used in the `kind`
+//! column of the `DataLifetime` table since all pieces of data are associated with a lifetime.
+//!
+//! `CollectedData` and `CollectedDataOption` are also tangential - they are used in onboarding
+//! configurations to specify the set of dentity data that needs to be collected, and in permissions
+//! to represent which pieces of data are allowed to be decrypted/accessed. Each `CollectedData`
+//! variant represents a kind of data that can be collected, like Name or Ssn.
+//! - Some `CollectedData` variants have multiple configurations of identity data that can be
+//!   collected. Those configurations are represented in `CollectedDataOption` - for example, to
+//!   collected a `CD::Address`, you could either collected `CDO::PartialAddress` or `CDO::FullAddress`
+//! - Some `CollectedDataOption` variants may represent multiple underlying `IdentityDataKind`s -
+//!   for example, `CDO::Name` cannot be collected without collecting _both_ `IDK::FirstName` and
+//!   `IDK::LastName`.
+
+mod collected_data;
+mod data_lifetime_kind;
+mod id_doc_kind;
+mod identity_data_kind;
+mod uvd_kind;
+
+pub use self::{
+    collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*, uvd_kind::*,
+};
+
 use std::str::FromStr;
 
 pub use derive_more::Display;
@@ -5,17 +45,17 @@ use diesel::{pg::Pg, sql_types::Text, AsExpression, FromSqlRow};
 use strum_macros::{AsRefStr, EnumDiscriminants};
 use thiserror::Error;
 
-use crate::{
-    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, IdentityDataKind, KvDataKey,
-};
+use crate::{api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, KvDataKey};
 
-/// Identifies a piece of data for a user vault
 #[derive(
     Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, AsExpression, FromSqlRow, AsRefStr, EnumDiscriminants,
 )]
 #[strum_discriminants(derive(strum_macros::EnumString), strum(serialize_all = "snake_case"))]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// Represents a piece of data stored inside the user vault.
+/// Mostly used in requests to decrypt a piece of data and in access events to show the log of
+/// decrypted items.
 pub enum DataIdentifier {
     Id(IdentityDataKind),
     Custom(KvDataKey),

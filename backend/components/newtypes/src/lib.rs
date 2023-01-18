@@ -20,6 +20,9 @@ pub use fields::*;
 pub mod db_types;
 pub use db_types::*;
 
+pub mod data_identifier;
+pub use data_identifier::*;
+
 mod b64;
 pub use b64::Base64Data;
 pub use serde;

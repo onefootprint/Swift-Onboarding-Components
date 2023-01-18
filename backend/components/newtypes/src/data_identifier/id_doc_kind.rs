@@ -24,6 +24,7 @@ use strum_macros::{AsRefStr, Display, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// The kind of an IdentityDocument
 pub enum IdDocKind {
     IdCard,
     DriverLicense,
