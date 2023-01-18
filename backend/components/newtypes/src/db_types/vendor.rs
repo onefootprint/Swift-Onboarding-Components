@@ -22,6 +22,9 @@ use crate::util::impl_enum_str_diesel;
     EnumString,
     AsRefStr,
     JsonSchema,
+    Hash,
+    Ord,
+    PartialOrd,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

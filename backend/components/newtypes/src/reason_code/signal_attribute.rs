@@ -23,4 +23,5 @@ pub enum SignalScope {
     Identity,
     IpAddress,
     Document,
+    Selfie,
 }

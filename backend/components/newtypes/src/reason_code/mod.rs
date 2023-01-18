@@ -1,12 +1,46 @@
 mod idology;
 mod signal;
 mod signal_attribute;
+mod socure;
 
 use std::str::FromStr;
 
 pub use idology::*;
 pub use signal::*;
 pub use signal_attribute::*;
+pub use socure::*;
+
+macro_rules! vendor_reason_code_enum {
+    (
+        $(#[$macros:meta])*
+        pub enum $name:ident {
+            $(#[ser = $ser:literal, description = $description:literal] #[footprint_reason_code = $footprint_reason_code:expr] $item:ident),*
+        }
+    ) => {
+        $(#[$macros])*
+        pub enum $name {
+            $(#[doc=$description] #[strum(to_string = $ser)] $item,)*
+        }
+
+        impl $name {
+            pub fn description(&self) -> String {
+                match self {
+                    $(Self::$item => String::from($description)),*
+                }
+            }
+        }
+
+        impl From<&$name> for Option<FootprintReasonCode> {
+            fn from(vendor_reason_code: &$name) -> Self {
+                match vendor_reason_code {
+                    $($name::$item => $footprint_reason_code),*
+                }
+            }
+        }
+
+    }
+}
+pub(crate) use vendor_reason_code_enum;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(try_from = "&str")]

@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
-
-use super::reason_code::reason_codes::SocureReasonCode;
+use newtypes::SocureReasonCode;
 
 // https://developer.socure.com/reference#tag/ID+
 // https://developer.socure.com/docs/idplus/modules/modules-overview

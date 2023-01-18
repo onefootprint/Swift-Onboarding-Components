@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use newtypes::{IDologyReasonCode};
+use newtypes::IDologyReasonCode;
 
 use super::error::RequestError;
 

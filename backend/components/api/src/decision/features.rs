@@ -135,7 +135,8 @@ impl FeatureVector {
 
         all_codes
             .into_iter()
-            .group_by(|t| t.1)
+            .sorted()
+            .group_by(|t| t.1.clone())
             .into_iter()
             .map(|(footprint_reason_code, group)| {
                 (
@@ -143,6 +144,7 @@ impl FeatureVector {
                     group
                         .into_iter()
                         .map(|(vendor, _)| vendor)
+                        .unique()
                         .collect::<Vec<Vendor>>(),
                 )
             })
@@ -339,7 +341,10 @@ mod tests {
                 IDologyReasonCode::IpNotLocated,
                 IDologyReasonCode::StreetNameDoesNotMatch,
             ],
-            footprint_reason_codes: vec![],
+            footprint_reason_codes: vec![
+                FootprintReasonCode::IpNotLocated,
+                FootprintReasonCode::AddressStreetNameDoesNotMatch,
+            ],
             verification_result: idology_result.verification_result_id,
         };
         let expected_feature_vector = FeatureVector {
@@ -422,7 +427,9 @@ mod tests {
                 status: DecisionStatus::Pass,
                 reason_codes: vec![],
                 footprint_reason_codes: vec![
-                    FootprintReasonCode::LastNameDoesNotMatch,
+                    FootprintReasonCode::SubjectDeceased,
+                    FootprintReasonCode::NameLastDoesNotMatch,
+                    FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SubjectDeceased,
                 ],
                 id_located: false,
@@ -444,6 +451,7 @@ mod tests {
                 verification_result: VerificationResultId::from("456".to_owned()),
                 reason_codes: vec![],
                 footprint_reason_codes: vec![
+                    FootprintReasonCode::SsnIssuedPriorToDob,
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SsnIssuedPriorToDob,
                 ],
@@ -455,11 +463,13 @@ mod tests {
         assert!(have_same_elements(
             vec![
                 (FootprintReasonCode::SubjectDeceased, vec![Vendor::Idology]),
-                (FootprintReasonCode::LastNameDoesNotMatch, vec![Vendor::Idology]),
+                (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
             ],
             feature_vector.consolidated_reason_codes(vec![VendorAPI::IdologyExpectID])
         ));
 
+        let yo = feature_vector
+            .consolidated_reason_codes(vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus]);
         // correctly consolidates by vendor
         assert!(have_same_elements(
             vec![
@@ -467,11 +477,10 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     vec![Vendor::Idology, Vendor::Socure]
                 ),
-                (FootprintReasonCode::LastNameDoesNotMatch, vec![Vendor::Idology]),
+                (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
                 (FootprintReasonCode::SsnIssuedPriorToDob, vec![Vendor::Socure]),
             ],
-            feature_vector
-                .consolidated_reason_codes(vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus])
+            yo
         ));
     }
 

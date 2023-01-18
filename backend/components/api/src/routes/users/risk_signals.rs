@@ -56,7 +56,7 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
     signals
         .into_iter()
         .filter(|signal| {
-            let rc = signal.reason_code;
+            let rc = signal.reason_code.clone();
             if !filters.scope.is_empty() && !rc.scopes().iter().any(|x| filters.scope.contains(x)) {
                 return false;
             }

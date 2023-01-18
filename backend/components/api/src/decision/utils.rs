@@ -146,13 +146,13 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
                     ],
                     // Manual review
                     (DecisionStatus::Fail, true) => vec![
-                        FootprintReasonCode::SsnDoesNotMatchWithinTolerance,
-                        FootprintReasonCode::LastNameDoesNotMatch,
+                        FootprintReasonCode::SsnDoesNotMatchWithin1Digit,
+                        FootprintReasonCode::NameLastDoesNotMatch,
                     ],
                     // Approved
                     (DecisionStatus::Pass, _) => vec![
-                        FootprintReasonCode::MobileNumber,
-                        FootprintReasonCode::CorporateEmailDomain,
+                        FootprintReasonCode::PhoneNumberLocatedIsVoip,
+                        FootprintReasonCode::EmailDomainCorporate,
                     ],
                     _ => vec![],
                 };

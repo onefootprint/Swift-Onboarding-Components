@@ -34,7 +34,7 @@ impl DbToApi<(RiskSignal, Option<Vec<(VerificationRequest, VerificationResult)>>
         Self {
             id,
             onboarding_decision_id,
-            reason_code,
+            reason_code: reason_code.clone(),
             description: reason_code.description(),
             severity: reason_code.severity(),
             scopes: reason_code.scopes(),

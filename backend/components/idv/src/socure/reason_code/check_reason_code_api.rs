@@ -1,4 +1,5 @@
-use super::reason_codes::SocureReasonCode;
+use newtypes::SocureReasonCode;
+
 use crate::socure::client::SocureClient;
 
 #[derive(Debug, Eq, PartialEq)]
@@ -61,15 +62,13 @@ pub async fn query_socure_reason_code_endpoint_and_compare_against_enum(
 #[cfg(test)]
 mod tests {
 
+    use newtypes::SocureReasonCode;
     use serde_json::json;
     use tracing_test::traced_test;
 
     use crate::socure::{
         client::SocureClient,
-        reason_code::{
-            check_reason_code_api::{DifferingDescriptionReasonCode, MissingReasonCode},
-            reason_codes::SocureReasonCode,
-        },
+        reason_code::check_reason_code_api::{DifferingDescriptionReasonCode, MissingReasonCode},
     };
 
     use super::compare_enum_vs_latest_api_response;
