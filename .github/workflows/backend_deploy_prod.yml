@@ -86,7 +86,7 @@ jobs:
       testUrl: '${{ needs.deploy_stack_prod.outputs.url }}'
       isPR: false
       waitForDeploy: true
-      commitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
+      expectedCommitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
