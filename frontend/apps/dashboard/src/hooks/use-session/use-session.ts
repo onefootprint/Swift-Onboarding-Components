@@ -6,7 +6,6 @@ import {
   DASHBOARD_AUTHORIZATION_HEADER,
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
-import migrations from './migrations';
 
 export type Session = {
   auth: string;
@@ -42,7 +41,10 @@ export const useStore = create<UserSessionState>()(
       reset: () => set({ data: undefined }),
       update: (data?: Session) => set({ data }),
     }),
-    migrations,
+    {
+      version: 1,
+      name: 'dashboard-storage',
+    },
   ),
 );
 

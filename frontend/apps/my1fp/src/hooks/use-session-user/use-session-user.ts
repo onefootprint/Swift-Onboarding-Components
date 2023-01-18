@@ -72,41 +72,47 @@ type UserSessionState = {
 const initialMe = undefined;
 
 export const useStore = create<UserSessionState>()(
-  persist(set => ({
-    session: initialMe,
-    logIn: (session: UserSession) => set({ session }),
-    logOut: () => set({ session: undefined }),
-    updateData: (data: UserSessionData) => {
-      set(state => {
-        const newState = { ...state };
-        if (!newState.session) {
-          newState.session = emptySession;
-        }
-        newState.session!.data = { ...data };
-        return newState;
-      });
+  persist(
+    set => ({
+      session: initialMe,
+      logIn: (session: UserSession) => set({ session }),
+      logOut: () => set({ session: undefined }),
+      updateData: (data: UserSessionData) => {
+        set(state => {
+          const newState = { ...state };
+          if (!newState.session) {
+            newState.session = emptySession;
+          }
+          newState.session!.data = { ...data };
+          return newState;
+        });
+      },
+      updateBiometric: (biometric: UserSessionBiometric) => {
+        set(state => {
+          const newState = { ...state };
+          if (!newState.session) {
+            newState.session = emptySession;
+          }
+          newState.session!.biometric = [...biometric];
+          return newState;
+        });
+      },
+      updateMetadata: (metadata: UserSessionMetadata) => {
+        set(state => {
+          const newState = { ...state };
+          if (!newState.session) {
+            newState.session = emptySession;
+          }
+          newState.session!.metadata = { ...metadata };
+          return newState;
+        });
+      },
+    }),
+    {
+      version: 1,
+      name: 'my1fp-storage',
     },
-    updateBiometric: (biometric: UserSessionBiometric) => {
-      set(state => {
-        const newState = { ...state };
-        if (!newState.session) {
-          newState.session = emptySession;
-        }
-        newState.session!.biometric = [...biometric];
-        return newState;
-      });
-    },
-    updateMetadata: (metadata: UserSessionMetadata) => {
-      set(state => {
-        const newState = { ...state };
-        if (!newState.session) {
-          newState.session = emptySession;
-        }
-        newState.session!.metadata = { ...metadata };
-        return newState;
-      });
-    },
-  })),
+  ),
 );
 
 const useSessionUser = () => {
