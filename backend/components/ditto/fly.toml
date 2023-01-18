@@ -7,10 +7,11 @@ kill_timeout = 5
 cmd = "./ditto"
 
 [env]
-  PORT = 5000
+  BASIC_PORT = 5001
+  TLS_PORT = 5002
 
 [[services]]
-  internal_port = 5000
+  internal_port = 5001
   protocol = "tcp"
 
 [services.concurrency]
@@ -27,3 +28,22 @@ cmd = "./ditto"
   interval = "15s"
   restart_limit = 6
   timeout = "2s"
+
+[[services]]
+  internal_port = 5002
+  protocol = "tcp"
+
+[services.concurrency]
+  hard_limit = 25
+  soft_limit = 20
+  type = "connections"
+
+[[services.ports]]
+  port = "8443"
+
+[[services.tcp_checks]]
+  grace_period = "1s"
+  interval = "15s"
+  restart_limit = 6
+  timeout = "2s"
+

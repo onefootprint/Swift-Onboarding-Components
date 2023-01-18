@@ -129,6 +129,17 @@ define_newtype_id!(
     "Identifier for a socure_device_session"
 );
 define_newtype_id!(UserConsentId, String, "Identifier for a UserConsent");
+define_newtype_id!(ProxyConfigId, String, "Identifier for a Proxy Configuration");
+define_newtype_id!(
+    ProxyConfigItemId,
+    String,
+    "Identifier for a Proxy Configuration detail"
+);
+define_newtype_id!(
+    ProxyConfigIngressRuleId,
+    String,
+    "Identifier for a Proxy Configuration Ingress Rule"
+);
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

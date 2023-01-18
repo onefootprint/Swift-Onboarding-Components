@@ -1,11 +1,14 @@
 use std::{fmt::Display, str::FromStr};
 
 use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
 use serde::{de, Deserialize, Deserializer, Serialize};
 
 const B64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Apiv2Schema)]
+pub use base64::DecodeError;
+
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Apiv2Schema, JsonSchema)]
 pub struct Base64Data(pub Vec<u8>);
 
 impl Base64Data {

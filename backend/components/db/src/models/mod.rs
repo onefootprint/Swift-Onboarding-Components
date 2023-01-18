@@ -29,3 +29,4 @@ pub mod user_vault_data;
 pub mod verification_request;
 pub mod verification_result;
 pub mod webauthn_credential;
+pub mod proxy_config;

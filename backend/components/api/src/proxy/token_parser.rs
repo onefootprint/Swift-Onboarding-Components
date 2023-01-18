@@ -1,5 +1,8 @@
+//! Parses tokens on the EGRESS and detokenizes
+
 use std::collections::HashMap;
-use std::str::FromStr;
+
+
 
 use crate::errors::proxy::VaultProxyError;
 
@@ -7,13 +10,14 @@ use crate::errors::ApiResult;
 
 use itertools::Itertools;
 
-use newtypes::DataIdentifier;
-use newtypes::FootprintUserId;
+
+
 use newtypes::PiiString;
+use newtypes::ProxyToken;
 
 /// The Proxy Token Parser finds and replaces
 /// instances of ProxyTokens with their
-pub(super) struct ProxyTokenParser<'a> {
+pub struct ProxyTokenParser<'a> {
     /// the original input
     body: &'a str,
     /// maps proxy tokens to their original string matches
@@ -25,7 +29,7 @@ impl<'a> ProxyTokenParser<'a> {
     const TOKEN_MATCH_DELIMITER: &str = "::";
 
     /// parses a string into a single Proxy Token
-    pub(super) fn parse(raw: &'a str) -> ApiResult<ProxyTokenParser> {
+    pub fn parse(raw: &'a str) -> ApiResult<ProxyTokenParser> {
         let parsed: Vec<(String, ProxyToken)> = raw
             .split(Self::TOKEN_MATCH_DELIMITER)
             .map(|tok| {
@@ -47,7 +51,7 @@ impl<'a> ProxyTokenParser<'a> {
     }
 
     /// replace proxy tokens with their detokenized counterparts
-    pub(super) fn detokenize_body(self, detokens: HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
+    pub fn detokenize_body(self, detokens: HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
         let mut detokenized_body = self.body.to_string();
 
         let mut not_found = vec![];
@@ -78,48 +82,6 @@ impl<'a> ProxyTokenParser<'a> {
     }
 }
 
-///
-/// The token format is as follows:
-/// ::$<fp_id>.<data_kind>.<attribute_name>::
-///
-/// Example:
-/// ::$fp_id_Gysdl9zxbBfrbSvfc0xCz.id.ssn9::
-///
-/// Rules:
-/// - Whitespaces are ignored
-/// - Case SENSITIVE
-///
-///
-/// Future work: support filters / transformations, i.e: :: $<fp_id>.id.last_name | uppercase ::
-///
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ProxyToken {
-    pub fp_id: FootprintUserId,
-    pub identifier: DataIdentifier,
-}
-
-impl ProxyToken {
-    /// parses a string into a single Proxy Token
-    fn parse(raw: &str) -> Result<Self, VaultProxyError> {
-        let mut chars = raw.trim().chars();
-
-        if chars.next() != Some('$') {
-            return Err(VaultProxyError::InvalidTokenStart);
-        }
-        let token = chars.collect::<String>();
-        let mut token = token.split('.');
-        let Some(fp_id) = token.next() else {
-            return Err(VaultProxyError::InvalidTokenComponents);
-        };
-        let data_identifier = token.join(".");
-
-        Ok(Self {
-            fp_id: FootprintUserId::from(fp_id.to_string()),
-            identifier: DataIdentifier::from_str(&data_identifier)?,
-        })
-    }
-}
-
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
@@ -131,8 +93,10 @@ mod tests {
     //!     - failure cases (invalid tokens)
     //!     - multiple fp_ids
     //!     - multiple matches
+    use std::str::FromStr;
+
     use super::*;
-    use newtypes::{DataIdentifier, IdentityDataKind as IDK, KvDataKey};
+    use newtypes::{DataIdentifier, IdentityDataKind as IDK, KvDataKey, FootprintUserId};
     use test_case::test_case;
     use DataIdentifier as DI;
 

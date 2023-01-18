@@ -6,6 +6,7 @@ pub mod auth;
 pub mod index;
 pub mod members;
 pub mod ob_config;
+pub mod proxy_configs;
 pub mod roles;
 pub mod settings;
 
@@ -30,4 +31,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
 
     auth::routes(config);
     api_keys::routes(config);
+    proxy_configs::routes(config);
 }

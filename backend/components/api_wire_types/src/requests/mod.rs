@@ -21,3 +21,6 @@ pub use self::decrypt_document_request::*;
 
 pub mod org;
 pub use self::org::*;
+
+pub mod proxy_config;
+pub use self::proxy_config::*;

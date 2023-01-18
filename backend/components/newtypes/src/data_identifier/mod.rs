@@ -77,7 +77,7 @@ impl From<KvDataKey> for DataIdentifier {
     }
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum DataIdentifierParsingError {
     #[error("Cannot parse: {0}")]
     CannotParse(String),

@@ -47,6 +47,9 @@ pub use status_code::*;
 
 pub use uuid::Uuid;
 
+pub mod proxy_token;
+pub use self::proxy_token::*;
+
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
     #[error("invalid length ssn")]
@@ -65,6 +68,8 @@ pub enum Error {
     DeserializeError,
     #[error("{0}")]
     TenantError(#[from] TenantError),
+    #[error("{0}")]
+    ProxyTokenError(#[from] ProxyTokenError),
 }
 
 pub type NtResult<T> = Result<T, Error>;

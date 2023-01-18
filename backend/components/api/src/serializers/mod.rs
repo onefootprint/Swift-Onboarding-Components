@@ -13,5 +13,6 @@ mod risk_signal;
 mod secret_api_key;
 mod user;
 mod user_timeline;
+mod proxy_config;
 
 pub use user::UserDetail;

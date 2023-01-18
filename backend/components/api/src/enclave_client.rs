@@ -162,6 +162,21 @@ impl EnclaveClient {
         Ok(results)
     }
 
+    /// Decrypts the provided SealedVaultBytes into PiiBytes
+    pub async fn decrypt_to_pii_bytes(
+        &self,
+        sealed_data: &SealedVaultBytes,
+        sealed_key: &EncryptedVaultPrivateKey,
+        transform: DataTransform,
+    ) -> Result<PiiBytes, EnclaveError> {
+        let sealed = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?;
+        self.batch_decrypt_to_piibytes(vec![sealed], sealed_key, transform)
+            .await?
+            .into_iter()
+            .next()
+            .ok_or(EnclaveError::InvalidEnclaveDecryptResponse)
+    }
+
     /// Util for batch decrypting many EciesP256Sha256AesGcmSealed values with the same key and transform
     /// into PiiBytes
     async fn batch_decrypt_to_piibytes(

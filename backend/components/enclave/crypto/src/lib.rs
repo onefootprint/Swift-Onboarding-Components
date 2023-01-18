@@ -13,6 +13,7 @@ pub use hex;
 use hmac::Mac;
 
 pub use serde_cbor;
+pub use pem;
 
 #[derive(Error, Debug)]
 pub enum Error {

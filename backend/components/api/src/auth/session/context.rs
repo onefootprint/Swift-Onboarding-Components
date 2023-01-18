@@ -19,7 +19,7 @@ use crate::auth::AuthError;
 
 /// Abstract Session Context Type
 #[derive(Debug, Clone, Apiv2Security)]
-#[openapi(apiKey)]
+#[openapi(apiKey, description = "Session authentication key")]
 pub struct SessionContext<T> {
     pub data: T,
     pub auth_token: SessionAuthToken,

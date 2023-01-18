@@ -28,6 +28,7 @@ mod s3;
 mod state;
 mod types;
 mod utils;
+mod proxy;
 
 use crate::errors::ApiError;
 use paperclip::actix::{web, OpenApiExt};

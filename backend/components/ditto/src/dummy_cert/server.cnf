@@ -1,0 +1,26 @@
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+
+[req_distinguished_name]
+countryName = US
+countryName_default = US
+stateOrProvinceName = MA
+stateOrProvinceName_default = MA
+localityName = BOSTON
+localityName_default = BOSTON
+organizationalUnitName = ONEFOOTPRINT
+organizationalUnitName_default = ONEFOOTPRINT
+commonName = ditto.footprint.dev
+commonName_default = ditto.footprint.dev
+commonName_max = 64
+
+[ v3_req ]
+# Extensions to add to a certificate request
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+DNS.2 = ditto.footprint.dev

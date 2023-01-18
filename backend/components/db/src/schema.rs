@@ -290,6 +290,75 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    proxy_config (id) {
+        id -> Text,
+        tenant_id -> Text,
+        is_live -> Bool,
+        name -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        url -> Text,
+        method -> Text,
+        client_identity_cert_der -> Nullable<Bytea>,
+        e_client_identity_key_der -> Nullable<Bytea>,
+        ingress_content_type -> Nullable<Text>,
+        access_reason -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    proxy_config_header (id) {
+        id -> Text,
+        config_id -> Text,
+        name -> Text,
+        value -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    proxy_config_ingress_rule (id) {
+        id -> Text,
+        config_id -> Text,
+        token_path -> Text,
+        target -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    proxy_config_secret_header (id) {
+        id -> Text,
+        config_id -> Text,
+        name -> Text,
+        e_data -> Bytea,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    proxy_config_server_cert (id) {
+        id -> Text,
+        config_id -> Text,
+        cert_hash -> Bytea,
+        cert_der -> Bytea,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     risk_signal (id) {
         id -> Text,
         onboarding_decision_id -> Text,
@@ -564,6 +633,11 @@ joinable!(onboarding_decision -> onboarding (onboarding_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
 joinable!(phone_number -> data_lifetime (lifetime_id));
+joinable!(proxy_config -> tenant (tenant_id));
+joinable!(proxy_config_header -> proxy_config (config_id));
+joinable!(proxy_config_ingress_rule -> proxy_config (config_id));
+joinable!(proxy_config_secret_header -> proxy_config (config_id));
+joinable!(proxy_config_server_cert -> proxy_config (config_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
 joinable!(scoped_user -> ob_configuration (ob_configuration_id));
 joinable!(scoped_user -> tenant (tenant_id));
@@ -601,6 +675,11 @@ allow_tables_to_appear_in_same_query!(
     onboarding_decision,
     onboarding_decision_verification_result_junction,
     phone_number,
+    proxy_config,
+    proxy_config_header,
+    proxy_config_ingress_rule,
+    proxy_config_secret_header,
+    proxy_config_server_cert,
     risk_signal,
     scoped_user,
     session,

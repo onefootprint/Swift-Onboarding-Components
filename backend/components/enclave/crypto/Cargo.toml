@@ -20,3 +20,4 @@ sec1 = "0.3.0"
 hmac = "0.12.1"
 rand = { workspace = true }
 chacha20poly1305 = "0.10.1"
+pem = "1.1.1"

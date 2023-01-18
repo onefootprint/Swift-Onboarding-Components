@@ -12,4 +12,4 @@ thiserror = { workspace = true }
 serde_bytes = { workspace = true }
 openssl = { workspace = true }
 byteorder = "1.4"
-x509-parser = "0.13"
+x509-parser = { workspace = true }

@@ -12,3 +12,4 @@ export_schema!(Vendor);
 export_schema!(OnboardingStatus);
 export_schema!(LivenessSource);
 export_schema!(LivenessAttributes);
+export_schema!(ProxyIngressContentType);
