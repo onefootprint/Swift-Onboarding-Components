@@ -1,4 +1,4 @@
-import { UserDataAttribute } from './user-data-attribute';
+import UserDataAttribute from './user-data-attribute';
 
 export enum CollectedKycDataOption {
   name = 'name',

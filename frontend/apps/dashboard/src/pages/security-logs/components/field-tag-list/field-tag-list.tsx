@@ -1,4 +1,4 @@
-import { dataKindToDisplayName } from '@onefootprint/types';
+import { useTranslation } from '@onefootprint/hooks';
 import { Tag } from '@onefootprint/ui';
 import React from 'react';
 
@@ -6,30 +6,39 @@ type FieldTagListProps = {
   targets: string[];
 };
 
-const FieldTagList = ({ targets }: FieldTagListProps) => (
-  <>
-    {targets.map((target: string, i: number) => {
+const FieldTagList = ({ targets }: FieldTagListProps) => {
+  const { allT } = useTranslation('');
+
+  const tags = targets
+    .map((target: string) => {
       const parts = target.split('.');
-      const prefix = parts[0];
-      let text;
-      if (prefix === 'id') {
-        const dataAttribute = parts[parts.length - 1];
-        text = dataKindToDisplayName[dataAttribute];
-      } else if (prefix === 'custom') {
-        // TODO better formatting for custom data tags
-        text = target;
-      } else {
-        text = target;
+      if (parts.length === 2) {
+        const [prefix, label] = parts;
+        if (prefix === 'id') {
+          return allT(`user-data-attributes.${label}`);
+        }
+        if (prefix === 'custom') {
+          // TODO better formatting for custom data tags
+          return target;
+        }
+        if (prefix === 'id_document') {
+          return allT(`id-doc-type.${label}`);
+        }
       }
-      return (
-        // eslint-disable-next-line react/no-array-index-key
-        <span key={`${target}-${i}`}>
-          <Tag>{text}</Tag>
+      return '';
+    })
+    .filter(tag => tag.length > 0);
+
+  return (
+    <>
+      {tags.map((tag: string, i: number) => (
+        <span key={`${tag}`}>
+          <Tag>{tag}</Tag>
           {i !== targets.length - 1 && <span>, </span>}
         </span>
-      );
-    })}
-  </>
-);
+      ))}
+    </>
+  );
+};
 
 export default FieldTagList;

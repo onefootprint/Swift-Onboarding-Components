@@ -1,6 +1,6 @@
 import IdDocType from './id-doc-type';
 import { Onboarding } from './onboarding';
-import { UserDataAttribute } from './user-data-attribute';
+import UserDataAttribute from './user-data-attribute';
 
 export type ScopedUser = {
   id: string;

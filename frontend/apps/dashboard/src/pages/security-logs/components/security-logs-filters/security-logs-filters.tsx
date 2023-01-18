@@ -21,15 +21,27 @@ const UsersFilters = () => {
               label: t('date-attributes.basic.title'),
               options: [
                 {
-                  label: allT('user-data-attributes.name'),
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.firstName}`,
+                  ),
                   value: 'name',
                 },
                 {
-                  label: allT('user-data-attributes.email'),
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.lastName}`,
+                  ),
+                  value: 'name',
+                },
+                {
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.email}`,
+                  ),
                   value: UserDataAttribute.email,
                 },
                 {
-                  label: allT('user-data-attributes.phone-number'),
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.phoneNumber}`,
+                  ),
                   value: UserDataAttribute.phoneNumber,
                 },
               ],
@@ -38,15 +50,15 @@ const UsersFilters = () => {
               label: t('date-attributes.identity.title'),
               options: [
                 {
-                  label: allT('user-data-attributes.ssn4'),
+                  label: allT(`user-data-attributes.${UserDataAttribute.ssn4}`),
                   value: UserDataAttribute.ssn4,
                 },
                 {
-                  label: allT('user-data-attributes.ssn9'),
+                  label: allT(`user-data-attributes.${UserDataAttribute.ssn9}`),
                   value: UserDataAttribute.ssn9,
                 },
                 {
-                  label: allT('user-data-attributes.dob'),
+                  label: allT(`user-data-attributes.${UserDataAttribute.dob}`),
                   value: UserDataAttribute.dob,
                 },
               ],
@@ -55,27 +67,35 @@ const UsersFilters = () => {
               label: t('date-attributes.address.title'),
               options: [
                 {
-                  label: allT('user-data-attributes.country'),
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.country}`,
+                  ),
                   value: UserDataAttribute.country,
                 },
                 {
-                  label: allT('user-data-attributes.address-line1'),
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.addressLine1}`,
+                  ),
                   value: UserDataAttribute.addressLine1,
                 },
                 {
-                  label: allT('user-data-attributes.address-line2'),
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.addressLine2}`,
+                  ),
                   value: UserDataAttribute.addressLine2,
                 },
                 {
-                  label: allT('user-data-attributes.city'),
+                  label: allT(`user-data-attributes.${UserDataAttribute.city}`),
                   value: UserDataAttribute.city,
                 },
                 {
-                  label: allT('user-data-attributes.zip'),
+                  label: allT(`user-data-attributes.${UserDataAttribute.zip}`),
                   value: UserDataAttribute.zip,
                 },
                 {
-                  label: allT('user-data-attributes.state'),
+                  label: allT(
+                    `user-data-attributes.${UserDataAttribute.state}`,
+                  ),
                   value: UserDataAttribute.state,
                 },
               ],

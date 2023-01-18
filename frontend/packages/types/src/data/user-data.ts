@@ -1,5 +1,5 @@
 import { CountryCode } from './countries';
-import { UserDataAttribute } from './user-data-attribute';
+import UserDataAttribute from './user-data-attribute';
 
 export type UserData = Partial<{
   [UserDataAttribute.firstName]: string;

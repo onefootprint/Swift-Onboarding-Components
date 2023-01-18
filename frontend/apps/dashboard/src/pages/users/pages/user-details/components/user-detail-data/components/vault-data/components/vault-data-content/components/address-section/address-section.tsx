@@ -84,7 +84,7 @@ const AddressSection = ({
     >
       {fieldsState[UserDataAttribute.addressLine1].exists && (
         <DataRow
-          label={allT('user-data-attributes.address-line1')}
+          label={allT(`user-data-attributes.${UserDataAttribute.addressLine1}`)}
           data={kycData[UserDataAttribute.addressLine1]}
           checkbox={{
             register: register(`kycData.${UserDataAttribute.addressLine1}`),
@@ -95,7 +95,7 @@ const AddressSection = ({
       )}
       {fieldsState[UserDataAttribute.addressLine2].exists && (
         <DataRow
-          label={allT('user-data-attributes.address-line2')}
+          label={allT(`user-data-attributes.${UserDataAttribute.addressLine2}`)}
           data={kycData[UserDataAttribute.addressLine2]}
           checkbox={{
             register: register(`kycData.${UserDataAttribute.addressLine2}`),
@@ -106,7 +106,7 @@ const AddressSection = ({
       )}
       {fieldsState[UserDataAttribute.city].exists && (
         <DataRow
-          label={allT('user-data-attributes.city')}
+          label={allT(`user-data-attributes.${UserDataAttribute.city}`)}
           data={kycData[UserDataAttribute.city]}
           checkbox={{
             register: register(`kycData.${UserDataAttribute.city}`),
@@ -117,7 +117,7 @@ const AddressSection = ({
       )}
       {fieldsState[UserDataAttribute.state].exists && (
         <DataRow
-          label={allT('user-data-attributes.state')}
+          label={allT(`user-data-attributes.${UserDataAttribute.state}`)}
           data={kycData[UserDataAttribute.state]}
           checkbox={{
             register: register(`kycData.${UserDataAttribute.state}`),
@@ -128,7 +128,7 @@ const AddressSection = ({
       )}
       {fieldsState[UserDataAttribute.zip].exists && (
         <DataRow
-          label={allT('user-data-attributes.zip')}
+          label={allT(`user-data-attributes.${UserDataAttribute.zip}`)}
           data={kycData[UserDataAttribute.zip]}
           checkbox={{
             register: register(`kycData.${UserDataAttribute.zip}`),
@@ -139,7 +139,7 @@ const AddressSection = ({
       )}
       {fieldsState[UserDataAttribute.country].exists && (
         <DataRow
-          label={allT('user-data-attributes.country')}
+          label={allT(`user-data-attributes.${UserDataAttribute.country}`)}
           data={kycData[UserDataAttribute.country]}
           checkbox={{
             register: register(`kycData.${UserDataAttribute.country}`),

@@ -1,10 +1,26 @@
-import { dataKindToDisplayName } from '@onefootprint/types';
+import { UserDataAttribute } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 
 type FieldTagListProps = {
   targets: string[];
+};
+
+const dataKindToDisplayName: Record<string, String> = {
+  [UserDataAttribute.firstName]: 'First name',
+  [UserDataAttribute.lastName]: 'Last name',
+  [UserDataAttribute.email]: 'Email',
+  [UserDataAttribute.phoneNumber]: 'Phone number',
+  [UserDataAttribute.ssn9]: 'SSN (Full)',
+  [UserDataAttribute.ssn4]: 'SSN (Last 4)',
+  [UserDataAttribute.dob]: 'Date of birth',
+  [UserDataAttribute.addressLine1]: 'Address line 1',
+  [UserDataAttribute.addressLine2]: 'Address line 2',
+  [UserDataAttribute.city]: 'City',
+  [UserDataAttribute.state]: 'State',
+  [UserDataAttribute.zip]: 'Zip code',
+  [UserDataAttribute.country]: 'Country',
 };
 
 const FieldTagList = ({ targets }: FieldTagListProps) => (
