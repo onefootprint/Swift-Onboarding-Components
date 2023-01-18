@@ -94,8 +94,10 @@ const CreateOnboardingConfig = ({
         name: state.data.name,
         mustCollectData: getSelectedKycDataOptionsList(state.data.kycData),
         mustCollectIdentityDocument: !!state.data.documents.idDoc,
+        mustCollectSelfie: !!state.data.documents.selfie,
         canAccessData: getSelectedKycDataOptionsList(accessFormData.kycData),
-        canAccessIdentityDocumentImages: accessFormData.documents.idDoc,
+        canAccessIdentityDocumentImages: !!accessFormData.documents.idDoc,
+        canAccessSelfieImage: !!accessFormData.documents.selfie,
       },
       {
         onSuccess: () => {
