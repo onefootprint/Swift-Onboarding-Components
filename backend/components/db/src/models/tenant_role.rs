@@ -176,6 +176,7 @@ impl TenantRole {
         conn: &mut PgConnection,
         tenant_id: &TenantId,
         scopes: Option<Vec<TenantScope>>,
+        name: Option<String>,
         cursor: Option<DateTime<Utc>>,
         page_size: i64,
     ) -> DbResult<Vec<Self>> {
@@ -191,6 +192,9 @@ impl TenantRole {
         }
         if let Some(scopes) = scopes {
             query = query.filter(tenant_role::scopes.overlaps_with(scopes))
+        }
+        if let Some(name) = name {
+            query = query.filter(tenant_role::name.ilike(format!("%{}%", name)))
         }
 
         let results = query.get_results(conn)?;

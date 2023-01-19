@@ -34,14 +34,14 @@ async fn get(
 
     let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
-    let OrgRoleFilters { scopes } = filters.into_inner();
+    let OrgRoleFilters { scopes, name } = filters.into_inner();
     let scopes = scopes.map(|s| s.0);
 
     let tenant_id = tenant.id.clone();
     let results = state
         .db_pool
         .db_query(move |conn| {
-            TenantRole::list_active(conn, &tenant_id, scopes, cursor, (page_size + 1) as i64)
+            TenantRole::list_active(conn, &tenant_id, scopes, name, cursor, (page_size + 1) as i64)
         })
         .await??;
 

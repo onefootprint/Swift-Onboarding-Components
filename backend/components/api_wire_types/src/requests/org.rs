@@ -15,6 +15,7 @@ export_schema!(UpdateTenantRequest);
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
 pub struct OrgMemberFilters {
     pub role_ids: Option<Csv<TenantRoleId>>,
+    pub name: Option<String>,
 }
 
 export_schema!(OrgMemberFilters);
@@ -22,6 +23,7 @@ export_schema!(OrgMemberFilters);
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
 pub struct OrgRoleFilters {
     pub scopes: Option<Csv<TenantScope>>,
+    pub name: Option<String>,
 }
 
 export_schema!(OrgRoleFilters);
