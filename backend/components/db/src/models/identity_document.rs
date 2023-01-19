@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::schema::{data_lifetime, document_request, identity_document};
 use crate::{DbResult, HasLifetime, TxnPgConnection};
 use chrono::{DateTime, Utc};
@@ -146,7 +148,24 @@ impl IdentityDocument {
 
         Ok(results)
     }
+
+    pub fn get_bulk_with_requests(
+        conn: &mut PgConnection,
+        ids: Vec<&IdentityDocumentId>,
+    ) -> DbResult<HashMap<IdentityDocumentId, (Self, DocumentRequest)>> {
+        let results = identity_document::table
+            .inner_join(document_request::table)
+            .filter(identity_document::id.eq_any(ids))
+            .get_results::<(Self, DocumentRequest)>(conn)?
+            .into_iter()
+            .map(|e| (e.0.id.clone(), e))
+            .collect();
+
+        Ok(results)
+    }
 }
+
+pub type SaturatedIdentityDocumentTimelineEvent = (IdentityDocument, DocumentRequest);
 
 #[cfg(test)]
 mod tests {

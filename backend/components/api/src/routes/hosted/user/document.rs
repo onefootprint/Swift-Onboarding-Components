@@ -10,6 +10,7 @@ use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatu
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
+use db::models::user_timeline::UserTimeline;
 use db::models::user_vault::UserVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
@@ -17,7 +18,10 @@ use db::{DbError, DbResult};
 use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
-use newtypes::{DocumentRequestId, DocumentRequestStatus, ScopedUserId, SealedVaultDataKey};
+use newtypes::{
+    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, ScopedUserId, SealedVaultDataKey,
+    UserVaultId,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 const FRONT: &str = "front";
@@ -215,6 +219,7 @@ pub async fn post(
         // Save our verification request
         let ob_id = auth_info.onboarding.id.clone();
         let su_id = auth_info.scoped_user.id.clone();
+        let id_doc_id = identity_document.id.clone();
         let (document_verification_request, doc_request) = state
             .db_pool
             .db_transaction(
@@ -231,7 +236,7 @@ pub async fn post(
                         conn.conn(),
                         api,
                         ob_id,
-                        identity_document.id,
+                        id_doc_id,
                     )?;
 
                     // Move our status to uploaded since we have generated a doc verification request
@@ -249,6 +254,8 @@ pub async fn post(
             doc_request,
             document_verification_request,
             auth_info.scoped_user.id.clone(),
+            auth_info.scoped_user.user_vault_id.clone(),
+            identity_document.id.clone(),
         )
         .await?;
     } else {
@@ -360,6 +367,8 @@ async fn handle_scan_onboarding_request(
     document_request: DbDocumentRequest,
     document_verification_request: VerificationRequest,
     scoped_user_id: ScopedUserId,
+    user_vault_id: UserVaultId,
+    identity_document_id: IdentityDocumentId,
 ) -> Result<(), ApiError> {
     // Make document verification request
     // TODO: spawn a thread to make this request, but scan onboarding returns immediately (allegedly) so it's fine for now
@@ -398,8 +407,16 @@ async fn handle_scan_onboarding_request(
                     ..Default::default()
                 };
                 let should_collect_selfie = document_request.should_collect_selfie;
-                let current_doc_request_id = document_request.id.clone();
-                document_request.update(conn.conn(), failed_update)?;
+                let current_doc_request = document_request.update(conn.conn(), failed_update)?;
+                // Create a timeline event
+                UserTimeline::create(
+                    conn,
+                    newtypes::DocumentUploadedInfo {
+                        id: identity_document_id.clone(),
+                    },
+                    user_vault_id,
+                    Some(scoped_user_id.clone()),
+                )?;
 
                 // Create a new document request.
                 // ref_id is None here since we are retrying scan onboarding!
@@ -408,15 +425,24 @@ async fn handle_scan_onboarding_request(
                     scoped_user_id,
                     None,
                     should_collect_selfie,
-                    Some(current_doc_request_id),
+                    Some(current_doc_request.id),
                 )?;
             } else {
                 let completed_update = DocumentRequestUpdate {
                     status: Some(DocumentRequestStatus::Complete),
                     ..Default::default()
                 };
-
                 document_request.update(conn.conn(), completed_update)?;
+
+                // Create a timeline event
+                UserTimeline::create(
+                    conn,
+                    newtypes::DocumentUploadedInfo {
+                        id: identity_document_id,
+                    },
+                    user_vault_id,
+                    Some(scoped_user_id),
+                )?;
             }
 
             Ok(())

@@ -10,6 +10,8 @@ use newtypes::{DbUserTimelineEvent, FootprintUserId, ScopedUserId, TenantId, Use
 use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
+use super::document_request::DocumentRequest;
+use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
 
@@ -39,7 +41,7 @@ pub struct NewUserTimeline {
 pub enum SaturatedTimelineEvent {
     DataCollected(newtypes::DataCollectedInfo),
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
-    DocumentUploaded(newtypes::DocumentUploadedInfo), // TODO
+    DocumentUploaded((IdentityDocument, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
     Annotation(AnnotationInfo),
 }
@@ -102,9 +104,16 @@ impl UserTimeline {
             _ => None,
         });
 
+        let identity_document_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::DocumentUploaded(ref e) => Some(&e.id),
+            _ => None,
+        });
+
         let mut decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let mut annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
         let mut liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
+        let mut identity_documents_and_requests =
+            IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -123,9 +132,11 @@ impl UserTimeline {
                                 .transpose()?,
                         )
                     }
-                    DbUserTimelineEvent::DocumentUploaded(ref e) => {
-                        SaturatedTimelineEvent::DocumentUploaded(e.clone())
-                    }
+                    DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
+                        identity_documents_and_requests
+                            .remove(&e.id)
+                            .ok_or(DbError::RelatedObjectNotFound)?,
+                    ),
                     DbUserTimelineEvent::Liveness(ref e) => {
                         let (liveness, insight) = liveness_events
                             .remove(&e.id)
