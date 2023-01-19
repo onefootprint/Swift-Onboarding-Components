@@ -4,11 +4,11 @@ pub(crate) mod test_data {
     use serde::Serialize;
 
     fn load_username() -> PiiString {
-        PiiString::from(dotenv::var("IDOLOGY_USERNAME").unwrap())
+        PiiString::from(dotenv::var("IDOLOGY_SANDBOX_USERNAME").unwrap())
     }
 
     fn load_password() -> PiiString {
-        PiiString::from(dotenv::var("IDOLOGY_PASSWORD").unwrap())
+        PiiString::from(dotenv::var("IDOLOGY_SANDBOX_PASSWORD").unwrap())
     }
 
     #[derive(Serialize)]

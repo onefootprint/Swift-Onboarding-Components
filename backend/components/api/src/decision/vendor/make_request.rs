@@ -53,7 +53,7 @@ pub async fn send_docv_request(
         onboarding_id = request.onboarding_id.to_string(),
     );
     // Make the request to the DocV vendor
-
+    // TODO implement mocking for these once we use scan verify
     let result = match request.vendor_api {
         VendorAPI::IdologyScanVerifySubmission => {
             idv::idology::send_scan_verify_request(&state.idology_client, data).await?
@@ -64,9 +64,7 @@ pub async fn send_docv_request(
             };
             idv::idology::poll_scan_verify_results_request(&state.idology_client, ref_id).await?
         }
-        VendorAPI::IdologyScanOnboarding => {
-            idv::idology::send_scan_onboarding_request(&state.idology_client, data).await?
-        }
+        VendorAPI::IdologyScanOnboarding => send_scan_onboarding_docv_request(state, request, data).await?,
         api => {
             let err = format!("send_docv_request not implemented for {}", api);
             return Err(ApiError::AssertionError(err));
@@ -177,6 +175,51 @@ pub async fn send_socure_idv_request(
     }
 }
 
+pub async fn send_scan_onboarding_docv_request(
+    state: &State,
+    request: VerificationRequest,
+    data: DocVData,
+) -> Result<VendorResponse, ApiError> {
+    let feature_flag_client = &state.feature_flag_client;
+
+    let onboarding_id = request.onboarding_id.clone();
+    let ob_configuration_key = state
+        .db_pool
+        .db_query(move |conn| -> Result<ObConfigurationKey, DbError> {
+            Ok(ObConfiguration::get_by_onboarding_id(conn, &onboarding_id)?.key)
+        })
+        .await??;
+
+    if feature_flag_client
+        .bool_flag("DisableAllScanOnboardingCalls")
+        .unwrap_or(false)
+    {
+        Err(ApiError::from(idv::Error::VendorCallsDisabledError))
+    } else if state.config.service_config.is_production()
+        || feature_flag_client
+            .bool_flag_by_ob_configuration_key(
+                "EnableScanOnboardingCallsInNonProdEnvironment",
+                &ob_configuration_key,
+            )
+            .unwrap_or(false)
+    {
+        idv::idology::send_scan_onboarding_request(&state.idology_client, data)
+            .await
+            .map_err(ApiError::from)
+    } else {
+        let response = idv::test_fixtures::scan_onboarding_fake_passing_response();
+
+        let parsed_response = idv::idology::scan_onboarding::response::parse_response(response.clone())
+            .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+
+        Ok(VendorResponse {
+            vendor: Vendor::Idology,
+            response: ParsedResponse::IDologyScanOnboarding(parsed_response),
+            raw_response: response,
+        })
+    }
+}
+
 /// Make our requests to a vendor, building data from the cached VerificationRequest
 pub async fn make_idv_request(
     state: &State,
@@ -186,7 +229,7 @@ pub async fn make_idv_request(
 
     let data = build_request::build_idv_data_from_verification_request(state, request.clone()).await?;
 
-    let vendor_response = make_request::send_idv_request(state, request, data).await?;
+    let vendor_response = send_idv_request(state, request, data).await?;
 
     let verification_result =
         verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
@@ -216,7 +259,7 @@ pub async fn make_docv_request(
         build_request::build_docv_data_for_submission_from_verification_request(state, request.clone())
             .await?;
 
-    let vendor_response = make_request::send_docv_request(state, request, data).await?;
+    let vendor_response = send_docv_request(state, request, data).await?;
 
     let verification_result =
         verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
