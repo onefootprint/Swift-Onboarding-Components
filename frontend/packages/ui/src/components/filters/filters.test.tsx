@@ -1,12 +1,12 @@
 import {
   customRender,
+  MockDate,
   screen,
   userEvent,
   waitFor,
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import MockDate from 'mockdate';
 import React from 'react';
 
 import Filters, { FiltersProps } from './filters';
