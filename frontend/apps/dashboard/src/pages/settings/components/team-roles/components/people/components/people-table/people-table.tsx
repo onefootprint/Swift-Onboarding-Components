@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { OrgMember } from '@onefootprint/types';
-import { Table, TableRow } from '@onefootprint/ui';
+import { Table } from '@onefootprint/ui';
 import React from 'react';
 
-import MemberRow from '../member-row';
+import Row from '../row';
 
 type PeopleTableProps = {
   members: OrgMember[];
@@ -14,9 +14,9 @@ type PeopleTableProps = {
 const PeopleTable = ({ members, isLoading, onFilter }: PeopleTableProps) => {
   const { t } = useTranslation('pages.settings.team-roles.people');
   const columns = [
-    { id: 'email', text: t('table.header.email'), width: '25%' },
-    { id: 'lastActive', text: t('table.header.lastActive'), width: '15%' },
-    { id: 'role', text: t('table.header.role'), width: '50%' },
+    { id: 'email', text: t('table.header.email'), width: '35%' },
+    { id: 'lastActive', text: t('table.header.lastActive'), width: '25%' },
+    { id: 'role', text: t('table.header.role'), width: '40%' },
   ];
 
   return (
@@ -25,10 +25,21 @@ const PeopleTable = ({ members, isLoading, onFilter }: PeopleTableProps) => {
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={t('table.empty-state')}
-      getKeyForRow={(member: OrgMember) => member.id}
+      getKeyForRow={member => member.id}
       isLoading={isLoading}
-      items={members as OrgMember[]}
-      renderTr={({ item }: TableRow<OrgMember>) => <MemberRow member={item} />}
+      items={members}
+      renderTr={({ item: member }) => (
+        <Row
+          createdAt={member.createdAt}
+          email={member.email}
+          firstName={member.firstName}
+          id={member.id}
+          lastLoginAt={member.lastLoginAt}
+          lastName={member.lastName}
+          roleId={member.roleId}
+          roleName={member.roleName}
+        />
+      )}
     />
   );
 };
