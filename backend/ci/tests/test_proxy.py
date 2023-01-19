@@ -75,13 +75,10 @@ def configure_proxy(tenant, ingress_rules):
                 "backend/components/ditto/src/dummy_cert/client.key"
             ),
         },
-        "headers": [
-            {
-                "name": "my-test-header",
-                "value": "my-test-value"
-            }
-        ],
-        "ingress_settings": {"rules": ingress_rules, "content_type": "json"} if len(ingress_rules) > 0 else None,
+        "headers": [{"name": "my-test-header", "value": "my-test-value"}],
+        "ingress_settings": {"rules": ingress_rules, "content_type": "json"}
+        if len(ingress_rules) > 0
+        else None,
         "method": "POST",
         "name": "test config",
         "pinned_server_certificates": [
@@ -89,13 +86,8 @@ def configure_proxy(tenant, ingress_rules):
                 "backend/components/ditto/src/dummy_cert/server.crt"
             ),
         ],
-        "secret_headers": [
-            {
-                "name": "my-secret-header",
-                "value": "footprintrocks"
-            }
-        ],
-        "url": "https://ditto.footprint.dev:8443"
+        "secret_headers": [{"name": "my-secret-header", "value": "footprintrocks"}],
+        "url": "https://ditto.footprint.dev:8443",
     }
 
     body = post(
@@ -256,8 +248,7 @@ class TestVaultProxy:
                 FwdTestHeader("test1234"),
                 ProxyDestinationHeader(ditto_url),
                 ProxyAccessReason("test reason"),
-                ProxyIngressRule(
-                    f"${fp_id}.custom.card_number=$.data.card_number"),
+                ProxyIngressRule(f"${fp_id}.custom.card_number=$.data.card_number"),
                 ProxyIngressContentType("json"),
             ],
         )
@@ -266,18 +257,15 @@ class TestVaultProxy:
         assert result["data"]["card_number"] == f"${fp_id}.custom.card_number"
 
         data = dict(reason="test", fields=["custom.card_number"])
-        response = post(f"users/{fp_id}/vault/decrypt",
-                        data, sandbox_tenant.sk.key)
+        response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["custom.card_number"] == "12345678910"
 
     def test_proxy_config(self, sandbox_tenant):
         # create the proxy config
-        proxy_id = configure_proxy(sandbox_tenant, [
-            {
-                "target": "$.data.card_number",
-                "token": "custom.card_number"
-            }
-        ])
+        proxy_id = configure_proxy(
+            sandbox_tenant,
+            [{"target": "$.data.card_number", "token": "custom.card_number"}],
+        )
 
         # create the vault
         body = post("users/", None, sandbox_tenant.sk.key)
@@ -297,9 +285,7 @@ class TestVaultProxy:
         data = {
             "full_name": f"::${fp_id}.id.first_name:: ::${fp_id}.id.last_name::",
             "msg": f"::${fp_id}.custom.message::",
-            "data": {
-                "card_number": "4242424242424242424"
-            }
+            "data": {"card_number": "4242424242424242424"},
         }
 
         response = _make_request(
@@ -311,7 +297,7 @@ class TestVaultProxy:
             auths=[
                 sandbox_tenant.sk.key,
                 ProxyId(proxy_id),
-                ProxyIngressRuleTokenAssignment(fp_id)
+                ProxyIngressRuleTokenAssignment(fp_id),
             ],
         )
 
@@ -329,6 +315,5 @@ class TestVaultProxy:
         assert result["msg"] == "hello world"
 
         data = dict(reason="test", fields=["custom.card_number"])
-        response = post(f"users/{fp_id}/vault/decrypt",
-                        data, sandbox_tenant.sk.key)
+        response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["custom.card_number"] == "4242424242424242424"
