@@ -182,7 +182,7 @@ const UserVaultDetail = ({ id }) => {
           slug: 'dbquery',
           params: {
             query: `\
-                SELECT user_vault_data.kind, created_at, committed_at FROM data_lifetime \
+                SELECT user_vault_data.kind, created_at, portablized_at FROM data_lifetime \
                 INNER JOIN user_vault_data ON user_vault_data.lifetime_id=data_lifetime.id AND data_lifetime.user_vault_id='${id}';`,
           },
         }}

@@ -6,21 +6,21 @@ use db::{
 use newtypes::{DataLifetimeSeqno, ScopedUserId, UserVaultId};
 
 /// There are a lot of places we build UVWs, under varying circumstances. Things to consider:
-///   - Committed and Speculative data:
-///       Does the flow need access to both committed AND speculative data?
-///   - If the flow needs access to committed data, has the requester been granted access to see the committed data?
-///     For example, a tenant shouldn't see committed data they didn't ask to collect (via an authorized OB config)
+///   - Portable and Speculative data:
+///       Does the flow need access to both portable AND speculative data?
+///   - If the flow needs access to portable data, has the requester been granted access to see the portable data?
+///     For example, a tenant shouldn't see portable data they didn't ask to collect (via an authorized OB config)
 ///
 /// The UvwArgs variants below are used to construct a UserVaultWrapper specific to the use case.
 pub enum UvwArgs<'a> {
-    /// Used to build a UVW that sees ALL committed data and speculative data
+    /// Used to build a UVW that sees ALL portable data and speculative data
     /// Allows reconstructing a UserVaultWrapper at the time a VerificationRequest was made
     /// This is only used during the onboarding process
     Idv(VerificationRequest),
-    /// Used to build a UVW for a user that sees ALL committed data, or if it's non-portable, just speculative.
+    /// Used to build a UVW for a user that sees ALL portable data, or if it's non-portable, just speculative.
     /// This is generally used in user-authed APIs for my1fp
     User(&'a UserVaultId),
-    /// Used to build a UVW that sees ALL committed data and speculative data
+    /// Used to build a UVW that sees ALL portable data and speculative data
     /// Generally used during APIs on the bifrost onboarding path when WRITING data to the vault or
     /// in tenant-authed APIs when READING data from the vault.
     /// TODO should we have this include the list of fields to be decrypted so we can selectively choose what to load?

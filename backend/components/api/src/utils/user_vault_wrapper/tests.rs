@@ -129,7 +129,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
     };
     uvw.update_identity_data(conn, update, vec![]).unwrap();
 
-    // Make the user can't see the name and email until it's committed
+    // Make the user can't see the name and email until it's portable
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
     assert!(!uvw.has_identity_field(IdentityDataKind::FirstName));
     assert!(!uvw.has_identity_field(IdentityDataKind::LastName));
@@ -142,7 +142,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
     assert!(uvw.has_identity_field(IdentityDataKind::Email));
     uvw.commit_identity_data(conn).unwrap();
 
-    // Now we should see the committed name and email
+    // Now we should see the portable name and email
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
     assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
     assert!(uvw.has_identity_field(IdentityDataKind::LastName));
@@ -363,15 +363,15 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
     uvw.commit_identity_data(conn).unwrap();
 
-    // Commit data for tenant1 - the new ssn4 should _not_ be committed
+    // Commit data for tenant1 - the new ssn4 should _not_ be portable
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.commit_identity_data(conn).unwrap();
 
-    // Now, when getting committed data, we should still see the ssn9 added for tenant 2
+    // Now, when getting portable data, we should still see the ssn9 added for tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
     assert_eq!(uvw.get_identity_e_field(IdentityDataKind::Ssn4), ssn4_tenant2);
     assert_eq!(uvw.get_identity_e_field(IdentityDataKind::Ssn9), ssn9_tenant2);
-    // But, we should still have the name that was committed by tenant 1
+    // But, we should still have the name that was portable by tenant 1
     assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
     assert!(uvw.has_identity_field(IdentityDataKind::LastName));
 }
@@ -503,8 +503,8 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
 
     // Build a map map of DataLifetimeKind -> CommittedCounts
     struct CommittedCounts {
-        committed: usize,
-        not_committed: usize,
+        portable: usize,
+        speculative: usize,
     }
     let kind_to_counts = DataLifetime::get_active(conn, &uv.id, Some(&su.id))
         .unwrap()
@@ -512,30 +512,30 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
         .into_group_map_by(|dl| dl.kind)
         .into_iter()
         .map(|(kind, v)| {
-            let (committed, not_committed): (Vec<_>, _) = v
+            let (portable, speculative): (Vec<_>, _) = v
                 .into_iter()
-                .map(|dl| dl.committed_at.is_some())
+                .map(|dl| dl.portablized_at.is_some())
                 .partition(|x| *x);
             let counts = CommittedCounts {
-                committed: committed.len(),
-                not_committed: not_committed.len(),
+                portable: portable.len(),
+                speculative: speculative.len(),
             };
             (kind, counts)
         })
         .collect::<HashMap<_, _>>();
 
-    // Assert all custom DLs are not committed
+    // Assert all custom DLs are not portable
     let custom = kind_to_counts.get(&DataLifetimeKind::Custom).unwrap();
-    assert_eq!(custom.committed, 0);
-    assert_eq!(custom.not_committed, 2);
+    assert_eq!(custom.portable, 0);
+    assert_eq!(custom.speculative, 2);
 
-    // Assert identity doc DL is not committed
+    // Assert identity doc DL is not portable
     let id_doc = kind_to_counts.get(&DataLifetimeKind::IdentityDocument).unwrap();
-    assert_eq!(id_doc.committed, 0);
-    assert_eq!(id_doc.not_committed, 1);
+    assert_eq!(id_doc.portable, 0);
+    assert_eq!(id_doc.speculative, 1);
 
-    // But identity data should be committed
+    // But identity data should be portable
     let ssn4 = kind_to_counts.get(&DataLifetimeKind::Ssn4).unwrap();
-    assert_eq!(ssn4.committed, 1);
-    assert_eq!(ssn4.not_committed, 0);
+    assert_eq!(ssn4.portable, 1);
+    assert_eq!(ssn4.speculative, 0);
 }

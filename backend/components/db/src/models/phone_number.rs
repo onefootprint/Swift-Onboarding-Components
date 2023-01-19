@@ -77,7 +77,7 @@ impl PhoneNumber {
         priority: DataPriority,
         su_id: Option<&ScopedUserId>,
     ) -> DbResult<PhoneNumber> {
-        // Create a committed lifetime - once the phone number is verified and bound to a vault
+        // Create a portable lifetime - once the phone number is verified and bound to a vault
         // it should be immediately portable, even though it isn't verified by vendors.
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let lifetime = DataLifetime::create(conn, uv_id, su_id, IdentityDataKind::PhoneNumber.into(), seqno)?;

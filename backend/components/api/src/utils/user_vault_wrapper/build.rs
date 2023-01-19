@@ -36,11 +36,11 @@ impl UserVaultWrapper {
         kv_data: Vec<KeyValueData>,
         lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<Self> {
-        let (committed, speculative) =
+        let (portable, speculative) =
             UvwData::partition(uvd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
         let result = Self {
             user_vault,
-            committed,
+            portable,
             speculative,
             _seqno: seqno,
             is_hydrated: PhantomData,
@@ -60,7 +60,7 @@ impl UserVaultWrapper {
         let active_lifetime_ids: Vec<_> = active_lifetimes.iter().map(|l| l.id.clone()).collect();
 
         // Fetch all the data related to the active lifetimes
-        // Split into committed + uncommitted data
+        // Split into portable + speculative data
         let data = UserVaultData::get_for(conn, &active_lifetime_ids)?;
         let phone_numbers = PhoneNumber::get_for(conn, &active_lifetime_ids)?;
         let emails = Email::get_for(conn, &active_lifetime_ids)?;

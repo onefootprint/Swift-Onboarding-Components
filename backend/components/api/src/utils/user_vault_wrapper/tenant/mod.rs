@@ -12,7 +12,7 @@ pub use decrypt_request::DecryptRequest;
 use super::UserVaultWrapper;
 use newtypes::ScopedUserId;
 
-/// Constructed for a specific tenant's view of the world. A tenant is able to see its own uncommitted
+/// Constructed for a specific tenant's view of the world. A tenant is able to see its own speculative
 /// data on the user vault.
 /// This UVW variant contains all of the functionality to decrypt information on the vault
 pub struct TenantUvw {

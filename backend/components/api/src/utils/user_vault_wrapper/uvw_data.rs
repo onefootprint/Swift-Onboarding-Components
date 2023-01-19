@@ -38,11 +38,11 @@ impl UvwData {
     ) -> ApiResult<(Self, Self)> {
         let speculative_lifetime_ids: HashSet<_> = all_lifetimes
             .iter()
-            .filter(|l| l.committed_seqno.is_some())
+            .filter(|l| l.portablized_seqno.is_some())
             .map(|l| l.id.clone())
             .collect();
 
-        // Partition each piece of data by committed / speculative
+        // Partition each piece of data by portable / speculative
         fn partition<T: HasLifetime>(
             data: Vec<T>,
             speculative_lifetime_ids: &HashSet<DataLifetimeId>,
@@ -50,26 +50,26 @@ impl UvwData {
             data.into_iter()
                 .partition(|d| speculative_lifetime_ids.contains(d.lifetime_id()))
         }
-        let (committed_uvd, speculative_uvd) = partition(uvd, &speculative_lifetime_ids);
-        let (committed_phone_numbers, speculative_phone_numbers) =
+        let (portable_uvd, speculative_uvd) = partition(uvd, &speculative_lifetime_ids);
+        let (portable_phone_numbers, speculative_phone_numbers) =
             partition(phone_numbers, &speculative_lifetime_ids);
-        let (committed_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
-        let (committed_identity_documents, speculative_identity_documents) =
+        let (portable_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
+        let (portable_identity_documents, speculative_identity_documents) =
             partition(identity_documents, &speculative_lifetime_ids);
-        let (committed_kv_data, speculative_kv_data) = partition(kv_data, &speculative_lifetime_ids);
+        let (portable_kv_data, speculative_kv_data) = partition(kv_data, &speculative_lifetime_ids);
 
-        if !committed_kv_data.is_empty() {
+        if !portable_kv_data.is_empty() {
             // We don't commit kv_data yet because we don't want it to be portable. Error if we find
             // any
-            return Err(ApiError::AssertionError("Found committed kv_data".to_owned()));
+            return Err(ApiError::AssertionError("Found portable kv_data".to_owned()));
         }
 
-        let committed = Self::build(
-            committed_uvd,
-            committed_phone_numbers,
-            committed_emails,
-            committed_identity_documents,
-            committed_kv_data,
+        let portable = Self::build(
+            portable_uvd,
+            portable_phone_numbers,
+            portable_emails,
+            portable_identity_documents,
+            portable_kv_data,
             &all_lifetimes,
         );
         let speculative = Self::build(
@@ -80,7 +80,7 @@ impl UvwData {
             speculative_kv_data,
             &all_lifetimes,
         );
-        Ok((committed, speculative))
+        Ok((portable, speculative))
     }
 
     fn build(

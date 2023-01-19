@@ -44,10 +44,10 @@ table! {
         user_vault_id -> Text,
         scoped_user_id -> Nullable<Text>,
         created_at -> Timestamptz,
-        committed_at -> Nullable<Timestamptz>,
+        portablized_at -> Nullable<Timestamptz>,
         deactivated_at -> Nullable<Timestamptz>,
         created_seqno -> Int8,
-        committed_seqno -> Nullable<Int8>,
+        portablized_seqno -> Nullable<Int8>,
         deactivated_seqno -> Nullable<Int8>,
         kind -> Text,
     }

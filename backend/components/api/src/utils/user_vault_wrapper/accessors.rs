@@ -25,36 +25,36 @@ impl UserVaultWrapper {
             .collect()
     }
 
-    /// Return speculative phone numbers if exist, otherwise committed. There should only be one
+    /// Return speculative phone numbers if exist, otherwise portable. There should only be one
     pub fn phone_numbers(&self) -> &[PhoneNumber] {
         if !self.speculative.phone_numbers.is_empty() {
             &self.speculative.phone_numbers
         } else {
-            &self.committed.phone_numbers
+            &self.portable.phone_numbers
         }
     }
 
-    /// Return speculative emails if exist, otherwise committed. There should only be one
+    /// Return speculative emails if exist, otherwise portable. There should only be one
     pub fn emails(&self) -> &[Email] {
         if !self.speculative.emails.is_empty() {
             &self.speculative.emails
         } else {
-            &self.committed.emails
+            &self.portable.emails
         }
     }
 
-    /// Return speculative identity_documents if exist, otherwise committed. There should only be one
+    /// Return speculative identity_documents if exist, otherwise portable. There should only be one
     pub fn identity_documents(&self) -> &[IdentityDocument] {
-        // TODO but do we support committed ID docs?
+        // TODO but do we support portable ID docs?
         if !self.speculative.identity_documents.is_empty() {
             &self.speculative.identity_documents
         } else {
-            &self.committed.identity_documents
+            &self.portable.identity_documents
         }
     }
 
     pub fn kv_data(&self) -> &HashMap<KvDataKey, KeyValueData> {
-        // We don't currently support committed kv data
+        // We don't currently support portable kv data
         &self.speculative.kv_data
     }
 }
@@ -63,7 +63,7 @@ impl UserVaultWrapper {
     pub fn get_identity_e_field(&self, kind: IdentityDataKind) -> Option<&SealedVaultBytes> {
         self.speculative
             .get_identity_e_field(kind)
-            .or_else(|| self.committed.get_identity_e_field(kind))
+            .or_else(|| self.portable.get_identity_e_field(kind))
     }
 
     pub fn has_identity_field(&self, kind: IdentityDataKind) -> bool {

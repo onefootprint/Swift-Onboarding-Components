@@ -16,7 +16,7 @@ fn build_lifetime(
     uv_id: &UserVaultId,
     su_id: &ScopedUserId,
     created_seqno: DataLifetimeSeqno,
-    committed_seqno: Option<DataLifetimeSeqno>,
+    portablized_seqno: Option<DataLifetimeSeqno>,
     deactivated_seqno: Option<DataLifetimeSeqno>,
     kind: DataLifetimeKind,
 ) -> DataLifetime {
@@ -24,8 +24,8 @@ fn build_lifetime(
         .unwrap()
         .pop()
         .unwrap();
-    if let Some(committed_seqno) = committed_seqno {
-        lifetime = lifetime.commit(conn, committed_seqno).unwrap();
+    if let Some(portablized_seqno) = portablized_seqno {
+        lifetime = lifetime.commit(conn, portablized_seqno).unwrap();
     }
     if let Some(deactivated_seqno) = deactivated_seqno {
         lifetime = DataLifetime::bulk_deactivate(conn, vec![lifetime.id], deactivated_seqno)
@@ -177,7 +177,7 @@ fn test_get_active(conn: &mut TestPgConnection) {
     let results = DataLifetime::get_active(conn, &c.uv_id, Some(&c.su_id)).unwrap();
     assert_eq!(ids(results), ids(vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]));
 
-    // Query for only committed data (not scoped to any tenant), should only return committed lifetimes
+    // Query for only portable data (not scoped to any tenant), should only return portable lifetimes
     let results = DataLifetime::get_active(conn, &c.uv_id, None).unwrap();
     assert_eq!(ids(results), ids(vec![&c.lifetime2, &c.lifetime4]));
 }
@@ -191,7 +191,7 @@ fn test_get_bulk_active_for_tenant(conn: &mut TestPgConnection) {
             .unwrap();
     assert_eq!(
         ids(results.remove(&c.uv_id).unwrap()),
-        ids(vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]) // lifetime4 visible from other tenant bc committed
+        ids(vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]) // lifetime4 visible from other tenant bc portable
     );
     assert_eq!(
         ids(results.remove(&c.uv2_id).unwrap()),
@@ -205,9 +205,9 @@ fn test_get_bulk_active_for_tenant(conn: &mut TestPgConnection) {
             .unwrap();
     assert_eq!(
         ids(results.remove(&c.uv_id).unwrap()),
-        ids(vec![&c.lifetime2, &c.lifetime4]) //lifetime2 visible from other tenant bc committed
+        ids(vec![&c.lifetime2, &c.lifetime4]) //lifetime2 visible from other tenant bc portable
     );
-    assert_eq!(ids(results.remove(&c.uv2_id).unwrap()), ids(vec![&c.lifetime6])); // lifetime6 visible from other tenant bc committed
+    assert_eq!(ids(results.remove(&c.uv2_id).unwrap()), ids(vec![&c.lifetime6])); // lifetime6 visible from other tenant bc portable
     assert!(results.is_empty()); // No other results
 }
 
@@ -218,11 +218,11 @@ fn test_get_active_at_for_tenant(conn: &mut TestPgConnection) {
         (c.seqno0, vec![]),                                         // Nothing exists
         (c.seqno1, vec![&c.lifetime1, &c.lifetime2, &c.lifetime3]), // l1, l2, l3 created for tenant
         (c.seqno2, vec![&c.lifetime1, &c.lifetime2, &c.lifetime3]), // Nothing happens here
-        (c.seqno3, vec![&c.lifetime1, &c.lifetime2, &c.lifetime3]), // l2 committed
+        (c.seqno3, vec![&c.lifetime1, &c.lifetime2, &c.lifetime3]), // l2 portable
         (
             c.seqno4,
             vec![&c.lifetime1, &c.lifetime2, &c.lifetime3, &c.lifetime4],
-        ), // l3 committed, l4 committed at other tenant
+        ), // l3 portable, l4 portable at other tenant
         (c.seqno5, vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]), // l3 deactivated
         (c.seqno6, vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]), // Nothing happens here
     ];
@@ -234,15 +234,15 @@ fn test_get_active_at_for_tenant(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_get_active_at_only_committed(conn: &mut TestPgConnection) {
+fn test_get_active_at_only_portable(conn: &mut TestPgConnection) {
     let c = TestData::build(conn);
 
     let tests = vec![
         (c.seqno0, vec![]),                                         // Nothing exists
         (c.seqno1, vec![]),             // l1, l2, l3 created for tenant, not visible yet
         (c.seqno2, vec![]),             // Nothing happens here
-        (c.seqno3, vec![&c.lifetime2]), // l2 committed
-        (c.seqno4, vec![&c.lifetime2, &c.lifetime3, &c.lifetime4]), // l3 committed, l4 committed at other tenant
+        (c.seqno3, vec![&c.lifetime2]), // l2 portable
+        (c.seqno4, vec![&c.lifetime2, &c.lifetime3, &c.lifetime4]), // l3 portable, l4 portable at other tenant
         (c.seqno5, vec![&c.lifetime2, &c.lifetime4]),               // l3 deactivated
         (c.seqno6, vec![&c.lifetime2, &c.lifetime4]),               // Nothing happens here
     ];

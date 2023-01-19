@@ -31,7 +31,7 @@ pub use writeable::*;
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
     speculative: UvwData,
-    committed: UvwData,
+    portable: UvwData,
     // The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.
     _seqno: Option<DataLifetimeSeqno>,
     // Represents whether we have fetched the appropriate data

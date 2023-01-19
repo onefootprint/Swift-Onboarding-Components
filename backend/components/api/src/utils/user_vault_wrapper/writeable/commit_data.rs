@@ -9,57 +9,57 @@ use std::collections::HashSet;
 
 struct CurrentData {
     speculative: HashSet<CollectedDataOption>,
-    committed: HashSet<CollectedDataOption>,
+    portable: HashSet<CollectedDataOption>,
 }
 
 struct DataToCommit {
-    to_commit: HashSet<CollectedDataOption>,
+    to_portablize: HashSet<CollectedDataOption>,
     to_deactivate: HashSet<CollectedDataOption>,
 }
 
-/// Given the set of speculative CollectedDataOptions and committed CollectedDataOptions,
+/// Given the set of speculative CollectedDataOptions and portable CollectedDataOptions,
 /// determines which speculative CDOs we will commit and which we will deactivate.
-/// Generally, we will commit a speculative CDO if it is not replacing a committed CDO that
+/// Generally, we will commit a speculative CDO if it is not replacing a portable CDO that
 /// contains more information.
-/// For example, we will not allow a speculative Ssn4 to replace a committed Ssn9. We will allow
-/// a speculative Ssn9 to replace a committed Ssn9 or committed Ssn4, though.
+/// For example, we will not allow a speculative Ssn4 to replace a portable Ssn9. We will allow
+/// a speculative Ssn9 to replace a portable Ssn9 or portable Ssn4, though.
 fn decide_data_to_commit(data: CurrentData) -> DataToCommit {
     let CurrentData {
         speculative,
-        committed,
+        portable,
     } = data;
-    // Split the list of speculative CDOs based on whether they should be committed or not
+    // Split the list of speculative CDOs based on whether they should be portable or not
     let (to_commit, to_deactivate) = speculative.into_iter().partition(|speculative_cdo| {
         let full_cdo = speculative_cdo.full_variant();
         match full_cdo {
-            // Only commit this piece of speculative data if the full CDO isn't committed
-            // NOTE: we'll rarely have a speculative partial CDO and a committed full CDO since
+            // Only commit this piece of speculative data if the full CDO isn't portable
+            // NOTE: we'll rarely have a speculative partial CDO and a portable full CDO since
             // we normally block these updates from happening when the speculative data is added.
             // Could only happen due to a race condition. More context at
             // https://linear.app/footprint/issue/FP-2129/handle-onboarding-race-condition
             Some(full_cdo) => {
-                let committed_has_full_variant = committed.contains(&full_cdo);
-                if committed_has_full_variant {
+                let portable_has_full_variant = portable.contains(&full_cdo);
+                if portable_has_full_variant {
                     log::info!(
-                        "Trying to commit partial CDO {} when full CDO {} is committed",
+                        "Trying to commit partial CDO {} when full CDO {} is portable",
                         speculative_cdo,
                         full_cdo
                     );
                 }
-                !committed_has_full_variant
+                !portable_has_full_variant
             }
             // Commit!
             None => true,
         }
     });
     DataToCommit {
-        to_commit,
+        to_portablize: to_commit,
         to_deactivate,
     }
 }
 
 impl WriteableUvw {
-    /// Marks all speculative identity data data as committed in order to make it portable after
+    /// Marks all speculative identity data data as portable in order to make it portable after
     /// it is verified by an approved onboarding.
     /// Intentionally consumes the UVW to prevent using a stale reference
     /// NOTE: this DOES NOT commit custom data or identity documents since we haven't figured out
@@ -74,28 +74,28 @@ impl WriteableUvw {
         // the CollectedDataOption model
         let d = decide_data_to_commit(CurrentData {
             speculative: CollectedDataOption::list_from(uvw.speculative.get_populated_identity_fields()),
-            committed: CollectedDataOption::list_from(uvw.committed.get_populated_identity_fields()),
+            portable: CollectedDataOption::list_from(uvw.portable.get_populated_identity_fields()),
         });
         let speculative_kinds_to_commit: Vec<_> =
-            d.to_commit.into_iter().flat_map(|o| o.attributes()).collect();
+            d.to_portablize.into_iter().flat_map(|o| o.attributes()).collect();
         let speculative_kinds_to_deactivate: Vec<_> =
             d.to_deactivate.into_iter().flat_map(|o| o.attributes()).collect();
 
         //
-        // Deactivate all existing, committed data that is about to be replaced by speculative data.
+        // Deactivate all existing, portable data that is about to be replaced by speculative data.
         // Also deactivate speculative data that we don't want to keep.
         //
         let lifetime_ids_to_deactivate = {
             // For everything that we're about to commit, deactivate the old data if exists
-            let committed_lifetimes_to_deactivate =
-                uvw.committed.get_id_lifetimes(&speculative_kinds_to_commit);
-            let is_all_data_committed = committed_lifetimes_to_deactivate
+            let portable_lifetimes_to_deactivate =
+                uvw.portable.get_id_lifetimes(&speculative_kinds_to_commit);
+            let is_all_data_portable = portable_lifetimes_to_deactivate
                 .iter()
-                .all(|l| l.committed_seqno.is_some());
-            if !is_all_data_committed {
-                // Everything we are deactivating should be committed already
+                .all(|l| l.portablized_seqno.is_some());
+            if !is_all_data_portable {
+                // Everything we are deactivating should be portable already
                 return Err(ApiError::AssertionError(
-                    "Lifetime to deactivate is not committed".to_owned(),
+                    "Lifetime to deactivate is not portable".to_owned(),
                 ));
             }
             // And, grab the IDs of speculative data that we're deactivating.
@@ -111,7 +111,7 @@ impl WriteableUvw {
                     .collect();
                 log::error!("Deactivating speculative data due to race condition: {:?}", ids,);
             }
-            committed_lifetimes_to_deactivate
+            portable_lifetimes_to_deactivate
                 .into_iter()
                 .chain(speculative_lifetimes_to_deactivate.into_iter())
                 .map(|l| l.id.clone())
@@ -129,7 +129,7 @@ impl WriteableUvw {
                 uvw.speculative.get_id_lifetimes(&speculative_kinds_to_commit);
             let all_data_is_speculative_and_belongs_to_scoped_user = speculative_lifetimes_to_commit
                 .iter()
-                .all(|l| l.committed_seqno.is_none() && l.scoped_user_id == Some(scoped_user_id.clone()));
+                .all(|l| l.portablized_seqno.is_none() && l.scoped_user_id == Some(scoped_user_id.clone()));
             if !all_data_is_speculative_and_belongs_to_scoped_user {
                 // Just a sanity check filter that we don't commit other data - all results should match
                 // this filter
@@ -193,16 +193,19 @@ mod test {
     )]
     fn test_decide_data_to_commit(
         speculative: Vec<CollectedDataOption>,
-        committed: Vec<CollectedDataOption>,
+        portable: Vec<CollectedDataOption>,
         expected_to_commit: Vec<CollectedDataOption>,
         expected_to_deactivate: Vec<CollectedDataOption>,
     ) -> Option<usize> {
         let current_data = CurrentData {
             speculative: speculative.into_iter().collect(),
-            committed: committed.into_iter().collect(),
+            portable: portable.into_iter().collect(),
         };
         let data = decide_data_to_commit(current_data);
-        assert_eq!(data.to_commit, HashSet::from_iter(expected_to_commit.into_iter()));
+        assert_eq!(
+            data.to_portablize,
+            HashSet::from_iter(expected_to_commit.into_iter())
+        );
         assert_eq!(
             data.to_deactivate,
             HashSet::from_iter(expected_to_deactivate.into_iter())

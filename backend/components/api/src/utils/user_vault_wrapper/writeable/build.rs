@@ -9,9 +9,9 @@ use crate::{
 use super::WriteableUvw;
 
 impl UserVaultWrapper {
-    /// Builds a locked UVW that sees committed data AND speculative data for the tenant.
+    /// Builds a locked UVW that sees portable data AND speculative data for the tenant.
     /// This should be used during onboarding operations in order to allow the tenant to see
-    /// uncommitted data that has been added by previous operations
+    /// speculative data that has been added by previous operations
     pub fn lock_for_onboarding(
         conn: &mut TxnPgConnection,
         scoped_user_id: &ScopedUserId,

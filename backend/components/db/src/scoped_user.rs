@@ -78,13 +78,13 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
     if let Some(fingerprints) = params.fingerprints {
         let matching_uv_ids = fingerprint::table
             .inner_join(data_lifetime::table)
-            // Active lifetimes - all active rows that are committed
-            // TODO should also be able to search uncommitted fingerprints made by this tenant.
+            // Active lifetimes - all active rows that are portable
+            // TODO should also be able to search speculative fingerprints made by this tenant.
             // But diesel doesn't let you join on scoped_user and use it in a subquery
             // Might be able to execute this subquery and then use it - I don't think results
             // would be large
             .filter(data_lifetime::deactivated_seqno.is_null())
-            .filter(not(data_lifetime::committed_seqno.is_null()))
+            .filter(not(data_lifetime::portablized_seqno.is_null()))
             // Matching fingerprint
             .filter(fingerprint::sh_data.eq_any(fingerprints))
             .select(data_lifetime::user_vault_id);

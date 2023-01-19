@@ -24,7 +24,7 @@ impl WriteableUvw {
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
         self.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
-        if !self.committed.emails.is_empty() {
+        if !self.portable.emails.is_empty() {
             // We don't currently support adding a secondary email
             return Err(UserError::InvalidDataUpdate.into());
         }
@@ -32,7 +32,7 @@ impl WriteableUvw {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         // Deactivate the old speculative email, if exists
         let kinds = vec![DataLifetimeKind::Email];
-        DataLifetime::bulk_deactivate_uncommitted(conn, &self.scoped_user_id, kinds, seqno)?;
+        DataLifetime::bulk_deactivate_speculative(conn, &self.scoped_user_id, kinds, seqno)?;
 
         // Add the new speculative email
         let email = email.to_piistring();
@@ -91,7 +91,7 @@ impl WriteableUvw {
             .collect::<Result<Vec<_>, ApiError>>()?;
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        // TODO: Should we use bulk_deactivate_uncommitted here? When we denormalize `key` onto DataLifetimeKind
+        // TODO: Should we use bulk_deactivate_speculative here? When we denormalize `key` onto DataLifetimeKind
         DataLifetime::bulk_deactivate(conn, existing_lifetime_ids, seqno)?;
         KeyValueData::bulk_create(conn, &self.user_vault().id, &self.scoped_user_id, updates, seqno)?;
         Ok(())

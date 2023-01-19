@@ -103,7 +103,7 @@ impl UvdBuilder {
     pub fn validate_and_save(
         self,
         conn: &mut TxnPgConnection,
-        existing_fields: Vec<IdentityDataKind>, // committed or speculative on UVW
+        existing_fields: Vec<IdentityDataKind>, // portable or speculative on UVW
         user_vault_id: UserVaultId,
         scoped_user_id: ScopedUserId,
         fingerprints: Vec<(UvdKind, FingerprintBytes)>,
@@ -125,14 +125,14 @@ impl UvdBuilder {
         }
 
         // Deactivate old UVDs that we have overwritten that belong to this tenant.
-        // We will only deactivate speculative, uncommitted data here - never committed data
+        // We will only deactivate speculative, uncommitted data here - never portable data
         let kinds_to_deactivate = new
             .iter()
             .flat_map(|cdo| cdo.attributes())
             .map(DataLifetimeKind::from)
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::bulk_deactivate_uncommitted(conn, &scoped_user_id, kinds_to_deactivate, seqno)?;
+        DataLifetime::bulk_deactivate_speculative(conn, &scoped_user_id, kinds_to_deactivate, seqno)?;
 
         // Create the new UVDs
         let uvds = UserVaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;

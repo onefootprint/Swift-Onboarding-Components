@@ -35,11 +35,11 @@ pub async fn handler(
             let uv_id = user_auth.user_vault_id();
             let args = if let Some(ref su) = su {
                 // If the auth token is during an onboarding session, create a UVW that sees all
-                // speculative data for the tenant in order to see an uncommitted phone number
+                // speculative data for the tenant in order to see a speculative phone number
                 // that was added by this tenant.
                 UvwArgs::Tenant(&su.id)
             } else {
-                // Otherwise, create a UVW that only sees committed data
+                // Otherwise, create a UVW that only sees portable data
                 UvwArgs::User(uv_id)
             };
             let uvw = UserVaultWrapper::build(conn, args)?;

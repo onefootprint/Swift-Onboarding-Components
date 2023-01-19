@@ -33,7 +33,7 @@ use crate::{DbError, DbResult};
 ///
 /// Lifecycle attributes:
 /// - `created_at`/`created_seqno`: When the data was created
-/// - `committed_at`/`committed_seqno`: When the data was committed and made portable. This is
+/// - `portablized_at`/`portablized_seqno`: When the data was committed and made portable. This is
 ///   usually after is has been verified with data vendors. BUT, it is not synonymous with verified -
 ///   we also make contact info like phone/email portable as soon as it is added
 /// - `deactivated_at`/`deactivated_seqno`: When the data was archived and is no longer active. This
@@ -54,7 +54,7 @@ use crate::{DbError, DbResult};
 /// Notably:
 /// Each lifecycle attribute is represented both with a human-readable timestamp AND with
 /// a machine-readable seqno. The seqno is controlled by a postgres sequence that is incremented
-/// when new rows are added/committed/deactivated. It provides a _total_ ordering of events that
+/// when new rows are added/portablized/deactivated. It provides a _total_ ordering of events that
 /// occur during the data lifecycle (which cannot always be provided by a timestamp).
 ///
 /// More info here: https://www.notion.so/Data-model-v4-724c993c985748fc85a77f80e9a46f72
@@ -67,10 +67,10 @@ pub struct DataLifetime {
     pub scoped_user_id: Option<ScopedUserId>,
     // Lifecycle attributes
     pub created_at: DateTime<Utc>,
-    pub committed_at: Option<DateTime<Utc>>,
+    pub portablized_at: Option<DateTime<Utc>>,
     pub deactivated_at: Option<DateTime<Utc>>,
     pub created_seqno: DataLifetimeSeqno,
-    pub committed_seqno: Option<DataLifetimeSeqno>,
+    pub portablized_seqno: Option<DataLifetimeSeqno>,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
     pub kind: DataLifetimeKind,
 }
@@ -91,9 +91,9 @@ struct NewDataLifetime {
 #[derive(Default, AsChangeset)]
 #[diesel(table_name = data_lifetime)]
 struct DataLifetimeUpdate {
-    committed_at: Option<Option<DateTime<Utc>>>,
+    portablized_at: Option<Option<DateTime<Utc>>>,
     deactivated_at: Option<Option<DateTime<Utc>>>,
-    committed_seqno: Option<Option<DataLifetimeSeqno>>,
+    portablized_seqno: Option<Option<DataLifetimeSeqno>>,
     deactivated_seqno: Option<Option<DataLifetimeSeqno>>,
 }
 
@@ -168,8 +168,8 @@ impl DataLifetime {
 
     pub fn commit(self, conn: &mut PgConnection, seqno: DataLifetimeSeqno) -> DbResult<Self> {
         let update = DataLifetimeUpdate {
-            committed_at: Some(Some(Utc::now())),
-            committed_seqno: Some(Some(seqno)),
+            portablized_at: Some(Some(Utc::now())),
+            portablized_seqno: Some(Some(seqno)),
             ..DataLifetimeUpdate::default()
         };
         let result = diesel::update(data_lifetime::table)
@@ -179,7 +179,7 @@ impl DataLifetime {
         Ok(result)
     }
 
-    /// Marks a list of DataLifetimes as committed for a specific (user, tenant). Used to commit
+    /// Marks a list of DataLifetimes as portable for a specific (user, tenant). Used to commit
     /// speculative data and make it portable after it is verified by an approved onboarding
     pub fn bulk_commit_for_tenant(
         conn: &mut PgConnection,
@@ -188,14 +188,14 @@ impl DataLifetime {
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let update = DataLifetimeUpdate {
-            committed_at: Some(Some(Utc::now())),
-            committed_seqno: Some(Some(seqno)),
+            portablized_at: Some(Some(Utc::now())),
+            portablized_seqno: Some(Some(seqno)),
             ..DataLifetimeUpdate::default()
         };
         let results = diesel::update(data_lifetime::table)
             .filter(data_lifetime::id.eq_any(ids))
             .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
-            .filter(data_lifetime::committed_seqno.is_null())
+            .filter(data_lifetime::portablized_seqno.is_null())
             .set(update)
             .get_results(conn)?;
         Ok(results)
@@ -220,9 +220,9 @@ impl DataLifetime {
         Ok(results)
     }
 
-    /// Deactivates the uncommitted DataLifetimes with the provided kinds associated with this (user, tenant).
-    /// This should only be used when replacing speculative, un-committed user data with new un-committed user data
-    pub fn bulk_deactivate_uncommitted(
+    /// Deactivates the speculative DataLifetimes with the provided kinds associated with this (user, tenant).
+    /// This should only be used when replacing speculative, un-committed user data with new speculative user data
+    pub fn bulk_deactivate_speculative(
         conn: &mut PgConnection,
         scoped_user_id: &ScopedUserId,
         kinds: Vec<DataLifetimeKind>,
@@ -237,18 +237,18 @@ impl DataLifetime {
             .filter(data_lifetime::kind.eq_any(kinds))
             .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
             .filter(data_lifetime::deactivated_seqno.is_null())
-            // Specifically don't allow deactivating committed data here since we are replacing it
-            // with uncommitted data
-            .filter(data_lifetime::committed_seqno.is_null())
+            // Specifically don't allow deactivating portable data here since we are replacing it
+            // with speculative data
+            .filter(data_lifetime::portablized_seqno.is_null())
             .set(update)
             .get_results(conn)?;
         Ok(results)
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided scoped_user_id.
-    /// A piece of user data is visible if it is (1) committed and (2) not deactivated.
+    /// A piece of user data is visible if it is (1) portable and (2) not deactivated.
     /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
-    /// whether or not the data is committed.
+    /// whether or not the data is portable.
     pub fn get_active(
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
@@ -259,16 +259,16 @@ impl DataLifetime {
             .filter(data_lifetime::deactivated_seqno.is_null())
             .into_boxed();
 
-        let q_is_committed = not(data_lifetime::committed_seqno.is_null());
+        let q_is_portable = not(data_lifetime::portablized_seqno.is_null());
         if let Some(scoped_user_id) = scoped_user_id {
-            // Fetch committed data
-            // And also fetch uncommitted, non-portable data that was active at the time
+            // Fetch portable data
+            // And also fetch speculative, non-portable data that was active at the time
             // and belongs to the tenant
             let q_belongs_to_tenant = data_lifetime::scoped_user_id.eq(scoped_user_id);
-            query = query.filter(q_is_committed.or(q_belongs_to_tenant));
+            query = query.filter(q_is_portable.or(q_belongs_to_tenant));
         } else {
             // Only fetch committed, portable data
-            query = query.filter(q_is_committed)
+            query = query.filter(q_is_portable)
         }
 
         let results = query.get_results(conn)?;
@@ -283,16 +283,16 @@ impl DataLifetime {
         tenant_id: &TenantId,
     ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
         use crate::schema::scoped_user;
-        let q_is_committed = not(data_lifetime::committed_seqno.is_null());
+        let q_is_portable = not(data_lifetime::portablized_seqno.is_null());
         let q_belongs_to_tenant = scoped_user::tenant_id.eq(tenant_id);
         let query = data_lifetime::table
             .left_join(scoped_user::table)
             // Get data belonging to these users that is not deactivated
             .filter(data_lifetime::user_vault_id.eq_any(user_vault_ids))
             .filter(data_lifetime::deactivated_seqno.is_null())
-            // Fetch all rows that are either committed
+            // Fetch all rows that are either portable
             // OR belong to this tenant
-            .filter(q_is_committed.or(q_belongs_to_tenant));
+            .filter(q_is_portable.or(q_belongs_to_tenant));
 
         let results: Vec<Self> = query.select(data_lifetime::all_columns).get_results(conn)?;
         let uv_id_to_lifetimes = results
@@ -326,18 +326,18 @@ impl DataLifetime {
             )
             .into_boxed();
 
-        let q_is_committed = data_lifetime::committed_seqno.le(seqno);
+        let q_is_portable = data_lifetime::portablized_seqno.le(seqno);
         if let Some(scoped_user_id) = scoped_user_id {
-            // Fetch committed data
-            // AND also fetch uncommitted, non-portable data that was active at the time
+            // Fetch portable data
+            // AND also fetch speculative, non-portable data that was active at the time
             // and belongs to the tenant
             let q_belongs_to_tenant = data_lifetime::scoped_user_id
                 .eq(scoped_user_id)
                 .and(data_lifetime::created_seqno.le(seqno));
-            query = query.filter(q_is_committed.or(q_belongs_to_tenant));
+            query = query.filter(q_is_portable.or(q_belongs_to_tenant));
         } else {
-            // Only fetch committed, portable data
-            query = query.filter(q_is_committed)
+            // Only fetch portable, portable data
+            query = query.filter(q_is_portable)
         }
 
         let results = query.get_results(conn)?;
