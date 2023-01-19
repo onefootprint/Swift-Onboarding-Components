@@ -4,7 +4,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::request::PaginatedRequest;
+use crate::types::request::PaginationRequest;
 use crate::types::response::PaginatedResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -39,12 +39,12 @@ type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 #[get("/org/access_events")]
 async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
+    filters: web::Query<AccessEventRequest>,
+    pagination: web::Query<PaginationRequest<i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
-    let (filters, pagination) = request.into_inner().into_inner();
     let page_size = pagination.page_size(&state);
     let cursor = pagination.cursor;
     let AccessEventRequest {
@@ -54,7 +54,7 @@ async fn get(
         search,
         timestamp_lte,
         timestamp_gte,
-    } = filters;
+    } = filters.into_inner();
 
     let tenant = auth.tenant();
     let params = AccessEventListQueryParams {

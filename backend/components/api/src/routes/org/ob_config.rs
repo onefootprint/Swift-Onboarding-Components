@@ -10,9 +10,8 @@ use crate::auth::{
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
-use crate::types::EmptyRequest;
-use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
+use crate::types::PaginationRequest;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::DateTime;
@@ -50,7 +49,7 @@ pub fn get_detail(
 #[get("/org/onboarding_configs")]
 async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
+    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<
     Json<PaginatedResponseData<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
@@ -58,8 +57,8 @@ async fn get(
 > {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
-    let cursor = request.cursor;
-    let page_size = request.page_size(&state);
+    let cursor = pagination.cursor;
+    let page_size = pagination.page_size(&state);
 
     let query = ObConfigurationQuery {
         tenant_id: tenant.id.clone(),
@@ -74,7 +73,7 @@ async fn get(
         })
         .await??;
 
-    let cursor = request.cursor_item(&state, &configs).map(|x| x.created_at);
+    let cursor = pagination.cursor_item(&state, &configs).map(|x| x.created_at);
     let configs = configs
         .into_iter()
         .take(page_size)

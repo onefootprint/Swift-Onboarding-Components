@@ -8,8 +8,8 @@ use crate::errors::ApiResult;
 use crate::org::auth::magic_link::create_and_send_magic_link;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
-use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
+use crate::types::PaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -29,7 +29,8 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 #[get("/org/members")]
 async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<OrgMemberFilters, DateTime<Utc>>>,
+    filters: web::Query<OrgMemberFilters>,
+    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> actix_web::Result<
     Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
@@ -38,10 +39,9 @@ async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let (filters, pagination) = request.into_inner().into_inner();
     let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
-    let OrgMemberFilters { role_ids } = filters;
+    let OrgMemberFilters { role_ids } = filters.into_inner();
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let tenant_id = tenant.id.clone();

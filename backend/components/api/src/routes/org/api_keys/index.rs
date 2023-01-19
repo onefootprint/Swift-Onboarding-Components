@@ -1,8 +1,8 @@
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantUserAuthContext};
 use crate::auth::Either;
 use crate::errors::ApiResult;
-use crate::types::PaginatedRequest;
-use crate::types::{EmptyRequest, JsonApiResponse};
+use crate::types::JsonApiResponse;
+use crate::types::PaginationRequest;
 use crate::types::{PaginatedResponseData, ResponseData};
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -24,12 +24,12 @@ type ApiKeysResponse = Json<PaginatedResponseData<Vec<api_wire_types::SecretApiK
 #[actix::get("/org/api_keys")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
+    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> ApiResult<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    let page_size = request.page_size(&state);
-    let cursor = request.cursor;
+    let page_size = pagination.page_size(&state);
+    let cursor = pagination.cursor;
 
     let query = ApiKeyListQuery {
         tenant_id: auth.tenant().id.clone(),
@@ -46,7 +46,7 @@ pub async fn get(
         })
         .await??;
 
-    let cursor = request.cursor_item(&state, &keys).map(|x| x.created_at);
+    let cursor = pagination.cursor_item(&state, &keys).map(|x| x.created_at);
     let keys = keys
         .into_iter()
         .take(page_size)

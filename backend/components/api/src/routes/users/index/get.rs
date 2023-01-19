@@ -6,9 +6,9 @@ use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::serializers::UserDetail;
-use crate::types::request::PaginatedRequest;
 use crate::types::response::PaginatedResponseData;
 use crate::types::JsonApiResponse;
+use crate::types::PaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::TenantUvw;
@@ -52,13 +52,13 @@ fn get_visible_populated_fields(uvw: &TenantUvw) -> (Vec<IdentityDataKind>, Vec<
 #[get("/users")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<ListUsersRequest, i64>>,
+    filters: web::Query<ListUsersRequest>,
+    pagination: web::Query<PaginationRequest<i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<UsersListResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let (filters, pagination) = request.into_inner().into_inner();
     let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
     let ListUsersRequest {
@@ -68,7 +68,7 @@ pub async fn get(
         footprint_user_id,
         timestamp_lte,
         timestamp_gte,
-    } = filters;
+    } = filters.into_inner();
 
     // TODO clean phone number or email
     let fingerprints = match fingerprint {

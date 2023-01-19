@@ -3,8 +3,8 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::ApiResult;
 use crate::types::JsonApiResponse;
-use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
+use crate::types::PaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -25,16 +25,16 @@ type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::Organization
 #[get("/org/roles")]
 async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<OrgRoleFilters, DateTime<Utc>>>,
+    filters: web::Query<OrgRoleFilters>,
+    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let (filters, pagination) = request.into_inner().into_inner();
     let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
-    let OrgRoleFilters { scopes } = filters;
+    let OrgRoleFilters { scopes } = filters.into_inner();
     let scopes = scopes.map(|s| s.0);
 
     let tenant_id = tenant.id.clone();
