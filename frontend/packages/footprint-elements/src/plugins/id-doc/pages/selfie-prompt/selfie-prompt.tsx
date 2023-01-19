@@ -22,11 +22,13 @@ const SelfiePrompt = () => {
   } = state.context;
   const [consentVisible, setConsentVisible] = useState(!!consentRequired);
 
-  const handleCloseConsent = (isConsented: boolean) => {
+  const handleClose = () => {
     setConsentVisible(false);
-    if (isConsented) {
-      send({ type: Events.startSelfieCapture });
-    }
+  };
+
+  const handleConsent = () => {
+    send({ type: Events.startSelfieCapture });
+    setConsentVisible(false);
   };
 
   const handleClick = () => {
@@ -59,7 +61,11 @@ const SelfiePrompt = () => {
       <Button fullWidth onClick={handleClick}>
         {t('cta')}
       </Button>
-      <SelfieConsent open={consentVisible} onClose={handleCloseConsent} />
+      <SelfieConsent
+        open={consentVisible}
+        onClose={handleClose}
+        onConsent={handleConsent}
+      />
     </Container>
   );
 };

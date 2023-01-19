@@ -10,10 +10,11 @@ import useConsent from './hooks/use-consent';
 
 type SelfieConsentProps = {
   open: boolean;
-  onClose: (isConsented: boolean) => void;
+  onConsent: () => void;
+  onClose: () => void;
 };
 
-const SelfieConsent = ({ open, onClose }: SelfieConsentProps) => {
+const SelfieConsent = ({ open, onConsent, onClose }: SelfieConsentProps) => {
   const { t } = useTranslation('components.selfie-consent');
   const [state] = useIdDocMachine();
   const { authToken } = state.context;
@@ -21,7 +22,7 @@ const SelfieConsent = ({ open, onClose }: SelfieConsentProps) => {
   const requestErrorToast = useRequestErrorToast();
 
   const handleClose = () => {
-    onClose(false);
+    onClose();
   };
 
   const handleConsent = () => {
@@ -39,7 +40,7 @@ const SelfieConsent = ({ open, onClose }: SelfieConsentProps) => {
       { consentLanguageText, authToken },
       {
         onSuccess: () => {
-          onClose(true);
+          onConsent();
         },
         onError: requestErrorToast,
       },
