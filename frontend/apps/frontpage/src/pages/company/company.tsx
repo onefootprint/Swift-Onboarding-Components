@@ -113,12 +113,6 @@ const Company = () => {
       linkedin: 'https://www.linkedin.com/in/keagan-long-50597769/',
     },
     {
-      name: 'Omar Cameron',
-      avatarSrc: '/team/member-omar.png',
-      role: 'Sales',
-      linkedin: 'https://www.linkedin.com/in/omar-cameron/',
-    },
-    {
       name: 'Pedro Marques',
       avatarSrc: '/team/member-pedro.png',
       role: 'Design',
