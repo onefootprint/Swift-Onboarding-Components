@@ -8,7 +8,6 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
-import Drift from 'react-driftjs';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Layout from '../components/layout';
@@ -75,7 +74,6 @@ const App = ({ Component, pageProps }: AppProps) => (
           <MDXProvider>
             <Component {...pageProps} />
           </MDXProvider>
-          <Drift appId="bp8bybvft4dm" />
         </Layout>
       </DesignSystemProvider>
     </QueryClientProvider>
