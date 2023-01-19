@@ -9,6 +9,7 @@ export type SocureContext =
 
 export type SocureRequest = {
   publicKey: string;
+  endpoint: string;
   userConsent: boolean;
   context: SocureContext;
 };

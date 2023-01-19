@@ -22,6 +22,7 @@ const SocureSdk = ({
   const [state] = useBifrostMachine();
   const sendDeviceIdMutation = useSendDeviceSessionId();
 
+  const endpoint = 'https://s.risk.onefootprint.com/';
   // Socure adds the devicer object to the window object
   // https://developer.socure.com/docs/sdks/sigma-device/js-sdk/js-overview
   const getDevicer = () => {
@@ -33,6 +34,7 @@ const SocureSdk = ({
     const devicer = getDevicer();
     const options: SocureRequest = {
       publicKey,
+      endpoint,
       userConsent,
       context,
     };
