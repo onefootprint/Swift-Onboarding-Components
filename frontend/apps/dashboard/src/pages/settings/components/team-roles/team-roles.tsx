@@ -33,6 +33,7 @@ const TeamRoles = () => {
         {tabs.map(({ value, label }) => (
           <Tab
             as="button"
+            key={value}
             onClick={() => setTab(value)}
             selected={tab === value}
           >
