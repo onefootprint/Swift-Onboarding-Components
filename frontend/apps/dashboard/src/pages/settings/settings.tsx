@@ -5,6 +5,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import BusinessProfile from './components/business-profile';
+import TeamRoles from './components/team-roles';
 
 const Settings = () => {
   const { t } = useTranslation('pages.settings');
@@ -19,8 +20,11 @@ const Settings = () => {
           {t('header.title')}
         </Typography>
       </Header>
-      <Box>
+      <Box sx={{ marginBottom: 10 }}>
         <BusinessProfile />
+      </Box>
+      <Box>
+        <TeamRoles />
       </Box>
     </>
   );

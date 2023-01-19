@@ -1,4 +1,4 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useQueryState, useTranslation } from '@onefootprint/hooks';
 import { Box, Button, Tab, Tabs, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -9,12 +9,16 @@ import InviteTeammates from './components/invite-teammates';
 import People from './components/people';
 
 enum TabName {
-  people,
-  accessControl,
+  people = 'people',
+  accessControl = 'access-control',
 }
+
 const TeamRoles = () => {
   const { t } = useTranslation('pages.settings.team-roles');
-  const [tab, setTab] = useState<TabName>(TabName.people);
+  const [tab, setTab] = useQueryState<TabName>({
+    query: 'tab',
+    defaultValue: TabName.people,
+  });
   const [createRoleVisible, setCreateRoleVisible] = useState(false);
   const [inviteVisible, setInviteVisible] = useState(false);
 
