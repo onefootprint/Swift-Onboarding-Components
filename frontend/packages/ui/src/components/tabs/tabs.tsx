@@ -73,7 +73,7 @@ const Container = styled.nav`
         ${createFontStyles('body-3')};
         border-bottom: ${theme.borderWidth[2]} solid transparent;
         color: ${theme.color.tertiary};
-        padding-bottom: ${theme.spacing[3]};
+        padding: 0 0 ${theme.spacing[3]} 0;
 
         &[data-selected='true'] {
           color: ${theme.color.accent};

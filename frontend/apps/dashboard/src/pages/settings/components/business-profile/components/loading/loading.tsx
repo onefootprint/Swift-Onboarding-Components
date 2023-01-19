@@ -3,7 +3,7 @@ import React from 'react';
 
 const Loading = () => (
   <Box testID="business-profile-loading">
-    <Box sx={{ marginBottom: 8 }}>
+    <Box sx={{ marginBottom: 9 }}>
       <Avatar />
     </Box>
     <Box sx={{ display: 'grid', gap: 2 }}>
@@ -18,7 +18,7 @@ const Avatar = () => (
 );
 
 const Label = () => (
-  <Shimmer sx={{ width: '143px', height: '20px', borderRadius: 'default' }} />
+  <Shimmer sx={{ width: '143px', height: '24px', borderRadius: 'default' }} />
 );
 
 const Value = () => (

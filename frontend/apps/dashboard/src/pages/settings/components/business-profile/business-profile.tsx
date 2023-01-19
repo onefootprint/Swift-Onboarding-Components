@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import { Box, Divider, Typography } from '@onefootprint/ui';
+import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import SectionHeader from '../section-header';
 import Data from './components/data';
 import Error from './components/error';
 import Loading from './components/loading';
@@ -15,14 +16,10 @@ const BusinessProfile = () => {
 
   return (
     <section data-testid="business-profile-section">
-      <Header>
-        <Box>
-          <Typography variant="label-1" as="h3" sx={{ marginBottom: 2 }}>
-            {t('header.title')}
-          </Typography>
-          <Typography variant="body-3">{t('header.subtitle')}</Typography>
-        </Box>
-      </Header>
+      <SectionHeader
+        title={t('header.title')}
+        subtitle={t('header.subtitle')}
+      />
       <Box sx={{ marginY: 5 }}>
         <StyledDivider />
       </Box>
@@ -36,15 +33,6 @@ const BusinessProfile = () => {
     </section>
   );
 };
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    gap: ${theme.spacing[2]};
-    justify-content: space-between;
-  `}
-`;
 
 const Container = styled.div`
   ${({ theme }) => css`
