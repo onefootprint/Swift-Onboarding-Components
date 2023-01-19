@@ -61,6 +61,11 @@ const createIdDocMachine = () =>
                 },
               },
               {
+                target: States.selfiePrompt,
+                cond: context => !!context.selfie.required,
+                actions: Actions.assignIdDocFrontImage,
+              },
+              {
                 target: States.processingDocuments,
                 actions: Actions.assignIdDocFrontImage,
               },
