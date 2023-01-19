@@ -58,8 +58,9 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let cursor = request.cursor;
-    let page_size = request.page_size(&state);
+    let (filters, pagination) = request.into_inner().into_inner();
+    let cursor = pagination.cursor;
+    let page_size = pagination.page_size(&state);
     let ListUsersRequest {
         statuses,
         requires_manual_review,
@@ -67,7 +68,7 @@ pub async fn get(
         footprint_user_id,
         timestamp_lte,
         timestamp_gte,
-    } = request.data.clone();
+    } = filters;
 
     // TODO clean phone number or email
     let fingerprints = match fingerprint {
@@ -111,7 +112,7 @@ pub async fn get(
         .await??;
 
     // If there are more than page_size results, we should tell the client there's another page
-    let cursor = request
+    let cursor = pagination
         .cursor_item(&state, &scoped_users)
         .map(|(su, _)| su.ordering_id);
 

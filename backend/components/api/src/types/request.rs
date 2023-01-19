@@ -7,14 +7,12 @@ pub struct EmptyRequest {}
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct PaginatedRequest<T, C> {
-    #[serde(flatten)]
-    pub data: T,
+pub struct PaginationRequest<C> {
     pub cursor: Option<C>,
     pub page_size: Option<usize>,
 }
 
-impl<T, C> PaginatedRequest<T, C> {
+impl<C> PaginationRequest<C> {
     pub fn page_size(&self, state: &web::Data<State>) -> usize {
         if let Some(page_size) = self.page_size {
             page_size
@@ -29,5 +27,28 @@ impl<T, C> PaginatedRequest<T, C> {
         } else {
             None
         }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct PaginatedRequest<T, C> {
+    #[serde(flatten)]
+    data: T,
+    #[serde(flatten)]
+    pagination: PaginationRequest<C>,
+}
+
+impl<T, C> PaginatedRequest<T, C> {
+    pub fn into_inner(self) -> (T, PaginationRequest<C>) {
+        (self.data, self.pagination)
+    }
+}
+
+impl<T, C> std::ops::Deref for PaginatedRequest<T, C> {
+    type Target = PaginationRequest<C>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.pagination
     }
 }

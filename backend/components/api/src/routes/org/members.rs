@@ -6,7 +6,6 @@ use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::org::auth::magic_link::create_and_send_magic_link;
-use crate::types::EmptyRequest;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::types::PaginatedRequest;
@@ -14,6 +13,7 @@ use crate::types::PaginatedResponseData;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_wire_types::OrgMemberFilters;
 use chrono::{DateTime, Utc};
 use db::models::tenant_user::TenantUserListFilters;
 use db::models::tenant_user::{TenantUser, TenantUserUpdate};
@@ -29,7 +29,7 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 #[get("/org/members")]
 async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
+    request: web::Query<PaginatedRequest<OrgMemberFilters, DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> actix_web::Result<
     Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
@@ -37,8 +37,12 @@ async fn get(
 > {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
-    let cursor = request.cursor;
-    let page_size = request.page_size(&state);
+
+    let (filters, pagination) = request.into_inner().into_inner();
+    let cursor = pagination.cursor;
+    let page_size = pagination.page_size(&state);
+    let OrgMemberFilters { role_ids } = filters;
+    let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let tenant_id = tenant.id.clone();
     let results = state
@@ -49,13 +53,14 @@ async fn get(
                 cursor,
                 page_size: (page_size + 1) as i64,
                 only_active: true,
+                role_ids,
             };
             let result = TenantUser::list(conn, filters)?;
             Ok(result)
         })
         .await??;
 
-    let cursor = request.cursor_item(&state, &results).map(|x| x.0.created_at);
+    let cursor = pagination.cursor_item(&state, &results).map(|x| x.0.created_at);
     let results = results
         .into_iter()
         .take(page_size)

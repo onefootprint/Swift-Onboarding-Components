@@ -658,6 +658,27 @@ def create_tenant_user_with_role(tenant, role_id):
 
 
 class TestDashboardAdminUsers:
+    def test_get_members(self, tenant_user, sandbox_tenant, limited_role, admin_role):
+        user_id = tenant_user["id"]
+
+        body = get(f"org/members", None, sandbox_tenant.auth_token)
+        user = next(u for u in body["data"] if u["id"] == user_id)
+        assert user["role_id"] == admin_role["id"]
+
+        body = get(
+            f"org/members",
+            dict(role_ids=limited_role["id"]),
+            sandbox_tenant.auth_token,
+        )
+        assert not any(u["id"] == user_id for u in body["data"])
+
+        body = get(
+            f"org/members",
+            dict(role_ids=",".join([limited_role["id"], admin_role["id"]])),
+            sandbox_tenant.auth_token,
+        )
+        assert any(u["id"] == user_id for u in body["data"])
+
     def test_update_roles(self, sandbox_tenant, limited_role, admin_role):
         role_id = limited_role["id"]
         suffix = _gen_random_n_digit_number(10)

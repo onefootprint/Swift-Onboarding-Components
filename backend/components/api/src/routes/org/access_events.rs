@@ -44,8 +44,9 @@ async fn get(
 ) -> actix_web::Result<Json<PaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
-    let page_size = request.page_size(&state);
-    let cursor = request.cursor;
+    let (filters, pagination) = request.into_inner().into_inner();
+    let page_size = pagination.page_size(&state);
+    let cursor = pagination.cursor;
     let AccessEventRequest {
         footprint_user_id,
         kind,
@@ -53,7 +54,7 @@ async fn get(
         search,
         timestamp_lte,
         timestamp_gte,
-    } = request.data.clone();
+    } = filters;
 
     let tenant = auth.tenant();
     let params = AccessEventListQueryParams {
@@ -70,7 +71,7 @@ async fn get(
         AccessEventListItemForTenant::get(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;
 
     // If there are more than page_size results, we should tell the client there's another page
-    let cursor = request
+    let cursor = pagination
         .cursor_item(&state, &results)
         .map(|x| x.event.0.ordering_id);
     let response = results

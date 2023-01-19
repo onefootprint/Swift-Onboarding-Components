@@ -214,6 +214,9 @@ impl TenantUser {
         if let Some(cursor) = filters.cursor {
             query = query.filter(tenant_user::created_at.ge(cursor));
         }
+        if let Some(role_ids) = filters.role_ids {
+            query = query.filter(tenant_user::tenant_role_id.eq_any(role_ids));
+        }
         let results = query.get_results(conn)?;
         Ok(results)
     }
@@ -224,6 +227,7 @@ pub struct TenantUserListFilters<'a> {
     pub only_active: bool,
     pub cursor: Option<DateTime<Utc>>,
     pub page_size: i64,
+    pub role_ids: Option<Vec<TenantRoleId>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
