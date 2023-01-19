@@ -730,68 +730,56 @@
           "invite-teammates": "Invite teammates",
           "create-role": "Create role"
         },
-        "people": {
-          "table": {
-            "aria-label": "Table of organization members",
-            "header": {
-              "email": "Email",
-              "lastActive": "Last Active",
-              "role": "Role"
-            },
-            "empty-state": "No members found"
-          },
-          "filters": {
-            "status": {
-              "label": "Status",
-              "new": "New",
-              "manual-review": "Manual Review",
-              "processing": "Processing",
-              "failed": "Failed"
-            },
-            "date-range": {
-              "label": "Date range"
-            }
-          }
-        },
-        "access-control": {
-          "aria-label": "Table of organization roles",
-          "table": {
-            "header": {
-              "role": "Role",
-              "created": "Created at",
-              "permissions": "Permissions"
-            },
-            "empty-state": "No roles found"
-          }
-        },
         "tabs": {
-          "people": "People",
+          "members": "Members",
           "access-control": "Access control"
-        },
-        "create-role": {
-          "title": "Create role",
-          "form": {
-            "cta": "Submit",
-            "cancel": "Cancel",
-            "name": {
-              "label": "Role",
-              "placeholder": "Role name",
-              "errors": {
-                "required": "The role name is required."
-              }
-            },
+        }
+      },
+      "members": {
+        "table": {
+          "aria-label": "Table of organization members",
+          "header": {
+            "email": "Email",
+            "lastActive": "Last Active",
+            "role": "Role"
+          },
+          "empty-state": "No members found"
+        }
+      },
+      "access-control": {
+        "aria-label": "Table of organization roles",
+        "table": {
+          "header": {
+            "role": "Role",
+            "created": "Created at",
             "permissions": "Permissions"
           },
-          "toast": {
-            "success": {
-              "title": "Role created successfully!",
-              "description": "\"{{name}}\" is now available as a specific role."
-            }
-          }
-        },
-        "invite-teammates": {
-          "title": "Invite teammates"
+          "empty-state": "No roles found"
         }
+      },
+      "create-role": {
+        "title": "Create role",
+        "form": {
+          "cta": "Submit",
+          "cancel": "Cancel",
+          "name": {
+            "label": "Role",
+            "placeholder": "Role name",
+            "errors": {
+              "required": "The role name is required."
+            }
+          },
+          "permissions": "Permissions"
+        },
+        "toast": {
+          "success": {
+            "title": "Role created successfully!",
+            "description": "\"{{name}}\" is now available as a specific role."
+          }
+        }
+      },
+      "invite-teammates": {
+        "title": "Invite teammates"
       }
     }
   }

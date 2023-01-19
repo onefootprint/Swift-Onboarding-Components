@@ -5,10 +5,10 @@ import styled, { css } from 'styled-components';
 
 import SectionHeader from '../section-header';
 import AccessControl from './components/access-control';
-import People from './components/people';
+import Members from './components/members';
 
 enum TabName {
-  people = 'people',
+  members = 'members',
   accessControl = 'access-control',
 }
 
@@ -16,10 +16,10 @@ const TeamRoles = () => {
   const { t } = useTranslation('pages.settings.team-roles');
   const [tab, setTab] = useQueryState<TabName>({
     query: 'tab',
-    defaultValue: TabName.people,
+    defaultValue: TabName.members,
   });
   const tabs = [
-    { label: t('tabs.people'), value: TabName.people },
+    { label: t('tabs.members'), value: TabName.members },
     { label: t('tabs.access-control'), value: TabName.accessControl },
   ];
 
@@ -42,7 +42,7 @@ const TeamRoles = () => {
         ))}
       </Tabs>
       <Content>
-        {tab === TabName.people && <People />}
+        {tab === TabName.members && <Members />}
         {tab === TabName.accessControl && <AccessControl />}
       </Content>
     </section>

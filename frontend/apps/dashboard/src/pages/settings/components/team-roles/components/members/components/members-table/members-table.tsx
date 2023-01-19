@@ -3,31 +3,37 @@ import { OrgMember } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 
+import useOrgMembersFilters from '../../hooks/use-org-members-filters';
 import Row from '../row';
 
-type PeopleTableProps = {
-  members: OrgMember[];
+type MembersTableProps = {
+  data?: OrgMember[];
+  errorMessage?: string;
   isLoading?: boolean;
-  onFilter: (roles: string) => void;
 };
 
-const PeopleTable = ({ members, isLoading, onFilter }: PeopleTableProps) => {
-  const { t } = useTranslation('pages.settings.team-roles.people');
+const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
+  const { t } = useTranslation('pages.settings.members');
+  const filters = useOrgMembersFilters();
   const columns = [
     { id: 'email', text: t('table.header.email'), width: '35%' },
     { id: 'lastActive', text: t('table.header.lastActive'), width: '25%' },
     { id: 'role', text: t('table.header.role'), width: '40%' },
   ];
 
+  const handleSearchChange = (search: string) => {
+    filters.push({ member_search: search });
+  };
+
   return (
     <Table<OrgMember>
-      onChangeSearchText={onFilter}
       aria-label={t('table.aria-label')}
       columns={columns}
-      emptyStateText={t('table.empty-state')}
+      emptyStateText={errorMessage || t('table.empty-state')}
       getKeyForRow={member => member.id}
       isLoading={isLoading}
-      items={members}
+      items={data}
+      onChangeSearchText={handleSearchChange}
       renderTr={({ item: member }) => (
         <Row
           createdAt={member.createdAt}
@@ -44,4 +50,4 @@ const PeopleTable = ({ members, isLoading, onFilter }: PeopleTableProps) => {
   );
 };
 
-export default PeopleTable;
+export default MembersTable;

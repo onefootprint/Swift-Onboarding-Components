@@ -12,7 +12,7 @@ type RolesTableProps = {
 };
 
 const RolesTable = ({ roles, isLoading, onFilter }: RolesTableProps) => {
-  const { t } = useTranslation('pages.settings.team-roles.access-control');
+  const { t } = useTranslation('pages.settings.access-control');
   const columns = [
     { id: 'role', text: t('table.header.role'), width: '25%' },
     { id: 'created', text: t('table.header.created'), width: '15%' },
