@@ -1,3 +1,5 @@
+import stripBase64Prefix from './strip-base64-prefix';
+
 const imageFileToStrippedBase64 = (image: File) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -8,8 +10,8 @@ const imageFileToStrippedBase64 = (image: File) =>
         reject();
         return;
       }
-      const base64 = reader.result?.replace(/data:.+?;base64,/i, '');
-      resolve(base64);
+      const processedResult = stripBase64Prefix(reader.result);
+      resolve(processedResult);
     };
     reader.readAsDataURL(image);
   });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
+import stripBase64Prefix from '../../utils/image-processing/strip-base64-prefix';
 import Camera from './components/camera';
 import Preview from './components/preview';
 
@@ -19,7 +20,7 @@ const SelfiePhoto = () => {
     send({
       type: Events.receivedSelfieImage,
       payload: {
-        image,
+        image: stripBase64Prefix(image),
       },
     });
   };
