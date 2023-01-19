@@ -1,9 +1,8 @@
 use crate::auth::tenant::{CheckTenantGuard, TenantUserAuthContext};
 use crate::auth::tenant::{SecretTenantAuthContext, TenantGuard};
 use crate::auth::Either;
-use crate::errors::ApiError;
 use crate::types::response::ResponseData;
-use crate::types::{EmptyResponse, JsonApiResponse};
+use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use actix_web::web;
@@ -37,7 +36,7 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRequest>,
     auth: TenantUserAuthContext,
-) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::Organization> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
 
@@ -55,10 +54,12 @@ async fn patch(
         website_url,
         company_size,
     };
-    let _result = state
+    let updated_tenant = state
         .db_pool
         .db_query(move |conn| Tenant::update(conn, tenant_id, update_tenant))
         .await??;
 
-    Ok(Json(EmptyResponse::ok()))
+    Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
+        updated_tenant,
+    ))))
 }
