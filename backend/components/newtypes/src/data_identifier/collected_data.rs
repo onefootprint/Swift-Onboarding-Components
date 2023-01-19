@@ -10,29 +10,7 @@ use strum_macros::{AsRefStr, EnumString};
 
 use crate::IdentityDataKind;
 
-#[derive(
-    Debug,
-    Eq,
-    PartialEq,
-    Ord,
-    PartialOrd,
-    Hash,
-    Display,
-    Clone,
-    Copy,
-    EnumIter,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    AsRefStr,
-    JsonSchema,
-)]
-#[strum(serialize_all = "PascalCase")]
-#[serde(rename_all = "snake_case")]
-#[diesel(sql_type = Text)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Display, Clone, Copy, EnumIter)]
 /// Represents a type of collectible data. Each variant represents a set of fields that must be
 /// collected together, like FirstName and LastName.
 /// Some CollectedData variants have multiple Options of allowable collectible fields. For example,
@@ -45,8 +23,6 @@ pub enum CollectedData {
     Email,
     PhoneNumber,
 }
-
-crate::util::impl_enum_str_diesel!(CollectedData);
 
 impl CollectedData {
     /// Returns all the variants of this CollectedDataOption, in increasing order of "completeness."
@@ -86,7 +62,7 @@ impl CollectedData {
     AsRefStr,
     JsonSchema,
 )]
-#[strum(serialize_all = "PascalCase")]
+#[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 /// Represent the options of allowed CollectedData.
