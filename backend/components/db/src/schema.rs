@@ -474,12 +474,12 @@ table! {
         id -> Text,
         tenant_id -> Text,
         name -> Text,
-        scopes -> Jsonb,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
         is_immutable -> Bool,
+        scopes -> Array<Text>,
     }
 }
 

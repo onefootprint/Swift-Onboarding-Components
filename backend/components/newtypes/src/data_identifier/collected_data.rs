@@ -1,14 +1,11 @@
-use std::collections::HashSet;
-
-pub use derive_more::Display;
+use crate::IdentityDataKind;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use strum::{EnumIter, IntoEnumIterator};
-use strum_macros::{AsRefStr, EnumString};
-
-use crate::IdentityDataKind;
+use strum_macros::{AsRefStr, Display, EnumString};
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Display, Clone, Copy, EnumIter)]
 /// Represents a type of collectible data. Each variant represents a set of fields that must be

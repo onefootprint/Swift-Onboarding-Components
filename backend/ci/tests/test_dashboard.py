@@ -242,10 +242,6 @@ class TestDashboardDecrypt:
         )
         user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
-        # TODO: I can't figure out how to log in a tenant_user in a test so not sure how to test the tenant_user permissions
-        # tenant_role = create_tenant_role(sandbox_tenant, ["read"])
-        # tenant_user = create_tenant_user_with_role(sandbox_tenant, tenant_role["id"])
-
         data = {
             "document_type": "passport",
             "reason": "Responding to a customer request",
@@ -601,13 +597,11 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        scopes=[dict(kind="read"), dict(kind="api_keys")],
+        scopes=["read", "api_keys"],
     )
     body = post("org/roles", role_data, sandbox_tenant.auth_token)
     assert body["name"] == role_data["name"]
-    assert set(i["kind"] for i in body["scopes"]) == set(
-        i["kind"] for i in role_data["scopes"]
-    )
+    assert set(i for i in body["scopes"]) == set(i for i in role_data["scopes"])
     return body
 
 
@@ -615,7 +609,7 @@ def limited_role(sandbox_tenant):
 def admin_role(sandbox_tenant):
     body = get("org/roles", None, sandbox_tenant.auth_token)
     roles = body["data"]
-    return next(i for i in roles if i["scopes"][0]["kind"] == "admin")
+    return next(i for i in roles if i["scopes"][0] == "admin")
 
 
 @pytest.fixture(scope="session")
@@ -628,32 +622,6 @@ def tenant_user(sandbox_tenant, admin_role):
     body = post("org/members", user_data, sandbox_tenant.auth_token)
     assert not body["last_login_at"]
     assert body["role_id"] == admin_role["id"]
-    return body
-
-
-def create_tenant_role(tenant, scope_kinds):
-    suffix = _gen_random_n_digit_number(10)
-    role_data = dict(
-        name=f"Test limited role {suffix}",
-        scopes=[dict(kind=k) for k in scope_kinds],
-    )
-    body = post("org/roles", role_data, tenant.auth_token)
-    assert body["name"] == role_data["name"]
-    assert set(i["kind"] for i in body["scopes"]) == set(
-        i["kind"] for i in role_data["scopes"]
-    )
-    return body
-
-
-def create_tenant_user_with_role(tenant, role_id):
-    user_data = dict(
-        email="integrationtest+1@onefootprint.com",
-        role_id=role_id,
-        redirect_url="http://localhost:3001/auth",
-    )
-    body = post("org/members", user_data, tenant.auth_token)
-    assert not body["last_login_at"]
-    assert body["role_id"] == role_id
     return body
 
 
@@ -684,7 +652,7 @@ class TestDashboardAdminUsers:
         suffix = _gen_random_n_digit_number(10)
         patch_data = dict(
             name=f"New role name {suffix}",
-            scopes=[dict(kind="read"), dict(kind="onboarding_configuration")],
+            scopes=["read", "onboarding_configuration"],
         )
         patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token)
 
@@ -694,9 +662,7 @@ class TestDashboardAdminUsers:
         assert admin_role["id"] in role_ids
         role = next(r for r in body["data"] if r["id"] == role_id)
         assert role["name"] == patch_data["name"]
-        assert set(i["kind"] for i in role["scopes"]) == set(
-            i["kind"] for i in patch_data["scopes"]
-        )
+        assert set(i for i in role["scopes"]) == set(i for i in patch_data["scopes"])
 
     def test_cant_update_admin_role(self, sandbox_tenant, admin_role):
         role_id = admin_role["id"]

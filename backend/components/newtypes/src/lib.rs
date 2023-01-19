@@ -67,18 +67,10 @@ pub enum Error {
     #[error("Error deserializing")]
     DeserializeError,
     #[error("{0}")]
-    TenantError(#[from] TenantError),
-    #[error("{0}")]
     ProxyTokenError(#[from] ProxyTokenError),
 }
 
 pub type NtResult<T> = Result<T, Error>;
-
-#[derive(Debug, Clone, thiserror::Error)]
-pub enum TenantError {
-    #[error("Role scopes must include at least Read")]
-    InsufficientScopes,
-}
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum PhoneError {
@@ -116,6 +108,16 @@ pub enum AddressError {
     InvalidCharacters(String),
 }
 
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum EnumDotNotationError {
+    #[error("Cannot parse: {0}")]
+    CannotParse(String),
+    #[error("Cannot parse prefix: {0}")]
+    CannotParsePrefix(String),
+    #[error("Cannot parse suffix: {0}")]
+    CannotParseSuffix(String),
+}
+
 #[macro_use]
 pub mod util {
     // Derive to_sql using the type's as_ref() method and from_sql with the type's from_str method
@@ -147,12 +149,12 @@ pub mod util {
     // Derive to_sql using the type's to_string() method and from_sql with the type's from_str method
     macro_rules! impl_enum_string_diesel {
         ($type:ty) => {
-            impl diesel::serialize::ToSql<Text, Pg> for $type {
+            impl diesel::serialize::ToSql<Text, diesel::pg::Pg> for $type {
                 fn to_sql<'b>(
                     &'b self,
-                    out: &mut diesel::serialize::Output<'b, '_, Pg>,
+                    out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>,
                 ) -> diesel::serialize::Result {
-                    <String as diesel::serialize::ToSql<Text, Pg>>::to_sql(
+                    <String as diesel::serialize::ToSql<Text, diesel::pg::Pg>>::to_sql(
                         &self.to_string(),
                         &mut out.reborrow(),
                     )

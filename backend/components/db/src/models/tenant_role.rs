@@ -3,7 +3,7 @@ use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{TenantId, TenantRoleId, TenantScope, TenantScopeList};
+use newtypes::{TenantId, TenantRoleId, TenantScope};
 
 use super::tenant::Tenant;
 
@@ -15,18 +15,26 @@ pub struct TenantRole {
     pub id: TenantRoleId,
     pub tenant_id: TenantId,
     pub name: String,
-    pub scopes: TenantScopeList,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
     /// Denotes whether this is a default TenantRole that cannot be changed by a tenant.
     /// Each Tenant will have an immutable read-only and immutable admin role
-    /// TODO include in HTTP response
     pub is_immutable: IsImmutable,
+    /// The list of scopes that are granted to every user in this role
+    pub scopes: Vec<TenantScope>,
 }
 
 impl TenantRole {
+    fn validate_scopes(scopes: &[TenantScope]) -> DbResult<()> {
+        if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
+            // Every role must have at least Read permissions for now
+            return Err(DbError::InsufficientTenantScopes);
+        }
+        Ok(())
+    }
+
     fn get_or_create_immutable_role(
         conn: &mut TxnPgConnection,
         tenant_id: &TenantId,
@@ -37,7 +45,7 @@ impl TenantRole {
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::name.eq(name))
-            .filter(tenant_role::scopes.eq(TenantScopeList::new(scopes.clone())?))
+            .filter(tenant_role::scopes.eq(&scopes))
             .filter(tenant_role::is_immutable.eq(true))
             .first::<Self>(conn.conn())
             .optional()?;
@@ -66,10 +74,11 @@ impl TenantRole {
         scopes: Vec<TenantScope>,
         is_immutable: IsImmutable,
     ) -> DbResult<Self> {
+        Self::validate_scopes(&scopes)?;
         let new = NewTenantRoleRow {
             tenant_id,
             name,
-            scopes: TenantScopeList::new(scopes)?,
+            scopes,
             is_immutable,
             created_at: Utc::now(),
         };
@@ -136,9 +145,12 @@ impl TenantRole {
         name: Option<String>,
         scopes: Option<Vec<TenantScope>>,
     ) -> DbResult<Self> {
+        if let Some(scopes) = scopes.as_ref() {
+            Self::validate_scopes(scopes)?;
+        }
         let update = TenantRoleUpdate {
             name,
-            scopes: scopes.map(TenantScopeList::new).transpose()?,
+            scopes,
             ..TenantRoleUpdate::default()
         };
         let role = Self::lock_active(conn, id, tenant_id)?;
@@ -186,7 +198,7 @@ impl TenantRole {
 struct NewTenantRoleRow {
     tenant_id: TenantId,
     name: String,
-    scopes: TenantScopeList,
+    scopes: Vec<TenantScope>,
     created_at: DateTime<Utc>,
     is_immutable: IsImmutable,
 }
@@ -195,6 +207,6 @@ struct NewTenantRoleRow {
 #[diesel(table_name = tenant_role)]
 struct TenantRoleUpdate {
     name: Option<String>,
-    scopes: Option<TenantScopeList>,
+    scopes: Option<Vec<TenantScope>>,
     deactivated_at: Option<Option<DateTime<Utc>>>,
 }

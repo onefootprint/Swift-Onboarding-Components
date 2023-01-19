@@ -8,7 +8,7 @@ pub enum VaultProxyError {
     #[error("missing $ from token start")]
     InvalidTokenComponents,
     #[error("invalid data type identifier: {0}")]
-    InvalidDataIdentifier(#[from] newtypes::DataIdentifierParsingError),
+    InvalidDataIdentifier(#[from] newtypes::EnumDotNotationError),
     #[error("found invalid or unknown data identifiers: {0}")]
     DataIdentifiersNotFound(String),
     #[error("destination target url is an invalid url")]
@@ -58,5 +58,5 @@ pub enum VaultProxyError {
     #[error("invalid pem file: {0}")]
     PemError(#[from] crypto::pem::PemError),
     #[error("invalid proxy token: {0}")]
-    ProxyTokenError(#[from] ProxyTokenError)
+    ProxyTokenError(#[from] ProxyTokenError),
 }

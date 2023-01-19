@@ -37,12 +37,14 @@ mod uvd_kind;
 pub use self::{
     collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*, uvd_kind::*,
 };
-use crate::{api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, KvDataKey};
+use crate::{
+    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
+    KvDataKey,
+};
 pub use derive_more::Display;
-use diesel::{pg::Pg, sql_types::Text, AsExpression, FromSqlRow};
+use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use std::str::FromStr;
 use strum_macros::{AsRefStr, EnumDiscriminants};
-use thiserror::Error;
 
 #[derive(
     Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, AsExpression, FromSqlRow, AsRefStr, EnumDiscriminants,
@@ -74,16 +76,8 @@ impl From<KvDataKey> for DataIdentifier {
     }
 }
 
-#[derive(Debug, Clone, Error)]
-pub enum DataIdentifierParsingError {
-    #[error("Cannot parse: {0}")]
-    CannotParse(String),
-    #[error("Cannot parse prefix: {0}")]
-    CannotParsePrefix(String),
-    #[error("Cannot parse suffix: {0}")]
-    CannotParseSuffix(String),
-}
-
+/// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
+/// We serialize DIs as `prefix.suffix`
 impl std::fmt::Display for DataIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = self.as_ref();
@@ -97,39 +91,39 @@ impl std::fmt::Display for DataIdentifier {
     }
 }
 
+/// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
+/// We serialize DIs as `prefix.suffix`
 impl FromStr for DataIdentifier {
-    type Err = DataIdentifierParsingError;
+    type Err = EnumDotNotationError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let period_idx = s
             .find('.')
-            .ok_or_else(|| DataIdentifierParsingError::CannotParse(s.to_owned()))?;
+            .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
         let prefix = &s[..period_idx];
         let suffix = &s[(period_idx + 1)..];
         let prefix = DataIdentifierDiscriminants::from_str(prefix)
-            .map_err(|_| DataIdentifierParsingError::CannotParsePrefix(prefix.to_owned()))?;
+            .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
         // Parse the suffix differently depending on the prefix
+        let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
         let result = match prefix {
-            DataIdentifierDiscriminants::Id => Self::Id(
-                IdentityDataKind::from_str(suffix)
-                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
-            ),
-            DataIdentifierDiscriminants::Custom => Self::Custom(
-                KvDataKey::from_str(suffix)
-                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
-            ),
-            DataIdentifierDiscriminants::IdDocument => Self::IdDocument(
-                IdDocKind::from_str(suffix)
-                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
-            ),
-            DataIdentifierDiscriminants::Selfie => Self::Selfie(
-                IdDocKind::from_str(suffix)
-                    .map_err(|_| DataIdentifierParsingError::CannotParseSuffix(suffix.to_owned()))?,
-            ),
+            DataIdentifierDiscriminants::Id => {
+                Self::Id(IdentityDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
+            DataIdentifierDiscriminants::Custom => {
+                Self::Custom(KvDataKey::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
+            DataIdentifierDiscriminants::IdDocument => {
+                Self::IdDocument(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
+            DataIdentifierDiscriminants::Selfie => {
+                Self::Selfie(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
         };
         Ok(result)
     }
 }
 
+/// A custom implementation to use the above FromStr impl to deserialize
 impl<'de> serde::Deserialize<'de> for DataIdentifier {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -140,6 +134,7 @@ impl<'de> serde::Deserialize<'de> for DataIdentifier {
     }
 }
 
+/// A custom implementation to use the above Display impl to serialize
 impl serde::Serialize for DataIdentifier {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

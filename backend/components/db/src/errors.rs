@@ -51,6 +51,8 @@ pub enum DbError {
     CannotCreatedScopedUser,
     #[error("Cannot update an immutable role {0}")]
     CannotUpdateImmutableRole(String),
+    #[error("Tenant role scopes must include at least Read")]
+    InsufficientTenantScopes,
 
     // Pass-through errors from other crates
     #[error("{0}")]

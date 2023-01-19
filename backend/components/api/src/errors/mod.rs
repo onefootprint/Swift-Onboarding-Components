@@ -151,6 +151,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
         DbError::NewtypesError(_) => StatusCode::BAD_REQUEST,
+        DbError::InsufficientTenantScopes => StatusCode::BAD_REQUEST,
     }
 }
 

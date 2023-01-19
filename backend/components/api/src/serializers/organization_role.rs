@@ -15,7 +15,7 @@ impl DbToApi<TenantRole> for api_wire_types::OrganizationRole {
         Self {
             id,
             name,
-            scopes: scopes.into_inner(),
+            scopes,
             is_immutable,
             created_at,
         }

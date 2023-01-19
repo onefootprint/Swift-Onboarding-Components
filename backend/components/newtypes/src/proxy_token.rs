@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use itertools::Itertools;
 
-
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 
 use crate::{DataIdentifier, FootprintUserId};
@@ -84,5 +83,5 @@ pub enum ProxyTokenError {
     #[error("missing or invalid components")]
     InvalidTokenComponents,
     #[error("invalid data type identifier: {0}")]
-    InvalidDataIdentifier(#[from] crate::DataIdentifierParsingError),
+    InvalidDataIdentifier(#[from] crate::EnumDotNotationError),
 }
