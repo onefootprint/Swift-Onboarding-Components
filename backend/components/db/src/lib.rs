@@ -19,6 +19,7 @@ pub use connection::TxnPgConnection;
 use std::time::Duration;
 
 pub use crate::errors::DbError;
+use crate::schema::user_consent;
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 pub use diesel::prelude::PgConnection;
@@ -272,6 +273,10 @@ pub async fn private_cleanup_integration_tests(
 
                     deleted_rows += diesel::delete(manual_review::table)
                         .filter(manual_review::onboarding_id.eq_any(ob_ids))
+                        .execute(conn.conn())?;
+
+                    deleted_rows += diesel::delete(user_consent::table)
+                        .filter(user_consent::onboarding_id.eq_any(ob_ids))
                         .execute(conn.conn())?;
 
                     deleted_rows += diesel::delete(socure_device_session::table)
