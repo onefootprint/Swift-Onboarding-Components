@@ -13,6 +13,7 @@ import {
   withOrganization,
   withOrganizationError,
   withUpdateOrganization,
+  withUpdateOrganizationError,
 } from './business-profile.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -86,41 +87,77 @@ describe('<BusinessProfile />', () => {
     });
 
     describe('when updating the company name', () => {
-      beforeEach(() => {
-        withUpdateOrganization({ name: 'Lorem' });
+      describe('when the request succeeds', () => {
+        beforeEach(() => {
+          withUpdateOrganization({ name: 'Lorem' });
+        });
+
+        it('should update the company name', async () => {
+          await renderBusinessProfileAndWaitData();
+
+          const prevName = screen.getByText('Acme');
+          expect(prevName).toBeInTheDocument();
+
+          const editDialogTrigger = screen.getByRole('button', {
+            name: 'Edit Company name',
+          });
+          await userEvent.click(editDialogTrigger);
+
+          const editDialog = screen.getByRole('dialog', {
+            name: 'Edit Company name',
+          });
+          expect(editDialog).toBeInTheDocument();
+
+          const input = screen.getByLabelText('Company name');
+          await userEvent.type(input, 'Lorem');
+
+          const submit = screen.getByRole('button', { name: 'Save' });
+          await userEvent.click(submit);
+
+          await waitForElementToBeRemoved(() =>
+            screen.queryByRole('dialog', {
+              name: 'Edit Company name',
+            }),
+          );
+
+          await waitFor(() => {
+            const newName = screen.getByText('AcmeLorem');
+            expect(newName).toBeInTheDocument();
+          });
+        });
       });
 
-      it('should update the company name', async () => {
-        await renderBusinessProfileAndWaitData();
-
-        const prevName = screen.getByText('Acme');
-        expect(prevName).toBeInTheDocument();
-
-        const editDialogTrigger = screen.getByRole('button', {
-          name: 'Edit Company name',
+      describe('when the request fails', () => {
+        beforeEach(() => {
+          withUpdateOrganizationError();
         });
-        await userEvent.click(editDialogTrigger);
 
-        const editDialog = screen.getByRole('dialog', {
-          name: 'Edit Company name',
-        });
-        expect(editDialog).toBeInTheDocument();
+        it('should update the company name', async () => {
+          await renderBusinessProfileAndWaitData();
 
-        const input = screen.getByLabelText('Company name');
-        await userEvent.type(input, 'Lorem');
+          const prevName = screen.getByText('Acme');
+          expect(prevName).toBeInTheDocument();
 
-        const submit = screen.getByRole('button', { name: 'Save' });
-        await userEvent.click(submit);
-
-        await waitForElementToBeRemoved(() =>
-          screen.queryByRole('dialog', {
+          const editDialogTrigger = screen.getByRole('button', {
             name: 'Edit Company name',
-          }),
-        );
+          });
+          await userEvent.click(editDialogTrigger);
 
-        await waitFor(() => {
-          const newName = screen.getByText('AcmeLorem');
-          expect(newName).toBeInTheDocument();
+          const editDialog = screen.getByRole('dialog', {
+            name: 'Edit Company name',
+          });
+          expect(editDialog).toBeInTheDocument();
+
+          const input = screen.getByLabelText('Company name');
+          await userEvent.type(input, 'Lorem');
+
+          const submit = screen.getByRole('button', { name: 'Save' });
+          await userEvent.click(submit);
+
+          await waitFor(() => {
+            const error = screen.getByText('Something went wrong');
+            expect(error).toBeInTheDocument();
+          });
         });
       });
     });
@@ -128,39 +165,77 @@ describe('<BusinessProfile />', () => {
     describe('when adding the website url', () => {
       beforeEach(() => {
         withOrganization({ websiteUrl: null });
-        withUpdateOrganization({ websiteUrl: 'https://acme.com' });
       });
 
-      it('should add the website url', async () => {
-        await renderBusinessProfileAndWaitData();
-
-        expect(true).toBe(true);
-
-        const addDialogTrigger = screen.getByRole('button', {
-          name: 'Add Website',
+      describe('when the request succeeds', () => {
+        beforeEach(() => {
+          withUpdateOrganization({ websiteUrl: 'https://acme.com' });
         });
-        await userEvent.click(addDialogTrigger);
 
-        const addDialog = screen.getByRole('dialog', {
-          name: 'Add Website',
-        });
-        expect(addDialog).toBeInTheDocument();
+        it('should add the website url', async () => {
+          await renderBusinessProfileAndWaitData();
 
-        const input = screen.getByLabelText('Website');
-        await userEvent.type(input, 'https://acme.com');
+          expect(true).toBe(true);
 
-        const submit = screen.getByRole('button', { name: 'Save' });
-        await userEvent.click(submit);
-
-        await waitForElementToBeRemoved(() =>
-          screen.queryByRole('dialog', {
+          const addDialogTrigger = screen.getByRole('button', {
             name: 'Add Website',
-          }),
-        );
+          });
+          await userEvent.click(addDialogTrigger);
 
-        await waitFor(() => {
-          const newName = screen.getByText('https://acme.com');
-          expect(newName).toBeInTheDocument();
+          const addDialog = screen.getByRole('dialog', {
+            name: 'Add Website',
+          });
+          expect(addDialog).toBeInTheDocument();
+
+          const input = screen.getByLabelText('Website');
+          await userEvent.type(input, 'https://acme.com');
+
+          const submit = screen.getByRole('button', { name: 'Save' });
+          await userEvent.click(submit);
+
+          await waitForElementToBeRemoved(() =>
+            screen.queryByRole('dialog', {
+              name: 'Add Website',
+            }),
+          );
+
+          await waitFor(() => {
+            const newName = screen.getByText('https://acme.com');
+            expect(newName).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request fails', () => {
+        beforeEach(() => {
+          withUpdateOrganizationError();
+        });
+
+        it('should add the website url', async () => {
+          await renderBusinessProfileAndWaitData();
+
+          expect(true).toBe(true);
+
+          const addDialogTrigger = screen.getByRole('button', {
+            name: 'Add Website',
+          });
+          await userEvent.click(addDialogTrigger);
+
+          const addDialog = screen.getByRole('dialog', {
+            name: 'Add Website',
+          });
+          expect(addDialog).toBeInTheDocument();
+
+          const input = screen.getByLabelText('Website');
+          await userEvent.type(input, 'https://acme.com');
+
+          const submit = screen.getByRole('button', { name: 'Save' });
+          await userEvent.click(submit);
+
+          await waitFor(() => {
+            const error = screen.getByText('Something went wrong');
+            expect(error).toBeInTheDocument();
+          });
         });
       });
     });
@@ -168,40 +243,79 @@ describe('<BusinessProfile />', () => {
     describe('when updating the website url', () => {
       beforeEach(() => {
         withOrganization();
-        withUpdateOrganization({ websiteUrl: 'https://acme.com.br' });
       });
 
-      it('should update the website url', async () => {
-        await renderBusinessProfileAndWaitData();
-
-        const prevWebsite = screen.getByText('https://acme.com');
-        expect(prevWebsite).toBeInTheDocument();
-
-        const editDialogTrigger = screen.getByRole('button', {
-          name: 'Edit Website',
+      describe('when the request succeeds', () => {
+        beforeEach(() => {
+          withUpdateOrganization({ websiteUrl: 'https://acme.com.br' });
         });
-        await userEvent.click(editDialogTrigger);
 
-        const editDialog = screen.getByRole('dialog', {
-          name: 'Edit Website',
-        });
-        expect(editDialog).toBeInTheDocument();
+        it('should update the website url', async () => {
+          await renderBusinessProfileAndWaitData();
 
-        const input = screen.getByLabelText('Website');
-        await userEvent.type(input, '.br');
+          const prevWebsite = screen.getByText('https://acme.com');
+          expect(prevWebsite).toBeInTheDocument();
 
-        const submit = screen.getByRole('button', { name: 'Save' });
-        await userEvent.click(submit);
-
-        await waitForElementToBeRemoved(() =>
-          screen.queryByRole('dialog', {
+          const editDialogTrigger = screen.getByRole('button', {
             name: 'Edit Website',
-          }),
-        );
+          });
+          await userEvent.click(editDialogTrigger);
 
-        await waitFor(() => {
-          const newName = screen.getByText('https://acme.com.br');
-          expect(newName).toBeInTheDocument();
+          const editDialog = screen.getByRole('dialog', {
+            name: 'Edit Website',
+          });
+          expect(editDialog).toBeInTheDocument();
+
+          const input = screen.getByLabelText('Website');
+          await userEvent.type(input, '.br');
+
+          const submit = screen.getByRole('button', { name: 'Save' });
+          await userEvent.click(submit);
+
+          await waitForElementToBeRemoved(() =>
+            screen.queryByRole('dialog', {
+              name: 'Edit Website',
+            }),
+          );
+
+          await waitFor(() => {
+            const newName = screen.getByText('https://acme.com.br');
+            expect(newName).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request fails', () => {
+        beforeEach(() => {
+          withUpdateOrganizationError();
+        });
+
+        it('should update the website url', async () => {
+          await renderBusinessProfileAndWaitData();
+
+          const prevWebsite = screen.getByText('https://acme.com');
+          expect(prevWebsite).toBeInTheDocument();
+
+          const editDialogTrigger = screen.getByRole('button', {
+            name: 'Edit Website',
+          });
+          await userEvent.click(editDialogTrigger);
+
+          const editDialog = screen.getByRole('dialog', {
+            name: 'Edit Website',
+          });
+          expect(editDialog).toBeInTheDocument();
+
+          const input = screen.getByLabelText('Website');
+          await userEvent.type(input, '.br');
+
+          const submit = screen.getByRole('button', { name: 'Save' });
+          await userEvent.click(submit);
+
+          await waitFor(() => {
+            const error = screen.getByText('Something went wrong');
+            expect(error).toBeInTheDocument();
+          });
         });
       });
     });

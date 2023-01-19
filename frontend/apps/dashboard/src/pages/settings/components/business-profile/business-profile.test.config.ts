@@ -41,3 +41,15 @@ export const withUpdateOrganization = (newOrg: Partial<Organization>) =>
       ...newOrg,
     },
   });
+
+export const withUpdateOrganizationError = () =>
+  mockRequest({
+    method: 'patch',
+    path: '/org',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });

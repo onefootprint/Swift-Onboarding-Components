@@ -1,3 +1,4 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import {
   Organization,
@@ -22,12 +23,14 @@ const updateOrgRequest = async (
 };
 
 const useUpdateOrg = () => {
+  const showErrorToast = useRequestErrorToast();
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: UpdateOrgRequest) =>
       updateOrgRequest(authHeaders, payload),
+    onError: showErrorToast,
     onSuccess: (response: UpdateOrgResponse, payload: UpdateOrgRequest) => {
       queryClient.invalidateQueries(['org']);
       const prevOrg = queryClient.getQueryData<Organization>(['org']);
