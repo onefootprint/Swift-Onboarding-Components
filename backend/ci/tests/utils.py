@@ -7,9 +7,9 @@ import arrow
 import time
 import os
 
-from .types import ObConfiguration, SecretApiKey, Tenant, BasicUser
-from .auth import DashboardAuth, FpAuth
-from .constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
+from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
+from tests.auth import DashboardAuth, FpAuth
+from tests.constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(os.environ.get("TEST_URL"), path)
 
@@ -161,6 +161,14 @@ def create_basic_sandbox_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
         phone_number=sandbox_phone_number,
         real_phone_number=phone_number,
     )
+
+
+def create_sandbox_user(sandbox_tenant, twilio):
+    from tests.bifrost_client import BifrostClient
+
+    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
+    bifrost_client.init_user_for_onboarding(twilio, build_user_data())
+    return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
 
 def create_tenant(org_data, ob_conf_data):

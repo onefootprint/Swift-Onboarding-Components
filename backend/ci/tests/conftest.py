@@ -1,25 +1,23 @@
 import requests
 import os
 import time
-from .auth import OnboardingSessionToken
 import pytest
 from twilio.rest import Client
-from .constants import (
+from tests.constants import (
     TWILIO_ACCOUNT_SID,
     TWILIO_API_KEY,
     TWILIO_API_KEY_SECRET,
     TENANT_ID1,
     TENANT_ID2,
 )
-from .utils import (
+from tests.utils import (
     IncorrectServerVersion,
-    build_user_data,
+    create_sandbox_user,
     _make_request,
     create_tenant,
     create_basic_sandbox_user,
     create_ob_config,
 )
-from .bifrost_client import BifrostClient
 
 
 @pytest.fixture(scope="session", autouse="true")
@@ -159,6 +157,4 @@ def sandbox_user(sandbox_tenant, twilio):
     """
     Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant.
     """
-    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio, build_user_data())
-    return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
+    return create_sandbox_user(sandbox_tenant, twilio)

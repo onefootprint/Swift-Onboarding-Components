@@ -1,3 +1,4 @@
+import pytest
 import arrow
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
@@ -5,10 +6,17 @@ from tests.utils import (
     put,
     post,
     _gen_random_ssn,
+    create_sandbox_user,
 )
 from tests.auth import (
     DashboardAuthIsLive,
 )
+
+
+@pytest.fixture(scope="module")
+def sandbox_user2(sandbox_tenant, twilio):
+    # Another sandbox user for endpoints that need multiple
+    return create_sandbox_user(sandbox_tenant, twilio)
 
 
 def test_get_org(sandbox_user):
@@ -19,22 +27,34 @@ def test_get_org(sandbox_user):
     tenant["logo_url"]
 
 
-def test_get_users_list(sandbox_user):
+def test_get_users_list(sandbox_user, sandbox_user2):
     tenant = sandbox_user.tenant
-    # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
-    # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
-    body = get("users", dict(fp_user_id=sandbox_user.fp_user_id), tenant.sk.key)
+    body = get("users", None, tenant.sk.key)
     scoped_users = body["data"]
     assert len(scoped_users)
 
-    scoped_user = list(
-        filter(lambda su: su["id"] == sandbox_user.fp_user_id, scoped_users)
-    )
-    assert len(scoped_user) == 1
+    # Check both scoped users exist
+    for fp_user_id in [sandbox_user.fp_user_id, sandbox_user2.fp_user_id]:
+        scoped_user = next(u for u in scoped_users if u["id"] == fp_user_id)
+        assert set(["first_name", "last_name"]) < set(
+            scoped_user["identity_data_attributes"]
+        )
 
-    assert set(["first_name", "last_name"]) < set(
-        scoped_user[0]["identity_data_attributes"]
+
+def test_get_users_list_pagination(sandbox_user, sandbox_user2):
+    sandbox_user2  # Not used, but need the fixture
+    tenant = sandbox_user.tenant
+    # Test paginated request with filters
+    body = get("users", dict(page_size=1, statuses="pass"), tenant.sk.key)
+    assert len(body["data"]) == 1
+    next_cursor = body["meta"]["next"]
+    assert next_cursor  # Should be more than one page
+    body = get(
+        "users",
+        dict(page_size=1, cursor=next_cursor, statuses="pass"),
+        tenant.sk.key,
     )
+    assert len(body["data"]) == 1
 
 
 def test_get_users_detail(sandbox_user):
