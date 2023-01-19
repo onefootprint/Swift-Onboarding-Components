@@ -37,7 +37,8 @@ describe('<Developers />', () => {
           org: {
             isLive: false,
             name: 'Acme',
-            sandboxRestricted: false,
+            isSandboxRestricted: false,
+            logoUrl: null,
           },
         },
       });
@@ -62,7 +63,8 @@ describe('<Developers />', () => {
             org: {
               isLive: false,
               name: 'Acme',
-              sandboxRestricted: true,
+              isSandboxRestricted: true,
+              logoUrl: null,
             },
           },
         });
@@ -89,7 +91,8 @@ describe('<Developers />', () => {
             org: {
               isLive: false,
               name: 'Acme',
-              sandboxRestricted: false,
+              isSandboxRestricted: false,
+              logoUrl: null,
             },
           },
         });
@@ -124,7 +127,8 @@ describe('<Developers />', () => {
           org: {
             isLive: true,
             name: 'Acme',
-            sandboxRestricted: false,
+            isSandboxRestricted: false,
+            logoUrl: null,
           },
         },
       });

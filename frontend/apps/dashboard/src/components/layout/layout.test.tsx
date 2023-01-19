@@ -43,8 +43,9 @@ describe('<Layout />', () => {
           },
           org: {
             isLive: false,
+            logoUrl: null,
             name: 'Acme',
-            sandboxRestricted: false,
+            isSandboxRestricted: true,
           },
         },
       });

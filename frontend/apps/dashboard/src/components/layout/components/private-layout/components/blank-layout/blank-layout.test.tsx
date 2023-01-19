@@ -23,8 +23,9 @@ describe('<BlankLayout />', () => {
         },
         org: {
           isLive: false,
+          logoUrl: null,
           name: 'Acme',
-          sandboxRestricted: true,
+          isSandboxRestricted: true,
         },
       },
     });

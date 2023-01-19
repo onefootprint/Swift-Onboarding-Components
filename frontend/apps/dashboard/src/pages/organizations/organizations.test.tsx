@@ -126,7 +126,8 @@ describe('<Organizations />', () => {
             expect(useStore.getState().data?.org).toEqual({
               isLive: true,
               name: 'Footprint Live Integration Testing',
-              sandboxRestricted: false,
+              isSandboxRestricted: false,
+              logoUrl: null,
             });
           });
         });

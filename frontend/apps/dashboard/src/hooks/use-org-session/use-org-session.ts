@@ -1,3 +1,5 @@
+import { Organization } from '@onefootprint/types';
+
 import useSession from '../use-session';
 
 const useOrgSession = () => {
@@ -9,22 +11,28 @@ const useOrgSession = () => {
   const data = sessionData?.org;
   const dangerouslyCastedData = dangerouslySessionData.org;
   const isSandbox = dangerouslyCastedData.isLive === false;
-  const canToggle = dangerouslyCastedData.sandboxRestricted === false;
+  const canToggle = dangerouslyCastedData.isSandboxRestricted === false;
 
   const toggle = () => {
     setOrg({ isLive: !dangerouslyCastedData.isLive });
+  };
+
+  const update = (newOrganization: Partial<Organization>) => {
+    setOrg(newOrganization);
   };
 
   const sandbox = {
     canToggle,
     isSandbox,
     toggle,
+    update,
   };
 
   return {
     dangerouslyCastedData,
     data,
     sandbox,
+    update,
   };
 };
 

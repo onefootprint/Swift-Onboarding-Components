@@ -7,18 +7,23 @@ import {
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
 
+export type UserSession = {
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+export type OrgSession = {
+  name: Organization['name'];
+  logoUrl: Organization['logoUrl'];
+  isSandboxRestricted: Organization['isSandboxRestricted'];
+  isLive: boolean;
+};
+
 export type Session = {
   auth: string;
-  user: {
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-  };
-  org: {
-    name: string;
-    sandboxRestricted: boolean;
-    isLive: boolean;
-  };
+  user: UserSession;
+  org: OrgSession;
 };
 
 export type AuthHeaders = {
@@ -42,7 +47,7 @@ export const useStore = create<UserSessionState>()(
       update: (data?: Session) => set({ data }),
     }),
     {
-      version: 1,
+      version: 3,
       name: 'dashboard-storage',
     },
   ),
@@ -59,7 +64,11 @@ const useSession = () => {
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(isLive),
   } as AuthHeaders;
 
-  const logIn = (authToken: string, user: OrgMember, tenant: Organization) => {
+  const logIn = (
+    authToken: string,
+    user: OrgMember,
+    organization: Organization,
+  ) => {
     update({
       auth: authToken,
       user: {
@@ -68,9 +77,10 @@ const useSession = () => {
         email: user.email,
       },
       org: {
-        name: tenant.name,
-        sandboxRestricted: tenant.isSandboxRestricted,
-        isLive: !tenant.isSandboxRestricted,
+        name: organization.name,
+        logoUrl: organization.logoUrl,
+        isSandboxRestricted: organization.isSandboxRestricted,
+        isLive: !organization.isSandboxRestricted,
       },
     });
   };
@@ -79,7 +89,7 @@ const useSession = () => {
     reset();
   };
 
-  const setOrg = (nextOrg: Partial<Session['org']>) => {
+  const setOrg = (nextOrg: Partial<OrgSession>) => {
     if (!data) return;
     update({
       ...data,
@@ -87,7 +97,7 @@ const useSession = () => {
     });
   };
 
-  const setUser = (nextUser: Partial<Session['user']>) => {
+  const setUser = (nextUser: Partial<UserSession>) => {
     if (!data) return;
     update({
       ...data,

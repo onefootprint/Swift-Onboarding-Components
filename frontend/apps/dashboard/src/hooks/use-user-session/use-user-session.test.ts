@@ -23,8 +23,9 @@ describe('useUserSession', () => {
         },
         org: {
           isLive: false,
+          logoUrl: null,
           name: 'Acme',
-          sandboxRestricted: false,
+          isSandboxRestricted: true,
         },
       },
     });

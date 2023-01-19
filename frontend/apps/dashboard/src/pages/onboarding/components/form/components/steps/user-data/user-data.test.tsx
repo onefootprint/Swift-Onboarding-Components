@@ -25,8 +25,9 @@ describe('<UserData />', () => {
         },
         org: {
           isLive: false,
+          logoUrl: null,
           name: 'Acme',
-          sandboxRestricted: false,
+          isSandboxRestricted: true,
         },
       },
     });
@@ -70,8 +71,9 @@ describe('<UserData />', () => {
           },
           org: {
             isLive: false,
+            logoUrl: null,
             name: 'Acme',
-            sandboxRestricted: false,
+            isSandboxRestricted: true,
           },
         },
       });

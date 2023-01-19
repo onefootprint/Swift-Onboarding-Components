@@ -12,6 +12,7 @@ const user = {
   roleName: 'Admin',
   roleId: 'orgrole_iGj82m9nFhtlVsNETOAZ7',
 };
+
 const tenant = {
   id: 'org_0912ufkdsmk1l2oedASDF',
   name: 'Acme',
@@ -42,7 +43,8 @@ describe('useSession', () => {
         org: {
           isLive: true,
           name: tenant.name,
-          sandboxRestricted: tenant.isSandboxRestricted,
+          isSandboxRestricted: tenant.isSandboxRestricted,
+          logoUrl: tenant.logoUrl,
         },
       };
       act(() => {

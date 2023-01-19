@@ -22,8 +22,9 @@ describe('useOrgSession', () => {
           },
           org: {
             isLive: false,
+            logoUrl: null,
             name: 'Acme',
-            sandboxRestricted: false,
+            isSandboxRestricted: true,
           },
         },
       });
@@ -31,15 +32,18 @@ describe('useOrgSession', () => {
 
     it('should return the data', () => {
       const { result } = renderHook(() => useOrgSession());
+
       expect(result.current.dangerouslyCastedData).toEqual({
         isLive: false,
+        isSandboxRestricted: true,
+        logoUrl: null,
         name: 'Acme',
-        sandboxRestricted: false,
       });
     });
 
     it('should indicate is sandbox when is not in live mode', () => {
       const { result } = renderHook(() => useOrgSession());
+
       expect(result.current.sandbox.isSandbox).toBeTruthy();
     });
 
@@ -49,7 +53,28 @@ describe('useOrgSession', () => {
       act(() => {
         result.current.sandbox.toggle();
       });
+
       expect(result.current.sandbox.isSandbox).toBeFalsy();
+    });
+
+    it('should update', () => {
+      const { result } = renderHook(() => useOrgSession());
+      expect(result.current.dangerouslyCastedData).toEqual({
+        isLive: false,
+        isSandboxRestricted: true,
+        logoUrl: null,
+        name: 'Acme',
+      });
+
+      act(() => {
+        result.current.sandbox.update({ name: 'Lorem' });
+      });
+      expect(result.current.dangerouslyCastedData).toEqual({
+        isLive: false,
+        isSandboxRestricted: true,
+        logoUrl: null,
+        name: 'Lorem',
+      });
     });
   });
 });
