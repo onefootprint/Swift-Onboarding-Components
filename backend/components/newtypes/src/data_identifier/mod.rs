@@ -43,11 +43,24 @@ use crate::{
 };
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
 use strum_macros::{AsRefStr, EnumDiscriminants};
 
 #[derive(
-    Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, AsExpression, FromSqlRow, AsRefStr, EnumDiscriminants,
+    Debug,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Hash,
+    Clone,
+    AsExpression,
+    FromSqlRow,
+    AsRefStr,
+    EnumDiscriminants,
+    SerializeDisplay,
+    DeserializeFromStr,
 )]
 #[strum_discriminants(derive(strum_macros::EnumString), strum(serialize_all = "snake_case"))]
 #[strum(serialize_all = "snake_case")]
@@ -120,27 +133,6 @@ impl FromStr for DataIdentifier {
             }
         };
         Ok(result)
-    }
-}
-
-/// A custom implementation to use the above FromStr impl to deserialize
-impl<'de> serde::Deserialize<'de> for DataIdentifier {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        FromStr::from_str(&s).map_err(serde::de::Error::custom)
-    }
-}
-
-/// A custom implementation to use the above Display impl to serialize
-impl serde::Serialize for DataIdentifier {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.collect_str(self)
     }
 }
 

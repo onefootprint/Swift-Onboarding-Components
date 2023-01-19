@@ -5,6 +5,7 @@ use crate::{CollectedDataOption, EnumDotNotationError};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{AsRefStr, EnumDiscriminants};
 
 #[derive(
@@ -18,6 +19,8 @@ use strum::{AsRefStr, EnumDiscriminants};
     EnumDiscriminants,
     Apiv2Schema,
     JsonSchema,
+    SerializeDisplay,
+    DeserializeFromStr,
 )]
 #[strum_discriminants(derive(strum_macros::EnumString), strum(serialize_all = "snake_case"))]
 #[strum(serialize_all = "snake_case")]
@@ -104,27 +107,6 @@ impl FromStr for TenantScope {
             TenantScopeDiscriminants::ManualReview => Self::ManualReview,
         };
         Ok(result)
-    }
-}
-
-/// A custom implementation to use the above FromStr impl to deserialize
-impl<'de> serde::Deserialize<'de> for TenantScope {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        FromStr::from_str(&s).map_err(serde::de::Error::custom)
-    }
-}
-
-/// A custom implementation to use the above Display impl to serialize
-impl serde::Serialize for TenantScope {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.collect_str(self)
     }
 }
 
