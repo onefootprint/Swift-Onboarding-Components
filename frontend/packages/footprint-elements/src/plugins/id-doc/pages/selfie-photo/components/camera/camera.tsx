@@ -11,6 +11,7 @@ import useUserMedia from './hooks/use-user-media';
 
 type CameraProps = {
   onCapture: (image: string) => void;
+  onError: () => void;
 };
 
 const CAPTURE_OPTIONS = {
@@ -18,7 +19,7 @@ const CAPTURE_OPTIONS = {
   video: { facingMode: 'user' },
 };
 
-const Camera = ({ onCapture }: CameraProps) => {
+const Camera = ({ onCapture, onError }: CameraProps) => {
   const { t } = useTranslation('pages.selfie-photo.camera');
   const canvasRef = useRef<HTMLCanvasElement>();
   const videoRef = useRef<HTMLVideoElement>();
@@ -28,12 +29,7 @@ const Camera = ({ onCapture }: CameraProps) => {
   const [showInstructions, setShowInstructions] = useState(true);
   const [image, setImage] = useState<string | undefined>();
 
-  const handleError = () => {
-    // https://linear.app/footprint/issue/FP-1444/handle-different-usermedia-errors-beyond-missing-permissions
-    // TODO: handle different errors
-  };
-
-  const mediaStream = useUserMedia(CAPTURE_OPTIONS, handleError);
+  const mediaStream = useUserMedia(CAPTURE_OPTIONS, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {

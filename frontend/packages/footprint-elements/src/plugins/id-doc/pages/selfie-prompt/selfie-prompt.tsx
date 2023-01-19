@@ -20,19 +20,24 @@ const SelfiePrompt = () => {
   const {
     selfie: { consentRequired },
   } = state.context;
-  const [consentVisible, setConsentVisible] = useState(!!consentRequired);
+  const [consentVisible, setConsentVisible] = useState(false);
 
   const handleClose = () => {
     setConsentVisible(false);
   };
 
   const handleConsent = () => {
-    send({ type: Events.startSelfieCapture });
+    send({ type: Events.consentReceived });
     setConsentVisible(false);
+    send({ type: Events.startSelfieCapture });
   };
 
   const handleClick = () => {
-    setConsentVisible(true);
+    if (consentRequired) {
+      setConsentVisible(true);
+    } else {
+      send({ type: Events.startSelfieCapture });
+    }
   };
 
   return (

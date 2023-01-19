@@ -21,8 +21,10 @@ export enum States {
 export enum Events {
   receivedContext = 'receivedContext',
   idDocCountryAndTypeSelected = 'idDocCountryAndTypeSelected',
+  cameraErrored = 'cameraErrored',
   receivedIdDocFrontImage = 'receivedIdDocFrontImage',
   receivedIdDocBackImage = 'receivedIdDocBackImage',
+  consentReceived = 'startSelfieCapture',
   startSelfieCapture = 'startSelfieCapture',
   receivedSelfieImage = 'receivedSelfieImage',
   succeeded = 'succeeded',
@@ -37,6 +39,7 @@ export enum Actions {
   assignIdDocFrontImage = 'assignIdDocFrontImage',
   assignIdDocBackImage = 'assignIdDocBackImage',
   assignIdDocImageErrors = 'assignIdDocImageErrors',
+  assignConsent = 'assignConsent',
   assignSelfie = 'assignSelfie',
 }
 
@@ -79,6 +82,9 @@ export type MachineEvents =
       };
     }
   | {
+      type: Events.cameraErrored;
+    }
+  | {
       type: Events.receivedIdDocFrontImage;
       payload: {
         image: string;
@@ -89,6 +95,9 @@ export type MachineEvents =
       payload: {
         image: string;
       };
+    }
+  | {
+      type: Events.consentReceived;
     }
   | {
       type: Events.startSelfieCapture;

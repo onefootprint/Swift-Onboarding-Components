@@ -120,7 +120,7 @@ describe('Id Doc Machine Tests', () => {
     expect(state.value).toEqual(States.selfiePrompt);
 
     state = machine.send({
-      type: Events.startSelfieCapture,
+      type: Events.consentReceived,
     });
     expect(state.value).toEqual(States.selfieImage);
 
@@ -202,7 +202,7 @@ describe('Id Doc Machine Tests', () => {
     expect(state.value).toEqual(States.selfiePrompt);
 
     state = machine.send({
-      type: Events.startSelfieCapture,
+      type: Events.consentReceived,
     });
     expect(state.value).toEqual(States.selfieImage);
 

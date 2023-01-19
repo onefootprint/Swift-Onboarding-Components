@@ -89,6 +89,9 @@ const createIdDocMachine = () =>
         },
         [States.selfiePrompt]: {
           on: {
+            [Events.consentReceived]: {
+              actions: [Actions.assignConsent],
+            },
             [Events.startSelfieCapture]: {
               target: States.selfieImage,
             },
@@ -96,6 +99,9 @@ const createIdDocMachine = () =>
         },
         [States.selfieImage]: {
           on: {
+            [Events.cameraErrored]: {
+              target: States.selfiePrompt,
+            },
             [Events.receivedSelfieImage]: {
               target: States.processingDocuments,
               actions: Actions.assignSelfie,
@@ -170,6 +176,12 @@ const createIdDocMachine = () =>
         [Actions.assignIdDocBackImage]: assign((context, event) => {
           if (event.type === Events.receivedIdDocBackImage) {
             context.idDoc.backImage = event.payload.image;
+          }
+          return context;
+        }),
+        [Actions.assignConsent]: assign((context, event) => {
+          if (event.type === Events.consentReceived) {
+            context.selfie.consentRequired = false;
           }
           return context;
         }),

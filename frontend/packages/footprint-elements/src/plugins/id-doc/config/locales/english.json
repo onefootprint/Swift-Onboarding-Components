@@ -3,10 +3,17 @@
     "errors": {}
   },
   "components": {
+    "media-errors": {
+      "not-found": "We couldn't find a camera on your device. Please use another device.",
+      "already-in-use": "Another application is using your camera, please close the other application and try again.",
+      "constraint": "We couldn't find a camera that could be used to take photos. Please use another device.",
+      "camera-permissions": "camera",
+      "other-error": "There was an error accessing your camera. Please try again."
+    },
     "missing-permissions": {
       "title": "Allow access to your {{permissionName}}",
       "subtitle": "This lets you submit photos of your documents, and we can use them to verify your identity.",
-      "action-required": "Open settings"
+      "cta": "Open settings to give camera permissions"
     },
     "id-doc-photo-prompt": {
       "title": "Submit your {{type}} ({{side}})",

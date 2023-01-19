@@ -71,7 +71,7 @@ const Template: Story<BottomSheetProps> = ({
       <BottomSheet
         onClose={() => {
           setOpen(false);
-          onClose();
+          onClose?.();
         }}
         open={open}
         testID={testID}
@@ -121,7 +121,7 @@ const LinkTemplate: Story<BottomSheetProps> = ({
         title={title}
         onClose={() => {
           setOpen(false);
-          onClose();
+          onClose?.();
         }}
         testID={testID}
         open={open}

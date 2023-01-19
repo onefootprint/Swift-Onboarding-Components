@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 
+import useHandleCameraError from '../../../../../hooks/use-handle-camera-error';
+
 const useUserMedia = (
   requestedMedia: MediaStreamConstraints,
   onError?: () => void,
 ) => {
+  const onCameraError = useHandleCameraError();
   const [mediaStream, setMediaStream] = useState<null | MediaStream>(null);
 
   useEffect(() => {
@@ -14,8 +17,7 @@ const useUserMedia = (
         );
         setMediaStream(stream);
       } catch (err) {
-        // https://linear.app/footprint/issue/FP-1444/handle-different-usermedia-errors-beyond-missing-permissions
-        // TODO: handle different errors
+        onCameraError(err);
         onError?.();
       }
     };

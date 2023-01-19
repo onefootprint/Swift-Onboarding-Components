@@ -13,6 +13,7 @@ import styled, { css } from 'styled-components';
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
+import useHandleCameraError from '../../hooks/use-handle-camera-error';
 import imageFileToStrippedBase64 from '../../utils/image-processing/image-file-to-stripped-base64';
 
 type IdDocPhotoPromptProps = {
@@ -33,6 +34,7 @@ const IdDocPhotoPrompt = ({
   const { t } = useTranslation('components.id-doc-photo-prompt');
   const takePhotoRef = useRef<HTMLInputElement | undefined>();
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
+  const onCameraError = useHandleCameraError();
 
   const handleImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
@@ -48,7 +50,11 @@ const IdDocPhotoPrompt = ({
   };
 
   const handleTake = () => {
-    takePhotoRef.current?.click();
+    try {
+      takePhotoRef.current?.click();
+    } catch (err) {
+      onCameraError(err);
+    }
   };
 
   return (

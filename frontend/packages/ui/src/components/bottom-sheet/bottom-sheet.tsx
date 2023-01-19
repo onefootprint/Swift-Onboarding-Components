@@ -9,7 +9,7 @@ import Typography from '../typography';
 
 export type BottomSheetProps = {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   children: React.ReactNode;
   title?: string;
   testID?: string;

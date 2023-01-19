@@ -7,6 +7,7 @@ import {
   MachineProvider,
   useIdDocMachine,
 } from './components/machine-provider';
+import MissingPermissionsSheetProvider from './components/missing-permissions-sheet/missing-permissions-sheet-provider';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { IdDocProps } from './id-doc.types';
@@ -43,7 +44,9 @@ const App = ({ context, onDone }: IdDocProps) => {
   return (
     <I18nextProvider i18n={configureI18next()}>
       <QueryClientProvider client={queryClient}>
-        <Router onDone={onDone} />
+        <MissingPermissionsSheetProvider>
+          <Router onDone={onDone} />
+        </MissingPermissionsSheetProvider>
       </QueryClientProvider>
     </I18nextProvider>
   );

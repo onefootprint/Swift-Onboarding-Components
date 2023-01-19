@@ -25,6 +25,12 @@ const SelfiePhoto = () => {
     });
   };
 
+  const handleError = () => {
+    send({
+      type: Events.cameraErrored,
+    });
+  };
+
   const handleCapture = async (newImage: string) => {
     setImage(newImage);
   };
@@ -36,7 +42,7 @@ const SelfiePhoto = () => {
       onConfirm={handleConfirm}
     />
   ) : (
-    <Camera onCapture={handleCapture} />
+    <Camera onCapture={handleCapture} onError={handleError} />
   );
 };
 
