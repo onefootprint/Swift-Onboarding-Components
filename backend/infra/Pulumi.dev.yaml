@@ -50,6 +50,8 @@ config:
     socure:
       certificationApiKey:
         secure: v1:+aZfvN92irHYxlcW:L4orljMQLkT681z+XjSgYq2nkS+xKH4kKBnp/LXnAqeBDWSsHTXOWQfmj3SwftO8eLYy2A==
+      productionApiKey:
+        secure: v1:qvdpWPO/cjNqw2E9:8M9wZQ9/AzdQJEAg/sDilSmjFpzmQDqBHkbNrg7idxWmtFNlW95Mdkoj+VMkW1n33iRlzQ==
       sandboxApiKey:
         secure: v1:E/Vv2txLN2q/bNr8:dTiRlaKK+HXTMsYVV4xUwg4V3MUNBBMd52Q9iP6UKW3HjbyLAQTvO1T67TbUHu16+mKE8g==
     twilio:

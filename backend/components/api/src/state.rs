@@ -30,7 +30,7 @@ pub struct State {
     #[allow(unused)]
     pub(crate) socure_sandbox_client: SocureClient,
     #[allow(unused)]
-    pub(crate) socure_certification_client: SocureClient,
+    pub(crate) socure_production_client: SocureClient,
     pub(crate) feature_flag_client: FeatureFlagClient,
 }
 
@@ -100,8 +100,8 @@ impl State {
         let socure_sandbox_client = SocureClient::new(config.socure_config.sandbox_api_key.clone(), true)
             .expect("failed to build socure sandbox client");
 
-        let socure_certification_client =
-            SocureClient::new(config.socure_config.certification_api_key.clone(), false)
+        let socure_production_client =
+            SocureClient::new(config.socure_config.production_api_key.clone(), false)
                 .expect("failed to build socure certification client");
 
         // let out = hmac_client
@@ -146,7 +146,7 @@ impl State {
             idology_client,
             s3_client,
             socure_sandbox_client,
-            socure_certification_client,
+            socure_production_client,
             feature_flag_client,
         }
     }

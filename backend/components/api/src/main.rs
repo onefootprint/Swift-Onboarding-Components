@@ -24,11 +24,11 @@ mod feature_flag;
 mod routes;
 mod serializers;
 use self::routes::*;
+mod proxy;
 mod s3;
 mod state;
 mod types;
 mod utils;
-mod proxy;
 
 use crate::errors::ApiError;
 use paperclip::actix::{web, OpenApiExt};
@@ -77,7 +77,7 @@ async fn main() -> std::io::Result<()> {
 
     // only perform Socure Reason Code API check on prod startups
     if config.service_config.is_production() {
-        socure_reason_code_check(&state.socure_certification_client).await;
+        socure_reason_code_check(&state.socure_production_client).await;
     }
 
     log::info!("starting server on port {}", config.port);

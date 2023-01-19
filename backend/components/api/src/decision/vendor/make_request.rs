@@ -154,7 +154,7 @@ pub async fn send_socure_idv_request(
             .unwrap_or(false)
     {
         idv::socure::send_idplus_request(
-            &state.socure_certification_client,
+            &state.socure_production_client,
             data,
             socure_device_session_id,
             ip_address,

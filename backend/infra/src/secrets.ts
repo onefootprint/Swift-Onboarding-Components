@@ -29,7 +29,7 @@ export interface StaticSecrets {
   grafanaPrometheusPushAuth: aws.ssm.Parameter;
   airplaneApiToken: pulumi.Output<string>;
   socureSandboxApiKey: aws.ssm.Parameter;
-  socureCertificationApiKey: aws.ssm.Parameter;
+  socureProductionApiKey: aws.ssm.Parameter;
   launchDarklySdkKey: aws.ssm.Parameter;
 }
 
@@ -70,7 +70,7 @@ interface IDology {
 
 interface Socure {
   sandboxApiKey: string;
-  certificationApiKey: string;
+  productionApiKey: string;
 }
 
 interface Grafana {
@@ -202,9 +202,9 @@ export async function LoadSecrets(
       `socureSandboxApiKey-${stack}`,
       secretConstants.socure.sandboxApiKey,
     ),
-    socureCertificationApiKey: createSecretParameter(
-      `socureCertificationApiKey-${stack}`,
-      secretConstants.socure.certificationApiKey,
+    socureProductionApiKey: createSecretParameter(
+      `socureProductionApiKey-${stack}`,
+      secretConstants.socure.productionApiKey,
     ),
     launchDarklySdkKey: createSecretParameter(
       `launchDarklySdkKey-${stack}`,
