@@ -9,7 +9,7 @@ use reqwest::header::HeaderValue;
 use crate::errors::{proxy::VaultProxyError, ApiError, ApiResult};
 
 /// Prefixes custom headers to forward along egress
-pub const FORWARD_HEADER_PREFIX: &str = "x-fpp-";
+pub const FORWARD_HEADER_PREFIX: &str = "x-fp-proxy-fwd-";
 
 /// Parses out headers to forward along the egress
 #[derive(Debug, Clone, Default)]

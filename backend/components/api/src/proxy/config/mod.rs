@@ -34,7 +34,7 @@ pub mod proxy_headers {
     pub const PROXY_CONFIG_BY_ID_HEADER: &str = "x-fp-proxy-id";
 
     // Egress
-    pub const EGRESS_URL_HEADER_NAME: &str = "x-fp-proxy-target";
+    pub const EGRESS_URL_HEADER_NAME: &str = "x-fp-proxy-target-url";
     pub const EGRESS_METHOD_HEADER_NAME: &str = "x-fp-proxy-method";
 
     // Ingress

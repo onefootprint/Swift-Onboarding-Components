@@ -24,9 +24,9 @@ pub struct IngressRule {
 impl IngressRule {
     /// These can be configured fully as headers:
     ///
-    /// x-fp-proxy-ingress-rule: $fp_id_abc.custom.credit_card_number=$.data.card.number
-    /// x-fp-proxy-ingress-rule: $fp_id_abc.custom.credit_card_exp=$.data.card.expiration
-    /// x-fp-proxy-ingress-rule: $fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
+    /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number
+    /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration
+    /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
     ///
     pub const INGRESS_RULE_HEADER: &str = "x-fp-proxy-ingress-rule";
 
@@ -72,7 +72,7 @@ impl TryFrom<&str> for IngressRule {
     type Error = ApiError;
 
     /// <proxy_token> + '=' + <target>
-    /// Example $fp_id_abc.custom.credit_card_number=$.data.card.number
+    /// Example fp_id_abc.custom.credit_card_number=$.data.card.number
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let components: Vec<&str> = value.split('=').collect();
 

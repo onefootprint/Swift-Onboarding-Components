@@ -13,23 +13,7 @@ meta:
 
 ## Setup and authentication
 
-The Footprint API uses API keys to authenticate requests. You can view and manage your API keys in the developer dashboard. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. Test mode secret keys have the prefix `sk_test` and live mode secret keys have the prefix `sk_live`.
-
-<inline-alert variant='warning'>Treat this key like a sensitive password! Your API keys carry many privileges, so be sure to keep them secure! Do not post your secret keys in publicly accessible places like GitHub or client-side code like web front-ends.</inline-alert>
-
-Authentication to the API is performed via HTTP Basic Auth. Provide your API key as the basic auth username value with no password. Alternatively, Footprint supports header-based auth via a custom header.
-If you need to authenticate via bearer auth (e.g., for a cross-origin request), use `-H "X-Footprint-Secret-Key: sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv"` instead of `-u <api_key>:`.
-
-<inline-alert variant='info'>All API requests must be made over HTTPS, calls made over plain HTTP will fail.</inline-alert>
-
-### Sanity check
-
-You can check that your API key is working as expected:
-
-```bash
-curl https://api.onefootprint.com/org/api_keys/check \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
-```
+Please ensure you are familiar with our [server-side API authentication guide](/kyc-with-pii/api-auth) to securely connect to the Footprint API from your backend.
 
 ## Vault custom data
 
@@ -39,7 +23,7 @@ Footprint also supports custom key-value attributes that are provided by you and
 
 ### Update a user vault
 
-```bash
+```curl
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
 	-X PUT \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \

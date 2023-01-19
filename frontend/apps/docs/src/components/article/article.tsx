@@ -1,4 +1,4 @@
-import { createFontStyles } from '@onefootprint/ui';
+import { createFontStyles, media } from '@onefootprint/ui';
 import Markdown, { MarkdownToJSX } from 'markdown-to-jsx';
 import React from 'react';
 import SEO from 'src/components/seo';
@@ -78,6 +78,7 @@ const Container = styled(Markdown)`
   ${({ theme }) => css`
     ${createFontStyles('body-2')};
     color: ${theme.color.secondary};
+    max-width: 100%;
 
     > p {
       margin-bottom: ${theme.spacing[7]};
@@ -137,6 +138,22 @@ const Container = styled(Markdown)`
       th,
       td {
         padding: ${theme.spacing[5]} ${theme.spacing[6]};
+        vertical-align: middle;
+      }
+
+      ${media.greaterThan('md')`
+        code {
+          white-space: nowrap;
+        }
+        td:nth-child(2) {
+          min-width: ${theme.spacing[12]};
+        } 
+      `}
+
+      tr:has(> :nth-child(2):last-child) {
+        td {
+          width: 50%;
+        }
       }
 
       th {

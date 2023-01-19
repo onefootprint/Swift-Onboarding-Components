@@ -112,10 +112,10 @@ mod tests {
     }
 
     const VALID_JSON_BODY: &str = r#"{
-    "ssn": "::$fp_id_abcd.id.ssn9::",
-    "last_name": "::   $fp_id_abcd.id.last_name ::",
-    "credit_card": "::$fp_id_abcd.custom.credit_card ::",
-    "full_name": "::$fp_id_abcd.id.first_name:: ::$fp_id_abcd.id.last_name::"
+    "ssn": "::fp_id_abcd.id.ssn9::",
+    "last_name": "::   fp_id_abcd.id.last_name ::",
+    "credit_card": "::fp_id_abcd.custom.credit_card ::",
+    "full_name": "::fp_id_abcd.id.first_name:: ::fp_id_abcd.id.last_name::"
 }"#;
 
     #[derive(serde::Deserialize, PartialEq, Eq, Debug, Clone)]
@@ -178,12 +178,12 @@ mod tests {
         assert_eq!(test, result);
     }
 
-    #[test_case("$fp_id_abcd.id.ssn9", "fp_id_abcd", DI::Id(IDK::Ssn9) => true)]
-    #[test_case("$fp_id_abcdsdfsdfs.id.last_name", "fp_id_abcdsdfsdfs", DI::Id(IDK::LastName) => true)]
-    #[test_case("$fp_id_abcd.id.ssn4", "fp_id_abcd", DI::Id(IDK::Ssn9) => false)]
-    #[test_case("$fp_id_abcd.id.sdfb.ssn4", "fp_id_abcd", DI::Id(IDK::Ssn4) => false)]
-    #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("credit_card") => true)]
-    #[test_case("$fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("ach_account") => false)]
+    #[test_case("fp_id_abcd.id.ssn9", "fp_id_abcd", DI::Id(IDK::Ssn9) => true)]
+    #[test_case("fp_id_abcdsdfsdfs.id.last_name", "fp_id_abcdsdfsdfs", DI::Id(IDK::LastName) => true)]
+    #[test_case("fp_id_abcd.id.ssn4", "fp_id_abcd", DI::Id(IDK::Ssn9) => false)]
+    #[test_case("fp_id_abcd.id.sdfb.ssn4", "fp_id_abcd", DI::Id(IDK::Ssn4) => false)]
+    #[test_case("fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("credit_card") => true)]
+    #[test_case("fp_id_abcd.custom.credit_card", "fp_id_abcd", custom("ach_account") => false)]
     fn test_proxy_parse_token(raw: &str, fp_id: &str, identifier: DataIdentifier) -> bool {
         let expected = ProxyToken {
             fp_id: FootprintUserId::from_str(fp_id).unwrap(),

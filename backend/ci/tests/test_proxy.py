@@ -8,11 +8,11 @@ import urllib.parse
 
 
 class FwdTestHeader(BaseAuth):
-    HEADER_NAME = "x-fpp-test-header"
+    HEADER_NAME = "x-fp-proxy-fwd-test-header"
 
 
 class ProxyDestinationHeader(BaseAuth):
-    HEADER_NAME = "x-fp-proxy-target"
+    HEADER_NAME = "x-fp-proxy-target-url"
 
 
 class ProxyDestinationMethod(BaseAuth):
@@ -51,7 +51,7 @@ class ProxyIngressRuleTokenAssignment(BaseAuth):
     HEADER_NAME = "x-fp-proxy-ingress-rule-token"
 
 
-def read_pem_file_to_header(name):
+def read_file(name):
     import os
 
     absolute_path = os.path.dirname(__file__)
@@ -61,19 +61,17 @@ def read_pem_file_to_header(name):
 
 
 def read_pem_file_to_header_encoded(name):
-    return urllib.parse.quote(read_pem_file_to_header(name))
+    return urllib.parse.quote(read_file(name))
 
 
 def configure_proxy(tenant, ingress_rules):
     data = {
         "access_reason": "test decrypt",
         "client_identity": {
-            "certificate": read_pem_file_to_header(
+            "certificate": read_file(
                 "backend/components/ditto/src/dummy_cert/client.crt"
             ),
-            "key": read_pem_file_to_header(
-                "backend/components/ditto/src/dummy_cert/client.key"
-            ),
+            "key": read_file("backend/components/ditto/src/dummy_cert/client.key"),
         },
         "headers": [{"name": "my-test-header", "value": "my-test-value"}],
         "ingress_settings": {"rules": ingress_rules, "content_type": "json"}
@@ -82,9 +80,7 @@ def configure_proxy(tenant, ingress_rules):
         "method": "POST",
         "name": "test config",
         "pinned_server_certificates": [
-            read_pem_file_to_header(
-                "backend/components/ditto/src/dummy_cert/server.crt"
-            ),
+            read_file("backend/components/ditto/src/dummy_cert/server.crt"),
         ],
         "secret_headers": [{"name": "my-secret-header", "value": "footprintrocks"}],
         "url": "https://ditto.footprint.dev:8443",
@@ -120,10 +116,10 @@ class TestVaultProxy:
 
         # send the proxy request
         data = {
-            "full_name": f"::${fp_id}.id.first_name:: ::${fp_id}.id.last_name::",
-            "last4_credit_card": f"::${fp_id}.custom.cc4::",
-            "ach": f"::${fp_id}.custom.ach_account_number::",
-            "ssn": f"::${fp_id}.id.ssn9::",
+            "full_name": f"::{fp_id}.id.first_name:: ::{fp_id}.id.last_name::",
+            "last4_credit_card": f"::{fp_id}.custom.cc4::",
+            "ach": f"::{fp_id}.custom.ach_account_number::",
+            "ssn": f"::{fp_id}.id.ssn9::",
         }
         response = _make_request(
             method=requests.post,
@@ -173,7 +169,7 @@ class TestVaultProxy:
 
         # send the proxy request
         data = {
-            "message": f"::${fp_id}.custom.test_field::",
+            "message": f"::{fp_id}.custom.test_field::",
         }
 
         response = _make_request(
@@ -248,13 +244,13 @@ class TestVaultProxy:
                 FwdTestHeader("test1234"),
                 ProxyDestinationHeader(ditto_url),
                 ProxyAccessReason("test reason"),
-                ProxyIngressRule(f"${fp_id}.custom.card_number=$.data.card_number"),
+                ProxyIngressRule(f"{fp_id}.custom.card_number=$.data.card_number"),
                 ProxyIngressContentType("json"),
             ],
         )
 
         result = response.json()
-        assert result["data"]["card_number"] == f"${fp_id}.custom.card_number"
+        assert result["data"]["card_number"] == f"{fp_id}.custom.card_number"
 
         data = dict(reason="test", fields=["custom.card_number"])
         response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
@@ -283,8 +279,8 @@ class TestVaultProxy:
 
         # fire the proxy request
         data = {
-            "full_name": f"::${fp_id}.id.first_name:: ::${fp_id}.id.last_name::",
-            "msg": f"::${fp_id}.custom.message::",
+            "full_name": f"::{fp_id}.id.first_name:: ::{fp_id}.id.last_name::",
+            "msg": f"::{fp_id}.custom.message::",
             "data": {"card_number": "4242424242424242424"},
         }
 

@@ -8,17 +8,17 @@ use crate::{DataIdentifier, FootprintUserId};
 
 ///
 /// The token format is as follows:
-/// $<fp_id>.<data_kind>.<attribute_name>
+/// <fp_id>.<data_kind>.<attribute_name>
 ///
 /// Example:
-/// $fp_id_Gysdl9zxbBfrbSvfc0xCz.id.ssn9
+/// fp_id_Gysdl9zxbBfrbSvfc0xCz.id.ssn9
 ///
 /// Rules:
 /// - Whitespaces are ignored
 /// - Case SENSITIVE
 ///
 ///
-/// Future work: support filters / transformations, i.e: :: $<fp_id>.id.last_name | uppercase ::
+/// Future work: support filters / transformations, i.e: :: <fp_id>.id.last_name | uppercase ::
 ///
 #[derive(Debug, Clone, PartialEq, Eq, Hash, DeserializeFromStr, SerializeDisplay)]
 pub struct ProxyToken {
@@ -29,11 +29,8 @@ pub struct ProxyToken {
 impl ProxyToken {
     /// parses a string into a single Proxy Token
     pub fn parse(raw: &str) -> Result<Self, crate::Error> {
-        let mut chars = raw.trim().chars();
+        let chars = raw.trim().chars();
 
-        if chars.next() != Some('$') {
-            return Err(ProxyTokenError::InvalidTokenStart)?;
-        }
         let token = chars.collect::<String>();
         let mut token = token.split('.');
         let Some(fp_id) = token.next() else {
@@ -58,7 +55,7 @@ impl FromStr for ProxyToken {
 
 impl std::fmt::Display for ProxyToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        format!("${}.{}", self.fp_id, self.identifier).fmt(f)
+        format!("{}.{}", self.fp_id, self.identifier).fmt(f)
     }
 }
 
@@ -68,7 +65,7 @@ impl paperclip::v2::schema::Apiv2Schema for ProxyToken {
     }
 
     fn description() -> &'static str {
-        "String of format '$<fp_id>.<data_kind>.<attribute_name>'"
+        "String of format '<fp_id>.<data_kind>.<attribute_name>'"
     }
 
     fn required() -> bool {
@@ -78,8 +75,6 @@ impl paperclip::v2::schema::Apiv2Schema for ProxyToken {
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum ProxyTokenError {
-    #[error("missing $ from token start")]
-    InvalidTokenStart,
     #[error("missing or invalid components")]
     InvalidTokenComponents,
     #[error("invalid data type identifier: {0}")]
