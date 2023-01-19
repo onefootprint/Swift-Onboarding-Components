@@ -267,13 +267,13 @@ impl ObConfiguration {
     /// to decrypt.
     /// Don't use this on Onboardings that have not been authorized
     pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
+        let data_scopes = self.can_access_data.iter().cloned().map(TenantScope::Decrypt);
         let scopes = [
-            Some(TenantScope::Decrypt(self.can_access_data.clone())),
             self.can_access_identity_document_images
                 .then_some(TenantScope::DecryptDocuments),
             self.can_access_selfie_image.then_some(TenantScope::DecryptSelfie),
         ];
-        scopes.into_iter().flatten().collect()
+        scopes.into_iter().flatten().chain(data_scopes).collect()
     }
 
     /// Returns the TenantScopes that represent the data this ObConfiguration grants access to see.
@@ -282,12 +282,12 @@ impl ObConfiguration {
     /// or not they can decrypt it.
     /// Don't use this on Onboardings that have not been authorized
     pub fn visible_scopes(&self) -> Vec<TenantScope> {
+        let data_scopes = self.can_access_data.iter().cloned().map(TenantScope::Decrypt);
         let scopes = [
-            Some(TenantScope::Decrypt(self.must_collect_data.clone())),
             self.must_collect_identity_document
                 .then_some(TenantScope::DecryptDocuments),
             self.must_collect_selfie.then_some(TenantScope::DecryptSelfie),
         ];
-        scopes.into_iter().flatten().collect()
+        scopes.into_iter().flatten().chain(data_scopes).collect()
     }
 }
