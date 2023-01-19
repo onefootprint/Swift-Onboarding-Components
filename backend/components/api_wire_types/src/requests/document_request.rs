@@ -16,6 +16,7 @@ pub struct DocumentRequest {
     /// country of document
     pub country_code: String,
 }
+
 /// Status of identity document collection
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 #[serde(tag = "kind")]

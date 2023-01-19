@@ -14,7 +14,7 @@ use db::models::user_timeline::UserTimeline;
 use db::models::user_vault::UserVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::{DbError, DbResult};
+use db::{DbError, DbResult, PgConnection};
 use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
@@ -27,6 +27,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 const FRONT: &str = "front";
 const BACK: &str = "back";
 const SELFIE: &str = "selfie";
+const NUM_RETRIES: i64 = 3;
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
 #[api_v2_operation(description = "POSTs a document to footprint servers", tags(Hosted))]
@@ -287,10 +288,10 @@ pub async fn get(
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
     // Load our document request and check the status
-    let (latest_request, previous_request_verification_result) = state
+    let (latest_request, previous_request_verification_result, retry_limit_exceeded) = state
         .db_pool
         .db_query(
-            move |conn| -> Result<(DbDocumentRequest, Option<VerificationResult>), ApiError> {
+            move |conn| -> Result<(DbDocumentRequest, Option<VerificationResult>, bool), ApiError> {
                 let Some(auth_info) = user_auth.onboarding(conn)? else {
                 return Err(ApiError::from(OnboardingError::NoOnboarding))
             };
@@ -299,8 +300,14 @@ pub async fn get(
                 // to handle each set of errors appropriately
                 let (latest_request, previous_request_verification_result) =
                     DbDocumentRequest::get_latest_with_verification_result(conn, &auth_info.scoped_user.id)?;
+                let retry_limit_exceeded =
+                    retry_limit_exceeded(conn, &latest_request.scoped_user_id).unwrap_or_default();
 
-                Ok((latest_request, previous_request_verification_result))
+                Ok((
+                    latest_request,
+                    previous_request_verification_result,
+                    retry_limit_exceeded,
+                ))
             },
         )
         .await??;
@@ -345,6 +352,10 @@ pub async fn get(
             current_request_internal_errors_needing_retry.push(DocumentImageError::InternalError)
         }
     };
+    // handle retries
+    if retry_limit_exceeded {
+        status = DocumentResponseStatus::RetryLimitExceeded
+    }
 
     // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
     // otherwise, we'll pass through the status
@@ -379,9 +390,11 @@ async fn handle_scan_onboarding_request(
     // Our vendor request could fail for some reason. We handle most errors in the vendor request code, but if
     // some anticipated error arises, if we don't catch the error here, we introduce a potential loophole for someone to get through
     // doc verification by somehow inducing a failure on the vendor side
+    let mut status = DocumentRequestStatus::Complete;
     let needs_retry = match vendor_result {
         Err(_) => {
             tracing::warn!(verification_request=%verification_request_id, "Document vendor request failed for unknown reason");
+            status = DocumentRequestStatus::UploadFailed;
             true
         }
         Ok(result) => {
@@ -393,7 +406,12 @@ async fn handle_scan_onboarding_request(
                 )),
             }?;
 
-            response.response.needs_retry()
+            if response.response.needs_retry() {
+                status = DocumentRequestStatus::Failed;
+                true
+            } else {
+                false
+            }
         }
     };
 
@@ -403,11 +421,9 @@ async fn handle_scan_onboarding_request(
             if needs_retry {
                 // Move our status to failed since we need a new doc verification request
                 let failed_update = DocumentRequestUpdate {
-                    status: Some(DocumentRequestStatus::Failed),
+                    status: Some(status),
                     ..Default::default()
                 };
-                let should_collect_selfie = document_request.should_collect_selfie;
-                let current_doc_request = document_request.update(conn.conn(), failed_update)?;
                 // Create a timeline event
                 UserTimeline::create(
                     conn,
@@ -418,15 +434,27 @@ async fn handle_scan_onboarding_request(
                     Some(scoped_user_id.clone()),
                 )?;
 
-                // Create a new document request.
-                // ref_id is None here since we are retrying scan onboarding!
-                DbDocumentRequest::create(
-                    conn,
-                    scoped_user_id,
-                    None,
-                    should_collect_selfie,
-                    Some(current_doc_request.id),
-                )?;
+                let current_doc_request = document_request.update(conn.conn(), failed_update)?;
+                let current_doc_request_id = current_doc_request.id.clone();
+                let should_collect_selfie = current_doc_request.should_collect_selfie;
+                // If we have exceeded our retry limit, we no longer want to create new document requests and
+                // we're done. GETting the status at this point will return `RetryLimitExceed` to the frontend
+                //
+                // Note (2023-01-19):
+                //   There's a the question of how to represent this in the document request status, if at all.
+                //   Since "failing due to retries" is a part of the overall bifrost "Doc collection" step, and not an individual doc request itself.
+                //   I think in order to maintain a serialized log of why an entire set of document requests failed, we'd need a new data model and this just seemed simpler for now to encode in runtime logic
+                if !retry_limit_exceeded(conn.conn(), &current_doc_request.scoped_user_id)? {
+                    // Create a new document request.
+                    // ref_id is None here since we are retrying scan onboarding!
+                    DbDocumentRequest::create(
+                        conn,
+                        scoped_user_id,
+                        None,
+                        should_collect_selfie,
+                        Some(current_doc_request_id),
+                    )?;
+                }
             } else {
                 let completed_update = DocumentRequestUpdate {
                     status: Some(DocumentRequestStatus::Complete),
@@ -479,4 +507,12 @@ async fn handle_s3_upload_error(
             Ok(())
         })
         .await
+}
+
+// We only allow users to have NUM_RETRIES tries. If we are the source of the error (UploadFailed), we shouldn't
+// count that towards their retries
+fn retry_limit_exceeded(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> Result<bool, DbError> {
+    let num_failed = DbDocumentRequest::count_status(conn, scoped_user_id, DocumentRequestStatus::Failed)?;
+
+    Ok(num_failed >= NUM_RETRIES)
 }

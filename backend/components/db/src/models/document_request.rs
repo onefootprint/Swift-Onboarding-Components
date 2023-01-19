@@ -122,6 +122,19 @@ impl DocumentRequest {
         Ok(result)
     }
 
+    pub fn count_status(
+        conn: &mut PgConnection,
+        scoped_user_id: &ScopedUserId,
+        status: DocumentRequestStatus,
+    ) -> DbResult<i64> {
+        let num_status: i64 = document_request::table
+            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::status.eq(status))
+            .count()
+            .get_result(conn)?;
+        Ok(num_status)
+    }
+
     pub fn get_latest_with_verification_result(
         conn: &mut PgConnection,
         scoped_user_id: &ScopedUserId,
