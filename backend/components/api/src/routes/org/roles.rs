@@ -1,15 +1,14 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
-
 use crate::errors::ApiResult;
-use crate::types::EmptyRequest;
 use crate::types::JsonApiResponse;
 use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_wire_types::OrgRoleFilters;
 use chrono::{DateTime, Utc};
 use db::models::tenant_role::TenantRole;
 use newtypes::TenantRoleId;
@@ -26,21 +25,27 @@ type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::Organization
 #[get("/org/roles")]
 async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
+    request: web::Query<PaginatedRequest<OrgRoleFilters, DateTime<Utc>>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
-    let cursor = request.cursor;
-    let page_size = request.page_size(&state);
+
+    let (filters, pagination) = request.into_inner().into_inner();
+    let cursor = pagination.cursor;
+    let page_size = pagination.page_size(&state);
+    let OrgRoleFilters { scopes } = filters;
+    let scopes = scopes.map(|s| s.0);
 
     let tenant_id = tenant.id.clone();
     let results = state
         .db_pool
-        .db_query(move |conn| TenantRole::list_active(conn, &tenant_id, cursor, (page_size + 1) as i64))
+        .db_query(move |conn| {
+            TenantRole::list_active(conn, &tenant_id, scopes, cursor, (page_size + 1) as i64)
+        })
         .await??;
 
-    let cursor = request.cursor_item(&state, &results).map(|x| x.created_at);
+    let cursor = pagination.cursor_item(&state, &results).map(|x| x.created_at);
     let results = results
         .into_iter()
         .take(page_size)

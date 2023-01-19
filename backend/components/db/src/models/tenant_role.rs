@@ -175,6 +175,7 @@ impl TenantRole {
     pub fn list_active(
         conn: &mut PgConnection,
         tenant_id: &TenantId,
+        scopes: Option<Vec<TenantScope>>,
         cursor: Option<DateTime<Utc>>,
         page_size: i64,
     ) -> DbResult<Vec<Self>> {
@@ -188,6 +189,10 @@ impl TenantRole {
         if let Some(cursor) = cursor {
             query = query.filter(tenant_role::created_at.ge(cursor))
         }
+        if let Some(scopes) = scopes {
+            query = query.filter(tenant_role::scopes.overlaps_with(scopes))
+        }
+
         let results = query.get_results(conn)?;
         Ok(results)
     }

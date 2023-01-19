@@ -633,6 +633,7 @@ class TestDashboardAdminUsers:
         user = next(u for u in body["data"] if u["id"] == user_id)
         assert user["role_id"] == admin_role["id"]
 
+        # Test filter on role_id
         body = get(
             f"org/members",
             dict(role_ids=limited_role["id"]),
@@ -646,6 +647,24 @@ class TestDashboardAdminUsers:
             sandbox_tenant.auth_token,
         )
         assert any(u["id"] == user_id for u in body["data"])
+
+    def test_get_roles(self, sandbox_tenant, limited_role, admin_role):
+        body = get(f"org/roles", None, sandbox_tenant.auth_token)
+        assert any(u["id"] == admin_role["id"] for u in body["data"])
+        assert any(u["id"] == limited_role["id"] for u in body["data"])
+
+        # Test filter on scopes
+        body = get(f"org/roles", dict(scopes="api_keys"), sandbox_tenant.auth_token)
+        assert not any(u["id"] == admin_role["id"] for u in body["data"])
+        assert any(u["id"] == limited_role["id"] for u in body["data"])
+
+        body = get(f"org/roles", dict(scopes="admin"), sandbox_tenant.auth_token)
+        assert any(u["id"] == admin_role["id"] for u in body["data"])
+        assert not any(u["id"] == limited_role["id"] for u in body["data"])
+
+        body = get(f"org/roles", dict(scopes="admin, read"), sandbox_tenant.auth_token)
+        assert any(u["id"] == admin_role["id"] for u in body["data"])
+        assert any(u["id"] == limited_role["id"] for u in body["data"])
 
     def test_update_roles(self, sandbox_tenant, limited_role, admin_role):
         role_id = limited_role["id"]

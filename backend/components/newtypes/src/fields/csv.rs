@@ -1,5 +1,5 @@
 use crate::{api_schema_helper::string_api_data_type_alias, KvDataKey};
-use crate::{DataIdentifier, IdentityDataKind, TenantRoleId};
+use crate::{DataIdentifier, IdentityDataKind, TenantRoleId, TenantScope};
 use derive_more::Deref;
 use schemars::JsonSchema;
 use serde::de::IntoDeserializer;
@@ -26,6 +26,7 @@ string_api_data_type_alias!(Csv<KvDataKey>);
 string_api_data_type_alias!(Csv<IdentityDataKind>);
 string_api_data_type_alias!(Csv<DataIdentifier>);
 string_api_data_type_alias!(Csv<TenantRoleId>);
+string_api_data_type_alias!(Csv<TenantScope>);
 
 /// serde_urlencoded, used by actix's web::Query, isn't very good at deserializing Vecs:
 /// https://github.com/nox/serde_urlencoded/issues/6

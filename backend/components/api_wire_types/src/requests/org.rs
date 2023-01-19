@@ -18,3 +18,10 @@ pub struct OrgMemberFilters {
 }
 
 export_schema!(OrgMemberFilters);
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+pub struct OrgRoleFilters {
+    pub scopes: Option<Csv<TenantScope>>,
+}
+
+export_schema!(OrgRoleFilters);
