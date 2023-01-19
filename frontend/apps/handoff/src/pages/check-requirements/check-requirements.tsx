@@ -19,6 +19,7 @@ const CheckRequirements = () => {
       let missingLiveness = false;
       let idDocRequestId;
       let missingSelfie = false;
+      let missingConsent = false;
 
       requirements.forEach((req: OnboardingRequirement) => {
         if (req.kind === OnboardingRequirementKind.liveness) {
@@ -27,6 +28,7 @@ const CheckRequirements = () => {
         if (req.kind === OnboardingRequirementKind.idDoc) {
           idDocRequestId = req.documentRequestId;
           missingSelfie = req.shouldCollectSelfie;
+          missingConsent = req.shouldCollectConsent;
         }
       });
 
@@ -36,6 +38,7 @@ const CheckRequirements = () => {
           idDocRequestId,
           missingSelfie,
           missingLiveness,
+          missingConsent,
         },
       });
     },

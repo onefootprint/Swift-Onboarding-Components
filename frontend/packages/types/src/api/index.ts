@@ -1,4 +1,5 @@
 export * from './biometric-register';
+export * from './consent';
 export * from './create-org-role';
 export * from './d2p-generate';
 export * from './d2p-sms';

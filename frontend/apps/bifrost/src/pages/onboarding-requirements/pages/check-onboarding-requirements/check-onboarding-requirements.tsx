@@ -27,6 +27,7 @@ const CheckOnboardingRequirements = () => {
     let liveness = false;
     let idDocRequestId;
     let selfie = false;
+    let consent = false;
     let kycData: CollectedKycDataOption[] = [];
     let identityCheck = false;
 
@@ -40,6 +41,7 @@ const CheckOnboardingRequirements = () => {
       if (req.kind === OnboardingRequirementKind.idDoc) {
         idDocRequestId = req.documentRequestId;
         selfie = req.shouldCollectSelfie;
+        consent = req.shouldCollectConsent;
       }
       if (req.kind === OnboardingRequirementKind.identityCheck) {
         identityCheck = true;
@@ -52,6 +54,7 @@ const CheckOnboardingRequirements = () => {
         liveness,
         idDocRequestId,
         selfie,
+        consent,
         kycData,
         identityCheck,
       },

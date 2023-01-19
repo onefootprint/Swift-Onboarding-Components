@@ -86,6 +86,7 @@ const Root = () => {
             shouldCollectIdDoc: true,
             requestId: requirements?.idDocRequestId ?? '',
             shouldCollectSelfie: requirements?.missingSelfie,
+            shouldCollectConsent: requirements?.missingConsent,
           },
         }}
         onDone={() => {

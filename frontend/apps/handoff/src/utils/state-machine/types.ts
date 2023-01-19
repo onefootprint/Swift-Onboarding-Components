@@ -32,6 +32,7 @@ export type MachineContext = {
     idDocRequestId?: string;
     missingLiveness?: boolean;
     missingSelfie?: boolean;
+    missingConsent?: boolean;
   };
 };
 
@@ -59,6 +60,7 @@ export type MachineEvents =
         idDocRequestId?: string;
         missingSelfie?: boolean;
         missingLiveness?: boolean;
+        missingConsent?: boolean;
       };
     }
   | {

@@ -21,6 +21,7 @@ export type Requirements = {
   liveness: boolean;
   idDocRequestId?: string;
   selfie?: boolean;
+  consent?: boolean;
   kycData: readonly CollectedKycDataOption[];
 };
 

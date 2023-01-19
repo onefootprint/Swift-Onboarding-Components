@@ -1,24 +1,49 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { BottomSheet, Button, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { Trans } from 'react-i18next';
 
 import { HeaderTitle } from '../../../../components';
+import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import useConsent from './hooks/use-consent';
 
 type SelfieConsentProps = {
   open: boolean;
-  onClose: (isConsented?: boolean) => void;
+  onClose: (isConsented: boolean) => void;
 };
 
 const SelfieConsent = ({ open, onClose }: SelfieConsentProps) => {
   const { t } = useTranslation('components.selfie-consent');
+  const [state] = useIdDocMachine();
+  const { authToken } = state.context;
+  const consentMutation = useConsent();
+  const requestErrorToast = useRequestErrorToast();
 
   const handleClose = () => {
-    onClose();
+    onClose(false);
   };
+
   const handleConsent = () => {
-    onClose(true);
+    if (!authToken || consentMutation.isLoading) {
+      return;
+    }
+
+    const consentLanguageText = [
+      t('title'),
+      t('subtitle'),
+      t('cta'),
+      t('footer'),
+    ].join(' ');
+    consentMutation.mutate(
+      { consentLanguageText, authToken },
+      {
+        onSuccess: () => {
+          onClose(true);
+        },
+        onError: requestErrorToast,
+      },
+    );
   };
 
   return (
@@ -28,7 +53,12 @@ const SelfieConsent = ({ open, onClose }: SelfieConsentProps) => {
         subtitle={t('subtitle')}
         sx={{ marginBottom: 8 }}
       />
-      <Button onClick={handleConsent} fullWidth sx={{ marginBottom: 5 }}>
+      <Button
+        onClick={handleConsent}
+        fullWidth
+        sx={{ marginBottom: 5 }}
+        loading={consentMutation.isLoading}
+      >
         {t('cta')}
       </Button>
       <Typography

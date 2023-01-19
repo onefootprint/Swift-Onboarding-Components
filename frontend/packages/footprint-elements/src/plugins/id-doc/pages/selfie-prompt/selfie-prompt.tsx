@@ -15,15 +15,16 @@ import SelfieConsent from '../../components/selfie-consent';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
 const SelfiePrompt = () => {
-  const [, send] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
   const { t } = useTranslation('pages.selfie-photo-prompt');
-  const [consentVisible, setConsentVisible] = useState(false);
+  const {
+    selfie: { consentRequired },
+  } = state.context;
+  const [consentVisible, setConsentVisible] = useState(!!consentRequired);
 
-  const handleCloseConsent = (isConsented?: boolean) => {
+  const handleCloseConsent = (isConsented: boolean) => {
     setConsentVisible(false);
     if (isConsented) {
-      // TODO: Tell backend that consent is successfully collected
-      // https://linear.app/footprint/issue/FP-2282/integrate-with-api-to-record-collected-consent-on-bifrost
       send({ type: Events.startSelfieCapture });
     }
   };

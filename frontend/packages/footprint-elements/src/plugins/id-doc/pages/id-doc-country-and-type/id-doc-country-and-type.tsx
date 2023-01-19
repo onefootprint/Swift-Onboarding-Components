@@ -33,27 +33,10 @@ const getCountryFromCode = (countryCode: CountryCode) => {
 };
 
 const IdDocCountryAndType = () => {
+  const { t } = useTranslation('pages.country-and-type-selection');
   const [, send] = useIdDocMachine();
   const [country, setCountry] = useState<CountryRecord>(DEFAULT_COUNTRY);
   const types: IdDocType[] = IdDocTypesByCountry[country.value3];
-  const options: RadioSelectOptionFields[] = types.map(
-    type => optionByDocType[type],
-  );
-  const [docType, setDocType] = useState<IdDocType>(
-    types.length ? types[0] : IdDocType.passport,
-  );
-  const { t } = useTranslation('pages.country-and-type-selection');
-
-  const handleCountryChange = (option: CountrySelectOption) => {
-    const nextCountry = getCountryFromCode(option.value);
-    if (nextCountry) {
-      setCountry(nextCountry);
-    }
-  };
-
-  const handleDocTypeChange = (value: string) => {
-    setDocType(IdDocType[value as keyof typeof IdDocType]);
-  };
 
   const optionByDocType: Record<IdDocType, RadioSelectOptionFields> = {
     [IdDocType.passport]: {
@@ -74,6 +57,23 @@ const IdDocCountryAndType = () => {
       IconComponent: IcoIdCard24,
       value: t('form.type.idCard.value'),
     },
+  };
+  const options: RadioSelectOptionFields[] = types.map(
+    type => optionByDocType[type],
+  );
+  const [docType, setDocType] = useState<IdDocType>(
+    types.length ? types[0] : IdDocType.passport,
+  );
+
+  const handleCountryChange = (option: CountrySelectOption) => {
+    const nextCountry = getCountryFromCode(option.value);
+    if (nextCountry) {
+      setCountry(nextCountry);
+    }
+  };
+
+  const handleDocTypeChange = (value: string) => {
+    setDocType(IdDocType[value as keyof typeof IdDocType]);
   };
 
   const handleSubmit = () => {
