@@ -35,20 +35,33 @@ impl<C> PaginationRequest<C> {
 pub struct PaginatedRequest<T, C> {
     #[serde(flatten)]
     data: T,
-    #[serde(flatten)]
-    pagination: PaginationRequest<C>,
+    pub cursor: Option<C>,
+    pub page_size: Option<usize>,
 }
 
 impl<T, C> PaginatedRequest<T, C> {
     pub fn into_inner(self) -> (T, PaginationRequest<C>) {
-        (self.data, self.pagination)
+        let pagination = PaginationRequest {
+            cursor: self.cursor,
+            page_size: self.page_size,
+        };
+        (self.data, pagination)
     }
-}
 
-impl<T, C> std::ops::Deref for PaginatedRequest<T, C> {
-    type Target = PaginationRequest<C>;
+    // TODO don't dupe
+    pub fn page_size(&self, state: &web::Data<State>) -> usize {
+        if let Some(page_size) = self.page_size {
+            page_size
+        } else {
+            state.config.default_page_size
+        }
+    }
 
-    fn deref(&self) -> &Self::Target {
-        &self.pagination
+    pub fn cursor_item<'a, U>(&self, state: &web::Data<State>, values: &'a [U]) -> Option<&'a U> {
+        if values.len() > self.page_size(state) {
+            values.last()
+        } else {
+            None
+        }
     }
 }
