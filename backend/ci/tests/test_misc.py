@@ -1,4 +1,6 @@
-from tests.utils import post
+import requests
+from requests.auth import HTTPBasicAuth
+from tests.utils import post, url
 from tests.constants import CUSTODIAN_AUTH
 
 
@@ -17,3 +19,11 @@ def test_tenant_create():
         body["error"]["message"]
         == "Cannot inherit credentials for a non-integration test tenant"
     )
+
+
+def test_basic_auth(sandbox_tenant):
+    response = requests.get(
+        url("org/api_keys/check"),
+        auth=HTTPBasicAuth(sandbox_tenant.sk.key.value, ""),
+    )
+    assert response.status_code == 200

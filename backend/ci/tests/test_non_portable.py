@@ -1,8 +1,5 @@
 import pytest
-from tests.utils import url
 from tests.utils import post, get, put, build_user_data
-import requests
-from requests.auth import HTTPBasicAuth
 
 
 class TestNonPortableVaultApi:
@@ -149,7 +146,6 @@ class TestUnifiedVaultApi:
         }
 
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
-        # TODO update these to serialized DataIdentifiers
         assert response["id.last_name"] == True
         assert response["id.ssn9"] == True
         assert response["custom.ach_account_number"] == True
@@ -189,12 +185,3 @@ class TestUnifiedVaultApi:
             "custom.ach_account_number",
             "custom.cc4",
         }
-
-
-class TestApiFormats:
-    def test_basic_auth(self, sandbox_tenant):
-        response = requests.get(
-            url("org/api_keys/check"),
-            auth=HTTPBasicAuth(sandbox_tenant.sk.key.value, ""),
-        )
-        assert response.status_code == 200
