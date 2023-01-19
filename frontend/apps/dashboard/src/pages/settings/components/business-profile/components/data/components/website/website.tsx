@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import Fieldset from '../fieldset';
+import Form from './components/form';
 
 export type WebsiteProps = {
   value?: string | null;
@@ -11,12 +12,17 @@ const Website = ({ value }: WebsiteProps) => {
   const { t } = useTranslation('pages.settings.business-profile.website');
 
   return (
-    <Fieldset
-      addLabel={t('add')}
-      editLabel={t('edit')}
-      label={t('label')}
-      value={value}
-    />
+    <Fieldset label={t('label')} value={value}>
+      {({ id, handleSubmit }) => (
+        <Form
+          id={id}
+          value={value}
+          onSubmit={(newWebsite: string) =>
+            handleSubmit('websiteUrl', newWebsite)
+          }
+        />
+      )}
+    </Fieldset>
   );
 };
 

@@ -1,8 +1,9 @@
 import { Organization } from '@onefootprint/types';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Avatar from './components/logo';
+import Logo from './components/logo';
 import Name from './components/name';
 import Website from './components/website';
 
@@ -11,13 +12,13 @@ type DataProps = {
 };
 
 const Data = ({ organization }: DataProps) => (
-  <div>
-    <Avatar organization={organization} />
+  <Box testID="business-profile-data">
+    <Logo organization={organization} />
     <Grid>
       <Name value={organization.name} />
       <Website value={organization.websiteUrl} />
     </Grid>
-  </div>
+  </Box>
 );
 
 const Grid = styled.div`

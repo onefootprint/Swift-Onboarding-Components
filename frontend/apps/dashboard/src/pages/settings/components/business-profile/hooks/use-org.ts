@@ -15,7 +15,7 @@ const getOrgRequest = async (authHeaders: AuthHeaders) => {
 
 const useOrg = () => {
   const { authHeaders } = useSession();
-  return useQuery(['org', authHeaders], () => getOrgRequest(authHeaders));
+  return useQuery(['org'], () => getOrgRequest(authHeaders));
 };
 
 export default useOrg;

@@ -3,18 +3,21 @@ import { Organization } from '@onefootprint/types';
 
 export const organizationFixture: Organization = {
   id: 'org_9L42CAdpXhDeSmi1DI8Qks',
-  name: 'Footprint',
-  logoUrl: 'https://onefootprint.com/logo.png',
+  name: 'Acme',
+  logoUrl: 'https://acme.com/logo.png',
   isSandboxRestricted: false,
-  websiteUrl: 'https://onefootprint.com',
+  websiteUrl: 'https://acme.com',
   companySize: null,
 };
 
-export const withOrganization = () =>
+export const withOrganization = (organization?: Partial<Organization>) =>
   mockRequest({
     method: 'get',
     path: '/org',
-    response: organizationFixture,
+    response: {
+      ...organizationFixture,
+      ...organization,
+    },
   });
 
 export const withOrganizationError = () =>
@@ -26,5 +29,15 @@ export const withOrganizationError = () =>
       error: {
         message: 'Something went wrong',
       },
+    },
+  });
+
+export const withUpdateOrganization = (newOrg: Partial<Organization>) =>
+  mockRequest({
+    method: 'patch',
+    path: '/org',
+    response: {
+      ...organizationFixture,
+      ...newOrg,
     },
   });

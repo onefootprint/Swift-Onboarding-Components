@@ -9,7 +9,7 @@ type LogoProps = {
 };
 
 const Logo = ({ organization }: LogoProps) => {
-  const { t } = useTranslation('pages.settings.business-profile');
+  const { t } = useTranslation('pages.settings.business-profile.logo');
 
   return (
     <LogoContainer>
@@ -18,9 +18,11 @@ const Logo = ({ organization }: LogoProps) => {
         size="large"
         src={organization.logoUrl}
       />
-      <LinkButton size="compact" onClick={() => {}}>
-        {t('logo.change')}
-      </LinkButton>
+      <ButtonContainer>
+        <LinkButton size="compact" onClick={() => {}}>
+          {t('cta')}
+        </LinkButton>
+      </ButtonContainer>
     </LogoContainer>
   );
 };
@@ -30,6 +32,12 @@ const LogoContainer = styled.div`
     display: flex;
     gap: ${theme.spacing[5]};
   `}
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default Logo;

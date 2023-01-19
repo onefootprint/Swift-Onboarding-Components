@@ -10,13 +10,13 @@
   "back": "Go back",
   "next": "Next",
   "complete": "Complete",
+  "cancel": "Cancel",
   "confirm": {
     "title": "Are you sure?",
     "description": "Your data won't be saved.",
     "cta": "Yes",
     "cancel": "No"
   },
-  "cancel": "Cancel",
   "user-data-attributes": {
     "name": "Name",
     "phone_number": "Phone number",
@@ -695,24 +695,33 @@
         "title": "Settings"
       },
       "business-profile": {
+        "add": "Add {{label}}",
+        "edit": "Edit {{label}}",
         "header": {
           "title": "Business profile",
           "subtitle": "Manage your business details"
         },
         "logo": {
-          "change": "Change logo"
+          "cta": "Change logo"
         },
         "name": {
           "label": "Company name",
-          "add": "Add company name",
-          "edit": "Edit company name"
+          "form": {
+            "placeholder": "Acme Bank",
+            "errors": {
+              "required": "Please enter a name"
+            }
+          }
         },
         "website": {
           "label": "Website",
-          "add": "Add website",
-          "edit": "Edit website"
-        },
-        "edit": "Edit"
+          "form": {
+            "placeholder": "https://acme.com",
+            "errors": {
+              "required": "Please enter a website"
+            }
+          }
+        }
       },
       "team-roles": {
         "header": {
