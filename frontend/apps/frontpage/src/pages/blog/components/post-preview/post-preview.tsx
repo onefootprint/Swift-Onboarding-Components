@@ -1,5 +1,5 @@
 import { Box, media, Typography } from '@onefootprint/ui';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -40,10 +40,11 @@ const PostPreview = ({
       <FeatureImageMobileContainer>
         <FeatureImage
           height={228}
+          width={358}
           layout="responsive"
           objectFit="cover"
+          alt={featureImageAlt}
           src={featureImageUrl}
-          width={358}
         />
       </FeatureImageMobileContainer>
       <Content>

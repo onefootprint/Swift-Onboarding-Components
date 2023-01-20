@@ -1,13 +1,24 @@
 import { createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 type PostContentProps = {
   html: string;
 };
-const PostContent = ({ html }: PostContentProps) => (
-  <Content dangerouslySetInnerHTML={{ __html: html }} />
-);
+
+const PostContent = ({ html }: PostContentProps) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const links = contentRef.current?.getElementsByTagName('a') || [];
+    Array.from(links).forEach(link => {
+      link.setAttribute('target', 'blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+    });
+  }, []);
+  return (
+    <Content dangerouslySetInnerHTML={{ __html: html }} ref={contentRef} />
+  );
+};
 
 const Content = styled.div`
   ${({ theme }) => css`
