@@ -121,7 +121,7 @@ describe('<BusinessProfile />', () => {
           );
 
           await waitFor(() => {
-            const newName = screen.getByText('AcmeLorem');
+            const newName = screen.getByText('Lorem');
             expect(newName).toBeInTheDocument();
           });
         });

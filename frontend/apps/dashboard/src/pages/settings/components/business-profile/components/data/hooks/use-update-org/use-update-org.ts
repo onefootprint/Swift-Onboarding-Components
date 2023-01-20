@@ -1,10 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import {
-  Organization,
-  UpdateOrgRequest,
-  UpdateOrgResponse,
-} from '@onefootprint/types';
+import { UpdateOrgRequest, UpdateOrgResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
@@ -24,22 +20,21 @@ const updateOrgRequest = async (
 
 const useUpdateOrg = () => {
   const showErrorToast = useRequestErrorToast();
-  const { authHeaders } = useSession();
+  const session = useSession();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: UpdateOrgRequest) =>
-      updateOrgRequest(authHeaders, payload),
+      updateOrgRequest(session.authHeaders, payload),
     onError: showErrorToast,
-    onSuccess: (response: UpdateOrgResponse, payload: UpdateOrgRequest) => {
+    onSuccess: (response: UpdateOrgResponse) => {
       queryClient.invalidateQueries(['org']);
-      const prevOrg = queryClient.getQueryData<Organization>(['org']);
-      if (prevOrg) {
-        queryClient.setQueryData(['org'], {
-          ...prevOrg,
-          ...payload,
-        });
-      }
+      queryClient.setQueryData(['org'], response);
+      session.setOrg({
+        name: response.name,
+        logoUrl: response.logoUrl,
+        isSandboxRestricted: response.isSandboxRestricted,
+      });
     },
   });
 };
