@@ -140,6 +140,11 @@ define_newtype_id!(
     String,
     "Identifier for a Proxy Configuration Ingress Rule"
 );
+define_newtype_id!(
+    IdologyExpectIdResponseId,
+    String,
+    "Identifier for a IdologyExpectIdResponse"
+);
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

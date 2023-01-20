@@ -23,12 +23,19 @@ pub struct IDologyQualifiers {
 
 impl IDologyQualifiers {
     pub fn parse_qualifiers(&self) -> Vec<IDologyReasonCode> {
+        self.raw_qualifiers()
+            .iter()
+            .filter_map(|s| IDologyReasonCode::from_str(s.as_str()).ok())
+            .collect()
+    }
+
+    pub fn raw_qualifiers(&self) -> Vec<String> {
         // In the IDology API, the key named `qualifier` can either be a list of qualifiers OR
         // a single qualifier. Parse both cases here
         match self.qualifier {
             serde_json::Value::Object(_) => {
-                if let Some(qualifier) = Self::parse_qualifier(self.qualifier.clone()) {
-                    vec![qualifier]
+                if let Some(qualifier_key) = KeyResponse::parse_key(self.qualifier.clone()) {
+                    vec![qualifier_key]
                 } else {
                     vec![]
                 }
@@ -36,15 +43,10 @@ impl IDologyQualifiers {
             serde_json::Value::Array(ref qualifier_list) => qualifier_list
                 .iter()
                 .cloned()
-                .flat_map(Self::parse_qualifier)
+                .flat_map(KeyResponse::parse_key)
                 .collect(),
             _ => vec![],
         }
-    }
-
-    fn parse_qualifier(qualifier: serde_json::Value) -> Option<IDologyReasonCode> {
-        let key = KeyResponse::parse_key(qualifier)?;
-        IDologyReasonCode::from_str(key.as_str()).ok()
     }
 }
 #[derive(Debug, Clone, serde::Deserialize)]

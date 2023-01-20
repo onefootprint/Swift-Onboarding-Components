@@ -1,10 +1,13 @@
 use super::*;
 use crate::{errors::ApiError, State};
 
+
 use db::{
     models::{
-        insight_event::InsightEvent, ob_configuration::ObConfiguration,
-        socure_device_session::SocureDeviceSession, verification_request::VerificationRequest,
+        insight_event::InsightEvent,
+        ob_configuration::ObConfiguration,
+        socure_device_session::SocureDeviceSession,
+        verification_request::VerificationRequest,
     },
     DbError,
 };
@@ -231,7 +234,7 @@ pub async fn make_idv_request(
 
     let vendor_response = send_idv_request(state, request, data).await?;
 
-    let verification_result =
+    let (verification_result, structured_vendor_response) =
         verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
             .await?;
 
@@ -239,6 +242,7 @@ pub async fn make_idv_request(
         response: vendor_response,
         verification_result_id: verification_result.id,
         verification_request_id: request_id,
+        structured_vendor_response,
     };
 
     Ok(result)
@@ -261,7 +265,7 @@ pub async fn make_docv_request(
 
     let vendor_response = send_docv_request(state, request, data).await?;
 
-    let verification_result =
+    let (verification_result, structured_vendor_response) =
         verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
             .await?;
 
@@ -269,6 +273,7 @@ pub async fn make_docv_request(
         response: vendor_response,
         verification_result_id: verification_result.id,
         verification_request_id: request_id,
+        structured_vendor_response,
     };
 
     Ok(result)

@@ -415,6 +415,7 @@ mod tests {
                 .unwrap(),
             verification_request_id: VerificationRequestId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d")
                 .unwrap(),
+            structured_vendor_response: None,
         };
 
         Ok(result)

@@ -74,6 +74,14 @@ impl ExpectIDResponse {
         }
     }
 
+    pub fn raw_qualifiers(&self) -> Vec<String> {
+        if let Some(ref qualifiers) = self.qualifiers {
+            qualifiers.raw_qualifiers()
+        } else {
+            vec![]
+        }
+    }
+
     fn error(&self) -> Option<RequestError> {
         self.error
             .clone()
