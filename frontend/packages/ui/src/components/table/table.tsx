@@ -19,13 +19,14 @@ export type TableProps<T> = {
   emptyStateText?: string;
   getKeyForRow: (item: T) => string;
   hideThead?: boolean;
+  initialSearch?: string;
   isLoading?: boolean;
   items?: Array<T>;
   onChangeSearchText?: (text: string) => void;
   onRowClick?: (item: T) => void;
   renderActions?: () => React.ReactNode;
   renderTr: (row: TableRow<T>) => JSX.Element;
-  initialSearch?: string;
+  searchPlaceholder?: string;
 };
 
 const Table = <T,>({
@@ -34,13 +35,14 @@ const Table = <T,>({
   emptyStateText = 'No results',
   getKeyForRow,
   hideThead,
+  initialSearch,
   isLoading,
   items,
   onChangeSearchText,
   onRowClick,
   renderActions,
   renderTr,
-  initialSearch,
+  searchPlaceholder = 'Search...',
 }: TableProps<T>) => {
   const shouldRenderFilters = onChangeSearchText || renderActions;
   const shouldShowEmptyState = !isLoading && !items?.length;
@@ -53,6 +55,7 @@ const Table = <T,>({
         <TableFilters
           initialValue={initialSearch}
           onChangeText={onChangeSearchText}
+          placeholder={searchPlaceholder}
         >
           {renderActions?.()}
         </TableFilters>

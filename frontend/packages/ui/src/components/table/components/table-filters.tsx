@@ -6,14 +6,16 @@ import SearchInput from '../../search-input';
 
 type TableFilterProps = {
   children: React.ReactNode;
-  onChangeText?: (text: string) => void;
   initialValue?: string;
+  onChangeText?: (text: string) => void;
+  placeholder: string;
 };
 
 const TableFilter = ({
   children,
   onChangeText,
   initialValue = '',
+  placeholder,
 }: TableFilterProps) => {
   const [search, setSearch] = useState(initialValue);
   const debouncedSearch = useDebounce(search, 300);
@@ -30,6 +32,7 @@ const TableFilter = ({
     <TableFilterContainer>
       <SearchInput
         onChangeText={handleChangeText}
+        placeholder={placeholder}
         sx={{ width: '232px' }}
         value={search}
       />

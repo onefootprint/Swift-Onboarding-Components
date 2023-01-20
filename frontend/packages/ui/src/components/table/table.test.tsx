@@ -18,6 +18,8 @@ describe('<Table />', () => {
       { text: 'Name', width: '50%' },
       { text: 'Age', width: '50%' },
     ],
+    searchPlaceholder,
+    onChangeSearchText,
   }: Partial<TableProps<{ id: string; name: string; age: number }>>) =>
     customRender(
       <Table
@@ -28,7 +30,9 @@ describe('<Table />', () => {
         hideThead={hideThead}
         isLoading={isLoading}
         items={items}
+        onChangeSearchText={onChangeSearchText}
         onRowClick={onRowClick}
+        searchPlaceholder={searchPlaceholder}
         renderTr={() => (
           <>
             <td />
@@ -70,6 +74,18 @@ describe('<Table />', () => {
         });
         const table = screen.getByLabelText('table');
         expect(table.querySelector('thead')).not.toBeInTheDocument();
+      });
+    });
+
+    describe('when it has a custom search placeholder', () => {
+      it('should render the custom placeholder', () => {
+        renderTable({
+          searchPlaceholder: 'Search by name',
+          onChangeSearchText: () => {},
+        });
+
+        const search = screen.getByPlaceholderText('Search by name');
+        expect(search).toBeInTheDocument();
       });
     });
   });
