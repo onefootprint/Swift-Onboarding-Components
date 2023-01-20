@@ -16,8 +16,8 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
   const { t } = useTranslation('pages.settings.members');
   const filters = useOrgMembersFilters();
   const columns = [
-    { id: 'email', text: t('table.header.email'), width: '35%' },
-    { id: 'lastActive', text: t('table.header.lastActive'), width: '25%' },
+    { id: 'email', text: t('table.header.email'), width: '25%' },
+    { id: 'lastActive', text: t('table.header.lastActive'), width: '35%' },
     { id: 'role', text: t('table.header.role'), width: '40%' },
   ];
 

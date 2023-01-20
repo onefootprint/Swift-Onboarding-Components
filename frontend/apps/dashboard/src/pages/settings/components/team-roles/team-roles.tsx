@@ -4,12 +4,12 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SectionHeader from '../section-header';
-import AccessControl from './components/access-control';
 import Members from './components/members';
+import Roles from './components/roles';
 
 enum TabName {
   members = 'members',
-  accessControl = 'access-control',
+  roles = 'roles',
 }
 
 const TeamRoles = () => {
@@ -20,7 +20,7 @@ const TeamRoles = () => {
   });
   const tabs = [
     { label: t('tabs.members'), value: TabName.members },
-    { label: t('tabs.access-control'), value: TabName.accessControl },
+    { label: t('tabs.roles'), value: TabName.roles },
   ];
 
   return (
@@ -43,7 +43,7 @@ const TeamRoles = () => {
       </Tabs>
       <Content>
         {tab === TabName.members && <Members />}
-        {tab === TabName.accessControl && <AccessControl />}
+        {tab === TabName.roles && <Roles />}
       </Content>
     </section>
   );

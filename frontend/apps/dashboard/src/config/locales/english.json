@@ -76,16 +76,6 @@
     "ip_address": "IP Address",
     "document": "Document"
   },
-  "org-role-permissions": {
-    "admin": "Admin",
-    "onboarding_configuration": "Onboarding configuration",
-    "api_keys": "API keys",
-    "org_settings": "Modify organization settings",
-    "security_logs": "View security logs",
-    "users": "View user list & details",
-    "decrypt": "Decrypt certain attributes",
-    "decrypt_custom": "Decrypt all data"
-  },
   "components": {
     "timeline": {
       "empty": "No items"
@@ -725,14 +715,14 @@
       },
       "team-roles": {
         "header": {
-          "title": "Team & Roles",
+          "title": "Members & Roles",
           "subtitle": "Manage who is a member of your team and their roles",
           "invite-teammates": "Invite teammates",
           "create-role": "Create role"
         },
         "tabs": {
           "members": "Members",
-          "access-control": "Access control"
+          "roles": "Roles"
         }
       },
       "members": {
@@ -746,7 +736,7 @@
           "empty-state": "No members found"
         }
       },
-      "access-control": {
+      "roles": {
         "aria-label": "Table of organization roles",
         "table": {
           "header": {
@@ -755,6 +745,17 @@
             "permissions": "Permissions"
           },
           "empty-state": "No roles found"
+        },
+        "scopes": {
+          "read": "Read",
+          "admin": "Admin",
+          "onboarding_configuration": "Onboarding configuration",
+          "api_keys": "API keys",
+          "org_settings": "Modify organization settings",
+          "decrypt_custom": "Decrypt all data",
+          "decrypt_documents": "Decrypt documents",
+          "decrypt": "decrypt",
+          "manual_review": "Manual review"
         }
       },
       "create-role": {

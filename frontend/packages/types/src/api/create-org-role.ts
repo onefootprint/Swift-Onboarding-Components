@@ -1,14 +1,14 @@
-import { OrgRolePermission } from '../data';
+import { OrgRoleScope } from '../data';
 
 export type CreateOrgRoleRequest = {
   authToken: string;
   name: string;
-  scopes: OrgRolePermission[];
+  scopes: OrgRoleScope[];
 };
 
 export type CreateOrgRoleResponse = {
   createdAt: string;
   id: string;
   name: string;
-  scopes: OrgRolePermission[];
+  scopes: OrgRoleScope[];
 };
