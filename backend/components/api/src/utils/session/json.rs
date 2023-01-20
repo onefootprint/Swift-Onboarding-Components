@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use crypto::sha256;
 use db::{models::session::Session, PgConnection};
-use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus};
+use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus, HandoffMetadata};
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::errors::ApiError;
@@ -14,6 +14,7 @@ pub struct RateLimitRecord {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct HandoffRecord {
     pub status: D2pSessionStatus,
+    pub meta: Option<HandoffMetadata>,
 }
 
 pub struct JsonSession<C>

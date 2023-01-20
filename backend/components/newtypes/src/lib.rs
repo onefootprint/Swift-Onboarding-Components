@@ -23,6 +23,9 @@ pub use db_types::*;
 pub mod data_identifier;
 pub use data_identifier::*;
 
+pub mod handoff_metadata;
+pub use handoff_metadata::*;
+
 mod b64;
 pub use b64::Base64Data;
 pub use serde;

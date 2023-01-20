@@ -358,8 +358,14 @@ class TestBifrost:
         post("hosted/user/email", {"email": EMAIL}, non_sandbox_auth_token)
 
     def test_d2p_biometric(self, non_sandbox_auth_token):
+        # Try generating tokens with no metadata for backwards compatibility
+        post("hosted/onboarding/d2p/generate", None, non_sandbox_auth_token)
+        post("hosted/onboarding/d2p/generate", dict(), non_sandbox_auth_token)
         # Get new auth token in d2p/generate endpoint
-        body = post("hosted/onboarding/d2p/generate", None, non_sandbox_auth_token)
+        meta = dict(opener="mobile")
+        body = post(
+            "hosted/onboarding/d2p/generate", dict(meta=meta), non_sandbox_auth_token
+        )
         d2p_auth_token = FpAuth(body["auth_token"])
 
         # Send the d2p token to the user via SMS
@@ -377,6 +383,7 @@ class TestBifrost:
         def _assert_get_status(expected_status):
             body = get("hosted/onboarding/d2p/status", None, d2p_auth_token)
             assert body["status"] == expected_status
+            assert body["meta"] == meta
 
         # Use the auth token to check the status of the d2p session
         _assert_get_status("waiting")

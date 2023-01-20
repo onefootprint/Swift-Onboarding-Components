@@ -6,13 +6,9 @@ use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::session::{HandoffRecord, JsonSession};
 use crate::State;
-use newtypes::D2pSessionStatus;
-use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct StatusResponse {
-    status: D2pSessionStatus,
-}
+use api_wire_types::D2pStatusResponse;
+use api_wire_types::D2pUpdateStatusRequest;
+use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-status",
@@ -23,24 +19,20 @@ pub struct StatusResponse {
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> actix_web::Result<Json<ResponseData<StatusResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<D2pStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
-    let session = &state
+    let session = state
         .db_pool
         .db_query(move |conn| JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token))
         .await??
         .ok_or(HandoffError::HandoffSessionNotFound)?;
     Ok(Json(ResponseData {
-        data: StatusResponse {
+        data: D2pStatusResponse {
             status: session.data.status,
+            meta: session.data.meta,
         },
     }))
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct UpdateStatusRequest {
-    status: D2pSessionStatus,
 }
 
 #[api_v2_operation(
@@ -51,12 +43,12 @@ pub struct UpdateStatusRequest {
 #[post("/hosted/onboarding/d2p/status")]
 pub async fn post(
     user_auth: UserAuthContext,
-    request: Json<UpdateStatusRequest>,
+    request: Json<D2pUpdateStatusRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
-    let UpdateStatusRequest { status } = request.into_inner();
+    let D2pUpdateStatusRequest { status } = request.into_inner();
     state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
@@ -70,7 +62,11 @@ pub async fn post(
             if status.priority() <= session.data.status.priority() {
                 return Err(HandoffError::InvalidStatusTransition(status).into());
             }
-            let handoff_record = HandoffRecord { status };
+            let handoff_record = HandoffRecord {
+                status,
+                // Don't change the meta session data
+                meta: session.data.meta,
+            };
             JsonSession::update_or_create(conn, &user_auth.auth_token, &handoff_record, session.expires_at)?;
             Ok(())
         })

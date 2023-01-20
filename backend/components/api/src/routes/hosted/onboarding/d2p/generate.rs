@@ -6,14 +6,10 @@ use crate::types::response::ResponseData;
 use crate::utils::session::JsonSession;
 use crate::utils::session::{AuthSession, HandoffRecord};
 use crate::State;
+use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
 use chrono::{Duration, Utc};
-use newtypes::{D2pSessionStatus, SessionAuthToken};
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct GenerateResponse {
-    auth_token: SessionAuthToken,
-}
+use newtypes::D2pSessionStatus;
+use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-generate",
@@ -25,15 +21,16 @@ pub struct GenerateResponse {
 #[post("/hosted/onboarding/d2p/generate")]
 pub async fn handler(
     state: web::Data<State>,
+    // Option for backwards compatibility
+    request: Option<web::Json<D2pGenerateRequest>>,
     user_auth: UserAuthContext,
-) -> actix_web::Result<Json<ResponseData<GenerateResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<D2pGenerateResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
     if user_auth.data.has_scope(&UserAuthScopeDiscriminant::Handoff) {
         // Don't allow making a handoff token with an existing handoff token. This allows subverting
         // token expiry by constantly just making a new one
         return Err(AuthError::CannotCreateMultipleHandoffTokens.into());
     }
-
     let session_sealing_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
@@ -45,6 +42,8 @@ pub async fn handler(
             // a hash of the auth token so both handoff clients can look up the status
             let handoff_record = HandoffRecord {
                 status: D2pSessionStatus::Waiting,
+                // Allow embedding extra metadata in the backend session
+                meta: request.and_then(|r| r.into_inner().meta),
             };
             let now = Utc::now();
             JsonSession::update_or_create(conn, &auth_token, &handoff_record, now + expires_in)?;
@@ -53,6 +52,6 @@ pub async fn handler(
         .await??;
 
     Ok(Json(ResponseData {
-        data: GenerateResponse { auth_token },
+        data: D2pGenerateResponse { auth_token },
     }))
 }
