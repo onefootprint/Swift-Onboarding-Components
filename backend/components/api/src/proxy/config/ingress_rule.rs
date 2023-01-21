@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use crate::{
     errors::{proxy::VaultProxyError, ApiError},
-    utils::headers::get_required_header,
 };
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
@@ -29,11 +28,6 @@ impl IngressRule {
     /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
     ///
     pub const INGRESS_RULE_HEADER: &str = "x-fp-proxy-ingress-rule";
-
-    /// If specifying proxy configuration ingress rules from a stored configuration
-    /// the corresponding token must be assigned just-in-time via a headers
-    /// i.e: `x-fp-proxy-ingress-rule-token: fp_id_abc`
-    pub const INGRESS_RULE_TOKEN_ASSIGNMENT_HEADER: &str = "x-fp-proxy-ingress-rule-token";
 }
 
 impl IngressRule {
@@ -42,14 +36,13 @@ impl IngressRule {
     /// use with the rules
     pub fn parse_from_db_rules(
         rules: Vec<ProxyConfigIngressRule>,
-        headers: &HeaderMap,
+        fp_id: Option<FootprintUserId>,
     ) -> Result<Vec<Self>, ApiError> {
         if rules.is_empty() {
             return Ok(vec![]);
         }
 
-        let fp_id = get_required_header(Self::INGRESS_RULE_TOKEN_ASSIGNMENT_HEADER, headers)
-            .map(FootprintUserId::from)?;
+        let fp_id = fp_id.ok_or(VaultProxyError::MissingFootprintUserTokenParameter)?;
 
         let rules = rules
             .into_iter()

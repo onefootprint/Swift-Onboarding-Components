@@ -71,6 +71,7 @@ strum = { workspace = true }
 
 workos = "0.2"
 byteorder = "1.4"
+bytes = "1.3"
 
 macros = { path = "../macros" }
 db = { path = "../db" }

@@ -51,6 +51,31 @@ macro_rules! define_newtype_id {
     };
 }
 
+/// A trait that enables an id to verify its prefix
+pub trait PrefixId: From<String> {
+    const PREFIX: &'static str;
+
+    fn parse_with_prefix<S: Into<String>>(s: S) -> Result<Self, crate::Error> {
+        let s: String = s.into();
+        if !s.starts_with(Self::PREFIX) {
+            return Err(crate::Error::IdPrefixError(Self::PREFIX));
+        }
+        let unique_part = s.replace(Self::PREFIX, "");
+        if !unique_part.chars().all(char::is_alphanumeric) || unique_part.is_empty() {
+            return Err(crate::Error::IdPrefixError(Self::PREFIX));
+        }
+        Ok(Self::from(s))
+    }
+}
+/// This macro implements a way to verify the prefix of an id
+macro_rules! impl_verified_prefix_for_nt_id {
+    ($name: ident, $prefix: literal) => {
+        impl PrefixId for $name {
+            const PREFIX: &'static str = $prefix;
+        }
+    };
+}
+
 define_newtype_id!(
     AuthTokenHash,
     String,
@@ -78,6 +103,8 @@ define_newtype_id!(IdentityDataId, String, "Identifier for user identity data ro
 define_newtype_id!(ScopedUserId, String, "Identifier for an ScopedUser");
 define_newtype_id!(OnboardingId, String, "Identifier for an OnboardingLink");
 define_newtype_id!(FootprintUserId, String, "Identifier for a ScopedUser");
+impl_verified_prefix_for_nt_id!(FootprintUserId, "fp_id_");
+
 define_newtype_id!(
     ObConfigurationId,
     String,
@@ -145,6 +172,7 @@ define_newtype_id!(
     String,
     "Identifier for a IdologyExpectIdResponse"
 );
+define_newtype_id!(ProxyRequestLogId, String, "Identifier for a log of proxy request");
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(
@@ -223,5 +251,18 @@ mod tests {
 
         let x = TestUuid::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap();
         assert_eq!(x.to_string(), "a5971b52-1b44-4c3a-a83f-a96796f8774d".to_string());
+    }
+
+    #[test]
+    fn test_prefix() {
+        define_newtype_id!(TestId, String, "");
+        impl_verified_prefix_for_nt_id!(TestId, "abcd_ab_");
+
+        let _ = TestId::parse_with_prefix("abcd_ab_asdajsdhj1h313j1jsdsdf").expect("failed to parse id");
+        let _ = TestId::parse_with_prefix("abcd_ab_12abADdas3ssF").expect("failed to parse id");
+        let _ = TestId::parse_with_prefix("abcd_ab_as12123abcd_ab").expect_err("failed to fail id");
+        let _ = TestId::parse_with_prefix("abcd_ab_a2112@@$$dfdf").expect_err("failed to fail id");
+        let _ = TestId::parse_with_prefix("abcd_ab_a2112@@$$dfdf").expect_err("failed to fail id");
+        let _ = TestId::parse_with_prefix("abcd_ab_").expect_err("failed to fail id");
     }
 }

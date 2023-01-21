@@ -1,7 +1,7 @@
 use actix_web::{http::header::HeaderMap, FromRequest};
 
 use futures::Future;
-use newtypes::{PiiString, ProxyConfigId, ProxyIngressContentType};
+use newtypes::{FootprintUserId, PiiString, ProxyConfigId, ProxyIngressContentType};
 use paperclip::actix::Apiv2Header;
 use reqwest::Method;
 use std::{pin::Pin, str::FromStr};
@@ -36,12 +36,23 @@ pub mod proxy_headers {
     // Egress
     pub const EGRESS_URL_HEADER_NAME: &str = "x-fp-proxy-target-url";
     pub const EGRESS_METHOD_HEADER_NAME: &str = "x-fp-proxy-method";
+    pub const EGRESS_PATH_AND_QUERY: &str = "x-fp-path-and-query";
 
     // Ingress
     pub const INGRESS_CONTENT_TYPE: &str = "x-fp-proxy-ingress-content-type";
 
     // other
     pub const ACCESS_REASON: &str = "x-fp-proxy-access-reason";
+
+    /// When proxy requests are on behalf of a single footprint user, users
+    /// can omit the fp_id_xxx. prefix on proxy tokens, and just use `id.x` or `custom.y`.
+    ///
+    /// This header denotes the token to se.
+    ///
+    /// Similarly, If specifying proxy configuration ingress rules from a stored configuration
+    /// the corresponding token must be assigned just-in-time via a headers
+    /// i.e: `x-fp-proxy-footprint-token: fp_id_abc`
+    pub const USER_TOKEN_ASSIGNMENT_HEADER: &str = "x-fp-proxy-footprint-token";
 
     // helper function to get method
     pub fn get_proxy_method_or_default(headers: &HeaderMap, default: Method) -> Method {
@@ -53,9 +64,12 @@ pub mod proxy_headers {
 
 #[derive(Debug, Clone)]
 pub struct ProxyConfig {
+    /// the source of the configuration if not JIT
+    pub config_id: Option<ProxyConfigId>,
     pub egress: EgressConfig,
     pub ingress: IngressConfig,
     pub access_reason: Option<String>,
+    pub global_fp_id: Option<FootprintUserId>,
 }
 
 #[derive(Debug, Clone)]
@@ -157,6 +171,9 @@ impl TryFrom<&HeaderMap> for ProxyConfig {
         let proxy_target = get_required_header(proxy_headers::EGRESS_URL_HEADER_NAME, headers)?;
         let url = url::Url::parse(&proxy_target).map_err(|_| VaultProxyError::InvalidDestinationUrl)?;
         let method = proxy_headers::get_proxy_method_or_default(headers, Method::POST);
+        let global_fp_id =
+            get_header(proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, headers).map(FootprintUserId::from);
+
         let egress_headers = ForwardProxyHeaders::try_from(headers)?;
         let pinned_certs = PinnedServerCertificates::try_from(headers)?;
         let client_certs = ParsedClientCertificate::try_from(headers)?;
@@ -185,6 +202,8 @@ impl TryFrom<&HeaderMap> for ProxyConfig {
         };
 
         Ok(Self {
+            global_fp_id,
+            config_id: None,
             egress,
             ingress,
             access_reason,
@@ -213,7 +232,7 @@ impl ProxyConfig {
             .await??;
 
         let db::models::proxy_config::ProxyConfig {
-            id: _,
+            id,
             tenant_id: _,
             is_live: _,
             name: _,
@@ -228,9 +247,26 @@ impl ProxyConfig {
             access_reason,
         } = db_config;
 
-        let url = url::Url::parse(&url).map_err(|_| VaultProxyError::InvalidDestinationUrl)?;
+        // get the base url and/or path and query from headers
+        let url =
+            if let Some(path_and_query) = get_header(proxy_headers::EGRESS_PATH_AND_QUERY, header_map) {
+                let url = format!("{url}{path_and_query}");
+                url::Url::parse(&url)
+            } else {
+                url::Url::parse(&url)
+            }
+            .map_err(|_| VaultProxyError::InvalidDestinationUrl)?;
+
         let method =
             reqwest::Method::from_str(&method).map_err(|_| VaultProxyError::InvalidDestinationMethod)?;
+
+        // support method JIT overwrite
+        let method = proxy_headers::get_proxy_method_or_default(header_map, method);
+
+        // grab a global fp_id
+        // note we dont throw the error here as it may or may not be required
+        let global_fp_id =
+            get_header(proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, header_map).map(FootprintUserId::from);
 
         // build the headers
         let headers = headers
@@ -307,16 +343,15 @@ impl ProxyConfig {
 
         // ingress rules
         // NOTE: ingress rules defined in the config table need a matching `fp_id`
-        let rules = IngressRule::parse_from_db_rules(ingress_rules, header_map)?;
-
-        // support method JIT
-        let method = proxy_headers::get_proxy_method_or_default(header_map, method);
+        let rules = IngressRule::parse_from_db_rules(ingress_rules, global_fp_id.clone())?;
 
         // support additional JIT forward headers
         let headers = ForwardProxyHeaders(headers.collect())
             .concat(ForwardProxyHeaders::try_from(header_map).ok().unwrap_or_default());
 
         Ok(ProxyConfig {
+            global_fp_id,
+            config_id: Some(id),
             egress: EgressConfig {
                 url,
                 method,

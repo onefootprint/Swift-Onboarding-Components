@@ -4,11 +4,15 @@ use itertools::Itertools;
 
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 
-use crate::{DataIdentifier, FootprintUserId};
+use crate::{DataIdentifier, FootprintUserId, PrefixId};
 
 ///
 /// The token format is as follows:
 /// <fp_id>.<data_kind>.<attribute_name>
+///
+/// OR, if a global fp_id is known, the following is also accepted:
+///
+/// <data_kind>.<attribute_name>
 ///
 /// Example:
 /// fp_id_Gysdl9zxbBfrbSvfc0xCz.id.ssn9
@@ -29,9 +33,20 @@ pub struct ProxyToken {
 impl ProxyToken {
     /// parses a string into a single Proxy Token
     pub fn parse(raw: &str) -> Result<Self, crate::Error> {
-        let chars = raw.trim().chars();
+        Self::parse_global(raw, None)
+    }
 
+    /// parses a string into a single Proxy Token with support for a global footprint user id
+    /// in the case where just an identifier is specified
+    pub fn parse_global(raw: &str, global_fp_id: Option<FootprintUserId>) -> Result<Self, crate::Error> {
+        let chars = raw.trim().chars();
         let token = chars.collect::<String>();
+
+        // accept the case where the token is just a data identifier but we have a global fp_id
+        if let (Some(fp_id), Ok(identifier)) = (global_fp_id, DataIdentifier::from_str(&token)) {
+            return Ok(Self { fp_id, identifier });
+        }
+
         let mut token = token.split('.');
         let Some(fp_id) = token.next() else {
             return Err(ProxyTokenError::InvalidTokenComponents)?;
@@ -39,7 +54,7 @@ impl ProxyToken {
         let data_identifier = token.join(".");
 
         Ok(Self {
-            fp_id: FootprintUserId::from(fp_id.to_string()),
+            fp_id: FootprintUserId::parse_with_prefix(fp_id)?,
             identifier: DataIdentifier::from_str(&data_identifier).map_err(ProxyTokenError::from)?,
         })
     }

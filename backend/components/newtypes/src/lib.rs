@@ -71,6 +71,8 @@ pub enum Error {
     DeserializeError,
     #[error("{0}")]
     ProxyTokenError(#[from] ProxyTokenError),
+    #[error("expected identifier with prefix: {0}")]
+    IdPrefixError(&'static str),
 }
 
 pub type NtResult<T> = Result<T, Error>;

@@ -19,10 +19,7 @@ pub struct TokenizedIngress {
 /// configuration rules
 ///
 /// Also: returns values to send to the vault
-pub async fn process_ingress(
-    response: reqwest::Response,
-    config: IngressConfig,
-) -> ApiResult<TokenizedIngress> {
+pub async fn process_ingress(response: bytes::Bytes, config: IngressConfig) -> ApiResult<TokenizedIngress> {
     let extractor = match config.content_type {
         IngressContentType::Unspecified => {
             // we need a content-type if rules are provided
@@ -32,12 +29,12 @@ pub async fn process_ingress(
 
             // nothing to do!
             return Ok(TokenizedIngress {
-                tokenized_body: response.bytes().await?,
+                tokenized_body: response,
                 values_to_vault: HashMap::new(),
             });
         }
         IngressContentType::Json => JsonPath {
-            value: response.json().await?,
+            value: serde_json::from_slice(response.as_ref())?,
         },
     };
 

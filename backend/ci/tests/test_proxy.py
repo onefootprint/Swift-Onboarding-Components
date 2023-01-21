@@ -47,8 +47,8 @@ class ProxyId(BaseAuth):
     HEADER_NAME = "x-fp-proxy-id"
 
 
-class ProxyIngressRuleTokenAssignment(BaseAuth):
-    HEADER_NAME = "x-fp-proxy-ingress-rule-token"
+class ProxyTokenAssignment(BaseAuth):
+    HEADER_NAME = "x-fp-proxy-footprint-token"
 
 
 def read_file(name):
@@ -116,11 +116,13 @@ class TestVaultProxy:
 
         # send the proxy request
         data = {
-            "full_name": f"::{fp_id}.id.first_name:: ::{fp_id}.id.last_name::",
-            "last4_credit_card": f"::{fp_id}.custom.cc4::",
-            "ach": f"::{fp_id}.custom.ach_account_number::",
-            "ssn": f"::{fp_id}.id.ssn9::",
+            "full_name": f"{{{{ {fp_id}.id.first_name }}}} {{{{ {fp_id}.id.last_name }}}}",
+            "last4_credit_card": f"{{{{ {fp_id}.custom.cc4 }}}}",
+            "ach": f"{{{{ {fp_id}.custom.ach_account_number }}}}",
+            "ssn": f"{{{{ {fp_id}.id.ssn9 }}}}",
         }
+
+        print(data)
         response = _make_request(
             method=requests.post,
             path="proxy",
@@ -169,7 +171,7 @@ class TestVaultProxy:
 
         # send the proxy request
         data = {
-            "message": f"::{fp_id}.custom.test_field::",
+            "message": f"{{{{ {fp_id}.custom.test_field }}}}",
         }
 
         response = _make_request(
@@ -279,8 +281,9 @@ class TestVaultProxy:
 
         # fire the proxy request
         data = {
-            "full_name": f"::{fp_id}.id.first_name:: ::{fp_id}.id.last_name::",
-            "msg": f"::{fp_id}.custom.message::",
+            "full_name": f"{{{{ {fp_id}.id.first_name }}}} {{{{ {fp_id}.id.last_name }}}}",
+            # here we test the token assignment also works for egress
+            "msg": "{{ custom.message }}",
             "data": {"card_number": "4242424242424242424"},
         }
 
@@ -293,7 +296,7 @@ class TestVaultProxy:
             auths=[
                 sandbox_tenant.sk.key,
                 ProxyId(proxy_id),
-                ProxyIngressRuleTokenAssignment(fp_id),
+                ProxyTokenAssignment(fp_id),
             ],
         )
 

@@ -378,6 +378,25 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    proxy_request_log (id) {
+        id -> Text,
+        tenant_id -> Text,
+        config_id -> Nullable<Text>,
+        e_url -> Bytea,
+        method -> Text,
+        sent_at -> Timestamptz,
+        received_at -> Nullable<Timestamptz>,
+        status_code -> Nullable<Int4>,
+        e_request_data -> Bytea,
+        e_response_data -> Nullable<Bytea>,
+        request_error -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     risk_signal (id) {
         id -> Text,
         onboarding_decision_id -> Text,
@@ -658,6 +677,8 @@ joinable!(proxy_config_header -> proxy_config (config_id));
 joinable!(proxy_config_ingress_rule -> proxy_config (config_id));
 joinable!(proxy_config_secret_header -> proxy_config (config_id));
 joinable!(proxy_config_server_cert -> proxy_config (config_id));
+joinable!(proxy_request_log -> proxy_config (config_id));
+joinable!(proxy_request_log -> tenant (tenant_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
 joinable!(scoped_user -> ob_configuration (ob_configuration_id));
 joinable!(scoped_user -> tenant (tenant_id));
@@ -701,6 +722,7 @@ allow_tables_to_appear_in_same_query!(
     proxy_config_ingress_rule,
     proxy_config_secret_header,
     proxy_config_server_cert,
+    proxy_request_log,
     risk_signal,
     scoped_user,
     session,

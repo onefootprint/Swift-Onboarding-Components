@@ -15,6 +15,7 @@ pub mod onboarding;
 pub mod onboarding_decision;
 pub mod phone_number;
 pub mod proxy_config;
+pub mod proxy_request_log;
 pub mod risk_signal;
 pub mod scoped_user;
 pub mod session;

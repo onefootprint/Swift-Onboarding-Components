@@ -59,4 +59,6 @@ pub enum VaultProxyError {
     PemError(#[from] crypto::pem::PemError),
     #[error("invalid proxy token: {0}")]
     ProxyTokenError(#[from] ProxyTokenError),
+    #[error("must specifiy footprint user token header for ingress rules")]
+    MissingFootprintUserTokenParameter,
 }

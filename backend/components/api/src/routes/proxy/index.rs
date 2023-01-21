@@ -19,7 +19,7 @@ use crate::State;
 
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
 
-#[tracing::instrument(skip(state, body_bytes))]
+#[tracing::instrument(skip(state, body_bytes, request))]
 #[api_v2_operation(
     description = "Proxy decrypt user vault data to a target HTTPS destination",
     tags(Proxy, PublicApi)
@@ -51,7 +51,7 @@ pub async fn post(
     };
 
     // 1. parse
-    let parser = ProxyTokenParser::parse(body)?;
+    let parser = ProxyTokenParser::parse(body, config.global_fp_id)?;
 
     // 2. detokenize
     let detokens = proxy::detokenize::detokenize(
@@ -66,13 +66,20 @@ pub async fn post(
     let detokenized_body = parser.detokenize_body(detokens)?;
 
     // 3. proxy the detokenized request
-    let response = net_client::proxy_request(detokenized_body, config.egress).await?;
+    let response = net_client::proxy_request(
+        &state,
+        auth.tenant(),
+        config.config_id.clone(),
+        detokenized_body,
+        config.egress,
+    )
+    .await?;
 
     // 4. build the ingress response
-    let mut builder = HttpResponse::build(response.status());
+    let mut builder = HttpResponse::build(response.status_code);
 
     // 4a. forward ingress headers
-    response.headers().into_iter().for_each(|(name, value)| {
+    response.headers.iter().for_each(|(name, value)| {
         builder.insert_header((name, value));
     });
 
@@ -80,7 +87,7 @@ pub async fn post(
     let TokenizedIngress {
         tokenized_body,
         values_to_vault,
-    } = pii_parser::process_ingress(response, config.ingress).await?;
+    } = pii_parser::process_ingress(response.body, config.ingress).await?;
 
     // 4c. vault pii
     tokenize::vault_pii(&state, auth.as_ref(), values_to_vault, insight).await?;

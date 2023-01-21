@@ -13,7 +13,7 @@ pub enum DbError {
     // Wrapped errors
     #[error("Db interact error")]
     DbInteract(#[from] deadpool_diesel::InteractError),
-    #[error("Db error")]
+    #[error("database error")]
     DbError(#[from] diesel::result::Error),
     #[error("Pool error")]
     PoolGet(#[from] deadpool_diesel::PoolError),
