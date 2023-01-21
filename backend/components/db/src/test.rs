@@ -3,13 +3,11 @@ use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
-use crate::models::{tenant::Tenant, user_vault::UserVault};
-use crate::{test_helpers, DbResult, TxnPgConnection};
+use crate::TxnPgConnection;
 use diesel::prelude::*;
 
 use newtypes::{
-    DbActor, EncryptedVaultPrivateKey, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId,
-    TenantRoleId, UserVaultId, VaultPublicKey,
+    DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, TenantRoleId, UserVaultId,
 };
 
 pub(crate) fn test_tenant_admin_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> TenantRole {
@@ -80,40 +78,76 @@ pub(crate) fn test_tenant_api_key(
     .unwrap()
 }
 
-#[actix_rt::test]
-async fn test_db() {
-    // TODO put this test in a transaction
-    let _ = dotenv::dotenv(); // Don't actually care if this succeeds since env is set in github actions
-    let db_url = std::env::var("DATABASE_URL").expect("couldn't parse DB url from environment");
+#[cfg(test)]
+mod test {
+    use crate::models::{tenant::Tenant, user_vault::UserVault};
+    use crate::{test_helpers, DbResult};
+    use diesel::sql_types::Text;
+    use diesel::{sql_query, RunQueryDsl};
+    use newtypes::{EncryptedVaultPrivateKey, VaultPublicKey};
 
-    // Run migrations on this DB if they haven't been run yet
-    test_helpers::run_migrations_once(db_url.clone());
+    #[actix_rt::test]
+    async fn test_db() {
+        // TODO put this test in a transaction
+        let _ = dotenv::dotenv(); // Don't actually care if this succeeds since env is set in github actions
+        let db_url = std::env::var("DATABASE_URL").expect("couldn't parse DB url from environment");
 
-    let pool = crate::init(&db_url).expect("couldn't initiate DB pool");
-    let tenant = crate::models::tenant::NewTenant {
-        name: "test_tenant".to_owned(),
-        e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
-        public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
-        logo_url: None,
-        workos_id: None,
-        sandbox_restricted: true,
-    };
-    pool.db_query(|conn| Tenant::save(conn, tenant).expect("couldn't create tenant"))
+        // Run migrations on this DB if they haven't been run yet
+        test_helpers::run_migrations_once(db_url.clone());
+
+        let pool = crate::init(&db_url).expect("couldn't initiate DB pool");
+        let tenant = crate::models::tenant::NewTenant {
+            name: "test_tenant".to_owned(),
+            e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
+            public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
+            logo_url: None,
+            workos_id: None,
+            sandbox_restricted: true,
+        };
+        pool.db_query(|conn| Tenant::save(conn, tenant).expect("couldn't create tenant"))
+            .await
+            .expect("couldn't make DB query");
+
+        let new_user = crate::models::user_vault::NewUserVaultArgs {
+            e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
+            public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
+            is_live: false,
+            is_portable: true,
+        };
+        pool.db_transaction(|conn| -> DbResult<_> {
+            let result = UserVault::create(conn, new_user)?.into_inner();
+            Ok(result)
+        })
         .await
-        .expect("couldn't make DB query");
+        .expect("couldn't init user vault");
 
-    let new_user = crate::models::user_vault::NewUserVaultArgs {
-        e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
-        public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
-        is_live: false,
-        is_portable: true,
-    };
-    pool.db_transaction(|conn| -> DbResult<_> {
-        let result = UserVault::create(conn, new_user)?.into_inner();
-        Ok(result)
-    })
-    .await
-    .expect("couldn't init user vault");
+        // TODO find_by_phone_number and find_by_email
+    }
 
-    // TODO find_by_phone_number and find_by_email
+    #[tokio::test]
+    async fn test_diesel_manage_updated_at_trigger_present_on_all_tables() {
+        #[derive(QueryableByName, Debug)]
+        struct Res {
+            #[diesel(sql_type = Text)]
+            table_name: String,
+        }
+        let mut conn = test_helpers::test_db_conn();
+        let res = sql_query("
+            select table_name
+            from information_schema.columns 
+            where 
+                column_name = '_updated_at' 
+                and table_name not in (select event_object_table from information_schema.triggers where action_statement = 'EXECUTE FUNCTION diesel_set_updated_at()');")
+            .get_results::<Res>(&mut conn)
+            .unwrap();
+
+        assert!(
+            res.is_empty(),
+            "Found tables with `_updated_at` but no `set_updated_at` trigger: {}",
+            res.into_iter()
+                .map(|r| r.table_name)
+                .collect::<Vec<String>>()
+                .join(",")
+        );
+    }
 }
