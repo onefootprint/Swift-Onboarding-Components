@@ -1,36 +1,38 @@
 import React from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import { States } from 'src/utils/state-machine/bifrost';
+import { Events, States } from 'src/utils/state-machine/bifrost';
 
 import AuthenticationSuccess from './authentication-success';
 import Complete from './complete';
 import ConfigInvalid from './config-invalid';
+import Error from './error';
 import Identify from './identify';
 import Init from './init';
 import Onboarding from './onboarding';
 
 const Root = () => {
-  const [state] = useBifrostMachine();
-  if (state.matches(States.init)) {
-    return <Init />;
-  }
-  if (state.matches(States.configInvalid)) {
-    return <ConfigInvalid />;
-  }
-  if (state.matches(States.identify)) {
-    return <Identify />;
-  }
-  if (state.matches(States.onboarding)) {
-    return <Onboarding />;
-  }
-  if (state.matches(States.authenticationSuccess)) {
-    return <AuthenticationSuccess />;
-  }
-  if (state.matches(States.complete)) {
-    return <Complete />;
-  }
-  // TODO: SHOW 404
-  return null;
+  const [state, send] = useBifrostMachine();
+
+  return (
+    <ErrorBoundary
+      FallbackComponent={Error}
+      // TODO: Add logging to ObserveCollector here
+      // onError={(error, stack) => {
+      // observeCollector.logError('error', error, { stack });
+      // }}
+      onReset={() => {
+        send({ type: Events.reset });
+      }}
+    >
+      {state.matches(States.init) && <Init />}
+      {state.matches(States.configInvalid) && <ConfigInvalid />}
+      {state.matches(States.identify) && <Identify />}
+      {state.matches(States.onboarding) && <Onboarding />}
+      {state.matches(States.authenticationSuccess) && <AuthenticationSuccess />}
+      {state.matches(States.complete) && <Complete />}
+    </ErrorBoundary>
+  );
 };
 
 export default Root;

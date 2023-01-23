@@ -156,6 +156,11 @@
         "title": "Submission completed!",
         "subtitle": "Thanks for using Footprint to verify your identity."
       }
+    },
+    "error": {
+      "title": "Oops! An error occurred.",
+      "description": "We're sorry. Please restart the onboarding.",
+      "cta": "Restart"
     }
   }
 }

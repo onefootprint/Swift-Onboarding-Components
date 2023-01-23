@@ -11,6 +11,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
     id: 'bifrostMachine',
     initial: States.init,
     context: {},
+    on: {
+      [Events.reset]: {
+        target: States.init,
+        actions: [Actions.resetContext],
+      },
+    },
     states: {
       [States.init]: {
         on: {
@@ -118,6 +124,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         }
         return context;
       }),
+      [Actions.resetContext]: assign(() => ({})),
     },
   },
 );

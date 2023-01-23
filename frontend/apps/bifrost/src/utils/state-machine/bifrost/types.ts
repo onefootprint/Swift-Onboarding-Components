@@ -16,6 +16,7 @@ export enum Events {
   authenticationSucceeded = 'authenticationSucceeded',
   identifyCompleted = 'done.invoke.identify',
   onboardingCompleted = 'done.invoke.onboarding',
+  reset = 'reset',
 }
 
 export enum Actions {
@@ -24,6 +25,7 @@ export enum Actions {
   assignAuthToken = 'assignAuthToken',
   assignValidationToken = 'assignValidationToken',
   assignStatus = 'assignStatus',
+  resetContext = 'resetContext',
 }
 
 export type BootstrapData = {
@@ -66,4 +68,7 @@ export type BifrostEvent =
         validationToken?: string;
         status?: OnboardingStatus;
       };
+    }
+  | {
+      type: Events.reset;
     };
