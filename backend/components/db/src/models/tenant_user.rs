@@ -197,27 +197,19 @@ impl TenantUser {
         Ok(result)
     }
 
-    pub fn list(
-        conn: &mut PgConnection,
-        filters: TenantUserListFilters,
-    ) -> DbResult<Vec<(Self, TenantRole)>> {
+    pub fn count(conn: &mut PgConnection, filters: &TenantUserListFilters) -> DbResult<i64> {
+        // Apply filters. TODO share these with list
         let mut query = tenant_user::table
-            .inner_join(tenant_role::table)
             .filter(tenant_user::tenant_id.eq(filters.tenant_id))
-            .into_boxed()
-            .order_by(tenant_user::email.asc())
-            .limit(filters.page_size);
+            .into_boxed();
 
         if filters.only_active {
             query = query.filter(tenant_user::deactivated_at.is_null())
         }
-        if let Some(cursor) = filters.cursor {
-            query = query.filter(tenant_user::email.ge(cursor));
-        }
-        if let Some(role_ids) = filters.role_ids {
+        if let Some(ref role_ids) = filters.role_ids {
             query = query.filter(tenant_user::tenant_role_id.eq_any(role_ids));
         }
-        if let Some(search) = filters.search {
+        if let Some(ref search) = filters.search {
             let pattern = format!("%{}%", search);
             query = query.filter(
                 tenant_user::first_name
@@ -226,6 +218,41 @@ impl TenantUser {
                     .or(tenant_user::email.ilike(pattern)),
             )
         }
+
+        let count = query.count().get_result(conn)?;
+        Ok(count)
+    }
+
+    pub fn list(
+        conn: &mut PgConnection,
+        filters: &TenantUserListFilters,
+    ) -> DbResult<Vec<(Self, TenantRole)>> {
+        // Apply filters. TODO share these with count
+        let mut query = tenant_user::table
+            .inner_join(tenant_role::table)
+            .filter(tenant_user::tenant_id.eq(filters.tenant_id))
+            .into_boxed();
+
+        if filters.only_active {
+            query = query.filter(tenant_user::deactivated_at.is_null())
+        }
+        if let Some(ref role_ids) = filters.role_ids {
+            query = query.filter(tenant_user::tenant_role_id.eq_any(role_ids));
+        }
+        if let Some(ref search) = filters.search {
+            let pattern = format!("%{}%", search);
+            query = query.filter(
+                tenant_user::first_name
+                    .ilike(pattern.clone())
+                    .or(tenant_user::last_name.ilike(pattern.clone()))
+                    .or(tenant_user::email.ilike(pattern)),
+            )
+        }
+        // Apply pagination filters
+        if let Some(ref cursor) = filters.cursor {
+            query = query.filter(tenant_user::email.ge(cursor));
+        }
+        query = query.order_by(tenant_user::email.asc()).limit(filters.page_size);
         let results = query.get_results(conn)?;
         Ok(results)
     }

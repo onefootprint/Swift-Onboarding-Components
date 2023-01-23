@@ -79,6 +79,7 @@ where
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct PaginatedReponseMeta<C> {
     pub next: Option<C>,
+    // TODO why is this optional?
     pub count: Option<i64>,
 }
 

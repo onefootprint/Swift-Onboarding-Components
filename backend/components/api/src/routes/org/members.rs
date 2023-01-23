@@ -46,7 +46,7 @@ async fn get(
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let tenant_id = tenant.id.clone();
-    let results = state
+    let (results, count) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantUserListFilters {
@@ -57,8 +57,9 @@ async fn get(
                 role_ids,
                 search,
             };
-            let result = TenantUser::list(conn, filters)?;
-            Ok(result)
+            let result = TenantUser::list(conn, &filters)?;
+            let count = TenantUser::count(conn, &filters)?;
+            Ok((result, count))
         })
         .await??;
 
@@ -70,7 +71,7 @@ async fn get(
         .take(page_size)
         .map(api_wire_types::OrganizationMember::from_db)
         .collect::<Vec<api_wire_types::OrganizationMember>>();
-    Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
+    Ok(Json(PaginatedResponseData::ok(results, cursor, Some(count))))
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
