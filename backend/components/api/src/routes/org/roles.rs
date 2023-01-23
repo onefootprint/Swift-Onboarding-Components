@@ -10,6 +10,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_wire_types::OrgRoleFilters;
 use db::models::tenant_role::TenantRole;
+use db::models::tenant_role::TenantRoleListFilters;
 use newtypes::TenantRoleId;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
@@ -37,10 +38,19 @@ async fn get(
     let scopes = scopes.map(|s| s.0);
 
     let tenant_id = tenant.id.clone();
-    let results = state
+    let (results, count) = state
         .db_pool
-        .db_query(move |conn| {
-            TenantRole::list_active(conn, &tenant_id, scopes, name, cursor, (page_size + 1) as i64)
+        .db_query(move |conn| -> ApiResult<_> {
+            let filters = TenantRoleListFilters {
+                tenant_id: &tenant_id,
+                scopes,
+                name,
+                cursor,
+                page_size: (page_size + 1) as i64,
+            };
+            let results = TenantRole::list_active(conn, &filters)?;
+            let count = TenantRole::count_active(conn, &filters)?;
+            Ok((results, count))
         })
         .await??;
 
@@ -50,7 +60,7 @@ async fn get(
         .take(page_size)
         .map(api_wire_types::OrganizationRole::from_db)
         .collect::<Vec<api_wire_types::OrganizationRole>>();
-    Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
+    Ok(Json(PaginatedResponseData::ok(results, cursor, Some(count))))
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]

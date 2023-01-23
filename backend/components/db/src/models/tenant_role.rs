@@ -1,11 +1,12 @@
-use crate::{schema::tenant_role, DbError, DbResult, TxnPgConnection};
-use diesel::prelude::*;
-
+use super::tenant::Tenant;
+use crate::{
+    schema::tenant_role::{self, BoxedQuery},
+    DbError, DbResult, TxnPgConnection,
+};
 use chrono::{DateTime, Utc};
+use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{TenantId, TenantRoleId, TenantScope};
-
-use super::tenant::Tenant;
 
 pub type IsImmutable = bool;
 
@@ -172,33 +173,38 @@ impl TenantRole {
         Ok(result)
     }
 
-    pub fn list_active(
-        conn: &mut PgConnection,
-        tenant_id: &TenantId,
-        scopes: Option<Vec<TenantScope>>,
-        name: Option<String>,
-        cursor: Option<String>,
-        page_size: i64,
-    ) -> DbResult<Vec<Self>> {
+    pub fn list_active_query<'a>(filters: &'a TenantRoleListFilters) -> BoxedQuery<'a, diesel::pg::Pg> {
         let mut query = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(tenant_role::tenant_id.eq(filters.tenant_id))
             .filter(tenant_role::deactivated_at.is_null())
-            .into_boxed()
-            .order_by(tenant_role::name.asc())
-            .limit(page_size);
+            .into_boxed();
 
-        if let Some(cursor) = cursor {
-            query = query.filter(tenant_role::name.ge(cursor))
-        }
-        if let Some(scopes) = scopes {
+        if let Some(ref scopes) = filters.scopes {
             query = query.filter(tenant_role::scopes.overlaps_with(scopes))
         }
-        if let Some(name) = name {
+        if let Some(ref name) = filters.name {
             query = query.filter(tenant_role::name.ilike(format!("%{}%", name)))
+        }
+        query
+    }
+
+    pub fn list_active(conn: &mut PgConnection, filters: &TenantRoleListFilters) -> DbResult<Vec<Self>> {
+        let mut query = Self::list_active_query(filters)
+            .order_by(tenant_role::name.asc())
+            .limit(filters.page_size);
+
+        if let Some(ref cursor) = filters.cursor {
+            query = query.filter(tenant_role::name.ge(cursor))
         }
 
         let results = query.get_results(conn)?;
         Ok(results)
+    }
+
+    pub fn count_active(conn: &mut PgConnection, filters: &TenantRoleListFilters) -> DbResult<i64> {
+        let query = Self::list_active_query(filters);
+        let count = query.count().get_result(conn)?;
+        Ok(count)
     }
 }
 
@@ -218,4 +224,12 @@ struct TenantRoleUpdate {
     name: Option<String>,
     scopes: Option<Vec<TenantScope>>,
     deactivated_at: Option<Option<DateTime<Utc>>>,
+}
+
+pub struct TenantRoleListFilters<'a> {
+    pub tenant_id: &'a TenantId,
+    pub scopes: Option<Vec<TenantScope>>,
+    pub name: Option<String>,
+    pub cursor: Option<String>,
+    pub page_size: i64,
 }
