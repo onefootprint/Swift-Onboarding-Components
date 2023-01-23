@@ -217,12 +217,13 @@ impl TenantUser {
         if let Some(role_ids) = filters.role_ids {
             query = query.filter(tenant_user::tenant_role_id.eq_any(role_ids));
         }
-        if let Some(name) = filters.name {
-            let pattern = format!("%{}%", name);
+        if let Some(search) = filters.search {
+            let pattern = format!("%{}%", search);
             query = query.filter(
                 tenant_user::first_name
                     .ilike(pattern.clone())
-                    .or(tenant_user::last_name.ilike(pattern)),
+                    .or(tenant_user::last_name.ilike(pattern.clone()))
+                    .or(tenant_user::email.ilike(pattern)),
             )
         }
         let results = query.get_results(conn)?;
@@ -236,7 +237,7 @@ pub struct TenantUserListFilters<'a> {
     pub cursor: Option<DateTime<Utc>>,
     pub page_size: i64,
     pub role_ids: Option<Vec<TenantRoleId>>,
-    pub name: Option<String>,
+    pub search: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

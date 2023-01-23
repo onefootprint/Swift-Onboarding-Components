@@ -57,12 +57,13 @@ def tenant_user2(sandbox_tenant, limited_role):
     "filters,expected_user1,expected_user2",
     [
         (None, True, True),  # No filters
-        # Filter on name
-        (dict(name="wach"), False, True),
-        (dict(name="wachs"), False, True),
-        (dict(name="flerp"), True, False),
-        (dict(name="grin"), True, False),
-        (dict(name="erp"), True, True),
+        # Filter on search
+        (dict(search="wach"), False, True),
+        (dict(search="wachs"), False, True),
+        (dict(search="flerp"), True, False),
+        (dict(search="grin"), True, False),
+        (dict(search="erp"), True, True),
+        (dict(search="@onefootprint.com"), True, True),
     ],
 )
 def test_get_members(

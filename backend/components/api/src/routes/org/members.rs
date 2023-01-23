@@ -41,7 +41,7 @@ async fn get(
 
     let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
-    let OrgMemberFilters { role_ids, name } = filters.into_inner();
+    let OrgMemberFilters { role_ids, search } = filters.into_inner();
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let tenant_id = tenant.id.clone();
@@ -54,7 +54,7 @@ async fn get(
                 page_size: (page_size + 1) as i64,
                 only_active: true,
                 role_ids,
-                name,
+                search,
             };
             let result = TenantUser::list(conn, filters)?;
             Ok(result)
