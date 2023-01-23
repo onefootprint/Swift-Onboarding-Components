@@ -17,23 +17,15 @@ import { Events } from './utils/state-machine/types';
 const App = ({ context, onDone }: IdDocProps) => {
   const [, send] = useIdDocMachine();
   const { authToken, device, customData } = context;
-  const {
-    requestId,
-    shouldCollectIdDoc,
-    shouldCollectSelfie,
-    shouldCollectConsent,
-  } = customData || {};
+  const { shouldCollectIdDoc, shouldCollectSelfie, shouldCollectConsent } =
+    customData || {};
 
   useEffectOnce(() => {
-    if (!requestId) {
-      return;
-    }
     send({
       type: Events.receivedContext,
       payload: {
         authToken,
         device,
-        requestId,
         idDocRequired: !!shouldCollectIdDoc,
         selfieRequired: !!shouldCollectSelfie,
         consentRequired: !!shouldCollectConsent,

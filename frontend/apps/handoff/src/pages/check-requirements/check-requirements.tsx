@@ -17,7 +17,7 @@ const CheckRequirements = () => {
     onSuccess: (response: OnboardingStatusResponse) => {
       const { requirements } = response;
       let missingLiveness = false;
-      let idDocRequestId;
+      let missingIdDoc = false;
       let missingSelfie = false;
       let missingConsent = false;
 
@@ -26,7 +26,7 @@ const CheckRequirements = () => {
           missingLiveness = true;
         }
         if (req.kind === OnboardingRequirementKind.idDoc) {
-          idDocRequestId = req.documentRequestId;
+          missingIdDoc = true;
           missingSelfie = req.shouldCollectSelfie;
           missingConsent = req.shouldCollectConsent;
         }
@@ -35,7 +35,7 @@ const CheckRequirements = () => {
       send({
         type: Events.requirementsReceived,
         payload: {
-          idDocRequestId,
+          missingIdDoc,
           missingSelfie,
           missingLiveness,
           missingConsent,

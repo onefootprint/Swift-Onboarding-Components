@@ -20,7 +20,7 @@ export type OnboardingRequirementsMachineArgs = {
 };
 
 const defaultRequirements: Requirements = {
-  idDocRequestId: undefined,
+  idDoc: false,
   liveness: false,
   kycData: [],
   identityCheck: false,

@@ -22,7 +22,6 @@ const ProcessingDocuments = () => {
     idDoc: { type, country, frontImage, backImage },
     selfie: { image: selfieImage },
     authToken,
-    requestId,
   } = state.context;
 
   const submitDocMutation = useSubmitDoc();
@@ -40,7 +39,7 @@ const ProcessingDocuments = () => {
   });
 
   useEffectOnce(() => {
-    if (!frontImage || !authToken || !type || !country || !requestId) {
+    if (!frontImage || !authToken || !type || !country) {
       return;
     }
     submitDocMutation.mutate(
@@ -51,7 +50,6 @@ const ProcessingDocuments = () => {
         authToken,
         documentType: type,
         countryCode: country,
-        requestId,
       },
       {
         // Only start polling after the document upload is successful

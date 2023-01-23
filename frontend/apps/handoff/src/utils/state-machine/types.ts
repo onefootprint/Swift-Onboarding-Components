@@ -29,7 +29,7 @@ export type MachineContext = {
   device?: DeviceInfo;
   authToken?: string;
   requirements?: {
-    idDocRequestId?: string;
+    missingIdDoc?: boolean;
     missingLiveness?: boolean;
     missingSelfie?: boolean;
     missingConsent?: boolean;
@@ -57,7 +57,7 @@ export type MachineEvents =
   | {
       type: Events.requirementsReceived;
       payload: {
-        idDocRequestId?: string;
+        missingIdDoc?: boolean;
         missingSelfie?: boolean;
         missingLiveness?: boolean;
         missingConsent?: boolean;

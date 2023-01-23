@@ -146,14 +146,12 @@ const createIdDocMachine = () =>
             const {
               authToken,
               device,
-              requestId,
               idDocRequired,
               selfieRequired,
               consentRequired,
             } = event.payload;
             context.authToken = authToken;
             context.device = { ...device };
-            context.requestId = requestId;
             context.idDoc.required = idDocRequired;
             context.selfie.required = selfieRequired;
             context.selfie.consentRequired = consentRequired;

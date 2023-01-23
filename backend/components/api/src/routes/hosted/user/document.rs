@@ -31,7 +31,7 @@ const NUM_RETRIES: i64 = 3;
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
 #[api_v2_operation(description = "POSTs a document to footprint servers", tags(Hosted))]
-#[actix::post("/hosted/user/document/{document_request_id}")] // document_request_id is going away here
+#[actix::post("/hosted/user/document")]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
@@ -280,7 +280,7 @@ pub async fn post(
 
 // This just can pull the latest for the scoped_user_id and lock
 #[api_v2_operation(description = "GET a document request status", tags(Hosted))]
-#[actix::get("/hosted/user/document/{document_request_id}/status")] // request id going away
+#[actix::get("/hosted/user/document/status")]
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
@@ -460,6 +460,7 @@ async fn handle_scan_onboarding_request(
                     status: Some(DocumentRequestStatus::Complete),
                     ..Default::default()
                 };
+
                 document_request.update(conn.conn(), completed_update)?;
 
                 // Create a timeline event

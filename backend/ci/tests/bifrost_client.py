@@ -122,7 +122,7 @@ class BifrostClient:
             data["selfie_image"] = test_image
 
         post(
-            f"hosted/user/document/{document_request_id}",
+            f"hosted/user/document",
             data,
             self.basic_sandbox_user.auth_token,
         )

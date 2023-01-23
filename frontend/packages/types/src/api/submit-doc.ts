@@ -7,7 +7,6 @@ export type SubmitDocRequest = {
   selfieImage?: string;
   documentType: IdDocType;
   countryCode: CountryCode3;
-  requestId: string;
 };
 
 export type SubmitDocResponse = {};

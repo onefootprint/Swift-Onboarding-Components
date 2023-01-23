@@ -53,7 +53,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       expect(requirements).toEqual({
         identityCheck: false,
         liveness: false,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
       expect(kycData).toEqual({});
@@ -73,7 +73,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: false,
           liveness: false,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
@@ -102,7 +102,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: true,
           liveness: true,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [CollectedKycDataOption.name],
         },
       });
@@ -110,7 +110,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       expect(state.context.requirements).toEqual({
         identityCheck: true,
         liveness: true,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [CollectedKycDataOption.name],
       });
       expect(state.context.startedDataCollection).toBe(true);
@@ -132,14 +132,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: true,
           liveness: true,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: true,
         liveness: true,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
 
@@ -155,14 +155,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: true,
           liveness: false,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: true,
         liveness: false,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
 
@@ -178,14 +178,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: false,
           liveness: false,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: false,
         liveness: false,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
       expect(state.value).toBe(States.success);
@@ -211,14 +211,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: true,
           liveness: false,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: true,
         liveness: false,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
 
@@ -233,14 +233,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: false,
           liveness: false,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: false,
         liveness: false,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
       expect(state.value).toBe(States.success);
@@ -268,14 +268,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: true,
           liveness: true,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [CollectedKycDataOption.name],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: true,
         liveness: true,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [CollectedKycDataOption.name],
       });
 
@@ -291,14 +291,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: true,
           liveness: true,
-          idDocRequestId: 'id',
+          idDoc: true,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: true,
         liveness: true,
-        idDocRequestId: 'id',
+        idDoc: true,
         kycData: [],
       });
 
@@ -314,14 +314,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: true,
           liveness: false,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: true,
         liveness: false,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
 
@@ -337,14 +337,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: {
           identityCheck: false,
           liveness: false,
-          idDocRequestId: undefined,
+          idDoc: false,
           kycData: [],
         },
       });
       expect(state.context.requirements).toEqual({
         identityCheck: false,
         liveness: false,
-        idDocRequestId: undefined,
+        idDoc: false,
         kycData: [],
       });
       expect(state.value).toBe(States.success);

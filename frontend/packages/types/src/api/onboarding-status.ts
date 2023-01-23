@@ -15,7 +15,6 @@ export type CollectKycDataRequirement = {
 
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
-  documentRequestId: string;
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
 };

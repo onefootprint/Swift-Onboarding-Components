@@ -12,11 +12,10 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     selfieImage,
     documentType,
     countryCode,
-    requestId,
   } = payload;
   const response = await request<SubmitDocResponse>({
     method: 'POST',
-    url: `/hosted/user/document/${requestId}`,
+    url: `/hosted/user/document`,
     data: {
       frontImage,
       backImage,

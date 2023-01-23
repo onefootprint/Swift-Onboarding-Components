@@ -27,13 +27,13 @@ export const RequirementTargets: MachineTarget[] = [
 export const requiresAdditionalInfo = (context: MachineContext) => {
   const {
     onboardingContext: { userFound },
-    requirements: { kycData, idDocRequestId, liveness },
+    requirements: { kycData, idDoc, liveness },
     startedDataCollection,
   } = context;
   return (
     !startedDataCollection &&
     userFound &&
-    (kycData.length > 0 || !!idDocRequestId || !!liveness)
+    (kycData.length > 0 || !!idDoc || !!liveness)
   );
 };
 
@@ -42,17 +42,17 @@ const shouldRunCollectKycData = (context: MachineContext) =>
 
 const shouldRunIdDoc = (context: MachineContext) => {
   const {
-    requirements: { idDocRequestId },
+    requirements: { idDoc },
     onboardingContext: {
       device: { type },
     },
   } = context;
-  return !!idDocRequestId && type === 'mobile';
+  return !!idDoc && type === 'mobile';
 };
 
 const shouldRunTransfer = (context: MachineContext) => {
   const {
-    requirements: { idDocRequestId, liveness },
+    requirements: { idDoc, liveness },
     onboardingContext: {
       device: { type },
     },
@@ -60,7 +60,7 @@ const shouldRunTransfer = (context: MachineContext) => {
   if (type === 'mobile') {
     return !!liveness;
   }
-  return !!idDocRequestId || !!liveness;
+  return !!idDoc || !!liveness;
 };
 
 const shouldRunIdentityCheck = (context: MachineContext) =>

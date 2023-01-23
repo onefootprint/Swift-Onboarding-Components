@@ -83,8 +83,7 @@ const Root = () => {
           authToken,
           device,
           customData: {
-            shouldCollectIdDoc: true,
-            requestId: requirements?.idDocRequestId ?? '',
+            shouldCollectIdDoc: requirements?.missingIdDoc,
             shouldCollectSelfie: requirements?.missingSelfie,
             shouldCollectConsent: requirements?.missingConsent,
           },

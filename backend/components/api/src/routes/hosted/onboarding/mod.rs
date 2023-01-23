@@ -77,7 +77,6 @@ pub fn get_requirements(
     // In various places in the codebase, we will determine if a DocumentRequest should be created
     //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
     //      we will create a DocumentRequest row.
-
     let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding.id)?;
 
     let doc_request_result = DocumentRequest::get_active(conn, scoped_user_id);

@@ -19,7 +19,7 @@ export enum States {
 export type Requirements = {
   identityCheck: boolean;
   liveness: boolean;
-  idDocRequestId?: string;
+  idDoc?: boolean;
   selfie?: boolean;
   consent?: boolean;
   kycData: readonly CollectedKycDataOption[];

@@ -46,7 +46,6 @@ export enum Actions {
 export type MachineContext = {
   authToken?: string;
   device?: DeviceInfo;
-  requestId?: string;
   idDoc: {
     required?: boolean;
     type?: IdDocType;
@@ -68,7 +67,6 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
-        requestId?: string;
         selfieRequired?: boolean;
         idDocRequired?: boolean;
         consentRequired?: boolean;

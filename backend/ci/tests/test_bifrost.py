@@ -675,7 +675,7 @@ class TestBifrost:
 
         # Submit the document
         post_body = post(
-            f"hosted/user/document/{document_request_id}",
+            f"hosted/user/document",
             data,
             auth_token,
             ob_config_key,
@@ -693,7 +693,7 @@ class TestBifrost:
         }
 
         get_body = get(
-            f"hosted/user/document/{document_request_id}/status",
+            f"hosted/user/document/status",
             None,
             auth_token,
             ob_config_key,
