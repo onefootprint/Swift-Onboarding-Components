@@ -23,7 +23,7 @@ const useOrgMembersFilters = () => {
   const requestParams = {
     cursor: queryToString(values.cursor),
     search: values.search,
-    // pageSize: values.pageSize,
+    pageSize: values.pageSize,
   };
   return {
     ...filters,
