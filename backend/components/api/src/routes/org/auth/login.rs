@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::str::FromStr;
 
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::WorkOsSession;
@@ -50,7 +51,7 @@ async fn handler(
     tracing::info!(profile =?profile, "workos login");
 
     // First, get all matching tenant users.
-    let email = OrgMemberEmail::from(profile.email.clone());
+    let email = OrgMemberEmail::from_str(&profile.email)?;
     let matching_tenant_users: Vec<_> = state
         .db_pool
         .db_query(move |conn| TenantUser::list_by_email(conn, &email))
@@ -120,7 +121,7 @@ async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(Tena
     let (tenant, is_new_tenant) = find_or_create_tenant(state, profile).await?;
     let first_name = profile.first_name.clone();
     let last_name = profile.last_name.clone();
-    let email = profile.email.clone();
+    let email = OrgMemberEmail::from_str(&profile.email)?;
     let tenant_id = tenant.id.clone();
     let tenant_user = state
         .db_pool
@@ -141,7 +142,7 @@ async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(Tena
             let are_no_users = TenantUser::list(conn, filters)?.is_empty();
             let role_id = if are_no_users { admin_role.id } else { ro_role.id };
             let (tenant_user, _) =
-                TenantUser::create(conn, email.into(), tenant_id, role_id, first_name, last_name)?;
+                TenantUser::create(conn, email, tenant_id, role_id, first_name, last_name)?;
             Ok(tenant_user)
         })
         .await?;

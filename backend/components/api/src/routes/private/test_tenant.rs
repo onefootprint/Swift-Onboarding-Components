@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::auth::custodian::CustodianAuthContext;
 use crate::auth::session::AuthSessionData;
 use crate::errors::tenant::TenantError;
@@ -86,7 +88,7 @@ async fn post(
             //
             // Get or create the TenantUser
             //
-            let email = OrgMemberEmail::from("integrationtests@onefootprint.com".to_owned());
+            let email = OrgMemberEmail::from_str("integrationtests@onefootprint.com")?;
             let tenant_user = match TenantUser::get_by_email_for_test(conn, &email, &tenant.id) {
                 Ok(tenant_user) => tenant_user,
                 Err(e) => {

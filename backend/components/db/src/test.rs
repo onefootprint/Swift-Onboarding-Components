@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::models::annotation::{Annotation, AnnotationInfo};
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
@@ -24,7 +26,7 @@ pub(crate) fn test_tenant_user(
 ) -> TenantUser {
     let (tenant_user, _) = TenantUser::create(
         conn,
-        OrgMemberEmail::from(email),
+        OrgMemberEmail::from_str(&email).unwrap(),
         tenant_id,
         tenant_role_id,
         first_name,

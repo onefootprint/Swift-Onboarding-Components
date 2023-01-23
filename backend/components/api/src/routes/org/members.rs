@@ -14,9 +14,10 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_wire_types::OrgMemberFilters;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use db::models::tenant_user::TenantUserListFilters;
 use db::models::tenant_user::{TenantUser, TenantUserUpdate};
+use newtypes::OrgMemberEmail;
 use newtypes::TenantRoleId;
 use newtypes::TenantUserId;
 use paperclip::actix::Apiv2Schema;
@@ -30,16 +31,16 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgMemberFilters>,
-    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
+    pagination: web::Query<PaginationRequest<OrgMemberEmail>>,
     auth: TenantUserAuthContext,
 ) -> actix_web::Result<
-    Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
+    Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, OrgMemberEmail>>,
     ApiError,
 > {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let cursor = pagination.cursor;
+    let cursor = pagination.cursor.clone();
     let page_size = pagination.page_size(&state);
     let OrgMemberFilters { role_ids, search } = filters.into_inner();
     let role_ids = role_ids.map(|r_ids| r_ids.0);
@@ -61,7 +62,9 @@ async fn get(
         })
         .await??;
 
-    let cursor = pagination.cursor_item(&state, &results).map(|x| x.0.created_at);
+    let cursor = pagination
+        .cursor_item(&state, &results)
+        .map(|x| x.0.email.clone());
     let results = results
         .into_iter()
         .take(page_size)
@@ -72,7 +75,7 @@ async fn get(
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct CreateTenantUserRequest {
-    email: String,
+    email: OrgMemberEmail,
     role_id: TenantRoleId,
     redirect_url: String, // The URL to the dashboard where the invite login link should be sent
     first_name: Option<String>,
@@ -103,7 +106,7 @@ async fn post(
     let (user, role) = state
         .db_pool
         .db_transaction(move |conn| {
-            TenantUser::create(conn, email.into(), tenant_id, role_id, first_name, last_name)
+            TenantUser::create(conn, email, tenant_id, role_id, first_name, last_name)
         })
         .await?;
 

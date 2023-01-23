@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::WorkOsSession;
 use crate::auth::SessionContext;
@@ -22,7 +24,7 @@ fn post(
     auth: SessionContext<WorkOsSession>,
 ) -> actix_web::Result<Json<ResponseData<AssumeRoleResponse>>, ApiError> {
     let AssumeRoleRequest { tenant_id } = request.into_inner();
-    let email = OrgMemberEmail::from(auth.data.email.clone());
+    let email = OrgMemberEmail::from_str(&auth.data.email)?;
 
     let (tenant_user, tenant_role, tenant) = state
         .db_pool
@@ -57,7 +59,7 @@ fn get(
     state: web::Data<State>,
     auth: SessionContext<WorkOsSession>,
 ) -> actix_web::Result<Json<ResponseData<RolesResponse>>, ApiError> {
-    let email = OrgMemberEmail::from(auth.data.email.clone());
+    let email = OrgMemberEmail::from_str(&auth.data.email)?;
     let tenants = state
         .db_pool
         .db_query(move |conn| TenantUser::list_by_email(conn, &email))

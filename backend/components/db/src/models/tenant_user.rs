@@ -205,14 +205,14 @@ impl TenantUser {
             .inner_join(tenant_role::table)
             .filter(tenant_user::tenant_id.eq(filters.tenant_id))
             .into_boxed()
-            .order_by(tenant_user::created_at.asc())
+            .order_by(tenant_user::email.asc())
             .limit(filters.page_size);
 
         if filters.only_active {
             query = query.filter(tenant_user::deactivated_at.is_null())
         }
         if let Some(cursor) = filters.cursor {
-            query = query.filter(tenant_user::created_at.ge(cursor));
+            query = query.filter(tenant_user::email.ge(cursor));
         }
         if let Some(role_ids) = filters.role_ids {
             query = query.filter(tenant_user::tenant_role_id.eq_any(role_ids));
@@ -234,7 +234,7 @@ impl TenantUser {
 pub struct TenantUserListFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub only_active: bool,
-    pub cursor: Option<DateTime<Utc>>,
+    pub cursor: Option<OrgMemberEmail>,
     pub page_size: i64,
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,
