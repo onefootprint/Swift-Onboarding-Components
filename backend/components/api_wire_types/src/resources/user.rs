@@ -8,6 +8,7 @@ pub struct User {
     pub is_portable: bool,
     pub identity_data_attributes: Vec<IdentityDataKind>,
     pub identity_document_types: Vec<IdDocKind>,
+    pub selfie_document_types: Vec<IdDocKind>,
     pub start_timestamp: DateTime<Utc>,
     pub onboarding: Option<Onboarding>,
     pub ordering_id: i64,

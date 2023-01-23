@@ -1,5 +1,7 @@
 import pytest
 import arrow
+from tests.bifrost_client import BifrostClient, DocumentDataOptions
+from tests.utils import build_user_data
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
@@ -63,6 +65,33 @@ def test_get_users_detail(sandbox_user):
     assert set(["first_name", "last_name"]) < set(
         scoped_user["identity_data_attributes"]
     )
+
+
+@pytest.mark.parametrize(
+    "document_data,expected_identity_document_types,expected_selfie_document_types",
+    [
+        (DocumentDataOptions.front_back, ["passport"], []),
+        (DocumentDataOptions.front_back_selfie, ["passport"], ["passport"]),
+    ],
+)
+def test_get_users_detail_doc_and_selfie(
+    sandbox_user,
+    twilio,
+    doc_request_sandbox_ob_config,
+    document_data,
+    expected_identity_document_types,
+    expected_selfie_document_types,
+):
+    tenant = sandbox_user.tenant
+    bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
+    bifrost_client.init_user_for_onboarding(
+        twilio, build_user_data(), document_data=document_data
+    )
+    user = bifrost_client.onboard_user_onto_tenant(tenant)
+
+    res = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+    assert res["identity_document_types"] == expected_identity_document_types
+    assert res["selfie_document_types"] == expected_selfie_document_types
 
 
 def test_liveness_list(sandbox_user):

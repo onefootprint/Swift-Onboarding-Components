@@ -19,9 +19,17 @@ impl TenantUvw {
         let id_docs = self
             .identity_documents()
             .iter()
-            .map(|i| i.document_type)
-            .unique()
-            .map(DataIdentifier::IdDocument);
+            .flat_map(|i| {
+                if i.selfie_image_s3_url.is_some() {
+                    vec![
+                        DataIdentifier::IdDocument(i.document_type),
+                        DataIdentifier::Selfie(i.document_type),
+                    ]
+                } else {
+                    vec![DataIdentifier::IdDocument(i.document_type)]
+                }
+            })
+            .unique();
 
         id_docs
         .chain(id_data)
