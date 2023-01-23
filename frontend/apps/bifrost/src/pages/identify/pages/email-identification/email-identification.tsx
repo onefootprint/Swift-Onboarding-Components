@@ -3,7 +3,7 @@ import {
   useIdentifyVerify,
   useLoginChallenge,
 } from '@onefootprint/footprint-elements';
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import {
   ChallengeData,
   ChallengeKind,
@@ -15,6 +15,7 @@ import {
 import { Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { Trans } from 'react-i18next';
 import { Events } from 'src/utils/state-machine/identify/types';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
@@ -26,7 +27,6 @@ import EmailIdentificationHeader from './components/email-identification-header'
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentification = () => {
-  const { t } = useTranslation('pages.email-identification');
   const [challengePickerVisible, setChallengePickerVisible] = useState(false);
   const [formData, setFormData] = useState({ [UserDataAttribute.email]: '' });
   const showRequestErrorToast = useRequestErrorToast();
@@ -156,14 +156,25 @@ const EmailIdentification = () => {
         sx={{ textAlign: 'center' }}
         variant="caption-1"
       >
-        {t('terms.label')}&nbsp;
-        <Link
-          href="https://www.onefootprint.com/terms-of-service"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          {t('terms.link')}
-        </Link>
+        <Trans
+          i18nKey="pages.email-identification.footer"
+          components={{
+            termsLink: (
+              <Link
+                href="https://www.onefootprint.com/terms-of-service"
+                rel="noopener noreferrer"
+                target="_blank"
+              />
+            ),
+            privacyPolicyLink: (
+              <Link
+                href="https://www.onefootprint.com/privacy-policy"
+                rel="noopener noreferrer"
+                target="_blank"
+              />
+            ),
+          }}
+        />
       </Typography>
       {deviceSupportsWebauthn && (
         <ChallengePicker

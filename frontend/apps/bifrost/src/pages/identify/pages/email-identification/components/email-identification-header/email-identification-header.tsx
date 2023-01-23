@@ -6,7 +6,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 const EmailIdentificationHeader = () => {
-  const { t } = useTranslation('pages.email-identification');
+  const { t } = useTranslation('pages.email-identification.header');
   return (
     <>
       <NavigationHeader button={{ variant: 'close' }} />

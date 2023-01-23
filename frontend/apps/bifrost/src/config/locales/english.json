@@ -9,8 +9,10 @@
   },
   "pages": {
     "email-identification": {
-      "title": "Hey there! 👋",
-      "subtitle": "Enter your email to get started.",
+      "header": {
+        "title": "Hey there! 👋",
+        "subtitle": "Enter your email to get started."
+      },
       "form": {
         "email": {
           "label": "Email",
@@ -23,10 +25,7 @@
         },
         "cta": "Continue"
       },
-      "terms": {
-        "label": "By continuing you agree to our",
-        "link": "Terms of Service"
-      },
+      "footer": "By clicking \"Continue\", I agree to the <termsLink>Terms of Service</termsLink> and acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>.",
       "challenge-picker": {
         "header": "Welcome back! 🎉",
         "title": "How would you like to continue?",
