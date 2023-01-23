@@ -138,6 +138,7 @@ async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(Tena
                 only_active: false,
                 role_ids: None,
                 search: None,
+                is_invite_pending: None,
             };
             let are_no_users = TenantUser::list(conn, &filters)?.is_empty();
             let role_id = if are_no_users { admin_role.id } else { ro_role.id };

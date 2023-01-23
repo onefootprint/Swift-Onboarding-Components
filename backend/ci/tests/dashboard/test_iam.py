@@ -64,6 +64,9 @@ def tenant_user2(sandbox_tenant, limited_role):
         (dict(search="grin"), True, False),
         (dict(search="erp"), True, True),
         (dict(search="@onefootprint.com"), True, True),
+        # Filter on is_invite_pending
+        (dict(is_invite_pending="true"), True, True),
+        (dict(is_invite_pending="false"), False, False),
     ],
 )
 def test_get_members(

@@ -16,6 +16,7 @@ export_schema!(UpdateTenantRequest);
 pub struct OrgMemberFilters {
     pub role_ids: Option<Csv<TenantRoleId>>,
     pub search: Option<String>,
+    pub is_invite_pending: Option<bool>,
 }
 
 export_schema!(OrgMemberFilters);

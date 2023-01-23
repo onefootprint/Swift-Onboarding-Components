@@ -42,7 +42,11 @@ async fn get(
 
     let cursor = pagination.cursor.clone();
     let page_size = pagination.page_size(&state);
-    let OrgMemberFilters { role_ids, search } = filters.into_inner();
+    let OrgMemberFilters {
+        role_ids,
+        search,
+        is_invite_pending,
+    } = filters.into_inner();
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let tenant_id = tenant.id.clone();
@@ -56,6 +60,7 @@ async fn get(
                 only_active: true,
                 role_ids,
                 search,
+                is_invite_pending,
             };
             let result = TenantUser::list(conn, &filters)?;
             let count = TenantUser::count(conn, &filters)?;

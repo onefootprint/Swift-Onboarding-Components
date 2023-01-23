@@ -3,7 +3,7 @@ use crate::{
     schema::{tenant_role, tenant_user},
     DbError, DbResult, TxnPgConnection,
 };
-use diesel::prelude::*;
+use diesel::{dsl::not, prelude::*};
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
@@ -218,6 +218,12 @@ impl TenantUser {
                     .or(tenant_user::email.ilike(pattern)),
             )
         }
+        if let Some(is_invite_pending) = filters.is_invite_pending {
+            match is_invite_pending {
+                true => query = query.filter(tenant_user::last_login_at.is_null()),
+                false => query = query.filter(not(tenant_user::last_login_at.is_null())),
+            }
+        }
 
         let count = query.count().get_result(conn)?;
         Ok(count)
@@ -227,7 +233,7 @@ impl TenantUser {
         conn: &mut PgConnection,
         filters: &TenantUserListFilters,
     ) -> DbResult<Vec<(Self, TenantRole)>> {
-        // Apply filters. TODO share these with count
+        // Apply filters. TODO share these with count. Do list of filters
         let mut query = tenant_user::table
             .inner_join(tenant_role::table)
             .filter(tenant_user::tenant_id.eq(filters.tenant_id))
@@ -248,6 +254,13 @@ impl TenantUser {
                     .or(tenant_user::email.ilike(pattern)),
             )
         }
+        if let Some(is_invite_pending) = filters.is_invite_pending {
+            match is_invite_pending {
+                true => query = query.filter(tenant_user::last_login_at.is_null()),
+                false => query = query.filter(not(tenant_user::last_login_at.is_null())),
+            }
+        }
+
         // Apply pagination filters
         if let Some(ref cursor) = filters.cursor {
             query = query.filter(tenant_user::email.ge(cursor));
@@ -265,6 +278,7 @@ pub struct TenantUserListFilters<'a> {
     pub page_size: i64,
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,
+    pub is_invite_pending: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
