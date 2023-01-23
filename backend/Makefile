@@ -102,14 +102,14 @@ stop-local:
 	@killall enclave || echo "no enclave running"
 	@killall footprint-core || echo "no fpc running"
 
-run-local: stop-local
+run-enclave-local: stop-local
 	@cargo run -p enclave --features simulate & echo "starting enclave..."
 	@cargo run -p enclave_proxy & echo "starting enclave proxy.."
+
+run-local: run-enclave-local
 	@cargo run -p footprint-core
 
-watch-local: stop-local
-	@cargo run -p enclave --features simulate & echo "starting enclave..."
-	@cargo run -p enclave_proxy & echo "starting enclave proxy.."
+watch-local: run-enclave-local
 	@cargo watch -x 'run -p footprint-core' -i ci
 
 watch: watch-local

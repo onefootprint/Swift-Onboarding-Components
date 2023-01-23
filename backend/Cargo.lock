@@ -1792,9 +1792,9 @@ dependencies = [
 
 [[package]]
 name = "deadpool-diesel"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "98dfc8fc3cdec5c9049948c6d6c33590c24d8c18e95732dfb7cda44e3f50b5d5"
+checksum = "f9ce884fff09b610fd0bbd9e9447327fda9f613d5bd1fa114f57905cbcfd8d27"
 dependencies = [
  "deadpool",
  "deadpool-sync",
