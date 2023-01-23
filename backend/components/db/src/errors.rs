@@ -1,4 +1,5 @@
 use diesel::result::DatabaseErrorKind;
+use diesel::result::Error::DatabaseError as DieselDbError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -39,6 +40,8 @@ pub enum DbError {
     ApiKeyDisabled,
     #[error("User is deactivated. Please contact your administor for assistance.")]
     TenantUserDeactivated,
+    #[error("User with this email already exists.")]
+    TenantUserAlreadyExists,
     #[error("Role used by this user is deactivated. Please contact your administor for assistance.")]
     TenantRoleDeactivated,
     #[error("Cannot deactivate a role while users are using it. There are {0} active users with this role.")]
@@ -70,25 +73,39 @@ impl DbError {
         matches!(self, Self::DbError(diesel::result::Error::NotFound))
     }
 
-    pub fn is_constraint_violation(&self) -> bool {
-        if let Self::DbError(diesel::result::Error::DatabaseError(kind, _)) = self {
-            matches!(
-                kind,
-                DatabaseErrorKind::UniqueViolation
-                    | DatabaseErrorKind::ForeignKeyViolation
-                    | DatabaseErrorKind::CheckViolation
-            )
-        } else {
-            false
-        }
+    pub fn is_fk_constraint_violation(&self) -> bool {
+        matches!(
+            self,
+            Self::DbError(DieselDbError(DatabaseErrorKind::ForeignKeyViolation, _))
+        )
+    }
+
+    pub fn is_check_constraint_violation(&self) -> bool {
+        matches!(
+            self,
+            Self::DbError(DieselDbError(DatabaseErrorKind::CheckViolation, _))
+        )
+    }
+
+    pub fn is_unique_constraint_violation(&self) -> bool {
+        matches!(
+            self,
+            Self::DbError(DieselDbError(DatabaseErrorKind::UniqueViolation, _))
+        )
     }
 
     pub fn message(&self) -> String {
         if self.is_not_found() {
             return "Data not found".to_owned();
         }
-        if self.is_constraint_violation() {
-            return "Operation not allowed: constraint violation".to_owned();
+        if self.is_fk_constraint_violation() {
+            return "Operation not allowed: foreign key constraint violation".to_owned();
+        }
+        if self.is_check_constraint_violation() {
+            return "Operation not allowed: check constraint violation".to_owned();
+        }
+        if self.is_unique_constraint_violation() {
+            return "Operation not allowed: unique constraint violation".to_owned();
         }
         self.to_string()
     }

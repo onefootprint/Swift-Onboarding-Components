@@ -127,7 +127,10 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
             if e.is_not_found() {
                 return StatusCode::NOT_FOUND;
             }
-            if e.is_constraint_violation() {
+            if e.is_fk_constraint_violation()
+                || e.is_check_constraint_violation()
+                || e.is_unique_constraint_violation()
+            {
                 return StatusCode::BAD_REQUEST;
             }
             StatusCode::INTERNAL_SERVER_ERROR
@@ -152,6 +155,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
         DbError::NewtypesError(_) => StatusCode::BAD_REQUEST,
         DbError::InsufficientTenantScopes => StatusCode::BAD_REQUEST,
+        DbError::TenantUserAlreadyExists => StatusCode::BAD_REQUEST,
     }
 }
 

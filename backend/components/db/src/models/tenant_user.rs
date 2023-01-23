@@ -169,7 +169,15 @@ impl TenantUser {
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
-            .get_result(conn.conn())?;
+            .get_result(conn.conn())
+            .map_err(DbError::from)
+            .map_err(|e| {
+                if e.is_unique_constraint_violation() {
+                    DbError::TenantUserAlreadyExists
+                } else {
+                    e
+                }
+            })?;
         Ok((result, tenant_role))
     }
 
