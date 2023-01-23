@@ -177,18 +177,18 @@ impl TenantRole {
         tenant_id: &TenantId,
         scopes: Option<Vec<TenantScope>>,
         name: Option<String>,
-        cursor: Option<DateTime<Utc>>,
+        cursor: Option<String>,
         page_size: i64,
     ) -> DbResult<Vec<Self>> {
         let mut query = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::deactivated_at.is_null())
             .into_boxed()
-            .order_by(tenant_role::created_at.asc())
+            .order_by(tenant_role::name.asc())
             .limit(page_size);
 
         if let Some(cursor) = cursor {
-            query = query.filter(tenant_role::created_at.ge(cursor))
+            query = query.filter(tenant_role::name.ge(cursor))
         }
         if let Some(scopes) = scopes {
             query = query.filter(tenant_role::scopes.overlaps_with(scopes))

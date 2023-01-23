@@ -9,14 +9,13 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_wire_types::OrgRoleFilters;
-use chrono::{DateTime, Utc};
 use db::models::tenant_role::TenantRole;
 use newtypes::TenantRoleId;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
-type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::OrganizationRole>, DateTime<Utc>>>;
+type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::OrganizationRole>, String>>;
 
 #[api_v2_operation(
     tags(OrgSettings),
@@ -26,13 +25,13 @@ type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::Organization
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgRoleFilters>,
-    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
+    pagination: web::Query<PaginationRequest<String>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let cursor = pagination.cursor;
+    let cursor = pagination.cursor.clone();
     let page_size = pagination.page_size(&state);
     let OrgRoleFilters { scopes, name } = filters.into_inner();
     let scopes = scopes.map(|s| s.0);
@@ -45,7 +44,7 @@ async fn get(
         })
         .await??;
 
-    let cursor = pagination.cursor_item(&state, &results).map(|x| x.created_at);
+    let cursor = pagination.cursor_item(&state, &results).map(|x| x.name.clone());
     let results = results
         .into_iter()
         .take(page_size)
