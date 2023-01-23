@@ -6,6 +6,7 @@ import { Trans } from 'react-i18next';
 
 import { HeaderTitle } from '../../../../components';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import Terms from './components/terms';
 import useConsent from './hooks/use-consent';
 
 type SelfieConsentProps = {
@@ -52,20 +53,13 @@ const SelfieConsent = ({ open, onConsent, onClose }: SelfieConsentProps) => {
       <HeaderTitle
         title={t('title')}
         subtitle={t('subtitle')}
-        sx={{ marginBottom: 8 }}
+        sx={{ marginBottom: 4 }}
       />
-      <Button
-        onClick={handleConsent}
-        fullWidth
-        sx={{ marginBottom: 5 }}
-        loading={consentMutation.isLoading}
-      >
-        {t('cta')}
-      </Button>
+      <Terms />
       <Typography
-        variant="body-4"
+        variant="body-2"
         color="secondary"
-        sx={{ textAlign: 'center' }}
+        sx={{ textAlign: 'center', marginTop: 4 }}
       >
         <Trans
           i18nKey="components.selfie-consent.footer"
@@ -80,6 +74,14 @@ const SelfieConsent = ({ open, onConsent, onClose }: SelfieConsentProps) => {
           }}
         />
       </Typography>
+      <Button
+        onClick={handleConsent}
+        fullWidth
+        sx={{ marginTop: 8, marginBottom: 7 }}
+        loading={consentMutation.isLoading}
+      >
+        {t('cta')}
+      </Button>
     </BottomSheet>
   );
 };

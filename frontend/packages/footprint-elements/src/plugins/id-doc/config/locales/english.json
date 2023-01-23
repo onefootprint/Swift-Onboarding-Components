@@ -45,10 +45,15 @@
       }
     },
     "selfie-consent": {
-      "title": "Allow Footprint to collect and use your biometric data",
-      "subtitle": "Footprint will collect, use, and share this data with third party providers to confirm your identity and improve its systems and security.",
-      "cta": "Allow and continue",
-      "footer": "By continuing you are agree to Footprint and third-party vendors' <a>privacy policies.</a>"
+      "title": "Footprint needs to collect and use your biometric data",
+      "subtitle": "By clicking \"Agree\", you agree that Footprint will:",
+      "terms": {
+        "collection": "Collect biometric data from your selfie and identity documents.",
+        "use": "Use this information for identity verification, fraud prevention and improving Footprint's services.",
+        "share": "Share this data with <a>third-party providers</a> for identity verification and fraud prevention purposes."
+      },
+      "cta": "Agree",
+      "footer": "Please refer to our <a>Privacy Policy</a> for more details about how we handle and retain your biometric data."
     }
   },
   "pages": {
