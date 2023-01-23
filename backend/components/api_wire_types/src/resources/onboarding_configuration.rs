@@ -10,6 +10,7 @@ pub struct OnboardingConfiguration {
     pub name: String,
     pub org_name: String,
     pub logo_url: Option<String>,
+    pub privacy_policy_url: Option<String>,
     pub must_collect_data: Vec<CollectedDataOption>,
     pub can_access_data: Vec<CollectedDataOption>,
     pub must_collect_identity_document: bool,

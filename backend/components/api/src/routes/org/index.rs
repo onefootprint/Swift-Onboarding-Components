@@ -46,6 +46,7 @@ async fn patch(
         website_url,
         company_size,
         logo_url,
+        privacy_policy_url,
     } = request.into_inner();
 
     let update_tenant = UpdateTenant {
@@ -53,6 +54,7 @@ async fn patch(
         logo_url,
         website_url,
         company_size,
+        privacy_policy_url,
     };
     let updated_tenant = state
         .db_pool

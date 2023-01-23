@@ -487,6 +487,7 @@ table! {
         sandbox_restricted -> Bool,
         website_url -> Nullable<Text>,
         company_size -> Nullable<Text>,
+        privacy_policy_url -> Nullable<Text>,
     }
 }
 

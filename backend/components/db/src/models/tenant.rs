@@ -25,6 +25,7 @@ pub struct Tenant {
     pub sandbox_restricted: bool,
     pub website_url: Option<String>,
     pub company_size: Option<CompanySize>,
+    pub privacy_policy_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -88,4 +89,5 @@ pub struct UpdateTenant {
     pub logo_url: Option<String>,
     pub website_url: Option<String>,
     pub company_size: Option<CompanySize>,
+    pub privacy_policy_url: Option<String>,
 }

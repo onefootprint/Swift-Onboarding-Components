@@ -1,0 +1,1 @@
+ALTER TABLE tenant ADD COLUMN privacy_policy_url TEXT;

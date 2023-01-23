@@ -1,0 +1,1 @@
+ALTER TABLE tenant DROP COLUMN privacy_policy_url;

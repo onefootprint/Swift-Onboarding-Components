@@ -22,6 +22,7 @@ impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfigurat
         let Tenant {
             name: org_name,
             logo_url,
+            privacy_policy_url,
             ..
         } = tenant;
         Self {
@@ -30,6 +31,7 @@ impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfigurat
             name,
             org_name,
             logo_url,
+            privacy_policy_url,
             must_collect_data,
             can_access_data,
             must_collect_identity_document,
