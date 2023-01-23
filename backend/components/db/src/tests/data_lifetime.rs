@@ -1,7 +1,10 @@
 use std::collections::HashSet;
 
 use macros::db_test;
-use newtypes::{DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, ScopedUserId, TenantId, UserVaultId};
+use newtypes::{
+    DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, IdDocKind, IdentityDataKind, ScopedUserId, TenantId,
+    UserVaultId,
+};
 
 use crate::tests::prelude::*;
 use crate::TxnPgConnection;
@@ -11,16 +14,16 @@ use crate::models::data_lifetime::DataLifetime;
 use super::fixtures;
 
 /// Util function to create multiple DataLifetimes with the provided info
-fn build_lifetime(
+fn build_lifetime<T: Into<DataLifetimeKind>>(
     conn: &mut TxnPgConnection,
     uv_id: &UserVaultId,
     su_id: &ScopedUserId,
     created_seqno: DataLifetimeSeqno,
     portablized_seqno: Option<DataLifetimeSeqno>,
     deactivated_seqno: Option<DataLifetimeSeqno>,
-    kind: DataLifetimeKind,
+    kind: T,
 ) -> DataLifetime {
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, Some(su_id), vec![kind], created_seqno)
+    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, Some(su_id), vec![kind.into()], created_seqno)
         .unwrap()
         .pop()
         .unwrap();
@@ -97,7 +100,7 @@ impl TestData {
         let seqno6 = DataLifetime::get_next_seqno(conn).unwrap();
 
         // Place some DataLifetimes at various points along the timeline
-        let lifetime1 = build_lifetime(conn, &uv_id, &su_id, seqno1, None, None, DataLifetimeKind::Email);
+        let lifetime1 = build_lifetime(conn, &uv_id, &su_id, seqno1, None, None, IdentityDataKind::Email);
         let lifetime2 = build_lifetime(
             conn,
             &uv_id,
@@ -105,7 +108,7 @@ impl TestData {
             seqno1,
             Some(seqno3),
             None,
-            DataLifetimeKind::FirstName,
+            IdentityDataKind::FirstName,
         );
         let lifetime3 = build_lifetime(
             conn,
@@ -114,7 +117,7 @@ impl TestData {
             seqno1,
             Some(seqno4),
             Some(seqno5),
-            DataLifetimeKind::LastName,
+            IdentityDataKind::LastName,
         );
         // For same user, different scoped user
         let lifetime4 = build_lifetime(
@@ -124,18 +127,10 @@ impl TestData {
             seqno1,
             Some(seqno4),
             None,
-            DataLifetimeKind::PhoneNumber,
+            IdentityDataKind::PhoneNumber,
         );
         // For different user
-        let lifetime5 = build_lifetime(
-            conn,
-            &uv2_id,
-            &su2_id,
-            seqno1,
-            None,
-            None,
-            DataLifetimeKind::IdentityDocument,
-        );
+        let lifetime5 = build_lifetime(conn, &uv2_id, &su2_id, seqno1, None, None, IdDocKind::Passport);
         let lifetime6 = build_lifetime(
             conn,
             &uv2_id,
@@ -143,7 +138,7 @@ impl TestData {
             seqno1,
             Some(seqno3),
             None,
-            DataLifetimeKind::AddressLine1,
+            IdentityDataKind::AddressLine1,
         );
 
         Self {

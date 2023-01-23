@@ -45,14 +45,12 @@ impl KeyValueData {
         seqno: DataLifetimeSeqno,
     ) -> Result<(), DbError> {
         // Make a DataLifetime row for each of the new pieces of data being inserted
-        let lifetimes = DataLifetime::bulk_create(
-            conn,
-            user_vault_id,
-            Some(scoped_user_id),
-            // TODO do we want to denormalize the key onto the DataLifetimeKind?
-            data.iter().map(|_| DataLifetimeKind::Custom).collect(),
-            seqno,
-        )?;
+        let dlks = data
+            .iter()
+            .map(|a| a.data_key.clone())
+            .map(DataLifetimeKind::from)
+            .collect();
+        let lifetimes = DataLifetime::bulk_create(conn, user_vault_id, Some(scoped_user_id), dlks, seqno)?;
         let new_rows = data
             .into_iter()
             .zip(lifetimes)

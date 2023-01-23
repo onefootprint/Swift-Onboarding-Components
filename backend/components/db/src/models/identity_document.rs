@@ -106,7 +106,8 @@ impl IdentityDocument {
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        let lifetime = DataLifetime::create(conn, uv_id, su_id, DataLifetimeKind::IdentityDocument, seqno)?;
+        let lifetime =
+            DataLifetime::create(conn, uv_id, su_id, DataLifetimeKind::from(document_type), seqno)?;
         let new = NewIdentityDocument {
             request_id,
             front_image_s3_url,

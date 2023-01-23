@@ -14,6 +14,7 @@ use newtypes::address::{Address, AddressLine, City, Country, FullAddressOrZip, S
 use newtypes::dob::DateOfBirth;
 use newtypes::email::Email;
 use newtypes::Fingerprint;
+use newtypes::IdentityDataKind;
 use newtypes::KvDataKey;
 use newtypes::SealedVaultBytes;
 use newtypes::{
@@ -21,7 +22,6 @@ use newtypes::{
     ssn::{Ssn, Ssn4, Ssn9},
     PiiString, UvdKind,
 };
-use newtypes::{DataLifetimeKind, IdentityDataKind};
 use std::str::FromStr;
 
 #[db_test]
@@ -487,12 +487,14 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
     uvw.update_identity_data(conn, update, vec![]).unwrap();
 
     // Also add an identity document
-    fixtures::identity_document::create(conn, &uv.id, Some(&su.id));
+    let id_doc = fixtures::identity_document::create(conn, &uv.id, Some(&su.id));
 
     // Also add some custom data
+    let custom_key1 = KvDataKey::from_str("blerp").unwrap();
+    let custom_key2 = KvDataKey::from_str("flerp").unwrap();
     let custom_data = HashMap::from_iter([
-        (KvDataKey::from_str("blerp").unwrap(), PiiString::from("BLERP")),
-        (KvDataKey::from_str("flerp").unwrap(), PiiString::from("FLERP")),
+        (custom_key1.clone(), PiiString::from("BLERP")),
+        (custom_key2.clone(), PiiString::from("FLERP")),
     ]);
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_custom_data(conn, custom_data).unwrap();
@@ -501,41 +503,27 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.commit_identity_data(conn).unwrap();
 
-    // Build a map map of DataLifetimeKind -> CommittedCounts
-    struct CommittedCounts {
-        portable: usize,
-        speculative: usize,
-    }
-    let kind_to_counts = DataLifetime::get_active(conn, &uv.id, Some(&su.id))
+    let (portable, speculative): (Vec<_>, Vec<_>) = DataLifetime::get_active(conn, &uv.id, Some(&su.id))
         .unwrap()
         .into_iter()
-        .into_group_map_by(|dl| dl.kind)
-        .into_iter()
-        .map(|(kind, v)| {
-            let (portable, speculative): (Vec<_>, _) = v
-                .into_iter()
-                .map(|dl| dl.portablized_at.is_some())
-                .partition(|x| *x);
-            let counts = CommittedCounts {
-                portable: portable.len(),
-                speculative: speculative.len(),
-            };
-            (kind, counts)
-        })
-        .collect::<HashMap<_, _>>();
+        .partition_map(|dl| {
+            if dl.portablized_at.is_some() {
+                either::Either::Left(dl.kind)
+            } else {
+                either::Either::Right(dl.kind)
+            }
+        });
 
-    // Assert all custom DLs are not portable
-    let custom = kind_to_counts.get(&DataLifetimeKind::Custom).unwrap();
-    assert_eq!(custom.portable, 0);
-    assert_eq!(custom.speculative, 2);
-
-    // Assert identity doc DL is not portable
-    let id_doc = kind_to_counts.get(&DataLifetimeKind::IdentityDocument).unwrap();
-    assert_eq!(id_doc.portable, 0);
-    assert_eq!(id_doc.speculative, 1);
+    let expected_speculative_kinds = [
+        // Assert all custom DLs are not portable
+        custom_key1.into(),
+        custom_key2.into(),
+        // Assert identity doc DL is not portable
+        id_doc.document_type.into(),
+    ];
+    assert!(expected_speculative_kinds.iter().all(|k| speculative.contains(k)));
 
     // But identity data should be portable
-    let ssn4 = kind_to_counts.get(&DataLifetimeKind::Ssn4).unwrap();
-    assert_eq!(ssn4.portable, 1);
-    assert_eq!(ssn4.speculative, 0);
+    let expected_portable_kinds = [IdentityDataKind::Ssn4.into()];
+    assert!(expected_portable_kinds.iter().all(|k| portable.contains(k)));
 }

@@ -9,7 +9,7 @@ use db::models::user_timeline::UserTimeline;
 use db::TxnPgConnection;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, EmailId, Fingerprint, KvDataKey,
+    CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind, KvDataKey,
     PiiString, UvdKind,
 };
 use std::collections::HashMap;
@@ -31,7 +31,7 @@ impl WriteableUvw {
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         // Deactivate the old speculative email, if exists
-        let kinds = vec![DataLifetimeKind::Email];
+        let kinds = vec![IdentityDataKind::Email.into()];
         DataLifetime::bulk_deactivate_speculative(conn, &self.scoped_user_id, kinds, seqno)?;
 
         // Add the new speculative email
