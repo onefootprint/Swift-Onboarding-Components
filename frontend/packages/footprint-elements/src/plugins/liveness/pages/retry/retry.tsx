@@ -49,20 +49,23 @@ const Retry = () => {
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Button
-        onClick={handleRetry}
-        loading={biometricInitMutation.isLoading}
-        fullWidth
-      >
-        {t('cta')}
-      </Button>
-      <Button
-        loading={skipLivenessMutation.isLoading}
-        onClick={handleSkip}
-        fullWidth
-      >
-        {t('skip')}
-      </Button>
+      <ButtonsContainer>
+        <Button
+          onClick={handleRetry}
+          loading={biometricInitMutation.isLoading}
+          fullWidth
+        >
+          {t('cta')}
+        </Button>
+        <Button
+          loading={skipLivenessMutation.isLoading}
+          onClick={handleSkip}
+          fullWidth
+          variant="secondary"
+        >
+          {t('skip')}
+        </Button>
+      </ButtonsContainer>
     </Container>
   );
 };
@@ -71,6 +74,13 @@ const Container = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[8]};
+  `}
+`;
+
+const ButtonsContainer = styled.form`
+  ${({ theme }) => css`
+    display: grid;
+    row-gap: ${theme.spacing[4]};
   `}
 `;
 
