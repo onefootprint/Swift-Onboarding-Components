@@ -53,7 +53,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         </BifrostMachineProvider>
       </QueryClientProvider>
       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`}
+        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=Function.prototype`}
         strategy="lazyOnload"
       />
     </>
