@@ -30,7 +30,7 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
         <BaseDialog
           open
           isResponsive={false}
-          size="small"
+          size="compact"
           title={confirmationDialog.title}
           onClose={hide}
           primaryButton={{
