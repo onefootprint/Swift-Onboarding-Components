@@ -1,9 +1,9 @@
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantUserAuthContext};
 use crate::auth::Either;
 use crate::errors::ApiResult;
+use crate::types::CursorPaginationRequest;
 use crate::types::JsonApiResponse;
-use crate::types::PaginationRequest;
-use crate::types::{PaginatedResponseData, ResponseData};
+use crate::types::{CursorPaginatedResponse, ResponseData};
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
@@ -15,7 +15,7 @@ use newtypes::{ApiKeyStatus, TenantApiKeyId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, patch, web, web::Json};
 
-type ApiKeysResponse = Json<PaginatedResponseData<Vec<api_wire_types::SecretApiKey>, DateTime<Utc>>>;
+type ApiKeysResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::SecretApiKey>, DateTime<Utc>>>;
 
 #[api_v2_operation(
     description = "Lists the tenant's secret API keys",
@@ -24,7 +24,7 @@ type ApiKeysResponse = Json<PaginatedResponseData<Vec<api_wire_types::SecretApiK
 #[actix::get("/org/api_keys")]
 pub async fn get(
     state: web::Data<State>,
-    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
+    pagination: web::Query<CursorPaginationRequest<DateTime<Utc>>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> ApiResult<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -56,7 +56,7 @@ pub async fn get(
         })
         .map(api_wire_types::SecretApiKey::from_db)
         .collect::<Vec<api_wire_types::SecretApiKey>>();
-    Ok(Json(PaginatedResponseData::ok(keys, cursor, Some(count))))
+    Ok(Json(CursorPaginatedResponse::ok(keys, cursor, Some(count))))
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

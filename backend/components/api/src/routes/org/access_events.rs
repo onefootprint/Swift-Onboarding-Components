@@ -4,8 +4,8 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::request::PaginationRequest;
-use crate::types::response::PaginatedResponseData;
+use crate::types::request::CursorPaginationRequest;
+use crate::types::response::CursorPaginatedResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
@@ -40,9 +40,9 @@ type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 async fn get(
     state: web::Data<State>,
     filters: web::Query<AccessEventRequest>,
-    pagination: web::Query<PaginationRequest<i64>>,
+    pagination: web::Query<CursorPaginationRequest<i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<PaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
+) -> actix_web::Result<Json<CursorPaginatedResponse<AccessEventResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
     let page_size = pagination.page_size(&state);
@@ -79,5 +79,5 @@ async fn get(
         .take(page_size)
         .map(api_wire_types::AccessEvent::from_db)
         .collect::<Vec<api_wire_types::AccessEvent>>();
-    Ok(Json(PaginatedResponseData::ok(response, cursor, None)))
+    Ok(Json(CursorPaginatedResponse::ok(response, cursor, None)))
 }

@@ -6,9 +6,9 @@ use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::serializers::UserDetail;
-use crate::types::response::PaginatedResponseData;
+use crate::types::response::CursorPaginatedResponse;
+use crate::types::CursorPaginationRequest;
 use crate::types::JsonApiResponse;
-use crate::types::PaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::TenantUvw;
@@ -58,9 +58,9 @@ fn get_visible_populated_fields(uvw: &TenantUvw) -> (Vec<IdentityDataKind>, Vec<
 pub async fn get(
     state: web::Data<State>,
     filters: web::Query<ListUsersRequest>,
-    pagination: web::Query<PaginationRequest<i64>>,
+    pagination: web::Query<CursorPaginationRequest<i64>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<PaginatedResponseData<UsersListResponse, i64>>, ApiError> {
+) -> actix_web::Result<Json<CursorPaginatedResponse<UsersListResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
@@ -143,7 +143,7 @@ pub async fn get(
         })
         .collect::<ApiResult<_>>()?;
 
-    Ok(Json(PaginatedResponseData::ok(scoped_users, cursor, count)))
+    Ok(Json(CursorPaginatedResponse::ok(scoped_users, cursor, count)))
 }
 
 #[api_v2_operation(

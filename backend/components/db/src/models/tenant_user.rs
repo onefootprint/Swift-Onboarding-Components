@@ -270,10 +270,13 @@ impl TenantUser {
         }
 
         // Apply pagination filters
-        if let Some(ref cursor) = filters.cursor {
-            query = query.filter(tenant_user::email.ge(cursor));
+        if let Some(page) = filters.page {
+            query = query.offset(filters.page_size * (page as i64));
         }
-        query = query.order_by(tenant_user::email.asc()).limit(filters.page_size);
+        // Always fetch one extra result so we can see if there is another page
+        query = query
+            .order_by(tenant_user::email.asc())
+            .limit(filters.page_size + 1);
         let results = query.get_results(conn)?;
         Ok(results)
     }
@@ -282,7 +285,7 @@ impl TenantUser {
 pub struct TenantUserListFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub only_active: bool,
-    pub cursor: Option<OrgMemberEmail>,
+    pub page: Option<usize>,
     pub page_size: i64,
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,

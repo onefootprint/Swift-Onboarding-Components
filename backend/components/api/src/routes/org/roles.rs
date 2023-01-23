@@ -2,9 +2,9 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::ApiResult;
+use crate::types::CursorPaginatedResponse;
+use crate::types::CursorPaginationRequest;
 use crate::types::JsonApiResponse;
-use crate::types::PaginatedResponseData;
-use crate::types::PaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -16,7 +16,7 @@ use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
-type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::OrganizationRole>, String>>;
+type RolesResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::OrganizationRole>, String>>;
 
 #[api_v2_operation(
     tags(OrgSettings),
@@ -26,7 +26,7 @@ type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::Organization
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgRoleFilters>,
-    pagination: web::Query<PaginationRequest<String>>,
+    pagination: web::Query<CursorPaginationRequest<String>>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -60,7 +60,7 @@ async fn get(
         .take(page_size)
         .map(api_wire_types::OrganizationRole::from_db)
         .collect::<Vec<api_wire_types::OrganizationRole>>();
-    Ok(Json(PaginatedResponseData::ok(results, cursor, Some(count))))
+    Ok(Json(CursorPaginatedResponse::ok(results, cursor, Some(count))))
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]

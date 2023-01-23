@@ -3,13 +3,12 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::tenant::TenantError;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::org::auth::magic_link::create_and_send_magic_link;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
-use crate::types::PaginatedResponseData;
-use crate::types::PaginationRequest;
+use crate::types::OffsetPaginatedResponse;
+use crate::types::OffsetPaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -31,16 +30,13 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgMemberFilters>,
-    pagination: web::Query<PaginationRequest<OrgMemberEmail>>,
+    pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantUserAuthContext,
-) -> actix_web::Result<
-    Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, OrgMemberEmail>>,
-    ApiError,
-> {
+) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let cursor = pagination.cursor.clone();
+    let page = pagination.page;
     let page_size = pagination.page_size(&state);
     let OrgMemberFilters {
         role_ids,
@@ -55,8 +51,8 @@ async fn get(
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantUserListFilters {
                 tenant_id: &tenant_id,
-                cursor,
-                page_size: (page_size + 1) as i64,
+                page,
+                page_size: page_size as i64,
                 only_active: true,
                 role_ids,
                 search,
@@ -68,15 +64,13 @@ async fn get(
         })
         .await??;
 
-    let cursor = pagination
-        .cursor_item(&state, &results)
-        .map(|x| x.0.email.clone());
+    let next_page = pagination.next_page(&state, results.len());
     let results = results
         .into_iter()
         .take(page_size)
         .map(api_wire_types::OrganizationMember::from_db)
         .collect::<Vec<api_wire_types::OrganizationMember>>();
-    Ok(Json(PaginatedResponseData::ok(results, cursor, Some(count))))
+    Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]

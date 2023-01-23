@@ -10,8 +10,8 @@ use crate::auth::{
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
-use crate::types::PaginatedResponseData;
-use crate::types::PaginationRequest;
+use crate::types::CursorPaginatedResponse;
+use crate::types::CursorPaginationRequest;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::DateTime;
@@ -49,10 +49,10 @@ pub fn get_detail(
 #[get("/org/onboarding_configs")]
 async fn get(
     state: web::Data<State>,
-    pagination: web::Query<PaginationRequest<DateTime<Utc>>>,
+    pagination: web::Query<CursorPaginationRequest<DateTime<Utc>>>,
     auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<
-    Json<PaginatedResponseData<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
+    Json<CursorPaginatedResponse<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
     ApiError,
 > {
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -80,7 +80,7 @@ async fn get(
         .map(|x| (x, tenant.clone()))
         .map(api_wire_types::OnboardingConfiguration::from_db)
         .collect::<Vec<api_wire_types::OnboardingConfiguration>>();
-    Ok(Json(PaginatedResponseData::ok(configs, cursor, Some(count))))
+    Ok(Json(CursorPaginatedResponse::ok(configs, cursor, Some(count))))
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

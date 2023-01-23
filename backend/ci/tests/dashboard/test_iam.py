@@ -41,16 +41,38 @@ def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
     return body
 
 
+def deactivate_old_tenant_user(email, auth_token):
+    # Since we reuse this tenant across integration test runs, an incomplete previous integration
+    # test run may leave active users that cause conflict. Deactivate any old integration test
+    # users
+    body = get("org/members", dict(search=email), auth_token)
+    if not body["data"]:
+        return
+    user_id = body["data"][0]["id"]
+    post(f"org/members/{user_id}/deactivate", None, auth_token)
+
+
 @pytest.fixture(scope="session")
 def tenant_user(sandbox_tenant, admin_role):
-    email = f"integrationtest+1@onefootprint.com"
+    email = f"custom_it_user+1@onefootprint.com"
+    deactivate_old_tenant_user(email, sandbox_tenant.auth_token)
     return create_tenant_user(sandbox_tenant, admin_role, email, "Flerp", "Grinman")
 
 
 @pytest.fixture(scope="session")
 def tenant_user2(sandbox_tenant, limited_role):
-    email = f"integrationtest+2@onefootprint.com"
+    email = f"custom_it_user+2@onefootprint.com"
+    deactivate_old_tenant_user(email, sandbox_tenant.auth_token)
     return create_tenant_user(sandbox_tenant, limited_role, email, "Merp", "Wachs")
+
+
+@pytest.fixture(scope="session")
+def tenant_user3(sandbox_tenant, limited_role):
+    email = f"custom_it_user+3@onefootprint.com"
+    deactivate_old_tenant_user(email, sandbox_tenant.auth_token)
+    return create_tenant_user(
+        sandbox_tenant, limited_role, email, "Piip", "The Warrior"
+    )
 
 
 @pytest.mark.parametrize(
@@ -80,6 +102,38 @@ def test_get_members(
     body = get(f"org/members", filters, sandbox_tenant.auth_token)
     assert any(u["id"] == tenant_user["id"] for u in body["data"]) == expected_user1
     assert any(u["id"] == tenant_user2["id"] for u in body["data"]) == expected_user2
+
+
+def test_get_members_pagination(
+    tenant_user,
+    tenant_user2,
+    tenant_user3,
+    sandbox_tenant,
+):
+    ORDERED_USERS = [tenant_user, tenant_user2, tenant_user3]
+    NUM_USERS = len(ORDERED_USERS)
+    for i in range(NUM_USERS):
+        body = get(
+            f"org/members",
+            dict(search="custom_it_user", page_size=1, page=i),
+            sandbox_tenant.auth_token,
+        )
+        assert len(body["data"]) == 1
+        assert body["data"][0]["id"] == ORDERED_USERS[i]["id"]
+        next_page = body["meta"]["next_page"]
+        if i != NUM_USERS - 1:
+            assert next_page == i + 1
+        else:
+            assert not next_page
+
+    # Null page should return first page
+    body = get(
+        f"org/members",
+        dict(search="custom_it_user", page_size=1),
+        sandbox_tenant.auth_token,
+    )
+    assert len(body["data"]) == 1
+    assert body["data"][0]["id"] == tenant_user["id"]
 
 
 def test_get_members_filter_role_id(tenant_user, tenant_user2, sandbox_tenant):
@@ -176,11 +230,12 @@ def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
 
 
 def test_deactivate_role_and_user(
-    sandbox_tenant, tenant_user, tenant_user2, limited_role
+    sandbox_tenant, tenant_user, tenant_user2, tenant_user3, limited_role
 ):
     role_id = limited_role["id"]
     user_id = tenant_user["id"]
     user_id2 = tenant_user2["id"]
+    user_id3 = tenant_user3["id"]
     # Make sure the tenant_user is using the limited role
     user_data = dict(role_id=limited_role["id"])
     patch(f"org/members/{user_id}", user_data, sandbox_tenant.auth_token)
@@ -196,6 +251,7 @@ def test_deactivate_role_and_user(
     # So we deactivate the users
     post(f"org/members/{user_id}/deactivate", None, sandbox_tenant.auth_token)
     post(f"org/members/{user_id2}/deactivate", None, sandbox_tenant.auth_token)
+    post(f"org/members/{user_id3}/deactivate", None, sandbox_tenant.auth_token)
 
     # And now we can deactivate it
     post(f"org/roles/{role_id}/deactivate", None, sandbox_tenant.auth_token)

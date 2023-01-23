@@ -77,28 +77,33 @@ where
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-pub struct PaginatedReponseMeta<C> {
+/// Metadata required for a cursor-paginated response.
+pub struct CursorPaginatedResponseMeta<C> {
+    /// The cursor to be provided in the next request to fetch the next page
     pub next: Option<C>,
     // TODO why is this optional?
     pub count: Option<i64>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct PaginatedResponseData<T, C> {
+/// Wraps the response data with metadata needed for a cursor-paginated result.
+/// Cursor pagination requests take in a cursor that identifies the start of the page (and is
+/// delivered by the last pagination request) using an ordered field.
+pub struct CursorPaginatedResponse<T, C> {
     pub data: T,
-    pub meta: PaginatedReponseMeta<C>,
+    pub meta: CursorPaginatedResponseMeta<C>,
 }
 
-impl<T, C: Clone> PaginatedResponseData<T, C> {
+impl<T, C: Clone> CursorPaginatedResponse<T, C> {
     pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> Self {
         Self {
             data,
-            meta: PaginatedReponseMeta { next, count },
+            meta: CursorPaginatedResponseMeta { next, count },
         }
     }
 }
 
-impl<T, C> Responder for PaginatedResponseData<T, C>
+impl<T, C> Responder for CursorPaginatedResponse<T, C>
 where
     T: Serialize,
     C: Serialize,
@@ -110,7 +115,7 @@ where
     }
 }
 
-impl<T, C> paperclip::v2::schema::Apiv2Schema for PaginatedResponseData<T, C>
+impl<T, C> paperclip::v2::schema::Apiv2Schema for CursorPaginatedResponse<T, C>
 where
     T: paperclip::v2::schema::Apiv2Schema,
     C: TypedData,
@@ -137,17 +142,44 @@ where
             ..Default::default()
         };
         schema.properties.insert("data".into(), Box::new(T::raw_schema()));
-        schema
-            .properties
-            .insert("meta".into(), Box::new(PaginatedReponseMeta::<C>::raw_schema()));
+        schema.properties.insert(
+            "meta".into(),
+            Box::new(CursorPaginatedResponseMeta::<C>::raw_schema()),
+        );
 
         schema
     }
 }
 
-impl<T, C> paperclip::actix::OperationModifier for PaginatedResponseData<T, C>
+impl<T, C> paperclip::actix::OperationModifier for CursorPaginatedResponse<T, C>
 where
     T: paperclip::v2::schema::Apiv2Schema,
     C: TypedData,
 {
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+/// Metadata required for an offset-paginated response.
+pub struct OffsetPaginatedResponseMeta {
+    pub next_page: Option<usize>,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+/// Wraps the response data with metadata needed for an offset-paginated result.
+/// Offset pagination requests take in a page number and page size and use postgres's OFFSET
+/// in order to fetch the requested page.
+/// Can be used alongside another actix web::Query extractor
+pub struct OffsetPaginatedResponse<T> {
+    pub data: Vec<T>,
+    pub meta: OffsetPaginatedResponseMeta,
+}
+
+impl<T> OffsetPaginatedResponse<T> {
+    pub fn ok(data: Vec<T>, next_page: Option<usize>, count: i64) -> Self {
+        Self {
+            data,
+            meta: OffsetPaginatedResponseMeta { next_page, count },
+        }
+    }
 }

@@ -133,7 +133,7 @@ async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(Tena
             // Otherwise, read-only perms
             let filters = TenantUserListFilters {
                 tenant_id: &tenant_id,
-                cursor: None,
+                page: None,
                 page_size: 1,
                 only_active: false,
                 role_ids: None,
