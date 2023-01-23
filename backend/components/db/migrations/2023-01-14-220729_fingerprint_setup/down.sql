@@ -1,0 +1,1 @@
+DROP TABLE fingerprint_visit_event;

@@ -104,6 +104,23 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    fingerprint_visit_event (id) {
+        id -> Text,
+        visitor_id -> Text,
+        user_vault_id -> Nullable<Text>,
+        scoped_user_id -> Nullable<Text>,
+        path -> Text,
+        session_id -> Nullable<Text>,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     identity_document (id) {
         id -> Text,
         request_id -> Text,
@@ -657,6 +674,8 @@ joinable!(data_lifetime -> user_vault (user_vault_id));
 joinable!(document_request -> scoped_user (scoped_user_id));
 joinable!(email -> data_lifetime (lifetime_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
+joinable!(fingerprint_visit_event -> scoped_user (scoped_user_id));
+joinable!(fingerprint_visit_event -> user_vault (user_vault_id));
 joinable!(identity_document -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
 joinable!(idology_expect_id_response -> verification_result (verification_result_id));
@@ -706,6 +725,7 @@ allow_tables_to_appear_in_same_query!(
     document_request,
     email,
     fingerprint,
+    fingerprint_visit_event,
     identity_document,
     idology_expect_id_response,
     insight_event,

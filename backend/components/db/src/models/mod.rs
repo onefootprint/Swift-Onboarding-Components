@@ -4,6 +4,7 @@ pub mod data_lifetime;
 pub mod document_request;
 pub mod email;
 pub mod fingerprint;
+pub mod fingerprint_visit_event;
 pub mod identity_document;
 pub mod idology_expect_id_response;
 pub mod insight_event;

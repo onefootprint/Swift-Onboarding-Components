@@ -75,7 +75,7 @@ pub struct AuthedOnboardingInfo {
 impl SessionContext<UserSession> {
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
     /// session, if exists
-    fn scoped_user_id(&self) -> Option<ScopedUserId> {
+    pub fn scoped_user_id(&self) -> Option<ScopedUserId> {
         self.data
             .scopes
             .iter()

@@ -1,8 +1,13 @@
-use actix_web::http::header::HeaderMap;
-use newtypes::Uuid;
+use std::pin::Pin;
 
 use super::get_header;
+use actix_web::{http::header::HeaderMap, FromRequest};
+use futures_util::Future;
+use newtypes::Uuid;
+use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]
 pub struct TelemetryHeaders {
     /// Optional client-generated and -provided session identifier that links multiple HTTP requests
     /// that occured in the same "session"
@@ -18,5 +23,15 @@ impl TelemetryHeaders {
             .unwrap_or(None)
             .map(|uuid| uuid.to_string());
         Self { session_id }
+    }
+}
+
+impl FromRequest for TelemetryHeaders {
+    type Error = crate::ApiError;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+        let headers = TelemetryHeaders::parse_from_request(req.headers());
+        Box::pin(async move { Ok(headers) })
     }
 }

@@ -26,6 +26,7 @@ use paperclip::actix::Apiv2Schema;
 
 pub mod authorize;
 pub mod d2p;
+pub mod fingerprint_visit;
 pub mod index;
 pub mod kyc;
 pub mod pat;
@@ -41,8 +42,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(kyc::get)
         .service(kyc::post)
         .service(skip_liveness::post)
+        .service(fingerprint_visit::post)
         .service(pat::get)
         .service(socure_device::post);
+
     d2p::routes(config);
 }
 

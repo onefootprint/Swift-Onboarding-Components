@@ -151,6 +151,16 @@ define_newtype_id!(ManualReviewId, String, "Identifier for a manual review");
 define_newtype_id!(DataLifetimeId, String, "Identifier for a data lifetime");
 define_newtype_id!(UvdId, String, "Identifier for a UserVaultData");
 define_newtype_id!(
+    FingerprintVisitorId,
+    String,
+    "Identifier for a Fingerprint VisitorId"
+);
+define_newtype_id!(
+    FingerprintVisitEventId,
+    String,
+    "Identifier for a Fingerprint visit event"
+);
+define_newtype_id!(
     SocureDeviceSessionId,
     String,
     "Identifier for a socure_device_session"
