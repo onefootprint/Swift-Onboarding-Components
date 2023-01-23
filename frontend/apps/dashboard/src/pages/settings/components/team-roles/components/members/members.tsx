@@ -13,7 +13,7 @@ const Members = () => {
   } = useOrgMembers();
 
   return (
-    <Box testID="people-table" as="section">
+    <Box testID="members-table" as="section">
       <MembersTable
         data={response?.data}
         errorMessage={errorMessage}
