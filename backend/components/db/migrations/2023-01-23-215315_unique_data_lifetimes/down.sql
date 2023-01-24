@@ -1,0 +1,2 @@
+DROP INDEX unique_portable_data_lifetime_per_user_vault;
+DROP INDEX unique_speculative_data_lifetime_per_scoped_user;
