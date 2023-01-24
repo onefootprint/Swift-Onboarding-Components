@@ -144,7 +144,7 @@ impl UvdBuilder {
             .into_iter()
             .map(|(kind, sh_data)| -> ApiResult<_> {
                 Ok(NewFingerprint {
-                    kind: kind.into(),
+                    kind: IdentityDataKind::from(kind).into(),
                     sh_data,
                     lifetime_id: kind_to_lifetime
                         .get(&kind)

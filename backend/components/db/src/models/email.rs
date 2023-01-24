@@ -74,7 +74,7 @@ impl Email {
         // same DataLifetime
         let new_fingerprint = NewFingerprint {
             sh_data: fingerprint,
-            kind: IdentityDataKind::Email,
+            kind: IdentityDataKind::Email.into(),
             lifetime_id: lifetime.id,
         };
         // TODO: ensure that the fingerprint tuple of (user_vault_id, fingerprint) is unique

@@ -2,8 +2,7 @@ use crate::schema::fingerprint;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::IdentityDataKind;
-use newtypes::{DataLifetimeId, Fingerprint as FingerprintData, FingerprintId};
+use newtypes::{DataLifetimeId, DataLifetimeKind, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};
 
 use crate::{DbResult, TxnPgConnection};
@@ -16,7 +15,9 @@ pub struct Fingerprint {
     pub sh_data: FingerprintData,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub kind: IdentityDataKind,
+    // TODO migrate
+    /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
+    pub kind: DataLifetimeKind,
     pub lifetime_id: DataLifetimeId,
 }
 
@@ -24,7 +25,7 @@ pub struct Fingerprint {
 #[diesel(table_name = fingerprint)]
 pub struct NewFingerprint {
     pub sh_data: FingerprintData,
-    pub kind: IdentityDataKind,
+    pub kind: DataLifetimeKind,
     pub lifetime_id: DataLifetimeId,
 }
 

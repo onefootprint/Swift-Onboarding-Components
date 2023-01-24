@@ -98,7 +98,7 @@ impl PhoneNumber {
         // same DataLifetime
         let new_fingerprint = NewFingerprint {
             sh_data: args.sh_phone_number,
-            kind: IdentityDataKind::PhoneNumber,
+            kind: IdentityDataKind::PhoneNumber.into(),
             lifetime_id: lifetime.id,
         };
         Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
