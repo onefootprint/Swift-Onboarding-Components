@@ -150,6 +150,7 @@ impl UvdBuilder {
                         .get(&kind)
                         .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?
                         .clone(),
+                    is_unique: false,
                 })
             })
             .collect::<ApiResult<_>>()?;

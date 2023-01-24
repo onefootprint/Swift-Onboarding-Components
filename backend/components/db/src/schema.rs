@@ -97,6 +97,7 @@ table! {
         _updated_at -> Timestamptz,
         kind -> Text,
         lifetime_id -> Text,
+        is_unique -> Bool,
     }
 }
 

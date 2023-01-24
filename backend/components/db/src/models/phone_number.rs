@@ -100,6 +100,7 @@ impl PhoneNumber {
             sh_data: args.sh_phone_number,
             kind: IdentityDataKind::PhoneNumber.into(),
             lifetime_id: lifetime.id,
+            is_unique: true,
         };
         Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
 

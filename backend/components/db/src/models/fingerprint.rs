@@ -15,10 +15,12 @@ pub struct Fingerprint {
     pub sh_data: FingerprintData,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    // TODO migrate
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
     pub kind: DataLifetimeKind,
     pub lifetime_id: DataLifetimeId,
+    /// For rows with is_unique, a db-level constraint enforces that no two rows have the same
+    /// fingerprint for the same kind
+    pub is_unique: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -27,6 +29,7 @@ pub struct NewFingerprint {
     pub sh_data: FingerprintData,
     pub kind: DataLifetimeKind,
     pub lifetime_id: DataLifetimeId,
+    pub is_unique: bool,
 }
 
 pub type IsUnique = bool;

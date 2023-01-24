@@ -76,6 +76,7 @@ impl Email {
             sh_data: fingerprint,
             kind: IdentityDataKind::Email.into(),
             lifetime_id: lifetime.id,
+            is_unique: false,
         };
         // TODO: ensure that the fingerprint tuple of (user_vault_id, fingerprint) is unique
         Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
