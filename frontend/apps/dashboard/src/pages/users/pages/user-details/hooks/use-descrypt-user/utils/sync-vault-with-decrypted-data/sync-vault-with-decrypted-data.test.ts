@@ -38,6 +38,8 @@ describe('syncVaultWithDecryptedData', () => {
           [IdDocType.driversLicense]: [
             {
               front: 'image',
+              uploadedAt: 'date',
+              status: 'success',
             },
           ],
         },
@@ -51,6 +53,8 @@ describe('syncVaultWithDecryptedData', () => {
           [IdDocType.passport]: [
             {
               front: 'image',
+              uploadedAt: 'date',
+              status: 'success',
             },
           ],
         },
@@ -68,11 +72,15 @@ describe('syncVaultWithDecryptedData', () => {
         [IdDocType.driversLicense]: [
           {
             front: 'image',
+            uploadedAt: 'date',
+            status: 'success',
           },
         ],
         [IdDocType.passport]: [
           {
             front: 'image',
+            uploadedAt: 'date',
+            status: 'success',
           },
         ],
       },

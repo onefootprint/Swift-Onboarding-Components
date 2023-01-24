@@ -304,6 +304,7 @@
         "id-doc": {
           "title": "ID Documents",
           "title-with-selfie": "ID Documents & Selfie",
+          "success-flag": "Successful",
           "id-doc-images": {
             "show": "Show",
             "hide": "Hide"

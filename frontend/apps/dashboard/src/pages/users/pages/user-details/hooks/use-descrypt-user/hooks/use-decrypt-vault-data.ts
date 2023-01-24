@@ -67,6 +67,7 @@ const useDecryptVaultData = (userId: string) => {
                 decryptedVaultData.idDoc[documentType] = [];
               }
               const decryptedImages = images.map(image => ({
+                ...image,
                 front: addBase64Prefix(image.front),
                 back: image.back ? addBase64Prefix(image.back) : undefined,
               }));

@@ -130,6 +130,8 @@ describe('getSectionsVisibility', () => {
           [IdDocType.passport]: [
             {
               front: 'image_bytes',
+              uploadedAt: 'date',
+              status: 'success',
             },
           ],
         },
@@ -160,6 +162,8 @@ describe('getSectionsVisibility', () => {
             {
               front: 'image_bytes',
               back: 'image_bytes',
+              uploadedAt: 'date',
+              status: 'success',
             },
           ],
         },

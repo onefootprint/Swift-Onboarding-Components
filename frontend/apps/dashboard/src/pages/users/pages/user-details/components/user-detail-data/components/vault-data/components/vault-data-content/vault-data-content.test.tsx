@@ -87,7 +87,9 @@ describe('<VaultDataContent />', () => {
           [UserDataAttribute.ssn4]: null,
         },
         idDoc: {
-          [IdDocType.passport]: [{ front: 'image' }],
+          [IdDocType.passport]: [
+            { front: 'image', uploadedAt: 'date', status: 'success' },
+          ],
           [IdDocType.driversLicense]: null,
         },
       };
@@ -174,7 +176,9 @@ describe('<VaultDataContent />', () => {
           [UserDataAttribute.ssn4]: null,
         },
         idDoc: {
-          [IdDocType.passport]: [{ front: 'image' }],
+          [IdDocType.passport]: [
+            { front: 'image', uploadedAt: 'date', status: 'success' },
+          ],
           [IdDocType.driversLicense]: null,
         },
       };
