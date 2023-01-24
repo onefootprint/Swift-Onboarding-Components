@@ -13,6 +13,7 @@ const decryptIdDoc = async (
     data: {
       reason,
       documentType,
+      includeSelfie: true, // For now, we always decrypt selfie with id doc
     },
     headers: authHeaders,
   });

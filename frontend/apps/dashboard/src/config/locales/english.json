@@ -302,14 +302,18 @@
           "title": "Address data"
         },
         "id-doc": {
-          "title": "ID Documents",
-          "title-with-selfie": "ID Documents & Selfie",
+          "title": "ID documents",
+          "title-with-selfie": "ID documents & Selfie",
           "success-flag": "Successful",
           "id-doc-images": {
             "show": "Show",
             "hide": "Hide"
           },
           "preview": {
+            "tabs": {
+              "successful-uploads": "Successful uploads",
+              "failed-uploads": "Failed Uploads"
+            },
             "front-alt": "Front image of the ID Doc",
             "back-alt": "Back image of the ID Doc"
           }

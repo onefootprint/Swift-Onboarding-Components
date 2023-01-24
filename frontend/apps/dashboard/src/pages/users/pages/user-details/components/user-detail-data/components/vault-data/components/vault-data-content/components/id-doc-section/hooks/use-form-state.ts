@@ -49,8 +49,11 @@ const useFormState = ({
   return {
     fieldsState,
     areAllFieldsSelected:
-      fieldsState[IdDocType.passport].checked &&
-      fieldsState[IdDocType.idCard].checked &&
+      !fieldsState[IdDocType.passport].exists ||
+      (fieldsState[IdDocType.passport].checked &&
+        !fieldsState[IdDocType.idCard].exists) ||
+      (fieldsState[IdDocType.idCard].checked &&
+        !fieldsState[IdDocType.driversLicense].exists) ||
       fieldsState[IdDocType.driversLicense].checked,
     areAllFieldsDisabled:
       fieldsState[IdDocType.passport].disabled &&

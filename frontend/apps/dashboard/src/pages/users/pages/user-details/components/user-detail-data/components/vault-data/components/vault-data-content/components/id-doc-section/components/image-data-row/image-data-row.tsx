@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { DecryptedIdDocStatus } from '@onefootprint/types';
 import { Checkbox, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
@@ -6,7 +7,7 @@ import EncryptedCell from 'src/components/encrypted-cell';
 import { IdDocDataValue } from 'src/pages/users/users.types';
 import styled, { css } from 'styled-components';
 
-import ImagesPreview from '../images-preview';
+import DecryptedDataPreview from '../decrypted-data-preview';
 import SuccessFlag from '../success-flag';
 
 export type ImageDataRowProps = {
@@ -30,7 +31,9 @@ const ImageDataRow = ({ label, data, checkbox }: ImageDataRowProps) => {
   const handleToggleIdDocVisibility = () => {
     setImagesVisible(!imagesVisible);
   };
-  const isSuccessful = data?.some(doc => doc.status === 'success');
+  const isSuccessful = data?.some(
+    doc => doc.status === DecryptedIdDocStatus.success,
+  );
 
   if (visible) {
     return (
@@ -73,11 +76,7 @@ const ImageDataRow = ({ label, data, checkbox }: ImageDataRowProps) => {
           </LinkButton>
         )}
       </RowContainer>
-      {hasImageData && imagesVisible && (
-        <ImagesContainer>
-          <ImagesPreview images={data} />
-        </ImagesContainer>
-      )}
+      {hasImageData && imagesVisible && <DecryptedDataPreview images={data} />}
     </Container>
   );
 };
@@ -100,12 +99,6 @@ const TitleContainer = styled.div`
     flex-direction: column wrap;
     justify-content: flex-start;
     gap: ${theme.spacing[7]};
-  `}
-`;
-
-const ImagesContainer = styled.div`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[5]};
   `}
 `;
 

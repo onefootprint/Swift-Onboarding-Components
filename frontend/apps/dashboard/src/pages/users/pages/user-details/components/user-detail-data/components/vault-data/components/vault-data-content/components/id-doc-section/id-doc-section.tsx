@@ -71,7 +71,7 @@ const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
   return (
     <DataSection
       iconComponent={IcoIdCard24}
-      title={hasSelfie ? t('id-doc-title-with-selfie') : t('id-doc.title')}
+      title={hasSelfie ? t('id-doc.title-with-selfie') : t('id-doc.title')}
       footer={<RiskSignalsOverview type="document" />}
       renderCta={renderCta}
       testID="document-section"

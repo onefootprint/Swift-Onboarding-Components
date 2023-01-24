@@ -11,19 +11,15 @@ type ImagesPreviewProps = {
 };
 
 const ImagesPreview = ({ images }: ImagesPreviewProps) => {
-  const [index, setIndex] = useState(0);
   const { t } = useTranslation('pages.user-details.user-info.id-doc.preview');
-  if (!images.length) {
-    return null;
-  }
-
+  const [index, setIndex] = useState(0);
   const selectedImage = images[index];
   const showImageIndex = (selectedIndex: number) => {
     setIndex(selectedIndex);
   };
 
   return (
-    <PreviewArea>
+    <Container>
       <ImagesContainer>
         <Image
           src={selectedImage.front}
@@ -45,15 +41,12 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
       {images.length > 1 && (
         <Pager max={images.length} onClick={showImageIndex} value={index} />
       )}
-    </PreviewArea>
+    </Container>
   );
 };
 
-const PreviewArea = styled.div`
+const Container = styled.div`
   ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default};
-    padding: ${theme.spacing[6]};
     display: flex;
     flex-direction: column;
     justify-content: center;
