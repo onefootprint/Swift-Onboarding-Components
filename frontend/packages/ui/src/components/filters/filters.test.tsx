@@ -205,6 +205,31 @@ describe('<Filters />', () => {
       });
     });
 
+    describe('when the filter is loading', () => {
+      it('should show a loading spinner', async () => {
+        renderFilters({
+          controls: [
+            {
+              kind: 'multi-select-grouped',
+              label: 'Attributes',
+              loading: true,
+              options: defaulOptions,
+              query: 'attributes',
+              selectedOptions: [],
+            },
+          ],
+        });
+
+        const trigger = screen.getByRole('button', { name: 'Attributes' });
+        await userEvent.click(trigger);
+
+        const loading = screen.getByRole('progressbar', {
+          name: 'Loading Attributes',
+        });
+        expect(loading).toBeInTheDocument();
+      });
+    });
+
     describe('when selecting an option', () => {
       it('should trigger onChange with the selected option and close the popover', async () => {
         const onChange = jest.fn();

@@ -5,6 +5,7 @@ import React from 'react';
 
 import useOrgMembersFilters from '../../hooks/use-org-members-filters';
 import Row from '../row';
+import Filters from './components/filters';
 
 type MembersTableProps = {
   data?: OrgMember[];
@@ -36,6 +37,7 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
       isLoading={isLoading}
       items={data}
       onChangeSearchText={handleSearchChange}
+      renderActions={() => <Filters />}
       renderTr={({ item: member }) => (
         <Row
           createdAt={member.createdAt}

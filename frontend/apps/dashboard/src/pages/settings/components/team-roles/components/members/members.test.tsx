@@ -14,6 +14,7 @@ import Members from './members';
 import {
   orgMembersFixture,
   orgMembersRelativeTimeFixture,
+  orgRolesFixture,
   withCreateOrgMembers,
   withCreateOrgMembersError,
   withOrgMembers,
@@ -105,7 +106,7 @@ describe('<Members />', () => {
     });
 
     describe('when typing on the table search', () => {
-      it('should append email to query', async () => {
+      it('should append member_search query', async () => {
         const push = jest.fn();
         useRouterSpy({
           pathname: '/settings',
@@ -123,6 +124,51 @@ describe('<Members />', () => {
             {
               query: {
                 member_search: 'Jane',
+                tab: 'Members',
+              },
+            },
+            undefined,
+            { shallow: true },
+          );
+        });
+      });
+    });
+
+    describe('when applying a filter by role', () => {
+      const [firstRole] = orgRolesFixture;
+
+      it('should append member_role query', async () => {
+        const push = jest.fn();
+        useRouterSpy({
+          pathname: '/settings',
+          query: {
+            tab: 'Members',
+          },
+          push,
+        });
+        await renderMembersAndWaitData();
+
+        const filterTrigger = screen.getByRole('button', {
+          name: 'Role',
+        });
+        await userEvent.click(filterTrigger);
+
+        const filterDialog = screen.getByRole('dialog', {
+          name: 'Role',
+        });
+        const checkbox = within(filterDialog).getByLabelText(firstRole.name);
+        await userEvent.click(checkbox);
+
+        const submitButton = within(filterDialog).getByRole('button', {
+          name: 'Apply',
+        });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(push).toHaveBeenCalledWith(
+            {
+              query: {
+                member_role: [firstRole.id],
                 tab: 'Members',
               },
             },

@@ -3,6 +3,7 @@ import React, { useId, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 import Box from '../../../box';
+import LoadingIndicator from '../../../loading-indicator';
 import type { FilterControl, FilterSelectedOption } from '../../filters.types';
 import AddPill from './components/add-pill';
 import ClearPill from './components/clear-pill';
@@ -27,7 +28,7 @@ const Control = ({ control, onChange }: ControlProps) => {
   const [open, setOpen] = useState(false);
   const popoverId = useId();
   const dateOptions = useDateOptions();
-  const { query, kind, label, options, selectedOptions } = control;
+  const { query, kind, label, loading, options, selectedOptions } = control;
   const hasSelectedOptions = selectedOptions.length > 0;
   const { styles, attributes, setReferenceElement, setPopperElement } =
     usePopper();
@@ -51,7 +52,7 @@ const Control = ({ control, onChange }: ControlProps) => {
 
   return (
     <>
-      <Box ref={setReferenceElement}>
+      <Box ref={setReferenceElement} aria-busy={loading}>
         {hasSelectedOptions ? (
           <PillGroup>
             <ClearPill onClick={clear}>{label}</ClearPill>
@@ -88,26 +89,36 @@ const Control = ({ control, onChange }: ControlProps) => {
             zIndex: theme.zIndex.dialog,
           }}
         >
-          <Popover id={popoverId} onClose={close} title={control.label}>
-            {kind === 'multi-select' && (
-              <MultiSelectForm
-                onSubmit={handleSubmit}
-                options={options}
-                selectedOptions={selectedOptions}
+          <Popover id={popoverId} onClose={close} title={label}>
+            {loading ? (
+              <LoadingIndicator
+                color="secondary"
+                size="compact"
+                aria-label={`Loading ${label}`}
               />
-            )}
-            {kind === 'multi-select-grouped' && (
-              <MultiSelectGroupedForm
-                onSubmit={handleSubmit}
-                options={options}
-                selectedOptions={selectedOptions}
-              />
-            )}
-            {kind === 'date' && (
-              <DateForm
-                onSubmit={handleSubmit}
-                selectedOptions={selectedOptions}
-              />
+            ) : (
+              <>
+                {kind === 'multi-select' && (
+                  <MultiSelectForm
+                    onSubmit={handleSubmit}
+                    options={options}
+                    selectedOptions={selectedOptions}
+                  />
+                )}
+                {kind === 'multi-select-grouped' && (
+                  <MultiSelectGroupedForm
+                    onSubmit={handleSubmit}
+                    options={options}
+                    selectedOptions={selectedOptions}
+                  />
+                )}
+                {kind === 'date' && (
+                  <DateForm
+                    onSubmit={handleSubmit}
+                    selectedOptions={selectedOptions}
+                  />
+                )}
+              </>
             )}
           </Popover>
         </div>

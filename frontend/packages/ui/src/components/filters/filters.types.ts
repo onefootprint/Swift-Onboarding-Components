@@ -29,6 +29,7 @@ export type FilterDate = {
 };
 
 export type FilterControl = {
+  loading?: boolean;
   query: string;
   label: string;
 } & (FilterMultiSelect | FilterMultiSelectGrouped | FilterDate);

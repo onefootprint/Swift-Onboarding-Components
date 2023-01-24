@@ -755,6 +755,11 @@
           },
           "empty-state": "No members found"
         },
+        "filters": {
+          "role": {
+            "label": "Role"
+          }
+        },
         "invite": {
           "title": "Invite teammates",
           "form": {
