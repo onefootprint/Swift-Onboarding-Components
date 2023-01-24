@@ -9,7 +9,7 @@ import getSessionId from '../../utils/session-id/session-id';
 import sendObservePayload from './hooks/send-observe-payload';
 import getClickedElementInfo, {
   getClickedElementContextInPage,
-} from './utils/get-click-element-info';
+} from './utils/get-click-element-info/get-click-element-info';
 import getErrorEventInfo from './utils/get-error-event-info';
 import getNavigatorProperties from './utils/get-navigator-properties';
 

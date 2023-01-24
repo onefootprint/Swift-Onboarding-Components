@@ -50,6 +50,7 @@ const PhoneRegistrationForm = ({
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <PhoneInput
+        data-private
         disableMask={isSandbox}
         hasError={!!errors.phone}
         hint={getHint()}

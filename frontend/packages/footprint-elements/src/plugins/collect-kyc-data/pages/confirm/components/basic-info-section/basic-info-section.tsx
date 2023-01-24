@@ -51,6 +51,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
 
   return (
     <Section
+      data-private
       title={t('basic-info.title')}
       onEdit={handleEdit}
       IconComponent={IcoFileText24}

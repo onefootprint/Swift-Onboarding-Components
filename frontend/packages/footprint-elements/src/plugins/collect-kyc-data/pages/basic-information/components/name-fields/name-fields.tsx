@@ -15,6 +15,7 @@ const NameFields = () => {
     <Grid.Row>
       <Grid.Column col={6}>
         <TextInput
+          data-private
           hasError={!!errors[UserDataAttribute.firstName]}
           hint={
             errors[UserDataAttribute.firstName]
@@ -28,6 +29,7 @@ const NameFields = () => {
       </Grid.Column>
       <Grid.Column col={6}>
         <TextInput
+          data-private
           hasError={!!errors[UserDataAttribute.lastName]}
           hint={
             errors[UserDataAttribute.firstName]

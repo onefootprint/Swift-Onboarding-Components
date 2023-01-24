@@ -17,6 +17,7 @@ const DobField = () => {
 
   return (
     <TextInput
+      data-private
       hasError={!!errors[UserDataAttribute.dob]}
       hint={errors[UserDataAttribute.dob] ? t('error') : undefined}
       label={t('label')}

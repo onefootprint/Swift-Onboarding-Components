@@ -14,6 +14,7 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
 
   return (
     <Controller
+      data-private
       control={control}
       name={UserDataAttribute.country}
       render={({ field }) => (

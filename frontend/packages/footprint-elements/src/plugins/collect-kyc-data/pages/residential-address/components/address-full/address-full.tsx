@@ -140,8 +140,9 @@ const AddressFull = ({
           {!hideTitle && (
             <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           )}
-          <CountryField onChange={handleCountryChange} />
+          <CountryField onChange={handleCountryChange} data-private />
           <AddressInput
+            data-private
             country={country.value}
             hasError={!!errors[UserDataAttribute.addressLine1]}
             hint={
@@ -154,6 +155,7 @@ const AddressFull = ({
             {...register(UserDataAttribute.addressLine1, { required: true })}
           />
           <TextInput
+            data-private
             autoComplete="address-line2"
             label={t('form.address-line-2.label')}
             placeholder={t('form.address-line-2.placeholder')}
@@ -162,6 +164,7 @@ const AddressFull = ({
           <Grid.Row>
             <Grid.Column col={6}>
               <TextInput
+                data-private
                 autoComplete="address-level2"
                 hasError={!!errors[UserDataAttribute.city]}
                 hint={errors[UserDataAttribute.city] && t('form.city.error')}
@@ -183,6 +186,7 @@ const AddressFull = ({
                   typeof field.value === 'object' ? field.value : undefined;
                 return (
                   <Select
+                    data-private
                     label={t('form.state.label')}
                     onBlur={field.onBlur}
                     options={STATES}
@@ -197,6 +201,7 @@ const AddressFull = ({
             />
           ) : (
             <TextInput
+              data-private
               autoComplete="address-level1"
               hasError={!!errors[UserDataAttribute.state]}
               hint={errors[UserDataAttribute.state] && t('form.state.error')}

@@ -40,6 +40,7 @@ const EmailIdentificationForm = ({
     <form onSubmit={handleSubmit(onSubmit)} noValidate={isSandbox}>
       <Box sx={{ marginBottom: 7 }}>
         <TextInput
+          data-private
           hasError={!!errors.email}
           hint={getHint()}
           label={t('email.label')}

@@ -1,6 +1,11 @@
-const MAX_INNER_TEXT_LENGTH = 50;
-const MIN_INNER_TEXT_LENGTH = 5;
-const titleElementTagNames = ['title', 'h1', 'h2', 'h3', 'h4'];
+import {
+  DATA_PRIVATE_ATTRIBUTE,
+  MAX_INNER_TEXT_LENGTH,
+  MIN_INNER_TEXT_LENGTH,
+  REDACTED_PRIVATE_DATA_VALUE,
+  TITLE_ELEMENT_TAG_NAMES,
+  UNNAMED_ELEMENT_VALUE,
+} from './get-click-element-info.constants';
 
 type IClickElementInfo = {
   name: string;
@@ -37,7 +42,7 @@ function getClickedElementDetails(
     text => !!text?.length,
   ) as string[];
   return {
-    name: modifiedTexts.length ? modifiedTexts[0] : '_unnamed_',
+    name: modifiedTexts.length ? modifiedTexts[0] : UNNAMED_ELEMENT_VALUE,
     otherNames: modifiedTexts.length ? modifiedTexts.slice(1) : [],
     tag: el.tagName ?? null,
     role: el.getAttribute('role') ?? null,
@@ -46,6 +51,26 @@ function getClickedElementDetails(
       .filter((c: string) => c && c.length),
   };
 }
+
+const getElementTextsWithoutPrivateData = (el: HTMLElement): string[] => {
+  const texts: string[] = [];
+  const isPrivateData = el.getAttribute(DATA_PRIVATE_ATTRIBUTE);
+  if (isPrivateData) {
+    texts.push(REDACTED_PRIVATE_DATA_VALUE);
+    return texts;
+  }
+
+  const value = tidyElementValue((el as HTMLInputElement).value);
+  if (value) {
+    texts.push(value);
+  }
+  const innerText = tidyElementValue(el.innerText);
+  if (innerText) {
+    texts.push(innerText);
+  }
+
+  return texts;
+};
 
 const getClickedElementInfo = (el: HTMLElement) => {
   let texts = [el.getAttribute('aria-label')];
@@ -57,8 +82,9 @@ const getClickedElementInfo = (el: HTMLElement) => {
   if (el.childElementCount) {
     texts.push(findChildrenElementsTexts(el));
   }
-  texts.push(tidyInnerText(el.innerText));
-  texts = texts.filter(text => !!text?.length) as string[];
+  texts.push(...getElementTextsWithoutPrivateData(el));
+  // Get rid of dupes
+  texts = Array.from(new Set(texts)).filter(text => !!text?.length) as string[];
 
   return getClickedElementDetails(texts, el);
 };
@@ -92,22 +118,21 @@ const findChildrenElementsTexts = (parent: HTMLElement): string | null => {
     return b.size - a.size;
   });
 
-  // Find the inner text from the elements collected, only log them if they don't contain private data.
-  const filteredTexts = fontEls
-    .map(fontEl => {
-      const isPrivateData = fontEl.el.getAttribute('private-data');
-      return isPrivateData ? '<redacted_pii_data>' : fontEl.el.innerText;
-    })
-    .filter(text => !!text?.length) as string[];
+  // Find the texts from the elements collected, only log them if they don't contain private data.
+  const fontElsTexts: string[] = [];
+  fontEls.forEach(({ el }) => {
+    fontElsTexts.push(...getElementTextsWithoutPrivateData(el));
+  });
+  const filteredTexts = fontElsTexts.filter(text => !!text?.length) as string[];
 
   if (filteredTexts.length) {
     return filteredTexts[0];
   }
 
   // if we have nothing with any font size then just look through common title elements
-  const textContents = titleElementTagNames
-    .map(tag => parent.querySelector(tag)?.textContent)
-    .filter(text => !!text?.length) as string[];
+  const textContents = TITLE_ELEMENT_TAG_NAMES.map(
+    tag => parent.querySelector(tag)?.textContent,
+  ).filter(text => !!text?.length) as string[];
 
   if (textContents.length) {
     return textContents[0];
@@ -116,13 +141,13 @@ const findChildrenElementsTexts = (parent: HTMLElement): string | null => {
   return null;
 };
 
-function tidyInnerText(innerText: string): string | null {
-  if (!innerText) {
+function tidyElementValue(value: string): string | null {
+  if (!value) {
     return null;
   }
-  let text = innerText;
+  let text = value;
   if (text.length > MAX_INNER_TEXT_LENGTH) {
-    text = innerText.substring(0, MAX_INNER_TEXT_LENGTH);
+    text = value.substring(0, MAX_INNER_TEXT_LENGTH);
   }
   const newLineBoundary = text.indexOf('\n');
   if (newLineBoundary < 0) {

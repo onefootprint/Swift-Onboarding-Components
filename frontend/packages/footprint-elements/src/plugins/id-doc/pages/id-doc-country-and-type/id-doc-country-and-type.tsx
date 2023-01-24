@@ -92,6 +92,7 @@ const IdDocCountryAndType = () => {
       <IcoIdGeneric40 />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <CountrySelect
+        data-private
         label={t('form.country')}
         onChange={handleCountryChange}
         value={country}

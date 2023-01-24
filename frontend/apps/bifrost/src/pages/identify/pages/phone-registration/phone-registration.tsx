@@ -68,7 +68,7 @@ const PhoneRegistration = () => {
             <Box>
               <StyledIcoEmail24 />
             </Box>
-            <Typography variant="label-3" color="primary">
+            <Typography variant="label-3" color="primary" data-private>
               {email}
             </Typography>
           </EmailCardContent>

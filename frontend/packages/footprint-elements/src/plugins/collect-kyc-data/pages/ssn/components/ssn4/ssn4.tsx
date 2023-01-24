@@ -51,6 +51,7 @@ const SSN4 = ({
           <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         )}
         <TextInput
+          data-private
           hasError={!!errors.ssn4}
           hint={errors.ssn4 && t('form.error')}
           label={t('form.label')}

@@ -47,6 +47,7 @@ const PhoneVerification = () => {
       <Form autoComplete="off" role="presentation">
         <Box>
           <HeaderTitle
+            data-private
             title={userFound ? t('title.existing-user') : t('title.new-user')}
             subtitle={t('subtitle', {
               phoneCountryCode,
