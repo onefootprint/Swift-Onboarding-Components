@@ -20,7 +20,8 @@ type IdDocSectionProps = {
 const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
   const { t, allT } = useTranslation('pages.user-details.user-info');
   const { idDoc } = vaultData;
-  const docTypes = Object.keys(idDoc ?? {}) as IdDocType[];
+  const idDocTypes = Object.keys(idDoc ?? {}) as IdDocType[];
+  const hasSelfie = user.selfieDocumentTypes.length > 0;
   const { register, setValue, control } = useFormContext();
   const { areAllFieldsSelected, areAllFieldsDisabled, fieldsState } =
     useFormState({
@@ -29,7 +30,7 @@ const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
       vaultData,
     });
 
-  if (!idDoc || !docTypes.length) {
+  if (!idDoc || !idDocTypes.length) {
     return null;
   }
 
@@ -70,12 +71,12 @@ const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
   return (
     <DataSection
       iconComponent={IcoIdCard24}
-      title={t('id-doc.title')}
+      title={hasSelfie ? t('id-doc-title-with-selfie') : t('id-doc.title')}
       footer={<RiskSignalsOverview type="document" />}
       renderCta={renderCta}
       testID="document-section"
     >
-      {docTypes.map(type => (
+      {idDocTypes.map(type => (
         <ImageDataRow
           key={type}
           label={allT(`id-doc-type.${type}`)}

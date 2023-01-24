@@ -302,7 +302,8 @@
           "title": "Address data"
         },
         "id-doc": {
-          "title": "ID Document",
+          "title": "ID Documents",
+          "title-with-selfie": "ID Documents & Selfie",
           "id-doc-images": {
             "show": "Show",
             "hide": "Hide"

@@ -41,6 +41,7 @@ describe('<VaultDataContent />', () => {
     startTimestamp: 'time',
     orderingId: 'ordering',
     identityDocumentTypes,
+    selfieDocumentTypes: [],
     requiresManualReview: false,
     status: OnboardingStatus.verified,
   });
