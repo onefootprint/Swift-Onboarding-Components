@@ -36,7 +36,7 @@ const useOrgMembers = () => {
   const filters = useOrgMembersFilters();
   const { requestParams } = filters;
   const orgMembersQuery = useQuery(
-    ['orgMembers', requestParams],
+    ['org', 'members', requestParams],
     () => getOrgMembersRequest(authHeaders, requestParams),
     {
       enabled: filters.isReady,

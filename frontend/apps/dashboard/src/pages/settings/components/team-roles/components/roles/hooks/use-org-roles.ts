@@ -36,7 +36,7 @@ const useOrgRoles = () => {
   const filters = useOrgRolesFilters();
   const { requestParams } = filters;
   const orgRolesQuery = useQuery(
-    ['orgRoles', requestParams],
+    ['org', 'roles', requestParams],
     () => getOrgRolesRequest(authHeaders, requestParams),
     {
       enabled: filters.isReady,
