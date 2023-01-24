@@ -39,7 +39,6 @@ impl SealingKey {
     }
 }
 
-// TODO can I put this in one trait with an auto-impl?
 impl Debug for SealingKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("<redacted>")

@@ -1,30 +1,29 @@
 use crypto::{random::gen_random_alphanumeric_code, sha256};
-pub use derive_more::{Add, Display, From, FromStr, Into};
+pub use derive_more::{Add, Display, Into};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::AuthTokenHash;
+use crate::{AuthTokenHash, PiiString};
 
 /// An cryptographically generated auth token to authenticate a session
 #[derive(
-    Debug,
-    Clone,
-    Hash,
-    PartialEq,
-    Eq,
-    Display,
-    From,
-    Into,
-    FromStr,
-    Serialize,
-    Deserialize,
-    Default,
-    Apiv2Schema,
-    JsonSchema,
+    Clone, Hash, PartialEq, Eq, Display, Into, Serialize, Deserialize, Default, Apiv2Schema, JsonSchema,
 )]
 #[serde(transparent)]
 pub struct SessionAuthToken(String);
+
+impl std::fmt::Debug for SessionAuthToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<redacted>")
+    }
+}
+
+impl From<PiiString> for SessionAuthToken {
+    fn from(value: PiiString) -> Self {
+        Self(value.leak_to_string())
+    }
+}
 
 impl SessionAuthToken {
     const PREFIX: &'static str = "tok_";

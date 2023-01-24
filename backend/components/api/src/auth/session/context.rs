@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use crypto::aead::ScopedSealingKey;
 use db::PgConnection;
 use futures_util::Future;
-use newtypes::SessionAuthToken;
+use newtypes::{PiiString, SessionAuthToken};
 use paperclip::actix::Apiv2Security;
 
 use crate::{
@@ -79,7 +79,7 @@ where
             .into_iter()
             .filter_map(|h| req.headers().get(h))
             .next()
-            .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
+            .and_then(|hv| hv.to_str().map(PiiString::from).ok())
             .ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()));
         let headers = req.headers().clone();
 
