@@ -1,4 +1,8 @@
-import { IdDocType, UserDataAttribute } from '@onefootprint/types';
+import {
+  DecryptedIdDocStatus,
+  IdDocType,
+  UserDataAttribute,
+} from '@onefootprint/types';
 
 import syncVaultWithDecryptedData from './sync-vault-with-decrypted-data';
 
@@ -39,7 +43,7 @@ describe('syncVaultWithDecryptedData', () => {
             {
               front: 'image',
               uploadedAt: 'date',
-              status: 'success',
+              status: DecryptedIdDocStatus.success,
             },
           ],
         },
@@ -54,7 +58,7 @@ describe('syncVaultWithDecryptedData', () => {
             {
               front: 'image',
               uploadedAt: 'date',
-              status: 'success',
+              status: DecryptedIdDocStatus.success,
             },
           ],
         },
@@ -73,14 +77,14 @@ describe('syncVaultWithDecryptedData', () => {
           {
             front: 'image',
             uploadedAt: 'date',
-            status: 'success',
+            status: DecryptedIdDocStatus.success,
           },
         ],
         [IdDocType.passport]: [
           {
             front: 'image',
             uploadedAt: 'date',
-            status: 'success',
+            status: DecryptedIdDocStatus.success,
           },
         ],
       },

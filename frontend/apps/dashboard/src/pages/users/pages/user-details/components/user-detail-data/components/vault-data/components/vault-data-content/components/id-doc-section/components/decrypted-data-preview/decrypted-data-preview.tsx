@@ -33,7 +33,7 @@ const DecryptedDataPreview = ({ images }: DecryptedDataPreviewProps) => {
       <Tabs variant="underlined">
         {successfulUploads.length > 0 && (
           <Tab
-            key="success"
+            key={DecryptedIdDocStatus.success}
             onClick={() => setTab(DecryptedIdDocStatus.success)}
             selected={tab === DecryptedIdDocStatus.success}
           >
@@ -42,7 +42,7 @@ const DecryptedDataPreview = ({ images }: DecryptedDataPreviewProps) => {
         )}
         {failedUploads.length > 0 && (
           <Tab
-            key="fail"
+            key={DecryptedIdDocStatus.fail}
             onClick={() => setTab(DecryptedIdDocStatus.fail)}
             selected={tab === DecryptedIdDocStatus.fail}
           >

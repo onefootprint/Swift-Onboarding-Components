@@ -7,6 +7,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
+  DecryptedIdDocStatus,
   IdDocType,
   OnboardingStatus,
   UserDataAttribute,
@@ -88,7 +89,11 @@ describe('<VaultDataContent />', () => {
         },
         idDoc: {
           [IdDocType.passport]: [
-            { front: 'image', uploadedAt: 'date', status: 'success' },
+            {
+              front: 'image',
+              uploadedAt: 'date',
+              status: DecryptedIdDocStatus.success,
+            },
           ],
           [IdDocType.driversLicense]: null,
         },
@@ -177,7 +182,11 @@ describe('<VaultDataContent />', () => {
         },
         idDoc: {
           [IdDocType.passport]: [
-            { front: 'image', uploadedAt: 'date', status: 'success' },
+            {
+              front: 'image',
+              uploadedAt: 'date',
+              status: DecryptedIdDocStatus.success,
+            },
           ],
           [IdDocType.driversLicense]: null,
         },

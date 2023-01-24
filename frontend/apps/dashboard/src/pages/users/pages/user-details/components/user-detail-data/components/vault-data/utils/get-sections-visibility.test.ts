@@ -1,4 +1,8 @@
-import { IdDocType, UserDataAttribute } from '@onefootprint/types';
+import {
+  DecryptedIdDocStatus,
+  IdDocType,
+  UserDataAttribute,
+} from '@onefootprint/types';
 
 import getSectionsVisibility from './get-sections-visibility';
 
@@ -131,7 +135,7 @@ describe('getSectionsVisibility', () => {
             {
               front: 'image_bytes',
               uploadedAt: 'date',
-              status: 'success',
+              status: DecryptedIdDocStatus.success,
             },
           ],
         },
@@ -163,7 +167,7 @@ describe('getSectionsVisibility', () => {
               front: 'image_bytes',
               back: 'image_bytes',
               uploadedAt: 'date',
-              status: 'success',
+              status: DecryptedIdDocStatus.success,
             },
           ],
         },
