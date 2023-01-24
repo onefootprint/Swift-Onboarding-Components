@@ -12,6 +12,7 @@ import Roles from './roles';
 import {
   orgRolesCreatedAtFixture,
   orgRolesFixture,
+  orgRolesScopesFixture,
   withOrgRoles,
   withOrgRolesError,
 } from './roles.test.config';
@@ -75,8 +76,9 @@ describe('<Roles />', () => {
         const name = screen.getByText(role.name);
         expect(name).toBeInTheDocument();
 
-        role.scopes.forEach(scope => {
-          const permission = screen.getByText(scope, { exact: false });
+        role.scopes.forEach((scope, scopeIndex) => {
+          const scopeText = orgRolesScopesFixture[scopeIndex];
+          const permission = screen.getByText(scopeText);
           expect(permission).toBeInTheDocument();
         });
 

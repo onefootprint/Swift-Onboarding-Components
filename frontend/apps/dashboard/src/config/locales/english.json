@@ -811,8 +811,8 @@
           "empty-state": "No roles found"
         },
         "scopes": {
+          "admin": "Everything",
           "read": "Read",
-          "admin": "Admin",
           "onboarding_configuration": "Onboarding configuration",
           "api_keys": "API keys",
           "org_settings": "Modify organization settings",

@@ -20,6 +20,8 @@ export const orgRolesFixture: OrgRole[] = [
 
 export const orgRolesCreatedAtFixture = ['9/19/22, 4:24 PM', '1/6/23, 5:11 AM'];
 
+export const orgRolesScopesFixture = ['Everything', 'Read'];
+
 export const withOrgRoles = () =>
   mockRequest({
     method: 'get',
