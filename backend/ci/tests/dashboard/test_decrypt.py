@@ -175,25 +175,11 @@ def test_tenant_document_decrypt(user_with_documents):
     assert set(access_event["targets"]) == {"id_document.passport"}
 
 
-@pytest.mark.parametrize(
-    "can_access_selfie_image,expected_status_code,expected_message",
-    [
-        (True, 200, ""),
-        (
-            False,
-            401,
-            "Auth error: Not allowed: onboarding configuration does not have permissions to decrypt attributes: selfie.passport",
-        ),
-    ],
-)
 def test_tenant_selfie_decrypt(
     sandbox_tenant,
     must_collect_data,
     can_access_data,
     twilio,
-    can_access_selfie_image,
-    expected_status_code,
-    expected_message,
 ):
     from tests.image_fixtures import test_image
 
@@ -204,7 +190,7 @@ def test_tenant_selfie_decrypt(
         "must_collect_identity_document": True,
         "must_collect_selfie": True,
         "can_access_identity_document_images": True,
-        "can_access_selfie_image": can_access_selfie_image,
+        "can_access_selfie_image": True,
     }
     ob_config = create_ob_config(sandbox_tenant.sk, ob_conf_data)
 
@@ -226,19 +212,15 @@ def test_tenant_selfie_decrypt(
         f"users/{user.fp_user_id}/vault/identity/document/decrypt",
         data,
         sandbox_tenant.sk.key,
-        status_code=expected_status_code,
     )
 
-    if expected_status_code == 200:
-        assert resp["document_type"] == "passport"
-        assert resp["images"][0]["front"] == test_image
-        assert resp["images"][0]["back"] == test_image
-        assert resp["images"][0]["selfie"] == test_image
+    assert resp["document_type"] == "passport"
+    assert resp["images"][0]["front"] == test_image
+    assert resp["images"][0]["back"] == test_image
+    assert resp["images"][0]["selfie"] == test_image
 
-        access_event = latest_access_event_for(user)
-        assert set(access_event["targets"]) == {
-            "id_document.passport",
-            "selfie.passport",
-        }
-    else:
-        assert expected_message == resp["error"]["message"]
+    access_event = latest_access_event_for(user)
+    assert set(access_event["targets"]) == {
+        "id_document.passport",
+        "selfie.passport",
+    }

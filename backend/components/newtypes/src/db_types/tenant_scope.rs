@@ -52,8 +52,6 @@ pub enum TenantScope {
     DecryptCustom,
     /// Allows decrypting identity documents
     DecryptDocuments,
-    // Allows decrypting selfie images
-    DecryptSelfie,
 }
 
 impl_enum_string_diesel!(TenantScope);
@@ -103,7 +101,6 @@ impl FromStr for TenantScope {
             TenantScopeDiscriminants::OrgSettings => Self::OrgSettings,
             TenantScopeDiscriminants::DecryptCustom => Self::DecryptCustom,
             TenantScopeDiscriminants::DecryptDocuments => Self::DecryptDocuments,
-            TenantScopeDiscriminants::DecryptSelfie => Self::DecryptSelfie,
             TenantScopeDiscriminants::ManualReview => Self::ManualReview,
         };
         Ok(result)
@@ -124,7 +121,6 @@ mod tests {
     #[test_case(TenantScope::OrgSettings => "org_settings")]
     #[test_case(TenantScope::DecryptCustom => "decrypt_custom")]
     #[test_case(TenantScope::DecryptDocuments => "decrypt_documents")]
-    #[test_case(TenantScope::DecryptSelfie => "decrypt_selfie")]
     #[test_case(TenantScope::ManualReview => "manual_review")]
     fn test_to_string(identifier: TenantScope) -> String {
         identifier.to_string()
@@ -139,7 +135,6 @@ mod tests {
     #[test_case("org_settings" => TenantScope::OrgSettings)]
     #[test_case("decrypt_custom" => TenantScope::DecryptCustom)]
     #[test_case("decrypt_documents" => TenantScope::DecryptDocuments)]
-    #[test_case("decrypt_selfie" => TenantScope::DecryptSelfie)]
     #[test_case("manual_review" => TenantScope::ManualReview)]
     fn test_from_str(input: &str) -> TenantScope {
         TenantScope::from_str(input).unwrap()

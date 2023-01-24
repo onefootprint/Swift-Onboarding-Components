@@ -110,7 +110,8 @@ impl IsGuardMet for CanDecrypt {
             // While Custom + Document permissions are very easy to determine
             DataIdentifier::Custom(_) => Right(token_scopes.contains(&TenantScope::DecryptCustom)),
             DataIdentifier::IdDocument(_) => Right(token_scopes.contains(&TenantScope::DecryptDocuments)),
-            DataIdentifier::Selfie(_) => Right(token_scopes.contains(&TenantScope::DecryptSelfie)),
+            // For now, permissions to decrypt documents gives permissions to decrypt selfies
+            DataIdentifier::Selfie(_) => Right(token_scopes.contains(&TenantScope::DecryptDocuments)),
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different
@@ -187,8 +188,8 @@ mod test {
     #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => true)]
     #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![DI::IdDocument(IdDocKind::Passport)]) => false)]
     #[test_case(&[TS::DecryptDocuments], CanDecrypt::new(vec![DI::IdDocument(IdDocKind::Passport)]) => true)]
-    #[test_case(&[TS::DecryptDocuments], CanDecrypt::new(vec![DI::Selfie(IdDocKind::Passport)]) => false)]
-    #[test_case(&[TS::DecryptSelfie], CanDecrypt::new(vec![DI::Selfie(IdDocKind::Passport)]) => true)]
+    #[test_case(&[TS::Decrypt(CDO::Name)], CanDecrypt::new(vec![DI::Selfie(IdDocKind::Passport)]) => false)]
+    #[test_case(&[TS::DecryptDocuments], CanDecrypt::new(vec![DI::Selfie(IdDocKind::Passport)]) => true)]
     // CanDecrypt complex
     #[test_case(&[TS::DecryptCustom, TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::IdDocument(IdDocKind::Passport)]) => false)]
     #[test_case(&[TS::DecryptCustom, TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
