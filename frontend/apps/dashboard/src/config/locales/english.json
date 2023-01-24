@@ -733,6 +733,7 @@
             "lastActive": "Last Active",
             "role": "Role"
           },
+          "pending-invite": "Pending",
           "empty-state": "No members found"
         }
       },

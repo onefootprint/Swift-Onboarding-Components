@@ -1,5 +1,6 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { OrgMember } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -12,28 +13,35 @@ const Row = ({
   email,
   lastLoginAt,
   roleName,
-}: RowProps) => (
-  <>
-    <Td>
-      {firstName ? (
-        <Typography variant="body-3">
-          {firstName} {lastName}
+}: RowProps) => {
+  const { t } = useTranslation('pages.settings.members.table');
+
+  return (
+    <>
+      <Td>
+        {firstName ? (
+          <Typography variant="body-3">
+            {firstName} {lastName}
+          </Typography>
+        ) : (
+          <Typography variant="body-3">-</Typography>
+        )}
+        <Typography variant="body-3" color="tertiary">
+          {email}
         </Typography>
-      ) : (
-        <Typography variant="body-3">-</Typography>
-      )}
-      <Typography variant="body-3" color="tertiary">
-        {email}
-      </Typography>
-    </Td>
-    <Td>
-      <Typography variant="body-3">{lastLoginAt ?? '-'}</Typography>
-    </Td>
-    <Td>
-      <Typography variant="body-3">{roleName}</Typography>
-    </Td>
-  </>
-);
+      </Td>
+      <Td>
+        <Typography variant="body-3">{lastLoginAt ?? '-'}</Typography>
+      </Td>
+      <Td>
+        <Typography variant="body-3">{roleName}</Typography>
+      </Td>
+      <Td>
+        {!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}
+      </Td>
+    </>
+  );
+};
 
 const Td = styled.td`
   && {

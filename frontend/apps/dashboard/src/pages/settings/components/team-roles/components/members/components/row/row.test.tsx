@@ -61,4 +61,11 @@ describe('<Row />', () => {
       expect(screen.getByText('-')).toBeInTheDocument();
     });
   });
+
+  describe('when invite is pending', () => {
+    it('should render the pending invite badge', () => {
+      renderRow({ lastLoginAt: null });
+      expect(screen.getByText('Pending')).toBeInTheDocument();
+    });
+  });
 });

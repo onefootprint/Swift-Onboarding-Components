@@ -17,8 +17,9 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
   const filters = useOrgMembersFilters();
   const columns = [
     { id: 'email', text: t('table.header.email'), width: '25%' },
-    { id: 'lastActive', text: t('table.header.lastActive'), width: '35%' },
-    { id: 'role', text: t('table.header.role'), width: '40%' },
+    { id: 'lastActive', text: t('table.header.lastActive'), width: '20%' },
+    { id: 'role', text: t('table.header.role'), width: '45%' },
+    { id: 'status', text: '', width: '10%' },
   ];
 
   const handleSearchChange = (search: string) => {
