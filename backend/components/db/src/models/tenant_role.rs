@@ -191,10 +191,10 @@ impl TenantRole {
     pub fn list_active(conn: &mut PgConnection, filters: &TenantRoleListFilters) -> DbResult<Vec<Self>> {
         let mut query = Self::list_active_query(filters)
             .order_by(tenant_role::name.asc())
-            .limit(filters.page_size);
+            .limit(filters.page_size + 1);
 
-        if let Some(ref cursor) = filters.cursor {
-            query = query.filter(tenant_role::name.ge(cursor))
+        if let Some(page) = filters.page {
+            query = query.offset(filters.page_size * (page as i64));
         }
 
         let results = query.get_results(conn)?;
@@ -230,6 +230,6 @@ pub struct TenantRoleListFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub scopes: Option<Vec<TenantScope>>,
     pub name: Option<String>,
-    pub cursor: Option<String>,
+    pub page: Option<usize>,
     pub page_size: i64,
 }

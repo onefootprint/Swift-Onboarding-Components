@@ -2,9 +2,9 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantUserAuthContext;
 use crate::errors::ApiResult;
-use crate::types::CursorPaginatedResponse;
-use crate::types::CursorPaginationRequest;
 use crate::types::JsonApiResponse;
+use crate::types::OffsetPaginatedResponse;
+use crate::types::OffsetPaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -16,7 +16,7 @@ use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
-type RolesResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::OrganizationRole>, String>>;
+type RolesResponse = Json<OffsetPaginatedResponse<api_wire_types::OrganizationRole>>;
 
 #[api_v2_operation(
     tags(OrgSettings),
@@ -26,13 +26,13 @@ type RolesResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::Organizati
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgRoleFilters>,
-    pagination: web::Query<CursorPaginationRequest<String>>,
+    pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantUserAuthContext,
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let cursor = pagination.cursor.clone();
+    let page = pagination.page;
     let page_size = pagination.page_size(&state);
     let OrgRoleFilters { scopes, name } = filters.into_inner();
     let scopes = scopes.map(|s| s.0);
@@ -45,8 +45,8 @@ async fn get(
                 tenant_id: &tenant_id,
                 scopes,
                 name,
-                cursor,
-                page_size: (page_size + 1) as i64,
+                page,
+                page_size: page_size as i64,
             };
             let results = TenantRole::list_active(conn, &filters)?;
             let count = TenantRole::count_active(conn, &filters)?;
@@ -54,13 +54,13 @@ async fn get(
         })
         .await??;
 
-    let cursor = pagination.cursor_item(&state, &results).map(|x| x.name.clone());
+    let next_page = pagination.next_page(&state, results.len());
     let results = results
         .into_iter()
         .take(page_size)
         .map(api_wire_types::OrganizationRole::from_db)
         .collect::<Vec<api_wire_types::OrganizationRole>>();
-    Ok(Json(CursorPaginatedResponse::ok(results, cursor, Some(count))))
+    Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
