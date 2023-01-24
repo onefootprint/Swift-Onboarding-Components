@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use newtypes::{flat_api_object_map_type, IdDocKind};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
@@ -20,6 +21,17 @@ pub struct DecryptIdentityDocumentRequest {
     pub include_selfie: bool,
 }
 
+/// This status is used to group and display decrypted documents in the dashboard
+/// It is derived from `DocumentRequestStatus` in that it represents whether or not the document
+/// was successfully uploaded AND usable by our vendors to make a determination.
+///
+/// It does NOT represent whether the document was verified or not.
+#[derive(Debug, Clone, Apiv2Schema, Serialize)]
+pub enum DecryptedDocumentStatus {
+    Success,
+    Fail,
+}
+
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]
 pub struct ImageData {
     // Base64 encoded image
@@ -28,6 +40,9 @@ pub struct ImageData {
     pub back: Option<String>,
     // Base64 encoded string
     pub selfie: Option<String>,
+    // the time the IdentityDocument was created in our database
+    pub uploaded_at: DateTime<Utc>,
+    pub status: DecryptedDocumentStatus,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]
