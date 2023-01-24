@@ -3,11 +3,12 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 export type SectionHeaderProps = {
-  title: string;
+  children?: React.ReactNode;
   subtitle: string;
+  title: string;
 };
 
-const SectionHeader = ({ title, subtitle }: SectionHeaderProps) => (
+const SectionHeader = ({ children, subtitle, title }: SectionHeaderProps) => (
   <Header>
     <Box>
       <Typography variant="label-1" as="h3" sx={{ marginBottom: 2 }}>
@@ -15,6 +16,7 @@ const SectionHeader = ({ title, subtitle }: SectionHeaderProps) => (
       </Typography>
       <Typography variant="body-3">{subtitle}</Typography>
     </Box>
+    {children}
   </Header>
 );
 
@@ -22,7 +24,7 @@ const Header = styled.header`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[2]};
+    flex-direction: row;
     justify-content: space-between;
     margin-bottom: ${theme.spacing[5]};
   `}

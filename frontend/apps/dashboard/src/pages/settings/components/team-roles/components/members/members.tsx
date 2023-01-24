@@ -1,6 +1,7 @@
-import { Box, Pagination } from '@onefootprint/ui';
+import { Box, Pagination, Portal } from '@onefootprint/ui';
 import React from 'react';
 
+import Invite from './components/invite';
 import MembersTable from './components/members-table';
 import useOrgMembers from './hooks/use-org-members';
 
@@ -13,7 +14,10 @@ const Members = () => {
   } = useOrgMembers();
 
   return (
-    <Box testID="members-table" as="section">
+    <Box testID="people-table" as="section">
+      <Portal selector="#members-actions">
+        <Invite />
+      </Portal>
       <MembersTable
         data={response?.data}
         errorMessage={errorMessage}

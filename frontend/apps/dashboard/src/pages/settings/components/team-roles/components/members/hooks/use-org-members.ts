@@ -63,7 +63,6 @@ const useOrgMembers = () => {
 
   return {
     ...orgMembersQuery,
-
     errorMessage,
     pagination,
   };

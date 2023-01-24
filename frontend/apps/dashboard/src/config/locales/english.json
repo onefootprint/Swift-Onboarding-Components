@@ -716,9 +716,7 @@
       "team-roles": {
         "header": {
           "title": "Members & Roles",
-          "subtitle": "Manage who is a member of your team and their roles",
-          "invite-teammates": "Invite teammates",
-          "create-role": "Create role"
+          "subtitle": "Manage who is a member of your team and their roles"
         },
         "tabs": {
           "members": "Members",
@@ -735,6 +733,45 @@
           },
           "pending-invite": "Pending",
           "empty-state": "No members found"
+        },
+        "invite": {
+          "title": "Invite teammates",
+          "form": {
+            "email": {
+              "label": "Email address",
+              "placeholder": "jane.doe@acme.com",
+              "errors": {
+                "required": "Please enter an email"
+              }
+            },
+            "role": {
+              "label": "Role",
+              "placeholder": "Select",
+              "errors": {
+                "required": "Please enter a role"
+              },
+              "options": {
+                "admin": "Admin",
+                "developer": "Developer",
+                "member": "Member"
+              }
+            },
+            "errors": {
+              "invalid": "Please complete the fields above."
+            }
+          },
+          "notification": {
+            "success": {
+              "title_one": "Invitation sent successfully.",
+              "description_one": "The user will receive an email with instructions to join the organization.",
+              "title_other": "Invitations sent successfully.",
+              "description_other": "The users will receive an email with instructions to join the organization."
+            },
+            "error": {
+              "title_one": "Invitation wasn't sent",
+              "title_other": "Invitations weren't sent"
+            }
+          }
         }
       },
       "roles": {
@@ -779,9 +816,6 @@
             "description": "\"{{name}}\" is now available as a specific role."
           }
         }
-      },
-      "invite-teammates": {
-        "title": "Invite teammates"
       }
     }
   }

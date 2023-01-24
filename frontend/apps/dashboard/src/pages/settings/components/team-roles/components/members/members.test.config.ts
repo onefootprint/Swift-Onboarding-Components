@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { OrgMember } from '@onefootprint/types';
+import { OrgMember, OrgRole } from '@onefootprint/types';
 
 export const orgMembersFixture: OrgMember[] = [
   {
@@ -73,12 +73,29 @@ export const orgMembersRelativeTimeFixture = [
   '7 days ago',
 ];
 
-export const withOrgMembers = () =>
+export const orgRolesFixture: OrgRole[] = [
+  {
+    id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+    name: 'Super',
+    scopes: ['admin'],
+    isImmutable: true,
+    createdAt: '2022-09-19T16:24:35.367322Z',
+  },
+  {
+    id: 'orgrole_erflKNWEF13143EWRWELJN',
+    name: 'Member',
+    isImmutable: true,
+    scopes: ['read'],
+    createdAt: '2023-01-06T05:11:08.415924Z',
+  },
+];
+
+export const withOrgMembers = (orgMembers: OrgMember[] = []) =>
   mockRequest({
     method: 'get',
     path: '/org/members',
     response: {
-      data: orgMembersFixture,
+      data: [...orgMembersFixture, ...orgMembers],
       meta: {
         next: null,
         count: null,
@@ -98,4 +115,46 @@ export const withOrgMembersError = () =>
     },
   });
 
-export default withOrgMembers;
+export const withCreateOrgMembers = () =>
+  mockRequest({
+    method: 'post',
+    path: '/org/members',
+    response: null,
+  });
+
+export const withCreateOrgMembersError = () =>
+  mockRequest({
+    method: 'post',
+    path: '/org/members',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withOrgRoles = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/roles',
+    response: {
+      data: orgRolesFixture,
+      meta: {
+        next: null,
+        count: null,
+      },
+    },
+  });
+
+export const withOrgRolesError = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/roles',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });

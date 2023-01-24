@@ -5,6 +5,8 @@ import {
   screen,
   userEvent,
   waitFor,
+  waitForElementToBeRemoved,
+  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -12,8 +14,12 @@ import Members from './members';
 import {
   orgMembersFixture,
   orgMembersRelativeTimeFixture,
+  withCreateOrgMembers,
+  withCreateOrgMembersError,
   withOrgMembers,
   withOrgMembersError,
+  withOrgRoles,
+  withOrgRolesError,
 } from './members.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -29,6 +35,10 @@ describe('<Members />', () => {
     });
   });
 
+  beforeEach(() => {
+    withOrgRoles();
+  });
+
   beforeAll(() => {
     MockDate.set(testDate);
   });
@@ -37,7 +47,13 @@ describe('<Members />', () => {
     MockDate.reset();
   });
 
-  const renderMembers = () => customRender(<Members />);
+  const renderMembers = () =>
+    customRender(
+      <section>
+        <div id="members-actions" />
+        <Members />
+      </section>,
+    );
 
   const renderMembersAndWaitData = async () => {
     renderMembers();
@@ -49,12 +65,12 @@ describe('<Members />', () => {
     });
   };
 
-  describe('when the request fails', () => {
+  describe('when the request to load the members fails', () => {
     beforeEach(() => {
       withOrgMembersError();
     });
 
-    it('should render the error message', async () => {
+    it('should render an error message', async () => {
       renderMembers();
 
       await waitFor(() => {
@@ -64,7 +80,7 @@ describe('<Members />', () => {
     });
   });
 
-  describe('when the request succeeds', () => {
+  describe('when the request to load the members succeeds', () => {
     beforeEach(() => {
       withOrgMembers();
     });
@@ -110,6 +126,125 @@ describe('<Members />', () => {
             undefined,
             { shallow: true },
           );
+        });
+      });
+    });
+
+    describe('when inviting a teammate', () => {
+      describe('when the request to load the roles fails', () => {
+        beforeEach(() => {
+          withOrgRolesError();
+        });
+
+        it('should render an error message', async () => {
+          renderMembersAndWaitData();
+
+          const inviteButton = screen.getByRole('button', {
+            name: 'Invite teammates',
+          });
+          await userEvent.click(inviteButton);
+
+          await waitFor(() => {
+            const dialog = screen.getByRole('dialog', {
+              name: 'Invite teammates',
+            });
+            const errorMessage = within(dialog).getByText(
+              'Something went wrong',
+            );
+
+            expect(errorMessage).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to create a member succeeds', () => {
+        beforeEach(() => {
+          withCreateOrgMembers();
+        });
+
+        it('should invite a teammate and display the invited user in the table', async () => {
+          renderMembersAndWaitData();
+
+          const inviteButton = screen.getByRole('button', {
+            name: 'Invite teammates',
+          });
+          await userEvent.click(inviteButton);
+
+          const dialog = screen.getByRole('dialog', {
+            name: 'Invite teammates',
+          });
+
+          await waitFor(() => {
+            screen.getByTestId('members-roles-data');
+          });
+
+          const emailField = screen.getByLabelText('Email address');
+          await userEvent.type(emailField, 'johnny@acme.com');
+
+          // Updated list of members
+          withOrgMembers([
+            {
+              id: 'orguser_IXNDrl9WcqJi18ZUnpMlVO',
+              email: 'johnny@acme.com',
+              firstName: null,
+              lastName: null,
+              lastLoginAt: '2023-01-18T17:54:10.668420Z',
+              createdAt: '2022-09-19T16:24:35.368337Z',
+              roleName: 'Admin',
+              roleId: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+            },
+          ]);
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Invite',
+          });
+          await userEvent.click(submitButton);
+
+          await waitForElementToBeRemoved(dialog);
+
+          await waitFor(() => {
+            const successMessage = screen.getByText(
+              'Invitation sent successfully.',
+            );
+            expect(successMessage).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const name = screen.getByText('johnny@acme.com');
+            expect(name).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to create a member fails', () => {
+        beforeEach(() => {
+          withCreateOrgMembersError();
+        });
+
+        it('should show an error message', async () => {
+          renderMembersAndWaitData();
+
+          const inviteButton = screen.getByRole('button', {
+            name: 'Invite teammates',
+          });
+          await userEvent.click(inviteButton);
+
+          await waitFor(() => {
+            screen.getByTestId('members-roles-data');
+          });
+
+          const emailField = screen.getByLabelText('Email address');
+          await userEvent.type(emailField, 'johnny@acme.com');
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Invite',
+          });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            const successMessage = screen.getByText("Invitation wasn't sent");
+            expect(successMessage).toBeInTheDocument();
+          });
         });
       });
     });
