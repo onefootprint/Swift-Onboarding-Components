@@ -1,6 +1,6 @@
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use newtypes::{OnboardingId, VendorAPI};
+use newtypes::{OnboardingId, PiiJsonValue, SealedVaultBytes, VendorAPI};
 use std::str::FromStr;
 
 use crate::decision::vendor::vendor_result::VendorResult;
@@ -27,12 +27,22 @@ fn test_from_verification_results_for_onboarding(conn: &mut TestPgConnection) {
         conn,
         ob1_requests[0].id.clone(),
         idv::test_fixtures::test_idology_expectid_response(),
+        SealedVaultBytes(
+            PiiJsonValue::from(idv::test_fixtures::test_idology_expectid_response())
+                .leak_to_vec()
+                .unwrap(),
+        ),
     )
     .unwrap();
     let ob2_result = VerificationResult::create(
         conn,
         ob2_requests[0].id.clone(),
         idv::test_fixtures::test_twilio_lookupv2_response(),
+        SealedVaultBytes(
+            PiiJsonValue::from(idv::test_fixtures::test_twilio_lookupv2_response())
+                .leak_to_vec()
+                .unwrap(),
+        ),
     )
     .unwrap();
 

@@ -179,7 +179,7 @@ impl EnclaveClient {
 
     /// Util for batch decrypting many EciesP256Sha256AesGcmSealed values with the same key and transform
     /// into PiiBytes
-    async fn batch_decrypt_to_piibytes(
+    pub async fn batch_decrypt_to_piibytes(
         &self,
         sealed_data: Vec<EciesP256Sha256AesGcmSealed>,
         sealed_key: &EncryptedVaultPrivateKey,

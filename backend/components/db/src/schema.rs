@@ -645,6 +645,7 @@ table! {
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        e_response -> Nullable<Bytea>,
     }
 }
 

@@ -4,7 +4,7 @@ use ::twilio::response::lookup::LookupV2Response;
 use idology::expectid::response::ExpectIDAPIResponse;
 use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
 use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
-use newtypes::Vendor;
+use newtypes::{PiiJsonValue, Vendor};
 use socure::response::SocureIDPlusResponse;
 
 pub mod idology;
@@ -72,7 +72,7 @@ impl ParsedResponse {
 pub struct VendorResponse {
     pub vendor: Vendor,
     pub response: ParsedResponse,
-    pub raw_response: serde_json::Value,
+    pub raw_response: PiiJsonValue,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -89,4 +89,6 @@ pub enum Error {
     SocureError(#[from] socure::Error),
     #[error("Calls to vendor disabled via circuit breaker feature flag")]
     VendorCallsDisabledError,
+    #[error("serde_json error: {0}")]
+    SerderJsonError(#[from] serde_json::Error),
 }

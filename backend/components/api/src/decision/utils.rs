@@ -23,6 +23,8 @@ use crate::{
     State,
 };
 
+use super::vendor;
+
 type ShouldInitiateVerificationRequests = bool;
 // Logic to figure out test status from some of the identity data we collected during onboarding
 // As of 2022-10-15 we do this by looking at the phone number
@@ -105,9 +107,16 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
                         .pop()
                         .ok_or(ApiError::ResourceNotFound)?;
                 let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
-                // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
-                let result = VerificationResult::create(conn, request.id, raw_response)?;
 
+                // Verification result response is encrypted
+                let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
+                let e_response = vendor::verification_result::encrypt_verification_result_response(
+                    raw_response.clone().into(),
+                    uv.public_key,
+                )?;
+
+                // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
+                let result = VerificationResult::create(conn, request.id, raw_response, e_response)?;
                 // If the decision is a pass, mark all data as verified for the onboarding
                 let seqno = if decision_status == DecisionStatus::Pass {
                     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;

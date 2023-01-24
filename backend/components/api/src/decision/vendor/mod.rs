@@ -16,7 +16,7 @@ pub(super) mod build_request;
 pub mod make_request;
 pub mod socure;
 pub mod vendor_result;
-mod verification_result;
+pub mod verification_result;
 
 /// Build verification requests from the UserVaultWrapper and save.
 /// We save so that if something happens, we can always replay the requests

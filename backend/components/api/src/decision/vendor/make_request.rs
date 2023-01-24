@@ -1,13 +1,10 @@
 use super::*;
 use crate::{errors::ApiError, State};
 
-
 use db::{
     models::{
-        insight_event::InsightEvent,
-        ob_configuration::ObConfiguration,
-        socure_device_session::SocureDeviceSession,
-        verification_request::VerificationRequest,
+        insight_event::InsightEvent, ob_configuration::ObConfiguration,
+        socure_device_session::SocureDeviceSession, verification_request::VerificationRequest,
     },
     DbError,
 };
@@ -110,7 +107,7 @@ pub async fn send_idology_idv_request(
 
         Ok(VendorResponse {
             vendor: Vendor::Idology,
-            raw_response: response,
+            raw_response: response.into(),
             response: ParsedResponse::IDologyExpectID(parsed_response),
         })
     }
@@ -173,7 +170,7 @@ pub async fn send_socure_idv_request(
         Ok(VendorResponse {
             vendor: Vendor::Socure,
             response: ParsedResponse::SocureIDPlus(parsed_response),
-            raw_response: response,
+            raw_response: response.into(),
         })
     }
 }
@@ -218,7 +215,7 @@ pub async fn send_scan_onboarding_docv_request(
         Ok(VendorResponse {
             vendor: Vendor::Idology,
             response: ParsedResponse::IDologyScanOnboarding(parsed_response),
-            raw_response: response,
+            raw_response: response.into(),
         })
     }
 }
@@ -229,14 +226,22 @@ pub async fn make_idv_request(
     request: VerificationRequest,
 ) -> Result<vendor_result::VendorResult, ApiError> {
     let request_id = request.id.clone();
+    let requestid = request.id.clone();
 
     let data = build_request::build_idv_data_from_verification_request(state, request.clone()).await?;
 
     let vendor_response = send_idv_request(state, request, data).await?;
-
-    let (verification_result, structured_vendor_response) =
-        verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
-            .await?;
+    let uv = state
+        .db_pool
+        .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
+        .await??;
+    let (verification_result, structured_vendor_response) = verification_result::save_verification_result(
+        state,
+        request_id.clone(),
+        vendor_response.clone(),
+        uv.public_key,
+    )
+    .await?;
 
     let result = vendor_result::VendorResult {
         response: vendor_response,
@@ -258,16 +263,25 @@ pub async fn make_docv_request(
     request: VerificationRequest,
 ) -> Result<vendor_result::VendorResult, ApiError> {
     let request_id = request.id.clone();
+    let requestid = request.id.clone();
 
     let data =
         build_request::build_docv_data_for_submission_from_verification_request(state, request.clone())
             .await?;
 
     let vendor_response = send_docv_request(state, request, data).await?;
+    let uv = state
+        .db_pool
+        .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
+        .await??;
 
-    let (verification_result, structured_vendor_response) =
-        verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
-            .await?;
+    let (verification_result, structured_vendor_response) = verification_result::save_verification_result(
+        state,
+        request_id.clone(),
+        vendor_response.clone(),
+        uv.public_key,
+    )
+    .await?;
 
     let result = vendor_result::VendorResult {
         response: vendor_response,

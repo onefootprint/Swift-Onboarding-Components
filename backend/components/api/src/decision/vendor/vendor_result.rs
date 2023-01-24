@@ -46,7 +46,7 @@ impl VendorResult {
                     response: VendorResponse {
                         vendor: request.vendor,
                         response: parsed_response,
-                        raw_response: result.response,
+                        raw_response: result.response.into(),
                     },
                     verification_request_id: request.id,
                     verification_result_id: result.id,

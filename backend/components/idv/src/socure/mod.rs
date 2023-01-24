@@ -26,7 +26,7 @@ pub async fn send_idplus_request(
     Ok(VendorResponse {
         vendor: Vendor::Socure,
         response: ParsedResponse::SocureIDPlus(parsed_response),
-        raw_response: response,
+        raw_response: response.into(),
     })
 }
 

@@ -7,7 +7,8 @@ use crate::models::{
 use crate::tests::prelude::*;
 use macros::db_test;
 use newtypes::{
-    DocumentRequestStatus, OnboardingId, ScopedUserId, SealedVaultDataKey, UserVaultId, VendorAPI,
+    DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedUserId, SealedVaultDataKey, UserVaultId,
+    VendorAPI,
 };
 
 use super::prelude::TestPgConnection;
@@ -39,8 +40,17 @@ fn test_get_latest_verification_result(conn: &mut TestPgConnection) {
         id1.id,
     )
     .unwrap();
-    let vr1_result =
-        VerificationResult::create(conn, vr1.id, serde_json::json!({"test": "response"})).unwrap();
+    let vr1_result = VerificationResult::create(
+        conn,
+        vr1.id,
+        serde_json::json!({"test": "response"}),
+        newtypes::SealedVaultBytes(
+            PiiJsonValue::new(serde_json::json!({"test": "response"}))
+                .leak_to_vec()
+                .unwrap(),
+        ),
+    )
+    .unwrap();
     let update = DocumentRequestUpdate::idv_reqs_initiated();
     let dr1 = dr1.update(conn.conn(), update).unwrap();
     let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);

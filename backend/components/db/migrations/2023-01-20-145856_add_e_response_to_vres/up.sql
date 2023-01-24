@@ -1,0 +1,1 @@
+ALTER TABLE verification_result ADD COLUMN e_response BYTEA;

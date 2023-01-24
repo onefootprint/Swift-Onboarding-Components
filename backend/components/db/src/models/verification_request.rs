@@ -1,4 +1,4 @@
-use crate::schema::{verification_request, verification_result};
+use crate::schema::{onboarding, scoped_user, user_vault, verification_request, verification_result};
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -9,6 +9,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
+use super::user_vault::UserVault;
 use super::verification_result::VerificationResult;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
@@ -39,7 +40,7 @@ struct NewVerificationRequestRow {
     uvw_snapshot_seqno: DataLifetimeSeqno,
     identity_document_id: Option<IdentityDocumentId>,
 }
-
+pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 impl VerificationRequest {
     pub fn bulk_create(
         conn: &mut PgConnection,
@@ -75,7 +76,7 @@ impl VerificationRequest {
     pub fn get_requests_and_results_for_onboarding(
         conn: &mut PgConnection,
         onboarding_id: OnboardingId,
-    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
+    ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<(VerificationRequest, Option<VerificationResult>)> = verification_request::table
             .filter(verification_request::onboarding_id.eq(onboarding_id))
             .left_join(verification_result::table)
@@ -103,5 +104,15 @@ impl VerificationRequest {
             .values(new_row)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    pub fn get_user_vault(conn: &mut PgConnection, id: VerificationRequestId) -> DbResult<UserVault> {
+        let res = verification_request::table
+            .filter(verification_request::id.eq(id))
+            .inner_join(onboarding::table.inner_join(scoped_user::table.inner_join(user_vault::table)))
+            .select(user_vault::all_columns)
+            .get_result(conn)?;
+
+        Ok(res)
     }
 }

@@ -4,44 +4,45 @@ use crate::{
     State,
 };
 
-use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-
 use super::*;
+use db::{
+    models::{
+        onboarding::Onboarding,
+        verification_request::{RequestAndMaybeResult, VerificationRequest},
+    },
+    DbError,
+};
 /// The Engine module is the main entry point into running our verification logic
 ///
 ///
 /// Run loads saved VerificationRequests and (potentially) VerificationResults and produces a Decision
-pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
-    // TODO: Move check `initiated`
-    // See https://www.notion.so/Statuses-v2-461c189437c148b085bc666c596546a9
 
-    let (requests, ob_id, previous_results) = state
+pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
+    let obid = ob.id.clone();
+    let requests_and_results = state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
             // Load our requests and results
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
-            let requests_and_results =
-                VerificationRequest::get_requests_and_results_for_onboarding(conn, ob.id.clone())?;
-            // In the case we have already run some verifications for this onboarding, create our previous VendorResults
-            let previous_results =
-                vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
-                    requests_and_results.clone(),
-                )?;
-            let requests: Vec<VerificationRequest> = requests_and_results
-                .into_iter()
-                .filter_map(|(request, result)| {
-                    // Only send requests for which we don't already have a result
-                    if result.is_none() {
-                        Some(request)
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-
-            Ok((requests, ob.id, previous_results))
+            VerificationRequest::get_requests_and_results_for_onboarding(conn, obid)
         })
-        .await?;
+        .await??;
+
+    let previous_results = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
+        requests_and_results.clone(),
+    )?;
+
+    let requests: Vec<VerificationRequest> = requests_and_results
+        .into_iter()
+        .filter_map(|(request, result)| {
+            // Only send requests for which we don't already have a result
+            if result.is_none() {
+                Some(request)
+            } else {
+                None
+            }
+        })
+        .collect();
 
     // Make requests
     let raw_results = vendor::make_request::make_vendor_requests(state, requests).await?;
@@ -76,7 +77,7 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
     let features = features::create_features(results);
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    risk::create_final_decision(state, ob_id, features).await?;
+    risk::create_final_decision(state, ob.id, features).await?;
 
     Ok(())
 }

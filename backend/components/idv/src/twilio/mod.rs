@@ -35,6 +35,6 @@ pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<Ven
     Ok(VendorResponse {
         vendor: Vendor::Twilio,
         response: ParsedResponse::TwilioLookupV2(parsed),
-        raw_response: response,
+        raw_response: response.into(),
     })
 }

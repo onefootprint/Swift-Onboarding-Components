@@ -24,12 +24,6 @@ impl DbToApi<(RiskSignal, Option<Vec<(VerificationRequest, VerificationResult)>>
             vendors,
             ..
         } = target.0;
-        let raw_responses = target.1.map(|results| {
-            results
-                .into_iter()
-                .map(api_wire_types::RiskSignalRawResponse::from_db)
-                .collect()
-        });
 
         Self {
             id,
@@ -41,15 +35,6 @@ impl DbToApi<(RiskSignal, Option<Vec<(VerificationRequest, VerificationResult)>>
             timestamp: created_at,
             deactivated_at,
             vendors,
-            raw_responses,
         }
-    }
-}
-
-impl DbToApi<(VerificationRequest, VerificationResult)> for api_wire_types::RiskSignalRawResponse {
-    fn from_db(target: (VerificationRequest, VerificationResult)) -> Self {
-        let VerificationRequest { vendor, .. } = target.0;
-        let VerificationResult { response, .. } = target.1;
-        Self { vendor, response }
     }
 }

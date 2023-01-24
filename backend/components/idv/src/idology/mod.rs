@@ -39,7 +39,7 @@ pub async fn send_expectid_request(
 
     Ok(VendorResponse {
         vendor: Vendor::Idology,
-        raw_response: response,
+        raw_response: response.into(),
         response: ParsedResponse::IDologyExpectID(parsed_response),
     })
 }
@@ -61,7 +61,7 @@ pub async fn send_scan_verify_request(
 
     Ok(VendorResponse {
         vendor: Vendor::Idology,
-        raw_response: response,
+        raw_response: response.into(),
         response: ParsedResponse::IDologyScanVerifySubmission(parsed_response),
     })
 }
@@ -94,7 +94,7 @@ pub async fn poll_scan_verify_results_request(
 
     Ok(VendorResponse {
         vendor: Vendor::Idology,
-        raw_response: response,
+        raw_response: response.into(),
         response: ParsedResponse::IDologyScanVerifyResult(parsed),
     })
 }
@@ -119,7 +119,7 @@ pub async fn send_scan_onboarding_request(
 
     Ok(VendorResponse {
         vendor: Vendor::Idology,
-        raw_response: response,
+        raw_response: response.into(),
         response: ParsedResponse::IDologyScanOnboarding(parsed_response),
     })
 }

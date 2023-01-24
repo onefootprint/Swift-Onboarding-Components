@@ -407,7 +407,7 @@ mod tests {
         let res = VendorResponse {
             vendor: Vendor::Idology,
             response: ParsedResponse::IDologyExpectID(parsed_response),
-            raw_response: raw,
+            raw_response: raw.into(),
         };
         let result = VendorResult {
             response: res,
