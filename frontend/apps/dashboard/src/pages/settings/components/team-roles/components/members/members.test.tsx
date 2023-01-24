@@ -20,6 +20,8 @@ import {
   withOrgMembersError,
   withOrgRoles,
   withOrgRolesError,
+  withRemoveOrgMember,
+  withRemoveOrgMemberError,
 } from './members.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -65,7 +67,7 @@ describe('<Members />', () => {
     });
   };
 
-  describe('when the request to load the members fails', () => {
+  describe('when the request to fetch the members fails', () => {
     beforeEach(() => {
       withOrgMembersError();
     });
@@ -80,13 +82,14 @@ describe('<Members />', () => {
     });
   });
 
-  describe('when the request to load the members succeeds', () => {
+  describe('when the request to fetch the members succeeds', () => {
     beforeEach(() => {
       withOrgMembers();
     });
 
     it('should render the name and email of each member', async () => {
       await renderMembersAndWaitData();
+
       orgMembersFixture.forEach((member, index) => {
         const name = screen.getByText(`${member.firstName} ${member.lastName}`);
         expect(name).toBeInTheDocument();
@@ -183,6 +186,7 @@ describe('<Members />', () => {
 
           // Updated list of members
           withOrgMembers([
+            ...orgMembersFixture,
             {
               id: 'orguser_IXNDrl9WcqJi18ZUnpMlVO',
               email: 'johnny@acme.com',
@@ -245,6 +249,100 @@ describe('<Members />', () => {
             const successMessage = screen.getByText("Invitation wasn't sent");
             expect(successMessage).toBeInTheDocument();
           });
+        });
+      });
+    });
+
+    describe('when removing a member', () => {
+      describe('when the request to remove a member fails', () => {
+        const [userToRemove] = orgMembersFixture;
+
+        beforeEach(() => {
+          withRemoveOrgMemberError(userToRemove.id);
+        });
+
+        it('should show an error message', async () => {
+          await renderMembersAndWaitData();
+
+          const actionButton = screen.getByRole('button', {
+            name: `Open actions for member ${userToRemove.email}`,
+          });
+          await userEvent.click(actionButton);
+
+          const removeButton = screen.getByText('Remove member');
+          await userEvent.click(removeButton);
+          await waitFor(() => {
+            screen.getByRole('dialog', {
+              name: 'Remove team member',
+            });
+          });
+
+          const confirmationDialog = screen.getByRole('dialog', {
+            name: 'Remove team member',
+          });
+
+          expect(true).toBe(true);
+
+          const submitButton = within(confirmationDialog).getByRole('button', {
+            name: 'Yes',
+          });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            const errorMessage = screen.getByText('Something went wrong');
+            expect(errorMessage).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to remove a member succeeds', () => {
+        const [userToRemove] = orgMembersFixture;
+
+        beforeEach(() => {
+          withRemoveOrgMember(userToRemove.id);
+        });
+
+        it('should remove the member and update the list', async () => {
+          await renderMembersAndWaitData();
+
+          const actionButton = screen.getByRole('button', {
+            name: `Open actions for member ${userToRemove.email}`,
+          });
+          await userEvent.click(actionButton);
+
+          const removeButton = screen.getByText('Remove member');
+          await userEvent.click(removeButton);
+          await waitFor(() => {
+            screen.getByRole('dialog', {
+              name: 'Remove team member',
+            });
+          });
+
+          const confirmationDialog = screen.getByRole('dialog', {
+            name: 'Remove team member',
+          });
+
+          // Necessary to mock the fetch request without the
+          // user removed
+          withOrgMembers(
+            orgMembersFixture.filter(m => m.id !== userToRemove.id),
+          );
+
+          const submitButton = within(confirmationDialog).getByRole('button', {
+            name: 'Yes',
+          });
+          await userEvent.click(submitButton);
+          await waitForElementToBeRemoved(confirmationDialog);
+
+          await waitFor(() => {
+            const confirmationMessage = screen.getByText('Team member removed');
+            expect(confirmationMessage).toBeInTheDocument();
+          });
+
+          const userRemovedName = screen.queryByText(
+            `${userToRemove.firstName} ${userToRemove.lastName}`,
+          );
+          await waitForElementToBeRemoved(userRemovedName);
         });
       });
     });

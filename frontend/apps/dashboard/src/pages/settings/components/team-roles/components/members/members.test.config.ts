@@ -90,12 +90,12 @@ export const orgRolesFixture: OrgRole[] = [
   },
 ];
 
-export const withOrgMembers = (orgMembers: OrgMember[] = []) =>
+export const withOrgMembers = (orgMembers: OrgMember[] = orgMembersFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/members',
     response: {
-      data: [...orgMembersFixture, ...orgMembers],
+      data: orgMembers,
       meta: {
         next: null,
         count: null,
@@ -126,6 +126,25 @@ export const withCreateOrgMembersError = () =>
   mockRequest({
     method: 'post',
     path: '/org/members',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withRemoveOrgMember = (id: string) =>
+  mockRequest({
+    method: 'post',
+    path: `/org/members/${id}/deactivate`,
+    response: null,
+  });
+
+export const withRemoveOrgMemberError = (id: string) =>
+  mockRequest({
+    method: 'post',
+    path: `/org/members/${id}/deactivate`,
     statusCode: 400,
     response: {
       error: {

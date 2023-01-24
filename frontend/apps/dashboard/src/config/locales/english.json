@@ -732,6 +732,25 @@
             "role": "Role"
           },
           "pending-invite": "Pending",
+          "actions": {
+            "aria-label": "Open actions for member {{email}}",
+            "remove": {
+              "cta": "Remove member",
+              "confirmation": {
+                "title": "Remove team member",
+                "description": "You’re about to remove <b>{{name}}</b> from your team. Are you sure?"
+              },
+              "notification": {
+                "success": {
+                  "title": "Team member removed",
+                  "description": "{{email}} has been removed from the team."
+                },
+                "error": {
+                  "title": "Error removing team member"
+                }
+              }
+            }
+          },
           "empty-state": "No members found"
         },
         "invite": {

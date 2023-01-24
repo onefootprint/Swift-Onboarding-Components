@@ -1,10 +1,25 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  customRender,
+  screen,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import Row, { RowProps } from './row';
 import memberFixture from './row.test.config';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<Row />', () => {
+  beforeEach(() => {
+    useRouterSpy({
+      pathname: '/settings',
+      query: {
+        tab: 'members',
+      },
+    });
+  });
+
   const renderRow = ({
     createdAt = memberFixture.createdAt,
     email = memberFixture.email,
