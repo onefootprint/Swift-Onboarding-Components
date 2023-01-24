@@ -117,6 +117,7 @@
       "title": "Authorize access",
       "subtitle": "{{tenantName}} will be able to securely view the following data:",
       "cta": "Authorize",
+      "footer": "By clicking \"Authorize\", you acknowledge {{tenantName}}'s <a>privacy policy</a>.",
       "onboarding-complete-error": {
         "title": "An error occurred",
         "description": "An error occurred while completing onboarding. Please try again."

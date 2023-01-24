@@ -16,6 +16,7 @@ describe('Onboarding Requirements Machine Tests', () => {
     isLive: true,
     key: 'key',
     logoUrl: 'url',
+    privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: 'enabled',

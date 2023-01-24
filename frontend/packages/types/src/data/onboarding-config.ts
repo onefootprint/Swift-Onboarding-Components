@@ -1,14 +1,17 @@
 import { CollectedKycDataOption } from './collected-kyc-data-option';
 
 export type OnboardingConfig = {
-  createdAt: string;
   id: string;
-  isLive: boolean;
-  key: string;
-  logoUrl: string | null;
   name: string;
-  orgName: string;
+  key: string;
+  isLive: boolean;
+  createdAt: string;
   status: 'enabled' | 'disabled';
+
+  orgName: string;
+  logoUrl: string | null;
+  privacyPolicyUrl: string | null;
+
   mustCollectData: CollectedKycDataOption[];
   mustCollectIdentityDocument: boolean;
   mustCollectSelfie: boolean; // Frontend placeholder until the backend implementation

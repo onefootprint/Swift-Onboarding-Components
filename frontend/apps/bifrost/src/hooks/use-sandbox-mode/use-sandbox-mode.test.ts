@@ -12,6 +12,7 @@ describe('useSandboxMode', () => {
     id: 'id',
     key: 'key',
     logoUrl: 'url',
+    privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: 'enabled',

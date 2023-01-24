@@ -14,6 +14,7 @@ describe('<SandboxBanner />', () => {
       isLive: options.isLive,
       key: 'key',
       logoUrl: 'url',
+      privacyPolicyUrl: 'url',
       name: 'tenant',
       orgName: 'tenantOrg',
       status: 'enabled',

@@ -10,6 +10,7 @@ describe('initContextComplete', () => {
     isLive: true,
     key: 'key',
     logoUrl: 'url',
+    privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: 'enabled',

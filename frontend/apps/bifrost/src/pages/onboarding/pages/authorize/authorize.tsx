@@ -24,7 +24,9 @@ import {
   Typography,
   useToast,
 } from '@onefootprint/ui';
+import Link from 'next/link';
 import React, { useState } from 'react';
+import { Trans } from 'react-i18next';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
@@ -57,7 +59,12 @@ const Authorize = () => {
   const [collectedIdDocTypes, setCollectedIdDocTypes] = useState<IdDocType[]>();
   const {
     authToken,
-    config: { canAccessData, name: tenantName, canAccessSelfieImage },
+    config: {
+      name: tenantName,
+      privacyPolicyUrl,
+      canAccessData,
+      canAccessSelfieImage,
+    },
   } = state.context;
 
   const statusQuery = useGetOnboardingStatus(authToken, {
@@ -152,12 +159,35 @@ const Authorize = () => {
             </Category>
           )}
         </CategoriesContainer>
-        <FootprintButton
-          fullWidth
-          loading={onboardingAuthorizeMutation.isLoading}
-          onClick={handleClick}
-          text={t('cta')}
-        />
+        <ButtonContainer>
+          <FootprintButton
+            fullWidth
+            loading={onboardingAuthorizeMutation.isLoading}
+            onClick={handleClick}
+            text={t('cta')}
+          />
+          {privacyPolicyUrl && (
+            <Typography
+              variant="label-4"
+              color="secondary"
+              sx={{ textAlign: 'center' }}
+            >
+              <Trans
+                i18nKey="pages.authorize.footer"
+                values={{ tenantName }}
+                components={{
+                  a: (
+                    <Link
+                      href={privacyPolicyUrl}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    />
+                  ),
+                }}
+              />
+            </Typography>
+          )}
+        </ButtonContainer>
       </Container>
     </>
   );
@@ -193,6 +223,14 @@ const CategoriesContainer = styled.div`
     column-count: 2;
     width: 100%;
     margin-bottom: -${theme.spacing[3]};
+  `}
+`;
+
+const ButtonContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[4]};
   `}
 `;
 

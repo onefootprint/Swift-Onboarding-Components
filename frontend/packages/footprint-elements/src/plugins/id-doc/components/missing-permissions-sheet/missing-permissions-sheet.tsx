@@ -26,7 +26,7 @@ const MissingPermissionsSheet = ({
           subtitle={t('subtitle')}
         />
         <Typography variant="body-2" sx={{ textAlign: 'center', marginTop: 9 }}>
-          {t('open-settings')}
+          {t('cta')}
         </Typography>
       </Container>
     </BottomSheet>
