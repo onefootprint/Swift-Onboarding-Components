@@ -184,7 +184,17 @@ def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
     assert user["role_id"] == limited_role["id"]
 
 
-def test_cant_deactivate_current_user(sandbox_tenant):
+def test_cannot_edit_current_user(sandbox_tenant, limited_role):
+    user_id = sandbox_tenant.rolebinding_id
+    patch(
+        f"org/members/{user_id}",
+        dict(role_id=limited_role["id"]),
+        sandbox_tenant.auth_token,
+        status_code=400,
+    )
+
+
+def test_cannot_deactivate_current_user(sandbox_tenant):
     user_id = sandbox_tenant.rolebinding_id
     post(
         f"org/members/{user_id}/deactivate",

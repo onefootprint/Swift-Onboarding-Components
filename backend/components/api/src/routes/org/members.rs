@@ -171,9 +171,8 @@ async fn patch_rb(
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant = auth.tenant();
-
-    let tenant_id = tenant.id.clone();
+    let tenant_id = auth.tenant().id.clone();
+    let actor = auth.actor();
     let rb_id = rb_id.into_inner();
     let UpdateTenantRolebindingRequest { role_id } = request.into_inner();
 
@@ -181,10 +180,18 @@ async fn patch_rb(
         tenant_role_id: role_id,
         ..Default::default()
     };
-    // TODO Don't allow changing the current user's role
     state
         .db_pool
-        .db_transaction(move |conn| TenantRolebinding::update(conn, (&rb_id, &tenant_id), rolebinding_update))
+        .db_transaction(move |conn| -> ApiResult<()> {
+            if let AuthActor::TenantUser(tenant_user_id) = actor {
+                let (user, _, _, _) = TenantRolebinding::get(conn, (&rb_id, &tenant_id))?;
+                if tenant_user_id == user.id {
+                    return Err(TenantError::CannotEditCurrentUser.into());
+                }
+            }
+            TenantRolebinding::update(conn, (&rb_id, &tenant_id), rolebinding_update)?;
+            Ok(())
+        })
         .await?;
 
     EmptyResponse::ok().json()
@@ -198,10 +205,8 @@ async fn deactivate(
     auth: TenantUserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant = auth.tenant();
-    let tenant_id = tenant.id.clone();
+    let tenant_id = auth.tenant().id.clone();
     let rb_id = rb_id.into_inner();
-
     let actor = auth.actor();
 
     let update = TenantRolebindingUpdate {
@@ -214,7 +219,7 @@ async fn deactivate(
             if let AuthActor::TenantUser(tenant_user_id) = actor {
                 let (user, _, _, _) = TenantRolebinding::get(conn, (&rb_id, &tenant_id))?;
                 if tenant_user_id == user.id {
-                    return Err(TenantError::CannotDeactivateCurrentUser.into());
+                    return Err(TenantError::CannotEditCurrentUser.into());
                 }
             }
             TenantRolebinding::update(conn, (&rb_id, &tenant_id), update)?;
