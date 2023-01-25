@@ -6,9 +6,9 @@ import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 
 export type ToggleProps = {
-  'aria-label'?: string;
   checked?: boolean;
   defaultChecked?: boolean;
+  fullWidth?: boolean;
   disabled?: boolean;
   id?: string;
   label?: string;
@@ -24,10 +24,10 @@ export type ToggleProps = {
 const Switch = forwardRef<HTMLInputElement, ToggleProps>(
   (
     {
-      'aria-label': ariaLabel,
       label,
       labelPlacement = 'left',
       checked: initialChecked,
+      fullWidth = false,
       defaultChecked,
       disabled,
       id: possibleId,
@@ -69,7 +69,11 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
     };
 
     return (
-      <ToggleContainer data-placement={labelPlacement} sx={sxStyles}>
+      <ToggleContainer
+        data-placement={labelPlacement}
+        data-full-width={fullWidth}
+        sx={sxStyles}
+      >
         {label && (
           <Label data-placement={labelPlacement} htmlFor={id}>
             {label}
@@ -90,7 +94,7 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
         />
         <Button
           aria-checked={checked}
-          aria-label={ariaLabel}
+          aria-label={label}
           checked={checked}
           disabled={disabled}
           onBlur={onBlur}
@@ -111,7 +115,14 @@ const ToggleContainer = styled.div<{
 }>`
   display: flex;
   align-items: center;
-  justify-content: center;
+
+  &[data-full-width='false'] {
+    justify-content: center;
+  }
+
+  &[data-full-width='true'] {
+    justify-content: space-between;
+  }
 
   &[data-placement='left'] {
     flex-direction: row;

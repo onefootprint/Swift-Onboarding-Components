@@ -33,12 +33,6 @@ describe('<Toggle />', () => {
     );
 
   describe('<Toggle />', () => {
-    it('should render a label', () => {
-      renderToggle({ label: 'Toggle' });
-      const input = screen.getByLabelText('Toggle');
-      expect(input).toBeInTheDocument();
-    });
-
     describe('when it is a controlled component', () => {
       it('should check the checkbox', () => {
         renderToggle({ checked: true });

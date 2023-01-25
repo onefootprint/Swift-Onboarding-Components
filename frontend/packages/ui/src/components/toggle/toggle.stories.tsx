@@ -33,6 +33,11 @@ export default {
       description: 'If true, the checkbox will be disabled',
       required: false,
     },
+    fullWidth: {
+      control: 'boolean',
+      description: 'Use 100% of the parent container width',
+      required: false,
+    },
     label: {
       control: 'text',
       description: 'Toggle label',
@@ -77,6 +82,7 @@ const Template: Story<ToggleProps> = ({
   checked: initialChecked,
   defaultChecked,
   disabled,
+  fullWidth,
   id,
   label,
   labelPlacement,
@@ -93,6 +99,7 @@ const Template: Story<ToggleProps> = ({
       checked={checked}
       defaultChecked={defaultChecked}
       disabled={disabled}
+      fullWidth={fullWidth}
       id={id}
       label={label}
       labelPlacement={labelPlacement}
@@ -114,6 +121,7 @@ Base.args = {
   checked: false,
   defaultChecked: false,
   disabled: false,
+  fullWidth: false,
   id: 'toggle-id',
   label: 'Toggle',
   labelPlacement: 'left',

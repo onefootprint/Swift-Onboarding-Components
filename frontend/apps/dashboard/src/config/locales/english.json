@@ -10,6 +10,7 @@
   "back": "Go back",
   "next": "Next",
   "complete": "Complete",
+  "create": "Create",
   "cancel": "Cancel",
   "confirm": {
     "title": "Are you sure?",
@@ -815,7 +816,27 @@
           "empty-state": "No roles found"
         },
         "create": {
-          "title": "Create role"
+          "title": "Create role",
+          "form": {
+            "name": {
+              "label": "Name",
+              "placeholder": "Customer support",
+              "errors": {
+                "required": "Please enter a name"
+              }
+            },
+            "permissions": {
+              "label": "Permissions",
+              "scopes": {
+                "read": "Read only",
+                "onboarding-configuration": "Manage onboarding configuration",
+                "api-keys": "Manage API keys",
+                "org-settings": "Modify organization settings",
+                "manual-review": "Perform manual review",
+                "decrypt": "Decrypt data"
+              }
+            }
+          }
         },
         "scopes": {
           "admin": "Everything",
@@ -823,9 +844,9 @@
           "onboarding_configuration": "Onboarding configuration",
           "api_keys": "API keys",
           "org_settings": "Modify organization settings",
-          "decrypt_custom": "Decrypt all data",
+          "decrypt_custom": "Decrypt",
           "decrypt_documents": "Decrypt documents",
-          "decrypt": "decrypt",
+          "decrypt": "Decrypt",
           "manual_review": "Manual review"
         }
       },

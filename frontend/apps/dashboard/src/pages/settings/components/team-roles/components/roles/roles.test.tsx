@@ -135,7 +135,18 @@ describe('<Roles />', () => {
         const dialog = screen.getByRole('dialog', {
           name: 'Create role',
         });
-        expect(dialog).toBeInTheDocument();
+
+        const nameField = screen.getByLabelText('Name');
+        await userEvent.type(nameField, 'Customer Support');
+
+        const submitButton = screen.getByRole('button', {
+          name: 'Create',
+        });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(dialog).not.toBeInTheDocument();
+        });
       });
     });
   });

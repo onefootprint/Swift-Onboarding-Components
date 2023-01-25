@@ -39,7 +39,6 @@ const Developers = () => {
           >
             <Box>
               <Toggle
-                aria-label={t('header.toggle-sandbox.label')}
                 checked={sandbox.isSandbox}
                 disabled={!sandbox.canToggle}
                 label={t('header.toggle-sandbox.label')}

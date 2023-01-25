@@ -25,7 +25,7 @@ export default {
     },
     fullWidth: {
       control: 'boolean',
-      description: 'Renders the button as a block element (100%)',
+      description: 'Use 100% of the parent container width',
     },
     size: {
       control: 'select',
