@@ -26,7 +26,7 @@ const TeamRoles = () => {
   return (
     <section data-testid="team-roles-section">
       <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
-        <div id="members-actions" />
+        <div id="team-roles-actions" />
       </SectionHeader>
       <Tabs variant="underlined">
         {tabs.map(({ value, label }) => (

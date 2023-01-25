@@ -38,7 +38,13 @@ describe('<Roles />', () => {
     MockDate.reset();
   });
 
-  const renderRoles = () => customRender(<Roles />);
+  const renderRoles = () =>
+    customRender(
+      <section>
+        <div id="team-roles-actions" />
+        <Roles />
+      </section>,
+    );
 
   const renderRolesAndWaitData = async () => {
     renderRoles();
@@ -50,7 +56,7 @@ describe('<Roles />', () => {
     });
   };
 
-  describe('when the request fails', () => {
+  describe('when the request to fetch the org roles fails', () => {
     beforeEach(() => {
       withOrgRolesError();
     });
@@ -65,7 +71,7 @@ describe('<Roles />', () => {
     });
   });
 
-  describe('when the request succeeds', () => {
+  describe('when the request to fetch the org roles succeeds', () => {
     beforeEach(() => {
       withOrgRoles();
     });
@@ -114,6 +120,22 @@ describe('<Roles />', () => {
             { shallow: true },
           );
         });
+      });
+    });
+
+    describe('when creating a role', () => {
+      it('should open the create dialog', async () => {
+        await renderRolesAndWaitData();
+
+        const createButton = screen.getByRole('button', {
+          name: 'Create role',
+        });
+        await userEvent.click(createButton);
+
+        const dialog = screen.getByRole('dialog', {
+          name: 'Create role',
+        });
+        expect(dialog).toBeInTheDocument();
       });
     });
   });

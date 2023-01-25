@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCode16,
   IcoFileText16,
-  IcoSettings16,
+  // IcoSettings16,
   IcoUsers16,
   LogoFpCompact,
 } from '@onefootprint/icons';
@@ -28,7 +28,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     { href: '/users', Icon: IcoUsers16, text: t('users') },
     { href: '/security-logs', Icon: IcoFileText16, text: t('security-logs') },
     { href: '/developers', Icon: IcoCode16, text: t('developers') },
-    { href: '/settings', Icon: IcoSettings16, text: t('settings') },
+    // { href: '/settings', Icon: IcoSettings16, text: t('settings') },
   ];
 
   return (

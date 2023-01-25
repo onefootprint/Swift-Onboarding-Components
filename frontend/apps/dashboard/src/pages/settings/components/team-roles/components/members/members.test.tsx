@@ -53,7 +53,7 @@ describe('<Members />', () => {
   const renderMembers = () =>
     customRender(
       <section>
-        <div id="members-actions" />
+        <div id="team-roles-actions" />
         <Members />
       </section>,
     );

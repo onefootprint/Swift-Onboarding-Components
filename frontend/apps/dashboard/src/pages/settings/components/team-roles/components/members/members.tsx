@@ -15,7 +15,7 @@ const Members = () => {
 
   return (
     <Box testID="people-table" as="section">
-      <Portal selector="#members-actions">
+      <Portal selector="#team-roles-actions">
         <Invite />
       </Portal>
       <MembersTable
