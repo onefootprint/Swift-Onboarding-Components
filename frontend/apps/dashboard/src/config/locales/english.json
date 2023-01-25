@@ -312,7 +312,7 @@
           "preview": {
             "tabs": {
               "successful-uploads": "Successful uploads",
-              "failed-uploads": "Failed Uploads"
+              "failed-uploads": "Failed uploads"
             },
             "front-alt": "Front image of the ID Doc",
             "back-alt": "Back image of the ID Doc"

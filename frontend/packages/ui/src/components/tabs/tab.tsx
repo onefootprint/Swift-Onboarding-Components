@@ -14,7 +14,7 @@ const TabItem = forwardRef<HTMLAnchorElement, TabItemPros>(
     <TabItemContainer
       aria-selected={selected}
       as={as}
-      data-selected={selected}
+      data-selected={!!selected}
       href={href}
       onClick={onClick}
       ref={ref}
