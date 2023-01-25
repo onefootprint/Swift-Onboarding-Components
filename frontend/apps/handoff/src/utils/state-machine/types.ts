@@ -18,13 +18,11 @@ export enum Events {
   idDocCompleted = 'idDocCompleted',
   statusReceived = 'statusReceived', // Fetching d2p status is complete
   d2pAlreadyCompleted = 'd2pAlreadyCompleted',
-  reset = 'reset',
 }
 
 export enum Actions {
   assignInitContext = 'assignInitContext',
   assignRequirements = 'assignRequirements',
-  resetContext = 'resetContext',
 }
 
 export type MachineContext = {
@@ -70,7 +68,4 @@ export type MachineEvents =
     }
   | {
       type: Events.idDocCompleted;
-    }
-  | {
-      type: Events.reset;
     };
