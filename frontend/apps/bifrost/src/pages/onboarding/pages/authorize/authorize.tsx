@@ -228,6 +228,7 @@ const CategoriesContainer = styled.div`
 
 const ButtonContainer = styled.div`
   ${({ theme }) => css`
+    width: 100%;
     display: flex;
     flex-direction: column;
     row-gap: ${theme.spacing[4]};
