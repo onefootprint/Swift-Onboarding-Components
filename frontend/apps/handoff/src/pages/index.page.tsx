@@ -5,12 +5,14 @@ import {
 } from '@onefootprint/footprint-elements';
 import { GetD2PResponse } from '@onefootprint/types';
 import React from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events, States } from 'src/utils/state-machine';
 
 import Canceled from './canceled';
 import CheckRequirements from './check-requirements';
 import Complete from './complete';
+import Error from './error';
 import Expired from './expired';
 import Init from './init';
 
@@ -42,58 +44,52 @@ const Root = () => {
     onError: handleError,
   });
 
-  if (state.matches(States.init)) {
-    return <Init />;
-  }
-  if (state.matches(States.complete)) {
-    return <Complete />;
-  }
-  if (state.matches(States.canceled)) {
-    return <Canceled />;
-  }
-  if (state.matches(States.expired)) {
-    return <Expired />;
-  }
-  if (state.matches(States.checkRequirements)) {
-    return <CheckRequirements />;
-  }
-  if (state.matches(States.liveness)) {
-    if (!authToken || !device) {
-      return null;
-    }
-    return (
-      <Liveness
-        context={{
-          authToken,
-          device,
-        }}
-        onDone={() => {
-          send({ type: Events.livenessCompleted });
-        }}
-      />
-    );
-  }
-  if (state.matches(States.idDoc)) {
-    if (!authToken || !device) {
-      return null;
-    }
-    return (
-      <IdDoc
-        context={{
-          authToken,
-          device,
-          customData: {
-            shouldCollectIdDoc: requirements?.missingIdDoc,
-            shouldCollectSelfie: requirements?.missingSelfie,
-            shouldCollectConsent: requirements?.missingConsent,
-          },
-        }}
-        onDone={() => {
-          send({ type: Events.idDocCompleted });
-        }}
-      />
-    );
-  }
+  return (
+    <ErrorBoundary
+      FallbackComponent={Error}
+      // TODO: add error logging
+      // onError={(error, stack) => {
+      //   observeCollector.logError('error', error, { stack });
+      // }}
+      onReset={() => {
+        send({ type: Events.reset });
+      }}
+    >
+      {state.matches(States.init) && <Init />}
+      {state.matches(States.complete) && <Complete />}
+      {state.matches(States.canceled) && <Canceled />}
+      {state.matches(States.expired) && <Expired />}
+      {state.matches(States.checkRequirements) && <CheckRequirements />}
+      {state.matches(States.liveness) && !!authToken && !!device && (
+        <Liveness
+          context={{
+            authToken,
+            device,
+          }}
+          onDone={() => {
+            send({ type: Events.livenessCompleted });
+          }}
+        />
+      )}
+      {state.matches(States.init) && !!authToken && !!device && (
+        <IdDoc
+          context={{
+            authToken,
+            device,
+            customData: {
+              shouldCollectIdDoc: requirements?.missingIdDoc,
+              shouldCollectSelfie: requirements?.missingSelfie,
+              shouldCollectConsent: requirements?.missingConsent,
+            },
+          }}
+          onDone={() => {
+            send({ type: Events.idDocCompleted });
+          }}
+        />
+      )}
+    </ErrorBoundary>
+  );
+
   return null;
 };
 

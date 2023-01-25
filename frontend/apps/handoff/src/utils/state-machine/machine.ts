@@ -17,6 +17,12 @@ export const createHandoffMachine = () =>
       id: 'handoff',
       initial: States.init,
       context: {},
+      on: {
+        [Events.reset]: {
+          target: States.init,
+          actions: [Actions.resetContext],
+        },
+      },
       states: {
         [States.init]: {
           on: {
@@ -114,6 +120,7 @@ export const createHandoffMachine = () =>
           }
           return context;
         }),
+        [Actions.resetContext]: assign(() => ({})),
       },
     },
   );
