@@ -1,199 +1,53 @@
-use crate::{
-    models::tenant_role::TenantRole,
-    schema::{tenant_role, tenant_user},
-    DbError, DbResult, TxnPgConnection,
-};
-use diesel::{dsl::not, prelude::*};
-
+use crate::{schema::tenant_user, DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
+use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{OrgMemberEmail, TenantId, TenantRoleId, TenantUserId};
+use newtypes::{Locked, OrgMemberEmail, TenantUserId};
 use serde::{Deserialize, Serialize};
-
-use super::tenant::Tenant;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = tenant_user)]
 pub struct TenantUser {
     pub id: TenantUserId,
-    pub tenant_role_id: TenantRoleId,
     pub email: OrgMemberEmail,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
-    pub last_login_at: Option<DateTime<Utc>>,
-    pub tenant_id: TenantId,
-    pub deactivated_at: Option<DateTime<Utc>>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
 }
 
-pub type TenantUserInfo = (TenantUser, TenantRole, Tenant);
-
-pub enum TenantUserIdentifier<'a> {
-    Id(&'a TenantUserId),
-    Email(&'a OrgMemberEmail, &'a TenantId),
-}
-
-impl<'a> From<&'a TenantUserId> for TenantUserIdentifier<'a> {
-    fn from(value: &'a TenantUserId) -> Self {
-        Self::Id(value)
-    }
-}
-
-impl<'a> From<(&'a OrgMemberEmail, &'a TenantId)> for TenantUserIdentifier<'a> {
-    fn from((email, tenant_id): (&'a OrgMemberEmail, &'a TenantId)) -> Self {
-        Self::Email(email, tenant_id)
-    }
-}
-
 impl TenantUser {
-    /// Get the list of active TenantUserIds that have this email address.
-    /// Could be multiple if a user has been invited to multiple tenants.
-    pub fn list_by_email(
+    pub(crate) fn lock_or_create(
         conn: &mut PgConnection,
-        email: &OrgMemberEmail,
-    ) -> DbResult<Vec<(TenantUserId, Tenant)>> {
-        use crate::schema::tenant;
-        let results = tenant_user::table
-            .inner_join(tenant::table)
-            .filter(tenant_user::email.eq(email))
-            .filter(tenant_user::deactivated_at.is_null())
-            .select((tenant_user::id, tenant::all_columns))
-            .get_results(conn)?;
-        Ok(results)
-    }
-
-    /// Fetches TenantUserInfo by TenantUserId when logging them in via a workos auth token, and
-    /// validates invariants for the TenantUser
-    pub fn get<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<TenantUserInfo>
-    where
-        T: Into<TenantUserIdentifier<'a>>,
-    {
-        use crate::schema::tenant;
-        let mut query = tenant_user::table
-            .inner_join(tenant_role::table)
-            .inner_join(tenant::table)
-            .into_boxed();
-        match id.into() {
-            TenantUserIdentifier::Id(id) => {
-                query = query.filter(tenant_user::id.eq(id));
-            }
-            TenantUserIdentifier::Email(email, tenant_id) => {
-                query = query
-                    .filter(tenant_user::email.eq(email))
-                    .filter(tenant_user::tenant_id.eq(tenant_id));
-            }
-        }
-        let (user, role, tenant): TenantUserInfo = query.first(conn)?;
-        user.validate_login(&role)?;
-        Ok((user, role, tenant))
-    }
-
-    /// Log into a given TenantUser
-    pub fn login<'a, T>(
-        conn: &mut TxnPgConnection,
-        id: T,
-        workos_first_name: Option<String>,
-        workos_last_name: Option<String>,
-    ) -> DbResult<TenantUserInfo>
-    where
-        T: Into<TenantUserIdentifier<'a>>,
-    {
-        let (user, role, tenant) = Self::get(conn, id)?;
-
-        // Update the name if there's no name on the tenant_user
-        let tenant_user_has_no_name = user.first_name.is_none() && user.last_name.is_none();
-        let (first_name, last_name) = if tenant_user_has_no_name {
-            (workos_first_name, workos_last_name)
-        } else {
-            (None, None)
-        };
-        let update = TenantUserUpdate {
-            first_name,
-            last_name,
-            // Always set last_login_at to show when this user was logged into
-            last_login_at: Some(Utc::now()),
-            ..TenantUserUpdate::default()
-        };
-        let user = Self::update(conn, &user.tenant_id, &user.id, update)?;
-        Ok((user, role, tenant))
-    }
-
-    fn validate_login(&self, role: &TenantRole) -> DbResult<()> {
-        if self.deactivated_at.is_some() {
-            return Err(DbError::TenantUserDeactivated);
-        }
-        if role.deactivated_at.is_some() {
-            return Err(DbError::TenantRoleDeactivated);
-        }
-        if role.tenant_id != self.tenant_id {
-            return Err(DbError::TenantRoleMismatch);
-        }
-        Ok(())
-    }
-
-    /// Only used when create integration test tenant users
-    pub fn get_by_email_for_test(
-        conn: &mut PgConnection,
-        email: &OrgMemberEmail,
-        tenant_id: &TenantId,
-    ) -> DbResult<Self> {
-        let user = tenant_user::table
-            .filter(tenant_user::email.eq(email))
-            .filter(tenant_user::tenant_id.eq(tenant_id))
-            .get_result(conn)?;
-        Ok(user)
-    }
-
-    pub fn create(
-        conn: &mut TxnPgConnection,
         email: OrgMemberEmail,
-        tenant_id: TenantId,
-        tenant_role_id: TenantRoleId,
         first_name: Option<String>,
         last_name: Option<String>,
-    ) -> DbResult<(Self, TenantRole)> {
-        // Make sure the role we are using belongs to the tenant, otherwise could invite self to
-        // another tenant's role
-        let tenant_role = TenantRole::lock_active(conn, &tenant_role_id, &tenant_id)?;
+    ) -> DbResult<Locked<Self>> {
+        let user = tenant_user::table
+            .filter(tenant_user::email.eq(&email))
+            .for_no_key_update()
+            .first(conn)
+            .optional()?;
+        if let Some(user) = user {
+            return Ok(Locked::new(user));
+        }
+        // User doesn't exist, create it.
+        // Could be a race condition, but we're still protected by uniqueness constraints
         let new_user = NewTenantUser {
-            tenant_role_id: tenant_role.id.clone(),
             email,
-            created_at: Utc::now(),
-            // init to None since they haven't logged in yet!
-            last_login_at: None,
-            tenant_id,
             first_name,
             last_name,
+            created_at: Utc::now(),
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
-            .get_result(conn.conn())
-            .map_err(DbError::from)
-            .map_err(|e| {
-                if e.is_unique_constraint_violation() {
-                    DbError::TenantUserAlreadyExists
-                } else {
-                    e
-                }
-            })?;
-        Ok((result, tenant_role))
+            .get_result(conn)?;
+        Ok(Locked::new(result))
     }
 
-    pub fn update(
-        conn: &mut TxnPgConnection,
-        tenant_id: &TenantId,
-        id: &TenantUserId,
-        update: TenantUserUpdate,
-    ) -> DbResult<Self> {
-        if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
-            // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
-            TenantRole::lock_active(conn, tenant_role_id, tenant_id)?;
-        }
+    pub fn update(conn: &mut TxnPgConnection, id: &TenantUserId, update: TenantUserUpdate) -> DbResult<Self> {
         let results: Vec<Self> = diesel::update(tenant_user::table)
-            .filter(tenant_user::deactivated_at.is_null())
-            .filter(tenant_user::tenant_id.eq(tenant_id))
             .filter(tenant_user::id.eq(id))
             .set(update)
             .load(conn.conn())?;
@@ -204,112 +58,20 @@ impl TenantUser {
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
     }
-
-    pub fn count(conn: &mut PgConnection, filters: &TenantUserListFilters) -> DbResult<i64> {
-        // Apply filters. TODO share these with list
-        let mut query = tenant_user::table
-            .filter(tenant_user::tenant_id.eq(filters.tenant_id))
-            .into_boxed();
-
-        if filters.only_active {
-            query = query.filter(tenant_user::deactivated_at.is_null())
-        }
-        if let Some(ref role_ids) = filters.role_ids {
-            query = query.filter(tenant_user::tenant_role_id.eq_any(role_ids));
-        }
-        if let Some(ref search) = filters.search {
-            let pattern = format!("%{}%", search);
-            query = query.filter(
-                tenant_user::first_name
-                    .ilike(pattern.clone())
-                    .or(tenant_user::last_name.ilike(pattern.clone()))
-                    .or(tenant_user::email.ilike(pattern)),
-            )
-        }
-        if let Some(is_invite_pending) = filters.is_invite_pending {
-            match is_invite_pending {
-                true => query = query.filter(tenant_user::last_login_at.is_null()),
-                false => query = query.filter(not(tenant_user::last_login_at.is_null())),
-            }
-        }
-
-        let count = query.count().get_result(conn)?;
-        Ok(count)
-    }
-
-    pub fn list(
-        conn: &mut PgConnection,
-        filters: &TenantUserListFilters,
-    ) -> DbResult<Vec<(Self, TenantRole)>> {
-        // Apply filters. TODO share these with count. Do list of filters
-        let mut query = tenant_user::table
-            .inner_join(tenant_role::table)
-            .filter(tenant_user::tenant_id.eq(filters.tenant_id))
-            .into_boxed();
-
-        if filters.only_active {
-            query = query.filter(tenant_user::deactivated_at.is_null())
-        }
-        if let Some(ref role_ids) = filters.role_ids {
-            query = query.filter(tenant_user::tenant_role_id.eq_any(role_ids));
-        }
-        if let Some(ref search) = filters.search {
-            let pattern = format!("%{}%", search);
-            query = query.filter(
-                tenant_user::first_name
-                    .ilike(pattern.clone())
-                    .or(tenant_user::last_name.ilike(pattern.clone()))
-                    .or(tenant_user::email.ilike(pattern)),
-            )
-        }
-        if let Some(is_invite_pending) = filters.is_invite_pending {
-            match is_invite_pending {
-                true => query = query.filter(tenant_user::last_login_at.is_null()),
-                false => query = query.filter(not(tenant_user::last_login_at.is_null())),
-            }
-        }
-
-        // Apply pagination filters
-        if let Some(page) = filters.page {
-            query = query.offset(filters.page_size * (page as i64));
-        }
-        // Always fetch one extra result so we can see if there is another page
-        query = query
-            .order_by(tenant_user::email.asc())
-            .limit(filters.page_size + 1);
-        let results = query.get_results(conn)?;
-        Ok(results)
-    }
-}
-
-pub struct TenantUserListFilters<'a> {
-    pub tenant_id: &'a TenantId,
-    pub only_active: bool,
-    pub page: Option<usize>,
-    pub page_size: i64,
-    pub role_ids: Option<Vec<TenantRoleId>>,
-    pub search: Option<String>,
-    pub is_invite_pending: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = tenant_user)]
 struct NewTenantUser {
-    tenant_role_id: TenantRoleId,
     email: OrgMemberEmail,
     created_at: DateTime<Utc>,
-    last_login_at: Option<DateTime<Utc>>,
-    tenant_id: TenantId,
     first_name: Option<String>,
     last_name: Option<String>,
 }
 
-#[derive(AsChangeset, Default)]
+#[derive(AsChangeset)]
 #[diesel(table_name = tenant_user)]
 pub struct TenantUserUpdate {
-    pub tenant_role_id: Option<TenantRoleId>,
-    pub deactivated_at: Option<Option<DateTime<Utc>>>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub last_login_at: Option<DateTime<Utc>>,
 }

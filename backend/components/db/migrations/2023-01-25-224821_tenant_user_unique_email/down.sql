@@ -1,0 +1,1 @@
+DROP INDEX tenant_user_unique_email;

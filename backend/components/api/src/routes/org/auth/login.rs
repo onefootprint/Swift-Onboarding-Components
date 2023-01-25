@@ -16,9 +16,9 @@ use api_wire_types::{Organization, OrganizationMember};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
-use db::models::tenant_user::{TenantUser, TenantUserListFilters};
+use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters};
 use db::tenant::get_opt_by_workos_org_id;
-use newtypes::{OrgMemberEmail, TenantScope, TenantUserId};
+use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::organizations::{
     CreateOrganization, CreateOrganizationParams, DomainFilters, ListOrganizations, ListOrganizationsParams,
@@ -52,27 +52,27 @@ async fn handler(
 
     // First, get all matching tenant users.
     let email = OrgMemberEmail::from_str(&profile.email)?;
-    let matching_tenant_users: Vec<_> = state
+    let matching_rolebindings: Vec<_> = state
         .db_pool
-        .db_query(move |conn| TenantUser::list_by_email(conn, &email))
+        .db_query(move |conn| TenantRolebinding::list_by_email(conn, &email))
         .await??
         .into_iter()
         .map(|(id, _)| id)
         .collect();
 
-    let (matching_tenant_users, created_new_tenant) = if !matching_tenant_users.is_empty() {
-        (matching_tenant_users, false)
+    let (matching_rolebindings, created_new_tenant) = if !matching_rolebindings.is_empty() {
+        (matching_rolebindings, false)
     } else {
         // If there are no users with this email, make a new one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
-        let (tenant_user_id, created_new_tenant) = create_tenant_user(&state, profile).await?;
-        (vec![tenant_user_id], created_new_tenant)
+        let (rolebinding_id, created_new_tenant) = create_tenant_user(&state, profile).await?;
+        (vec![rolebinding_id], created_new_tenant)
     };
 
-    let (session_data, requires_onboarding, user, tenant) = if matching_tenant_users.len() == 1 {
-        // If one user, log into it and create a TenantUser ssession
-        let tenant_user_id = matching_tenant_users
+    let (session_data, requires_onboarding, user, tenant) = if matching_rolebindings.len() == 1 {
+        // If one rolebinding, log into it and create a TenantUser session
+        let rolebinding_id = matching_rolebindings
             .into_iter()
             .next()
             .ok_or(TenantError::TenantUserDoesNotExist)?;
@@ -80,16 +80,18 @@ async fn handler(
         // Log into the user, updating the last_login_at and name (if new)
         let first_name = profile.first_name.clone();
         let last_name = profile.last_name.clone();
-        let (tenant_user, tenant_role, tenant) = state
+        let (tenant_user, rb, tenant_role, tenant) = state
             .db_pool
-            .db_transaction(move |conn| TenantUser::login(conn, &tenant_user_id, first_name, last_name))
+            .db_transaction(move |conn| {
+                TenantRolebinding::login(conn, &rolebinding_id, first_name, last_name)
+            })
             .await?;
 
-        let session_data = AuthSessionData::TenantUser(tenant_user.clone().into());
+        let session_data = AuthSessionData::TenantUser(rb.clone().into());
 
         let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
-        let user = Some(OrganizationMember::from_db((tenant_user, tenant_role)));
+        let user = Some(OrganizationMember::from_db((tenant_user, rb, tenant_role)));
         let tenant = Some(Organization::from_db(tenant));
         (session_data, requires_onboarding, user, tenant)
     } else {
@@ -116,14 +118,17 @@ async fn handler(
 
 type IsNewTenant = bool;
 
-async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(TenantUserId, IsNewTenant)> {
+async fn create_tenant_user(
+    state: &State,
+    profile: &Profile,
+) -> ApiResult<(TenantRolebindingId, IsNewTenant)> {
     // Otherwise, find or create the tenant and create a new TenantUser
     let (tenant, is_new_tenant) = find_or_create_tenant(state, profile).await?;
     let first_name = profile.first_name.clone();
     let last_name = profile.last_name.clone();
     let email = OrgMemberEmail::from_str(&profile.email)?;
     let tenant_id = tenant.id.clone();
-    let tenant_user = state
+    let rb = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Get or create the default admin and read-only role for this tenant
@@ -131,7 +136,7 @@ async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(Tena
             let ro_role = TenantRole::get_or_create_ro_role(conn, &tenant_id)?;
             // If the tenant was just created and has no users, give the user admin perms.
             // Otherwise, read-only perms
-            let filters = TenantUserListFilters {
+            let filters = TenantRolebindingFilters {
                 tenant_id: &tenant_id,
                 page: None,
                 page_size: 1,
@@ -140,15 +145,15 @@ async fn create_tenant_user(state: &State, profile: &Profile) -> ApiResult<(Tena
                 search: None,
                 is_invite_pending: None,
             };
-            let are_no_users = TenantUser::list(conn, &filters)?.is_empty();
+            let are_no_users = TenantRolebinding::list(conn, &filters)?.is_empty();
             let role_id = if are_no_users { admin_role.id } else { ro_role.id };
-            let (tenant_user, _) =
-                TenantUser::create(conn, email, tenant_id, role_id, first_name, last_name)?;
-            Ok(tenant_user)
+            let (_, rb, _) =
+                TenantRolebinding::create(conn, email, role_id, tenant_id, first_name, last_name)?;
+            Ok(rb)
         })
         .await?;
-    // Only give the TenantUserId here to make sure we log into the tenant
-    Ok((tenant_user.id, is_new_tenant))
+    // Only give the TenantRolebindingId here to make sure we log into the tenant
+    Ok((rb.id, is_new_tenant))
 }
 
 async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tenant, IsNewTenant), ApiError> {

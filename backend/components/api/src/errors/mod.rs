@@ -155,7 +155,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
         DbError::NewtypesError(_) => StatusCode::BAD_REQUEST,
         DbError::InsufficientTenantScopes => StatusCode::BAD_REQUEST,
-        DbError::TenantUserAlreadyExists => StatusCode::BAD_REQUEST,
+        DbError::TenantRolebindingAlreadyExists => StatusCode::BAD_REQUEST,
     }
 }
 

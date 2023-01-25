@@ -5,7 +5,7 @@ use crate::*;
 #[schemars(rename_all = "camelCase")]
 
 pub struct OrganizationMember {
-    pub id: TenantUserId,
+    pub id: TenantRolebindingId,
     pub email: String,
     pub first_name: Option<String>,
     pub last_name: Option<String>,

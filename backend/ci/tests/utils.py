@@ -181,8 +181,9 @@ def create_tenant(org_data, ob_conf_data):
     tenant = Tenant(
         default_ob_config=ob_config,
         sk=sk,
-        auth_token=auth_token,
         name=org_data["name"],
+        auth_token=auth_token,
+        rolebinding_id=body["tenant_rolebinding_id"],
     )
     return tenant
 

@@ -6,21 +6,27 @@ use crate::{
     errors::ApiError,
 };
 use db::{
-    models::{tenant::Tenant, tenant_role::TenantRole, tenant_user::TenantUser},
+    models::{
+        tenant::Tenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding,
+        tenant_user::TenantUser,
+    },
     PgConnection,
 };
-use newtypes::{TenantScope, TenantUserId};
+use newtypes::{TenantRolebindingId, TenantScope};
 use paperclip::actix::Apiv2Security;
 
 use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
 
 #[derive(Debug, Clone)]
+/// Represents all tenant info identified by a workos session token. This struct is hydrated from
+/// the DB using the information on the TenantUserSession
 pub struct TenantUserAuth {
     tenant: Tenant,
     tenant_role: TenantRole,
-    #[allow(dead_code)]
+    #[allow(unused)]
+    tenant_rolebinding: TenantRolebinding,
     tenant_user: TenantUser,
-    #[allow(dead_code)]
+    #[allow(unused)]
     data: TenantUserSession,
 }
 
@@ -39,20 +45,17 @@ pub struct TenantUserAuth {
 pub struct ParsedTenantUserAuth(TenantUserAuth);
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+/// The struct that is serialized and saved into the session table in the DB.
+/// The session token is used to look up this session info, and this session info is used to fetch
+/// the related user, rolebinding, role, and tenant information from the DB
 pub struct TenantUserSession {
-    pub email: String,
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub tenant_user_id: TenantUserId,
+    pub tenant_rolebinding_id: TenantRolebindingId,
 }
 
-impl From<TenantUser> for TenantUserSession {
-    fn from(tu: TenantUser) -> Self {
+impl From<TenantRolebinding> for TenantUserSession {
+    fn from(rb: TenantRolebinding) -> Self {
         Self {
-            email: tu.email.0,
-            first_name: tu.first_name,
-            last_name: tu.last_name,
-            tenant_user_id: tu.id,
+            tenant_rolebinding_id: rb.id,
         }
     }
 }
@@ -69,15 +72,16 @@ impl ExtractableAuthSession for ParsedTenantUserAuth {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (tenant_user, tenant_role, tenant) = TenantUser::get(conn, &data.tenant_user_id)?;
+        let (tu, rb, tr, tenant) = TenantRolebinding::get(conn, &data.tenant_rolebinding_id)?;
 
-        tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tenant_role.id, tenant_user_id=%tenant_user.id, "authenticated");
+        tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tr.id, tenant_rb_id=%rb.id, tenant_user_id=%tu.id, "authenticated");
 
         Ok(Self(TenantUserAuth {
             data,
             tenant,
-            tenant_role,
-            tenant_user,
+            tenant_rolebinding: rb,
+            tenant_role: tr,
+            tenant_user: tu,
         }))
     }
 }

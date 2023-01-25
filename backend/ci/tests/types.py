@@ -43,8 +43,10 @@ class ObConfiguration(NamedTuple):
 class Tenant(NamedTuple):
     default_ob_config: ObConfiguration
     sk: SecretApiKey
-    auth_token: DashboardAuth
     name: str
+    auth_token: DashboardAuth
+    # The rolebinding id for the authed user
+    rolebinding_id: str
 
 
 class BasicUser(NamedTuple):

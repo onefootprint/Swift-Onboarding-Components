@@ -6,7 +6,7 @@ use crate::{
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{TenantId, TenantRoleId, TenantScope};
+use newtypes::{Locked, TenantId, TenantRoleId, TenantScope};
 
 pub type IsImmutable = bool;
 
@@ -93,7 +93,7 @@ impl TenantRole {
         conn: &mut TxnPgConnection,
         id: &TenantRoleId,
         tenant_id: &TenantId,
-    ) -> DbResult<Self> {
+    ) -> DbResult<Locked<Self>> {
         let role: TenantRole = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::id.eq(id))
@@ -102,19 +102,19 @@ impl TenantRole {
         if role.deactivated_at.is_some() {
             return Err(DbError::TenantRoleDeactivated);
         }
-        Ok(role)
+        Ok(Locked::new(role))
     }
 
     pub fn deactivate(conn: &mut TxnPgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
-        use crate::schema::tenant_user;
-        let role = Self::lock_active(conn, id, tenant_id)?;
+        use crate::schema::tenant_rolebinding;
+        let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
         }
         // Make sure there are no users using this role before deactivating
-        let num_active_users: i64 = tenant_user::table
-            .filter(tenant_user::tenant_role_id.eq(&role.id))
-            .filter(tenant_user::deactivated_at.is_null())
+        let num_active_users: i64 = tenant_rolebinding::table
+            .filter(tenant_rolebinding::tenant_role_id.eq(&role.id))
+            .filter(tenant_rolebinding::deactivated_at.is_null())
             .count()
             .get_result(conn.conn())?;
         if num_active_users > 0 {
@@ -154,7 +154,7 @@ impl TenantRole {
             scopes,
             ..TenantRoleUpdate::default()
         };
-        let role = Self::lock_active(conn, id, tenant_id)?;
+        let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
         }

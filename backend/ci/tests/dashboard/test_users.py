@@ -270,7 +270,6 @@ def test_get_annotations(sandbox_user):
     assert annotation2["note"] == note2
     assert annotation2["source"]["kind"] == "organization"
     assert (
-        annotation2["source"]["member"]
-        == "Footprint Integration Testing (integrationtests@onefootprint.com)"
+        " (integrationtests@onefootprint.com)" in annotation2["source"]["member"]
     )  # I guess there's no way to get the tenant user from Tenant so we just hard code this?
     assert annotation2["is_pinned"] == True

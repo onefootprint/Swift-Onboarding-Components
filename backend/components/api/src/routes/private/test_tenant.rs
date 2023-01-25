@@ -12,9 +12,9 @@ use chrono::Duration;
 use db::models::tenant::{NewIntegrationTestTenant, Tenant};
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
-use db::models::tenant_user::TenantUser;
+use db::models::tenant_rolebinding::TenantRolebinding;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{OrgMemberEmail, SessionAuthToken, TenantId};
+use newtypes::{OrgMemberEmail, SessionAuthToken, TenantId, TenantRolebindingId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -32,6 +32,7 @@ struct NewClientResponse {
     org_id: TenantId,
     key: api_wire_types::SecretApiKey,
     auth_token: SessionAuthToken,
+    tenant_rolebinding_id: TenantRolebindingId,
 }
 
 #[api_v2_operation(
@@ -60,7 +61,7 @@ async fn post(
     let secret_api_key = SecretApiKey::generate(is_live);
     let sh_secret_api_key = secret_api_key.fingerprint(&state.hmac_client).await?;
 
-    let (tenant, auth_token, api_key) = state
+    let (tenant, rb, auth_token, api_key) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             //
@@ -89,27 +90,27 @@ async fn post(
             // Get or create the TenantUser
             //
             let email = OrgMemberEmail::from_str("integrationtests@onefootprint.com")?;
-            let tenant_user = match TenantUser::get_by_email_for_test(conn, &email, &tenant.id) {
-                Ok(tenant_user) => tenant_user,
+            let rb = match TenantRolebinding::get_by_email_for_test(conn, &email, &tenant.id) {
+                Ok(rb) => rb,
                 Err(e) => {
                     if !e.is_not_found() {
                         return Err(e.into()); // Real error, return
                     }
                     let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant.id)?;
                     let _ro_role = TenantRole::get_or_create_ro_role(conn, &tenant.id)?;
-                    let (tenant_user, _) = TenantUser::create(
+                    let (_, rb, _) = TenantRolebinding::create(
                         conn,
                         email, // Always create with the same email so we find it next time
-                        admin_role.tenant_id,
                         admin_role.id,
+                        admin_role.tenant_id,
                         Some("Footprint".to_owned()),
                         Some("Integration Testing".to_owned()),
                     )?;
-                    tenant_user
+                    rb
                 }
             };
             // Create a new workos session for the integration test tenant user
-            let session_data = AuthSessionData::TenantUser(tenant_user.into());
+            let session_data = AuthSessionData::TenantUser(rb.clone().into());
             let auth_token = AuthSession::create_sync(conn, &key, session_data, Duration::minutes(15))?;
 
             //
@@ -133,7 +134,7 @@ async fn post(
                     )?
                 }
             };
-            Ok((tenant, auth_token, api_key))
+            Ok((tenant, rb, auth_token, api_key))
         })
         .await?;
 
@@ -153,6 +154,7 @@ async fn post(
             org_id: tenant.id,
             key: api_wire_types::SecretApiKey::from_db((api_key, Some(decrypted_api_key), None)),
             auth_token,
+            tenant_rolebinding_id: rb.id,
         },
     }))
 }

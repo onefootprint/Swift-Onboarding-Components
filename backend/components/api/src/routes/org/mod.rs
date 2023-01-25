@@ -21,6 +21,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(members::get)
         .service(members::post)
         .service(members::patch)
+        .service(members::patch_rb)
         .service(members::deactivate)
         .service(roles::get)
         .service(roles::post)

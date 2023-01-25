@@ -157,6 +157,43 @@ def test_get_members_filter_role_id(tenant_user, tenant_user2, sandbox_tenant):
         )
 
 
+def test_update_name(sandbox_tenant):
+    first_name = f"Footprint {_gen_random_n_digit_number(5)}"
+    last_name = f"Integration Testing {_gen_random_n_digit_number(5)}"
+    data = dict(first_name=first_name, last_name=last_name)
+    patch(f"org/members", data, sandbox_tenant.auth_token)
+
+    body = get(
+        f"org/members",
+        dict(search="integrationtests@onefootprint.com"),
+        sandbox_tenant.auth_token,
+    )
+    assert any(
+        i["first_name"] == first_name and i["last_name"] == last_name
+        for i in body["data"]
+    )
+
+
+def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
+    user_id = tenant_user["id"]
+    user_data = dict(role_id=limited_role["id"])
+    patch(f"org/members/{user_id}", user_data, sandbox_tenant.auth_token)
+
+    body = get(f"org/members", None, sandbox_tenant.auth_token)
+    user = next(u for u in body["data"] if u["id"] == user_id)
+    assert user["role_id"] == limited_role["id"]
+
+
+def test_cant_deactivate_current_user(sandbox_tenant):
+    user_id = sandbox_tenant.rolebinding_id
+    post(
+        f"org/members/{user_id}/deactivate",
+        None,
+        sandbox_tenant.auth_token,
+        status_code=400,
+    )
+
+
 @pytest.mark.parametrize(
     "filters,expected_admin_role,expected_limited_role",
     [
@@ -217,16 +254,6 @@ def test_cant_update_admin_role(sandbox_tenant, admin_role):
         sandbox_tenant.auth_token,
         status_code=400,
     )
-
-
-def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
-    user_id = tenant_user["id"]
-    user_data = dict(role_id=limited_role["id"])
-    patch(f"org/members/{user_id}", user_data, sandbox_tenant.auth_token)
-
-    body = get(f"org/members", None, sandbox_tenant.auth_token)
-    user = next(u for u in body["data"] if u["id"] == user_id)
-    assert user["role_id"] == limited_role["id"]
 
 
 def test_deactivate_role_and_user(

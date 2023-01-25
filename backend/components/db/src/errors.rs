@@ -41,7 +41,7 @@ pub enum DbError {
     #[error("User is deactivated. Please contact your administor for assistance.")]
     TenantUserDeactivated,
     #[error("User with this email already exists.")]
-    TenantUserAlreadyExists,
+    TenantRolebindingAlreadyExists,
     #[error("Role used by this user is deactivated. Please contact your administor for assistance.")]
     TenantRoleDeactivated,
     #[error("Cannot deactivate a role while users are using it. There are {0} active users with this role.")]

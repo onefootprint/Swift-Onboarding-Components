@@ -8,7 +8,7 @@ use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
-use db::models::tenant_user::TenantUser;
+use db::models::tenant_rolebinding::TenantRolebinding;
 use newtypes::OrgMemberEmail;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
@@ -26,11 +26,11 @@ fn post(
     let AssumeRoleRequest { tenant_id } = request.into_inner();
     let email = OrgMemberEmail::from_str(&auth.data.email)?;
 
-    let (tenant_user, tenant_role, tenant) = state
+    let (tenant_user, rb, tenant_role, tenant) = state
         .db_pool
-        .db_transaction(move |conn| TenantUser::login(conn, (&email, &tenant_id), None, None))
+        .db_transaction(move |conn| TenantRolebinding::login(conn, (&email, &tenant_id), None, None))
         .await?;
-    let session_data = AuthSessionData::TenantUser(tenant_user.clone().into());
+    let session_data = AuthSessionData::TenantUser(rb.clone().into());
 
     let session_sealing_key = state.session_sealing_key.clone();
     // Update the auth session to contain the newly assumed role.
@@ -42,7 +42,7 @@ fn post(
         .await??;
 
     let data = AssumeRoleResponse {
-        user: OrganizationMember::from_db((tenant_user, tenant_role)),
+        user: OrganizationMember::from_db((tenant_user, rb, tenant_role)),
         tenant: Organization::from_db(tenant),
     };
     ResponseData::ok(data).json()
@@ -62,7 +62,7 @@ fn get(
     let email = OrgMemberEmail::from_str(&auth.data.email)?;
     let tenants = state
         .db_pool
-        .db_query(move |conn| TenantUser::list_by_email(conn, &email))
+        .db_query(move |conn| TenantRolebinding::list_by_email(conn, &email))
         .await??
         .into_iter()
         .map(|(_, tenant)| tenant);

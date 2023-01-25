@@ -1,18 +1,21 @@
-use db::models::{tenant_role::TenantRole, tenant_user::TenantUser};
+use db::models::{tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding, tenant_user::TenantUser};
 
 use crate::utils::db2api::DbToApi;
 
-impl DbToApi<(TenantUser, TenantRole)> for api_wire_types::OrganizationMember {
-    fn from_db((user, role): (TenantUser, TenantRole)) -> Self {
+impl DbToApi<(TenantUser, TenantRolebinding, TenantRole)> for api_wire_types::OrganizationMember {
+    fn from_db((user, rb, role): (TenantUser, TenantRolebinding, TenantRole)) -> Self {
         let TenantUser {
-            id,
             email,
-            last_login_at,
-            created_at,
             first_name,
             last_name,
             ..
         } = user;
+        let TenantRolebinding {
+            id,
+            last_login_at,
+            created_at,
+            ..
+        } = rb;
         let TenantRole {
             name: role_name,
             id: role_id,

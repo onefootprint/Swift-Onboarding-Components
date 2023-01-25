@@ -3,6 +3,7 @@ use std::str::FromStr;
 use crate::models::annotation::{Annotation, AnnotationInfo};
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
+use crate::models::tenant_rolebinding::TenantRolebinding;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
 use crate::TxnPgConnection;
@@ -24,11 +25,11 @@ pub(crate) fn test_tenant_user(
     first_name: Option<String>,
     last_name: Option<String>,
 ) -> TenantUser {
-    let (tenant_user, _) = TenantUser::create(
+    let (tenant_user, _, _) = TenantRolebinding::create(
         conn,
         OrgMemberEmail::from_str(&email).unwrap(),
-        tenant_id,
         tenant_role_id,
+        tenant_id,
         first_name,
         last_name,
     )
