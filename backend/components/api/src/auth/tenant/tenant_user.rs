@@ -20,6 +20,7 @@ pub struct TenantUserAuth {
     tenant_role: TenantRole,
     #[allow(dead_code)]
     tenant_user: TenantUser,
+    #[allow(dead_code)]
     data: TenantUserSession,
 }
 
@@ -85,19 +86,6 @@ impl TenantUserAuth {
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
     }
-
-    pub fn format_principal(&self) -> String {
-        // Show "Name (email)" as the principal if the name is set, otherwise just email
-        let name = match (&self.data.first_name, &self.data.last_name) {
-            (Some(first_name), Some(last_name)) => Some(format!("{} {}", first_name, last_name)),
-            (Some(name), None) | (None, Some(name)) => Some(name.clone()),
-            (None, None) => None,
-        };
-        match name {
-            Some(name) => format!("{} ({})", name, self.data.email),
-            None => self.data.email.clone(),
-        }
-    }
 }
 
 /// A shorthand for the commonly used ParsedWorkOs context
@@ -134,10 +122,6 @@ impl TenantAuth for SessionContext<TenantUserAuth> {
 
     fn tenant(&self) -> &Tenant {
         self.data.tenant()
-    }
-
-    fn format_principal(&self) -> String {
-        self.data.format_principal()
     }
 
     fn actor(&self) -> AuthActor {

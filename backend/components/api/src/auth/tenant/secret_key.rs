@@ -83,10 +83,6 @@ impl TenantAuth for SecretTenantAuthContext {
         &self.tenant
     }
 
-    fn format_principal(&self) -> String {
-        format!("ApiKey<{}>", self.api_key.name)
-    }
-
     fn is_live(&self) -> Result<bool, ApiError> {
         if self.tenant.sandbox_restricted && self.api_key.is_live {
             return Err(AuthError::SandboxRestricted.into());

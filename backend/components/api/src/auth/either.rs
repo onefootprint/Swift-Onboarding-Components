@@ -103,13 +103,6 @@ where
         }
     }
 
-    fn format_principal(&self) -> String {
-        match self {
-            Either::Left(l) => l.format_principal(),
-            Either::Right(r) => r.format_principal(),
-        }
-    }
-
     fn is_live(&self) -> Result<bool, ApiError> {
         match self {
             Either::Left(l) => l.is_live(),

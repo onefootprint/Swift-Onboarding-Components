@@ -20,7 +20,6 @@ use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
-    fn format_principal(&self) -> String;
     fn is_live(&self) -> Result<bool, ApiError>;
     fn actor(&self) -> AuthActor;
 }
