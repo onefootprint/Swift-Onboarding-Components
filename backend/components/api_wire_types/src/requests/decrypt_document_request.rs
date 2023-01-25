@@ -27,6 +27,7 @@ pub struct DecryptIdentityDocumentRequest {
 ///
 /// It does NOT represent whether the document was verified or not.
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum DecryptedDocumentStatus {
     Success,
     Fail,

@@ -70,6 +70,9 @@ const useDecryptVaultData = (userId: string) => {
                 ...image,
                 front: addBase64Prefix(image.front),
                 back: image.back ? addBase64Prefix(image.back) : undefined,
+                selfie: image.selfie
+                  ? addBase64Prefix(image.selfie)
+                  : undefined,
               }));
               decryptedVaultData.idDoc[documentType]?.push(...decryptedImages);
             },
