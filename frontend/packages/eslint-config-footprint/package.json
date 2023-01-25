@@ -16,13 +16,13 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^16.1.0",
     "eslint-config-next": "^12.3.4",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest": "^25.3.0",
     "eslint-plugin-jest-dom": "^4.0.3",
     "eslint-plugin-simple-import-sort": "^7.0.0",
-    "eslint-plugin-testing-library": "^5.0.1",
+    "eslint-plugin-testing-library": "^5.10.0",
     "eslint-config-turbo": "0.0.7"
   }
 }
