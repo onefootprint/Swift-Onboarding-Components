@@ -1,4 +1,5 @@
 use db::PgConnection;
+use newtypes::TenantUserId;
 use paperclip::actix::Apiv2Schema;
 
 use crate::{
@@ -11,10 +12,8 @@ use crate::{
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 pub struct WorkOsSession {
-    /// The email that was proven to be owned by WorkOs auth.
-    pub email: String,
-    // TODO first name and last name?
-    // TODO make this tenant user id instead of email since there's only one user per email
+    /// The TenantUserId that is proven to be owned via a workos auth
+    pub tenant_user_id: TenantUserId,
 }
 
 impl ExtractableAuthSession for WorkOsSession {

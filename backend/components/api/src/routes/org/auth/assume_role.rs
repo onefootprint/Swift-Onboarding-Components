@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::WorkOsSession;
 use crate::auth::SessionContext;
@@ -9,7 +7,6 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
 use db::models::tenant_rolebinding::TenantRolebinding;
-use newtypes::OrgMemberEmail;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
 #[api_v2_operation(
@@ -24,11 +21,11 @@ fn post(
     auth: SessionContext<WorkOsSession>,
 ) -> actix_web::Result<Json<ResponseData<AssumeRoleResponse>>, ApiError> {
     let AssumeRoleRequest { tenant_id } = request.into_inner();
-    let email = OrgMemberEmail::from_str(&auth.data.email)?;
+    let tu_id = auth.data.tenant_user_id.clone();
 
     let (tenant_user, rb, tenant_role, tenant) = state
         .db_pool
-        .db_transaction(move |conn| TenantRolebinding::login(conn, (&email, &tenant_id)))
+        .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id)))
         .await?;
     let session_data = AuthSessionData::TenantUser(rb.clone().into());
 
@@ -59,10 +56,10 @@ fn get(
     state: web::Data<State>,
     auth: SessionContext<WorkOsSession>,
 ) -> actix_web::Result<Json<ResponseData<RolesResponse>>, ApiError> {
-    let email = OrgMemberEmail::from_str(&auth.data.email)?;
+    let tu_id = auth.data.tenant_user_id.clone();
     let tenants = state
         .db_pool
-        .db_query(move |conn| TenantRolebinding::list_by_email(conn, &email))
+        .db_query(move |conn| TenantRolebinding::list_by_user(conn, &tu_id))
         .await??
         .into_iter()
         .map(|(_, tenant)| tenant);

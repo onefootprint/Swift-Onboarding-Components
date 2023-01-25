@@ -91,20 +91,20 @@ async fn post(
             // Get or create the TenantUser
             //
             let email = OrgMemberEmail::from_str("integrationtests@onefootprint.com")?;
-            let rb = match TenantRolebinding::get_by_email_for_test(conn, &email, &tenant.id) {
-                Ok(rb) => rb,
+            let user = TenantUser::get_and_update_or_create(
+                conn,
+                email, // Always create with the same email so we find it next time
+                Some("Footprint".to_owned()),
+                Some("Integration Testing".to_owned()),
+            )?;
+            let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant.id)?;
+            let _ro_role = TenantRole::get_or_create_ro_role(conn, &tenant.id)?;
+            let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
+                Ok((_, rb, _, _)) => rb,
                 Err(e) => {
                     if !e.is_not_found() {
                         return Err(e.into()); // Real error, return
                     }
-                    let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant.id)?;
-                    let _ro_role = TenantRole::get_or_create_ro_role(conn, &tenant.id)?;
-                    let user = TenantUser::get_and_update_or_create(
-                        conn,
-                        email, // Always create with the same email so we find it next time
-                        Some("Footprint".to_owned()),
-                        Some("Integration Testing".to_owned()),
-                    )?;
                     let (rb, _) =
                         TenantRolebinding::create(conn, user.id, admin_role.id, admin_role.tenant_id)?;
                     rb

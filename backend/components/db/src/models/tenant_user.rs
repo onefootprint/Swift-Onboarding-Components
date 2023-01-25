@@ -2,7 +2,7 @@ use crate::{schema::tenant_user, DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{OrgMemberEmail, TenantUserId};
+use newtypes::{Locked, OrgMemberEmail, TenantUserId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -70,12 +70,12 @@ impl TenantUser {
         Ok(result)
     }
 
-    pub fn lock(conn: &mut TxnPgConnection, id: &TenantUserId) -> DbResult<Self> {
+    pub fn lock(conn: &mut TxnPgConnection, id: &TenantUserId) -> DbResult<Locked<Self>> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
             .for_no_key_update()
             .first(conn.conn())?;
-        Ok(user)
+        Ok(Locked::new(user))
     }
 }
 

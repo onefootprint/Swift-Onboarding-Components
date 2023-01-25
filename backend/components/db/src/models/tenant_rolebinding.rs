@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::{OrgMemberEmail, TenantId, TenantRoleId, TenantRolebindingId, TenantUserId};
+use newtypes::{TenantId, TenantRoleId, TenantRolebindingId, TenantUserId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -32,7 +32,7 @@ pub enum TenantRolebindingIdentifier<'a> {
     Id(&'a TenantRolebindingId),
     /// Used when we have a TenantRolebindingId but want to check that the tenant owns the RB
     Tenant(&'a TenantRolebindingId, &'a TenantId),
-    Email(&'a OrgMemberEmail, &'a TenantId),
+    User(&'a TenantUserId, &'a TenantId),
 }
 
 impl<'a> From<&'a TenantRolebindingId> for TenantRolebindingIdentifier<'a> {
@@ -47,9 +47,9 @@ impl<'a> From<(&'a TenantRolebindingId, &'a TenantId)> for TenantRolebindingIden
     }
 }
 
-impl<'a> From<(&'a OrgMemberEmail, &'a TenantId)> for TenantRolebindingIdentifier<'a> {
-    fn from((email, tenant_id): (&'a OrgMemberEmail, &'a TenantId)) -> Self {
-        Self::Email(email, tenant_id)
+impl<'a> From<(&'a TenantUserId, &'a TenantId)> for TenantRolebindingIdentifier<'a> {
+    fn from((user_id, tenant_id): (&'a TenantUserId, &'a TenantId)) -> Self {
+        Self::User(user_id, tenant_id)
     }
 }
 
@@ -91,32 +91,16 @@ impl TenantRolebinding {
         Ok((rb, tenant_role.into_inner()))
     }
 
-    /// Only used when create integration test tenant users
-    pub fn get_by_email_for_test(
-        conn: &mut PgConnection,
-        email: &OrgMemberEmail,
-        tenant_id: &TenantId,
-    ) -> DbResult<Self> {
-        let user = tenant_rolebinding::table
-            .inner_join(tenant_user::table)
-            .filter(tenant_user::email.eq(email))
-            .filter(tenant_rolebinding::tenant_id.eq(tenant_id))
-            .select(tenant_rolebinding::all_columns)
-            .get_result(conn)?;
-        Ok(user)
-    }
-
-    /// Get the list of active TenantUserIds that have this email address.
+    /// Get the list of active TenantRolebindingIds for the provided user.
     /// Could be multiple if a user has been invited to multiple tenants.
-    pub fn list_by_email(
+    pub fn list_by_user(
         conn: &mut PgConnection,
-        email: &OrgMemberEmail,
+        user_id: &TenantUserId,
     ) -> DbResult<Vec<(TenantRolebindingId, Tenant)>> {
         use crate::schema::tenant;
         let results = tenant_rolebinding::table
             .inner_join(tenant::table)
-            .inner_join(tenant_user::table)
-            .filter(tenant_user::email.eq(email))
+            .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
             .filter(tenant_rolebinding::deactivated_at.is_null())
             .select((tenant_rolebinding::id, tenant::all_columns))
             .get_results(conn)?;
@@ -147,9 +131,9 @@ impl TenantRolebinding {
                     .filter(tenant_rolebinding::id.eq(id))
                     .filter(tenant_rolebinding::tenant_id.eq(tenant_id));
             }
-            TenantRolebindingIdentifier::Email(email, tenant_id) => {
+            TenantRolebindingIdentifier::User(user_id, tenant_id) => {
                 query = query
-                    .filter(tenant_user::email.eq(email))
+                    .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
                     .filter(tenant_rolebinding::tenant_id.eq(tenant_id));
             }
         }

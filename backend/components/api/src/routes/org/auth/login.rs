@@ -53,18 +53,14 @@ async fn handler(
     tracing::info!(profile =?profile, "workos login");
 
     let profile2 = profile.clone();
-    // First, get all matching tenant users.
+    // First, get all matching tenant rolebindings.
     let (user, matching_rolebindings) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let email = OrgMemberEmail::from_str(&profile2.email)?;
-            let user = TenantUser::get_and_update_or_create(
-                conn,
-                email.clone(),
-                profile2.first_name,
-                profile2.last_name,
-            )?;
-            let matching_rolebindings = TenantRolebinding::list_by_email(conn, &email)?;
+            let user =
+                TenantUser::get_and_update_or_create(conn, email, profile2.first_name, profile2.last_name)?;
+            let matching_rolebindings = TenantRolebinding::list_by_user(conn, &user.id)?;
             Ok((user, matching_rolebindings))
         })
         .await?;
@@ -76,7 +72,7 @@ async fn handler(
         // If there are no rolebindings for this user, make one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
-        let (rb_id, created_new_tenant) = create_tenant_rolebinding(&state, user.id, profile).await?;
+        let (rb_id, created_new_tenant) = create_tenant_rolebinding(&state, user.id.clone(), profile).await?;
         (vec![rb_id], created_new_tenant)
     };
 
@@ -106,7 +102,7 @@ async fn handler(
         // mins to do so.
         // TODO one day support footprint firm employees
         let session_data = AuthSessionData::WorkOs(WorkOsSession {
-            email: profile.email.clone(),
+            tenant_user_id: user.id,
         });
         (session_data, false, None, None)
     };
@@ -155,7 +151,7 @@ async fn create_tenant_rolebinding(
             Ok(rb)
         })
         .await?;
-    // Only give the TenantRolebindingId here to make sure we log into the tenant
+    // Just give the ID - the caller will log into the rolebinding (and update last_login_at)
     Ok((rb.id, is_new_tenant))
 }
 
