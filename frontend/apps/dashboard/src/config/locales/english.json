@@ -316,6 +316,7 @@
               "successful-uploads": "Successful uploads",
               "failed-uploads": "Failed uploads"
             },
+            "segment-control": "Switch between ID document and selfie images",
             "front-alt": "Front image of the ID Doc",
             "back-alt": "Back image of the ID Doc"
           }

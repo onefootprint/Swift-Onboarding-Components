@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { DecryptedIdDoc } from '@onefootprint/types';
+import { SegmentedControl } from '@onefootprint/ui';
 import Image from 'next/legacy/image';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -11,30 +12,64 @@ type ImagesPreviewProps = {
 };
 
 const ImagesPreview = ({ images }: ImagesPreviewProps) => {
-  const { t } = useTranslation('pages.user-details.user-info.id-doc.preview');
+  const { t, allT } = useTranslation(
+    'pages.user-details.user-info.id-doc.preview',
+  );
   const [index, setIndex] = useState(0);
+  const idDocSegment = allT('collected-id-doc-attributes.id-doc-image');
+  const selfieSegment = allT('collected-id-doc-attributes.selfie-image');
+  const [segment, setSegment] = useState<string>(idDocSegment);
   const selectedImage = images[index];
   const showImageIndex = (selectedIndex: number) => {
     setIndex(selectedIndex);
   };
 
+  if (!images.length) {
+    return null;
+  }
+
+  const handleChangeSegment = (newSegment: string) => {
+    setSegment(newSegment);
+  };
+
   return (
     <Container>
-      <ImagesContainer>
-        <Image
-          src={selectedImage.front}
-          width={350}
-          height={350}
-          layout="fixed"
-          alt={t('front-alt')}
+      {selectedImage.selfie && (
+        <SegmentedControl
+          aria-label={t('segment-control')}
+          value={segment}
+          onChange={handleChangeSegment}
+          options={[idDocSegment, selfieSegment]}
         />
-        {selectedImage.back && (
+      )}
+      <ImagesContainer>
+        {segment === idDocSegment && (
+          <>
+            <Image
+              src={selectedImage.front}
+              width={350}
+              height={350}
+              layout="fixed"
+              alt={t('front-alt')}
+            />
+            {selectedImage.back && (
+              <Image
+                src={selectedImage.back}
+                width={350}
+                height={350}
+                layout="fixed"
+                alt={t('back-alt')}
+              />
+            )}
+          </>
+        )}
+        {segment === selfieSegment && selectedImage.selfie && (
           <Image
-            src={selectedImage.back}
+            src={selectedImage.selfie}
             width={350}
             height={350}
             layout="fixed"
-            alt={t('back-alt')}
+            alt={t('front-alt')}
           />
         )}
       </ImagesContainer>
