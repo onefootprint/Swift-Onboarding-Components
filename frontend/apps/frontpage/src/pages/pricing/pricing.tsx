@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { media, Typography } from '@onefootprint/ui';
+import { LinkButton, media, Typography } from '@onefootprint/ui';
+import { createPopup } from '@typeform/embed';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -7,6 +8,8 @@ import SEO from '../../components/seo';
 import Faq from './components/faq';
 import AddOns from './components/plan-tables/add-ons/add-ons';
 import CorePlan from './components/plan-tables/core-plan/core-plan';
+
+const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 const Pricing = () => {
   const { t } = useTranslation('pages.pricing');
@@ -28,6 +31,19 @@ const Pricing = () => {
         <PlansContainer>
           <CorePlan />
           <AddOns />
+          <BigCustomerBanner>
+            <Typography variant="display-2">🐋</Typography>
+            <Typography variant="label-2">
+              {t('big-customer-banner.title')}
+            </Typography>
+            <Typography variant="body-2">
+              {t('big-customer-banner.details')}
+            </Typography>
+
+            <LinkButton onClick={toggleTypeform}>
+              {t('big-customer-banner.cta')}
+            </LinkButton>
+          </BigCustomerBanner>
         </PlansContainer>
         <Faq
           title={t('faq.title')}
@@ -143,6 +159,23 @@ const PlansContainer = styled.div`
       gap: ${theme.spacing[8]};
     `}
   `}
+`;
+
+const BigCustomerBanner = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: ${theme.spacing[2]};
+    padding: ${theme.spacing[5]};
+    border-radius: ${theme.borderRadius.default};
+    border: 1px solid ${theme.borderColor.tertiary};
+
+    button {
+      margin-top: ${theme.spacing[2]};
+    }
+  `};
 `;
 
 export default Pricing;

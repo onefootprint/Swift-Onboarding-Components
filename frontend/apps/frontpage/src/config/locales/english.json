@@ -509,6 +509,11 @@
           }
         }
       },
+      "big-customer-banner": {
+        "title": "Need more than 10k verifications per month?",
+        "details": "We have a special pricing for you!",
+        "cta": "Contact us"
+      },
       "faq": {
         "title": "Frequently asked questions",
         "questions": {
