@@ -17,8 +17,10 @@ use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters};
+use db::models::tenant_user::TenantUser;
 use db::tenant::get_opt_by_workos_org_id;
-use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope};
+use itertools::Itertools;
+use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope, TenantUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::organizations::{
     CreateOrganization, CreateOrganizationParams, DomainFilters, ListOrganizations, ListOrganizationsParams,
@@ -50,24 +52,32 @@ async fn handler(
         .await?;
     tracing::info!(profile =?profile, "workos login");
 
+    let profile2 = profile.clone();
     // First, get all matching tenant users.
-    let email = OrgMemberEmail::from_str(&profile.email)?;
-    let matching_rolebindings: Vec<_> = state
+    let (user, matching_rolebindings) = state
         .db_pool
-        .db_query(move |conn| TenantRolebinding::list_by_email(conn, &email))
-        .await??
-        .into_iter()
-        .map(|(id, _)| id)
-        .collect();
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let email = OrgMemberEmail::from_str(&profile2.email)?;
+            let user = TenantUser::get_and_update_or_create(
+                conn,
+                email.clone(),
+                profile2.first_name,
+                profile2.last_name,
+            )?;
+            let matching_rolebindings = TenantRolebinding::list_by_email(conn, &email)?;
+            Ok((user, matching_rolebindings))
+        })
+        .await?;
+    let matching_rolebindings = matching_rolebindings.into_iter().map(|(id, _)| id).collect_vec();
 
     let (matching_rolebindings, created_new_tenant) = if !matching_rolebindings.is_empty() {
         (matching_rolebindings, false)
     } else {
-        // If there are no users with this email, make a new one.
+        // If there are no rolebindings for this user, make one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
-        let (rolebinding_id, created_new_tenant) = create_tenant_user(&state, profile).await?;
-        (vec![rolebinding_id], created_new_tenant)
+        let (rb_id, created_new_tenant) = create_tenant_rolebinding(&state, user.id, profile).await?;
+        (vec![rb_id], created_new_tenant)
     };
 
     let (session_data, requires_onboarding, user, tenant) = if matching_rolebindings.len() == 1 {
@@ -78,13 +88,9 @@ async fn handler(
             .ok_or(TenantError::TenantUserDoesNotExist)?;
 
         // Log into the user, updating the last_login_at and name (if new)
-        let first_name = profile.first_name.clone();
-        let last_name = profile.last_name.clone();
         let (tenant_user, rb, tenant_role, tenant) = state
             .db_pool
-            .db_transaction(move |conn| {
-                TenantRolebinding::login(conn, &rolebinding_id, first_name, last_name)
-            })
+            .db_transaction(move |conn| TenantRolebinding::login(conn, &rolebinding_id))
             .await?;
 
         let session_data = AuthSessionData::TenantUser(rb.clone().into());
@@ -118,15 +124,13 @@ async fn handler(
 
 type IsNewTenant = bool;
 
-async fn create_tenant_user(
+async fn create_tenant_rolebinding(
     state: &State,
+    user_id: TenantUserId,
     profile: &Profile,
 ) -> ApiResult<(TenantRolebindingId, IsNewTenant)> {
     // Otherwise, find or create the tenant and create a new TenantUser
     let (tenant, is_new_tenant) = find_or_create_tenant(state, profile).await?;
-    let first_name = profile.first_name.clone();
-    let last_name = profile.last_name.clone();
-    let email = OrgMemberEmail::from_str(&profile.email)?;
     let tenant_id = tenant.id.clone();
     let rb = state
         .db_pool
@@ -147,8 +151,7 @@ async fn create_tenant_user(
             };
             let are_no_users = TenantRolebinding::list(conn, &filters)?.is_empty();
             let role_id = if are_no_users { admin_role.id } else { ro_role.id };
-            let (_, rb, _) =
-                TenantRolebinding::create(conn, email, role_id, tenant_id, first_name, last_name)?;
+            let (rb, _) = TenantRolebinding::create(conn, user_id, role_id, tenant_id)?;
             Ok(rb)
         })
         .await?;

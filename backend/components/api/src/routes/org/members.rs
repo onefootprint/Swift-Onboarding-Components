@@ -108,8 +108,10 @@ async fn post(
     } = request.into_inner();
     let (user, rb, role) = state
         .db_pool
-        .db_transaction(move |conn| {
-            TenantRolebinding::create(conn, email, role_id, tenant_id, first_name, last_name)
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let user = TenantUser::get_and_update_or_create(conn, email, first_name, last_name)?;
+            let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, tenant_id)?;
+            Ok((user, rb, role))
         })
         .await?;
 

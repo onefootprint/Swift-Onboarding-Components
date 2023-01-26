@@ -13,6 +13,7 @@ use db::models::tenant::{NewIntegrationTestTenant, Tenant};
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::{OrgMemberEmail, SessionAuthToken, TenantId, TenantRolebindingId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -98,14 +99,14 @@ async fn post(
                     }
                     let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant.id)?;
                     let _ro_role = TenantRole::get_or_create_ro_role(conn, &tenant.id)?;
-                    let (_, rb, _) = TenantRolebinding::create(
+                    let user = TenantUser::get_and_update_or_create(
                         conn,
                         email, // Always create with the same email so we find it next time
-                        admin_role.id,
-                        admin_role.tenant_id,
                         Some("Footprint".to_owned()),
                         Some("Integration Testing".to_owned()),
                     )?;
+                    let (rb, _) =
+                        TenantRolebinding::create(conn, user.id, admin_role.id, admin_role.tenant_id)?;
                     rb
                 }
             };

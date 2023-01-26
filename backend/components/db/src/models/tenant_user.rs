@@ -1,8 +1,8 @@
 use crate::{schema::tenant_user, DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{Locked, OrgMemberEmail, TenantUserId};
+use diesel::{Insertable, Queryable};
+use newtypes::{OrgMemberEmail, TenantUserId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -18,19 +18,30 @@ pub struct TenantUser {
 }
 
 impl TenantUser {
-    pub(crate) fn lock_or_create(
-        conn: &mut PgConnection,
+    pub fn get_and_update_or_create(
+        conn: &mut TxnPgConnection,
         email: OrgMemberEmail,
         first_name: Option<String>,
         last_name: Option<String>,
-    ) -> DbResult<Locked<Self>> {
-        let user = tenant_user::table
+    ) -> DbResult<Self> {
+        let user: Option<Self> = tenant_user::table
             .filter(tenant_user::email.eq(&email))
-            .for_no_key_update()
-            .first(conn)
+            .first(conn.conn())
             .optional()?;
         if let Some(user) = user {
-            return Ok(Locked::new(user));
+            // Update the name if there's no name on the tenant_user
+            let tenant_user_has_no_name = user.first_name.is_none() && user.last_name.is_none();
+            let workos_provided_name = first_name.is_some() || last_name.is_some();
+            let user = if tenant_user_has_no_name && workos_provided_name {
+                let user_update = TenantUserUpdate {
+                    first_name,
+                    last_name,
+                };
+                TenantUser::update(conn, &user.id, user_update)?
+            } else {
+                user
+            };
+            return Ok(user);
         }
         // User doesn't exist, create it.
         // Could be a race condition, but we're still protected by uniqueness constraints
@@ -42,8 +53,8 @@ impl TenantUser {
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
-            .get_result(conn)?;
-        Ok(Locked::new(result))
+            .get_result(conn.conn())?;
+        Ok(result)
     }
 
     pub fn update(conn: &mut TxnPgConnection, id: &TenantUserId, update: TenantUserUpdate) -> DbResult<Self> {
@@ -57,6 +68,14 @@ impl TenantUser {
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
+    }
+
+    pub fn lock(conn: &mut TxnPgConnection, id: &TenantUserId) -> DbResult<Self> {
+        let user = tenant_user::table
+            .filter(tenant_user::id.eq(id))
+            .for_no_key_update()
+            .first(conn.conn())?;
+        Ok(user)
     }
 }
 

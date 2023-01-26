@@ -2,39 +2,26 @@ use std::str::FromStr;
 
 use crate::models::annotation::{Annotation, AnnotationInfo};
 use crate::models::tenant_api_key::TenantApiKey;
-use crate::models::tenant_role::TenantRole;
-use crate::models::tenant_rolebinding::TenantRolebinding;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
 use crate::TxnPgConnection;
 use diesel::prelude::*;
 
-use newtypes::{
-    DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, TenantRoleId, UserVaultId,
-};
-
-pub(crate) fn test_tenant_admin_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> TenantRole {
-    TenantRole::get_or_create_admin_role(conn, tenant_id).unwrap()
-}
+use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, UserVaultId};
 
 pub(crate) fn test_tenant_user(
     conn: &mut TxnPgConnection,
     email: String,
-    tenant_id: TenantId,
-    tenant_role_id: TenantRoleId,
     first_name: Option<String>,
     last_name: Option<String>,
 ) -> TenantUser {
-    let (tenant_user, _, _) = TenantRolebinding::create(
+    TenantUser::get_and_update_or_create(
         conn,
         OrgMemberEmail::from_str(&email).unwrap(),
-        tenant_role_id,
-        tenant_id,
         first_name,
         last_name,
     )
-    .unwrap();
-    tenant_user
+    .unwrap()
 }
 
 pub(crate) fn test_annotation<T>(

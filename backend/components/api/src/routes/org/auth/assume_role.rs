@@ -28,7 +28,7 @@ fn post(
 
     let (tenant_user, rb, tenant_role, tenant) = state
         .db_pool
-        .db_transaction(move |conn| TenantRolebinding::login(conn, (&email, &tenant_id), None, None))
+        .db_transaction(move |conn| TenantRolebinding::login(conn, (&email, &tenant_id)))
         .await?;
     let session_data = AuthSessionData::TenantUser(rb.clone().into());
 

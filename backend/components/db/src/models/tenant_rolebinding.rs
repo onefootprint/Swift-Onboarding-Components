@@ -1,6 +1,6 @@
 use super::tenant::Tenant;
 use super::tenant_role::TenantRole;
-use super::tenant_user::{TenantUser, TenantUserUpdate};
+use super::tenant_user::TenantUser;
 use crate::DbError;
 use crate::{
     schema::tenant_role, schema::tenant_rolebinding, schema::tenant_user, DbResult, TxnPgConnection,
@@ -58,19 +58,18 @@ impl TenantRolebinding {
     /// associate the TenantUser with the provided role
     pub fn create(
         conn: &mut TxnPgConnection,
-        email: OrgMemberEmail,
+        tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
         tenant_id: TenantId,
-        first_name: Option<String>,
-        last_name: Option<String>,
-    ) -> DbResult<(TenantUser, Self, TenantRole)> {
+    ) -> DbResult<(Self, TenantRole)> {
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
         let tenant_role = TenantRole::lock_active(conn, &tenant_role_id, &tenant_id)?;
-        let user = TenantUser::lock_or_create(conn, email, first_name, last_name)?;
+        // Lock the user so we don't create two rolebindings in parallel
+        TenantUser::lock(conn, &tenant_user_id)?;
 
         let new = NewTenantRolebinding {
-            tenant_user_id: user.id.clone(),
+            tenant_user_id,
             tenant_role_id,
             tenant_id,
             // init to None since they haven't logged in yet!
@@ -89,7 +88,7 @@ impl TenantRolebinding {
                     e
                 }
             })?;
-        Ok((user.into_inner(), rb, tenant_role.into_inner()))
+        Ok((rb, tenant_role.into_inner()))
     }
 
     /// Only used when create integration test tenant users
@@ -174,29 +173,13 @@ impl TenantRolebinding {
         Ok(())
     }
 
-    /// Log into a given TenantUser
-    pub fn login<'a, T>(
-        conn: &mut TxnPgConnection,
-        id: T,
-        workos_first_name: Option<String>,
-        workos_last_name: Option<String>,
-    ) -> DbResult<TenantUserInfo>
+    /// Log into a given TenantRolebinding
+    pub fn login<'a, T>(conn: &mut TxnPgConnection, id: T) -> DbResult<TenantUserInfo>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
         let (user, rb, role, tenant) = Self::get(conn, id)?;
 
-        // Update the name if there's no name on the tenant_user
-        let tenant_user_has_no_name = user.first_name.is_none() && user.last_name.is_none();
-        let user = if tenant_user_has_no_name {
-            let user_update = TenantUserUpdate {
-                first_name: workos_first_name,
-                last_name: workos_last_name,
-            };
-            TenantUser::update(conn, &user.id, user_update)?
-        } else {
-            user
-        };
         // Always set last_login_at to show when this user was logged into
         let rb_update = TenantRolebindingUpdate {
             last_login_at: Some(Some(Utc::now())),

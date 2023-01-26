@@ -167,7 +167,7 @@ mod tests {
     use crate::actor::SaturatedActor;
     use crate::tests::prelude::*;
     // TODO modernize utils
-    use crate::test::{test_annotation, test_tenant_admin_role, test_tenant_api_key, test_tenant_user};
+    use crate::test::{test_annotation, test_tenant_api_key, test_tenant_user};
     use crate::tests::fixtures;
     use crate::tests::prelude::TestPgConnection;
     use macros::db_test;
@@ -178,26 +178,10 @@ mod tests {
         let user_vault = fixtures::user_vault::create(conn).into_inner();
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
-
-        let tenant_role = test_tenant_admin_role(conn, &tenant.id);
         let scoped_user = fixtures::scoped_user::create(conn, &user_vault.id, &ob_config.id);
 
-        let tenant_user1 = test_tenant_user(
-            conn,
-            String::from("tu1@acme.com"),
-            tenant.id.clone(),
-            tenant_role.id.clone(),
-            None,
-            None,
-        );
-        let tenant_user2 = test_tenant_user(
-            conn,
-            String::from("tu2@acme.com"),
-            tenant.id.clone(),
-            tenant_role.id,
-            None,
-            None,
-        );
+        let tenant_user1 = test_tenant_user(conn, String::from("tu1@acme.com"), None, None);
+        let tenant_user2 = test_tenant_user(conn, String::from("tu2@acme.com"), None, None);
 
         let annotation1 = test_annotation(
             conn,
