@@ -30,7 +30,7 @@ const PhoneVerificationSuccessContainer = styled.div`
     justify-content: center;
     align-items: center;
     height: 100px;
-    row-gap: ${theme.spacing[8]};
+    gap: ${theme.spacing[4]};
   `}
 `;
 
