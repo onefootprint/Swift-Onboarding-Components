@@ -20,21 +20,21 @@ use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
 #[derive(Debug, Clone)]
 /// Represents all tenant info identified by a workos session token. This struct is hydrated from
 /// the DB using the information on the TenantUserSession
-pub struct TenantUserAuth {
+pub struct TenantRbAuth {
     tenant: Tenant,
     tenant_role: TenantRole,
-    #[allow(unused)]
-    tenant_rolebinding: TenantRolebinding,
     tenant_user: TenantUser,
     #[allow(unused)]
-    data: TenantUserSession,
+    tenant_rolebinding: TenantRolebinding,
+    #[allow(unused)]
+    data: TenantRbSession,
 }
 
-/// Nests a private TenantUserAuth and implements traits required to extract this session from an
+/// Nests a private TenantRbAuth and implements traits required to extract this session from an
 /// actix request.
-/// Notably, this struct isn't very useful since the entire nested TenantUserAuth is hidden. If you
+/// Notably, this struct isn't very useful since the entire nested TenantRbAuth is hidden. If you
 /// want to do something useful, you likely have to enforce permissions by calling
-/// `check_permissions`, which will give you the more useful nested TenantUserAuth
+/// `check_permissions`, which will give you the more useful nested TenantRbAuth
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
@@ -42,17 +42,17 @@ pub struct TenantUserAuth {
     name = "X-Fp-Dashboard-Authorization",
     description = "Auth token for a dashboard user"
 )]
-pub struct ParsedTenantUserAuth(TenantUserAuth);
+pub struct ParsedTenantRbAuth(TenantRbAuth);
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// The struct that is serialized and saved into the session table in the DB.
 /// The session token is used to look up this session info, and this session info is used to fetch
 /// the related user, rolebinding, role, and tenant information from the DB
-pub struct TenantUserSession {
+pub struct TenantRbSession {
     pub tenant_rolebinding_id: TenantRolebindingId,
 }
 
-impl From<TenantRolebinding> for TenantUserSession {
+impl From<TenantRolebinding> for TenantRbSession {
     fn from(rb: TenantRolebinding) -> Self {
         Self {
             tenant_rolebinding_id: rb.id,
@@ -60,14 +60,14 @@ impl From<TenantRolebinding> for TenantUserSession {
     }
 }
 
-impl ExtractableAuthSession for ParsedTenantUserAuth {
+impl ExtractableAuthSession for ParsedTenantRbAuth {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
     fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError> {
         let data = match auth_session {
-            AuthSessionData::TenantUser(data) => data,
+            AuthSessionData::TenantRb(data) => data,
             _ => {
                 return Err(AuthError::SessionTypeError.into());
             }
@@ -76,7 +76,7 @@ impl ExtractableAuthSession for ParsedTenantUserAuth {
 
         tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tr.id, tenant_rb_id=%rb.id, tenant_user_id=%tu.id, "authenticated");
 
-        Ok(Self(TenantUserAuth {
+        Ok(Self(TenantRbAuth {
             data,
             tenant,
             tenant_rolebinding: rb,
@@ -86,16 +86,16 @@ impl ExtractableAuthSession for ParsedTenantUserAuth {
     }
 }
 
-impl TenantUserAuth {
+impl TenantRbAuth {
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
     }
 }
 
 /// A shorthand for the commonly used ParsedWorkOs context
-pub type TenantUserAuthContext = SessionContext<ParsedTenantUserAuth>;
+pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
 
-impl CanCheckTenantGuard for TenantUserAuthContext {
+impl CanCheckTenantGuard for TenantRbAuthContext {
     fn token_scopes(&self) -> &[TenantScope] {
         &self.data.0.tenant_role.scopes
     }
@@ -105,7 +105,7 @@ impl CanCheckTenantGuard for TenantUserAuthContext {
     }
 }
 
-impl TenantAuth for SessionContext<TenantUserAuth> {
+impl TenantAuth for SessionContext<TenantRbAuth> {
     fn is_live(&self) -> Result<bool, ApiError> {
         let is_live: Option<bool> = self
             .headers

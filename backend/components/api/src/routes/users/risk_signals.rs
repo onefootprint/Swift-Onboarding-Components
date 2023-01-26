@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantUserAuthContext;
+use crate::auth::tenant::TenantRbAuthContext;
 use crate::auth::Either;
 
 use crate::types::response::ResponseData;
@@ -30,7 +30,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Path<FootprintUserId>,
     filters: web::Query<RiskSignalFilters>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -90,7 +90,7 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
 pub async fn get_detail(
     state: web::Data<State>,
     request: web::Path<(FootprintUserId, RiskSignalId)>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

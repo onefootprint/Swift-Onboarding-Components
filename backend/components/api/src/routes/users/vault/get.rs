@@ -1,5 +1,5 @@
 use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
-use crate::auth::{tenant::TenantUserAuthContext, Either};
+use crate::auth::{tenant::TenantRbAuthContext, Either};
 use crate::errors::tenant::TenantError;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -37,7 +37,7 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetUnifiedResponse> {
     let footprint_user_id = path.into_inner();
 

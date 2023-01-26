@@ -27,7 +27,7 @@ fn post(
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id)))
         .await?;
-    let session_data = AuthSessionData::TenantUser(rb.clone().into());
+    let session_data = AuthSessionData::TenantRb(rb.clone().into());
 
     let session_sealing_key = state.session_sealing_key.clone();
     // Update the auth session to contain the newly assumed role.

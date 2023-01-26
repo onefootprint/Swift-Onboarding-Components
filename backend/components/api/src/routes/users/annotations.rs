@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantUserAuthContext;
+use crate::auth::tenant::TenantRbAuthContext;
 use crate::auth::Either;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
@@ -34,7 +34,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_user_id: web::Path<FootprintUserId>,
     query: web::Query<AnnotationFilters>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<AnnotationsListResponse> {
     // TODO paginate?
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -63,7 +63,7 @@ struct UpdateAnnotationPath {
 #[patch("/users/{footprint_user_id}/annotations/{annotation_id}")]
 async fn patch(
     state: web::Data<State>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateAnnotationPath>,
     request: web::Json<UpdateAnnotationRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -112,7 +112,7 @@ impl ValidateRequest for CreateAnnotationRequest {
 #[post("/users/{footprint_user_id}/annotations")]
 pub fn post(
     state: web::Data<State>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
     footprint_user_id: web::Path<FootprintUserId>,
     request: Json<CreateAnnotationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {

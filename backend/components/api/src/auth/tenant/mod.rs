@@ -11,8 +11,8 @@ mod secret_key;
 pub use secret_key::*;
 mod ob_session;
 pub use ob_session::*;
-mod tenant_user;
-pub use self::tenant_user::*;
+mod tenant_rb;
+pub use self::tenant_rb::*;
 
 use super::AuthError;
 use crate::errors::ApiError;

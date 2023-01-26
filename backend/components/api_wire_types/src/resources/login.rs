@@ -11,7 +11,7 @@ export_schema!(OrgLoginRequest);
 pub struct OrgLoginResponse {
     pub created_new_tenant: bool,
     pub requires_onboarding: bool,
-    /// If the email is associated with one tenant, a long-lived TenantUserAuth token to perform
+    /// If the email is associated with one tenant, a long-lived TenantRbAuth token to perform
     /// actions on the dashboard.
     /// If the email is associated with multiple tenants, a a short-lived WorkOsAuth token that
     /// can be used to select the tenant as which to auth.

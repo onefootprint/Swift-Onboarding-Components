@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 /// Decrypt document data for a footprint user
 ///   2022-11-28: We do not support PUT operations (interested customers should use custom vault for document data they wish to store)
 use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
-use crate::auth::{tenant::TenantUserAuthContext, Either};
+use crate::auth::{tenant::TenantRbAuthContext, Either};
 
 use crate::errors::ApiError;
 use crate::types::{JsonApiResponse, ResponseData};
@@ -37,7 +37,7 @@ use strum::IntoEnumIterator;
 pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
-    tenant_auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    tenant_auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDocumentForDecryptResponse> {
     let tenant_auth = tenant_auth.check_guard(TenantGuard::Read)?;
     let footprint_user_id = path.into_inner();
@@ -72,7 +72,7 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityDocumentRequest>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
     let DecryptIdentityDocumentRequest {

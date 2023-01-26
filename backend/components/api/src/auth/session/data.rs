@@ -21,7 +21,7 @@ pub enum AuthSessionData {
     WorkOs(crate::auth::tenant::WorkOsSession),
 
     /// authed as a user at a tenant for admin dashboard
-    TenantUser(crate::auth::tenant::TenantUserSession),
+    TenantRb(crate::auth::tenant::TenantRbSession),
 
     /// user-specific sessions
     User(crate::auth::user::UserSession),

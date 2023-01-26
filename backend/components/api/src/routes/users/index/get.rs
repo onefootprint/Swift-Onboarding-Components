@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantUserAuthContext;
+use crate::auth::tenant::TenantRbAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
@@ -59,7 +59,7 @@ pub async fn get(
     state: web::Data<State>,
     filters: web::Query<ListUsersRequest>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<CursorPaginatedResponse<UsersListResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
@@ -154,7 +154,7 @@ pub async fn get(
 pub async fn get_detail(
     state: web::Data<State>,
     footprint_user_id: web::Path<FootprintUserId>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<JsonApiResponse<UsersDetailResponse>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();

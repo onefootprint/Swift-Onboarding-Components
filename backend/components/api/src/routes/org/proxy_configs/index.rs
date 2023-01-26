@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantUserAuthContext};
+use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantRbAuthContext};
 use crate::auth::Either;
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiResult;
@@ -21,7 +21,7 @@ type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfig>>>
 #[actix::get("/org/proxy_configs")]
 pub async fn get(
     state: web::Data<State>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> ApiResult<ProxyConfigsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -48,7 +48,7 @@ pub async fn get(
 pub async fn post(
     state: web::Data<State>,
     request: Json<CreateProxyConfigRequest>,
-    auth: Either<TenantUserAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfig>>> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant = auth.tenant();

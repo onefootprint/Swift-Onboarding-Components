@@ -90,7 +90,7 @@ async fn handler(
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rolebinding_id))
             .await?;
 
-        let session_data = AuthSessionData::TenantUser(rb.clone().into());
+        let session_data = AuthSessionData::TenantRb(rb.clone().into());
 
         let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
