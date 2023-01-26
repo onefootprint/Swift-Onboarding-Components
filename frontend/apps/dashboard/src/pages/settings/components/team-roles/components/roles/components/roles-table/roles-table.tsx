@@ -18,7 +18,8 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
   const columns = [
     { id: 'role', text: t('table.header.role'), width: '25%' },
     { id: 'created', text: t('table.header.created'), width: '15%' },
-    { id: 'permissions', text: t('table.header.permissions'), width: '60%' },
+    { id: 'permissions', text: t('table.header.permissions'), width: '55%' },
+    { id: 'actions', text: '', width: '5%' },
   ];
 
   const handleSearchChange = (search: string) => {

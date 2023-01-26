@@ -5,6 +5,8 @@ import {
   screen,
   userEvent,
   waitFor,
+  waitForElementToBeRemoved,
+  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -15,6 +17,8 @@ import {
   orgRolesScopesFixture,
   withCreateOrgRole,
   withCreateOrgRoleError,
+  withDisableOrgRole,
+  withDisableOrgRoleError,
   withOrgRoles,
   withOrgRolesError,
 } from './roles.test.config';
@@ -211,6 +215,93 @@ describe('<Roles />', () => {
           });
 
           expect(dialog).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when disabling a role', () => {
+      describe('when the request to disable a role succeeds', () => {
+        const [roleToDisable] = orgRolesFixture;
+
+        beforeEach(() => {
+          withDisableOrgRole(roleToDisable.id);
+        });
+
+        it('should disable a role and show a confirmation message', async () => {
+          await renderRolesAndWaitData();
+          withOrgRoles(
+            orgRolesFixture.filter(role => role.id !== roleToDisable.id),
+          );
+
+          const actionButton = screen.getByRole('button', {
+            name: `Open actions for role ${roleToDisable.name}`,
+          });
+          await userEvent.click(actionButton);
+
+          const removeButton = screen.getByText('Remove role');
+          await userEvent.click(removeButton);
+          await waitFor(() => {
+            screen.getByRole('dialog', {
+              name: 'Remove role',
+            });
+          });
+
+          const confirmationDialog = screen.getByRole('dialog', {
+            name: 'Remove role',
+          });
+
+          const submitButton = within(confirmationDialog).getByRole('button', {
+            name: 'Yes',
+          });
+          await userEvent.click(submitButton);
+          await waitForElementToBeRemoved(confirmationDialog);
+
+          await waitFor(() => {
+            const confirmationMessage = screen.getByText('Role removed');
+            expect(confirmationMessage).toBeInTheDocument();
+          });
+
+          const userRemovedName = screen.queryByText(roleToDisable.name);
+          await waitForElementToBeRemoved(userRemovedName);
+        });
+      });
+
+      describe('when the request to disable a role fails', () => {
+        const [roleToDisable] = orgRolesFixture;
+
+        beforeEach(() => {
+          withDisableOrgRoleError(roleToDisable.id);
+        });
+
+        it('should disable a role and show a confirmation message', async () => {
+          await renderRolesAndWaitData();
+
+          const actionButton = screen.getByRole('button', {
+            name: `Open actions for role ${roleToDisable.name}`,
+          });
+          await userEvent.click(actionButton);
+
+          const removeButton = screen.getByText('Remove role');
+          await userEvent.click(removeButton);
+          await waitFor(() => {
+            screen.getByRole('dialog', {
+              name: 'Remove role',
+            });
+          });
+
+          const confirmationDialog = screen.getByRole('dialog', {
+            name: 'Remove role',
+          });
+
+          const submitButton = within(confirmationDialog).getByRole('button', {
+            name: 'Yes',
+          });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            const errorMessage = screen.getByText('Something went wrong');
+            expect(errorMessage).toBeInTheDocument();
+          });
         });
       });
     });

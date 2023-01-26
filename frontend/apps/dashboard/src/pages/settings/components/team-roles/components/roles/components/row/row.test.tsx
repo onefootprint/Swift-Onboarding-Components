@@ -43,7 +43,7 @@ describe('<Row />', () => {
   describe('when is not admin', () => {
     it('should render the scopes', () => {
       renderRow({ scopes: ['read'] });
-      expect(screen.getByText('Read')).toBeInTheDocument();
+      expect(screen.getByText('Member')).toBeInTheDocument();
     });
   });
 });

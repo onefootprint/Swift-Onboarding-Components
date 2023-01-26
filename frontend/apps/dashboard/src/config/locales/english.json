@@ -807,12 +807,31 @@
         }
       },
       "roles": {
-        "aria-label": "Table of organization roles",
         "table": {
+          "aria-label": "Table of organization roles",
           "header": {
             "role": "Role",
             "created": "Created at",
             "permissions": "Permissions"
+          },
+          "actions": {
+            "aria-label": "Open actions for role {{name}}",
+            "remove": {
+              "cta": "Remove role",
+              "confirmation": {
+                "title": "Remove role",
+                "description": "You’re about to remove the role <b>{{name}}</b>. Are you sure?"
+              },
+              "notification": {
+                "success": {
+                  "title": "Role removed",
+                  "description": "{{name}} role has been removed."
+                },
+                "error": {
+                  "title": "Error removing role"
+                }
+              }
+            }
           },
           "empty-state": "No roles found"
         },
@@ -849,7 +868,7 @@
         },
         "scopes": {
           "admin": "Everything",
-          "read": "Read",
+          "read": "Member",
           "onboarding_configuration": "Manage onboarding configuration",
           "api_keys": "Manage API keys",
           "org_settings": "Modify organization settings",

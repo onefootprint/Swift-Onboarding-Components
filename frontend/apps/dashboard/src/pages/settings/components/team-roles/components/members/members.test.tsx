@@ -326,9 +326,6 @@ describe('<Members />', () => {
           const confirmationDialog = screen.getByRole('dialog', {
             name: 'Remove team member',
           });
-
-          expect(true).toBe(true);
-
           const submitButton = within(confirmationDialog).getByRole('button', {
             name: 'Yes',
           });

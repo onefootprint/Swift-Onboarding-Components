@@ -3,24 +3,35 @@ import { OrgRole } from '@onefootprint/types';
 
 export const orgRolesFixture: OrgRole[] = [
   {
+    id: 'orgrole_aExxJ5gSBpvqIJ2VcHH6J',
+    name: 'Customer support',
+    scopes: ['api_keys'],
+    isImmutable: false,
+    createdAt: '2022-11-18T00:04:11.368107Z',
+  },
+  {
     id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
     name: 'Super',
     scopes: ['admin'],
     isImmutable: true,
-    createdAt: '2022-09-19T16:24:35.367322Z',
+    createdAt: '2023-01-25T21:47:22.679708Z',
   },
   {
     id: 'orgrole_erflKNWEF13143EWRWELJN',
-    name: 'Member',
+    name: 'Read only',
     isImmutable: true,
     scopes: ['read'],
-    createdAt: '2023-01-06T05:11:08.415924Z',
+    createdAt: '2023-01-06T04:33:34.272399Z',
   },
 ];
 
-export const orgRolesCreatedAtFixture = ['9/19/22, 4:24 PM', '1/6/23, 5:11 AM'];
+export const orgRolesCreatedAtFixture = [
+  '11/18/22, 12:04 AM',
+  '1/25/23, 9:47 PM',
+  '1/6/23, 4:33 AM',
+];
 
-export const orgRolesScopesFixture = ['Everything', 'Read'];
+export const orgRolesScopesFixture = ['Everything', 'Read', 'Manage Api Keys'];
 
 export const withOrgRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
   mockRequest({
@@ -58,6 +69,25 @@ export const withCreateOrgRoleError = () =>
   mockRequest({
     method: 'post',
     path: '/org/roles',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withDisableOrgRole = (id: string) =>
+  mockRequest({
+    method: 'post',
+    path: `/org/roles/${id}/deactivate`,
+    response: null,
+  });
+
+export const withDisableOrgRoleError = (id: string) =>
+  mockRequest({
+    method: 'post',
+    path: `/org/roles/${id}/deactivate`,
     statusCode: 400,
     response: {
       error: {
