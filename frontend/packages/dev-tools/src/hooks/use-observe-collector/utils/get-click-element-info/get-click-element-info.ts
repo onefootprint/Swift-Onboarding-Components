@@ -72,7 +72,7 @@ const getElementTextsWithoutPrivateData = (el: HTMLElement): string[] => {
   return texts;
 };
 
-const getClickedElementInfo = (el: HTMLElement) => {
+export const getClickedElementInfo = (el: HTMLElement) => {
   let texts = [el.getAttribute('aria-label')];
   if (el.tagName.toLowerCase() === 'img') {
     texts.push(el.getAttribute('alt'));
@@ -158,5 +158,3 @@ function tidyElementValue(value: string): string | null {
   }
   return null;
 }
-
-export default getClickedElementInfo;

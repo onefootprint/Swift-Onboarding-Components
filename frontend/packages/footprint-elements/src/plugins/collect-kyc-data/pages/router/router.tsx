@@ -1,3 +1,4 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
@@ -17,6 +18,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useCollectKycDataMachine();
   const isDone = state.matches(States.completed);
+  useLogStateMachine('collect-kyc-data', state);
 
   useEffect(() => {
     if (isDone) {

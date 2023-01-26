@@ -1,5 +1,5 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import { withProvider } from '@onefootprint/footprint-elements';
-import has from 'lodash/has';
 import React from 'react';
 import MachineProvider, {
   useIdentifyMachine,
@@ -12,25 +12,24 @@ import PhoneRegistration from './pages/phone-registration';
 import PhoneVerification from './pages/phone-verification';
 import ProcessBootstrapData from './pages/process-bootstrap-data';
 
-type Page = {
-  [page in States]?: () => JSX.Element;
-};
-
 const Identify = () => {
   const [state] = useIdentifyMachine();
-  const valueCasted = state.value as States;
-  const pages: Page = {
-    [States.processBootstrapData]: ProcessBootstrapData,
-    [States.emailIdentification]: EmailIdentification,
-    [States.phoneRegistration]: PhoneRegistration,
-    [States.phoneVerification]: PhoneVerification,
-    [States.biometricLoginRetry]: BiometricLoginRetry,
-  };
-  if (has(pages, valueCasted)) {
-    const Page = pages[valueCasted];
-    if (Page) {
-      return <Page />;
-    }
+  useLogStateMachine('identify', state);
+
+  if (state.matches(States.processBootstrapData)) {
+    return <ProcessBootstrapData />;
+  }
+  if (state.matches(States.emailIdentification)) {
+    return <EmailIdentification />;
+  }
+  if (state.matches(States.phoneRegistration)) {
+    return <PhoneRegistration />;
+  }
+  if (state.matches(States.phoneVerification)) {
+    return <PhoneVerification />;
+  }
+  if (state.matches(States.biometricLoginRetry)) {
+    return <BiometricLoginRetry />;
   }
   return null;
 };

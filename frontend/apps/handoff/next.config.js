@@ -2,7 +2,7 @@
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' localhost:8000 vitals.vercel-insights.com *.ingest.sentry.io *.onefootprint.com vercel.live *.pusher.com wss://*.pusher.com;
+  connect-src 'self' localhost:8000 vitals.vercel-insights.com *.ingest.sentry.io *.onefootprint.com vercel.live *.pusher.com wss://*.pusher.com 189225732777.collect.observeinc.com;
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';

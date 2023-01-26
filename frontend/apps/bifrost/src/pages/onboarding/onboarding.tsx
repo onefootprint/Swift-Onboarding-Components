@@ -1,3 +1,4 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import { withProvider } from '@onefootprint/footprint-elements';
 import React from 'react';
 import SocureSdk from 'src/components/socure-sdk';
@@ -11,6 +12,7 @@ import InitOnboarding from './pages/init-onboarding';
 
 const Onboarding = () => {
   const [state] = useOnboardingMachine();
+  useLogStateMachine('onboarding', state);
 
   if (state.matches(States.initOnboarding)) {
     return <InitOnboarding />;

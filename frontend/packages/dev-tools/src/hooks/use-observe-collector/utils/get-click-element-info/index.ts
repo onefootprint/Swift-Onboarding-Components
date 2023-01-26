@@ -1,1 +1,1 @@
-export { default } from './get-click-element-info';
+export * from './get-click-element-info';

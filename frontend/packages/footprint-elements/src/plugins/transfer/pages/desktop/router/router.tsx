@@ -1,3 +1,4 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useDesktopMachine, {
@@ -14,6 +15,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useDesktopMachine();
   const isDone = state.matches(States.success) || state.matches(States.failure);
+  useLogStateMachine('transfer-desktop', state);
 
   useEffect(() => {
     if (isDone) {

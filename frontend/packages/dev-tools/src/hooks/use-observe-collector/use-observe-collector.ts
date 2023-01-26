@@ -1,27 +1,34 @@
+import { IS_DEV, IS_SERVER } from '@onefootprint/global-constants';
 import constate from 'constate';
+import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import UAParser from 'ua-parser-js';
-import { useDebouncedCallback } from 'use-debounce';
-import { useEventListener } from 'usehooks-ts';
+import { useEffectOnce, useEventListener } from 'usehooks-ts';
 
 import getSessionId from '../../utils/session-id/session-id';
-import sendObservePayload from './hooks/send-observe-payload';
-import getClickedElementInfo, {
+import {
   getClickedElementContextInPage,
-} from './utils/get-click-element-info/get-click-element-info';
+  getClickedElementInfo,
+} from './utils/get-click-element-info';
 import getErrorEventInfo from './utils/get-error-event-info';
 import getNavigatorProperties from './utils/get-navigator-properties';
+import sendObservePayload from './utils/send-observe-payload/send-observe-payload';
 
 const DEBOUNCE_INTERVAL = 10000; // 10 seconds
-const MAX_DEBOUNCE = 60000; // 1 min
-const IS_SSR = typeof window === 'undefined';
+const MAX_DEBOUNCE = 30000; // 30 seconds
 
-const useObserveCollectorImpl = () => {
+const IS_LOGGING_DISABLED = IS_SERVER || IS_DEV;
+
+type ObserveCollectorProps = {
+  appName: string;
+};
+
+const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
   const router = useRouter();
   const queue: Record<string, any>[] = [];
   const userAgent = new UAParser().getResult();
-  const clientContext: Record<string, any> = IS_SSR
+  const clientContext: Record<string, any> = IS_LOGGING_DISABLED
     ? {}
     : {
         navigator: getNavigatorProperties(),
@@ -32,22 +39,17 @@ const useObserveCollectorImpl = () => {
         engine: userAgent.engine,
         cpu: userAgent.cpu,
       };
+  const environment: Record<string, any> = {
+    nodeEnv: process.env.NODE_ENV,
+    vercelEnv: process.env.NEXT_PUBLIC_VERCEL_ENV || 'local',
+    gitCommitRef: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || '',
+    gitCommitSha: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || '',
+    deploymentUrl: process.env.NEXT_PUBLIC_VERCEL_URL || '',
+    apiUrl: process.env.NEXT_PUBLIC_API_BASE_URL || '',
+  };
   let appContext: Record<string, any> = {};
 
-  const debouncedSendQueue = useDebouncedCallback(
-    () => {
-      if (IS_SSR) {
-        return;
-      }
-      sendQueue();
-    },
-    DEBOUNCE_INTERVAL,
-    {
-      maxWait: MAX_DEBOUNCE,
-    },
-  );
-
-  if (!IS_SSR) {
+  if (!IS_LOGGING_DISABLED) {
     // Overwrite console.error and console.warn implementations to also log here
     const consoleError = window.console.error;
     window.console.error = (...args: any[]) => {
@@ -73,16 +75,21 @@ const useObserveCollectorImpl = () => {
   }
 
   const addToQueue = (payload: Record<string, any>) => {
-    if (IS_SSR) {
+    if (IS_LOGGING_DISABLED) {
       return;
     }
+
     queue.push({
       ...payload,
       sessionId: getSessionId(),
       path: router.asPath,
       timestamp: Date.now(),
       clientContext,
-      appContext,
+      environment,
+      appContext: {
+        name: appName,
+        data: appContext,
+      },
     });
     debouncedSendQueue();
   };
@@ -118,7 +125,7 @@ const useObserveCollectorImpl = () => {
   };
 
   const sendQueue = () => {
-    if (IS_SSR || !queue.length) {
+    if (IS_LOGGING_DISABLED || !queue.length) {
       return;
     }
     const numItems = queue.length;
@@ -126,7 +133,23 @@ const useObserveCollectorImpl = () => {
     sendObservePayload(items);
   };
 
+  const debouncedSendQueue = useCallback(
+    debounce(sendQueue, DEBOUNCE_INTERVAL, { maxWait: MAX_DEBOUNCE }),
+    [queue],
+  );
+
+  useEffectOnce(() => {
+    // So that we can calculate session duration
+    log('session-start');
+  });
+
+  useEffect(() => {
+    log('page-change');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.asPath]);
+
   useEventListener('beforeunload', () => {
+    log('session-end');
     debouncedSendQueue.flush();
     debouncedSendQueue.cancel();
   });
@@ -165,16 +188,11 @@ const useObserveCollectorImpl = () => {
     });
   });
 
-  useEffect(() => {
-    log('page-change');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.asPath]);
-
-  // Allow the apps to set custom context data like bifrost session id etc. that can be emitted with each item.
-  const setAppContext = (appName: string, appData?: Record<string, any>) => {
+  // Allow the apps to set custom context data like tenant name or bifrost session id etc. that can be emitted with each item.
+  const setAppContext = (data?: Record<string, any>) => {
     appContext = {
-      name: appName,
-      data: appData,
+      ...appContext,
+      ...data,
     };
   };
 

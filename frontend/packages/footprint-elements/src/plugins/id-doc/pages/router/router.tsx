@@ -1,3 +1,4 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
@@ -18,6 +19,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useIdDocMachine();
   const isDone = state.matches(States.success) || state.matches(States.failure);
+  useLogStateMachine('id-doc', state);
 
   useEffect(() => {
     if (isDone) {

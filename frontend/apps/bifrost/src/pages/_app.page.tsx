@@ -1,6 +1,7 @@
 import '@onefootprint/design-tokens/src/output/theme.css';
 
 import theme from '@onefootprint/design-tokens';
+import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import {
   configureFootprint,
   FootprintProvider,
@@ -41,16 +42,18 @@ const App = ({ Component, pageProps }: AppProps) => {
         />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <BifrostMachineProvider>
-          <DesignSystemProvider theme={theme.light}>
-            <GlobalStyle />
-            <FootprintProvider client={footprint}>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </FootprintProvider>
-          </DesignSystemProvider>
-        </BifrostMachineProvider>
+        <ObserveCollectorProvider appName="bifrost">
+          <BifrostMachineProvider>
+            <DesignSystemProvider theme={theme.light}>
+              <GlobalStyle />
+              <FootprintProvider client={footprint}>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </FootprintProvider>
+            </DesignSystemProvider>
+          </BifrostMachineProvider>
+        </ObserveCollectorProvider>
       </QueryClientProvider>
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=Function.prototype`}

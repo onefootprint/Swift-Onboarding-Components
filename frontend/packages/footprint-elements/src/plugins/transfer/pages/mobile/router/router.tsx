@@ -1,3 +1,4 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useMobileMachine, {
@@ -14,6 +15,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useMobileMachine();
   const isDone = state.matches(States.success) || state.matches(States.failure);
+  useLogStateMachine('transfer-mobile', state);
 
   useEffect(() => {
     if (isDone) {

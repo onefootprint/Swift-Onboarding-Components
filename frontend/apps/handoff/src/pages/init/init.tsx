@@ -1,3 +1,4 @@
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
   useParseHandoffUrl,
   useUpdateD2PStatus,
@@ -12,6 +13,7 @@ import { Events } from 'src/utils/state-machine';
 const Init = () => {
   const [, send] = useHandoffMachine();
   const updateD2PStatusMutation = useUpdateD2PStatus();
+  const observeCollector = useObserveCollector();
 
   useParseHandoffUrl({
     onSuccess: (authToken: string) => {
@@ -43,6 +45,9 @@ const Init = () => {
   });
 
   useDeviceInfo((device: DeviceInfo) => {
+    observeCollector.setAppContext({
+      device,
+    });
     send({
       type: Events.initContextUpdated,
       payload: {

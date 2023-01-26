@@ -2,7 +2,7 @@ import { customRender, screen } from '@onefootprint/test-utils';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 
-import getClickedElementInfo from './get-click-element-info';
+import { getClickedElementInfo } from './get-click-element-info';
 import {
   MAX_INNER_TEXT_LENGTH,
   REDACTED_PRIVATE_DATA_VALUE,

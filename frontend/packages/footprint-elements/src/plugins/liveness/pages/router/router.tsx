@@ -1,3 +1,4 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useLivenessMachine from '../../hooks/use-liveness-machine';
@@ -14,6 +15,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useLivenessMachine();
   const isDone = state.matches(States.completed);
+  useLogStateMachine('liveness', state);
 
   useEffect(() => {
     if (isDone) {

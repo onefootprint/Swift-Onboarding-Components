@@ -1,6 +1,7 @@
 import '@onefootprint/design-tokens/src/output/theme.css';
 
 import themes from '@onefootprint/design-tokens';
+import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
@@ -27,22 +28,24 @@ const App = ({ Component, pageProps }: AppProps) => (
   // const { hideAppClip } = router.query;
 
   <QueryClientProvider client={queryClient}>
-    <MachineProvider>
-      <DesignSystemProvider theme={themes.light}>
-        <GlobalStyle />
-        <Head>
-          {/* {hideAppClip ? null : (
+    <ObserveCollectorProvider appName="handoff">
+      <MachineProvider>
+        <DesignSystemProvider theme={themes.light}>
+          <GlobalStyle />
+          <Head>
+            {/* {hideAppClip ? null : (
               <meta
                 name="apple-itunes-app"
                 content="app-id=1632436468, app-clip-bundle-id=com.onefootprint.my.live, app-clip-display=card"
               />
             )} */}
-        </Head>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </DesignSystemProvider>
-    </MachineProvider>
+          </Head>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </DesignSystemProvider>
+      </MachineProvider>
+    </ObserveCollectorProvider>
   </QueryClientProvider>
 );
 const GlobalStyle = createGlobalStyle`

@@ -1,3 +1,7 @@
+import {
+  useLogStateMachine,
+  useObserveCollector,
+} from '@onefootprint/dev-tools';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
@@ -13,14 +17,15 @@ import Onboarding from './onboarding';
 
 const Root = () => {
   const [state, send] = useBifrostMachine();
+  const observeCollector = useObserveCollector();
+  useLogStateMachine('bifrost', state);
 
   return (
     <ErrorBoundary
       FallbackComponent={Error}
-      // TODO: Add logging to ObserveCollector here
-      // onError={(error, stack) => {
-      // observeCollector.logError('error', error, { stack });
-      // }}
+      onError={(error, stack) => {
+        observeCollector.logError('error', error, { stack });
+      }}
       onReset={() => {
         send({ type: Events.reset });
       }}

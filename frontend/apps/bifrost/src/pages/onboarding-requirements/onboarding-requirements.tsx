@@ -1,3 +1,4 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import {
   CollectKycData,
   IdDoc,
@@ -21,6 +22,7 @@ const OnboardingRequirements = () => {
     onboardingContext: { authToken, device, userFound },
     requirements: { kycData, liveness, idDoc, selfie },
   } = state.context;
+  useLogStateMachine('onboarding-requirements', state);
 
   const handleRequirementCompleted = () => {
     send({
