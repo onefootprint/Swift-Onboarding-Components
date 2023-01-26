@@ -100,11 +100,12 @@ const TitleContainer = styled.div`
 `;
 
 const Container = styled.div`
-  flex-direction: column;
-  text-align: center;
-  display: flex;
-  justify-content: center;
   align-items: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 188px; // use the same height as bifrost/init-onboarding loading
+  justify-content: center;
+  text-align: center;
 `;
 
 export default CheckOnboardingRequirements;
