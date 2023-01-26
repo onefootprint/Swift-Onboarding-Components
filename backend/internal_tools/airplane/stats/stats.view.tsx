@@ -95,10 +95,6 @@ const TenantUsers = () => {
       <Table
         title="Org Users"
         defaultPageSize={10}
-        columns={[
-          { accessor: 'count', label: 'onboardings' },
-          { accessor: '_created_at', label: 'created' },
-        ]}
         task={{
           slug: 'dbquery',
           params: {
