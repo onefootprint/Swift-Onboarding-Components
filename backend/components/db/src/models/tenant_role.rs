@@ -1,14 +1,18 @@
+use std::collections::HashMap;
+
 use super::tenant::Tenant;
 use crate::{
     schema::tenant_role::{self, BoxedQuery},
     DbError, DbResult, TxnPgConnection,
 };
 use chrono::{DateTime, Utc};
-use diesel::prelude::*;
+use diesel::{dsl::count_star, prelude::*};
 use diesel::{Insertable, PgConnection, Queryable};
+use itertools::Itertools;
 use newtypes::{Locked, TenantId, TenantRoleId, TenantScope};
 
 pub type IsImmutable = bool;
+pub type NumActiveUsers = i64;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_role)]
@@ -188,7 +192,11 @@ impl TenantRole {
         query
     }
 
-    pub fn list_active(conn: &mut PgConnection, filters: &TenantRoleListFilters) -> DbResult<Vec<Self>> {
+    pub fn list_active(
+        conn: &mut PgConnection,
+        filters: &TenantRoleListFilters,
+    ) -> DbResult<Vec<(Self, NumActiveUsers)>> {
+        use crate::schema::tenant_rolebinding;
         let mut query = Self::list_active_query(filters)
             .order_by(tenant_role::name.asc())
             .limit(filters.page_size + 1);
@@ -196,8 +204,24 @@ impl TenantRole {
         if let Some(page) = filters.page {
             query = query.offset(filters.page_size * (page as i64));
         }
+        let results: Vec<Self> = query.get_results(conn)?;
 
-        let results = query.get_results(conn)?;
+        // For each role, fetch the number of active users
+        let role_ids = results.iter().map(|r| r.id.clone()).collect_vec();
+        let num_active_users_per_role: Vec<(TenantRoleId, NumActiveUsers)> = tenant_rolebinding::table
+            .filter(tenant_rolebinding::tenant_role_id.eq_any(role_ids))
+            .filter(tenant_rolebinding::deactivated_at.is_null())
+            .group_by(tenant_rolebinding::tenant_role_id)
+            .select((tenant_rolebinding::tenant_role_id, count_star()))
+            .get_results(conn)?;
+
+        // Zip results together
+        let mut num_active_users_per_role: HashMap<_, _> = num_active_users_per_role.into_iter().collect();
+        let results = results
+            .into_iter()
+            .map(|r| (num_active_users_per_role.remove(&r.id).unwrap_or_default(), r))
+            .map(|(r, count)| (count, r))
+            .collect();
         Ok(results)
     }
 

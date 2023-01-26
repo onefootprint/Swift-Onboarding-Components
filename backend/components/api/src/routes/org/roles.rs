@@ -58,6 +58,7 @@ async fn get(
     let results = results
         .into_iter()
         .take(page_size)
+        .map(|(r, num_active_users)| (r, Some(num_active_users)))
         .map(api_wire_types::OrganizationRole::from_db)
         .collect::<Vec<api_wire_types::OrganizationRole>>();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))

@@ -28,6 +28,15 @@ def admin_role(sandbox_tenant):
 
 
 def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
+    # Since we reuse this tenant across integration test runs, an incomplete previous integration
+    # test run may leave active users that cause conflict. Deactivate any old integration test
+    # users
+    body = get("org/members", dict(search=email), tenant.auth_token)
+    if body["data"]:
+        user_id = body["data"][0]["id"]
+        post(f"org/members/{user_id}/deactivate", None, tenant.auth_token)
+
+    # Create the tenant_user
     user_data = dict(
         email=email,
         role_id=role["id"],
@@ -41,35 +50,21 @@ def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
     return body
 
 
-def deactivate_old_tenant_user(email, auth_token):
-    # Since we reuse this tenant across integration test runs, an incomplete previous integration
-    # test run may leave active users that cause conflict. Deactivate any old integration test
-    # users
-    body = get("org/members", dict(search=email), auth_token)
-    if not body["data"]:
-        return
-    user_id = body["data"][0]["id"]
-    post(f"org/members/{user_id}/deactivate", None, auth_token)
-
-
 @pytest.fixture(scope="session")
 def tenant_user(sandbox_tenant, admin_role):
     email = f"custom_it_user+1@onefootprint.com"
-    deactivate_old_tenant_user(email, sandbox_tenant.auth_token)
     return create_tenant_user(sandbox_tenant, admin_role, email, "Flerp", "Grinman")
 
 
 @pytest.fixture(scope="session")
 def tenant_user2(sandbox_tenant, limited_role):
     email = f"custom_it_user+2@onefootprint.com"
-    deactivate_old_tenant_user(email, sandbox_tenant.auth_token)
     return create_tenant_user(sandbox_tenant, limited_role, email, "Merp", "Wachs")
 
 
 @pytest.fixture(scope="session")
 def tenant_user3(sandbox_tenant, limited_role):
     email = f"custom_it_user+3@onefootprint.com"
-    deactivate_old_tenant_user(email, sandbox_tenant.auth_token)
     return create_tenant_user(
         sandbox_tenant, limited_role, email, "Piip", "The Warrior"
     )
@@ -221,17 +216,34 @@ def test_cannot_deactivate_current_user(sandbox_tenant):
 def test_get_roles(
     sandbox_tenant,
     limited_role,
+    tenant_user,
+    tenant_user2,
+    tenant_user3,
     admin_role,
     filters,
     expected_admin_role,
     expected_limited_role,
 ):
+    # Need to use these fixtures
+    tenant_user
+    tenant_user2
+    tenant_user3
+
     body = get(f"org/roles", filters, sandbox_tenant.auth_token)
     assert any(u["id"] == admin_role["id"] for u in body["data"]) == expected_admin_role
     assert (
         any(u["id"] == limited_role["id"] for u in body["data"])
         == expected_limited_role
     )
+
+    if expected_limited_role:
+        limited_role = next(u for u in body["data"] if u["id"] == limited_role["id"])
+        # Check num_active_users
+        body = get(
+            "org/members", dict(role_ids=limited_role["id"]), sandbox_tenant.auth_token
+        )
+        expected_num_users = len(body["data"])
+        assert limited_role["num_active_users"] == expected_num_users
 
 
 def test_update_roles(sandbox_tenant, limited_role, admin_role):

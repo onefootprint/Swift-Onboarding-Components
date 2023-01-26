@@ -10,5 +10,7 @@ pub struct OrganizationRole {
     pub scopes: Vec<TenantScope>,
     pub is_immutable: bool,
     pub created_at: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub num_active_users: Option<i64>,
 }
 export_schema!(OrganizationRole);
