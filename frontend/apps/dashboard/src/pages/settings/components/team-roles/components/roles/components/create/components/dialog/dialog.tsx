@@ -3,6 +3,8 @@ import { Dialog as FPDialog } from '@onefootprint/ui';
 import React from 'react';
 
 import Form from './components/form';
+import type { FormData } from './dialog.types';
+import useCreateRole from './hooks/use-create-role';
 
 type DialogProps = {
   onClose: () => void;
@@ -11,9 +13,15 @@ type DialogProps = {
 
 const Dialog = ({ onClose, open }: DialogProps) => {
   const { t, allT } = useTranslation('pages.settings.roles.create');
+  const createRoleMutation = useCreateRole();
 
-  const handleSubmit = () => {
-    onClose();
+  const handleSubmit = (formData: FormData) => {
+    const { name, scopes } = formData;
+    createRoleMutation.mutate(
+      // Read scope should be always included
+      { name, scopes: ['read', ...scopes] },
+      { onSuccess: onClose },
+    );
   };
 
   return (
@@ -26,10 +34,12 @@ const Dialog = ({ onClose, open }: DialogProps) => {
         form: 'role-create-form',
         label: allT('create'),
         type: 'submit',
+        loading: createRoleMutation.isLoading,
       }}
       secondaryButton={{
         label: allT('cancel'),
         onClick: onClose,
+        disabled: createRoleMutation.isLoading,
       }}
     >
       <Form onSubmit={handleSubmit} />

@@ -832,22 +832,27 @@
                 "onboarding-configuration": "Manage onboarding configuration",
                 "api-keys": "Manage API keys",
                 "org-settings": "Modify organization settings",
-                "manual-review": "Perform manual review",
-                "decrypt": "Decrypt data"
+                "manual-review": "Perform manual review"
               }
+            }
+          },
+          "notifications": {
+            "success": {
+              "title": "Role created",
+              "description": "Role {{name}} was created successfully."
+            },
+            "error": {
+              "title": "Error creating role"
             }
           }
         },
         "scopes": {
           "admin": "Everything",
           "read": "Read",
-          "onboarding_configuration": "Onboarding configuration",
-          "api_keys": "API keys",
+          "onboarding_configuration": "Manage onboarding configuration",
+          "api_keys": "Manage API keys",
           "org_settings": "Modify organization settings",
-          "decrypt_custom": "Decrypt",
-          "decrypt_documents": "Decrypt documents",
-          "decrypt": "Decrypt",
-          "manual_review": "Manual review"
+          "manual_review": "Perform manual review"
         }
       },
       "create-role": {

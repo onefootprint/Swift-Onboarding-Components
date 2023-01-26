@@ -22,12 +22,12 @@ export const orgRolesCreatedAtFixture = ['9/19/22, 4:24 PM', '1/6/23, 5:11 AM'];
 
 export const orgRolesScopesFixture = ['Everything', 'Read'];
 
-export const withOrgRoles = () =>
+export const withOrgRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/roles',
     response: {
-      data: orgRolesFixture,
+      data: orgRoles,
       meta: {
         next: null,
         count: null,
@@ -38,6 +38,25 @@ export const withOrgRoles = () =>
 export const withOrgRolesError = () =>
   mockRequest({
     method: 'get',
+    path: '/org/roles',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withCreateOrgRole = (orgRole: OrgRole = orgRolesFixture[0]) =>
+  mockRequest({
+    method: 'post',
+    path: '/org/roles',
+    response: orgRole,
+  });
+
+export const withCreateOrgRoleError = () =>
+  mockRequest({
+    method: 'post',
     path: '/org/roles',
     statusCode: 400,
     response: {

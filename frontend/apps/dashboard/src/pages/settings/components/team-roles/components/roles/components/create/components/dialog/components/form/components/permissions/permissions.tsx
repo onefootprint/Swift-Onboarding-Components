@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, createFontStyles, Toggle, Typography } from '@onefootprint/ui';
+import { Box, Checkbox, createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -14,37 +14,26 @@ const Permissions = () => {
         <Typography variant="label-2">{t('label')}</Typography>
       </Box>
       <ToggleContainer>
-        <Toggle
-          fullWidth
-          label={t('scopes.read')}
-          checked
-          disabled
-          {...register('read')}
-        />
-        <Toggle
-          fullWidth
+        <Checkbox disabled label={t('scopes.read')} checked />
+        <Checkbox
           label={t('scopes.onboarding-configuration')}
-          {...register('onboarding_configuration')}
+          value="onboarding_configuration"
+          {...register('scopes')}
         />
-        <Toggle
-          fullWidth
+        <Checkbox
           label={t('scopes.api-keys')}
-          {...register('api_keys')}
+          value="api_keys"
+          {...register('scopes')}
         />
-        <Toggle
-          fullWidth
+        <Checkbox
           label={t('scopes.org-settings')}
-          {...register('org_settings')}
+          value="org_settings"
+          {...register('scopes')}
         />
-        <Toggle
-          fullWidth
+        <Checkbox
           label={t('scopes.manual-review')}
-          {...register('manual_review')}
-        />
-        <Toggle
-          fullWidth
-          label={t('scopes.decrypt')}
-          {...register('decrypt')}
+          value="manual_review"
+          {...register('scopes')}
         />
       </ToggleContainer>
     </>

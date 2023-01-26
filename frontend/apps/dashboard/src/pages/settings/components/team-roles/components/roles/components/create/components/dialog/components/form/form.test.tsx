@@ -10,7 +10,7 @@ describe('<Form />', () => {
   it('should render the read-only as checked by default', () => {
     renderForm({});
 
-    const readonlyToggle = screen.getByRole('switch', { name: 'Read only' });
+    const readonlyToggle = screen.getByRole('checkbox', { name: 'Read only' });
     expect(readonlyToggle).toBeChecked();
   });
 });

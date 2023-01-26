@@ -13,6 +13,8 @@ import {
   orgRolesCreatedAtFixture,
   orgRolesFixture,
   orgRolesScopesFixture,
+  withCreateOrgRole,
+  withCreateOrgRoleError,
   withOrgRoles,
   withOrgRolesError,
 } from './roles.test.config';
@@ -55,21 +57,6 @@ describe('<Roles />', () => {
       expect(isLoading).toBe('false');
     });
   };
-
-  describe('when the request to fetch the org roles fails', () => {
-    beforeEach(() => {
-      withOrgRolesError();
-    });
-
-    it('should render the error message', async () => {
-      renderRoles();
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText('Something went wrong');
-        expect(errorMessage).toBeInTheDocument();
-      });
-    });
-  });
 
   describe('when the request to fetch the org roles succeeds', () => {
     beforeEach(() => {
@@ -124,29 +111,122 @@ describe('<Roles />', () => {
     });
 
     describe('when creating a role', () => {
-      it('should open the create dialog', async () => {
-        await renderRolesAndWaitData();
-
-        const createButton = screen.getByRole('button', {
-          name: 'Create role',
+      describe('when the request to create a role succeeds', () => {
+        beforeEach(() => {
+          withCreateOrgRole({
+            id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6X',
+            name: 'Customer Support',
+            scopes: ['read', 'api_keys'],
+            isImmutable: false,
+            createdAt: '2022-09-19T16:24:35.367322Z',
+          });
         });
-        await userEvent.click(createButton);
 
-        const dialog = screen.getByRole('dialog', {
-          name: 'Create role',
+        it('should create a role and show a confirmation message', async () => {
+          withOrgRoles([
+            ...orgRolesFixture,
+            {
+              id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6X',
+              name: 'Customer Support',
+              scopes: ['read', 'api_keys'],
+              isImmutable: false,
+              createdAt: '2022-09-19T16:24:35.367322Z',
+            },
+          ]);
+          await renderRolesAndWaitData();
+
+          const createButton = screen.getByRole('button', {
+            name: 'Create role',
+          });
+          await userEvent.click(createButton);
+
+          const dialog = screen.getByRole('dialog', {
+            name: 'Create role',
+          });
+
+          const nameField = screen.getByLabelText('Name');
+          await userEvent.type(nameField, 'Customer Support');
+
+          const roleField = screen.getByRole('checkbox', {
+            name: 'Manage API keys',
+          });
+          await userEvent.click(roleField);
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Create',
+          });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            const confirmationMessage = screen.getByText(
+              'Role Customer Support was created successfully.',
+            );
+            expect(confirmationMessage).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            expect(dialog).not.toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const name = screen.getByText('Customer Support');
+            expect(name).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to create a role fails', () => {
+        beforeEach(() => {
+          withCreateOrgRoleError();
         });
 
-        const nameField = screen.getByLabelText('Name');
-        await userEvent.type(nameField, 'Customer Support');
+        it('should show an error message', async () => {
+          await renderRolesAndWaitData();
 
-        const submitButton = screen.getByRole('button', {
-          name: 'Create',
-        });
-        await userEvent.click(submitButton);
+          const createButton = screen.getByRole('button', {
+            name: 'Create role',
+          });
+          await userEvent.click(createButton);
 
-        await waitFor(() => {
-          expect(dialog).not.toBeInTheDocument();
+          const dialog = screen.getByRole('dialog', {
+            name: 'Create role',
+          });
+
+          const nameField = screen.getByLabelText('Name');
+          await userEvent.type(nameField, 'Customer Support');
+
+          const roleField = screen.getByRole('checkbox', {
+            name: 'Manage API keys',
+          });
+          await userEvent.click(roleField);
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Create',
+          });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            const confirmationMessage = screen.getByText('Error creating role');
+            expect(confirmationMessage).toBeInTheDocument();
+          });
+
+          expect(dialog).toBeInTheDocument();
         });
+      });
+    });
+  });
+
+  describe('when the request to fetch the org roles fails', () => {
+    beforeEach(() => {
+      withOrgRolesError();
+    });
+
+    it('should show the error message', async () => {
+      renderRoles();
+
+      await waitFor(() => {
+        const errorMessage = screen.getByText('Something went wrong');
+        expect(errorMessage).toBeInTheDocument();
       });
     });
   });

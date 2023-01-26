@@ -3,12 +3,8 @@ import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import type { FormData } from '../../dialog.types';
 import Permissions from './components/permissions';
-
-// TODO: Add permissions once toggle integration works
-type FormData = {
-  name: string;
-};
 
 export type FormProps = {
   onSubmit: (formData: FormData) => void;
@@ -19,6 +15,7 @@ const Form = ({ onSubmit }: FormProps) => {
   const formMethods = useForm<FormData>({
     defaultValues: {
       name: '',
+      scopes: [],
     },
   });
   const {
