@@ -26,6 +26,7 @@ const EmailIdentificationForm = ({
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<FormData>({ defaultValues: { email } });
 
@@ -46,6 +47,7 @@ const EmailIdentificationForm = ({
           label={t('email.label')}
           placeholder={t('email.placeholder')}
           type="email"
+          defaultValue={getValues('email')}
           {...register('email', {
             required: {
               value: true,
