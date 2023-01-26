@@ -196,7 +196,8 @@ pub async fn private_cleanup_integration_tests(
         .db_transaction(move |conn| -> Result<usize, DbError> {
             use schema::{
                 access_event, annotation, data_lifetime, document_request, email, fingerprint,
-                identity_document, liveness_event, manual_review, onboarding, onboarding_decision,
+                fingerprint_visit_event, identity_document, idology_expect_id_response, liveness_event,
+                manual_review, onboarding, onboarding_decision,
                 onboarding_decision_verification_result_junction, phone_number, risk_signal, scoped_user,
                 socure_device_session, user_timeline, user_vault, user_vault_data, verification_request,
                 verification_result, webauthn_credential,
@@ -210,6 +211,10 @@ pub async fn private_cleanup_integration_tests(
 
             deleted_rows += diesel::delete(user_timeline::table)
                 .filter(user_timeline::user_vault_id.eq(&uv.id))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(fingerprint_visit_event::table)
+                .filter(fingerprint_visit_event::user_vault_id.eq(&uv.id))
                 .execute(conn.conn())?;
 
             // DataLifetimes
@@ -265,6 +270,13 @@ pub async fn private_cleanup_integration_tests(
                     .filter(document_request::scoped_user_id.eq_any(su_ids))
                     .execute(conn.conn())?;
 
+                deleted_rows += diesel::delete(fingerprint_visit_event::table)
+                    .filter(
+                        fingerprint_visit_event::scoped_user_id
+                            .eq_any(su_ids.select(scoped_user::id.nullable())),
+                    )
+                    .execute(conn.conn())?;
+
                 // Onboardings
                 {
                     let ob_ids = onboarding::table
@@ -311,6 +323,17 @@ pub async fn private_cleanup_integration_tests(
                         let verification_request_ids = verification_request::table
                             .filter(verification_request::onboarding_id.eq_any(ob_ids))
                             .select(verification_request::id);
+
+                        let verification_result_ids = verification_result::table
+                            .filter(verification_result::request_id.eq_any(verification_request_ids))
+                            .select(verification_result::id);
+
+                        deleted_rows += diesel::delete(idology_expect_id_response::table)
+                            .filter(
+                                idology_expect_id_response::verification_result_id
+                                    .eq_any(verification_result_ids),
+                            )
+                            .execute(conn.conn())?;
 
                         deleted_rows += diesel::delete(verification_result::table)
                             .filter(verification_result::request_id.eq_any(verification_request_ids))
