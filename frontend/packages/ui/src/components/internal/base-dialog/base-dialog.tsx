@@ -4,7 +4,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEventListener, useLockedBody } from 'usehooks-ts';
 
-import { media } from '../../../utils';
+import media from '../../../utils/media';
 import Box from '../../box';
 import Button from '../../button';
 import IconButton from '../../icon-button';

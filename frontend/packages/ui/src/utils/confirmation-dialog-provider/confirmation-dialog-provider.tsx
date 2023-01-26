@@ -1,8 +1,8 @@
 import constate from 'constate';
 import React from 'react';
 
-import { Typography } from '../../components';
 import BaseDialog from '../../components/internal/base-dialog';
+import Typography from '../../components/typography';
 import useConfirmationDialog from './hooks/use-confirmation-dialog';
 
 export type ConfirmationDialogProps = {
