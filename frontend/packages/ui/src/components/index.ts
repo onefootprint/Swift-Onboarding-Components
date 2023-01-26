@@ -67,6 +67,8 @@ export { default as RadioSelect } from './radio-select';
 export * from './radio-select';
 export * from './search-input';
 export { default as SearchInput } from './search-input';
+export { default as SegmentedControl } from './segmented-control';
+export * from './segmented-control';
 export * from './select';
 export { default as Select } from './select';
 export * from './shimmer';
