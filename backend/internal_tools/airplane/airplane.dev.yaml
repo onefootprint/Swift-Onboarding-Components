@@ -1,11 +1,4 @@
-resources:
-    - database: footprint_db
-      host: localhost
-      kind: postgres
-      name: My database
-      port: "5432"
-      slug: footprint_db
-      ssl: disable
-      username: alex
+resources: []
 configVars:
-    DATABASE_URL: postgresql://localhost/footprint_db
+  DATABASE_URL: postgresql://postgres@localhost/footprint_db
+envVars: {}

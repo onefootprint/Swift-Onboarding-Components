@@ -102,10 +102,11 @@ const TenantUsers = () => {
         task={{
           slug: 'dbquery',
           params: {
-            query: `\
-            SELECT tenant_user.email, tenant_user._created_at, tenant.name as org FROM tenant \
-            INNER JOIN tenant_user on tenant_user.tenant_id = tenant.id \
-            WHERE email NOT LIKE '%@onefootprint.com' ORDER BY _created_at DESC;`,
+            query: `
+            SELECT tenant_user.email, tenant_user._created_at as created, tenant.name as org, tenant.id as id FROM tenant 
+            INNER JOIN tenant_rolebinding on tenant_rolebinding.tenant_id = tenant.id 
+            INNER JOIN tenant_user on tenant_user.id = tenant_rolebinding.tenant_user_id
+            WHERE tenant.id NOT LIKE '_private_it_org_%' ORDER BY created ASC;`,
           },
         }}
       ></Table>
