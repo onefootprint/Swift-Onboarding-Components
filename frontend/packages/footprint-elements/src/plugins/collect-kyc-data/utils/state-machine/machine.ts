@@ -190,7 +190,7 @@ const createCollectKycDataMachine = () =>
         },
         [States.addressEditDesktop]: {
           on: {
-            [Events.basicInformationSubmitted]: [
+            [Events.residentialAddressSubmitted]: [
               {
                 target: States.confirm,
                 cond: context => context.device?.type !== 'mobile',
