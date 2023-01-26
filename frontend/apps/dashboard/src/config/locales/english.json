@@ -47,7 +47,8 @@
   "id-doc-type": {
     "id_card": "ID card",
     "driver_license": "Driver's License",
-    "passport": "Passport"
+    "passport": "Passport",
+    "selfie": "Selfie"
   },
   "vendors": {
     "idology": "Idology",

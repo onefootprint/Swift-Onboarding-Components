@@ -24,6 +24,9 @@ const FieldTagList = ({ targets }: FieldTagListProps) => {
         if (prefix === 'id_document') {
           return allT(`id-doc-type.${label}`);
         }
+        if (prefix === 'selfie') {
+          return allT('id-doc-type.selfie');
+        }
       }
       return '';
     })
