@@ -1,6 +1,7 @@
 use super::*;
 use crate::{errors::ApiError, State};
 
+use crate::feature_flag::FeatureFlagClient;
 use db::{
     models::{
         insight_event::InsightEvent, ob_configuration::ObConfiguration,

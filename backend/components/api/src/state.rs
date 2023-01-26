@@ -4,7 +4,7 @@ use crate::{
     config::Config,
     enclave_client::EnclaveClient,
     errors::ApiError,
-    feature_flag::FeatureFlagClient,
+    feature_flag::LaunchDarklyFeatureFlagClient,
     s3,
     signed_hash::SignedHashClient,
     utils::{email::SendgridClient, twilio::TwilioClient},
@@ -31,7 +31,7 @@ pub struct State {
     pub(crate) socure_sandbox_client: SocureClient,
     #[allow(unused)]
     pub(crate) socure_production_client: SocureClient,
-    pub(crate) feature_flag_client: FeatureFlagClient,
+    pub(crate) feature_flag_client: LaunchDarklyFeatureFlagClient,
 }
 
 impl State {
@@ -46,7 +46,7 @@ impl State {
 
     #[allow(clippy::expect_used)]
     pub async fn init_or_die(mut config: Config) -> Self {
-        let feature_flag_client = FeatureFlagClient::new();
+        let feature_flag_client = LaunchDarklyFeatureFlagClient::new();
         let feature_flag_client = match feature_flag_client.init(&config.launch_darkly_sdk_key).await {
             Ok(client) => {
                 tracing::info!("FeatureFlagClient successfully initialized");

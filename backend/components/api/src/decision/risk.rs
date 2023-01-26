@@ -12,9 +12,10 @@ use db::{
 };
 
 use super::features::*;
+use crate::feature_flag::FeatureFlagClient;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
-    feature_flag::FeatureFlagClient,
+    feature_flag::LaunchDarklyFeatureFlagClient,
     utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
@@ -127,7 +128,7 @@ fn write_risk_signals(
     conn: &mut TxnPgConnection,
     feature_vector: &FeatureVector,
     onboarding_decision_id: OnboardingDecisionId,
-    feature_flag_client: &FeatureFlagClient,
+    feature_flag_client: &LaunchDarklyFeatureFlagClient,
     tenant_id: &TenantId,
 ) -> ApiResult<()> {
     let mut vendor_apis = vec![

@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
+#[cfg(test)]
+use mockall::{automock, predicate::*};
 use newtypes::{ObConfigurationKey, TenantId, Uuid};
 use thiserror::Error;
 
@@ -12,12 +14,25 @@ pub enum FeatureFlagError {
     LaunchDarklyClientFailedToInitialize,
 }
 
+#[cfg_attr(test, automock)]
+pub trait FeatureFlagClient {
+    fn bool_flag(&self, flag_key: &str) -> Result<bool, FeatureFlagError>;
+
+    fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError>;
+
+    fn bool_flag_by_ob_configuration_key(
+        &self,
+        flag_key: &str,
+        ob_configuration_key: &ObConfigurationKey,
+    ) -> Result<bool, FeatureFlagError>;
+}
+
 #[derive(Clone)]
-pub struct FeatureFlagClient {
+pub struct LaunchDarklyFeatureFlagClient {
     pub launch_darkly_client: Option<Arc<launchdarkly_server_sdk::Client>>,
 }
 
-impl FeatureFlagClient {
+impl LaunchDarklyFeatureFlagClient {
     pub fn new() -> Self {
         Self {
             launch_darkly_client: None,
@@ -36,8 +51,10 @@ impl FeatureFlagClient {
             })
         }
     }
+}
 
-    pub fn bool_flag(&self, flag_key: &str) -> Result<bool, FeatureFlagError> {
+impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
+    fn bool_flag(&self, flag_key: &str) -> Result<bool, FeatureFlagError> {
         let key = Uuid::new_v4().to_string();
         let context = ContextBuilder::new(key)
             .build()
@@ -50,11 +67,7 @@ impl FeatureFlagClient {
         flag_value
     }
 
-    pub fn bool_flag_by_tenant_id(
-        &self,
-        flag_key: &str,
-        tenant_id: &TenantId,
-    ) -> Result<bool, FeatureFlagError> {
+    fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError> {
         let context = ContextBuilder::new(tenant_id.clone())
             .build()
             .map_err(FeatureFlagError::LaunchDarklyError)?;
@@ -66,8 +79,7 @@ impl FeatureFlagClient {
         flag_value
     }
 
-    #[allow(unused)]
-    pub fn bool_flag_by_ob_configuration_key(
+    fn bool_flag_by_ob_configuration_key(
         &self,
         flag_key: &str,
         ob_configuration_key: &ObConfigurationKey,

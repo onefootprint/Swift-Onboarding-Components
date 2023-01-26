@@ -16,14 +16,13 @@ use newtypes::{
     TenantId, Vendor, VendorAPI,
 };
 
+use super::vendor;
+use crate::feature_flag::FeatureFlagClient;
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
-    feature_flag::FeatureFlagClient,
     utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
-
-use super::vendor;
 
 type ShouldInitiateVerificationRequests = bool;
 // Logic to figure out test status from some of the identity data we collected during onboarding
@@ -76,9 +75,7 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
             state.feature_flag_client.clone(),
             &scoped_user.tenant_id,
             &ob_config_key,
-        )
-        .await?
-        {
+        ) {
             return Ok(true);
         }
 
@@ -200,11 +197,11 @@ pub fn create_document_verification_request(
 }
 
 /// Logic to determine if we should send IDV requests for a tenant in production. Separated out for testing
-pub(self) async fn should_send_prod_idv_requests(
-    feature_flag_client: FeatureFlagClient,
+pub(self) fn should_send_prod_idv_requests(
+    feature_flag_client: impl FeatureFlagClient,
     tenant_id: &TenantId,
     ob_config_key: &ObConfigurationKey,
-) -> Result<bool, ApiError> {
+) -> bool {
     let should_send_tenant = feature_flag_client
         .bool_flag_by_tenant_id("EnableProductionIdvCallsByTenant", tenant_id)
         .unwrap_or(false);
@@ -212,11 +209,7 @@ pub(self) async fn should_send_prod_idv_requests(
         .bool_flag_by_ob_configuration_key("EnableProductionIdvCallsByObConfig", ob_config_key)
         .unwrap_or(false);
 
-    if should_send_tenant || should_send_ob_config {
-        return Ok(true);
-    };
-
-    Ok(false)
+    should_send_tenant || should_send_ob_config
 }
 
 // If socure fails, we shouldn't fail the DE run
@@ -226,24 +219,43 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::feature_flag::{FeatureFlagError, MockFeatureFlagClient};
+    use mockall::predicate::*;
+    use std::str::FromStr;
+    use test_case::test_case;
 
-    #[ignore]
-    #[tokio::test]
-    async fn test_should_send_prod_idv() {
-        // It is hard to unit test this, so I manually toggled flags on and off in the launch darkly UI and tested the correct
-        // assertions.
-        let ld_key = dotenv::var("LAUNCH_DARKLY_SDK_KEY").unwrap();
-        let feature_flag_client = FeatureFlagClient::new();
-        let feature_flag_client = feature_flag_client.init(&ld_key).await.unwrap();
-        let test_tenant_id: TenantId = "DEV_TESTING_TENANT_ID".to_string().into();
-        let test_ob_config_key: ObConfigurationKey = "DEV_TESTING_OB_CONFIG_KEY".to_string().into();
+    #[test_case(Ok(true), Ok(true) => true)]
+    #[test_case(Ok(false), Ok(true) => true)]
+    #[test_case(Ok(true), Ok(false) => true)]
+    #[test_case(Ok(false), Ok(false) => false)]
+    #[test_case(Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize), Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize) => false)]
+    fn test_should_send_prod_idv_requests(
+        tenant_flag_response: Result<bool, FeatureFlagError>,
+        ob_config_flag_response: Result<bool, FeatureFlagError>,
+    ) -> bool {
+        let mut mock_ff_client = MockFeatureFlagClient::new();
 
-        assert!(
-            should_send_prod_idv_requests(feature_flag_client, &test_tenant_id, &test_ob_config_key)
-                .await
-                .unwrap()
-        );
+        let tenant_id = TenantId::from_str("tenant123").unwrap();
+        let ob_configuration_id = ObConfigurationKey::from_str("obc123").unwrap();
+
+        mock_ff_client
+            .expect_bool_flag_by_tenant_id()
+            .with(eq("EnableProductionIdvCallsByTenant"), eq(tenant_id.clone()))
+            .times(1)
+            .return_once(|_, _| tenant_flag_response);
+
+        mock_ff_client
+            .expect_bool_flag_by_ob_configuration_key()
+            .with(
+                eq("EnableProductionIdvCallsByObConfig"),
+                eq(ob_configuration_id.clone()),
+            )
+            .times(1)
+            .return_once(|_, _| ob_config_flag_response);
+
+        should_send_prod_idv_requests(mock_ff_client, &tenant_id, &ob_configuration_id)
     }
 }
