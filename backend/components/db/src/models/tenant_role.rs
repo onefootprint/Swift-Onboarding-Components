@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use super::tenant::Tenant;
 use crate::{
     schema::tenant_role::{self, BoxedQuery},
-    DbError, DbResult, TxnPgConnection,
+    DbError, DbResult, NextPage, OffsetPagination, TxnPgConnection,
 };
 use chrono::{DateTime, Utc};
 use diesel::{dsl::count_star, prelude::*};
@@ -195,14 +195,15 @@ impl TenantRole {
     pub fn list_active(
         conn: &mut PgConnection,
         filters: &TenantRoleListFilters,
-    ) -> DbResult<Vec<(Self, NumActiveUsers)>> {
+        pagination: OffsetPagination,
+    ) -> DbResult<(Vec<(Self, NumActiveUsers)>, NextPage)> {
         use crate::schema::tenant_rolebinding;
         let mut query = Self::list_active_query(filters)
             .order_by(tenant_role::name.asc())
-            .limit(filters.page_size + 1);
+            .limit(pagination.limit());
 
-        if let Some(page) = filters.page {
-            query = query.offset(filters.page_size * (page as i64));
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset)
         }
         let results: Vec<Self> = query.get_results(conn)?;
 
@@ -222,6 +223,7 @@ impl TenantRole {
             .map(|r| (num_active_users_per_role.remove(&r.id).unwrap_or_default(), r))
             .map(|(r, count)| (count, r))
             .collect();
+        let results = pagination.results(results);
         Ok(results)
     }
 
@@ -254,6 +256,4 @@ pub struct TenantRoleListFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub scopes: Option<Vec<TenantScope>>,
     pub name: Option<String>,
-    pub page: Option<usize>,
-    pub page_size: i64,
 }

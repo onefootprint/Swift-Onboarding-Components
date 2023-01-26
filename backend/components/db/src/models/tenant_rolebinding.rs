@@ -1,10 +1,10 @@
 use super::tenant::Tenant;
 use super::tenant_role::TenantRole;
 use super::tenant_user::TenantUser;
-use crate::DbError;
 use crate::{
     schema::tenant_role, schema::tenant_rolebinding, schema::tenant_user, DbResult, TxnPgConnection,
 };
+use crate::{DbError, NextPage, OffsetPagination};
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -27,6 +27,7 @@ pub struct TenantRolebinding {
 }
 
 pub type TenantUserInfo = (TenantUser, TenantRolebinding, TenantRole, Tenant);
+pub type BasicTenantUserInfo = (TenantUser, TenantRolebinding, TenantRole);
 
 pub enum TenantRolebindingIdentifier<'a> {
     Id(&'a TenantRolebindingId),
@@ -233,7 +234,8 @@ impl TenantRolebinding {
     pub fn list(
         conn: &mut PgConnection,
         filters: &TenantRolebindingFilters,
-    ) -> DbResult<Vec<(TenantUser, Self, TenantRole)>> {
+        pagination: OffsetPagination,
+    ) -> DbResult<(Vec<BasicTenantUserInfo>, NextPage)> {
         // Apply filters. TODO share these with count. Do list of filters
         let mut query = tenant_user::table
             .inner_join(tenant_rolebinding::table.inner_join(tenant_role::table))
@@ -263,19 +265,16 @@ impl TenantRolebinding {
         }
 
         // Apply pagination filters
-        if let Some(page) = filters.page {
-            query = query.offset(filters.page_size * (page as i64));
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset)
         }
-        // Always fetch one extra result so we can see if there is another page
-        query = query
-            .order_by(tenant_user::email.asc())
-            .limit(filters.page_size + 1);
+        query = query.order_by(tenant_user::email.asc()).limit(pagination.limit());
         let results = query
             .get_results::<(TenantUser, (TenantRolebinding, TenantRole))>(conn)?
             .into_iter()
             .map(|(tu, (rb, tr))| (tu, rb, tr))
             .collect();
-        Ok(results)
+        Ok(pagination.results(results))
     }
 }
 
@@ -302,8 +301,6 @@ pub struct TenantRolebindingUpdate {
 pub struct TenantRolebindingFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub only_active: bool,
-    pub page: Option<usize>,
-    pub page_size: i64,
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,
     pub is_invite_pending: Option<bool>,

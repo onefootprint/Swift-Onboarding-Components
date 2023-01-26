@@ -16,6 +16,9 @@ pub mod models;
 mod connection;
 pub use connection::TxnPgConnection;
 
+mod pagination;
+pub use pagination::*;
+
 use std::time::Duration;
 
 pub use crate::errors::DbError;

@@ -58,12 +58,4 @@ impl OffsetPaginationRequest {
             state.config.default_page_size
         }
     }
-
-    pub fn next_page(&self, state: &web::Data<State>, num_results: usize) -> Option<usize> {
-        if num_results > self.page_size(state) {
-            Some(self.page.unwrap_or_default() + 1)
-        } else {
-            None
-        }
-    }
 }

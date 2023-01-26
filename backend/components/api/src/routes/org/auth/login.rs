@@ -19,6 +19,7 @@ use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters};
 use db::models::tenant_user::TenantUser;
 use db::tenant::get_opt_by_workos_org_id;
+use db::OffsetPagination;
 use itertools::Itertools;
 use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope, TenantUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -138,14 +139,14 @@ async fn create_tenant_rolebinding(
             // Otherwise, read-only perms
             let filters = TenantRolebindingFilters {
                 tenant_id: &tenant_id,
-                page: None,
-                page_size: 1,
                 only_active: false,
                 role_ids: None,
                 search: None,
                 is_invite_pending: None,
             };
-            let are_no_users = TenantRolebinding::list(conn, &filters)?.is_empty();
+            let pagination = OffsetPagination::new(None, 1);
+            let (users, _) = TenantRolebinding::list(conn, &filters, pagination)?;
+            let are_no_users = users.is_empty();
             let role_id = if are_no_users { admin_role.id } else { ro_role.id };
             let (rb, _) = TenantRolebinding::create(conn, user_id, role_id, tenant_id)?;
             Ok(rb)

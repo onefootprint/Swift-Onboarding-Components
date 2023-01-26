@@ -11,6 +11,7 @@ use crate::State;
 use api_wire_types::OrgRoleFilters;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_role::TenantRoleListFilters;
+use db::OffsetPagination;
 use newtypes::TenantRoleId;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
@@ -38,29 +39,26 @@ async fn get(
     let scopes = scopes.map(|s| s.0);
 
     let tenant_id = tenant.id.clone();
-    let (results, count) = state
+    let (results, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantRoleListFilters {
                 tenant_id: &tenant_id,
                 scopes,
                 name,
-                page,
-                page_size: page_size as i64,
             };
-            let results = TenantRole::list_active(conn, &filters)?;
+            let pagination = OffsetPagination::new(page, page_size);
+            let (results, next_page) = TenantRole::list_active(conn, &filters, pagination)?;
             let count = TenantRole::count_active(conn, &filters)?;
-            Ok((results, count))
+            Ok((results, next_page, count))
         })
         .await??;
 
-    let next_page = pagination.next_page(&state, results.len());
     let results = results
         .into_iter()
-        .take(page_size)
         .map(|(r, num_active_users)| (r, Some(num_active_users)))
         .map(api_wire_types::OrganizationRole::from_db)
-        .collect::<Vec<api_wire_types::OrganizationRole>>();
+        .collect();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 

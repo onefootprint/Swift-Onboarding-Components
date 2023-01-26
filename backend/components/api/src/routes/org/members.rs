@@ -19,6 +19,7 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_rolebinding::TenantRolebindingFilters;
 use db::models::tenant_rolebinding::TenantRolebindingUpdate;
 use db::models::tenant_user::{TenantUser, TenantUserUpdate};
+use db::OffsetPagination;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantRoleId;
 use newtypes::TenantRolebindingId;
@@ -49,30 +50,27 @@ async fn get(
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let tenant_id = tenant.id.clone();
-    let (results, count) = state
+    let (results, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantRolebindingFilters {
                 tenant_id: &tenant_id,
-                page,
-                page_size: page_size as i64,
                 only_active: true,
                 role_ids,
                 search,
                 is_invite_pending,
             };
-            let result = TenantRolebinding::list(conn, &filters)?;
+            let pagination = OffsetPagination::new(page, page_size);
+            let (results, next_page) = TenantRolebinding::list(conn, &filters, pagination)?;
             let count = TenantRolebinding::count(conn, &filters)?;
-            Ok((result, count))
+            Ok((results, next_page, count))
         })
         .await??;
 
-    let next_page = pagination.next_page(&state, results.len());
     let results = results
         .into_iter()
-        .take(page_size)
         .map(api_wire_types::OrganizationMember::from_db)
-        .collect::<Vec<api_wire_types::OrganizationMember>>();
+        .collect();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
