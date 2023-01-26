@@ -1,0 +1,2 @@
+ALTER TABLE tenant_user ADD COLUMN is_firm_employee BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE tenant_user ALTER COLUMN is_firm_employee DROP DEFAULT;

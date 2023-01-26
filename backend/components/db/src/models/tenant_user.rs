@@ -15,6 +15,7 @@ pub struct TenantUser {
     pub created_at: DateTime<Utc>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
+    pub is_firm_employee: bool,
 }
 
 impl TenantUser {
@@ -50,6 +51,9 @@ impl TenantUser {
             first_name,
             last_name,
             created_at: Utc::now(),
+            // No codepaths make firm-employee TenantUsers. For now, we'll just set this flag in
+            // the DB manually
+            is_firm_employee: false,
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
@@ -86,6 +90,7 @@ struct NewTenantUser {
     created_at: DateTime<Utc>,
     first_name: Option<String>,
     last_name: Option<String>,
+    is_firm_employee: bool,
 }
 
 #[derive(AsChangeset)]

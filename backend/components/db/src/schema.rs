@@ -569,6 +569,7 @@ table! {
         created_at -> Timestamptz,
         first_name -> Nullable<Text>,
         last_name -> Nullable<Text>,
+        is_firm_employee -> Bool,
     }
 }
 
