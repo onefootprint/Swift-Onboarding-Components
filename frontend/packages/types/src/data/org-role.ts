@@ -20,9 +20,10 @@ export type OrgRoleScope =
   | 'manual_review';
 
 export type OrgRole = {
-  id: string;
-  name: string;
-  scopes: OrgRoleScope[];
-  isImmutable: boolean;
   createdAt: string;
+  id: string;
+  isImmutable: boolean;
+  name: string;
+  numActiveUsers: number;
+  scopes: OrgRoleScope[];
 };

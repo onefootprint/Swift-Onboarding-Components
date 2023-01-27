@@ -80,6 +80,7 @@ export const orgRolesFixture: OrgRole[] = [
     scopes: ['admin'],
     isImmutable: true,
     createdAt: '2022-09-19T16:24:35.367322Z',
+    numActiveUsers: 1,
   },
   {
     id: 'orgrole_erflKNWEF13143EWRWELJN',
@@ -87,6 +88,7 @@ export const orgRolesFixture: OrgRole[] = [
     isImmutable: true,
     scopes: ['read'],
     createdAt: '2023-01-06T05:11:08.415924Z',
+    numActiveUsers: 4,
   },
 ];
 

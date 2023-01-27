@@ -812,6 +812,7 @@
           "aria-label": "Table of organization roles",
           "header": {
             "role": "Role",
+            "active-users": "Active users",
             "created": "Created at",
             "permissions": "Permissions"
           },

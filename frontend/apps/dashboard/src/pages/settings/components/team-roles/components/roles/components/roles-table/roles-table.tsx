@@ -16,9 +16,10 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
   const { t } = useTranslation('pages.settings.roles');
   const filters = useOrgRolesFilters();
   const columns = [
-    { id: 'role', text: t('table.header.role'), width: '25%' },
+    { id: 'role', text: t('table.header.role'), width: '20%' },
+    { id: 'active-users', text: t('table.header.active-users'), width: '15%' },
+    { id: 'permissions', text: t('table.header.permissions'), width: '50%' },
     { id: 'created', text: t('table.header.created'), width: '15%' },
-    { id: 'permissions', text: t('table.header.permissions'), width: '55%' },
     { id: 'actions', text: '', width: '5%' },
   ];
 
@@ -41,6 +42,7 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
           id={role.id}
           isImmutable={role.isImmutable}
           name={role.name}
+          numActiveUsers={role.numActiveUsers}
           scopes={role.scopes}
         />
       )}

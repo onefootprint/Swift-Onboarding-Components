@@ -10,17 +10,19 @@ describe('<Row />', () => {
     scopes = ['admin'],
     isImmutable = true,
     createdAt = '11/17/22, 9:04 PM',
+    numActiveUsers = 0,
   }: Partial<RowProps>) => {
     customRender(
       <table>
         <tbody>
           <tr>
             <Row
-              id={id}
-              name={name}
-              scopes={scopes}
-              isImmutable={isImmutable}
               createdAt={createdAt}
+              id={id}
+              isImmutable={isImmutable}
+              name={name}
+              numActiveUsers={numActiveUsers}
+              scopes={scopes}
             />
           </tr>
         </tbody>

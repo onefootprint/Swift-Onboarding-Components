@@ -67,11 +67,14 @@ describe('<Roles />', () => {
       withOrgRoles();
     });
 
-    it('should role name, created at and permissions', async () => {
+    it('should role name, number of active users, created at and permissions', async () => {
       await renderRolesAndWaitData();
       orgRolesFixture.forEach((role, index) => {
         const name = screen.getByText(role.name);
         expect(name).toBeInTheDocument();
+
+        const numActiveUsers = screen.getByText(role.numActiveUsers);
+        expect(numActiveUsers).toBeInTheDocument();
 
         role.scopes.forEach((scope, scopeIndex) => {
           const scopeText = orgRolesScopesFixture[scopeIndex];
@@ -123,6 +126,7 @@ describe('<Roles />', () => {
             scopes: ['read', 'api_keys'],
             isImmutable: false,
             createdAt: '2022-09-19T16:24:35.367322Z',
+            numActiveUsers: 0,
           });
         });
 
@@ -135,6 +139,7 @@ describe('<Roles />', () => {
               scopes: ['read', 'api_keys'],
               isImmutable: false,
               createdAt: '2022-09-19T16:24:35.367322Z',
+              numActiveUsers: 0,
             },
           ]);
           await renderRolesAndWaitData();

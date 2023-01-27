@@ -8,6 +8,7 @@ export const orgRolesFixture: OrgRole[] = [
     scopes: ['api_keys'],
     isImmutable: false,
     createdAt: '2022-11-18T00:04:11.368107Z',
+    numActiveUsers: 4,
   },
   {
     id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
@@ -15,6 +16,7 @@ export const orgRolesFixture: OrgRole[] = [
     scopes: ['admin'],
     isImmutable: true,
     createdAt: '2023-01-25T21:47:22.679708Z',
+    numActiveUsers: 1,
   },
   {
     id: 'orgrole_erflKNWEF13143EWRWELJN',
@@ -22,6 +24,7 @@ export const orgRolesFixture: OrgRole[] = [
     isImmutable: true,
     scopes: ['read'],
     createdAt: '2023-01-06T04:33:34.272399Z',
+    numActiveUsers: 3,
   },
 ];
 
