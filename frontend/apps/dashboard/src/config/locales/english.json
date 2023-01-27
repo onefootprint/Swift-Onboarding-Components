@@ -869,7 +869,7 @@
         },
         "scopes": {
           "admin": "Everything",
-          "read": "Member",
+          "read": "Read-only",
           "onboarding_configuration": "Manage onboarding configuration",
           "api_keys": "Manage API keys",
           "org_settings": "Modify organization settings",
