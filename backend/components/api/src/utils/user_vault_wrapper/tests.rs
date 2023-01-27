@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use super::UserVaultWrapper;
-use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_vault_data::NewUserVaultData;
@@ -10,18 +9,14 @@ use db::tests::fixtures;
 use db::tests::prelude::*;
 use itertools::Itertools;
 use macros::db_test;
-use newtypes::address::{Address, AddressLine, City, Country, FullAddressOrZip, State, Zip, ZipAndCountry};
-use newtypes::dob::DateOfBirth;
 use newtypes::email::Email;
+use newtypes::DataIdentifier;
 use newtypes::Fingerprint;
-use newtypes::IdentityDataKind;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::IdentityDataUpdate;
 use newtypes::KvDataKey;
 use newtypes::SealedVaultBytes;
-use newtypes::{
-    name::{FullName, Name},
-    ssn::{Ssn, Ssn4, Ssn9},
-    PiiString, UvdKind,
-};
+use newtypes::{PiiString, UvdKind};
 use std::str::FromStr;
 
 #[db_test]
@@ -57,19 +52,19 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
 
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![
-        (IdentityDataKind::FirstName, Some(SealedVaultBytes(vec![1]))),
-        (IdentityDataKind::LastName, Some(SealedVaultBytes(vec![2]))),
-        (IdentityDataKind::Ssn4, Some(SealedVaultBytes(vec![3]))),
-        (IdentityDataKind::Email, Some(email.e_data)),
-        (IdentityDataKind::PhoneNumber, Some(phone_number.e_e164.clone())),
-        (IdentityDataKind::Dob, None),
-        (IdentityDataKind::AddressLine1, None),
-        (IdentityDataKind::AddressLine2, None),
-        (IdentityDataKind::City, None),
-        (IdentityDataKind::State, None),
-        (IdentityDataKind::Zip, None),
-        (IdentityDataKind::Country, None),
-        (IdentityDataKind::Ssn9, None),
+        (IDK::FirstName, Some(SealedVaultBytes(vec![1]))),
+        (IDK::LastName, Some(SealedVaultBytes(vec![2]))),
+        (IDK::Ssn4, Some(SealedVaultBytes(vec![3]))),
+        (IDK::Email, Some(email.e_data)),
+        (IDK::PhoneNumber, Some(phone_number.e_e164.clone())),
+        (IDK::Dob, None),
+        (IDK::AddressLine1, None),
+        (IDK::AddressLine2, None),
+        (IDK::City, None),
+        (IDK::State, None),
+        (IDK::Zip, None),
+        (IDK::Country, None),
+        (IDK::Ssn9, None),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -79,19 +74,19 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
     // build_for_user should only show the phone number
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
     let tests = vec![
-        (IdentityDataKind::FirstName, None),
-        (IdentityDataKind::LastName, None),
-        (IdentityDataKind::Ssn4, None),
-        (IdentityDataKind::Email, None),
-        (IdentityDataKind::PhoneNumber, Some(phone_number.e_e164)),
-        (IdentityDataKind::Dob, None),
-        (IdentityDataKind::AddressLine1, None),
-        (IdentityDataKind::AddressLine2, None),
-        (IdentityDataKind::City, None),
-        (IdentityDataKind::State, None),
-        (IdentityDataKind::Zip, None),
-        (IdentityDataKind::Country, None),
-        (IdentityDataKind::Ssn9, None),
+        (IDK::FirstName, None),
+        (IDK::LastName, None),
+        (IDK::Ssn4, None),
+        (IDK::Email, None),
+        (IDK::PhoneNumber, Some(phone_number.e_e164)),
+        (IDK::Dob, None),
+        (IDK::AddressLine1, None),
+        (IDK::AddressLine2, None),
+        (IDK::City, None),
+        (IDK::State, None),
+        (IDK::Zip, None),
+        (IDK::Country, None),
+        (IDK::Ssn9, None),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -118,72 +113,31 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
 
     // Add a name
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    let update = IdentityDataUpdate {
-        name: Some(FullName {
-            first_name: Name::from_str("Flerp").unwrap(),
-            last_name: Name::from_str("Derp").unwrap(),
-        }),
-        dob: None,
-        address: None,
-        ssn: None,
-    };
+    let update = [
+        (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
+        (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+    ];
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
     uvw.update_identity_data(conn, update, vec![]).unwrap();
 
     // Make the user can't see the name and email until it's portable
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert!(!uvw.has_identity_field(IdentityDataKind::FirstName));
-    assert!(!uvw.has_identity_field(IdentityDataKind::LastName));
-    assert!(!uvw.has_identity_field(IdentityDataKind::Email));
+    assert!(!uvw.has_identity_field(IDK::FirstName));
+    assert!(!uvw.has_identity_field(IDK::LastName));
+    assert!(!uvw.has_identity_field(IDK::Email));
 
     // Commit
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
-    assert!(uvw.has_identity_field(IdentityDataKind::LastName));
-    assert!(uvw.has_identity_field(IdentityDataKind::Email));
+    assert!(uvw.has_identity_field(IDK::FirstName));
+    assert!(uvw.has_identity_field(IDK::LastName));
+    assert!(uvw.has_identity_field(IDK::Email));
     uvw.commit_identity_data(conn).unwrap();
 
     // Now we should see the portable name and email
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
-    assert!(uvw.has_identity_field(IdentityDataKind::LastName));
-    assert!(uvw.has_identity_field(IdentityDataKind::Email));
-}
-
-// Some impls to make test code cleaner
-impl From<FullName> for IdentityDataUpdate {
-    fn from(value: FullName) -> Self {
-        Self {
-            name: Some(value),
-            ..Self::default()
-        }
-    }
-}
-
-impl From<DateOfBirth> for IdentityDataUpdate {
-    fn from(value: DateOfBirth) -> Self {
-        Self {
-            dob: Some(value),
-            ..Self::default()
-        }
-    }
-}
-
-impl From<FullAddressOrZip> for IdentityDataUpdate {
-    fn from(value: FullAddressOrZip) -> Self {
-        Self {
-            address: Some(value),
-            ..Self::default()
-        }
-    }
-}
-
-impl From<Ssn> for IdentityDataUpdate {
-    fn from(value: Ssn) -> Self {
-        Self {
-            ssn: Some(value),
-            ..Self::default()
-        }
-    }
+    assert!(uvw.has_identity_field(IDK::FirstName));
+    assert!(uvw.has_identity_field(IDK::LastName));
+    assert!(uvw.has_identity_field(IDK::Email));
 }
 
 #[db_test]
@@ -196,7 +150,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConnection) {
     let su2 = fixtures::scoped_user::create(conn, &uv.id, &ob_config2.id);
 
     struct Test<'a> {
-        update: IdentityDataUpdate,
+        update: Vec<(DataIdentifier, PiiString)>,
         su_id: &'a newtypes::ScopedUserId,
         is_allowed: bool,
     }
@@ -204,100 +158,89 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConnection) {
     // Apply a series of updates in order. Some of the updates are allowed, others are not
     let tests = vec![
         Test {
-            update: FullName {
-                first_name: Name::from_str("Flerp").unwrap(),
-                last_name: Name::from_str("Derp").unwrap(),
-            }
-            .into(),
+            update: vec![
+                (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
+                (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+            ],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to replace name
         Test {
-            update: FullName {
-                first_name: Name::from_str("Merp").unwrap(),
-                last_name: Name::from_str("Derp").unwrap(),
-            }
-            .into(),
+            update: vec![
+                (IDK::FirstName.into(), PiiString::new("Merp".to_owned())),
+                (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+            ],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to add ssn4
         Test {
-            update: Ssn::Ssn4(Ssn4::from_str("1234").unwrap()).into(),
+            update: vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to add ssn9 after ssn4
         Test {
-            update: Ssn::Ssn9(Ssn9::from_str("123121234").unwrap()).into(),
+            update: vec![(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))],
             su_id: &su.id,
             is_allowed: true,
         },
         // NOT allowed to add ssn4 after ssn9
         Test {
-            update: Ssn::Ssn4(Ssn4::from_str("1234").unwrap()).into(),
+            update: vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))],
             su_id: &su.id,
             is_allowed: false,
         },
         // BUT, can add ssn4 on different scoped user
         Test {
-            update: Ssn::Ssn4(Ssn4::from_str("1234").unwrap()).into(),
+            update: vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))],
             su_id: &su2.id, // This is the only test that uses su2
             is_allowed: true,
         },
         // Allowed to add partial address
         Test {
-            update: FullAddressOrZip::ZipAndCountry(ZipAndCountry {
-                zip: Zip::try_from("94117".to_owned()).unwrap(),
-                country: Country::try_from("US".to_owned()).unwrap(),
-            })
-            .into(),
+            update: vec![
+                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
+                (IDK::Country.into(), PiiString::new("US".to_owned())),
+            ],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to add full address on top of partial address
         Test {
-            update: FullAddressOrZip::Address(Address {
-                line1: AddressLine::try_from("Flerp".to_owned()).unwrap(),
-                line2: None,
-                city: City::try_from("San Francisco".to_owned()).unwrap(),
-                state: State::try_from("CA".to_owned()).unwrap(),
-                zip: Zip::try_from("94117".to_owned()).unwrap(),
-                country: Country::try_from("US".to_owned()).unwrap(),
-            })
-            .into(),
+            update: vec![
+                (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),
+                (IDK::City.into(), PiiString::new("San Francisco".to_owned())),
+                (IDK::State.into(), PiiString::new("CA".to_owned())),
+                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
+                (IDK::Country.into(), PiiString::new("US".to_owned())),
+            ],
             su_id: &su.id,
             is_allowed: true,
         },
         // Not allowed to add partial address on top of full address
         Test {
-            update: FullAddressOrZip::ZipAndCountry(ZipAndCountry {
-                zip: Zip::try_from("94117".to_owned()).unwrap(),
-                country: Country::try_from("US".to_owned()).unwrap(),
-            })
-            .into(),
+            update: vec![
+                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
+                (IDK::Country.into(), PiiString::new("US".to_owned())),
+            ],
             su_id: &su.id,
             is_allowed: false,
         },
         // Allowed to update all remaining info
         Test {
-            update: IdentityDataUpdate {
-                name: Some(FullName {
-                    first_name: Name::from_str("Merp").unwrap(),
-                    last_name: Name::from_str("Derp").unwrap(),
-                }),
-                dob: Some(DateOfBirth::try_from(PiiString::new("1995-12-25".to_owned())).unwrap()),
-                address: Some(FullAddressOrZip::Address(Address {
-                    line1: AddressLine::try_from("Flerp".to_owned()).unwrap(),
-                    line2: None,
-                    city: City::try_from("San Francisco".to_owned()).unwrap(),
-                    state: State::try_from("CA".to_owned()).unwrap(),
-                    zip: Zip::try_from("94117".to_owned()).unwrap(),
-                    country: Country::try_from("US".to_owned()).unwrap(),
-                })),
-                ssn: Some(Ssn::Ssn9(Ssn9::from_str("123121234").unwrap())),
-            },
+            update: vec![
+                (IDK::FirstName.into(), PiiString::new("Lerp".to_owned())),
+                (IDK::LastName.into(), PiiString::new("Merp".to_owned())),
+                (IDK::Dob.into(), PiiString::new("1990-12-25".to_owned())),
+                (IDK::Ssn9.into(), PiiString::new("123121234".to_owned())),
+                (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),
+                (IDK::City.into(), PiiString::new("San Francisco".to_owned())),
+                (IDK::State.into(), PiiString::new("CA".to_owned())),
+                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
+                (IDK::Country.into(), PiiString::new("US".to_owned())),
+            ],
             su_id: &su.id,
             is_allowed: true,
         },
@@ -312,7 +255,10 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConnection) {
             is_allowed,
         } = test;
         let uvw = UserVaultWrapper::lock_for_onboarding(conn, su_id).unwrap();
-        let result = uvw.update_identity_data(conn, update.clone(), vec![]);
+        let update = IdentityDataUpdate::new(HashMap::from_iter(update.into_iter()))
+            .unwrap()
+            .0;
+        let result = uvw.update_identity_data(conn, update, vec![]);
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
 }
@@ -334,29 +280,28 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
     let su2 = fixtures::scoped_user::create(conn, &uv.id, &ob_config2.id);
 
     // Add speculative ssn4 (and some other data) by tenant 1
-    let update = IdentityDataUpdate {
-        ssn: Some(Ssn::Ssn4(Ssn4::from_str("0987").unwrap())),
-        name: Some(FullName {
-            first_name: Name::from_str("Flerp").unwrap(),
-            last_name: Name::from_str("Derp").unwrap(),
-        }),
-        ..IdentityDataUpdate::default()
-    };
+    let update = [
+        (IDK::FirstName.into(), PiiString::new("Lerp".to_owned())),
+        (IDK::LastName.into(), PiiString::new("Merp".to_owned())),
+        (IDK::Ssn4.into(), PiiString::new("1234".to_owned())),
+    ];
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 as was written by tenant 1
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
-    let ssn4_tenant1 = uvw.get_identity_e_field(IdentityDataKind::Ssn4);
-    assert!(!uvw.has_identity_field(IdentityDataKind::Ssn9));
+    let ssn4_tenant1 = uvw.get_identity_e_field(IDK::Ssn4);
+    assert!(!uvw.has_identity_field(IDK::Ssn9));
 
     // Add speculative ssn9 by tenant 2
-    let update = Ssn::Ssn9(Ssn9::from_str("123121234").unwrap()).into();
+    let update = [(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))];
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
     uvw.update_identity_data(conn, update, vec![]).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su2.id)).unwrap();
-    let ssn4_tenant2 = uvw.get_identity_e_field(IdentityDataKind::Ssn4);
-    let ssn9_tenant2 = uvw.get_identity_e_field(IdentityDataKind::Ssn9);
+    let ssn4_tenant2 = uvw.get_identity_e_field(IDK::Ssn4);
+    let ssn9_tenant2 = uvw.get_identity_e_field(IDK::Ssn9);
     assert_ne!(ssn4_tenant1, ssn4_tenant2);
 
     // Commit data for tenant2
@@ -369,11 +314,11 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
 
     // Now, when getting portable data, we should still see the ssn9 added for tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
-    assert_eq!(uvw.get_identity_e_field(IdentityDataKind::Ssn4), ssn4_tenant2);
-    assert_eq!(uvw.get_identity_e_field(IdentityDataKind::Ssn9), ssn9_tenant2);
+    assert_eq!(uvw.get_identity_e_field(IDK::Ssn4), ssn4_tenant2);
+    assert_eq!(uvw.get_identity_e_field(IDK::Ssn9), ssn9_tenant2);
     // But, we should still have the name that was portable by tenant 1
-    assert!(uvw.has_identity_field(IdentityDataKind::FirstName));
-    assert!(uvw.has_identity_field(IdentityDataKind::LastName));
+    assert!(uvw.has_identity_field(IDK::FirstName));
+    assert!(uvw.has_identity_field(IDK::LastName));
 }
 
 #[db_test]
@@ -385,42 +330,44 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
 
     let updates = vec![
         // Partial address
-        FullAddressOrZip::ZipAndCountry(ZipAndCountry {
-            zip: Zip::try_from("94117".to_owned()).unwrap(),
-            country: Country::try_from("US".to_owned()).unwrap(),
-        }),
+        vec![
+            (IDK::Zip.into(), PiiString::new("94117".to_owned())),
+            (IDK::Country.into(), PiiString::new("US".to_owned())),
+        ],
         // Full address with line2
-        FullAddressOrZip::Address(Address {
-            line1: AddressLine::try_from("Flerp".to_owned()).unwrap(),
-            line2: Some(AddressLine::try_from("Flerp".to_owned()).unwrap()),
-            city: City::try_from("San Francisco".to_owned()).unwrap(),
-            state: State::try_from("CA".to_owned()).unwrap(),
-            zip: Zip::try_from("94117".to_owned()).unwrap(),
-            country: Country::try_from("US".to_owned()).unwrap(),
-        }),
+        vec![
+            (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),
+            (IDK::AddressLine2.into(), PiiString::new("Flerp".to_owned())),
+            (IDK::City.into(), PiiString::new("San Francisco".to_owned())),
+            (IDK::State.into(), PiiString::new("CA".to_owned())),
+            (IDK::Zip.into(), PiiString::new("94117".to_owned())),
+            (IDK::Country.into(), PiiString::new("US".to_owned())),
+        ],
         // Full address without line2
-        FullAddressOrZip::Address(Address {
-            line1: AddressLine::try_from("Flerp".to_owned()).unwrap(),
-            line2: None,
-            city: City::try_from("San Francisco".to_owned()).unwrap(),
-            state: State::try_from("CA".to_owned()).unwrap(),
-            zip: Zip::try_from("94117".to_owned()).unwrap(),
-            country: Country::try_from("US".to_owned()).unwrap(),
-        }),
+        vec![
+            (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),
+            (IDK::City.into(), PiiString::new("San Francisco".to_owned())),
+            (IDK::State.into(), PiiString::new("CA".to_owned())),
+            (IDK::Zip.into(), PiiString::new("94117".to_owned())),
+            (IDK::Country.into(), PiiString::new("US".to_owned())),
+        ],
     ];
 
     for update in updates {
+        let update = IdentityDataUpdate::new(HashMap::from_iter(update.into_iter()))
+            .unwrap()
+            .0;
         let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
         uvw.update_identity_data(conn, update.into(), vec![]).unwrap();
     }
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
-    assert!(uvw.has_identity_field(IdentityDataKind::AddressLine1));
+    assert!(uvw.has_identity_field(IDK::AddressLine1));
     // We should have cleared out line2 in the last update
-    assert!(!uvw.has_identity_field(IdentityDataKind::AddressLine2));
-    assert!(uvw.has_identity_field(IdentityDataKind::City));
-    assert!(uvw.has_identity_field(IdentityDataKind::State));
-    assert!(uvw.has_identity_field(IdentityDataKind::Zip));
-    assert!(uvw.has_identity_field(IdentityDataKind::Country));
+    assert!(!uvw.has_identity_field(IDK::AddressLine2));
+    assert!(uvw.has_identity_field(IDK::City));
+    assert!(uvw.has_identity_field(IDK::State));
+    assert!(uvw.has_identity_field(IDK::Zip));
+    assert!(uvw.has_identity_field(IDK::Country));
 }
 
 #[db_test]
@@ -479,10 +426,8 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     // Add some identity data
-    let update = IdentityDataUpdate {
-        ssn: Some(Ssn::Ssn4(Ssn4::from_str("0987").unwrap())),
-        ..IdentityDataUpdate::default()
-    };
+    let update = [(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))];
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_identity_data(conn, update, vec![]).unwrap();
 
@@ -524,6 +469,6 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
     assert!(expected_speculative_kinds.iter().all(|k| speculative.contains(k)));
 
     // But identity data should be portable
-    let expected_portable_kinds = [IdentityDataKind::Ssn4.into()];
+    let expected_portable_kinds = [IDK::Ssn4.into()];
     assert!(expected_portable_kinds.iter().all(|k| portable.contains(k)));
 }

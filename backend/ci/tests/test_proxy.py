@@ -106,8 +106,9 @@ class TestVaultProxy:
         # post data to it
         user_data = build_user_data()
         data = {
-            "identity": user_data,
-            "custom": {"ach_account_number": "123467890", "cc4": "4242"},
+            "custom.ach_account_number": "123467890",
+            "custom.cc4": "4242",
+            **user_data,
         }
         put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -122,7 +123,6 @@ class TestVaultProxy:
             "ssn": f"{{{{ {fp_id}.id.ssn9 }}}}",
         }
 
-        print(data)
         response = _make_request(
             method=requests.post,
             path="proxy",
@@ -146,10 +146,10 @@ class TestVaultProxy:
         assert result["ach"] == "123467890"
         assert result["last4_credit_card"] == "4242"
 
-        first = user_data["name"]["first_name"]
-        last = user_data["name"]["last_name"]
+        first = user_data["id.first_name"]
+        last = user_data["id.last_name"]
         assert result["full_name"] == f"{first} {last}"
-        assert result["ssn"] == user_data["ssn9"]
+        assert result["ssn"] == user_data["id.ssn9"]
 
     def test_proxy_tls(self, sandbox_tenant):
         # create the vault
@@ -161,8 +161,8 @@ class TestVaultProxy:
         # post data to it
         user_data = build_user_data()
         data = {
-            "identity": user_data,
-            "custom": {"test_field": "hello world"},
+            "custom.test_field": "hello world",
+            **user_data,
         }
         put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -222,8 +222,8 @@ class TestVaultProxy:
         # post data to it
         user_data = build_user_data()
         data = {
-            "identity": user_data,
-            "custom": {"test_field": "hello world"},
+            "custom.test_field": "hello world",
+            **user_data,
         }
         put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -274,8 +274,8 @@ class TestVaultProxy:
         # post data to it
         user_data = build_user_data()
         data = {
-            "identity": user_data,
-            "custom": {"message": "hello world"},
+            "custom.message": "hello world",
+            **user_data,
         }
         put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -308,8 +308,8 @@ class TestVaultProxy:
         result = response.json()
         # print(result)
 
-        first = user_data["name"]["first_name"]
-        last = user_data["name"]["last_name"]
+        first = user_data["id.first_name"]
+        last = user_data["id.last_name"]
         assert result["full_name"] == f"{first} {last}"
         assert result["msg"] == "hello world"
 

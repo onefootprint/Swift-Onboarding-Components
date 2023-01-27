@@ -71,6 +71,8 @@ pub enum Error {
     DeserializeError,
     #[error("{0}")]
     ProxyTokenError(#[from] ProxyTokenError),
+    #[error("Cannot convert to UvdKind: {0}")]
+    UvdKindConversionError(IdentityDataKind),
     #[error("expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
     #[error("{0:?}")]

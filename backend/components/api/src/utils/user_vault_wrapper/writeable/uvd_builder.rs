@@ -1,7 +1,4 @@
-use crate::{
-    errors::{user::UserError, ApiError, ApiResult},
-    types::identity_data_request::IdentityDataUpdate,
-};
+use crate::errors::{user::UserError, ApiError, ApiResult};
 use db::{
     models::{
         data_lifetime::DataLifetime,
@@ -11,11 +8,8 @@ use db::{
     TxnPgConnection,
 };
 use newtypes::{
-    address::{Address, FullAddressOrZip, ZipAndCountry},
-    name::FullName,
-    ssn::{Ssn, Ssn4},
-    CollectedDataOption, DataLifetimeKind, Fingerprint as FingerprintBytes, IdentityDataKind, PiiString,
-    ScopedUserId, UserVaultId, UvdKind, VaultPublicKey,
+    CollectedDataOption, DataLifetimeKind, Fingerprint as FingerprintBytes, IdentityDataKind,
+    IdentityDataUpdate, PiiString, ScopedUserId, UserVaultId, UvdKind, VaultPublicKey,
 };
 use std::collections::HashMap;
 
@@ -35,65 +29,10 @@ impl UvdBuilder {
             Ok(())
         };
 
-        let IdentityDataUpdate {
-            name,
-            dob,
-            ssn,
-            address,
-        } = update;
-
-        // Add the name, if provided
-        if let Some(name) = name {
-            let FullName {
-                first_name,
-                last_name,
-            } = name;
-            add_sealed(first_name.into(), UvdKind::FirstName)?;
-            add_sealed(last_name.into(), UvdKind::LastName)?;
-        }
-
-        // Add the dob, if provided
-        if let Some(dob) = dob {
-            add_sealed(dob.into(), UvdKind::Dob)?;
-        }
-
-        // Add the ssn, if provided
-        match ssn {
-            Some(Ssn::Ssn9(ssn9)) => {
-                let ssn4 = Ssn4::from(&ssn9);
-                add_sealed(ssn9.into(), UvdKind::Ssn9)?;
-                add_sealed(ssn4.into(), UvdKind::Ssn4)?;
+        for (kind, pii) in update.into_inner() {
+            if let Some(kind) = kind.uvd_kind() {
+                add_sealed(pii, kind)?;
             }
-            Some(Ssn::Ssn4(ssn4)) => {
-                add_sealed(ssn4.into(), UvdKind::Ssn4)?;
-            }
-            None => {}
-        }
-
-        // Add the address, if provided
-        match address {
-            Some(FullAddressOrZip::Address(Address {
-                line1: line_1,
-                line2: line_2,
-                city,
-                state,
-                zip,
-                country,
-            })) => {
-                add_sealed(line_1.into(), UvdKind::AddressLine1)?;
-                if let Some(line_2) = line_2 {
-                    add_sealed(line_2.into(), UvdKind::AddressLine2)?;
-                }
-                add_sealed(city.into(), UvdKind::City)?;
-                add_sealed(state.into(), UvdKind::State)?;
-                add_sealed(zip.into(), UvdKind::Zip)?;
-                add_sealed(country.into(), UvdKind::Country)?;
-            }
-            Some(FullAddressOrZip::ZipAndCountry(ZipAndCountry { zip, country })) => {
-                add_sealed(zip.into(), UvdKind::Zip)?;
-                add_sealed(country.into(), UvdKind::Country)?;
-            }
-            None => {}
         }
 
         Ok(Self { data })
@@ -106,7 +45,7 @@ impl UvdBuilder {
         existing_fields: Vec<IdentityDataKind>, // portable or speculative on UVW
         user_vault_id: UserVaultId,
         scoped_user_id: ScopedUserId,
-        fingerprints: Vec<(UvdKind, FingerprintBytes)>,
+        fingerprints: Vec<(IdentityDataKind, FingerprintBytes)>,
     ) -> ApiResult<Vec<CollectedDataOption>> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
@@ -138,13 +77,13 @@ impl UvdBuilder {
         let uvds = UserVaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding UVD row
-        let kind_to_lifetime: HashMap<_, _> =
-            HashMap::from_iter(uvds.into_iter().map(|uvd| (uvd.kind, uvd.lifetime_id)));
+        let kind_to_lifetime: HashMap<IdentityDataKind, _> =
+            HashMap::from_iter(uvds.into_iter().map(|uvd| (uvd.kind.into(), uvd.lifetime_id)));
         let fingerprints: Vec<_> = fingerprints
             .into_iter()
             .map(|(kind, sh_data)| -> ApiResult<_> {
                 Ok(NewFingerprint {
-                    kind: IdentityDataKind::from(kind).into(),
+                    kind: kind.into(),
                     sh_data,
                     lifetime_id: kind_to_lifetime
                         .get(&kind)

@@ -84,9 +84,7 @@ def test_get_users_detail_doc_and_selfie(
 ):
     tenant = sandbox_user.tenant
     bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
-    bifrost_client.init_user_for_onboarding(
-        twilio, build_user_data(), document_data=document_data
-    )
+    bifrost_client.init_user_for_onboarding(twilio, document_data=document_data)
     user = bifrost_client.onboard_user_onto_tenant(tenant)
 
     res = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
@@ -158,18 +156,14 @@ def test_portable_failed_data_write(sandbox_user):
     assert body["id.first_name"]
 
     data = {
-        "dob": {
-            "month": 1,
-            "day": 1,
-            "year": 1970,
-        },
-        "ssn9": _gen_random_ssn(),
+        "id.dob": "1970-01-01",
+        "id.ssn9": _gen_random_ssn(),
     }
 
     # ensure we cannot change data in a portable vault
     put(
         f"users/{sandbox_user.fp_user_id}/vault",
-        dict(identity=data),
+        data,
         sandbox_user.tenant.sk.key,
         status_code=401,
     )

@@ -101,6 +101,11 @@ impl IdentityDataKind {
                 | Self::Dob
         )
     }
+
+    /// Gets the UvdKind represented by this IdentityDataKind, if exists
+    pub fn uvd_kind(&self) -> Option<UvdKind> {
+        UvdKind::iter().find(|k| Self::from(*k) == *self)
+    }
 }
 
 impl SaltedFingerprint for IdentityDataKind {

@@ -319,38 +319,26 @@ class TestBifrost:
 
         # Test validating data before setting
         data = {
-            "name": {
-                "first_name": "Flerp",
-                "last_name": "Derp",
-            },
-            "dob": {
-                "month": 12,
-                "day": 25,
-                "year": 1995,
-            },
-            "address": {
-                "line1": "1 Footprint Way",
-                "line2": "",
-                "city": "Enclave",
-                "state": "NY",
-                "zip": "10009",
-                "country": "US",
-            },
-            "ssn9": _gen_random_ssn(),
-            "speculative": True,
+            "id.first_name": "Flerp",
+            "id.last_name": "Derp",
+            "id.dob": "1995-12-25",
+            "id.address_line1": "1 Footprint Way",
+            "id.address_line2": "",
+            "id.city": "Enclave",
+            "id.state": "NY",
+            "id.zip": "10009",
+            "id.country": "US",
+            "id.ssn9": _gen_random_ssn(),
         }
-        post("hosted/user/data/identity", data, non_sandbox_auth_token)
+        post("hosted/user/data/identity/validate", data, non_sandbox_auth_token)
 
         # Actually set the data
-        data.pop("speculative")
         post("hosted/user/data/identity", data, non_sandbox_auth_token)
 
         # Should be allowed to update speculative fields that are already set
         data = {
-            "name": {
-                "first_name": "Flerp2",
-                "last_name": "Derp2",
-            }
+            "id.first_name": "Flerp2",
+            "id.last_name": "Derp2",
         }
         post("hosted/user/data/identity", data, non_sandbox_auth_token)
 
@@ -720,9 +708,7 @@ class TestBifrostSandbox:
         expected_requires_manual_review,
     ):
         bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-        bifrost_client.init_user_for_onboarding(
-            twilio, build_user_data(), sandbox_suffix=suffix
-        )
+        bifrost_client.init_user_for_onboarding(twilio, sandbox_suffix=suffix)
         user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
         # Get the status

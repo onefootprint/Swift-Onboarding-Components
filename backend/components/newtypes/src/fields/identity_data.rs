@@ -10,10 +10,51 @@ use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 
-pub type DataRequest = HashMap<DataIdentifier, PiiString>;
-pub type IdentityDataRequest = HashMap<IDK, PiiString>;
+type DataRequest = HashMap<DataIdentifier, PiiString>;
+type IdentityDataRequest = HashMap<IDK, PiiString>;
 
-pub fn clean_and_validate_id_data(id_data: IdentityDataRequest) -> NtResult<IdentityDataRequest> {
+#[derive(Debug, Clone)]
+pub struct IdentityDataUpdate(IdentityDataRequest);
+
+impl IdentityDataUpdate {
+    /// Composes a new IdentityDataUpdate with cleaned and validated data, and returns any other
+    /// non-identity key-value pairs included in the input DataRequest
+    pub fn new(map: DataRequest) -> NtResult<(Self, DataRequest)> {
+        let (id_data, other_data): (HashMap<_, _>, HashMap<_, _>) =
+            map.into_iter().partition_map(|(k, v)| match k {
+                DataIdentifier::Id(idk) => Left((idk, v)),
+                k => Right((k, v)),
+            });
+
+        let clean_id_data = clean_and_validate_id_data(id_data)?;
+        let id_update = Self(clean_id_data);
+        Ok((id_update, other_data))
+    }
+
+    pub fn into_inner(self) -> IdentityDataRequest {
+        self.0
+    }
+}
+
+impl std::ops::Deref for IdentityDataUpdate {
+    type Target = IdentityDataRequest;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+fn clean_and_validate_id_data(id_data: IdentityDataRequest) -> NtResult<IdentityDataRequest> {
+    // Custom case to always populate ssn4 if we have ssn9.
+    // TODO clean this up
+    let mut id_data = id_data;
+    if let Some(ssn9) = id_data.get(&IDK::Ssn9) {
+        #[allow(clippy::map_entry)]
+        if !id_data.contains_key(&IDK::Ssn4) {
+            let ssn4 = PiiString::new(ssn9.leak().chars().skip(ssn9.leak().len() - 4).collect());
+            id_data.insert(IDK::Ssn4, ssn4);
+        }
+    }
+
     // Make sure all keys provided are parts of coherent CollectedDataOptions.
     // For ex, can't specify FirstName without LastName
     let id_keys = id_data.keys().cloned().collect_vec();
@@ -42,8 +83,6 @@ pub fn clean_and_validate_id_data(id_data: IdentityDataRequest) -> NtResult<Iden
 fn extra_id_kinds(id_kinds: Vec<IDK>) -> Vec<IDK> {
     // Get all the CDOs represented in here
     let cdos = CollectedDataOption::list_from(id_kinds.clone());
-    // Is there anything weird with SSN?
-    // TODO: Overwrite ssn4 if ssn9 is given
     let represented_idks: HashSet<_> = cdos.into_iter().flat_map(|cdo| cdo.attributes()).collect();
     let id_kinds: HashSet<_> = id_kinds.into_iter().collect();
     // Keys given minus represented keys

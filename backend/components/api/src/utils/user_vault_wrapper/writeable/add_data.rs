@@ -2,15 +2,14 @@ use super::uvd_builder::UvdBuilder;
 use super::WriteableUvw;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
-use crate::types::identity_data_request::IdentityDataUpdate;
 use db::models::data_lifetime::DataLifetime;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConnection;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind, KvDataKey,
-    PiiString, UvdKind,
+    CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind,
+    IdentityDataUpdate, KvDataKey, PiiString,
 };
 use std::collections::HashMap;
 
@@ -54,7 +53,7 @@ impl WriteableUvw {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
-        fingerprints: Vec<(UvdKind, Fingerprint)>,
+        fingerprints: Vec<(IdentityDataKind, Fingerprint)>,
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_identity_fields();
         let uv = self.user_vault();

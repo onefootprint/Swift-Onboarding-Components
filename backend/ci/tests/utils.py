@@ -167,7 +167,7 @@ def create_sandbox_user(sandbox_tenant, twilio):
     from tests.bifrost_client import BifrostClient
 
     bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio, build_user_data())
+    bifrost_client.init_user_for_onboarding(twilio)
     return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
 
@@ -201,24 +201,16 @@ def create_ob_config(sk, ob_conf_data):
 def build_user_data():
     ssn = _gen_random_ssn()
     user_data = {
-        "name": {
-            "first_name": "Sandbox",
-            "last_name": "User",
-        },
-        "dob": {
-            "month": 12,
-            "day": 25,
-            "year": 1995,
-        },
-        "address": {
-            "line1": "1 Footprint Way",
-            "line2": "PO Box Wallaby Way",
-            "city": "Enclave",
-            "state": "NY",
-            "zip": "10009",
-            "country": "US",
-        },
-        "ssn9": ssn,
+        "id.first_name": "Sandbox",
+        "id.last_name": "User",
+        "id.dob": "1995-12-25",
+        "id.address_line1": "1 Footprint Way",
+        "id.address_line2": "PO Box Wallaby Way",
+        "id.city": "Enclave",
+        "id.state": "NY",
+        "id.zip": "10009",
+        "id.country": "US",
+        "id.ssn9": ssn,
     }
     return user_data
 

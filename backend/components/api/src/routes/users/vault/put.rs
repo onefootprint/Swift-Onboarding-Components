@@ -1,10 +1,10 @@
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::AuthError;
+use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
-use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::fingerprint_builder::FingerprintBuilder;
+use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -13,26 +13,16 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
 use itertools::Itertools;
 use newtypes::{
-    flat_api_object_map_type, AccessEventKind, FootprintUserId, IdentityDataKind, KvDataKey, PiiString,
+    flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, IdentityDataUpdate, PiiString,
 };
-use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
+use std::collections::HashMap;
 
 flat_api_object_map_type!(
-    PutCustomDataRequest<KvDataKey, PiiString>,
+    PutDataRequest<DataIdentifier, PiiString>,
     description="Key-value map for data to store in the vault",
-    example=r#"{ "ach_account_number": "1234567890", "cc_last_4": "4242" }"#
+    example=r#"{ "id.first_name": "Peter", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }"#
 );
-
-// TODO move this to key-value targets of DataIdentifiers.
-// Would require moving validationg logic for identity data, which is also used in the bifrost API
-#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
-pub struct UnifiedUserVaultPutRequest {
-    /// identity data
-    identity: Option<IdentityDataRequest>,
-    /// custom data fields
-    custom: Option<PutCustomDataRequest>,
-}
 
 #[api_v2_operation(
     description = "Updates data in the identity vault.",
@@ -42,11 +32,10 @@ pub struct UnifiedUserVaultPutRequest {
 pub async fn put(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
-    request: Json<UnifiedUserVaultPutRequest>,
+    request: Json<PutDataRequest>,
     tenant_auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let request = request.into_inner();
     let footprint_user_id = path.into_inner();
     let insight = CreateInsightEvent::from(insight);
 
@@ -56,23 +45,18 @@ pub async fn put(
     let is_live = tenant_auth.is_live()?;
     let principal = tenant_auth.actor().into();
 
-    // TODO move this into one function? maybe in follow-up PR that takes in data identifiers
-    let UnifiedUserVaultPutRequest { identity, custom } = request;
-    let identity_update = identity.map(IdentityDataUpdate::try_from).transpose()?;
-    let identity_fingerprints = if let Some(ref u) = identity_update {
-        FingerprintBuilder::fingerprints(&state, u.clone()).await?
-    } else {
-        vec![]
-    };
+    let request = request.into_inner();
+    let targets = request.keys().cloned().collect_vec();
+    let (id_update, other_data) = IdentityDataUpdate::new(request.into())?;
+    let custom_data = other_data
+        .into_iter()
+        .map(|(k, v)| match k {
+            DataIdentifier::Custom(k) => Ok((k, v)),
+            k => Err(TenantError::ValidationError(format!("Cannot put key {}", k)).into()),
+        })
+        .collect::<ApiResult<HashMap<_, _>>>()?;
 
-    let custom_targets = custom
-        .as_ref()
-        .map_or(vec![], |u| u.keys().cloned().map(|x| x.into()).collect_vec());
-    let identity_targets = identity_fingerprints
-        .iter()
-        .map(|(x, _)| IdentityDataKind::from(*x))
-        .map(|x| x.into());
-    let targets = custom_targets.into_iter().chain(identity_targets).collect_vec();
+    let identity_fingerprints = build_fingerprints(&state, id_update.clone()).await?;
 
     state
         .db_pool
@@ -80,17 +64,17 @@ pub async fn put(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
             // TODO can we use the same UVW to add both kinds of data?
-            if let Some(custom_update) = custom {
+            if !custom_data.is_empty() {
                 let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                uvw.update_custom_data(conn, custom_update.into())?;
+                uvw.update_custom_data(conn, custom_data)?;
             }
-            if let Some(update) = identity_update {
+            if !id_update.is_empty() {
                 let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
                 // Can only add identity data to a non-portable vault
                 if uvw.user_vault().is_portable {
                     return Err(AuthError::CannotModifyPortableUser.into());
                 }
-                uvw.update_identity_data(conn, update, identity_fingerprints)?;
+                uvw.update_identity_data(conn, id_update, identity_fingerprints)?;
             }
 
             // Create an access event to show data was added

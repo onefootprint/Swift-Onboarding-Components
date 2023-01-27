@@ -27,6 +27,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(index::get)
         .service(authorized_orgs::get)
         .service(identity_data::post)
+        .service(identity_data::post_speculative)
         .service(decrypt::post)
         .service(access_events::get)
         .service(biometric::init_post)

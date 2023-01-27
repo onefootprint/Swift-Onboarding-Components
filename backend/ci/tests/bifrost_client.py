@@ -1,10 +1,10 @@
 import json
 import os
 
-from .types import User
-from .webauthn_simulator import SoftWebauthnDevice
+from tests.types import User
+from tests.webauthn_simulator import SoftWebauthnDevice
 from enum import Enum
-from .utils import (
+from tests.utils import (
     _sandbox_email,
     create_basic_sandbox_user,
     get,
@@ -12,6 +12,7 @@ from .utils import (
     override_webauthn_challenge,
     override_webauthn_attestation,
     get_requirement_from_requirements,
+    build_user_data,
 )
 
 
@@ -48,15 +49,13 @@ class BifrostClient:
         self.ob_config = ob_config
 
     # Associate a specific instance with a challenged user and data we'd like to simulate submitting
-    def init_user_for_onboarding(
-        self, twilio, user_data, sandbox_suffix=None, document_data=None
-    ):
+    def init_user_for_onboarding(self, twilio, sandbox_suffix=None, document_data=None):
         self.basic_sandbox_user = create_basic_sandbox_user(
             twilio,
             tenant_pk=self.ob_config.key,
             suffix=sandbox_suffix,
         )
-        self.user_data = user_data
+        self.user_data = build_user_data()
         self.document_data = document_data
 
     def initialize_onboarding(self):
@@ -197,15 +196,15 @@ class BifrostClient:
         return User(
             auth_token=self.basic_sandbox_user.auth_token,
             fp_user_id=fp_user_id,
-            first_name=self.user_data["name"]["first_name"],
-            last_name=self.user_data["name"]["last_name"],
-            address_line1=self.user_data["address"]["line1"],
-            address_line2=self.user_data["address"]["line2"],
-            zip=self.user_data["address"]["zip"],
-            city=self.user_data["address"]["city"],
-            state=self.user_data["address"]["state"],
-            country=self.user_data["address"]["country"],
-            ssn=self.user_data["ssn9"],
+            first_name=self.user_data["id.first_name"],
+            last_name=self.user_data["id.last_name"],
+            address_line1=self.user_data["id.address_line1"],
+            address_line2=self.user_data["id.address_line2"],
+            zip=self.user_data["id.zip"],
+            city=self.user_data["id.city"],
+            state=self.user_data["id.state"],
+            country=self.user_data["id.country"],
+            ssn=self.user_data["id.ssn9"],
             phone_number=self.basic_sandbox_user.phone_number,
             real_phone_number=self.basic_sandbox_user.real_phone_number,
             email=sandbox_email,

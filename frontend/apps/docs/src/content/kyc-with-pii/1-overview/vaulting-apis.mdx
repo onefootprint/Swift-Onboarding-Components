@@ -28,10 +28,8 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 	-X PUT \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
-			"custom": {
-				"ach_account": "111122224444",
-				"cc4": "4242"
-			}
+			"custom.ach_account": "111122224444",
+			"custom.cc4": "4242"
 		}'
 ```
 
@@ -131,22 +129,13 @@ Standalone Footprint user vaults can store two types of data attributes: structu
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
 	-X PUT \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-	-d '{ "identity": {
-				"name": {
-					"first_name": "Jane",
-					"last_name": "Joe"
-				},
-				"dob": {
-					"day": 12,
-					"month": 12,
-					"year": 1988
-				},
-				"ssn9": "12-121-1212"
-	 		},
-			"custom": {
-				"ach_account": "111122224444",
-				"cc4": "4242"
-			}
+	-d '{
+		    "id.first_name": "Jane",
+		    "id.last_name": "Joe"
+		    "id.dob": "1988-12-30",
+			"id.ssn9": "12-121-1212",
+			"custom.ach_account": "111122224444",
+			"custom.cc4": "4242"
 		}'
 ```
 

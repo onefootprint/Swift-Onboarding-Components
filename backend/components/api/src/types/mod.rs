@@ -1,5 +1,4 @@
 pub mod error;
-pub mod identity_data_request;
 
 pub mod request;
 pub mod response;

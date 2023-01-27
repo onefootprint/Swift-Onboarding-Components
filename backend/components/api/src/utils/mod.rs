@@ -2,7 +2,7 @@ pub mod challenge;
 pub mod db2api;
 pub mod email;
 pub mod email_domain;
-pub mod fingerprint_builder;
+pub mod fingerprint;
 pub mod headers;
 pub mod liveness;
 pub mod session;

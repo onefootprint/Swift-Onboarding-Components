@@ -6,14 +6,14 @@ class TestNonPortableVaultApi:
     @pytest.mark.parametrize(
         "data",
         [
-            {"ssn9": "12345678"},
-            {"ssn4": "123456789"},
-            {"ssn4": "123"},
-            {"name": {"first_name": "Hi"}},  # Also need last name
-            {"name": {"last_name": "Bye"}},  # Also need first name
-            {"dob": {"day": 1, "month": 1}},  # Also need year
-            {"address": {"zip": "12345"}},
-            {"address": {"line1": "1 Footprint Way"}},
+            {"id.ssn9": "12345678"},
+            {"id.ssn4": "123456789"},
+            {"id.ssn4": "123"},
+            {"id.first_name": "Hi"},  # Also need last name
+            {"id.last_name": "Bye"},  # Also need first name
+            {"id.dob": "2023-13-25"},  # Invalid date
+            {"id.zip": "12345"},
+            {"id.address_line1": "1 Footprint Way"},
         ],
     )
     def test_identity_validation(self, sandbox_tenant, data):
@@ -22,12 +22,7 @@ class TestNonPortableVaultApi:
         fp_id = user["id"]
         assert fp_id
 
-        put(
-            f"users/{fp_id}/vault",
-            dict(identity=data),
-            sandbox_tenant.sk.key,
-            status_code=400,
-        )
+        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400)
 
     def test_vault_create_write_decrypt(self, sandbox_tenant):
         # create the vault
@@ -38,7 +33,7 @@ class TestNonPortableVaultApi:
 
         # post data to it
         data = build_user_data()
-        put(f"users/{fp_id}/vault", dict(identity=data), sandbox_tenant.sk.key)
+        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
         # check that the data is there now
         params = {"fields": "id.first_name, id.last_name, id.zip, id.ssn9, id.city"}
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
@@ -81,8 +76,8 @@ class TestNonPortableVaultApi:
         assert fp_id
 
         # post data to it
-        data = dict(ach_account_number="123467890", cc4="4242")
-        put(f"users/{fp_id}/vault", dict(custom=data), sandbox_tenant.sk.key)
+        data = {"custom.ach_account_number": "123467890", "custom.cc4": "4242"}
+        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # verify access events created
         body = get(
@@ -135,8 +130,9 @@ class TestUnifiedVaultApi:
 
         # post data to it
         data = {
-            "identity": build_user_data(),
-            "custom": {"ach_account_number": "123467890", "cc4": "4242"},
+            "custom.ach_account_number": "123467890",
+            "custom.cc4": "4242",
+            **build_user_data(),
         }
         put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
