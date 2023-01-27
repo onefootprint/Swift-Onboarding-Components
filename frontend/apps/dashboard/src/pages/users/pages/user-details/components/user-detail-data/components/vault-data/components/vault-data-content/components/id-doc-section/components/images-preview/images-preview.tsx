@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { DecryptedIdDoc } from '@onefootprint/types';
 import { SegmentedControl } from '@onefootprint/ui';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -45,30 +45,27 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
       <ImagesContainer>
         {segment === idDocSegment && (
           <>
-            <Image
+            <StyledImage
               src={selectedImage.front}
               width={350}
               height={350}
-              layout="fixed"
               alt={t('front-alt')}
             />
             {selectedImage.back && (
-              <Image
+              <StyledImage
                 src={selectedImage.back}
                 width={350}
                 height={350}
-                layout="fixed"
                 alt={t('back-alt')}
               />
             )}
           </>
         )}
         {segment === selfieSegment && selectedImage.selfie && (
-          <Image
+          <StyledImage
             src={selectedImage.selfie}
             width={350}
             height={350}
-            layout="fixed"
             alt={t('front-alt')}
           />
         )}
@@ -97,6 +94,10 @@ const ImagesContainer = styled.div`
     align-items: center;
     gap: ${theme.spacing[6]};
   `};
+`;
+
+const StyledImage = styled(Image)`
+  object-fit: contain;
 `;
 
 export default ImagesPreview;
