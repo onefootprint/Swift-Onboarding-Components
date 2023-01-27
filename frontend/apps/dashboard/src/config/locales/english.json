@@ -824,7 +824,14 @@
                 "title": "Remove role",
                 "description": "You’re about to remove the role <b>{{name}}</b>. Are you sure?"
               },
-              "notification": {
+              "errors": {
+                "num-active-users": {
+                  "title": "Role can't be removed",
+                  "description_one": "One user is assigned to this role. Please assign those users to a different role.",
+                  "description_others": "{{count}} users are assigned to this role. Please assign those users to a different role."
+                }
+              },
+              "feedback": {
                 "success": {
                   "title": "Role removed",
                   "description": "{{name}} role has been removed."

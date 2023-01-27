@@ -8,7 +8,7 @@ export const orgRolesFixture: OrgRole[] = [
     scopes: ['api_keys'],
     isImmutable: false,
     createdAt: '2022-11-18T00:04:11.368107Z',
-    numActiveUsers: 4,
+    numActiveUsers: 0,
   },
   {
     id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
@@ -35,6 +35,8 @@ export const orgRolesCreatedAtFixture = [
 ];
 
 export const orgRolesScopesFixture = ['Everything', 'Read', 'Manage Api Keys'];
+
+export const orgRoleWithoutActiveUsers = orgRolesFixture[0];
 
 export const withOrgRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
   mockRequest({

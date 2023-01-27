@@ -36,16 +36,7 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
       isLoading={isLoading}
       items={data}
       onChangeSearchText={handleSearchChange}
-      renderTr={({ item: role }) => (
-        <Row
-          createdAt={role.createdAt}
-          id={role.id}
-          isImmutable={role.isImmutable}
-          name={role.name}
-          numActiveUsers={role.numActiveUsers}
-          scopes={role.scopes}
-        />
-      )}
+      renderTr={({ item: role }) => <Row role={role} />}
     />
   );
 };

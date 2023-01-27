@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Box, createFontStyles, Dropdown } from '@onefootprint/ui';
+import { OrgRole } from '@onefootprint/types';
+import { Box, createFontStyles, Dropdown, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 import styled from 'styled-components';
@@ -9,14 +10,15 @@ import ConfirmationDialog from './components/confirmation-dialog';
 import useRemoveRole from './hooks/use-remove-role';
 
 export type ActionsProps = {
-  id: string;
-  name: string;
+  role: OrgRole;
 };
 
-const Actions = ({ id, name }: ActionsProps) => {
+const Actions = ({ role }: ActionsProps) => {
+  const { id, numActiveUsers, name } = role;
   const { t } = useTranslation('pages.settings.roles.table.actions');
   const [open, setOpen] = useState(false);
   const removeRoleMutation = useRemoveRole(name);
+  const toast = useToast();
 
   const showConfirmation = () => {
     setOpen(true);
@@ -27,7 +29,17 @@ const Actions = ({ id, name }: ActionsProps) => {
   };
 
   const handleRemove = () => {
-    showConfirmation();
+    if (numActiveUsers === 0) {
+      showConfirmation();
+    } else {
+      toast.show({
+        title: t('remove.errors.num-active-users.title'),
+        description: t('remove.errors.num-active-users.description', {
+          count: numActiveUsers,
+        }),
+        variant: 'error',
+      });
+    }
   };
 
   const remove = () => {

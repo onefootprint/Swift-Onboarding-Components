@@ -5,17 +5,13 @@ import createTagList from 'src/utils/create-tag-list';
 
 import Actions from './components/actions';
 
-export type RowProps = OrgRole;
+export type RowProps = {
+  role: OrgRole;
+};
 
-const Row = ({
-  createdAt,
-  id,
-  isImmutable,
-  name,
-  numActiveUsers,
-  scopes,
-}: RowProps) => {
+const Row = ({ role }: RowProps) => {
   const { t } = useTranslation('pages.settings.roles');
+  const { name, scopes, isImmutable, createdAt, numActiveUsers } = role;
   const tags = scopes.map((scope: OrgRoleScope) => t(`scopes.${scope}`));
 
   return (
@@ -26,7 +22,7 @@ const Row = ({
         {scopes.includes('admin') ? t('scopes.admin') : createTagList(tags)}
       </td>
       <td>{createdAt}</td>
-      <td>{isImmutable ? null : <Actions id={id} name={name} />}</td>
+      <td>{isImmutable ? null : <Actions role={role} />}</td>
     </>
   );
 };

@@ -15,6 +15,7 @@ import {
   orgRolesCreatedAtFixture,
   orgRolesFixture,
   orgRolesScopesFixture,
+  orgRoleWithoutActiveUsers,
   withCreateOrgRole,
   withCreateOrgRoleError,
   withDisableOrgRole,
@@ -224,10 +225,10 @@ describe('<Roles />', () => {
       });
     });
 
-    describe('when disabling a role', () => {
-      describe('when the request to disable a role succeeds', () => {
-        const [roleToDisable] = orgRolesFixture;
+    describe('when disabling a role with no active users', () => {
+      const roleToDisable = orgRoleWithoutActiveUsers;
 
+      describe('when the request to disable a role succeeds', () => {
         beforeEach(() => {
           withDisableOrgRole(roleToDisable.id);
         });
@@ -272,8 +273,6 @@ describe('<Roles />', () => {
       });
 
       describe('when the request to disable a role fails', () => {
-        const [roleToDisable] = orgRolesFixture;
-
         beforeEach(() => {
           withDisableOrgRoleError(roleToDisable.id);
         });

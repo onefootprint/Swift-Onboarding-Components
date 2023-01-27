@@ -25,14 +25,14 @@ const useRemoveRole = (name: string) => {
     onError: (error: unknown) => {
       toast.show({
         description: getErrorMessage(error),
-        title: t('notification.error.title'),
+        title: t('feedback.error.title'),
         variant: 'error',
       });
     },
     onSuccess: () => {
       toast.show({
-        description: t('notification.success.description', { name }),
-        title: t('notification.success.title'),
+        description: t('feedback.success.description', { name }),
+        title: t('feedback.success.title'),
       });
       queryClient.invalidateQueries();
     },
