@@ -2,7 +2,7 @@ use crate::auth::tenant::Any;
 use crate::auth::tenant::AuthActor;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantRbAuthContext;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use crate::org::auth::magic_link::create_and_send_magic_link;
@@ -35,7 +35,7 @@ async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgMemberFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
@@ -91,7 +91,7 @@ struct CreateTenantUserRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantUserRequest>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
@@ -131,7 +131,7 @@ struct UpdateTenantUserRequest {
 async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantUserRequest>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(Any)?;
 
@@ -168,7 +168,7 @@ async fn patch_rb(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRolebindingRequest>,
     rb_id: web::Path<TenantRolebindingId>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
@@ -202,7 +202,7 @@ async fn patch_rb(
 async fn deactivate(
     state: web::Data<State>,
     rb_id: web::Path<TenantRolebindingId>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();

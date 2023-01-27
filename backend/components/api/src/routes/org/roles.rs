@@ -1,6 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantRbAuthContext;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::ApiResult;
 use crate::types::JsonApiResponse;
 use crate::types::OffsetPaginatedResponse;
@@ -28,7 +28,7 @@ async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgRoleFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
@@ -73,7 +73,7 @@ struct CreateTenantRoleRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantRoleRequest>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
@@ -101,7 +101,7 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
@@ -122,7 +122,7 @@ async fn patch(
 async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();

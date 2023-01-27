@@ -4,7 +4,7 @@ use crate::auth::tenant::ObPkAuth;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::{
-    tenant::{CheckTenantGuard, TenantRbAuthContext},
+    tenant::{CheckTenantGuard, TenantSessionAuth},
     Either,
 };
 use crate::errors::tenant::TenantError;
@@ -50,7 +50,7 @@ pub fn get_detail(
 async fn get(
     state: web::Data<State>,
     pagination: web::Query<CursorPaginationRequest<DateTime<Utc>>>,
-    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<
     Json<CursorPaginatedResponse<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
     ApiError,
@@ -162,7 +162,7 @@ impl CreateOnboardingConfigurationRequest {
 #[post("/org/onboarding_configs")]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
@@ -221,7 +221,7 @@ struct UpdateObConfigRequest {
 #[patch("/org/onboarding_configs/{id}")]
 async fn patch(
     state: web::Data<State>,
-    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {

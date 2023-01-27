@@ -1,4 +1,4 @@
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantRbAuthContext};
+use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
@@ -18,7 +18,7 @@ pub struct GetTenantResponse {
 #[actix::get("/org/settings")]
 pub async fn get(
     state: web::Data<State>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> actix_web::Result<Json<ResponseData<GetTenantResponse>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();

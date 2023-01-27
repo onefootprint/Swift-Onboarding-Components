@@ -17,8 +17,11 @@ mod firm_employee;
 pub use self::firm_employee::*;
 
 use super::AuthError;
+use super::Either;
 use crate::errors::ApiError;
 use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
+
+pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAuthContext>;
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;

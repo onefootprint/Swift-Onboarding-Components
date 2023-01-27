@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantRbAuthContext;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::request::CursorPaginationRequest;
@@ -41,7 +41,7 @@ async fn get(
     state: web::Data<State>,
     filters: web::Query<AccessEventRequest>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
-    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<CursorPaginatedResponse<AccessEventResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 

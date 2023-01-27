@@ -1,6 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantRbAuthContext;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
@@ -24,7 +24,7 @@ pub async fn post(
     state: web::Data<State>,
     fp_user_id: web::Path<FootprintUserId>,
     request: web::Json<DecisionRequest>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();

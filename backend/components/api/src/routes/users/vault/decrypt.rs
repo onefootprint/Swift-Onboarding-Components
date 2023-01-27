@@ -1,5 +1,5 @@
 use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
-use crate::auth::{tenant::TenantRbAuthContext, Either};
+use crate::auth::{tenant::TenantSessionAuth, Either};
 use crate::errors::tenant::TenantError;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::headers::InsightHeaders;
@@ -35,7 +35,7 @@ pub async fn post(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptUnifiedFieldsRequest>,
-    auth: Either<TenantRbAuthContext, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptUnifiedResponse> {
     let footprint_user_id = path.into_inner();
