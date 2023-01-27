@@ -17,6 +17,8 @@ SET
 FROM tenant_rolebinding trb
 WHERE trb.tenant_user_id = tu.id;
 
+TRUNCATE tenant_rolebinding;
+
 ALTER TABLE tenant_user
     ALTER COLUMN tenant_role_id SET NOT NULL,
     ALTER COLUMN tenant_id SET NOT NULL,
