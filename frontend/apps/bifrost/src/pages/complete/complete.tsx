@@ -6,7 +6,7 @@ import {
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { OnboardingStatus } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
+import { Box, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
@@ -45,13 +45,15 @@ const Complete = () => {
       />
       <Container>
         {isVerified && <ConfettiAnimation />}
-        <Box sx={{ marginBottom: 8 }}>
-          <IcoCheckCircle40 color="success" />
-        </Box>
+        <IcoCheckCircle40 color="success" />
+        <Box sx={{ marginBottom: 4 }} />
         <HeaderTitle
+          sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}
           title={isVerified ? t('success.title') : t('failure.title')}
           subtitle={isVerified ? t('success.subtitle') : t('failure.subtitle')}
         />
+        <Box sx={{ marginBottom: 7 }} />
+        <LinkButton href="/">{t('success.cta')}</LinkButton>
       </Container>
     </>
   );

@@ -150,7 +150,8 @@
     "complete": {
       "success": {
         "title": "You're verified!  🎉",
-        "subtitle": "Next time you need to verify your identity, you can just sign in using Footprint and do it in one click!"
+        "subtitle": "Next time you need to verify your identity, you can just sign in using Footprint and do it in one click!",
+        "cta": "Return to site"
       },
       "failure": {
         "title": "Submission completed!",

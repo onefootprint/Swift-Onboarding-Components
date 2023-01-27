@@ -44,7 +44,7 @@ const FootprintFooterContainer = styled.footer`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: ${theme.spacing[4]} ${theme.spacing[7]};
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
   `}
 `;
 
@@ -53,6 +53,7 @@ const LinksContainer = styled.ul`
     align-items: center;
     display: flex;
     justify-content: center;
+    gap: ${theme.spacing[2]};
 
     li {
       &:not(:last-child) {

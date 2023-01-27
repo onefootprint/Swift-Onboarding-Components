@@ -24,6 +24,7 @@ const ConfettiAnimation = () => {
         left: 0,
         height: `${height}`,
         width: `${width}`,
+        pointerEvents: 'none',
       }}
     />
   );
