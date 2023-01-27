@@ -14,7 +14,7 @@ type DialogProps = {
   open: boolean;
 };
 
-const Content = ({ onClose, open }: DialogProps) => {
+const Dialog = ({ onClose, open }: DialogProps) => {
   const { t } = useTranslation('pages.settings.members.invite');
   const rolesQuery = useRolesOptions();
   const inviteMembersMutations = useInviteMembers();
@@ -56,4 +56,4 @@ const Content = ({ onClose, open }: DialogProps) => {
   );
 };
 
-export default Content;
+export default Dialog;

@@ -68,21 +68,6 @@ describe('<Members />', () => {
     });
   };
 
-  describe('when the request to fetch the members fails', () => {
-    beforeEach(() => {
-      withOrgMembersError();
-    });
-
-    it('should render an error message', async () => {
-      renderMembers();
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText('Something went wrong');
-        expect(errorMessage).toBeInTheDocument();
-      });
-    });
-  });
-
   describe('when the request to fetch the members succeeds', () => {
     beforeEach(() => {
       withOrgMembers();
@@ -387,6 +372,21 @@ describe('<Members />', () => {
           );
           await waitForElementToBeRemoved(userRemovedName);
         });
+      });
+    });
+  });
+
+  describe('when the request to fetch the members fails', () => {
+    beforeEach(() => {
+      withOrgMembersError();
+    });
+
+    it('should render an error message', async () => {
+      renderMembers();
+
+      await waitFor(() => {
+        const errorMessage = screen.getByText('Something went wrong');
+        expect(errorMessage).toBeInTheDocument();
       });
     });
   });

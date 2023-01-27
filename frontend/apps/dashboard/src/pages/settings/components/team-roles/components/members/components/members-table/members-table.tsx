@@ -38,18 +38,7 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
       items={data}
       onChangeSearchText={handleSearchChange}
       renderActions={() => <Filters />}
-      renderTr={({ item: member }) => (
-        <Row
-          createdAt={member.createdAt}
-          email={member.email}
-          firstName={member.firstName}
-          id={member.id}
-          lastLoginAt={member.lastLoginAt}
-          lastName={member.lastName}
-          roleId={member.roleId}
-          roleName={member.roleName}
-        />
-      )}
+      renderTr={({ item: member }) => <Row member={member} />}
     />
   );
 };
