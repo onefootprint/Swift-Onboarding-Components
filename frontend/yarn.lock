@@ -2744,6 +2744,18 @@
   version "2.0.0-alpha.4"
   resolved "https://registry.yarnpkg.com/@resvg/resvg-wasm/-/resvg-wasm-2.0.0-alpha.4.tgz#fc2f86186a9641df030d8f9f3f9d995899cd1ecb"
   integrity sha512-pWIG9a/x1ky8gXKRhPH1OPKpHFoMN1ISLbJ+O+gPXQHIAKhNd5I28RlWf7q576hAOQA9JZTlo3p/M2uyLzJmmw==
+  
+"@rive-app/canvas@1.0.98":
+  version "1.0.98"
+  resolved "https://registry.yarnpkg.com/@rive-app/canvas/-/canvas-1.0.98.tgz#36b75be962fbb77b6ef9c47a843efb3297e45300"
+  integrity sha512-dBsiM6ObIBHCUA/8RwCBDwlOSJ7+K3m4M0/OgPpgmvQ4Qw7d63ouSoOJxiwBeysu9dSqIVEXk9zR/pdqhAVCVQ==
+
+"@rive-app/react-canvas@^3.0.35":
+  version "3.0.35"
+  resolved "https://registry.yarnpkg.com/@rive-app/react-canvas/-/react-canvas-3.0.35.tgz#4749bd40851f35769880404f7d0590681527f63b"
+  integrity sha512-215d3bw57OZundZXnuLWWr8mtRW5iomzNZ6TdQ4+MaLxKKKX91cSI0ef8g0Tq9khgNTCyRt1morNOTDXMLbDZg==
+  dependencies:
+    "@rive-app/canvas" "1.0.98"
 
 "@rollup/plugin-sucrase@4.0.4":
   version "4.0.4"
@@ -9313,6 +9325,17 @@ framer-motion@^7.8.0:
     "@motionone/dom" "^10.15.3"
     hey-listen "^1.0.8"
     tslib "2.4.0"
+  optionalDependencies:
+    "@emotion/is-prop-valid" "^0.8.2"
+
+framer-motion@^8.5.2:
+  version "8.5.2"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-8.5.2.tgz#8f14c5bbbd429e7add5a3098de5f50e32a074d32"
+  integrity sha512-dt1WwCUIlJ24N/PCCayr0BZJcHOfU/L7kO8fgG8SxcAiGufaNg+Xl0oD14z7mRTGLrqRdA1ZlMW5Wr77aO1Xuw==
+  dependencies:
+    "@motionone/dom" "^10.15.3"
+    hey-listen "^1.0.8"
+    tslib "^2.4.0"
   optionalDependencies:
     "@emotion/is-prop-valid" "^0.8.2"
 

@@ -15,6 +15,7 @@ import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useHandleCameraError from '../../hooks/use-handle-camera-error';
 import imageFileToStrippedBase64 from '../../utils/image-processing/image-file-to-stripped-base64';
+import IdAnimation from './components/id-animation';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
@@ -59,7 +60,15 @@ const IdDocPhotoPrompt = ({
 
   return (
     <Container>
-      <Icon />
+      {side === 'back' ? (
+        <>
+          <IdAnimation />
+          <Icon />
+        </>
+      ) : (
+        <Icon />
+      )}
+
       <HeaderTitle
         title={t('title', {
           type: IdDocTypeToLabel[type],

@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
+    "@rive-app/react-canvas": "^3.0.35",
     "@storybook/addon-actions": "^6.5.15",
     "@storybook/addon-essentials": "^6.5.15",
     "@storybook/addon-interactions": "^6.5.15",
@@ -52,6 +53,7 @@
     "@storybook/testing-library": "^0.0.11",
     "@types/lodash": "^4.14.191",
     "eslint-config-footprint": "*",
+    "framer-motion": "^8.5.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "styled-components": "^5.3.6",
