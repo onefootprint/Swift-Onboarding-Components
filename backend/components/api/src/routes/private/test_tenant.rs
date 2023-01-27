@@ -21,7 +21,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientRequest {
     /// Client-provided primary key of the tenant. Must start with a `_private_it_org_` prefix.
-    /// If a tenant with this ID already exists, it will be returned and impersonated.
+    /// If a tenant with this ID already exists, it will be returned and assumed.
     /// Otherwise, we make a new tenant with this ID.
     id: TenantId,
     name: String,

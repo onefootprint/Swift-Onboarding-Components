@@ -1,7 +1,7 @@
 use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
 use crate::{
     auth::{
-        session::{AuthSessionData, ExtractableAuthSession},
+        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -13,7 +13,7 @@ use db::{
     },
     PgConnection,
 };
-use newtypes::{TenantRolebindingId, TenantScope};
+use newtypes::{TenantRolebindingId, TenantScope, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -131,3 +131,20 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
         AuthActor::from(self.data.tenant_user.id.clone())
     }
 }
+
+impl TenantRbAuthContext {
+    /// Escape hatch to get the `TenantUserId` for a `TenantRbAuthContext`, if and only if the
+    /// authed user is a firm employee.
+    pub fn firm_employee_id(&self) -> ApiResult<TenantUserId> {
+        let tenant_user = &self.data.0.tenant_user;
+        if !tenant_user.is_firm_employee {
+            // TODO should we hide these errors with 404s?
+            return Err(AuthError::NotFirmEmployee.into());
+        }
+        Ok(tenant_user.id.clone())
+    }
+}
+
+// Allow calling SessionContext<T>::update for T=TenantRbAuth, only for mutating a token to be used
+// for impersonation
+impl AllowSessionUpdate for ParsedTenantRbAuth {}

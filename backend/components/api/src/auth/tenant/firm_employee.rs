@@ -22,7 +22,7 @@ pub struct FirmEmployeeSession {
     /// The TenantUserId that is proven to be owned via a workos auth.
     /// Must be a TenantUser with is_firm_employee=true
     pub tenant_user_id: TenantUserId,
-    /// The TenantId being impersonated by this firm employee
+    /// The TenantId whose role is being assumed by this firm employee
     pub tenant_id: TenantId,
 }
 
