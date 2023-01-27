@@ -197,7 +197,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[8]};
+    row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
   `}
@@ -210,19 +210,19 @@ const IconContainer = styled.span`
 `;
 
 const Category = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    margin-bottom: ${theme.spacing[3]};
-  `}
+  display: flex;
+  justify-content: left;
+  align-items: center;
 `;
 
 const CategoriesContainer = styled.div`
   ${({ theme }) => css`
-    column-count: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
     width: 100%;
-    margin-bottom: -${theme.spacing[3]};
+    gap: ${theme.spacing[3]};
+    padding: ${theme.spacing[3]};
   `}
 `;
 
