@@ -87,6 +87,20 @@ impl IdentityDataKind {
     pub fn fingerprintable() -> impl Iterator<Item = Self> {
         Self::iter().filter(Self::allows_fingerprint)
     }
+
+    // Some kinds we may be more surprised than others seeing show up in multiple distinct vaults
+    pub fn potentially_should_have_unique_fingerprint(&self) -> bool {
+        matches!(
+            self,
+            Self::PhoneNumber
+                | Self::Email
+                | Self::Ssn9
+                | Self::LastName
+                | Self::Ssn4
+                | Self::AddressLine1
+                | Self::Dob
+        )
+    }
 }
 
 impl SaltedFingerprint for IdentityDataKind {
