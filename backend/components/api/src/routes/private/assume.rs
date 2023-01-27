@@ -1,10 +1,13 @@
+use std::str::FromStr;
+
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::{FirmEmployeeSession, TenantRbAuthContext};
+use crate::auth::AuthError;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use db::models::tenant::Tenant;
-use newtypes::TenantId;
+use newtypes::{OrgMemberEmail, TenantId, INTEGRATION_TEST_USER_EMAIL};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -23,9 +26,17 @@ async fn post(
     auth: TenantRbAuthContext,
     request: Json<AssumeRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let firm_employee_id = auth.firm_employee_id()?;
+    let firm_employee = auth.firm_employee_user()?;
     let session_sealing_key = state.session_sealing_key.clone();
     let tenant_id = request.into_inner().tenant_id;
+
+    // We have this custom logic for the integration testing user to limit who they can impersonate.
+    // We don't want the integration testing user to be able to have unlimited read access to all tenants.
+    let integration_test_email = OrgMemberEmail::from_str(INTEGRATION_TEST_USER_EMAIL)?;
+    if firm_employee.email == integration_test_email && !tenant_id.is_integration_test_tenant() {
+        return Err(AuthError::NotFirmEmployee.into());
+    }
+
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -33,7 +44,7 @@ async fn post(
             Tenant::get(conn, &tenant_id)?;
 
             let session = FirmEmployeeSession {
-                tenant_user_id: firm_employee_id,
+                tenant_user_id: firm_employee.id,
                 tenant_id,
             };
             auth.update_session(conn, &session_sealing_key, AuthSessionData::FirmEmployee(session))?;

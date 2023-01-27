@@ -2,6 +2,7 @@ use crate::auth::tenant::Any;
 use crate::auth::tenant::AuthActor;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantRbAuthContext;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
@@ -131,7 +132,8 @@ struct UpdateTenantUserRequest {
 async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantUserRequest>,
-    auth: TenantSessionAuth,
+    // Weird to take in an impersonation token here
+    auth: TenantRbAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(Any)?;
 

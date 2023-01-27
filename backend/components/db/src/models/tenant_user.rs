@@ -2,7 +2,7 @@ use crate::{schema::tenant_user, DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{Locked, OrgMemberEmail, TenantUserId};
+use newtypes::{Locked, OrgMemberEmail, TenantUserId, INTEGRATION_TEST_USER_EMAIL};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -80,6 +80,15 @@ impl TenantUser {
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
+    }
+
+    pub fn set_is_firm_employee_testing_only(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<Self> {
+        let user = diesel::update(tenant_user::table)
+            .filter(tenant_user::id.eq(id))
+            .filter(tenant_user::email.eq(INTEGRATION_TEST_USER_EMAIL))
+            .set(tenant_user::is_firm_employee.eq(true))
+            .get_result(conn)?;
+        Ok(user)
     }
 
     pub fn lock(conn: &mut TxnPgConnection, id: &TenantUserId) -> DbResult<Locked<Self>> {

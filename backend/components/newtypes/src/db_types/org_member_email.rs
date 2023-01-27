@@ -3,7 +3,9 @@ use schemars::JsonSchema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
 
-#[derive(Debug, Clone, DeserializeFromStr, SerializeDisplay, DieselNewType, Default, JsonSchema)]
+#[derive(
+    Debug, Clone, DeserializeFromStr, SerializeDisplay, DieselNewType, Default, JsonSchema, Eq, PartialEq,
+)]
 #[serde(transparent)]
 pub struct OrgMemberEmail(pub String);
 

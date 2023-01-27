@@ -41,6 +41,7 @@ class ObConfiguration(NamedTuple):
 
 
 class Tenant(NamedTuple):
+    id: str
     default_ob_config: ObConfiguration
     sk: SecretApiKey
     name: str

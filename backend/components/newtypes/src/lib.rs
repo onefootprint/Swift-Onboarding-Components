@@ -263,3 +263,9 @@ pub mod util {
     pub(crate) use impl_enum_str_diesel;
     pub(crate) use impl_enum_string_diesel;
 }
+
+/// The email address of the TenantUser that is used in integration tests.
+/// This tenant user has is_firm_employee set, which is slightly dangerous. So, we use
+/// this hardcoded email address to also gate permissions in some places.
+/// DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU ARE DOING.
+pub static INTEGRATION_TEST_USER_EMAIL: &str = "integrationtests@onefootprint.com";

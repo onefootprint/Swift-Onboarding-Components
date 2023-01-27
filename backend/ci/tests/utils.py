@@ -179,6 +179,7 @@ def create_tenant(org_data, ob_conf_data):
     print("\n======org info======")
     print(body)
     tenant = Tenant(
+        id=body["org_id"],
         default_ob_config=ob_config,
         sk=sk,
         name=org_data["name"],

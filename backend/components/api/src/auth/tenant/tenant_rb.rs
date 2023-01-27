@@ -13,7 +13,7 @@ use db::{
     },
     PgConnection,
 };
-use newtypes::{TenantRolebindingId, TenantScope, TenantUserId};
+use newtypes::{TenantRolebindingId, TenantScope};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -133,15 +133,15 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 }
 
 impl TenantRbAuthContext {
-    /// Escape hatch to get the `TenantUserId` for a `TenantRbAuthContext`, if and only if the
+    /// Escape hatch to get the `TenantUser` for a `TenantRbAuthContext`, if and only if the
     /// authed user is a firm employee.
-    pub fn firm_employee_id(&self) -> ApiResult<TenantUserId> {
-        let tenant_user = &self.data.0.tenant_user;
+    pub fn firm_employee_user(&self) -> ApiResult<TenantUser> {
+        let tenant_user = self.data.0.tenant_user.clone();
         if !tenant_user.is_firm_employee {
             // TODO should we hide these errors with 404s?
             return Err(AuthError::NotFirmEmployee.into());
         }
-        Ok(tenant_user.id.clone())
+        Ok(tenant_user)
     }
 }
 

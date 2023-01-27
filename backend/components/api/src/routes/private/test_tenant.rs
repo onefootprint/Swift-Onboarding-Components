@@ -15,7 +15,9 @@ use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{OrgMemberEmail, SessionAuthToken, TenantId, TenantRolebindingId};
+use newtypes::{
+    OrgMemberEmail, SessionAuthToken, TenantId, TenantRolebindingId, INTEGRATION_TEST_USER_EMAIL,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -90,13 +92,14 @@ async fn post(
             //
             // Get or create the TenantUser
             //
-            let email = OrgMemberEmail::from_str("integrationtests@onefootprint.com")?;
+            let email = OrgMemberEmail::from_str(INTEGRATION_TEST_USER_EMAIL)?;
             let user = TenantUser::get_and_update_or_create(
                 conn,
                 email, // Always create with the same email so we find it next time
                 Some("Footprint".to_owned()),
                 Some("Integration Testing".to_owned()),
             )?;
+            let user = TenantUser::set_is_firm_employee_testing_only(conn, &user.id)?;
             let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant.id)?;
             let _ro_role = TenantRole::get_or_create_ro_role(conn, &tenant.id)?;
             let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {

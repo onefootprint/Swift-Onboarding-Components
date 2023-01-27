@@ -86,7 +86,8 @@ def tenant(must_collect_data, can_access_data):
 
 
 @pytest.fixture(scope="session")
-def sandbox_tenant(must_collect_data, can_access_data):
+def sandbox_tenant_data(must_collect_data, can_access_data):
+    # We reuse this in another place
     org_data = {
         "id": TENANT_ID2,
         "name": "Footprint Sandbox Integration Testing",
@@ -99,7 +100,12 @@ def sandbox_tenant(must_collect_data, can_access_data):
         "can_access_data": can_access_data,
     }
 
-    return create_tenant(org_data, ob_conf_data)
+    return (org_data, ob_conf_data)
+
+
+@pytest.fixture(scope="session")
+def sandbox_tenant(sandbox_tenant_data):
+    return create_tenant(*sandbox_tenant_data)
 
 
 @pytest.fixture
