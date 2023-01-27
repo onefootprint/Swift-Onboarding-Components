@@ -23,6 +23,9 @@ pub enum AuthSessionData {
     /// authed as a user at a tenant for admin dashboard
     TenantRb(crate::auth::tenant::TenantRbSession),
 
+    /// Authed as a firm employee impersonating a tenant with read-only permissions
+    FirmEmployee(crate::auth::tenant::FirmEmployeeSession),
+
     /// user-specific sessions
     User(crate::auth::user::UserSession),
 

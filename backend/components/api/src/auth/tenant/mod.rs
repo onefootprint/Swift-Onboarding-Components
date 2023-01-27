@@ -13,6 +13,8 @@ mod ob_session;
 pub use ob_session::*;
 mod tenant_rb;
 pub use self::tenant_rb::*;
+mod firm_employee;
+pub use self::firm_employee::*;
 
 use super::AuthError;
 use crate::errors::ApiError;

@@ -48,4 +48,6 @@ pub enum AuthError {
     CannotModifyPortableUser,
     #[error("Not allowed: handoff tokens cannot create other handoff tokens")]
     CannotCreateMultipleHandoffTokens,
+    #[error("Not allowed: user is not a firm employee")]
+    NotFirmEmployee,
 }

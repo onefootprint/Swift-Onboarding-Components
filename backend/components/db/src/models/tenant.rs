@@ -59,6 +59,11 @@ impl Tenant {
         Ok(tenant)
     }
 
+    pub fn get(conn: &mut PgConnection, id: &TenantId) -> DbResult<Self> {
+        let tenant = tenant::table.filter(tenant::id.eq(id)).first(conn)?;
+        Ok(tenant)
+    }
+
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
     pub fn save<T>(conn: &mut PgConnection, value: T) -> DbResult<Self>

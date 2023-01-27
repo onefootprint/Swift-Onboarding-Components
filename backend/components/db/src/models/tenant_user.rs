@@ -19,6 +19,14 @@ pub struct TenantUser {
 }
 
 impl TenantUser {
+    pub fn get_firm_employee(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<Self> {
+        let user = tenant_user::table
+            .filter(tenant_user::id.eq(id))
+            .filter(tenant_user::is_firm_employee.eq(true))
+            .first(conn)?;
+        Ok(user)
+    }
+
     pub fn get_and_update_or_create(
         conn: &mut TxnPgConnection,
         email: OrgMemberEmail,

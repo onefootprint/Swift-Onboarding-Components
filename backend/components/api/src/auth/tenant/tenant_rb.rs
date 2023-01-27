@@ -1,9 +1,10 @@
+use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
 use crate::{
     auth::{
         session::{AuthSessionData, ExtractableAuthSession},
         AuthError, SessionContext,
     },
-    errors::ApiError,
+    errors::ApiResult,
 };
 use db::{
     models::{
@@ -15,11 +16,9 @@ use db::{
 use newtypes::{TenantRolebindingId, TenantScope};
 use paperclip::actix::Apiv2Security;
 
-use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
-
 #[derive(Debug, Clone)]
-/// Represents all tenant info identified by a workos session token. This struct is hydrated from
-/// the DB using the information on the TenantUserSession
+/// Represents all tenant info identified by a tenant RB session token. This struct is hydrated from
+/// the DB using the information on the TenantRbSession
 pub struct TenantRbAuth {
     tenant: Tenant,
     tenant_role: TenantRole,
@@ -65,7 +64,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError> {
+    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
             _ => {
@@ -92,7 +91,7 @@ impl TenantRbAuth {
     }
 }
 
-/// A shorthand for the commonly used ParsedWorkOs context
+/// A shorthand for the commonly used ParsedTenantRbAuth context
 pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
 
 impl CanCheckTenantGuard for TenantRbAuthContext {
@@ -106,7 +105,7 @@ impl CanCheckTenantGuard for TenantRbAuthContext {
 }
 
 impl TenantAuth for SessionContext<TenantRbAuth> {
-    fn is_live(&self) -> Result<bool, ApiError> {
+    fn is_live(&self) -> ApiResult<bool> {
         let is_live: Option<bool> = self
             .headers
             .0
