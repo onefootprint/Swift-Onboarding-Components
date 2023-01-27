@@ -10,6 +10,7 @@ use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatu
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
+use db::models::user_consent::UserConsent;
 use db::models::user_timeline::UserTimeline;
 use db::models::user_vault::UserVault;
 use db::models::verification_request::VerificationRequest;
@@ -39,7 +40,7 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    let (uv, db_document_request, auth_info) = state
+    let (uv, db_document_request, auth_info, user_consent) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let Some(auth_info) = user_auth.onboarding(conn)? else {
@@ -60,15 +61,23 @@ pub async fn post(
             let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
             let uv = UserVault::get(conn, user_auth.user_vault_id())?;
 
-            Ok((uv, db_document_request, auth_info))
+            let user_consent = UserConsent::latest_for_onboarding(conn, &auth_info.onboarding.id)?;
+
+            Ok((uv, db_document_request, auth_info, user_consent))
         })
         .await?;
 
-    if !db_document_request.should_collect_selfie && request.selfie_image.is_some() {
-        return Err(TenantError::ValidationError(
-            "Document request is not expecting selfie_image".to_owned(),
-        )
-        .into());
+    if request.selfie_image.is_some() {
+        if !db_document_request.should_collect_selfie {
+            return Err(TenantError::ValidationError(
+                "Document request is not expecting selfie_image".to_owned(),
+            )
+            .into());
+        }
+
+        if user_consent.is_none() {
+            return Err(ApiError::from(OnboardingError::UserConsentNotFound));
+        }
     }
 
     // generate a sealed data key (with its plaintext)

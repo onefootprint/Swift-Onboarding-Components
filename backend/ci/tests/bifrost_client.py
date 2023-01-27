@@ -26,10 +26,16 @@ class DocumentDataOptions(Enum):
     front_back_selfie = 4
 
     def has_back(self):
-        return self in [DocumentDataOptions.front_back, DocumentDataOptions.front_back_selfie]
-    
+        return self in [
+            DocumentDataOptions.front_back,
+            DocumentDataOptions.front_back_selfie,
+        ]
+
     def has_selfie(self):
-        return self in [DocumentDataOptions.front_selfie, DocumentDataOptions.front_back_selfie]
+        return self in [
+            DocumentDataOptions.front_selfie,
+            DocumentDataOptions.front_back_selfie,
+        ]
 
 
 class BifrostClient:
@@ -108,18 +114,23 @@ class BifrostClient:
         document_request_id = req["document_request_id"]
 
         data = {
-                "front_image": test_image,
-                "back_image": None,
-                "selfie_image": None,
-                "document_type": "passport",
-                "country_code": "USA",
-            }
-        
+            "front_image": test_image,
+            "back_image": None,
+            "selfie_image": None,
+            "document_type": "passport",
+            "country_code": "USA",
+        }
+
         if self.document_data.has_back():
             data["back_image"] = test_image
 
         if self.document_data.has_selfie():
             data["selfie_image"] = test_image
+            post(
+                f"hosted/user/consent",
+                {"consent_language_text": "I consent"},
+                self.basic_sandbox_user.auth_token,
+            )
 
         post(
             f"hosted/user/document",

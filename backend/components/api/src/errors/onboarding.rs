@@ -33,4 +33,6 @@ pub enum OnboardingError {
     NonPortableScopedUser,
     #[error("Cannot edit completed onboarding")]
     AlreadyCompleted,
+    #[error("User consent not found for onboarding")]
+    UserConsentNotFound,
 }
