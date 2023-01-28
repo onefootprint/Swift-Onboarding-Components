@@ -1,4 +1,3 @@
-use chrono::Datelike;
 use chrono::NaiveDate;
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
@@ -44,6 +43,25 @@ pub struct DateOfBirth {
     pub day: Day,
     pub month: Month,
     pub year: Year,
+}
+
+impl TryFrom<PiiString> for Dob {
+    type Error = crate::Error;
+    fn try_from(s: PiiString) -> Result<Self, Self::Error> {
+        let parts: Vec<&str> = s.leak().split('-').collect();
+        if parts.len() != 3 {
+            return Err(DobError::InvalidDob.into());
+        }
+        let year: i32 = parts[0].parse().map_err(|_| DobError::InvalidYear)?;
+        let month: u32 = parts[1].parse().map_err(|_| DobError::InvalidMonth)?;
+        let day: u32 = parts[2].parse().map_err(|_| DobError::InvalidDay)?;
+        let result = Self {
+            day: Day::try_from(day)?,
+            month: Month::try_from(month)?,
+            year: Year::try_from(year)?,
+        };
+        Ok(result)
+    }
 }
 
 impl TryFrom<Dob> for DateOfBirth {
@@ -137,10 +155,6 @@ impl TryFrom<i32> for Year {
     type Error = crate::Error;
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
-        let current_year = chrono::Utc::now().year();
-        if value < 1900 || value > current_year {
-            return Err(crate::DobError::InvalidYear.into());
-        }
         Ok(Year(value))
     }
 }
