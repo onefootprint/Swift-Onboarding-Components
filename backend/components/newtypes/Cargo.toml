@@ -24,6 +24,7 @@ schemars = { workspace = true }
 itertools = { workspace = true }
 reqwest = { workspace = true }
 serde_with = "2.2.0"
+either = { workspace = true }
 
 # diesel
 diesel = { workspace = true }

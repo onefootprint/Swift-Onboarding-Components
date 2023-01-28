@@ -53,7 +53,7 @@ pub use uuid::Uuid;
 pub mod proxy_token;
 pub use self::proxy_token::*;
 
-#[derive(Debug, Clone, thiserror::Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("invalid length ssn")]
     InvalidSsn,
@@ -73,6 +73,26 @@ pub enum Error {
     ProxyTokenError(#[from] ProxyTokenError),
     #[error("expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
+    #[error("{0:?}")]
+    ValidationError(#[from] DataValidationError),
+}
+
+use std::collections::HashMap;
+use strum::Display;
+
+#[derive(Debug, Display)]
+// TODO impl better Display
+pub enum DataValidationError {
+    /// There are additional IDKs provided that aren't part of any CDO
+    ExtraFieldError(Vec<IdentityDataKind>),
+    /// One or more IDKs weren't able to be verified
+    FieldValidationError(HashMap<IdentityDataKind, Error>),
+}
+
+impl std::error::Error for DataValidationError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
 }
 
 pub type NtResult<T> = Result<T, Error>;

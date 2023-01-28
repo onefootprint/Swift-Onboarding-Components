@@ -25,7 +25,7 @@ tracing-subscriber = { version = "0.3", features = [
 tracing-bunyan-formatter = "0.3.2"
 envconfig = "0.10.0"
 dotenv = { workspace = true }
-either = "1.6"
+either = { workspace = true }
 opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
 tokio = { workspace = true }
 futures-util = { workspace = true }

@@ -2,11 +2,13 @@ pub mod address;
 pub mod csv;
 pub mod dob;
 pub mod email;
+mod identity_data;
 pub mod name;
 pub mod phone_number;
 mod pii;
 pub mod sandbox;
 pub mod ssn;
+pub use identity_data::*;
 pub use pii::*;
 
 /// helper macro to convert to PiiString

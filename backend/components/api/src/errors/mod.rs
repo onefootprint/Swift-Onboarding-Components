@@ -227,6 +227,7 @@ impl actix_web::ResponseError for ApiError {
             tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api error");
             self.message()
         };
+        // TODO json serialize validation error
 
         let response = ApiResponseError {
             error: FpResponseErrorInfo {
