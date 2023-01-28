@@ -4,7 +4,7 @@ use actix_web::{
 };
 
 use db::errors::DbError;
-use newtypes::{Uuid, VendorAPI};
+use newtypes::{ErrorMessage, Uuid, VendorAPI};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
@@ -160,10 +160,11 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
 }
 
 impl ApiError {
-    fn message(&self) -> String {
+    fn message(&self) -> ErrorMessage {
         match self {
-            ApiError::Database(e) => e.message(),
-            _ => self.to_string(),
+            Self::NewtypeError(newtypes::Error::ValidationError(e)) => e.json_message(),
+            ApiError::Database(e) => ErrorMessage::String(e.message()),
+            _ => ErrorMessage::String(self.to_string()),
         }
     }
 }
@@ -222,12 +223,11 @@ impl actix_web::ResponseError for ApiError {
             && crate::config::SERVICE_CONFIG.is_production()
         {
             tracing::error!(error=?self, support_id=support_id.to_string(), status_code, "returning api ISE");
-            "something went wrong".to_string()
+            ErrorMessage::String("something went wrong".to_string())
         } else {
             tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api error");
             self.message()
         };
-        // TODO json serialize validation error
 
         let response = ApiResponseError {
             error: FpResponseErrorInfo {

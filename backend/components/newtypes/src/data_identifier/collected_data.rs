@@ -39,6 +39,27 @@ impl CollectedData {
     }
 }
 
+impl IdentityDataKind {
+    /// Maps an IdentityDataKind to the CollectedData variant that contains this IDK
+    pub fn parent(&self) -> CollectedData {
+        match self {
+            Self::FirstName => CollectedData::Name,
+            Self::LastName => CollectedData::Name,
+            Self::Dob => CollectedData::Dob,
+            Self::Ssn4 => CollectedData::Ssn,
+            Self::Ssn9 => CollectedData::Ssn,
+            Self::AddressLine1 => CollectedData::Address,
+            Self::AddressLine2 => CollectedData::Address,
+            Self::City => CollectedData::Address,
+            Self::State => CollectedData::Address,
+            Self::Zip => CollectedData::Address,
+            Self::Country => CollectedData::Address,
+            Self::Email => CollectedData::Email,
+            Self::PhoneNumber => CollectedData::PhoneNumber,
+        }
+    }
+}
+
 #[derive(
     Debug,
     Eq,
@@ -150,6 +171,7 @@ impl CollectedDataOption {
 
 #[cfg(test)]
 mod test {
+    use itertools::Itertools;
     use std::collections::HashSet;
     use strum::IntoEnumIterator;
     use test_case::test_case;
@@ -183,6 +205,19 @@ mod test {
         for cdo in CDO::iter() {
             // Parent's children should contain self
             assert!(cdo.parent().options().contains(&cdo));
+        }
+    }
+
+    #[test]
+    fn test_idk_parent() {
+        for idk in IdentityDataKind::iter() {
+            // Parent's children should contain self
+            assert!(idk
+                .parent()
+                .options()
+                .into_iter()
+                .flat_map(|cdo| cdo.attributes())
+                .contains(&idk));
         }
     }
 

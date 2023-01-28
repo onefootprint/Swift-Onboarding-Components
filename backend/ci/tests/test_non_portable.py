@@ -4,25 +4,33 @@ from tests.utils import post, get, put, build_user_data
 
 class TestNonPortableVaultApi:
     @pytest.mark.parametrize(
-        "data",
+        "key, value, expected_error",
         [
-            {"id.ssn9": "12345678"},
-            {"id.ssn4": "123456789"},
-            {"id.ssn4": "123"},
-            {"id.first_name": "Hi"},  # Also need last name
-            {"id.last_name": "Bye"},  # Also need first name
-            {"id.dob": "2023-13-25"},  # Invalid date
-            {"id.zip": "12345"},
-            {"id.address_line1": "1 Footprint Way"},
+            ("id.ssn9", "12345678", "SSN is an invalid length"),
+            ("id.ssn4", "123456789", "SSN is an invalid length"),
+            ("id.ssn4", "123", "SSN is an invalid length"),
+            ("id.first_name", "Hi", "Cannot vault without other Name data"),
+            ("id.last_name", "Bye", "Cannot vault without other Name data"),
+            ("id.dob", "2023-13-25", "Invalid month for dob"),
+            ("id.zip", "12345", "Cannot vault without other Address data"),
+            (
+                "id.address_line1",
+                "1 Footprint Way",
+                "Cannot vault without other Address data",
+            ),
         ],
     )
-    def test_identity_validation(self, sandbox_tenant, data):
+    def test_identity_validation(self, sandbox_tenant, key, value, expected_error):
         body = post("users/", None, sandbox_tenant.sk.key)
         user = body
         fp_id = user["id"]
         assert fp_id
 
-        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400)
+        data = {key: value}
+        body = put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400)
+        # Should have a JSON error message with the invalid field identifier as the key
+        print(body["error"]["message"][key])
+        assert body["error"]["message"][key] == expected_error
 
     def test_vault_create_write_decrypt(self, sandbox_tenant):
         # create the vault

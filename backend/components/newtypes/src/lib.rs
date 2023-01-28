@@ -29,6 +29,7 @@ pub use handoff_metadata::*;
 mod b64;
 pub use b64::Base64Data;
 pub use serde;
+use serde::ser::SerializeMap;
 
 mod auth_token;
 pub use self::auth_token::*;
@@ -55,15 +56,15 @@ pub use self::proxy_token::*;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("invalid length ssn")]
+    #[error("SSN is an invalid length")]
     InvalidSsn,
-    #[error("invalid email address")]
+    #[error("Invalid email address")]
     InvalidEmail,
-    #[error("dob error: {0}")]
+    #[error("{0}")]
     DobError(#[from] DobError),
-    #[error("address error: {0}")]
+    #[error("{0}")]
     AddressError(#[from] AddressError),
-    #[error("phone error: {0}")]
+    #[error("{0}")]
     PhoneError(#[from] PhoneError),
     #[error("Serde error")]
     SerdeError,
@@ -73,9 +74,9 @@ pub enum Error {
     ProxyTokenError(#[from] ProxyTokenError),
     #[error("Cannot convert to UvdKind: {0}")]
     UvdKindConversionError(IdentityDataKind),
-    #[error("expected identifier with prefix: {0}")]
+    #[error("Expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
-    #[error("{0:?}")]
+    #[error("{0}")]
     ValidationError(#[from] DataValidationError),
 }
 
@@ -83,12 +84,54 @@ use std::collections::HashMap;
 use strum::Display;
 
 #[derive(Debug, Display)]
-// TODO impl better Display
 pub enum DataValidationError {
     /// There are additional IDKs provided that aren't part of any CDO
     ExtraFieldError(Vec<IdentityDataKind>),
     /// One or more IDKs weren't able to be verified
     FieldValidationError(HashMap<IdentityDataKind, Error>),
+}
+
+#[derive(Debug, Clone)]
+pub enum ErrorMessage {
+    String(String),
+    Map(HashMap<String, String>),
+}
+
+impl serde::Serialize for ErrorMessage {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Self::String(s) => serializer.serialize_str(s),
+            Self::Map(m) => {
+                let mut ser = serializer.serialize_map(Some(m.len()))?;
+                for (k, v) in m {
+                    ser.serialize_entry(k, v)?;
+                }
+                ser.end()
+            }
+        }
+    }
+}
+
+impl DataValidationError {
+    pub fn json_message(&self) -> ErrorMessage {
+        let err = match self {
+            Self::ExtraFieldError(x) => x
+                .iter()
+                .map(|idk| {
+                    let err_str = format!("Cannot vault without other {} data", idk.parent());
+                    (DataIdentifier::from(*idk).to_string(), err_str)
+                })
+                .collect(),
+            Self::FieldValidationError(x) => x
+                .iter()
+                .map(|(k, v)| (DataIdentifier::from(*k).to_string(), v.to_string()))
+                .collect(),
+        };
+        ErrorMessage::Map(err)
+    }
 }
 
 impl std::error::Error for DataValidationError {
