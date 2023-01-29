@@ -24,7 +24,7 @@ The Footprint API uses API keys to authenticate requests. You can view and manag
 
 Authentication to the API is performed via [HTTP Basic Authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Provide your API key as the basic auth username value with no password. In `curl` syntax this would be written as `-u <api_key>:`. For example:
 
-```curl
+```bash
 curl ... -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```
 
@@ -32,7 +32,7 @@ curl ... -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 
 Alternatively, Footprint supports header-based auth via the `X-Footprint-Secret-Key` header. For example, to authenticate with header auth using cURL use the following instead of `-u <api_key>:`
 
-```curl
+```bash
 curl ... -H "X-Footprint-Secret-Key: sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv"
 ```
 
@@ -42,6 +42,6 @@ curl ... -H "X-Footprint-Secret-Key: sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv"
 
 You can check that your API key is working as expected:
 
-```curl
+```bash
 curl https://api.onefootprint.com/org/api_keys/check -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```

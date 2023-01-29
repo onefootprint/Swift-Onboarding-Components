@@ -62,7 +62,7 @@ A vault proxy request consists of a typical authenticated HTTP `POST` request to
 
 For example:
 
-```curl
+```bash
 
 curl https://api.onefootprint.com/proxy \
     -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
@@ -183,7 +183,7 @@ Ingress rules use a similar token format to the body format above, except withou
 
 Currently ingress only supports JSON and the associated [JSONPath](https://github.com/json-path/JsonPath) format for specifying a target value.
 
-```curl
+```bash
 -H 'x-fp-proxy-ingress-rule: fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card_number=$.data.card.number'
 ```
 
@@ -273,7 +273,7 @@ Note that `pinned_server_certificates` and `client_identity` parameters are opti
 
 ## POST the Proxy Configuration
 
-```curl
+```bash
 curl -X POST -u <YOUR_API_KEY>: https://api.onefootprint.com/org/proxy_configs -H 'Content-Type: application/json' -d @object.json
 
 {
@@ -288,7 +288,7 @@ Take note of the `id` that comes back, for example: `proxy_id_AY5ec7I5QDUFWG8BAQ
 
 In this example we invoke the proxy to generate a credit card number for user by securely passing tokens for the user's PII and on the recieving end vaulting the resulting card number to the user's vault.
 
-```curl
+```bash
 curl  -X POST -u <YOUR_API_KEY>: \
       -H 'x-fp-proxy-id: proxy_id_AY5ec7I5QDUFWG8BAQG78k' \
       -H 'x-fp-proxy-footprint-token: fp_id_ABoOtcf9DbF6shyLNONT3n' \
@@ -312,7 +312,7 @@ Use our `ditto` server to test your proxy configurations. Sending requests to `h
 
 ## Basic usage
 
-```shell
+```bash
 $ curl -i -X POST https://ditto.footprint.dev -H 'Test-Header: FootprintRocks'  --data '{"hello": "world" }'
 
 test-header: FootprintRocks
@@ -327,7 +327,7 @@ By using `https://ditto.footprint.dev` as your proxy destination target, you can
 
 The footprint ditto server also supports testing mTLS with client certificates: use `https://ditto.footprint.dev:8443` (port 8443). Note that the server certificate is self-signed so you must either trust it or pin it the configuration.
 
-```shell
+```bash
 $ curl --cert client.crt --key client.key -i -k -X POST https://ditto.footprint.dev:8443 -H 'Test-Header: FootprintRocks' --data '{"hello": "world" }'
 
 x-ditto-client-cert-serial: 12431179266346922388
