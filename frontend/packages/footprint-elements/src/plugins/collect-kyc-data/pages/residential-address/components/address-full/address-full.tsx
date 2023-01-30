@@ -181,7 +181,8 @@ const AddressFull = ({
             <Controller
               control={control}
               name={UserDataAttribute.state}
-              render={({ field }) => {
+              rules={{ required: true }}
+              render={({ field, fieldState: { error } }) => {
                 const value =
                   typeof field.value === 'object' ? field.value : undefined;
                 return (
@@ -193,6 +194,8 @@ const AddressFull = ({
                     onChange={nextOption => {
                       field.onChange(nextOption);
                     }}
+                    hint={error && t('form.state.error')}
+                    hasError={!!error}
                     placeholder={t('form.state.placeholder')}
                     value={value}
                   />
