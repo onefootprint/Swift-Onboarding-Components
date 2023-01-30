@@ -62,7 +62,7 @@ const Root = () => {
           }}
         />
       )}
-      {state.matches(States.init) && !!authToken && !!device && (
+      {state.matches(States.idDoc) && !!authToken && !!device && (
         <IdDoc
           context={{
             authToken,
