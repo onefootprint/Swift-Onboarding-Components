@@ -24,16 +24,20 @@ const Complete = () => {
   const isVerified = status === OnboardingStatus.verified;
 
   useEffectOnce(() => {
-    handleClose(CLOSE_DELAY);
+    handleComplete(CLOSE_DELAY);
   });
 
-  const handleClose = (closeDelay?: number) => {
+  const handleComplete = (closeDelay?: number) => {
     if (validationToken) {
       footprint.complete({
         validationToken,
         closeDelay,
       });
     }
+  };
+
+  const handleClose = () => {
+    footprint.close();
   };
 
   return (
@@ -53,7 +57,7 @@ const Complete = () => {
           subtitle={isVerified ? t('success.subtitle') : t('failure.subtitle')}
         />
         <Box sx={{ marginBottom: 7 }} />
-        <LinkButton href="/">{t('success.cta')}</LinkButton>
+        <LinkButton onClick={handleClose}>{t('success.cta')}</LinkButton>
       </Container>
     </>
   );
