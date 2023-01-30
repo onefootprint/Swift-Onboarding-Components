@@ -2,7 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetD2PRequest, GetD2PResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../../../../config/constants';
+import { AUTH_HEADER } from '../../../../../config/constants';
 
 type GetD2PStatusPollArgs = {
   enabled?: boolean;

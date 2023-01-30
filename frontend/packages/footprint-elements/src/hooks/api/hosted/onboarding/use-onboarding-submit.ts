@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../../../config/constants';
+import { AUTH_HEADER } from '../../../../config/constants';
 
 const onboardingSubmit = async (payload: OnboardingSubmitRequest) => {
   const response = await request<OnboardingSubmitResponse>({

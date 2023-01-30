@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
-import { useCreateHandoffUrl } from '../../../../../utils/handoff-url';
+import { useCreateHandoffUrl } from '../../../../../hooks/handoff-url';
 import useGenerateScopedAuthToken from '../../../hooks/mobile/use-generate-scoped-auth-token';
 import useMobileMachine, {
   Events,
