@@ -1,26 +1,28 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
+  useGetD2PStatus,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/footprint-elements';
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
-import { D2PStatusUpdate } from '@onefootprint/types';
+import { D2PStatusUpdate, GetD2PResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events } from 'src/utils/state-machine';
 
 const Init = () => {
-  const [, send] = useHandoffMachine();
+  const [state, send] = useHandoffMachine();
+  const { authToken } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const observeCollector = useObserveCollector();
 
   useParseHandoffUrl({
-    onSuccess: (authToken: string) => {
+    onSuccess: (authTokenFromUrl: string) => {
       // Tell the api that d2p is in progress now
       updateD2PStatusMutation.mutate(
         {
-          authToken,
+          authToken: authTokenFromUrl,
           status: D2PStatusUpdate.inProgress,
         },
         {
@@ -35,12 +37,36 @@ const Init = () => {
             send({
               type: Events.initContextUpdated,
               payload: {
-                authToken,
+                authToken: authTokenFromUrl,
               },
             });
           },
         },
       );
+    },
+  });
+
+  // Fetch the status only once when the authToken has been parsed from url
+  useGetD2PStatus({
+    refetchInterval: false,
+    authToken: authToken ?? '',
+    options: {
+      onSuccess: (data: GetD2PResponse) => {
+        const { meta } = data;
+        const opener = meta?.opener ?? 'unknown';
+        const bifrostSessionId = meta?.sessionId ?? '';
+        observeCollector.setAppContext({
+          opener,
+          bifrostSessionId,
+        });
+
+        send({
+          type: Events.initContextUpdated,
+          payload: {
+            opener,
+          },
+        });
+      },
     },
   });
 

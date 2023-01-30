@@ -6,16 +6,14 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import HeaderTitle from '../../components/header-title';
 import useHandoffMachine from '../../hooks/use-handoff-machine';
-import useOpener from '../../hooks/use-opener';
 
 const SUCCESS_COUNTER_SECONDS = 3;
 
 const Complete = () => {
   const { t } = useTranslation('pages.complete');
-  const opener = useOpener();
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const [state] = useHandoffMachine();
-  const { authToken } = state.context;
+  const { authToken, opener } = state.context;
 
   const shouldShowCounter = opener === 'mobile';
   const { countdown, setSeconds } = useCountdown({

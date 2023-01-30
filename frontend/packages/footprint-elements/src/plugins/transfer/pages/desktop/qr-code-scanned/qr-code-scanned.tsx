@@ -18,9 +18,12 @@ const QRCodeScanned = () => {
   const translationSource = useTranslationSourceForRequirements();
   const cancelD2P = useCancelD2P();
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
-  useGetD2PStatus(true, scopedAuthToken ?? '', {
-    onSuccess: handleSuccess,
-    onError: handleError,
+  useGetD2PStatus({
+    authToken: scopedAuthToken ?? '',
+    options: {
+      onSuccess: handleSuccess,
+      onError: handleError,
+    },
   });
 
   return (

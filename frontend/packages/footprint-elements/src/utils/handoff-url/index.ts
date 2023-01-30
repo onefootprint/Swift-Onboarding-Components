@@ -1,3 +1,2 @@
-export { default as createHandoffUrl } from './create-handoff-url';
-export { default as useParseHandoffUrl } from './parse-handoff-url';
-export * from './types';
+export { default as useCreateHandoffUrl } from './use-create-handoff-url';
+export { default as useParseHandoffUrl } from './use-parse-handoff-url';

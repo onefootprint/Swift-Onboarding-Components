@@ -1,6 +1,6 @@
 import {
-  createHandoffUrl,
   HeaderTitle,
+  useCreateHandoffUrl,
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatus } from '@onefootprint/types';
@@ -20,7 +20,7 @@ import useD2PGenerate from './hooks/use-generate-d2p';
 const QRRegister = () => {
   const { t } = useTranslation('pages.liveness-check.qr-register');
   const [state, send] = useLivenessCheckMachine();
-  const { scopedAuthToken, device } = state.context;
+  const { scopedAuthToken } = state.context;
   const { session } = useSessionUser();
   const authToken = session?.authToken;
 
@@ -28,20 +28,19 @@ const QRRegister = () => {
   const d2pSmsMutation = useD2PSms();
   const statusResponse = useGetD2PStatus();
   const generateScopedAuthToken = useGenerateScopedAuthToken();
-
-  const shouldShowQRCodeLoading =
-    d2pGenerateMutation.isLoading || !state.context.scopedAuthToken;
+  const url = useCreateHandoffUrl(scopedAuthToken);
+  const isLoading = d2pGenerateMutation.isLoading || !scopedAuthToken || !url;
 
   useEffect(() => {
     if (!scopedAuthToken && authToken) {
-      generateScopedAuthToken(authToken);
+      generateScopedAuthToken();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (authToken && statusResponse.error) {
-      generateScopedAuthToken(authToken);
+      generateScopedAuthToken();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse.error]);
@@ -64,12 +63,8 @@ const QRRegister = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse?.data?.status]);
 
-  const url = createHandoffUrl({
-    authToken: scopedAuthToken ?? '',
-    opener: device?.type,
-  });
   const handleSendLinkToPhone = () => {
-    if (!scopedAuthToken) {
+    if (!scopedAuthToken || !url) {
       return;
     }
     d2pSmsMutation.mutate(
@@ -89,7 +84,7 @@ const QRRegister = () => {
         {t('instructions')}
       </Typography>
       <QRCodeContainer>
-        {shouldShowQRCodeLoading || !scopedAuthToken ? (
+        {isLoading ? (
           <Shimmer sx={{ height: '128px', width: '128px' }} />
         ) : (
           <QRCodeSVG value={url} />
@@ -102,7 +97,7 @@ const QRRegister = () => {
       <Typography variant="body-2" color="secondary">
         {t('sms.instructions')}
       </Typography>
-      <Button fullWidth onClick={handleSendLinkToPhone}>
+      <Button fullWidth onClick={handleSendLinkToPhone} disabled={isLoading}>
         {t('sms.cta')}
       </Button>
     </Container>

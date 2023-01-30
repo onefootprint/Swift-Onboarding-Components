@@ -5,14 +5,18 @@ import { useMutation } from '@tanstack/react-query';
 import { AUTH_HEADER } from '../../../../config/constants';
 
 const d2pGenerate = async (payload: D2PGenerateRequest) => {
+  const { authToken, meta } = payload;
   const response = await request<D2PGenerateResponse>({
     method: 'POST',
     url: '/hosted/onboarding/d2p/generate',
-    data: payload,
+    data: {
+      meta,
+    },
     headers: {
-      [AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: authToken,
     },
   });
+
   return response.data;
 };
 

@@ -29,6 +29,7 @@ export enum Actions {
 
 export type MachineContext = {
   device?: DeviceInfo;
+  opener?: string;
   authToken?: string;
   requirements?: {
     missingIdDoc?: boolean;
@@ -46,6 +47,7 @@ export type MachineEvents =
       type: Events.initContextUpdated;
       payload: {
         authToken?: string;
+        opener?: string;
         device?: DeviceInfo;
       };
     }

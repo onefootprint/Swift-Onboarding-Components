@@ -1,6 +1,6 @@
 import {
-  createHandoffUrl,
   HeaderTitle,
+  useCreateHandoffUrl,
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
@@ -19,22 +19,21 @@ const NewTabRequest = () => {
   const generateScopedAuthToken = useGenerateScopedAuthToken();
   const { session } = useSessionUser();
   const authToken = session?.authToken;
+  const url = useCreateHandoffUrl(scopedAuthToken);
 
   useEffect(() => {
     if (!scopedAuthToken && authToken) {
-      generateScopedAuthToken(authToken);
+      generateScopedAuthToken();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, scopedAuthToken]);
 
   const handleClick = () => {
-    if (!scopedAuthToken) {
+    if (!url) {
       return;
     }
-    const tab = window.open(
-      createHandoffUrl({ authToken: scopedAuthToken, opener: 'mobile' }),
-      '_blank',
-    );
+
+    const tab = window.open(url, '_blank');
     if (tab) {
       send({ type: Events.newTabOpened, payload: { tab } });
     } else {
@@ -46,7 +45,7 @@ const NewTabRequest = () => {
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Button onClick={handleClick} fullWidth>
+      <Button onClick={handleClick} fullWidth disabled={!url}>
         {t('cta')}
       </Button>
     </Container>

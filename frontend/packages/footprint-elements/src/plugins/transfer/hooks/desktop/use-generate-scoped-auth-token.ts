@@ -1,16 +1,32 @@
+import { getSessionId } from '@onefootprint/dev-tools';
+import { useEffect } from 'react';
+
 import { useD2PGenerate } from '../../../../hooks';
 import useDesktopMachine, { Events } from './use-desktop-machine';
 
 const useGenerateScopedAuthToken = () => {
   const d2pGenerateMutation = useD2PGenerate();
-  const [, send] = useDesktopMachine();
+  const [state, send] = useDesktopMachine();
+  const { authToken, device } = state.context;
+  const opener = device?.type ?? 'unknown';
+  const sessionId = getSessionId();
 
-  const generateScopedAuthToken = (authToken: string) => {
-    if (d2pGenerateMutation.isLoading) {
+  const generateScopedAuthToken = () => {
+    if (
+      d2pGenerateMutation.isLoading ||
+      d2pGenerateMutation.isSuccess ||
+      !authToken
+    ) {
       return;
     }
     d2pGenerateMutation.mutate(
-      { authToken },
+      {
+        authToken,
+        meta: {
+          opener,
+          sessionId,
+        },
+      },
       {
         onSuccess(data) {
           send({
@@ -23,6 +39,11 @@ const useGenerateScopedAuthToken = () => {
       },
     );
   };
+
+  useEffect(() => {
+    generateScopedAuthToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authToken, d2pGenerateMutation.isLoading, d2pGenerateMutation.isSuccess]);
 
   return { mutation: d2pGenerateMutation, generateScopedAuthToken };
 };

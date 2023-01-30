@@ -4,11 +4,12 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
-import useOpener from '../../hooks/use-opener';
+import useHandoffMachine from '../../hooks/use-handoff-machine/use-handoff-machine';
 
 const Expired = () => {
   const { t } = useTranslation('pages.expired');
-  const opener = useOpener();
+  const [state] = useHandoffMachine();
+  const { opener } = state.context;
 
   const handleClick = () => {
     window.close();

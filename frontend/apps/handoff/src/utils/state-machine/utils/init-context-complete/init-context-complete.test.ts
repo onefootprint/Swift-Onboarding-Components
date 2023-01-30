@@ -10,6 +10,7 @@ describe('initContextComplete', () => {
           hasSupportForWebauthn: true,
         },
         authToken: 'token',
+        opener: 'mobile',
       };
       const event: MachineEvents = {
         type: Events.initContextUpdated,
@@ -21,6 +22,7 @@ describe('initContextComplete', () => {
     it('when some data is in the machine context and some in the event payload', () => {
       const context: MachineContext = {
         authToken: 'token',
+        opener: 'mobile',
       };
       const event: MachineEvents = {
         type: Events.initContextUpdated,

@@ -2,11 +2,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import HeaderTitle from '../../components/header-title';
-import useOpener from '../../hooks/use-opener';
+import useHandoffMachine from '../../hooks/use-handoff-machine/use-handoff-machine';
 
 const Canceled = () => {
+  const [state] = useHandoffMachine();
+  const { opener } = state.context;
   const { t } = useTranslation('pages.canceled');
-  const opener = useOpener();
 
   return (
     <HeaderTitle

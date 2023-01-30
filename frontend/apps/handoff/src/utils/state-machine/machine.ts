@@ -118,8 +118,9 @@ export const createHandoffMachine = () =>
           if (event.type !== Events.initContextUpdated) {
             return context;
           }
-          const { device, authToken } = event.payload;
+          const { device, authToken, opener } = event.payload;
           context.device = device !== undefined ? device : context.device;
+          context.opener = opener !== undefined ? opener : context.opener;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
 

@@ -34,9 +34,12 @@ const useNewTabStatusUpdate = () => {
     });
   };
 
-  useGetD2PStatus(true, scopedAuthToken ?? '', {
-    onSuccess: handleSuccess,
-    onError: handleError,
+  useGetD2PStatus({
+    authToken: scopedAuthToken ?? '',
+    options: {
+      onSuccess: handleSuccess,
+      onError: handleError,
+    },
   });
 };
 

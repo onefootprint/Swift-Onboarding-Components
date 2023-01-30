@@ -1,3 +1,4 @@
+import useSessionUser from 'src/hooks/use-session-user';
 import useLivenessCheckMachine from 'src/pages/liveness-check/hooks/use-liveness-check-machine';
 import { Events } from 'src/utils/state-machine/liveness-check/types';
 
@@ -5,11 +6,18 @@ import useD2PGenerate from '../../pages/qr-register/hooks/use-generate-d2p';
 
 const useGenerateScopedAuthToken = () => {
   const d2pGenerateMutation = useD2PGenerate();
-  const [, send] = useLivenessCheckMachine();
+  const [state, send] = useLivenessCheckMachine();
+  const { session } = useSessionUser();
+  const authToken = session?.authToken ?? '';
 
-  return (authToken: string) => {
+  return () =>
     d2pGenerateMutation.mutate(
-      { authToken },
+      {
+        authToken,
+        meta: {
+          opener: state.context.device?.type ?? 'unknown',
+        },
+      },
       {
         onSuccess(data) {
           send({
@@ -21,7 +29,6 @@ const useGenerateScopedAuthToken = () => {
         },
       },
     );
-  };
 };
 
 export default useGenerateScopedAuthToken;

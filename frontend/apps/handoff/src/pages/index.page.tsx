@@ -26,28 +26,27 @@ const Root = () => {
   const observeCollector = useObserveCollector();
   useLogStateMachine('handoff', state);
 
-  const handleSuccess = (data: GetD2PResponse) => {
-    send({
-      type: Events.statusReceived,
-      payload: {
-        status: data.status,
+  useGetD2PStatus({
+    enabled: !state.done,
+    authToken: authToken ?? '',
+    options: {
+      onSuccess: (data: GetD2PResponse) => {
+        send({
+          type: Events.statusReceived,
+          payload: {
+            status: data.status,
+          },
+        });
       },
-    });
-  };
-
-  const handleError = () => {
-    send({
-      type: Events.statusReceived,
-      payload: {
-        isError: true,
+      onError: () => {
+        send({
+          type: Events.statusReceived,
+          payload: {
+            isError: true,
+          },
+        });
       },
-    });
-  };
-
-  const pollingEnabled = !state.done;
-  useGetD2PStatus(pollingEnabled, authToken ?? '', {
-    onSuccess: handleSuccess,
-    onError: handleError,
+    },
   });
 
   return (

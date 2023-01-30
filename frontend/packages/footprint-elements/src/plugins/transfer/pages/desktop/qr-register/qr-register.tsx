@@ -1,13 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import { QRCodeSVG } from 'qrcode.react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
 import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
-import { createHandoffUrl } from '../../../../../utils/handoff-url';
+import { useCreateHandoffUrl } from '../../../../../utils/handoff-url';
 import useDesktopMachine, {
   Events,
 } from '../../../hooks/desktop/use-desktop-machine';
@@ -19,37 +19,29 @@ const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
-  const { authToken, scopedAuthToken, device } = state.context;
-
+  const { scopedAuthToken } = state.context;
+  const url = useCreateHandoffUrl(scopedAuthToken);
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken();
-  useEffect(() => {
-    if (authToken) {
-      generateScopedAuthToken(authToken);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken]);
+  const isLoading = mutation.isLoading || !scopedAuthToken || !url;
 
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
-  useGetD2PStatus(true, scopedAuthToken ?? '', {
-    onSuccess: handleSuccess,
-    onError: () => {
-      if (authToken) {
-        generateScopedAuthToken(authToken);
-      }
-      handleError();
-    },
-  });
-
-  const url = createHandoffUrl({
+  useGetD2PStatus({
     authToken: scopedAuthToken ?? '',
-    opener: device?.type,
+    options: {
+      onSuccess: handleSuccess,
+      onError: () => {
+        generateScopedAuthToken();
+        handleError();
+      },
+    },
   });
 
   const d2pSmsMutation = useD2PSms();
   const handleSendLinkToPhone = () => {
-    if (!scopedAuthToken) {
+    if (!scopedAuthToken || !url) {
       return;
     }
+
     d2pSmsMutation.mutate(
       { authToken: scopedAuthToken, url },
       {
@@ -72,7 +64,7 @@ const QRRegister = () => {
           {t(`${translationSource}.instructions`)}
         </Typography>
         <QRCodeContainer>
-          {mutation.isLoading || !scopedAuthToken ? (
+          {isLoading ? (
             <Shimmer sx={{ height: '128px', width: '128px' }} />
           ) : (
             <QRCodeSVG value={url} />
@@ -87,7 +79,7 @@ const QRRegister = () => {
         </Typography>
         <Button
           fullWidth
-          disabled={mutation.isLoading}
+          disabled={isLoading}
           loading={d2pSmsMutation.isLoading}
           onClick={handleSendLinkToPhone}
         >
