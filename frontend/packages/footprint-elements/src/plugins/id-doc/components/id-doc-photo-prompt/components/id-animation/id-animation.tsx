@@ -10,6 +10,7 @@ const iconAnimationVariants = {
   },
   finish: {
     opacity: 0,
+    zIndex: -1,
     transition: {
       delay: 4,
       duration: 0.1,

@@ -60,15 +60,8 @@ const IdDocPhotoPrompt = ({
 
   return (
     <Container>
-      {side === 'back' ? (
-        <>
-          <IdAnimation />
-          <Icon />
-        </>
-      ) : (
-        <Icon />
-      )}
-
+      {side === 'back' && <IdAnimation />}
+      <Icon />
       <HeaderTitle
         title={t('title', {
           type: IdDocTypeToLabel[type],
