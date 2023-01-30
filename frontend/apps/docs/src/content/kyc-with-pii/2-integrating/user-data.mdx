@@ -17,13 +17,13 @@ use the `userData` option:
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
-const userData = { email: 'jane.doe@acme.com', phoneNumber: '+1-202-555-0179' };
+const userData = { email: 'jane.doe@acme.com', phoneNumber: '+12025550179' };
 footprint.open({ publicKey, userData });
 ```
 
 ### Available user data
 
-| Variable      | Description                                                             |
-| ------------- | ----------------------------------------------------------------------- |
-| `email`       | Optional. User email (e.g `jane.doe@acme.com`)                          |
-| `phoneNumber` | Optional. User phone. Must include country code (e.g `+1-202-555-0179`) |
+| Variable      | Description                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `email`       | Optional. User email (e.g `jane.doe@acme.com`)                                                                           |
+| `phoneNumber` | Optional. User phone. Must be in the [E.164](https://www.twilio.com/docs/glossary/what-e164) format (e.g `+12025550179`) |
