@@ -4,7 +4,7 @@ use super::UvwArgs;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
-use db::models::identity_document::IdentityDocument;
+use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
@@ -32,7 +32,7 @@ impl UserVaultWrapper {
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
-        identity_documents: Vec<IdentityDocument>,
+        identity_documents: Vec<IdentityDocumentAndRequest>,
         kv_data: Vec<KeyValueData>,
         lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<Self> {
@@ -64,7 +64,7 @@ impl UserVaultWrapper {
         let data = UserVaultData::get_for(conn, &active_lifetime_ids)?;
         let phone_numbers = PhoneNumber::get_for(conn, &active_lifetime_ids)?;
         let emails = Email::get_for(conn, &active_lifetime_ids)?;
-        let identity_documents = IdentityDocument::get_for(conn, &active_lifetime_ids)?;
+        let identity_documents = IdentityDocumentAndRequest::get_for(conn, &active_lifetime_ids)?;
         let kv_data = if su_id.is_some() {
             KeyValueData::get_for(conn, &active_lifetime_ids)?
         } else {

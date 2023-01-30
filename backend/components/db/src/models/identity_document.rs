@@ -33,22 +33,6 @@ pub struct IdentityDocument {
     pub selfie_image_s3_url: Option<String>,
 }
 
-impl HasLifetime for IdentityDocument {
-    fn lifetime_id(&self) -> &DataLifetimeId {
-        &self.lifetime_id
-    }
-
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
-    where
-        Self: Sized,
-    {
-        let results = identity_document::table
-            .filter(identity_document::lifetime_id.eq_any(lifetime_ids))
-            .get_results(conn)?;
-        Ok(results)
-    }
-}
-
 impl IdentityDocument {
     pub fn seal_with_data_key(
         b64_image: &str,
@@ -167,6 +151,51 @@ impl IdentityDocument {
 }
 
 pub type SaturatedIdentityDocumentTimelineEvent = (IdentityDocument, DocumentRequest);
+
+/// The status of an identity document is often needed in conjunction with the document itself,
+/// so we use IdentityDocumentAndRequest in various places (like when we build a UVWs)
+#[derive(Debug, Clone)]
+pub struct IdentityDocumentAndRequest((IdentityDocument, DocumentRequest));
+impl IdentityDocumentAndRequest {
+    pub fn new(v: (IdentityDocument, DocumentRequest)) -> Self {
+        Self(v)
+    }
+
+    pub fn identity_document(&self) -> &IdentityDocument {
+        let (doc, _) = &self.0;
+        doc
+    }
+}
+impl std::ops::Deref for IdentityDocumentAndRequest {
+    type Target = IdentityDocument;
+
+    fn deref(&self) -> &Self::Target {
+        let (doc, _) = &self.0;
+
+        doc
+    }
+}
+
+impl HasLifetime for IdentityDocumentAndRequest {
+    fn lifetime_id(&self) -> &DataLifetimeId {
+        &self.lifetime_id
+    }
+
+    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
+        let results = identity_document::table
+            .filter(identity_document::lifetime_id.eq_any(lifetime_ids))
+            .inner_join(document_request::table)
+            .select((identity_document::all_columns, document_request::all_columns))
+            .get_results::<(IdentityDocument, DocumentRequest)>(conn)?
+            .into_iter()
+            .map(IdentityDocumentAndRequest::new)
+            .collect();
+        Ok(results)
+    }
+}
 
 #[cfg(test)]
 mod tests {

@@ -1,6 +1,6 @@
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
-use db::models::identity_document::IdentityDocument;
+use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
@@ -20,7 +20,7 @@ pub(super) struct UvwData {
     pub(super) phone_numbers: Vec<PhoneNumber>,
     pub(super) emails: Vec<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
-    pub(super) identity_documents: Vec<IdentityDocument>,
+    pub(super) identity_documents: Vec<IdentityDocumentAndRequest>,
     pub(super) kv_data: HashMap<KvDataKey, KeyValueData>,
 
     // A map of all of the DataLifetimes for this data.
@@ -32,7 +32,7 @@ impl UvwData {
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
-        identity_documents: Vec<IdentityDocument>,
+        identity_documents: Vec<IdentityDocumentAndRequest>,
         kv_data: Vec<KeyValueData>,
         all_lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<(Self, Self)> {
@@ -87,7 +87,7 @@ impl UvwData {
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
-        identity_documents: Vec<IdentityDocument>,
+        identity_documents: Vec<IdentityDocumentAndRequest>,
         kv_data: Vec<KeyValueData>,
         all_lifetimes: &[DataLifetime],
     ) -> Self {

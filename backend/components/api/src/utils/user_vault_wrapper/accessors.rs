@@ -1,6 +1,6 @@
 use super::UserVaultWrapper;
 use db::models::email::Email;
-use db::models::identity_document::IdentityDocument;
+use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
@@ -44,7 +44,7 @@ impl UserVaultWrapper {
     }
 
     /// Return speculative identity_documents if exist, otherwise portable. There should only be one
-    pub fn identity_documents(&self) -> &[IdentityDocument] {
+    pub fn identity_documents(&self) -> &[IdentityDocumentAndRequest] {
         // TODO but do we support portable ID docs?
         if !self.speculative.identity_documents.is_empty() {
             &self.speculative.identity_documents

@@ -4,7 +4,7 @@ use crate::errors::ApiResult;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
-use db::models::identity_document::IdentityDocument;
+use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
@@ -46,7 +46,7 @@ impl UserVaultWrapper {
         let uvds = UserVaultData::bulk_get(conn, &active_lifetime_list)?;
         let phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
         let emails = Email::bulk_get(conn, &active_lifetime_list)?;
-        let identity_document_map = IdentityDocument::bulk_get(conn, &active_lifetime_list)?;
+        let identity_document_map = IdentityDocumentAndRequest::bulk_get(conn, &active_lifetime_list)?;
         let kv_data_map = KeyValueData::bulk_get(conn, &active_lifetime_list)?;
         let scoped_user_ids = users.iter().map(|(su, _)| &su.id).collect();
         let ob_config_map = ObConfiguration::list_authorized_for_users(conn, scoped_user_ids)?;
