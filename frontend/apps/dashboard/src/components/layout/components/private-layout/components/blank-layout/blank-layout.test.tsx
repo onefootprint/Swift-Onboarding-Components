@@ -17,6 +17,7 @@ describe('<BlankLayout />', () => {
       data: {
         auth: '1',
         user: {
+          id: 'org_rb_jDESK4Wm2DkIbSRhIdlwJT',
           email: 'jane.doe@acme.com',
           firstName: 'Jane',
           lastName: 'Doe',

@@ -36,6 +36,7 @@ describe('useSession', () => {
       const expectedData = {
         auth: '1',
         user: {
+          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,

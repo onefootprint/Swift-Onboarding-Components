@@ -44,7 +44,7 @@ export const withOrgAuthRolesError = () =>
 
 export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
   user: {
-    id: 'orguser_yAESwjmuQyDiK0ShYjTR38',
+    id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
     email: 'jane@onefootprint.com',
     firstName: null,
     lastName: null,

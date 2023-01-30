@@ -12,6 +12,7 @@ describe('useUpdateOrg', () => {
       data: {
         auth: '1',
         user: {
+          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
           email: 'jane.doe@acme.com',
           firstName: 'Jane',
           lastName: 'Doe',

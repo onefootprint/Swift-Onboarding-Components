@@ -17,6 +17,7 @@ describe('useUserSession', () => {
       data: {
         auth: '1',
         user: {
+          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
           email: 'jane.doe@acme.com',
           firstName: '',
           lastName: '',
@@ -35,6 +36,7 @@ describe('useUserSession', () => {
     const { result } = customRenderHook(() => useUserSession());
 
     expect(result.current.dangerouslyCastedData).toEqual({
+      id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
       email: 'jane.doe@acme.com',
       firstName: '',
       lastName: '',
@@ -48,6 +50,7 @@ describe('useUserSession', () => {
       result.current.mutation.mutate({ firstName: 'Jane', lastName: 'Doe' });
       await waitFor(() => {
         expect(result.current.dangerouslyCastedData).toEqual({
+          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
           email: 'jane.doe@acme.com',
           firstName: '',
           lastName: '',

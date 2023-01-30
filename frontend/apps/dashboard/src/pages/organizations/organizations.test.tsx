@@ -117,6 +117,7 @@ describe('<Organizations />', () => {
 
           await waitFor(() => {
             expect(useStore.getState().data?.user).toEqual({
+              id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
               email: 'jane@onefootprint.com',
               firstName: null,
               lastName: null,

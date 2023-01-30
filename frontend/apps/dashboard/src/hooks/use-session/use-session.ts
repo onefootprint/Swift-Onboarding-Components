@@ -6,38 +6,13 @@ import {
   DASHBOARD_AUTHORIZATION_HEADER,
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
-
-export type UserSession = {
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-};
-
-export type OrgSession = {
-  name: Organization['name'];
-  logoUrl: Organization['logoUrl'];
-  isSandboxRestricted: Organization['isSandboxRestricted'];
-  isLive: boolean;
-};
-
-export type Session = {
-  auth: string;
-  user: UserSession;
-  org: OrgSession;
-};
-
-export type AuthHeaders = {
-  [DASHBOARD_AUTHORIZATION_HEADER]: string;
-  [DASHBOARD_IS_LIVE_HEADER]: string;
-};
-
-// Whenever changing this, make sure to read this guide:
-// https://www.notion.so/onefootprint/Migrating-session-w-Zustand-92cc5a563d6747ca80fd689232c5b7b4
-type UserSessionState = {
-  data?: Session;
-  update: (data?: Session) => void;
-  reset: () => void;
-};
+import {
+  AuthHeaders,
+  OrgSession,
+  Session,
+  UserSession,
+  UserSessionState,
+} from './user-session.types';
 
 export const useStore = create<UserSessionState>()(
   persist(
@@ -47,7 +22,7 @@ export const useStore = create<UserSessionState>()(
       update: (data?: Session) => set({ data }),
     }),
     {
-      version: 3,
+      version: 4,
       name: 'dashboard-storage',
     },
   ),
@@ -72,6 +47,7 @@ const useSession = () => {
     update({
       auth: authToken,
       user: {
+        id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
