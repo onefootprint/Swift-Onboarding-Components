@@ -200,6 +200,7 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
+    min-height: var(--loading-container-min-height);
   `}
 `;
 

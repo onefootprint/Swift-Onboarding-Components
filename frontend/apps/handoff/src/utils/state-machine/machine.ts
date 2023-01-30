@@ -1,3 +1,4 @@
+import { D2PStatus } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
@@ -7,7 +8,6 @@ import {
   MachineEvents,
   States,
 } from './types';
-import StatusReceivedTransitions from './utils';
 import initContextComplete from './utils/init-context-complete';
 
 export const createHandoffMachine = () =>
@@ -17,6 +17,25 @@ export const createHandoffMachine = () =>
       id: 'handoff',
       initial: States.init,
       context: {},
+      on: {
+        [Events.statusReceived]: [
+          {
+            target: States.expired,
+            cond: (context, event) => !!event.payload.isError,
+          },
+          {
+            target: States.canceled,
+            cond: (context, event) =>
+              event.payload.status === D2PStatus.canceled,
+          },
+          {
+            target: States.complete,
+            cond: (context, event) =>
+              event.payload.status === D2PStatus.completed ||
+              event.payload.status === D2PStatus.failed,
+          },
+        ],
+      },
       states: {
         [States.init]: {
           on: {
@@ -37,7 +56,6 @@ export const createHandoffMachine = () =>
                 target: States.complete,
               },
             ],
-            ...StatusReceivedTransitions,
           },
         },
         [States.checkRequirements]: {
@@ -57,7 +75,6 @@ export const createHandoffMachine = () =>
                 target: States.complete,
               },
             ],
-            ...StatusReceivedTransitions,
           },
         },
         [States.liveness]: {
@@ -71,7 +88,6 @@ export const createHandoffMachine = () =>
                 target: States.complete,
               },
             ],
-            ...StatusReceivedTransitions,
           },
         },
         [States.idDoc]: {
@@ -79,7 +95,6 @@ export const createHandoffMachine = () =>
             [Events.idDocCompleted]: {
               target: States.complete,
             },
-            ...StatusReceivedTransitions,
           },
         },
         [States.expired]: {

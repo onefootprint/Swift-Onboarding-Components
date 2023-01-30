@@ -66,6 +66,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 const GlobalStyle = createGlobalStyle`
   html {
     --navigation-header-height: 65px;
+    --loading-container-min-height: 188px;
 
     ${media.greaterThan('md')`
       --navigation-header-height: 57px;

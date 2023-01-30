@@ -1,36 +1,46 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useSkipLiveness } from '../../../../hooks';
-import HeaderTitle from '../../components/header-title';
 import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
 
-const TRANSITION_DELAY = 6000;
-
 const Unavailable = () => {
-  const { t } = useTranslation('pages.unavailable');
   const [state, send] = useLivenessMachine();
   const { authToken } = state.context;
   const skipLivenessMutation = useSkipLiveness();
-  const handleLivenessSkipped = () => {
-    setTimeout(() => {
-      send({
-        type: Events.completed,
-      });
-    }, TRANSITION_DELAY);
-  };
 
   useEffectOnce(() => {
-    if (authToken) {
-      skipLivenessMutation.mutate(
-        { authToken },
-        { onSuccess: handleLivenessSkipped },
-      );
+    if (!authToken) {
+      return;
     }
+
+    skipLivenessMutation.mutate(
+      { authToken },
+      {
+        onSuccess: () => {
+          send({
+            type: Events.completed,
+          });
+        },
+      },
+    );
   });
 
-  return <HeaderTitle title={t('title')} subtitle={t('subtitle')} />;
+  return (
+    <Container>
+      <LoadingIndicator />
+    </Container>
+  );
 };
+
+const Container = styled.div`
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  min-height: var(--loading-container-min-height);
+`;
 
 export default Unavailable;

@@ -69,7 +69,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     row-gap: ${theme.spacing[7]};
-    min-height: 188px;
+    min-height: var(--loading-container-min-height);
     justify-content: center;
     text-align: center;
   `}

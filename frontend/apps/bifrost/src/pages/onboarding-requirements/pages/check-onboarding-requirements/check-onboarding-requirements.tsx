@@ -103,7 +103,7 @@ const Container = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
-  min-height: 188px; // use the same height as bifrost/init-onboarding loading
+  min-height: var(--loading-container-min-height);
   justify-content: center;
   text-align: center;
 `;

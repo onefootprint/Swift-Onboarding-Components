@@ -75,6 +75,7 @@ const Container = styled.div`
   flex-direction: column;
   text-align: center;
   display: flex;
+  min-height: var(--loading-container-min-height);
   justify-content: center;
   align-items: center;
 `;
