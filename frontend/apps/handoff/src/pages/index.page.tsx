@@ -1,4 +1,7 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
+import {
+  useLogStateMachine,
+  useObserveCollector,
+} from '@onefootprint/dev-tools';
 import {
   IdDoc,
   Liveness,
@@ -6,18 +9,21 @@ import {
 } from '@onefootprint/footprint-elements';
 import { GetD2PResponse } from '@onefootprint/types';
 import React from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events, States } from 'src/utils/state-machine';
 
 import Canceled from './canceled';
 import CheckRequirements from './check-requirements';
 import Complete from './complete';
+import Error from './error';
 import Expired from './expired';
 import Init from './init';
 
 const Root = () => {
   const [state, send] = useHandoffMachine();
   const { authToken, device, requirements } = state.context;
+  const observeCollector = useObserveCollector();
   useLogStateMachine('handoff', state);
 
   const handleSuccess = (data: GetD2PResponse) => {
@@ -45,7 +51,15 @@ const Root = () => {
   });
 
   return (
-    <>
+    <ErrorBoundary
+      FallbackComponent={Error}
+      onError={(error, stack) => {
+        observeCollector.logError('error', error, { stack });
+      }}
+      onReset={() => {
+        send({ type: Events.reset });
+      }}
+    >
       {state.matches(States.init) && <Init />}
       {state.matches(States.complete) && <Complete />}
       {state.matches(States.canceled) && <Canceled />}
@@ -78,10 +92,8 @@ const Root = () => {
           }}
         />
       )}
-    </>
+    </ErrorBoundary>
   );
-
-  return null;
 };
 
 export default Root;

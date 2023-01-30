@@ -18,6 +18,10 @@ export const createHandoffMachine = () =>
       initial: States.init,
       context: {},
       on: {
+        [Events.reset]: {
+          target: States.init,
+          actions: [Actions.resetContext],
+        },
         [Events.statusReceived]: [
           {
             target: States.expired,
@@ -129,6 +133,7 @@ export const createHandoffMachine = () =>
           }
           return context;
         }),
+        [Actions.resetContext]: assign(() => ({})),
       },
     },
   );
