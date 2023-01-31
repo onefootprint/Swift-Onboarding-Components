@@ -7,6 +7,7 @@ pub struct RiskSignal {
     pub id: RiskSignalId,
     pub onboarding_decision_id: OnboardingDecisionId,
     pub reason_code: FootprintReasonCode,
+    pub note: String,
     pub description: String,
     pub severity: SignalSeverity,
     pub scopes: Vec<SignalScope>,
