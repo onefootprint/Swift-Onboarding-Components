@@ -184,6 +184,7 @@ define_newtype_id!(
     "Identifier for a IdologyExpectIdResponse"
 );
 define_newtype_id!(ProxyRequestLogId, String, "Identifier for a log of proxy request");
+define_newtype_id!(RuleSetName, String, "Identifier for a RuleSet");
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

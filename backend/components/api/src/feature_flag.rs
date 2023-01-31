@@ -3,7 +3,7 @@ use std::sync::Arc;
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
 #[cfg(test)]
 use mockall::{automock, predicate::*};
-use newtypes::{ObConfigurationKey, TenantId, Uuid};
+use newtypes::{ObConfigurationKey, RuleSetName, TenantId, Uuid};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -24,6 +24,12 @@ pub trait FeatureFlagClient {
         &self,
         flag_key: &str,
         ob_configuration_key: &ObConfigurationKey,
+    ) -> Result<bool, FeatureFlagError>;
+
+    fn bool_flag_by_rule_set_name(
+        &self,
+        flag_key: &str,
+        rule_set_name: &RuleSetName,
     ) -> Result<bool, FeatureFlagError>;
 }
 
@@ -85,6 +91,22 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         ob_configuration_key: &ObConfigurationKey,
     ) -> Result<bool, FeatureFlagError> {
         let context = ContextBuilder::new(ob_configuration_key.clone())
+            .build()
+            .map_err(FeatureFlagError::LaunchDarklyError)?;
+        let flag_value = self
+            .launch_darkly_client
+            .as_ref()
+            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)
+            .map(|c| c.bool_variation(&context, flag_key, false));
+        flag_value
+    }
+
+    fn bool_flag_by_rule_set_name(
+        &self,
+        flag_key: &str,
+        rule_set_name: &RuleSetName,
+    ) -> Result<bool, FeatureFlagError> {
+        let context = ContextBuilder::new(rule_set_name.clone())
             .build()
             .map_err(FeatureFlagError::LaunchDarklyError)?;
         let flag_value = self

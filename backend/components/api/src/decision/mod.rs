@@ -1,5 +1,6 @@
 use db::models::ob_configuration::ObConfiguration;
-
+use newtypes::RuleSetName;
+use thiserror::Error;
 ////////////////////////
 /// Decision Engine
 ////////////////////////
@@ -43,7 +44,14 @@ use db::models::ob_configuration::ObConfiguration;
 pub mod engine;
 pub(self) mod features;
 pub mod risk;
+pub mod rule;
 #[cfg(test)]
 pub mod tests;
 pub mod utils;
 pub mod vendor;
+
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("Missing data for rules_set {0}")]
+    MissingDataForRuleSet(RuleSetName),
+}

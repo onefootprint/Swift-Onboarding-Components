@@ -108,6 +108,8 @@ pub enum ApiError {
     MissingRequiredHeader(&'static str),
     #[error("{0}")]
     VaultProxyError(#[from] proxy::VaultProxyError),
+    #[error("Decision error: {0}")]
+    DecisionError(#[from] crate::decision::Error),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -188,6 +190,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
             ApiError::ChallengeError(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsApiError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::DecisionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::OnboardingError(_) => StatusCode::BAD_REQUEST,
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
