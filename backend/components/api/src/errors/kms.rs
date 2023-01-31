@@ -20,5 +20,5 @@ pub enum KmsSignError {
     #[error("crypto error: {0}")]
     Crypto(#[from] crypto::Error),
     #[error("data not available")]
-    MacDataNotReturned
+    MacDataNotReturned,
 }

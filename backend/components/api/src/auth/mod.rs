@@ -14,27 +14,27 @@ pub mod user;
 pub enum AuthError {
     #[error("Key not found")]
     ApiKeyNotFound,
-    #[error("missing X-Onboarding-Config-Key")]
+    #[error("Missing X-Onboarding-Config-Key")]
     MissingClientPublicAuthHeader,
-    #[error("missing X-Footprint-Secret-Key or HttpBasicAuth")]
+    #[error("Missing X-Footprint-Secret-Key or HttpBasicAuth")]
     MissingSecretKeyAuth,
-    #[error("missing X-Footprint-Custodian-Key")]
+    #[error("Missing X-Footprint-Custodian-Key")]
     MissingCustodianAuthHeader,
-    #[error("invalid X-Footprint-Custodian-Key")]
+    #[error("Invalid X-Footprint-Custodian-Key")]
     InvalidCustodianAuthHeader,
-    #[error("invalid tenant skey or footprint user id")]
+    #[error("Invalid tenant skey or footprint user id")]
     InvalidTenantKeyOrUserId,
-    #[error("incorrect session type auth")]
+    #[error("Incorrect session type auth")]
     SessionTypeError,
     #[error("Session expired or does not exist")]
     NoSessionFound,
-    #[error("missing header: {0}")]
+    #[error("Nissing header: {0}")]
     MissingHeader(String),
-    #[error("session expired")]
+    #[error("Session expired")]
     SessionExpired,
-    #[error("invalid token for header {0}")]
+    #[error("Invalid token for header {0}")]
     InvalidTokenForHeader(String),
-    #[error("not allowed: restricted to sandbox mode")]
+    #[error("Not allowed: restricted to sandbox mode")]
     SandboxRestricted,
     #[error("Not allowed: requires one of the following scopes: {0:?}")]
     MissingScope(Vec<UserAuthScopeDiscriminant>),

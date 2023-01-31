@@ -32,81 +32,81 @@ pub type ApiResult<T> = Result<T, ApiError>;
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("Auth error: {0}")]
+    #[error("{0}")]
     AuthError(#[from] crate::auth::AuthError),
-    #[error("kms error: {0}")]
+    #[error("{0}")]
     KmsError(#[from] kms::KmsSignError),
-    #[error("onboarding error: {0}")]
+    #[error("{0}")]
     OnboardingError(#[from] onboarding::OnboardingError),
     #[error("{0}")]
     TenantError(#[from] tenant::TenantError),
-    #[error("handoff error: {0}")]
+    #[error("{0}")]
     HandoffError(#[from] HandoffError),
-    #[error("user error: {0}")]
+    #[error("{0}")]
     UserError(#[from] user::UserError),
-    #[error("challenge error: {0}")]
+    #[error("{0}")]
     ChallengeError(#[from] ChallengeError),
-    #[error("crypto error: {0}")]
+    #[error("{0}")]
     Crypto(#[from] crypto::Error),
-    #[error("database error: {0}")]
+    #[error("{0}")]
     Database(#[from] DbError),
-    #[error("dotenv error: {0}")]
+    #[error("{0}")]
     Dotenv(#[from] dotenv::Error),
-    #[error("enclave error: {0}")]
+    #[error("{0}")]
     EnclaveError(#[from] enclave::EnclaveError),
-    #[error("workos api error: {0}")]
+    #[error("{0}")]
     WorkOsApiError(String),
-    #[error("workos error: {0}")]
+    #[error("{0}")]
     WorkOsLoginError(#[from] workos_login::WorkOsLoginError),
-    #[error("webauthn error: {0}")]
+    #[error("{0}")]
     Webauthn(#[from] WebauthnError),
-    #[error("no phone number for vault")]
+    #[error("No phone number for vault")]
     NoPhoneNumberForVault,
-    #[error("external request error: {0}")]
+    #[error("{0}")]
     ReqwestError(#[from] reqwest::Error),
-    #[error("error from sendgrid api: {0}")]
+    #[error("Sendgrid error: {0}")]
     SendgridError(String),
-    #[error("invalid parameter: {0}")]
+    #[error("{0}")]
     NewtypeError(#[from] newtypes::Error),
-    #[error("decode utf8 error: {0}")]
+    #[error("{0}")]
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
-    #[error("json body invalid: {0}")]
+    #[error("{0}")]
     InvalidJsonBody(JsonPayloadError),
-    #[error("query parameters are invalid: {0}")]
+    #[error("{0}")]
     InvalidQueryParam(QueryPayloadError),
-    #[error("form body invalid: {0}")]
+    #[error("{0}")]
     InvalidFormError(UrlencodedError),
-    #[error("json error: {0}")]
+    #[error("{0}")]
     SerdeJson(#[from] serde_json::Error),
-    #[error("cbor error: {0}")]
+    #[error("{0}")]
     SerdeCbor(#[from] serde_cbor::Error),
-    #[error("twilio error: {0}")]
+    #[error("{0}")]
     Twilio(#[from] twilio::error::Error),
     #[error("Endpoint not found")]
     EndpointNotFound,
     #[error("Resource not found")]
     ResourceNotFound,
-    #[error("Idv error: {0}")]
+    #[error("{0}")]
     IdvError(#[from] idv::Error),
-    #[error("io error: {0}")]
+    #[error("{0}")]
     Io(#[from] std::io::Error),
-    #[error("S3 error: {0}")]
+    #[error("{0}")]
     S3Error(#[from] crate::s3::S3Error),
-    #[error("privacy pass token error: {0}")]
+    #[error("{0}")]
     PrivacyPassError(#[from] privacy_pass::Error),
     #[error("Vendor request failed {0}")]
     VendorRequestFailed(VendorAPI),
     #[error("One or more vendor requests failed")]
     VendorRequestsFailed,
-    #[error("Unexpected: {0}")]
+    #[error("{0}")]
     AssertionError(String),
-    #[error("Feature Flag error: {0}")]
+    #[error("{0}")]
     FeatureFlagError(#[from] crate::feature_flag::FeatureFlagError),
     #[error("Invalid body: proxy requests must contain utf8 only")]
     InvalidProxyBody,
     #[error("Missing required header: {0}")]
     MissingRequiredHeader(&'static str),
-    #[error("vault proxy request error: {0}")]
+    #[error("{0}")]
     VaultProxyError(#[from] proxy::VaultProxyError),
 }
 
