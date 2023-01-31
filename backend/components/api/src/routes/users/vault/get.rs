@@ -17,7 +17,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
 pub struct FieldsParams {
-    /// Comma separated list of fields to check
+    /// Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`
     #[openapi(example = "id.last_name, custom.ach_account, id.dob, id.ssn9")]
     fields: Csv<DataIdentifier>,
 }

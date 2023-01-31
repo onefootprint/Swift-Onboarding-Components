@@ -17,9 +17,9 @@ use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct DecryptUnifiedFieldsRequest {
-    /// list of data identifiers to decrypt
+    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
     fields: HashSet<DataIdentifier>,
-    /// reason for the data decryption
+    /// Reason for the data decryption. This will be logged
     reason: String,
 }
 
