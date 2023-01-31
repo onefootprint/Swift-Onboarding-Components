@@ -729,13 +729,6 @@
         "reading-time": "{{readingTime}} min. read"
       }
     },
-    "footprint-live": {
-      "html-title": "The last identity form you'll ever fill out",
-      "title": "The last identity form you'll ever fill out",
-      "subtitle": "Create a portable digital identity that can be re-used in multiple companies when you need to verify your identity. All it takes is one click.",
-      "promo": "Verify for a chance of winning a $500 gift card 🤑",
-      "cta": "Validate your ID"
-    },
     "supported-id-documents": {
       "html-title": "Footprint - Supported ID Documents",
       "title": "Supported ID Documents",
