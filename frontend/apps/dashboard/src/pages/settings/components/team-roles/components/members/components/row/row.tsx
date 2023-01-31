@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { OrgMember } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
+import useUserSession from 'src/hooks/use-user-session';
 import styled from 'styled-components';
 
 import Actions from './components/actions';
@@ -13,7 +14,10 @@ export type RowProps = {
 // TODO: https://linear.app/footprint/issue/FP-1877/add-dropdown-to-member-row-to-change-role-only-if-logged-in-user-is
 const Row = ({ member }: RowProps) => {
   const { t } = useTranslation('pages.settings.members.table');
+  const session = useUserSession();
   const { email, firstName, lastName, lastLoginAt, roleName } = member;
+  const isMemberCurrentUser = session.data?.id === member.id;
+  const shouldShowActions = !isMemberCurrentUser;
 
   return (
     <>
@@ -28,9 +32,7 @@ const Row = ({ member }: RowProps) => {
       <Td>
         {!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}
       </Td>
-      <Td>
-        <Actions member={member} />
-      </Td>
+      <Td>{shouldShowActions && <Actions member={member} />}</Td>
     </>
   );
 };

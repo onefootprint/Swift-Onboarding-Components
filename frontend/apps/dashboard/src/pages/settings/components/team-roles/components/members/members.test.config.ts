@@ -1,5 +1,32 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import { OrgMember, OrgRole } from '@onefootprint/types';
+import { useStore } from 'src/hooks/use-session';
+
+const originalState = useStore.getState();
+
+beforeEach(() => {
+  useStore.setState({
+    data: {
+      auth: '1',
+      user: {
+        id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
+        email: 'jane.doe@acme.com',
+        firstName: 'Jane',
+        lastName: 'Doe',
+      },
+      org: {
+        isLive: false,
+        logoUrl: null,
+        name: 'Acme',
+        isSandboxRestricted: true,
+      },
+    },
+  });
+});
+
+afterAll(() => {
+  useStore.setState(originalState);
+});
 
 export const orgMembersFixture: OrgMember[] = [
   {
