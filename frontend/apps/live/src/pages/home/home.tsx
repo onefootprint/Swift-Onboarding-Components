@@ -17,41 +17,43 @@ const Live = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/live" />
+      <SEO title={t('html-title')} />
       <BlurredBackground>
-        <Nav>
-          <Link
-            href="https://onefootprint.com/"
-            target="_blank"
-            rel="nonreferrer"
-          >
-            <LogoFpDefault />
-          </Link>
-        </Nav>
-        <HeroContainer>
-          <TextContainer>
-            <Typography as="h1" variant="display-2">
-              {t('title')}
-            </Typography>
-            <Typography as="h1" variant="display-4">
-              {t('subtitle')}
-            </Typography>
-            <ActionsContainer>
-              <FootprintButton publicKey={publicKey} label={t('cta')} />
-            </ActionsContainer>
-          </TextContainer>
-          <ImageContainer>
-            <ImageOffset>
-              <Image
-                src="/live/fl-devices.png"
-                fill
-                alt="footprint wallet"
-                priority
-              />
-            </ImageOffset>
-          </ImageContainer>
-        </HeroContainer>
-        <Footer />
+        <Wrapper>
+          <Nav>
+            <Link
+              href="https://onefootprint.com/"
+              target="_blank"
+              rel="nonreferrer"
+            >
+              <LogoFpDefault />
+            </Link>
+          </Nav>
+          <HeroContainer>
+            <TextContainer>
+              <Typography as="h1" variant="display-2">
+                {t('title')}
+              </Typography>
+              <Typography as="h1" variant="display-4">
+                {t('subtitle')}
+              </Typography>
+              <ActionsContainer>
+                <FootprintButton publicKey={publicKey} label={t('cta')} />
+              </ActionsContainer>
+            </TextContainer>
+            <ImageContainer>
+              <ImageOffset>
+                <Image
+                  src="/live/fl-devices.png"
+                  fill
+                  alt="footprint wallet"
+                  priority
+                />
+              </ImageOffset>
+            </ImageContainer>
+          </HeroContainer>
+          <Footer />
+        </Wrapper>
       </BlurredBackground>
     </>
   );
@@ -83,6 +85,15 @@ const BlurredBackground = styled.div`
   }
 `;
 
+const Wrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Nav = styled.nav`
   width: 100%;
   height: 100px;
@@ -97,7 +108,7 @@ const Nav = styled.nav`
 const HeroContainer = styled.div`
   ${({ theme }) => css`
     z-index: 1;
-    margin: ${theme.spacing[11]} 0;
+    padding: ${theme.spacing[11]} 0 ${theme.spacing[3]} 0;
     max-width: 90%;
     display: grid;
     gap: ${theme.spacing[4]};
@@ -176,7 +187,7 @@ const ImageOffset = styled.div`
       align-self: center;
       position: absolute;
       left: 0;
-      width: 1100px;
+      width: 800px;
       height: 720px;
   `};
 `;

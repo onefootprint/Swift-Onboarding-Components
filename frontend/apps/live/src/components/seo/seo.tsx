@@ -6,7 +6,6 @@ type SeoProps = {
   image?: string;
   keywords?: string;
   kind?: string;
-  slug?: string;
   title: string;
   og?: {
     title?: string;
@@ -27,17 +26,16 @@ type SeoProps = {
 
 const Seo = ({
   description = "The last identity verification you'll ever need",
-  image = 'https://onefootprint.com/cover.png',
+  image = 'https://live.onefootprint.com/cover.png',
   keywords = 'footprint,foot,print,id,onefootprint,identity,kyc,verify,security',
   kind = 'product',
-  slug,
   title,
   og = {},
   twitter = {},
 }: SeoProps) => (
   <Head>
     <title>{title}</title>
-    <link rel="canonical" href={`https://onefootprint.com${slug}`} />
+    <link rel="canonical" href="https://live.onefootprint.com" />
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords} />
     <meta property="og:type" content={kind} />
@@ -46,7 +44,7 @@ const Seo = ({
     {og.author && (
       <meta name="author" property="og:author" content={og.author} />
     )}
-    <meta property="og:url" content={`https://onefootprint.com${slug}`} />
+    <meta property="og:url" content="https://live.onefootprint.com" />
     <meta property="og:image" content={og.image || image} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={twitter.title || title} />
@@ -61,7 +59,7 @@ const Seo = ({
       name="twitter:description"
       content={twitter.description || description}
     />
-    <meta name="twitter:url" content={`https://onefootprint.com${slug}`} />
+    <meta name="twitter:url" content="https://live.onefootprint.com" />
     <meta name="twitter:image" content={twitter.image || image} />
   </Head>
 );

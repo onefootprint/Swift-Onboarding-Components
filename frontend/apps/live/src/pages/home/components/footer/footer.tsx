@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Typography } from '@onefootprint/ui';
+import { media, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -34,16 +34,25 @@ const Footer = () => {
 const FooterContainer = styled.footer`
   ${({ theme }) => css`
     width: 100%;
-    position: fixed;
+    position: relative;
     bottom: 0;
     left: 0;
     padding: ${theme.spacing[4]};
     display: flex;
-    justify-content: flex-end;
-    gap: ${theme.spacing[4]};
+    justify-content: center;
+    gap: ${theme.spacing[7]};
+    margin-top: ${theme.spacing[4]};
+
     a {
       text-decoration: none;
     }
+  `}
+
+  ${media.greaterThan('md')`
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    justify-content: flex-end;
   `}
 `;
 
