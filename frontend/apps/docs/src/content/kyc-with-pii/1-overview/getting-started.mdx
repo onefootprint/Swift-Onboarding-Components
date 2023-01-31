@@ -133,15 +133,15 @@ Using the `status` and `required_manual_review` fields to decide whether or not 
 ### Optionally, decrypt identity fields from the user’s vault:
 
 ```bash
-curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/identity/decrypt \
+curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/decrypt \
    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-   -d '{"fields": ["dob", "last_name", "ssn4"], "reason": "getting started test"}'
+   -d '{"fields": ["id.dob", "id.last_name", "id.ssn4"], "reason": "getting started test"}'
 ```
 
 ```json
 {
-  "dob": "1988-12-25",
-  "last_name": "Smith",
-  "ssn4": "1212"
+  "id.dob": "1988-12-25",
+  "id.last_name": "Smith",
+  "id.ssn4": "1212"
 }
 ```

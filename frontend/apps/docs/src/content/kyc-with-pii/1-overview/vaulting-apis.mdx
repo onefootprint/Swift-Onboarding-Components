@@ -46,12 +46,8 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 
 ```json
 {
-  "identity": {
-    "ssn9": true
-  },
-  "custom": {
-    "ach_account": true
-  }
+  "identity.ssn9": true,
+  "custom.ach_account": true
 }
 ```
 
@@ -71,14 +67,10 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 
 ```json
 {
-  "identity": {
-    "last_name": "Smith"
-    "dob": "1988-12-25",
-    "ssn9": "121211212",
-  },
-  "custom": {
-    "ach_account": "111122224444"
-  }
+  "id.last_name": "Smith",
+  "id.dob": "1988-12-25",
+  "id.ssn9": "121211212",
+  "custom.ach_account": "111122224444"
 }
 ```
 
