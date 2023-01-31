@@ -1,7 +1,7 @@
-import { UserDataObj } from '../data';
+import { UserData } from '../data';
 
 export type UserDataRequest = {
-  data: UserDataObj;
+  data: UserData;
   authToken: string;
   speculative?: boolean;
 };
