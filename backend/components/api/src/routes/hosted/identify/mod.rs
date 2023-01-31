@@ -15,7 +15,7 @@ use newtypes::{Fingerprinter, PiiString};
 use newtypes::{IdentityDataKind, PhoneNumber};
 use newtypes::{UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
-use webauthn_rs_core::proto::AuthenticationState;
+use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -52,6 +52,8 @@ pub struct PhoneChallengeState {
 pub struct BiometricChallengeState {
     pub state: AuthenticationState,
     pub user_vault_id: UserVaultId,
+    #[serde(default)]
+    pub non_synced_cred_ids: Vec<Base64UrlSafeData>,
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {

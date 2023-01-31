@@ -19,7 +19,8 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::{NewUserInfo, UserVault};
-use newtypes::{IdentityDataKind, Fingerprinter, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
+use db::models::webauthn_credential::WebauthnCredential;
+use newtypes::{Fingerprinter, IdentityDataKind, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -65,7 +66,7 @@ pub async fn post(
             validate_sms_challenge(&state, c_state, &request.challenge_response, ob_config.clone()).await?
         }
         ChallengeData::Biometric(challenge_state) => {
-            validate_biometric_challenge(&state, challenge_state, &request.challenge_response)?
+            validate_biometric_challenge(&state, challenge_state, &request.challenge_response).await?
         }
     };
 
@@ -106,7 +107,7 @@ pub async fn post(
     }))
 }
 
-fn validate_biometric_challenge(
+async fn validate_biometric_challenge(
     state: &web::Data<State>,
     challenge_state: BiometricChallengeState,
     challenge_response: &str,
@@ -114,9 +115,21 @@ fn validate_biometric_challenge(
     // Decode and validate the response to the biometric challenge
     let webauthn = LivenessWebauthnConfig::new(state);
     let auth_resp = serde_json::from_str(challenge_response)?;
-    webauthn
+
+    let result = webauthn
         .webauthn()
         .authenticate_credential(&auth_resp, &challenge_state.state)?;
+
+    // if the credential's backup state has changed:
+    // update the backup state to learn that a credential is now portable across devices
+    if result.backup_state && challenge_state.non_synced_cred_ids.contains(&result.cred_id) {
+        let uv_id = challenge_state.user_vault_id.clone();
+
+        state
+            .db_pool
+            .db_query(move |conn| WebauthnCredential::update_backup_state(conn, &uv_id, &result.cred_id.0))
+            .await??;
+    }
 
     Ok((challenge_state.user_vault_id, VerifyKind::UserInherited))
 }

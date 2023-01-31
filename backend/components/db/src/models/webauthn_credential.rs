@@ -28,6 +28,12 @@ pub struct WebauthnCredential {
     pub backup_state: bool,
 }
 
+#[derive(Debug, Clone, AsChangeset)]
+#[diesel(table_name = webauthn_credential)]
+struct UpdateCredentialBackupState {
+    backup_state: bool,
+}
+
 impl WebauthnCredential {
     pub fn get_for_user_vault(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let creds = schema::webauthn_credential::table
@@ -56,6 +62,19 @@ impl WebauthnCredential {
             .get_results::<(WebauthnCredential, InsightEvent)>(conn)?;
 
         Ok(results)
+    }
+
+    pub fn update_backup_state(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+        cred_id: &[u8],
+    ) -> DbResult<()> {
+        diesel::update(webauthn_credential::table)
+            .filter(webauthn_credential::user_vault_id.eq(user_vault_id))
+            .filter(webauthn_credential::credential_id.eq(cred_id))
+            .set(&UpdateCredentialBackupState { backup_state: true })
+            .execute(conn)?;
+        Ok(())
     }
 }
 

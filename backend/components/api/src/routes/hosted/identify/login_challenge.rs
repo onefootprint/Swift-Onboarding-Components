@@ -159,6 +159,13 @@ async fn initiate_biometric_challenge_for_user(
         })
         .collect::<Result<Vec<Credential>, crypto::Error>>()?;
 
+    // separately keep tracked of devices not backed up
+    let non_synced_cred_ids = creds
+        .iter()
+        .filter(|c| !c.backup_state)
+        .map(|c| c.cred_id.clone())
+        .collect();
+
     // generate the challenge and return it
     let webauthn = LivenessWebauthnConfig::new(state);
     let (challenge, auth_state) = webauthn
@@ -169,6 +176,7 @@ async fn initiate_biometric_challenge_for_user(
         state: BiometricChallengeState {
             state: auth_state,
             user_vault_id: user_id.clone(),
+            non_synced_cred_ids,
         },
         challenge_json: serde_json::to_string(&challenge)?,
     })
