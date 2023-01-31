@@ -29,7 +29,7 @@ flat_api_object_map_type!(
 );
 
 #[api_v2_operation(
-    description = "Check for the existence of items in a vault",
+    description = "Given a list of fields, checks for their existence in the vault without decrypting them.",
     tags(Vault, PublicApi, Users)
 )]
 #[actix::get("/users/{footprint_user_id}/vault")]

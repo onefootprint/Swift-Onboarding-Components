@@ -29,7 +29,10 @@ flat_api_object_map_type!(
     example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
 
-#[api_v2_operation(tags(Vault, PublicApi, Users), description = "Decrypts items from the vault")]
+#[api_v2_operation(
+    tags(Vault, PublicApi, Users),
+    description = "Decrypts the specified list of fields from the provided user vault."
+)]
 #[actix::post("/users/{footprint_user_id}/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,

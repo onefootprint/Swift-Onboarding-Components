@@ -25,7 +25,7 @@ flat_api_object_map_type!(
 );
 
 #[api_v2_operation(
-    description = "Updates data in the identity vault.",
+    description = "Updates data in a user vault. Can be used to update `id.` data or `custom.` data, but `id.` data can only be specified for user vaults created via API.",
     tags(Vault, PublicApi, Users)
 )]
 #[actix::put("/users/{footprint_user_id}/vault")]
