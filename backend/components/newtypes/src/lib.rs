@@ -56,16 +56,12 @@ pub use self::proxy_token::*;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("SSN is an invalid length")]
-    InvalidSsn,
     #[error("Invalid email address")]
     InvalidEmail,
-    #[error("{0}")]
-    DobError(#[from] DobError),
-    #[error("{0}")]
-    AddressError(#[from] AddressError),
-    #[error("{0}")]
-    PhoneError(#[from] PhoneError),
+    #[error("Invalid phone number")]
+    InvalidPhoneNumber,
+    #[error("Invalid sandbox suffix. Suffix must be non-empty, alphanumeric string")]
+    InvalidSandboxSuffix,
     #[error("Serde error")]
     SerdeError,
     #[error("Error deserializing")]
@@ -76,6 +72,8 @@ pub enum Error {
     UvdKindConversionError(IdentityDataKind),
     #[error("Expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
+    #[error("{0}")]
+    ParsingError(#[from] fields::parsing::Error),
     #[error("{0}")]
     ValidationError(#[from] DataValidationError),
 }
@@ -141,42 +139,6 @@ impl std::error::Error for DataValidationError {
 }
 
 pub type NtResult<T> = Result<T, Error>;
-
-#[derive(Debug, Clone, thiserror::Error)]
-pub enum PhoneError {
-    #[error("invalid phone number")]
-    InvalidPhoneNumber,
-    #[error("Invalid sandbox suffix. Suffix must be non-empty, alphanumeric string")]
-    InvalidSandboxSuffix,
-}
-
-#[derive(Debug, Clone, thiserror::Error)]
-pub enum DobError {
-    #[error("Nonexistant date for dob %Y-%m-%d: {0}")]
-    NonexistantDate(String),
-    #[error("Invalid day for dob")]
-    InvalidDay,
-    #[error("Invalid month for dob")]
-    InvalidMonth,
-    #[error("Invalid year for dob")]
-    InvalidYear,
-    #[error("Cannot parse DOB")]
-    InvalidDob,
-}
-
-#[derive(Debug, Clone, thiserror::Error)]
-pub enum AddressError {
-    #[error("invalid zip code, zip code must be alphanumeric: {0}")]
-    InvalidZip(String),
-    #[error("invalid country code: {0}, country code must be 2-digit ISO 3166-1 Alpha 2")]
-    InvalidCountry(String),
-    #[error("invalid state code: {0}, state code must be 2-digit U.S. State")]
-    InvalidState(String),
-    #[error("invalid address provided: {0}, address must not contain special characters other than #")]
-    InvalidAddressCharacters(String),
-    #[error("invalid characters provided: {0}, city and/or state must not contain special characters")]
-    InvalidCharacters(String),
-}
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum EnumDotNotationError {

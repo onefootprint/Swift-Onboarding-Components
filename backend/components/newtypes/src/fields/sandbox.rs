@@ -10,7 +10,7 @@ pub(crate) fn split_sandbox_parts(s: &str) -> Result<(&str, &str), crate::Error>
             // "sandbox suffix" must match [a-zA-Z0-9_]+
             || !split[1].chars().all(|x| x.is_alphanumeric() || allowed_characters.contains(&x))
         {
-            return Err(crate::PhoneError::InvalidSandboxSuffix.into());
+            return Err(crate::Error::InvalidSandboxSuffix);
         }
         (split[0], split[1])
     } else {

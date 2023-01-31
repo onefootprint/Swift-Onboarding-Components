@@ -1,30 +1,27 @@
-use crate::{PhoneError, PiiString};
+use crate::api_schema_helper::string_api_data_type_alias;
+use crate::PiiString;
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::v2::schema::TypedData;
-use serde::{Deserialize, Deserializer, Serialize};
+use serde_with::DeserializeFromStr;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Default, DeserializeFromStr)]
 /// Phone number string. Must be valid e164 length and include a country code
 pub struct PhoneNumber {
     pub number: PiiString,
     pub suffix: String,
 }
 
-impl TypedData for PhoneNumber {
-    fn data_type() -> paperclip::v2::models::DataType {
-        paperclip::v2::models::DataType::String
-    }
-}
+string_api_data_type_alias!(PhoneNumber);
 
 impl PhoneNumber {
     pub fn leak(&self) -> &str {
         self.number.leak()
     }
 
+    #[allow(dead_code)]
     fn is_live(&self) -> bool {
         self.suffix.is_empty()
     }
@@ -40,12 +37,12 @@ impl From<PhoneNumber> for PiiString {
     }
 }
 
-fn sanitize_phone(s: &str) -> Result<String, PhoneError> {
+fn sanitize_phone(s: &str) -> Result<String, crate::Error> {
     // else check valid digits + e164 lengths
     let number = s.chars().filter(|c| c.is_ascii_digit()).collect::<String>();
     match number.len() {
         7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 => Ok(number),
-        _ => Err(crate::PhoneError::InvalidPhoneNumber),
+        _ => Err(crate::Error::InvalidPhoneNumber),
     }
 }
 
@@ -62,39 +59,7 @@ impl FromStr for PhoneNumber {
     }
 }
 
-impl<'de> Deserialize<'de> for PhoneNumber {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        FromStr::from_str(&s).map_err(serde::de::Error::custom)
-    }
-}
-
-fn phone_fmt(phone: &PhoneNumber) -> String {
-    let number = phone.number.leak();
-    let skip = number.len() - 2;
-    let phone_str = format!(
-        "{}{}",
-        "*".repeat(skip),
-        phone.number.leak().chars().skip(skip).collect::<String>()
-    );
-    let suffix = if !phone.is_live() {
-        format!("#{}", phone.suffix)
-    } else {
-        "".to_string()
-    };
-    format!("{phone_str}{suffix}")
-}
-
-impl Debug for PhoneNumber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", phone_fmt(self))
-    }
-}
-
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Validated phone number string. Only output from the twilio client
 /// iso_country_code is two digit country code for e164 formatted number,
 /// such as "US" or "CH"
@@ -143,26 +108,6 @@ impl ValidatedPhoneNumber {
     }
 }
 
-impl Debug for ValidatedPhoneNumber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let number = self.e164.leak();
-        let skip = number.len() - 2;
-
-        let phone_number = format!(
-            "{}{}",
-            "*".repeat(skip),
-            number.chars().skip(skip).collect::<String>()
-        );
-        let suffix = if !self.is_live() {
-            format!("#{}", self.suffix)
-        } else {
-            "".to_owned()
-        };
-        let out = format!("{phone_number}{suffix}");
-        std::fmt::Display::fmt(&out, f)
-    }
-}
-
 impl ValidatedPhoneNumber {
     /// escape hatch for constructing a known validated phone number
     pub fn __build(e164: String, iso_country_code: String, suffix: String) -> Self {
@@ -189,10 +134,11 @@ impl ValidatedPhoneNumber {
 mod tests {
 
     use super::*;
+    use serde::Deserialize;
 
     #[test]
     fn test_number() {
-        #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
+        #[derive(Eq, Debug, PartialEq, Deserialize)]
         struct Test {
             pub phone_number: PhoneNumber,
         }
@@ -226,13 +172,11 @@ mod tests {
 
         let test_bad_str = "12345";
         assert!(PhoneNumber::from_str(test_bad_str).is_err());
-
-        assert_eq!(format!("{:#?}", deserialized.phone_number), "**********90");
     }
 
     #[test]
     fn test_sandbox() {
-        #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
+        #[derive(Eq, Debug, PartialEq, Deserialize)]
         struct Test {
             pub phone_number: PhoneNumber,
         }
@@ -258,7 +202,5 @@ mod tests {
 
         let test_bad_str = "12345";
         assert!(PhoneNumber::from_str(test_bad_str).is_err());
-
-        assert_eq!(format!("{:#?}", deserialized.phone_number), "**********90#abc");
     }
 }

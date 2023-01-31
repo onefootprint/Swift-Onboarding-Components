@@ -1,12 +1,10 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::v2::schema::TypedData;
 use regex::Regex;
-use serde::{Deserialize, Deserializer, Serialize};
-use std::str::FromStr;
+use serde_with::DeserializeFromStr;
 
-use crate::PiiString;
+use crate::{api_schema_helper::string_api_data_type_alias, PiiString};
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, DeserializeFromStr, Default)]
 /// Email address. Will be checked against a basic regex for validity and
 /// uppercased for consistency.
 pub struct Email {
@@ -14,11 +12,7 @@ pub struct Email {
     pub suffix: String,
 }
 
-impl TypedData for Email {
-    fn data_type() -> paperclip::v2::models::DataType {
-        paperclip::v2::models::DataType::String
-    }
-}
+string_api_data_type_alias!(Email);
 
 impl Email {
     pub fn leak(&self) -> &str {
@@ -75,82 +69,26 @@ impl From<Email> for PiiString {
     }
 }
 
-impl<'de> Deserialize<'de> for Email {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        FromStr::from_str(&s).map_err(serde::de::Error::custom)
-    }
-}
-
-fn email_fmt(email: &Email) -> String {
-    let mut split = email.leak().split('@');
-    let name = String::from_iter(split.next().unwrap().chars().map(|_| '*'));
-    let domain = split.next().unwrap();
-    let suffix = if !email.is_live() {
-        format!("#{}", email.suffix)
-    } else {
-        "".to_string()
-    };
-    format!("{name}@{domain}{suffix}")
-}
-
-impl std::fmt::Debug for Email {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", email_fmt(self))
-    }
-}
-
 #[cfg(test)]
 mod tests {
-
     use super::*;
+    use std::str::FromStr;
+    use test_case::test_case;
 
-    macro_rules! email_tests {
-        ($($name:ident: $value:expr,)*) => {
-        $(
-            #[test]
-            fn $name() {
-                #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
-                struct Test {
-                    pub email: Email,
-                }
-                let (input, expected_email, expected_debug) = $value;
-                let email: Test = serde_json::from_str(input).expect("Could not deserialize");
-                assert_eq!(email.email, expected_email);
-                assert_eq!(expected_debug, format!("{:#?}", email.email));
-            }
-        )*
-        }
-    }
-
-    email_tests! {
-        good_email1: (
-            "{\"email\": \"beep_boop+@gmail.com\"}",
-            Email {
-                email: PiiString::from("beep_boop+@gmail.com"),
-                suffix: "".to_owned()
-            },
-            "**********@gmail.com",
-        ),
-        good_email2: (
-            "{\"email\": \"yoooooo.o.o@biz.real#sandbox1\"}",
-            Email {
-                email: PiiString::from("yoooooo.o.o@biz.real"),
-                suffix: "sandbox1".to_owned()
-            },
-            "***********@biz.real#sandbox1",
-        ),
-        good_email3: (
-            "{\"email\": \"flerpderpmerp@onefootprint.com#1\"}",
-            Email {
-                email: PiiString::from( "flerpderpmerp@onefootprint.com"),
-                suffix: "1".to_owned()
-            },
-            "*************@onefootprint.com#1",
-        ),
+    #[test_case("beep_boop+@gmail.com" => Email {
+        email: PiiString::from("beep_boop+@gmail.com"),
+        suffix: "".to_owned()
+    })]
+    #[test_case("yoooooo.o.o@biz.real#sandbox1" => Email {
+        email: PiiString::from("yoooooo.o.o@biz.real"),
+        suffix: "sandbox1".to_owned()
+    })]
+    #[test_case("flerpderpmerp@onefootprint.com#1" => Email {
+        email: PiiString::from("flerpderpmerp@onefootprint.com"),
+        suffix: "1".to_owned()
+    })]
+    fn test_email(input: &str) -> Email {
+        Email::from_str(input).expect("Could not parse")
     }
 
     #[test]

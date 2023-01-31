@@ -1,5 +1,3 @@
-use super::SocureConversionError;
-use newtypes::dob::DateOfBirth;
 use newtypes::*;
 use std::fmt::Debug;
 
@@ -58,11 +56,6 @@ impl SocureRequest {
         // if numeric_zip.len() != 9 && numeric_zip.len() != 5 {
         //     return Err(crate::SocureConversionError::UnsupportedZipFormat.into());
         // }
-
-        let dob = dob
-            .map(|dob| DateOfBirth::try_from(dob).map_err(|_| SocureConversionError::CantParseDob))
-            .transpose()?
-            .map(|dob| dob.yyyy_mm_dd());
 
         Ok(Self {
             modules,

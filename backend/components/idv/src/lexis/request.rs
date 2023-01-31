@@ -1,6 +1,3 @@
-use super::ConversionError;
-
-use newtypes::dob::DateOfBirth;
 use newtypes::*;
 use std::fmt::Debug;
 
@@ -70,14 +67,10 @@ impl LexisRequest {
             country: _,
             ssn4: _,
             ssn9,
-            dob,
+            dob: _,
             email: _,
             phone_number,
         } = idv_data;
-
-        let _dob = dob
-            .map(|dob| DateOfBirth::try_from(dob).map_err(|_| ConversionError::CantParseDob))
-            .transpose()?;
 
         Ok(Self {
             flex_id_request: FlexIdRequest {

@@ -6,12 +6,17 @@ class TestNonPortableVaultApi:
     @pytest.mark.parametrize(
         "key, value, expected_error",
         [
-            ("id.ssn9", "12345678", "SSN is an invalid length"),
-            ("id.ssn4", "123456789", "SSN is an invalid length"),
-            ("id.ssn4", "123", "SSN is an invalid length"),
+            ("id.ssn9", "12345678", "Invalid length"),
+            ("id.ssn4", "123456789", "Invalid length"),
+            ("id.ssn4", "123", "Invalid length"),
+            ("id.ssn4", "123a", "Invalid character: can only provide ascii digits"),
             ("id.first_name", "Hi", "Cannot vault without other Name data"),
             ("id.last_name", "Bye", "Cannot vault without other Name data"),
-            ("id.dob", "2023-13-25", "Invalid month for dob"),
+            (
+                "id.dob",
+                "2023-13-25",
+                "Invalid date: must provide a valid date in ISO 8601 format, YYYY-MM-DD",
+            ),
             ("id.zip", "12345", "Cannot vault without other Address data"),
             (
                 "id.address_line1",

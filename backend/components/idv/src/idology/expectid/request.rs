@@ -1,5 +1,6 @@
 use crate::idology::error as IdologyError;
-use newtypes::{dob::DateOfBirth, IdvData, PiiString};
+use chrono::{Datelike, NaiveDate};
+use newtypes::{IdvData, PiiString};
 
 /// Request to Idology ExpectID
 #[derive(Debug, Clone, serde::Serialize)]
@@ -59,11 +60,12 @@ impl TryFrom<IdvData> for RequestData {
         let last_name = last_name.ok_or(IdologyError::ConversionError::MissingLastName)?;
         let address = address_line1.ok_or(IdologyError::ConversionError::MissingAddress)?; // TODO
         let (dob_month, dob_year, dob_day) = if let Some(dob) = dob {
-            let dob = DateOfBirth::try_from(dob).map_err(|_| IdologyError::ConversionError::CantParseDob)?;
+            let dob = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
+                .map_err(|_| IdologyError::ConversionError::CantParseDob)?;
             (
-                Some(dob.month.into()),
-                Some(dob.year.into()),
-                Some(dob.day.into()),
+                Some(PiiString::new(dob.month().to_string())),
+                Some(PiiString::new(dob.year().to_string())),
+                Some(PiiString::new(dob.day().to_string())),
             )
         } else {
             (None, None, None)

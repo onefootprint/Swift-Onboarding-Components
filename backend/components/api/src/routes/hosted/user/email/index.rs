@@ -8,15 +8,15 @@ use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
-use newtypes::email::Email as EmailData;
+use newtypes::email::Email;
 use newtypes::{Fingerprinter, IdentityDataKind};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct AddEmailRequest {
-    email: EmailData,
+    email: Email,
     #[serde(default)]
     speculative: bool,
 }

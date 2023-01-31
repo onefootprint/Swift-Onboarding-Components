@@ -22,20 +22,12 @@ pub fn parse_response(value: serde_json::Value) -> Result<FlexIDResponse, Error>
 pub enum Error {
     #[error("request error: {0}")]
     Request(#[from] reqwest::Error),
-    #[error("lexis type conversion error: {0}")]
-    ConversionError(#[from] ConversionError),
     #[error("internal reqwest error: {0}")]
     InernalReqwestError(#[from] ReqwestError),
     #[error("api error: {0}")]
     Api(String),
     #[error("Json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum ConversionError {
-    #[error("Could not parse DOB")]
-    CantParseDob,
 }
 
 #[derive(Debug, thiserror::Error)]

@@ -89,8 +89,6 @@ pub enum SocureConversionError {
     MissingLastName,
     #[error("Last name must be provided")]
     MissingCountry,
-    #[error("Could not parse DOB")]
-    CantParseDob,
 }
 
 #[derive(Debug, thiserror::Error)]

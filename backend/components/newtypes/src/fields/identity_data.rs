@@ -1,14 +1,10 @@
-use crate::address::{AddressLine, City, Country, State, Zip};
-use crate::dob::{DateOfBirth, Dob};
-use crate::email::Email;
-use crate::name::Name;
-use crate::ssn::{Ssn4, Ssn9};
-use crate::{CollectedDataOption, DataIdentifier, IdentityDataKind as IDK, PhoneNumber, PiiString};
+use crate::{CollectedDataOption, DataIdentifier, IdentityDataKind as IDK, PiiString};
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
-use std::str::FromStr;
+
+use super::parsing::clean_and_validate_field;
 
 type DataRequest = HashMap<DataIdentifier, PiiString>;
 type IdentityDataRequest = HashMap<IDK, PiiString>;
@@ -89,26 +85,6 @@ fn extra_id_kinds(id_kinds: Vec<IDK>) -> Vec<IDK> {
     id_kinds.difference(&represented_idks).cloned().collect_vec()
 }
 
-fn clean_and_validate_field(idk: IDK, input: PiiString) -> NtResult<PiiString> {
-    let result = match idk {
-        IDK::FirstName => Name::from_str(input.leak())?.into(),
-        IDK::LastName => Name::from_str(input.leak())?.into(),
-        // Dob validation is horribly complex - will clean up when we deprecate old code
-        IDK::Dob => DateOfBirth::try_from(Dob::try_from(input)?)?.into(),
-        IDK::Ssn4 => Ssn4::from_str(input.leak())?.into(),
-        IDK::Ssn9 => Ssn9::from_str(input.leak())?.into(),
-        IDK::AddressLine1 => AddressLine::try_from(input.leak_to_string())?.into(),
-        IDK::AddressLine2 => AddressLine::try_from(input.leak_to_string())?.into(),
-        IDK::City => City::try_from(input.leak_to_string())?.into(),
-        IDK::State => State::try_from(input.leak_to_string())?.into(),
-        IDK::Zip => Zip::try_from(input.leak_to_string())?.into(),
-        IDK::Country => Country::try_from(input.leak_to_string())?.into(),
-        IDK::Email => Email::from_str(input.leak())?.into(),
-        IDK::PhoneNumber => PhoneNumber::from_str(input.leak())?.into(),
-    };
-    Ok(result)
-}
-
 #[cfg(test)]
 mod test {
     use super::IDK::*;
@@ -148,13 +124,13 @@ mod test {
     #[test_case(Ssn4, "6789" => Some("6789".to_owned()))]
     #[test_case(Ssn9, "123-45-678" => None)]
     #[test_case(Ssn9, "123-45-6789" => Some("123456789".to_owned()))]
-    #[test_case(AddressLine1, "100 Enclave Way@" => None)]
+    #[test_case(AddressLine1, "100 Nitro Way@" => Some("100 Nitro Way@".to_owned()))]
     #[test_case(AddressLine1, "100 Enclave Way" => Some("100 Enclave Way".to_owned()))]
     #[test_case(AddressLine2, "#1" => Some("#1".to_owned()))]
-    #[test_case(City, "#Footprint" => None)]
     #[test_case(City, "Footprint" => Some("Footprint".to_owned()))]
-    #[test_case(State, "#CA" => None)]
+    #[test_case(City, "_Footprint1" => Some("_Footprint1".to_owned()))] // We don't care about special chars
     #[test_case(State, "CA" => Some("CA".to_owned()))]
+    #[test_case(State, "CA1" => Some("CA1".to_owned()))] // We don't care about special chars
     #[test_case(Zip, "flerp!" => None)]
     #[test_case(Zip, "12345" => Some("12345".to_owned()))]
     #[test_case(Country, "BLERP" => None)]
