@@ -1,5 +1,5 @@
 export type UserEmailObj = {
-  email?: string;
+  email: string;
 };
 
 export type UserEmailRequest = {

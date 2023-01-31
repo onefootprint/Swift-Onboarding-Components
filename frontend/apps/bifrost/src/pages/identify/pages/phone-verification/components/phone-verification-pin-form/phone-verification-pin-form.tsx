@@ -30,29 +30,59 @@ const PhoneVerificationPinForm = ({
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
 
-  const shouldShowSuccess = identifyVerifyMutation.isSuccess;
+  const shouldShowSuccess =
+    identifyVerifyMutation.isSuccess && userEmailMutation.isSuccess;
   const shouldShowLoading =
     identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
+
+  const delayedSuccessTransition = (authToken: string) => {
+    setTimeout(() => {
+      send({
+        type: Events.smsChallengeSucceeded,
+        payload: {
+          authToken,
+        },
+      });
+    }, SUCCESS_EVENT_DELAY_MS);
+  };
 
   const handlePinValidationSucceeded = ({
     authToken,
   }: IdentifyVerifyResponse) => {
     // Only send the user email to the backend if we are onboarding the user for
     // the first time
-    if (!userFound) {
-      userEmailMutation.mutate({ data: { email }, authToken });
+    if (!authToken) {
+      console.error(
+        'Received empty auth token from successful sms pin verification.',
+      );
+      return;
     }
 
-    if (authToken) {
-      setTimeout(() => {
-        send({
-          type: Events.smsChallengeSucceeded,
-          payload: {
-            authToken,
-          },
-        });
-      }, SUCCESS_EVENT_DELAY_MS);
+    if (userFound) {
+      delayedSuccessTransition(authToken);
+      return;
     }
+
+    if (!email) {
+      showRequestErrorToast();
+      console.error(
+        'Found empty email while trying to send verification email.',
+      );
+      return;
+    }
+
+    userEmailMutation.mutate(
+      { data: { email }, authToken },
+      {
+        onSuccess: () => {
+          delayedSuccessTransition(authToken);
+        },
+        onError: (error: unknown) => {
+          showRequestErrorToast(error);
+          console.error('Failed email verification request: ', error);
+        },
+      },
+    );
   };
 
   const handlePinCompleted = (pin: string) => {

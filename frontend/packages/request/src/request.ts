@@ -46,10 +46,10 @@ export const isLogoutError = (error: unknown) => {
   );
 };
 
-export const getErrorMessage = (error: unknown | Error): string => {
+export const getErrorMessage = (error?: unknown | Error): string => {
   if (isFootprintError(error)) {
-    if (error.response?.data.error.message) {
-      return error.response?.data.error.message;
+    if (error?.response?.data.error.message) {
+      return error.response.data.error.message;
     }
   }
   if (isUnhandledError(error)) {
