@@ -266,6 +266,7 @@ pub async fn complete_post(
                 public_key,
                 attestation_data,
                 backup_eligible: cred.backup_eligible,
+                backup_state: cred.backup_state,
                 attestation_type,
                 insight_event_id: insight_event.id,
             }

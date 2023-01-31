@@ -3,9 +3,7 @@ use crate::schema::{self, webauthn_credential};
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::{
-    AttestationType, InsightEventId, UserVaultId, WebauthnCredentialId,
-};
+use newtypes::{AttestationType, InsightEventId, UserVaultId, WebauthnCredentialId};
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::InsightEvent;
@@ -27,6 +25,7 @@ pub struct WebauthnCredential {
     pub backup_eligible: bool,
     pub attestation_type: AttestationType,
     pub insight_event_id: InsightEventId,
+    pub backup_state: bool,
 }
 
 impl WebauthnCredential {
@@ -70,6 +69,7 @@ pub struct NewWebauthnCredential {
     pub backup_eligible: bool,
     pub attestation_type: AttestationType,
     pub insight_event_id: InsightEventId,
+    pub backup_state: bool,
 }
 
 impl NewWebauthnCredential {

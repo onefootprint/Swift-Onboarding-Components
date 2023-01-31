@@ -680,6 +680,7 @@ table! {
         backup_eligible -> Bool,
         attestation_type -> Text,
         insight_event_id -> Text,
+        backup_state -> Bool,
     }
 }
 
