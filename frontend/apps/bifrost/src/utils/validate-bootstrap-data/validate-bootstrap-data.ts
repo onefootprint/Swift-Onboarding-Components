@@ -1,16 +1,12 @@
 import { PhoneNumberUtil } from 'google-libphonenumber';
-import IsEmail from 'isemail';
 
 import { BootstrapData } from '../state-machine/bifrost/types';
 
 const validateBootstrapData = (bootstrapData: BootstrapData) => {
   const { email, phoneNumber } = bootstrapData;
-  const validatedData: BootstrapData = {};
-
-  const isEmailValid = IsEmail.validate(email ?? '');
-  if (isEmailValid) {
-    validatedData.email = email;
-  }
+  const validatedData: BootstrapData = {
+    email,
+  };
 
   let isPhoneValid = false;
   if (phoneNumber) {
