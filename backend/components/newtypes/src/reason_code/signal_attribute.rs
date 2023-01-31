@@ -1,8 +1,19 @@
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
+use strum::Display;
 
 #[derive(
-    Debug, Clone, Copy, Eq, PartialEq, Hash, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema,
+    Debug,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    Hash,
+    serde::Serialize,
+    serde::Deserialize,
+    Apiv2Schema,
+    JsonSchema,
+    Display,
 )]
 #[serde(rename_all = "snake_case")]
 /// Represents the granularity of data attributes that could be alerted on by a data vendor

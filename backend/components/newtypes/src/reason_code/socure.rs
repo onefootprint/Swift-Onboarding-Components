@@ -1,11 +1,11 @@
 use crate::db_types::FootprintReasonCode;
-use strum::Display;
+use strum::{Display, EnumIter};
 use strum_macros::EnumString;
 
 use crate::vendor_reason_code_enum;
 
 vendor_reason_code_enum! {
-    #[derive(Debug, Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, Hash)]
+    #[derive(Debug, Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, Hash, EnumIter)]
     #[serde(try_from = "&str")]
     pub enum SocureReasonCode {
         #[ser = "I121", description = "Social networks match"]

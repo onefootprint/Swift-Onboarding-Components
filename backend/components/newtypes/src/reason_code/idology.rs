@@ -1,10 +1,11 @@
 use crate::{vendor_reason_code_enum, FootprintReasonCode};
 
 use super::{OldSignalSeverity, Signal};
+use strum::EnumIter;
 use strum_macros::EnumString;
 
 vendor_reason_code_enum! {
-    #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString)]
+    #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, EnumIter, Hash)]
     #[serde(try_from = "&str")]
     pub enum IDologyReasonCode {
         #[ser = "resultcode.coppa.alert", description = "Customer is 13 or under.  COPPA laws forbid conducting e-commerce with people under 14 years of age. When this result is encountered, the input information and located data will not be available in any record of the transaction due to the issues around storing data on children."]

@@ -75,6 +75,7 @@ footprint_reason_code_enum! {
         Eq,
         Ord,
         PartialOrd,
+        Hash
     )]
     #[strum(serialize_all = "snake_case")]
     #[serde(rename_all = "snake_case")]
@@ -221,7 +222,7 @@ footprint_reason_code_enum! {
         #[note = "IP high risk TOR", severity = SignalSeverity::High, scopes =  vec![SignalScope::IpAddress], description = "Indicates that the IP address is associated with a TOR network."]
         IpAlertHighRiskTor,
 
-        #[note = "IP high risk proxy", severity = SignalSeverity::High, scopes =  vec![SignalScope::IpAddress], description = "TODO"]
+        #[note = "IP high risk proxy", severity = SignalSeverity::High, scopes =  vec![SignalScope::IpAddress], description = "IP address is associated with an anonymizing proxy"]
         IpAlertHighRiskProxy,
 
         // ~~~~~~~~~~~~ Email ~~~~~~~~~~~~
@@ -412,12 +413,18 @@ pub enum SignalSeverity {
 
 #[cfg(test)]
 mod tests {
+    use itertools::Itertools;
     use test_case::test_case;
+
+    use crate::IDologyReasonCode;
+    use crate::SocureReasonCode;
 
     use super::FootprintReasonCode;
     use super::SignalScope;
     use super::SignalSeverity;
     use std::cmp::Ordering;
+    use std::collections::HashMap;
+    use strum::IntoEnumIterator;
 
     #[test_case(SignalSeverity::Low, SignalSeverity::High => Ordering::Less)]
     #[test_case(SignalSeverity::Low, SignalSeverity::Medium => Ordering::Less)]
@@ -436,5 +443,63 @@ mod tests {
             "Records indicate that the subject in question is deceased.",
             frc.description()
         );
+    }
+
+    #[test]
+    #[ignore]
+    // Just a little script to dump our reason codes into CSV format for uploading to google docs so non-eng folks can work on them
+    fn export_reason_codes_for_gdoc() {
+        let mut frc_to_idology: HashMap<FootprintReasonCode, Vec<IDologyReasonCode>> = HashMap::new();
+        IDologyReasonCode::iter()
+            .flat_map(|r| Into::<Option<FootprintReasonCode>>::into(&r).map(|frc| (frc, r)))
+            .for_each(|(frc, r)| {
+                frc_to_idology.entry(frc).or_insert_with(Vec::new).push(r);
+            });
+
+        let mut frc_to_socure: HashMap<FootprintReasonCode, Vec<SocureReasonCode>> = HashMap::new();
+        SocureReasonCode::iter()
+            .flat_map(|r| Into::<Option<FootprintReasonCode>>::into(&r).map(|frc| (frc, r)))
+            .for_each(|(frc, r)| {
+                frc_to_socure.entry(frc).or_insert_with(Vec::new).push(r);
+            });
+
+        let mut rows: Vec<String> = Vec::new();
+        rows.push(String::from(
+            "footprint_reason_code,scopes,description,idology_reason_codes,socure_reason_codes",
+        ));
+        FootprintReasonCode::iter().for_each(|frc| {
+            let idology_rc = frc_to_idology.get(&frc);
+            let socure_rc = frc_to_socure.get(&frc);
+
+            let scopes_str = frc
+                .scopes()
+                .iter()
+                .map(|r| r.clone().to_string())
+                .collect::<Vec<String>>()
+                .join(",");
+            let idology_str = idology_rc.map(|v| {
+                v.iter()
+                    .map(|r| r.clone().to_string())
+                    .collect::<Vec<String>>()
+                    .join(",")
+            });
+            let socure_str = socure_rc.map(|v| {
+                v.iter()
+                    .map(|r| r.clone().to_string())
+                    .collect::<Vec<String>>()
+                    .join(",")
+            });
+
+            let row = format!(
+                "{},\"{}\",\"{}\",\"{}\",\"{}\"",
+                frc,
+                scopes_str,
+                frc.description(),
+                idology_str.unwrap_or_default(),
+                socure_str.unwrap_or_default(),
+            );
+            rows.push(row);
+        });
+        println!("{}", rows.join("\n"));
     }
 }
