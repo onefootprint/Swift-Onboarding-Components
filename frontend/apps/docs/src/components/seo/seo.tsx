@@ -29,7 +29,9 @@ const Seo = ({
     <meta property="og:url" content={`https://docs.onefootprint.com${slug}`} />
     <meta
       property="og:image"
-      content={`https://docs.onefootprint.com/api/og?title=${title}`}
+      content={`https://docs.onefootprint.com/api/og?title=${encodeURIComponent(
+        title,
+      )}`}
     />
   </Head>
 );

@@ -15,8 +15,6 @@ export default async function handler(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-
-    // ?title=<title>
     const fallbackTitle = 'Footprint docs';
     const urlTitle = searchParams.get('title');
     const title = urlTitle ? urlTitle.slice(0, 100) : fallbackTitle;
