@@ -53,7 +53,9 @@ const BasicInformation = ({
     if (!authToken) {
       return;
     }
-    syncData(authToken, basicInformation, {
+    syncData({
+      authToken,
+      data: basicInformation,
       speculative: true,
       onSuccess: handleSuccess,
       onError: handleError,

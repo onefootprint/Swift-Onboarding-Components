@@ -2,6 +2,7 @@ import {
   CollectedKycDataOption,
   OptionToRequiredAttributes,
   UserData,
+  UserDataAttribute,
 } from '@onefootprint/types';
 
 import { States } from '../state-machine/types';
@@ -36,6 +37,13 @@ export const isMissing = (
     .filter(option => mustCollect.includes(option))
     .flatMap(option => OptionToRequiredAttributes[option])
     .some(attr => !collectedData || !collectedData[attr]);
+
+export const isMissingEmailAttribute = (
+  mustCollect: readonly CollectedKycDataOption[],
+  collectedData?: UserData,
+) =>
+  mustCollect.includes(CollectedKycDataOption.email) &&
+  !collectedData?.[UserDataAttribute.email];
 
 export const isMissingBasicAttribute = (
   mustCollect: readonly CollectedKycDataOption[],

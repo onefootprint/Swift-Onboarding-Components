@@ -71,7 +71,6 @@ export type MachineEvents =
       payload: {
         userFound: boolean;
         phone: string;
-        email?: string; // if the user was identified with a different email
         challengeData?: ChallengeData; // if user was found
       };
     }

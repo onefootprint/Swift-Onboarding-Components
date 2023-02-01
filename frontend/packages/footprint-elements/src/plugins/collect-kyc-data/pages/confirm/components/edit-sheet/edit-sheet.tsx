@@ -3,10 +3,12 @@ import { BottomSheet } from '@onefootprint/ui';
 import React from 'react';
 
 import BasicInformation from '../../../basic-information';
+import Email from '../../../email';
 import ResidentialAddress from '../../../residential-address';
 import SSN from '../../../ssn';
 
 export enum EditSection {
+  email = 'email',
   basicInfo = 'basic-info',
   address = 'address',
   identity = 'identity',
@@ -28,6 +30,9 @@ const EditSheet = ({ section, open, onClose }: EditSheetProps) => {
       onClose={onClose}
       title={t('title', { name: t(`name.${section}`) })}
     >
+      {section === EditSection.email && (
+        <Email ctaLabel={ctaLabel} onComplete={onClose} hideHeader />
+      )}
       {section === EditSection.basicInfo && (
         <BasicInformation ctaLabel={ctaLabel} onComplete={onClose} hideHeader />
       )}
@@ -35,8 +40,7 @@ const EditSheet = ({ section, open, onClose }: EditSheetProps) => {
         <ResidentialAddress
           ctaLabel={ctaLabel}
           onComplete={onClose}
-          hideTitle
-          hideNavHeader
+          hideHeader
         />
       )}
       {section === EditSection.identity && (
@@ -44,8 +48,7 @@ const EditSheet = ({ section, open, onClose }: EditSheetProps) => {
           ctaLabel={ctaLabel}
           onComplete={onClose}
           hideDisclaimer
-          hideTitle
-          hideNavHeader
+          hideHeader
         />
       )}
     </BottomSheet>

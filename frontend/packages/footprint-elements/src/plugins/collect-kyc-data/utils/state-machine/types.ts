@@ -1,5 +1,9 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { CollectedKycDataOption, UserData } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  OnboardingConfig,
+  UserData,
+} from '@onefootprint/types';
 
 import {
   BasicInformation,
@@ -16,14 +20,17 @@ export type OnboardingData = {
 export enum States {
   // Initial Collection
   init = 'init',
+  email = 'email',
   basicInformation = 'basicInformation',
   residentialAddress = 'residentialAddress',
   ssn = 'ssn',
   // Confirm
   confirm = 'confirm',
+  emailEditDesktop = 'emailEditDesktop',
   basicInfoEditDesktop = 'basicInfoEditDesktop',
   addressEditDesktop = 'addressEditDesktop',
   identityEditDesktop = 'identityEditDesktop',
+
   completed = 'completed',
 }
 
@@ -32,6 +39,8 @@ export type MachineContext = {
   device?: DeviceInfo;
   authToken?: string;
   userFound?: boolean;
+  config?: OnboardingConfig;
+  receivedEmail?: boolean; // Whether received non-empty email from initial context
   // Machine generated
   missingAttributes: CollectedKycDataOption[];
   data: UserData;
@@ -39,11 +48,13 @@ export type MachineContext = {
 
 export enum Events {
   receivedContext = 'receivedContext',
+  emailSubmitted = 'emailSubmitted',
   basicInformationSubmitted = 'basicInformationSubmitted',
   residentialAddressSubmitted = 'residentialAddressSubmitted',
   ssnSubmitted = 'ssnSubmitted',
   navigatedToPrevPage = 'navigatedToPrevPage',
   confirmed = 'confirmed',
+  editEmail = 'editEmail',
   editBasicInfo = 'editBasicInfo',
   editAddress = 'editAddress',
   editIdentity = 'editIdentity',
@@ -52,6 +63,7 @@ export enum Events {
 
 export enum Actions {
   assignInitialContext = 'assignInitialContext',
+  assignEmail = 'assignEmail',
   assignBasicInformation = 'assignBasicInformation',
   assignResidentialAddress = 'assignResidentialAddress',
   assignSsn = 'assignSsn',
@@ -65,11 +77,21 @@ export type MachineEvents =
         missingAttributes: readonly CollectedKycDataOption[];
         userFound: boolean;
         device: DeviceInfo;
+        email?: string;
+        config: OnboardingConfig;
+      };
+    }
+  | {
+      type: Events.emailSubmitted;
+      payload: {
+        email?: string;
       };
     }
   | {
       type: Events.basicInformationSubmitted;
-      payload: { basicInformation: BasicInformation };
+      payload: {
+        basicInformation: BasicInformation;
+      };
     }
   | {
       type: Events.residentialAddressSubmitted;
@@ -83,6 +105,7 @@ export type MachineEvents =
     }
   | { type: Events.navigatedToPrevPage }
   | { type: Events.confirmed }
+  | { type: Events.editEmail }
   | { type: Events.editBasicInfo }
   | { type: Events.editAddress }
   | { type: Events.editIdentity }

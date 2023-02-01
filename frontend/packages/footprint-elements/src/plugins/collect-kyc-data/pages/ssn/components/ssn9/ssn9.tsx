@@ -19,16 +19,14 @@ type SSN9Props = {
   onSubmit: (formData: FormData) => void;
   ctaLabel?: string;
   hideDisclaimer?: boolean;
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
+  hideHeader?: boolean;
 };
 
 const SSN9 = ({
   hideDisclaimer,
   ctaLabel,
   isMutationLoading,
-  hideTitle,
-  hideNavHeader,
+  hideHeader,
   onSubmit,
 }: SSN9Props) => {
   const [state] = useCollectKycDataMachine();
@@ -49,9 +47,9 @@ const SSN9 = ({
 
   return (
     <>
-      {!hideNavHeader && <NavigationHeader />}
+      {!hideHeader && <NavigationHeader />}
       <Form onSubmit={handleSubmit(onSubmit)}>
-        {!hideTitle && (
+        {!hideHeader && (
           <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         )}
         <TextInput

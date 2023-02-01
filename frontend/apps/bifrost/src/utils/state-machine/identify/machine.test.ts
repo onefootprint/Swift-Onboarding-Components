@@ -86,12 +86,10 @@ describe('Identify Machine Tests', () => {
         payload: {
           phone: '+16509878899',
           userFound: true,
-          email: 'belce.dogru@onefootprint.com',
           challengeData,
         },
       });
-      // Email should be updated
-      expect(state.context.email).toEqual('belce.dogru@onefootprint.com');
+
       expect(state.context.userFound).toEqual(true);
       expect(state.context.phone).toEqual('+16509878899');
       expect(state.context.challengeData).toEqual(challengeData);
@@ -131,11 +129,8 @@ describe('Identify Machine Tests', () => {
         payload: {
           phone: '+16509878899',
           userFound: false,
-          email: 'belce.dogru@onefootprint.com',
         },
       });
-      // Email should be updated
-      expect(state.context.email).toEqual('belce.dogru@onefootprint.com');
       expect(state.context.userFound).toEqual(false);
       expect(state.context.phone).toEqual('+16509878899');
       expect(state.value).toEqual(States.phoneVerification);
@@ -151,10 +146,8 @@ describe('Identify Machine Tests', () => {
         payload: {
           phone: '+16501111111',
           userFound: true,
-          email: 'someone@onefootprint.com',
         },
       });
-      expect(state.context.email).toEqual('someone@onefootprint.com');
       expect(state.context.userFound).toEqual(true);
       expect(state.context.phone).toEqual('+16501111111');
       expect(state.value).toEqual(States.phoneVerification);

@@ -22,16 +22,14 @@ export type AddressZipCodeAndCountryProps = {
   isMutationLoading: boolean;
   onSubmit: (residentialAddress: ResidentialZipCodeAndCountry) => void;
   ctaLabel?: string;
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
+  hideHeader?: boolean;
 };
 
 const AddressZipCodeAndCountry = ({
   isMutationLoading,
   onSubmit,
-  hideTitle,
+  hideHeader,
   ctaLabel,
-  hideNavHeader,
 }: AddressZipCodeAndCountryProps) => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
@@ -64,10 +62,10 @@ const AddressZipCodeAndCountry = ({
 
   return (
     <>
-      {!hideNavHeader && <NavigationHeader />}
+      {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(onSubmitFormData)}>
-          {!hideTitle && (
+          {!hideHeader && (
             <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           )}
           <CountryField onChange={handleCountryChange} />

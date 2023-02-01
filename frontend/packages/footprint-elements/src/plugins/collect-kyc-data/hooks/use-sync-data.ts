@@ -6,19 +6,26 @@ import {
 
 import { useUserData } from '../../../hooks';
 
-const useSyncData = () => {
-  const mutation = useUserData();
+type SyncDataArgs = {
+  authToken?: string;
+  data: UserData;
+  speculative?: boolean;
+  onSuccess?: (data: UserDataResponse) => void;
+  onError?: (error: unknown) => void;
+};
 
-  const syncData = (
-    authToken: string,
-    data: UserData,
-    options: {
-      speculative?: boolean;
-      onSuccess?: (data: UserDataResponse) => void;
-      onError?: (error: unknown) => void;
-    } = {},
-  ) => {
+const useSyncData = () => {
+  const userDataMutation = useUserData();
+
+  const syncData = ({
+    authToken,
+    data,
+    speculative,
+    onSuccess,
+    onError,
+  }: SyncDataArgs) => {
     if (!authToken) {
+      console.error('Found empty auth token while syncing kyc data fields.');
       return;
     }
 
@@ -30,20 +37,20 @@ const useSyncData = () => {
       requestData[UserDataAttribute.dob] = `${year}-${month}-${day}`;
     }
 
-    mutation.mutate(
+    userDataMutation.mutate(
       {
         data: requestData,
         authToken,
-        speculative: options.speculative,
+        speculative,
       },
       {
-        onSuccess: options.onSuccess,
-        onError: options?.onError,
+        onSuccess,
+        onError,
       },
     );
   };
 
-  return { mutation, syncData };
+  return { mutation: userDataMutation, syncData };
 };
 
 export default useSyncData;

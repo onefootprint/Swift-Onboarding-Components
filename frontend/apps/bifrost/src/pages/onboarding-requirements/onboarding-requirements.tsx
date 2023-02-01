@@ -19,7 +19,7 @@ import IdentityCheck from './pages/identity-check';
 const OnboardingRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken, device, userFound },
+    onboardingContext: { authToken, device, userFound, email, config },
     requirements: { kycData, liveness, idDoc, selfie },
   } = state.context;
   useLogStateMachine('onboarding-requirements', state);
@@ -45,6 +45,8 @@ const OnboardingRequirements = () => {
           customData: {
             missingAttributes: kycData,
             userFound,
+            email,
+            config,
           },
         }}
         onDone={handleRequirementCompleted}

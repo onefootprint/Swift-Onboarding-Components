@@ -17,6 +17,7 @@ export type OnboardingRequirementsMachineArgs = {
   device: DeviceInfo;
   config: OnboardingConfig;
   authToken: string;
+  email?: string;
 };
 
 const defaultRequirements: Requirements = {
@@ -31,6 +32,7 @@ const createOnboardingRequirementsMachine = ({
   device,
   authToken,
   config,
+  email,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
@@ -43,6 +45,7 @@ const createOnboardingRequirementsMachine = ({
           device,
           authToken,
           config,
+          email,
         },
         requirements: { ...defaultRequirements },
         kycData: {},

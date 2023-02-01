@@ -37,16 +37,14 @@ export type AddressFullProps = {
   isMutationLoading: boolean;
   onSubmit: (residentialAddress: ResidentialAddressFull) => void;
   ctaLabel?: string;
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
+  hideHeader?: boolean;
 };
 
 const AddressFull = ({
   isMutationLoading,
   ctaLabel,
   onSubmit,
-  hideTitle,
-  hideNavHeader,
+  hideHeader,
 }: AddressFullProps) => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
@@ -134,10 +132,10 @@ const AddressFull = ({
 
   return (
     <>
-      {!hideNavHeader && <NavigationHeader />}
+      {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(onSubmitFormData)}>
-          {!hideTitle && (
+          {!hideHeader && (
             <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           )}
           <CountryField onChange={handleCountryChange} data-private />

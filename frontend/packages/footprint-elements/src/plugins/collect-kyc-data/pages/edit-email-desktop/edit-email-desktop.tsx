@@ -1,13 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import EditDataContainerDesktop from '../../components/edit-data-container-desktop/edit-data-container-desktop';
+import EditDataContainerDesktop from '../../components/edit-data-container-desktop';
 import useCollectKycDataMachine, {
   Events,
 } from '../../hooks/use-collect-kyc-data-machine';
-import SSN from '../ssn';
+import Email from '../email';
 
-const EditIdentityDesktop = () => {
+const EditEmailDesktop = () => {
   const { t } = useTranslation('pages.confirm');
   const [, send] = useCollectKycDataMachine();
 
@@ -16,15 +16,14 @@ const EditIdentityDesktop = () => {
   };
 
   return (
-    <EditDataContainerDesktop name={t('identity.title').toLowerCase()}>
-      <SSN
+    <EditDataContainerDesktop name={t('email.title').toLowerCase()}>
+      <Email
         ctaLabel={t('edit-sheet.save')}
         onComplete={handlePrev}
-        hideDisclaimer
         hideHeader
       />
     </EditDataContainerDesktop>
   );
 };
 
-export default EditIdentityDesktop;
+export default EditEmailDesktop;

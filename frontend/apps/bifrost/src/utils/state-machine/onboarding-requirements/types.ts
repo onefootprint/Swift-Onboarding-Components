@@ -31,6 +31,7 @@ export type MachineContext = {
     config: OnboardingConfig;
     device: DeviceInfo;
     authToken: string;
+    email?: string;
   };
   startedDataCollection: boolean;
   requirements: Requirements;

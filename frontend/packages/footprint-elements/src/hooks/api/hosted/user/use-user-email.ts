@@ -10,7 +10,7 @@ const userEmailRequest = async (payload: UserEmailRequest) => {
     url: '/hosted/user/email',
     data: {
       email: payload.data.email,
-      speculative: false,
+      speculative: payload.speculative,
     },
     headers: {
       [AUTH_HEADER]: payload.authToken,

@@ -7,7 +7,9 @@ import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
 import EditAddressDesktop from '../edit-address-desktop';
 import EditBasicInfoDesktop from '../edit-basic-info-desktop';
+import EditEmailDesktop from '../edit-email-desktop';
 import EditIdentityDesktop from '../edit-identity-desktop';
+import Email from '../email';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
@@ -26,6 +28,9 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
+  if (state.matches(States.email)) {
+    return <Email />;
+  }
   if (state.matches(States.basicInformation)) {
     return <BasicInformation />;
   }
@@ -37,6 +42,9 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches(States.confirm)) {
     return <Confirm />;
+  }
+  if (state.matches(States.emailEditDesktop)) {
+    return <EditEmailDesktop />;
   }
   if (state.matches(States.basicInfoEditDesktop)) {
     return <EditBasicInfoDesktop />;

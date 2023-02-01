@@ -49,12 +49,20 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           onDone: [
             {
               target: States.onboarding,
-              actions: [Actions.assignAuthToken, Actions.assignUserFound],
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignUserFound,
+                Actions.assignEmail,
+              ],
               cond: context => !!context.config,
             },
             {
               target: States.authenticationSuccess,
-              actions: [Actions.assignAuthToken, Actions.assignUserFound],
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignUserFound,
+                Actions.assignEmail,
+              ],
             },
           ],
         },
@@ -68,6 +76,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               device: context.device!,
               authToken: context.authToken!,
               config: context.config!,
+              email: context.email,
             }),
           onDone: {
             target: States.complete,
@@ -103,6 +112,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignUserFound]: assign((context, event) => {
         if (event.type === Events.identifyCompleted) {
           context.userFound = event.data.userFound;
+        }
+        return context;
+      }),
+      [Actions.assignEmail]: assign((context, event) => {
+        if (event.type === Events.identifyCompleted) {
+          context.email = event.data.email;
         }
         return context;
       }),

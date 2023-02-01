@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { UserDataAttribute } from '@onefootprint/types';
 import { Button, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -9,27 +10,33 @@ import useCollectKycDataMachine, {
   Events,
 } from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import useSyncEmail from '../../hooks/use-sync-email';
+import { isMissingEmailAttribute } from '../../utils/missing-attributes/missing-attributes';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
 import EditSheet, { EditSection } from './components/edit-sheet';
+import EmailSection from './components/email-section';
 import IdentitySection from './components/identity-section';
 
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, device } = state.context;
+  const { authToken, data, device, missingAttributes } = state.context;
   const isMobile = device?.type === 'mobile';
   const [editContent, setEditContent] = useState<EditSection | undefined>();
-  const { mutation, syncData } = useSyncData();
+  const { mutation: syncDataMutation, syncData } = useSyncData();
+  const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
+  const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
 
   const toast = useToast();
 
-  const handleError = () => {
+  const handleError = (error: unknown) => {
     toast.show({
       title: t('error.title'),
       description: t('error.description'),
       variant: 'error',
     });
+    console.error(error);
   };
 
   const handleSyncSuccess = () => {
@@ -38,19 +45,42 @@ const Confirm = () => {
     });
   };
 
-  const handleConfirm = () => {
-    if (!authToken) {
-      return;
-    }
-    syncData(authToken, data, {
+  const handleSyncData = () => {
+    syncData({
+      authToken,
+      data,
       speculative: false,
       onSuccess: handleSyncSuccess,
       onError: handleError,
     });
   };
 
+  const handleConfirm = () => {
+    // If email is missing, we need to sync it successfully before we can
+    // sync the rest of the kyc data.
+    if (isMissingEmailAttribute(missingAttributes)) {
+      syncEmail({
+        authToken,
+        email: data[UserDataAttribute.email],
+        speculative: false,
+        onSuccess: handleSyncData,
+        onError: handleError,
+      });
+    } else {
+      handleSyncData();
+    }
+  };
+
   const handlePrev = () => {
     send({ type: Events.navigatedToPrevPage });
+  };
+
+  const handleEmailEdit = () => {
+    if (isMobile) {
+      setEditContent(EditSection.email);
+    } else {
+      send({ type: Events.editEmail });
+    }
   };
 
   const handleBasicInfoEdit = () => {
@@ -90,11 +120,12 @@ const Confirm = () => {
           subtitle={t('summary.subtitle')}
         />
         <SectionsContainer>
+          <EmailSection onEdit={handleEmailEdit} />
           <BasicInfoSection onEdit={handleBasicInfoEdit} />
           <AddressSection onEdit={handleAddressEdit} />
           <IdentitySection onEdit={handleIdentityEdit} />
         </SectionsContainer>
-        <Button fullWidth onClick={handleConfirm} loading={mutation.isLoading}>
+        <Button fullWidth onClick={handleConfirm} loading={isLoading}>
           {t('summary.cta')}
         </Button>
       </Container>

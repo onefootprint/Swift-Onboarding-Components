@@ -23,6 +23,7 @@ export enum Actions {
   assignInitContext = 'assignInitContext',
   assignUserFound = 'assignUserFound',
   assignAuthToken = 'assignAuthToken',
+  assignEmail = 'assignEmail',
   assignValidationToken = 'assignValidationToken',
   assignStatus = 'assignStatus',
   resetContext = 'resetContext',
@@ -38,6 +39,7 @@ export type BifrostContext = {
   device?: DeviceInfo;
   config?: OnboardingConfig;
   userFound?: boolean;
+  email?: string;
   validationToken?: string;
   bootstrapData?: BootstrapData;
   status?: OnboardingStatus;
@@ -60,6 +62,7 @@ export type BifrostEvent =
       data: {
         authToken: string;
         userFound: boolean;
+        email?: string;
       };
     }
   | {

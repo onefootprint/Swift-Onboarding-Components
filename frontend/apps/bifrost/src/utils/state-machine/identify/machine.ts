@@ -105,7 +105,6 @@ const createIdentifyMachine = ({
                 target: States.phoneVerification,
                 actions: [
                   Actions.assignPhone,
-                  Actions.assignEmail,
                   Actions.assignUserFound,
                   Actions.assignChallenge,
                 ],
@@ -158,6 +157,7 @@ const createIdentifyMachine = ({
           data: {
             authToken: (context: MachineContext) => context.authToken,
             userFound: (context: MachineContext) => context.userFound,
+            email: (context: MachineContext) => context.email,
           },
         },
       },
@@ -173,11 +173,7 @@ const createIdentifyMachine = ({
           return context;
         }),
         [Actions.assignEmail]: assign((context, event) => {
-          if (
-            (event.type === Events.emailIdentificationCompleted ||
-              event.type === Events.phoneIdentificationCompleted) &&
-            event.payload.email
-          ) {
+          if (event.type === Events.emailIdentificationCompleted) {
             context.email = event.payload.email;
           }
           return context;

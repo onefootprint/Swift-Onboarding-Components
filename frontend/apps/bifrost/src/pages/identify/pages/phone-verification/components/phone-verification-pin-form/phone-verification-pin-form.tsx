@@ -64,10 +64,12 @@ const PhoneVerificationPinForm = ({
     }
 
     if (!email) {
-      showRequestErrorToast();
+      // If no email is found, we will let collect-kyc-data machine collect a new email &
+      // send a verification email.
       console.error(
         'Found empty email while trying to send verification email.',
       );
+      delayedSuccessTransition(authToken);
       return;
     }
 

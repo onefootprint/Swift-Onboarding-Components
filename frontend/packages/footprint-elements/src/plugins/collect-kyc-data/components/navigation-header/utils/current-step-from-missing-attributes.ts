@@ -16,6 +16,12 @@ const getCurrentStepFromMissingAttributes = (
     return 0;
   }
   let currentStep = 0;
+  if (mustCollect.includes(CollectedKycDataOption.email)) {
+    currentStep += 1;
+    if (state === States.email) {
+      return currentStep;
+    }
+  }
   if (isMissingBasicAttribute(mustCollect)) {
     currentStep += 1;
     if (state === States.basicInformation) {

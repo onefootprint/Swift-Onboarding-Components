@@ -15,15 +15,13 @@ type SSNProps = {
   onComplete?: () => void;
   ctaLabel?: string;
   hideDisclaimer?: boolean;
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
+  hideHeader?: boolean;
 };
 
 const SSN = ({
   hideDisclaimer,
   ctaLabel,
-  hideTitle,
-  hideNavHeader,
+  hideHeader,
   onComplete,
 }: SSNProps) => {
   const [state, send] = useCollectKycDataMachine();
@@ -52,7 +50,9 @@ const SSN = ({
     if (!authToken) {
       return;
     }
-    syncData(authToken, ssnInfo, {
+    syncData({
+      authToken,
+      data: ssnInfo,
       speculative: true,
       onSuccess: handleSuccess,
       onError: handleError,
@@ -65,8 +65,7 @@ const SSN = ({
         onSubmit={onSubmit}
         isMutationLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
-        hideTitle={hideTitle}
-        hideNavHeader={hideNavHeader}
+        hideHeader={hideHeader}
       />
     );
   }
@@ -78,8 +77,7 @@ const SSN = ({
         isMutationLoading={mutation.isLoading}
         hideDisclaimer={hideDisclaimer}
         ctaLabel={ctaLabel}
-        hideTitle={hideTitle}
-        hideNavHeader={hideNavHeader}
+        hideHeader={hideHeader}
       />
     );
   }

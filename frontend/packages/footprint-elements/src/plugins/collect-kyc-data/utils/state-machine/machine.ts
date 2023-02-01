@@ -1,7 +1,9 @@
+import { UserDataAttribute } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
   isMissingBasicAttribute,
+  isMissingEmailAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from '../missing-attributes';
@@ -27,6 +29,16 @@ const createCollectKycDataMachine = () =>
         [States.init]: {
           on: {
             [Events.receivedContext]: [
+              {
+                target: States.email,
+                actions: Actions.assignInitialContext,
+                cond: (context, event) =>
+                  // If email was passed into initial context, no need to collect again
+                  isMissingEmailAttribute(event.payload.missingAttributes, {
+                    ...context.data,
+                    email: event.payload.email,
+                  }),
+              },
               {
                 target: States.basicInformation,
                 actions: Actions.assignInitialContext,
@@ -60,6 +72,43 @@ const createCollectKycDataMachine = () =>
             ],
           },
         },
+        [States.email]: {
+          on: {
+            [Events.emailSubmitted]: [
+              {
+                target: States.basicInformation,
+                actions: Actions.assignEmail,
+                cond: context =>
+                  isMissingBasicAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.residentialAddress,
+                actions: [Actions.assignEmail],
+                cond: context =>
+                  isMissingResidentialAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.ssn,
+                actions: [Actions.assignEmail],
+                cond: context =>
+                  isMissingSsnAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.confirm,
+                actions: [Actions.assignEmail],
+              },
+            ],
+          },
+        },
         [States.basicInformation]: {
           on: {
             [Events.basicInformationSubmitted]: [
@@ -86,6 +135,11 @@ const createCollectKycDataMachine = () =>
                 actions: [Actions.assignBasicInformation],
               },
             ],
+            [Events.navigatedToPrevPage]: {
+              target: States.email,
+              cond: context =>
+                isMissingEmailAttribute(context.missingAttributes),
+            },
           },
         },
         [States.residentialAddress]: {
@@ -105,11 +159,18 @@ const createCollectKycDataMachine = () =>
                 actions: [Actions.assignResidentialAddress],
               },
             ],
-            [Events.navigatedToPrevPage]: {
-              target: States.basicInformation,
-              cond: context =>
-                isMissingBasicAttribute(context.missingAttributes),
-            },
+            [Events.navigatedToPrevPage]: [
+              {
+                target: States.basicInformation,
+                cond: context =>
+                  isMissingBasicAttribute(context.missingAttributes),
+              },
+              {
+                target: States.email,
+                cond: context =>
+                  isMissingEmailAttribute(context.missingAttributes),
+              },
+            ],
           },
         },
         [States.ssn]: {
@@ -129,23 +190,16 @@ const createCollectKycDataMachine = () =>
                 cond: context =>
                   isMissingBasicAttribute(context.missingAttributes),
               },
+              {
+                target: States.email,
+                cond: context =>
+                  isMissingEmailAttribute(context.missingAttributes),
+              },
             ],
           },
         },
         [States.confirm]: {
           on: {
-            [Events.editBasicInfo]: {
-              target: States.basicInfoEditDesktop,
-              cond: context => context.device?.type !== 'mobile',
-            },
-            [Events.editAddress]: {
-              target: States.addressEditDesktop,
-              cond: context => context.device?.type !== 'mobile',
-            },
-            [Events.editIdentity]: {
-              target: States.identityEditDesktop,
-              cond: context => context.device?.type !== 'mobile',
-            },
             [Events.confirmed]: [
               {
                 target: States.completed,
@@ -167,7 +221,64 @@ const createCollectKycDataMachine = () =>
                 cond: context =>
                   isMissingBasicAttribute(context.missingAttributes),
               },
+              {
+                target: States.email,
+                cond: context =>
+                  isMissingEmailAttribute(context.missingAttributes),
+              },
             ],
+            // Below are DESKTOP transitions
+            [Events.editEmail]: {
+              target: States.emailEditDesktop,
+              cond: context => context.device?.type !== 'mobile',
+            },
+            [Events.editBasicInfo]: {
+              target: States.basicInfoEditDesktop,
+              cond: context => context.device?.type !== 'mobile',
+            },
+            [Events.editAddress]: {
+              target: States.addressEditDesktop,
+              cond: context => context.device?.type !== 'mobile',
+            },
+            [Events.editIdentity]: {
+              target: States.identityEditDesktop,
+              cond: context => context.device?.type !== 'mobile',
+            },
+            // Below are MOBILE transitions
+            [Events.emailSubmitted]: {
+              actions: [Actions.assignEmail],
+              cond: context => context.device?.type === 'mobile',
+            },
+            [Events.basicInformationSubmitted]: {
+              actions: [Actions.assignBasicInformation],
+              cond: context => context.device?.type === 'mobile',
+            },
+            [Events.residentialAddressSubmitted]: {
+              actions: [Actions.assignResidentialAddress],
+              cond: context => context.device?.type === 'mobile',
+            },
+            [Events.ssnSubmitted]: {
+              actions: [Actions.assignSsn],
+              cond: context => context.device?.type === 'mobile',
+            },
+          },
+        },
+        [States.emailEditDesktop]: {
+          on: {
+            [Events.emailSubmitted]: [
+              {
+                target: States.confirm,
+                cond: context => context.device?.type !== 'mobile',
+                actions: [Actions.assignEmail],
+              },
+              {
+                actions: [Actions.assignEmail],
+              },
+            ],
+            [Events.returnToSummary]: {
+              target: States.confirm,
+              cond: context => context.device?.type !== 'mobile',
+            },
           },
         },
         [States.basicInfoEditDesktop]: {
@@ -233,12 +344,27 @@ const createCollectKycDataMachine = () =>
       actions: {
         [Actions.assignInitialContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, userFound, missingAttributes } =
-              event.payload;
+            const {
+              authToken,
+              device,
+              userFound,
+              missingAttributes,
+              email,
+              config,
+            } = event.payload;
             context.device = device;
             context.authToken = authToken;
             context.userFound = userFound;
             context.missingAttributes = [...missingAttributes];
+            context.data[UserDataAttribute.email] = email;
+            context.receivedEmail = !!email;
+            context.config = config;
+          }
+          return context;
+        }),
+        [Actions.assignEmail]: assign((context, event) => {
+          if (event.type === Events.emailSubmitted) {
+            context.data.email = event.payload.email;
           }
           return context;
         }),

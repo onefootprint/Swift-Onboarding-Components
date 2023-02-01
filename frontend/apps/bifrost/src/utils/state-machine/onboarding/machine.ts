@@ -16,6 +16,7 @@ export type OnboardingMachineArgs = {
   device: DeviceInfo;
   config: OnboardingConfig;
   authToken: string;
+  email?: string;
 };
 
 const createOnboardingMachine = ({
@@ -23,6 +24,7 @@ const createOnboardingMachine = ({
   device,
   authToken,
   config,
+  email,
 }: OnboardingMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
@@ -34,6 +36,7 @@ const createOnboardingMachine = ({
         device,
         authToken,
         config,
+        email,
       },
       states: {
         [States.initOnboarding]: {
@@ -66,6 +69,7 @@ const createOnboardingMachine = ({
                 device: context.device,
                 authToken: context.authToken!,
                 config: context.config,
+                email: context.email,
               }),
             onDone: {
               target: States.authorize,

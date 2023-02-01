@@ -20,8 +20,7 @@ const EditAddressDesktop = () => {
       <ResidentialAddress
         ctaLabel={t('edit-sheet.save')}
         onComplete={handlePrev}
-        hideTitle
-        hideNavHeader
+        hideHeader
       />
     </EditDataContainerDesktop>
   );

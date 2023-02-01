@@ -16,15 +16,13 @@ type SSN4Props = {
   isMutationLoading: boolean;
   onSubmit: (formData: FormData) => void;
   ctaLabel?: string;
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
+  hideHeader?: boolean;
 };
 
 const SSN4 = ({
   ctaLabel,
   isMutationLoading,
-  hideTitle,
-  hideNavHeader,
+  hideHeader,
   onSubmit,
 }: SSN4Props) => {
   const [state] = useCollectKycDataMachine();
@@ -45,9 +43,9 @@ const SSN4 = ({
 
   return (
     <>
-      {!hideNavHeader && <NavigationHeader />}
+      {!hideHeader && <NavigationHeader />}
       <Form onSubmit={handleSubmit(onSubmit)}>
-        {!hideTitle && (
+        {!hideHeader && (
           <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         )}
         <TextInput

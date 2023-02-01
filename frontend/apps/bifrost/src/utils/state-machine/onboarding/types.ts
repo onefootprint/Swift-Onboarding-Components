@@ -12,6 +12,7 @@ export type MachineContext = {
   userFound: boolean;
   config: OnboardingConfig;
   device: DeviceInfo;
+  email?: string;
   authToken: string;
   validationToken?: string;
   status?: OnboardingStatus;

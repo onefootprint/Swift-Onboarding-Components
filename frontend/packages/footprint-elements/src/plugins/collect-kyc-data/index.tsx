@@ -23,7 +23,7 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
     if (!customData) {
       return;
     }
-    const { missingAttributes, userFound } = customData;
+    const { missingAttributes, userFound, email, config } = customData;
     send({
       type: Events.receivedContext,
       payload: {
@@ -31,6 +31,8 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
         authToken,
         missingAttributes,
         userFound,
+        email,
+        config,
       },
     });
   });

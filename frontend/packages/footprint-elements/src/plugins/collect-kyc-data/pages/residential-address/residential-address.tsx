@@ -13,15 +13,13 @@ import AddressZipCodeAndCountry from './components/address-zip-code-and-country'
 type ResidentialAddressProps = {
   ctaLabel?: string;
   onComplete?: () => void;
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
+  hideHeader?: boolean;
 };
 
 const ResidentialAddress = ({
   ctaLabel,
   onComplete,
-  hideTitle,
-  hideNavHeader,
+  hideHeader,
 }: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
   const [state, send] = useCollectKycDataMachine();
@@ -51,7 +49,9 @@ const ResidentialAddress = ({
     if (!authToken) {
       return;
     }
-    syncData(authToken, residentialAddress, {
+    syncData({
+      authToken,
+      data: residentialAddress,
       speculative: true,
       onSuccess: handleSuccess,
       onError: handleError,
@@ -64,8 +64,7 @@ const ResidentialAddress = ({
         onSubmit={handleSubmit}
         isMutationLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
-        hideTitle={hideTitle}
-        hideNavHeader={hideNavHeader}
+        hideHeader={hideHeader}
       />
     );
   }
@@ -75,8 +74,7 @@ const ResidentialAddress = ({
         onSubmit={handleSubmit}
         isMutationLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
-        hideTitle={hideTitle}
-        hideNavHeader={hideNavHeader}
+        hideHeader={hideHeader}
       />
     );
   }
