@@ -11,11 +11,11 @@ import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
+import IdAnimation from '../../../../components/id-animation';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useHandleCameraError from '../../hooks/use-handle-camera-error';
 import imageFileToStrippedBase64 from '../../utils/image-processing/image-file-to-stripped-base64';
-import IdAnimation from './components/id-animation';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
@@ -60,7 +60,13 @@ const IdDocPhotoPrompt = ({
 
   return (
     <Container>
-      {side === 'back' && <IdAnimation />}
+      {side === 'back' && (
+        <IdAnimation
+          firstText={t('animation-back-side.first')}
+          secondText={t('animation-back-side.second')}
+          src="/id-animation/id-animation.riv"
+        />
+      )}
       <Icon />
       <HeaderTitle
         title={t('title', {

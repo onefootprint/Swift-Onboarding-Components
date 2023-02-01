@@ -20,6 +20,10 @@
       "subtitle": "Upload or take a photo of the {{side}} of your {{type}}.",
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
+      "animation-back-side": {
+        "first": "Front image captured",
+        "second": "Now the back side"
+      },
       "take-photo": {
         "title": "Take photo",
         "take": "Take photo",
@@ -88,6 +92,10 @@
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
       "cta": "Take photo",
+      "animation-selfie": {
+        "first-text": "Back image captured",
+        "second-text": "Now we need a selfie"
+      },
       "guidelines": {
         "check-lighting": {
           "title": "Check your lighting",

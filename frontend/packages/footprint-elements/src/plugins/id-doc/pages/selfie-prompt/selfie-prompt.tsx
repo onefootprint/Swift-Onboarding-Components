@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
+import IdAnimation from '../../../../components/id-animation';
 import InfoBox from '../../../../components/info-box/info-box';
 import SelfieConsent from '../../components/selfie-consent';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
@@ -42,6 +43,11 @@ const SelfiePrompt = () => {
 
   return (
     <Container>
+      <IdAnimation
+        firstText={t('animation-selfie.first-text')}
+        secondText={t('animation-selfie.second-text')}
+        src="/selfie-animation/selfie-animation.riv"
+      />
       <IcoSelfie40 />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InfoBox

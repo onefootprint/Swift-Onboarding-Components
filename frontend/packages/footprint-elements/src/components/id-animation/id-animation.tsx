@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const iconAnimationVariants = {
+const containerAnimationVariants = {
   initial: {
     opacity: 1,
+    zIndex: 1,
   },
   finish: {
     opacity: 0,
@@ -51,11 +52,12 @@ const secondTextAnimationVariants = {
 const canvasAnimationVariants = {
   initial: {
     y: 0,
-    scale: 1,
+    scale: 1.2,
   },
   finish: {
-    y: -332,
+    y: -310,
     scale: 0.85,
+    opacity: 0,
     transition: {
       delay: 3.2,
       duration: 0.8,
@@ -64,32 +66,38 @@ const canvasAnimationVariants = {
   },
 };
 
-const IdAnimation = () => (
+type IdAnimationProps = {
+  src: string;
+  firstText: string;
+  secondText: string;
+};
+
+const IdAnimation = ({ src, firstText, secondText }: IdAnimationProps) => (
   <AnimationWrapper
     animate="finish"
     initial="initial"
-    variants={iconAnimationVariants}
+    variants={containerAnimationVariants}
   >
     <CanvasWrapper
       animate="finish"
       variants={canvasAnimationVariants}
       initial="initial"
     >
-      <RiveComponent src="/id-animation/id-animation.riv" />
+      <RiveComponent src={src} />
     </CanvasWrapper>
     <motion.div
       animate="finish"
       variants={textAnimationVariants}
       initial="initial"
     >
-      <Typography variant="label-2">Front image uploaded</Typography>
+      <Typography variant="label-2">{firstText}</Typography>
     </motion.div>
     <motion.div
       animate="finish"
       variants={secondTextAnimationVariants}
       initial="initial"
     >
-      <Typography variant="label-2">Now the back side</Typography>
+      <Typography variant="label-2">{secondText}</Typography>
     </motion.div>
   </AnimationWrapper>
 );
@@ -106,7 +114,6 @@ const AnimationWrapper = styled(motion.div)`
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 100;
     background-color: ${theme.backgroundColor.primary};
   `}
 `;
