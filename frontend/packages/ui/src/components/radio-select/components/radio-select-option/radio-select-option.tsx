@@ -41,7 +41,7 @@ const RadioSelectOption = ({
         <IconComponent color={selected ? 'quinary' : undefined} />
       </IconContainer>
       <OptionLabel>
-        <Typography variant="label-2" color="accent">
+        <Typography variant="label-2" color={selected ? 'accent' : 'primary'}>
           {title}
         </Typography>
         <Typography variant="body-4" color="secondary">
