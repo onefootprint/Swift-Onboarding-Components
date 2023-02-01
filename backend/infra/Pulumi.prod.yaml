@@ -35,9 +35,9 @@ config:
       launchDarklySdkKey:
         secure: v1:Ejh/oU+Ev4JTICIn:fEH+pIJ8Ekb258tFuoTMdU7hOw75grl5XniVgeGFOHcNCUgbSYalBuPQyc8ICbOQLuowMHQDF9U=
     resources:
-      cpuUnits: 256
+      cpuUnits: 2048
       instances: 2
-      memoryMB: 512
+      memoryMB: 4096
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents

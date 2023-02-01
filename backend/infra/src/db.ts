@@ -98,6 +98,7 @@ export async function CreateDB(
     instanceClass: 'db.serverless',
     engine: EngineType.AuroraPostgresql,
     engineVersion: db.engineVersion,
+    performanceInsightsEnabled: true,
   });
 
   const _dbInstance2 = new aws.rds.ClusterInstance(`${clusterIdentifier}-2`, {
@@ -105,6 +106,7 @@ export async function CreateDB(
     instanceClass: 'db.serverless',
     engine: EngineType.AuroraPostgresql,
     engineVersion: db.engineVersion,
+    performanceInsightsEnabled: true,
   });
 
   const { rw: databaseUrl, ro: readOnlyDatabaseUrl } = pulumi
