@@ -285,9 +285,10 @@ vendor_reason_code_enum! {
         HighRisk,
 
         #[ser = "resultcode.pa.dob.match", description = "Indicates that the input DOB matches the located DOB on the PA Watch List record."]
-        #[footprint_reason_code = None] // We are not currently configured to use the "PA product" so not mapping these three "Pa" reason codes to FootprintReasonCode's
+        #[footprint_reason_code = Some(FootprintReasonCode::PotentialWatchlistHit)]
         PaDobMatch,
 
+        // 2023-01-31 I (argoff) don't know what these 2 mean. From the description it sounds like we shouldn't fail an OB because of them, but will ask idology
         #[ser = "resultcode.pa.dob.does.not.match", description = "Indicates that the input DOB does not match the located DOB on the PA Watch List record."]
         #[footprint_reason_code = None]
         PaDobDoesNotMatch,

@@ -21,6 +21,7 @@ pub struct IDologyFeatures {
     pub is_id_scan_required: bool,
     pub verification_result: VerificationResultId,
     pub create_manual_review: bool,
+    pub potential_watchlist_hit: bool,
 }
 
 impl IDologyFeatures {
@@ -162,10 +163,17 @@ impl From<VendorResult> for FeatureVector {
 
                 let (status, create_manual_review) = r.status();
                 let reason_codes = r.parse_qualifiers();
-                let footprint_reason_codes = reason_codes
+                let mut footprint_reason_codes: Vec<FootprintReasonCode> = reason_codes
                     .iter()
                     .flat_map(Into::<Option<FootprintReasonCode>>::into)
                     .collect();
+                // this is derived from IDologyReasonCodes as well as the response itself
+                if r.has_potential_watchlist_hit()
+                    && !footprint_reason_codes.contains(&FootprintReasonCode::PotentialWatchlistHit)
+                {
+                    footprint_reason_codes.push(FootprintReasonCode::PotentialWatchlistHit)
+                }
+
                 let idology_features = IDologyFeatures {
                     status,
                     create_manual_review,
@@ -175,6 +183,7 @@ impl From<VendorResult> for FeatureVector {
                     verification_result: verification_result_id,
                     reason_codes,
                     footprint_reason_codes,
+                    potential_watchlist_hit: r.has_potential_watchlist_hit(),
                 };
                 Self {
                     idology_features: Some(idology_features),
@@ -344,8 +353,10 @@ mod tests {
             footprint_reason_codes: vec![
                 FootprintReasonCode::IpNotLocated,
                 FootprintReasonCode::AddressStreetNameDoesNotMatch,
+                FootprintReasonCode::PotentialWatchlistHit,
             ],
             verification_result: idology_result.verification_result_id,
+            potential_watchlist_hit: true,
         };
         let expected_feature_vector = FeatureVector {
             idology_features: Some(expected_idology_features),
@@ -387,6 +398,15 @@ mod tests {
           "results": {
             "key": "result.match",
             "message": "ID Located"
+          },
+          "restriction": {
+            "key": "global.watch.list",
+            "message": "you are bad",
+            "pa": {
+                "list": "Office of Foreign Asset Control",
+                "score": "97",
+                "dob": "02121978"
+              }
           },
           "qualifiers": {
             "qualifier": [
@@ -438,6 +458,7 @@ mod tests {
                 is_id_scan_required: false,
                 verification_result: VerificationResultId::from("123".to_owned()),
                 create_manual_review: false,
+                potential_watchlist_hit: false,
             }),
             idology_scan_onboarding_features: None,
             twilio_features: None,

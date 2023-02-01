@@ -16,6 +16,7 @@ impl KeyResponse {
         Some(response.key)
     }
 }
+
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct IDologyQualifiers {
     pub qualifier: serde_json::Value,

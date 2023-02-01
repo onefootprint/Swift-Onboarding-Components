@@ -78,6 +78,11 @@ pub fn idology_rule_set() -> RuleSet<IDologyFeatures> {
             name: "ssn.issued_prior_to_dob".into(),
             outcome: RuleOutcome::Fail,
         },
+        Rule {
+            rule: { |f: &IDologyFeatures| f.potential_watchlist_hit },
+            name: "watchlist.potential_hit".into(),
+            outcome: RuleOutcome::Fail,
+        },
     ];
 
     let passing_rules = vec![Rule {
@@ -123,14 +128,19 @@ mod test {
             ],
             verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d")
                 .unwrap(),
+            potential_watchlist_hit: true,
         };
 
         let res = idology_rule_set().evaluate(&idology_features);
 
-        // we expect 2 failing rules triggered
+        // we expect 3 failing rules triggered
         assert_eq!(
             res.failing_rules_triggered,
-            vec!["subject.deceased".to_string(), "address.is_po_box".to_string()]
+            vec![
+                "subject.deceased".to_string(),
+                "address.is_po_box".to_string(),
+                "watchlist.potential_hit".to_string()
+            ]
         );
         // and 1 passing rule
         assert_eq!(res.passing_rules_triggered, vec!["status.id_located".to_string()]);

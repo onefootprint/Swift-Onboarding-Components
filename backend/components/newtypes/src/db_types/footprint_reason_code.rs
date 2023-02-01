@@ -82,6 +82,10 @@ footprint_reason_code_enum! {
     #[diesel(sql_type = Text)]
     pub enum FootprintReasonCode {
 
+        // ~~~~~~~~~ Identity ~~~~~~~~~~~~~~~
+        #[note = "Potential watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Address], description = "Potential match on a governmental watchlist (OFAC, PEP or NonSDN Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
+        PotentialWatchlistHit,
+
         // ~~~~~~~~~ Address ~~~~~~~~~~~~~~~
 
         #[note = "Address does not match", severity = SignalSeverity::High, scopes =  vec![SignalScope::Address], description = "Address found does not match address submitted. This can be due to a typo in the input information, typos or errors in the address located, or the address is actually incorrect, but the subject’s credentials are located in or near the target ZIP code, city, or metropolitan area."]
