@@ -23,7 +23,6 @@ const Layout = ({ children }: LayoutProps) => (
 const LayoutContainer = styled.div`
   ${({ theme }) => css`
     background: ${theme.components.bifrost.dialog.bg};
-    border-radius: ${theme.components.bifrost.dialog.borderRadius};
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -46,8 +45,9 @@ const LayoutContainer = styled.div`
     ${media.greaterThan('md')`
       height: unset;
       margin: ${theme.spacing[9]} auto ${theme.spacing[9]};
-      max-width: 480px;
       max-height: calc(100vh - (2 * ${theme.spacing[9]}));
+      max-width: 480px;
+      border-radius: ${theme.components.bifrost.dialog.borderRadius};
     `}
   `}
 `;
