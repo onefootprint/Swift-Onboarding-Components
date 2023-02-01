@@ -37,8 +37,12 @@ pub fn idology_rule_set() -> RuleSet<IDologyFeatures> {
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
+                    // it does not match, and it is not a close mismatch
                     f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnDoesNotMatchWithin1Digit)
+                        .contains(&FootprintReasonCode::SsnDoesNotMatch)
+                        && !f
+                            .footprint_reason_codes
+                            .contains(&FootprintReasonCode::SsnDoesNotMatchWithin1Digit)
                 }
             },
             name: "ssn.does_not_match".into(),
