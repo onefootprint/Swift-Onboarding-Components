@@ -89,6 +89,13 @@ export default {
         type: { summary: 'object', required: true },
       },
     },
+    isConfirmation: {
+      control: 'boolean',
+      description: 'Whether the dialog is a confirmation dialog',
+      table: {
+        type: { summary: 'boolean', required: false },
+      },
+    },
   },
 } as Meta;
 
@@ -102,6 +109,7 @@ const Template: Story<DialogProps> = ({
   size,
   testID,
   title,
+  isConfirmation,
 }: DialogProps) => {
   const [open, setOpen] = useState(initialOpen);
   const SelectedIcon =
@@ -124,6 +132,7 @@ const Template: Story<DialogProps> = ({
         size={size}
         testID={testID}
         title={title}
+        isConfirmation={isConfirmation}
       >
         <Typography variant="body-4">{children}</Typography>
       </Dialog>
@@ -158,6 +167,7 @@ Base.args = {
   size: 'default',
   testID: 'dialog-test-id',
   title: 'Title',
+  isConfirmation: false,
 };
 
 const OnlyPrimaryTemplate: Story<DialogProps> = ({
@@ -169,6 +179,7 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
   size,
   testID,
   title,
+  isConfirmation,
 }: DialogProps) => {
   const [open, setOpen] = useState(initialOpen);
   const SelectedIcon =
@@ -190,6 +201,7 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
         size={size}
         testID={testID}
         title={title}
+        isConfirmation={isConfirmation}
       >
         <Typography variant="body-4">{children}</Typography>
       </Dialog>
@@ -211,6 +223,7 @@ OnlyPrimary.args = {
   onClose: () => {
     console.log('close');
   },
+  isConfirmation: false,
 };
 
 const LinkTemplate: Story<DialogProps> = ({
@@ -220,6 +233,7 @@ const LinkTemplate: Story<DialogProps> = ({
   linkButton = { label: 'Link' },
   size,
   testID,
+  isConfirmation = false,
   open: initialVisibility,
 }: DialogProps) => {
   const [open, setOpen] = useState(initialVisibility);
@@ -238,6 +252,7 @@ const LinkTemplate: Story<DialogProps> = ({
         size={size}
         testID={testID}
         open={open}
+        isConfirmation={isConfirmation}
       >
         <Typography variant="body-4">Content</Typography>
       </Dialog>

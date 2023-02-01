@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
@@ -13,19 +14,21 @@ const NavigationCloseButton = ({
   confirm,
   onClick,
 }: NavigationCloseButtonProps) => {
+  const { t } = useTranslation('components.exit-dialog');
+
   const footprint = useFootprintProvider();
   const confirmationDialog = useConfirmationDialog();
 
   const showConfirmation = (callback: () => void) => {
     confirmationDialog.open({
-      title: 'Are you sure?',
-      description: 'Leaving this flow will not save your data.',
+      title: t('title'),
+      description: t('description'),
       primaryButton: {
-        label: 'Yes',
+        label: t('yes'),
         onClick: callback,
       },
       secondaryButton: {
-        label: 'No',
+        label: t('no'),
       },
     });
   };

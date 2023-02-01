@@ -26,10 +26,11 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
   return (
     <>
       {children}
-      {confirmationDialog ? (
+      {confirmationDialog && (
         <BaseDialog
           open
           isResponsive={false}
+          isConfirmation
           size="compact"
           title={confirmationDialog.title}
           onClose={hide}
@@ -54,7 +55,7 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
             {confirmationDialog.description}
           </Typography>
         </BaseDialog>
-      ) : null}
+      )}
     </>
   );
 };

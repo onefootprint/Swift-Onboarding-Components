@@ -18,6 +18,7 @@ export type DialogProps = {
   size?: Size;
   testID?: string;
   title: string;
+  isConfirmation?: boolean;
 } & (OnlyPrimaryButton | OnlyButtons | PrimaryAndLinkButtons | NoButtons);
 
 // eslint-disable-next-line react/jsx-props-no-spreading

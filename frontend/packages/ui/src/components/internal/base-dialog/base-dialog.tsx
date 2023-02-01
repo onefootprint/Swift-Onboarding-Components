@@ -30,6 +30,7 @@ type BaseDialogProps = {
   testID?: string;
   title: string;
   isResponsive?: boolean;
+  isConfirmation?: boolean;
 } & (OnlyPrimaryButton | OnlyButtons | PrimaryAndLinkButtons | NoButtons);
 
 const BaseDialog = ({
@@ -45,6 +46,7 @@ const BaseDialog = ({
   testID,
   title,
   isResponsive = false,
+  isConfirmation = false,
 }: BaseDialogProps) => {
   useLockedBody(open);
   useEventListener('keydown', event => {
@@ -66,6 +68,7 @@ const BaseDialog = ({
             onClick={(event: React.MouseEvent<HTMLDivElement>) => {
               event.stopPropagation();
             }}
+            isConfirmation={isConfirmation}
           >
             <Header>
               <CloseContainer>
@@ -132,19 +135,30 @@ const BaseDialog = ({
 const DialogContainer = styled.div<{
   size: Size;
   isResponsive: boolean;
+  isConfirmation: boolean;
 }>`
-  ${({ theme, isResponsive }) => css`
+  ${({ theme, isResponsive, isConfirmation }) => css`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
+    position: absolute;
+    top: ${theme.spacing[9]};
+
+    ${isConfirmation &&
+    `
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      max-width: 90%;
+    `}
 
     ${isResponsive &&
     media.lessThan('sm')`
       width: 100vw;
       height: 100vh;
       border-radius: 0;
-    `}
+    `};
   `}
 
   ${({ size }) => {
