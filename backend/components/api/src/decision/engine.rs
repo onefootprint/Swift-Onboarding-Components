@@ -9,6 +9,7 @@ use super::*;
 use db::{
     models::{
         onboarding::Onboarding,
+        user_vault::UserVault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
     },
     DbError,
@@ -30,9 +31,18 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
         })
         .await??;
 
+    let obid = ob.id.clone();
+    let uv = state
+        .db_pool
+        .db_query(move |conn| UserVault::get(conn, &obid))
+        .await??;
+
     let previous_results = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
         requests_and_results.clone(),
-    )?;
+        &state.enclave_client,
+        &uv.e_private_key,
+    )
+    .await?;
 
     let requests: Vec<VerificationRequest> = requests_and_results
         .into_iter()

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
-use newtypes::SocureReasonCode;
+use newtypes::{ScrubbedPiiString, SocureReasonCode};
 
 // https://developer.socure.com/reference#tag/ID+
 // https://developer.socure.com/docs/idplus/modules/modules-overview
@@ -146,9 +146,9 @@ impl PartialEq for GlobalWatchlistMatch {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GlobalWatchlistMatchComment {
-    pub name: Vec<String>,
+    pub name: Vec<ScrubbedPiiString>,
     pub original_country_text: Vec<String>,
-    pub aka: Vec<String>,
+    pub aka: Vec<ScrubbedPiiString>,
     pub political_position: Vec<String>,
     pub offense: Vec<String>,
 }

@@ -37,6 +37,12 @@ impl PiiBytes {
 #[serde(transparent)]
 pub struct ScrubbedPiiString(#[serde(serialize_with = "scrubbed_str")] PiiString);
 
+impl ScrubbedPiiString {
+    pub fn new(s: PiiString) -> Self {
+        Self(s)
+    }
+}
+
 fn scrubbed_str<S>(_v: &PiiString, s: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,

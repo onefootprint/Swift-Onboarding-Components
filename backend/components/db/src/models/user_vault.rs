@@ -1,12 +1,13 @@
-use crate::schema::scoped_user;
 use crate::schema::user_vault::{self, BoxedQuery};
+use crate::schema::{onboarding, scoped_user};
 use crate::{DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    EncryptedVaultPrivateKey, FootprintUserId, Locked, ScopedUserId, TenantId, UserVaultId, VaultPublicKey,
+    EncryptedVaultPrivateKey, FootprintUserId, Locked, OnboardingId, ScopedUserId, TenantId, UserVaultId,
+    VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -32,6 +33,7 @@ pub enum UserVaultIdentifier<'a> {
         tenant_id: &'a TenantId,
         is_live: IsLive,
     },
+    OnboardingId(&'a OnboardingId),
 }
 
 impl<'a> From<&'a UserVaultId> for UserVaultIdentifier<'a> {
@@ -53,6 +55,12 @@ impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for UserVaultIdentifi
             tenant_id,
             is_live,
         }
+    }
+}
+
+impl<'a> From<&'a OnboardingId> for UserVaultIdentifier<'a> {
+    fn from(id: &'a OnboardingId) -> Self {
+        Self::OnboardingId(id)
     }
 }
 
@@ -78,6 +86,16 @@ impl UserVault {
                     .filter(scoped_user::tenant_id.eq(tenant_id))
                     .filter(scoped_user::is_live.eq(is_live))
                     .select(scoped_user::user_vault_id);
+                user_vault::table
+                    .filter(user_vault::id.eq_any(uv_ids))
+                    .into_boxed()
+            }
+            UserVaultIdentifier::OnboardingId(onboarding_id) => {
+                let uv_ids = onboarding::table
+                    .filter(onboarding::id.eq(onboarding_id))
+                    .inner_join(scoped_user::table)
+                    .select(scoped_user::user_vault_id);
+
                 user_vault::table
                     .filter(user_vault::id.eq_any(uv_ids))
                     .into_boxed()

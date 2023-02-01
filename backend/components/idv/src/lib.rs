@@ -15,7 +15,8 @@ pub mod test_fixtures;
 pub mod twilio;
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
+#[serde(untagged)]
 pub enum ParsedResponse {
     IDologyExpectID(ExpectIDAPIResponse),
     IDologyScanVerifyResult(ScanVerifyAPIResponse),

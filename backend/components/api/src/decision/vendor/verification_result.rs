@@ -37,20 +37,15 @@ pub(super) async fn save_verification_result(
         .db_transaction(
             move |conn| -> Result<(VerificationResult, Option<StructuredVendorResponse>), ApiError> {
                 // For testing rollout of footprint
-                let temporary_raw_response = vendor_response.raw_response.clone().into_leak();
+                let scrubbed_json = serde_json::to_value(&vendor_response.response)?;
 
                 let e_response = encrypt_verification_result_response(
                     vendor_response.raw_response,
                     user_vault_public_key,
                 )?;
 
-                let verification_result = VerificationResult::create(
-                    conn,
-                    verification_request_id,
-                    // To be removed
-                    temporary_raw_response,
-                    e_response,
-                )?;
+                let verification_result =
+                    VerificationResult::create(conn, verification_request_id, scrubbed_json, e_response)?;
                 let structured_vendor_response = vendor_response
                     .response
                     .save_vendor_response(conn, verification_result.id.clone())?;
@@ -74,10 +69,9 @@ pub fn encrypt_verification_result_response(
 }
 
 // Bulk decrypt a Vec of encrypted responses
-#[allow(unused)]
 pub async fn decrypt_verification_result_response(
     enclave_client: &EnclaveClient,
-    sealed_data: Vec<&SealedVaultBytes>, // sealed vault bytes
+    sealed_data: Vec<SealedVaultBytes>, // sealed vault bytes
     sealed_key: &EncryptedVaultPrivateKey,
 ) -> Result<Vec<PiiJsonValue>, ApiError> {
     let sealed_data: Vec<_> = sealed_data

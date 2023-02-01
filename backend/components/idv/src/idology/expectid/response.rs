@@ -14,11 +14,12 @@ pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDAPIResponse, I
 }
 
 pub type IdNumber = u64;
-#[derive(Debug, Clone, serde::Deserialize)]
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ExpectIDAPIResponse {
     pub response: ExpectIDResponse,
 }
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct ExpectIDResponse {
     pub qualifiers: Option<IDologyQualifiers>,
@@ -33,7 +34,7 @@ pub struct ExpectIDResponse {
     pub restriction: Option<Restriction>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Restriction {
     pub key: Option<String>,

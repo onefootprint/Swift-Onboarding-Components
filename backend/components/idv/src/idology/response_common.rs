@@ -5,7 +5,7 @@ use newtypes::IDologyReasonCode;
 use super::error::RequestError;
 
 /// This file holds common structures used to work with Idology APIs
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct KeyResponse {
     pub key: String,
 }
@@ -16,8 +16,7 @@ impl KeyResponse {
         Some(response.key)
     }
 }
-
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct IDologyQualifiers {
     pub qualifier: serde_json::Value,
 }
@@ -50,7 +49,7 @@ impl IDologyQualifiers {
         }
     }
 }
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct SubmissionResponseError {
     pub error: Option<String>,
 }

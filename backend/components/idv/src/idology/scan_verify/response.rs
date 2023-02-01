@@ -41,7 +41,7 @@ pub type IdNumber = u64;
 /// have a top level `status` AND a top level `response`
 /// 2. Errors from this request are just related to request issues (not a valid username, or incorrect image formats),
 ///   NOT practical document image errors like blurry/unreadable. That is only gotten from the results api request
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ScanVerifySubmissionAPIResponse {
     pub status: String,
     pub response: Option<SubmissionResponseError>,
@@ -76,7 +76,7 @@ impl ScanVerifySubmissionAPIResponse {
     }
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ScanVerifyAPIResponse {
     pub response: ScanVerifyResponse,
 }
@@ -91,7 +91,7 @@ impl ScanVerifyAPIResponse {
 }
 
 /// https://web.idologylive.com/api_portal.php#step-3-obtaining-scan-verify-results-subtitle-step-3-scan-verify
-#[derive(Debug, Clone, serde::Deserialize, Default)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct ScanVerifyResponse {
     pub qualifiers: Option<IDologyQualifiers>,

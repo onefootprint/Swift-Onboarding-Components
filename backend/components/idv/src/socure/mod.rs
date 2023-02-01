@@ -108,6 +108,7 @@ mod tests {
     use crate::socure::response::{GlobalWatchlist, GlobalWatchlistMatch, GlobalWatchlistMatchComment};
 
     use super::*;
+    use newtypes::ScrubbedPiiString;
     use serde_json::{json, Value};
 
     #[test]
@@ -310,9 +311,9 @@ mod tests {
                             match_fields: vec!["nameEquivalent".to_owned()],
                             source_urls: vec!["https://www.socure.com".to_owned()],
                             comments: GlobalWatchlistMatchComment {
-                                name: vec!["John C. Doe".to_owned()],
+                                name: vec![ScrubbedPiiString::new(PiiString::new("John C. Doe".to_owned()))],
                                 original_country_text: vec!["EN, Politician".to_owned()],
-                                aka: vec!["John Doe".to_owned()],
+                                aka: vec![ScrubbedPiiString::new(PiiString::new("John Doe".to_owned()))],
                                 political_position: vec!["Child of Henry Doe (Politician)".to_owned()],
                                 offense: vec!["Pep,Pep Class 2,Pep Class 4".to_owned()]
                             },
@@ -323,9 +324,12 @@ mod tests {
                             match_fields: vec!["nameExact".to_owned()],
                             source_urls: vec!["https://www.example.org/members/current/ministers".to_owned()],
                             comments: GlobalWatchlistMatchComment {
-                                name: vec!["John Doe".to_owned()],
+                                name: vec![ScrubbedPiiString::new(PiiString::from("John Doe".to_owned()))],
                                 original_country_text: vec!["Any Country".to_owned()],
-                                aka: vec!["Doe John".to_owned(), "Jack Doe".to_owned()],
+                                aka: vec![
+                                    ScrubbedPiiString::new(PiiString::new("Doe John".to_owned())),
+                                    ScrubbedPiiString::new(PiiString::new("Jack Doe".to_owned()))
+                                ],
                                 political_position: vec!["Member of the Cabinet of Ministers".to_owned()],
                                 offense: vec!["Pep Class 2".to_owned()]
                             },
