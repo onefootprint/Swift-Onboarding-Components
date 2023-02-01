@@ -1,4 +1,8 @@
-import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
+import {
+  COUNTRIES,
+  DEFAULT_COUNTRY,
+  REGION_CODES,
+} from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
@@ -8,7 +12,6 @@ import Input from './components/input';
 import Option from './components/option';
 import useInputMask from './hooks/use-input-mask';
 import type { PhoneInputProps, PhoneSelectOption } from './phone-input.types';
-import { getCountryByNumber } from './phone-input.utils';
 
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (
@@ -25,9 +28,8 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     ref,
   ) => {
     const localRef = useRef<HTMLInputElement>(null);
-    const [selectedCountry, setCountry] = useState<PhoneSelectOption>(() =>
-      getCountryByNumber(value),
-    );
+    const [selectedCountry, setCountry] =
+      useState<PhoneSelectOption>(DEFAULT_COUNTRY);
     const countryCode = selectedCountry.value;
     const { isLoading, masks } = useInputMask(countryCode);
     const masksCount = Object.keys(masks).length;
