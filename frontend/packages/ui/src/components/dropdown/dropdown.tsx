@@ -12,11 +12,11 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)`
     border: none;
     cursor: pointer;
     display: flex;
-    height: 32px;
+    height: 24px;
     justify-content: center;
     margin: 0;
     padding: 0;
-    width: 32px;
+    width: 24px;
 
     &[data-state='open'] {
       ${createOverlayBackground('darken-2', 'primary')};
