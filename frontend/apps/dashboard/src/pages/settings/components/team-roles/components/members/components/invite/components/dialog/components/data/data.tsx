@@ -42,11 +42,13 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
   };
 
   const handleAfterSubmit = (formData: FormData) => {
-    const invitations = formData.invitations.map(invite => ({
-      email: invite.email,
-      roleId: invite.role.value,
-      redirectUrl: `${window.location.origin}/auth`,
-    }));
+    const invitations = formData.invitations
+      .filter(invite => invite.email && invite.role.value)
+      .map(invite => ({
+        email: invite.email,
+        roleId: invite.role.value,
+        redirectUrl: `${window.location.origin}/auth`,
+      }));
     onSubmit(invitations);
   };
 
