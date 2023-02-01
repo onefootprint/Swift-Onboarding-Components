@@ -2,7 +2,9 @@ use crate::{schema::fingerprint_visit_event, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{FingerprintVisitEventId, FingerprintVisitorId, ScopedUserId, UserVaultId};
+use newtypes::{
+    FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedUserId, UserVaultId,
+};
 use serde::{Deserialize, Serialize};
 
 /// Represents a single visit from a FootprintVisitorId
@@ -18,6 +20,7 @@ pub struct FingerprintVisitEvent {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub fingerprint_request_id: FingerprintRequestId,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = fingerprint_visit_event)]
@@ -28,11 +31,13 @@ pub struct NewFingerprintVisit {
     pub path: String,
     pub session_id: Option<String>,
     pub created_at: DateTime<Utc>,
+    pub request_id: FingerprintRequestId,
 }
 impl FingerprintVisitEvent {
     pub fn create(
         conn: &mut PgConnection,
         visitor_id: FingerprintVisitorId,
+        request_id: FingerprintRequestId,
         user_vault_id: Option<UserVaultId>,
         scoped_user_id: Option<ScopedUserId>,
         path: String,
@@ -45,6 +50,7 @@ impl FingerprintVisitEvent {
             path,
             session_id,
             created_at: Utc::now(),
+            request_id,
         };
 
         let visit = diesel::insert_into(fingerprint_visit_event::table)

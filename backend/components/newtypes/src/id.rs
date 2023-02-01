@@ -157,6 +157,11 @@ define_newtype_id!(
     "Identifier for a Fingerprint VisitorId"
 );
 define_newtype_id!(
+    FingerprintRequestId,
+    String,
+    "Identifier for a Fingerprint Visitor Visit"
+);
+define_newtype_id!(
     FingerprintVisitEventId,
     String,
     "Identifier for a Fingerprint visit event"

@@ -21,7 +21,11 @@ pub async fn post(
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
 
-    let FingerprintVisitRequest { visitor_id, path } = request.into_inner();
+    let FingerprintVisitRequest {
+        visitor_id,
+        path,
+        request_id,
+    } = request.into_inner();
 
     state
         .db_pool
@@ -31,12 +35,21 @@ pub async fn post(
 
             FingerprintVisitEvent::create(
                 conn,
-                visitor_id.into(),
-                Some(user_vault_id),
-                scoped_user_id,
+                visitor_id.clone().into(),
+                request_id.into(),
+                Some(user_vault_id.clone()),
+                scoped_user_id.clone(),
                 path,
-                telemetry_headers.session_id,
+                telemetry_headers.session_id.clone(),
             )?;
+
+            // associate session_id with visitor_id and other identifiers in logs so we can see things in observe
+            tracing::info!(
+                session_id=%format!("{:?}", telemetry_headers.session_id), 
+                visitor_id=%visitor_id, 
+                user_vault_id=%user_vault_id,
+                scoped_user_id=%format!("{:?}", scoped_user_id), 
+                "fingerprint visit");
 
             Ok(())
         })
