@@ -190,7 +190,8 @@ const createIdentifyMachine = ({
         [Actions.assignUserFound]: assign((context, event) => {
           if (
             event.type === Events.emailIdentificationCompleted ||
-            event.type === Events.phoneIdentificationCompleted
+            event.type === Events.phoneIdentificationCompleted ||
+            event.type === Events.bootstrapDataProcessed
           ) {
             context.userFound = event.payload.userFound;
           }
