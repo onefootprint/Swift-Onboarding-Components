@@ -82,9 +82,11 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
     let onboarding_decision = risk::create_final_decision(state, ob.id, features).await?;
 
     let status = onboarding_decision.status.to_string();
-    metrics::DECISION_ENGINE_ONBOARDING_DECISION
-        .with(&labels! {"status" => status.as_str()})
-        .inc();
+    if let Ok(metric) =
+        metrics::DECISION_ENGINE_ONBOARDING_DECISION.get_metric_with(&labels! {"status" => status.as_str()})
+    {
+        metric.inc();
+    }
 
     Ok(())
 }

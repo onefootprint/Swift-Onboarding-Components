@@ -117,16 +117,20 @@ pub async fn send_idology_idv_request(
                         .as_ref()
                         .map(|k| k.key.clone())
                         .unwrap_or_default();
-                    metrics::IDOLOGY_EXPECT_ID_SUCCESS
-                        .with(&labels! {"summary_result" => summary_result.as_str(), "results" => results.as_str()})
-                        .inc();
+                    if let Ok(metric) = metrics::IDOLOGY_EXPECT_ID_SUCCESS.get_metric_with(
+                        &labels! {"summary_result" => summary_result.as_str(), "results" => results.as_str()},
+                    ) {
+                        metric.inc();
+                    }
                 };
             }
             Err(ref e) => {
                 let error = format!("{}", e);
-                metrics::IDOLOGY_EXPECT_ID_ERROR
-                    .with(&labels! {"error" => error.as_str()})
-                    .inc()
+                if let Ok(metric) =
+                    metrics::IDOLOGY_EXPECT_ID_ERROR.get_metric_with(&labels! {"error" => error.as_str()})
+                {
+                    metric.inc();
+                }
             }
         }
         res
