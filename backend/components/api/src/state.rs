@@ -12,6 +12,7 @@ use crate::{
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
 use idv::{idology::client::IdologyClient, socure::client::SocureClient};
+
 use workos::{ApiKey, WorkOs};
 
 #[derive(Clone)]

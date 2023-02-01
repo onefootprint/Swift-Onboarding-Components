@@ -26,12 +26,12 @@ pub async fn create_final_decision(
     state: &State,
     ob_id: OnboardingId,
     features: FeatureVector,
-) -> ApiResult<()> {
+) -> ApiResult<OnboardingDecision> {
     // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: Create our risk signals!
     // Save status
     let feature_flag_client = state.feature_flag_client.clone();
-    state
+    let obd = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &ob_id)?;
@@ -80,15 +80,15 @@ pub async fn create_final_decision(
             write_risk_signals(
                 conn,
                 &features,
-                obd.id,
+                obd.id.clone(),
                 &feature_flag_client,
                 &scoped_user.tenant_id,
             )?;
 
-            Ok(())
+            Ok(obd)
         })
         .await?;
-    Ok(())
+    Ok(obd)
 }
 
 #[derive(PartialEq, Eq, Debug)]

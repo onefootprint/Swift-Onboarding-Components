@@ -1,4 +1,5 @@
 use super::*;
+use crate::metrics;
 use crate::{errors::ApiError, State};
 
 use crate::feature_flag::FeatureFlagClient;
@@ -11,6 +12,7 @@ use db::{
 };
 use idv::{idology::expectid::response::ExpectIDAPIResponse, ParsedResponse, VendorResponse};
 use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, Vendor, VendorAPI};
+use prometheus::labels;
 
 /// Branch on vendor and send requests to vendors
 pub async fn send_idv_request(
@@ -96,9 +98,38 @@ pub async fn send_idology_idv_request(
             )
             .unwrap_or(false)
     {
-        idv::idology::send_expectid_request(&state.idology_client, data)
+        let res = idv::idology::send_expectid_request(&state.idology_client, data)
             .await
-            .map_err(ApiError::from)
+            .map_err(ApiError::from);
+
+        match res {
+            Ok(ref res) => {
+                if let ParsedResponse::IDologyExpectID(expect_id_response) = &res.response {
+                    let summary_result = expect_id_response
+                        .response
+                        .summary_result
+                        .as_ref()
+                        .map(|k| k.key.clone())
+                        .unwrap_or_default();
+                    let results = expect_id_response
+                        .response
+                        .results
+                        .as_ref()
+                        .map(|k| k.key.clone())
+                        .unwrap_or_default();
+                    metrics::IDOLOGY_EXPECT_ID_SUCCESS
+                        .with(&labels! {"summary_result" => summary_result.as_str(), "results" => results.as_str()})
+                        .inc();
+                };
+            }
+            Err(ref e) => {
+                let error = format!("{}", e);
+                metrics::IDOLOGY_EXPECT_ID_ERROR
+                    .with(&labels! {"error" => error.as_str()})
+                    .inc()
+            }
+        }
+        res
     } else {
         let response = idv::test_fixtures::idology_fake_data_expectid_response();
 
@@ -154,14 +185,24 @@ pub async fn send_socure_idv_request(
             )
             .unwrap_or(false)
     {
-        idv::socure::send_idplus_request(
+        let res = idv::socure::send_idplus_request(
             &state.socure_production_client,
             data,
             socure_device_session_id,
             ip_address,
         )
         .await
-        .map_err(|e| ApiError::from(idv::Error::from(e)))
+        .map_err(|e| ApiError::from(idv::Error::from(e)));
+
+        if let Ok(r) = &res {
+            if let ParsedResponse::SocureIDPlus(socure_response) = &r.response {
+                if let Some(score) = socure_response.sigma_fraud_score() {
+                    metrics::SOCURE_SIGMA_FRAUD_SCORE.observe(score.into());
+                }
+            }
+        }
+
+        res
     } else {
         let response = idv::test_fixtures::socure_idplus_fake_passing_response();
 

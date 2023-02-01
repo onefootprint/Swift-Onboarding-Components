@@ -1,11 +1,12 @@
 use crate::errors::ApiError;
 use crate::types::{ResponseData, StringResponse};
-use crate::State;
 use crate::{auth::custodian::CustodianAuthContext, types::JsonApiResponse};
+use crate::{metrics, State};
 
 use actix_web::cookie::time::Instant;
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
 use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
+
 use serde::{Deserialize, Serialize};
 
 #[api_v2_operation(tags(Private), description = "Returns 200 if the API server is running")]
@@ -23,6 +24,8 @@ async fn handler() -> StringResponse {
 #[tracing::instrument(name = "status", skip(state))]
 #[get("/status")]
 async fn status(state: web::Data<State>) -> StringResponse {
+    metrics::GET_STATUS_COUNTER.inc();
+
     let before_enclave = chrono::Utc::now().timestamp_millis();
     state.enclave_client.pong().await?;
     let after_enclave = chrono::Utc::now().timestamp_millis();

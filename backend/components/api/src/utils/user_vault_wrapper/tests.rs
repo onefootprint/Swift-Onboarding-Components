@@ -358,7 +358,7 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
             .unwrap()
             .0;
         let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-        uvw.update_identity_data(conn, update.into(), vec![]).unwrap();
+        uvw.update_identity_data(conn, update, vec![]).unwrap();
     }
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
     assert!(uvw.has_identity_field(IDK::AddressLine1));

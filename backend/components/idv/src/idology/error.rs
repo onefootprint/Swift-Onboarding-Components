@@ -21,7 +21,7 @@ pub enum Error {
     MissingReferenceId,
     #[error("Document results are not ready")]
     DocumentResultsNotReady,
-    #[error("Document results are not ready")]
+    #[error("RequestError: {0}")]
     RequestError(#[from] RequestError),
     #[error("Scan Verify document submission was not successful")]
     ScanVerifyDocumentSubmissionNotSuccessful,

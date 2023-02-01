@@ -1,5 +1,6 @@
 use crate::{
     errors::{onboarding::OnboardingError, ApiError},
+    metrics,
     utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs},
     State,
 };
@@ -12,6 +13,7 @@ use db::{
     },
     DbError,
 };
+use prometheus::labels;
 /// The Engine module is the main entry point into running our verification logic
 ///
 ///
@@ -77,7 +79,12 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
     let features = features::create_features(results);
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    risk::create_final_decision(state, ob.id, features).await?;
+    let onboarding_decision = risk::create_final_decision(state, ob.id, features).await?;
+
+    let status = onboarding_decision.status.to_string();
+    metrics::DECISION_ENGINE_ONBOARDING_DECISION
+        .with(&labels! {"status" => status.as_str()})
+        .inc();
 
     Ok(())
 }

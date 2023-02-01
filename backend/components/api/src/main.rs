@@ -12,6 +12,7 @@ use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 
 mod config;
+mod metrics;
 mod prometheus;
 mod signed_hash;
 mod telemetry;
@@ -46,7 +47,8 @@ async fn main() -> std::io::Result<()> {
 
     // telemetry
     let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
-    let prometheus = prometheus::init(&config);
+    let prom = prometheus::init(&config);
+    metrics::register_all_metrics(&prom.registry).expect("Prometheus metrics failed to register");
 
     // sentry
     let sample_rate = if config.service_config.is_local() {
@@ -110,7 +112,7 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(web::Data::new(state.clone()))
-            .wrap(prometheus.clone())
+            .wrap(prom.clone())
             .wrap(
                 sentry_actix::Sentry::builder()
                     .capture_server_errors(true)
