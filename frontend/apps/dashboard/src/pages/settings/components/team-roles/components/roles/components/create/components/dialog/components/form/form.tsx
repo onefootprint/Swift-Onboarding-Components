@@ -16,6 +16,8 @@ const Form = ({ onSubmit }: FormProps) => {
     defaultValues: {
       name: '',
       scopes: [],
+      showDecrypt: false,
+      decryptFields: [],
     },
   });
   const {
@@ -27,7 +29,7 @@ const Form = ({ onSubmit }: FormProps) => {
   return (
     <FormProvider {...formMethods}>
       <form id="role-create-form" onSubmit={handleSubmit(onSubmit)}>
-        <Box sx={{ marginBottom: 9 }}>
+        <Box sx={{ marginBottom: 8 }}>
           <TextInput
             autoFocus
             hasError={!!errors.name}

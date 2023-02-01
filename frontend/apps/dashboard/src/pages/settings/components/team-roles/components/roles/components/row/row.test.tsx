@@ -39,6 +39,28 @@ describe('<Row />', () => {
       renderRow({ role: { ...roleFixture, scopes: ['read'] } });
       expect(screen.getByText('Read-only')).toBeInTheDocument();
     });
+
+    describe('when it has one decrypt field', () => {
+      it('should render the scope', () => {
+        renderRow({ role: { ...roleFixture, scopes: ['decrypt.name'] } });
+        const tag = screen.getByText('Decrypt Full name');
+        expect(tag).toBeInTheDocument();
+      });
+    });
+
+    describe('when it has more than one decrypt field', () => {
+      it('should render the number of fields and the details in a tooltip', async () => {
+        renderRow({
+          role: { ...roleFixture, scopes: ['decrypt.name', 'decrypt.email'] },
+        });
+        const tag = screen.getByText('Decrypt 2 fields');
+        expect(tag).toBeInTheDocument();
+
+        await userEvent.hover(tag);
+        const tooltipContent = screen.getByText('Full name, Email');
+        expect(tooltipContent).toBeInTheDocument();
+      });
+    });
   });
 
   describe('when the role is assigned to at least one user', () => {

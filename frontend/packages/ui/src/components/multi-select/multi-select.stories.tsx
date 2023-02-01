@@ -94,8 +94,13 @@ export default {
       description: 'Mark the multi-select as required',
     },
     value: {
-      control: 'array',
+      control: 'optio',
       description: 'Value of the multi-select',
+    },
+    size: {
+      control: 'select',
+      options: ['default', 'compact'],
+      description: 'Size of the multi-select',
     },
   },
 } as ComponentMeta<typeof MultiSelect>;
@@ -125,6 +130,7 @@ const Template: Story<MultiSelectProps<Option, Group>> = ({
   options,
   placeholder,
   required,
+  size,
   value,
 }: MultiSelectProps<Option, Group>) => (
   <MultiSelect
@@ -142,6 +148,7 @@ const Template: Story<MultiSelectProps<Option, Group>> = ({
     options={options}
     placeholder={placeholder}
     required={required}
+    size={size}
     value={value}
   />
 );
@@ -162,5 +169,6 @@ Base.args = {
   options: defaultOptions,
   placeholder: 'Select...',
   required: false,
+  size: 'default',
   value: undefined,
 };

@@ -1,4 +1,4 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
 import Form, { FormProps } from './form';
@@ -12,5 +12,22 @@ describe('<Form />', () => {
 
     const readonlyToggle = screen.getByRole('checkbox', { name: 'Read only' });
     expect(readonlyToggle).toBeChecked();
+  });
+
+  describe('when clicking on the Decrypt data field', () => {
+    it('should toggle the multi-select to pick the decrypt fields', async () => {
+      renderForm({});
+
+      const decryptField = screen.getByRole('checkbox', {
+        name: 'Decrypt data',
+      });
+      await userEvent.click(decryptField);
+
+      const attributesSelect = screen.getByLabelText('Permissible attributes');
+      expect(attributesSelect).toBeInTheDocument();
+
+      await userEvent.click(decryptField);
+      expect(attributesSelect).not.toBeInTheDocument();
+    });
   });
 });

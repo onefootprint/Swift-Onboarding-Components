@@ -35,6 +35,7 @@ export type MultiSelectProps<Option, Group extends GroupBase<Option>> = {
   options: OptionsOrGroups<Option, Group> | undefined;
   placeholder?: string;
   required?: boolean;
+  size?: 'default' | 'compact';
   value?: PropsValue<Option>;
 };
 
@@ -56,16 +57,23 @@ const MultiSelect = <
   options,
   placeholder = 'Search...',
   required,
+  size,
   value,
 }: MultiSelectProps<Option, Group>) => {
   const internalId = useId();
   const id = baseId || internalId;
   const theme = useTheme();
   const { dropdown, input } = theme.components;
+  const inputSize =
+    size === 'compact' ? input.size.compact : input.size.default;
 
   return (
     <Box>
-      {label && <Label htmlFor={id}>{label}</Label>}
+      {label && (
+        <Label htmlFor={id} size={size}>
+          {label}
+        </Label>
+      )}
       <Select<Option, true, Group>
         autoFocus={autoFocus}
         escapeClearsValue={false}
@@ -128,12 +136,12 @@ const MultiSelect = <
           }),
           placeholder: base => ({
             ...base,
-            font: theme.typography['body-3'],
+            font: inputSize.typography,
             color: input.global.placeholderColor,
             padding: `0 ${theme.spacing[3]}`,
           }),
           group: () => ({
-            ':first-child': {
+            ':first-of-type': {
               marginTop: theme.spacing[1],
             },
             ':not(:last-child)': {
@@ -185,7 +193,7 @@ const MultiSelect = <
           input: (base, { hasValue }) => ({
             ...base,
             color: input.global.color,
-            font: input.size.default.typography,
+            font: inputSize.typography,
             margin: `${theme.spacing[1]} auto ${theme.spacing[1]} ${
               theme.spacing[hasValue ? 1 : 3]
             }`,
@@ -202,7 +210,6 @@ const MultiSelect = <
             display: 'flex',
             flexDirection: 'row',
             gap: theme.spacing[3],
-            minHeight: theme.spacing[7],
             justifyContent: 'space-between',
             padding: `${theme.spacing[2]} ${theme.spacing[3]}`,
           }),

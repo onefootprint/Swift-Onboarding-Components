@@ -162,6 +162,19 @@ describe('<Roles />', () => {
           });
           await userEvent.click(roleField);
 
+          const decryptField = screen.getByRole('checkbox', {
+            name: 'Decrypt data',
+          });
+          await userEvent.click(decryptField);
+
+          const attributesSelect = screen.getByLabelText(
+            'Permissible attributes',
+          );
+          await userEvent.click(attributesSelect);
+
+          const fullNameOption = screen.getByText('Full name');
+          await userEvent.click(fullNameOption);
+
           const submitButton = screen.getByRole('button', {
             name: 'Create',
           });

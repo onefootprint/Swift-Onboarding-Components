@@ -16,10 +16,13 @@ const Dialog = ({ onClose, open }: DialogProps) => {
   const createRoleMutation = useCreateRole();
 
   const handleSubmit = (formData: FormData) => {
-    const { name, scopes } = formData;
+    const { name, scopes, decryptFields } = formData;
+    const decryptScopes = decryptFields.map(({ value }) => value);
     createRoleMutation.mutate(
-      // Read scope should be always included
-      { name, scopes: ['read', ...scopes] },
+      {
+        name,
+        scopes: ['read', ...scopes, ...decryptScopes],
+      },
       { onSuccess: onClose },
     );
   };

@@ -1,4 +1,4 @@
-import UserDataAttribute from './user-data-attribute';
+import { CollectedKycDataOption } from './collected-kyc-data-option';
 
 export type OrgRoleScope =
   | 'read'
@@ -15,7 +15,7 @@ export type OrgRoleScope =
   // Allows decrypting identity documents
   | 'decrypt_documents'
   // Allows decrypting identity data attributes belonging to the listed CollectedDataOptions
-  | `decrypt.${UserDataAttribute}`
+  | `decrypt.${CollectedKycDataOption}`
   //  Allows performing manual review actions on users, like making a new decision or adding an annotation
   | 'manual_review';
 
