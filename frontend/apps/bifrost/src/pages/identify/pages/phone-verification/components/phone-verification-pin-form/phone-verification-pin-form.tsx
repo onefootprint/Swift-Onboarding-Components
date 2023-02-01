@@ -5,7 +5,7 @@ import {
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IdentifyVerifyResponse } from '@onefootprint/types';
 import { PinInput } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
@@ -24,18 +24,16 @@ const PhoneVerificationPinForm = ({
 }: PhoneVerificationPinFormProps) => {
   const showRequestErrorToast = useRequestErrorToast();
   const { t } = useTranslation('pages.phone-verification.form');
-
   const [state, send] = useIdentifyMachine();
+  const [shouldShowSuccess, setShouldShowSuccess] = useState(false);
   const { email, userFound, challengeData, tenantPk } = state.context;
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
-
-  const shouldShowSuccess =
-    identifyVerifyMutation.isSuccess && userEmailMutation.isSuccess;
   const shouldShowLoading =
     identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
 
   const delayedSuccessTransition = (authToken: string) => {
+    setShouldShowSuccess(true);
     setTimeout(() => {
       send({
         type: Events.smsChallengeSucceeded,
