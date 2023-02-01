@@ -1,7 +1,6 @@
 import {
   useIdentify,
   useLoginChallenge,
-  useSignupChallenge,
 } from '@onefootprint/footprint-elements';
 import {
   ChallengeData,
@@ -9,7 +8,6 @@ import {
   Identifier,
   IdentifyResponse,
   LoginChallengeResponse,
-  SignupChallengeResponse,
 } from '@onefootprint/types';
 import { BootstrapData } from 'src/hooks/use-bifrost-machine';
 import { useEffectOnce } from 'usehooks-ts';
@@ -35,7 +33,6 @@ const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
 
   const identifyMutation = useIdentify();
   const loginChallengeMutation = useLoginChallenge();
-  const signupChallengeMutation = useSignupChallenge();
 
   const identify = (
     identifier: Identifier,
@@ -68,23 +65,6 @@ const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
     );
   };
 
-  const sendSmsSignupChallenge = (
-    onSuccess: (data: SignupChallengeResponse) => void,
-  ) => {
-    if (!phoneNumber) {
-      options.onError();
-      return;
-    }
-
-    signupChallengeMutation.mutate(
-      { phoneNumber },
-      {
-        onSuccess,
-        onError: options.onError,
-      },
-    );
-  };
-
   const processPhoneData = () => {
     if (!phoneNumber) {
       options.onError();
@@ -98,9 +78,11 @@ const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
           options.onSuccess(userFound, challengeData);
         });
       } else {
-        sendSmsSignupChallenge(({ challengeData }) => {
-          options.onSuccess(userFound, challengeData);
-        });
+        // We hit this branch if only the phone number was provided, and the
+        // phone is not associated with an existing user account. In this case,
+        // don't bootstrap the flow, and force the user to go through the whole
+        // identify flow to share their email with us.
+        options.onError();
       }
     });
   };
