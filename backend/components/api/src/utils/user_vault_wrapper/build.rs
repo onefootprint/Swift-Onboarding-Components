@@ -48,6 +48,7 @@ impl UserVaultWrapper {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn build(conn: &mut PgConnection, args: UvwArgs) -> ApiResult<Self> {
         let (uv, su_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(seqno) = seqno {

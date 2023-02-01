@@ -46,6 +46,7 @@ impl EnclaveClient {
     }
 
     /// send the request to the enclave
+    #[tracing::instrument(skip_all)]
     async fn send(&self, req: RpcRequest) -> Result<EnclavePayload, EnclaveError> {
         tracing::info!("sending enclave request");
         let response = self.client.send_request(req).await?;
@@ -179,6 +180,7 @@ impl EnclaveClient {
 
     /// Util for batch decrypting many EciesP256Sha256AesGcmSealed values with the same key and transform
     /// into PiiBytes
+    #[tracing::instrument(skip_all)]
     pub async fn batch_decrypt_to_piibytes(
         &self,
         sealed_data: Vec<EciesP256Sha256AesGcmSealed>,
