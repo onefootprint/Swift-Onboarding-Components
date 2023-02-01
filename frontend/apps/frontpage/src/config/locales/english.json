@@ -489,8 +489,8 @@
         "micro-title": "Add-ons",
         "title": "Customize your plan",
         "features": {
-          "drivers-license": "Drivers license scan",
-          "kyb": "KYB (know Your Business)",
+          "drivers-license": "Driver's license scan",
+          "kyb": "KYB (Know Your Business)",
           "data-vaulting": {
             "title": "Custom data vaulting",
             "details": "Unlimited tokens & decryptions"

@@ -23,7 +23,7 @@ const AddOns = () => {
 
       <FeatureRow
         title={t('add-ons.features.kyb')}
-        credits={16}
+        credits={20}
         unitFirst={t('units.business')}
       />
       <FeatureRow
@@ -35,7 +35,7 @@ const AddOns = () => {
       />
       <FeatureRow
         title={t('add-ons.features.kba')}
-        credits={4}
+        credits={5}
         unitFirst={t('units.person')}
       />
       <FeatureRow
