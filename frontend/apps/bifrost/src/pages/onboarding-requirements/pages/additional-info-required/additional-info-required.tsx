@@ -15,7 +15,7 @@ const AdditionalInfoRequired = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: {
-      config: { name },
+      config: { orgName },
     },
   } = state.context;
   const handleClick = () => {
@@ -30,7 +30,7 @@ const AdditionalInfoRequired = () => {
       <Container>
         <HeaderTitle
           title={t('title')}
-          subtitle={t('subtitle', { tenantName: name })}
+          subtitle={t('subtitle', { tenantName: orgName })}
         />
         <Button fullWidth onClick={handleClick}>
           {t('cta')}

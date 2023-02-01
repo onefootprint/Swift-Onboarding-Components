@@ -60,7 +60,7 @@ const Authorize = () => {
   const {
     authToken,
     config: {
-      name: tenantName,
+      orgName: tenantName,
       privacyPolicyUrl,
       canAccessData,
       canAccessSelfieImage,
