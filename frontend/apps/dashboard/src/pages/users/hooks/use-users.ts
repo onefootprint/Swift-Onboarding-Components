@@ -6,7 +6,7 @@ import {
   UsersResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import usePagination from 'src/hooks/use-pagination';
+import { useCursorPagination } from 'src/hooks/use-pagination';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import useUsersFilters from './use-users-filters';
@@ -47,7 +47,7 @@ const useUsers = () => {
       }),
     },
   );
-  const pagination = usePagination({
+  const pagination = useCursorPagination({
     count: usersQuery.data?.meta.count,
     next: usersQuery.data?.meta.next,
     cursor: filters.values.cursor,

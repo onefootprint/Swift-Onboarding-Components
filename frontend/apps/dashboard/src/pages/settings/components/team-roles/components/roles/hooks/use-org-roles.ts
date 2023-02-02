@@ -51,9 +51,9 @@ const useOrgRoles = () => {
   );
   const pagination = usePagination({
     count: orgRolesQuery.data?.meta.count,
-    next: orgRolesQuery.data?.meta.next,
-    cursor: filters.values.cursor,
-    onChange: newCursor => filters.push({ roles_cursor: newCursor }),
+    next: orgRolesQuery.data?.meta.nextPage,
+    page: filters.values.page,
+    onChange: newPage => filters.push({ roles_page: newPage }),
   });
   const errorMessage = orgRolesQuery.error
     ? getErrorMessage(orgRolesQuery.error)

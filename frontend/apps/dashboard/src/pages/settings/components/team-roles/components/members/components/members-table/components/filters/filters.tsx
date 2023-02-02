@@ -18,7 +18,7 @@ const Filters = () => {
           label: t('role.label'),
           loading: rolesQuery.isLoading,
           options: rolesQuery.data || [],
-          query: 'member_role',
+          query: 'members_role',
           selectedOptions: filters.values.role,
         },
       ]}

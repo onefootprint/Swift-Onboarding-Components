@@ -91,7 +91,7 @@ describe('<Members />', () => {
     });
 
     describe('when typing on the table search', () => {
-      it('should append member_search query', async () => {
+      it('should append members_search query', async () => {
         const push = jest.fn();
         useRouterSpy({
           pathname: '/settings',
@@ -108,7 +108,7 @@ describe('<Members />', () => {
           expect(push).toHaveBeenCalledWith(
             {
               query: {
-                member_search: 'Jane',
+                members_search: 'Jane',
                 tab: 'Members',
               },
             },
@@ -122,7 +122,7 @@ describe('<Members />', () => {
     describe('when applying a filter by role', () => {
       const [firstRole] = orgRolesFixture;
 
-      it('should append member_role query', async () => {
+      it('should append members_role query', async () => {
         const push = jest.fn();
         useRouterSpy({
           pathname: '/settings',
@@ -153,7 +153,7 @@ describe('<Members />', () => {
           expect(push).toHaveBeenCalledWith(
             {
               query: {
-                member_role: [firstRole.id],
+                members_role: [firstRole.id],
                 tab: 'Members',
               },
             },

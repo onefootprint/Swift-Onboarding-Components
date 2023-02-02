@@ -3,29 +3,31 @@ import { DEFAULT_PAGE_SIZE } from 'src/config/constants';
 const useCursorPagination = ({
   count = 0,
   next = null,
+  cursor = [],
   onChange,
-  page = 0,
   pageSize = DEFAULT_PAGE_SIZE,
 }: {
   count?: number;
   next?: string | null;
-  onChange: (newPage: string) => void;
-  page?: number;
+  cursor: string[];
+  onChange: (newCursor: string) => void;
   pageSize?: number;
 }) => ({
   count,
   hasNextPage: !!next,
-  hasPrevPage: page > 0,
+  hasPrevPage: cursor.length > 0,
   loadNextPage: () => {
-    if (next) {
-      onChange(next);
+    const nextCursor = next;
+    if (nextCursor) {
+      const newCursor = [...cursor, nextCursor].toString();
+      onChange(newCursor);
     }
   },
   loadPrevPage: () => {
-    const newPage = Math.max(0, page - 1);
-    onChange(newPage.toString());
+    const newCursor = cursor.slice(0, -1).toString();
+    onChange(newCursor);
   },
-  pageIndex: page,
+  pageIndex: cursor.length,
   pageSize,
 });
 

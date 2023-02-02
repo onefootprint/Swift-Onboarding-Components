@@ -53,9 +53,9 @@ const useOrgMembers = () => {
   );
   const pagination = usePagination({
     count: orgMembersQuery.data?.meta.count,
-    next: orgMembersQuery.data?.meta.next,
-    cursor: filters.values.cursor,
-    onChange: newCursor => filters.push({ member_cursor: newCursor }),
+    next: orgMembersQuery.data?.meta.nextPage,
+    page: filters.values.page,
+    onChange: newPage => filters.push({ members_page: newPage }),
   });
   const errorMessage = orgMembersQuery.error
     ? getErrorMessage(orgMembersQuery.error)

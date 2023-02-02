@@ -31,7 +31,7 @@ const Members = () => {
           onPrevPage={pagination.loadPrevPage}
           pageIndex={pagination.pageIndex}
           pageSize={pagination.pageSize}
-          totalNumResults={response.meta.count}
+          totalNumResults={pagination.count}
         />
       )}
     </Box>

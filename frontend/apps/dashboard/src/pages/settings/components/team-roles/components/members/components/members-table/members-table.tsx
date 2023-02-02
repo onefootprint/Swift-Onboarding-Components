@@ -25,7 +25,7 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
   ];
 
   const handleSearchChange = (search: string) => {
-    filters.push({ member_search: search });
+    filters.push({ members_search: search });
   };
 
   return (
