@@ -3,6 +3,7 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
+import Head from 'next/head';
 import React from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
@@ -18,13 +19,35 @@ type AppProps = {
 };
 
 const App = ({ Component, pageProps }: AppProps) => (
-  <QueryClientProvider client={queryClient}>
-    <DesignSystemProvider theme={themes.light}>
-      <GlobalStyle />
-      <AppHeader navigation={pageProps.page?.navigation} />
-      <Component {...pageProps} />
-    </DesignSystemProvider>
-  </QueryClientProvider>
+  <>
+    <Head>
+      <link rel="shortcut icon" href="/favicon.ico" />
+      <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="/apple-touch-icon.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon-32x32.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="/favicon-16x16.png"
+      />
+    </Head>
+    <QueryClientProvider client={queryClient}>
+      <DesignSystemProvider theme={themes.light}>
+        <GlobalStyle />
+        <AppHeader navigation={pageProps.page?.navigation} />
+        <Component {...pageProps} />
+      </DesignSystemProvider>
+    </QueryClientProvider>
+  </>
 );
 
 const GlobalStyle = createGlobalStyle`
