@@ -1,8 +1,6 @@
-use crate::auth::tenant::Any;
 use crate::auth::tenant::AuthActor;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantRbAuthContext;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
@@ -19,7 +17,7 @@ use chrono::Utc;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_rolebinding::TenantRolebindingFilters;
 use db::models::tenant_rolebinding::TenantRolebindingUpdate;
-use db::models::tenant_user::{TenantUser, TenantUserUpdate};
+use db::models::tenant_user::TenantUser;
 use db::OffsetPagination;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantRoleId;
@@ -122,51 +120,13 @@ async fn post(
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
-struct UpdateTenantUserRequest {
-    first_name: Option<String>,
-    last_name: Option<String>,
-}
-
-#[api_v2_operation(tags(OrgSettings), description = "Updates the authed user.")]
-#[patch("/org/members")]
-async fn patch(
-    state: web::Data<State>,
-    request: web::Json<UpdateTenantUserRequest>,
-    // Weird to take in an impersonation token here
-    auth: TenantRbAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(Any)?;
-
-    let UpdateTenantUserRequest {
-        first_name,
-        last_name,
-    } = request.into_inner();
-
-    let user_id = match auth.actor() {
-        AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
-        _ => return Err(TenantError::ValidationError("Cannot patch non-user principal".to_owned()).into()),
-    };
-
-    let user_update = TenantUserUpdate {
-        first_name,
-        last_name,
-    };
-    state
-        .db_pool
-        .db_transaction(move |conn| TenantUser::update(conn, &user_id, user_update))
-        .await?;
-
-    EmptyResponse::ok().json()
-}
-
-#[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct UpdateTenantRolebindingRequest {
     role_id: Option<TenantRoleId>,
 }
 
 #[api_v2_operation(tags(OrgSettings), description = "Updates the provided member.")]
 #[patch("/org/members/{tenant_rb_id}")]
-async fn patch_rb(
+async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRolebindingRequest>,
     rb_id: web::Path<TenantRolebindingId>,

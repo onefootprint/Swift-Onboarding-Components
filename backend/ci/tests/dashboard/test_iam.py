@@ -156,17 +156,11 @@ def test_update_name(sandbox_tenant):
     first_name = f"Footprint {_gen_random_n_digit_number(5)}"
     last_name = f"Integration Testing {_gen_random_n_digit_number(5)}"
     data = dict(first_name=first_name, last_name=last_name)
-    patch(f"org/members", data, sandbox_tenant.auth_token)
+    patch(f"org/member", data, sandbox_tenant.auth_token)
 
-    body = get(
-        f"org/members",
-        dict(search="integrationtests@onefootprint.com"),
-        sandbox_tenant.auth_token,
-    )
-    assert any(
-        i["first_name"] == first_name and i["last_name"] == last_name
-        for i in body["data"]
-    )
+    body = get(f"org/member", data, sandbox_tenant.auth_token)
+    assert body["first_name"] == first_name
+    assert body["last_name"] == last_name
 
 
 def test_update_user_role(sandbox_tenant, tenant_user, limited_role):

@@ -60,7 +60,7 @@ def test_read_allowed(assumed_token, path):
     [
         "org",
         "org/api_keys/some_id",
-        "org/members",  # this one is weird
+        "org/member",  # this one is weird
         "org/members/some_id",
         "org/roles/some_id",
         "org/onboarding_configs/some_id",

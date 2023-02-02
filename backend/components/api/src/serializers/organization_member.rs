@@ -33,3 +33,21 @@ impl DbToApi<(TenantUser, TenantRolebinding, TenantRole)> for api_wire_types::Or
         }
     }
 }
+
+impl DbToApi<(TenantUser, TenantRole)> for api_wire_types::BasicOrganizationMember {
+    fn from_db((user, role): (TenantUser, TenantRole)) -> Self {
+        let TenantUser {
+            email,
+            first_name,
+            last_name,
+            ..
+        } = user;
+        let role = api_wire_types::OrganizationRole::from_db(role);
+        Self {
+            email: email.0,
+            first_name,
+            last_name,
+            role,
+        }
+    }
+}

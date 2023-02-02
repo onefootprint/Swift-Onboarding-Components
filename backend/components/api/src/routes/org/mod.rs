@@ -4,6 +4,7 @@ pub mod access_events;
 pub mod api_keys;
 pub mod auth;
 pub mod index;
+pub mod member;
 pub mod members;
 pub mod ob_config;
 pub mod proxy_configs;
@@ -21,8 +22,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(members::get)
         .service(members::post)
         .service(members::patch)
-        .service(members::patch_rb)
         .service(members::deactivate)
+        .service(member::get)
+        .service(member::patch)
         .service(roles::get)
         .service(roles::post)
         .service(roles::patch)

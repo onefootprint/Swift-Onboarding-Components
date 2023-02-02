@@ -28,7 +28,7 @@ pub enum AuthError {
     SessionTypeError,
     #[error("Session expired or does not exist")]
     NoSessionFound,
-    #[error("Nissing header: {0}")]
+    #[error("Missing header: {0}")]
     MissingHeader(String),
     #[error("Session expired")]
     SessionExpired,

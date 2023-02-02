@@ -71,7 +71,7 @@ pub trait IsGuardMet: Display {
 /// implementation to check whether a guard is met by the token_permissions() and
 /// yield the tenant auth if so.
 /// Purposefully private to prevent calling these methods outside of this module
-trait CanCheckTenantGuard: Sized {
+pub trait CanCheckTenantGuard: Sized {
     /// The tenant role that the authed principal has
     fn role(&self) -> &TenantRole;
 
@@ -93,6 +93,13 @@ pub trait CheckTenantGuard {
     fn check_guard<T>(self, gaurd: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
         T: IsGuardMet;
+
+    fn role(&self) -> &TenantRole
+    where
+        Self: CanCheckTenantGuard,
+    {
+        CanCheckTenantGuard::role(self)
+    }
 }
 
 impl<TAuthExtractor> CheckTenantGuard for TAuthExtractor

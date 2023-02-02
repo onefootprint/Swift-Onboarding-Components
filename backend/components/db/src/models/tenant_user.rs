@@ -19,6 +19,11 @@ pub struct TenantUser {
 }
 
 impl TenantUser {
+    pub fn get(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<Self> {
+        let user = tenant_user::table.filter(tenant_user::id.eq(id)).first(conn)?;
+        Ok(user)
+    }
+
     pub fn get_firm_employee(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<Self> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
