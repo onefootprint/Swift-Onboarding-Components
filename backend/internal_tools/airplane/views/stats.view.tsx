@@ -24,9 +24,9 @@ const Stats = () => {
     <Stack>
       <Stack direction="row">
         <OverviewCard
-          title={'Customers'}
+          title={'Live Customers'}
           query={
-            "select count(*) from tenant WHERE tenant.id NOT LIKE '_private_it_org_%'"
+            "select count(*) from tenant WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND id != 'org_hyZP3ksCvsT0AlLqMZsgrI' AND id != 'org_e2FHVfOM5Hd3Ce492o5Aat'"
           }
         ></OverviewCard>
         <OverviewCard
@@ -40,7 +40,7 @@ const Stats = () => {
           query={`
           SELECT count(*) FROM onboarding 
           INNER JOIN scoped_user on scoped_user.id = onboarding.scoped_user_id
-          INNER JOIN tenant on tenant.id = scoped_user.id
+          INNER JOIN tenant on tenant.id = scoped_user.tenant_id
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_user.is_live = true AND onboarding.is_authorized = true;
           `}
         ></OverviewCard>

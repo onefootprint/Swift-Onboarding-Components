@@ -22,7 +22,6 @@ export default airplane.task(
     const dbUrl = process.env.DATABASE_URL;
     const query = params.query;
 
-    console.log(dbUrl);
     const client = new Client({
       connectionString: dbUrl,
     });
