@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection};
+use crate::PgConnection;
+use diesel::{Insertable};
 use newtypes::{OnboardingId, SocureDeviceSessionId};
 use serde::{Deserialize, Serialize};
-
 use crate::schema::socure_device_session;
 use crate::{DbError, DbResult};
 

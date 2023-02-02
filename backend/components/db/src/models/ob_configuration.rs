@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
+use crate::PgConnection;
 use crate::TxnPgConnection;
 use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::{ApiKeyStatus, TenantScope};
 use newtypes::{CollectedDataOption, ObConfigurationId, ObConfigurationKey, TenantId};

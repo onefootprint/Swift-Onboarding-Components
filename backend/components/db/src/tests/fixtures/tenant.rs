@@ -1,4 +1,4 @@
-use diesel::PgConnection;
+use crate::PgConnection;
 use newtypes::{EncryptedVaultPrivateKey, VaultPublicKey};
 
 use crate::models::tenant::{NewTenant, Tenant};

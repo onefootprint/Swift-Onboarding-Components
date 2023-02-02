@@ -1,4 +1,4 @@
-use diesel::PgConnection;
+use crate::PgConnection;
 use newtypes::{CollectedDataOption, TenantId};
 
 use crate::models::ob_configuration::ObConfiguration;

@@ -2,10 +2,11 @@ use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_user::ScopedUser;
 use crate::DbError;
+use crate::PgConnection;
 use crate::{schema::user_timeline, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
+use diesel::{Insertable, Queryable};
 use newtypes::{DbUserTimelineEvent, FootprintUserId, ScopedUserId, TenantId, UserTimelineId, UserVaultId};
 use serde::{Deserialize, Serialize};
 

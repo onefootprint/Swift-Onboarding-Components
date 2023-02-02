@@ -1,7 +1,8 @@
 use crate::schema::{data_lifetime, phone_number};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{PgConnection, Queryable};
+use crate::PgConnection;
+use diesel::{Queryable};
 use newtypes::{
     DataLifetimeId, DataPriority, Fingerprint as FingerprintData, IdentityDataKind, PhoneNumberId,
     ScopedUserId, SealedVaultBytes, UserVaultId,

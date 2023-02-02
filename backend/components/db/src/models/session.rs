@@ -1,6 +1,7 @@
 use crate::schema::session;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use crate::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::AuthTokenHash;
 use serde::{Deserialize, Serialize};

@@ -3,6 +3,7 @@ use crate::schema::fingerprint;
 use chrono::{DateTime, Utc};
 use diesel::dsl::count_distinct;
 use diesel::prelude::*;
+use crate::PgConnection;
 use diesel::Queryable;
 use newtypes::{DataLifetimeId, DataLifetimeKind, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};

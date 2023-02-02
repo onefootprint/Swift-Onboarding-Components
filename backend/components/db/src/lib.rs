@@ -25,12 +25,11 @@ pub use crate::errors::DbError;
 use crate::schema::{kv_data, user_consent};
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
-pub use diesel::prelude::PgConnection;
+pub use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
 use errors::TransactionError;
-use newtypes::{UserVaultId};
-
+use newtypes::UserVaultId;
 
 #[allow(unused_imports)]
 pub mod schema;

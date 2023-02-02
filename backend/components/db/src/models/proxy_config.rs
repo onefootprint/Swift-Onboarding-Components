@@ -1,3 +1,4 @@
+use crate::PgConnection;
 use crate::{
     schema::{
         proxy_config, proxy_config_header, proxy_config_ingress_rule, proxy_config_secret_header,
@@ -7,7 +8,6 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::PgConnection;
 use diesel::{Identifiable, Insertable, Queryable};
 use newtypes::{
     ProxyConfigId, ProxyConfigIngressRuleId, ProxyConfigItemId, ProxyIngressContentType, SealedVaultBytes,

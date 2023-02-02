@@ -2,7 +2,8 @@ use crate::diesel::ExpressionMethods;
 use crate::schema::{self, webauthn_credential};
 use crate::DbResult;
 use chrono::{DateTime, Utc};
-use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
+use crate::PgConnection;
+use diesel::{Insertable, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{AttestationType, InsightEventId, UserVaultId, WebauthnCredentialId};
 use serde::{Deserialize, Serialize};
 

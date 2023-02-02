@@ -1,11 +1,11 @@
 use std::collections::HashMap;
-
+use crate::PgConnection;
 use crate::schema::{data_lifetime, document_request, identity_document};
 use crate::{DbResult, HasLifetime, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
+use diesel::{Insertable, Queryable};
 
 use newtypes::{
     Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdDocKind, IdentityDocumentId,

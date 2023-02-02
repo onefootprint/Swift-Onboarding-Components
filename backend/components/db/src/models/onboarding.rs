@@ -10,6 +10,7 @@ use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
 use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
+use crate::PgConnection;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{

@@ -4,8 +4,8 @@ use crate::models::annotation::{Annotation, AnnotationInfo};
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
+use crate::PgConnection;
 use crate::TxnPgConnection;
-use diesel::prelude::*;
 
 use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, UserVaultId};
 

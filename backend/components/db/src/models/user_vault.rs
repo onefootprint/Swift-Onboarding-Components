@@ -1,10 +1,11 @@
 use crate::schema::user_vault::{self, BoxedQuery};
 use crate::schema::{onboarding, scoped_user};
+use crate::PgConnection;
 use crate::{DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
+use diesel::{Insertable, QueryDsl, Queryable};
 use newtypes::{
     EncryptedVaultPrivateKey, FootprintUserId, Locked, OnboardingId, ScopedUserId, TenantId, UserVaultId,
     VaultPublicKey,

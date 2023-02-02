@@ -2,6 +2,7 @@ use crate::schema::user_vault_data;
 use crate::DbResult;
 use crate::HasLifetime;
 use crate::HasSealedIdentityData;
+use crate::PgConnection;
 use crate::TxnPgConnection;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;

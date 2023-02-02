@@ -2,7 +2,8 @@ use crate::schema::user_consent;
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
+use crate::PgConnection;
+use diesel::{Insertable, Queryable};
 use newtypes::{InsightEventId, OnboardingId, UserConsentId};
 use serde::{Deserialize, Serialize};
 

@@ -1,3 +1,4 @@
+use crate::PgConnection;
 use crate::{
     schema::{data_lifetime, email},
     DbResult, HasLifetime, HasSealedIdentityData, TxnPgConnection,

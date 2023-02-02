@@ -1,6 +1,7 @@
 use crate::schema::access_event;
 use chrono::{DateTime, Utc};
-use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
+use crate::PgConnection;
+use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedUserId};
 use serde::{Deserialize, Serialize};
 

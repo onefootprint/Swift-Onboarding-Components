@@ -1,7 +1,8 @@
 use crate::{schema::verification_result, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection};
+use crate::PgConnection;
+use diesel::{Insertable};
 use newtypes::{SealedVaultBytes, VerificationRequestId, VerificationResultId};
 use serde::{Deserialize, Serialize};
 

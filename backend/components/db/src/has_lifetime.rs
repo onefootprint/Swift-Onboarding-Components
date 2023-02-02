@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use diesel::PgConnection;
+use crate::PgConnection;
 use itertools::Itertools;
 use newtypes::{DataLifetimeId, SealedVaultBytes, UserVaultId};
 

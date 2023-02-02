@@ -1,6 +1,7 @@
 use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use crate::schema::tenant_api_key;
 use crate::schema::tenant_api_key::BoxedQuery;
+use crate::PgConnection;
 use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;

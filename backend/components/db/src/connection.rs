@@ -1,4 +1,5 @@
-use diesel::PgConnection;
+use crate::PgConnection;
+// use diesel::PgConnection;
 
 /// Wrapper around a PgConnection that allows us to have type-safety for functions that should only
 /// ever run inside of a transaction.

@@ -6,6 +6,7 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
+use crate::PgConnection;
 use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, OnboardingStatus, TenantId};
 
 #[derive(Clone)]

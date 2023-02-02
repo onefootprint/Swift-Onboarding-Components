@@ -5,9 +5,10 @@ use crate::{
     schema::tenant_role::{self, BoxedQuery},
     DbError, DbResult, NextPage, OffsetPagination, TxnPgConnection,
 };
+use crate::PgConnection;
 use chrono::{DateTime, Utc};
 use diesel::{dsl::count_star, prelude::*};
-use diesel::{Insertable, PgConnection, Queryable};
+use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{Locked, TenantId, TenantRoleId, TenantScope};
 

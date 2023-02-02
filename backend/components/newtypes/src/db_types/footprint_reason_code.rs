@@ -417,7 +417,6 @@ pub enum SignalSeverity {
 
 #[cfg(test)]
 mod tests {
-    use itertools::Itertools;
     use test_case::test_case;
 
     use crate::IDologyReasonCode;

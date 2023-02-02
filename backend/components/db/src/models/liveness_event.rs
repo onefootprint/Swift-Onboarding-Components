@@ -9,8 +9,8 @@ use crate::DbResult;
 
 use chrono::{DateTime, Utc};
 
+use crate::PgConnection;
 use diesel::prelude::*;
-use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
 
 use newtypes::FootprintUserId;

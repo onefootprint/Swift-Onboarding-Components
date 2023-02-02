@@ -1,5 +1,6 @@
+use crate::PgConnection;
 use crate::{run_migrations, DbPool, TxnPgConnection};
-use diesel::{Connection, PgConnection};
+use diesel::Connection;
 use std::sync::Once;
 
 /// Common DB test helpers for this crate and others

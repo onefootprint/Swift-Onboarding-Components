@@ -3,7 +3,7 @@ use crate::models::user_vault::{NewUserVaultArgs, UserVault};
 use crate::{errors::DbError, models::user_vault::NewNonPortableUserVaultReq};
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{Fingerprint};
+use newtypes::Fingerprint;
 
 // TODO modernize these utils
 /// a NON-portable, tenant-scoped vault + a scoped user for the tenant and the vault

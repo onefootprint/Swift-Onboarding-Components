@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::actor::SaturatedActor;
 use crate::models::verification_request::VerificationRequest;
 use crate::TxnPgConnection;
+use crate::PgConnection;
 use crate::{
     actor,
     schema::{onboarding_decision, onboarding_decision_verification_result_junction},

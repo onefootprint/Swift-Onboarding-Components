@@ -1,3 +1,4 @@
+use crate::PgConnection;
 use crate::{schema::tenant_user, DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;

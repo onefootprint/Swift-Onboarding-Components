@@ -2,7 +2,8 @@ use crate::{schema::kv_data, DbError};
 use crate::{DbResult, HasLifetime, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
+use crate::PgConnection;
+use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{
     DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, KeyValueDataId, KvDataKey, ScopedUserId,
     SealedVaultBytes, UserVaultId,

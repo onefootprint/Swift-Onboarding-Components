@@ -1,7 +1,8 @@
+use crate::PgConnection;
 use crate::{schema::fingerprint_visit_event, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
+use diesel::{Insertable, Queryable};
 use newtypes::{
     FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedUserId, UserVaultId,
 };

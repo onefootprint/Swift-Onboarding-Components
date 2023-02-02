@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::PgConnection;
 use crate::{schema::tenant_api_key_access_log, DbError};
 use chrono::{DateTime, Utc};
 use diesel::dsl::max;

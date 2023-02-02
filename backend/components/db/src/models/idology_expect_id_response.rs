@@ -2,6 +2,7 @@ use crate::schema::idology_expect_id_response;
 use crate::DbError;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use crate::PgConnection;
 use diesel::Insertable;
 use newtypes::{IdologyExpectIdResponseId, VerificationResultId};
 use serde::{Deserialize, Serialize};

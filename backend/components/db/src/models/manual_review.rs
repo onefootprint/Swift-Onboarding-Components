@@ -1,9 +1,9 @@
 use crate::{schema::manual_review, DbResult};
 use crate::{DbError, TxnPgConnection};
 
+use crate::PgConnection;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::PgConnection;
 use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId};
 use serde::{Deserialize, Serialize};
 

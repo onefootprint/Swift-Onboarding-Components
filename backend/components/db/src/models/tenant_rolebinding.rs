@@ -1,6 +1,7 @@
 use super::tenant::Tenant;
 use super::tenant_role::TenantRole;
 use super::tenant_user::TenantUser;
+use crate::PgConnection;
 use crate::{
     schema::tenant_role, schema::tenant_rolebinding, schema::tenant_user, DbResult, TxnPgConnection,
 };

@@ -1,8 +1,8 @@
 use crate::{
     test_helpers::{db_url, test_db_conn},
-    DbError, MIGRATIONS,
+    DbError, PgConnection, MIGRATIONS,
 };
-use diesel::{Connection, PgConnection, RunQueryDsl};
+use diesel::{Connection, RunQueryDsl};
 
 /// An ephemeral database for use within a DB test
 /// which helps avoid issues with conflicting uniqueness/etc.

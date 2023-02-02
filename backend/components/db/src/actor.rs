@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use diesel::PgConnection;
+use crate::PgConnection;
 use newtypes::{DbActor, TenantApiKeyId, TenantUserId};
 
 use crate::{

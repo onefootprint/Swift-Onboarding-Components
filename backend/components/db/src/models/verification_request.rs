@@ -2,7 +2,8 @@ use crate::schema::{onboarding, scoped_user, user_vault, verification_request, v
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection};
+use crate::PgConnection;
+use diesel::{Insertable};
 use newtypes::{
     DataLifetimeSeqno, IdentityDocumentId, OnboardingId, Vendor, VendorAPI, VerificationRequestId,
 };

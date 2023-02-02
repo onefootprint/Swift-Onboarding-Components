@@ -3,7 +3,8 @@ use crate::schema::risk_signal;
 use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
+use crate::PgConnection;
+use diesel::{Insertable, Queryable};
 use newtypes::{FootprintReasonCode, FootprintUserId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
 use serde::{Deserialize, Serialize};
 

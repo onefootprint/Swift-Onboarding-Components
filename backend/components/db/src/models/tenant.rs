@@ -1,10 +1,10 @@
 use crate::schema::{scoped_user, tenant};
+use crate::PgConnection;
 use crate::{DbResult, TxnPgConnection};
+use chrono::{DateTime, Utc};
 use diesel::insertable::CanInsertInSingleQuery;
 use diesel::pg::Pg;
 use diesel::prelude::*;
-
-use chrono::{DateTime, Utc};
 use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};

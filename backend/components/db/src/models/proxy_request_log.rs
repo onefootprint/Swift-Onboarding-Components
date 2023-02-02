@@ -1,7 +1,7 @@
+use crate::PgConnection;
 use crate::{schema::proxy_request_log, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::PgConnection;
 use diesel::{Identifiable, Insertable, Queryable};
 use newtypes::{ProxyConfigId, ProxyRequestLogId, SealedVaultBytes, TenantId};
 

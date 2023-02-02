@@ -1,4 +1,5 @@
 use crate::schema::{onboarding, scoped_user};
+use crate::PgConnection;
 use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;

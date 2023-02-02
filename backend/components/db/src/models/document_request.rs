@@ -3,7 +3,8 @@ use crate::TxnPgConnection;
 use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
+use crate::PgConnection;
+use diesel::{Insertable, Queryable};
 use newtypes::{DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, Locked, ScopedUserId};
 use serde::{Deserialize, Serialize};
 

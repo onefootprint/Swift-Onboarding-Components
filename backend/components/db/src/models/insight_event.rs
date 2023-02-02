@@ -3,7 +3,8 @@ use crate::DbPool;
 use crate::{schema::insight_event, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
+use crate::PgConnection;
+use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{InsightEventId, OnboardingId};
 use serde::{Deserialize, Serialize};
 

@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::nextval;
 use crate::schema::data_lifetime;
+use crate::PgConnection;
 use crate::TxnPgConnection;
 use crate::{DbError, DbResult};
 
