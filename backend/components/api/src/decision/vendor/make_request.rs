@@ -1,3 +1,4 @@
+use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
 use crate::metrics;
 use crate::{errors::ApiError, State};
@@ -10,7 +11,9 @@ use db::{
     },
     DbError,
 };
-use idv::{idology::expectid::response::ExpectIDAPIResponse, ParsedResponse, VendorResponse};
+use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
+use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
+use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
 use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, Vendor, VendorAPI};
 use prometheus::labels;
 
@@ -28,12 +31,33 @@ pub async fn send_idv_request(
     );
     // Make the request to the IDV vendor
 
+    let onboarding_id = request.onboarding_id.clone();
+    let ob_configuration_key = state
+        .db_pool
+        .db_query(move |conn| ObConfiguration::get_by_onboarding_id(conn, &onboarding_id))
+        .await??
+        .key;
+
+    let is_production = state.config.service_config.is_production();
+
+    // still TODO: traitfy the ff logic shared by these requests
     let result = match request.vendor_api {
-        VendorAPI::IdologyExpectID => send_idology_idv_request(state, request, data).await?,
+        VendorAPI::IdologyExpectID => {
+            send_idology_idv_request(
+                data,
+                is_production,
+                ob_configuration_key,
+                &state.idology_client,
+                &state.feature_flag_client,
+            )
+            .await?
+        }
         VendorAPI::TwilioLookupV2 => idv::twilio::lookup_v2(&state.twilio_client.client, data)
             .await
             .map_err(idv::Error::from)?,
-        VendorAPI::SocureIDPlus => send_socure_idv_request(state, request, data).await?,
+        VendorAPI::SocureIDPlus => {
+            send_socure_idv_request(state, request, data, &state.socure_production_client).await?
+        }
         api => {
             let err = format!("send_idv_request not implemented for {}", api);
             return Err(ApiError::AssertionError(err));
@@ -78,51 +102,49 @@ pub async fn send_docv_request(
 }
 
 pub async fn send_idology_idv_request(
-    state: &State,
-    request: VerificationRequest,
     data: IdvData,
+    is_production: bool,
+    ob_configuration_key: ObConfigurationKey,
+    idology_api_call: &impl VendorAPICall<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >,
+    feature_flag_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
-    let onboarding_id = request.onboarding_id.clone();
-    let ob_configuration_key = state
-        .db_pool
-        .db_query(move |conn| ObConfiguration::get_by_onboarding_id(conn, &onboarding_id))
-        .await??
-        .key;
-
-    if state.config.service_config.is_production()
-        || state
-            .feature_flag_client
+    if is_production
+        || feature_flag_client
             .bool_flag_by_ob_configuration_key(
                 "EnableIdologyIdvCallsInNonProdEnvironment",
                 &ob_configuration_key,
             )
             .unwrap_or(false)
     {
-        let res = idv::idology::send_expectid_request(&state.idology_client, data)
-            .await
-            .map_err(ApiError::from);
+        let res = idology_api_call
+            .make_request(IdologyExpectIDRequest { idv_data: data })
+            .await;
 
         match res {
-            Ok(ref res) => {
-                if let ParsedResponse::IDologyExpectID(expect_id_response) = &res.response {
-                    let summary_result = expect_id_response
-                        .response
-                        .summary_result
-                        .as_ref()
-                        .map(|k| k.key.clone())
-                        .unwrap_or_default();
-                    let results = expect_id_response
-                        .response
-                        .results
-                        .as_ref()
-                        .map(|k| k.key.clone())
-                        .unwrap_or_default();
-                    if let Ok(metric) = metrics::IDOLOGY_EXPECT_ID_SUCCESS.get_metric_with(
-                        &labels! {"summary_result" => summary_result.as_str(), "results" => results.as_str()},
-                    ) {
-                        metric.inc();
-                    }
-                };
+            Ok(ref vr) => {
+                let summary_result = vr
+                    .parsed_response
+                    .response
+                    .summary_result
+                    .as_ref()
+                    .map(|k| k.key.clone())
+                    .unwrap_or_default();
+                let results = vr
+                    .parsed_response
+                    .response
+                    .results
+                    .as_ref()
+                    .map(|k| k.key.clone())
+                    .unwrap_or_default();
+                if let Ok(metric) = metrics::IDOLOGY_EXPECT_ID_SUCCESS.get_metric_with(
+                    &labels! {"summary_result" => summary_result.as_str(), "results" => results.as_str()},
+                ) {
+                    metric.inc();
+                }
             }
             Err(ref e) => {
                 let error = format!("{}", e);
@@ -133,11 +155,23 @@ pub async fn send_idology_idv_request(
                 }
             }
         }
-        res
+
+        res.map(|r| {
+            let vendor = Vendor::from(r.clone().vendor_api()); // TOOD: clones :>
+            let parsed_response = r.clone().parsed_response();
+            let raw_response = r.raw_response();
+            VendorResponse {
+                // TODO: later delete VendorResponse and just replace with VendorAPIResponse
+                vendor,
+                response: parsed_response,
+                raw_response,
+            }
+        })
+        .map_err(|e| ApiError::from(idv::Error::from(e)))
     } else {
         let response = idv::test_fixtures::idology_fake_data_expectid_response();
 
-        let parsed_response: ExpectIDAPIResponse =
+        let parsed_response: ExpectIDResponse =
             idv::idology::expectid::response::parse_response(response.clone())
                 .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
@@ -153,6 +187,7 @@ pub async fn send_socure_idv_request(
     state: &State,
     request: VerificationRequest,
     data: IdvData,
+    socure_api_call: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
 ) -> Result<VendorResponse, ApiError> {
     let feature_flag_client = &state.feature_flag_client;
 
@@ -189,24 +224,32 @@ pub async fn send_socure_idv_request(
             )
             .unwrap_or(false)
     {
-        let res = idv::socure::send_idplus_request(
-            &state.socure_production_client,
-            data,
-            socure_device_session_id,
-            ip_address,
-        )
-        .await
-        .map_err(|e| ApiError::from(idv::Error::from(e)));
+        let res = socure_api_call
+            .make_request(SocureIDPlusRequest {
+                idv_data: data,
+                socure_device_session_id,
+                ip_address,
+            })
+            .await;
 
         if let Ok(r) = &res {
-            if let ParsedResponse::SocureIDPlus(socure_response) = &r.response {
-                if let Some(score) = socure_response.sigma_fraud_score() {
-                    metrics::SOCURE_SIGMA_FRAUD_SCORE.observe(score.into());
-                }
+            if let Some(score) = r.parsed_response.sigma_fraud_score() {
+                metrics::SOCURE_SIGMA_FRAUD_SCORE.observe(score.into());
             }
         }
 
-        res
+        res.map(|r| {
+            // TODO: later delete VendorResponse and just replace with VendorAPIResponse
+            let vendor = Vendor::from(r.clone().vendor_api()); // TOOD: clones :>
+            let parsed_response = r.clone().parsed_response();
+            let raw_response = r.raw_response();
+            VendorResponse {
+                vendor,
+                response: parsed_response,
+                raw_response,
+            }
+        })
+        .map_err(|e| ApiError::from(idv::Error::from(e)))
     } else {
         let response = idv::test_fixtures::socure_idplus_fake_passing_response();
 
@@ -376,4 +419,83 @@ pub async fn make_vendor_requests(
     }
 
     Ok(results)
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+#[allow(clippy::expect_used)]
+mod tests {
+    use super::*;
+    use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+    use crate::feature_flag::{FeatureFlagError, MockFeatureFlagClient};
+
+    use idv::idology::{
+        expectid::{response::ExpectIDResponse, response::Response},
+        IdologyExpectIDAPIResponse,
+    };
+    use mockall::predicate::*;
+
+    use newtypes::PiiJsonValue;
+    use serde_json::json;
+    use std::str::FromStr;
+    use test_case::test_case;
+
+    #[test_case(true, Ok(false), true)]
+    #[test_case(false, Ok(true), true)]
+    #[test_case(false, Ok(false), false)]
+    #[test_case(true, Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize), true)]
+    #[test_case(false, Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize), false)]
+    #[tokio::test]
+    async fn test_send_idology_idv_request(
+        // Proof of concept test
+        is_production: bool,
+        flag_response: Result<bool, FeatureFlagError>,
+        expect_api_call: bool,
+    ) {
+        let ob_configuration_key = ObConfigurationKey::from_str("obc123").unwrap();
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+        let mut mock_api = MockVendorAPICall::<
+            IdologyExpectIDRequest,
+            IdologyExpectIDAPIResponse,
+            idv::idology::error::Error,
+        >::new();
+
+        mock_ff_client
+            .expect_bool_flag_by_ob_configuration_key()
+            .with(
+                eq("EnableIdologyIdvCallsInNonProdEnvironment"),
+                eq(ob_configuration_key.clone()),
+            )
+            .return_once(|_, _| flag_response);
+
+        if expect_api_call {
+            mock_api.expect_make_request().times(1).return_once(|_| {
+                Ok(IdologyExpectIDAPIResponse {
+                    // TODO: helpers methods to make these and other test structs
+                    raw_response: PiiJsonValue::from(json!({"yo": "sup"})),
+                    parsed_response: ExpectIDResponse {
+                        response: Response {
+                            qualifiers: None,
+                            results: None,
+                            summary_result: None,
+                            id_number: None,
+                            id_scan: None,
+                            error: None,
+                            restriction: None,
+                        },
+                    },
+                })
+            });
+        }
+
+        send_idology_idv_request(
+            IdvData { ..Default::default() },
+            is_production,
+            ob_configuration_key,
+            &mock_api,
+            &mock_ff_client,
+        )
+        .await
+        .expect("shouldn't error");
+    }
 }

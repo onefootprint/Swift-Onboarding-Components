@@ -2828,11 +2828,13 @@ name = "idv"
 version = "0.1.0"
 dependencies = [
  "actix-rt",
+ "async-trait",
  "base64",
  "chrono",
  "dotenv",
  "itertools",
  "levenshtein",
+ "mockall",
  "newtypes",
  "reqwest",
  "serde",

@@ -10,7 +10,7 @@ use db::{
 use enclave_proxy::DataTransform;
 use idv::{
     idology::{
-        expectid::response::ExpectIDAPIResponse,
+        expectid::response::ExpectIDResponse,
         scan_onboarding::response::ScanOnboardingAPIResponse,
         scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse},
     },
@@ -101,7 +101,7 @@ trait SaveStructuredVendorResponse {
     ) -> DbResult<Option<StructuredVendorResponse>>; //TODO: remove Option here when all structured vendor responses have been implemented
 }
 
-impl SaveStructuredVendorResponse for ExpectIDAPIResponse {
+impl SaveStructuredVendorResponse for ExpectIDResponse {
     fn save_vendor_response(
         &self,
         conn: &mut PgConnection,

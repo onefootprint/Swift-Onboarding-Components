@@ -1,4 +1,8 @@
-use super::{error as IdologyError, expectid, scan_onboarding, scan_verify};
+use super::{
+    error as IdologyError,
+    expectid::{self},
+    scan_onboarding, scan_verify,
+};
 use newtypes::{DocVData, IdvData, PiiString};
 
 #[derive(Debug, Clone)]
@@ -20,10 +24,7 @@ impl IdologyClient {
 
     /// Make a request to the ExpectID module. Returns the result from ExpectID and a vec of
     /// scopes that were sent to IDology's ExpectID
-    pub(super) async fn verify_expectid(
-        &self,
-        idv_data: IdvData,
-    ) -> Result<serde_json::Value, IdologyError::Error> {
+    pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<serde_json::Value, IdologyError::Error> {
         let url = "https://web.idologylive.com/api/idiq.svc";
         let req_data = expectid::request::RequestData::try_from(idv_data)?;
         let req_list = expectid::request::Request {

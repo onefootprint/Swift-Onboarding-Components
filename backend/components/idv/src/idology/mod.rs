@@ -6,13 +6,13 @@ pub(self) mod response_common;
 pub mod scan_onboarding;
 pub mod scan_verify;
 
-use newtypes::{DocVData, IdvData};
+use newtypes::{DocVData, IdvData, PiiJsonValue};
 
 use crate::{ParsedResponse, VendorResponse};
 
 use crate::idology::client::IdologyClient;
 use crate::idology::error as IdologyError;
-use expectid::response::ExpectIDAPIResponse;
+use expectid::response::ExpectIDResponse;
 use newtypes::Vendor;
 use scan_onboarding::response::ScanOnboardingAPIResponse;
 
@@ -23,25 +23,14 @@ use tokio_retry::{
 
 use self::scan_verify::response::ScanVerifySubmissionAPIResponse;
 
-pub async fn send_expectid_request(
-    client: &IdologyClient,
-    data: IdvData,
-) -> Result<VendorResponse, crate::Error> {
-    let response = client
-        .verify_expectid(data)
-        .await
-        .map_err(crate::idology::error::Error::from)?;
-    let parsed_response: ExpectIDAPIResponse =
-        expectid::response::parse_response(response.clone()).map_err(crate::idology::error::Error::from)?;
+pub struct IdologyExpectIDRequest {
+    pub idv_data: IdvData,
+}
 
-    // Validate there are no errors (related to UN/PW, submitted fields, whitelisted IPs etc)
-    parsed_response.response.validate()?;
-
-    Ok(VendorResponse {
-        vendor: Vendor::Idology,
-        raw_response: response.into(),
-        response: ParsedResponse::IDologyExpectID(parsed_response),
-    })
+#[derive(Clone)]
+pub struct IdologyExpectIDAPIResponse {
+    pub raw_response: PiiJsonValue,
+    pub parsed_response: ExpectIDResponse,
 }
 
 pub async fn send_scan_verify_request(
@@ -158,10 +147,9 @@ mod test {
         // ////////////
         // Send to ExpectID
         // ////////////
-        let res = send_expectid_request(&client, idv_data).await.unwrap();
-        let ParsedResponse::IDologyExpectID(expect_id_response) = res.response else {
-            panic!("incorrect expectID results response type")
-        };
+        let res = client.verify_expectid(idv_data).await.unwrap();
+        let expect_id_response = crate::idology::expectid::response::parse_response(res).unwrap();
+
         let parsed_expect_id = expect_id_response.response.clone();
         assert!(parsed_expect_id.is_id_scan_required());
         // pull out the query id

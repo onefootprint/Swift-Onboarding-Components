@@ -1,10 +1,13 @@
 use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
-use idology::expectid::response::ExpectIDAPIResponse;
+
+use idology::expectid::response::ExpectIDResponse;
 use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
 use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
+
 use newtypes::{PiiJsonValue, Vendor};
+
 use socure::response::SocureIDPlusResponse;
 
 pub mod idology;
@@ -18,7 +21,7 @@ pub mod twilio;
 #[derive(Clone, serde::Serialize)]
 #[serde(untagged)]
 pub enum ParsedResponse {
-    IDologyExpectID(ExpectIDAPIResponse),
+    IDologyExpectID(ExpectIDResponse),
     IDologyScanVerifyResult(ScanVerifyAPIResponse),
     IDologyScanVerifySubmission(ScanVerifySubmissionAPIResponse),
     IDologyScanOnboarding(ScanOnboardingAPIResponse),
@@ -71,7 +74,8 @@ impl ParsedResponse {
 
 #[derive(Clone)]
 pub struct VendorResponse {
-    pub vendor: Vendor,
+    // TODO: make a trait and remove the ParsedResponse enum
+    pub vendor: Vendor, // TODO: remove this, doesn't seem like its actually used at all
     pub response: ParsedResponse,
     pub raw_response: PiiJsonValue,
 }

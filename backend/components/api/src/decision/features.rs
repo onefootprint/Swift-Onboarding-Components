@@ -1,6 +1,6 @@
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
-use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse};
+use idv::{idology::expectid::response::Response, ParsedResponse};
 
 use itertools::Itertools;
 use newtypes::{
@@ -26,7 +26,7 @@ pub struct IDologyFeatures {
 
 impl IDologyFeatures {
     #[allow(unused)]
-    fn signals_from_response_qualifiers(response: ExpectIDResponse) -> Vec<Signal> {
+    fn signals_from_response_qualifiers(response: Response) -> Vec<Signal> {
         let qualifiers = response.parse_qualifiers();
 
         // TODO move this logic into decision engine
@@ -323,7 +323,7 @@ mod tests {
     use super::*;
     use idv::{
         idology::error::Error as IdologyError,
-        idology::expectid::response::{self as idology_verification, ExpectIDAPIResponse},
+        idology::expectid::response::{self as idology_verification, ExpectIDResponse},
         socure::response::SocureIDPlusResponse,
         ParsedResponse, VendorResponse,
     };
@@ -422,7 +422,7 @@ mod tests {
           }
         }});
 
-        let parsed_response: ExpectIDAPIResponse = idology_verification::parse_response(raw.clone())?;
+        let parsed_response: ExpectIDResponse = idology_verification::parse_response(raw.clone())?;
 
         let res = VendorResponse {
             vendor: Vendor::Idology,

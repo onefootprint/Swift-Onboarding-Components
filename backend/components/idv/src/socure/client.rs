@@ -1,8 +1,8 @@
 use crate::socure::conversion::SocureRequest;
 use crate::socure::SocureReqwestError;
+
 use newtypes::{IdvData, PiiString};
 use reqwest::header;
-
 use std::time::Duration;
 use tokio_retry::strategy::{jitter, ExponentialBackoff};
 use tokio_retry::Retry;

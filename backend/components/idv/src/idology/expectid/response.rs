@@ -8,20 +8,20 @@ use newtypes::{DecisionStatus, IDologyReasonCode};
 use serde::{Deserialize, Deserializer};
 
 // Given a raw response, deserialize
-pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDAPIResponse, IdologyError::Error> {
-    let response: ExpectIDAPIResponse = serde_json::value::from_value(value)?;
+pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDResponse, IdologyError::Error> {
+    let response: ExpectIDResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }
 
 pub type IdNumber = u64;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct ExpectIDAPIResponse {
-    pub response: ExpectIDResponse,
+pub struct ExpectIDResponse {
+    pub response: Response,
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "kebab-case")]
-pub struct ExpectIDResponse {
+pub struct Response {
     pub qualifiers: Option<IDologyQualifiers>,
     // TODO should these be options?
     pub results: Option<KeyResponse>,
@@ -92,7 +92,7 @@ impl Pa {
 
 type CreateManualReview = bool;
 
-impl ExpectIDResponse {
+impl Response {
     /// IDology-determined status for verifying the customer
     pub fn summary_status(&self) -> (DecisionStatus, CreateManualReview) {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {

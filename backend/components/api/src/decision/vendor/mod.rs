@@ -16,6 +16,7 @@ pub(super) mod build_request;
 pub mod make_request;
 pub mod socure;
 pub mod vendor_result;
+pub mod vendor_trait;
 pub mod verification_result;
 
 /// Build verification requests from the UserVaultWrapper and save.
