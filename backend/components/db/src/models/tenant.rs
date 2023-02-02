@@ -1,4 +1,4 @@
-use crate::schema::tenant;
+use crate::schema::{scoped_user, tenant};
 use crate::{DbResult, TxnPgConnection};
 use diesel::insertable::CanInsertInSingleQuery;
 use diesel::pg::Pg;
@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
-use newtypes::{CompanySize, EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
+use newtypes::{CompanySize, EncryptedVaultPrivateKey, TenantId, UserVaultId, VaultPublicKey};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -84,6 +84,18 @@ impl Tenant {
             .get_result(conn)?;
 
         Ok(result)
+    }
+
+    pub fn list_by_user_vault_id(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+    ) -> DbResult<Vec<Tenant>> {
+        let res = scoped_user::table
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .inner_join(tenant::table)
+            .select(tenant::all_columns)
+            .get_results(conn)?;
+        Ok(res)
     }
 }
 

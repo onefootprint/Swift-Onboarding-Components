@@ -2,7 +2,10 @@ use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use newtypes::{Fingerprinter, IdentityDataKind};
+use db::models::tenant::Tenant;
+use db::models::user_vault::UserVault;
+use db::user_vault::get_by_fingerprint;
+use newtypes::{Fingerprinter, IdentityDataKind, TenantId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -47,11 +50,12 @@ async fn post(
 
     let requested_number = request.phone_number.clone();
 
-    if !(allowed_deletion_numbers.contains(&requested_number)
-        || requested_number == state.config.integration_test_phone_number
+    let is_integration_test_phone_number = requested_number == state.config.integration_test_phone_number
         || requested_number.leak().split('#').next()
-            == Some(state.config.integration_test_phone_number.leak()))
-    {
+            == Some(state.config.integration_test_phone_number.leak());
+    let is_allowlisted_real_phone_number = allowed_deletion_numbers.contains(&requested_number);
+
+    if !(is_integration_test_phone_number || is_allowlisted_real_phone_number) {
         return Err(ApiError::AssertionError(
             "Cannot clean up provided number".to_owned(),
         ));
@@ -61,7 +65,51 @@ async fn post(
     let sh_data = state
         .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.to_piistring())
         .await?;
-    let num_deleted_rows = db::private_cleanup_integration_tests(&state.db_pool, sh_data).await?;
+
+    let uv = get_by_fingerprint(&state.db_pool, sh_data).await?;
+    let user_vault_id = if let Some(uv) = uv {
+        uv.id
+    } else {
+        return Ok(Json(ResponseData::ok(CleanupResponse { num_deleted_rows: 0 })));
+    };
+
+    let is_production = state.config.service_config.is_production();
+
+    #[allow(clippy::unwrap_used)]
+    let allowed_impacted_tenants: Vec<TenantId> = vec![
+        "org_e2FHVfOM5Hd3Ce492o5Aat", // Footprint Live
+        "org_hyZP3ksCvsT0AlLqMZsgrI", // Acme Inc.
+    ]
+    .into_iter()
+    .map(|s| TenantId::from_str(s).unwrap())
+    .collect();
+
+    let num_deleted_rows = state
+        .db_pool
+        .db_transaction(move |conn| -> Result<usize, ApiError> {
+            UserVault::lock(conn, &user_vault_id)?;
+
+            if is_production && is_allowlisted_real_phone_number {
+                let impacted_tenants: Vec<Tenant> = Tenant::list_by_user_vault_id(conn, &user_vault_id)?;
+
+                let unallowed_affected_tenants: Vec<String> = impacted_tenants
+                    .into_iter()
+                    .filter(|t| !allowed_impacted_tenants.contains(&t.id))
+                    .map(|t| t.id.to_string())
+                    .collect();
+
+                if !unallowed_affected_tenants.is_empty() {
+                    return Err(ApiError::AssertionError(format!(
+                        "Clearing vault would have impacted tenants: {}",
+                        unallowed_affected_tenants.join(",")
+                    )));
+                }
+            }
+
+            let num_deleted_rows = db::private_cleanup_integration_tests(conn, &user_vault_id)?;
+            Ok(num_deleted_rows)
+        })
+        .await?;
 
     Ok(Json(ResponseData::ok(CleanupResponse { num_deleted_rows })))
 }
