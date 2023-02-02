@@ -6,6 +6,7 @@ pub use self::guards::*;
 mod workos;
 pub use self::workos::*;
 use db::models::tenant::Tenant;
+use db::models::tenant_role::TenantRole;
 pub use ob_public_key::*;
 mod secret_key;
 pub use secret_key::*;
@@ -71,8 +72,13 @@ pub trait IsGuardMet: Display {
 /// yield the tenant auth if so.
 /// Purposefully private to prevent calling these methods outside of this module
 trait CanCheckTenantGuard: Sized {
+    /// The tenant role that the authed principal has
+    fn role(&self) -> &TenantRole;
+
     /// The list of TenantPermissions scopes that are allowed by this auth token
-    fn token_scopes(&self) -> &[TenantScope];
+    fn token_scopes(&self) -> &[TenantScope] {
+        &self.role().scopes
+    }
 
     /// The boxed TenantAuth trait object that can be utilized once permissions are checked
     fn tenant_auth(self) -> Box<dyn TenantAuth>;

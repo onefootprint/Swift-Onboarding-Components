@@ -13,7 +13,7 @@ use db::{
     },
     PgConnection,
 };
-use newtypes::{TenantRolebindingId, TenantScope};
+use newtypes::{TenantRolebindingId};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -95,8 +95,8 @@ impl TenantRbAuth {
 pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
 
 impl CanCheckTenantGuard for TenantRbAuthContext {
-    fn token_scopes(&self) -> &[TenantScope] {
-        &self.data.0.tenant_role.scopes
+    fn role(&self) -> &TenantRole {
+        &self.data.0.tenant_role
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {

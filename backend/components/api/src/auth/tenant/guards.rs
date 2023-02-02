@@ -1,5 +1,6 @@
 use super::{CanCheckTenantGuard, IsGuardMet, TenantAuth};
 use crate::auth::Either;
+use db::models::tenant_role::TenantRole;
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, TenantScope};
@@ -135,10 +136,10 @@ where
     A: CanCheckTenantGuard,
     B: CanCheckTenantGuard,
 {
-    fn token_scopes(&self) -> &[newtypes::TenantScope] {
+    fn role(&self) -> &TenantRole {
         match self {
-            Either::Left(l) => l.token_scopes(),
-            Either::Right(r) => r.token_scopes(),
+            Either::Left(l) => l.role(),
+            Either::Right(r) => r.role(),
         }
     }
 

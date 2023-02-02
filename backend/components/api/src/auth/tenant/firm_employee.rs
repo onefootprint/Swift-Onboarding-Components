@@ -7,10 +7,14 @@ use crate::{
     errors::ApiResult,
 };
 use db::{
-    models::{tenant::Tenant, tenant_user::TenantUser},
+    models::{
+        tenant::Tenant,
+        tenant_role::{ImmutableRoleKind, TenantRole},
+        tenant_user::TenantUser,
+    },
     PgConnection,
 };
-use newtypes::{TenantId, TenantScope, TenantUserId};
+use newtypes::{TenantId, TenantUserId};
 use paperclip::actix::{Apiv2Schema, Apiv2Security};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -32,6 +36,7 @@ pub struct FirmEmployeeSession {
 pub struct FirmEmployeeAuth {
     tenant: Tenant,
     tenant_user: TenantUser,
+    role: TenantRole,
 }
 
 /// Nests a private FirmEmployeeAuth and implements traits required to extract this session from an
@@ -69,17 +74,23 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
             return Err(AuthError::NotFirmEmployee.into());
         }
         let tenant = Tenant::get(conn, &data.tenant_id)?;
+        // Firm employee session _always_ has RO role
+        // This is the magic of the FirmEmployeeAuthContet: firm employees only ever have read
+        // permissions for other tenants
+        let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
-        Ok(Self(FirmEmployeeAuth { tenant, tenant_user }))
+        Ok(Self(FirmEmployeeAuth {
+            tenant,
+            tenant_user,
+            role,
+        }))
     }
 }
 
 impl CanCheckTenantGuard for FirmEmployeeAuthContext {
-    fn token_scopes(&self) -> &[TenantScope] {
-        // This is the magic of the FirmEmployeeAuthContet: firm employees only ever have read
-        // permissions for other tenants
-        &[TenantScope::Read]
+    fn role(&self) -> &TenantRole {
+        &self.data.0.role
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {

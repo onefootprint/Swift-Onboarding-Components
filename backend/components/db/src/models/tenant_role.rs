@@ -31,6 +31,22 @@ pub struct TenantRole {
     pub scopes: Vec<TenantScope>,
 }
 
+#[derive(Debug, Clone, Copy)]
+/// Represents the two immutable roles that every tenant has
+pub enum ImmutableRoleKind {
+    Admin,
+    ReadOnly,
+}
+
+impl ImmutableRoleKind {
+    fn props(&self) -> (&str, Vec<TenantScope>) {
+        match self {
+            Self::Admin => ("Admin", vec![TenantScope::Admin]),
+            Self::ReadOnly => ("Member", vec![TenantScope::Read]),
+        }
+    }
+}
+
 impl TenantRole {
     fn validate_scopes(scopes: &[TenantScope]) -> DbResult<()> {
         if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
@@ -40,36 +56,42 @@ impl TenantRole {
         Ok(())
     }
 
-    fn get_or_create_immutable_role(
-        conn: &mut TxnPgConnection,
+    pub fn get_immutable(
+        conn: &mut PgConnection,
         tenant_id: &TenantId,
-        name: &str,
-        scopes: Vec<TenantScope>,
+        kind: ImmutableRoleKind,
     ) -> DbResult<Self> {
-        Tenant::lock(conn, tenant_id)?;
+        let (name, scopes) = kind.props();
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::name.eq(name))
             .filter(tenant_role::scopes.eq(&scopes))
             .filter(tenant_role::is_immutable.eq(true))
-            .first::<Self>(conn.conn())
-            .optional()?;
-        let role = if let Some(role) = role {
-            role
-        } else {
-            Self::create(conn, tenant_id.clone(), name.to_owned(), scopes, true)?
-        };
+            .first::<Self>(conn)?;
         Ok(role)
     }
 
-    /// Every tenant is created with an admin role - this gets or creates that role
-    pub fn get_or_create_admin_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> DbResult<Self> {
-        Self::get_or_create_immutable_role(conn, tenant_id, "Admin", vec![TenantScope::Admin])
-    }
-
-    /// Every tenant is created with a read-only role - this gets or creates that role
-    pub fn get_or_create_ro_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> DbResult<Self> {
-        Self::get_or_create_immutable_role(conn, tenant_id, "Member", vec![TenantScope::Read])
+    /// Every tenant is created with an admin/read only role - this gets or creates that role
+    pub fn get_or_create_immutable(
+        conn: &mut TxnPgConnection,
+        tenant_id: &TenantId,
+        kind: ImmutableRoleKind,
+    ) -> DbResult<Self> {
+        Tenant::lock(conn, tenant_id)?;
+        let role = Self::get_immutable(conn, tenant_id, kind);
+        let role = match role {
+            Ok(role) => role,
+            Err(e) => {
+                if e.is_not_found() {
+                    // If the role is not found, create it
+                    let (name, scopes) = kind.props();
+                    Self::create(conn, tenant_id.clone(), name.to_owned(), scopes, true)?
+                } else {
+                    return Err(e);
+                }
+            }
+        };
+        Ok(role)
     }
 
     pub fn create(

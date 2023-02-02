@@ -11,7 +11,7 @@ use crate::State;
 use chrono::Duration;
 use db::models::tenant::{NewIntegrationTestTenant, Tenant};
 use db::models::tenant_api_key::TenantApiKey;
-use db::models::tenant_role::TenantRole;
+use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
@@ -100,8 +100,9 @@ async fn post(
                 Some("Integration Testing".to_owned()),
             )?;
             let user = TenantUser::set_is_firm_employee_testing_only(conn, &user.id)?;
-            let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant.id)?;
-            let _ro_role = TenantRole::get_or_create_ro_role(conn, &tenant.id)?;
+            let admin_role = TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin)?;
+            let _ro_role =
+                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
             let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
                 Ok((_, rb, _, _)) => rb,
                 Err(e) => {

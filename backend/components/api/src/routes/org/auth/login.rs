@@ -15,7 +15,7 @@ use api_wire_types::{OrgLoginRequest, OrgLoginResponse};
 use api_wire_types::{Organization, OrganizationMember};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
-use db::models::tenant_role::TenantRole;
+use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters};
 use db::models::tenant_user::TenantUser;
 use db::tenant::get_opt_by_workos_org_id;
@@ -133,8 +133,8 @@ async fn create_tenant_rolebinding(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Get or create the default admin and read-only role for this tenant
-            let admin_role = TenantRole::get_or_create_admin_role(conn, &tenant_id)?;
-            let ro_role = TenantRole::get_or_create_ro_role(conn, &tenant_id)?;
+            let admin_role = TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin)?;
+            let ro_role = TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
             // If the tenant was just created and has no users, give the user admin perms.
             // Otherwise, read-only perms
             let filters = TenantRolebindingFilters {

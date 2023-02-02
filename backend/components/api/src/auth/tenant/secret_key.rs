@@ -1,13 +1,15 @@
 use super::{AuthActor, CanCheckTenantGuard};
 use crate::auth::{tenant::TenantAuth, AuthError};
+use crate::errors::ApiResult;
 use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
 use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
+use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use futures_util::Future;
-use newtypes::{secret_api_key::SecretApiKey, TenantScope};
+use newtypes::secret_api_key::SecretApiKey;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -23,6 +25,7 @@ use std::pin::Pin;
 pub struct SecretTenantAuthContext {
     tenant: Tenant,
     api_key: TenantApiKey,
+    role: TenantRole,
 }
 
 impl SecretTenantAuthContext {
@@ -48,15 +51,29 @@ impl FromRequest for SecretTenantAuthContext {
         Box::pin(async move {
             let sh_api_key = tenant_sk_input?.fingerprint(&state.hmac_client).await?;
 
-            let (api_key, tenant) = state
+            let (api_key, tenant, role) = state
                 .db_pool
-                .db_query(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
+                .db_query(|conn| -> ApiResult<_> {
+                    let api_key = TenantApiKey::get_enabled(conn, sh_api_key)?;
+                    let result = if let Some((api_key, tenant)) = api_key {
+                        // TODO one day fetch an associated role here rather than always admin
+                        let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::Admin)?;
+                        Some((api_key, tenant, role))
+                    } else {
+                        None
+                    };
+                    Ok(result)
+                })
                 .await??
                 .ok_or(AuthError::ApiKeyNotFound)?;
 
             tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, "authenticated");
 
-            Ok(SecretTenantAuthContext { tenant, api_key })
+            Ok(SecretTenantAuthContext {
+                tenant,
+                api_key,
+                role,
+            })
         })
     }
 }
@@ -97,10 +114,8 @@ impl TenantAuth for SecretTenantAuthContext {
 }
 
 impl CanCheckTenantGuard for SecretTenantAuthContext {
-    fn token_scopes(&self) -> &[TenantScope] {
-        // Every secret API key is able to perform any action
-        // TODO IAM for API keys
-        &[TenantScope::Admin]
+    fn role(&self) -> &TenantRole {
+        &self.role
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {
