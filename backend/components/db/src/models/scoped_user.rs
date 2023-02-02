@@ -1,6 +1,6 @@
 use crate::schema::{onboarding, scoped_user};
-use crate::PgConnection;
-use crate::{DbError, DbResult, TxnPgConnection};
+use crate::PgConn;
+use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -83,7 +83,7 @@ impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for ScopedUserIdentif
 impl ScopedUser {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
     pub fn get_or_create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         uv: &Locked<UserVault>,
         // OR should we take in the ObConfiguration?
         ob_configuration_id: ObConfigurationId,
@@ -121,7 +121,7 @@ impl ScopedUser {
 
     /// Used to create a ScopedUser for a non-portable vault
     pub fn create_non_portable(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         uv: Locked<UserVault>,
         tenant_id: TenantId,
     ) -> DbResult<Self> {
@@ -144,7 +144,7 @@ impl ScopedUser {
 
     /// get scoped_users by a specific user vault
     pub fn list_for_user_vault(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         user_vault_id: &UserVaultId,
     ) -> DbResult<Vec<(ScopedUser, Tenant)>> {
         use crate::schema::tenant;
@@ -155,10 +155,7 @@ impl ScopedUser {
         Ok(results)
     }
 
-    pub fn get<'a, T: Into<ScopedUserIdentifier<'a>>>(
-        conn: &mut PgConnection,
-        id: T,
-    ) -> DbResult<ScopedUser> {
+    pub fn get<'a, T: Into<ScopedUserIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedUser> {
         let mut query = scoped_user::table.into_boxed();
 
         match id.into() {
@@ -183,10 +180,7 @@ impl ScopedUser {
         Ok(result)
     }
 
-    pub fn get_by_onboarding_id(
-        conn: &mut PgConnection,
-        onboarding_id: &OnboardingId,
-    ) -> DbResult<ScopedUser> {
+    pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<ScopedUser> {
         let result = onboarding::table
             .into_boxed()
             .filter(onboarding::id.eq(onboarding_id))

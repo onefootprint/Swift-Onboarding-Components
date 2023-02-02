@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::PgConnection;
+use crate::PgConn;
 use itertools::Itertools;
 use newtypes::{DataLifetimeId, SealedVaultBytes, UserVaultId};
 
@@ -14,16 +14,13 @@ pub trait HasLifetime {
 
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to a single user vault.
-    fn get_for(conn: &mut PgConnection, lifetimes: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetimes: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized;
 
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to potentially multiple user vaults.
-    fn bulk_get(
-        conn: &mut PgConnection,
-        lifetimes: &[&DataLifetime],
-    ) -> DbResult<HashMap<UserVaultId, Vec<Self>>>
+    fn bulk_get(conn: &mut PgConn, lifetimes: &[&DataLifetime]) -> DbResult<HashMap<UserVaultId, Vec<Self>>>
     where
         Self: Sized,
     {

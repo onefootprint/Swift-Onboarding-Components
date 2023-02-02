@@ -14,8 +14,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::nextval;
 use crate::schema::data_lifetime;
-use crate::PgConnection;
-use crate::TxnPgConnection;
+use crate::PgConn;
+use crate::TxnPgConn;
 use crate::{DbError, DbResult};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -115,14 +115,14 @@ impl DataLifetime {
     /// Uniquely, writes made to a sequence are never undone, even if the transaction that made the
     /// write ends up rolling back. Because of this, multiple concurrently running transactions can
     /// fetch the next value from a sequence without creating an observable throughput bottleneck.
-    pub fn get_next_seqno(conn: &mut PgConnection) -> DbResult<DataLifetimeSeqno> {
+    pub fn get_next_seqno(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
         let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
         Ok(result)
     }
 
     /// Gets the current sequence number for the lifetime table without incrementing. Should be used
     /// when taking a snapshot
-    pub fn get_current_seqno(conn: &mut PgConnection) -> DbResult<DataLifetimeSeqno> {
+    pub fn get_current_seqno(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
         let result = diesel::sql_query("SELECT last_value FROM data_lifetime_seqno".to_owned())
             .get_result::<PgSequence>(conn)?;
         Ok(result.last_value)
@@ -130,7 +130,7 @@ impl DataLifetime {
 
     /// Creates a new DataLifetime rows with the same created_seqno and created_at for each kind in `kinds`
     pub(crate) fn bulk_create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
         kinds: Vec<DataLifetimeKind>,
@@ -154,7 +154,7 @@ impl DataLifetime {
 
     /// Creates a single new DataLifetime row
     pub(crate) fn create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
         kind: DataLifetimeKind,
@@ -167,7 +167,7 @@ impl DataLifetime {
         Ok(lifetime)
     }
 
-    pub fn commit(self, conn: &mut PgConnection, seqno: DataLifetimeSeqno) -> DbResult<Self> {
+    pub fn commit(self, conn: &mut PgConn, seqno: DataLifetimeSeqno) -> DbResult<Self> {
         let update = DataLifetimeUpdate {
             portablized_at: Some(Some(Utc::now())),
             portablized_seqno: Some(Some(seqno)),
@@ -183,7 +183,7 @@ impl DataLifetime {
     /// Marks a list of DataLifetimes as portable for a specific (user, tenant). Used to commit
     /// speculative data and make it portable after it is verified by an approved onboarding
     pub fn bulk_commit_for_tenant(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
         scoped_user_id: ScopedUserId,
         seqno: DataLifetimeSeqno,
@@ -204,7 +204,7 @@ impl DataLifetime {
 
     /// Given a list of DataLifetimeIds, marks the active DataLifetime rows as deactivated.
     pub fn bulk_deactivate(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -224,7 +224,7 @@ impl DataLifetime {
     /// Deactivates the speculative DataLifetimes with the provided kinds associated with this (user, tenant).
     /// This should only be used when replacing speculative, un-committed user data with new speculative user data
     pub fn bulk_deactivate_speculative(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
@@ -251,7 +251,7 @@ impl DataLifetime {
     /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
     /// whether or not the data is portable.
     pub fn get_active(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
     ) -> DbResult<Vec<Self>> {
@@ -279,7 +279,7 @@ impl DataLifetime {
     /// Get the list of currently active DataLifetimeIds for the provided tenant_id and list
     /// of user_vault_ids.
     pub fn get_bulk_active_for_tenant(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         user_vault_ids: Vec<&UserVaultId>,
         tenant_id: &TenantId,
     ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
@@ -311,7 +311,7 @@ impl DataLifetime {
     /// Get the list of currently active DataLifetimeIds for the provided (user_vault_id, scoped_user_id)
     /// at a given seqno. This allows reconstructing a snapshot of what a user vault looked like at a time.
     pub fn get_active_at(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
         seqno: DataLifetimeSeqno,

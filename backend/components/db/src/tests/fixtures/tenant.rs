@@ -1,9 +1,9 @@
-use crate::PgConnection;
+use crate::PgConn;
 use newtypes::{EncryptedVaultPrivateKey, VaultPublicKey};
 
 use crate::models::tenant::{NewTenant, Tenant};
 
-pub fn create(conn: &mut PgConnection) -> Tenant {
+pub fn create(conn: &mut PgConn) -> Tenant {
     let new_tenant = NewTenant {
         name: "Test tenant".to_owned(),
         public_key: VaultPublicKey::unvalidated(vec![]),

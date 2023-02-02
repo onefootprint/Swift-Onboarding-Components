@@ -3,12 +3,12 @@ use crate::schema::fingerprint;
 use chrono::{DateTime, Utc};
 use diesel::dsl::count_distinct;
 use diesel::prelude::*;
-use crate::PgConnection;
+use crate::PgConn;
 use diesel::Queryable;
 use newtypes::{DataLifetimeId, DataLifetimeKind, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};
 
-use crate::{DbResult, TxnPgConnection};
+use crate::{DbResult, TxnPgConn};
 
 // TODO eventually, we'll need to mandate that certain pieces of data have unique fingerprints per user vault (like phone numbers)
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -38,7 +38,7 @@ pub struct NewFingerprint {
 pub type IsUnique = bool;
 
 impl Fingerprint {
-    pub fn bulk_create(conn: &mut TxnPgConnection, fingerprints: Vec<NewFingerprint>) -> DbResult<()> {
+    pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprint>) -> DbResult<()> {
         // Alert if we see multiple user vaults with the same information
         let new_sh_data = fingerprints.iter().map(|f| f.sh_data.clone()).collect();
         let existing_fingerprints_result = Self::bulk_check_if_exists(conn.conn(), new_sh_data);
@@ -68,7 +68,7 @@ impl Fingerprint {
     }
 
     fn bulk_check_if_exists(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         sh_datas: Vec<FingerprintData>,
     ) -> DbResult<Vec<(DataLifetimeKind, i64)>> {
         let res: Vec<(DataLifetimeKind, i64)> = fingerprint::table

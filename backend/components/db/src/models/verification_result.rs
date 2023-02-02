@@ -1,8 +1,8 @@
+use crate::PgConn;
 use crate::{schema::verification_result, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
-use diesel::{Insertable};
+use diesel::Insertable;
 use newtypes::{SealedVaultBytes, VerificationRequestId, VerificationResultId};
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +29,7 @@ struct NewVerificationResult {
 
 impl VerificationResult {
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         request_id: VerificationRequestId,
         // To be removed once we are finished testing
         response: serde_json::Value,

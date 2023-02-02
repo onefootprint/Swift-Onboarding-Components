@@ -2,7 +2,7 @@ use super::WriteableUvw;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
-use db::TxnPgConnection;
+use db::TxnPgConn;
 use newtypes::CollectedDataOption;
 use newtypes::DataLifetimeSeqno;
 use std::collections::HashSet;
@@ -64,7 +64,7 @@ impl WriteableUvw {
     /// Intentionally consumes the UVW to prevent using a stale reference
     /// NOTE: this DOES NOT commit custom data or identity documents since we haven't figured out
     /// the portability story for those types of data
-    pub fn commit_identity_data(self, conn: &mut TxnPgConnection) -> ApiResult<DataLifetimeSeqno> {
+    pub fn commit_identity_data(self, conn: &mut TxnPgConn) -> ApiResult<DataLifetimeSeqno> {
         let Self { uvw, scoped_user_id } = self;
 
         // Use the same seqno to deactivate old data and commit new data

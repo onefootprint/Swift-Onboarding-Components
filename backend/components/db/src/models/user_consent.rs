@@ -1,8 +1,8 @@
 use crate::schema::user_consent;
 use crate::DbResult;
+use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::{InsightEventId, OnboardingId, UserConsentId};
 use serde::{Deserialize, Serialize};
@@ -30,7 +30,7 @@ pub struct NewUserConsent {
 
 impl UserConsent {
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         timestamp: DateTime<Utc>,
         onboarding_id: OnboardingId,
         insight_event_id: InsightEventId,
@@ -51,7 +51,7 @@ impl UserConsent {
     }
 
     pub fn latest_for_onboarding(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         onboarding_id: &OnboardingId,
     ) -> DbResult<Option<UserConsent>> {
         let res = user_consent::table

@@ -1,10 +1,10 @@
-use crate::PgConnection;
+use crate::PgConn;
 use crate::{
     schema::{
         proxy_config, proxy_config_header, proxy_config_ingress_rule, proxy_config_secret_header,
         proxy_config_server_cert,
     },
-    DbResult, TxnPgConnection,
+    DbResult, TxnPgConn,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -144,7 +144,7 @@ pub type DbProxyConfigAll = (
 
 impl ProxyConfig {
     /// create a new proxy config along with other config tables
-    pub fn create_new(conn: &mut TxnPgConnection, args: NewProxyConfigArgs) -> DbResult<Self> {
+    pub fn create_new(conn: &mut TxnPgConn, args: NewProxyConfigArgs) -> DbResult<Self> {
         let NewProxyConfigArgs {
             tenant_id,
             is_live,
@@ -232,7 +232,7 @@ impl ProxyConfig {
         Ok(proxy_config)
     }
 
-    pub fn list(conn: &mut PgConnection, tenant_id: &TenantId, is_live: bool) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Vec<Self>> {
         let result = proxy_config::table
             .filter(proxy_config::tenant_id.eq(tenant_id))
             .filter(proxy_config::is_live.eq(is_live))
@@ -242,7 +242,7 @@ impl ProxyConfig {
     }
 
     pub fn find(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         tenant_id: &TenantId,
         is_live: bool,
         proxy_config_id: ProxyConfigId,

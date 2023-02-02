@@ -1,12 +1,12 @@
 use crate::models::scoped_user::ScopedUser;
 use crate::models::user_vault::UserVault;
 use crate::schema;
+use crate::PgConn;
 use crate::{errors::DbError, schema::scoped_user::BoxedQuery};
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use crate::PgConnection;
 use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, OnboardingStatus, TenantId};
 
 #[derive(Clone)]
@@ -96,7 +96,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
 }
 
 pub fn count_authorized_for_tenant(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     params: OnboardingListQueryParams,
 ) -> Result<i64, DbError> {
     let count = list_authorized_for_tenant_query(params)
@@ -107,7 +107,7 @@ pub fn count_authorized_for_tenant(
 
 /// lists all scoped_users across all configurations
 pub fn list_authorized_for_tenant(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,

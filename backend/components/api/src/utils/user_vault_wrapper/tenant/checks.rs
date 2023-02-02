@@ -1,4 +1,4 @@
-use db::PgConnection;
+use db::PgConn;
 use newtypes::ScopedUserId;
 
 use crate::{
@@ -9,7 +9,7 @@ use crate::{
 /// Some shared checks that are done before adding identity data to a user vault.
 pub fn pre_add_data_checks(
     user_auth: &SessionContext<UserSession>,
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
 ) -> ApiResult<ScopedUserId> {
     // TODO For now, we only allow adding an email during onboarding since we otherwise
     // don't know which scoped user to associate the data with.

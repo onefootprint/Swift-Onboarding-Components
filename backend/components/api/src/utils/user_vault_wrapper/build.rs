@@ -15,8 +15,8 @@ use db::models::user_vault::NewUserInfo;
 use db::models::user_vault::UserVault;
 use db::models::user_vault_data::UserVaultData;
 use db::HasLifetime;
-use db::PgConnection;
-use db::TxnPgConnection;
+use db::PgConn;
+use db::TxnPgConn;
 use newtypes::CollectedDataOption;
 use newtypes::DataCollectedInfo;
 use newtypes::DataLifetimeSeqno;
@@ -49,7 +49,7 @@ impl UserVaultWrapper {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn build(conn: &mut PgConnection, args: UvwArgs) -> ApiResult<Self> {
+    pub fn build(conn: &mut PgConn, args: UvwArgs) -> ApiResult<Self> {
         let (uv, su_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(seqno) = seqno {
             // We are reconstructing the UVW as it appeared at a given seqno
@@ -88,7 +88,7 @@ impl UserVaultWrapper {
     /// Custom util function to create a user vault, its phone number, and optionally associate it
     /// with a provided ob_config
     pub fn create_user_vault(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         user_info: NewUserInfo,
         ob_config: Option<ObConfiguration>,
         phone_args: NewPhoneNumberArgs,

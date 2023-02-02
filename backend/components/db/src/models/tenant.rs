@@ -1,6 +1,6 @@
 use crate::schema::{scoped_user, tenant};
-use crate::PgConnection;
-use crate::{DbResult, TxnPgConnection};
+use crate::PgConn;
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::insertable::CanInsertInSingleQuery;
 use diesel::pg::Pg;
@@ -51,7 +51,7 @@ pub struct NewIntegrationTestTenant {
 }
 
 impl Tenant {
-    pub fn lock(conn: &mut TxnPgConnection, id: &TenantId) -> DbResult<Self> {
+    pub fn lock(conn: &mut TxnPgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table
             .for_no_key_update()
             .filter(tenant::id.eq(id))
@@ -59,14 +59,14 @@ impl Tenant {
         Ok(tenant)
     }
 
-    pub fn get(conn: &mut PgConnection, id: &TenantId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table.filter(tenant::id.eq(id)).first(conn)?;
         Ok(tenant)
     }
 
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
-    pub fn save<T>(conn: &mut PgConnection, value: T) -> DbResult<Self>
+    pub fn save<T>(conn: &mut PgConn, value: T) -> DbResult<Self>
     where
         T: Insertable<tenant::table>,
         <T as Insertable<tenant::table>>::Values: QueryFragment<Pg> + CanInsertInSingleQuery<Pg> + QueryId,
@@ -77,7 +77,7 @@ impl Tenant {
         Ok(tenant)
     }
 
-    pub fn update(conn: &mut PgConnection, id: TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
+    pub fn update(conn: &mut PgConn, id: TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
         let result = diesel::update(tenant::table)
             .filter(tenant::id.eq(id))
             .set(update_tenant)
@@ -86,10 +86,7 @@ impl Tenant {
         Ok(result)
     }
 
-    pub fn list_by_user_vault_id(
-        conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
-    ) -> DbResult<Vec<Tenant>> {
+    pub fn list_by_user_vault_id(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Tenant>> {
         let res = scoped_user::table
             .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .inner_join(tenant::table)

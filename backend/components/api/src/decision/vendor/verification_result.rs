@@ -5,7 +5,7 @@ use db::{
         idology_expect_id_response::{IdologyExpectIdResponse, NewIdologyExpectIdResponse},
         verification_result::VerificationResult,
     },
-    DbResult, PgConnection,
+    DbResult, PgConn,
 };
 use enclave_proxy::DataTransform;
 use idv::{
@@ -96,7 +96,7 @@ pub enum StructuredVendorResponse {
 trait SaveStructuredVendorResponse {
     fn save_vendor_response(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>>; //TODO: remove Option here when all structured vendor responses have been implemented
 }
@@ -104,7 +104,7 @@ trait SaveStructuredVendorResponse {
 impl SaveStructuredVendorResponse for ExpectIDResponse {
     fn save_vendor_response(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>> {
         let new_idology_expect_id_response = NewIdologyExpectIdResponse {
@@ -125,7 +125,7 @@ impl SaveStructuredVendorResponse for ExpectIDResponse {
 impl SaveStructuredVendorResponse for ScanVerifyAPIResponse {
     fn save_vendor_response(
         &self,
-        _conn: &mut PgConnection,
+        _conn: &mut PgConn,
         _verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>> {
         Ok(None) // TODO:
@@ -135,7 +135,7 @@ impl SaveStructuredVendorResponse for ScanVerifyAPIResponse {
 impl SaveStructuredVendorResponse for ScanVerifySubmissionAPIResponse {
     fn save_vendor_response(
         &self,
-        _conn: &mut PgConnection,
+        _conn: &mut PgConn,
         _verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>> {
         Ok(None) // TODO:
@@ -145,7 +145,7 @@ impl SaveStructuredVendorResponse for ScanVerifySubmissionAPIResponse {
 impl SaveStructuredVendorResponse for ScanOnboardingAPIResponse {
     fn save_vendor_response(
         &self,
-        _conn: &mut PgConnection,
+        _conn: &mut PgConn,
         _verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>> {
         Ok(None) // TODO:
@@ -155,7 +155,7 @@ impl SaveStructuredVendorResponse for ScanOnboardingAPIResponse {
 impl SaveStructuredVendorResponse for LookupV2Response {
     fn save_vendor_response(
         &self,
-        _conn: &mut PgConnection,
+        _conn: &mut PgConn,
         _verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>> {
         Ok(None) // TODO:
@@ -165,7 +165,7 @@ impl SaveStructuredVendorResponse for LookupV2Response {
 impl SaveStructuredVendorResponse for SocureIDPlusResponse {
     fn save_vendor_response(
         &self,
-        _conn: &mut PgConnection,
+        _conn: &mut PgConn,
         _verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>> {
         Ok(None) // TODO:
@@ -175,7 +175,7 @@ impl SaveStructuredVendorResponse for SocureIDPlusResponse {
 impl SaveStructuredVendorResponse for ParsedResponse {
     fn save_vendor_response(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         verification_result_id: VerificationResultId,
     ) -> DbResult<Option<StructuredVendorResponse>> {
         match self {

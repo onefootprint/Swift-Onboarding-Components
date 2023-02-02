@@ -1,7 +1,7 @@
 use crate::errors::ApiResult;
 use db::{
     models::{onboarding::Onboarding, user_vault::UserVault, verification_request::VerificationRequest},
-    PgConnection,
+    PgConn,
 };
 use newtypes::{DataLifetimeSeqno, ScopedUserId, UserVaultId};
 
@@ -30,7 +30,7 @@ pub enum UvwArgs<'a> {
 type Args = (UserVault, Option<ScopedUserId>, Option<DataLifetimeSeqno>);
 
 impl<'a> UvwArgs<'a> {
-    pub(super) fn build(self, conn: &mut PgConnection) -> ApiResult<Args> {
+    pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
         let args = match self {
             Self::Idv(req) => {
                 let (_, su, _, _) = Onboarding::get(conn, &req.onboarding_id)?;

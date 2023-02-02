@@ -1,15 +1,15 @@
 use crate::schema::{data_lifetime, phone_number};
+use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
-use diesel::{Queryable};
+use diesel::Queryable;
 use newtypes::{
     DataLifetimeId, DataPriority, Fingerprint as FingerprintData, IdentityDataKind, PhoneNumberId,
     ScopedUserId, SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{DbResult, HasLifetime, HasSealedIdentityData, TxnPgConnection};
+use crate::{DbResult, HasLifetime, HasSealedIdentityData, TxnPgConn};
 
 use super::{
     data_lifetime::DataLifetime,
@@ -47,7 +47,7 @@ pub struct NewPhoneNumberArgs {
 }
 
 impl PhoneNumber {
-    pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = phone_number::table
             .inner_join(data_lifetime::table)
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
@@ -58,7 +58,7 @@ impl PhoneNumber {
     }
 
     pub fn get(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         phone_number_id: &PhoneNumberId,
         user_vault_id: &UserVaultId,
     ) -> DbResult<Self> {
@@ -72,7 +72,7 @@ impl PhoneNumber {
     }
 
     pub fn create_verified(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         uv_id: &UserVaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
@@ -115,7 +115,7 @@ impl HasLifetime for PhoneNumber {
     }
 
     /// Note: only returns primary phone numbers
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,
     {

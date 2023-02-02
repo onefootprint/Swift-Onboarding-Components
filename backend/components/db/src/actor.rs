@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::PgConnection;
+use crate::PgConn;
 use newtypes::{DbActor, TenantApiKeyId, TenantUserId};
 
 use crate::{
@@ -41,7 +41,7 @@ impl HasActor for AccessEvent {
     }
 }
 
-pub fn saturate_actors<T>(conn: &mut PgConnection, has_actors: Vec<T>) -> DbResult<Vec<(T, SaturatedActor)>>
+pub fn saturate_actors<T>(conn: &mut PgConn, has_actors: Vec<T>) -> DbResult<Vec<(T, SaturatedActor)>>
 where
     T: HasActor,
 {

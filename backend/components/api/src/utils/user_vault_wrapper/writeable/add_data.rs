@@ -5,7 +5,7 @@ use crate::errors::{ApiError, ApiResult};
 use db::models::data_lifetime::DataLifetime;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::user_timeline::UserTimeline;
-use db::TxnPgConnection;
+use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind,
@@ -18,7 +18,7 @@ use std::collections::HashMap;
 impl WriteableUvw {
     pub fn add_email(
         self, // Intentionally consume to prevent using stale UVW
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
@@ -51,7 +51,7 @@ impl WriteableUvw {
 
     pub fn update_identity_data(
         self, // consume self, since we don't want stale data getting used
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         update: IdentityDataUpdate,
         fingerprints: Vec<(IdentityDataKind, Fingerprint)>,
     ) -> Result<(), ApiError> {
@@ -73,7 +73,7 @@ impl WriteableUvw {
 
     pub fn update_custom_data(
         self, // consume self, since we don't want stale data getting used
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()> {
         let existing_lifetime_ids = update
@@ -96,11 +96,7 @@ impl WriteableUvw {
         Ok(())
     }
 
-    fn add_user_timeline(
-        &self,
-        conn: &mut TxnPgConnection,
-        attributes: Vec<CollectedDataOption>,
-    ) -> ApiResult<()> {
+    fn add_user_timeline(&self, conn: &mut TxnPgConn, attributes: Vec<CollectedDataOption>) -> ApiResult<()> {
         if !attributes.is_empty() {
             // Create a timeline event that shows all the new data that was added
             UserTimeline::create(

@@ -15,7 +15,7 @@ use db::models::user_timeline::UserTimeline;
 use db::models::user_vault::UserVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::{DbError, DbResult, PgConnection};
+use db::{DbError, DbResult, PgConn};
 use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
@@ -521,7 +521,7 @@ async fn handle_s3_upload_error(
 
 // We only allow users to have NUM_RETRIES tries. If we are the source of the error (UploadFailed), we shouldn't
 // count that towards their retries
-fn retry_limit_exceeded(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> Result<bool, DbError> {
+fn retry_limit_exceeded(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> Result<bool, DbError> {
     let num_failed = DbDocumentRequest::count_status(conn, scoped_user_id, DocumentRequestStatus::Failed)?;
 
     Ok(num_failed >= NUM_RETRIES)

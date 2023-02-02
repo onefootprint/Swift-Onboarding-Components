@@ -7,7 +7,7 @@ use crate::tests::prelude::*;
 use crate::models::ob_configuration::ObConfiguration;
 
 #[db_test]
-fn test_ob_config(conn: &mut TestPgConnection) {
+fn test_ob_config(conn: &mut TestPgConn) {
     // Create an ob config
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);

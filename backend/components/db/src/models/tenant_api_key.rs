@@ -1,8 +1,8 @@
 use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use crate::schema::tenant_api_key;
 use crate::schema::tenant_api_key::BoxedQuery;
-use crate::PgConnection;
-use crate::{DbError, DbResult, TxnPgConnection};
+use crate::PgConn;
+use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -79,7 +79,7 @@ impl TenantApiKey {
     }
 
     pub fn list(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         query: &ApiKeyListQuery,
         cursor: Option<DateTime<Utc>>,
         page_size: i64,
@@ -96,15 +96,12 @@ impl TenantApiKey {
         Ok(results)
     }
 
-    pub fn count(conn: &mut PgConnection, query: &ApiKeyListQuery) -> DbResult<i64> {
+    pub fn count(conn: &mut PgConn, query: &ApiKeyListQuery) -> DbResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
     }
 
-    pub fn get<'a, T: Into<TenantApiKeyIdentifier<'a>>>(
-        conn: &mut PgConnection,
-        id: T,
-    ) -> DbResult<TenantApiKey> {
+    pub fn get<'a, T: Into<TenantApiKeyIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<TenantApiKey> {
         let mut query = tenant_api_key::table.into_boxed();
         match id.into() {
             TenantApiKeyIdentifier::Id(id, tenant_id, is_live) => {
@@ -125,7 +122,7 @@ impl TenantApiKey {
     }
 
     pub fn get_enabled(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         sh_api_key: Fingerprint,
     ) -> DbResult<Option<(TenantApiKey, Tenant)>> {
         use crate::schema::tenant;
@@ -144,7 +141,7 @@ impl TenantApiKey {
     }
 
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         name: String,
         sh_secret_api_key: Fingerprint,
         e_secret_api_key: SealedVaultBytes,
@@ -168,7 +165,7 @@ impl TenantApiKey {
     }
 
     pub fn update(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         id: TenantApiKeyId,
         tenant_id: TenantId,
         is_live: IsLive,

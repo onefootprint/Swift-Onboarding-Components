@@ -1,10 +1,8 @@
 use super::tenant::Tenant;
 use super::tenant_role::TenantRole;
 use super::tenant_user::TenantUser;
-use crate::PgConnection;
-use crate::{
-    schema::tenant_role, schema::tenant_rolebinding, schema::tenant_user, DbResult, TxnPgConnection,
-};
+use crate::PgConn;
+use crate::{schema::tenant_role, schema::tenant_rolebinding, schema::tenant_user, DbResult, TxnPgConn};
 use crate::{DbError, NextPage, OffsetPagination};
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
@@ -59,7 +57,7 @@ impl TenantRolebinding {
     /// Gets or creates the TenantUser with the provided email, and creates a rolebinding to
     /// associate the TenantUser with the provided role
     pub fn create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
         tenant_id: TenantId,
@@ -96,7 +94,7 @@ impl TenantRolebinding {
     /// Get the list of active TenantRolebindingIds for the provided user.
     /// Could be multiple if a user has been invited to multiple tenants.
     pub fn list_by_user(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         user_id: &TenantUserId,
     ) -> DbResult<Vec<(TenantRolebindingId, Tenant)>> {
         use crate::schema::tenant;
@@ -111,7 +109,7 @@ impl TenantRolebinding {
 
     /// Fetches TenantUserInfo when logging them in via a workos auth token, and
     /// validates invariants for the TenantUser
-    pub fn get<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<TenantUserInfo>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<TenantUserInfo>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -160,7 +158,7 @@ impl TenantRolebinding {
     }
 
     /// Log into a given TenantRolebinding
-    pub fn login<'a, T>(conn: &mut TxnPgConnection, id: T) -> DbResult<TenantUserInfo>
+    pub fn login<'a, T>(conn: &mut TxnPgConn, id: T) -> DbResult<TenantUserInfo>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -175,7 +173,7 @@ impl TenantRolebinding {
         Ok((user, rb, role, tenant))
     }
 
-    pub fn update<'a, T>(conn: &mut TxnPgConnection, id: T, update: TenantRolebindingUpdate) -> DbResult<Self>
+    pub fn update<'a, T>(conn: &mut TxnPgConn, id: T, update: TenantRolebindingUpdate) -> DbResult<Self>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -199,7 +197,7 @@ impl TenantRolebinding {
         Ok(result)
     }
 
-    pub fn count(conn: &mut PgConnection, filters: &TenantRolebindingFilters) -> DbResult<i64> {
+    pub fn count(conn: &mut PgConn, filters: &TenantRolebindingFilters) -> DbResult<i64> {
         // Apply filters. TODO share these with list
         let mut query = tenant_user::table
             .inner_join(tenant_rolebinding::table)
@@ -233,7 +231,7 @@ impl TenantRolebinding {
     }
 
     pub fn list(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         filters: &TenantRolebindingFilters,
         pagination: OffsetPagination,
     ) -> DbResult<(Vec<BasicTenantUserInfo>, NextPage)> {

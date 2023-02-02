@@ -1,8 +1,8 @@
 use crate::diesel::ExpressionMethods;
 use crate::schema::{self, webauthn_credential};
 use crate::DbResult;
+use crate::PgConn;
 use chrono::{DateTime, Utc};
-use crate::PgConnection;
 use diesel::{Insertable, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{AttestationType, InsightEventId, UserVaultId, WebauthnCredentialId};
 use serde::{Deserialize, Serialize};
@@ -36,7 +36,7 @@ struct UpdateCredentialBackupState {
 }
 
 impl WebauthnCredential {
-    pub fn get_for_user_vault(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
+    pub fn get_for_user_vault(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
             .get_results(conn)?;
@@ -44,7 +44,7 @@ impl WebauthnCredential {
         Ok(creds)
     }
 
-    pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
+    pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
             .inner_join(schema::insight_event::table)
@@ -54,7 +54,7 @@ impl WebauthnCredential {
     }
 
     pub fn get_bulk(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         ids: Vec<&WebauthnCredentialId>,
     ) -> DbResult<Vec<(Self, InsightEvent)>> {
         let results = webauthn_credential::table
@@ -66,7 +66,7 @@ impl WebauthnCredential {
     }
 
     pub fn update_backup_state(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         user_vault_id: &UserVaultId,
         cred_id: &[u8],
     ) -> DbResult<()> {
@@ -93,7 +93,7 @@ pub struct NewWebauthnCredential {
 }
 
 impl NewWebauthnCredential {
-    pub fn save(self, conn: &mut PgConnection) -> DbResult<WebauthnCredential> {
+    pub fn save(self, conn: &mut PgConn) -> DbResult<WebauthnCredential> {
         let result = diesel::insert_into(webauthn_credential::table)
             .values(self)
             .get_result(conn)?;

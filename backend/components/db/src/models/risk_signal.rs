@@ -1,9 +1,9 @@
 use crate::models::verification_request::VerificationRequest;
 use crate::schema::risk_signal;
 use crate::DbResult;
+use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::{FootprintReasonCode, FootprintUserId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
 use serde::{Deserialize, Serialize};
@@ -34,7 +34,7 @@ pub struct NewRiskSignal {
 
 impl RiskSignal {
     pub fn bulk_create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         onboarding_decision_id: OnboardingDecisionId,
         signals: Vec<(FootprintReasonCode, Vec<Vendor>)>,
     ) -> DbResult<Vec<Self>> {
@@ -76,7 +76,7 @@ impl RiskSignal {
     }
 
     pub fn list(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         footprint_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
@@ -86,7 +86,7 @@ impl RiskSignal {
     }
 
     pub fn get(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         id: &RiskSignalId,
         footprint_user_id: &FootprintUserId,
         tenant_id: &TenantId,

@@ -8,7 +8,7 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         verification_request::VerificationRequest,
     },
-    TxnPgConnection,
+    TxnPgConn,
 };
 use newtypes::OnboardingId;
 
@@ -23,7 +23,7 @@ pub mod verification_result;
 /// We save so that if something happens, we can always replay the requests
 #[tracing::instrument(skip(conn, uvw))]
 pub fn build_verification_requests_and_checkpoint(
-    conn: &mut TxnPgConnection,
+    conn: &mut TxnPgConn,
     uvw: &UserVaultWrapper,
     ob_id: &OnboardingId,
 ) -> Result<Vec<VerificationRequest>, ApiError> {

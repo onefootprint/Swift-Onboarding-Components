@@ -3,10 +3,10 @@ use newtypes::{Fingerprint, SealedVaultBytes};
 
 use crate::{
     models::phone_number::{NewPhoneNumberArgs, PhoneNumber},
-    TxnPgConnection,
+    TxnPgConn,
 };
 
-pub fn create(conn: &mut TxnPgConnection, uv_id: &UserVaultId, su_id: Option<&ScopedUserId>) -> PhoneNumber {
+pub fn create(conn: &mut TxnPgConn, uv_id: &UserVaultId, su_id: Option<&ScopedUserId>) -> PhoneNumber {
     let phone_info = NewPhoneNumberArgs {
         e_phone_number: SealedVaultBytes(vec![]),
         sh_phone_number: Fingerprint(vec![]),

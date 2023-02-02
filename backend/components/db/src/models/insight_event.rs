@@ -1,9 +1,9 @@
 use crate::schema::onboarding;
 use crate::DbPool;
+use crate::PgConn;
 use crate::{schema::insight_event, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
 use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{InsightEventId, OnboardingId};
 use serde::{Deserialize, Serialize};
@@ -68,7 +68,7 @@ pub struct CreateInsightEvent {
 }
 
 impl CreateInsightEvent {
-    pub fn insert_with_conn(self, conn: &mut PgConnection) -> Result<InsightEvent, DbError> {
+    pub fn insert_with_conn(self, conn: &mut PgConn) -> Result<InsightEvent, DbError> {
         let ev = diesel::insert_into(crate::schema::insight_event::table)
             .values(self)
             .get_result(conn)?;
@@ -83,7 +83,7 @@ impl CreateInsightEvent {
 
 impl InsightEvent {
     pub fn get_by_onboarding_id(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         onboarding_id: &OnboardingId,
     ) -> Result<InsightEvent, DbError> {
         let insight_event: InsightEvent = onboarding::table

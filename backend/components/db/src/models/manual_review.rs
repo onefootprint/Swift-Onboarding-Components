@@ -1,7 +1,7 @@
 use crate::{schema::manual_review, DbResult};
-use crate::{DbError, TxnPgConnection};
+use crate::{DbError, TxnPgConn};
 
-use crate::PgConnection;
+use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId};
@@ -40,7 +40,7 @@ struct ManualReviewUpdate {
 }
 
 impl ManualReview {
-    pub fn create(conn: &mut PgConnection, onboarding_id: OnboardingId) -> DbResult<Self> {
+    pub fn create(conn: &mut PgConn, onboarding_id: OnboardingId) -> DbResult<Self> {
         // NOTE: We have a uniqueness constraint that won't allow us to create multiple active
         // ManualReview rows for one onboarding.
         let new = NewManualReview {
@@ -56,7 +56,7 @@ impl ManualReview {
     /// Used to mark the manual review as complete
     pub fn complete<T>(
         self,
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         actor: T,
         decision_id: Option<OnboardingDecisionId>,
     ) -> DbResult<()>

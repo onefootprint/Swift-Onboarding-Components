@@ -6,7 +6,7 @@ use db::{
         liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
         user_consent::UserConsent,
     },
-    DbError, PgConnection,
+    DbError, PgConn,
 };
 use newtypes::{CollectedDataOption, IdDocKind, OnboardingId, SessionAuthToken, UserVaultId};
 use paperclip::actix::web;
@@ -50,7 +50,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
 }
 
 fn create_onboarding_validation_token(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     session_sealing_key: &ScopedSealingKey,
     ob_id: OnboardingId,
 ) -> Result<SessionAuthToken, DbError> {
@@ -64,7 +64,7 @@ fn create_onboarding_validation_token(
 }
 
 pub fn get_requirements(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     ob_info: &AuthedOnboardingInfo,
 ) -> ApiResult<(Vec<OnboardingRequirement>, Onboarding)> {
     let ob_config_id = &ob_info.ob_config.id;
@@ -133,7 +133,7 @@ pub struct AuthorizeFields {
     selfie_collected: bool,
 }
 pub fn get_fields_to_authorize(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     user_vault_id: &UserVaultId,
     ob_config: &ObConfiguration,
 ) -> ApiResult<AuthorizeFields> {

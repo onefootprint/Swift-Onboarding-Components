@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::PgConnection;
+use crate::PgConn;
 use crate::{schema::tenant_api_key_access_log, DbError};
 use chrono::{DateTime, Utc};
 use diesel::dsl::max;
@@ -27,7 +27,7 @@ struct NewTenantApiKeyAccessLog {
 }
 
 impl TenantApiKeyAccessLog {
-    pub fn create(conn: &mut PgConnection, tenant_api_key_id: TenantApiKeyId) -> Result<(), DbError> {
+    pub fn create(conn: &mut PgConn, tenant_api_key_id: TenantApiKeyId) -> Result<(), DbError> {
         let access_log = NewTenantApiKeyAccessLog {
             tenant_api_key_id,
             timestamp: Utc::now(),
@@ -39,7 +39,7 @@ impl TenantApiKeyAccessLog {
     }
 
     pub fn get(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         tenant_api_key_ids: Vec<&TenantApiKeyId>,
     ) -> Result<HashMap<TenantApiKeyId, DateTime<Utc>>, DbError> {
         let results: HashMap<TenantApiKeyId, DateTime<Utc>> = tenant_api_key_access_log::table

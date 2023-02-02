@@ -3,7 +3,7 @@ use std::{marker::PhantomData, pin::Pin};
 use actix_web::{http::header::HeaderMap, web, FromRequest};
 use chrono::{DateTime, Utc};
 use crypto::aead::ScopedSealingKey;
-use db::PgConnection;
+use db::PgConn;
 use futures_util::Future;
 use newtypes::{PiiString, SessionAuthToken};
 use paperclip::actix::Apiv2Security;
@@ -45,7 +45,7 @@ where
     /// new provided data
     pub fn update_session(
         self, // Intentionally consume to prevent reading stale value
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
     ) -> ApiResult<()> {

@@ -9,7 +9,7 @@ use db::{
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
     },
-    PgConnection,
+    PgConn,
 };
 use newtypes::{
     DbActor, DecisionStatus, FootprintReasonCode, IdentityDocumentId, ObConfigurationKey, OnboardingId,
@@ -176,7 +176,7 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
 
 /// Helper to do some sanity checks when creating document verification requests
 pub fn create_document_verification_request(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     vendor_api: VendorAPI,
     onboarding_id: OnboardingId,
     identity_document_id: IdentityDocumentId,

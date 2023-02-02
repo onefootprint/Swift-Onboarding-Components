@@ -7,7 +7,7 @@ use newtypes::{
 };
 
 use crate::tests::prelude::*;
-use crate::TxnPgConnection;
+use crate::TxnPgConn;
 
 use crate::models::data_lifetime::DataLifetime;
 
@@ -15,7 +15,7 @@ use super::fixtures;
 
 /// Util function to create multiple DataLifetimes with the provided info
 fn build_lifetime<T: Into<DataLifetimeKind>>(
-    conn: &mut TxnPgConnection,
+    conn: &mut TxnPgConn,
     uv_id: &UserVaultId,
     su_id: &ScopedUserId,
     created_seqno: DataLifetimeSeqno,
@@ -71,7 +71,7 @@ struct TestData {
 }
 
 impl TestData {
-    fn build(conn: &mut TxnPgConnection) -> Self {
+    fn build(conn: &mut TxnPgConn) -> Self {
         // Create tenants
         let t_id = fixtures::tenant::create(conn).id;
         let t2_id = fixtures::tenant::create(conn).id;
@@ -166,7 +166,7 @@ impl TestData {
 }
 
 #[db_test]
-fn test_get_active(conn: &mut TestPgConnection) {
+fn test_get_active(conn: &mut TestPgConn) {
     let c = TestData::build(conn);
     // Query for su_id, should return all active lifetimes
     let results = DataLifetime::get_active(conn, &c.uv_id, Some(&c.su_id)).unwrap();
@@ -178,7 +178,7 @@ fn test_get_active(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_get_bulk_active_for_tenant(conn: &mut TestPgConnection) {
+fn test_get_bulk_active_for_tenant(conn: &mut TestPgConn) {
     let c = TestData::build(conn);
     // View for tenant 1
     let mut results =
@@ -207,7 +207,7 @@ fn test_get_bulk_active_for_tenant(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_get_active_at_for_tenant(conn: &mut TestPgConnection) {
+fn test_get_active_at_for_tenant(conn: &mut TestPgConn) {
     let c = TestData::build(conn);
     let tests = vec![
         (c.seqno0, vec![]),                                         // Nothing exists
@@ -229,7 +229,7 @@ fn test_get_active_at_for_tenant(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_get_active_at_only_portable(conn: &mut TestPgConnection) {
+fn test_get_active_at_only_portable(conn: &mut TestPgConn) {
     let c = TestData::build(conn);
 
     let tests = vec![

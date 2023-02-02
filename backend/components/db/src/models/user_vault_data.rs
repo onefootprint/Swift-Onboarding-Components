@@ -2,8 +2,8 @@ use crate::schema::user_vault_data;
 use crate::DbResult;
 use crate::HasLifetime;
 use crate::HasSealedIdentityData;
-use crate::PgConnection;
-use crate::TxnPgConnection;
+use crate::PgConn;
+use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::DataLifetimeKind;
@@ -46,7 +46,7 @@ pub struct NewUserVaultDataRow {
 
 impl UserVaultData {
     pub fn bulk_create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         user_vault_id: &UserVaultId,
         scoped_user_id: Option<&ScopedUserId>,
         data: Vec<NewUserVaultData>,
@@ -83,7 +83,7 @@ impl HasLifetime for UserVaultData {
         &self.lifetime_id
     }
 
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,
     {

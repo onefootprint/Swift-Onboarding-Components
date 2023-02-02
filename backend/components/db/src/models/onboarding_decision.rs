@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::actor::SaturatedActor;
 use crate::models::verification_request::VerificationRequest;
-use crate::TxnPgConnection;
-use crate::PgConnection;
+use crate::PgConn;
+use crate::TxnPgConn;
 use crate::{
     actor,
     schema::{onboarding_decision, onboarding_decision_verification_result_junction},
@@ -81,7 +81,7 @@ impl OnboardingDecision {
         self.status.into()
     }
 
-    pub fn create(conn: &mut TxnPgConnection, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
             .filter(onboarding_decision::onboarding_id.eq(&args.onboarding.id))
@@ -129,7 +129,7 @@ impl OnboardingDecision {
     }
 
     pub fn get_bulk(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
     ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
         use crate::schema::{ob_configuration, onboarding, verification_request, verification_result};

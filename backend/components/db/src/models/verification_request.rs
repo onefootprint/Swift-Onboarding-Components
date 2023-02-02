@@ -1,9 +1,9 @@
 use crate::schema::{onboarding, scoped_user, user_vault, verification_request, verification_result};
 use crate::DbResult;
+use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
-use diesel::{Insertable};
+use diesel::Insertable;
 use newtypes::{
     DataLifetimeSeqno, IdentityDocumentId, OnboardingId, Vendor, VendorAPI, VerificationRequestId,
 };
@@ -44,7 +44,7 @@ struct NewVerificationRequestRow {
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 impl VerificationRequest {
     pub fn bulk_create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         onboarding_id: OnboardingId,
         vendor_apis: Vec<VendorAPI>,
     ) -> Result<Vec<Self>, crate::DbError> {
@@ -66,7 +66,7 @@ impl VerificationRequest {
         Ok(result)
     }
 
-    pub fn get_for_onboarding(conn: &mut PgConnection, onboarding_id: OnboardingId) -> DbResult<Vec<Self>> {
+    pub fn get_for_onboarding(conn: &mut PgConn, onboarding_id: OnboardingId) -> DbResult<Vec<Self>> {
         let res = verification_request::table
             .filter(verification_request::onboarding_id.eq(onboarding_id))
             .get_results(conn)?;
@@ -75,7 +75,7 @@ impl VerificationRequest {
     }
     /// Based on VerificationRequests for the onboarding, get VerificationResults
     pub fn get_requests_and_results_for_onboarding(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         onboarding_id: OnboardingId,
     ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<(VerificationRequest, Option<VerificationResult>)> = verification_request::table
@@ -87,7 +87,7 @@ impl VerificationRequest {
     }
 
     pub fn create_document_verification_request(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         vendor_api: VendorAPI,
         onboarding_id: OnboardingId,
         identity_document_id: IdentityDocumentId,
@@ -107,7 +107,7 @@ impl VerificationRequest {
         Ok(result)
     }
 
-    pub fn get_user_vault(conn: &mut PgConnection, id: VerificationRequestId) -> DbResult<UserVault> {
+    pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<UserVault> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
             .inner_join(onboarding::table.inner_join(scoped_user::table.inner_join(user_vault::table)))

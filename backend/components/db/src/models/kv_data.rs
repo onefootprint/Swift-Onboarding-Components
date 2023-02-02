@@ -1,8 +1,8 @@
+use crate::PgConn;
 use crate::{schema::kv_data, DbError};
-use crate::{DbResult, HasLifetime, TxnPgConnection};
+use crate::{DbResult, HasLifetime, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
 use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{
     DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, KeyValueDataId, KvDataKey, ScopedUserId,
@@ -39,7 +39,7 @@ pub struct NewKeyValueDataArgs {
 
 impl KeyValueData {
     pub fn bulk_create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         user_vault_id: &UserVaultId,
         scoped_user_id: &ScopedUserId,
         data: Vec<NewKeyValueDataArgs>,
@@ -76,7 +76,7 @@ impl HasLifetime for KeyValueData {
         &self.lifetime_id
     }
 
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>> {
         let results = kv_data::table
             .filter(kv_data::lifetime_id.eq_any(lifetime_ids))
             .get_results(conn)?;

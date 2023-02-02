@@ -1,7 +1,7 @@
 use crate::schema::user_vault::{self, BoxedQuery};
 use crate::schema::{onboarding, scoped_user};
-use crate::PgConnection;
-use crate::{DbResult, TxnPgConnection};
+use crate::PgConn;
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -104,7 +104,7 @@ impl UserVault {
         }
     }
 
-    pub fn get<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<Self>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
     where
         T: Into<UserVaultIdentifier<'a>>,
     {
@@ -112,7 +112,7 @@ impl UserVault {
         Ok(user)
     }
 
-    pub fn lock(conn: &mut TxnPgConnection, id: &UserVaultId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &UserVaultId) -> DbResult<Locked<Self>> {
         let user = user_vault::table
             .filter(user_vault::id.eq(id))
             .for_no_key_update()
@@ -120,7 +120,7 @@ impl UserVault {
         Ok(Locked::new(user))
     }
 
-    pub fn lock_by_scoped_user(conn: &mut TxnPgConnection, su_id: &ScopedUserId) -> DbResult<Locked<Self>> {
+    pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedUserId) -> DbResult<Locked<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq(su_id))
             .select(scoped_user::user_vault_id);
@@ -131,7 +131,7 @@ impl UserVault {
         Ok(Locked::new(user))
     }
 
-    pub fn multi_get(conn: &mut PgConnection, ids: Vec<&ScopedUserId>) -> DbResult<Vec<Self>> {
+    pub fn multi_get(conn: &mut PgConn, ids: Vec<&ScopedUserId>) -> DbResult<Vec<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq_any(ids))
             .select(scoped_user::user_vault_id);
@@ -141,7 +141,7 @@ impl UserVault {
         Ok(users)
     }
 
-    pub fn create(conn: &mut PgConnection, new_user: NewUserVaultArgs) -> DbResult<Locked<UserVault>> {
+    pub fn create(conn: &mut PgConn, new_user: NewUserVaultArgs) -> DbResult<Locked<UserVault>> {
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user)
             .get_result::<UserVault>(conn)?;

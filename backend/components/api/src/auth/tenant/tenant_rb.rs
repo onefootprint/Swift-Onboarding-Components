@@ -11,9 +11,9 @@ use db::{
         tenant::Tenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding,
         tenant_user::TenantUser,
     },
-    PgConnection,
+    PgConn,
 };
-use newtypes::{TenantRolebindingId};
+use newtypes::TenantRolebindingId;
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -64,7 +64,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> ApiResult<Self> {
+    fn try_from(auth_session: AuthSessionData, conn: &mut PgConn) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
             _ => {

@@ -1,4 +1,4 @@
-use db::PgConnection;
+use db::PgConn;
 use newtypes::TenantUserId;
 use paperclip::actix::Apiv2Schema;
 
@@ -21,7 +21,7 @@ impl ExtractableAuthSession for WorkOsSession {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(auth_session: AuthSessionData, _conn: &mut PgConnection) -> ApiResult<Self> {
+    fn try_from(auth_session: AuthSessionData, _conn: &mut PgConn) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::WorkOs(data) => data,
             _ => {

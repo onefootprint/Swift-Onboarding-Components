@@ -14,7 +14,7 @@ pub mod errors;
 pub mod models;
 
 mod connection;
-pub use connection::TxnPgConnection;
+pub use connection::TxnPgConn;
 
 mod pagination;
 pub use pagination::*;
@@ -25,7 +25,7 @@ pub use crate::errors::DbError;
 use crate::schema::{kv_data, user_consent};
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
-pub use diesel::pg::PgConnection;
+use diesel::pg::PgConnection as DieselPgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
 use errors::TransactionError;
@@ -52,6 +52,9 @@ pub mod test_helpers;
 
 pub mod tests;
 
+// Wrapper around diesel's PgConnection that allows us to swap out the underlying conn implementation
+// in one place
+pub type PgConn = DieselPgConnection;
 pub type DbResult<T> = Result<T, DbError>;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
@@ -62,7 +65,7 @@ pub struct DbPool(Pool);
 impl DbPool {
     pub async fn db_query<F, R>(&self, f: F) -> Result<R, DbError>
     where
-        F: FnOnce(&mut PgConnection) -> R + Send + 'static,
+        F: FnOnce(&mut PgConn) -> R + Send + 'static,
         R: Send + 'static,
     {
         let current_span = tracing::info_span!("db query");
@@ -82,16 +85,16 @@ impl DbPool {
 
     pub async fn db_transaction<F, R, E>(&self, f: F) -> Result<R, E>
     where
-        F: FnOnce(&mut TxnPgConnection) -> Result<R, E> + Send + 'static,
+        F: FnOnce(&mut TxnPgConn) -> Result<R, E> + Send + 'static,
         E: From<DbError> + Send + 'static,
         R: Send + 'static,
     {
         let result = self
-            .db_query(|c: &mut PgConnection| {
+            .db_query(|c: &mut PgConn| {
                 c.build_transaction()
                     .run(|conn| -> Result<_, TransactionError<E>> {
                         // Any error returned by f() is an ApplicationError
-                        let mut conn = TxnPgConnection::new(conn);
+                        let mut conn = TxnPgConn::new(conn);
                         f(&mut conn).map_err(|e| TransactionError::ApplicationError(e))
                     })
             })
@@ -168,7 +171,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
 
 pub fn run_migrations(url: &str) -> Result<(), DbError> {
     use crate::diesel_migrations::MigrationHarness;
-    let mut conn = PgConnection::establish(url)?;
+    let mut conn = PgConn::establish(url)?;
     conn.run_pending_migrations(MIGRATIONS)
         .map_err(DbError::MigrationFailed)?;
     Ok(())
@@ -181,10 +184,7 @@ pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
     Ok(())
 }
 
-pub fn private_cleanup_integration_tests(
-    conn: &mut TxnPgConnection,
-    uvid: &UserVaultId,
-) -> Result<usize, DbError> {
+pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &UserVaultId) -> Result<usize, DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.
 

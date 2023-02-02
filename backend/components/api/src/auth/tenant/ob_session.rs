@@ -1,6 +1,6 @@
 use db::{
     models::{ob_configuration::ObConfiguration, tenant::Tenant},
-    PgConnection,
+    PgConn,
 };
 use newtypes::{ObConfigurationId, TenantId};
 use paperclip::actix::Apiv2Security;
@@ -32,7 +32,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         vec!["X-Onboarding-Session-Token"]
     }
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError> {
+    fn try_from(auth_session: AuthSessionData, conn: &mut PgConn) -> Result<Self, ApiError> {
         let data = match auth_session {
             AuthSessionData::OnboardingSession(data) => data,
             _ => {

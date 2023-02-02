@@ -11,10 +11,10 @@ use newtypes::{
     VendorAPI,
 };
 
-use super::prelude::TestPgConnection;
+use super::prelude::TestPgConn;
 
 #[db_test]
-fn test_get_latest_verification_result(conn: &mut TestPgConnection) {
+fn test_get_latest_verification_result(conn: &mut TestPgConn) {
     let uv_id = UserVaultId::from("uv1".to_string());
     let su_id: ScopedUserId = "su1".to_string().into();
 

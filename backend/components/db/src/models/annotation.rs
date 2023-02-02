@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::PgConnection;
+use crate::PgConn;
 use crate::{
     actor,
     actor::SaturatedActor,
@@ -47,7 +47,7 @@ struct AnnotationUpdate {
 
 impl Annotation {
     pub fn create<T>(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         note: String,
         is_pinned: bool,
         scoped_user_id: ScopedUserId,
@@ -77,7 +77,7 @@ impl Annotation {
     }
 
     pub fn update(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         id: AnnotationId,
         tenant_id: TenantId,
         footprint_user_id: FootprintUserId,
@@ -101,7 +101,7 @@ impl Annotation {
     }
 
     pub fn get_bulk(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         ids: Vec<&AnnotationId>,
     ) -> DbResult<HashMap<AnnotationId, AnnotationInfo>> {
         let annotations = annotation::table
@@ -119,7 +119,7 @@ impl Annotation {
     }
 
     pub fn list(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         fp_user_id: FootprintUserId,
         tenant_id: TenantId,
         is_live: bool,

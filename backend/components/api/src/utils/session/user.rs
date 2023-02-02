@@ -1,6 +1,6 @@
 use chrono::{DateTime, Duration, Utc};
 use crypto::aead::ScopedSealingKey;
-use db::{models::session::Session, PgConnection};
+use db::{models::session::Session, PgConn};
 use newtypes::{AuthTokenHash, SealedSessionBytes, SessionAuthToken};
 
 use crate::{
@@ -55,7 +55,7 @@ impl AuthSession {
     }
 
     pub fn create_sync(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
         expires_in: Duration,
@@ -69,7 +69,7 @@ impl AuthSession {
 
     pub fn update(
         self, // Intentionally consume to prevent reading stale values
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
     ) -> Result<(), db::DbError> {

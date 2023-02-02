@@ -1,9 +1,9 @@
 use crate::schema::{identity_document, verification_request, verification_result};
-use crate::TxnPgConnection;
+use crate::PgConn;
+use crate::TxnPgConn;
 use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::{DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, Locked, ScopedUserId};
 use serde::{Deserialize, Serialize};
@@ -51,7 +51,7 @@ impl DocumentRequestUpdate {
 
 impl DocumentRequest {
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         scoped_user_id: ScopedUserId,
         ref_id: Option<String>,
         should_collect_selfie: bool,
@@ -72,7 +72,7 @@ impl DocumentRequest {
         Ok(result)
     }
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
-    pub fn lock_active(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> DbResult<Locked<Self>> {
+    pub fn lock_active(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Locked<Self>> {
         let result = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
@@ -83,7 +83,7 @@ impl DocumentRequest {
     }
 
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
-    pub fn get_active(conn: &mut PgConnection, scoped_user_id: &ScopedUserId) -> DbResult<Self> {
+    pub fn get_active(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Self> {
         let result = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
@@ -93,7 +93,7 @@ impl DocumentRequest {
     }
 
     pub fn get(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
         request_id: &DocumentRequestId,
     ) -> DbResult<Self> {
@@ -105,14 +105,14 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    pub fn update(self, conn: &mut PgConnection, update: DocumentRequestUpdate) -> DbResult<Self> {
+    pub fn update(self, conn: &mut PgConn, update: DocumentRequestUpdate) -> DbResult<Self> {
         // Intentionally consume self so the stale version is not used
         let result = Self::update_by_id(conn, &self.id, update)?;
         Ok(result)
     }
 
     pub fn update_by_id(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         id: &DocumentRequestId,
         update: DocumentRequestUpdate,
     ) -> DbResult<Self> {
@@ -124,7 +124,7 @@ impl DocumentRequest {
     }
 
     pub fn count_status(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
         status: DocumentRequestStatus,
     ) -> DbResult<i64> {
@@ -137,7 +137,7 @@ impl DocumentRequest {
     }
 
     pub fn get_latest_with_verification_result(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
     ) -> DbResult<(DocumentRequest, Option<VerificationResult>)> {
         let latest_doc_request: Self = document_request::table
@@ -169,7 +169,7 @@ impl DocumentRequest {
     }
 
     pub fn lock(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         scoped_user_id: &ScopedUserId,
         id: &DocumentRequestId,
     ) -> DbResult<Locked<Self>> {

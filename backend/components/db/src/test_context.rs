@@ -1,6 +1,6 @@
 use crate::{
     test_helpers::{db_url, test_db_conn},
-    DbError, PgConnection, MIGRATIONS,
+    DbError, PgConn, MIGRATIONS,
 };
 use diesel::{Connection, RunQueryDsl};
 
@@ -8,7 +8,7 @@ use diesel::{Connection, RunQueryDsl};
 /// which helps avoid issues with conflicting uniqueness/etc.
 pub struct TestContext {
     db_name: String,
-    pub conn: PgConnection,
+    pub conn: PgConn,
 }
 
 impl TestContext {
@@ -30,7 +30,7 @@ impl TestContext {
         let _ = base_url_comp.pop();
         let base_url = base_url_comp.join("/");
 
-        let mut conn = PgConnection::establish(&format!("{}/{}", base_url, db_name))
+        let mut conn = PgConn::establish(&format!("{}/{}", base_url, db_name))
             .unwrap_or_else(|e| panic!("Cannot connect to {}/{} database: {:?}", base_url, db_name, e));
 
         use crate::diesel_migrations::MigrationHarness;
@@ -73,7 +73,7 @@ mod tests {
     /// this avoid conflicting data creation (like the same unique email row)
     #[test]
     fn test_test_context() {
-        let create_unique_email = |_conn: &mut PgConnection| {
+        let create_unique_email = |_conn: &mut PgConn| {
             // No longer works with new email create API, which requires txn
             /*
             let uv = test_user_vault(conn, true);

@@ -1,11 +1,11 @@
+use crate::schema::socure_device_session;
+use crate::PgConn;
+use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
-use diesel::{Insertable};
+use diesel::Insertable;
 use newtypes::{OnboardingId, SocureDeviceSessionId};
 use serde::{Deserialize, Serialize};
-use crate::schema::socure_device_session;
-use crate::{DbError, DbResult};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = socure_device_session)]
@@ -28,7 +28,7 @@ struct NewSocureDeviceSession {
 
 impl SocureDeviceSession {
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         device_session_id: String, //TODO: make this a wrapped type?
         onboarding_id: OnboardingId,
     ) -> Result<SocureDeviceSession, DbError> {
@@ -44,7 +44,7 @@ impl SocureDeviceSession {
     }
 
     pub fn latest_for_onboarding(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         onboarding_id: &OnboardingId,
     ) -> DbResult<Option<SocureDeviceSession>> {
         let res = socure_device_session::table

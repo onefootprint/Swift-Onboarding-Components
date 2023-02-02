@@ -20,7 +20,7 @@ use newtypes::{PiiString, UvdKind};
 use std::str::FromStr;
 
 #[db_test]
-fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
+fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     let uv = fixtures::user_vault::create(conn);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
@@ -95,7 +95,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
+fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     let uv = fixtures::user_vault::create(conn);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
@@ -141,7 +141,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_uvw_update_identity_data_validation(conn: &mut TestPgConnection) {
+fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
     let uv = fixtures::user_vault::create(conn);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
@@ -264,7 +264,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
+fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     // This is a very particular test and exposes a very niche condition. It tests:
     // - Add speculative ssn4 to tenant 1
     // - Add speculative ssn9 to tenant 2 and commit it
@@ -322,7 +322,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
+fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
     let uv = fixtures::user_vault::create(conn);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
@@ -371,7 +371,7 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_commit_custom_data(conn: &mut TestPgConnection) {
+fn test_commit_custom_data(conn: &mut TestPgConn) {
     // We haven't figured out the portability story for custom data or identity documents yet, so
     // for now, let's make sure we never commit them through the UVW
     let uv = fixtures::user_vault::create(conn);
@@ -417,7 +417,7 @@ fn test_commit_custom_data(conn: &mut TestPgConnection) {
 }
 
 #[db_test]
-fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConnection) {
+fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
     // We haven't figured out the portability story for custom data or identity documents yet, so
     // for now, let's make sure we never commit them through the UVW
     let uv = fixtures::user_vault::create(conn);

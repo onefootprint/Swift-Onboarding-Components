@@ -12,12 +12,12 @@ use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
 use db::models::user_vault_data::UserVaultData;
 use db::HasLifetime;
-use db::PgConnection;
+use db::PgConn;
 use newtypes::{ScopedUserId, TenantId};
 use std::collections::HashMap;
 
 impl UserVaultWrapper {
-    pub fn build_for_tenant(conn: &mut PgConnection, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
+    pub fn build_for_tenant(conn: &mut PgConn, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
         let uvw = Self::build(conn, UvwArgs::Tenant(su_id))?;
         let ob_configs = ObConfiguration::list_authorized_for_user(conn, su_id)?;
         Ok(TenantUvw {
@@ -32,7 +32,7 @@ impl UserVaultWrapper {
     // Note: it is possible that there are multiple scoped users for each user vault
     #[tracing::instrument(skip_all)]
     pub fn multi_get_for_tenant(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         users: Vec<(ScopedUser, UserVault)>,
         tenant_id: &TenantId,
     ) -> ApiResult<HashMap<ScopedUserId, TenantUvw>> {

@@ -1,11 +1,11 @@
-use std::collections::HashMap;
-use crate::PgConnection;
 use crate::schema::{data_lifetime, document_request, identity_document};
-use crate::{DbResult, HasLifetime, TxnPgConnection};
+use crate::PgConn;
+use crate::{DbResult, HasLifetime, TxnPgConn};
 use chrono::{DateTime, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use std::collections::HashMap;
 
 use newtypes::{
     Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdDocKind, IdentityDocumentId,
@@ -78,7 +78,7 @@ pub struct NewIdentityDocument {
 impl IdentityDocument {
     #[allow(clippy::too_many_arguments)]
     pub fn create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         request_id: DocumentRequestId,
         uv_id: &UserVaultId,
         front_image_s3_url: Option<String>,
@@ -110,7 +110,7 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
-    pub fn get(conn: &mut PgConnection, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
+    pub fn get(conn: &mut PgConn, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
         let res: (Self, DocumentRequest) = identity_document::table
             .filter(identity_document::id.eq(id))
             .inner_join(document_request::table)
@@ -121,10 +121,7 @@ impl IdentityDocument {
     }
 
     /// Get all the documents collected for a given onboarding
-    pub fn get_for_scoped_user_id(
-        conn: &mut PgConnection,
-        scoped_user_id: &ScopedUserId,
-    ) -> DbResult<Vec<Self>> {
+    pub fn get_for_scoped_user_id(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Vec<Self>> {
         let results = identity_document::table
             .inner_join(data_lifetime::table)
             .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
@@ -135,7 +132,7 @@ impl IdentityDocument {
     }
 
     pub fn get_bulk_with_requests(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         ids: Vec<&IdentityDocumentId>,
     ) -> DbResult<HashMap<IdentityDocumentId, (Self, DocumentRequest)>> {
         let results = identity_document::table
@@ -181,7 +178,7 @@ impl HasLifetime for IdentityDocumentAndRequest {
         &self.lifetime_id
     }
 
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,
     {

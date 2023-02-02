@@ -8,9 +8,9 @@ use crate::actor::{self, SaturatedActor};
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
-use crate::{DbError, DbResult, TxnPgConnection};
+use crate::PgConn;
+use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
-use crate::PgConnection;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
@@ -152,7 +152,7 @@ pub type SerializableOnboardingInfo = OnboardingInfo<(OnboardingDecision, Satura
 pub type BasicOnboardingInfo<ObT> = (ObT, ScopedUser, Option<ManualReview>, Option<OnboardingDecision>);
 
 impl Onboarding {
-    pub fn get<'a, T>(conn: &'a mut PgConnection, id: T) -> DbResult<BasicOnboardingInfo<Onboarding>>
+    pub fn get<'a, T>(conn: &'a mut PgConn, id: T) -> DbResult<BasicOnboardingInfo<Onboarding>>
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
@@ -192,7 +192,7 @@ impl Onboarding {
     // TODO generify lock functions to use OnboardingIdentifier.
     // It is difficult because we can't call .for_update() on boxed queries
     pub fn lock_by_config(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         user_vault_id: &UserVaultId,
         ob_configuration_id: &ObConfigurationId,
     ) -> DbResult<Option<Locked<Onboarding>>> {
@@ -210,7 +210,7 @@ impl Onboarding {
     }
 
     pub fn lock_for_tenant(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         fp_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
@@ -231,7 +231,7 @@ impl Onboarding {
         Ok((Locked::new(result.0), result.1, result.2, result.3))
     }
 
-    pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &OnboardingId) -> DbResult<Locked<Self>> {
         let result = onboarding::table
             .filter(onboarding::id.eq(id))
             .for_no_key_update()
@@ -240,7 +240,7 @@ impl Onboarding {
     }
 
     pub fn get_for_scoped_users(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         scoped_user_ids: Vec<&ScopedUserId>,
     ) -> DbResult<HashMap<ScopedUserId, SerializableOnboardingInfo>> {
         use crate::schema::{
@@ -290,7 +290,7 @@ impl Onboarding {
         Ok(result_map)
     }
 
-    pub fn get_or_create(conn: &mut TxnPgConnection, args: OnboardingCreateArgs) -> DbResult<Onboarding> {
+    pub fn get_or_create(conn: &mut TxnPgConn, args: OnboardingCreateArgs) -> DbResult<Onboarding> {
         let ob = onboarding::table
             .filter(onboarding::scoped_user_id.eq(&args.scoped_user_id))
             .filter(onboarding::ob_configuration_id.eq(&args.ob_configuration_id))
@@ -328,17 +328,13 @@ impl Onboarding {
         Ok(ob)
     }
 
-    pub fn update(self, conn: &mut PgConnection, update: OnboardingUpdate) -> DbResult<Self> {
+    pub fn update(self, conn: &mut PgConn, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
         let result = Self::update_by_id(conn, &self.id, update)?;
         Ok(result)
     }
 
-    pub fn update_by_id(
-        conn: &mut PgConnection,
-        id: &OnboardingId,
-        update: OnboardingUpdate,
-    ) -> DbResult<Self> {
+    pub fn update_by_id(conn: &mut PgConn, id: &OnboardingId, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
         let result = diesel::update(onboarding::table)
             .filter(onboarding::id.eq(id))

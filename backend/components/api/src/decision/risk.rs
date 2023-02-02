@@ -8,7 +8,7 @@ use db::{
         risk_signal::RiskSignal,
         scoped_user::ScopedUser,
     },
-    TxnPgConnection,
+    TxnPgConn,
 };
 
 use super::{features::*, rule::rule_set::RuleSetResult};
@@ -174,7 +174,7 @@ fn decision_from_ruleset_result(
 }
 
 fn write_risk_signals(
-    conn: &mut TxnPgConnection,
+    conn: &mut TxnPgConn,
     feature_vector: &FeatureVector,
     onboarding_decision_id: OnboardingDecisionId,
     feature_flag_client: &LaunchDarklyFeatureFlagClient,

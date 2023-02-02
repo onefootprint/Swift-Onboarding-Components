@@ -4,13 +4,13 @@ use crate::models::annotation::{Annotation, AnnotationInfo};
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
-use crate::PgConnection;
-use crate::TxnPgConnection;
+use crate::PgConn;
+use crate::TxnPgConn;
 
 use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, UserVaultId};
 
 pub(crate) fn test_tenant_user(
-    conn: &mut TxnPgConnection,
+    conn: &mut TxnPgConn,
     email: String,
     first_name: Option<String>,
     last_name: Option<String>,
@@ -25,7 +25,7 @@ pub(crate) fn test_tenant_user(
 }
 
 pub(crate) fn test_annotation<T>(
-    conn: &mut TxnPgConnection,
+    conn: &mut TxnPgConn,
     note: String,
     is_pinned: bool,
     scoped_user_id: ScopedUserId,
@@ -52,7 +52,7 @@ where
 }
 
 pub(crate) fn test_tenant_api_key(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     name: String,
     tenant_id: TenantId,
     is_live: bool,

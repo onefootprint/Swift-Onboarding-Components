@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
 use super::tenant::Tenant;
+use crate::PgConn;
 use crate::{
     schema::tenant_role::{self, BoxedQuery},
-    DbError, DbResult, NextPage, OffsetPagination, TxnPgConnection,
+    DbError, DbResult, NextPage, OffsetPagination, TxnPgConn,
 };
-use crate::PgConnection;
 use chrono::{DateTime, Utc};
 use diesel::{dsl::count_star, prelude::*};
 use diesel::{Insertable, Queryable};
@@ -57,11 +57,7 @@ impl TenantRole {
         Ok(())
     }
 
-    pub fn get_immutable(
-        conn: &mut PgConnection,
-        tenant_id: &TenantId,
-        kind: ImmutableRoleKind,
-    ) -> DbResult<Self> {
+    pub fn get_immutable(conn: &mut PgConn, tenant_id: &TenantId, kind: ImmutableRoleKind) -> DbResult<Self> {
         let (name, scopes) = kind.props();
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
@@ -74,7 +70,7 @@ impl TenantRole {
 
     /// Every tenant is created with an admin/read only role - this gets or creates that role
     pub fn get_or_create_immutable(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         tenant_id: &TenantId,
         kind: ImmutableRoleKind,
     ) -> DbResult<Self> {
@@ -96,7 +92,7 @@ impl TenantRole {
     }
 
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         tenant_id: TenantId,
         name: String,
         scopes: Vec<TenantScope>,
@@ -117,7 +113,7 @@ impl TenantRole {
     }
 
     pub fn lock_active(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         id: &TenantRoleId,
         tenant_id: &TenantId,
     ) -> DbResult<Locked<Self>> {
@@ -132,7 +128,7 @@ impl TenantRole {
         Ok(Locked::new(role))
     }
 
-    pub fn deactivate(conn: &mut TxnPgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
+    pub fn deactivate(conn: &mut TxnPgConn, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
         use crate::schema::tenant_rolebinding;
         let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
         if role.is_immutable {
@@ -167,7 +163,7 @@ impl TenantRole {
     }
 
     pub fn update(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         tenant_id: &TenantId,
         id: &TenantRoleId,
         name: Option<String>,
@@ -216,7 +212,7 @@ impl TenantRole {
     }
 
     pub fn list_active(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         filters: &TenantRoleListFilters,
         pagination: OffsetPagination,
     ) -> DbResult<(Vec<(Self, NumActiveUsers)>, NextPage)> {
@@ -250,7 +246,7 @@ impl TenantRole {
         Ok(results)
     }
 
-    pub fn count_active(conn: &mut PgConnection, filters: &TenantRoleListFilters) -> DbResult<i64> {
+    pub fn count_active(conn: &mut PgConn, filters: &TenantRoleListFilters) -> DbResult<i64> {
         let query = Self::list_active_query(filters);
         let count = query.count().get_result(conn)?;
         Ok(count)

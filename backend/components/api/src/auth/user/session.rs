@@ -2,7 +2,7 @@ use db::{
     models::{
         ob_configuration::ObConfiguration, onboarding::Onboarding, scoped_user::ScopedUser, tenant::Tenant,
     },
-    PgConnection,
+    PgConn,
 };
 use itertools::Itertools;
 use newtypes::{ScopedUserId, UserVaultId};
@@ -87,7 +87,7 @@ impl SessionContext<UserSession> {
     }
 
     /// Fetch the scoped_user info
-    pub fn scoped_user(&self, conn: &mut PgConnection) -> ApiResult<Option<ScopedUser>> {
+    pub fn scoped_user(&self, conn: &mut PgConn) -> ApiResult<Option<ScopedUser>> {
         let Some(scoped_user_id) = self.scoped_user_id() else {
             return Ok(None);
         };
@@ -98,7 +98,7 @@ impl SessionContext<UserSession> {
     }
 
     /// Fetch the onboarding info associated with this user token, if it exists
-    pub fn onboarding(&self, conn: &mut PgConnection) -> ApiResult<Option<AuthedOnboardingInfo>> {
+    pub fn onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<AuthedOnboardingInfo>> {
         if !self.data.has_scope(&UserAuthScopeDiscriminant::OrgOnboarding) {
             // If there is no Onboarding scope on this auth token, the Onboarding won't exist
             return Ok(None);
@@ -125,7 +125,7 @@ impl SessionContext<UserSession> {
 
     /// Assert that the onboarding info exists for this user auth token and return it.
     /// Useful as a shorthand for endpoints along the onboarding flow
-    pub fn assert_onboarding(&self, conn: &mut PgConnection) -> ApiResult<AuthedOnboardingInfo> {
+    pub fn assert_onboarding(&self, conn: &mut PgConn) -> ApiResult<AuthedOnboardingInfo> {
         let info = self
             .onboarding(conn)?
             .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboarding]))?;
@@ -159,7 +159,7 @@ impl ExtractableAuthSession for ParsedUserSession {
         vec!["X-Fp-Authorization"]
     }
 
-    fn try_from(value: AuthSessionData, _conn: &mut PgConnection) -> Result<Self, ApiError> {
+    fn try_from(value: AuthSessionData, _conn: &mut PgConn) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {
                 tracing::info!(user_vault_id=%data.user_vault_id, "user session authenticated");

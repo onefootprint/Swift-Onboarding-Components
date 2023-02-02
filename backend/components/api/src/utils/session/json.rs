@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use crypto::sha256;
-use db::{models::session::Session, PgConnection};
+use db::{models::session::Session, PgConn};
 use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus, HandoffMetadata};
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -47,7 +47,7 @@ impl<C> JsonSession<C>
 where
     C: Serialize + DeserializeOwned,
 {
-    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConnection, key: S) -> Result<Option<Self>, ApiError> {
+    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConn, key: S) -> Result<Option<Self>, ApiError> {
         let session = Session::get(conn, key.into().0.into())?;
         let session = if let Some(session) = session {
             Some(Self {
@@ -61,7 +61,7 @@ where
     }
 
     pub fn update_or_create<S: Into<JsonSessionKey>>(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         key: S,
         data: &C,
         expires_at: DateTime<Utc>,

@@ -1,8 +1,8 @@
 use crate::schema::idology_expect_id_response;
 use crate::DbError;
+use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use crate::PgConnection;
 use diesel::Insertable;
 use newtypes::{IdologyExpectIdResponseId, VerificationResultId};
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,7 @@ pub struct NewIdologyExpectIdResponse {
 
 impl IdologyExpectIdResponse {
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         new_idology_expect_id_response: NewIdologyExpectIdResponse,
     ) -> Result<IdologyExpectIdResponse, DbError> {
         let result = diesel::insert_into(idology_expect_id_response::table)

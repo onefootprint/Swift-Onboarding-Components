@@ -1,5 +1,5 @@
-use crate::PgConnection;
-use crate::{schema::tenant_user, DbError, DbResult, TxnPgConnection};
+use crate::PgConn;
+use crate::{schema::tenant_user, DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -20,12 +20,12 @@ pub struct TenantUser {
 }
 
 impl TenantUser {
-    pub fn get(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = tenant_user::table.filter(tenant_user::id.eq(id)).first(conn)?;
         Ok(user)
     }
 
-    pub fn get_firm_employee(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<Self> {
+    pub fn get_firm_employee(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
             .filter(tenant_user::is_firm_employee.eq(true))
@@ -34,7 +34,7 @@ impl TenantUser {
     }
 
     pub fn get_and_update_or_create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         email: OrgMemberEmail,
         first_name: Option<String>,
         last_name: Option<String>,
@@ -75,7 +75,7 @@ impl TenantUser {
         Ok(result)
     }
 
-    pub fn update(conn: &mut TxnPgConnection, id: &TenantUserId, update: TenantUserUpdate) -> DbResult<Self> {
+    pub fn update(conn: &mut TxnPgConn, id: &TenantUserId, update: TenantUserUpdate) -> DbResult<Self> {
         let results: Vec<Self> = diesel::update(tenant_user::table)
             .filter(tenant_user::id.eq(id))
             .set(update)
@@ -88,7 +88,7 @@ impl TenantUser {
         Ok(result)
     }
 
-    pub fn set_is_firm_employee_testing_only(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<Self> {
+    pub fn set_is_firm_employee_testing_only(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = diesel::update(tenant_user::table)
             .filter(tenant_user::id.eq(id))
             .filter(tenant_user::email.eq(INTEGRATION_TEST_USER_EMAIL))
@@ -97,7 +97,7 @@ impl TenantUser {
         Ok(user)
     }
 
-    pub fn lock(conn: &mut TxnPgConnection, id: &TenantUserId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &TenantUserId) -> DbResult<Locked<Self>> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
             .for_no_key_update()

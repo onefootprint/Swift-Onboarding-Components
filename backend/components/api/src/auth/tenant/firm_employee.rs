@@ -12,7 +12,7 @@ use db::{
         tenant_role::{ImmutableRoleKind, TenantRole},
         tenant_user::TenantUser,
     },
-    PgConnection,
+    PgConn,
 };
 use newtypes::{TenantId, TenantUserId};
 use paperclip::actix::{Apiv2Schema, Apiv2Security};
@@ -61,7 +61,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> ApiResult<Self> {
+    fn try_from(auth_session: AuthSessionData, conn: &mut PgConn) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::FirmEmployee(data) => data,
             _ => {

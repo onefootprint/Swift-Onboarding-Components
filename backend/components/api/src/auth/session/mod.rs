@@ -3,7 +3,7 @@ pub use context::*;
 mod data;
 pub use data::*;
 
-use db::PgConnection;
+use db::PgConn;
 
 use crate::errors::ApiError;
 
@@ -11,5 +11,5 @@ use crate::errors::ApiError;
 pub trait ExtractableAuthSession: Sized + Send + Sync + 'static {
     fn header_names() -> Vec<&'static str>;
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError>;
+    fn try_from(auth_session: AuthSessionData, conn: &mut PgConn) -> Result<Self, ApiError>;
 }

@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
-use crate::PgConnection;
-use crate::TxnPgConnection;
+use crate::PgConn;
+use crate::TxnPgConn;
 use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
@@ -112,7 +112,7 @@ impl ObConfiguration {
     }
 
     pub fn list(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         query: &ObConfigurationQuery,
         cursor: Option<DateTime<Utc>>,
         page_size: i64,
@@ -128,15 +128,12 @@ impl ObConfiguration {
         Ok(results)
     }
 
-    pub fn count(conn: &mut PgConnection, query: &ObConfigurationQuery) -> DbResult<i64> {
+    pub fn count(conn: &mut PgConn, query: &ObConfigurationQuery) -> DbResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
     }
 
-    pub fn list_authorized_for_user(
-        conn: &mut PgConnection,
-        scoped_user_id: &ScopedUserId,
-    ) -> DbResult<Vec<Self>> {
+    pub fn list_authorized_for_user(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Vec<Self>> {
         // For now, this will be either 0 or 1 result
         let obcs = ob_configuration::table
             .inner_join(onboarding::table)
@@ -148,7 +145,7 @@ impl ObConfiguration {
     }
 
     pub fn list_authorized_for_users(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         scoped_user_ids: Vec<&ScopedUserId>,
     ) -> DbResult<HashMap<ScopedUserId, Vec<Self>>> {
         // For now, this will be either 0 or 1 result
@@ -167,7 +164,7 @@ impl ObConfiguration {
         Ok(obcs)
     }
 
-    pub fn get_enabled<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<(Self, Tenant)>
+    pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
     {
@@ -197,7 +194,7 @@ impl ObConfiguration {
 
     #[allow(clippy::too_many_arguments)]
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         name: String,
         tenant_id: TenantId,
         must_collect_data: Vec<CollectedDataOption>,
@@ -229,7 +226,7 @@ impl ObConfiguration {
     }
 
     pub fn update(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         id: &ObConfigurationId,
         tenant_id: &TenantId,
         is_live: bool,
@@ -251,7 +248,7 @@ impl ObConfiguration {
         Ok(result)
     }
 
-    pub fn get_by_onboarding_id(conn: &mut PgConnection, onboarding_id: &OnboardingId) -> DbResult<Self> {
+    pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Self> {
         let ob_config: ObConfiguration = onboarding::table
             .inner_join(ob_configuration::table)
             .filter(onboarding::id.eq(onboarding_id))

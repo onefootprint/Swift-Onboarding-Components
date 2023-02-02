@@ -1,4 +1,4 @@
-use crate::PgConnection;
+use crate::PgConn;
 use crate::{schema::fingerprint_visit_event, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -36,7 +36,7 @@ pub struct NewFingerprintVisit {
 }
 impl FingerprintVisitEvent {
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         visitor_id: FingerprintVisitorId,
         request_id: FingerprintRequestId,
         user_vault_id: Option<UserVaultId>,

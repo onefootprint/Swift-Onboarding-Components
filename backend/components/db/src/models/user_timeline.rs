@@ -2,7 +2,7 @@ use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_user::ScopedUser;
 use crate::DbError;
-use crate::PgConnection;
+use crate::PgConn;
 use crate::{schema::user_timeline, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -51,7 +51,7 @@ pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
 
 impl UserTimeline {
     pub fn create<T>(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         event: T,
         user_vault_id: UserVaultId,
         scoped_user_id: Option<ScopedUserId>,
@@ -72,7 +72,7 @@ impl UserTimeline {
     }
 
     pub fn list(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         footprint_user_id: FootprintUserId,
         tenant_id: TenantId,
         is_live: bool,
@@ -170,11 +170,11 @@ mod tests {
     // TODO modernize utils
     use crate::test::{test_annotation, test_tenant_api_key, test_tenant_user};
     use crate::tests::fixtures;
-    use crate::tests::prelude::TestPgConnection;
+    use crate::tests::prelude::TestPgConn;
     use macros::db_test;
 
     #[db_test]
-    fn test_list(conn: &mut TestPgConnection) {
+    fn test_list(conn: &mut TestPgConn) {
         let is_live = true;
         let user_vault = fixtures::user_vault::create(conn).into_inner();
         let tenant = fixtures::tenant::create(conn);

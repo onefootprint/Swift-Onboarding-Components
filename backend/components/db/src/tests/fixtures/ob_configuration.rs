@@ -1,9 +1,9 @@
-use crate::PgConnection;
+use crate::PgConn;
 use newtypes::{CollectedDataOption, TenantId};
 
 use crate::models::ob_configuration::ObConfiguration;
 
-pub fn create(conn: &mut PgConnection, tenant_id: &TenantId) -> ObConfiguration {
+pub fn create(conn: &mut PgConn, tenant_id: &TenantId) -> ObConfiguration {
     ObConfiguration::create(
         conn,
         "Flerp config".to_owned(),

@@ -22,7 +22,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::identity_document::IdentityDocument;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_user::ScopedUser;
-use db::PgConnection;
+use db::PgConn;
 use itertools::Itertools;
 use newtypes::{DataIdentifier, DocumentRequestStatus, FootprintUserId, IdDocKind, IdentityDocumentId};
 
@@ -140,7 +140,7 @@ fn available_images_from_uvw(uvw: &TenantUvw) -> HashSet<IdDocKind> {
 
 type StatusAndUploadedAt = (DecryptedDocumentStatus, DateTime<Utc>);
 fn create_image_data(
-    conn: &mut PgConnection,
+    conn: &mut PgConn,
     decrypted_docs: Vec<DecryptDocumentResult>,
 ) -> Result<Vec<ImageData>, ApiError> {
     // For this, we'll create the status just based on whether or not the upload was successful

@@ -9,7 +9,7 @@ use crate::DbResult;
 
 use chrono::{DateTime, Utc};
 
-use crate::PgConnection;
+use crate::PgConn;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 
@@ -40,7 +40,7 @@ pub struct LivenessEvent {
 
 impl LivenessEvent {
     pub fn get_by_user_vault_id(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         user_vault_id: &UserVaultId,
     ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
         use schema::insight_event;
@@ -54,7 +54,7 @@ impl LivenessEvent {
     }
 
     pub fn get_for_scoped_user(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         footprint_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
@@ -72,7 +72,7 @@ impl LivenessEvent {
     }
 
     pub fn get_bulk(
-        conn: &mut PgConnection,
+        conn: &mut PgConn,
         ids: Vec<&LivenessEventId>,
     ) -> DbResult<HashMap<LivenessEventId, (Self, InsightEvent)>> {
         let results = liveness_event::table
@@ -97,7 +97,7 @@ pub struct NewLivenessEvent {
 }
 
 impl NewLivenessEvent {
-    pub fn insert(self, conn: &mut PgConnection) -> Result<LivenessEvent, DbError> {
+    pub fn insert(self, conn: &mut PgConn) -> Result<LivenessEvent, DbError> {
         let ev = diesel::insert_into(crate::schema::liveness_event::table)
             .values(self)
             .get_result(conn)?;

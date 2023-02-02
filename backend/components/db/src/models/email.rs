@@ -1,7 +1,7 @@
-use crate::PgConnection;
+use crate::PgConn;
 use crate::{
     schema::{data_lifetime, email},
-    DbResult, HasLifetime, HasSealedIdentityData, TxnPgConnection,
+    DbResult, HasLifetime, HasSealedIdentityData, TxnPgConn,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -41,7 +41,7 @@ pub struct NewEmail {
 }
 
 impl Email {
-    pub fn list(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = email::table
             .inner_join(data_lifetime::table)
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
@@ -52,7 +52,7 @@ impl Email {
     }
 
     pub fn create(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         uv_id: &UserVaultId,
         e_data: SealedVaultBytes,
         fingerprint: FingerprintData,
@@ -85,11 +85,7 @@ impl Email {
         Ok(email)
     }
 
-    pub fn get(
-        conn: &mut PgConnection,
-        id: &EmailId,
-        user_vault_id: &UserVaultId,
-    ) -> DbResult<(Email, UserVault)> {
+    pub fn get(conn: &mut PgConn, id: &EmailId, user_vault_id: &UserVaultId) -> DbResult<(Email, UserVault)> {
         use crate::schema::user_vault;
         let result = email::table
             .inner_join(data_lifetime::table.inner_join(user_vault::table))
@@ -100,7 +96,7 @@ impl Email {
         Ok(result)
     }
 
-    pub fn mark_verified(conn: &mut PgConnection, id: &EmailId) -> DbResult<()> {
+    pub fn mark_verified(conn: &mut PgConn, id: &EmailId) -> DbResult<()> {
         diesel::update(email::table)
             .filter(email::id.eq(id))
             .set(email::is_verified.eq(true))
@@ -115,7 +111,7 @@ impl HasLifetime for Email {
     }
 
     /// Note: only returns primary emails
-    fn get_for(conn: &mut PgConnection, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,
     {

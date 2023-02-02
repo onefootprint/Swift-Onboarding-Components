@@ -1,4 +1,4 @@
-use db::{models::user_vault::UserVault, TxnPgConnection};
+use db::{models::user_vault::UserVault, TxnPgConn};
 use newtypes::{Locked, ScopedUserId};
 
 use crate::{
@@ -13,7 +13,7 @@ impl UserVaultWrapper {
     /// This should be used during onboarding operations in order to allow the tenant to see
     /// speculative data that has been added by previous operations
     pub fn lock_for_onboarding(
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         scoped_user_id: &ScopedUserId,
     ) -> ApiResult<WriteableUvw> {
         // Lock the UserVault in this transaction, then build the UVW

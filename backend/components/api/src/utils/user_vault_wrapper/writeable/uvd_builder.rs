@@ -5,7 +5,7 @@ use db::{
         fingerprint::{Fingerprint, NewFingerprint},
         user_vault_data::{NewUserVaultData, UserVaultData},
     },
-    TxnPgConnection,
+    TxnPgConn,
 };
 use newtypes::{
     CollectedDataOption, DataLifetimeKind, Fingerprint as FingerprintBytes, IdentityDataKind,
@@ -41,7 +41,7 @@ impl UvdBuilder {
     /// Validates that the pending updates are valid and then saves them to the DB as speculative data
     pub fn validate_and_save(
         self,
-        conn: &mut TxnPgConnection,
+        conn: &mut TxnPgConn,
         existing_fields: Vec<IdentityDataKind>, // portable or speculative on UVW
         user_vault_id: UserVaultId,
         scoped_user_id: ScopedUserId,
