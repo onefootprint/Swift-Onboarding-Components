@@ -69,7 +69,7 @@ impl TenantRole {
 
     /// Every tenant is created with a read-only role - this gets or creates that role
     pub fn get_or_create_ro_role(conn: &mut TxnPgConnection, tenant_id: &TenantId) -> DbResult<Self> {
-        Self::get_or_create_immutable_role(conn, tenant_id, "Read-only", vec![TenantScope::Read])
+        Self::get_or_create_immutable_role(conn, tenant_id, "Member", vec![TenantScope::Read])
     }
 
     pub fn create(
