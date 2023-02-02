@@ -186,8 +186,8 @@ impl TenantRole {
         if let Some(ref scopes) = filters.scopes {
             query = query.filter(tenant_role::scopes.overlaps_with(scopes))
         }
-        if let Some(ref name) = filters.name {
-            query = query.filter(tenant_role::name.ilike(format!("%{}%", name)))
+        if let Some(ref search) = filters.search {
+            query = query.filter(tenant_role::name.ilike(format!("%{}%", search)))
         }
         query
     }
@@ -255,5 +255,5 @@ struct TenantRoleUpdate {
 pub struct TenantRoleListFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub scopes: Option<Vec<TenantScope>>,
-    pub name: Option<String>,
+    pub search: Option<String>,
 }

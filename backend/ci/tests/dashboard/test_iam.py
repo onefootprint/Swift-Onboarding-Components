@@ -208,9 +208,9 @@ def test_cannot_deactivate_current_user(sandbox_tenant):
         (dict(scopes="admin"), True, False),
         (dict(scopes="admin, read"), True, True),
         # Filter on name
-        (dict(name="test limit"), False, True),
+        (dict(search="test limit"), False, True),
         # Filter on both!
-        (dict(name="admin", scopes="admin, read"), True, False),
+        (dict(search="admin", scopes="admin, read"), True, False),
     ],
 )
 def test_get_roles(
