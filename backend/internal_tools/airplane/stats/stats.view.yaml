@@ -1,4 +1,0 @@
-slug: stats_ui_view
-name: 'Statistics'
-description: 'View high-level user/customer statistics'
-entrypoint: stats.view.tsx

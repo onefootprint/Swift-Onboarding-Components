@@ -71,13 +71,23 @@ export function CreateAirplaneAgentStack(g: GlobalState): AirplaneOutput {
     { provider },
   );
 
-  const airplaneConf = new AirplaneConfigResource(
+  const airplaneConfDb = new AirplaneConfigResource(
     `airplane-env-conf-${g.stackMetadata.shortStackName}`,
     {
       envSlug: envSlug,
       apiToken: g.secretsStore.airplaneApiToken,
       name: 'DATABASE_URL',
       value: g.database.readOnlyDatabaseUrl,
+    },
+  );
+
+  const airplaneConfDashboard = new AirplaneConfigResource(
+    `airplane-env-conf-dashboard-url-${g.stackMetadata.shortStackName}`,
+    {
+      envSlug: envSlug,
+      apiToken: g.secretsStore.airplaneApiToken,
+      name: 'DASHBOARD_URL',
+      value: `https://dashboard.${g.constants.domain.frontendBase}`,
     },
   );
 

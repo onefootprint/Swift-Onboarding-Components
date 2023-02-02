@@ -14,6 +14,7 @@ import {
   Loader,
 } from '@airplane/views';
 import { useState } from 'react';
+import airplane from 'airplane';
 
 // Views documentation: https://docs.airplane.dev/views/getting-started
 const QueryUI = () => {
@@ -58,4 +59,11 @@ const QueryUI = () => {
   );
 };
 
-export default QueryUI;
+export default airplane.view(
+  {
+    slug: 'query_ui',
+    name: 'Query UI',
+    description: 'Run database queries (read only)',
+  },
+  QueryUI,
+);

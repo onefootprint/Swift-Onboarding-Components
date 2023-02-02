@@ -14,6 +14,7 @@ config:
     domain:
       base: dev.onefootprint.com
       prefix: api.
+      frontendBase: preview.onefootprint.com
     elastic:
       apiKey:
         secure: v1:kY0kR444OvfOf2Cr:gpD4whb9fFctHbhO+WxwZmXLo9Na0wc+zbkMtGUUIIlfr0FGEnM=

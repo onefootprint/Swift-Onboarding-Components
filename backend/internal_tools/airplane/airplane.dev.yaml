@@ -1,4 +1,5 @@
 resources: []
 configVars:
   DATABASE_URL: postgresql://postgres@localhost/footprint_db
+  DASHBOARD_URL: http://localhost:3001
 envVars: {}

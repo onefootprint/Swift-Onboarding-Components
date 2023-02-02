@@ -17,6 +17,7 @@ export interface Config {
 export interface Domains {
   base: string;
   prefix: string;
+  frontendBase: string;
 }
 
 export interface Resources {
