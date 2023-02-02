@@ -14,21 +14,19 @@ const NavigationCloseButton = ({
   confirm,
   onClick,
 }: NavigationCloseButtonProps) => {
-  const { t } = useTranslation('components.exit-dialog');
-
   const footprint = useFootprintProvider();
   const confirmationDialog = useConfirmationDialog();
 
   const showConfirmation = (callback: () => void) => {
     confirmationDialog.open({
-      title: t('title'),
-      description: t('description'),
+      title: 'Are you sure?',
+      description: 'Leaving this flow will not save your data.',
       primaryButton: {
-        label: t('yes'),
+        label: 'Yes',
         onClick: callback,
       },
       secondaryButton: {
-        label: t('no'),
+        label: 'No',
       },
     });
   };
