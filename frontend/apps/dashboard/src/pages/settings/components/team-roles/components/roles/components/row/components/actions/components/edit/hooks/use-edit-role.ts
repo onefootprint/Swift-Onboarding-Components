@@ -1,0 +1,52 @@
+import { useTranslation } from '@onefootprint/hooks';
+import request, { getErrorMessage } from '@onefootprint/request';
+import {
+  UpdateOrgRoleRequest,
+  UpdateOrgRoleResponse,
+} from '@onefootprint/types';
+import { useToast } from '@onefootprint/ui';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
+
+const updateRoleRequest = async (
+  authHeaders: AuthHeaders,
+  id: string,
+  payload: UpdateOrgRoleRequest,
+) => {
+  const { data } = await request<UpdateOrgRoleResponse>({
+    method: 'patch',
+    url: `/org/roles/${id}`,
+    headers: authHeaders,
+    data: payload,
+  });
+
+  return data;
+};
+
+const useEditRole = (id: string) => {
+  const { t } = useTranslation('pages.settings.roles.edit.notifications');
+  const toast = useToast();
+  const session = useSession();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: UpdateOrgRoleRequest) =>
+      updateRoleRequest(session.authHeaders, id, payload),
+    onError: (error: unknown) => {
+      toast.show({
+        title: t('error.title'),
+        description: getErrorMessage(error),
+        variant: 'error',
+      });
+    },
+    onSuccess: response => {
+      toast.show({
+        title: t('success.title'),
+        description: t('success.description', { name: response.name }),
+      });
+      queryClient.invalidateQueries(['org', 'roles']);
+    },
+  });
+};
+
+export default useEditRole;

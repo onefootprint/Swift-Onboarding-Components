@@ -15,7 +15,7 @@ const removeRoleRequest = async (authHeaders: AuthHeaders, id: string) => {
 };
 
 const useRemoveRole = (name: string) => {
-  const { t } = useTranslation('pages.settings.roles.table.actions.remove');
+  const { t } = useTranslation('pages.settings.roles.remove');
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();

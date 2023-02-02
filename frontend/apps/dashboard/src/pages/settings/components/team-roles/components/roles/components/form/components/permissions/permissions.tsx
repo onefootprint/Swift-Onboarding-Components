@@ -1,5 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
+import { OrgRoleScope } from '@onefootprint/types';
 import {
   Box,
   Checkbox,
@@ -7,7 +8,7 @@ import {
   MultiSelect,
   Typography,
 } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
@@ -15,10 +16,21 @@ import useDecryptOptions from './hooks/use-decrypt-options';
 
 const Permissions = () => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
-  const { t } = useTranslation('pages.settings.roles.create.form.permissions');
-  const { register, watch, control } = useFormContext();
+  const { t } = useTranslation('pages.settings.roles.form.permissions');
+  const { register, watch, control, setValue, getValues } = useFormContext();
   const decryptOptions = useDecryptOptions();
   const showDecryptSelect = watch('showDecrypt');
+
+  useEffect(() => {
+    if (!showDecryptSelect) {
+      const scopes = getValues('scopes') as OrgRoleScope[];
+      const scopesWithoutDecryptFields = scopes.filter(
+        scope => !scope.startsWith('decrypt'),
+      );
+      setValue('scopes', scopesWithoutDecryptFields);
+      setValue('decryptFields', []);
+    }
+  }, [showDecryptSelect]);
 
   return (
     <>

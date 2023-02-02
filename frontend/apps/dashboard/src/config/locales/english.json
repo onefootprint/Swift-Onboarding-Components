@@ -816,57 +816,15 @@
             "created": "Created at",
             "permissions": "Permissions"
           },
+          "empty-state": "No roles found",
           "actions": {
             "aria-label": "Open actions for role {{name}}",
-            "remove": {
-              "cta": "Remove role",
-              "confirmation": {
-                "title": "Remove role",
-                "description": "You’re about to remove the role <b>{{name}}</b>. Are you sure?"
-              },
-              "errors": {
-                "num-active-users": {
-                  "title": "Role can't be removed",
-                  "description_one": "One user is assigned to this role. Please assign those users to a different role.",
-                  "description_others": "{{count}} users are assigned to this role. Please assign those users to a different role."
-                }
-              },
-              "feedback": {
-                "success": {
-                  "title": "Role removed",
-                  "description": "{{name}} role has been removed."
-                },
-                "error": {
-                  "title": "Error removing role"
-                }
-              }
-            }
-          },
-          "empty-state": "No roles found"
+            "remove": "Remove role",
+            "edit": "Edit role"
+          }
         },
         "create": {
           "title": "Create role",
-          "form": {
-            "name": {
-              "label": "Name",
-              "placeholder": "Customer support",
-              "errors": {
-                "required": "Please enter a name"
-              }
-            },
-            "permissions": {
-              "label": "Permissions",
-              "scopes": {
-                "read": "Read only",
-                "onboarding-configuration": "Manage onboarding configuration",
-                "api-keys": "Manage API keys",
-                "org-settings": "Modify organization settings",
-                "manual-review": "Perform manual review",
-                "decrypt-attributes": "Permissible attributes",
-                "decrypt": "Decrypt data"
-              }
-            }
-          },
           "notifications": {
             "success": {
               "title": "Role created",
@@ -874,6 +832,61 @@
             },
             "error": {
               "title": "Error creating role"
+            }
+          }
+        },
+        "edit": {
+          "title": "Edit role",
+          "notifications": {
+            "success": {
+              "title": "Role updated",
+              "description": "Role {{name}} was updated successfully."
+            },
+            "error": {
+              "title": "Error updating role"
+            }
+          }
+        },
+        "remove": {
+          "confirmation": {
+            "title": "Remove role",
+            "description": "You’re about to remove the role <b>{{name}}</b>. Are you sure?"
+          },
+          "errors": {
+            "num-active-users": {
+              "title": "Role can't be removed",
+              "description_one": "One user is assigned to this role. Please assign those users to a different role.",
+              "description_others": "{{count}} users are assigned to this role. Please assign those users to a different role."
+            }
+          },
+          "feedback": {
+            "success": {
+              "title": "Role removed",
+              "description": "{{name}} role has been removed."
+            },
+            "error": {
+              "title": "Error removing role"
+            }
+          }
+        },
+        "form": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Customer support",
+            "errors": {
+              "required": "Please enter a name"
+            }
+          },
+          "permissions": {
+            "label": "Permissions",
+            "scopes": {
+              "read": "Read only",
+              "onboarding-configuration": "Manage onboarding configuration",
+              "api-keys": "Manage API keys",
+              "org-settings": "Modify organization settings",
+              "manual-review": "Perform manual review",
+              "decrypt-attributes": "Permissible attributes",
+              "decrypt": "Decrypt data"
             }
           }
         },
@@ -899,27 +912,6 @@
             "phone_number": "Phone number",
             "documents": "Documents",
             "custom": "Custom attributes"
-          }
-        }
-      },
-      "create-role": {
-        "title": "Create role",
-        "form": {
-          "cta": "Submit",
-          "cancel": "Cancel",
-          "name": {
-            "label": "Role",
-            "placeholder": "Role name",
-            "errors": {
-              "required": "The role name is required."
-            }
-          },
-          "permissions": "Permissions"
-        },
-        "toast": {
-          "success": {
-            "title": "Role created successfully!",
-            "description": "\"{{name}}\" is now available as a specific role."
           }
         }
       }

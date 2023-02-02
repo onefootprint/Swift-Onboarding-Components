@@ -45,6 +45,7 @@ export * from './submit-doc';
 export * from './submit-review';
 export * from './update-d2p-status';
 export * from './update-org';
+export * from './update-org-role';
 export * from './user-data-identity';
 export * from './user-decrypt';
 export * from './user-email';

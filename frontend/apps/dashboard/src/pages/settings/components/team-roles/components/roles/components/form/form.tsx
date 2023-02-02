@@ -1,34 +1,53 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  CreateOrgRoleRequest,
+  OrgRoleScope,
+  UpdateOrgRoleRequest,
+} from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { FormData } from '../../dialog.types';
 import Permissions from './components/permissions';
+import type { FormData } from './form.types';
 
 export type FormProps = {
-  onSubmit: (formData: FormData) => void;
+  defaultValues?: FormData;
+  onSubmit: (payload: CreateOrgRoleRequest | UpdateOrgRoleRequest) => void;
 };
 
-const Form = ({ onSubmit }: FormProps) => {
-  const { t } = useTranslation('pages.settings.roles.create.form');
-  const formMethods = useForm<FormData>({
-    defaultValues: {
-      name: '',
-      scopes: [],
-      showDecrypt: false,
-      decryptFields: [],
-    },
-  });
+const Form = ({
+  onSubmit,
+  defaultValues = {
+    name: '',
+    scopes: [],
+    showDecrypt: false,
+    decryptFields: [],
+  },
+}: FormProps) => {
+  const { t } = useTranslation('pages.settings.roles.form');
+  const formMethods = useForm<FormData>({ defaultValues });
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = formMethods;
 
+  const handleAfterSubmit = (formData: FormData) => {
+    const { name, scopes, decryptFields } = formData;
+    const decryptScopes = decryptFields.map(({ value }) => value);
+    const allScopes = [
+      ...new Set<OrgRoleScope>(['read', ...scopes, ...decryptScopes]),
+    ];
+    onSubmit({
+      name,
+      scopes: allScopes,
+    });
+  };
+
   return (
     <FormProvider {...formMethods}>
-      <form id="role-create-form" onSubmit={handleSubmit(onSubmit)}>
+      <form id="roles-form" onSubmit={handleSubmit(handleAfterSubmit)}>
         <Box sx={{ marginBottom: 8 }}>
           <TextInput
             autoFocus

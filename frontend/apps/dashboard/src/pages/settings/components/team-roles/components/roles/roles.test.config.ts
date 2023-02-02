@@ -38,6 +38,8 @@ export const orgRolesScopesFixture = ['Everything', 'Read', 'Manage Api Keys'];
 
 export const orgRoleWithoutActiveUsers = orgRolesFixture[0];
 
+export const orgRoleToEdit = orgRolesFixture[0];
+
 export const withOrgRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
   mockRequest({
     method: 'get',
@@ -74,6 +76,25 @@ export const withCreateOrgRoleError = () =>
   mockRequest({
     method: 'post',
     path: '/org/roles',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withUpdateOrgRole = (orgRole: OrgRole) =>
+  mockRequest({
+    method: 'patch',
+    path: `/org/roles/${orgRole.id}`,
+    response: orgRole,
+  });
+
+export const withUpdateOrgRoleError = (orgRole: OrgRole) =>
+  mockRequest({
+    method: 'patch',
+    path: `/org/roles/${orgRole.id}`,
     statusCode: 400,
     response: {
       error: {

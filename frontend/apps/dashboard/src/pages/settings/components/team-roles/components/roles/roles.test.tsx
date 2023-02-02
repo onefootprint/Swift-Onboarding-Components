@@ -8,6 +8,7 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
+import { OrgRole } from '@onefootprint/types';
 import React from 'react';
 
 import Roles from './roles';
@@ -15,6 +16,7 @@ import {
   orgRolesCreatedAtFixture,
   orgRolesFixture,
   orgRolesScopesFixture,
+  orgRoleToEdit,
   orgRoleWithoutActiveUsers,
   withCreateOrgRole,
   withCreateOrgRoleError,
@@ -22,6 +24,8 @@ import {
   withDisableOrgRoleError,
   withOrgRoles,
   withOrgRolesError,
+  withUpdateOrgRole,
+  withUpdateOrgRoleError,
 } from './roles.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -234,6 +238,103 @@ describe('<Roles />', () => {
           });
 
           expect(dialog).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when updating a role', () => {
+      const updatedRole: OrgRole = {
+        ...orgRoleToEdit,
+        scopes: ['read', 'api_keys', 'manual_review'],
+      };
+      const rolesWithoutUpdatedRole = orgRolesFixture.filter(
+        role => role.id !== orgRoleToEdit.id,
+      );
+
+      describe('when the request to update a role succeeds', () => {
+        beforeEach(() => {
+          withUpdateOrgRole(updatedRole);
+        });
+
+        it('should edit a role and show a confirmation message', async () => {
+          await renderRolesAndWaitData();
+          withOrgRoles([...rolesWithoutUpdatedRole, updatedRole]);
+
+          const actionButton = screen.getByRole('button', {
+            name: `Open actions for role ${orgRoleToEdit.name}`,
+          });
+          await userEvent.click(actionButton);
+
+          const editButton = screen.getByText('Edit role');
+          await userEvent.click(editButton);
+          await waitFor(() => {
+            screen.getByRole('dialog', {
+              name: 'Edit role',
+            });
+          });
+          const dialog = screen.getByRole('dialog', {
+            name: 'Edit role',
+          });
+
+          const manualReviewField = screen.getByRole('checkbox', {
+            name: 'Perform manual review',
+          });
+          await userEvent.click(manualReviewField);
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Save',
+          });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            const confirmationMessage = screen.getByText(
+              'Role Customer support was updated successfully.',
+            );
+            expect(confirmationMessage).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            expect(dialog).not.toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to update a role fails', () => {
+        beforeEach(() => {
+          withUpdateOrgRoleError(updatedRole);
+        });
+
+        it('should show the error message', async () => {
+          await renderRolesAndWaitData();
+          withOrgRoles([...rolesWithoutUpdatedRole, updatedRole]);
+
+          const actionButton = screen.getByRole('button', {
+            name: `Open actions for role ${orgRoleToEdit.name}`,
+          });
+          await userEvent.click(actionButton);
+
+          const editButton = screen.getByText('Edit role');
+          await userEvent.click(editButton);
+          await waitFor(() => {
+            screen.getByRole('dialog', {
+              name: 'Edit role',
+            });
+          });
+
+          const manualReviewField = screen.getByRole('checkbox', {
+            name: 'Perform manual review',
+          });
+          await userEvent.click(manualReviewField);
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Save',
+          });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            const errorMessage = screen.getByText('Something went wrong');
+            expect(errorMessage).toBeInTheDocument();
+          });
         });
       });
     });
