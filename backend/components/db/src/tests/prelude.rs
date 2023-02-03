@@ -1,8 +1,6 @@
 use diesel::Connection;
 
 use crate::test_helpers::test_db_conn;
-use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
 
@@ -34,25 +32,38 @@ impl<'a> TestPgConn<'a> {
     }
 }
 
+#[derive(Debug, thiserror::Error)]
+enum Error<T> {
+    // Any error type from conn.transaction() needs to implement From<diesel::result::Error>
+    DbError(#[from] diesel::result::Error),
+    TransactionRollbackTest(T),
+}
+
 /// Util to run a single function inside of a test transaction
 pub fn run_test_txn<F>(f: F)
 where
     F: FnOnce(&mut TestPgConn) + Send + 'static,
 {
+    run_test_txn_with_args(|conn, _| f(conn), ())
+}
+
+pub fn run_test_txn_with_args<F, TArgs, TRes>(f: F, args: TArgs) -> TRes
+where
+    F: FnOnce(&mut TestPgConn, TArgs) -> TRes + Send + 'static,
+{
     let _ = dotenv::dotenv(); // Don't actually care if this succeeds since env is set in github actions
 
     let mut c = test_db_conn();
-    let result = c.transaction(|conn| -> DbResult<()> {
+    let result = c.transaction(|conn| -> Result<(), Error<TRes>> {
         let mut conn = TestPgConn::new(TxnPgConn::new(conn));
-        f(&mut conn);
-        // No matter what happens during the test execution, roll back the transaction
-        Err(DbError::TransactionRollbackTest)
+        let result = f(&mut conn, args);
+        // No matter what happens during the test execution, return an Err here to roll back the transaction.
+        // Hide the actual result of calling f() inside the Err response so we can unpack it and return
+        Err(Error::TransactionRollbackTest(result))
     });
-    match result {
-        Err(DbError::TransactionRollbackTest) => Ok(()),
-        // Anything other than a TransactionRollbackTest error is not expected
-        Err(e) => Err(e),
-        Ok(_) => Err(DbError::TransactionRollbackTest),
-    }
-    .expect("Test transaction did not roll back with expected error");
+    let Err(Error::TransactionRollbackTest(result)) = result else {
+        // Anything other than an Error::TransactionRollbackTest is not expected
+        panic!("Test transaction did not roll back with expected error")
+    };
+    result
 }

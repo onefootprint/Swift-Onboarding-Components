@@ -151,7 +151,6 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::TenantRoleMismatch => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleDeactivated => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleHasUsers(_) => StatusCode::BAD_REQUEST,
-        DbError::TransactionRollbackTest => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::SandboxMismatch => StatusCode::BAD_REQUEST,
         DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,

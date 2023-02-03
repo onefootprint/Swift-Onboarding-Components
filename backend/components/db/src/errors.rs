@@ -62,10 +62,6 @@ pub enum DbError {
     NewtypesError(#[from] newtypes::Error),
     #[error("{0}")]
     CryptoError(#[from] crypto::Error),
-
-    // Testing-only error
-    #[error("Transaction rollback in a unit test")]
-    TransactionRollbackTest,
 }
 
 impl DbError {
