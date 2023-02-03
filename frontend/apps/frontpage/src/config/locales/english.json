@@ -440,6 +440,15 @@
             "content": "We'll give back a rebate of the two credits it costs to do a standard KYC the next time that same person does a one-click KYC on another platform. \n \n By virtue of you simply onboarding your users, you'll get back credits to use on any Footprint products. For example, if you onboard 100.000 people who are new to Footprint, you'll spend $50,000 on KYC, and you'll get all of that back in credits."
           }
         },
+        "calculator": {
+          "onboarding": "Onboarding",
+          "users-year": "users/year",
+          "will-have-a-cost-of": " will have a cost of",
+          "per-year": "/year",
+          "banner-recoup": "And you can recoup up to 100% of this cost the first year in credits!",
+          "unblocks": "unblocks",
+          "banner-custom": "custom pricing!"
+        },
         "micro-title": "Core",
         "title": "KYC + PII Security",
         "subtitle": "Next-gen encryption infrastructure to offload compliance, risk, and cost.",

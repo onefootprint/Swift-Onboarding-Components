@@ -9,6 +9,7 @@ import Banner from '../components/banner';
 import CheckedRow from '../components/checked-row';
 import FeatureRow from '../components/feature-row';
 import TableHeader from '../components/table-header';
+import Calculator from './components/calculator';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
@@ -72,7 +73,7 @@ const CorePlan = () => {
           >
             {t('core-plan.price-table.footprint-credit.dialog.content')}
           </InfoDialog>
-          <Box sx={{ marginTop: 2 }}>
+          <Box sx={{ marginTop: 2, marginBottom: 4 }}>
             <FeatureRow
               title={t('core-plan.price-table.secure-pii-storage.title')}
               credits={1}
@@ -104,6 +105,7 @@ const CorePlan = () => {
               {t('core-plan.price-table.one-click-KYC.dialog.content')}
             </InfoDialog>
           </Box>
+          <Calculator />
         </PricingTable>
         <Box>
           <Box>
