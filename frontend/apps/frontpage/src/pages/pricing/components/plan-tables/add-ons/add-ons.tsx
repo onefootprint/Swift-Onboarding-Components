@@ -43,6 +43,7 @@ const AddOns = () => {
         details={t('add-ons.features.vault-proxy.details')}
         credits={4}
         unitFirst={t('units.person')}
+        unitSecond={t('units.year')}
       />
       <FeatureRow
         title={t('add-ons.features.continuous-ofac.title')}

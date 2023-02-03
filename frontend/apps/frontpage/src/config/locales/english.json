@@ -455,9 +455,9 @@
         "price-table": {
           "footprint-credit": {
             "title": "Footprint credit",
-            "cta": "Why we use a credits system?",
+            "cta": "Why do we use a credits system?",
             "dialog": {
-              "title": "Why we use a credits system?",
+              "title": "Why do we use a credits system?",
               "content": "We hope credits are a transparent and simple ways for companies to keep track of pricing. We also use credits as a way to reward our early users: we give back a rebate of the two credits it costs to do a standard KYC the next time that same person does a one-click KYC on another platform.\n \n By virtue of you simply onboarding your users, you'll get back credits to use on any Footprint products. For example, if you onboard 100.000 people who are new to Footprint, you'll spend $50,000 on KYC, and you'll get all of that back in credits."
             }
           },
