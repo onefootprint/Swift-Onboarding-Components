@@ -52,7 +52,7 @@ const Complete = () => {
         <IcoCheckCircle40 color="success" />
         <Box sx={{ marginBottom: 4 }} />
         <HeaderTitle
-          sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
           title={isVerified ? t('success.title') : t('failure.title')}
           subtitle={isVerified ? t('success.subtitle') : t('failure.subtitle')}
         />
@@ -68,6 +68,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   text-align: center;
+  position: relative;
 `;
 
 export default Complete;

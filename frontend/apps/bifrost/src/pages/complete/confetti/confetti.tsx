@@ -1,33 +1,55 @@
+import { media } from '@onefootprint/ui';
 import Lottie from 'lottie-react';
-import React, { useEffect } from 'react';
+import React from 'react';
+import styled, { css } from 'styled-components';
 
-import { BIFROST_CONTAINER_ID } from '../../../components/layout';
 import LottieFile from './confetti-lottie.json';
 
-let height: number | undefined;
-let width: number | undefined;
+const ConfettiAnimation = () => (
+  <>
+    <Overlay />
+    <AnimationContainer animationData={LottieFile} loop={false} />
+  </>
+);
+const AnimationContainer = styled(Lottie)`
+  position: absolute;
+  top: -30vh;
+  left: 0;
+  height: 100vh;
+  width: 92vw;
+  pointer-events: none;
+  isolation: isolate;
+  z-index: 1;
 
-const ConfettiAnimation = () => {
-  useEffect(() => {
-    const container = document.getElementById(BIFROST_CONTAINER_ID);
-    height = container?.offsetHeight;
-    width = container?.offsetWidth;
-  }, []);
+  ${media.greaterThan('sm')`
+    height: 200%;
+    width: 200%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+  `}
+`;
 
-  return (
-    <Lottie
-      animationData={LottieFile}
-      loop={false}
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        height: `${height}`,
-        width: `${width}`,
-        pointerEvents: 'none',
-      }}
-    />
-  );
-};
+const Overlay = styled.span`
+  ${({ theme }) => css`
+    display: block;
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    height: 50%;
+    width: 100%;
+    z-index: 2;
+    background: linear-gradient(
+      180deg,
+      ${theme.backgroundColor.transparent} 0%,
+      ${theme.backgroundColor.primary} 20%,
+      ${theme.backgroundColor.primary} 100%
+    );
+
+    ${media.greaterThan('sm')`
+      display: none;
+    `};
+  `}
+`;
 
 export default ConfettiAnimation;
