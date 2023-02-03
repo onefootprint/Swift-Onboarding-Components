@@ -141,7 +141,21 @@
       "cta": "Back home"
     },
     "auth": {
-      "page-title": "Footprint Login | Logging in to the Footprint Dashboard"
+      "page-title": "Footprint Login | Logging in to the Footprint Dashboard",
+      "workos-error": {
+        "title": "Please try again",
+        "description": "Your login session has expired or is invalid"
+      },
+      "invite": {
+        "auth-expired": {
+          "title": "Welcome!",
+          "description": "Please log in with your email to accept your invite"
+        },
+        "login-successful": {
+          "title": "Welcome!",
+          "description": "You're now a part of {{tenantName}}'s organization"
+        }
+      }
     },
     "onboarding": {
       "page-title": "Footprint | Onboarding",

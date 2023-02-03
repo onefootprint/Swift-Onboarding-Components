@@ -23,7 +23,7 @@ fn post(
     let AssumeRoleRequest { tenant_id } = request.into_inner();
     let tu_id = auth.data.tenant_user_id.clone();
 
-    let (tenant_user, rb, tenant_role, tenant) = state
+    let ((tenant_user, rb, tenant_role, tenant), _) = state
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id)))
         .await?;

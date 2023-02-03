@@ -30,7 +30,7 @@ fn handler(
         redirect_url,
     } = request.into_inner();
     // TODO infer redirect_url from host header?
-    create_and_send_magic_link(&state, &email_address, &redirect_url).await?;
+    create_and_send_magic_link(&state, &email_address, &redirect_url, false).await?;
 
     Ok(Json(EmptyResponse::ok()))
 }
@@ -39,6 +39,7 @@ pub(crate) async fn create_and_send_magic_link(
     state: &State,
     email: &str,
     redirect_url: &str,
+    is_invite: bool,
 ) -> ApiResult<()> {
     let session = state
         .workos_client
@@ -46,7 +47,8 @@ pub(crate) async fn create_and_send_magic_link(
         .create_passwordless_session(&CreatePasswordlessSessionParams {
             r#type: CreatePasswordlessSessionType::MagicLink { email },
             redirect_uri: Some(redirect_url),
-            state: None,
+            // Can use this to pass more information to the client
+            state: is_invite.then_some("invite"),
         })
         .await?;
 

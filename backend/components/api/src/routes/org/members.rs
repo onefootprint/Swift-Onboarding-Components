@@ -113,7 +113,7 @@ async fn post(
         .await?;
 
     // TODO use a different email template for inviting a teammate
-    create_and_send_magic_link(&state, &user.email.0, &redirect_url).await?;
+    create_and_send_magic_link(&state, &user.email.0, &redirect_url, true).await?;
 
     let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
     ResponseData::ok(result).json()

@@ -9,7 +9,11 @@ export_schema!(OrgLoginRequest);
 
 #[derive(serde::Serialize, Apiv2Schema, JsonSchema)]
 pub struct OrgLoginResponse {
+    /// Whether a new tenant was created for the authed user
     pub created_new_tenant: bool,
+    /// Whether this user has logged into this tenant before
+    pub is_first_login: bool,
+    /// Whether tenant onboarding is still incomplete and we need to collect more info on the tenant from the user
     pub requires_onboarding: bool,
     /// If the email is associated with one tenant, a long-lived TenantRbAuth token to perform
     /// actions on the dashboard.

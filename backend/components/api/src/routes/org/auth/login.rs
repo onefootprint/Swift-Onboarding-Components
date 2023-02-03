@@ -77,7 +77,7 @@ async fn handler(
         (vec![rb_id], created_new_tenant)
     };
 
-    let (session_data, requires_onboarding, user, tenant) = if matching_rolebindings.len() == 1 {
+    let (session, requires_onboarding, user, tenant, is_first_login) = if matching_rolebindings.len() == 1 {
         // If one rolebinding, log into it and create a TenantUser session
         let rolebinding_id = matching_rolebindings
             .into_iter()
@@ -85,7 +85,7 @@ async fn handler(
             .ok_or(TenantError::TenantUserDoesNotExist)?;
 
         // Log into the user, updating the last_login_at and name (if new)
-        let (tenant_user, rb, tenant_role, tenant) = state
+        let ((tenant_user, rb, tenant_role, tenant), is_first_login) = state
             .db_pool
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rolebinding_id))
             .await?;
@@ -96,7 +96,7 @@ async fn handler(
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
         let user = Some(OrganizationMember::from_db((tenant_user, rb, tenant_role)));
         let tenant = Some(Organization::from_db(tenant));
-        (session_data, requires_onboarding, user, tenant)
+        (session_data, requires_onboarding, user, tenant, is_first_login)
     } else {
         // If multiple users, create a WorkOsSession that just shows the email that was proven to be owned.
         // This token lets the user choose which tenant they'd like to auth as. Only give them 10
@@ -105,13 +105,14 @@ async fn handler(
         let session_data = AuthSessionData::WorkOs(WorkOsSession {
             tenant_user_id: user.id,
         });
-        (session_data, false, None, None)
+        (session_data, false, None, None, false)
     };
     // Save tenant login in session data into the DB
-    let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
+    let auth_token = AuthSession::create(&state, session, Duration::hours(8)).await?;
     let data = OrgLoginResponse {
         auth_token,
         created_new_tenant,
+        is_first_login,
         requires_onboarding,
         user,
         tenant,

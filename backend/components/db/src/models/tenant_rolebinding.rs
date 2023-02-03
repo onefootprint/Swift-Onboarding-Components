@@ -25,6 +25,7 @@ pub struct TenantRolebinding {
     pub _updated_at: DateTime<Utc>,
 }
 
+pub type IsFirstLogin = bool;
 pub type TenantUserInfo = (TenantUser, TenantRolebinding, TenantRole, Tenant);
 pub type BasicTenantUserInfo = (TenantUser, TenantRolebinding, TenantRole);
 
@@ -158,19 +159,20 @@ impl TenantRolebinding {
     }
 
     /// Log into a given TenantRolebinding
-    pub fn login<'a, T>(conn: &mut TxnPgConn, id: T) -> DbResult<TenantUserInfo>
+    pub fn login<'a, T>(conn: &mut TxnPgConn, id: T) -> DbResult<(TenantUserInfo, IsFirstLogin)>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
         let (user, rb, role, tenant) = Self::get(conn, id)?;
 
         // Always set last_login_at to show when this user was logged into
+        let is_first_login = rb.last_login_at.is_none();
         let rb_update = TenantRolebindingUpdate {
             last_login_at: Some(Some(Utc::now())),
             ..TenantRolebindingUpdate::default()
         };
         let rb = Self::update(conn, (&rb.id, &tenant.id), rb_update)?;
-        Ok((user, rb, role, tenant))
+        Ok(((user, rb, role, tenant), is_first_login))
     }
 
     pub fn update<'a, T>(conn: &mut TxnPgConn, id: T, update: TenantRolebindingUpdate) -> DbResult<Self>
