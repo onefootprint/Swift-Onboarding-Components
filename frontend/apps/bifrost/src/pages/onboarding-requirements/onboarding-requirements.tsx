@@ -1,6 +1,7 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
 import {
   CollectKycData,
+  DeviceSignals,
   IdDoc,
   Transfer,
   withProvider,
@@ -34,55 +35,65 @@ const OnboardingRequirements = () => {
     return <CheckOnboardingRequirements />;
   }
   if (state.matches(States.additionalInfoRequired)) {
-    return <AdditionalInfoRequired />;
+    return (
+      <DeviceSignals page="additional-info-required" fpAuthToken={authToken}>
+        <AdditionalInfoRequired />
+      </DeviceSignals>
+    );
   }
   if (state.matches(States.kycData)) {
     return (
-      <CollectKycData
-        context={{
-          authToken,
-          device,
-          customData: {
-            missingAttributes: kycData,
-            userFound,
-            email,
-            config,
-          },
-        }}
-        onDone={handleRequirementCompleted}
-      />
+      <DeviceSignals page="kyc-data" fpAuthToken={authToken}>
+        <CollectKycData
+          context={{
+            authToken,
+            device,
+            customData: {
+              missingAttributes: kycData,
+              userFound,
+              email,
+              config,
+            },
+          }}
+          onDone={handleRequirementCompleted}
+        />
+      </DeviceSignals>
     );
   }
   if (state.matches(States.transfer)) {
     return (
-      <Transfer
-        context={{
-          authToken,
-          device,
-          customData: {
-            missingRequirements: {
-              liveness,
-              idDoc,
+      <DeviceSignals page="transfer" fpAuthToken={authToken}>
+        <Transfer
+          context={{
+            authToken,
+            device,
+            customData: {
+              missingRequirements: {
+                liveness,
+                idDoc,
+              },
             },
-          },
-        }}
-        onDone={handleRequirementCompleted}
-      />
+          }}
+          onDone={handleRequirementCompleted}
+        />
+      </DeviceSignals>
     );
   }
   if (state.matches(States.idDoc)) {
     return (
-      <IdDoc
-        context={{
-          authToken,
-          device,
-          customData: {
-            shouldCollectIdDoc: idDoc,
-            shouldCollectSelfie: selfie,
-          },
-        }}
-        onDone={handleRequirementCompleted}
-      />
+      <DeviceSignals page="id-doc" fpAuthToken={authToken}>
+        <IdDoc
+          context={{
+            authToken,
+            device,
+            customData: {
+              shouldCollectIdDoc: idDoc,
+              shouldCollectSelfie: selfie,
+            },
+          }}
+          onDone={handleRequirementCompleted}
+        />
+      </DeviceSignals>
     );
   }
   if (state.matches(States.identityCheck)) {

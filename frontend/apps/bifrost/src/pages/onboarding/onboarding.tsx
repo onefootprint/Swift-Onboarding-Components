@@ -1,7 +1,6 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { withProvider } from '@onefootprint/footprint-elements';
+import { DeviceSignals, withProvider } from '@onefootprint/footprint-elements';
 import React from 'react';
-import SocureSdk from 'src/components/socure-sdk';
 import { States } from 'src/utils/state-machine/onboarding';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
@@ -19,19 +18,13 @@ const Onboarding = () => {
   }
 
   if (state.matches(States.onboardingRequirements)) {
-    return (
-      <>
-        <OnboardingRequirements />
-        <SocureSdk context="profile" key="profile" />
-      </>
-    );
+    return <OnboardingRequirements />;
   }
   if (state.matches(States.authorize)) {
     return (
-      <>
+      <DeviceSignals page="authorize" fpAuthToken={state.context.authToken}>
         <Authorize />
-        <SocureSdk context="transaction" key="transaction" />
-      </>
+      </DeviceSignals>
     );
   }
   return null;

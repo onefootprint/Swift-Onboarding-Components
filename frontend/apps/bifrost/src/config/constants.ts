@@ -6,5 +6,3 @@ export const VERCEL_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 
 export const AUTH_HEADER = 'x-fp-authorization';
 export const CLIENT_PUBLIC_KEY_HEADER = 'X-Onboarding-Config-Key';
-
-export const SOCURE_PUBLIC_KEY = process.env.NEXT_PUBLIC_SOCURE_PUBLIC_KEY;

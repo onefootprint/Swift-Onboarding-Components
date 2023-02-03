@@ -3,6 +3,7 @@ import {
   useObserveCollector,
 } from '@onefootprint/dev-tools';
 import {
+  DeviceSignals,
   IdDoc,
   Liveness,
   useGetD2PStatus,
@@ -65,31 +66,35 @@ const Root = () => {
       {state.matches(States.expired) && <Expired />}
       {state.matches(States.checkRequirements) && <CheckRequirements />}
       {state.matches(States.liveness) && !!authToken && !!device && (
-        <Liveness
-          context={{
-            authToken,
-            device,
-          }}
-          onDone={() => {
-            send({ type: Events.livenessCompleted });
-          }}
-        />
+        <DeviceSignals page="liveness" fpAuthToken={authToken}>
+          <Liveness
+            context={{
+              authToken,
+              device,
+            }}
+            onDone={() => {
+              send({ type: Events.livenessCompleted });
+            }}
+          />
+        </DeviceSignals>
       )}
       {state.matches(States.idDoc) && !!authToken && !!device && (
-        <IdDoc
-          context={{
-            authToken,
-            device,
-            customData: {
-              shouldCollectIdDoc: requirements?.missingIdDoc,
-              shouldCollectSelfie: requirements?.missingSelfie,
-              shouldCollectConsent: requirements?.missingConsent,
-            },
-          }}
-          onDone={() => {
-            send({ type: Events.idDocCompleted });
-          }}
-        />
+        <DeviceSignals page="id-doc" fpAuthToken={authToken}>
+          <IdDoc
+            context={{
+              authToken,
+              device,
+              customData: {
+                shouldCollectIdDoc: requirements?.missingIdDoc,
+                shouldCollectSelfie: requirements?.missingSelfie,
+                shouldCollectConsent: requirements?.missingConsent,
+              },
+            }}
+            onDone={() => {
+              send({ type: Events.idDocCompleted });
+            }}
+          />
+        </DeviceSignals>
       )}
     </ErrorBoundary>
   );

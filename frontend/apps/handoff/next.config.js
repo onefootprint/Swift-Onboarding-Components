@@ -2,7 +2,7 @@
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' localhost:8000 vitals.vercel-insights.com *.ingest.sentry.io *.onefootprint.com vercel.live *.pusher.com wss://*.pusher.com unpkg.com 189225732777.collect.observeinc.com;
+  connect-src 'self' localhost:8000 vitals.vercel-insights.com *.ingest.sentry.io *.onefootprint.com vercel.live *.pusher.com wss://*.pusher.com dvnfo.com unpkg.com 189225732777.collect.observeinc.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io;
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
@@ -10,7 +10,7 @@ const ContentSecurityPolicy = `
   frame-src 'self' vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com js.dvnfo.com fpnpmcdn.net;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com;
   worker-src 'self' blob:;
 `;

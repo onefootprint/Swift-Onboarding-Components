@@ -31,7 +31,8 @@
         "NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA",
         "NEXT_PUBLIC_VERCEL_URL",
         "NODE_ENV",
-        "REVALIDATE_SECRET_TOKEN"
+        "REVALIDATE_SECRET_TOKEN",
+        "NEXT_PUBLIC_FINGERPRINT_API_KEY"
       ]
     },
     "test": {
