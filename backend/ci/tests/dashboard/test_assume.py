@@ -90,7 +90,7 @@ def test_cannot_patch(assumed_token, path):
             "org/onboarding_configs",
             dict(name="", must_collect_data=[], can_access_data=[]),
         ),
-        ("org/members", dict(email="", role_id="", redirect_url="")),
+        ("org/members", dict(email="e@onefootprint.com", role_id="", redirect_url="")),
         ("org/members/some_id/deactivate", dict()),
         ("org/roles", dict(name="", scopes=["read"])),
         ("org/roles/some_id/deactivate", dict()),

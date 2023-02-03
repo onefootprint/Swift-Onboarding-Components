@@ -19,6 +19,7 @@ use db::models::tenant_rolebinding::TenantRolebindingFilters;
 use db::models::tenant_rolebinding::TenantRolebindingUpdate;
 use db::models::tenant_user::TenantUser;
 use db::OffsetPagination;
+use newtypes::email::Email;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantRoleId;
 use newtypes::TenantRolebindingId;
@@ -75,7 +76,7 @@ async fn get(
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct CreateTenantUserRequest {
-    email: OrgMemberEmail,
+    email: Email,
     role_id: TenantRoleId,
     redirect_url: String, // The URL to the dashboard where the invite login link should be sent
     first_name: Option<String>,
@@ -103,6 +104,7 @@ async fn post(
         first_name,
         last_name,
     } = request.into_inner();
+    let email = OrgMemberEmail::try_from(email)?;
     let (user, rb, role) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
