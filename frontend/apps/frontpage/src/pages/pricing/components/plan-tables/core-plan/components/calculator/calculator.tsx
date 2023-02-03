@@ -38,17 +38,19 @@ const SectionsAnimation = {
 };
 
 const calculateCost = (users: number) =>
-  users * (CREDIT_DOLLAR_VALUE * STORAGE_ANNUAL_CREDITS) +
-  users * (CREDIT_DOLLAR_VALUE * KYC_CREDITS);
+  Math.round(
+    users * ((CREDIT_DOLLAR_VALUE * STORAGE_ANNUAL_CREDITS) / 12) +
+      users * (CREDIT_DOLLAR_VALUE * KYC_CREDITS),
+  );
 
 const CREDIT_DOLLAR_VALUE = 0.25;
 const STORAGE_ANNUAL_CREDITS = 1;
 const KYC_CREDITS = 2;
 
 const INITIAL_USER_VALUE = 5000;
-const SPECIAL_PRICE_USERS_THRESHOLD = 120000;
-const INCREMENT_USERS_BY = 5000;
-const MINIMUM_USER_VALUE = 5000;
+const SPECIAL_PRICE_USERS_THRESHOLD = 10000;
+const INCREMENT_USERS_BY = 1000;
+const MINIMUM_USER_VALUE = 1000;
 
 const Calculator = () => {
   const { t } = useTranslation('pages.pricing.core-plan.calculator');
@@ -85,7 +87,7 @@ const Calculator = () => {
             <IcoPlusSmall16 />
           </Button>
         </Controllers>
-        <Typography variant="label-3">{t('users-year')}</Typography>
+        <Typography variant="label-3">{t('users-month')}</Typography>
         {users < SPECIAL_PRICE_USERS_THRESHOLD ? (
           <motion.span
             animate="animate"
@@ -102,7 +104,7 @@ const Calculator = () => {
               >
                 ${cost.toLocaleString('en-US')}
               </motion.span>
-              {t('per-year')}
+              {t('per-month')}
             </Typography>
           </motion.span>
         ) : (

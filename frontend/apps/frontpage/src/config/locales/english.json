@@ -442,9 +442,9 @@
         },
         "calculator": {
           "onboarding": "Onboarding",
-          "users-year": "users/year",
+          "users-month": "users/month",
           "will-have-a-cost-of": " will have a cost of",
-          "per-year": "/year",
+          "per-month": "/month",
           "banner-recoup": "And you can recoup up to 100% of this cost the first year in credits!",
           "unblocks": "unblocks",
           "banner-custom": "custom pricing!"
