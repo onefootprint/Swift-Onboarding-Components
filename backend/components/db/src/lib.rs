@@ -14,17 +14,17 @@ pub mod errors;
 pub mod models;
 
 mod connection;
-pub use connection::TxnPgConn;
 
 mod pagination;
 pub use pagination::*;
+mod instrumented_connection;
 
 use std::time::Duration;
 
 pub use crate::errors::DbError;
 use crate::schema::{kv_data, user_consent};
 use deadpool::managed::{Hook, HookError};
-use deadpool_diesel::postgres::{Manager, Pool, Runtime};
+use deadpool_diesel::postgres::Runtime;
 use diesel::pg::PgConnection as DieselPgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
@@ -45,8 +45,6 @@ pub use has_lifetime::*;
 // Old tests
 #[cfg(test)]
 mod test;
-#[cfg(test)]
-pub mod test_context;
 #[allow(unused)]
 pub mod test_helpers;
 
@@ -54,11 +52,14 @@ pub mod tests;
 
 // Wrapper around diesel's PgConnection that allows us to swap out the underlying conn implementation
 // in one place
-pub type PgConn = DieselPgConnection;
+pub type PgConn = instrumented_connection::InstrumentedPgConnection;
 pub type DbResult<T> = Result<T, DbError>;
+pub use connection::TxnPgConn;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
+pub type Manager = deadpool_diesel::Manager<PgConn>;
+pub type Pool = deadpool::managed::Pool<Manager, deadpool::managed::Object<Manager>>;
 #[derive(Clone)]
 pub struct DbPool(Pool);
 
@@ -91,12 +92,11 @@ impl DbPool {
     {
         let result = self
             .db_query(|c: &mut PgConn| {
-                c.build_transaction()
-                    .run(|conn| -> Result<_, TransactionError<E>> {
-                        // Any error returned by f() is an ApplicationError
-                        let mut conn = TxnPgConn::new(conn);
-                        f(&mut conn).map_err(|e| TransactionError::ApplicationError(e))
-                    })
+                c.transaction(|conn| -> Result<_, TransactionError<E>> {
+                    // Any error returned by f() is an ApplicationError
+                    let mut conn = TxnPgConn::new(conn);
+                    f(&mut conn).map_err(|e| TransactionError::ApplicationError(e))
+                })
             })
             .await?;
         // Return ApplicationErrors as-is. Map DbErrors to E
@@ -171,7 +171,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
 
 pub fn run_migrations(url: &str) -> Result<(), DbError> {
     use crate::diesel_migrations::MigrationHarness;
-    let mut conn = PgConn::establish(url)?;
+    let mut conn = DieselPgConnection::establish(url)?;
     conn.run_pending_migrations(MIGRATIONS)
         .map_err(DbError::MigrationFailed)?;
     Ok(())

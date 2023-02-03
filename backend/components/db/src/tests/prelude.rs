@@ -1,3 +1,5 @@
+use diesel::Connection;
+
 use crate::test_helpers::test_db_conn;
 use crate::DbError;
 use crate::DbResult;
@@ -40,7 +42,7 @@ where
     let _ = dotenv::dotenv(); // Don't actually care if this succeeds since env is set in github actions
 
     let mut c = test_db_conn();
-    let result = c.build_transaction().run(|conn| -> DbResult<()> {
+    let result = c.transaction(|conn| -> DbResult<()> {
         let mut conn = TestPgConn::new(TxnPgConn::new(conn));
         f(&mut conn);
         // No matter what happens during the test execution, roll back the transaction

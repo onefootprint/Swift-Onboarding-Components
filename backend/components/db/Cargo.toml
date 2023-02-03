@@ -32,10 +32,13 @@ deadpool = { workspace = true }
 
 uuid = { workspace = true }
 
-diesel = { workspace = true, features = ["extras", "uuid", "postgres"] }
+# i-implement-a-third-party-backend-and-opt-into-breaking-changes only needed for our InstrumentedPgConnection
+diesel = { workspace = true, features = ["extras", "uuid", "postgres", "i-implement-a-third-party-backend-and-opt-into-breaking-changes" ] }
 diesel-derive-newtype = { workspace = true }
 diesel_migrations = { workspace = true }
 hex = { workspace = true }
+
+ipnetwork = { version = ">=0.12.2, <0.21.0" }
 
 [dev-dependencies]
 actix-rt = "2.7.0"
