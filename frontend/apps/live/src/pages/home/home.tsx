@@ -39,6 +39,9 @@ const Live = () => {
               </Typography>
               <ActionsContainer>
                 <FootprintButton publicKey={publicKey} label={t('cta')} />
+                <Typography as="p" variant="body-2" color="secondary">
+                  {t('disclaimer')}
+                </Typography>
               </ActionsContainer>
             </TextContainer>
             <ImageContainer>
@@ -157,10 +160,10 @@ const ActionsContainer = styled.div`
     margin-top: ${theme.spacing[6]};
 
     ${media.greaterThan('md')`
-      justify-content: flex-start;
-      flex-direction: row;
+      max-width: 90%;
+      
       & > * {
-        margin: 0;
+        width: fit-content;
       }
     `}
   `}

@@ -11,7 +11,8 @@
       "privacy-policy": {
         "title": "Privacy Policy"
       }
-    }
+    },
+    "disclaimer": "Footprint will not be able to access (or decrypt) any sensitive data. We will only get access to your name, phone, and email address."
   },
   "404": {
     "html-title": "Oops! Page not found.",
