@@ -92,7 +92,10 @@
     "**/target/**": true
   },
   "files.watcherExclude": {
-    "**/target/**": true
+    "**/target/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true
   },
   "rust-analyzer.files.excludeDirs": [
     "**/target/**"
