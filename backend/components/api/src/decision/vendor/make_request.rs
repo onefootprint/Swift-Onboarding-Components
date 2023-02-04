@@ -1,9 +1,12 @@
+#![allow(clippy::too_many_arguments)]
 use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
+use crate::enclave_client::EnclaveClient;
 use crate::metrics;
 use crate::{errors::ApiError, State};
 
 use crate::feature_flag::FeatureFlagClient;
+use db::DbPool;
 use db::{
     models::{
         insight_event::InsightEvent, ob_configuration::ObConfiguration,
@@ -13,15 +16,25 @@ use db::{
 };
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
+use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
 use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, Vendor, VendorAPI};
 use prometheus::labels;
 
 /// Branch on vendor and send requests to vendors
 pub async fn send_idv_request(
-    state: &State,
     request: VerificationRequest,
     data: IdvData,
+    db_pool: &DbPool,
+    is_production: bool,
+    ff_client: &impl FeatureFlagClient,
+    idology_client: &impl VendorAPICall<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >,
+    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
 ) -> Result<VendorResponse, ApiError> {
     tracing::info!(
         msg = "Sending verification request",
@@ -32,13 +45,10 @@ pub async fn send_idv_request(
     // Make the request to the IDV vendor
 
     let onboarding_id = request.onboarding_id.clone();
-    let ob_configuration_key = state
-        .db_pool
+    let ob_configuration_key = db_pool
         .db_query(move |conn| ObConfiguration::get_by_onboarding_id(conn, &onboarding_id))
         .await??
         .key;
-
-    let is_production = state.config.service_config.is_production();
 
     // still TODO: traitfy the ff logic shared by these requests
     let result = match request.vendor_api {
@@ -47,16 +57,14 @@ pub async fn send_idv_request(
                 data,
                 is_production,
                 ob_configuration_key,
-                &state.idology_client,
-                &state.feature_flag_client,
+                idology_client,
+                ff_client,
             )
             .await?
         }
-        VendorAPI::TwilioLookupV2 => idv::twilio::lookup_v2(&state.twilio_client.client, data)
-            .await
-            .map_err(idv::Error::from)?,
+        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(data, twilio_client).await?,
         VendorAPI::SocureIDPlus => {
-            send_socure_idv_request(state, request, data, &state.socure_production_client).await?
+            send_socure_idv_request(request, data, is_production, db_pool, socure_client, ff_client).await?
         }
         api => {
             let err = format!("send_idv_request not implemented for {}", api);
@@ -99,6 +107,30 @@ pub async fn send_docv_request(
     };
 
     Ok(result)
+}
+
+pub async fn send_twilio_lookupv2_request<T>(
+    idv_data: IdvData,
+    twilio_api_call: &T,
+) -> Result<VendorResponse, ApiError>
+where
+    T: VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+{
+    twilio_api_call
+        .make_request(TwilioLookupV2Request { idv_data })
+        .await
+        .map(|r| {
+            let vendor = Vendor::from(r.clone().vendor_api()); // TOOD: clones :>
+            let parsed_response = r.clone().parsed_response();
+            let raw_response = r.raw_response();
+            // TODO put this into a INto
+            VendorResponse {
+                vendor,
+                response: parsed_response,
+                raw_response,
+            }
+        })
+        .map_err(|e| ApiError::from(idv::Error::from(e)))
 }
 
 pub async fn send_idology_idv_request(
@@ -184,16 +216,15 @@ pub async fn send_idology_idv_request(
 }
 
 pub async fn send_socure_idv_request(
-    state: &State,
     request: VerificationRequest,
     data: IdvData,
-    socure_api_call: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    is_production: bool,
+    db_pool: &DbPool,
+    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    feature_flag_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
-    let feature_flag_client = &state.feature_flag_client;
-
     let onboarding_id = request.onboarding_id.clone();
-    let (socure_device_session_id, ip_address, ob_configuration_key) = state
-        .db_pool
+    let (socure_device_session_id, ip_address, ob_configuration_key) = db_pool
         .db_query(
             move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
                 let socure_device_session_id =
@@ -216,7 +247,7 @@ pub async fn send_socure_idv_request(
         .unwrap_or(false)
     {
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
-    } else if state.config.service_config.is_production()
+    } else if is_production
         || feature_flag_client
             .bool_flag_by_ob_configuration_key(
                 "EnableSocureIdvCallsInNonProdEnvironment",
@@ -224,7 +255,7 @@ pub async fn send_socure_idv_request(
             )
             .unwrap_or(false)
     {
-        let res = socure_api_call
+        let res = socure_client
             .make_request(SocureIDPlusRequest {
                 idv_data: data,
                 socure_device_session_id,
@@ -311,21 +342,42 @@ pub async fn send_scan_onboarding_docv_request(
 
 /// Make our requests to a vendor, building data from the cached VerificationRequest
 pub async fn make_idv_request(
-    state: &State,
     request: VerificationRequest,
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    is_production: bool,
+    ff_client: &impl FeatureFlagClient,
+    idology_client: &impl VendorAPICall<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >,
+    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
 ) -> Result<vendor_result::VendorResult, ApiError> {
     let request_id = request.id.clone();
     let requestid = request.id.clone();
 
-    let data = build_request::build_idv_data_from_verification_request(state, request.clone()).await?;
+    let data =
+        build_request::build_idv_data_from_verification_request(db_pool, enclave_client, request.clone())
+            .await?;
 
-    let vendor_response = send_idv_request(state, request, data).await?;
-    let uv = state
-        .db_pool
+    let vendor_response = send_idv_request(
+        request,
+        data,
+        db_pool,
+        is_production,
+        ff_client,
+        idology_client,
+        socure_client,
+        twilio_client,
+    )
+    .await?;
+    let uv = db_pool
         .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
         .await??;
     let (verification_result, structured_vendor_response) = verification_result::save_verification_result(
-        state,
+        db_pool,
         request_id.clone(),
         vendor_response.clone(),
         uv.public_key,
@@ -365,7 +417,7 @@ pub async fn make_docv_request(
         .await??;
 
     let (verification_result, structured_vendor_response) = verification_result::save_verification_result(
-        state,
+        &state.db_pool,
         request_id.clone(),
         vendor_response.clone(),
         uv.public_key,
@@ -382,41 +434,55 @@ pub async fn make_docv_request(
     Ok(result)
 }
 
-#[tracing::instrument(skip(state))]
+// #[tracing::instrument(skip(state))] TODO:
 pub async fn make_vendor_requests(
-    state: &State,
     requests: Vec<VerificationRequest>,
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    is_production: bool,
+    ff_client: &impl FeatureFlagClient,
+    idology_client: &impl VendorAPICall<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >,
+    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
 ) -> Result<Vec<Result<vendor_result::VendorResult, ApiError>>, ApiError> {
-    let raw_futures_with_vendors = requests
-        .into_iter()
-        .map(|r| (r.vendor_api, make_idv_request(state, r)));
+    let raw_futures_with_vendors = requests.into_iter().map(|r| {
+        (
+            r.vendor_api,
+            make_idv_request(
+                r,
+                db_pool,
+                enclave_client,
+                is_production,
+                ff_client,
+                idology_client,
+                socure_client,
+                twilio_client,
+            ),
+        )
+    });
 
-    // Make requests
     let (vendor_apis, raw_futures): (Vec<_>, Vec<_>) = raw_futures_with_vendors.into_iter().unzip();
-    let mut futures: Vec<_> = raw_futures.into_iter().map(Box::pin).collect();
-    let mut results: Vec<Result<vendor_result::VendorResult, ApiError>> = vec![];
-
-    while !futures.is_empty() {
-        let (result, idx, remaining) = futures::future::select_all(futures).await;
-
-        match result {
+    let raw_results = futures::future::join_all(raw_futures).await;
+    let results = raw_results
+        .into_iter()
+        .enumerate()
+        .map(|(idx, res)| match res {
+            Ok(_) => res,
             Err(ref e) => {
-                // return the api that failed
-                let api = vendor_apis[idx];
+                let vendor_api = vendor_apis[idx];
                 tracing::warn!(
-                    vendor_api = %api,
+                    vendor_api = %vendor_api,
                     err = format!("{:?}", e),
                     "VerificationRequest failed"
                 );
-
-                results.push(Err(ApiError::VendorRequestFailed(api)))
+                Err(ApiError::VendorRequestFailed(vendor_api))
             }
-            Ok(_) => {
-                results.push(result);
-            }
-        }
-        futures = remaining;
-    }
+        })
+        .collect();
 
     Ok(results)
 }

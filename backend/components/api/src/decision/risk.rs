@@ -1,4 +1,4 @@
-use newtypes::{DbActor, DecisionStatus, OnboardingDecisionId, OnboardingId, TenantId, VendorAPI};
+use newtypes::{DbActor, DecisionStatus, OnboardingDecisionId, OnboardingId, VendorAPI};
 
 use db::{
     models::{
@@ -8,41 +8,50 @@ use db::{
         risk_signal::RiskSignal,
         scoped_user::ScopedUser,
     },
-    TxnPgConn,
+    DbPool, TxnPgConn,
 };
 
 use super::{features::*, rule::rule_set::RuleSetResult};
 use crate::{decision::rule::rule_impl::idology_rule_set, feature_flag::FeatureFlagClient};
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
-    feature_flag::LaunchDarklyFeatureFlagClient,
     utils::user_vault_wrapper::UserVaultWrapper,
-    State,
 };
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
-#[tracing::instrument(skip(state, features))]
+#[tracing::instrument(skip(features, db_pool, ff_client))]
 pub async fn create_final_decision(
-    state: &State,
     ob_id: OnboardingId,
     features: FeatureVector,
+    db_pool: &DbPool,
+    ff_client: &impl FeatureFlagClient,
 ) -> ApiResult<OnboardingDecision> {
     // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: Create our risk signals!
     // Save status
-    let feature_flag_client = state.feature_flag_client.clone();
-    let obd = state
-        .db_pool
+
+    let obid = ob_id.clone();
+    let tenant_id = &db_pool
+        .db_query(move |conn| ScopedUser::get_by_onboarding_id(conn, &ob_id))
+        .await??
+        .tenant_id;
+
+    let tenant_can_view_socure_risk_signal = ff_client
+        .bool_flag_by_tenant_id("TenantCanViewSocureRiskSignal", tenant_id)
+        .unwrap_or(false);
+
+    let decision = final_decision(&features, obid.clone(), ff_client)?;
+
+    // let obid = obid.clone();
+    let obd = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let ob = Onboarding::lock(conn, &ob_id)?;
+            let ob = Onboarding::lock(conn, &obid)?;
             let scoped_user = ScopedUser::get(conn, &ob.scoped_user_id)?;
 
             // prevent race conditions from producing 2 decisions
             if ob.has_final_decision {
                 return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
             }
-
-            let decision = final_decision(&features, ob.id.clone(), &feature_flag_client)?;
 
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision.decision_status == DecisionStatus::Pass {
@@ -74,15 +83,14 @@ pub async fn create_final_decision(
 
             // Create ManualReview row if requested
             if decision.create_manual_review {
-                ManualReview::create(conn, ob_id)?;
+                ManualReview::create(conn, obid)?;
             }
 
             write_risk_signals(
                 conn,
                 &features,
                 obd.id.clone(),
-                &feature_flag_client,
-                &scoped_user.tenant_id,
+                tenant_can_view_socure_risk_signal,
             )?;
 
             Ok(obd)
@@ -177,8 +185,7 @@ fn write_risk_signals(
     conn: &mut TxnPgConn,
     feature_vector: &FeatureVector,
     onboarding_decision_id: OnboardingDecisionId,
-    feature_flag_client: &LaunchDarklyFeatureFlagClient,
-    tenant_id: &TenantId,
+    tenant_can_view_socure_risk_signal: bool,
 ) -> ApiResult<()> {
     let mut vendor_apis = vec![
         VendorAPI::IdologyExpectID,
@@ -189,10 +196,7 @@ fn write_risk_signals(
     ];
 
     // For now, our Socure contract only allows Footprint to view or use Socure data
-    if feature_flag_client
-        .bool_flag_by_tenant_id("TenantCanViewSocureRiskSignal", tenant_id)
-        .unwrap_or(false)
-    {
+    if tenant_can_view_socure_risk_signal {
         vendor_apis.push(VendorAPI::SocureIDPlus);
     }
 

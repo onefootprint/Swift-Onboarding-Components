@@ -6,7 +6,7 @@ use tokio::task::JoinHandle;
 use crate::State;
 
 #[allow(unused)]
-struct StateWithMockEnclave {
+pub struct StateWithMockEnclave {
     h1: JoinHandle<()>,
     h2: JoinHandle<()>,
     server: ServerHandle,

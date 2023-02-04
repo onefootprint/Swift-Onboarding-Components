@@ -113,4 +113,14 @@ impl RiskSignal {
             .get_results(conn)?;
         Ok((signal, vrs))
     }
+
+    pub fn list_by_onboarding_decision_id(
+        conn: &mut PgConn,
+        onboarding_decision_id: &OnboardingDecisionId,
+    ) -> DbResult<Vec<Self>> {
+        let results = risk_signal::table
+            .filter(risk_signal::onboarding_decision_id.eq(onboarding_decision_id))
+            .get_results(conn)?;
+        Ok(results)
+    }
 }

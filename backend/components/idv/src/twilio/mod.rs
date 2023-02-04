@@ -1,5 +1,5 @@
-use newtypes::{IdvData, Vendor};
-use twilio::response::parse_response;
+use newtypes::{IdvData, PiiJsonValue, Vendor};
+use twilio::response::{lookup::LookupV2Response, parse_response};
 
 use crate::{ParsedResponse, VendorResponse};
 
@@ -21,6 +21,16 @@ pub enum ReqwestError {
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("error sending request to socure api: {0}")]
     SendError(String),
+}
+
+pub struct TwilioLookupV2Request {
+    pub idv_data: IdvData,
+}
+
+#[derive(Clone)]
+pub struct TwilioLookupV2APIResponse {
+    pub raw_response: PiiJsonValue,
+    pub parsed_response: LookupV2Response,
 }
 
 pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<VendorResponse, Error> {

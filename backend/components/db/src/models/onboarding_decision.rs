@@ -176,4 +176,11 @@ impl OnboardingDecision {
 
         Ok(result_map)
     }
+
+    pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Vec<Self>> {
+        let result = onboarding_decision::table
+            .filter(onboarding_decision::onboarding_id.eq(onboarding_id))
+            .get_results(conn)?;
+        Ok(result)
+    }
 }

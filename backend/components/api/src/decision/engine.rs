@@ -1,29 +1,47 @@
 use crate::{
+    enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiError},
+    feature_flag::FeatureFlagClient,
     metrics,
     utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs},
     State,
 };
 
-use super::*;
+use super::{vendor::vendor_trait::VendorAPICall, *};
 use db::{
     models::{
         onboarding::Onboarding,
         user_vault::UserVault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
     },
-    DbError,
+    DbError, DbPool,
 };
+use idv::{
+    idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
+    socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
+    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
+};
+
 use prometheus::labels;
-/// The Engine module is the main entry point into running our verification logic
-///
 ///
 /// Run loads saved VerificationRequests and (potentially) VerificationResults and produces a Decision
-
-pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
+#[allow(clippy::too_many_arguments)]
+pub async fn run(
+    ob: Onboarding,
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    is_production: bool,
+    ff_client: &impl FeatureFlagClient,
+    idology_client: &impl VendorAPICall<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >,
+    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+) -> Result<(), ApiError> {
     let obid = ob.id.clone();
-    let requests_and_results = state
-        .db_pool
+    let requests_and_results = db_pool
         .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
             // Load our requests and results
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
@@ -32,14 +50,13 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
         .await??;
 
     let obid = ob.id.clone();
-    let uv = state
-        .db_pool
+    let uv = db_pool
         .db_query(move |conn| UserVault::get(conn, &obid))
         .await??;
 
     let previous_results = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
         requests_and_results.clone(),
-        &state.enclave_client,
+        enclave_client,
         &uv.e_private_key,
     )
     .await?;
@@ -57,7 +74,17 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
         .collect();
 
     // Make requests
-    let raw_results = vendor::make_request::make_vendor_requests(state, requests).await?;
+    let raw_results = vendor::make_request::make_vendor_requests(
+        requests,
+        db_pool,
+        enclave_client,
+        is_production,
+        ff_client,
+        idology_client,
+        socure_client,
+        twilio_client,
+    )
+    .await?;
     // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
     let has_errors = raw_results
         .iter()
@@ -89,7 +116,7 @@ pub async fn run(state: &State, ob: Onboarding) -> Result<(), ApiError> {
     let features = features::create_features(results);
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    let onboarding_decision = risk::create_final_decision(state, ob.id, features).await?;
+    let onboarding_decision = risk::create_final_decision(ob.id, features, db_pool, ff_client).await?;
 
     let status = onboarding_decision.status.to_string();
     if let Ok(metric) =

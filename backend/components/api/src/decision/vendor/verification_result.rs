@@ -5,7 +5,7 @@ use db::{
         idology_expect_id_response::{IdologyExpectIdResponse, NewIdologyExpectIdResponse},
         verification_result::VerificationResult,
     },
-    DbResult, PgConn,
+    DbPool, DbResult, PgConn,
 };
 use enclave_proxy::DataTransform;
 use idv::{
@@ -23,17 +23,16 @@ use newtypes::{
 };
 use twilio::response::lookup::LookupV2Response;
 
-use crate::{enclave_client::EnclaveClient, errors::ApiError, State};
+use crate::{enclave_client::EnclaveClient, errors::ApiError};
 
 /// Save a verification result, encrypting the response payload in the process
 pub(super) async fn save_verification_result(
-    state: &State,
+    db_pool: &DbPool,
     verification_request_id: VerificationRequestId,
     vendor_response: VendorResponse,
     user_vault_public_key: VaultPublicKey, // passed in so unit testing is easier
 ) -> Result<(VerificationResult, Option<StructuredVendorResponse>), ApiError> {
-    let res = state
-        .db_pool
+    let res = db_pool
         .db_transaction(
             move |conn| -> Result<(VerificationResult, Option<StructuredVendorResponse>), ApiError> {
                 // For testing rollout of footprint

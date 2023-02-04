@@ -15,7 +15,7 @@ pub enum FeatureFlagError {
 }
 
 #[cfg_attr(test, automock)]
-pub trait FeatureFlagClient {
+pub trait FeatureFlagClient: Sync + Send {
     fn bool_flag(&self, flag_key: &str) -> Result<bool, FeatureFlagError>;
 
     fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError>;

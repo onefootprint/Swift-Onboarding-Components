@@ -15,6 +15,7 @@ pub mod lexis;
 pub mod requirements;
 pub mod socure;
 pub mod test_fixtures;
+pub mod tests;
 pub mod twilio;
 
 #[allow(clippy::large_enum_variant)]

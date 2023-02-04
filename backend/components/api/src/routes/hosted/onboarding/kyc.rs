@@ -58,7 +58,17 @@ pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonAp
 
     // produce our decision
     if should_make_idv_requests_and_decision {
-        decision::engine::run(&state, ob_info.onboarding).await?;
+        decision::engine::run(
+            ob_info.onboarding,
+            &state.db_pool,
+            &state.enclave_client,
+            state.config.service_config.is_production(),
+            &state.feature_flag_client,
+            &state.idology_client,
+            &state.socure_production_client,
+            &state.twilio_client.client,
+        )
+        .await?;
     }
 
     EmptyResponse::ok().json()

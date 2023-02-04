@@ -44,7 +44,7 @@ fn post(
         .await??;
 
     let ids: Vec<_> = attributes.iter().cloned().map(DataIdentifier::Id).collect();
-    let results = uvw.decrypt_unsafe(&state, &ids).await?;
+    let results = uvw.decrypt_unsafe(&state.enclave_client, &ids).await?;
 
     let results = attributes
         .into_iter()

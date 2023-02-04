@@ -1,6 +1,8 @@
+use crate::enclave_client::EnclaveClient;
 use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
 use crate::{errors::ApiError, State};
 use crypto::aead::AeadSealedBytes;
+use db::DbPool;
 use db::models::document_request::DocRefId;
 use db::models::identity_document::IdentityDocument;
 use db::models::verification_request::VerificationRequest;
@@ -10,18 +12,18 @@ use std::{str::FromStr};
 use strum::IntoEnumIterator;
 
 pub async fn build_idv_data_from_verification_request(
-    state: &State,
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
     request: VerificationRequest,
 ) -> Result<IdvData, ApiError> {
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
-    let uvw = state
-        .db_pool
+    let uvw = db_pool
         .db_query(|conn| UserVaultWrapper::build(conn, UvwArgs::Idv(request)))
         .await??;
 
     let all_identity_data_kinds: Vec<_> = IdentityDataKind::iter().collect();
-    let mut decrypted_values = uvw.decrypt_unsafe(state, &all_identity_data_kinds).await?;
+    let mut decrypted_values = uvw.decrypt_unsafe(enclave_client, &all_identity_data_kinds).await?;
     // Remove sandbox suffixes
     let email = decrypted_values
         .remove(&IdentityDataKind::Email)

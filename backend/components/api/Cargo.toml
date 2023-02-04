@@ -94,3 +94,4 @@ test-case = "2.1.0"
 enclave = { path = "../enclave/enclave"}
 portpicker = "0.1.1"
 mockall = "0.9.1"
+rand = { version = "0.8 " }

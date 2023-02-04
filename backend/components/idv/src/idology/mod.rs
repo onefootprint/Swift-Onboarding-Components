@@ -2,7 +2,7 @@ pub mod client;
 pub mod error;
 pub mod expectid;
 pub(crate) mod fixtures;
-pub(self) mod response_common;
+pub mod response_common;
 pub mod scan_onboarding;
 pub mod scan_verify;
 

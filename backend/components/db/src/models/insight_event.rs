@@ -39,7 +39,7 @@ pub struct InsightEvent {
     pub tls: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Default)]
 #[diesel(table_name = insight_event)]
 pub struct CreateInsightEvent {
     pub timestamp: DateTime<Utc>,
