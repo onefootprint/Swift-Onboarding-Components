@@ -12,9 +12,6 @@ use super::session::AuthSession;
 
 #[derive(Debug, Clone)]
 pub struct SendgridClient {
-    pub from_email: String,
-    pub challenge_template_id: String,
-    pub magic_link_template_id: String,
     api_key: String,
     client: reqwest::Client,
 }
@@ -64,53 +61,40 @@ struct SendgridErrorFieldAndMessage {
 }
 
 impl SendgridClient {
-    pub fn new(
-        api_key: String,
-        from_email: String,
-        challenge_template_id: String,
-        magic_link_template_id: String,
-    ) -> Self {
+    const EMAIL_VERIFY_TEMPLATE_ID: &str = "d-c558e640dad04726a31e6710c7ffc57c";
+    const MAGIC_LINK_TEMPLATE_ID: &str = "d-a631e0eb72984e28a39940aa8f3bbe60";
+    const FROM_EMAIL: &str = "noreply@noreply.onefootprint.com";
+
+    pub fn new(api_key: String) -> Self {
         let client = reqwest::Client::new();
-        Self {
-            api_key,
-            from_email,
-            challenge_template_id,
-            magic_link_template_id,
-            client,
-        }
+        Self { api_key, client }
     }
 
-    pub async fn send_with_magic_link_template(
-        &self,
-        to_email: String,
-        curl_url: String,
-    ) -> Result<(), ApiError> {
-        self.send_with_link_template(to_email, curl_url, &self.magic_link_template_id)
+    pub async fn send_magic_link_email(&self, to_email: String, curl_url: String) -> Result<(), ApiError> {
+        let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
+        self.send_template(to_email, Self::MAGIC_LINK_TEMPLATE_ID, template_data)
             .await
     }
 
-    pub async fn send_with_challenge_template(
-        &self,
-        to_email: String,
-        curl_url: String,
-    ) -> Result<(), ApiError> {
-        self.send_with_link_template(to_email, curl_url, &self.challenge_template_id)
+    pub async fn send_email_verify_email(&self, to_email: String, curl_url: String) -> Result<(), ApiError> {
+        let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
+        self.send_template(to_email, Self::EMAIL_VERIFY_TEMPLATE_ID, template_data)
             .await
     }
 
-    pub async fn send_with_link_template(
+    async fn send_template(
         &self,
         to_email: String,
-        curl_url: String,
         template_id: &str,
+        template_data: HashMap<String, String>,
     ) -> Result<(), ApiError> {
         let req = SendgridTemplateRequest {
             personalizations: vec![SendgridPersonalization {
                 to: vec![SendgridEmail { email: to_email }],
-                dynamic_template_data: HashMap::from([("curl_request".to_string(), curl_url)]),
+                dynamic_template_data: template_data,
             }],
             from: SendgridEmail {
-                email: self.from_email.clone(),
+                email: Self::FROM_EMAIL.to_owned(),
             },
             template_id: template_id.to_string(),
         };
@@ -130,18 +114,6 @@ impl SendgridClient {
         let err = &res.text().await?;
         Err(ApiError::SendgridError(err.to_owned()))
     }
-}
-
-pub(crate) async fn send_magic_link_dashboard_auth_email(
-    state: &State,
-    email_address: String,
-    url: String,
-) -> Result<(), ApiError> {
-    state
-        .sendgrid_client
-        .send_with_magic_link_template(email_address, url)
-        .await?;
-    Ok(())
 }
 
 pub(crate) async fn send_email_challenge(
@@ -166,7 +138,7 @@ pub(crate) async fn send_email_challenge(
     let confirm_link_str = format!("{}/?v={}#{}", base_url, unique_param, token);
     state
         .sendgrid_client
-        .send_with_challenge_template(email_address.leak_to_string(), confirm_link_str)
+        .send_email_verify_email(email_address.leak_to_string(), confirm_link_str)
         .await?;
     Ok(())
 }

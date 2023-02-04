@@ -85,12 +85,7 @@ impl State {
             config.rp_id.clone(),
         );
 
-        let sendgrid_client = SendgridClient::new(
-            config.sendgrid_api_key.clone(),
-            config.sendgrid_from_email.clone(),
-            config.sendgrid_challenge_template_id.clone(),
-            config.sendgrid_magic_link_template_id.clone(),
-        );
+        let sendgrid_client = SendgridClient::new(config.sendgrid_api_key.clone());
 
         let idology_client = IdologyClient::new(
             config.idology_config.username.clone().into(),

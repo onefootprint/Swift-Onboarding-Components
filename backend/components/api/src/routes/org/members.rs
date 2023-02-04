@@ -4,13 +4,13 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
-use crate::org::auth::magic_link::create_and_send_magic_link;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::types::OffsetPaginatedResponse;
 use crate::types::OffsetPaginationRequest;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
+use crate::utils::magic_link::create_magic_link;
 use crate::State;
 use api_wire_types::OrgMemberFilters;
 use chrono::Utc;
@@ -105,17 +105,19 @@ async fn post(
         last_name,
     } = request.into_inner();
     let email = OrgMemberEmail::try_from(email)?;
+    let email2 = email.clone();
     let (user, rb, role) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let user = TenantUser::get_and_update_or_create(conn, email, first_name, last_name)?;
+            let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
             let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, tenant_id)?;
             Ok((user, rb, role))
         })
         .await?;
 
+    let link = create_magic_link(&state, &email.0, &redirect_url, false).await?;
     // TODO use a different email template for inviting a teammate
-    create_and_send_magic_link(&state, &user.email.0, &redirect_url, true).await?;
+    state.sendgrid_client.send_magic_link_email(email.0, link).await?;
 
     let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
     ResponseData::ok(result).json()

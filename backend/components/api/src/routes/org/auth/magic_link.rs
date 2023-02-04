@@ -1,12 +1,8 @@
-use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
+use crate::utils::magic_link::create_magic_link;
 use crate::State;
 use crate::{errors::ApiError, types::EmptyResponse};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-use workos::passwordless::{
-    CreatePasswordlessSession, CreatePasswordlessSessionParams, CreatePasswordlessSessionType,
-    PasswordlessSessionType,
-};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 struct LinkAuthRequest {
@@ -30,32 +26,11 @@ fn handler(
         redirect_url,
     } = request.into_inner();
     // TODO infer redirect_url from host header?
-    create_and_send_magic_link(&state, &email_address, &redirect_url, false).await?;
-
-    Ok(Json(EmptyResponse::ok()))
-}
-
-pub(crate) async fn create_and_send_magic_link(
-    state: &State,
-    email: &str,
-    redirect_url: &str,
-    is_invite: bool,
-) -> ApiResult<()> {
-    let session = state
-        .workos_client
-        .passwordless()
-        .create_passwordless_session(&CreatePasswordlessSessionParams {
-            r#type: CreatePasswordlessSessionType::MagicLink { email },
-            redirect_uri: Some(redirect_url),
-            // Can use this to pass more information to the client
-            state: is_invite.then_some("invite"),
-        })
+    let link = create_magic_link(&state, &email_address, &redirect_url, false).await?;
+    state
+        .sendgrid_client
+        .send_magic_link_email(email_address, link)
         .await?;
 
-    let link = match &session.r#type {
-        PasswordlessSessionType::MagicLink { email: _, link } => link.clone(),
-    };
-
-    crate::utils::email::send_magic_link_dashboard_auth_email(state, email.to_owned(), link).await?;
-    Ok(())
+    Ok(Json(EmptyResponse::ok()))
 }
