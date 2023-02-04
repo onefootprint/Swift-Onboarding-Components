@@ -96,6 +96,11 @@ async fn post(
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
 
+    let user_id = match auth.actor() {
+        AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
+        _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
+    };
+
     let tenant_id = tenant.id.clone();
     let CreateTenantUserRequest {
         email,
@@ -106,18 +111,22 @@ async fn post(
     } = request.into_inner();
     let email = OrgMemberEmail::try_from(email)?;
     let email2 = email.clone();
-    let (user, rb, role) = state
+    let (inviter, user, rb, role) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
+            let inviter = TenantUser::get(conn, &user_id)?;
             let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
             let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, tenant_id)?;
-            Ok((user, rb, role))
+            Ok((inviter, user, rb, role))
         })
         .await?;
 
     let link = create_magic_link(&state, &email.0, &redirect_url, false).await?;
-    // TODO use a different email template for inviting a teammate
-    state.sendgrid_client.send_magic_link_email(email.0, link).await?;
+    let inviter = inviter.first_name.unwrap_or(inviter.email.0);
+    state
+        .sendgrid_client
+        .send_dashboard_invite_email(email.0, inviter, tenant.name.clone(), link)
+        .await?;
 
     let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
     ResponseData::ok(result).json()

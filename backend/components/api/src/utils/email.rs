@@ -61,6 +61,7 @@ struct SendgridErrorFieldAndMessage {
 }
 
 impl SendgridClient {
+    const DASHBOARD_INVITE_TEMPLATE_ID: &str = "d-74de0508a7834a2494c499d2a70c41ba";
     const EMAIL_VERIFY_TEMPLATE_ID: &str = "d-c558e640dad04726a31e6710c7ffc57c";
     const MAGIC_LINK_TEMPLATE_ID: &str = "d-a631e0eb72984e28a39940aa8f3bbe60";
     const FROM_EMAIL: &str = "noreply@noreply.onefootprint.com";
@@ -73,6 +74,23 @@ impl SendgridClient {
     pub async fn send_magic_link_email(&self, to_email: String, curl_url: String) -> Result<(), ApiError> {
         let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
         self.send_template(to_email, Self::MAGIC_LINK_TEMPLATE_ID, template_data)
+            .await
+    }
+
+    pub async fn send_dashboard_invite_email(
+        &self,
+        to_email: String,
+        inviter: String,
+        org_name: String,
+        accept_url: String,
+    ) -> Result<(), ApiError> {
+        let template_data = HashMap::from([
+            ("recipient_email".to_string(), to_email.clone()),
+            ("inviter".to_string(), inviter),
+            ("org_name".to_string(), org_name),
+            ("accept_url".to_string(), accept_url),
+        ]);
+        self.send_template(to_email, Self::DASHBOARD_INVITE_TEMPLATE_ID, template_data)
             .await
     }
 
