@@ -20,7 +20,7 @@
     "@onefootprint/ui": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/footprint-react": "*",
-    "next": "13.1.2",
+    "next": "13.1.6",
     "react": "18.2.0",
     "styled-components": "^5.3.6"
   },
