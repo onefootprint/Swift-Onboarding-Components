@@ -156,7 +156,14 @@ pub(crate) async fn send_email_challenge(
 
     // add unique url query param to avoid incorrect caching by browser/client
     let unique_param = gen_random_alphanumeric_code(5);
-    let confirm_link_str = format!("https://confirm.onefootprint.com/?v={}#{}", unique_param, token);
+    let base_url = if state.config.service_config.is_production() {
+        "https://confirm.onefootprint.com"
+    } else if state.config.service_config.is_local() {
+        "http://localhost:3006"
+    } else {
+        "https://confirm.preview.onefootprint.com"
+    };
+    let confirm_link_str = format!("{}/?v={}#{}", base_url, unique_param, token);
     state
         .sendgrid_client
         .send_with_challenge_template(email_address.leak_to_string(), confirm_link_str)
