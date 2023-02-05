@@ -39,6 +39,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const sxStyles = useSX(sx);
+
     return (
       <ButtonContainer
         className="fp-button"
@@ -109,13 +110,6 @@ const ButtonContainer = styled.button<{
         color: ${button.variant[variant].active.color};
       }
 
-      &:disabled {
-        cursor: not-allowed;
-        background-color: ${button.variant[variant].disabled.bg};
-        border-color: ${button.variant[variant].disabled.borderColor};
-        color: ${button.variant[variant].disabled.color};
-      }
-
       &[data-loading='true'] {
         background-color: ${button.variant[variant].loading.bg};
         color: ${button.variant[variant].loading.color};
@@ -123,6 +117,17 @@ const ButtonContainer = styled.button<{
 
         path {
           fill: ${button.variant[variant].loading.color};
+        }
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        background-color: ${button.variant[variant].disabled.bg};
+        border-color: ${button.variant[variant].disabled.borderColor};
+        color: ${button.variant[variant].disabled.color};
+
+        path {
+          fill: ${button.variant[variant].disabled.color};
         }
       }
 

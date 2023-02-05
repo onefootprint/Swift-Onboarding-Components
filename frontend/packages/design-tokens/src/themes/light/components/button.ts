@@ -27,7 +27,7 @@ const button: Button = {
       },
       loading: {
         bg: 'var(fp-buttons-primary-loading-bg)',
-        color: 'var(fp-buttons-primary-loading-bg)',
+        color: 'var(fp-buttons-primary-loading-icon)',
       },
       disabled: {
         bg: 'var(--fp-buttons-primary-disabled-bg)',
@@ -51,7 +51,7 @@ const button: Button = {
       },
       loading: {
         bg: 'var(--fp-buttons-secondary-loading-bg)',
-        color: 'var(--fp-buttons-secondary-loading-bg)',
+        color: 'var(--fp-buttons-secondary-loading-icon)',
       },
       disabled: {
         bg: 'var(--fp-buttons-secondary-disabled-bg)',
