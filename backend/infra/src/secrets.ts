@@ -118,7 +118,12 @@ export async function LoadSecrets(
     }),
   });
 
-  const auroraDbPassword = new random.RandomPassword('db_password', {
+  const auroraDbPasswordOld = new random.RandomPassword('db_password', {
+    length: 44,
+    special: false,
+  });
+
+  const auroraDbPassword = new random.RandomPassword('db_password_020223', {
     length: 44,
     special: false,
   });
