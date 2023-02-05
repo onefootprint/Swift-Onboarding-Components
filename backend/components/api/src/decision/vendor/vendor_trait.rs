@@ -41,6 +41,9 @@ impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idol
     ) -> Result<IdologyExpectIDAPIResponse, idv::idology::error::Error> {
         let raw_response = self.verify_expectid(request.idv_data).await?; // TODO: this should return PiiJsonValue itself
         let parsed_response = idv::idology::expectid::response::parse_response(raw_response.clone())?;
+
+        parsed_response.response.validate()?;
+
         Ok(IdologyExpectIDAPIResponse {
             raw_response: PiiJsonValue::new(raw_response),
             parsed_response,
