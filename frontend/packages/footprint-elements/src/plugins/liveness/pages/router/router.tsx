@@ -5,7 +5,6 @@ import useLivenessMachine from '../../hooks/use-liveness-machine';
 import { States } from '../../utils/state-machine/types';
 import Register from '../register';
 import Retry from '../retry';
-import Success from '../success';
 import Unavailable from '../unavailable';
 
 type RouterProps = {
@@ -31,9 +30,6 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches(States.unavailable)) {
     return <Unavailable />;
-  }
-  if (state.matches(States.success)) {
-    return <Success />;
   }
   return null;
 };

@@ -5,7 +5,6 @@ export enum States {
   register = 'register',
   retry = 'retry',
   unavailable = 'unavailable',
-  success = 'success',
   completed = 'completed',
 }
 

@@ -2,7 +2,11 @@
   "global": {
     "errors": {}
   },
-  "components": {},
+  "components": {
+    "liveness-success": {
+      "label": "Verified!"
+    }
+  },
   "pages": {
     "register": {
       "title": "Liveness check",

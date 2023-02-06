@@ -42,7 +42,7 @@ export const createLivenessMachine = () =>
               target: States.retry,
             },
             [Events.succeeded]: {
-              target: States.success,
+              target: States.completed,
             },
           },
         },
@@ -55,18 +55,11 @@ export const createLivenessMachine = () =>
               target: States.completed,
             },
             [Events.succeeded]: {
-              target: States.success,
-            },
-          },
-        },
-        [States.unavailable]: {
-          on: {
-            [Events.completed]: {
               target: States.completed,
             },
           },
         },
-        [States.success]: {
+        [States.unavailable]: {
           on: {
             [Events.completed]: {
               target: States.completed,

@@ -1,11 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Button } from '@onefootprint/ui';
+import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
+import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
 import useBiometricInit from '../../hooks/use-register-biometric';
+
+const SUCCESS_TRANSITION_DELAY_MS = 1500;
 
 const Register = () => {
   const { t } = useTranslation('pages.register');
@@ -17,11 +19,14 @@ const Register = () => {
     if (!authToken) {
       return;
     }
+
     biometricInitMutation.mutate(
       { authToken },
       {
         onSuccess() {
-          send({ type: Events.succeeded });
+          setTimeout(() => {
+            send({ type: Events.succeeded });
+          }, SUCCESS_TRANSITION_DELAY_MS);
         },
         onError() {
           send({ type: Events.failed });
@@ -31,24 +36,23 @@ const Register = () => {
   };
 
   return (
-    <Container>
+    <Box>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Button
-        loading={biometricInitMutation.isLoading}
-        onClick={handleClick}
-        fullWidth
-      >
-        {t('cta')}
-      </Button>
-    </Container>
+      {biometricInitMutation.isSuccess ? (
+        <LivenessSuccess />
+      ) : (
+        <Button
+          loading={biometricInitMutation.isLoading}
+          disabled={biometricInitMutation.isLoading}
+          onClick={handleClick}
+          fullWidth
+          sx={{ marginTop: 8 }}
+        >
+          {t('cta')}
+        </Button>
+      )}
+    </Box>
   );
 };
-
-const Container = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[8]};
-  `}
-`;
 
 export default Register;

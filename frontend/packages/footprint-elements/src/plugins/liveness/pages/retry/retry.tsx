@@ -5,8 +5,11 @@ import styled, { css } from 'styled-components';
 
 import { useSkipLiveness } from '../../../../hooks';
 import HeaderTitle from '../../components/header-title';
+import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
 import useBiometricInit from '../../hooks/use-register-biometric';
+
+const SUCCESS_TRANSITION_DELAY_MS = 1500;
 
 const Retry = () => {
   const { t } = useTranslation('pages.retry');
@@ -37,7 +40,9 @@ const Retry = () => {
       { authToken },
       {
         onSuccess() {
-          send({ type: Events.succeeded });
+          setTimeout(() => {
+            send({ type: Events.succeeded });
+          }, SUCCESS_TRANSITION_DELAY_MS);
         },
         onError() {
           send({ type: Events.failed });
@@ -49,23 +54,33 @@ const Retry = () => {
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <ButtonsContainer>
-        <Button
-          onClick={handleRetry}
-          loading={biometricInitMutation.isLoading}
-          fullWidth
-        >
-          {t('cta')}
-        </Button>
-        <Button
-          loading={skipLivenessMutation.isLoading}
-          onClick={handleSkip}
-          fullWidth
-          variant="secondary"
-        >
-          {t('skip')}
-        </Button>
-      </ButtonsContainer>
+      {biometricInitMutation.isSuccess ? (
+        <LivenessSuccess />
+      ) : (
+        <ButtonsContainer>
+          <Button
+            onClick={handleRetry}
+            loading={biometricInitMutation.isLoading}
+            disabled={
+              biometricInitMutation.isLoading || skipLivenessMutation.isLoading
+            }
+            fullWidth
+          >
+            {t('cta')}
+          </Button>
+          <Button
+            loading={skipLivenessMutation.isLoading}
+            disabled={
+              biometricInitMutation.isLoading || skipLivenessMutation.isLoading
+            }
+            onClick={handleSkip}
+            fullWidth
+            variant="secondary"
+          >
+            {t('skip')}
+          </Button>
+        </ButtonsContainer>
+      )}
     </Container>
   );
 };
