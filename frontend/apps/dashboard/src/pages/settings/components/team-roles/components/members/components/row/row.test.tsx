@@ -2,16 +2,25 @@ import {
   createUseRouterSpy,
   customRender,
   screen,
+  userEvent,
+  waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
 import Row, { RowProps } from './row';
-import memberFixture from './row.test.config';
+import {
+  memberFixture,
+  roleToSelectOnEdit,
+  withEditMember,
+  withOrgRoles,
+} from './row.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
 describe('<Row />', () => {
   beforeEach(() => {
+    withOrgRoles();
     useRouterSpy({
       pathname: '/settings',
       query: {
@@ -20,7 +29,7 @@ describe('<Row />', () => {
     });
   });
 
-  const renderRow = ({ member = memberFixture }: Partial<RowProps>) => {
+  const renderRow = ({ member = memberFixture }: Partial<RowProps>) =>
     customRender(
       <table>
         <tbody>
@@ -30,7 +39,6 @@ describe('<Row />', () => {
         </tbody>
       </table>,
     );
-  };
 
   it('should render the name', () => {
     renderRow({
@@ -75,6 +83,41 @@ describe('<Row />', () => {
         member: { ...memberFixture, lastLoginAt: null },
       });
       expect(screen.getByText('Pending')).toBeInTheDocument();
+    });
+  });
+
+  describe('when clicking on the role button', () => {
+    beforeEach(() => {
+      withEditMember(memberFixture, roleToSelectOnEdit);
+    });
+
+    it('should display the list of roles with a description', async () => {
+      renderRow({});
+
+      const currentRole = screen.getByText('Admin');
+      expect(currentRole).toBeInTheDocument();
+
+      const roleButton = screen.getByRole('combobox', {
+        name: `Change ${memberFixture.email} role`,
+      });
+      await userEvent.click(roleButton);
+
+      await waitFor(() => {
+        const memberOption = screen.getByRole('option', {
+          name: 'Member',
+        });
+        expect(memberOption).toBeInTheDocument();
+      });
+
+      const memberOption = screen.getByRole('option', {
+        name: 'Member',
+      });
+      const description = within(memberOption).getByText('Read-only');
+      expect(description).toBeInTheDocument();
+      await userEvent.click(memberOption);
+
+      const newRole = screen.getByText('Member');
+      expect(newRole).toBeInTheDocument();
     });
   });
 });

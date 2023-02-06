@@ -3,12 +3,12 @@ import { Filters as FPFilter } from '@onefootprint/ui';
 import React from 'react';
 
 import useOrgMembersFilters from '../../../../hooks/use-org-members-filters';
-import useRolesOptions from '../../../../hooks/use-roles-options';
+import useRoles from '../../../../hooks/use-roles';
 
 const Filters = () => {
   const { t } = useTranslation('pages.settings.members.filters');
   const filters = useOrgMembersFilters();
-  const rolesQuery = useRolesOptions();
+  const rolesQuery = useRoles();
 
   return (
     <FPFilter
@@ -17,7 +17,7 @@ const Filters = () => {
           kind: 'multi-select',
           label: t('role.label'),
           loading: rolesQuery.isLoading,
-          options: rolesQuery.data || [],
+          options: rolesQuery.options,
           query: 'members_role',
           selectedOptions: filters.values.role,
         },

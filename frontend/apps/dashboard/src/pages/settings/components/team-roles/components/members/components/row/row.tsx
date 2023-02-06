@@ -6,16 +6,16 @@ import useUserSession from 'src/hooks/use-user-session';
 import styled from 'styled-components';
 
 import Actions from './components/actions';
+import EditRole from './components/edit-role';
 
 export type RowProps = {
   member: OrgMember;
 };
 
-// TODO: https://linear.app/footprint/issue/FP-1877/add-dropdown-to-member-row-to-change-role-only-if-logged-in-user-is
 const Row = ({ member }: RowProps) => {
   const { t } = useTranslation('pages.settings.members.table');
   const session = useUserSession();
-  const { email, firstName, lastName, lastLoginAt, roleName } = member;
+  const { email, firstName, lastName, lastLoginAt } = member;
   const isMemberCurrentUser = session.data?.id === member.id;
   const shouldShowActions = !isMemberCurrentUser;
 
@@ -27,8 +27,10 @@ const Row = ({ member }: RowProps) => {
           {email}
         </Typography>
       </Td>
-      <Td>{lastLoginAt ?? '-'}</Td>
-      <Td>{roleName}</Td>
+      <Td>{lastLoginAt || '-'}</Td>
+      <Td>
+        <EditRole member={member} />
+      </Td>
       <Td>
         {!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}
       </Td>

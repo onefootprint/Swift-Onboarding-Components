@@ -6,7 +6,7 @@ import { GetOrgRolesResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-const getOrgRolesRequest = async (authHeaders: AuthHeaders) => {
+const getRolesRequest = async (authHeaders: AuthHeaders) => {
   const { data: response } = await request<
     PaginatedRequestResponse<GetOrgRolesResponse>
   >({
@@ -19,24 +19,21 @@ const getOrgRolesRequest = async (authHeaders: AuthHeaders) => {
     },
   });
 
-  return response;
+  return response.data;
 };
 
-const useRolesOptions = () => {
+const useRoles = () => {
   const { authHeaders } = useSession();
-  const rolesQuery = useQuery(
-    ['members', 'roles'],
-    () => getOrgRolesRequest(authHeaders),
-    {
-      select: response =>
-        response.data.map(role => ({ label: role.name, value: role.id })),
-    },
+  const rolesQuery = useQuery(['members', 'roles'], () =>
+    getRolesRequest(authHeaders),
   );
-  const { error } = rolesQuery;
+  const { error, data = [] } = rolesQuery;
+  const options = data.map(role => ({ label: role.name, value: role.id }));
   return {
     ...rolesQuery,
     errorMessage: error ? getErrorMessage(error) : undefined,
+    options,
   };
 };
 
-export default useRolesOptions;
+export default useRoles;

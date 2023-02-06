@@ -46,7 +46,7 @@ export const orgMembersFixture: OrgMember[] = [
     lastName: 'Larson',
     lastLoginAt: '2023-01-19T13:02:16.268743Z',
     createdAt: '2022-09-20T09:26:24.292959Z',
-    roleName: 'Admin',
+    roleName: 'Member',
     roleId: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
   },
   {
@@ -56,7 +56,7 @@ export const orgMembersFixture: OrgMember[] = [
     lastName: 'Gilmore',
     lastLoginAt: '2023-01-17T20:14:10.836665Z',
     createdAt: '2022-09-20T16:14:00.347663Z',
-    roleName: 'Admin',
+    roleName: 'Member',
     roleId: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
   },
   {
@@ -66,7 +66,7 @@ export const orgMembersFixture: OrgMember[] = [
     lastName: 'Jennings',
     lastLoginAt: '2023-01-19T00:25:39.500544Z',
     createdAt: '2022-09-23T14:37:17.775986Z',
-    roleName: 'Admin',
+    roleName: 'Member',
     roleId: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
   },
   {
@@ -76,7 +76,7 @@ export const orgMembersFixture: OrgMember[] = [
     lastName: 'Velez',
     lastLoginAt: '2023-01-13T12:57:00.098715Z',
     createdAt: '2022-09-26T17:39:52.509690Z',
-    roleName: 'Admin',
+    roleName: 'Member',
     roleId: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
   },
   {
@@ -86,7 +86,7 @@ export const orgMembersFixture: OrgMember[] = [
     lastName: 'Tate',
     lastLoginAt: '2023-01-12T20:37:52.240432Z',
     createdAt: '2022-10-31T18:44:47.220049Z',
-    roleName: 'Admin',
+    roleName: 'Member',
     roleId: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
   },
 ];
@@ -103,7 +103,7 @@ export const orgMembersRelativeTimeFixture = [
 export const orgRolesFixture: OrgRole[] = [
   {
     id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
-    name: 'Super',
+    name: 'Admin',
     scopes: ['admin'],
     isImmutable: true,
     createdAt: '2022-09-19T16:24:35.367322Z',
@@ -115,9 +115,25 @@ export const orgRolesFixture: OrgRole[] = [
     isImmutable: true,
     scopes: ['read'],
     createdAt: '2023-01-06T05:11:08.415924Z',
-    numActiveUsers: 4,
+    numActiveUsers: 5,
+  },
+  {
+    id: 'orgrole_bX2flKNWEF13143EWRWELJN',
+    name: 'Developer',
+    isImmutable: true,
+    scopes: ['api_keys'],
+    createdAt: '2023-01-06T05:11:08.415924Z',
+    numActiveUsers: 0,
   },
 ];
+
+export const memberToEdit = orgMembersFixture.find(
+  member => member.email === 'jane.doe@acme.com',
+) as OrgMember;
+
+export const memberToEditRole = orgRolesFixture.find(
+  role => role.name === 'Developer',
+) as OrgRole;
 
 export const withOrgMembers = (orgMembers: OrgMember[] = orgMembersFixture) =>
   mockRequest({
@@ -163,6 +179,29 @@ export const withCreateOrgMembersError = () =>
     },
   });
 
+export const withEditMember = (member: OrgMember, newRole: OrgRole) =>
+  mockRequest({
+    method: 'patch',
+    path: `/org/members/${member.id}`,
+    response: {
+      ...member,
+      roleId: newRole.id,
+      roleName: newRole.name,
+    },
+  });
+
+export const withEditMemberError = (member: OrgMember) =>
+  mockRequest({
+    method: 'patch',
+    path: `/org/members/${member.id}`,
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
 export const withRemoveOrgMember = (id: string) =>
   mockRequest({
     method: 'post',
@@ -182,12 +221,12 @@ export const withRemoveOrgMemberError = (id: string) =>
     },
   });
 
-export const withOrgRoles = () =>
+export const withOrgRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/roles',
     response: {
-      data: orgRolesFixture,
+      data: orgRoles,
       meta: {
         next: null,
         count: null,

@@ -819,6 +819,18 @@
               "title_other": "Invitations weren't sent"
             }
           }
+        },
+        "edit-role": {
+          "aria-label": "Change {{email}} role",
+          "scopes": {
+            "admin": "Access to everything",
+            "read": "Read-only"
+          },
+          "notifications": {
+            "error": {
+              "title": "Error updating role"
+            }
+          }
         }
       },
       "roles": {

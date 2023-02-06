@@ -12,11 +12,15 @@ import React from 'react';
 
 import Members from './members';
 import {
+  memberToEdit,
+  memberToEditRole,
   orgMembersFixture,
   orgMembersRelativeTimeFixture,
   orgRolesFixture,
   withCreateOrgMembers,
   withCreateOrgMembersError,
+  withEditMember,
+  withEditMemberError,
   withOrgMembers,
   withOrgMembersError,
   withOrgRoles,
@@ -164,7 +168,7 @@ describe('<Members />', () => {
       });
     });
 
-    describe('when inviting a teammate', () => {
+    describe('when inviting a member', () => {
       describe('when the request to load the roles fails', () => {
         beforeEach(() => {
           withOrgRolesError();
@@ -279,6 +283,72 @@ describe('<Members />', () => {
           await waitFor(() => {
             const successMessage = screen.getByText("Invitation wasn't sent");
             expect(successMessage).toBeInTheDocument();
+          });
+        });
+      });
+    });
+
+    describe('when editing a member role', () => {
+      describe('when the request to edit the member role fails', () => {
+        beforeEach(() => {
+          withEditMemberError(memberToEdit);
+        });
+
+        it('should show an error message', async () => {
+          await renderMembersAndWaitData();
+
+          const roleButton = screen.getByRole('combobox', {
+            name: `Change ${memberToEdit.email} role`,
+          });
+          await userEvent.click(roleButton);
+
+          await waitFor(() => {
+            const newRoleOption = screen.getByRole('option', {
+              name: memberToEditRole.name,
+            });
+            expect(newRoleOption).toBeInTheDocument();
+          });
+
+          const newRoleOption = screen.getByRole('option', {
+            name: memberToEditRole.name,
+          });
+          await userEvent.click(newRoleOption);
+
+          await waitFor(() => {
+            const errorMessage = screen.getByText('Error updating role');
+            expect(errorMessage).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to edit the member succeeds', () => {
+        beforeEach(() => {
+          withEditMember(memberToEdit, memberToEditRole);
+        });
+
+        it('should update the member role', async () => {
+          await renderMembersAndWaitData();
+
+          const roleButton = screen.getByRole('combobox', {
+            name: `Change ${memberToEdit.email} role`,
+          });
+          await userEvent.click(roleButton);
+
+          await waitFor(() => {
+            const newRoleOption = screen.getByRole('option', {
+              name: memberToEditRole.name,
+            });
+            expect(newRoleOption).toBeInTheDocument();
+          });
+
+          const newRoleOption = screen.getByRole('option', {
+            name: memberToEditRole.name,
+          });
+          await userEvent.click(newRoleOption);
+
+          await waitFor(() => {
+            const newRole = screen.getByText(memberToEditRole.name);
+            expect(newRole).toBeInTheDocument();
           });
         });
       });
