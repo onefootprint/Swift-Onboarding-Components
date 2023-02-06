@@ -3,7 +3,6 @@ import { Button, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import imageBlobToBase64 from '../../../../utils/image-processing/image-blob-to-base64';
 import Flash from './components/flash';
 import Overlay from './components/overlay';
 import useSize from './hooks/use-size';
@@ -68,16 +67,8 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
     // callback when flash animation is done This gives animation enough time
     // to complete. Taking the photo at the end of the animation would be
     // buggy if the user moved during the flash.
-    canvasRef.current.toBlob(
-      async (blob: Blob | null) => {
-        if (blob) {
-          const imageString = (await imageBlobToBase64(blob)) as string;
-          setImage(imageString);
-        }
-      },
-      'image/jpeg',
-      1,
-    );
+    const imageString = canvasRef.current.toDataURL();
+    setImage(imageString);
   };
 
   const clearCanvas = () => {

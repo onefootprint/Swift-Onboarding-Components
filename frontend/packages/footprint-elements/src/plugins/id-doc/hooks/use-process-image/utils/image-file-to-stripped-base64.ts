@@ -1,6 +1,7 @@
-import stripBase64Prefix from './strip-base64-prefix';
+const stripBase64Prefix = (image: string) =>
+  image.replace(/data:.+?;base64,/i, '');
 
-const imageFileToStrippedBase64 = (image: File) =>
+const imageFileToStrippedBase64 = (image: File): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {

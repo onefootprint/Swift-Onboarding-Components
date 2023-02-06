@@ -5,6 +5,9 @@ node_modules
 .pnp
 .pnp.js
 
+# external libs
+packages/ui-emails/.react-email/
+
 # testing
 coverage
 

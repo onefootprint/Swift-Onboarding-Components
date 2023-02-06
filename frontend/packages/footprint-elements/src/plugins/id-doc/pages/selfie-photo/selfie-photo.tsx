@@ -1,26 +1,49 @@
 import React, { useState } from 'react';
 
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
-import stripBase64Prefix from '../../utils/image-processing/strip-base64-prefix';
+import useProcessImage from '../../hooks/use-process-image/use-process-image';
 import Camera from './components/camera';
 import Preview from './components/preview';
 
 const SelfiePhoto = () => {
   const [, send] = useIdDocMachine();
   const [image, setImage] = useState<string | null>(null);
+  const { processImageUrl, convertImageFileToStrippedBase64 } =
+    useProcessImage();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRetake = () => {
     setImage(null);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!image) {
       return;
     }
+
+    setIsLoading(true);
+    const processedImageFile = await processImageUrl(image);
+    if (!processedImageFile) {
+      // An error occurred, directly prompt user to re-take the image
+      setIsLoading(false);
+      handleRetake();
+      return;
+    }
+
+    const imageString = await convertImageFileToStrippedBase64(
+      processedImageFile,
+    );
+    if (!imageString) {
+      setIsLoading(false);
+      handleRetake();
+      return;
+    }
+
+    setIsLoading(false);
     send({
       type: Events.receivedSelfieImage,
       payload: {
-        image: stripBase64Prefix(image),
+        image: imageString,
       },
     });
   };
@@ -40,6 +63,7 @@ const SelfiePhoto = () => {
       imageSrc={image}
       onRetake={handleRetake}
       onConfirm={handleConfirm}
+      isLoading={isLoading}
     />
   ) : (
     <Camera onCapture={handleCapture} onError={handleError} />

@@ -7,9 +7,15 @@ type PreviewProps = {
   imageSrc: string;
   onRetake: () => void;
   onConfirm: () => void;
+  isLoading: boolean;
 };
 
-const Preview = ({ imageSrc, onRetake, onConfirm }: PreviewProps) => {
+const Preview = ({
+  imageSrc,
+  onRetake,
+  onConfirm,
+  isLoading,
+}: PreviewProps) => {
   const { t } = useTranslation('pages.selfie-photo.preview');
 
   return (
@@ -18,10 +24,21 @@ const Preview = ({ imageSrc, onRetake, onConfirm }: PreviewProps) => {
         <ImagePreview src={imageSrc} />
       </PreviewContainer>
       <ButtonsContainer>
-        <Button fullWidth onClick={onConfirm} variant="primary">
+        <Button
+          fullWidth
+          onClick={onConfirm}
+          variant="primary"
+          loading={isLoading}
+          disabled={isLoading}
+        >
           {t('confirm')}
         </Button>
-        <Button fullWidth onClick={onRetake} variant="secondary">
+        <Button
+          fullWidth
+          onClick={onRetake}
+          variant="secondary"
+          disabled={isLoading}
+        >
           {t('retake')}
         </Button>
       </ButtonsContainer>

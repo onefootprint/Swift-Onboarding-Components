@@ -7,7 +7,7 @@ import {
 } from '@onefootprint/icons';
 import { IdDocType } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
@@ -15,7 +15,7 @@ import IdAnimation from '../../../../components/id-animation';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useHandleCameraError from '../../hooks/use-handle-camera-error';
-import imageFileToStrippedBase64 from '../../utils/image-processing/image-file-to-stripped-base64';
+import useProcessImage from '../../hooks/use-process-image/use-process-image';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
@@ -36,25 +36,57 @@ const IdDocPhotoPrompt = ({
   const takePhotoRef = useRef<HTMLInputElement | undefined>();
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
   const onCameraError = useHandleCameraError();
+  const { processImageFile, convertImageFileToStrippedBase64 } =
+    useProcessImage();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [captureMethod, setCaptureMethod] = useState<
+    'take' | 'upload' | undefined
+  >();
+
+  const onProcessingDone = () => {
+    setIsLoading(false);
+    setCaptureMethod(undefined);
+  };
 
   const handleImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsLoading(true);
     const { files } = event.target;
     if (!files?.length) {
+      onProcessingDone();
       return;
     }
-    const imageString = (await imageFileToStrippedBase64(files[0])) as string;
+
+    const processedImageFile = await processImageFile(files[0]);
+    if (!processedImageFile) {
+      onProcessingDone();
+      return;
+    }
+
+    const imageString = await convertImageFileToStrippedBase64(
+      processedImageFile,
+    );
+    if (!imageString) {
+      onProcessingDone();
+      return;
+    }
+
     onComplete(imageString);
+    onProcessingDone();
   };
 
   const handleUpload = () => {
+    setCaptureMethod('upload');
     uploadPhotoRef.current?.click();
   };
 
   const handleTake = () => {
+    setCaptureMethod('take');
     try {
       takePhotoRef.current?.click();
     } catch (err) {
       onCameraError(err);
+      onProcessingDone();
     }
   };
 
@@ -97,7 +129,12 @@ const IdDocPhotoPrompt = ({
         />
       )}
       <ButtonsContainer>
-        <Button fullWidth onClick={handleTake}>
+        <Button
+          fullWidth
+          onClick={handleTake}
+          loading={isLoading && captureMethod === 'take'}
+          disabled={isLoading}
+        >
           {t('take-photo.title')}
         </Button>
         <StyledInput
@@ -107,8 +144,13 @@ const IdDocPhotoPrompt = ({
           capture="environment"
           onChange={handleImage}
         />
-
-        <Button fullWidth variant="secondary" onClick={handleUpload}>
+        <Button
+          fullWidth
+          variant="secondary"
+          onClick={handleUpload}
+          loading={isLoading && captureMethod === 'upload'}
+          disabled={isLoading}
+        >
           {t('upload-photo.title')}
         </Button>
         <StyledInput
