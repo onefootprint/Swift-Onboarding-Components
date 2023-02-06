@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -40,7 +41,12 @@ const Form = ({ onComplete, onSkip }: FormProps) => {
   };
 
   return (
-    <Container>
+    <Container
+      layout
+      transition={{
+        layout: { duration: 0.1, ease: 'easeOut' },
+      }}
+    >
       <Step id={id} onComplete={handleComplete} />
       <FormControls
         id={id}
@@ -53,7 +59,7 @@ const Form = ({ onComplete, onSkip }: FormProps) => {
   );
 };
 
-const Container = styled.div`
+const Container = styled(motion.div)`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
