@@ -41,6 +41,7 @@ const Form = ({ onComplete }: FormProps) => {
 
   return (
     <Container
+      data-step={id}
       layout
       transition={{
         layout: { duration: 0.1, ease: 'easeOut' },
@@ -65,6 +66,18 @@ const Container = styled(motion.div)`
     overflow: hidden;
     position: relative;
     width: 500px;
+
+    &[data-step='welcome-form'] {
+      background: 
+      url('/onboarding/noise.svg'),
+      linear-gradient(
+        0deg,
+        ${theme.backgroundColor.primary} 0%,
+        transparent 50%
+      ),
+      radial-gradient(at 0% 0%, #f9dff7 20%, transparent 60%),
+      radial-gradient(at 100% 0%, #e9e2ff 40%, transparent 60%),
+      radial-gradient(at 100% 100%, #e0f6f9 40%, transparent 60%);
   `}
 `;
 
