@@ -22,6 +22,7 @@ const Fingerprint = ({ page, fpAuthToken }: FingerprintProps) => {
     <FpjsProvider
       loadOptions={{
         apiKey: FINGERPRINT_API_KEY,
+        endpoint: 'https://fp.risk.onefootprint.com',
       }}
     >
       <FingerprintIntegration page={page} fpAuthToken={fpAuthToken} />
