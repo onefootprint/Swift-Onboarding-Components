@@ -17,6 +17,7 @@ use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::user_vault_wrapper::UserVaultWrapper,
 };
+use strum::IntoEnumIterator;
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
 #[tracing::instrument(skip(features, db_pool, ff_client))]
@@ -187,17 +188,12 @@ fn write_risk_signals(
     onboarding_decision_id: OnboardingDecisionId,
     tenant_can_view_socure_risk_signal: bool,
 ) -> ApiResult<()> {
-    let mut vendor_apis = vec![
-        VendorAPI::IdologyExpectID,
-        VendorAPI::IdologyScanVerifySubmission,
-        VendorAPI::IdologyScanVerifyResults,
-        VendorAPI::IdologyScanOnboarding,
-        VendorAPI::TwilioLookupV2,
-    ];
+    let mut vendor_apis: Vec<VendorAPI> = VendorAPI::iter()
+        .filter(|v| !matches!(v, &VendorAPI::SocureIDPlus))
+        .collect();
 
-    // For now, our Socure contract only allows Footprint to view or use Socure data
     if tenant_can_view_socure_risk_signal {
-        vendor_apis.push(VendorAPI::SocureIDPlus);
+        vendor_apis.push(VendorAPI::SocureIDPlus)
     }
 
     let reason_codes = feature_vector.consolidated_reason_codes(vendor_apis);
