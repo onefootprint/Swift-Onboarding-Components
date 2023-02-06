@@ -156,7 +156,9 @@ def test_update_name(sandbox_tenant):
     first_name = f"Footprint {_gen_random_n_digit_number(5)}"
     last_name = f"Integration Testing {_gen_random_n_digit_number(5)}"
     data = dict(first_name=first_name, last_name=last_name)
-    patch(f"org/member", data, sandbox_tenant.auth_token)
+    body = patch(f"org/member", data, sandbox_tenant.auth_token)
+    assert body["first_name"] == first_name
+    assert body["last_name"] == last_name
 
     body = get(f"org/member", data, sandbox_tenant.auth_token)
     assert body["first_name"] == first_name

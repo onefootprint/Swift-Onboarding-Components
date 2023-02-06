@@ -5,8 +5,6 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantRbAuthContext;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
-use crate::errors::ApiResult;
-use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
@@ -14,14 +12,14 @@ use crate::State;
 use db::models::tenant_user::TenantUser;
 use db::models::tenant_user::TenantUserUpdate;
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, web, web::Json};
+use paperclip::actix::{api_v2_operation, get, patch, web};
 
 #[api_v2_operation(tags(OrgSettings), description = "Returns info on the authed user.")]
 #[get("/org/member")]
 async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<ResponseData<api_wire_types::BasicOrganizationMember>>> {
+) -> JsonApiResponse<api_wire_types::BasicOrganizationMember> {
     let role = auth.role().clone();
     let auth = auth.check_guard(TenantGuard::Read)?;
     let user_id = match auth.actor() {
@@ -50,7 +48,8 @@ async fn patch(
     request: web::Json<UpdateTenantUserRequest>,
     // Weird to take in an impersonation token here
     auth: TenantRbAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::BasicOrganizationMember> {
+    let role = auth.role().clone();
     let auth = auth.check_guard(Any)?;
 
     let UpdateTenantUserRequest {
@@ -67,10 +66,11 @@ async fn patch(
         first_name,
         last_name,
     };
-    state
+    let user = state
         .db_pool
         .db_transaction(move |conn| TenantUser::update(conn, &user_id, user_update))
         .await?;
 
-    EmptyResponse::ok().json()
+    let result = api_wire_types::BasicOrganizationMember::from_db((user, role));
+    ResponseData::ok(result).json()
 }
