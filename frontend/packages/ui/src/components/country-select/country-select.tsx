@@ -59,6 +59,7 @@ const CountrySelect = ({
         disabled={disabled}
         hasError={hasError}
         hasFocus={isOpen}
+        isPrivate
         onClick={onClick}
         testID={triggerTestID}
       >

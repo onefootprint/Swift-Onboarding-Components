@@ -11,6 +11,7 @@ type BaseSelectTriggerProps = {
   hasFocus?: boolean;
   onClick?: () => void;
   testID?: string;
+  isPrivate?: boolean;
 };
 
 const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
@@ -20,6 +21,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       disabled,
       hasError,
       hasFocus,
+      isPrivate,
       onClick,
       testID,
     }: BaseSelectTriggerProps,
@@ -29,12 +31,15 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       data-has-error={hasError}
       data-has-focus={hasFocus}
       data-testid={testID}
+      data-private={isPrivate}
       disabled={disabled}
       onClick={onClick}
       ref={ref}
       type="button"
     >
-      <Content data-testid={testID}>{children}</Content>
+      <Content data-private={isPrivate} data-testid={testID}>
+        {children}
+      </Content>
       <IcoChevronDown16 />
     </BaseSelectTriggerContainer>
   ),

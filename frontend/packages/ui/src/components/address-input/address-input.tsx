@@ -103,6 +103,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       const itemProps = getItemProps({ item, index });
       return (
         <AddressDropdownItem
+          data-private
           disableHoverStyles={highlightedIndex !== -1}
           highlighted={highlightedIndex === index}
           key={item.place_id}
@@ -128,6 +129,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
             onKeyDown={handleKeyDown}
             tabIndex={0}
             value={value}
+            data-private
             ref={mergeRefs([
               localRef,
               inputProps.ref,
@@ -141,6 +143,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
               {...popper.attributes.popper}
               ref={mergeRefs([menuProps.ref, setPopperElement])}
               style={popper.styles.popper}
+              data-private
             >
               <>
                 {options.map(renderAddressItem)}

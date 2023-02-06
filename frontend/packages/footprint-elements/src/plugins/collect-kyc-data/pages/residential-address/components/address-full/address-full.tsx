@@ -185,7 +185,7 @@ const AddressFull = ({
                   typeof field.value === 'object' ? field.value : undefined;
                 return (
                   <Select
-                    data-private
+                    isPrivate
                     label={t('form.state.label')}
                     onBlur={field.onBlur}
                     options={STATES}

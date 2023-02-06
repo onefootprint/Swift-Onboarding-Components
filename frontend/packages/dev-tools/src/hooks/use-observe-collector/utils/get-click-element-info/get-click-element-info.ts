@@ -1,9 +1,10 @@
+import { take } from 'lodash';
+
 import {
   DATA_PRIVATE_ATTRIBUTE,
   MAX_INNER_TEXT_LENGTH,
   MIN_INNER_TEXT_LENGTH,
   REDACTED_PRIVATE_DATA_VALUE,
-  TITLE_ELEMENT_TAG_NAMES,
   UNNAMED_ELEMENT_VALUE,
 } from './get-click-element-info.constants';
 
@@ -15,22 +16,52 @@ type IClickElementInfo = {
   classList?: string[];
 };
 
+const getElementOrParentsHavePrivateData = (el: HTMLElement) => {
+  // True if element or any of its parents have the DATA_PRIVATE_ATTRIBUTE set.
+  let currentElement = el.parentElement;
+  let hasPrivateData = !!el.getAttribute(DATA_PRIVATE_ATTRIBUTE);
+
+  while (
+    currentElement &&
+    currentElement.tagName !== 'BODY' &&
+    !hasPrivateData
+  ) {
+    currentElement = currentElement.parentElement;
+    hasPrivateData = !!currentElement?.getAttribute(DATA_PRIVATE_ATTRIBUTE);
+  }
+
+  return hasPrivateData;
+};
+
 export const getClickedElementContextInPage = (
   el: HTMLElement,
 ): IClickElementInfo[] => {
-  // traverse the DOM tree looking for significant "things", like header markups or aria labels
-  const contexts: IClickElementInfo[] = [];
-  let currentElement = el.parentElement;
+  let allParents: HTMLElement[] = [];
+  let currentElement: HTMLElement | null = el;
   while (currentElement && currentElement.tagName !== 'BODY') {
-    const ariaLabel = currentElement.getAttribute('aria-label');
-    const role = currentElement.getAttribute('role');
-    const texts = [ariaLabel, role].filter(elem => !!elem) as string[];
-    if (texts.length) {
-      const info = getClickedElementDetails(texts, currentElement);
-      contexts.push(info);
-    }
+    allParents.push(currentElement);
     currentElement = currentElement.parentElement;
   }
+  allParents = allParents.reverse(); // The topmost elements come first
+  const privateDataParentIndex = allParents.findIndex(parentEl =>
+    parentEl.getAttribute(DATA_PRIVATE_ATTRIBUTE),
+  );
+  // If any of the parents contain private data, delete anything downstream
+  if (privateDataParentIndex > -1) {
+    allParents.splice(privateDataParentIndex + 1);
+  }
+
+  // Now traverse any parents looking for significant "things", like header markups or aria labels
+  const contexts: IClickElementInfo[] = [];
+  allParents.forEach(parentEl => {
+    const ariaLabel = parentEl.getAttribute('aria-label');
+    const role = parentEl.getAttribute('role');
+    const texts = [ariaLabel, role].filter(elem => !!elem) as string[];
+    if (texts.length) {
+      const info = getClickedElementDetails(texts, parentEl);
+      contexts.push(info);
+    }
+  });
   return contexts;
 };
 
@@ -41,6 +72,7 @@ function getClickedElementDetails(
   const modifiedTexts = Array.from(new Set(texts)).filter(
     text => !!text?.length,
   ) as string[];
+
   return {
     name: modifiedTexts.length ? modifiedTexts[0] : UNNAMED_ELEMENT_VALUE,
     otherNames: modifiedTexts.length ? modifiedTexts.slice(1) : [],
@@ -64,6 +96,7 @@ const getElementTextsWithoutPrivateData = (el: HTMLElement): string[] => {
   if (value) {
     texts.push(value);
   }
+
   const innerText = tidyElementValue(el.innerText);
   if (innerText) {
     texts.push(innerText);
@@ -73,72 +106,49 @@ const getElementTextsWithoutPrivateData = (el: HTMLElement): string[] => {
 };
 
 export const getClickedElementInfo = (el: HTMLElement) => {
-  let texts = [el.getAttribute('aria-label')];
+  const texts = [el.getAttribute('aria-label')];
   if (el.tagName.toLowerCase() === 'img') {
     texts.push(el.getAttribute('alt'));
-    texts.push(el.getAttribute('src'));
   }
   // fish around looking for clear semantic labels, like "headers"
-  if (el.childElementCount) {
-    texts.push(findChildrenElementsTexts(el));
+  const hasPrivateData = getElementOrParentsHavePrivateData(el);
+  if (hasPrivateData) {
+    texts.push(REDACTED_PRIVATE_DATA_VALUE);
+  } else {
+    texts.push(...findInclusiveDownstreamElementsTexts(el));
   }
-  texts.push(...getElementTextsWithoutPrivateData(el));
-  // Get rid of dupes
-  texts = Array.from(new Set(texts)).filter(text => !!text?.length) as string[];
 
   return getClickedElementDetails(texts, el);
 };
 
-const findChildrenElementsTexts = (parent: HTMLElement): string | null => {
-  const fontEls: { size: number; el: HTMLElement }[] = [];
+const MAX_DOWNSTREAM_TEXTS_TO_LOG = 3;
+
+const findInclusiveDownstreamElementsTexts = (
+  parent: HTMLElement,
+): string[] => {
+  const elems: HTMLElement[] = [parent];
   const children = Array.from(parent.querySelectorAll('*')) as HTMLElement[];
+  elems.push(...children);
 
-  // look through all of the items looking for the biggest font!
-  children.forEach(el => {
-    // get elements with font size
-    const style = getComputedStyle(el);
-    if (style.fontSize && style.fontSize.endsWith('px')) {
-      // This only supports px for now
-      const size = Number.parseInt(
-        style.fontSize.substring(0, style.fontSize.length - 2),
-        10,
-      );
-      fontEls.push({
-        size,
-        el,
-      });
-    }
-  });
+  const privateDataElemIndex = elems.findIndex(el =>
+    el.getAttribute(DATA_PRIVATE_ATTRIBUTE),
+  );
 
-  // sort by size, prefer nodes with no children
-  fontEls.sort((a: any, b: any) => {
-    if (a.size === b.size) {
-      return a.el.childElementCount - b.el.childElementCount;
-    }
-    return b.size - a.size;
-  });
+  // If any of the elems contain private data, delete anything downstream
+  if (privateDataElemIndex > -1) {
+    elems.splice(privateDataElemIndex + 1);
+  }
 
   // Find the texts from the elements collected, only log them if they don't contain private data.
-  const fontElsTexts: string[] = [];
-  fontEls.forEach(({ el }) => {
-    fontElsTexts.push(...getElementTextsWithoutPrivateData(el));
+  const texts: string[] = [];
+  elems.forEach(el => {
+    texts.push(...getElementTextsWithoutPrivateData(el));
   });
-  const filteredTexts = fontElsTexts.filter(text => !!text?.length) as string[];
 
-  if (filteredTexts.length) {
-    return filteredTexts[0];
-  }
+  const filteredTexts = texts.filter(text => !!text?.length);
 
-  // if we have nothing with any font size then just look through common title elements
-  const textContents = TITLE_ELEMENT_TAG_NAMES.map(
-    tag => parent.querySelector(tag)?.textContent,
-  ).filter(text => !!text?.length) as string[];
-
-  if (textContents.length) {
-    return textContents[0];
-  }
-
-  return null;
+  // Don't log too many texts
+  return take(filteredTexts, MAX_DOWNSTREAM_TEXTS_TO_LOG);
 };
 
 function tidyElementValue(value: string): string | null {
