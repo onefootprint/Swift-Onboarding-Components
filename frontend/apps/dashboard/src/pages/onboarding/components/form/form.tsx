@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import FormControls from './components/form-controls';
+import ProgressBar from './components/progress-bar';
 import CompanyData from './components/steps/company-data';
 import Invite from './components/steps/invite';
 import UserData from './components/steps/user-data';
@@ -10,7 +10,6 @@ import Welcome from './components/steps/welcome';
 
 export type FormProps = {
   onComplete: () => void;
-  onSkip?: () => void;
 };
 
 const steps = [
@@ -20,7 +19,7 @@ const steps = [
   { id: 'invite-form', Step: Invite },
 ];
 
-const Form = ({ onComplete, onSkip }: FormProps) => {
+const Form = ({ onComplete }: FormProps) => {
   const [step, setStep] = useState(0);
   const stepsCount = steps.length;
   const maxStep = stepsCount - 1;
@@ -48,13 +47,10 @@ const Form = ({ onComplete, onSkip }: FormProps) => {
       }}
     >
       <Step id={id} onComplete={handleComplete} />
-      <FormControls
-        id={id}
-        max={stepsCount}
-        onPrev={handlePrev}
-        onSkip={onSkip}
-        value={step}
-      />
+      <Controls>
+        <ProgressBar max={stepsCount} onPrev={handlePrev} value={step} />
+        <ButtonsContainer id="onboarding-cta-portal" />
+      </Controls>
     </Container>
   );
 };
@@ -69,6 +65,22 @@ const Container = styled(motion.div)`
     overflow: hidden;
     position: relative;
     width: 500px;
+  `}
+`;
+
+const Controls = styled.footer`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: ${theme.spacing[5]} ${theme.spacing[7]};
+  `}
+`;
+
+const ButtonsContainer = styled.footer`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[7]};
   `}
 `;
 

@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Typography } from '@onefootprint/ui';
+import { Button, Portal, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -12,7 +12,7 @@ export type WelcomeProps = {
 };
 
 const Welcome = ({ id, onComplete }: WelcomeProps) => {
-  const { t } = useTranslation('pages.onboarding.welcome');
+  const { t, allT } = useTranslation('pages.onboarding.welcome');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,6 +36,11 @@ const Welcome = ({ id, onComplete }: WelcomeProps) => {
         <Typography color="secondary" variant="body-1">
           {t('subtitle')}
         </Typography>
+        <Portal selector="#onboarding-cta-portal" removeContent>
+          <Button form={id} size="compact" type="submit">
+            {allT('next')}
+          </Button>
+        </Portal>
       </form>
     </Container>
   );

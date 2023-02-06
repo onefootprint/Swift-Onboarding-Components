@@ -1,7 +1,13 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16, IcoWarning16 } from '@onefootprint/icons';
-import { LinkButton, SelectOption, Typography } from '@onefootprint/ui';
+import {
+  Button,
+  LinkButton,
+  Portal,
+  SelectOption,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -20,7 +26,7 @@ type FormData = {
 };
 
 const Invite = ({ id, onComplete }: InviteProps) => {
-  const { t } = useTranslation('pages.onboarding.invite');
+  const { t, allT } = useTranslation('pages.onboarding.invite');
   const { roles, defaultRole } = useRoles();
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const methods = useForm({
@@ -78,6 +84,12 @@ const Invite = ({ id, onComplete }: InviteProps) => {
           </Typography>
         </Error>
       )}
+      <Portal selector="#onboarding-cta-portal">
+        <LinkButton onClick={onComplete}>{allT('skip')}</LinkButton>
+        <Button form={id} size="compact" type="submit">
+          {allT('complete')}
+        </Button>
+      </Portal>
     </Container>
   );
 };

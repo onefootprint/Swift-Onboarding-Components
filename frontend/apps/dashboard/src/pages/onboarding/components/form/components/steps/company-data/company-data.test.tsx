@@ -16,10 +16,8 @@ describe('<CompanyData />', () => {
   }: Partial<CompanyDataProps>) => {
     customRender(
       <>
+        <div id="onboarding-cta-portal" />
         <CompanyData id={id} onComplete={onComplete} />
-        <button form={id} type="submit">
-          Next
-        </button>
       </>,
     );
   };

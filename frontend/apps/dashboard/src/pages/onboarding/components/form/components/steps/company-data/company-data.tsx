@@ -1,5 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Select, SelectOption, TextInput } from '@onefootprint/ui';
+import {
+  Button,
+  Portal,
+  Select,
+  SelectOption,
+  TextInput,
+} from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -18,7 +24,7 @@ type FormData = {
 };
 
 const CompanyData = ({ id, onComplete }: CompanyDataProps) => {
-  const { t } = useTranslation('pages.onboarding.company-data');
+  const { t, allT } = useTranslation('pages.onboarding.company-data');
   const {
     control,
     register,
@@ -75,6 +81,11 @@ const CompanyData = ({ id, onComplete }: CompanyDataProps) => {
             />
           )}
         />
+        <Portal selector="#onboarding-cta-portal">
+          <Button form={id} size="compact" type="submit">
+            {allT('next')}
+          </Button>
+        </Portal>
       </Form>
     </Container>
   );

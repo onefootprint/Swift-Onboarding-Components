@@ -7,21 +7,17 @@ export const userFixture: UserUpdateResponse = {
   lastName: 'Doe',
 };
 
-export const withUser = () =>
+export const withUpdateUser = (response: UserUpdateResponse = userFixture) =>
   mockRequest({
-    method: 'put',
-    fullPath: true,
-    path: 'https://6398b28afe03352a94dba0aa.mockapi.io/api/users/1',
-    response: {
-      data: userFixture,
-    },
+    method: 'patch',
+    path: '/org/member',
+    response,
   });
 
-export const withUserError = () =>
+export const withUpdateUserError = () =>
   mockRequest({
-    method: 'put',
-    fullPath: true,
-    path: 'https://6398b28afe03352a94dba0aa.mockapi.io/api/users/1',
+    method: 'patch',
+    path: '/org/member',
     statusCode: 400,
     response: {
       error: {

@@ -8,13 +8,13 @@ import React from 'react';
 import { useStore } from 'src/hooks/use-session';
 
 import UserData, { UserDataProps } from './user-data';
-import { withUser, withUserError } from './user-data.test.config';
+import { withUpdateUser, withUpdateUserError } from './user-data.test.config';
 
 const originalState = useStore.getState();
 
 describe('<UserData />', () => {
   beforeEach(() => {
-    withUser();
+    withUpdateUser();
     useStore.setState({
       data: {
         auth: '1',
@@ -44,10 +44,8 @@ describe('<UserData />', () => {
   }: Partial<UserDataProps>) => {
     customRender(
       <>
+        <div id="onboarding-cta-portal" />
         <UserData id={id} onComplete={onComplete} />
-        <button form={id} type="submit">
-          Next
-        </button>
       </>,
     );
   };
@@ -123,7 +121,7 @@ describe('<UserData />', () => {
 
     describe('when the request fails', () => {
       beforeEach(() => {
-        withUserError();
+        withUpdateUserError();
       });
 
       it('should show an error messsage', async () => {

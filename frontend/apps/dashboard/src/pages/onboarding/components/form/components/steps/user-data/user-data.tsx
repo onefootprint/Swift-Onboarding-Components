@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Grid, TextInput } from '@onefootprint/ui';
+import { Button, Grid, Portal, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useUserSession from 'src/hooks/use-user-session';
@@ -19,7 +19,7 @@ type FormData = {
 
 const UserData = ({ id, onComplete }: UserDataProps) => {
   const { dangerouslyCastedData, mutation } = useUserSession();
-  const { t } = useTranslation('pages.onboarding.user-data');
+  const { t, allT } = useTranslation('pages.onboarding.user-data');
   const {
     register,
     handleSubmit: handleFormSubmit,
@@ -87,6 +87,16 @@ const UserData = ({ id, onComplete }: UserDataProps) => {
             />
           </Grid.Column>
         </Grid.Row>
+        <Portal selector="#onboarding-cta-portal">
+          <Button
+            form={id}
+            loading={mutation.isLoading}
+            size="compact"
+            type="submit"
+          >
+            {allT('next')}
+          </Button>
+        </Portal>
       </Form>
     </Container>
   );

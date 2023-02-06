@@ -12,11 +12,7 @@ const Onboarding = () => {
   const { dangerouslyCastedData } = useSession();
 
   const handleCompleted = () => {
-    // TODO: FP-2132
-    // https://linear.app/footprint/issue/FP-2132/dashboard-onboarding-complete-ob-flow-and-redirect-to
-  };
-
-  const handleSkip = () => {
+    alert('handle');
     // TODO: FP-2132
     // https://linear.app/footprint/issue/FP-2132/dashboard-onboarding-complete-ob-flow-and-redirect-to
   };
@@ -27,7 +23,7 @@ const Onboarding = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Container data-testid="onboarding-page">
-        <Form onComplete={handleCompleted} onSkip={handleSkip} />
+        <Form onComplete={handleCompleted} />
         <LoggedUser email={dangerouslyCastedData.email} />
       </Container>
     </>

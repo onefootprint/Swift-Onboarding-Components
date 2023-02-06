@@ -1,3 +1,15 @@
-import { withUser } from './components/steps/user-data/user-data.test.config';
+import { mockRequest } from '@onefootprint/test-utils';
+import { UserUpdateResponse } from '@onefootprint/types';
 
-export default withUser;
+export const userFixture: UserUpdateResponse = {
+  email: 'jane.doe@acme.com',
+  firstName: 'Jane',
+  lastName: 'Doe',
+};
+
+export const withUpdateUser = (response: UserUpdateResponse = userFixture) =>
+  mockRequest({
+    method: 'patch',
+    path: '/org/member',
+    response,
+  });

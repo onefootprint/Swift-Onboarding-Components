@@ -2,7 +2,10 @@ import { customRenderHook, screen, waitFor } from '@onefootprint/test-utils';
 import { useStore } from 'src/hooks/use-session';
 
 import useUserSession from './use-user-session';
-import { withUser, withUserError } from './use-user-session.test.config';
+import {
+  withUpdateUser,
+  withUpdateUserError,
+} from './use-user-session.test.config';
 
 const originalState = useStore.getState();
 
@@ -12,7 +15,7 @@ describe('useUserSession', () => {
   });
 
   beforeEach(() => {
-    withUser();
+    withUpdateUser();
     useStore.setState({
       data: {
         auth: '1',
@@ -60,7 +63,7 @@ describe('useUserSession', () => {
 
     describe('when the request fails', () => {
       beforeEach(() => {
-        withUserError();
+        withUpdateUserError();
       });
 
       it('should show an error messsage', async () => {

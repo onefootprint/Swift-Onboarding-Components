@@ -6,27 +6,13 @@ import times from 'lodash/times';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export type StepsProps = {
+export type ProgressBarProps = {
   value: number;
   max: number;
   onPrev?: () => void;
 };
 
-const dotAnimationVariants = {
-  active: {
-    y: 0,
-    transition: {
-      type: 'spring',
-      stiffness: 0,
-      bounce: 0,
-    },
-  },
-  inactive: {
-    y: 0,
-  },
-};
-
-const Steps = ({ value, max, onPrev }: StepsProps) => {
+const ProgressBar = ({ value, max, onPrev }: ProgressBarProps) => {
   const { t } = useTranslation();
   const shouldPrev = value > 0;
 
@@ -53,7 +39,19 @@ const Steps = ({ value, max, onPrev }: StepsProps) => {
                   layoutId="dot-active"
                   initial="inactive"
                   animate="active"
-                  variants={dotAnimationVariants}
+                  variants={{
+                    active: {
+                      y: 0,
+                      transition: {
+                        type: 'spring',
+                        stiffness: 0,
+                        bounce: 0,
+                      },
+                    },
+                    inactive: {
+                      y: 0,
+                    },
+                  }}
                 />
               )}
             </Dot>
@@ -105,4 +103,4 @@ const ActiveMarker = styled(motion.div)`
   `}
 `;
 
-export default Steps;
+export default ProgressBar;

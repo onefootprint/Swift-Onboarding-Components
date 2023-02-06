@@ -15,10 +15,8 @@ describe('<Invite />', () => {
   }: Partial<InviteProps>) =>
     customRender(
       <>
+        <div id="onboarding-cta-portal" />
         <Invite id={id} onComplete={onComplete} />
-        <button form={id} type="submit">
-          Complete
-        </button>
       </>,
     );
 
