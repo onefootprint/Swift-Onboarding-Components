@@ -65,6 +65,7 @@ deadpool = { version = "0.9.5", features=["managed"], default-features = false}
 paperclip = { version = "0.7.1", features = [
     "actix4",
     "actix4-validator",
+    "actix-multipart",
     "uuid",
     "chrono",
     "actix-session",

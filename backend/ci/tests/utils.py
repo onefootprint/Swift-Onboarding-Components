@@ -28,13 +28,14 @@ class IncorrectServerVersion(Exception):
         super().__init__(message)
 
 
-def _make_request(method, path, data, params, status_code, auths):
+def _make_request(method, path, data=None, params=None, status_code=200, auths=[], files=None):
     headers = {auth.HEADER_NAME: auth.value for auth in auths}
     response = method(
         url(path),
         headers=headers,
         json=data,
         params=params,
+        files=files
     )
     if response.status_code != status_code:
         raise HttpError(

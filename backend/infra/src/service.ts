@@ -1,5 +1,4 @@
 import { GlobalState } from './main';
-import { DnsConfig } from './dns';
 import { NitroServiceOutput } from './nitro_service';
 import { StackMetadata } from './stack_metadata';
 import { route53 } from '@pulumi/aws';
@@ -9,11 +8,10 @@ import * as pulumi from '@pulumi/pulumi';
 import { StaticSecrets } from './secrets';
 import { ServiceContainers } from './containers';
 import { EnclaveKeyDescriptor } from './enclave_key';
-import { FootprintVpc } from './vpc';
 import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as s3 from './s3';
 import { GetStackMetadata } from './stack_metadata';
-import * as cdn from './cdn';
+import * as appCdn from './app_cdn';
 import { FPC_SERVICE_PORT } from './sg';
 import { Certificate } from './certs';
 
@@ -95,6 +93,7 @@ export async function CreateApiService(
     cluster,
     g.database,
     g.buckets,
+    g.assetCdn,
     METRICS_ENDPOINT_PATH,
     nitroService,
   );
@@ -141,7 +140,7 @@ export async function CreateApiService(
       taskDefinition: taskDefinition.arn,
       deploymentController: {
         type: 'ECS',
-      },  
+      },
       deploymentCircuitBreaker: {
         enable: true,
         rollback: true,
@@ -327,7 +326,7 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  const distribution = await cdn.CreateCloudfrontDistribution({
+  const distribution = appCdn.CreateAppCloudfrontDistribution({
     cert,
     cdnToAlbSecret: g.secretsStore.cloudfrontSecret,
     cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
@@ -434,7 +433,10 @@ function createTaskContainerRole(
   signingKeyDescriptor: HmacSigningKeyDescriptor,
   s3Buckets: s3.ServiceS3Buckets,
 ): pulumi.Output<aws.iam.Role> {
-  const s3Policies: AWSPolicyConfig[] = [s3Buckets.documentImages.policy];
+  const s3Policies: AWSPolicyConfig[] = [
+    s3Buckets.documentImages.policy,
+    s3Buckets.assetsBucket.policy,
+  ];
 
   const role = pulumi
     .all([enclaveKeyDescriptor.rootKeyArn, signingKeyDescriptor.rootKeyArn])

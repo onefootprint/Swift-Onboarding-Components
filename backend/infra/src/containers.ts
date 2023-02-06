@@ -8,6 +8,8 @@ import { EnclaveKeyDescriptor } from './enclave_key';
 import { Region } from '@pulumi/aws';
 import { DatabaseOutput } from './db';
 import * as s3 from './s3';
+import * as assets from './asset_cdn';
+
 import { GetStackMetadata, StackEnvironment } from './stack_metadata';
 
 const OTEL_PORT = 4317;
@@ -23,6 +25,7 @@ export abstract class ServiceContainers {
     parent: pulumi.Resource,
     database: DatabaseOutput,
     s3Buckets: s3.ServiceS3Buckets,
+    assetsCdn: assets.AssetCdn,
     metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
   ): Promise<pulumi.Output<string>> {
@@ -56,6 +59,7 @@ export abstract class ServiceContainers {
       region,
       database,
       s3Buckets,
+      assetsCdn,
       metricsEndpointPath,
       nitroService,
     );
@@ -83,6 +87,7 @@ export abstract class ServiceContainers {
     region: Region,
     database: DatabaseOutput,
     s3Buckets: s3.ServiceS3Buckets,
+    assetsCdn: assets.AssetCdn,
     metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
@@ -289,6 +294,14 @@ export abstract class ServiceContainers {
               {
                 name: 'DOCUMENT_S3_BUCKET',
                 value: s3Buckets.documentImages.bucketName,
+              },
+              {
+                name: 'ASSETS_CDN_S3_BUCKET',
+                value: s3Buckets.assetsBucket.bucketName,
+              },
+              {
+                name: 'ASSETS_CDN_ORIGIN',
+                value: assetsCdn.origin,
               },
               {
                 name: 'METRICS_ENDPOINT_PATH',

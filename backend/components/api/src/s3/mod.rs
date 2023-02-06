@@ -1,5 +1,7 @@
-use aws_sdk_s3::model::{Delete, ObjectIdentifier};
+use aws_sdk_s3::model::{CompletedMultipartUpload, CompletedPart, Delete, ObjectIdentifier};
 use aws_sdk_s3::types::ByteStream;
+use bytes::{Bytes, BytesMut};
+use futures::StreamExt;
 use thiserror::Error;
 use url::{ParseError, Url};
 
@@ -44,27 +46,138 @@ impl S3Client {
         Ok(())
     }
 
-    #[allow(unused)]
     /// Put an object in S3 at the path specified by `s3://{bucket}/{key}`
     ///    - Note: S3 is a flat heirarchy, but key can use `/` in the name to mimic a directory structure
-    pub async fn put_object<T>(&self, bucket: &String, key: String, object: T) -> Result<String, S3Error>
+    #[tracing::instrument(skip(self, object))]
+    pub async fn put_object<T>(
+        &self,
+        bucket: &str,
+        key: String,
+        object: T,
+        mime: Option<&str>,
+    ) -> Result<String, S3Error>
     where
         aws_sdk_s3::types::ByteStream: std::convert::From<T>,
     {
         let body: ByteStream = ByteStream::from(object);
 
-        tracing::info!("s3: putting object");
-        self.client
+        tracing::info!("s3: begin put object");
+
+        let mut put = self
+            .client
             .put_object()
             .bucket(bucket)
             .key(key.clone())
-            .body(body)
-            .send()
-            .await?;
-        tracing::info!("s3: put object");
+            .body(body);
+
+        if let Some(mime) = mime {
+            put = put.content_type(mime);
+        }
+
+        put.send().await?;
+
+        tracing::info!("s3: put object complete");
 
         Ok(format!("{}{}/{}", S3_PATH_PREFIX, bucket, key))
     }
+
+    /// For use when > 5MB
+    /// For now we limit to 5MB so we should just use the regular put
+    #[allow(unused)]
+    #[tracing::instrument(skip(self, parts))]
+    pub async fn multipart_put_object(
+        &self,
+        bucket: &str,
+        key: String,
+        mime: &str,
+        mut parts: actix_multipart::Field,
+    ) -> Result<(), S3Error> {
+        let upload = self
+            .client
+            .create_multipart_upload()
+            .bucket(bucket)
+            .key(key.clone())
+            .content_type(mime)
+            .send()
+            .await?;
+
+        let upload_id = upload.upload_id().ok_or(S3Error::EmptyS3UploadId)?;
+
+        // this is what makes this efficient: read a chunk, upload a chunk!
+        let mut upload_parts = vec![];
+
+        // S3 requires all but the last upload part be < 5MB
+        const MIN_CHUNK_BYTE_SIZE: usize = 5 * 1024 * 1024;
+        let mut current_chunk = BytesMut::new();
+
+        loop {
+            let next = parts.next().await;
+            let should_continue = match next {
+                Some(Ok(chunk)) => {
+                    current_chunk.extend(chunk);
+                    if current_chunk.len() < MIN_CHUNK_BYTE_SIZE {
+                        continue;
+                    }
+                    true
+                }
+                None => false,
+                Some(Err(err)) => {
+                    let _ = self
+                        .client
+                        .abort_multipart_upload()
+                        .bucket(bucket)
+                        .key(key.clone())
+                        .upload_id(upload_id)
+                        .send()
+                        .await?;
+                    return Err(err)?;
+                }
+            };
+
+            let res = self
+                .client
+                .upload_part()
+                .upload_id(upload_id)
+                .bucket(bucket)
+                .key(key.clone())
+                .part_number(1 + upload_parts.len() as i32)
+                .body(Bytes::from(current_chunk).into())
+                .send()
+                .await?;
+
+            upload_parts.push(
+                CompletedPart::builder()
+                    .e_tag(res.e_tag.unwrap_or_default())
+                    .part_number(1 + upload_parts.len() as i32)
+                    .build(),
+            );
+
+            // reset our current chunk
+            current_chunk = BytesMut::new();
+
+            if !should_continue {
+                break;
+            }
+        }
+        let completed_multipart_upload = CompletedMultipartUpload::builder()
+            .set_parts(Some(upload_parts))
+            .build();
+
+        let _complete = self
+            .client
+            .complete_multipart_upload()
+            .bucket(bucket)
+            .key(key.clone())
+            .upload_id(upload_id)
+            .multipart_upload(completed_multipart_upload)
+            .send()
+            .await?;
+
+        tracing::info!("s3: put object multipart complete");
+
+        Ok(())
+    }
+
     /// Get an object in S3 from the path specified by `s3://{bucket}/{key}`
     #[allow(unused)]
     pub async fn get_object(&self, bucket: String, object: String) -> Result<actix_web::web::Bytes, S3Error> {
@@ -115,22 +228,36 @@ impl S3Client {
 
 #[derive(Debug, Error)]
 pub enum S3Error {
-    #[error("ListBucketsError")]
+    #[error("List error")]
     ListBuckets(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::ListBucketsError>),
-    #[error("DeleteObjectsError")]
+    #[error("Delete objects error")]
     DeleteObjects(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::DeleteObjectsError>),
-    #[error("PutObjectError")]
+    #[error("Put object error")]
     PutObject(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::PutObjectError>),
-    #[error("GetObjectError")]
+    #[error("Create multipart upload error")]
+    CreateMultipartUpload(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::CreateMultipartUploadError>),
+    #[error("Abort multipart error")]
+    AbortMultipartUpload(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::AbortMultipartUploadError>),
+    #[error("Upload multipart error")]
+    UploadPart(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::UploadPartError>),
+    #[error("Complete multipart error")]
+    CompleteUpload(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::CompleteMultipartUploadError>),
+    #[error("Get object error")]
     GetObject(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::GetObjectError>),
-    #[error("BucketNotFound")]
+    #[error("Not found")]
     BucketNotFound,
-    #[error("S3 URL parsing error")]
+    #[error("URL parsing error")]
     S3UrlParseError(#[from] ParseError),
-    #[error("AwsHttpByteStreamError error: {0}")]
+    #[error("Byte stream error")]
     AwsHttpByteStreamError(String),
-    #[error("Invalid S3 URL provided")]
+    #[error("Invalid URL provided")]
     InvalidS3Url,
+    #[error("Missing upload id")]
+    EmptyS3UploadId,
+    #[error("Missing upload location")]
+    EmptyS3UploadLocation,
+    #[error("Multipart upload error")]
+    MultipartUpload(#[from] actix_multipart::MultipartError),
 }
 
 #[cfg(test)]

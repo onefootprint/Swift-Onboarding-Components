@@ -68,6 +68,7 @@ pub(crate) fn test_tenant_api_key(
     .unwrap()
 }
 
+#[allow(clippy::module_inception)]
 #[cfg(test)]
 mod test {
     use crate::models::{tenant::Tenant, user_vault::UserVault};

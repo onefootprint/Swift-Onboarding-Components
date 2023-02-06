@@ -96,7 +96,7 @@ impl Tenant {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, AsChangeset)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsChangeset, Default)]
 #[diesel(table_name = tenant)]
 pub struct UpdateTenant {
     pub name: Option<String>,

@@ -12,6 +12,7 @@ use workos::WorkOsError;
 pub mod challenge;
 pub mod enclave;
 pub mod handoff;
+pub mod image_upload;
 pub mod kms;
 pub mod onboarding;
 pub mod proxy;
@@ -110,6 +111,8 @@ pub enum ApiError {
     VaultProxyError(#[from] proxy::VaultProxyError),
     #[error("Decision error: {0}")]
     DecisionError(#[from] crate::decision::Error),
+    #[error("image upload error: {0}")]
+    ImageUploadError(#[from] image_upload::ImageUploadError),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -212,6 +215,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidProxyBody => StatusCode::BAD_REQUEST,
             ApiError::VaultProxyError(_) => StatusCode::BAD_REQUEST,
+            ApiError::ImageUploadError(_) => StatusCode::BAD_REQUEST,
             ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
         }
     }

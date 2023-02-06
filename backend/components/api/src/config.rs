@@ -84,6 +84,12 @@ pub struct Config {
     #[envconfig(from = "DOCUMENT_S3_BUCKET", default = "footprint-dev-test")]
     pub document_s3_bucket: String,
 
+    #[envconfig(from = "ASSETS_CDN_S3_BUCKET", default = "footprint-logos-dev-local")]
+    pub assets_s3_bucket: String,
+
+    #[envconfig(from = "ASSETS_CDN_ORIGIN", default = "https://local.i-dev.onefp.net")]
+    pub assets_cdn_origin: String,
+
     #[envconfig(nested = true)]
     pub socure_config: SocureConfig,
 

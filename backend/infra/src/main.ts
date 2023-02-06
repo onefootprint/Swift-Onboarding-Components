@@ -3,7 +3,6 @@ import { Region } from '@pulumi/aws';
 import * as aws from '@pulumi/aws';
 import * as certs from './certs';
 import * as pulumi from '@pulumi/pulumi';
-import * as cdn from './cdn';
 import * as secrets from './secrets';
 import { Config } from './config';
 import * as svc from './service';
@@ -16,6 +15,7 @@ import { GetStackMetadata, StackMetadata } from './stack_metadata';
 import * as nitroService from './nitro_service';
 import * as dns from './dns';
 import * as airplane from './airplane';
+import * as assets from './asset_cdn';
 
 /**
  * Convenient type to pass shared global resources
@@ -33,6 +33,7 @@ export type GlobalState = {
   coreSecurityGroups: sg.CoreSecurityGroups;
   buckets: s3.ServiceS3Buckets;
   stackMetadata: StackMetadata;
+  assetCdn: assets.AssetCdn;
 };
 
 /**
@@ -98,6 +99,13 @@ export default async function main() {
   // Create our s3 buckets
   const s3Buckets = s3.CreateServiceBuckets(provider, constants, stackMetadata);
 
+  // Create our asset CDN
+  const assetCdn = await assets.CreateAssetCdn(
+    constants,
+    stackMetadata,
+    s3Buckets.assetsBucket,
+  );
+
   const globalState: GlobalState = {
     vpc,
     region,
@@ -111,6 +119,7 @@ export default async function main() {
     coreSecurityGroups,
     buckets: s3Buckets,
     stackMetadata,
+    assetCdn,
   };
 
   // create airplane agent
@@ -143,10 +152,11 @@ export type CoreServiceOutputs = {
  */
 async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
   // launch core services
-  const cert = await certs.CreateRegionalWildCertificateForDnsConfig(
-    g.dnsConfig,
-    g.region,
-  );
+  const cert = certs.CreateRegionalWildCertificateForDnsConfig({
+    domain: g.dnsConfig.apiDomain,
+    hostedZoneId: g.dnsConfig.hostedZone.id,
+    region: g.region,
+  });
 
   // create the nitro service
   const nitroServiceOutput = await nitroService.CreateNitroService(

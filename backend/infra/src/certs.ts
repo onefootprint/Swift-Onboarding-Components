@@ -1,37 +1,24 @@
 import { DnsConfig } from './dns';
-import { ec2, Region, route53 } from '@pulumi/aws';
-import { Output } from '@pulumi/pulumi';
+import { Region } from '@pulumi/aws';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
-
-export type CertConfig = {
-  hostedZoneId: string;
-  domain: string;
-  region: Region;
-};
 
 export type Certificate = {
   cert: aws.acm.Certificate;
   arn: pulumi.Output<string>;
 };
 
+export type CertConfig = {
+  hostedZoneId: string;
+  domain: string;
+  region: Region;
+};
 /**
  * Helper function to create a cert for a DnsConfig on a region
  */
-export async function CreateRegionalWildCertificateForDnsConfig(
-  dnsConfig: DnsConfig,
-  region: Region,
-): Promise<Certificate> {
-  return await CreateWildcardCertificate({
-    domain: dnsConfig.apiDomain,
-    region: region,
-    hostedZoneId: dnsConfig.hostedZone.id,
-  });
-}
-
-export async function CreateWildcardCertificate(
+export function CreateRegionalWildCertificateForDnsConfig(
   config: CertConfig,
-): Promise<Certificate> {
+): Certificate {
   const nameSuffix = `${config.domain}-cert-${config.region}`;
   const provider = new aws.Provider(`provider-${nameSuffix}`, {
     region: config.region,
@@ -54,7 +41,7 @@ export async function CreateWildcardCertificate(
     { provider },
   );
 
-  const records = cert.domainValidationOptions.apply(async ops => {
+  const records = cert.domainValidationOptions.apply(ops => {
     return ops
       .map(vop => {
         return {
@@ -83,7 +70,7 @@ export async function CreateWildcardCertificate(
     `cert-validation-result-${nameSuffix}`,
     {
       certificateArn: cert.arn,
-      validationRecordFqdns: records.apply(async recs => {
+      validationRecordFqdns: records.apply(recs => {
         return recs.map(record => record.fqdn);
       }),
     },

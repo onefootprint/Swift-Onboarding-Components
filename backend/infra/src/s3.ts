@@ -1,10 +1,7 @@
 import { StackMetadata } from './stack_metadata';
 import * as aws from '@pulumi/aws';
-import * as pulumi from '@pulumi/pulumi';
-import { FootprintVpc, Vpc } from './vpc';
 import { Config } from './config';
 import { AWSPolicyConfig } from './service';
-import * as crypto from 'crypto';
 
 /**
  * Configure document Images bucket
@@ -15,23 +12,18 @@ export function CreateServiceBuckets(
   stackMetadata: StackMetadata,
 ): ServiceS3Buckets {
   return {
-    documentImages: createBucket(
-      config.s3.documentImagesBucketNamePrefix,
-      stackMetadata,
-      config,
-      provider,
-    ),
+    documentImages: createDocumentImagesBucket(stackMetadata, config, provider),
+    assetsBucket: createAssetsBucket(stackMetadata, config, provider),
     // More buckets would go here in the future...
   };
 }
 
-function createBucket(
-  prefix: string,
+function createDocumentImagesBucket(
   stackMetadata: StackMetadata,
   config: Config,
   provider: aws.Provider,
 ): S3BucketConfig {
-  const bucketName = `${prefix}-${stackMetadata.shortStackName}`;
+  const bucketName = `${config.s3.documentImagesBucketNamePrefix}-${stackMetadata.shortStackName}`;
   const bucket = new aws.s3.Bucket(
     bucketName,
     {
@@ -61,12 +53,66 @@ function createBucket(
     }),
   };
   return {
+    bucket,
     bucketName,
     policy,
   };
 }
 
+function createAssetsBucket(
+  stackMetadata: StackMetadata,
+  config: Config,
+  provider: aws.Provider,
+): S3BucketConfig {
+  const bucketName = `onefootprint-assets-${stackMetadata.shortStackName}`;
+  const bucket = new aws.s3.Bucket(
+    bucketName,
+    {
+      forceDestroy: !config.deletionProtection,
+      bucket: bucketName,
+      arn: `arn:aws:s3:::${bucketName}`,
+      acl: 'public-read',
+      website: {
+        indexDocument: 'index.html',
+        errorDocument: '404.html',
+      },
+    },
+    {
+      provider,
+    },
+  );
+  const policy: AWSPolicyConfig = {
+    name: `s3_access_policy_${bucketName}`,
+    policy: JSON.stringify({
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Action: [
+            's3:GetObject',
+            's3:ListBucket',
+            's3:PutObject',
+            's3:UploadPart',
+            's3:CompleteMultipartUpload',
+            's3:AbortMultipartUpload',
+            's3:CreateMultipartUpload',
+          ],
+          Resource: [
+            `arn:aws:s3:::${bucketName}`,
+            `arn:aws:s3:::${bucketName}/*`,
+          ],
+        },
+      ],
+    }),
+  };
+  return {
+    bucket,
+    bucketName,
+    policy,
+  };
+}
 export interface S3BucketConfig {
+  bucket: aws.s3.Bucket;
   bucketName: string;
   policy: AWSPolicyConfig;
 }
@@ -75,4 +121,5 @@ export interface S3BucketConfig {
 // we return an object so container task definitions can decide if and how to use them
 export interface ServiceS3Buckets {
   documentImages: S3BucketConfig;
+  assetsBucket: S3BucketConfig;
 }

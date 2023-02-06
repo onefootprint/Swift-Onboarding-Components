@@ -18,6 +18,7 @@ export interface Domains {
   base: string;
   prefix: string;
   frontendBase: string;
+  assets: string;
 }
 
 export interface Resources {

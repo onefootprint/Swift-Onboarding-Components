@@ -15,6 +15,7 @@ config:
       base: api.onefootprint.com
       prefix: ''
       frontendBase: onefootprint.com
+      assets: i.onefp.net
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=

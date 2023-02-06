@@ -10,6 +10,7 @@ pub mod ob_config;
 pub mod proxy_configs;
 pub mod roles;
 pub mod settings;
+pub mod logo;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -30,7 +31,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(roles::patch)
         .service(roles::deactivate)
         .service(settings::get)
-        .service(access_events::get);
+        .service(access_events::get)
+        .service(logo::put);
 
     auth::routes(config);
     api_keys::routes(config);
