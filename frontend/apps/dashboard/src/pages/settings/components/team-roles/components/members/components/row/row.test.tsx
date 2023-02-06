@@ -12,6 +12,8 @@ import Row, { RowProps } from './row';
 import {
   memberFixture,
   roleToSelectOnEdit,
+  withCurrentUserDifferentFromMember,
+  withCurrentUserSameAsMember,
   withEditMember,
   withOrgRoles,
 } from './row.test.config';
@@ -20,6 +22,7 @@ const useRouterSpy = createUseRouterSpy();
 
 describe('<Row />', () => {
   beforeEach(() => {
+    withCurrentUserDifferentFromMember();
     withOrgRoles();
     useRouterSpy({
       pathname: '/settings',
@@ -40,28 +43,28 @@ describe('<Row />', () => {
       </table>,
     );
 
-  it('should render the name', () => {
+  it('should show the name', () => {
     renderRow({
       member: { ...memberFixture, firstName: 'Jane', lastName: 'Doe' },
     });
     expect(screen.getByText('Jane Doe')).toBeInTheDocument();
   });
 
-  it('should render the email', () => {
+  it('should show the email', () => {
     renderRow({
       member: { ...memberFixture, email: 'jane.doe@acme.com' },
     });
     expect(screen.getByText('jane.doe@acme.com')).toBeInTheDocument();
   });
 
-  it('should render the last active time', () => {
+  it('should show the last active time', () => {
     renderRow({
       member: { ...memberFixture, lastLoginAt: '3 hours ago' },
     });
     expect(screen.getByText('3 hours ago')).toBeInTheDocument();
   });
 
-  it('should render the role', () => {
+  it('should show the role', () => {
     renderRow({
       member: { ...memberFixture, roleName: 'Admin' },
     });
@@ -69,7 +72,7 @@ describe('<Row />', () => {
   });
 
   describe('when the name is not present', () => {
-    it('should render a dash', () => {
+    it('should show a dash', () => {
       renderRow({
         member: { ...memberFixture, firstName: null, lastName: null },
       });
@@ -78,7 +81,7 @@ describe('<Row />', () => {
   });
 
   describe('when invite is pending', () => {
-    it('should render the pending invite badge', () => {
+    it('should show the pending invite badge', () => {
       renderRow({
         member: { ...memberFixture, lastLoginAt: null },
       });
@@ -86,7 +89,7 @@ describe('<Row />', () => {
     });
   });
 
-  describe('when clicking on the role button', () => {
+  describe('when clicking on the edit role button', () => {
     beforeEach(() => {
       withEditMember(memberFixture, roleToSelectOnEdit);
     });
@@ -97,10 +100,10 @@ describe('<Row />', () => {
       const currentRole = screen.getByText('Admin');
       expect(currentRole).toBeInTheDocument();
 
-      const roleButton = screen.getByRole('combobox', {
+      const triggerButton = screen.getByRole('combobox', {
         name: `Change ${memberFixture.email} role`,
       });
-      await userEvent.click(roleButton);
+      await userEvent.click(triggerButton);
 
       await waitFor(() => {
         const memberOption = screen.getByRole('option', {
@@ -118,6 +121,30 @@ describe('<Row />', () => {
 
       const newRole = screen.getByText('Member');
       expect(newRole).toBeInTheDocument();
+    });
+  });
+
+  describe('when the current user is the same as the member', () => {
+    beforeEach(() => {
+      withCurrentUserSameAsMember();
+    });
+
+    it('should hide the edit role button', () => {
+      renderRow({});
+
+      const triggerButton = screen.queryByRole('combobox', {
+        name: `Change ${memberFixture.email} role`,
+      });
+      expect(triggerButton).not.toBeInTheDocument();
+    });
+
+    it('should hide the actions menu', () => {
+      renderRow({});
+
+      const actionsMenu = screen.queryByRole('button', {
+        name: `Open actions for member ${memberFixture.email}.com`,
+      });
+      expect(actionsMenu).not.toBeInTheDocument();
     });
   });
 });

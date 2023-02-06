@@ -4,7 +4,7 @@ import { useStore } from 'src/hooks/use-session';
 
 const originalState = useStore.getState();
 
-beforeEach(() => {
+export const withCurrentUserDifferentFromMember = () => {
   useStore.setState({
     data: {
       auth: '1',
@@ -22,7 +22,27 @@ beforeEach(() => {
       },
     },
   });
-});
+};
+
+export const withCurrentUserSameAsMember = () => {
+  useStore.setState({
+    data: {
+      auth: '1',
+      user: {
+        id: 'orguser_k0xUYuO2fFCwMHFPShuK77',
+        email: 'jack.doe@acme.com',
+        firstName: 'Jack',
+        lastName: 'Doe',
+      },
+      org: {
+        isLive: false,
+        logoUrl: null,
+        name: 'Acme',
+        isSandboxRestricted: true,
+      },
+    },
+  });
+};
 
 afterAll(() => {
   useStore.setState(originalState);
@@ -30,8 +50,8 @@ afterAll(() => {
 
 export const memberFixture = {
   id: 'orguser_k0xUYuO2fFCwMHFPShuK77',
-  email: 'jane.doe@acme.com',
-  firstName: 'Jane',
+  email: 'jack.doe@acme.com',
+  firstName: 'Jack',
   lastName: 'Doe',
   lastLoginAt: '3 hours ago',
   createdAt: '2022-09-20T09:26:24.292959Z',

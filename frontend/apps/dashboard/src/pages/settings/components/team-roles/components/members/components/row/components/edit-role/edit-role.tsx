@@ -79,7 +79,6 @@ const Trigger = styled(Select.Trigger)`
     cursor: pointer;
     display: flex;
     gap: ${theme.spacing[2]};
-    padding: ${theme.spacing[3]} 0;
     padding: unset;
   `}
 `;

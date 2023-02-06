@@ -29,7 +29,7 @@ const Row = ({ member }: RowProps) => {
       </Td>
       <Td>{lastLoginAt || '-'}</Td>
       <Td>
-        <EditRole member={member} />
+        {shouldShowActions ? <EditRole member={member} /> : member.roleName}
       </Td>
       <Td>
         {!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}
