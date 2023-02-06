@@ -67,6 +67,21 @@ describe('<Roles />', () => {
     });
   };
 
+  describe('when the request to fetch the org roles fails', () => {
+    beforeEach(() => {
+      withOrgRolesError();
+    });
+
+    it('should show the error message', async () => {
+      renderRoles();
+
+      await waitFor(() => {
+        const errorMessage = screen.getByText('Something went wrong');
+        expect(errorMessage).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('when the request to fetch the org roles succeeds', () => {
     beforeEach(() => {
       withOrgRoles();
@@ -119,6 +134,22 @@ describe('<Roles />', () => {
             { shallow: true },
           );
         });
+      });
+    });
+
+    describe('when opening with a member_search query', () => {
+      it('should show the search value', async () => {
+        useRouterSpy({
+          pathname: '/settings',
+          query: {
+            roles_search: 'Admin',
+            tab: 'roles',
+          },
+        });
+        await renderRolesAndWaitData();
+
+        const search = screen.getByPlaceholderText('Search...');
+        expect(search).toHaveValue('Admin');
       });
     });
 
@@ -421,21 +452,6 @@ describe('<Roles />', () => {
             expect(errorMessage).toBeInTheDocument();
           });
         });
-      });
-    });
-  });
-
-  describe('when the request to fetch the org roles fails', () => {
-    beforeEach(() => {
-      withOrgRolesError();
-    });
-
-    it('should show the error message', async () => {
-      renderRoles();
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText('Something went wrong');
-        expect(errorMessage).toBeInTheDocument();
       });
     });
   });

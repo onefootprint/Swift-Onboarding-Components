@@ -72,6 +72,21 @@ describe('<Members />', () => {
     });
   };
 
+  describe('when the request to fetch the members fails', () => {
+    beforeEach(() => {
+      withOrgMembersError();
+    });
+
+    it('should render an error message', async () => {
+      renderMembers();
+
+      await waitFor(() => {
+        const errorMessage = screen.getByText('Something went wrong');
+        expect(errorMessage).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('when the request to fetch the members succeeds', () => {
     beforeEach(() => {
       withOrgMembers();
@@ -120,6 +135,22 @@ describe('<Members />', () => {
             { shallow: true },
           );
         });
+      });
+    });
+
+    describe('when opening with a member_search query', () => {
+      it('should render the search input with the query value', async () => {
+        useRouterSpy({
+          pathname: '/settings',
+          query: {
+            members_search: 'Jane',
+            tab: 'Members',
+          },
+        });
+        await renderMembersAndWaitData();
+
+        const search = screen.getByPlaceholderText('Search...');
+        expect(search).toHaveValue('Jane');
       });
     });
 
@@ -442,21 +473,6 @@ describe('<Members />', () => {
           );
           await waitForElementToBeRemoved(userRemovedName);
         });
-      });
-    });
-  });
-
-  describe('when the request to fetch the members fails', () => {
-    beforeEach(() => {
-      withOrgMembersError();
-    });
-
-    it('should render an error message', async () => {
-      renderMembers();
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText('Something went wrong');
-        expect(errorMessage).toBeInTheDocument();
       });
     });
   });

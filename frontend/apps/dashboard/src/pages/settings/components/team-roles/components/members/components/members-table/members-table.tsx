@@ -28,19 +28,20 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
     filters.push({ members_search: search });
   };
 
-  return (
+  return filters.isReady ? (
     <Table<OrgMember>
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('table.empty-state')}
       getKeyForRow={member => member.id}
+      initialSearch={filters.values.search}
       isLoading={isLoading}
       items={data}
       onChangeSearchText={handleSearchChange}
       renderActions={() => <Filters />}
       renderTr={({ item: member }) => <Row member={member} />}
     />
-  );
+  ) : null;
 };
 
 export default MembersTable;

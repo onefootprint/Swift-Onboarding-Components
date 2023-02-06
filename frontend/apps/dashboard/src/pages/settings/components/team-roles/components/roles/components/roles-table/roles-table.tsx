@@ -27,18 +27,19 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
     filters.push({ roles_search: search });
   };
 
-  return (
+  return filters.isReady ? (
     <Table<OrgRole>
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('table.empty-state')}
       getKeyForRow={role => role.id}
+      initialSearch={filters.values.search}
       isLoading={isLoading}
       items={data}
       onChangeSearchText={handleSearchChange}
       renderTr={({ item: role }) => <Row role={role} />}
     />
-  );
+  ) : null;
 };
 
 export default RolesTable;
