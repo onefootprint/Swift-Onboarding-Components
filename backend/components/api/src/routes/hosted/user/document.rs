@@ -3,6 +3,7 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
+use crate::utils::large_json::LargeJson;
 use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
 use crate::{decision, State};
 use api_wire_types::document_request::DocumentRequest;
@@ -36,7 +37,7 @@ const NUM_RETRIES: i64 = 3;
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-    request: web::Json<DocumentRequest>,
+    request: LargeJson<DocumentRequest, 15_728_640>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 

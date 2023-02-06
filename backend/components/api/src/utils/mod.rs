@@ -10,6 +10,7 @@ pub mod session;
 pub mod twilio;
 pub mod user_vault_wrapper;
 pub mod validate_request;
+pub mod large_json;
 
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]
