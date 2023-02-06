@@ -1,5 +1,6 @@
 import pytest
 from tests.utils import post, get, put, build_user_data
+from tests.constants import EMAIL, PHONE_NUMBER
 
 
 class TestNonPortableVaultApi:
@@ -45,27 +46,35 @@ class TestNonPortableVaultApi:
         assert fp_id
 
         # post data to it
-        data = build_user_data()
+        data = {
+            "id.phone_number": PHONE_NUMBER,
+            "id.email": EMAIL,
+            **build_user_data()
+        }
         put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
         # check that the data is there now
-        params = {"fields": "id.first_name, id.last_name, id.zip, id.ssn9, id.city"}
+        params = {"fields": "id.first_name, id.last_name, id.zip, id.ssn9, id.city, id.phone_number, id.email"}
         response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
-        assert response["id.first_name"] == True
-        assert response["id.last_name"] == True
-        assert response["id.zip"] == True
-        assert response["id.ssn9"] == True
-        assert response["id.city"] == True
+        assert response["id.first_name"]
+        assert response["id.last_name"]
+        assert response["id.zip"]
+        assert response["id.ssn9"]
+        assert response["id.city"]
+        assert response["id.phone_number"]
+        assert response["id.email"]
 
         # decrypt the data
         data = dict(
             reason="test",
-            fields=["id.first_name", "id.zip", "id.city"],
+            fields=["id.first_name", "id.zip", "id.city", "id.phone_number", "id.email"],
         )
         body = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         data = body
         assert data["id.first_name"] == "Sandbox"
         assert data["id.zip"] == "10009"
         assert data["id.city"] == "Enclave"
+        assert data["id.phone_number"] == PHONE_NUMBER.replace(" ", "")
+        assert data["id.email"] == EMAIL
 
         # verify access events created
         body = get(
@@ -79,6 +88,8 @@ class TestNonPortableVaultApi:
             "id.first_name",
             "id.zip",
             "id.city",
+            "id.phone_number",
+            "id.email",
         }
 
     def test_custom_data(self, sandbox_tenant):

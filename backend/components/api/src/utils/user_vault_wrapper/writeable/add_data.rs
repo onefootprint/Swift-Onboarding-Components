@@ -2,30 +2,71 @@ use super::uvd_builder::UvdBuilder;
 use super::WriteableUvw;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
+use crate::utils::fingerprint::FingerprintMap;
 use db::models::data_lifetime::DataLifetime;
+use db::models::email::Email;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
+use db::models::phone_number::{NewPhoneNumberArgs, PhoneNumber};
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind,
-    IdentityDataUpdate, KvDataKey, PiiString,
+    IdentityDataUpdate, KvDataKey, PiiString, ValidatedPhoneNumber,
 };
 use std::collections::HashMap;
 
 // Right now, we only allow adding data to a user vault inside of a locked transaction and when
 // we have built the UserVaultWrapper for a specific tenant.
 impl WriteableUvw {
+    pub fn add_phone_number(
+        self, // Intentionally consume to prevent using stale UVW
+        conn: &mut TxnPgConn,
+        // TODO we shouldn't need ValidatedPhoneNumber here once we stop using the country code
+        phone_number: ValidatedPhoneNumber,
+        fingerprint: Fingerprint,
+    ) -> ApiResult<()> {
+        // Only used to add a phone number to a non-portable vault for now
+        if !self.portable.phone_numbers.is_empty() {
+            // We don't currently support adding a secondary phone
+            return Err(UserError::CannotReplaceData(IdentityDataKind::PhoneNumber.into()).into());
+        }
+
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        // Deactivate the old speculative phone, if exists
+        let kinds = vec![IdentityDataKind::PhoneNumber.into()];
+        DataLifetime::bulk_deactivate_speculative(conn, &self.scoped_user_id, kinds, seqno)?;
+
+        // Add the new speculative phone
+        let public_key = &self.user_vault.public_key;
+        let phone_info = NewPhoneNumberArgs {
+            e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
+            e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
+            sh_phone_number: fingerprint,
+        };
+        PhoneNumber::create(
+            conn,
+            &self.user_vault.id,
+            phone_info,
+            DataPriority::Primary,
+            Some(&self.scoped_user_id),
+            seqno,
+            false,
+        )?;
+        self.add_user_timeline(conn, vec![CollectedDataOption::PhoneNumber])?;
+
+        Ok(())
+    }
+
     pub fn add_email(
         self, // Intentionally consume to prevent using stale UVW
         conn: &mut TxnPgConn,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
-        self.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
         if !self.portable.emails.is_empty() {
             // We don't currently support adding a secondary email
-            return Err(UserError::InvalidDataUpdate.into());
+            return Err(UserError::CannotReplaceData(IdentityDataKind::Email.into()).into());
         }
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -36,7 +77,7 @@ impl WriteableUvw {
         // Add the new speculative email
         let email = email.to_piistring();
         let e_data = self.user_vault.public_key.seal_pii(&email)?;
-        let email = db::models::email::Email::create(
+        let email = Email::create(
             conn,
             &self.user_vault.id,
             e_data,
@@ -45,15 +86,18 @@ impl WriteableUvw {
             &self.scoped_user_id,
             seqno,
         )?;
+        self.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
 
         Ok(email.id)
     }
 
+    /// Applies the provided IdentityDataUpdate to the UVW.
+    /// NOTE: if the update contains a phone number or email, we will ignore it
     pub fn update_identity_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         update: IdentityDataUpdate,
-        fingerprints: Vec<(IdentityDataKind, Fingerprint)>,
+        fingerprints: FingerprintMap,
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_identity_fields();
         let uv = self.user_vault();

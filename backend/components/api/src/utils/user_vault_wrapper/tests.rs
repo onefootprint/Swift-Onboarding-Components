@@ -118,7 +118,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
         (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
     ];
     let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
-    uvw.update_identity_data(conn, update, vec![]).unwrap();
+    uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
 
     // Make the user can't see the name and email until it's portable
     let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
@@ -258,7 +258,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
         let update = IdentityDataUpdate::new(HashMap::from_iter(update.into_iter()))
             .unwrap()
             .0;
-        let result = uvw.update_identity_data(conn, update, vec![]);
+        let result = uvw.update_identity_data(conn, update, HashMap::new());
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
 }
@@ -287,7 +287,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     ];
     let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.update_identity_data(conn, update, vec![]).unwrap();
+    uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
     // Get the ssn4 as was written by tenant 1
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
     let ssn4_tenant1 = uvw.get_identity_e_field(IDK::Ssn4);
@@ -297,7 +297,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     let update = [(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))];
     let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
-    uvw.update_identity_data(conn, update, vec![]).unwrap();
+    uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su2.id)).unwrap();
     let ssn4_tenant2 = uvw.get_identity_e_field(IDK::Ssn4);
@@ -358,7 +358,7 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
             .unwrap()
             .0;
         let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-        uvw.update_identity_data(conn, update, vec![]).unwrap();
+        uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
     }
     let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
     assert!(uvw.has_identity_field(IDK::AddressLine1));
@@ -429,7 +429,7 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
     let update = [(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))];
     let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.update_identity_data(conn, update, vec![]).unwrap();
+    uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
 
     // Also add an identity document
     let id_doc = fixtures::identity_document::create(conn, &uv.id, Some(&su.id));

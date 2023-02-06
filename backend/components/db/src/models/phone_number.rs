@@ -4,8 +4,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::{
-    DataLifetimeId, DataPriority, Fingerprint as FingerprintData, IdentityDataKind, PhoneNumberId,
-    ScopedUserId, SealedVaultBytes, UserVaultId,
+    DataLifetimeId, DataLifetimeSeqno, DataPriority, Fingerprint as FingerprintData, IdentityDataKind,
+    PhoneNumberId, ScopedUserId, SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -71,19 +71,18 @@ impl PhoneNumber {
         Ok(result)
     }
 
-    pub fn create_verified(
+    pub fn create(
         conn: &mut TxnPgConn,
         uv_id: &UserVaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
         su_id: Option<&ScopedUserId>,
+        seqno: DataLifetimeSeqno,
+        is_unique_fingerprint: bool,
     ) -> DbResult<PhoneNumber> {
         // Create a portable lifetime - once the phone number is verified and bound to a vault
         // it should be immediately portable, even though it isn't verified by vendors.
-        let seqno = DataLifetime::get_next_seqno(conn)?;
         let lifetime = DataLifetime::create(conn, uv_id, su_id, IdentityDataKind::PhoneNumber.into(), seqno)?;
-        let seqno = lifetime.created_seqno;
-        let lifetime = lifetime.commit(conn, seqno)?;
         let new_row = NewPhoneNumberRow {
             e_e164: args.e_phone_number,
             e_country: args.e_phone_country,
@@ -101,9 +100,25 @@ impl PhoneNumber {
             sh_data: args.sh_phone_number,
             kind: IdentityDataKind::PhoneNumber.into(),
             lifetime_id: lifetime.id,
-            is_unique: true,
+            is_unique: is_unique_fingerprint,
         };
         Fingerprint::bulk_create(conn, vec![new_fingerprint])?;
+
+        Ok(phone_number)
+    }
+
+    pub fn create_verified(
+        conn: &mut TxnPgConn,
+        uv_id: &UserVaultId,
+        args: NewPhoneNumberArgs,
+        priority: DataPriority,
+        su_id: Option<&ScopedUserId>,
+    ) -> DbResult<PhoneNumber> {
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let phone_number = Self::create(conn, uv_id, args, priority, su_id, seqno, true)?;
+        // Create a portable lifetime - once the phone number is verified and bound to a vault
+        // it should be immediately portable, even though it isn't verified by vendors.
+        DataLifetime::commit(conn, &phone_number.lifetime_id, seqno)?;
 
         Ok(phone_number)
     }

@@ -39,6 +39,12 @@ impl std::ops::Deref for IdentityDataUpdate {
     }
 }
 
+impl std::ops::DerefMut for IdentityDataUpdate {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 fn clean_and_validate_id_data(id_data: IdentityDataRequest) -> NtResult<IdentityDataRequest> {
     // Custom case to always populate ssn4 if we have ssn9.
     // TODO clean this up

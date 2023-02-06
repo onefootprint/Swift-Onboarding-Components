@@ -4,7 +4,7 @@ use crate::types::response::ResponseData;
 use crate::State;
 use db::models::tenant::Tenant;
 use db::models::user_vault::UserVault;
-use db::user_vault::get_by_fingerprint;
+use db::user_vault::get_portable_by_fingerprint;
 use newtypes::{Fingerprinter, IdentityDataKind, TenantId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -66,7 +66,7 @@ async fn post(
         .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.to_piistring())
         .await?;
 
-    let uv = get_by_fingerprint(&state.db_pool, sh_data).await?;
+    let uv = get_portable_by_fingerprint(&state.db_pool, sh_data, true).await?;
     let user_vault_id = if let Some(uv) = uv {
         uv.id
     } else {

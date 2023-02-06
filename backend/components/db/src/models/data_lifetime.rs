@@ -167,14 +167,15 @@ impl DataLifetime {
         Ok(lifetime)
     }
 
-    pub fn commit(self, conn: &mut PgConn, seqno: DataLifetimeSeqno) -> DbResult<Self> {
+    // TODO rename to portablize
+    pub fn commit(conn: &mut PgConn, id: &DataLifetimeId, seqno: DataLifetimeSeqno) -> DbResult<Self> {
         let update = DataLifetimeUpdate {
             portablized_at: Some(Some(Utc::now())),
             portablized_seqno: Some(Some(seqno)),
             ..DataLifetimeUpdate::default()
         };
         let result = diesel::update(data_lifetime::table)
-            .filter(data_lifetime::id.eq(&self.id))
+            .filter(data_lifetime::id.eq(id))
             .set(update)
             .get_result(conn)?;
         Ok(result)

@@ -1,4 +1,7 @@
-use crate::errors::{user::UserError, ApiError, ApiResult};
+use crate::{
+    errors::{user::UserError, ApiError, ApiResult},
+    utils::fingerprint::FingerprintMap,
+};
 use db::{
     models::{
         data_lifetime::DataLifetime,
@@ -8,8 +11,8 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    CollectedDataOption, DataLifetimeKind, Fingerprint as FingerprintBytes, IdentityDataKind,
-    IdentityDataUpdate, PiiString, ScopedUserId, UserVaultId, UvdKind, VaultPublicKey,
+    CollectedDataOption, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate, PiiString, ScopedUserId,
+    UserVaultId, UvdKind, VaultPublicKey,
 };
 use std::collections::HashMap;
 
@@ -45,7 +48,7 @@ impl UvdBuilder {
         existing_fields: Vec<IdentityDataKind>, // portable or speculative on UVW
         user_vault_id: UserVaultId,
         scoped_user_id: ScopedUserId,
-        fingerprints: Vec<(IdentityDataKind, FingerprintBytes)>,
+        fingerprints: FingerprintMap,
     ) -> ApiResult<Vec<CollectedDataOption>> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.

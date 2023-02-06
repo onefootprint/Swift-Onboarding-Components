@@ -148,7 +148,8 @@ async fn validate_sms_challenge(
     let sh_phone_number = state
         .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.to_piistring())
         .await?;
-    let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, sh_phone_number).await?;
+    let existing_user =
+        db::user_vault::get_portable_by_fingerprint(&state.db_pool, sh_phone_number, false).await?;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
