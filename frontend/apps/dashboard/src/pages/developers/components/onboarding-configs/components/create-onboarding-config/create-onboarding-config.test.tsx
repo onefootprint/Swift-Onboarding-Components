@@ -213,7 +213,7 @@ describe('<CreateDialog />', () => {
 
     describe('when selecting the ssn', () => {
       describe('when collecting the full ssn', () => {
-        it('should show only the SSN (Full) field', async () => {
+        it('should show only the SSN field', async () => {
           await renderCreateDialogOnTheCollectDataSection();
 
           const ssnCheckbox = screen.getByLabelText('SSN');
@@ -231,13 +231,13 @@ describe('<CreateDialog />', () => {
             expect(screen.getByTestId('access-form')).toBeVisible();
           });
 
-          const fullSsn = screen.getByLabelText('SSN (Full)');
+          const fullSsn = screen.getByLabelText('SSN');
           expect(fullSsn).toBeInTheDocument();
         });
       });
 
       describe('when collecting the last four ssn', () => {
-        it('should show only the SSN (Last 4) field', async () => {
+        it('should show only the SSN (last 4) field', async () => {
           await renderCreateDialogOnTheCollectDataSection();
 
           const ssnCheckbox = screen.getByLabelText('SSN');
@@ -255,7 +255,7 @@ describe('<CreateDialog />', () => {
             expect(screen.getByTestId('access-form')).toBeVisible();
           });
 
-          const last4Ssn = screen.getByLabelText('SSN (Last 4)');
+          const last4Ssn = screen.getByLabelText('SSN (last 4)');
           expect(last4Ssn).toBeInTheDocument();
         });
       });

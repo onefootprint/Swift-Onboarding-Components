@@ -104,7 +104,7 @@
           }
         },
         "form": {
-          "label": "SSN (Full)",
+          "label": "SSN",
           "placeholder": "XXX-XX-XXXX",
           "error": "SSN cannot be empty or is invalid"
         }
@@ -113,7 +113,7 @@
         "title": "What are the last 4 digits of your Social Security Number?",
         "subtitle": "We're legally required to collect this information.",
         "form": {
-          "label": "SSN (Last 4)",
+          "label": "SSN (last 4)",
           "placeholder": "XXXX",
           "error": "SSN cannot be empty or is invalid"
         }
@@ -148,8 +148,8 @@
       },
       "identity": {
         "title": "Identity",
-        "ssn9": "SSN (Full)",
-        "ssn4": "SSN (Last 4)"
+        "ssn9": "SSN",
+        "ssn4": "SSN (last 4)"
       },
       "edit-sheet": {
         "title": "Edit {{name}}",

@@ -24,8 +24,8 @@
     "email": "Email",
     "first_name": "First name",
     "last_name": "Last name",
-    "ssn9": "SSN (Full)",
-    "ssn4": "SSN (Last 4)",
+    "ssn9": "SSN",
+    "ssn4": "SSN (last 4)",
     "dob": "Date of Birth",
     "address_line1": "Address line 1",
     "address_line2": "Address line 2",
@@ -37,8 +37,8 @@
   "collected-kyc-data-options": {
     "name": "Full name",
     "dob": "Date of Birth",
-    "ssn9": "SSN (Full)",
-    "ssn4": "SSN (Last 4)",
+    "ssn9": "SSN",
+    "ssn4": "SSN (last 4)",
     "full_address": "Address",
     "partial_address": "Address (Country & Zip Code)",
     "email": "Email",
@@ -272,7 +272,7 @@
           "status": "Status",
           "email": "Email",
           "ssn": "SSN",
-          "phone-number": "Phone Number",
+          "phone-number": "Phone number",
           "start": "Date"
         }
       }
@@ -930,8 +930,8 @@
           "decrypt": {
             "name": "Full name",
             "dob": "Date of birth",
-            "ssn9": "SSN (Full)",
-            "ssn4": "SSN (Last 4)",
+            "ssn9": "SSN",
+            "ssn4": "SSN (last 4)",
             "full_address": "Address",
             "partial_address": "Partial address (Country & Zip Code)",
             "email": "Email",

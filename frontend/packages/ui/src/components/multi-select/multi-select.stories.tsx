@@ -15,8 +15,8 @@ export const defaultOptions = [
   {
     label: 'Identity data',
     options: [
-      { value: 'ssn_9', label: 'SSN (Full)' },
-      { value: 'ssn_4', label: 'SSN (Last 4)' },
+      { value: 'ssn_9', label: 'SSN' },
+      { value: 'ssn_4', label: 'SSN (last 4)' },
       { value: 'dob', label: 'Date of birth' },
     ],
   },

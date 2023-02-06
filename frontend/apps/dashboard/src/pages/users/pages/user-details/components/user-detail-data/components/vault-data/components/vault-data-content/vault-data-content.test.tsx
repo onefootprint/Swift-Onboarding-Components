@@ -134,7 +134,7 @@ describe('<VaultDataContent />', () => {
       ).toBeInTheDocument();
 
       expect(
-        within(identitySection).getByText('SSN (Last 4)'),
+        within(identitySection).getByText('SSN (last 4)'),
       ).toBeInTheDocument();
       expect(
         within(identitySection).getByText('•••••••••'),
@@ -246,7 +246,7 @@ describe('<VaultDataContent />', () => {
       ).toBeInTheDocument();
 
       const ssnCheckbox = within(identitySection).getByLabelText(
-        'SSN (Last 4)',
+        'SSN (last 4)',
       ) as HTMLInputElement;
       expect(ssnCheckbox).toBeInTheDocument();
       expect(ssnCheckbox.disabled).toBe(false);

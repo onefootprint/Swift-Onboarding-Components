@@ -47,7 +47,7 @@ const Template: Story = ({ onClear, onChange }) => {
               options: [
                 { label: 'Full name', value: 'full_name' },
                 { label: 'Email', value: 'email' },
-                { label: 'Phone Number', value: 'phone_number' },
+                { label: 'Phone number', value: 'phone_number' },
               ],
             },
             {

@@ -28,11 +28,11 @@ const useDecryptOptions = () => {
       options: [
         {
           value: `decrypt.${CollectedKycDataOption.ssn9}`,
-          label: 'SSN (Full)',
+          label: 'SSN',
         },
         {
           value: `decrypt.${CollectedKycDataOption.ssn4}`,
-          label: 'SSN (Last 4)',
+          label: 'SSN (last 4)',
         },
         {
           value: `decrypt.${CollectedKycDataOption.dob}`,
