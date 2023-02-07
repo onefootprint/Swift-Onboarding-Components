@@ -6,16 +6,15 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 use actix_web::web::Query;
 use db::models::scoped_user::ScopedUser;
-use itertools::Itertools;
-use newtypes::csv::Csv;
 use newtypes::flat_api_object_map_type;
+use newtypes::input::Csv;
 use newtypes::{DataIdentifier, FootprintUserId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct FieldsParams {
     /// Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`
     #[openapi(example = "id.last_name, custom.ach_account, id.dob, id.ssn9")]
@@ -40,10 +39,7 @@ pub async fn get(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetUnifiedResponse> {
     let footprint_user_id = path.into_inner();
-
-    let request = request.into_inner();
-    let FieldsParams { fields } = request;
-    let fields = fields.clone().into_iter().collect_vec();
+    let FieldsParams { fields } = request.into_inner();
 
     if fields
         .iter()
@@ -52,7 +48,7 @@ pub async fn get(
         return Err(TenantError::CannotDecryptDocument.into());
     }
 
-    let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
+    let auth = auth.check_guard(CanDecrypt::new(fields.clone().to_vec()))?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 

@@ -48,9 +48,9 @@ pub async fn post(
             // By the time we call POST /hosted/onboarding, we expect that the user auth token was
             // created with a tenant's onboarding config PK. This will have already created a
             // ScopedUser and associated it with the user auth token.
-            let scoped_user = user_auth
-                .scoped_user(conn)?
-                .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboardingInit]))?;
+            let scoped_user = user_auth.scoped_user(conn)?.ok_or_else(|| {
+                AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboardingInit].into())
+            })?;
             let ob_configuration_id = scoped_user
                 .ob_configuration_id
                 .ok_or(OnboardingError::NonPortableScopedUser)?;

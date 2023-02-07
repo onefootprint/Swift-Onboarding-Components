@@ -17,7 +17,7 @@ pub use validate_user::*;
     serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Apiv2Schema, EnumDiscriminants,
 )]
 #[strum_discriminants(name(UserAuthScopeDiscriminant))]
-#[strum_discriminants(derive(Apiv2Schema, serde::Serialize))]
+#[strum_discriminants(derive(Apiv2Schema, serde::Serialize, strum_macros::Display))]
 #[strum_discriminants(vis(pub))]
 #[serde(rename = "snake_case")]
 pub enum UserAuthScope {

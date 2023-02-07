@@ -10,7 +10,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
-use newtypes::csv::deserialize_stringified_list;
+use newtypes::input::deserialize_stringified_list;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;

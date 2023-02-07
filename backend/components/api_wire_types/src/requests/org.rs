@@ -1,4 +1,4 @@
-use newtypes::csv::Csv;
+use newtypes::input::Csv;
 
 use crate::*;
 

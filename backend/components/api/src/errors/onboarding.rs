@@ -1,4 +1,4 @@
-use newtypes::CollectedDataOption;
+use newtypes::{output::Csv, CollectedDataOption};
 use thiserror::Error;
 
 use crate::types::onboarding_requirement::OnboardingRequirementDiscriminant;
@@ -19,10 +19,10 @@ pub enum OnboardingError {
     OnboardingDecisionNotNeeded,
     #[error("Tenant does not match")]
     TenantMismatch,
-    #[error("Unmet onboarding requirements: {0:?}")]
-    UnmetRequirements(Vec<OnboardingRequirementDiscriminant>),
-    #[error("Required attributes are not set: {0:?}")]
-    MissingAttributes(Vec<CollectedDataOption>),
+    #[error("Unmet onboarding requirements: {0}")]
+    UnmetRequirements(Csv<OnboardingRequirementDiscriminant>),
+    #[error("Required attributes are not set: {0}")]
+    MissingAttributes(Csv<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
     NonTerminalState,
     #[error("No pending document request found")]

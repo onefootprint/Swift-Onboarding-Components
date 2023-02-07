@@ -1,3 +1,4 @@
+use newtypes::output::Csv;
 use thiserror::Error;
 
 use self::user::UserAuthScopeDiscriminant;
@@ -36,8 +37,8 @@ pub enum AuthError {
     InvalidTokenForHeader(String),
     #[error("Not allowed: restricted to sandbox mode")]
     SandboxRestricted,
-    #[error("Not allowed: requires one of the following scopes: {0:?}")]
-    MissingScope(Vec<UserAuthScopeDiscriminant>),
+    #[error("Not allowed: requires one of the following scopes: {0}")]
+    MissingScope(Csv<UserAuthScopeDiscriminant>),
     #[error("Not allowed: required permission is missing: {0}")]
     MissingTenantPermission(String),
     #[error("Not allowed: role does not have permissions to decrypt attributes")]

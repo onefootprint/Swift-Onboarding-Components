@@ -1,4 +1,4 @@
-use newtypes::csv::deserialize_stringified_list;
+use newtypes::input::deserialize_stringified_list;
 
 use crate::*;
 

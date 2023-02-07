@@ -43,7 +43,7 @@ impl UvdBuilder {
                 }
             });
         if !invalid_fields.is_empty() {
-            return Err(UserError::InvalidDataKind(invalid_fields.into_iter().join(", ")).into());
+            return Err(UserError::InvalidDataKind(invalid_fields.into()).into());
         }
 
         for (kind, pii) in update {

@@ -7,6 +7,7 @@ use crate::types::response::ResponseData;
 use crate::State;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
+use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -37,8 +38,8 @@ pub async fn post(
             let ob_info = user_auth.assert_onboarding(conn)?;
             let (requirements, ob) = get_requirements(conn, &ob_info)?;
             if !requirements.is_empty() {
-                let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect();
-                return Err(OnboardingError::UnmetRequirements(unmet_requirements).into());
+                let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect_vec();
+                return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
             }
 
             // Mark the onboarding as authorized and create validation token

@@ -156,7 +156,7 @@ pub async fn perform_pre_run_operations(
             // Document Collection is handled synchronously in the frontend (to surface errors)
             let missing_attributes = uvw.missing_fields(&ob_config);
             if !missing_attributes.is_empty() {
-                return Err(OnboardingError::MissingAttributes(missing_attributes).into());
+                return Err(OnboardingError::MissingAttributes(missing_attributes.into()).into());
             }
 
             // Checkpoint and create VerificationRequests

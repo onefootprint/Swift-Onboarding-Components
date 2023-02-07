@@ -1,4 +1,4 @@
-use newtypes::{CollectedDataOption, DataIdentifier};
+use newtypes::{output::Csv, CollectedDataOption, DataIdentifier, IdentityDataKind};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -12,5 +12,5 @@ pub enum UserError {
     #[error("Data update is not allowed without providing the associated tenant")]
     NotAllowedWithoutTenant,
     #[error("Unable to add {0} in this method")]
-    InvalidDataKind(String),
+    InvalidDataKind(Csv<IdentityDataKind>),
 }

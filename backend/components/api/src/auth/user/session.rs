@@ -128,7 +128,7 @@ impl SessionContext<UserSession> {
     pub fn assert_onboarding(&self, conn: &mut PgConn) -> ApiResult<AuthedOnboardingInfo> {
         let info = self
             .onboarding(conn)?
-            .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboarding]))?;
+            .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboarding].into()))?;
         Ok(info)
     }
 }
@@ -193,7 +193,7 @@ impl UserAuthContext {
         if self.data.are_permissions_met(&requested_permissions) {
             Ok(self.map(|d| d.0))
         } else {
-            Err(AuthError::MissingScope(requested_permissions))
+            Err(AuthError::MissingScope(requested_permissions.into()))
         }
     }
 }

@@ -4,10 +4,10 @@ use derive_more::Deref;
 use schemars::JsonSchema;
 use serde::de::IntoDeserializer;
 use serde::de::{self, DeserializeOwned};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
-/// Comma separated list of type `T`
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Deref, JsonSchema)]
+/// Represents a comma-separated list of type `T` with a Deserialize implementation.
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Default, Deref, JsonSchema)]
 pub struct Csv<T>(#[serde(deserialize_with = "deserialize_stringified_list")] pub Vec<T>)
 where
     T: DeserializeOwned;
@@ -56,7 +56,7 @@ mod tests {
     use crate::IdentityDataKind;
     #[test]
     fn test_data_kinds() {
-        #[derive(serde::Serialize, serde::Deserialize)]
+        #[derive(serde::Deserialize)]
         struct Test {
             fields: Csv<IdentityDataKind>,
         }
