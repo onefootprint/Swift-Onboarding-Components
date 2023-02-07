@@ -6,17 +6,15 @@ module.exports = {
   compiler: {
     styledComponents: true,
   },
-  experimental: {
-    transpilePackages: [
-      'footprint-elements',
-      '@onefootprint/ui',
-      '@onefootprint/design-tokens',
-      '@onefootprint/icons',
-      '@onefootprint/global-constants',
-      '@onefootprint/icons',
-      '@onefootprint/hooks',
-      '@onefootprint/request',
-      '@onefootprint/types',
-    ],
-  },
+  transpilePackages: [
+    '@onefootprint/footprint-elements',
+    '@onefootprint/ui',
+    '@onefootprint/design-tokens',
+    '@onefootprint/icons',
+    '@onefootprint/global-constants',
+    '@onefootprint/icons',
+    '@onefootprint/hooks',
+    '@onefootprint/request',
+    '@onefootprint/types',
+  ],
 };

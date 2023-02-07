@@ -58,19 +58,17 @@ module.exports = {
   compiler: {
     styledComponents: true,
   },
-  experimental: {
-    transpilePackages: [
-      '@onefootprint/ui',
-      '@onefootprint/design-tokens',
-      '@onefootprint/icons',
-      '@onefootprint/global-constants',
-      '@onefootprint/icons',
-      '@onefootprint/hooks',
-      '@onefootprint/request',
-      '@onefootprint/types',
-      '@onefootprint/dev-tools',
-    ],
-  },
+  transpilePackages: [
+    '@onefootprint/ui',
+    '@onefootprint/design-tokens',
+    '@onefootprint/icons',
+    '@onefootprint/global-constants',
+    '@onefootprint/icons',
+    '@onefootprint/hooks',
+    '@onefootprint/request',
+    '@onefootprint/types',
+    '@onefootprint/dev-tools',
+  ],
   async redirects() {
     return [
       {

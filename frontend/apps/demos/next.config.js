@@ -63,18 +63,16 @@ module.exports = {
   images: {
     domains: ['footprint-blog.ghost.io', 'static.ghost.org'],
   },
-  experimental: {
-    transpilePackages: [
-      '@onefootprint/ui',
-      '@onefootprint/design-tokens',
-      '@onefootprint/icons',
-      '@onefootprint/global-constants',
-      '@onefootprint/icons',
-      '@onefootprint/hooks',
-      '@onefootprint/request',
-      '@onefootprint/types',
-    ],
-  },
+  transpilePackages: [
+    '@onefootprint/ui',
+    '@onefootprint/design-tokens',
+    '@onefootprint/icons',
+    '@onefootprint/global-constants',
+    '@onefootprint/icons',
+    '@onefootprint/hooks',
+    '@onefootprint/request',
+    '@onefootprint/types',
+  ],
   async redirects() {
     return [
       {
