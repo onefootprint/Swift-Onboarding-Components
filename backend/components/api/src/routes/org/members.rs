@@ -144,7 +144,7 @@ async fn patch(
     request: web::Json<UpdateTenantRolebindingRequest>,
     rb_id: web::Path<TenantRolebindingId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
     let actor = auth.actor();
@@ -155,21 +155,22 @@ async fn patch(
         tenant_role_id: role_id,
         ..Default::default()
     };
-    state
+    let (user, rb, role) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<()> {
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let (user, _, role, _) = TenantRolebinding::get(conn, (&rb_id, &tenant_id))?;
             if let AuthActor::TenantUser(tenant_user_id) = actor {
-                let (user, _, _, _) = TenantRolebinding::get(conn, (&rb_id, &tenant_id))?;
                 if tenant_user_id == user.id {
                     return Err(TenantError::CannotEditCurrentUser.into());
                 }
             }
-            TenantRolebinding::update(conn, (&rb_id, &tenant_id), rolebinding_update)?;
-            Ok(())
+            let rb = TenantRolebinding::update(conn, (&rb_id, &tenant_id), rolebinding_update)?;
+            Ok((user, rb, role))
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
+    ResponseData::ok(result).json()
 }
 
 #[api_v2_operation(tags(OrgSettings), description = "Deactivates the provided user.")]
