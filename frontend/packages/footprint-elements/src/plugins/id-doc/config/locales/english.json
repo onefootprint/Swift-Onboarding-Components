@@ -96,6 +96,10 @@
         "first-text": "Back image captured",
         "second-text": "Now we need a selfie"
       },
+      "animation-selfie-from-passport": {
+        "first-text": "Document image captured",
+        "second-text": "Now we need a selfie"
+      },
       "guidelines": {
         "check-lighting": {
           "title": "Check your lighting",

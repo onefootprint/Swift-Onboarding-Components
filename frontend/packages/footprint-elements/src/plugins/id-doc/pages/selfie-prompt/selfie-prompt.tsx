@@ -22,6 +22,9 @@ const SelfiePrompt = () => {
     selfie: { consentRequired },
   } = state.context;
   const [consentVisible, setConsentVisible] = useState(false);
+  const {
+    idDoc: { type },
+  } = state.context;
 
   const handleClose = () => {
     setConsentVisible(false);
@@ -43,11 +46,19 @@ const SelfiePrompt = () => {
 
   return (
     <Container>
-      <IdAnimation
-        firstText={t('animation-selfie.first-text')}
-        secondText={t('animation-selfie.second-text')}
-        src="/selfie-animation/selfie-animation.riv"
-      />
+      {type === 'passport' ? (
+        <IdAnimation
+          firstText={t('animation-selfie-from-passport.first-text')}
+          secondText={t('animation-selfie-from-passport.second-text')}
+          src="/selfie-animation/selfie-animation.riv"
+        />
+      ) : (
+        <IdAnimation
+          firstText={t('animation-selfie.first-text')}
+          secondText={t('animation-selfie.second-text')}
+          src="/selfie-animation/selfie-animation.riv"
+        />
+      )}
       <IcoSelfie40 />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InfoBox
