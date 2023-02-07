@@ -11,7 +11,7 @@ use db::{
     DbPool, TxnPgConn,
 };
 
-use super::{features::*, rule::rule_set::RuleSetResult};
+use super::{features::*, rule::rule_set::RuleSetResult, utils};
 use crate::{decision::rule::rule_impl::idology_rule_set, feature_flag::FeatureFlagClient};
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
@@ -37,9 +37,7 @@ pub async fn create_final_decision(
         .await??
         .tenant_id;
 
-    let tenant_can_view_socure_risk_signal = ff_client
-        .bool_flag_by_tenant_id("TenantCanViewSocureRiskSignal", tenant_id)
-        .unwrap_or(false);
+    let tenant_can_view_socure_risk_signal = utils::can_see_socure_results(ff_client, tenant_id);
 
     let decision = final_decision(&features, obid.clone(), ff_client)?;
 

@@ -218,6 +218,12 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
     !matches!(vendor_api, VendorAPI::SocureIDPlus)
 }
 
+pub fn can_see_socure_results(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
+    feature_flag_client
+        .bool_flag_by_tenant_id("TenantCanViewSocureRiskSignal", tenant_id)
+        .unwrap_or(false)
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {

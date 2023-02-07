@@ -30,10 +30,21 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();
+    // Not all tenants should see socure related risk signals
+    let tenant_can_view_socure_risk_signal =
+        crate::decision::utils::can_see_socure_results(&state.feature_flag_client, &tenant_id);
 
     let events = state
         .db_pool
-        .db_query(move |conn| UserTimeline::list(conn, footprint_user_id, tenant_id, is_live))
+        .db_query(move |conn| {
+            UserTimeline::list(
+                conn,
+                footprint_user_id,
+                tenant_id,
+                tenant_can_view_socure_risk_signal,
+                is_live,
+            )
+        })
         .await??;
     let events = events
         .into_iter()

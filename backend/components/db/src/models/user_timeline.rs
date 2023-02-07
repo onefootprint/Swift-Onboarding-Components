@@ -7,6 +7,7 @@ use crate::{schema::user_timeline, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::VendorAPI;
 use newtypes::{DbUserTimelineEvent, FootprintUserId, ScopedUserId, TenantId, UserTimelineId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +16,7 @@ use super::document_request::DocumentRequest;
 use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
-
+use strum::IntoEnumIterator;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = user_timeline)]
 pub struct UserTimeline {
@@ -75,6 +76,7 @@ impl UserTimeline {
         conn: &mut PgConn,
         footprint_user_id: FootprintUserId,
         tenant_id: TenantId,
+        tenant_can_view_socure_risk_signal: bool,
         is_live: bool,
     ) -> DbResult<Vec<UserTimelineInfo>> {
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
@@ -115,6 +117,13 @@ impl UserTimeline {
         let mut liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
         let mut identity_documents_and_requests =
             IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
+        let mut vendor_apis_to_include: Vec<VendorAPI> = VendorAPI::iter()
+            .filter(|v| !matches!(v, &VendorAPI::SocureIDPlus))
+            .collect();
+
+        if tenant_can_view_socure_risk_signal {
+            vendor_apis_to_include.push(VendorAPI::SocureIDPlus)
+        }
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -125,8 +134,16 @@ impl UserTimeline {
                         SaturatedTimelineEvent::DataCollected(e.clone())
                     }
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
+                        let (obd, ob_config, mut verification_requests, actor) =
+                            decisions.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?;
+                        // filter out socure, if applicable
+                        verification_requests.retain(|v| vendor_apis_to_include.contains(&v.vendor_api));
+
+                        let decision: SaturatedOnboardingDecisionInfo =
+                            (obd, ob_config, verification_requests, actor);
+
                         SaturatedTimelineEvent::OnboardingDecision(
-                            decisions.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
+                            decision,
                             e.annotation_id
                                 .as_ref()
                                 .map(|a_id| annotations.remove(a_id).ok_or(DbError::RelatedObjectNotFound)) // TODO: annotations.remove here and in a below match is sketch, could replace with .get.clone
@@ -224,7 +241,7 @@ mod tests {
         .0;
 
         let user_timeline_infos =
-            UserTimeline::list(conn, scoped_user.fp_user_id, tenant.id, is_live).unwrap();
+            UserTimeline::list(conn, scoped_user.fp_user_id, tenant.id, true, is_live).unwrap();
 
         assert_eq!(3, user_timeline_infos.len());
 
