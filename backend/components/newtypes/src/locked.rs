@@ -34,8 +34,8 @@ impl NotSyncMarker {
 /// use newtypes::Locked;
 /// let _: Box<Locked<i32>> = Box::new(Locked::new(1));
 /// ```
-#[derive(Debug)]
-pub struct Locked<T>(T, NotSyncMarker);
+#[derive(Debug, derive_more::Deref)]
+pub struct Locked<T>(#[deref] T, NotSyncMarker);
 
 impl<T> Locked<T> {
     pub fn new(t: T) -> Self {
@@ -45,14 +45,5 @@ impl<T> Locked<T> {
     /// Consumes self and returns unlocked UVW
     pub fn into_inner(self) -> T {
         self.0
-    }
-}
-
-/// Through dereference coercion, functions that want a &UserVaultWrapper can accept a &LockedUserVaultWrapper
-impl<T> std::ops::Deref for Locked<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }

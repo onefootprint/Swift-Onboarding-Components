@@ -33,9 +33,13 @@ impl PiiBytes {
 }
 
 /// Like PiiString, but scrubs the serde::Serialize implementation
-#[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+#[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash, derive_more::Deref)]
 #[serde(transparent)]
-pub struct ScrubbedPiiString(#[serde(serialize_with = "scrubbed_str")] PiiString);
+pub struct ScrubbedPiiString(
+    #[serde(serialize_with = "scrubbed_str")]
+    #[deref]
+    PiiString,
+);
 
 impl ScrubbedPiiString {
     pub fn new(s: PiiString) -> Self {
@@ -48,13 +52,6 @@ where
     S: serde::Serializer,
 {
     s.serialize_str("<SCRUBBED>")
-}
-
-impl std::ops::Deref for ScrubbedPiiString {
-    type Target = PiiString;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
 }
 
 impl<T> From<T> for PiiString

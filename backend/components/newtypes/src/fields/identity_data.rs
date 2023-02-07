@@ -9,7 +9,7 @@ use super::parsing::clean_and_validate_field;
 type DataRequest = HashMap<DataIdentifier, PiiString>;
 type IdentityDataRequest = HashMap<IDK, PiiString>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 pub struct IdentityDataUpdate(IdentityDataRequest);
 
 impl IdentityDataUpdate {
@@ -29,19 +29,6 @@ impl IdentityDataUpdate {
 
     pub fn into_inner(self) -> IdentityDataRequest {
         self.0
-    }
-}
-
-impl std::ops::Deref for IdentityDataUpdate {
-    type Target = IdentityDataRequest;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for IdentityDataUpdate {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

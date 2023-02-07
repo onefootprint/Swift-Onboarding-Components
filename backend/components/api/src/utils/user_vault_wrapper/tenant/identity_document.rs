@@ -79,7 +79,7 @@ impl TenantUvw {
             .identity_documents()
             .iter()
             .filter(|i| i.document_type == document_type)
-            .map(|doc| fetch_image(state, doc.identity_document().clone()));
+            .map(|doc| fetch_image(state, doc.identity_document.clone()));
 
         let result = futures::future::join_all(futures)
             .await

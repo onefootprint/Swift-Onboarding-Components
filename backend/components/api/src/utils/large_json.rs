@@ -12,6 +12,7 @@ use std::{
 };
 
 /// Just like Actix's Json, but custom size limit represented in the type
+#[derive(derive_more::Deref, derive_more::DerefMut)]
 pub struct LargeJson<T, const LIMIT: usize>(pub T);
 
 // This is our actual deserialzier (where the limit is used)
@@ -60,20 +61,6 @@ mod actix_json {
     }
 }
 
-// NOTE: the rest of this module is just re-duplicated Json trait impls since we created a newtype
-impl<T, const LIMIT: usize> std::ops::Deref for LargeJson<T, LIMIT> {
-    type Target = T;
-
-    fn deref(&self) -> &T {
-        &self.0
-    }
-}
-
-impl<T, const LIMIT: usize> std::ops::DerefMut for LargeJson<T, LIMIT> {
-    fn deref_mut(&mut self) -> &mut T {
-        &mut self.0
-    }
-}
 impl<T: std::fmt::Display, const LIMIT: usize> std::fmt::Display for LargeJson<T, LIMIT> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(&self.0, f)

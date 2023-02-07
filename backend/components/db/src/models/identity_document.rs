@@ -157,26 +157,11 @@ pub type SaturatedIdentityDocumentTimelineEvent = (IdentityDocument, DocumentReq
 
 /// The status of an identity document is often needed in conjunction with the document itself,
 /// so we use IdentityDocumentAndRequest in various places (like when we build a UVWs)
-#[derive(Debug, Clone)]
-pub struct IdentityDocumentAndRequest((IdentityDocument, DocumentRequest));
-impl IdentityDocumentAndRequest {
-    pub fn new(v: (IdentityDocument, DocumentRequest)) -> Self {
-        Self(v)
-    }
-
-    pub fn identity_document(&self) -> &IdentityDocument {
-        let (doc, _) = &self.0;
-        doc
-    }
-}
-impl std::ops::Deref for IdentityDocumentAndRequest {
-    type Target = IdentityDocument;
-
-    fn deref(&self) -> &Self::Target {
-        let (doc, _) = &self.0;
-
-        doc
-    }
+#[derive(Debug, Clone, derive_more::Deref)]
+pub struct IdentityDocumentAndRequest {
+    #[deref]
+    pub identity_document: IdentityDocument,
+    pub document_request: DocumentRequest,
 }
 
 impl HasLifetime for IdentityDocumentAndRequest {
@@ -194,7 +179,10 @@ impl HasLifetime for IdentityDocumentAndRequest {
             .select((identity_document::all_columns, document_request::all_columns))
             .get_results::<(IdentityDocument, DocumentRequest)>(conn)?
             .into_iter()
-            .map(IdentityDocumentAndRequest::new)
+            .map(|(doc, req)| IdentityDocumentAndRequest {
+                identity_document: doc,
+                document_request: req,
+            })
             .collect();
         Ok(results)
     }

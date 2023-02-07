@@ -31,6 +31,7 @@ deadpool-diesel = { workspace = true }
 deadpool = { workspace = true }
 
 uuid = { workspace = true }
+derive_more = { workspace = true }
 
 # i-implement-a-third-party-backend-and-opt-into-breaking-changes only needed for our InstrumentedPgConnection
 diesel = { workspace = true, features = ["extras", "uuid", "postgres", "i-implement-a-third-party-backend-and-opt-into-breaking-changes" ] }

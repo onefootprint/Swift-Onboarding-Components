@@ -1,6 +1,7 @@
 use newtypes::{Locked, ScopedUserId};
 
 use super::UserVaultWrapper;
+use derive_more::Deref;
 
 mod add_data;
 mod build;
@@ -23,16 +24,9 @@ mod uvd_builder;
 ///
 /// Since LockedUserVaultWrapper is not Sync/Send, we know that it cannot enter multiple threads at once AND (more importantly) it cannot be returned from a closure, leading
 /// to us using the stale data.
+#[derive(Deref)]
 pub struct WriteableUvw {
+    #[deref]
     uvw: Locked<UserVaultWrapper>,
     scoped_user_id: ScopedUserId,
-}
-
-/// Allow calling any Uvw functions from WriteableUvw
-impl std::ops::Deref for WriteableUvw {
-    type Target = UserVaultWrapper;
-
-    fn deref(&self) -> &Self::Target {
-        &self.uvw
-    }
 }
