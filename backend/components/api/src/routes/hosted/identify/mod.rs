@@ -110,7 +110,10 @@ async fn get_user_by_identifier(
         .compute_fingerprint(data_attribute, data.clean_for_fingerprint())
         .await?;
     // TODO should we only look for verified emails?
-    let existing_user = db::user_vault::get_portable_by_fingerprint(&state.db_pool, sh_data, false).await?;
+    let existing_user = state
+        .db_pool
+        .db_query(|conn| UserVault::find_portable(conn, sh_data))
+        .await??;
     Ok(existing_user)
 }
 

@@ -1,0 +1,29 @@
+use crate::models::data_lifetime::DataLifetime;
+use crate::tests::prelude::TestPgConn;
+use newtypes::{DataLifetimeKind, DataLifetimeSeqno, ScopedUserId, UserVaultId};
+
+/// Util function to create multiple DataLifetimes with the provided info
+pub fn build<T: Into<DataLifetimeKind>>(
+    conn: &mut TestPgConn,
+    uv_id: &UserVaultId,
+    su_id: &ScopedUserId,
+    created_seqno: DataLifetimeSeqno,
+    portablized_seqno: Option<DataLifetimeSeqno>,
+    deactivated_seqno: Option<DataLifetimeSeqno>,
+    kind: T,
+) -> DataLifetime {
+    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, Some(su_id), vec![kind.into()], created_seqno)
+        .unwrap()
+        .pop()
+        .unwrap();
+    if let Some(portablized_seqno) = portablized_seqno {
+        lifetime = DataLifetime::commit(conn, &lifetime.id, portablized_seqno).unwrap();
+    }
+    if let Some(deactivated_seqno) = deactivated_seqno {
+        lifetime = DataLifetime::bulk_deactivate(conn, vec![lifetime.id], deactivated_seqno)
+            .unwrap()
+            .pop()
+            .unwrap();
+    }
+    lifetime
+}

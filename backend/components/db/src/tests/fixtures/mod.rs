@@ -1,4 +1,6 @@
+pub mod data_lifetime;
 pub mod email;
+pub mod fingerprint;
 pub mod identity_document;
 pub mod ob_configuration;
 pub mod onboarding;

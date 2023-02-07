@@ -1,43 +1,11 @@
-use std::collections::HashSet;
-
+use super::fixtures;
+use crate::models::data_lifetime::DataLifetime;
+use crate::tests::prelude::*;
 use macros::db_test;
 use newtypes::{
-    DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, IdDocKind, IdentityDataKind, ScopedUserId, TenantId,
-    UserVaultId,
+    DataLifetimeId, DataLifetimeSeqno, IdDocKind, IdentityDataKind, ScopedUserId, TenantId, UserVaultId,
 };
-
-use crate::tests::prelude::*;
-use crate::TxnPgConn;
-
-use crate::models::data_lifetime::DataLifetime;
-
-use super::fixtures;
-
-/// Util function to create multiple DataLifetimes with the provided info
-fn build_lifetime<T: Into<DataLifetimeKind>>(
-    conn: &mut TxnPgConn,
-    uv_id: &UserVaultId,
-    su_id: &ScopedUserId,
-    created_seqno: DataLifetimeSeqno,
-    portablized_seqno: Option<DataLifetimeSeqno>,
-    deactivated_seqno: Option<DataLifetimeSeqno>,
-    kind: T,
-) -> DataLifetime {
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, Some(su_id), vec![kind.into()], created_seqno)
-        .unwrap()
-        .pop()
-        .unwrap();
-    if let Some(portablized_seqno) = portablized_seqno {
-        lifetime = DataLifetime::commit(conn, &lifetime.id, portablized_seqno).unwrap();
-    }
-    if let Some(deactivated_seqno) = deactivated_seqno {
-        lifetime = DataLifetime::bulk_deactivate(conn, vec![lifetime.id], deactivated_seqno)
-            .unwrap()
-            .pop()
-            .unwrap();
-    }
-    lifetime
-}
+use std::collections::HashSet;
 
 /// Util function to get the set of IDs from &Vec<DataLifetime> or Vec<&DataLifetime>
 fn ids<T, TIter>(lifetimes: TIter) -> HashSet<DataLifetimeId>
@@ -71,7 +39,7 @@ struct TestData {
 }
 
 impl TestData {
-    fn build(conn: &mut TxnPgConn) -> Self {
+    fn build(conn: &mut TestPgConn) -> Self {
         // Create tenants
         let t_id = fixtures::tenant::create(conn).id;
         let t2_id = fixtures::tenant::create(conn).id;
@@ -100,8 +68,9 @@ impl TestData {
         let seqno6 = DataLifetime::get_next_seqno(conn).unwrap();
 
         // Place some DataLifetimes at various points along the timeline
-        let lifetime1 = build_lifetime(conn, &uv_id, &su_id, seqno1, None, None, IdentityDataKind::Email);
-        let lifetime2 = build_lifetime(
+        let lifetime1 =
+            fixtures::data_lifetime::build(conn, &uv_id, &su_id, seqno1, None, None, IdentityDataKind::Email);
+        let lifetime2 = fixtures::data_lifetime::build(
             conn,
             &uv_id,
             &su_id,
@@ -110,7 +79,7 @@ impl TestData {
             None,
             IdentityDataKind::FirstName,
         );
-        let lifetime3 = build_lifetime(
+        let lifetime3 = fixtures::data_lifetime::build(
             conn,
             &uv_id,
             &su_id,
@@ -120,7 +89,7 @@ impl TestData {
             IdentityDataKind::LastName,
         );
         // For same user, different scoped user
-        let lifetime4 = build_lifetime(
+        let lifetime4 = fixtures::data_lifetime::build(
             conn,
             &uv_id,
             &su3_id,
@@ -130,8 +99,9 @@ impl TestData {
             IdentityDataKind::PhoneNumber,
         );
         // For different user
-        let lifetime5 = build_lifetime(conn, &uv2_id, &su2_id, seqno1, None, None, IdDocKind::Passport);
-        let lifetime6 = build_lifetime(
+        let lifetime5 =
+            fixtures::data_lifetime::build(conn, &uv2_id, &su2_id, seqno1, None, None, IdDocKind::Passport);
+        let lifetime6 = fixtures::data_lifetime::build(
             conn,
             &uv2_id,
             &su2_id,

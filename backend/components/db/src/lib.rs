@@ -39,7 +39,6 @@ pub mod actor;
 mod has_lifetime;
 pub mod scoped_user;
 pub mod tenant;
-pub mod user_vault;
 pub use has_lifetime::*;
 
 // Old tests

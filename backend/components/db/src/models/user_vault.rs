@@ -3,16 +3,19 @@ use crate::schema::{onboarding, scoped_user};
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
+use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, QueryDsl, Queryable};
+use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, FootprintUserId, Locked, OnboardingId, ScopedUserId, TenantId, UserVaultId,
-    VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, Locked, OnboardingId, ScopedUserId, TenantId,
+    UserVaultId, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
+use super::scoped_user::ScopedUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vault)]
@@ -146,6 +149,62 @@ impl UserVault {
             .values(new_user)
             .get_result::<UserVault>(conn)?;
         Ok(Locked::new(user_vault))
+    }
+
+    /// Create a NON-portable, tenant-scoped vault + a scoped user for the tenant and the vault
+    pub fn create_non_portable(
+        conn: &mut TxnPgConn,
+        req: NewNonPortableUserVaultReq,
+    ) -> DbResult<ScopedUser> {
+        let NewNonPortableUserVaultReq {
+            e_private_key,
+            public_key,
+            is_live,
+            tenant_id,
+        } = req;
+
+        let new_user_vault = NewUserVaultArgs {
+            e_private_key,
+            public_key,
+            is_live,
+            is_portable: false,
+        };
+        let user_vault = Self::create(conn, new_user_vault)?;
+        let scoped_user = ScopedUser::create_non_portable(conn, user_vault, tenant_id)?;
+
+        Ok(scoped_user)
+    }
+
+    #[tracing::instrument(skip_all)]
+    /// Look for the portable user vault with a matching fingerprint
+    pub fn find_portable(conn: &mut PgConn, sh_data: Fingerprint) -> DbResult<Option<UserVault>> {
+        use crate::schema::{data_lifetime, fingerprint};
+
+        let results = user_vault::table
+            .inner_join(data_lifetime::table.inner_join(fingerprint::table))
+            .filter(fingerprint::sh_data.eq(sh_data))
+            .filter(not(data_lifetime::portablized_seqno.is_null()))
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            // Never allow finding a vault-only, non-portable user vault created via API
+            .filter(user_vault::is_portable.eq(true))
+            .select(user_vault::all_columns)
+            .get_results::<UserVault>(conn)?;
+
+        // we found more than 1 vault on this fingerprint
+        if results.len() > 1 {
+            // find the unique vaults for this fingerprint
+            let unique: Vec<_> = results.into_iter().unique_by(|uv| uv.id.clone()).collect();
+            if unique.len() == 1 {
+                return Ok(unique.into_iter().next());
+            }
+
+            // in this case, more than 1 vault have non-verified claims for this email address
+            // so we cannot be sure which user vault we are trying to identify
+            tracing::info!("found more than one vault for fingerprint");
+            return Ok(None);
+        }
+
+        Ok(results.into_iter().next())
     }
 }
 

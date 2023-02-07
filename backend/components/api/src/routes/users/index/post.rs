@@ -7,6 +7,7 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use db::models::user_vault::NewNonPortableUserVaultReq;
+use db::models::user_vault::UserVault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
@@ -27,7 +28,10 @@ pub async fn post(
         tenant_id: auth.tenant().id.clone(),
     };
 
-    let scoped = db::user_vault::create_non_portable(&state.db_pool, request).await?;
+    let scoped = state
+        .db_pool
+        .db_transaction(|conn| UserVault::create_non_portable(conn, request))
+        .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::User::from_db(scoped))))
 }

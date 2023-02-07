@@ -25,3 +25,8 @@ mod test_db_query;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod document_request;
+
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod user_vault;
