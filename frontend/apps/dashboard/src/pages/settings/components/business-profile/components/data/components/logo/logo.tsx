@@ -37,7 +37,7 @@ const Logo = ({ organization }: LogoProps) => {
           {t('cta')}
           <StyledInput
             type="file"
-            accept="image/svg+xml, image/png, img/jpeg"
+            accept="image/svg+xml, image/png, image/jpeg"
             onChange={handleChange}
           />
         </Label>

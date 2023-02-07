@@ -3,11 +3,7 @@ import os
 import requests
 
 from tests.utils import (
-    SERVER_VERSION_HEADER,
-    HttpError,
-    IncorrectServerVersion,
-    _make_request,
-    url,
+    put,
 )
 
 
@@ -18,12 +14,11 @@ def _logo_path():
 def test_org_update_logo(sandbox_tenant):
     files = {"upload_file": ("logo.png", open(_logo_path(), "rb"), "image/png")}
 
-    body = _make_request(
-        method=requests.put,
-        path="org/logo",
-        status_code=200,
-        auths=[sandbox_tenant.auth_token],
+    body = put(
+        "org/logo",
+        None,
+        sandbox_tenant.auth_token,
         files=files,
-    ).json()
+    )
 
     assert body["logo_url"]

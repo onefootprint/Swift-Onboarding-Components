@@ -35,7 +35,7 @@ def wait_for_deploy():
     MAX_ATTEMPTS = 60
     while num_successes < REQUIRED_NUM_SUCCESS:
         try:
-            _make_request(requests.get, "/", None, None, 200, [])
+            _make_request(requests.get, "/", None, None, 200, [], None)
             num_successes += 1
             time.sleep(1)
         except IncorrectServerVersion as e:

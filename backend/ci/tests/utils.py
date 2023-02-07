@@ -28,15 +28,9 @@ class IncorrectServerVersion(Exception):
         super().__init__(message)
 
 
-def _make_request(method, path, data=None, params=None, status_code=200, auths=[], files=None):
+def _make_request(method, path, data, params, status_code, auths, files):
     headers = {auth.HEADER_NAME: auth.value for auth in auths}
-    response = method(
-        url(path),
-        headers=headers,
-        json=data,
-        params=params,
-        files=files
-    )
+    response = method(url(path), headers=headers, json=data, params=params, files=files)
     if response.status_code != status_code:
         raise HttpError(
             response.status_code,
@@ -57,10 +51,11 @@ def get(path, params=None, *auths, status_code=200):
         params=params,
         status_code=status_code,
         auths=auths,
+        files=None,
     ).json()
 
 
-def put(path, data=None, *auths, status_code=200):
+def put(path, data=None, *auths, status_code=200, files=None):
     return _make_request(
         method=requests.put,
         path=path,
@@ -68,6 +63,7 @@ def put(path, data=None, *auths, status_code=200):
         params=None,
         status_code=status_code,
         auths=auths,
+        files=files,
     ).json()
 
 
@@ -79,6 +75,7 @@ def post(path, data=None, *auths, status_code=200):
         params=None,
         status_code=status_code,
         auths=auths,
+        files=None,
     ).json()
 
 
@@ -90,6 +87,7 @@ def patch(path, data=None, *auths, status_code=200):
         params=None,
         status_code=status_code,
         auths=auths,
+        files=None,
     ).json()
 
 

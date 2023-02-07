@@ -135,6 +135,7 @@ class TestVaultProxy:
                 ProxyDestinationHeader(ditto_url),
                 ProxyAccessReason("test reason"),
             ],
+            files=None,
         )
 
         # test the header came in
@@ -201,6 +202,7 @@ class TestVaultProxy:
                     )
                 ),
             ],
+            files=None,
         )
 
         # test the header came in
@@ -249,6 +251,7 @@ class TestVaultProxy:
                 ProxyIngressRule(f"{fp_id}.custom.card_number=$.data.card_number"),
                 ProxyIngressContentType("json"),
             ],
+            files=None,
         )
 
         result = response.json()
@@ -298,6 +301,7 @@ class TestVaultProxy:
                 ProxyId(proxy_id),
                 ProxyTokenAssignment(fp_id),
             ],
+            files=None,
         )
 
         # test the header came in
