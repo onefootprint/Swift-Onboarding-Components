@@ -206,7 +206,7 @@ describe('<Members />', () => {
         });
 
         it('should render an error message', async () => {
-          renderMembersAndWaitData();
+          await renderMembersAndWaitData();
 
           const inviteButton = screen.getByRole('button', {
             name: 'Invite teammates',
@@ -232,7 +232,7 @@ describe('<Members />', () => {
         });
 
         it('should invite a teammate and display the invited user in the table', async () => {
-          renderMembersAndWaitData();
+          await renderMembersAndWaitData();
 
           const inviteButton = screen.getByRole('button', {
             name: 'Invite teammates',
@@ -292,7 +292,7 @@ describe('<Members />', () => {
         });
 
         it('should show an error message', async () => {
-          renderMembersAndWaitData();
+          await renderMembersAndWaitData();
 
           const inviteButton = screen.getByRole('button', {
             name: 'Invite teammates',
