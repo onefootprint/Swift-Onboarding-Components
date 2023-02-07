@@ -12,8 +12,8 @@ import BusinessProfile from './business-profile';
 import {
   withOrganization,
   withOrganizationError,
-  withUpdateOrganization,
-  withUpdateOrganizationError,
+  withUpdateOrg,
+  withUpdateOrgError,
 } from './business-profile.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -89,7 +89,7 @@ describe('<BusinessProfile />', () => {
     describe('when updating the company name', () => {
       describe('when the request succeeds', () => {
         beforeEach(() => {
-          withUpdateOrganization({ name: 'Lorem' });
+          withUpdateOrg({ name: 'Lorem' });
         });
 
         it('should update the company name', async () => {
@@ -129,7 +129,7 @@ describe('<BusinessProfile />', () => {
 
       describe('when the request fails', () => {
         beforeEach(() => {
-          withUpdateOrganizationError();
+          withUpdateOrgError();
         });
 
         it('should update the company name', async () => {
@@ -169,7 +169,7 @@ describe('<BusinessProfile />', () => {
 
       describe('when the request succeeds', () => {
         beforeEach(() => {
-          withUpdateOrganization({ websiteUrl: 'https://acme.com' });
+          withUpdateOrg({ websiteUrl: 'https://acme.com' });
         });
 
         it('should add the website url', async () => {
@@ -208,7 +208,7 @@ describe('<BusinessProfile />', () => {
 
       describe('when the request fails', () => {
         beforeEach(() => {
-          withUpdateOrganizationError();
+          withUpdateOrgError();
         });
 
         it('should add the website url', async () => {
@@ -247,7 +247,7 @@ describe('<BusinessProfile />', () => {
 
       describe('when the request succeeds', () => {
         beforeEach(() => {
-          withUpdateOrganization({ websiteUrl: 'https://acme.com.br' });
+          withUpdateOrg({ websiteUrl: 'https://acme.com.br' });
         });
 
         it('should update the website url', async () => {
@@ -287,7 +287,7 @@ describe('<BusinessProfile />', () => {
 
       describe('when the request fails', () => {
         beforeEach(() => {
-          withUpdateOrganizationError();
+          withUpdateOrgError();
         });
 
         it('should update the website url', async () => {

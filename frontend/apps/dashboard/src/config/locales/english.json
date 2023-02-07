@@ -201,13 +201,16 @@
           },
           "website": {
             "label": "Company website",
-            "placeholder": "https://www.acme.com"
+            "placeholder": "https://www.acme.com",
+            "errors": {
+              "required": "Please enter a website"
+            }
           },
           "size": {
             "label": "Company size",
             "placeholder": "Select",
             "errors": {
-              "required": "Please enter one option"
+              "required": "Please select one option"
             }
           }
         }

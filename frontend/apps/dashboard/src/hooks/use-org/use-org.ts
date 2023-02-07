@@ -1,7 +1,8 @@
 import request from '@onefootprint/request';
 import { GetOrgResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+
+import useSession, { AuthHeaders } from '../use-session';
 
 const getOrgRequest = async (authHeaders: AuthHeaders) => {
   const { data } = await request<GetOrgResponse>({

@@ -1,7 +1,7 @@
 import { customRenderHook, waitFor } from '@onefootprint/test-utils';
 import { useStore } from 'src/hooks/use-session';
 
-import { withUpdateOrganization } from './udate-update-org.test.config';
+import { withUpdateOrg } from './udate-update-org.test.config';
 import useUpdateOrg from './use-update-org';
 
 const originalState = useStore.getState();
@@ -33,7 +33,7 @@ describe('useUpdateOrg', () => {
 
   describe('when the request succeeds', () => {
     beforeEach(() => {
-      withUpdateOrganization({ name: 'Acme Inc.' });
+      withUpdateOrg({ name: 'Acme Inc.' });
     });
 
     it('should update the session', async () => {

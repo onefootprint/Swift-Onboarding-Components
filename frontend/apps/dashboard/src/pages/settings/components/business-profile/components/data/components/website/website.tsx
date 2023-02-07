@@ -18,7 +18,7 @@ const Website = ({ value }: WebsiteProps) => {
           id={id}
           value={value}
           onSubmit={(newWebsite: string) =>
-            handleSubmit('websiteUrl', newWebsite)
+            handleSubmit({ websiteUrl: newWebsite })
           }
         />
       )}

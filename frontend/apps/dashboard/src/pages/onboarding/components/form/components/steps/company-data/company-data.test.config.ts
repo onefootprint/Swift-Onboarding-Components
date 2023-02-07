@@ -1,26 +1,23 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import { Organization } from '@onefootprint/types';
 
-export const organizationFixture: Organization = {
-  id: 'org_9L42CAdpXhDeSmi1DI8Qks',
-  name: 'Acme',
-  logoUrl: 'https://acme.com/logo.png',
+export const orgFixture: Organization = {
+  id: 'org_9242CAdpXXlDDeSmi1DQks',
+  name: 'Acme Inc',
+  logoUrl: null,
   isSandboxRestricted: false,
-  websiteUrl: 'https://acme.com',
+  websiteUrl: null,
   companySize: null,
 };
 
-export const withOrganization = (organization?: Partial<Organization>) =>
+export const withOrg = (response: Organization = orgFixture) =>
   mockRequest({
     method: 'get',
     path: '/org',
-    response: {
-      ...organizationFixture,
-      ...organization,
-    },
+    response,
   });
 
-export const withOrganizationError = () =>
+export const withOrgError = () =>
   mockRequest({
     method: 'get',
     path: '/org',
@@ -32,14 +29,11 @@ export const withOrganizationError = () =>
     },
   });
 
-export const withUpdateOrg = (newOrg: Partial<Organization>) =>
+export const withUpdateOrg = (response: Partial<Organization>) =>
   mockRequest({
     method: 'patch',
     path: '/org',
-    response: {
-      ...organizationFixture,
-      ...newOrg,
-    },
+    response,
   });
 
 export const withUpdateOrgError = () =>

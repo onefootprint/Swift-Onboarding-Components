@@ -10,7 +10,7 @@ export const organizationFixture: Organization = {
   companySize: null,
 };
 
-export const withUpdateOrganization = (newOrg: Partial<Organization>) =>
+export const withUpdateOrg = (newOrg: Partial<Organization>) =>
   mockRequest({
     method: 'patch',
     path: '/org',

@@ -9,7 +9,7 @@ import React from 'react';
 import { useStore } from 'src/hooks/use-session';
 
 import Form, { FormProps } from './form';
-import { withUpdateUser } from './form.test.config';
+import { withOrg, withUpdateOrg, withUpdateUser } from './form.test.config';
 
 const originalState = useStore.getState();
 
@@ -18,7 +18,6 @@ describe('<Form />', () => {
     customRender(<Form onComplete={onComplete} />);
 
   beforeEach(() => {
-    withUpdateUser();
     useStore.setState({
       data: {
         auth: '1',
@@ -36,6 +35,12 @@ describe('<Form />', () => {
         },
       },
     });
+  });
+
+  beforeEach(() => {
+    withOrg();
+    withUpdateUser();
+    withUpdateOrg();
   });
 
   afterAll(() => {
@@ -60,8 +65,6 @@ describe('<Form />', () => {
       await waitFor(() => {
         screen.getByText('Tell us about you');
       });
-      const userDataStep = screen.getByText('Tell us about you');
-      expect(userDataStep).toBeInTheDocument();
 
       const firstNameField = screen.getByLabelText('First name');
       await userEvent.type(firstNameField, 'Jane');
@@ -75,8 +78,10 @@ describe('<Form />', () => {
       await waitFor(() => {
         screen.getByText('Tell us about your company');
       });
-      const companyDataStep = screen.getByText('Tell us about your company');
-      expect(companyDataStep).toBeInTheDocument();
+      await waitFor(() => {
+        screen.getByTestId('company-data-form');
+        screen.getByRole('button', { name: 'Next' });
+      });
 
       const companyNameField = screen.getByLabelText('Company name');
       await userEvent.type(companyNameField, 'Acme Inc.');

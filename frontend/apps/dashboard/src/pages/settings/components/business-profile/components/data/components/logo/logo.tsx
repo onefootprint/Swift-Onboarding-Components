@@ -4,7 +4,7 @@ import { Avatar, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import useUpdateOrgLogo from '../../hooks/use-update-org/use-update-org-logo';
+import useUpdateOrgLogo from './hooks/use-update-org-logo';
 
 type LogoProps = {
   organization: Organization;
