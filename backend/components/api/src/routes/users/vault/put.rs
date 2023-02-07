@@ -135,7 +135,17 @@ async fn parse_phone_number_info(
     let Some(fp) = id_fingerprints.remove(&IdentityDataKind::PhoneNumber) else {
         return Ok(None);
     };
-    let phone_number = state.twilio_client.standardize(&phone_number).await?;
+    let phone_number = state
+        .twilio_client
+        .standardize(&phone_number)
+        .await
+        .map_err(|e| {
+            tracing::error!(error=%e, "Error standardizing phone number");
+            newtypes::Error::new_validation_error(vec![(
+                IdentityDataKind::PhoneNumber,
+                "Could not validate phone number. Please provide in e164 format",
+            )])
+        })?;
     Ok(Some((phone_number, fp)))
 }
 

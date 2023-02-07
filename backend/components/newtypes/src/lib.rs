@@ -76,6 +76,22 @@ pub enum Error {
     ParsingError(#[from] fields::parsing::Error),
     #[error("{0}")]
     ValidationError(#[from] DataValidationError),
+    #[error("{0}")]
+    Custom(String),
+}
+
+impl Error {
+    /// Shorthand to create a key-value map of errors
+    pub fn new_validation_error<'a, T>(errors: T) -> Self
+    where
+        T: IntoIterator<Item = (IdentityDataKind, &'a str)>,
+    {
+        let errors = errors
+            .into_iter()
+            .map(|(idk, e)| (idk, Error::Custom(e.to_string())))
+            .collect();
+        DataValidationError::FieldValidationError(errors).into()
+    }
 }
 
 use std::collections::HashMap;
