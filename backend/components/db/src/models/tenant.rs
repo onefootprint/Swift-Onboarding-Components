@@ -51,6 +51,7 @@ pub struct NewIntegrationTestTenant {
 }
 
 impl Tenant {
+    #[tracing::instrument(skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table
             .for_no_key_update()
@@ -59,6 +60,7 @@ impl Tenant {
         Ok(tenant)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get(conn: &mut PgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table.filter(tenant::id.eq(id)).first(conn)?;
         Ok(tenant)
@@ -66,6 +68,7 @@ impl Tenant {
 
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
+    #[tracing::instrument(skip_all)]
     pub fn save<T>(conn: &mut PgConn, value: T) -> DbResult<Self>
     where
         T: Insertable<tenant::table>,
@@ -77,6 +80,7 @@ impl Tenant {
         Ok(tenant)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update(conn: &mut PgConn, id: TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
         let result = diesel::update(tenant::table)
             .filter(tenant::id.eq(id))
@@ -86,6 +90,7 @@ impl Tenant {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list_by_user_vault_id(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Tenant>> {
         let res = scoped_user::table
             .filter(scoped_user::user_vault_id.eq(user_vault_id))

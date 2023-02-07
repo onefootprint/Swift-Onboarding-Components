@@ -37,7 +37,7 @@ pub async fn create_final_decision(
 
     let obid = ob_id.clone();
     let tenant_id = &db_pool
-        .db_query(move |conn| ScopedUser::get_by_onboarding_id(conn, &ob_id))
+        .db_query(move |conn| ScopedUser::get(conn, &ob_id))
         .await??
         .tenant_id;
 

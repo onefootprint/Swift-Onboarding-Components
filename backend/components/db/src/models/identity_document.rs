@@ -41,6 +41,7 @@ impl IdentityDocument {
         let b64_data = Base64Data::from_str_standard(b64_image)?;
         data_key.seal_bytes(&b64_data.0)
     }
+
     pub fn unseal_with_data_key(
         image_bytes: AeadSealedBytes,
         data_key: &ScopedSealingKey,
@@ -48,6 +49,7 @@ impl IdentityDocument {
         let bytes = data_key.unseal_bytes(image_bytes)?;
         Ok(Base64Data::into_string_standard(bytes))
     }
+
     pub fn s3_path_for_document_image(
         image_type: &str,
         document_request_id: DocumentRequestId,
@@ -77,6 +79,7 @@ pub struct NewIdentityDocument {
 
 impl IdentityDocument {
     #[allow(clippy::too_many_arguments)]
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         request_id: DocumentRequestId,
@@ -110,6 +113,7 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
+    #[tracing::instrument(skip_all)]
     pub fn get(conn: &mut PgConn, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
         let res: (Self, DocumentRequest) = identity_document::table
             .filter(identity_document::id.eq(id))
@@ -121,6 +125,7 @@ impl IdentityDocument {
     }
 
     /// Get all the documents collected for a given onboarding
+    #[tracing::instrument(skip_all)]
     pub fn get_for_scoped_user_id(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Vec<Self>> {
         let results = identity_document::table
             .inner_join(data_lifetime::table)
@@ -131,6 +136,7 @@ impl IdentityDocument {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_bulk_with_requests(
         conn: &mut PgConn,
         ids: Vec<&IdentityDocumentId>,

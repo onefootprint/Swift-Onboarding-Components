@@ -27,6 +27,7 @@ struct NewSocureDeviceSession {
 }
 
 impl SocureDeviceSession {
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         device_session_id: String, //TODO: make this a wrapped type?
@@ -43,6 +44,7 @@ impl SocureDeviceSession {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn latest_for_onboarding(
         conn: &mut PgConn,
         onboarding_id: &OnboardingId,

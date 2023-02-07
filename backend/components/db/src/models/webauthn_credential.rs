@@ -36,6 +36,7 @@ struct UpdateCredentialBackupState {
 }
 
 impl WebauthnCredential {
+    #[tracing::instrument(skip_all)]
     pub fn get_for_user_vault(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
@@ -44,6 +45,7 @@ impl WebauthnCredential {
         Ok(creds)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
@@ -53,6 +55,7 @@ impl WebauthnCredential {
         Ok(creds)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&WebauthnCredentialId>,
@@ -65,6 +68,7 @@ impl WebauthnCredential {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update_backup_state(
         conn: &mut PgConn,
         user_vault_id: &UserVaultId,
@@ -93,6 +97,7 @@ pub struct NewWebauthnCredential {
 }
 
 impl NewWebauthnCredential {
+    #[tracing::instrument(skip_all)]
     pub fn save(self, conn: &mut PgConn) -> DbResult<WebauthnCredential> {
         let result = diesel::insert_into(webauthn_credential::table)
             .values(self)

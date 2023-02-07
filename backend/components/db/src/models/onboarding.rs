@@ -152,6 +152,7 @@ pub type SerializableOnboardingInfo = OnboardingInfo<(OnboardingDecision, Satura
 pub type BasicOnboardingInfo<ObT> = (ObT, ScopedUser, Option<ManualReview>, Option<OnboardingDecision>);
 
 impl Onboarding {
+    #[tracing::instrument(skip_all)]
     pub fn get<'a, T>(conn: &'a mut PgConn, id: T) -> DbResult<BasicOnboardingInfo<Onboarding>>
     where
         T: Into<OnboardingIdentifier<'a>>,
@@ -191,6 +192,7 @@ impl Onboarding {
 
     // TODO generify lock functions to use OnboardingIdentifier.
     // It is difficult because we can't call .for_update() on boxed queries
+    #[tracing::instrument(skip_all)]
     pub fn lock_by_config(
         conn: &mut TxnPgConn,
         user_vault_id: &UserVaultId,
@@ -209,6 +211,7 @@ impl Onboarding {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn lock_for_tenant(
         conn: &mut TxnPgConn,
         fp_user_id: &FootprintUserId,
@@ -231,6 +234,7 @@ impl Onboarding {
         Ok((Locked::new(result.0), result.1, result.2, result.3))
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &OnboardingId) -> DbResult<Locked<Self>> {
         let result = onboarding::table
             .filter(onboarding::id.eq(id))
@@ -239,6 +243,7 @@ impl Onboarding {
         Ok(Locked::new(result))
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_for_scoped_users(
         conn: &mut PgConn,
         scoped_user_ids: Vec<&ScopedUserId>,
@@ -290,6 +295,7 @@ impl Onboarding {
         Ok(result_map)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: OnboardingCreateArgs) -> DbResult<Onboarding> {
         let ob = onboarding::table
             .filter(onboarding::scoped_user_id.eq(&args.scoped_user_id))
@@ -328,12 +334,14 @@ impl Onboarding {
         Ok(ob)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update(self, conn: &mut PgConn, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
         let result = Self::update_by_id(conn, &self.id, update)?;
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update_by_id(conn: &mut PgConn, id: &OnboardingId, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
         let result = diesel::update(onboarding::table)

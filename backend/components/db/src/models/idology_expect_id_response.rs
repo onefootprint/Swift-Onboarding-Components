@@ -38,6 +38,7 @@ pub struct NewIdologyExpectIdResponse {
 }
 
 impl IdologyExpectIdResponse {
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         new_idology_expect_id_response: NewIdologyExpectIdResponse,

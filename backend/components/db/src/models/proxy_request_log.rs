@@ -43,6 +43,7 @@ pub struct FinishedRequestLog {
 
 impl ProxyRequestLog {
     /// create a new request log
+    #[tracing::instrument(skip_all)]
     pub fn create_new(conn: &mut PgConn, new: NewProxyRequestLog) -> DbResult<Self> {
         let log = diesel::insert_into(proxy_request_log::table)
             .values(new)
@@ -52,6 +53,7 @@ impl ProxyRequestLog {
     }
 
     /// create a new request log
+    #[tracing::instrument(skip_all)]
     pub fn finish_request(&self, conn: &mut PgConn, update: FinishedRequestLog) -> DbResult<Self> {
         let result = diesel::update(proxy_request_log::table)
             .filter(proxy_request_log::id.eq(&self.id))

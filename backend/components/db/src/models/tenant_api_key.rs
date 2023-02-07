@@ -78,6 +78,7 @@ impl TenantApiKey {
             .into_boxed()
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list(
         conn: &mut PgConn,
         query: &ApiKeyListQuery,
@@ -96,11 +97,13 @@ impl TenantApiKey {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn count(conn: &mut PgConn, query: &ApiKeyListQuery) -> DbResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get<'a, T: Into<TenantApiKeyIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<TenantApiKey> {
         let mut query = tenant_api_key::table.into_boxed();
         match id.into() {
@@ -121,6 +124,7 @@ impl TenantApiKey {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_enabled(
         conn: &mut PgConn,
         sh_api_key: Fingerprint,
@@ -140,6 +144,7 @@ impl TenantApiKey {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         name: String,
@@ -164,6 +169,7 @@ impl TenantApiKey {
         Ok(tenant_api_key)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
         id: TenantApiKeyId,

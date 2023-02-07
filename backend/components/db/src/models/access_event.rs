@@ -45,6 +45,7 @@ struct NewAccessEventWithInsight {
 }
 
 impl NewAccessEvent {
+    #[tracing::instrument(skip_all)]
     pub fn create(self, conn: &mut PgConn) -> Result<(), crate::DbError> {
         let insight_ev = self.insight.insert_with_conn(conn)?;
         let event = NewAccessEventWithInsight {

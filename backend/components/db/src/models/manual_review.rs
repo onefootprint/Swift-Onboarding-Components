@@ -40,6 +40,7 @@ struct ManualReviewUpdate {
 }
 
 impl ManualReview {
+    #[tracing::instrument(skip_all)]
     pub fn create(conn: &mut PgConn, onboarding_id: OnboardingId) -> DbResult<Self> {
         // NOTE: We have a uniqueness constraint that won't allow us to create multiple active
         // ManualReview rows for one onboarding.
@@ -54,6 +55,7 @@ impl ManualReview {
     }
 
     /// Used to mark the manual review as complete
+    #[tracing::instrument(skip_all)]
     pub fn complete<T>(
         self,
         conn: &mut TxnPgConn,

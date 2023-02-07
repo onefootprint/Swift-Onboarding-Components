@@ -38,6 +38,7 @@ pub struct NewFingerprint {
 pub type IsUnique = bool;
 
 impl Fingerprint {
+    #[tracing::instrument(skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprint>) -> DbResult<()> {
         // Alert if we see multiple user vaults with the same information
         let new_sh_data = fingerprints.iter().map(|f| f.sh_data.clone()).collect();
@@ -67,6 +68,7 @@ impl Fingerprint {
         Ok(())
     }
 
+    #[tracing::instrument(skip_all)]
     fn bulk_check_if_exists(
         conn: &mut PgConn,
         sh_datas: Vec<FingerprintData>,

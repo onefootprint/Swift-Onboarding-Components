@@ -28,6 +28,7 @@ struct NewVerificationResult {
 }
 
 impl VerificationResult {
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         request_id: VerificationRequestId,

@@ -45,6 +45,7 @@ pub struct NewUserVaultDataRow {
 }
 
 impl UserVaultData {
+    #[tracing::instrument(skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
         user_vault_id: &UserVaultId,

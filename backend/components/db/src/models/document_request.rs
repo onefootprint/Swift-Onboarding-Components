@@ -50,6 +50,7 @@ impl DocumentRequestUpdate {
 }
 
 impl DocumentRequest {
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         scoped_user_id: ScopedUserId,
@@ -71,7 +72,9 @@ impl DocumentRequest {
             .get_result::<DocumentRequest>(conn)?;
         Ok(result)
     }
+
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
+    #[tracing::instrument(skip_all)]
     pub fn lock_active(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Locked<Self>> {
         let result = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
@@ -83,6 +86,7 @@ impl DocumentRequest {
     }
 
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
+    #[tracing::instrument(skip_all)]
     pub fn get_active(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Self> {
         let result = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
@@ -92,6 +96,7 @@ impl DocumentRequest {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get(
         conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
@@ -105,12 +110,14 @@ impl DocumentRequest {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update(self, conn: &mut PgConn, update: DocumentRequestUpdate) -> DbResult<Self> {
         // Intentionally consume self so the stale version is not used
         let result = Self::update_by_id(conn, &self.id, update)?;
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update_by_id(
         conn: &mut PgConn,
         id: &DocumentRequestId,
@@ -123,6 +130,7 @@ impl DocumentRequest {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn count_status(
         conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
@@ -136,6 +144,7 @@ impl DocumentRequest {
         Ok(num_status)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_latest_with_verification_result(
         conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
@@ -168,6 +177,7 @@ impl DocumentRequest {
         }
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn lock(
         conn: &mut TxnPgConn,
         scoped_user_id: &ScopedUserId,

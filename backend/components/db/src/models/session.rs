@@ -25,6 +25,7 @@ pub struct UpdateSession {
 }
 
 impl Session {
+    #[tracing::instrument(skip_all)]
     pub fn get(conn: &mut PgConn, key: AuthTokenHash) -> Result<Option<Session>, crate::DbError> {
         let session = session::table
             .filter(session::key.eq(key))
@@ -40,6 +41,7 @@ impl Session {
         Ok(session)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update_or_create(
         conn: &mut PgConn,
         key: AuthTokenHash,

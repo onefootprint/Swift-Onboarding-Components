@@ -1,5 +1,4 @@
 use crate::schema::onboarding;
-use crate::DbPool;
 use crate::PgConn;
 use crate::{schema::insight_event, DbError};
 use chrono::{DateTime, Utc};
@@ -68,20 +67,17 @@ pub struct CreateInsightEvent {
 }
 
 impl CreateInsightEvent {
+    #[tracing::instrument(skip_all)]
     pub fn insert_with_conn(self, conn: &mut PgConn) -> Result<InsightEvent, DbError> {
         let ev = diesel::insert_into(crate::schema::insight_event::table)
             .values(self)
             .get_result(conn)?;
         Ok(ev)
     }
-
-    pub async fn insert(self, pool: &DbPool) -> Result<InsightEvent, DbError> {
-        let ev = pool.db_query(move |conn| self.insert_with_conn(conn)).await??;
-        Ok(ev)
-    }
 }
 
 impl InsightEvent {
+    #[tracing::instrument(skip_all)]
     pub fn get_by_onboarding_id(
         conn: &mut PgConn,
         onboarding_id: &OnboardingId,

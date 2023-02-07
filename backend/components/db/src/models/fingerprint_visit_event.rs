@@ -35,6 +35,7 @@ pub struct NewFingerprintVisit {
     pub request_id: FingerprintRequestId,
 }
 impl FingerprintVisitEvent {
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         visitor_id: FingerprintVisitorId,

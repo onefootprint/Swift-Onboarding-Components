@@ -41,6 +41,7 @@ pub struct NewEmail {
 }
 
 impl Email {
+    #[tracing::instrument(skip_all)]
     pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = email::table
             .inner_join(data_lifetime::table)
@@ -51,6 +52,7 @@ impl Email {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         uv_id: &UserVaultId,
@@ -85,6 +87,7 @@ impl Email {
         Ok(email)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get(conn: &mut PgConn, id: &EmailId, user_vault_id: &UserVaultId) -> DbResult<(Email, UserVault)> {
         use crate::schema::user_vault;
         let result = email::table
@@ -96,6 +99,7 @@ impl Email {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn mark_verified(conn: &mut PgConn, id: &EmailId) -> DbResult<()> {
         diesel::update(email::table)
             .filter(email::id.eq(id))

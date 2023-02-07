@@ -111,6 +111,7 @@ impl ObConfiguration {
             .into_boxed()
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list(
         conn: &mut PgConn,
         query: &ObConfigurationQuery,
@@ -128,11 +129,13 @@ impl ObConfiguration {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn count(conn: &mut PgConn, query: &ObConfigurationQuery) -> DbResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list_authorized_for_user(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Vec<Self>> {
         // For now, this will be either 0 or 1 result
         let obcs = ob_configuration::table
@@ -144,6 +147,7 @@ impl ObConfiguration {
         Ok(obcs)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list_authorized_for_users(
         conn: &mut PgConn,
         scoped_user_ids: Vec<&ScopedUserId>,
@@ -164,6 +168,7 @@ impl ObConfiguration {
         Ok(obcs)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
@@ -193,6 +198,7 @@ impl ObConfiguration {
     }
 
     #[allow(clippy::too_many_arguments)]
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         name: String,
@@ -225,6 +231,7 @@ impl ObConfiguration {
         Ok(obc)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
         id: &ObConfigurationId,
@@ -248,6 +255,7 @@ impl ObConfiguration {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Self> {
         let ob_config: ObConfiguration = onboarding::table
             .inner_join(ob_configuration::table)

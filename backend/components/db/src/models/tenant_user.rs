@@ -20,11 +20,13 @@ pub struct TenantUser {
 }
 
 impl TenantUser {
+    #[tracing::instrument(skip_all)]
     pub fn get(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = tenant_user::table.filter(tenant_user::id.eq(id)).first(conn)?;
         Ok(user)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_firm_employee(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
@@ -33,6 +35,7 @@ impl TenantUser {
         Ok(user)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_and_update_or_create(
         conn: &mut TxnPgConn,
         email: OrgMemberEmail,
@@ -75,6 +78,7 @@ impl TenantUser {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn update(conn: &mut TxnPgConn, id: &TenantUserId, update: TenantUserUpdate) -> DbResult<Self> {
         let results: Vec<Self> = diesel::update(tenant_user::table)
             .filter(tenant_user::id.eq(id))
@@ -88,6 +92,7 @@ impl TenantUser {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn set_is_firm_employee_testing_only(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = diesel::update(tenant_user::table)
             .filter(tenant_user::id.eq(id))
@@ -97,6 +102,7 @@ impl TenantUser {
         Ok(user)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &TenantUserId) -> DbResult<Locked<Self>> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))

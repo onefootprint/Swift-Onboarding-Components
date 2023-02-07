@@ -51,6 +51,7 @@ pub enum SaturatedTimelineEvent {
 pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
 
 impl UserTimeline {
+    #[tracing::instrument(skip_all)]
     pub fn create<T>(
         conn: &mut PgConn,
         event: T,
@@ -72,6 +73,7 @@ impl UserTimeline {
         Ok(())
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list(
         conn: &mut PgConn,
         footprint_user_id: FootprintUserId,

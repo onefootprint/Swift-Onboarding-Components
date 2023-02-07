@@ -144,6 +144,7 @@ pub type DbProxyConfigAll = (
 
 impl ProxyConfig {
     /// create a new proxy config along with other config tables
+    #[tracing::instrument(skip_all)]
     pub fn create_new(conn: &mut TxnPgConn, args: NewProxyConfigArgs) -> DbResult<Self> {
         let NewProxyConfigArgs {
             tenant_id,
@@ -232,6 +233,7 @@ impl ProxyConfig {
         Ok(proxy_config)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn list(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Vec<Self>> {
         let result = proxy_config::table
             .filter(proxy_config::tenant_id.eq(tenant_id))
@@ -241,6 +243,7 @@ impl ProxyConfig {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn find(
         conn: &mut PgConn,
         tenant_id: &TenantId,

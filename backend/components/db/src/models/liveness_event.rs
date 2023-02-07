@@ -39,6 +39,7 @@ pub struct LivenessEvent {
 }
 
 impl LivenessEvent {
+    #[tracing::instrument(skip_all)]
     pub fn get_by_user_vault_id(
         conn: &mut PgConn,
         user_vault_id: &UserVaultId,
@@ -53,6 +54,7 @@ impl LivenessEvent {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_for_scoped_user(
         conn: &mut PgConn,
         footprint_user_id: &FootprintUserId,
@@ -71,6 +73,7 @@ impl LivenessEvent {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&LivenessEventId>,
@@ -97,6 +100,7 @@ pub struct NewLivenessEvent {
 }
 
 impl NewLivenessEvent {
+    #[tracing::instrument(skip_all)]
     pub fn insert(self, conn: &mut PgConn) -> Result<LivenessEvent, DbError> {
         let ev = diesel::insert_into(crate::schema::liveness_event::table)
             .values(self)

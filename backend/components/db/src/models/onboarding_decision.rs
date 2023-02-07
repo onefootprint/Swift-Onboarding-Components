@@ -81,6 +81,7 @@ impl OnboardingDecision {
         self.status.into()
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn create(conn: &mut TxnPgConn, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
@@ -128,6 +129,7 @@ impl OnboardingDecision {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
@@ -177,6 +179,7 @@ impl OnboardingDecision {
         Ok(result_map)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Vec<Self>> {
         let result = onboarding_decision::table
             .filter(onboarding_decision::onboarding_id.eq(onboarding_id))

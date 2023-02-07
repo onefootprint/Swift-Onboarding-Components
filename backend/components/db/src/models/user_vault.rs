@@ -107,6 +107,7 @@ impl UserVault {
         }
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
     where
         T: Into<UserVaultIdentifier<'a>>,
@@ -115,6 +116,7 @@ impl UserVault {
         Ok(user)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &UserVaultId) -> DbResult<Locked<Self>> {
         let user = user_vault::table
             .filter(user_vault::id.eq(id))
@@ -123,6 +125,7 @@ impl UserVault {
         Ok(Locked::new(user))
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedUserId) -> DbResult<Locked<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq(su_id))
@@ -134,6 +137,7 @@ impl UserVault {
         Ok(Locked::new(user))
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn multi_get(conn: &mut PgConn, ids: Vec<&ScopedUserId>) -> DbResult<Vec<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq_any(ids))
@@ -144,6 +148,7 @@ impl UserVault {
         Ok(users)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn create(conn: &mut PgConn, new_user: NewUserVaultArgs) -> DbResult<Locked<UserVault>> {
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user)
@@ -152,6 +157,7 @@ impl UserVault {
     }
 
     /// Create a NON-portable, tenant-scoped vault + a scoped user for the tenant and the vault
+    #[tracing::instrument(skip_all)]
     pub fn create_non_portable(
         conn: &mut TxnPgConn,
         req: NewNonPortableUserVaultReq,
@@ -177,6 +183,7 @@ impl UserVault {
 
     #[tracing::instrument(skip_all)]
     /// Look for the portable user vault with a matching fingerprint
+    #[tracing::instrument(skip_all)]
     pub fn find_portable(conn: &mut PgConn, sh_data: Fingerprint) -> DbResult<Option<UserVault>> {
         use crate::schema::{data_lifetime, fingerprint};
 

@@ -63,7 +63,7 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
             .db_pool
             .db_query(
                 move |conn| -> Result<(ScopedUser, ObConfigurationKey), ApiError> {
-                    let su = ScopedUser::get_by_onboarding_id(conn, &obid)?;
+                    let su = ScopedUser::get(conn, &obid)?;
                     let ob_key = ObConfiguration::get_by_onboarding_id(conn, &obid)?.key;
 
                     Ok((su, ob_key))

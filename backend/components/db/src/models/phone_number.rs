@@ -47,6 +47,7 @@ pub struct NewPhoneNumberArgs {
 }
 
 impl PhoneNumber {
+    #[tracing::instrument(skip_all)]
     pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
         let results = phone_number::table
             .inner_join(data_lifetime::table)
@@ -57,6 +58,7 @@ impl PhoneNumber {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get(
         conn: &mut PgConn,
         phone_number_id: &PhoneNumberId,
@@ -71,6 +73,7 @@ impl PhoneNumber {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         uv_id: &UserVaultId,
@@ -107,6 +110,7 @@ impl PhoneNumber {
         Ok(phone_number)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn create_verified(
         conn: &mut TxnPgConn,
         uv_id: &UserVaultId,

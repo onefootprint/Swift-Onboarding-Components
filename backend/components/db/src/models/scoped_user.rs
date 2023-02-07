@@ -1,4 +1,4 @@
-use crate::schema::{onboarding, scoped_user};
+use crate::schema::{scoped_user};
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -47,6 +47,9 @@ pub enum ScopedUserIdentifier<'a> {
     Id {
         id: &'a ScopedUserId,
     },
+    OnboardingId {
+        id: &'a OnboardingId,
+    },
     User {
         id: &'a ScopedUserId,
         uv_id: &'a UserVaultId,
@@ -61,6 +64,12 @@ pub enum ScopedUserIdentifier<'a> {
 impl<'a> From<&'a ScopedUserId> for ScopedUserIdentifier<'a> {
     fn from(id: &'a ScopedUserId) -> Self {
         Self::Id { id }
+    }
+}
+
+impl<'a> From<&'a OnboardingId> for ScopedUserIdentifier<'a> {
+    fn from(id: &'a OnboardingId) -> Self {
+        Self::OnboardingId { id }
     }
 }
 
@@ -82,6 +91,7 @@ impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for ScopedUserIdentif
 
 impl ScopedUser {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
+    #[tracing::instrument(skip_all)]
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         uv: &Locked<UserVault>,
@@ -120,6 +130,7 @@ impl ScopedUser {
     }
 
     /// Used to create a ScopedUser for a non-portable vault
+    #[tracing::instrument(skip_all)]
     pub fn create_non_portable(
         conn: &mut TxnPgConn,
         uv: Locked<UserVault>,
@@ -143,6 +154,7 @@ impl ScopedUser {
     }
 
     /// get scoped_users by a specific user vault
+    #[tracing::instrument(skip_all)]
     pub fn list_for_user_vault(
         conn: &mut PgConn,
         user_vault_id: &UserVaultId,
@@ -155,11 +167,19 @@ impl ScopedUser {
         Ok(results)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn get<'a, T: Into<ScopedUserIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedUser> {
         let mut query = scoped_user::table.into_boxed();
 
         match id.into() {
             ScopedUserIdentifier::Id { id } => query = query.filter(scoped_user::id.eq(id)),
+            ScopedUserIdentifier::OnboardingId { id } => {
+                use crate::schema::onboarding;
+                let scoped_user_ids = onboarding::table
+                    .filter(onboarding::id.eq(id))
+                    .select(onboarding::scoped_user_id);
+                query = query.filter(scoped_user::id.eq_any(scoped_user_ids))
+            }
             ScopedUserIdentifier::User { id, uv_id } => {
                 query = query
                     .filter(scoped_user::id.eq(id))
@@ -177,17 +197,6 @@ impl ScopedUser {
             }
         }
         let result = query.first(conn)?;
-        Ok(result)
-    }
-
-    pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<ScopedUser> {
-        let result = onboarding::table
-            .into_boxed()
-            .filter(onboarding::id.eq(onboarding_id))
-            .inner_join(scoped_user::table)
-            .select(scoped_user::all_columns)
-            .get_result(conn)?;
-
         Ok(result)
     }
 }
