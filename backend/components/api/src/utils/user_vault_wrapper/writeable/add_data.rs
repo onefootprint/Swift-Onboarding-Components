@@ -1,5 +1,6 @@
 use super::uvd_builder::UvdBuilder;
 use super::WriteableUvw;
+use crate::auth::AuthError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::utils::fingerprint::FingerprintMap;
@@ -16,11 +17,89 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
-// Right now, we only allow adding data to a user vault inside of a locked transaction and when
-// we have built the UserVaultWrapper for a specific tenant.
+/// Right now, we only allow adding data to a user vault inside of a locked transaction and when
+/// we have built the UserVaultWrapper for a specific tenant.
+/// These are the publically accessible utils to update data on a UserVaultWrapper.
+/// They use the private, xxx_unsafe methods, which cannot be exposed publically because they don't
+/// take ownership over the UserVaultWrapper that is potentially stale after an update
 impl WriteableUvw {
-    pub fn add_phone_number(
+    pub fn add_email(
         self, // Intentionally consume to prevent using stale UVW
+        conn: &mut TxnPgConn,
+        email: NewtypeEmail,
+        fingerprint: Fingerprint,
+    ) -> ApiResult<EmailId> {
+        self.add_email_unsafe(conn, email, fingerprint)
+    }
+
+    /// Applies the provided IdentityDataUpdate to the UVW.
+    /// NOTE: if the update contains a phone number or email, we will ignore it
+    pub fn update_identity_data(
+        self, // consume self, since we don't want stale data getting used
+        conn: &mut TxnPgConn,
+        update: IdentityDataUpdate,
+        fingerprints: FingerprintMap,
+    ) -> ApiResult<()> {
+        self.update_identity_data_unsafe(conn, update, fingerprints)
+    }
+
+    pub fn update_custom_data(
+        self, // consume self, since we don't want stale data getting used
+        conn: &mut TxnPgConn,
+        update: HashMap<KvDataKey, PiiString>,
+    ) -> ApiResult<()> {
+        self.update_custom_data_unsafe(conn, update)
+    }
+
+    /// Util function to make updates to multiple pieces of the UserVault in one transaction
+    pub fn put_all_data(
+        self, // consume self, since we don't want stale data getting used
+        conn: &mut TxnPgConn,
+        phone_number: Option<ValidatedPhoneNumber>,
+        email: Option<newtypes::email::Email>,
+        uvd: IdentityDataUpdate,
+        id_fingerprints: FingerprintMap,
+        custom: HashMap<KvDataKey, PiiString>,
+    ) -> ApiResult<()> {
+        // TODO can we combine these codepaths with POST /hosted/user/email,
+        // POST /hosted/user/identity_data, and identify verify (where we make phone numbers)
+        let mut id_fingerprints = id_fingerprints;
+        let assert_portable = || -> Result<_, _> {
+            // Certain operations can only occur on portable vaults
+            if self.user_vault().is_portable {
+                return Err(AuthError::CannotModifyPortableUser);
+            }
+            Ok(())
+        };
+        if !custom.is_empty() {
+            self.update_custom_data_unsafe(conn, custom)?;
+        }
+        if let Some(phone_number) = phone_number {
+            assert_portable()?;
+            let Some(fp) = id_fingerprints.remove(&IdentityDataKind::PhoneNumber) else {
+                return Err(ApiError::AssertionError("No fingerprint found for phone number".to_owned()));
+            };
+            self.add_phone_number_unsafe(conn, phone_number, fp)?;
+        }
+        if let Some(email) = email {
+            assert_portable()?;
+            let Some(fp) = id_fingerprints.remove(&IdentityDataKind::Email) else {
+                return Err(ApiError::AssertionError("No fingerprint found for email".to_owned()));
+            };
+            self.add_email_unsafe(conn, email, fp)?;
+        }
+        if !uvd.is_empty() {
+            assert_portable()?;
+            self.update_identity_data_unsafe(conn, uvd, id_fingerprints)?;
+        }
+        Ok(())
+    }
+}
+
+// Private methods that don't consume self to allow batching multiple
+impl WriteableUvw {
+    fn add_phone_number_unsafe(
+        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
         // TODO we shouldn't need ValidatedPhoneNumber here once we stop using the country code
         phone_number: ValidatedPhoneNumber,
@@ -58,8 +137,8 @@ impl WriteableUvw {
         Ok(())
     }
 
-    pub fn add_email(
-        self, // Intentionally consume to prevent using stale UVW
+    fn add_email_unsafe(
+        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
@@ -91,10 +170,8 @@ impl WriteableUvw {
         Ok(email.id)
     }
 
-    /// Applies the provided IdentityDataUpdate to the UVW.
-    /// NOTE: if the update contains a phone number or email, we will ignore it
-    pub fn update_identity_data(
-        self, // consume self, since we don't want stale data getting used
+    fn update_identity_data_unsafe(
+        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
         update: IdentityDataUpdate,
         fingerprints: FingerprintMap,
@@ -115,8 +192,8 @@ impl WriteableUvw {
         Ok(())
     }
 
-    pub fn update_custom_data(
-        self, // consume self, since we don't want stale data getting used
+    fn update_custom_data_unsafe(
+        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()> {

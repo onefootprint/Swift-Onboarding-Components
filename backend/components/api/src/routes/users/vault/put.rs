@@ -1,10 +1,9 @@
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
-use crate::auth::AuthError;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::fingerprint::{build_fingerprints, FingerprintMap};
+use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -14,8 +13,8 @@ use db::models::scoped_user::ScopedUser;
 use itertools::Itertools;
 use newtypes::email::Email;
 use newtypes::{
-    flat_api_object_map_type, AccessEventKind, DataIdentifier, Fingerprint, FootprintUserId,
-    IdentityDataKind, IdentityDataUpdate, PhoneNumber, PiiString, ValidatedPhoneNumber,
+    flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, IdentityDataKind,
+    IdentityDataUpdate, PhoneNumber, PiiString, ValidatedPhoneNumber,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use std::collections::HashMap;
@@ -53,11 +52,14 @@ pub async fn put(
 
     // Parse identity data
     let (mut id_update, other_data) = IdentityDataUpdate::new(request.into())?;
-    let mut id_fingerprints = build_fingerprints(&state, id_update.clone()).await?;
+    let id_fingerprints = build_fingerprints(&state, id_update.clone()).await?;
 
     // Extract phone and email from identity data since they are handled separately (for now)
-    let phone_info = parse_phone_number_info(&state, &mut id_update, &mut id_fingerprints).await?;
-    let email_info = parse_email_info(&mut id_update, &mut id_fingerprints)?;
+    let phone_number = parse_phone_number_info(&state, &mut id_update).await?;
+    let email = id_update
+        .remove(&IdentityDataKind::Email)
+        .map(|p| Email::from_str(p.leak()))
+        .transpose()?;
 
     // Parse custom data
     let custom_data = other_data
@@ -73,34 +75,8 @@ pub async fn put(
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
-            // TODO can we use the same UVW to add both kinds of data?
-            // TODO can we combine these codepaths with POST /hosted/user/email,
-            // POST /hosted/user/identity_data, and identify verify (where we make phone numbers)
-            if !custom_data.is_empty() {
-                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                uvw.update_custom_data(conn, custom_data)?;
-            }
-            if !id_update.is_empty() {
-                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                if uvw.user_vault().is_portable {
-                    return Err(AuthError::CannotModifyPortableUser.into());
-                }
-                uvw.update_identity_data(conn, id_update, id_fingerprints)?;
-            }
-            if let Some((phone_number, fp)) = phone_info {
-                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                if uvw.user_vault().is_portable {
-                    return Err(AuthError::CannotModifyPortableUser.into());
-                }
-                uvw.add_phone_number(conn, phone_number, fp)?;
-            }
-            if let Some((email, fp)) = email_info {
-                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                if uvw.user_vault().is_portable {
-                    return Err(AuthError::CannotModifyPortableUser.into());
-                }
-                uvw.add_email(conn, email, fp)?;
-            }
+            let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
+            uvw.put_all_data(conn, phone_number, email, id_update, id_fingerprints, custom_data)?;
 
             // Create an access event to show data was added
             NewAccessEvent {
@@ -123,16 +99,12 @@ pub async fn put(
 async fn parse_phone_number_info(
     state: &State,
     id_update: &mut IdentityDataUpdate,
-    id_fingerprints: &mut FingerprintMap,
-) -> ApiResult<Option<(ValidatedPhoneNumber, Fingerprint)>> {
+) -> ApiResult<Option<ValidatedPhoneNumber>> {
     let phone_number = id_update
         .remove(&IdentityDataKind::PhoneNumber)
         .map(|p| PhoneNumber::from_str(p.leak()))
         .transpose()?;
     let Some(phone_number) = phone_number else {
-        return Ok(None);
-    };
-    let Some(fp) = id_fingerprints.remove(&IdentityDataKind::PhoneNumber) else {
         return Ok(None);
     };
     let phone_number = state
@@ -146,18 +118,5 @@ async fn parse_phone_number_info(
                 "Could not validate phone number. Please provide in e164 format",
             )])
         })?;
-    Ok(Some((phone_number, fp)))
-}
-
-fn parse_email_info(
-    id_update: &mut IdentityDataUpdate,
-    id_fingerprints: &mut FingerprintMap,
-) -> ApiResult<Option<(Email, Fingerprint)>> {
-    let email = id_update
-        .remove(&IdentityDataKind::Email)
-        .map(|p| Email::from_str(p.leak()))
-        .transpose()?;
-    let fp = id_fingerprints.remove(&IdentityDataKind::Email);
-    let info = email.and_then(|e| fp.map(|fp| (e, fp)));
-    Ok(info)
+    Ok(Some(phone_number))
 }
