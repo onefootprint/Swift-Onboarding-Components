@@ -160,6 +160,51 @@ describe('<CreateDialog />', () => {
         expect(onCloseMockFn).toHaveBeenCalled();
       });
     });
+
+    describe('when collecting the id document & selfie', () => {
+      it('should only show selfie only if id doc checkbox is checked', async () => {
+        await renderCreateDialogOnTheCollectDataSection();
+
+        const idDocCheckbox = screen.getByLabelText(
+          'ID Document',
+        ) as HTMLInputElement;
+        expect(idDocCheckbox).toBeInTheDocument();
+        expect(idDocCheckbox.checked).toBe(false);
+
+        expect(screen.queryByLabelText('Selfie')).toEqual(null);
+
+        await userEvent.click(idDocCheckbox);
+        await waitFor(() => {
+          expect(idDocCheckbox.checked).toBe(true);
+        });
+
+        await waitFor(() => {
+          const selfieCheckbox = screen.getByLabelText(
+            'Selfie',
+          ) as HTMLInputElement;
+          expect(selfieCheckbox).toBeInTheDocument();
+        });
+        const selfieCheckbox = screen.getByLabelText(
+          'Selfie',
+        ) as HTMLInputElement;
+        expect(selfieCheckbox.checked).toBe(false);
+
+        await userEvent.click(selfieCheckbox);
+        await waitFor(() => {
+          expect(selfieCheckbox.checked).toBe(true);
+        });
+
+        // Uncheck ID doc, selfie checkbox should be unchecked after that too
+        await userEvent.click(idDocCheckbox);
+        await waitFor(() => {
+          expect(idDocCheckbox.checked).toBe(false);
+        });
+
+        await waitFor(() => {
+          expect(selfieCheckbox).not.toBeInTheDocument();
+        });
+      });
+    });
   });
 
   describe('"Access data" section', () => {
@@ -184,7 +229,7 @@ describe('<CreateDialog />', () => {
       expect(allCheckboxes.length).toEqual(4);
     });
 
-    it('should show id document if it was collected', async () => {
+    it('should show id document but hide selfie if only the id doc was collected', async () => {
       await renderCreateDialogOnTheCollectDataSection();
 
       let idDocCheckbox = screen.getByLabelText('ID Document');
@@ -206,8 +251,73 @@ describe('<CreateDialog />', () => {
       expect(idDocCheckbox).toBeInTheDocument();
 
       await waitFor(() => {
-        const selfieCheckbox = screen.getByLabelText('Selfie');
+        expect(screen.queryByLabelText('Selfie')).toEqual(null);
+      });
+
+      // Checking id doc doesn't make selfie appear
+      await userEvent.click(idDocCheckbox);
+      await waitFor(() => {
+        expect(screen.queryByLabelText('Selfie')).toEqual(null);
+      });
+    });
+
+    it('should show both the id doc and selfie if both were collected', async () => {
+      await renderCreateDialogOnTheCollectDataSection();
+
+      let idDocCheckbox = screen.getByLabelText(
+        'ID Document',
+      ) as HTMLInputElement;
+      await userEvent.click(idDocCheckbox);
+
+      await waitFor(() => {
+        expect(idDocCheckbox.checked).toBe(true);
+      });
+
+      await waitFor(() => {
+        const selfieCheckbox = screen.getByLabelText(
+          'Selfie',
+        ) as HTMLInputElement;
         expect(selfieCheckbox).toBeInTheDocument();
+      });
+
+      let selfieCheckbox = screen.getByLabelText('Selfie') as HTMLInputElement;
+      expect(selfieCheckbox.checked).toBe(false);
+
+      await userEvent.click(selfieCheckbox);
+      await waitFor(() => {
+        expect(selfieCheckbox.checked).toBe(true);
+      });
+
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('access-form')).toBeVisible();
+      });
+
+      idDocCheckbox = screen.getByLabelText('ID Document') as HTMLInputElement;
+      expect(idDocCheckbox).toBeInTheDocument();
+      expect(idDocCheckbox.checked).toBe(true);
+
+      selfieCheckbox = screen.getByLabelText('Selfie') as HTMLInputElement;
+      expect(selfieCheckbox).toBeInTheDocument();
+      expect(selfieCheckbox.checked).toBe(true);
+
+      await userEvent.click(selfieCheckbox);
+
+      await waitFor(() => {
+        expect(selfieCheckbox.checked).toBe(false);
+      });
+
+      await userEvent.click(idDocCheckbox);
+
+      await waitFor(() => {
+        expect(idDocCheckbox.checked).toBe(false);
+      });
+
+      // Unchecking the id document box hides the selfie checkbox
+      await waitFor(() => {
+        expect(selfieCheckbox).not.toBeInTheDocument();
       });
     });
 

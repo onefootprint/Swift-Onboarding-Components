@@ -54,7 +54,6 @@ const AccessForm = ({
       kycData: defaultKycData,
       documents: {
         ...defaultDocumentData,
-        showSelfie: innerFields.idDoc,
       },
     },
   });
@@ -63,6 +62,7 @@ const AccessForm = ({
     setInnerFields(prevState => ({ ...prevState, idDoc: checked }));
     setValue('documents.showSelfie', checked);
   };
+  const isSelfieShown = innerFields.idDoc && !!defaultDocumentData.selfie;
 
   return (
     <form
@@ -126,7 +126,7 @@ const AccessForm = ({
               onChange={handleIdDocChange}
             />
           )}
-          <AnimatedContainer isExpanded={innerFields.idDoc}>
+          <AnimatedContainer isExpanded={isSelfieShown}>
             <Checkbox
               label={allT('collected-id-doc-attributes.selfie-image')}
               {...register(`documents.selfie`)}

@@ -24,9 +24,7 @@ type FormData = {
     showSSNOptions: boolean;
     ssnKind?: UserDataAttribute.ssn4 | UserDataAttribute.ssn9;
   };
-  documents: DocumentsFormData & {
-    showSelfie: boolean;
-  };
+  documents: DocumentsFormData;
 };
 
 type CollectFormProps = {
@@ -39,11 +37,9 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     'pages.developers.onboarding-configs.create.collect-form',
   );
   const defaultKycData = defaultValues.kycData;
-  const defaultDocumentData = defaultValues.documents;
   const [innerFields, setInnerFields] = useState({
     ssn: defaultKycData.ssn4 || defaultKycData.ssn9,
     address: defaultKycData.full_address || defaultKycData.partial_address,
-    idDoc: !!defaultDocumentData.idDoc,
   });
 
   const getInitialSSNKind = () => {
@@ -56,19 +52,17 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     return undefined;
   };
 
-  const { setValue, register, handleSubmit } = useForm<FormData>({
+  const { setValue, register, handleSubmit, watch } = useForm<FormData>({
     defaultValues: {
+      ...defaultValues,
       kycData: {
         ...defaultKycData,
         showSSNOptions: innerFields.ssn,
         ssnKind: getInitialSSNKind(),
       },
-      documents: {
-        ...defaultDocumentData,
-        showSelfie: innerFields.idDoc,
-      },
     },
   });
+  const idDoc = watch('documents.idDoc');
 
   const handleSSNKindsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = event.target;
@@ -76,14 +70,8 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     setValue('kycData.ssnKind', checked ? UserDataAttribute.ssn9 : undefined);
   };
 
-  const handleIdDocChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { checked } = event.target;
-    setInnerFields(prevState => ({ ...prevState, idDoc: checked }));
-    setValue('documents.showSelfie', checked);
-  };
-
   const handleBeforeSubmit = (formData: FormData) => {
-    const { kycData, documents: idDoc } = formData;
+    const { kycData, documents } = formData;
     const submittedData = {
       kycData: {
         [CollectedKycDataOption.email]: true,
@@ -95,8 +83,8 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         [UserDataAttribute.ssn9]: kycData.ssnKind === UserDataAttribute.ssn9,
       },
       documents: {
-        idDoc: idDoc.idDoc,
-        selfie: idDoc.selfie,
+        idDoc: documents.idDoc,
+        selfie: documents.selfie,
       },
     };
     onSubmit(submittedData);
@@ -159,9 +147,8 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
           <Checkbox
             label={t('documents.id-doc')}
             {...register(`documents.idDoc`)}
-            onChange={handleIdDocChange}
           />
-          {!innerFields.idDoc && (
+          {!idDoc && (
             <IdDocDescription>
               <Typography variant="body-3" color="tertiary">
                 <Trans
@@ -179,7 +166,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
               </Typography>
             </IdDocDescription>
           )}
-          <AnimatedContainer isExpanded={innerFields.idDoc}>
+          <AnimatedContainer isExpanded={idDoc}>
             <Checkbox
               label={t('documents.selfie')}
               {...register(`documents.selfie`)}
