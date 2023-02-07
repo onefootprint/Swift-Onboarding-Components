@@ -71,7 +71,6 @@ function createAssetsBucket(
       forceDestroy: !config.deletionProtection,
       bucket: bucketName,
       arn: `arn:aws:s3:::${bucketName}`,
-      acl: 'public-read',
       website: {
         indexDocument: 'index.html',
         errorDocument: '404.html',

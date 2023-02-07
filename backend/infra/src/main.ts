@@ -145,6 +145,7 @@ export type CoreServiceOutputs = {
   loadBalancerCname: string;
   internalLoadBalancerDnsName: pulumi.Output<string>;
   nitroServiceEndpoint: string;
+  assetCdn: string;
 };
 
 /**
@@ -182,6 +183,7 @@ async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
   );
 
   return {
+    assetCdn: g.assetCdn.origin,
     cdnDomainName: service.distribution.domainName,
     externalDomain: service.cdnDomain,
     loadBalancerCname: service.lbCname,
