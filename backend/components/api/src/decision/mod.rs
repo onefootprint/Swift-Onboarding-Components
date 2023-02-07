@@ -1,6 +1,7 @@
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::RuleSetName;
 use thiserror::Error;
+
+use self::rule::RuleSetName;
 ////////////////////////
 /// Decision Engine
 ////////////////////////

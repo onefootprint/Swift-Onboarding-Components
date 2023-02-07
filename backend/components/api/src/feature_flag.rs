@@ -3,8 +3,10 @@ use std::sync::Arc;
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
 #[cfg(test)]
 use mockall::{automock, predicate::*};
-use newtypes::{ObConfigurationKey, RuleSetName, TenantId, Uuid};
+use newtypes::{ObConfigurationKey, TenantId, Uuid};
 use thiserror::Error;
+
+use crate::decision::rule::RuleSetName;
 
 #[derive(Debug, Error)]
 pub enum FeatureFlagError {
@@ -106,7 +108,7 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         flag_key: &str,
         rule_set_name: &RuleSetName,
     ) -> Result<bool, FeatureFlagError> {
-        let context = ContextBuilder::new(rule_set_name.clone())
+        let context = ContextBuilder::new(rule_set_name.clone().to_string())
             .build()
             .map_err(FeatureFlagError::LaunchDarklyError)?;
         let flag_value = self

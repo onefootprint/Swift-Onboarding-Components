@@ -11,8 +11,12 @@ use db::{
     DbPool, TxnPgConn,
 };
 
-use super::{features::*, rule::rule_set::RuleSetResult, utils};
-use crate::{decision::rule::rule_impl::idology_rule_set, feature_flag::FeatureFlagClient};
+use super::{
+    features::*,
+    rule::{self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules},
+    utils,
+};
+use crate::feature_flag::FeatureFlagClient;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::user_vault_wrapper::UserVaultWrapper,
@@ -110,41 +114,48 @@ pub fn final_decision(
     feature_flag_client: &impl FeatureFlagClient,
 ) -> ApiResult<DecisionOutput> {
     // Run our rules and log
-    // TODO: we should remove status_from_features or add a diff set of defaults
-    let (status_from_features, idology_rule_result) = features
+    let idology_features = features
         .idology_features
         .as_ref()
-        .map(|i| (i.status, idology_rule_set().evaluate(i)))
-        .ok_or_else(|| super::Error::MissingDataForRuleSet(idology_rule_set().name))?;
+        .ok_or_else(|| super::Error::MissingDataForRuleSet(onboarding_rules::idology_base_rule_set().name))?;
 
-    // Compute our decision from the output of the rules
-    let decision_from_idology_ruleset =
-        decision_from_ruleset_result(&idology_rule_result, feature_flag_client);
+    // The set of rules that determine if a user passes onboarding
+    let prod_rules = vec![onboarding_rules::idology_base_rule_set()];
+    // Additional sets of rules that might be toggled on via a FF or by tenant
+    let additional_rules = vec![ActionableRuleSetBuilder::new(
+        onboarding_rules::idology_conservative_rule_set(),
+    )]
+    .into_iter()
+    .map(|a| a.build(feature_flag_client))
+    .collect();
 
-    // If we are make decisions based on the idology rules, use that decision. Else
-    // fall back to default
-    let decision_status = if decision_from_idology_ruleset.can_action {
-        decision_from_idology_ruleset.decision
+    // Evaluate our rules
+    let failed = rule::evaluate_onboarding_rules(prod_rules, idology_features, &onboarding_id);
+
+    // Evaluate conservative rules
+    let failed_conservative =
+        rule::evaluate_onboarding_rules(additional_rules, idology_features, &onboarding_id);
+
+    // If we no rules that triggered, we consider that a pass
+    let decision_status = if failed || failed_conservative {
+        DecisionStatus::Fail
     } else {
-        status_from_features
+        DecisionStatus::Pass
     };
 
     // For now, we just queue up failures so we can see until we have a better sense of
     // what reviews we want to be doing
     let create_manual_review = decision_status == DecisionStatus::Fail;
 
-    // Log
+    // Log evaluation
     tracing::info!(
-        rule_set_name=%idology_rule_result.ruleset_name,
-        can_action=%decision_from_idology_ruleset.can_action,
-        decision_from_rules=%decision_from_idology_ruleset.decision,
-        decision_for_onboarding=%decision_status,
-        onboarding_id=%&onboarding_id,
-        passing_rules_triggered=%idology_rule_result.passing_rules_triggered.clone().join(","),
-        failing_rules_triggered=%idology_rule_result.failing_rules_triggered.clone().join(","),
-        rules_not_triggered=%idology_rule_result.rules_not_triggered.clone().join(","),
-        create_manual_review=%create_manual_review,
-        "Decision Logic result"
+       failed_base=%failed,
+       failed_conservative=%failed_conservative,
+       create_manual_review=%create_manual_review,
+       decision=%decision_status,
+       onboarding_id=%&onboarding_id,
+       msg="decision",
+       "{}", rule::RULE_LOG_LINE,
     );
 
     let output = DecisionOutput {
@@ -153,31 +164,6 @@ pub fn final_decision(
         create_manual_review,
     };
     Ok(output)
-}
-
-struct DecisionFromRuleSet {
-    pub can_action: bool,
-    pub decision: DecisionStatus,
-}
-fn decision_from_ruleset_result(
-    ruleset_result: &RuleSetResult,
-    feature_flag_client: &impl FeatureFlagClient,
-) -> DecisionFromRuleSet {
-    // Check we can action via a feature flag, allows for shadow rollout of rule sets
-    let can_action = feature_flag_client
-        .bool_flag_by_rule_set_name("EnableRuleSetForDecision", &ruleset_result.ruleset_name)
-        .unwrap_or(false);
-
-    // User passes if they affirmatively are verified, without any negative rules getting fired
-    let decision = if ruleset_result.failing_rules_triggered.is_empty()
-        && !ruleset_result.passing_rules_triggered.is_empty()
-    {
-        DecisionStatus::Pass
-    } else {
-        DecisionStatus::Fail
-    };
-
-    DecisionFromRuleSet { can_action, decision }
 }
 
 fn write_risk_signals(
