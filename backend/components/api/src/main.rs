@@ -28,6 +28,10 @@ use self::routes::*;
 mod proxy;
 mod s3;
 mod state;
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod tests;
 mod types;
 mod utils;
 

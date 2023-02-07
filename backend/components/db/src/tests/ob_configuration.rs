@@ -10,7 +10,7 @@ use crate::models::ob_configuration::ObConfiguration;
 fn test_ob_config(conn: &mut TestPgConn) {
     // Create an ob config
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
 
     // Enforce it exists
     let (fetched_ob_config, tenant) =

@@ -1,4 +1,4 @@
-use crate::schema::{scoped_user};
+use crate::schema::scoped_user;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};

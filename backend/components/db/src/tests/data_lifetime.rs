@@ -45,13 +45,13 @@ impl TestData {
         let t2_id = fixtures::tenant::create(conn).id;
 
         // Create ob configs
-        let ob_config_id = fixtures::ob_configuration::create(conn, &t_id).id;
-        let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id).id;
+        let ob_config_id = fixtures::ob_configuration::create(conn, &t_id, true).id;
+        let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id, true).id;
 
         // Create user vaults (without phone number)
-        let uv_id = fixtures::user_vault::create(conn).into_inner().id;
-        let uv2_id = fixtures::user_vault::create(conn).into_inner().id;
-        let uvx_id = fixtures::user_vault::create(conn).into_inner().id;
+        let uv_id = fixtures::user_vault::create(conn, true).into_inner().id;
+        let uv2_id = fixtures::user_vault::create(conn, true).into_inner().id;
+        let uvx_id = fixtures::user_vault::create(conn, true).into_inner().id;
 
         // Create scoped users
         let su_id = fixtures::scoped_user::create(conn, &uv_id, &ob_config_id).id;

@@ -21,10 +21,10 @@ use std::str::FromStr;
 
 #[db_test]
 fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
-    let uv = fixtures::user_vault::create(conn);
-    let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let uv = db::tests::fixtures::user_vault::create(conn, true);
+    let tenant = db::tests::fixtures::tenant::create(conn);
+    let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let su = db::tests::fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     // Add identity data
     let data = vec![
@@ -96,9 +96,9 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
 
 #[db_test]
 fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
-    let uv = fixtures::user_vault::create(conn);
+    let uv = fixtures::user_vault::create(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     // Add an email
@@ -142,10 +142,10 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
 
 #[db_test]
 fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
-    let uv = fixtures::user_vault::create(conn);
+    let uv = fixtures::user_vault::create(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
-    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
     let su2 = fixtures::scoped_user::create(conn, &uv.id, &ob_config2.id);
 
@@ -272,10 +272,10 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     // Since there'a already an ssn9 when we commit the ssn4 for tenant1, we shouldn't
     // overwrite the more "complete" ssn9 on the user vault
     // This specific race condition was solved in https://linear.app/footprint/issue/FP-2129/handle-onboarding-race-condition
-    let uv = fixtures::user_vault::create(conn);
+    let uv = fixtures::user_vault::create(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
-    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
     let su2 = fixtures::scoped_user::create(conn, &uv.id, &ob_config2.id);
 
@@ -323,9 +323,9 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
 
 #[db_test]
 fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
-    let uv = fixtures::user_vault::create(conn);
+    let uv = fixtures::user_vault::create(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     let updates = vec![
@@ -374,9 +374,9 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
 fn test_commit_custom_data(conn: &mut TestPgConn) {
     // We haven't figured out the portability story for custom data or identity documents yet, so
     // for now, let's make sure we never commit them through the UVW
-    let uv = fixtures::user_vault::create(conn);
+    let uv = fixtures::user_vault::create(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     let k1 = KvDataKey::from_str("blerp").unwrap();
@@ -420,9 +420,9 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
 fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
     // We haven't figured out the portability story for custom data or identity documents yet, so
     // for now, let's make sure we never commit them through the UVW
-    let uv = fixtures::user_vault::create(conn);
+    let uv = fixtures::user_vault::create(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     // Add some identity data

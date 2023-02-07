@@ -195,9 +195,9 @@ mod tests {
     #[db_test]
     fn test_list(conn: &mut TestPgConn) {
         let is_live = true;
-        let user_vault = fixtures::user_vault::create(conn).into_inner();
+        let user_vault = fixtures::user_vault::create(conn, true).into_inner();
         let tenant = fixtures::tenant::create(conn);
-        let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+        let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
         let scoped_user = fixtures::scoped_user::create(conn, &user_vault.id, &ob_config.id);
 
         let tenant_user1 = test_tenant_user(conn, String::from("tu1@acme.com"), None, None);

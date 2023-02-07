@@ -8,8 +8,8 @@ use newtypes::{Fingerprint, IdentityDataKind as IDK};
 fn test_find_portable(conn: &mut TestPgConn) {
     // Create an ob config
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
-    let uv = fixtures::user_vault::create(conn).into_inner();
+    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let uv = fixtures::user_vault::create(conn, true).into_inner();
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();

@@ -113,12 +113,12 @@ async fn create_user_and_onboarding(
     db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let tenant = fixtures::tenant::create(conn);
-            let ob_config = fixtures::ob_configuration::create(conn, &tenant.id);
+            let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
             let ob_config_id = ob_config.id.clone();
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config, keys_and_phone);
 
-            let onboarding = fixtures::onboarding::create(conn, &ob_config_id, &su.id);
+            let onboarding = fixtures::onboarding::create_with_txn(conn, su.id, ob_config_id);
 
             fixtures::verification_request::bulk_create(
                 conn,

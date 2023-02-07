@@ -10,3 +10,7 @@ mod risk;
 #[allow(clippy::expect_used)]
 #[cfg(test)]
 mod engine;
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod utils;

@@ -1,7 +1,6 @@
 use db::{
     models::{
         manual_review::ManualReview,
-        ob_configuration::ObConfiguration,
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         risk_signal::RiskSignal,
@@ -12,8 +11,8 @@ use db::{
     PgConn,
 };
 use newtypes::{
-    DbActor, DecisionStatus, FootprintReasonCode, IdentityDocumentId, ObConfigurationKey, OnboardingId,
-    TenantId, Vendor, VendorAPI,
+    DbActor, DecisionStatus, FootprintReasonCode, IdentityDocumentId, OnboardingId, TenantId,
+    ValidatedPhoneNumber, Vendor, VendorAPI,
 };
 
 use super::vendor;
@@ -24,9 +23,11 @@ use crate::{
     State,
 };
 
+pub const IS_DEMO_TENANT_FLAG_NAME: &str = "IsDemoTenant";
+
 type ShouldInitiateVerificationRequests = bool;
-// Logic to figure out test status from some of the identity data we collected during onboarding
-// As of 2022-10-15 we do this by looking at the phone number
+
+#[tracing::instrument(skip_all)]
 pub async fn should_initiate_idv_or_else_setup_test_fixtures(
     state: &State,
     uvw: UserVaultWrapper,
@@ -35,143 +36,30 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
 ) -> ApiResult<ShouldInitiateVerificationRequests> {
     // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
     // phone number's sandbox suffix
-    let decrypted_phone = if !uvw.user_vault.is_live {
+    let is_sandbox = !uvw.user_vault.is_live;
+
+    if is_sandbox {
         let phone_number = uvw.get_decrypted_primary_phone(state).await?;
-        Some(phone_number)
+        should_initiate_sandbox_and_setup(state, ob_id, uvw, phone_number, should_setup_test_fixtures).await
     } else {
-        None
-    };
-
-    let (decision_status, create_manual_review) = if let Some(decrypted_phone) = decrypted_phone {
-        // This is a sandbox user vault. Check for pre-set validation cases
-        if decrypted_phone.suffix.starts_with("idv") {
-            // ALERT ALERT - This triggers real idv requests
-            // All other cases (ironically including non-sandbox users) end up triggering the fixture code path
-            return Ok(true);
-        } else if decrypted_phone.suffix.starts_with("fail") {
-            (DecisionStatus::Fail, false)
-        } else if decrypted_phone.suffix.starts_with("manualreview") {
-            (DecisionStatus::Fail, true)
-        } else {
-            (DecisionStatus::Pass, false)
-        }
-    } else {
-        // Decide to send prod request based on FFs for tenant_id OR ob_config id
         let obid = ob_id.clone();
-
-        let (scoped_user, ob_config_key) = state
+        let scoped_user = state
             .db_pool
-            .db_query(
-                move |conn| -> Result<(ScopedUser, ObConfigurationKey), ApiError> {
-                    let su = ScopedUser::get(conn, &obid)?;
-                    let ob_key = ObConfiguration::get_by_onboarding_id(conn, &obid)?.key;
-
-                    Ok((su, ob_key))
-                },
-            )
+            .db_query(move |conn| -> Result<ScopedUser, ApiError> {
+                ScopedUser::get(conn, &obid).map_err(ApiError::from)
+            })
             .await??;
 
-        if should_send_prod_idv_requests(
-            state.feature_flag_client.clone(),
-            &scoped_user.tenant_id,
-            &ob_config_key,
-        ) {
-            return Ok(true);
-        }
-
-        // BIG TODO: This controls whether or not we send actual verification requests, we need to revisit and remove the feature flag at some point
-        (DecisionStatus::Pass, false)
-    };
-
-    // Create the test fixture data
-    if should_setup_test_fixtures {
-        state
-            .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
-                let ob = Onboarding::lock(conn, &ob_id)?;
-                if ob.idv_reqs_initiated {
-                    return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-                }
-
-                // Create ManualReview row if requested
-                if create_manual_review {
-                    ManualReview::create(conn, ob.id.clone())?;
-                }
-
-                // Create some mock verification request and results
-                let request =
-                    VerificationRequest::bulk_create(conn, ob.id.clone(), vec![VendorAPI::IdologyExpectID])?
-                        .pop()
-                        .ok_or(ApiError::ResourceNotFound)?;
-                let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
-
-                // Verification result response is encrypted
-                let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
-                let e_response = vendor::verification_result::encrypt_verification_result_response(
-                    raw_response.clone().into(),
-                    uv.public_key,
-                )?;
-
-                // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
-                let result = VerificationResult::create(conn, request.id, raw_response, e_response)?;
-                // If the decision is a pass, mark all data as verified for the onboarding
-                let seqno = if decision_status == DecisionStatus::Pass {
-                    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
-                    let seqno = uvw.commit_identity_data(conn)?;
-                    Some(seqno)
-                } else {
-                    None
-                };
-
-                // Create the decision itself
-                // TODO should we move the creation of the decision onto the locked UVW since we also
-                // commit the data there? Would dedupe this logic between tests + prod
-                let new_decision = OnboardingDecisionCreateArgs {
-                    user_vault_id: uvw.user_vault.id.clone(),
-                    onboarding: &ob,
-                    logic_git_hash: crate::GIT_HASH.to_string(),
-                    status: decision_status,
-                    result_ids: vec![result.id],
-                    annotation_id: None,
-                    actor: DbActor::Footprint,
-                    seqno,
-                };
-                let decision = OnboardingDecision::create(conn, new_decision)?;
-
-                ob.into_inner().update(
-                    conn,
-                    OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
-                )?;
-
-                // Create some mock risk signals that are somewhat consistent with the mock decision
-                let reason_codes = match (decision_status, create_manual_review) {
-                    // Straight out rejection
-                    (DecisionStatus::Fail, false) => vec![
-                        FootprintReasonCode::SubjectDeceased,
-                        FootprintReasonCode::SsnIssuedPriorToDob,
-                    ],
-                    // Manual review
-                    (DecisionStatus::Fail, true) => vec![
-                        FootprintReasonCode::SsnDoesNotMatchWithin1Digit,
-                        FootprintReasonCode::NameLastDoesNotMatch,
-                    ],
-                    // Approved
-                    (DecisionStatus::Pass, _) => vec![
-                        FootprintReasonCode::PhoneNumberLocatedIsVoip,
-                        FootprintReasonCode::EmailDomainCorporate,
-                    ],
-                    _ => vec![],
-                };
-                let signals = reason_codes
-                    .into_iter()
-                    .map(|r| (r, vec![Vendor::Idology]))
-                    .collect();
-                RiskSignal::bulk_create(conn, decision.id, signals)?;
-                Ok(())
-            })
-            .await?;
+        should_initiate_prod_and_setup(
+            state,
+            ob_id,
+            uvw,
+            scoped_user.tenant_id,
+            &state.feature_flag_client,
+            should_setup_test_fixtures,
+        )
+        .await
     }
-    Ok(false)
 }
 
 /// Helper to do some sanity checks when creating document verification requests
@@ -197,19 +85,15 @@ pub fn create_document_verification_request(
 }
 
 /// Logic to determine if we should send IDV requests for a tenant in production. Separated out for testing
-pub(self) fn should_send_prod_idv_requests(
-    feature_flag_client: impl FeatureFlagClient,
-    tenant_id: &TenantId,
-    ob_config_key: &ObConfigurationKey,
-) -> bool {
-    let should_send_tenant = feature_flag_client
-        .bool_flag_by_tenant_id("EnableProductionIdvCallsByTenant", tenant_id)
-        .unwrap_or(false);
-    let should_send_ob_config = feature_flag_client
-        .bool_flag_by_ob_configuration_key("EnableProductionIdvCallsByObConfig", ob_config_key)
+pub(self) fn is_demo_tenant(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
+    let res = feature_flag_client
+        .bool_flag_by_tenant_id(IS_DEMO_TENANT_FLAG_NAME, tenant_id)
         .unwrap_or(false);
 
-    should_send_tenant || should_send_ob_config
+    // Log this so we can observe if something is amiss
+    tracing::info!(tenant_id=%tenant_id, is_demo=%res, "is demo tenant");
+
+    res
 }
 
 // If socure fails, we shouldn't fail the DE run
@@ -224,44 +108,149 @@ pub fn can_see_socure_results(feature_flag_client: &impl FeatureFlagClient, tena
         .unwrap_or(false)
 }
 
-#[cfg(test)]
-#[allow(clippy::unwrap_used)]
-mod tests {
-    use super::*;
-    use crate::feature_flag::{FeatureFlagError, MockFeatureFlagClient};
-    use mockall::predicate::*;
-    use std::str::FromStr;
-    use test_case::test_case;
+#[tracing::instrument(skip_all)]
+/// If the user vault is a sandbox vault, we take the desired status from the phone number suffix
+pub async fn should_initiate_sandbox_and_setup(
+    state: &State,
+    ob_id: OnboardingId,
+    uvw: UserVaultWrapper,
+    phone_number: ValidatedPhoneNumber,
+    should_setup_test_fixtures: bool,
+) -> ApiResult<bool> {
+    let (decision_status, create_manual_review) = decision_status_from_sandbox_suffix(phone_number);
 
-    #[test_case(Ok(true), Ok(true) => true)]
-    #[test_case(Ok(false), Ok(true) => true)]
-    #[test_case(Ok(true), Ok(false) => true)]
-    #[test_case(Ok(false), Ok(false) => false)]
-    #[test_case(Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize), Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize) => false)]
-    fn test_should_send_prod_idv_requests(
-        tenant_flag_response: Result<bool, FeatureFlagError>,
-        ob_config_flag_response: Result<bool, FeatureFlagError>,
-    ) -> bool {
-        let mut mock_ff_client = MockFeatureFlagClient::new();
-
-        let tenant_id = TenantId::from_str("tenant123").unwrap();
-        let ob_configuration_id = ObConfigurationKey::from_str("obc123").unwrap();
-
-        mock_ff_client
-            .expect_bool_flag_by_tenant_id()
-            .with(eq("EnableProductionIdvCallsByTenant"), eq(tenant_id.clone()))
-            .times(1)
-            .return_once(|_, _| tenant_flag_response);
-
-        mock_ff_client
-            .expect_bool_flag_by_ob_configuration_key()
-            .with(
-                eq("EnableProductionIdvCallsByObConfig"),
-                eq(ob_configuration_id.clone()),
-            )
-            .times(1)
-            .return_once(|_, _| ob_config_flag_response);
-
-        should_send_prod_idv_requests(mock_ff_client, &tenant_id, &ob_configuration_id)
+    if should_setup_test_fixtures {
+        setup_test_fixtures(state, ob_id, create_manual_review, decision_status, uvw).await?;
     }
+
+    Ok(false)
+}
+
+pub fn decision_status_from_sandbox_suffix(phone_number: ValidatedPhoneNumber) -> (DecisionStatus, bool) {
+    if phone_number.suffix.starts_with("fail") {
+        (DecisionStatus::Fail, false)
+    } else if phone_number.suffix.starts_with("manualreview") {
+        (DecisionStatus::Fail, true)
+    } else {
+        (DecisionStatus::Pass, false)
+    }
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn should_initiate_prod_and_setup(
+    state: &State,
+    ob_id: OnboardingId,
+    uvw: UserVaultWrapper,
+    tenant_id: TenantId,
+    feature_flag_client: &impl FeatureFlagClient,
+    should_setup_test_fixtures: bool,
+) -> ApiResult<bool> {
+    if is_demo_tenant(feature_flag_client, &tenant_id) {
+        if should_setup_test_fixtures {
+            setup_test_fixtures(state, ob_id, false, DecisionStatus::Pass, uvw).await?;
+        }
+
+        Ok(false)
+    } else {
+        // If this is a prod user vault, we always send prod requests
+        // In order to create production UVs, customers need us to flip a bit for them in PG on `tenant` (sandbox_restricted -> false)
+        Ok(true)
+    }
+}
+
+#[tracing::instrument(skip_all)]
+async fn setup_test_fixtures(
+    state: &State,
+    ob_id: OnboardingId,
+    create_manual_review: bool,
+    decision_status: DecisionStatus,
+    uvw: UserVaultWrapper,
+) -> ApiResult<()> {
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let ob = Onboarding::lock(conn, &ob_id)?;
+            if ob.idv_reqs_initiated {
+                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+            }
+
+            // Create ManualReview row if requested
+            if create_manual_review {
+                ManualReview::create(conn, ob.id.clone())?;
+            }
+
+            // Create some mock verification request and results
+            let request =
+                VerificationRequest::bulk_create(conn, ob.id.clone(), vec![VendorAPI::IdologyExpectID])?
+                    .pop()
+                    .ok_or(ApiError::ResourceNotFound)?;
+            let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
+
+            // Verification result response is encrypted
+            let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
+            let e_response = vendor::verification_result::encrypt_verification_result_response(
+                raw_response.clone().into(),
+                uv.public_key,
+            )?;
+
+            // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
+            let result = VerificationResult::create(conn, request.id, raw_response, e_response)?;
+            // If the decision is a pass, mark all data as verified for the onboarding
+            let seqno = if decision_status == DecisionStatus::Pass {
+                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
+                let seqno = uvw.commit_identity_data(conn)?;
+                Some(seqno)
+            } else {
+                None
+            };
+
+            // Create the decision itself
+            // TODO should we move the creation of the decision onto the locked UVW since we also
+            // commit the data there? Would dedupe this logic between tests + prod
+            let new_decision = OnboardingDecisionCreateArgs {
+                user_vault_id: uvw.user_vault.id.clone(),
+                onboarding: &ob,
+                logic_git_hash: crate::GIT_HASH.to_string(),
+                status: decision_status,
+                result_ids: vec![result.id],
+                annotation_id: None,
+                actor: DbActor::Footprint,
+                seqno,
+            };
+            let decision = OnboardingDecision::create(conn, new_decision)?;
+
+            ob.into_inner().update(
+                conn,
+                OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
+            )?;
+
+            // Create some mock risk signals that are somewhat consistent with the mock decision
+            let reason_codes = match (decision_status, create_manual_review) {
+                // Straight out rejection
+                (DecisionStatus::Fail, false) => vec![
+                    FootprintReasonCode::SubjectDeceased,
+                    FootprintReasonCode::SsnIssuedPriorToDob,
+                ],
+                // Manual review
+                (DecisionStatus::Fail, true) => vec![
+                    FootprintReasonCode::SsnDoesNotMatchWithin1Digit,
+                    FootprintReasonCode::NameLastDoesNotMatch,
+                ],
+                // Approved
+                (DecisionStatus::Pass, _) => vec![
+                    FootprintReasonCode::PhoneNumberLocatedIsVoip,
+                    FootprintReasonCode::EmailDomainCorporate,
+                ],
+                _ => vec![],
+            };
+            let signals = reason_codes
+                .into_iter()
+                .map(|r| (r, vec![Vendor::Idology]))
+                .collect();
+            RiskSignal::bulk_create(conn, decision.id, signals)?;
+            Ok(())
+        })
+        .await?;
+
+    Ok(())
 }

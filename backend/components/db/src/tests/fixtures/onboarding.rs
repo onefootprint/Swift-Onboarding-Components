@@ -1,30 +1,41 @@
+use newtypes::{ObConfigurationId, ScopedUserId};
+
 use crate::{
     models::{
         insight_event::CreateInsightEvent,
         onboarding::{Onboarding, OnboardingCreateArgs},
     },
-    TxnPgConn,
+    tests::prelude::*, TxnPgConn,
 };
-use chrono::Utc;
-use newtypes::{ObConfigurationId, ScopedUserId};
 
 pub fn create(
-    conn: &mut TxnPgConn,
-    ob_config_id: &ObConfigurationId,
-    scoped_user_id: &ScopedUserId,
+    conn: &mut TestPgConn,
+    scoped_user_id: ScopedUserId,
+    ob_configuration_id: ObConfigurationId,
 ) -> Onboarding {
-    Onboarding::get_or_create(
-        conn,
-        OnboardingCreateArgs {
-            scoped_user_id: scoped_user_id.clone(),
-            ob_configuration_id: ob_config_id.clone(),
-            insight_event: CreateInsightEvent {
-                timestamp: Utc::now(),
-                ..Default::default()
-            },
-            should_create_document_request: false,
-            should_collect_selfie: false,
-        },
-    )
-    .unwrap()
+    let ob_args = OnboardingCreateArgs {
+        scoped_user_id,
+        ob_configuration_id,
+        insight_event: CreateInsightEvent { ..Default::default() },
+        should_create_document_request: false,
+        should_collect_selfie: false,
+    };
+
+    Onboarding::get_or_create(conn, ob_args).unwrap()
+}
+
+pub fn create_with_txn(
+    conn: &mut TxnPgConn,
+    scoped_user_id: ScopedUserId,
+    ob_configuration_id: ObConfigurationId,
+) -> Onboarding {
+    let ob_args = OnboardingCreateArgs {
+        scoped_user_id,
+        ob_configuration_id,
+        insight_event: CreateInsightEvent { ..Default::default() },
+        should_create_document_request: false,
+        should_collect_selfie: false,
+    };
+
+    Onboarding::get_or_create(conn, ob_args).unwrap()
 }
