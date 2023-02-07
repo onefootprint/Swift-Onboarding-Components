@@ -62,6 +62,7 @@ impl LaunchDarklyFeatureFlagClient {
 }
 
 impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
+    #[tracing::instrument(skip_all)]
     fn bool_flag(&self, flag_key: &str) -> Result<bool, FeatureFlagError> {
         let key = Uuid::new_v4().to_string();
         let context = ContextBuilder::new(key)
@@ -75,6 +76,7 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         flag_value
     }
 
+    #[tracing::instrument(skip_all)]
     fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError> {
         let context = ContextBuilder::new(tenant_id.clone())
             .build()
@@ -87,6 +89,7 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         flag_value
     }
 
+    #[tracing::instrument(skip_all)]
     fn bool_flag_by_ob_configuration_key(
         &self,
         flag_key: &str,
@@ -103,6 +106,7 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         flag_value
     }
 
+    #[tracing::instrument(skip_all)]
     fn bool_flag_by_rule_set_name(
         &self,
         flag_key: &str,

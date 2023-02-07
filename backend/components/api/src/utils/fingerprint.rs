@@ -8,6 +8,7 @@ use crate::{errors::ApiResult, State};
 pub type FingerprintMap = HashMap<IdentityDataKind, Fingerprint>;
 
 /// Computes the fingerprints for a provided IdentityDataUpdate
+#[tracing::instrument(skip_all)]
 pub async fn build_fingerprints(state: &State, update: IdentityDataUpdate) -> ApiResult<FingerprintMap> {
     let fut_fingerprints = update.into_inner().into_iter().map(|(kind, pii)| {
         let pii = pii.clean_for_fingerprint();

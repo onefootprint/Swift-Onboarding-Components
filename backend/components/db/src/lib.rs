@@ -63,12 +63,13 @@ pub type Pool = deadpool::managed::Pool<Manager, deadpool::managed::Object<Manag
 pub struct DbPool(Pool);
 
 impl DbPool {
+    #[tracing::instrument(skip_all)]
     pub async fn db_query<F, R>(&self, f: F) -> Result<R, DbError>
     where
         F: FnOnce(&mut PgConn) -> R + Send + 'static,
         R: Send + 'static,
     {
-        let current_span = tracing::info_span!("db query");
+        let current_span = tracing::info_span!("db query interact");
 
         let result = self
             .0
@@ -83,6 +84,7 @@ impl DbPool {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn db_transaction<F, R, E>(&self, f: F) -> Result<R, E>
     where
         F: FnOnce(&mut TxnPgConn) -> Result<R, E> + Send + 'static,
@@ -168,6 +170,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
     Ok(DbPool(pool))
 }
 
+#[tracing::instrument(skip_all)]
 pub fn run_migrations(url: &str) -> Result<(), DbError> {
     use crate::diesel_migrations::MigrationHarness;
     let mut conn = DieselPgConnection::establish(url)?;
@@ -183,6 +186,7 @@ pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
     Ok(())
 }
 
+#[tracing::instrument(skip_all)]
 pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &UserVaultId) -> Result<usize, DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.

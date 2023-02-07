@@ -26,6 +26,7 @@ pub struct S3Client {
 impl S3Client {
     #[allow(unused)]
     /// Delete a set of objects by keys in a particular S3 bucket
+    #[tracing::instrument(skip_all)]
     pub async fn delete_objects(&self, bucket: &str, keys: Vec<String>) -> Result<(), S3Error> {
         let delete_objects: Vec<ObjectIdentifier> = keys
             .iter()

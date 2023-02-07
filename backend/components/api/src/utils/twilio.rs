@@ -39,6 +39,7 @@ impl TwilioClient {
         }
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn standardize(&self, phone_number: &PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
         let response = self.client.validate_phone_number(phone_number.leak()).await?;
         Ok(ValidatedPhoneNumber::__build(
@@ -48,6 +49,7 @@ impl TwilioClient {
         ))
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn send_challenge(
         &self,
         state: &State,
@@ -88,16 +90,14 @@ impl TwilioClient {
         ))
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn send_d2p(
         &self,
         state: &State,
         destination: &ValidatedPhoneNumber,
         url: String,
     ) -> Result<SecondsBeforeRetry, ApiError> {
-        let message_body = format!(
-            "Continue account verification using this link: {}",
-            url
-        );
+        let message_body = format!("Continue account verification using this link: {}", url);
 
         RateLimit {
             state,

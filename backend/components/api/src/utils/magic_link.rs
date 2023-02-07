@@ -5,6 +5,7 @@ use workos::passwordless::{
 
 use crate::{errors::ApiResult, State};
 
+#[tracing::instrument(skip_all)]
 pub(crate) async fn create_magic_link(
     state: &State,
     email: &str,

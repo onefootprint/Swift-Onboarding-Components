@@ -100,6 +100,7 @@ impl SendgridClient {
             .await
     }
 
+    #[tracing::instrument(skip_all)]
     async fn send_template(
         &self,
         to_email: String,

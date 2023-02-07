@@ -13,6 +13,7 @@ pub struct SignedHashClient {
 
 impl SignedHashClient {
     #[allow(dead_code)]
+    #[tracing::instrument(skip_all)]
     pub async fn verify_mac(&self, data: &[u8], signature: &[u8]) -> Result<bool, KmsSignError> {
         let result = self
             .client
@@ -27,6 +28,7 @@ impl SignedHashClient {
         Ok(result.mac_valid())
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn signed_hash(&self, data: &[u8]) -> Result<Vec<u8>, KmsSignError> {
         // hash the data before sending it to aws
         let data = sha256(data).to_vec();
@@ -52,6 +54,7 @@ impl SignedHashClient {
 impl Fingerprinter for SignedHashClient {
     type Error = KmsSignError;
 
+    #[tracing::instrument(skip_all)]
     async fn sign_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error> {
         Ok(Fingerprint(self.signed_hash(data).await?))
     }
@@ -61,6 +64,7 @@ impl Fingerprinter for SignedHashClient {
 impl Fingerprinter for State {
     type Error = KmsSignError;
 
+    #[tracing::instrument(skip_all)]
     async fn sign_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error> {
         self.hmac_client.sign_data(data).await
     }

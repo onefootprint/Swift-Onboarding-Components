@@ -69,6 +69,7 @@ impl EnclaveClient {
     }
 
     /// generates a new sealed vault key pair via the enclave
+    #[tracing::instrument(skip_all)]
     pub async fn generate_sealed_keypair(
         &self,
     ) -> Result<(VaultPublicKey, EncryptedVaultPrivateKey), EnclaveError> {
