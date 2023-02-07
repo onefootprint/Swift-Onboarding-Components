@@ -13,7 +13,7 @@ import Success from './components/success';
 import usePollDocStatus from './hooks/use-poll-doc-status';
 import useSubmitDoc from './hooks/use-submit-doc';
 
-const LOADING_TIMEOUT = 10000;
+const LOADING_TIMEOUT = 300000;
 
 const ProcessingDocuments = () => {
   const { t } = useTranslation('pages.processing-documents');
@@ -63,7 +63,7 @@ const ProcessingDocuments = () => {
     );
   });
 
-  // If we are stuck in loading state for 10 seconds, error out & retry uploading
+  // If we are stuck in loading state for LOADING_TIMEOUT, error out & retry uploading
   useTimeout(
     () => {
       stop();
