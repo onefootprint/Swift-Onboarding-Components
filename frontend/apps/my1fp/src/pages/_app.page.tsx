@@ -3,6 +3,7 @@ import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
+import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import My1FPQueryClientProvider from 'src/components/my1fp-query-client-provider';
@@ -15,11 +16,6 @@ import MachineProvider from './liveness-check/components/machine-provider';
 
 configureSentry();
 configureReactI18next();
-
-type AppProps = {
-  Component: React.FC;
-  pageProps: Record<string, any>;
-};
 
 const App = ({ Component, pageProps }: AppProps) => {
   const [mounted, setMounted] = useState(false);

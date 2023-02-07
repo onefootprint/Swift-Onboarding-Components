@@ -8,6 +8,7 @@ import {
 } from '@onefootprint/footprint-elements';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
+import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
@@ -24,11 +25,6 @@ import useExtendedAppearance from '../hooks/use-extended-appearance';
 const footprint = configureFootprint();
 configureSentry();
 configureReactI18next();
-
-type AppProps = {
-  Component: React.FC;
-  pageProps: Record<string, any>;
-};
 
 const App = ({ Component, pageProps }: AppProps) => {
   useExtendedAppearance();
