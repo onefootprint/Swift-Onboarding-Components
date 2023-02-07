@@ -83,7 +83,7 @@ const DotsContainer = styled(motion.div)`
 
 const Dot = styled.div`
   ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
+    background: ${theme.backgroundColor.senary};
     border-radius: ${theme.borderRadius.full};
     height: 8px;
     width: 8px;
