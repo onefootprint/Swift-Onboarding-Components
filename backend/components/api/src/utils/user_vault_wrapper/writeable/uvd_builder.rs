@@ -10,6 +10,8 @@ use db::{
     },
     TxnPgConn,
 };
+use either::Either::{Left, Right};
+use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate, PiiString, ScopedUserId,
     UserVaultId, UvdKind, VaultPublicKey,
@@ -32,10 +34,20 @@ impl UvdBuilder {
             Ok(())
         };
 
-        for (kind, pii) in update.into_inner() {
-            if let Some(kind) = kind.uvd_kind() {
-                add_sealed(pii, kind)?;
-            }
+        let (update, invalid_fields): (Vec<_>, Vec<_>) =
+            update.into_inner().into_iter().partition_map(|(kind, pii)| {
+                if let Some(kind) = kind.uvd_kind() {
+                    Left((kind, pii))
+                } else {
+                    Right(kind)
+                }
+            });
+        if !invalid_fields.is_empty() {
+            return Err(UserError::InvalidDataKind(invalid_fields.into_iter().join(", ")).into());
+        }
+
+        for (kind, pii) in update {
+            add_sealed(pii, kind)?;
         }
 
         Ok(Self { data })

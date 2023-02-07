@@ -11,4 +11,6 @@ pub enum UserError {
     PartialUpdateNotAllowed(CollectedDataOption),
     #[error("Data update is not allowed without providing the associated tenant")]
     NotAllowedWithoutTenant,
+    #[error("Unable to add {0} in this method")]
+    InvalidDataKind(String),
 }
