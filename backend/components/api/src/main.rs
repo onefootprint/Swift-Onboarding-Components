@@ -142,6 +142,7 @@ async fn main() -> std::io::Result<()> {
             .default_service(actix_web::web::to(default_not_found))
             .build()
     })
+    .shutdown_timeout(5)
     .bind(("0.0.0.0", config.port))?
     .run()
     .await

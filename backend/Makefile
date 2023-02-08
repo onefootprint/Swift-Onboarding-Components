@@ -62,7 +62,6 @@ run-enclave:
 build-enclave-proxy-release:
 	@echo "[release] building enclave-proxy"
 	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p enclave_proxy --features vsock --release
-	@sudo chown -R ec2-user target
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave_proxy ./out/enclave_proxy
 
 get-named-commit:
@@ -77,7 +76,7 @@ set-enclave-version:
 package-enclave:	
 	@echo "using account $(account)"
 	@echo "create image tagged as $(commit)"
-	@docker build -t enclave_pkg:$(commit) -f enclave_package.dockerfile .
+	@docker build -t enclave_pkg:$(commit) -f enclave_eif_package.dockerfile .
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
 	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest

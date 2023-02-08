@@ -147,6 +147,41 @@ jobs:
           sudo mv /var/lib/docker/volumes/cargo-cache ~/docker-cache
           sudo chown -R $(whoami):$(whoami) ~/docker-cache
 
+  # builds the enclave proxy image as needed
+  build_enclave_proxy:
+    name: Build Enclave Proxy
+    runs-on: [beast, linux]
+    environment: ${{ inputs.environment }}
+    needs: [extract_commit]
+    if: success()
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.commitHash }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: build enclave proxy
+        working-directory: ./backend
+        run: |
+          git --version
+          make build-enclave-proxy-release
+          account="$(aws sts get-caller-identity --query "Account" --output text)"
+          componentVersion="${{ needs.extract_commit.outputs.enclaveComponentVersion }}"
+          echo "using account ${account}"
+          echo "create image tagged as ${componentVersion}"
+          docker build -t "enclave_proxy_pkg:${componentVersion}" -f enclave_proxy_package.dockerfile .
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
+          docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
+          docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
+
   # builds the eif enclave image if needed
   build_eif:
     name: Build Signed EIF
@@ -175,12 +210,11 @@ jobs:
           echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
           git --version
           make build-eif
-          make build-enclave-proxy-release
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           componentVersion="${{ needs.extract_commit.outputs.enclaveComponentVersion }}"
           echo "using account ${account}"
           echo "create image tagged as ${componentVersion}"
-          docker build -t "enclave_pkg:${componentVersion}" -f enclave_package.dockerfile .
+          docker build -t "enclave_pkg:${componentVersion}" -f enclave_eif_package.dockerfile .
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
           docker tag enclave_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${componentVersion}
           docker tag enclave_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
@@ -201,7 +235,7 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
       url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
-    needs: [build_api, build_eif, extract_commit]
+    needs: [build_api, build_eif, build_enclave_proxy, extract_commit]
     if: success()
     steps:
       - uses: actions/checkout@v2
@@ -335,13 +369,3 @@ jobs:
                 body: commentBody
               });
             }
-
-      - name: Airplane deploy
-        working-directory: ./backend/internal_tools/airplane
-        run: |
-          curl -L https://github.com/airplanedev/cli/releases/latest/download/install.sh | sh
-          /home/runner/.airplane/bin/airplane deploy --env ${{ steps.pulumi_deploy.outputs.airplaneEnvSlug }} .
-        env:
-          AP_TEAM_ID: tea20220706zs7g4auu0i6
-          AP_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
-          AP_SOURCE: githubAction

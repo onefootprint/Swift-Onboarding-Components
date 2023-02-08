@@ -356,6 +356,7 @@ async function userData(
   const current = await aws.getCallerIdentity({});
   const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
   const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${constants.containers.enclaveVersion}`;
+  const enclaveProxyImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${constants.containers.enclaveVersion}`;
 
   const pulumiConfig = new pulumi.Config();
   const tailscaleAuthKey = pulumiConfig.get('serverTailscaleKey');
@@ -425,9 +426,12 @@ sudo usermod -aG ne $USER
 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ecrEndpoint}
 
-mkdir -p image
-docker run --rm -v $(pwd)/image:/shared ${enclaveImage}
-sudo chown $USER:$USER -R image/
+mkdir -p eif
+mkdir -p proxy
+docker run --rm -v $(pwd)/eif:/shared ${enclaveImage}
+docker run --rm -v $(pwd)/proxy:/shared ${enclaveProxyImage}
+sudo chown $USER:$USER -R eif/
+sudo chown $USER:$USER -R proxy/
 
 sudo systemctl start nitro-enclaves-allocator.service && sudo systemctl enable nitro-enclaves-allocator.service
 sudo systemctl start nitro-enclaves-vsock-proxy.service && sudo systemctl enable nitro-enclaves-vsock-proxy.service
@@ -443,7 +447,7 @@ do
         sleep 1
     else
         echo "restarting enclave"
-        sudo nitro-cli run-enclave --eif-path /image/enclave.eif --cpu-count ${config.cpus} --memory ${config.memory} --enclave-cid ${config.cid}
+        sudo nitro-cli run-enclave --eif-path /eif/enclave.eif --cpu-count ${config.cpus} --memory ${config.memory} --enclave-cid ${config.cid}
         sleep 5
     fi	 
 done
@@ -490,7 +494,7 @@ Description=enclave_proxy
 User=root
 WorkingDirectory=/
 EnvironmentFile=/enclave_proxy_environment
-ExecStart="/image/enclave_proxy"
+ExecStart="/proxy/enclave_proxy"
 Restart=always
 StandardOutput=syslog
 StandardError=syslog

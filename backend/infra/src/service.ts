@@ -216,7 +216,11 @@ async function createCdnFrontedLoadBalancer(
       healthCheck: {
         port: 'traffic-port',
         path: '/health',
+        interval: 5,
+        healthyThreshold: 2,
+        timeout: 4,
       },
+      deregistrationDelay: 10,
     },
     { provider },
   );

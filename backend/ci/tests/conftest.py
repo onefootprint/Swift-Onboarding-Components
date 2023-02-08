@@ -33,9 +33,22 @@ def wait_for_deploy():
     failed_attempts = 0
     REQUIRED_NUM_SUCCESS = 30
     MAX_ATTEMPTS = 60
+    attempts = 0
     while num_successes < REQUIRED_NUM_SUCCESS:
         try:
-            _make_request(requests.get, "/", None, None, 200, [], None)
+            _make_request(
+                requests.get,
+                # we add these query params for easy debugging in logs!
+                # roughly this can tell us if the deployment is behaving as we
+                # expect it to...old version still appear even after the deployment
+                # went through
+                f"/?ev={expected_version}&r={attempts}",
+                None,
+                None,
+                200,
+                [],
+                None,
+            )
             num_successes += 1
             time.sleep(1)
         except IncorrectServerVersion as e:
@@ -46,6 +59,7 @@ def wait_for_deploy():
             if failed_attempts == MAX_ATTEMPTS:
                 raise e
             time.sleep(10)
+        attempts += 1
     print(
         f"Correct server version {expected_version} found! Continuing to run tests..."
     )

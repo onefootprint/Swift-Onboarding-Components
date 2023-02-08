@@ -43,7 +43,7 @@ on:
 jobs:
   run_tests:
     name: remote integration tests
-    runs-on: ubuntu-latest
+    runs-on: beast
     strategy:
       matrix:
         python-version: ['3.9']
