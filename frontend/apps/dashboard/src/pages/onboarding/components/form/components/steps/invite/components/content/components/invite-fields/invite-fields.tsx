@@ -9,7 +9,7 @@ export type InviteFieldsProps = {
 };
 
 const InviteFields = ({ index, roles }: InviteFieldsProps) => {
-  const { t } = useTranslation('pages.settings.members.invite');
+  const { t } = useTranslation('pages.onboarding.invite');
   const { register, control } = useFormContext();
   const shouldShowLabel = index === 0;
   const isRequired = index === 0;
@@ -22,7 +22,7 @@ const InviteFields = ({ index, roles }: InviteFieldsProps) => {
           label={shouldShowLabel ? t('form.email.label') : undefined}
           placeholder={t('form.email.placeholder')}
           {...register(
-            `invites.${index}.email`,
+            `invitations.${index}.email`,
             isRequired
               ? {
                   required: {
@@ -37,7 +37,7 @@ const InviteFields = ({ index, roles }: InviteFieldsProps) => {
       <Grid.Column col={4}>
         <Controller
           control={control}
-          name={`invites.${index}.role`}
+          name={`invitations.${index}.role`}
           rules={{ required: isRequired }}
           render={select => (
             <Select

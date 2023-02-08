@@ -9,7 +9,7 @@ export type InviteFieldsProps = {
 };
 
 const InviteFields = ({ index, roles }: InviteFieldsProps) => {
-  const { t } = useTranslation('pages.onboarding.invite');
+  const { t } = useTranslation('pages.settings.members.invite');
   const { register, control } = useFormContext();
   const shouldShowLabel = index === 0;
   const isRequired = index === 0;

@@ -12,7 +12,7 @@ import { Controller, useForm } from 'react-hook-form';
 import useUpdateOrg from 'src/hooks/use-update-org';
 import styled, { css } from 'styled-components';
 
-import SIZE_OPTIONS from './form.constants';
+import SIZE_OPTIONS from './content.constants';
 
 export type FormData = {
   name: string;
@@ -20,13 +20,13 @@ export type FormData = {
   size?: SelectOption<OrganizationSize>;
 };
 
-export type FormProps = {
+export type ContentProps = {
   id: string;
   onComplete: () => void;
   organization: Organization;
 };
 
-const Form = ({ id, organization, onComplete }: FormProps) => {
+const Content = ({ id, organization, onComplete }: ContentProps) => {
   const { t, allT } = useTranslation('pages.onboarding.company-data');
   const updateOrgMutation = useUpdateOrg();
   const {
@@ -58,7 +58,7 @@ const Form = ({ id, organization, onComplete }: FormProps) => {
   };
 
   return (
-    <Container data-testid="company-data-form">
+    <Container data-testid="onboarding-company-data-content">
       <form id={id} onSubmit={handleFormSubmit(handleAfterSubmit)}>
         <TextInput
           hasError={!!errors.name}
@@ -125,4 +125,4 @@ const Container = styled.div`
   }
 `;
 
-export default Form;
+export default Content;

@@ -230,19 +230,20 @@
             "label": "Role",
             "placeholder": "Select",
             "errors": {
-              "required": "Please enter a role"
-            },
-            "options": {
-              "admin": "Admin",
-              "developer": "Developer",
-              "member": "Member"
+              "required": "Please select a role"
             }
           },
           "errors": {
             "invalid": "Please complete the fields above."
           }
         },
-        "add-more": "Add more"
+        "add-more": "Add more",
+        "notification": {
+          "error": {
+            "title_one": "Invitation wasn't sent",
+            "title_other": "Invitations weren't sent"
+          }
+        }
       },
       "logged-as": "Logged in as"
     },
@@ -798,12 +799,7 @@
               "label": "Role",
               "placeholder": "Select",
               "errors": {
-                "required": "Please enter a role"
-              },
-              "options": {
-                "admin": "Admin",
-                "developer": "Developer",
-                "member": "Member"
+                "required": "Please select a role"
               }
             },
             "errors": {

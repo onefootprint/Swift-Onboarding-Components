@@ -1,10 +1,25 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  customRender,
+  screen,
+  selectEvents,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
+import { useStore } from 'src/hooks/use-session';
 
-import { useStore } from '../../hooks/use-session';
 import Onboarding from './onboarding';
+import {
+  withInviteMember,
+  withOrg,
+  withRoles,
+  withUpdateOrg,
+  withUpdateUser,
+} from './onboarding.test.config';
 
 const originalState = useStore.getState();
+const useRouterSpy = createUseRouterSpy();
 
 describe('<Onboarding />', () => {
   const renderOnboarding = () => customRender(<Onboarding />);
@@ -29,14 +44,95 @@ describe('<Onboarding />', () => {
     });
   });
 
+  beforeEach(() => {
+    withOrg();
+    withUpdateUser();
+    withUpdateOrg();
+    withRoles();
+    withInviteMember();
+  });
+
   afterAll(() => {
     useStore.setState(originalState);
   });
 
-  it('should render the logged user email', () => {
-    renderOnboarding();
+  describe('when completing all the steps', () => {
+    const replace = jest.fn();
 
-    const email = screen.getByText('jane.doe@acme.com');
-    expect(email).toBeInTheDocument();
+    useRouterSpy({
+      pathname: '/onboarding',
+      query: {},
+      replace,
+    });
+
+    it('should redirect to the /users page', async () => {
+      renderOnboarding();
+
+      // 1st step
+      await waitFor(() => {
+        screen.getByText('Welcome to Footprint!');
+      });
+      const welcomeStep = screen.getByText('Welcome to Footprint!');
+      expect(welcomeStep).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+
+      // 2nd step
+      // User information
+      await waitFor(() => {
+        screen.getByText('Tell us about you');
+      });
+
+      const firstNameField = screen.getByLabelText('First name');
+      await userEvent.type(firstNameField, 'Jane');
+
+      const lastNameField = screen.getByLabelText('Last name');
+      await userEvent.type(lastNameField, 'Doe');
+
+      await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+
+      // 3rd step
+      // Company data
+      await waitFor(() => {
+        screen.getByText('Tell us about your company');
+        screen.getByTestId('onboarding-company-data-content');
+        screen.getByRole('button', { name: 'Next' });
+      });
+
+      const companyNameField = screen.getByLabelText('Company name');
+      await userEvent.type(companyNameField, 'Acme Inc.');
+
+      const companyWebsiteField = screen.getByLabelText('Company website');
+      await userEvent.type(companyWebsiteField, 'https://www.acme.com');
+
+      const companySizeTrigger = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(companySizeTrigger, '1-10');
+
+      await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+
+      // 4th step
+      // Invite members
+      await waitFor(() => {
+        screen.getByText('Invite teammates');
+        screen.getByTestId('onboarding-invite-content');
+        screen.getByRole('button', { name: 'Complete' });
+      });
+
+      const inviteStep = screen.getByText('Invite teammates');
+      expect(inviteStep).toBeInTheDocument();
+
+      const emailField = screen.getByLabelText('Email address');
+      await userEvent.type(emailField, 'jane.doe@acme.com');
+
+      await userEvent.click(screen.getByRole('button', { name: 'Complete' }));
+      await waitFor(() => {
+        expect(replace).toHaveBeenCalledTimes(1);
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: 'Skip' }));
+      await waitFor(() => {
+        expect(replace).toHaveBeenCalledTimes(2);
+      });
+    });
   });
 });

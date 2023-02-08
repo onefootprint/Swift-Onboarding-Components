@@ -4,8 +4,8 @@ import useOrg from 'src/hooks/use-org';
 import styled, { css } from 'styled-components';
 
 import Header from '../header';
+import Content from './components/content';
 import Error from './components/error';
-import Form from './components/form';
 import Loading from './components/loading';
 
 export type CompanyDataProps = {
@@ -23,7 +23,11 @@ const CompanyData = ({ id, onComplete }: CompanyDataProps) => {
         <Header title={t('title')} subtitle={t('subtitle')} />
         {orgQuery.isLoading && <Loading />}
         {orgQuery.data && (
-          <Form id={id} onComplete={onComplete} organization={orgQuery.data} />
+          <Content
+            id={id}
+            onComplete={onComplete}
+            organization={orgQuery.data}
+          />
         )}
         {orgQuery.error && <Error error={orgQuery.error} />}
       </>

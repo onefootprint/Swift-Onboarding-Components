@@ -3,7 +3,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Loading = () => (
-  <Container aria-busy data-testid="company-data-loading">
+  <Container aria-busy data-testid="onboarding-company-data-loading">
     <Box id="company-name-shimmer">
       <Shimmer sx={{ height: '20px', width: '105px', marginBottom: 3 }} />
       <Shimmer sx={{ height: '40px' }} />

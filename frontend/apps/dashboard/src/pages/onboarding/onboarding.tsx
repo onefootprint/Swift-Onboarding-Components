@@ -1,6 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React from 'react';
+import { DEFAULT_LOGGED_IN_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-user-session';
 import styled from 'styled-components';
 
@@ -9,12 +11,11 @@ import LoggedUser from './components/logged-user';
 
 const Onboarding = () => {
   const { t } = useTranslation('pages.onboarding');
+  const router = useRouter();
   const { dangerouslyCastedData } = useSession();
 
   const handleCompleted = () => {
-    alert('handle');
-    // TODO: FP-2132
-    // https://linear.app/footprint/issue/FP-2132/dashboard-onboarding-complete-ob-flow-and-redirect-to
+    router.replace(DEFAULT_LOGGED_IN_ROUTE);
   };
 
   return (

@@ -15,7 +15,7 @@ export type FormProps = {
 const steps = [
   { id: 'welcome-form', Step: Welcome },
   { id: 'user-data-form', Step: UserData },
-  { id: 'company-data-form', Step: CompanyData },
+  { id: 'onboarding-company-data-content', Step: CompanyData },
   { id: 'invite-form', Step: Invite },
 ];
 

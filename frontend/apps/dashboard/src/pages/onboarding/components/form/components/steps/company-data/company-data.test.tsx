@@ -35,7 +35,7 @@ describe('<CompanyData />', () => {
   }: Partial<CompanyDataProps>) => {
     renderCompanyData({ id, onComplete });
     await waitFor(() => {
-      screen.getByTestId('company-data-form');
+      screen.getByTestId('onboarding-company-data-content');
       screen.getByRole('button', { name: 'Next' });
     });
   };
@@ -48,7 +48,7 @@ describe('<CompanyData />', () => {
     it('should show a loading state', () => {
       renderCompanyData({});
 
-      const loading = screen.getByTestId('company-data-loading');
+      const loading = screen.getByTestId('onboarding-company-data-loading');
       expect(loading).toBeInTheDocument();
     });
   });
