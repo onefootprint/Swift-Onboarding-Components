@@ -8,6 +8,7 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
+import { OrgRoleScope } from '@onefootprint/types';
 import React from 'react';
 
 import Members from './members';
@@ -258,10 +259,17 @@ describe('<Members />', () => {
               email: 'johnny@acme.com',
               firstName: null,
               lastName: null,
-              lastLoginAt: '2023-01-18T17:54:10.668420Z',
-              createdAt: '2022-09-19T16:24:35.368337Z',
-              roleName: 'Admin',
-              roleId: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+              role: {
+                createdAt: '2022-09-19T16:24:34.368337Z',
+                id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+                isImmutable: true,
+                name: 'Admin',
+                numActiveUsers: 1,
+                scopes: ['admin' as OrgRoleScope],
+              },
+              rolebinding: {
+                lastLoginAt: '2023-01-18T17:54:10.668420Z',
+              },
             },
           ]);
 

@@ -222,7 +222,7 @@ def create_tenant(org_data, ob_conf_data):
         sk=sk,
         name=org_data["name"],
         auth_token=auth_token,
-        rolebinding_id=body["tenant_rolebinding_id"],
+        member_id=body["tenant_user_id"],
     )
     return tenant
 

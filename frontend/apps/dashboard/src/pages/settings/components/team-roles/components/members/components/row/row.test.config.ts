@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { OrgMember, OrgRole } from '@onefootprint/types';
+import { OrgMember, OrgRole, OrgRoleScope } from '@onefootprint/types';
 import { useStore } from 'src/hooks/use-session';
 
 const originalState = useStore.getState();
@@ -53,10 +53,17 @@ export const memberFixture = {
   email: 'jack.doe@acme.com',
   firstName: 'Jack',
   lastName: 'Doe',
-  lastLoginAt: '3 hours ago',
-  createdAt: '2022-09-20T09:26:24.292959Z',
-  roleName: 'Admin',
-  roleId: 'orgrole_aExxX6XgSBpvqIJ2VcHH6J',
+  role: {
+    createdAt: '2022-09-19T16:24:34.368337Z',
+    id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+    isImmutable: true,
+    name: 'Admin',
+    numActiveUsers: 1,
+    scopes: ['admin' as OrgRoleScope],
+  },
+  rolebinding: {
+    lastLoginAt: '2023-01-18T17:54:10.668420Z',
+  },
 };
 
 export const orgRolesFixture: OrgRole[] = [

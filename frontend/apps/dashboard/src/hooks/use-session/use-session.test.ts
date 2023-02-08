@@ -1,4 +1,5 @@
 import { act, renderHook } from '@onefootprint/test-utils';
+import { OrgRoleScope } from '@onefootprint/types';
 
 import useSession from './use-session';
 
@@ -7,10 +8,17 @@ const user = {
   email: 'jane.doe@acme.com',
   firstName: 'Jane',
   lastName: 'Doe',
-  lastLoginAt: '2022-11-07T23:39:54.073430Z',
-  createdAt: '2022-11-07T23:39:54.073430Z',
-  roleName: 'Admin',
-  roleId: 'orgrole_iGj82m9nFhtlVsNETOAZ7',
+  role: {
+    createdAt: '2022-09-19T16:24:34.368337Z',
+    id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+    isImmutable: true,
+    name: 'Admin',
+    numActiveUsers: 1,
+    scopes: ['admin' as OrgRoleScope],
+  },
+  rolebinding: {
+    lastLoginAt: '2023-01-18T17:54:10.668420Z',
+  },
 };
 
 const tenant = {

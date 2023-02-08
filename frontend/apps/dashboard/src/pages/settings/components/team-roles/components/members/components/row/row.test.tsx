@@ -59,14 +59,17 @@ describe('<Row />', () => {
 
   it('should show the last active time', () => {
     renderRow({
-      member: { ...memberFixture, lastLoginAt: '3 hours ago' },
+      member: { ...memberFixture, rolebinding: { lastLoginAt: '3 hours ago' } },
     });
     expect(screen.getByText('3 hours ago')).toBeInTheDocument();
   });
 
   it('should show the role', () => {
     renderRow({
-      member: { ...memberFixture, roleName: 'Admin' },
+      member: {
+        ...memberFixture,
+        role: { ...memberFixture.role, name: 'Admin' },
+      },
     });
     expect(screen.getByText('Admin')).toBeInTheDocument();
   });
@@ -83,7 +86,7 @@ describe('<Row />', () => {
   describe('when invite is pending', () => {
     it('should show the pending invite badge', () => {
       renderRow({
-        member: { ...memberFixture, lastLoginAt: null },
+        member: { ...memberFixture, rolebinding: { lastLoginAt: null } },
       });
       expect(screen.getByText('Pending')).toBeInTheDocument();
     });

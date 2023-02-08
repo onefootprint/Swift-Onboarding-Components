@@ -10,6 +10,7 @@ mod onboarding_decision;
 mod organization;
 mod organization_member;
 mod organization_role;
+mod organization_rolebinding;
 mod proxy_config;
 mod risk_signal;
 mod secret_api_key;

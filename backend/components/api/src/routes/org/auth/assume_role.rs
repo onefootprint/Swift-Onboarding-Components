@@ -39,7 +39,7 @@ fn post(
         .await??;
 
     let data = AssumeRoleResponse {
-        user: OrganizationMember::from_db((tenant_user, rb, tenant_role)),
+        user: OrganizationMember::from_db((tenant_user, None, tenant_role)),
         tenant: Organization::from_db(tenant),
     };
     ResponseData::ok(data).json()

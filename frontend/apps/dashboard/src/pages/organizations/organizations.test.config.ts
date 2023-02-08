@@ -2,6 +2,7 @@ import { mockRequest } from '@onefootprint/test-utils';
 import {
   GetAuthRoleResponse,
   OrgAssumeRoleResponse,
+  OrgRoleScope,
 } from '@onefootprint/types';
 
 export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
@@ -48,10 +49,17 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
     email: 'jane@onefootprint.com',
     firstName: null,
     lastName: null,
-    lastLoginAt: '2023-01-10T13:53:31.463515Z',
-    createdAt: '2023-01-03T21:47:19.528980Z',
-    roleName: 'Admin',
-    roleId: 'orgrole_JRqVwfoXdcM9Bs9YkXBwgL',
+    role: {
+      createdAt: '2022-09-19T16:24:34.368337Z',
+      id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+      isImmutable: true,
+      name: 'Admin',
+      numActiveUsers: 1,
+      scopes: ['admin' as OrgRoleScope],
+    },
+    rolebinding: {
+      lastLoginAt: '2023-01-18T17:54:10.668420Z',
+    },
   },
   tenant: {
     id: '_private_it_org_1',

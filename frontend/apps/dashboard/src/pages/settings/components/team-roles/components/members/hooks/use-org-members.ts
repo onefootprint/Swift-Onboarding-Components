@@ -44,9 +44,11 @@ const useOrgMembers = () => {
         meta: response.meta,
         data: response.data.map((member: OrgMember) => ({
           ...member,
-          lastLoginAt: member.lastLoginAt
-            ? formatRelativeDate(new Date(member.lastLoginAt))
-            : null,
+          rolebinding: {
+            lastLoginAt: member.rolebinding?.lastLoginAt
+              ? formatRelativeDate(new Date(member.rolebinding?.lastLoginAt))
+              : null,
+          },
         })),
       }),
     },

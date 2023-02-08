@@ -15,8 +15,9 @@ export type RowProps = {
 const Row = ({ member }: RowProps) => {
   const { t } = useTranslation('pages.settings.members.table');
   const session = useUserSession();
-  const { email, firstName, lastName, lastLoginAt } = member;
-  const isMemberCurrentUser = session.data?.id === member.id;
+  const { id, email, firstName, lastName } = member;
+  const lastLoginAt = member.rolebinding?.lastLoginAt;
+  const isMemberCurrentUser = session.data?.id === id;
   const shouldShowActions = !isMemberCurrentUser;
 
   return (
@@ -29,7 +30,7 @@ const Row = ({ member }: RowProps) => {
       </Td>
       <Td>{lastLoginAt || '-'}</Td>
       <Td>
-        {shouldShowActions ? <EditRole member={member} /> : member.roleName}
+        {shouldShowActions ? <EditRole member={member} /> : member.role.name}
       </Td>
       <Td>
         {!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}

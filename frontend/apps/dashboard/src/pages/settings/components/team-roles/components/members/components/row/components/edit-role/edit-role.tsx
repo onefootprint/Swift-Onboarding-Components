@@ -17,8 +17,8 @@ export type EditRoleProps = {
 const EditRole = ({ member }: EditRoleProps) => {
   const { t } = useTranslation('pages.settings.members.edit-role');
   const [value, setValue] = useState({
-    id: member.roleId,
-    name: member.roleName,
+    id: member.role.id,
+    name: member.role.name,
   });
   const rolesQuery = useRoles();
   const updateMemberMutation = useUpdateMember(member.id);
@@ -33,8 +33,8 @@ const EditRole = ({ member }: EditRoleProps) => {
         {
           onError: () => {
             setValue({
-              id: member.roleId,
-              name: member.roleName,
+              id: member.role.id,
+              name: member.role.name,
             });
           },
         },

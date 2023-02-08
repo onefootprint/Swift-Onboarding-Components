@@ -40,6 +40,9 @@ pub use self::org_member::*;
 pub mod org_role;
 pub use self::org_role::*;
 
+pub mod org_rolebinding;
+pub use self::org_rolebinding::*;
+
 pub mod user_timeline;
 pub use self::user_timeline::*;
 

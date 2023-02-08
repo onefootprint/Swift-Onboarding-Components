@@ -15,9 +15,7 @@ use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{
-    OrgMemberEmail, SessionAuthToken, TenantId, TenantRolebindingId, INTEGRATION_TEST_USER_EMAIL,
-};
+use newtypes::{OrgMemberEmail, SessionAuthToken, TenantId, TenantUserId, INTEGRATION_TEST_USER_EMAIL};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -35,7 +33,7 @@ struct NewClientResponse {
     org_id: TenantId,
     key: api_wire_types::SecretApiKey,
     auth_token: SessionAuthToken,
-    tenant_rolebinding_id: TenantRolebindingId,
+    tenant_user_id: TenantUserId,
 }
 
 #[api_v2_operation(
@@ -159,7 +157,7 @@ async fn post(
             org_id: tenant.id,
             key: api_wire_types::SecretApiKey::from_db((api_key, Some(decrypted_api_key), None)),
             auth_token,
-            tenant_rolebinding_id: rb.id,
+            tenant_user_id: rb.tenant_user_id,
         },
     }))
 }

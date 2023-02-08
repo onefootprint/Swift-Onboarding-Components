@@ -33,8 +33,8 @@ def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
     # users
     body = get("org/members", dict(search=email), tenant.auth_token)
     if body["data"]:
-        user_id = body["data"][0]["id"]
-        post(f"org/members/{user_id}/deactivate", None, tenant.auth_token)
+        rb_id = body["data"][0]["id"]
+        post(f"org/members/{rb_id}/deactivate", None, tenant.auth_token)
 
     # Create the tenant_user
     user_data = dict(
@@ -45,8 +45,8 @@ def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
         redirect_url="http://localhost:3001/auth",
     )
     body = post("org/members", user_data, tenant.auth_token)
-    assert not body["last_login_at"]
-    assert body["role_id"] == role["id"]
+    assert not body["rolebinding"]["last_login_at"]
+    assert body["role"]["id"] == role["id"]
     return body
 
 
@@ -133,12 +133,14 @@ def test_get_members_pagination(
 
 def test_get_members_filter_role_id(tenant_user, tenant_user2, sandbox_tenant):
     # Test filter on role_id, have to do in separate test bc can't parameterize
-    assert tenant_user["role_id"] != tenant_user2["role_id"]
+    assert tenant_user["role"]["id"] != tenant_user2["role"]["id"]
 
+    tu_role_id = tenant_user["role"]["id"]
+    tu2_role_id = tenant_user2["role"]["id"]
     tests = [
-        (dict(role_ids=tenant_user["role_id"]), True, False),
+        (dict(role_ids=tu_role_id), True, False),
         (
-            dict(role_ids=",".join([tenant_user["role_id"], tenant_user2["role_id"]])),
+            dict(role_ids=",".join([tu_role_id, tu2_role_id])),
             True,
             True,
         ),
@@ -172,11 +174,11 @@ def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
 
     body = get(f"org/members", None, sandbox_tenant.auth_token)
     user = next(u for u in body["data"] if u["id"] == user_id)
-    assert user["role_id"] == limited_role["id"]
+    assert user["role"]["id"] == limited_role["id"]
 
 
 def test_cannot_edit_current_user(sandbox_tenant, limited_role):
-    user_id = sandbox_tenant.rolebinding_id
+    user_id = sandbox_tenant.member_id
     patch(
         f"org/members/{user_id}",
         dict(role_id=limited_role["id"]),
@@ -186,7 +188,7 @@ def test_cannot_edit_current_user(sandbox_tenant, limited_role):
 
 
 def test_cannot_deactivate_current_user(sandbox_tenant):
-    user_id = sandbox_tenant.rolebinding_id
+    user_id = sandbox_tenant.member_id
     post(
         f"org/members/{user_id}/deactivate",
         None,
@@ -307,4 +309,4 @@ def test_deactivate_role_and_user(
 
     # Make sure the deactivated role isn't displayed anymore
     body = get("org/roles", None, sandbox_tenant.auth_token)
-    assert role_id not in set(u["id"] for u in body["data"])
+    assert role_id not in set(r["id"] for r in body["data"])

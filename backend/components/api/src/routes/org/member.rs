@@ -19,9 +19,10 @@ use paperclip::actix::{api_v2_operation, get, patch, web};
 async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::BasicOrganizationMember> {
+) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let role = auth.role().clone();
+    let rb = auth.rolebinding().cloned();
     let user_id = match auth.actor() {
         AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
         _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
@@ -31,7 +32,7 @@ async fn get(
         .db_query(move |conn| TenantUser::get(conn, &user_id))
         .await??;
 
-    let result = api_wire_types::BasicOrganizationMember::from_db((user, role));
+    let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
     ResponseData::ok(result).json()
 }
 
@@ -48,9 +49,10 @@ async fn patch(
     request: web::Json<UpdateTenantUserRequest>,
     // Weird to take in an impersonation token here
     auth: TenantRbAuthContext,
-) -> JsonApiResponse<api_wire_types::BasicOrganizationMember> {
+) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(Any)?;
     let role = auth.role().clone();
+    let rb = auth.rolebinding().cloned();
 
     let UpdateTenantUserRequest {
         first_name,
@@ -71,6 +73,6 @@ async fn patch(
         .db_transaction(move |conn| TenantUser::update(conn, &user_id, user_update))
         .await?;
 
-    let result = api_wire_types::BasicOrganizationMember::from_db((user, role));
+    let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
     ResponseData::ok(result).json()
 }

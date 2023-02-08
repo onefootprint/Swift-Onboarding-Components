@@ -21,7 +21,7 @@ export type ActionsProps = {
 // TODO: https://linear.app/footprint/issue/FP-1877/add-dropdown-to-member-row-to-change-role-only-if-logged-in-user-is
 const Actions = ({ member }: ActionsProps) => {
   const { t, allT } = useTranslation('pages.settings.members.table.actions');
-  const { id, email, firstName, lastName } = member;
+  const { email, firstName, lastName, id } = member;
   const [open, setOpen] = useState(false);
   const removeOrgMemberMutation = useRemoveOrgMember(email);
 

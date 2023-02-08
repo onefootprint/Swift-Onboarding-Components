@@ -22,7 +22,7 @@ use db::OffsetPagination;
 use newtypes::email::Email;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantRoleId;
-use newtypes::TenantRolebindingId;
+use newtypes::TenantUserId;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
@@ -138,18 +138,23 @@ struct UpdateTenantRolebindingRequest {
 }
 
 #[api_v2_operation(tags(OrgSettings), description = "Updates the provided member.")]
-#[patch("/org/members/{tenant_rb_id}")]
+#[patch("/org/members/{tenant_user_id}")]
 async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRolebindingRequest>,
-    rb_id: web::Path<TenantRolebindingId>,
+    tu_id: web::Path<TenantUserId>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
-    let actor = auth.actor();
-    let rb_id = rb_id.into_inner();
+    let tu_id = tu_id.into_inner();
     let UpdateTenantRolebindingRequest { role_id } = request.into_inner();
+
+    if let AuthActor::TenantUser(tenant_user_id) = auth.actor() {
+        if tenant_user_id == tu_id {
+            return Err(TenantError::CannotEditCurrentUser.into());
+        }
+    }
 
     let rolebinding_update = TenantRolebindingUpdate {
         tenant_role_id: role_id,
@@ -158,13 +163,8 @@ async fn patch(
     let (user, rb, role) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (user, _, role, _) = TenantRolebinding::get(conn, (&rb_id, &tenant_id))?;
-            if let AuthActor::TenantUser(tenant_user_id) = actor {
-                if tenant_user_id == user.id {
-                    return Err(TenantError::CannotEditCurrentUser.into());
-                }
-            }
-            let rb = TenantRolebinding::update(conn, (&rb_id, &tenant_id), rolebinding_update)?;
+            let (user, _, role, _) = TenantRolebinding::get(conn, (&tu_id, &tenant_id))?;
+            let rb = TenantRolebinding::update(conn, (&tu_id, &tenant_id), rolebinding_update)?;
             Ok((user, rb, role))
         })
         .await?;
@@ -174,16 +174,20 @@ async fn patch(
 }
 
 #[api_v2_operation(tags(OrgSettings), description = "Deactivates the provided user.")]
-#[post("/org/members/{tenant_rb_id}/deactivate")]
+#[post("/org/members/{tenant_user_id}/deactivate")]
 async fn deactivate(
     state: web::Data<State>,
-    rb_id: web::Path<TenantRolebindingId>,
+    tu_id: web::Path<TenantUserId>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
-    let rb_id = rb_id.into_inner();
-    let actor = auth.actor();
+    let tu_id = tu_id.into_inner();
+    if let AuthActor::TenantUser(tenant_user_id) = auth.actor() {
+        if tenant_user_id == tu_id {
+            return Err(TenantError::CannotEditCurrentUser.into());
+        }
+    }
 
     let update = TenantRolebindingUpdate {
         deactivated_at: Some(Some(Utc::now())),
@@ -192,13 +196,7 @@ async fn deactivate(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            if let AuthActor::TenantUser(tenant_user_id) = actor {
-                let (user, _, _, _) = TenantRolebinding::get(conn, (&rb_id, &tenant_id))?;
-                if tenant_user_id == user.id {
-                    return Err(TenantError::CannotEditCurrentUser.into());
-                }
-            }
-            TenantRolebinding::update(conn, (&rb_id, &tenant_id), update)?;
+            TenantRolebinding::update(conn, (&tu_id, &tenant_id), update)?;
             Ok(())
         })
         .await?;

@@ -46,8 +46,8 @@ class Tenant(NamedTuple):
     sk: SecretApiKey
     name: str
     auth_token: DashboardAuth
-    # The rolebinding id for the authed user
-    rolebinding_id: str
+    # The tenant user id for the authed user
+    member_id: str
 
 
 class BasicUser(NamedTuple):

@@ -42,12 +42,6 @@ impl<'a> From<&'a TenantRolebindingId> for TenantRolebindingIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a TenantRolebindingId, &'a TenantId)> for TenantRolebindingIdentifier<'a> {
-    fn from((id, tenant_id): (&'a TenantRolebindingId, &'a TenantId)) -> Self {
-        Self::Tenant(id, tenant_id)
-    }
-}
-
 impl<'a> From<(&'a TenantUserId, &'a TenantId)> for TenantRolebindingIdentifier<'a> {
     fn from((user_id, tenant_id): (&'a TenantUserId, &'a TenantId)) -> Self {
         Self::User(user_id, tenant_id)
@@ -175,7 +169,7 @@ impl TenantRolebinding {
             last_login_at: Some(Some(Utc::now())),
             ..TenantRolebindingUpdate::default()
         };
-        let rb = Self::update(conn, (&rb.id, &tenant.id), rb_update)?;
+        let rb = Self::update(conn, (&user.id, &tenant.id), rb_update)?;
         Ok(((user, rb, role, tenant), is_first_login))
     }
 
