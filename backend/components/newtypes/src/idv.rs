@@ -53,3 +53,24 @@ impl IdvData {
             .collect()
     }
 }
+
+// KYB analogs of IdvData, still TBD and subject to change
+#[derive(Debug, Clone, Default)]
+pub struct BusinessOwnerData {
+    pub first_name: PiiString,
+    pub last_name: PiiString,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct BusinessData {
+    pub name: PiiString,
+    pub website_url: Option<PiiString>,
+    pub phone_number: Option<PiiString>,
+    pub ein: Option<PiiString>,
+    pub address_line1: PiiString,
+    pub address_line2: Option<PiiString>,
+    pub city: PiiString,
+    pub state: PiiString,
+    pub zip: PiiString,
+    pub business_owners: Vec<BusinessOwnerData>,
+}

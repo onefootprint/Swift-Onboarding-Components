@@ -2855,6 +2855,7 @@ dependencies = [
  "async-trait",
  "base64",
  "chrono",
+ "derive_more",
  "dotenv",
  "itertools",
  "levenshtein",
@@ -2873,6 +2874,7 @@ dependencies = [
  "tracing",
  "tracing-test",
  "twilio",
+ "url",
 ]
 
 [[package]]
