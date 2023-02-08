@@ -307,6 +307,9 @@
           "vault-only": "Vault"
         }
       },
+      "vault-data": {
+        "empty-state": "No vault data found"
+      },
       "user-info": {
         "cta": {
           "select-all": "Select all",

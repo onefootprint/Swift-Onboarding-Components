@@ -1,5 +1,6 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { IdDocType, UserDataAttribute } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { User, UserVaultData } from 'src/pages/users/users.types';
 import styled, { css } from 'styled-components';
@@ -30,16 +31,22 @@ const VaultDataContent = ({
   vaultData,
   isDecrypting,
 }: VaultDataContentProps) => {
+  const { t } = useTranslation('pages.user-details.vault-data');
   const sectionsVisibility = getSectionsVisibility(vaultData);
-  const { identitySection, addressSection, idDocSection } = sectionsVisibility;
+  const { basicSection, identitySection, addressSection, idDocSection } =
+    sectionsVisibility;
+  const isNoData =
+    !basicSection && !identitySection && !addressSection && !idDocSection;
 
   return (
     <DataGrid>
-      <BasicSection
-        user={user}
-        vaultData={vaultData}
-        isDecrypting={isDecrypting}
-      />
+      {basicSection && (
+        <BasicSection
+          user={user}
+          vaultData={vaultData}
+          isDecrypting={isDecrypting}
+        />
+      )}
       {identitySection && (
         <IdentitySection
           user={user}
@@ -75,6 +82,7 @@ const VaultDataContent = ({
           />
         </Box>
       )}
+      {isNoData && <Typography variant="body-3">{t('empty-state')}</Typography>}
     </DataGrid>
   );
 };

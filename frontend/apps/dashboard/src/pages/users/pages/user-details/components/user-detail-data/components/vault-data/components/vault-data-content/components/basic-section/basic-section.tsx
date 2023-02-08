@@ -61,12 +61,13 @@ const BasicSection = ({ user, vaultData, isDecrypting }: BasicSectionProps) => {
       </LinkButton>
     );
   };
+  const footer = user.isPortable && <RiskSignals type="basic" />;
 
   return (
     <DataSection
       iconComponent={IcoFileText224}
       title={t('basic.title')}
-      footer={<RiskSignals type="basic" />}
+      footer={footer}
       renderCta={renderCta}
       testID="basic-section"
     >

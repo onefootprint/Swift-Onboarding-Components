@@ -73,12 +73,13 @@ const AddressSection = ({
       </LinkButton>
     );
   };
+  const footer = user.isPortable && <RiskSignals type="address" />;
 
   return (
     <DataSection
       iconComponent={IcoBuilding24}
       title={t('address.title')}
-      footer={<RiskSignals type="address" />}
+      footer={footer}
       renderCta={renderCta}
       testID="address-section"
     >

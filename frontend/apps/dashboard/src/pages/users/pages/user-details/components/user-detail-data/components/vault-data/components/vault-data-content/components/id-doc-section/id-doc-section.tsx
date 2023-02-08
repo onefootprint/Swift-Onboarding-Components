@@ -67,12 +67,13 @@ const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
       </LinkButton>
     );
   };
+  const footer = user.isPortable && <RiskSignalsOverview type="document" />;
 
   return (
     <DataSection
       iconComponent={IcoIdCard24}
       title={hasSelfie ? t('id-doc.title-with-selfie') : t('id-doc.title')}
-      footer={<RiskSignalsOverview type="document" />}
+      footer={footer}
       renderCta={renderCta}
       testID="document-section"
     >

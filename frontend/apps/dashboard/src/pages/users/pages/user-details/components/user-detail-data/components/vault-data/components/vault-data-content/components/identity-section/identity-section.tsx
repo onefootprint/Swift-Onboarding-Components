@@ -65,12 +65,13 @@ const IdentitySection = ({
       </LinkButton>
     );
   };
+  const footer = user.isPortable && <RiskSignals type="identity" />;
 
   return (
     <DataSection
       iconComponent={IcoUserCircle24}
       title={t('identity.title')}
-      footer={<RiskSignals type="identity" />}
+      footer={footer}
       renderCta={renderCta}
       testID="identity-section"
     >
