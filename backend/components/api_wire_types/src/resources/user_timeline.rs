@@ -12,6 +12,7 @@ use crate::{
 pub struct UserTimeline {
     pub event: UserTimelineEvent,
     pub timestamp: DateTime<Utc>,
+    pub is_from_other_org: bool,
 }
 
 export_schema!(UserTimeline);

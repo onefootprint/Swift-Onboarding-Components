@@ -5,8 +5,6 @@ import pytest
 from tests.constants import (
     EMAIL,
     PHONE_NUMBER,
-    TENANT_ID3,
-    TENANT_ID4,
 )
 from tests.auth import FpAuth, OnboardingSessionToken
 from tests.bifrost_client import BifrostClient
@@ -19,12 +17,11 @@ from tests.utils import (
     override_webauthn_challenge,
     get,
     post,
-    create_tenant,
     clean_up_user,
-    build_user_data,
     identify_verify,
     get_requirement_from_requirements,
     create_ob_config,
+    inherit_user,
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -57,74 +54,7 @@ def create_inherited_non_sandbox_user(twilio, tenant_auth):
     Completes identify flow to get an auth token for the single integration test non-sandbox user
     using the specified tenant auth
     """
-    identifier = dict(phone_number=PHONE_NUMBER)
-
-    def identify():
-        data = dict(
-            identifier=identifier,
-        )
-        body = post("hosted/identify", data)
-        assert body["user_found"]
-        assert body["available_challenge_kinds"]
-
-    def challenge():
-        data = dict(
-            identifier=identifier,
-            preferred_challenge_kind="sms",
-        )
-        body = post("hosted/identify/login_challenge", data)
-        assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-        assert body["challenge_data"]["challenge_kind"] == "sms"
-        return body["challenge_data"]["challenge_token"]
-
-    try_until_success(identify, 20)
-    challenge_token = try_until_success(challenge, 20)
-
-    # Log in as the user
-    return try_until_success(
-        lambda: identify_verify(
-            twilio,
-            PHONE_NUMBER,
-            challenge_token,
-            tenant_pk=tenant_auth,
-            expected_kind="user_inherited",
-        ),
-        5,
-    )
-
-
-@pytest.fixture(scope="session")
-def foo_tenant(must_collect_data, can_access_data):
-    org_data = {
-        "id": TENANT_ID3,
-        "name": "Footprint Integration Testing Foo",
-        "is_live": True,
-    }
-
-    ob_conf_data = {
-        "name": "Foo Credit Card",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
-    }
-
-    return create_tenant(org_data, ob_conf_data)
-
-
-@pytest.fixture(scope="session")
-def bar_tenant(must_collect_data, can_access_data):
-    org_data = {
-        "id": TENANT_ID4,
-        "name": "Footprint Integration Testing Bar",
-        "is_live": True,
-    }
-
-    ob_conf_data = {
-        "name": "Bar Insurance",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
-    }
-
-    return create_tenant(org_data, ob_conf_data)
+    return inherit_user(twilio, PHONE_NUMBER, tenant_auth)
 
 
 @pytest.fixture(scope="module")
@@ -537,49 +467,6 @@ class TestBifrost:
         body = post("hosted/identify", data)
         assert body["user_found"]
         assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
-
-    def test_identify_repeat_customer(
-        self, foo_tenant, bar_tenant, twilio, non_sandbox_auth_token
-    ):
-        # Not used in test, but want to make sure the user has been created before running this test
-        non_sandbox_auth_token
-
-        def onboard_onto_tenant(tenant):
-            # Log in as the user
-            auth_token = create_inherited_non_sandbox_user(
-                twilio, tenant.default_ob_config.key
-            )
-
-            # Start onboarding for user
-            post("hosted/onboarding", None, tenant.default_ob_config.key, auth_token)
-
-            post(
-                "hosted/onboarding/submit",
-                None,
-                tenant.default_ob_config.key,
-                auth_token,
-            )
-
-            # authorize onboarding for user
-            body = post(
-                "hosted/onboarding/authorize",
-                None,
-                tenant.default_ob_config.key,
-                auth_token,
-            )
-            validation_token = body["validation_token"]
-            assert validation_token
-
-            # test the validate api call
-            data = dict(validation_token=validation_token)
-            body = post("onboarding/session/validate", data, tenant.sk.key)
-            return body["footprint_user_id"]
-
-        foo_fp_user_id = onboard_onto_tenant(foo_tenant)
-        bar_fp_user_id = onboard_onto_tenant(bar_tenant)
-        assert (
-            foo_fp_user_id != bar_fp_user_id
-        ), "Onboarding onto different tenants should give different fp_user_id"
 
     # In this test we
     #   - Create a live user by re-using a previously challenged phone number

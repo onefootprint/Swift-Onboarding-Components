@@ -104,11 +104,51 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
+def inherit_user(twilio, phone_number, tenant_pk):
+    identifier = dict(phone_number=phone_number)
+    # Support sandbox phone numbers being passed in
+    real_phone_number = phone_number.split("#")[0]
+
+    def identify():
+        data = dict(
+            identifier=identifier,
+        )
+        body = post("hosted/identify", data)
+        assert body["user_found"]
+        assert body["available_challenge_kinds"]
+
+    def challenge():
+        data = dict(
+            identifier=identifier,
+            preferred_challenge_kind="sms",
+        )
+        body = post("hosted/identify/login_challenge", data)
+        assert body["challenge_data"]["phone_number_last_two"] == real_phone_number[-2:]
+        assert body["challenge_data"]["challenge_kind"] == "sms"
+        return body["challenge_data"]["challenge_token"]
+
+    try_until_success(identify, 5)
+    challenge_token = try_until_success(challenge, 20)
+
+    # Log in as the user
+    return try_until_success(
+        lambda: identify_verify(
+            twilio,
+            real_phone_number,
+            challenge_token,
+            tenant_pk=tenant_pk,
+            expected_kind="user_inherited",
+        ),
+        5,
+    )
+
+
 def identify_verify(
     twilio, phone_number, challenge_token, tenant_pk=None, expected_kind="user_created"
 ):
     messages = twilio.messages.list(to=phone_number, limit=6)
 
+    last_error = None
     for message in messages:
         try:
             code = str(re.search("\\d{6}", message.body).group(0))
@@ -158,7 +198,6 @@ def create_basic_sandbox_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
     return BasicUser(
         auth_token=auth_token,
         phone_number=sandbox_phone_number,
-        real_phone_number=phone_number,
     )
 
 

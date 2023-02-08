@@ -107,7 +107,7 @@ pub async fn post(
                 uv.id.clone(),
             ),
             sealed_front.0,
-            None
+            None,
         )
         .into_future();
 
@@ -126,7 +126,7 @@ pub async fn post(
                     uv.id.clone(),
                 ),
                 sealed_back.0,
-                None
+                None,
             )
             .into_future();
 
@@ -146,7 +146,7 @@ pub async fn post(
                     uv.id.clone(),
                 ),
                 encrypted_selfie_image.0,
-                None
+                None,
             )
             .into_future();
 

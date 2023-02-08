@@ -53,7 +53,6 @@ class Tenant(NamedTuple):
 class BasicUser(NamedTuple):
     auth_token: str
     phone_number: str
-    real_phone_number: str
 
 
 class User(NamedTuple):

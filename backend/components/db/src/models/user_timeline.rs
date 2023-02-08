@@ -54,7 +54,12 @@ pub enum SaturatedTimelineEvent {
     Annotation(AnnotationInfo),
 }
 
-pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
+pub type IsFromOtherTenant = bool;
+pub struct UserTimelineInfo(
+    pub UserTimeline,
+    pub IsFromOtherTenant,
+    pub SaturatedTimelineEvent,
+);
 
 impl UserTimeline {
     #[tracing::instrument(skip_all)]
@@ -115,15 +120,16 @@ impl UserTimeline {
     where
         T: Into<ScopedUserIdentifier<'a>>,
     {
+        let su = ScopedUser::get(conn, scoped_user_id)?;
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
-        let su = ScopedUser::get(conn, scoped_user_id)?;
         let results: Vec<Self> = user_timeline::table
-            .filter(user_timeline::user_vault_id.eq(su.user_vault_id))
+            .filter(user_timeline::user_vault_id.eq(&su.user_vault_id))
             .filter(
                 user_timeline::scoped_user_id
                     .is_null()
-                    .or(user_timeline::scoped_user_id.eq(su.id)),
+                    .or(user_timeline::scoped_user_id.eq(&su.id))
+                    .or(user_timeline::is_portable),
             )
             .order_by(user_timeline::timestamp.asc())
             .get_results(conn)?;
@@ -205,7 +211,16 @@ impl UserTimeline {
                         SaturatedTimelineEvent::Annotation(annotation)
                     }
                 };
-                Ok(UserTimelineInfo(ut, saturated_event))
+                let is_from_other_tenant = if let Some(su_id) = ut.scoped_user_id.as_ref() {
+                    // This will actually display that events from different ob configs at the same
+                    // tenant belong to a different tenant. Probably okay.
+                    su_id != &su.id
+                } else {
+                    // Timeline events not associated with a tenant technically don't belong to
+                    // another tenant. But we also might want to treat them differently in the UI
+                    false
+                };
+                Ok(UserTimelineInfo(ut, is_from_other_tenant, saturated_event))
             })
             .collect::<DbResult<Vec<_>>>()?;
 
@@ -281,7 +296,7 @@ mod tests {
 
         assert_eq!(3, user_timeline_infos.len());
 
-        let ut1 = match &user_timeline_infos[0].1 {
+        let ut1 = match &user_timeline_infos[0].2 {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
@@ -293,7 +308,7 @@ mod tests {
             _ => unreachable!(),
         };
 
-        let ut2 = match &user_timeline_infos[1].1 {
+        let ut2 = match &user_timeline_infos[1].2 {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
@@ -305,7 +320,7 @@ mod tests {
             _ => unreachable!(),
         };
 
-        let ut3 = match &user_timeline_infos[2].1 {
+        let ut3 = match &user_timeline_infos[2].2 {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
