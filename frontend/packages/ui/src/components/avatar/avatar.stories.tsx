@@ -16,11 +16,12 @@ export default {
     size: {
       control: 'select',
       description: 'Avatar size',
-      options: ['default', 'compact', 'large'],
+      options: ['default', 'compact', 'large', 'xlarge'],
     },
     src: {
       control: 'text',
-      description: 'Avatar image source',
+      description:
+        'Avatar image source | component meant to be used with company logos',
       required: false,
     },
     loading: {
@@ -51,6 +52,6 @@ export const WithImage = Template.bind({});
 WithImage.args = {
   name: 'Jane Doe',
   size: 'default',
-  src: 'https://i.pravatar.cc/150?img=35',
+  src: 'https://cdn.cdnlogo.com/logos/g/77/grampus-eight.svg',
   loading: false,
 };

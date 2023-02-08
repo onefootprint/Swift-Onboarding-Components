@@ -35,18 +35,21 @@ describe('<Avatar />', () => {
     it('should render the image', () => {
       renderAvatar({
         name: 'Jane Doe',
-        src: 'https://i.pravatar.cc/150?img=35',
+        src: 'https://cdn.cdnlogo.com/logos/g/77/grampus-eight.svg',
       });
       const image = screen.getByRole('img', { name: 'Jane Doe' });
 
       expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute('src', 'https://i.pravatar.cc/150?img=35');
+      expect(image).toHaveAttribute(
+        'src',
+        'https://cdn.cdnlogo.com/logos/g/77/grampus-eight.svg',
+      );
     });
 
     it('should show a loading state', () => {
       renderAvatar({
         name: 'Jane Doe',
-        src: 'https://i.pravatar.cc/150?img=35',
+        src: 'https://cdn.cdnlogo.com/logos/g/77/grampus-eight.svg',
         loading: true,
       });
 

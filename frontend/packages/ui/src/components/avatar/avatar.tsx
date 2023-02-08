@@ -1,4 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 import { Property } from 'csstype';
+import * as CSS from 'csstype';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -28,7 +30,9 @@ const Avatar = ({
   }
 
   return src ? (
-    <Image src={src} alt={name} height={sizes[size]} width={sizes[size]} />
+    <ImageContainer height={sizes[size]} width={sizes[size]}>
+      <img src={src} alt={name} />
+    </ImageContainer>
   ) : (
     <Fallback role="img" aria-label={name} data-size={size}>
       {name.charAt(0)}
@@ -40,6 +44,7 @@ const sizes: Record<AvatarSize, Property.Width | Property.Height> = {
   compact: '24px',
   default: '32px',
   large: '40px',
+  xlarge: '90px',
 };
 
 export const loadingIndicatorSize: Record<
@@ -49,11 +54,29 @@ export const loadingIndicatorSize: Record<
   compact: 'compact',
   default: 'compact',
   large: 'default',
+  xlarge: 'default',
 };
 
-const Image = styled.img`
-  ${({ theme }) => css`
+const ImageContainer = styled.div<{
+  height: CSS.Property.Height;
+  width: CSS.Property.Width;
+}>`
+  ${({ theme, height, width }) => css`
+    background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.full};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: fit-content;
+    padding: ${theme.spacing[2]};
+    height: ${height};
+    width: ${width};
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   `}
 `;
 
@@ -89,6 +112,12 @@ const Fallback = styled.div`
       ${createFontStyles('label-1')};
       height: ${sizes.large};
       width: ${sizes.large};
+    }
+
+    &[data-size='xlarge'] {
+      ${createFontStyles('display-3')};
+      height: ${sizes.xlarge};
+      width: ${sizes.xlarge};
     }
   `}
 `;
