@@ -1,4 +1,5 @@
 import { Typography } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -6,10 +7,14 @@ import SecuredByFootprint from '../secured-by-footprint';
 import type { Link } from './footprint-footer.types';
 
 const FootprintFooter = () => {
+  const router = useRouter();
+
   const links: Link[] = [
     {
       label: "What's this?",
-      href: 'https://www.onefootprint.com',
+      href: `https://www.onefootprint.com/tenant?ob-key=${
+        router.query.public_key as string
+      }`,
     },
     {
       label: 'Privacy',

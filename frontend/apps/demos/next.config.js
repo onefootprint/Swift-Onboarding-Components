@@ -61,7 +61,16 @@ module.exports = {
     ];
   },
   images: {
-    domains: ['footprint-blog.ghost.io', 'static.ghost.org'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'static.ghost.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'footprint-blog.ghost.io',
+      },
+    ],
   },
   transpilePackages: [
     '@onefootprint/ui',

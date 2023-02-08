@@ -30,7 +30,7 @@ const Avatar = ({
   }
 
   return src ? (
-    <ImageContainer height={sizes[size]} width={sizes[size]}>
+    <ImageContainer height={sizes[size]} width={sizes[size]} data-size={size}>
       <img src={src} alt={name} />
     </ImageContainer>
   ) : (
@@ -44,7 +44,7 @@ const sizes: Record<AvatarSize, Property.Width | Property.Height> = {
   compact: '24px',
   default: '32px',
   large: '40px',
-  xlarge: '90px',
+  xlarge: '72px',
 };
 
 export const loadingIndicatorSize: Record<
@@ -76,6 +76,10 @@ const ImageContainer = styled.div<{
       width: 100%;
       height: 100%;
       object-fit: contain;
+    }
+
+    &[data-size='xlarge'] {
+      padding: ${theme.spacing[4]};
     }
   `}
 `;

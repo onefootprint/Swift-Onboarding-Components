@@ -764,6 +764,30 @@
       "image": {
         "alt": "An image of a penguin using a smartphone"
       }
+    },
+    "tenant": {
+      "html-title": "{{tenantName}} ♥ Footprint",
+      "title": "We care about your PII data and privacy.",
+      "subtitle": "That's why {{tenantName}} has partnered with Footprint to achieve the highest security standards, so that your personal information is always safe and secure.",
+      "features": {
+        "title": "How Footprint guards your PII",
+        "feature-1": {
+          "title": "Zero-trust by design",
+          "description": "Our API ensures only the right parties can access the data they're allowed to see."
+        },
+        "feature-2": {
+          "title": "End-to-end encrypted",
+          "description": "Our advanced PII vaults are built on top of secure Nitro Enclaves. "
+        },
+        "feature-3": {
+          "title": "Granular data access",
+          "description": "Only the bare minimum data is decrypted. Nothing else leaves our enclave-backed vaults. "
+        },
+        "feature-4": {
+          "title": "Secure enclave backed",
+          "description": "All PII data is always encrypted to our Nitro Enclaves."
+        }
+      }
     }
   }
 }
