@@ -22,4 +22,5 @@ pub struct OnboardingDecision {
 pub struct LiteObConfiguration {
     pub must_collect_data: Vec<CollectedDataOption>,
     pub must_collect_identity_document: bool,
+    pub must_collect_selfie: bool,
 }

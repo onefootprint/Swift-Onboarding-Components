@@ -50,11 +50,13 @@ impl DbToApi<ObConfiguration> for api_wire_types::LiteObConfiguration {
         let ObConfiguration {
             must_collect_data,
             must_collect_identity_document,
+            must_collect_selfie,
             ..
         } = ob_configuration;
         api_wire_types::LiteObConfiguration {
             must_collect_data,
             must_collect_identity_document,
+            must_collect_selfie,
         }
     }
 }
