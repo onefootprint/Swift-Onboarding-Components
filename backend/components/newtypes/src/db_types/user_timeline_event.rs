@@ -1,14 +1,15 @@
-use diesel::{AsExpression, FromSqlRow};
-use diesel_as_jsonb::AsJsonb;
-use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
-
 use crate::{
     AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId, OnboardingDecisionId,
     WebauthnCredentialId,
 };
+use diesel::{AsExpression, FromSqlRow};
+use diesel_as_jsonb::AsJsonb;
+use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
+use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants)]
+#[strum_discriminants(name(DbUserTimelineEventKind))]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum DbUserTimelineEvent {

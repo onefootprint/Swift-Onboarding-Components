@@ -2,9 +2,11 @@ use super::WriteableUvw;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
+use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
 use newtypes::CollectedDataOption;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DbUserTimelineEventKind;
 use std::collections::HashSet;
 
 struct CurrentData {
@@ -142,7 +144,14 @@ impl WriteableUvw {
                 .map(|l| l.id.clone())
                 .collect()
         };
-        DataLifetime::bulk_commit_for_tenant(conn, lifetime_ids_to_commit, scoped_user_id, seqno)?;
+        DataLifetime::bulk_commit_for_tenant(conn, lifetime_ids_to_commit, &scoped_user_id, seqno)?;
+
+        // Portablize any data collection timeline events from the duration of this onboarding.
+        // NOTE: this may include data collection events for fields that we deactivated... It is
+        // tricky to locate the exact timeline events corresponding to each piece of data. Not
+        // worth it for now since we only deactivate speculative data in the rare condition that
+        // there is a race across onboarding onto two tenants
+        UserTimeline::bulk_portablize(conn, &scoped_user_id, DbUserTimelineEventKind::DataCollected)?;
 
         Ok(seqno)
     }

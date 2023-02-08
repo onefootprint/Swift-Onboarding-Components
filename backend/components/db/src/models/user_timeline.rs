@@ -7,8 +7,10 @@ use crate::{schema::user_timeline, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
+use newtypes::DbUserTimelineEventKind;
 use newtypes::VendorAPI;
-use newtypes::{DbUserTimelineEvent, FootprintUserId, ScopedUserId, TenantId, UserTimelineId, UserVaultId};
+use newtypes::{DbUserTimelineEvent, ScopedUserId, UserTimelineId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
@@ -16,6 +18,7 @@ use super::document_request::DocumentRequest;
 use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
+use super::scoped_user::ScopedUserIdentifier;
 use strum::IntoEnumIterator;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = user_timeline)]
@@ -80,16 +83,41 @@ impl UserTimeline {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list(
+    pub fn bulk_portablize(
         conn: &mut PgConn,
-        footprint_user_id: FootprintUserId,
-        tenant_id: TenantId,
+        scoped_user_id: &ScopedUserId,
+        kind: DbUserTimelineEventKind,
+    ) -> DbResult<()> {
+        let events = user_timeline::table
+            .filter(user_timeline::scoped_user_id.eq(scoped_user_id))
+            .get_results::<Self>(conn)?;
+        // Since we can't filter on the jsonb column very easily in postgres, filter in RAM. There
+        // won't be many events for each scoped user
+        let event_ids = events
+            .into_iter()
+            .filter(|e| DbUserTimelineEventKind::from(&e.event) == kind)
+            .map(|e| e.id)
+            .collect_vec();
+        diesel::update(user_timeline::table)
+            .filter(user_timeline::scoped_user_id.eq(scoped_user_id))
+            .filter(user_timeline::id.eq_any(event_ids))
+            .set(user_timeline::is_portable.eq(true))
+            .execute(conn)?;
+        Ok(())
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn list<'a, T>(
+        conn: &mut PgConn,
+        scoped_user_id: T,
         tenant_can_view_socure_risk_signal: bool,
-        is_live: bool,
-    ) -> DbResult<Vec<UserTimelineInfo>> {
+    ) -> DbResult<Vec<UserTimelineInfo>>
+    where
+        T: Into<ScopedUserIdentifier<'a>>,
+    {
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
-        let su = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+        let su = ScopedUser::get(conn, scoped_user_id)?;
         let results: Vec<Self> = user_timeline::table
             .filter(user_timeline::user_vault_id.eq(su.user_vault_id))
             .filter(
@@ -249,7 +277,7 @@ mod tests {
         .0;
 
         let user_timeline_infos =
-            UserTimeline::list(conn, scoped_user.fp_user_id, tenant.id, true, is_live).unwrap();
+            UserTimeline::list(conn, (&scoped_user.fp_user_id, &tenant.id, is_live), true).unwrap();
 
         assert_eq!(3, user_timeline_infos.len());
 

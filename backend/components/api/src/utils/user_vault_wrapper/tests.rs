@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use super::UserVaultWrapper;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use db::models::data_lifetime::DataLifetime;
+use db::models::user_timeline::UserTimeline;
 use db::models::user_vault_data::NewUserVaultData;
 use db::models::user_vault_data::UserVaultData;
 use db::tests::fixtures;
@@ -126,6 +127,11 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!uvw.has_identity_field(IDK::LastName));
     assert!(!uvw.has_identity_field(IDK::Email));
 
+    // The UserTimeline events shouldn't be portable right now
+    let timeline_events = UserTimeline::list(conn, &su.id, true).unwrap();
+    assert!(!timeline_events.is_empty());
+    assert!(!timeline_events.iter().any(|x| x.0.is_portable));
+
     // Commit
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     assert!(uvw.has_identity_field(IDK::FirstName));
@@ -138,6 +144,11 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(uvw.has_identity_field(IDK::FirstName));
     assert!(uvw.has_identity_field(IDK::LastName));
     assert!(uvw.has_identity_field(IDK::Email));
+
+    // And the user timeline events should be made portable
+    let timeline_events = UserTimeline::list(conn, &su.id, true).unwrap();
+    assert!(!timeline_events.is_empty());
+    assert!(timeline_events.iter().all(|x| x.0.is_portable));
 }
 
 #[db_test]

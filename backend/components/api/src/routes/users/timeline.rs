@@ -39,10 +39,8 @@ pub async fn get(
         .db_query(move |conn| {
             UserTimeline::list(
                 conn,
-                footprint_user_id,
-                tenant_id,
+                (&footprint_user_id, &tenant_id, is_live),
                 tenant_can_view_socure_risk_signal,
-                is_live,
             )
         })
         .await??;

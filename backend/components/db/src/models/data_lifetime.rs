@@ -192,7 +192,7 @@ impl DataLifetime {
     pub fn bulk_commit_for_tenant(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: &ScopedUserId,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let update = DataLifetimeUpdate {
