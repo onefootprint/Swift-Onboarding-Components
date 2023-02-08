@@ -50,6 +50,7 @@ impl SocureClient {
     }
 
     // Makes call to Socure's ID+ endpoint: https://developer.socure.com/reference#tag/ID+
+    #[tracing::instrument(skip_all)]
     pub async fn idplus(
         &self,
         idv_data: IdvData,
@@ -67,6 +68,7 @@ impl SocureClient {
         Ok(result)
     }
 
+    #[tracing::instrument(skip_all)]
     async fn attempt_idplus(
         &self,
         idv_data: IdvData,
@@ -104,6 +106,7 @@ impl SocureClient {
         json_response
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn reason_code(&self) -> Result<serde_json::Value, crate::socure::Error> {
         tracing::info!("SocureClient reason_code");
         let response = self

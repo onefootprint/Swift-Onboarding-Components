@@ -90,6 +90,7 @@ pub async fn poll_scan_verify_results_request(
 
 /// Scan onboarding
 /// As of 2023-01-06, acc to their API docs, we don't need to poll /shrug
+#[tracing::instrument(skip_all)]
 pub async fn send_scan_onboarding_request(
     client: &IdologyClient,
     data: DocVData,

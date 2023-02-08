@@ -181,6 +181,7 @@ impl S3Client {
 
     /// Get an object in S3 from the path specified by `s3://{bucket}/{key}`
     #[allow(unused)]
+    #[tracing::instrument(skip(self))]
     pub async fn get_object(&self, bucket: String, object: String) -> Result<actix_web::web::Bytes, S3Error> {
         tracing::info!("s3: getting object");
         let obj = self
@@ -200,6 +201,7 @@ impl S3Client {
         Ok(obj)
     }
     #[allow(unused)]
+    #[tracing::instrument(skip(self))]
     /// Get an object in S3 from the path specified by an s3 url
     pub async fn get_object_from_s3_url(&self, url: &str) -> Result<actix_web::web::Bytes, S3Error> {
         let (bucket, object) = S3Client::parse_s3_url(url)?;

@@ -386,6 +386,7 @@ pub async fn get(
     .json()
 }
 
+#[tracing::instrument(skip(state, document_request, document_verification_request))]
 async fn handle_scan_onboarding_request(
     state: &State,
     document_request: DbDocumentRequest,
@@ -405,8 +406,8 @@ async fn handle_scan_onboarding_request(
     // doc verification by somehow inducing a failure on the vendor side
     let mut status = DocumentRequestStatus::Complete;
     let needs_retry = match vendor_result {
-        Err(_) => {
-            tracing::warn!(verification_request=%verification_request_id, "Document vendor request failed for unknown reason");
+        Err(e) => {
+            tracing::warn!(verification_request=%verification_request_id, err=%e, "Document vendor request failed for unknown reason");
             status = DocumentRequestStatus::UploadFailed;
             true
         }

@@ -24,6 +24,7 @@ impl IdologyClient {
 
     /// Make a request to the ExpectID module. Returns the result from ExpectID and a vec of
     /// scopes that were sent to IDology's ExpectID
+    #[tracing::instrument(skip_all)]
     pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<serde_json::Value, IdologyError::Error> {
         let url = "https://web.idologylive.com/api/idiq.svc";
         let req_data = expectid::request::RequestData::try_from(idv_data)?;
@@ -50,6 +51,7 @@ impl IdologyClient {
 
     /// Submit an image to the ScanVerify module. Returns the result from ExpectID and a vec of
     /// scopes that were sent to IDology's ExpectID
+    #[tracing::instrument(skip_all)]
     pub(super) async fn submit_to_scan_verify(
         &self,
         docv_data: DocVData,
@@ -86,6 +88,7 @@ impl IdologyClient {
         Ok(idology_response)
     }
 
+    #[tracing::instrument(skip_all)]
     pub(super) async fn get_scan_verify_results(
         &self,
         query_id: u64,
@@ -140,6 +143,7 @@ impl IdologyClient {
     }
 
     /// Scan onboarding
+    #[tracing::instrument(skip_all)]
     pub(super) async fn submit_to_scan_onboarding(
         &self,
         docv_data: DocVData,

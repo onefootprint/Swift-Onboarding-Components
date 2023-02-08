@@ -26,6 +26,7 @@ pub struct DecryptDocumentResult {
     pub selfie: Option<PiiBytes>,
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn fetch_image(
     state: &State,
     identity_document: IdentityDocument,

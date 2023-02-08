@@ -54,6 +54,7 @@ pub async fn build_idv_data_from_verification_request(
 
 /// Build a data structure that can be used to submit the images of identity documents (and selfie) to vendors
 #[allow(dead_code)]
+#[tracing::instrument(skip(state))]
 pub async fn build_docv_data_for_submission_from_verification_request(
     state: &State,
     request: VerificationRequest,

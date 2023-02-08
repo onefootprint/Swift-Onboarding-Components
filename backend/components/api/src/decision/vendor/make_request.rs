@@ -22,6 +22,7 @@ use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, Vendor, VendorA
 use prometheus::labels;
 
 /// Branch on vendor and send requests to vendors
+#[tracing::instrument(skip(data, db_pool, ff_client, idology_client, socure_client, twilio_client))]
 pub async fn send_idv_request(
     request: VerificationRequest,
     data: IdvData,
@@ -76,6 +77,7 @@ pub async fn send_idv_request(
 }
 
 /// Send a request to vendors for document verification
+#[tracing::instrument(skip_all)]
 pub async fn send_docv_request(
     state: &State,
     request: VerificationRequest,
@@ -109,6 +111,7 @@ pub async fn send_docv_request(
     Ok(result)
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn send_twilio_lookupv2_request<T>(
     idv_data: IdvData,
     twilio_api_call: &T,
@@ -133,6 +136,7 @@ where
         .map_err(|e| ApiError::from(idv::Error::from(e)))
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn send_idology_idv_request(
     data: IdvData,
     is_production: bool,
@@ -215,6 +219,7 @@ pub async fn send_idology_idv_request(
     }
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn send_socure_idv_request(
     request: VerificationRequest,
     data: IdvData,
@@ -295,6 +300,7 @@ pub async fn send_socure_idv_request(
     }
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn send_scan_onboarding_docv_request(
     state: &State,
     request: VerificationRequest,
@@ -399,6 +405,7 @@ pub async fn make_idv_request(
 /// A note on usage: Doc verification is different from other vendor requests in that we run the request synchronously in bifrost
 /// in order to communicate potential issues with the uploaded image back to the customer. Because of this,
 /// we have VerificationResults _before_ the decision engine would run
+#[tracing::instrument(skip(state))]
 pub async fn make_docv_request(
     state: &State,
     request: VerificationRequest,
@@ -434,7 +441,7 @@ pub async fn make_docv_request(
     Ok(result)
 }
 
-// #[tracing::instrument(skip(state))] TODO:
+#[tracing::instrument(skip_all)]
 pub async fn make_vendor_requests(
     requests: Vec<VerificationRequest>,
     db_pool: &DbPool,

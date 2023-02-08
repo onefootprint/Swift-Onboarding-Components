@@ -111,6 +111,7 @@ impl EnclaveClient {
     }
 
     /// Decryptes the provided list of SealedVaultDataKeys into SealingKeys
+    #[tracing::instrument(skip_all)]
     pub async fn decrypt_sealed_vault_data_key(
         &self,
         sealed_data_keys: &[SealedVaultDataKey],
