@@ -7,6 +7,7 @@ mod workos;
 pub use self::workos::*;
 use db::models::tenant::Tenant;
 use db::models::tenant_role::TenantRole;
+use db::models::tenant_rolebinding::TenantRolebinding;
 pub use ob_public_key::*;
 mod secret_key;
 pub use secret_key::*;
@@ -28,6 +29,11 @@ pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn is_live(&self) -> Result<bool, ApiError>;
     fn actor(&self) -> AuthActor;
+    /// The role associated with the authed principal that gives permissions
+    fn role(&self) -> &TenantRole;
+    /// The rolebinding that ties the authed principal to the role. Will be None for firm employee
+    /// auth and API key auth
+    fn rolebinding(&self) -> Option<&TenantRolebinding>;
 }
 
 #[derive(Clone)]
@@ -71,7 +77,7 @@ pub trait IsGuardMet: Display {
 /// implementation to check whether a guard is met by the token_permissions() and
 /// yield the tenant auth if so.
 /// Purposefully private to prevent calling these methods outside of this module
-pub trait CanCheckTenantGuard: Sized {
+trait CanCheckTenantGuard: Sized {
     /// The tenant role that the authed principal has
     fn role(&self) -> &TenantRole;
 
@@ -93,13 +99,6 @@ pub trait CheckTenantGuard {
     fn check_guard<T>(self, gaurd: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
         T: IsGuardMet;
-
-    fn role(&self) -> &TenantRole
-    where
-        Self: CanCheckTenantGuard,
-    {
-        CanCheckTenantGuard::role(self)
-    }
 }
 
 impl<TAuthExtractor> CheckTenantGuard for TAuthExtractor

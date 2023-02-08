@@ -1,7 +1,7 @@
 use std::pin::Pin;
 
 use actix_web::FromRequest;
-use db::models::tenant::Tenant;
+use db::models::{tenant::Tenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding};
 use futures_util::Future;
 
 use crate::errors::ApiError;
@@ -100,6 +100,20 @@ where
         match self {
             Either::Left(s) => s.tenant(),
             Either::Right(s) => s.tenant(),
+        }
+    }
+
+    fn role(&self) -> &TenantRole {
+        match self {
+            Either::Left(s) => s.role(),
+            Either::Right(s) => s.role(),
+        }
+    }
+
+    fn rolebinding(&self) -> Option<&TenantRolebinding> {
+        match self {
+            Either::Left(s) => s.rolebinding(),
+            Either::Right(s) => s.rolebinding(),
         }
     }
 

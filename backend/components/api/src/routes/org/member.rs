@@ -20,8 +20,8 @@ async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::BasicOrganizationMember> {
-    let role = auth.role().clone();
     let auth = auth.check_guard(TenantGuard::Read)?;
+    let role = auth.role().clone();
     let user_id = match auth.actor() {
         AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
         _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
@@ -49,8 +49,8 @@ async fn patch(
     // Weird to take in an impersonation token here
     auth: TenantRbAuthContext,
 ) -> JsonApiResponse<api_wire_types::BasicOrganizationMember> {
-    let role = auth.role().clone();
     let auth = auth.check_guard(Any)?;
+    let role = auth.role().clone();
 
     let UpdateTenantUserRequest {
         first_name,

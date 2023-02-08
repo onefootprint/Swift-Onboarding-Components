@@ -10,6 +10,7 @@ use db::{
     models::{
         tenant::Tenant,
         tenant_role::{ImmutableRoleKind, TenantRole},
+        tenant_rolebinding::TenantRolebinding,
         tenant_user::TenantUser,
     },
     PgConn,
@@ -120,6 +121,14 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
 
     fn tenant(&self) -> &Tenant {
         &self.data.tenant
+    }
+
+    fn role(&self) -> &TenantRole {
+        &self.data.role
+    }
+
+    fn rolebinding(&self) -> Option<&TenantRolebinding> {
+        None
     }
 
     fn actor(&self) -> AuthActor {

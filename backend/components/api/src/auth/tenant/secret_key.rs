@@ -8,6 +8,7 @@ use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
+use db::models::tenant_rolebinding::TenantRolebinding;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
 use paperclip::actix::Apiv2Security;
@@ -106,6 +107,14 @@ impl TenantAuth for SecretTenantAuthContext {
         }
 
         Ok(self.api_key.is_live)
+    }
+
+    fn role(&self) -> &TenantRole {
+        &self.role
+    }
+
+    fn rolebinding(&self) -> Option<&TenantRolebinding> {
+        None
     }
 
     fn actor(&self) -> AuthActor {
