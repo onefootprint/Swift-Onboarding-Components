@@ -41,6 +41,7 @@ def test_get_users_list(sandbox_user, sandbox_user2):
         assert set(["first_name", "last_name"]) < set(
             scoped_user["identity_data_attributes"]
         )
+        assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
 
 
 def test_get_users_list_pagination(sandbox_user, sandbox_user2):

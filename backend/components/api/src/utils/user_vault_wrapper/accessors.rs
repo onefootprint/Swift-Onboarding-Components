@@ -75,6 +75,10 @@ impl UserVaultWrapper {
             .filter(|k| self.has_identity_field(*k))
             .collect()
     }
+
+    pub fn get_populated_custom_data(&self) -> Vec<KvDataKey> {
+        self.kv_data().keys().cloned().collect()
+    }
 }
 
 impl UserVaultWrapper {

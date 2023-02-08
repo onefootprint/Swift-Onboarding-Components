@@ -68,7 +68,6 @@ impl UserVaultWrapper {
                     uvds.get(&uv_id).cloned().unwrap_or_default(),
                     phone_numbers.get(&uv_id).cloned().unwrap_or_default(),
                     emails.get(&uv_id).cloned().unwrap_or_default(),
-                    // TODO  We never show custom data or id docs in the user list table, no need to fetch here really
                     identity_document_map.get(&uv_id).cloned().unwrap_or_default(),
                     kv_data_map.get(&uv_id).cloned().unwrap_or_default(),
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
