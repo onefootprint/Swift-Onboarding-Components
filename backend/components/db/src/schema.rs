@@ -601,6 +601,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         user_vault_id -> Text,
+        is_portable -> Bool,
     }
 }
 

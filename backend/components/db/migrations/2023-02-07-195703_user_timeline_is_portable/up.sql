@@ -1,0 +1,2 @@
+ALTER TABLE user_timeline ADD COLUMN is_portable BOOLEAN DEFAULT FALSE NOT NULL;
+ALTER TABLE user_timeline ALTER COLUMN is_portable DROP DEFAULT;

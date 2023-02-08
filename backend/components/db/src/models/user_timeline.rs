@@ -27,6 +27,8 @@ pub struct UserTimeline {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub user_vault_id: UserVaultId,
+    /// Designates whether the UserTimeline event can be seen by tenants other than the one that created it
+    pub is_portable: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -36,6 +38,7 @@ pub struct NewUserTimeline {
     pub scoped_user_id: Option<ScopedUserId>,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
+    pub is_portable: bool,
 }
 
 #[allow(clippy::large_enum_variant)]
@@ -56,6 +59,8 @@ impl UserTimeline {
         conn: &mut PgConn,
         event: T,
         user_vault_id: UserVaultId,
+        // Is only ever null during my1fp account creation in identify verify. Should we get rid of
+        // that codepath?
         scoped_user_id: Option<ScopedUserId>,
     ) -> DbResult<()>
     where
@@ -66,6 +71,7 @@ impl UserTimeline {
             scoped_user_id,
             user_vault_id,
             timestamp: chrono::Utc::now(),
+            is_portable: false,
         };
         diesel::insert_into(user_timeline::table)
             .values(new)
