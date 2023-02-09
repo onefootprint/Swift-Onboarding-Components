@@ -208,9 +208,9 @@ async fn test_run(
 
     mock_ff_client
         .expect_bool_flag_by_rule_set_name()
-        .times(1)
+        .times(2)
         .with(eq("EnableRuleSetForDecision"), always())
-        .return_once(|_, _| Ok(true));
+        .returning(|_, _| Ok(true));
 
     mock_twilio_api_call
         .expect_make_request()

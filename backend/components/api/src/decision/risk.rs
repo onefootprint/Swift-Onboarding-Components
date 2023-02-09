@@ -122,11 +122,12 @@ pub fn final_decision(
     // The set of rules that determine if a user passes onboarding
     let prod_rules = vec![onboarding_rules::idology_base_rule_set()];
     // Additional sets of rules that might be toggled on via a FF or by tenant
-    let additional_rules = vec![ActionableRuleSetBuilder::new(
+    let additional_rules = vec![
         onboarding_rules::idology_conservative_rule_set(),
-    )]
+        onboarding_rules::temp_watchlist(),
+    ]
     .into_iter()
-    .map(|a| a.build(feature_flag_client))
+    .map(|rs| ActionableRuleSetBuilder::new(rs).build(feature_flag_client))
     .collect();
 
     // Evaluate our rules

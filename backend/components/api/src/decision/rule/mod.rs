@@ -46,6 +46,7 @@ pub fn evaluate_onboarding_rules<T, R: EvaluateRuleSet<T>>(
 pub enum RuleSetName {
     IdologyBaseRules,
     IdologyConservativeFailingRules,
+    TempWatchlist,
     #[cfg(test)]
     Test(String),
 }

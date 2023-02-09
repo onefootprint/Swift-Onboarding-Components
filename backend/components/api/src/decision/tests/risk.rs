@@ -87,6 +87,14 @@ fn test_final_decision(
         )
         .times(1)
         .return_once(move |_, _| Ok(should_use_conservative_rules));
+    mock_ff_client
+        .expect_bool_flag_by_rule_set_name()
+        .with(
+            eq("EnableRuleSetForDecision"),
+            eq(onboarding_rules::temp_watchlist().name),
+        )
+        .times(1)
+        .return_once(move |_, _| Ok(should_use_conservative_rules));
 
     // function under test
     final_decision(&feature_vector, onboarding_id, &mock_ff_client).unwrap()

@@ -137,3 +137,18 @@ pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
         name: RuleSetName::IdologyConservativeFailingRules,
     }
 }
+
+// will remove once we make sure the score based rule is working
+pub fn temp_watchlist() -> RuleSet<IDologyFeatures> {
+    let rule = Rule {
+        rule: |f: &IDologyFeatures| {
+            f.footprint_reason_codes
+                .contains(&FootprintReasonCode::PotentialWatchlistHit)
+        },
+        name: RuleName::WatchlistHit,
+    };
+    RuleSet {
+        rules: vec![rule],
+        name: RuleSetName::TempWatchlist,
+    }
+}

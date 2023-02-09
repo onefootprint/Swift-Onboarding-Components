@@ -76,6 +76,7 @@ pub struct Pa {
     #[serde(deserialize_with = "from_string_or_int")]
     pub score: Option<String>,
     pub record_type: Option<String>,
+    #[serde(deserialize_with = "from_string_or_int")]
     pub dob: Option<String>,
 }
 
@@ -326,11 +327,14 @@ mod tests {
                 {
                   "list": "Office of Foreign Asset Control",
                   // int instead of string
-                  "score": 98
+                  "score": 98,
+                  "dob": 11301960
                 },
                 {
                     "list": "Bad Boy list",
+                    // strings
                     "score": "97",
+                    "dob": "11301960"
                 },
                 ]
             },
