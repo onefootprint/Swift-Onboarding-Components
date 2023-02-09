@@ -176,9 +176,7 @@ pub async fn get_detail(
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
             let uvw = UserVaultWrapper::build_for_tenant(conn, &su.id)?;
-            let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
-                .remove(&su.id)
-                .ok_or(ApiError::ResourceNotFound)?;
+            let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?.remove(&su.id);
 
             Ok((su, ob, uvw))
         })
@@ -190,7 +188,7 @@ pub async fn get_detail(
         identity_data_kinds,
         document_types,
         selfie_document_types,
-        Some(ob),
+        ob,
         su,
         uvw.user_vault.is_portable,
     ));

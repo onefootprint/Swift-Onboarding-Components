@@ -1,7 +1,7 @@
 use super::TenantUvw;
-use crate::auth::tenant::{CanDecrypt, IsGuardMet};
+use crate::auth::tenant::{CanDecrypt, IsGuardMet, TenantGuardDsl};
 use itertools::Itertools;
-use newtypes::DataIdentifier;
+use newtypes::{DataIdentifier, TenantScope};
 
 impl TenantUvw {
     /// Retrieve the fields that the tenant is allowed to see exist. Any field that was requested
@@ -9,11 +9,16 @@ impl TenantUvw {
     ///
     /// NOTE: This is different from whether the tenant can decrypt the data
     pub fn get_visible_populated_fields(&self) -> Vec<DataIdentifier> {
-        let can_see_scopes = self
-            .authorized_ob_configs
-            .iter()
-            .flat_map(|x| x.visible_scopes())
-            .collect_vec();
+        let can_see_scopes = if self.user_vault.is_portable {
+            // Visibility of fields in portable vaults is controlled by approved onboarding configs
+            self.authorized_ob_configs
+                .iter()
+                .flat_map(|x| x.visible_scopes())
+                .collect_vec()
+        } else {
+            // All fields are visible in non-portable vaults
+            vec![TenantScope::Admin]
+        };
 
         let id_data = self.get_populated_identity_fields().into_iter().map(|k| k.into());
         let id_docs = self
@@ -35,7 +40,9 @@ impl TenantUvw {
         .chain(id_data)
         // Reuse the tenant auth codepaths to filter out DataIdentifiers on this UserVaultWrapper
         // that are visible given the approved onboarding configurations
-        .filter(|x| CanDecrypt::single(x.clone()).is_met(&can_see_scopes))
+        .filter(|x| {
+            CanDecrypt::single(x.clone()).or_admin().is_met(&can_see_scopes)
+        })
         .collect()
     }
 }

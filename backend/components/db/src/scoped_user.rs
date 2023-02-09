@@ -26,7 +26,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
     // not be visible in the dashboard since the tenant doesn't have permissions to view anything
     // about the user
     use crate::schema::{
-        data_lifetime, fingerprint, manual_review, onboarding, onboarding_decision, scoped_user,
+        data_lifetime, fingerprint, manual_review, onboarding, onboarding_decision, scoped_user, user_vault,
     };
     let authorized_ids = onboarding::table
         .filter(onboarding::is_authorized.eq(true))
@@ -36,8 +36,18 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
     let mut query = scoped_user::table
         .filter(scoped_user::tenant_id.eq(params.tenant_id))
         .filter(scoped_user::is_live.eq(params.is_live))
-        .filter(scoped_user::id.eq_any(authorized_ids))
         .into_boxed();
+
+    let non_portable_vault_ids = user_vault::table
+        .filter(user_vault::is_portable.eq(false))
+        .select(user_vault::id);
+    query = query.filter(
+        // Allow seeing any authorized scoped users for portable vaults OR non-portable vaults owned
+        // by the tenant
+        scoped_user::id
+            .eq_any(authorized_ids)
+            .or(scoped_user::user_vault_id.eq_any(non_portable_vault_ids)),
+    );
 
     // Filter on whether user is in manual review
     if let Some(requires_manual_review) = params.requires_manual_review {
