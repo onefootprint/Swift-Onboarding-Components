@@ -1,10 +1,16 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  customRender,
+  screen,
+  userEvent,
+} from '@onefootprint/test-utils';
 import React from 'react';
 import { useStore } from 'src/hooks/use-session';
 
 import BlankLayout, { BlankLayoutProps } from './blank-layout';
 
 const originalState = useStore.getState();
+const useRouterSpy = createUseRouterSpy();
 
 describe('<BlankLayout />', () => {
   const renderBlankLayout = ({
@@ -28,6 +34,11 @@ describe('<BlankLayout />', () => {
           name: 'Acme',
           isSandboxRestricted: true,
         },
+        meta: {
+          createdNewTenant: false,
+          isFirstLogin: false,
+          requiresOnboarding: false,
+        },
       },
     });
   });
@@ -37,12 +48,16 @@ describe('<BlankLayout />', () => {
   });
 
   it('should render correctly', () => {
+    useRouterSpy({ pathname: '/onboarding' });
     renderBlankLayout({ children: 'Blank Layout' });
     expect(screen.getByText('Blank Layout')).toBeInTheDocument();
   });
 
   describe('when clicking on the logout button', () => {
     it('should logout the user', async () => {
+      const push = jest.fn();
+      useRouterSpy({ pathname: '/onboarding', push });
+
       const dataBeforeLogout = useStore.getState().data;
       expect(dataBeforeLogout).toBeDefined();
 
@@ -50,8 +65,7 @@ describe('<BlankLayout />', () => {
       const logoutButton = screen.getByText('Log out');
       await userEvent.click(logoutButton);
 
-      const dataAfterLogout = useStore.getState().data;
-      expect(dataAfterLogout).toBeUndefined();
+      expect(push).toHaveBeenCalledWith('/logout');
     });
   });
 });

@@ -30,6 +30,11 @@ describe('<UserData />', () => {
           name: 'Acme',
           isSandboxRestricted: true,
         },
+        meta: {
+          createdNewTenant: false,
+          isFirstLogin: false,
+          requiresOnboarding: false,
+        },
       },
     });
   });
@@ -74,6 +79,11 @@ describe('<UserData />', () => {
             logoUrl: null,
             name: 'Acme',
             isSandboxRestricted: true,
+          },
+          meta: {
+            createdNewTenant: false,
+            isFirstLogin: false,
+            requiresOnboarding: false,
           },
         },
       });

@@ -25,7 +25,16 @@ const Data = ({ authToken, organizations }: DataProps) => {
       { tenantId, authToken },
       {
         onSuccess({ user, tenant }: OrgAssumeRoleResponse) {
-          logIn(authToken, user, tenant);
+          logIn({
+            auth: authToken,
+            user,
+            org: tenant,
+            meta: {
+              isFirstLogin: false,
+              requiresOnboarding: false,
+              createdNewTenant: false,
+            },
+          });
           router.push('/users');
         },
         onError: showErrorToast,

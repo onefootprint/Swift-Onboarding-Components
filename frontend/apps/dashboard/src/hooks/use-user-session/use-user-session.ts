@@ -26,7 +26,7 @@ const useUserSession = () => {
   const showErrorToast = useRequestErrorToast();
   const session = useSession();
   const data = session.data?.user;
-  const dangerouslyCastedData = session.dangerouslyCastedData.user;
+  const dangerouslyCastedData = session.dangerouslyCastedData?.user;
 
   const mutation = useMutation({
     mutationFn: (payload: UserUpdateRequest) =>

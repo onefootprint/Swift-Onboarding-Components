@@ -3,14 +3,12 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 import themes from '@onefootprint/design-tokens';
 import FootprintDevTools from '@onefootprint/dev-tools';
 import { DesignSystemProvider } from '@onefootprint/ui';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Layout from '../components/layout';
-import PageGuard from '../components/page-guard';
 import configureReactI18next from '../config/initializers/react-i18next';
 import ReactQueryProvider from '../config/initializers/react-query-provider';
 import configureSentry from '../config/initializers/sentry';
@@ -48,14 +46,11 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
       <ReactQueryProvider>
         <DesignSystemProvider theme={themes.light}>
-          <ReactQueryDevtools />
           <FootprintDevTools />
           <GlobalStyle />
-          <PageGuard>
-            <Layout name={pageProps.layout}>
-              <Component />
-            </Layout>
-          </PageGuard>
+          <Layout name={pageProps.layout}>
+            <Component />
+          </Layout>
         </DesignSystemProvider>
       </ReactQueryProvider>
     </>

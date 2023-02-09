@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16, LogoFpCompact } from '@onefootprint/icons';
 import { Container, LinkButton } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 import React from 'react';
-import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 export type BlankLayoutProps = {
@@ -11,20 +12,33 @@ export type BlankLayoutProps = {
 
 const BlankLayout = ({ children }: BlankLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
-  const { logOut } = useSession();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push('/logout');
+  };
 
   return (
-    <Container testID="private-blank-layout">
-      <Inner>
-        <Header>
-          <LogoFpCompact />
-          <LinkButton onClick={logOut} iconComponent={IcoArrowRightSmall16}>
-            {t('log-out')}
-          </LinkButton>
-        </Header>
-        <Content>{children}</Content>
-      </Inner>
-    </Container>
+    <motion.div
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }}
+    >
+      <Container testID="private-blank-layout">
+        <Inner>
+          <Header>
+            <LogoFpCompact />
+            <LinkButton
+              onClick={handleLogout}
+              iconComponent={IcoArrowRightSmall16}
+            >
+              {t('log-out')}
+            </LinkButton>
+          </Header>
+          <Content>{children}</Content>
+        </Inner>
+      </Container>
+    </motion.div>
   );
 };
 

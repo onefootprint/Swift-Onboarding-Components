@@ -7,6 +7,7 @@ import {
   LogoFpCompact,
 } from '@onefootprint/icons';
 import { Container, Tab, Tabs, Typography } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -32,7 +33,11 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   ];
 
   return (
-    <>
+    <DefaultLayoutContainer
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }}
+    >
       <Header data-testid="private-default-layout">
         <SandboxBanner />
         <Container>
@@ -71,9 +76,15 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
           Footprint ❤️ {dangerouslyCastedData.name}
         </Typography>
       </Footer>
-    </>
+    </DefaultLayoutContainer>
   );
 };
+
+const DefaultLayoutContainer = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+`;
 
 const Header = styled.div`
   flex: 1 0 auto;
