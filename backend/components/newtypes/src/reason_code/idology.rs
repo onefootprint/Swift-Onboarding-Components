@@ -33,11 +33,11 @@ vendor_reason_code_enum! {
         LocatedAddressIsPoBox,
 
         #[ser = "resultcode.warm.input.address.alert", description = "This indicates that the input address provided by the consumer is a warm address. Warm addresses will be clarified further as to which type with the content of the <warm-address-list> value. Those are:  • mail drop • hospital  • hotel  • prison  • campground • college  • university  •    USPO  • General Delivery"]
-        #[footprint_reason_code = Some(FootprintReasonCode::AddressInputIsWarm)]
+        #[footprint_reason_code = None] //We manually map these based on the specific type of address
         WarmInputAddressAlert,
 
         #[ser = "resultcode.warm.address.alert", description = "This indicates that the located address is a warm address. Warm addresses will be clarified further as to which type with the content of the <warm-address-list> value. Those are:  • mail drop • hospital  • hotel  • prison  • campground • college  • university  •   USPO  • General Delivery"]
-        #[footprint_reason_code = Some(FootprintReasonCode::AddressLocatedIsWarm)]
+        #[footprint_reason_code = None] //We manually map these based on the specific type of address
         WarmAddressAlert,
 
         #[ser = "resultcode.zip.does.not.match", description = "ZIP code located does not match the ZIP code submitted."]
@@ -49,7 +49,7 @@ vendor_reason_code_enum! {
         InputAddressIsNotDeliverable,
 
         #[ser = "resultcode.located.address.is.not.deliverable", description = "The located address for the individual is not a deliverable address. If the setting to return additional information in the API has been enabled for an enterprise by our Customer Success team, the following details may be returned in the  tag: • Address is Valid • Invalid Delivery Address • Address is a Deliverable Address • Address is Deliverable after dropping building number • Address is a military address • Address is a general delivery address • Address missing building number • Premise number invalid •Box number missing • Address is a post office box • Address is a rural route • Address is rural route but designator missing • Address is valid but does not receive USPS mail • Address matched to unique ZIP"]
-        #[footprint_reason_code = Some(FootprintReasonCode::AddressLocatedIsNotDeliverable)]
+        #[footprint_reason_code = None]
         LocatedAddressIsNotDeliverable,
 
         #[ser = "resultcode.yob.does.not.match", description = "The year of birth located does not match. If neither the month-of-birth nor the year-of-birth match, this ID Note is presented."]
@@ -157,7 +157,7 @@ vendor_reason_code_enum! {
         ActivationDateAlert,
 
         #[ser = "resultcode.first.name.does.not.match", description = "This indicates that the located first name does not match the input first name. Note: This ID Note must be enabled by a Customer Success account manager for use in your enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::NameFirstDoesNotMatch)]
+        #[footprint_reason_code = None]
         FirstNameDoesNotMatch,
 
         #[ser = "resultcode.last.name.does.not.match", description = "This indicates that the located last name does not match the input last name."]
@@ -181,35 +181,35 @@ vendor_reason_code_enum! {
         AgeAboveMaximum,
 
         #[ser = "resultcode.blacklist.alert.ssn", description = "Indicates that the input SSN9 was found on the Alert List for the Enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListSsn)]
+        #[footprint_reason_code = None]
         AlertListAlertSsn,
 
         #[ser = "resultcode.blacklist.alert.address", description = "Indicates that the input Address was found on the Alert List for the Enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListAddress)]
+        #[footprint_reason_code = None]
         AlertListAlertAddress,
 
         #[ser = "resultcode.blacklist.alert.address.zip", description = "Indicates that the input Address and Zip Code were found on the Alert List for the Enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListAddressAndZip)]
+        #[footprint_reason_code = None]
         AlertListAlertAddressAndZip,
 
         #[ser = "resultcode.blacklist.alert.ip", description = "Indicates that the input IP Address was found on the Alert List for the Enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListIpAddress)]
+        #[footprint_reason_code = None]
         AlertListAlertIpAddress,
 
         #[ser = "resultcode.blacklist.alert.phone", description = "Indicates that the input Phone Number was found on the Alert List for the Enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListPhoneNumber)]
+        #[footprint_reason_code = None]
         AlertListAlertPhoneNumber,
 
         #[ser = "resultcode.blacklist.alert.email", description = "Indicates that the input Email Address was found on the Alert List for the Enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListEmailAddress)]
+        #[footprint_reason_code = None]
         AlertListAlertEmailAddress,
 
         #[ser = "resultcode.blacklist.alert.domain", description = "Indicates that the input Email Domain was found on the Alert List for the enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListEmailDomain)]
+        #[footprint_reason_code = None]
         AlertListAlertEmailDomain,
 
         #[ser = "resultcode.blacklist.alert.document.number", description = "Indicates that the input Document Number was found on the Alert List for the enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListDocumentNumber)]
+        #[footprint_reason_code = None]
         AlertListAlertDocumentNumber,
 
         #[ser = "resultcode.network.alert.ssn", description = "Indicates that the input SSN9 was found on the Network Alert List."]
@@ -342,27 +342,27 @@ vendor_reason_code_enum! {
         InvalidEmailAddress,
 
         #[ser = "resultcode.mobile.id.age.alert", description = "The “age” of the mobile account (account creation date) falls within the specified time range that the Enterprise is configured to monitor."]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountLowAge)]
+        #[footprint_reason_code = None]
         MobileIdAgeAlert,
 
         #[ser = "resultcode.mobile.change.event.number", description = "A change event has occurred on the mobile account within the specified time range that the Enterprise is configured to monitor. Event = Phone Number Change"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountEventPhoneNumberChange)]
+        #[footprint_reason_code = None]
         MobileChangeEventNumber,
 
         #[ser = "resultcode.mobile.change.event.status", description = "A change event has occurred on the mobile account within the specified time range that the Enterprise is configured to monitor. Event = Network Status Change"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountEventNetworkStatusChange)]
+        #[footprint_reason_code = None]
         MobileChangeEventStatus,
 
         #[ser = "resultcode.mobile.change.event.ported", description = "A change event has occurred on the mobile account within the specified time range that the Enterprise is configured to monitor. Event = Number was ported"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountEventNumberWasPorted)]
+        #[footprint_reason_code = None]
         MobileChangeEventPorted,
 
         #[ser = "resultcode.mobile.change.event.device", description = "A change event has occurred on the mobile account within the specified time range that the Enterprise is configured to monitor. Event = Device Change"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountEventDeviceChange)]
+        #[footprint_reason_code = None]
         MobileChangeEventDevice,
 
         #[ser = "resultcode.mobile.change.event.simswap", description = "A change event has occurred on the mobile account within the specified time range that the Enterprise is configured to monitor. Event = SIM Swap"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountEventSimSwap)]
+        #[footprint_reason_code = None]
         MobileChangeEventSimswap,
 
         #[ser = "resultcode.mobile.account.type.postpaid", description = "Determines the type of mobile account being used to create the mobile identity. Account Type = Postpaid"]

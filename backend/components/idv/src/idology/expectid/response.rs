@@ -1,11 +1,12 @@
 use crate::idology::{
     error as IdologyError,
-    response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
+    response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType},
     IdologyError::RequestError,
 };
 use itertools::Itertools;
-use newtypes::{DecisionStatus, IDologyReasonCode};
+use newtypes::{DecisionStatus, FootprintReasonCode, IDologyReasonCode};
 use serde::{Deserialize, Deserializer};
+use std::str::FromStr;
 
 // Given a raw response, deserialize
 pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDResponse, IdologyError::Error> {
@@ -131,17 +132,25 @@ impl Response {
         }
     }
 
-    pub fn parse_qualifiers(&self) -> Vec<IDologyReasonCode> {
+    pub fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
         if let Some(ref qualifiers) = self.qualifiers {
-            qualifiers.parse_qualifiers()
-        } else {
-            vec![]
-        }
-    }
-
-    pub fn raw_qualifiers(&self) -> Vec<String> {
-        if let Some(ref qualifiers) = self.qualifiers {
-            qualifiers.raw_qualifiers()
+            qualifiers
+                .parse_qualifiers()
+                .into_iter()
+                .flat_map(|q| match q.1 {
+                    IDologyReasonCode::WarmInputAddressAlert => {
+                        q.0.warm_address_list
+                            .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
+                            .map(|t| t.to_input_address_footprint_reason_code())
+                    }
+                    IDologyReasonCode::WarmAddressAlert => {
+                        q.0.warm_address_list
+                            .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
+                            .map(|t| t.to_located_address_footprint_reason_code())
+                    }
+                    _ => Into::<Option<FootprintReasonCode>>::into(&q.1),
+                })
+                .collect()
         } else {
             vec![]
         }
@@ -229,10 +238,10 @@ where
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use newtypes::IDologyReasonCode;
     use serde_json::json;
-
-    use super::*;
+    use test_case::test_case;
 
     #[test]
     fn test_idology_response_single() {
@@ -257,7 +266,14 @@ mod tests {
           }
         );
         let response = parse_response(response).expect("Could not parse response");
-        let reason_codes = response.response.qualifiers.unwrap().parse_qualifiers();
+        let reason_codes = response
+            .response
+            .qualifiers
+            .unwrap()
+            .parse_qualifiers()
+            .into_iter()
+            .map(|r| r.1)
+            .collect::<Vec<IDologyReasonCode>>();
         assert_eq!(reason_codes, vec![IDologyReasonCode::IpNotLocated],)
     }
 
@@ -265,7 +281,14 @@ mod tests {
     fn test_idology_response_list() {
         let response = crate::test_fixtures::test_idology_expectid_response();
         let response = parse_response(response).expect("Could not parse response");
-        let reason_codes = response.response.qualifiers.unwrap().parse_qualifiers();
+        let reason_codes = response
+            .response
+            .qualifiers
+            .unwrap()
+            .parse_qualifiers()
+            .into_iter()
+            .map(|r| r.1)
+            .collect::<Vec<IDologyReasonCode>>();
         let expected = vec![
             IDologyReasonCode::IpNotLocated,
             IDologyReasonCode::StreetNameDoesNotMatch,
@@ -414,5 +437,40 @@ mod tests {
 
         // Malformed score
         assert_eq!(None, response_malformed_score.max_watchlist_score())
+    }
+
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardMailDrop])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "hospital"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardHospital])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "hotel"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardHotel])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "prison"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardPrison])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "campground"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardCampground])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "college"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardCollege])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "university"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardUniversity])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "USPO"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardUspo])]
+    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "General Delivery"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardGeneralDelivery])]
+    #[test_case(json!([
+        {
+          "key": "resultcode.warm.input.address.alert",
+          "warm-address-list": "General Delivery"
+        },
+        {
+          "key": "resultcode.address.velocity.alert",
+        },
+        {
+            "key": "resultcode.warm.input.address.alert",
+            "warm-address-list": "hotel"
+        },
+      ]) => vec![FootprintReasonCode::AddressInputIsNotStandardGeneralDelivery, FootprintReasonCode::AddressAlertVelocity, FootprintReasonCode::AddressInputIsNotStandardHotel])]
+    fn test_parse_footprint_reason_codes(qualifier: serde_json::Value) -> Vec<FootprintReasonCode> {
+        Response {
+            qualifiers: Some(IDologyQualifiers { qualifier }),
+            results: None,
+            summary_result: None,
+            id_number: None,
+            id_scan: None,
+            error: None,
+            restriction: None,
+        }
+        .footprint_reason_codes()
     }
 }

@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use newtypes::IDologyReasonCode;
+use newtypes::{FootprintReasonCode, IDologyReasonCode};
+use strum::EnumString;
 
 use super::error::RequestError;
 
@@ -10,43 +11,64 @@ pub struct KeyResponse {
     pub key: String,
 }
 
-impl KeyResponse {
-    fn parse_key(value: serde_json::Value) -> Option<String> {
-        let response: Self = serde_json::value::from_value(value).ok()?;
-        Some(response.key)
-    }
-}
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct IDologyQualifiers {
     pub qualifier: serde_json::Value,
 }
 
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct ParsedIdologyQualifier {
+    pub key: String,
+    pub message: Option<String>,
+    pub warm_address_list: Option<String>,
+}
+
 impl IDologyQualifiers {
-    pub fn parse_qualifiers(&self) -> Vec<IDologyReasonCode> {
+    pub fn parse_qualifiers(&self) -> Vec<(ParsedIdologyQualifier, IDologyReasonCode)> {
         self.raw_qualifiers()
-            .iter()
-            .filter_map(|s| IDologyReasonCode::from_str(s.as_str()).ok())
+            .into_iter()
+            .filter_map(|parsed_idology_qualifier| {
+                let idology_reason_code = IDologyReasonCode::from_str(parsed_idology_qualifier.key.as_str());
+                match idology_reason_code {
+                    Ok(i) => Some((parsed_idology_qualifier, i)),
+                    Err(e) => {
+                        tracing::warn!(err=%e, "Error parsing IdologyReasonCode");
+                        None
+                    }
+                }
+            })
             .collect()
     }
 
-    pub fn raw_qualifiers(&self) -> Vec<String> {
+    pub fn raw_qualifiers(&self) -> Vec<ParsedIdologyQualifier> {
         // In the IDology API, the key named `qualifier` can either be a list of qualifiers OR
         // a single qualifier. Parse both cases here
-        match self.qualifier {
+
+        let parsed_qualifiers = match self.qualifier {
             serde_json::Value::Object(_) => {
-                if let Some(qualifier_key) = KeyResponse::parse_key(self.qualifier.clone()) {
-                    vec![qualifier_key]
-                } else {
-                    vec![]
-                }
+                let parsed_qualifier =
+                    serde_json::value::from_value::<ParsedIdologyQualifier>(self.qualifier.clone());
+                vec![parsed_qualifier]
             }
             serde_json::Value::Array(ref qualifier_list) => qualifier_list
                 .iter()
                 .cloned()
-                .flat_map(KeyResponse::parse_key)
+                .map(serde_json::value::from_value)
                 .collect(),
             _ => vec![],
-        }
+        };
+
+        parsed_qualifiers
+            .into_iter()
+            .flat_map(|p| match p {
+                Ok(q) => Some(q),
+                Err(e) => {
+                    tracing::warn!(err=%e, "Error parsing Idology qualifiers");
+                    None
+                }
+            })
+            .collect()
     }
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -57,6 +79,60 @@ pub struct IdologyResponseHelpers;
 impl IdologyResponseHelpers {
     pub fn parse_idology_error(error: String) -> RequestError {
         RequestError::from(error)
+    }
+}
+
+#[derive(EnumString)]
+pub enum WarmAddressType {
+    #[strum(serialize = "mail drop")]
+    MailDrop,
+    #[strum(serialize = "hospital")]
+    Hospital,
+    #[strum(serialize = "hotel")]
+    Hotel,
+    #[strum(serialize = "prison")]
+    Prison,
+    #[strum(serialize = "campground")]
+    Campground,
+    #[strum(serialize = "college")]
+    College,
+    #[strum(serialize = "university")]
+    University,
+    #[strum(serialize = "USPO")]
+    USPO,
+    #[strum(serialize = "General Delivery")]
+    GeneralDelivery,
+}
+
+impl WarmAddressType {
+    pub fn to_input_address_footprint_reason_code(&self) -> FootprintReasonCode {
+        match self {
+            WarmAddressType::MailDrop => FootprintReasonCode::AddressInputIsNotStandardMailDrop,
+            WarmAddressType::Hospital => FootprintReasonCode::AddressInputIsNotStandardHospital,
+            WarmAddressType::Hotel => FootprintReasonCode::AddressInputIsNotStandardHotel,
+            WarmAddressType::Prison => FootprintReasonCode::AddressInputIsNotStandardPrison,
+            WarmAddressType::Campground => FootprintReasonCode::AddressInputIsNotStandardCampground,
+            WarmAddressType::College => FootprintReasonCode::AddressInputIsNotStandardCollege,
+            WarmAddressType::University => FootprintReasonCode::AddressInputIsNotStandardUniversity,
+            WarmAddressType::USPO => FootprintReasonCode::AddressInputIsNotStandardUspo,
+            WarmAddressType::GeneralDelivery => FootprintReasonCode::AddressInputIsNotStandardGeneralDelivery,
+        }
+    }
+
+    pub fn to_located_address_footprint_reason_code(&self) -> FootprintReasonCode {
+        match self {
+            WarmAddressType::MailDrop => FootprintReasonCode::AddressLocatedIsNotStandardMailDrop,
+            WarmAddressType::Hospital => FootprintReasonCode::AddressLocatedIsNotStandardHospital,
+            WarmAddressType::Hotel => FootprintReasonCode::AddressLocatedIsNotStandardHotel,
+            WarmAddressType::Prison => FootprintReasonCode::AddressLocatedIsNotStandardPrison,
+            WarmAddressType::Campground => FootprintReasonCode::AddressLocatedIsNotStandardCampground,
+            WarmAddressType::College => FootprintReasonCode::AddressLocatedIsNotStandardCollege,
+            WarmAddressType::University => FootprintReasonCode::AddressLocatedIsNotStandardUniversity,
+            WarmAddressType::USPO => FootprintReasonCode::AddressLocatedIsNotStandardUspo,
+            WarmAddressType::GeneralDelivery => {
+                FootprintReasonCode::AddressLocatedIsNotStandardGeneralDelivery
+            }
+        }
     }
 }
 

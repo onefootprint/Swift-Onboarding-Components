@@ -267,7 +267,14 @@ mod test {
         );
         assert_eq!(
             vec![IDologyReasonCode::FaceCompareAlert],
-            scan_ob_response.response.qualifiers.unwrap().parse_qualifiers()
+            scan_ob_response
+                .response
+                .qualifiers
+                .unwrap()
+                .parse_qualifiers()
+                .into_iter()
+                .map(|r| r.1)
+                .collect::<Vec<IDologyReasonCode>>()
         );
     }
 }

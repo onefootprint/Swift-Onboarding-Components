@@ -10,14 +10,12 @@ use test_case::test_case;
 
 fn idology_features(
     status: DecisionStatus,
-    reason_codes: Vec<IDologyReasonCode>,
     fp_reason_codes: Vec<FootprintReasonCode>,
     watchlist_potential_hit: bool,
     watchlist_max_score: Option<i32>,
 ) -> IDologyFeatures {
     IDologyFeatures {
         status,
-        reason_codes,
         footprint_reason_codes: fp_reason_codes,
         id_located: true,
         id_number_for_scan_required: None,
@@ -30,15 +28,15 @@ fn idology_features(
 }
 
 // if no id located, we fail.
-#[test_case(idology_features(DecisionStatus::Fail, vec![], vec![], false, None) => true)]
+#[test_case(idology_features(DecisionStatus::Fail, vec![], false, None) => true)]
 // High watchlist score
-#[test_case(idology_features(DecisionStatus::Pass, vec![], vec![], false, Some(94)) => true)]
-#[test_case(idology_features(DecisionStatus::Pass, vec![], vec![FootprintReasonCode::SubjectDeceased], false, None) => true)]
+#[test_case(idology_features(DecisionStatus::Pass, vec![], false, Some(94)) => true)]
+#[test_case(idology_features(DecisionStatus::Pass, vec![FootprintReasonCode::SubjectDeceased], false, None) => true)]
 // SSN rules
-#[test_case(idology_features(DecisionStatus::Pass, vec![], vec![FootprintReasonCode::SsnDoesNotMatch], false, None) => true)]
-#[test_case(idology_features(DecisionStatus::Pass, vec![], vec![FootprintReasonCode::SsnDoesNotMatchWithin1Digit], false, None) => false)]
-#[test_case(idology_features(DecisionStatus::Pass, vec![], vec![FootprintReasonCode::SsnLocatedIsInvalid], false, None) => true)]
-#[test_case(idology_features(DecisionStatus::Pass, vec![], vec![FootprintReasonCode::SsnIssuedPriorToDob], false, None) => true)]
+#[test_case(idology_features(DecisionStatus::Pass, vec![FootprintReasonCode::SsnDoesNotMatch], false, None) => true)]
+#[test_case(idology_features(DecisionStatus::Pass, vec![FootprintReasonCode::SsnDoesNotMatchWithin1Digit], false, None) => false)]
+#[test_case(idology_features(DecisionStatus::Pass, vec![FootprintReasonCode::SsnLocatedIsInvalid], false, None) => true)]
+#[test_case(idology_features(DecisionStatus::Pass, vec![FootprintReasonCode::SsnIssuedPriorToDob], false, None) => true)]
 
 fn test_idology_base_rule_set(idology_features: IDologyFeatures) -> bool {
     evaluate_onboarding_rules(

@@ -609,15 +609,15 @@ vendor_reason_code_enum! {
         R106,
 
         #[ser = "R110", description = "Alert List email address match"]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListEmailAddress)]
+        #[footprint_reason_code = None]
         R110,
 
         #[ser = "R111", description = "Alert List SSN/ITIN match"]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListSsn)]
+        #[footprint_reason_code = None]
         R111,
 
         #[ser = "R113", description = "Alert List phone number match"]
-        #[footprint_reason_code = Some(FootprintReasonCode::AlertListPhoneNumber)]
+        #[footprint_reason_code = None]
         R113,
 
         #[ser = "R180", description = "Watchlist search returned at least one hit on OFAC SDN list"]

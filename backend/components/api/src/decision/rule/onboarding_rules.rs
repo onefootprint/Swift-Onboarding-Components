@@ -115,8 +115,20 @@ pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::AddressLocatedIsWarm)
+                    f.footprint_reason_codes.iter().any(|rc| {
+                        vec![
+                            FootprintReasonCode::AddressLocatedIsNotStandardCampground,
+                            FootprintReasonCode::AddressLocatedIsNotStandardCollege,
+                            FootprintReasonCode::AddressLocatedIsNotStandardGeneralDelivery,
+                            FootprintReasonCode::AddressLocatedIsNotStandardHospital,
+                            FootprintReasonCode::AddressLocatedIsNotStandardHotel,
+                            FootprintReasonCode::AddressLocatedIsNotStandardMailDrop,
+                            FootprintReasonCode::AddressLocatedIsNotStandardPrison,
+                            FootprintReasonCode::AddressLocatedIsNotStandardUniversity,
+                            FootprintReasonCode::AddressLocatedIsNotStandardUspo,
+                        ]
+                        .contains(rc)
+                    })
                 }
             },
             name: RuleName::AddressLocatedIsWarm,

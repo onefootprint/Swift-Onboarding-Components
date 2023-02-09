@@ -114,7 +114,12 @@ impl SaveStructuredVendorResponse for ExpectIDResponse {
             error: self.response.error.clone(),
             results: self.response.results.as_ref().map(|r| r.key.clone()),
             summary_result: self.response.summary_result.as_ref().map(|r| r.key.clone()),
-            qualifiers: self.response.raw_qualifiers(),
+            qualifiers: self
+                .response
+                .qualifiers
+                .as_ref()
+                .map(|q| q.parse_qualifiers().into_iter().map(|p| p.0.key).collect())
+                .unwrap_or_default(),
         };
         IdologyExpectIdResponse::create(conn, new_idology_expect_id_response)
             .map(|i| Some(StructuredVendorResponse::IDologyExpectID(i)))

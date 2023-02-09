@@ -1,11 +1,11 @@
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
-use idv::{idology::expectid::response::Response, ParsedResponse};
+use idv::ParsedResponse;
 
 use itertools::Itertools;
 use newtypes::{
-    idology::IdologyScanOnboardingCaptureResult, DecisionStatus, FootprintReasonCode, IDologyReasonCode,
-    Signal, Vendor, VendorAPI, VerificationResultId,
+    idology::IdologyScanOnboardingCaptureResult, DecisionStatus, FootprintReasonCode, Vendor, VendorAPI,
+    VerificationResultId,
 };
 
 use super::vendor::{socure::SocureFeatures, vendor_result::VendorResult};
@@ -14,7 +14,6 @@ use super::vendor::{socure::SocureFeatures, vendor_result::VendorResult};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IDologyFeatures {
     pub status: DecisionStatus,
-    pub reason_codes: Vec<IDologyReasonCode>,
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
     pub id_located: bool,
     pub id_number_for_scan_required: Option<u64>,
@@ -23,16 +22,6 @@ pub struct IDologyFeatures {
     pub create_manual_review: bool,
     pub watchlist_potential_hit: bool,
     pub watchlist_max_score: Option<i32>,
-}
-
-impl IDologyFeatures {
-    #[allow(unused)]
-    fn signals_from_response_qualifiers(response: Response) -> Vec<Signal> {
-        let qualifiers = response.parse_qualifiers();
-
-        // TODO move this logic into decision engine
-        qualifiers.into_iter().map(|r| r.signal()).collect()
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -164,12 +153,7 @@ impl From<VendorResult> for FeatureVector {
 
                 // TODO: fix this to just be id_located. Shouldn't have idv crate doing anything w.r.t. our DecisionStatus
                 let (status, create_manual_review) = r.status();
-                let reason_codes = r.parse_qualifiers();
-                let mut footprint_reason_codes: Vec<FootprintReasonCode> = reason_codes
-                    .iter()
-                    .flat_map(Into::<Option<FootprintReasonCode>>::into)
-                    .collect();
-
+                let mut footprint_reason_codes: Vec<FootprintReasonCode> = r.footprint_reason_codes();
                 // this is derived from IDologyReasonCodes as well as the response itself
                 if r.has_potential_watchlist_hit()
                     && !footprint_reason_codes.contains(&FootprintReasonCode::PotentialWatchlistHit)
@@ -184,7 +168,6 @@ impl From<VendorResult> for FeatureVector {
                     is_id_scan_required: r.is_id_scan_required(),
                     id_number_for_scan_required: r.id_number,
                     verification_result: verification_result_id,
-                    reason_codes,
                     footprint_reason_codes,
                     watchlist_potential_hit: r.has_potential_watchlist_hit(),
                     watchlist_max_score: r.max_watchlist_score(),
@@ -350,10 +333,6 @@ mod tests {
             id_located: true,
             is_id_scan_required: false,
             id_number_for_scan_required: Some(3010453),
-            reason_codes: vec![
-                IDologyReasonCode::IpNotLocated,
-                IDologyReasonCode::StreetNameDoesNotMatch,
-            ],
             footprint_reason_codes: vec![
                 FootprintReasonCode::IpNotLocated,
                 FootprintReasonCode::AddressStreetNameDoesNotMatch,
@@ -458,7 +437,6 @@ mod tests {
         let feature_vector = FeatureVector {
             idology_features: Some(IDologyFeatures {
                 status: DecisionStatus::Pass,
-                reason_codes: vec![],
                 footprint_reason_codes: vec![
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::NameLastDoesNotMatch,
