@@ -1,19 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoLogOut24, IcoUser24 } from '@onefootprint/icons';
 import { Dropdown, Typography } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 const NavDropdown = () => {
   const { t } = useTranslation('components.private-layout.nav');
-  const { dangerouslyCastedData } = useSession();
-  const router = useRouter();
-
-  const handleLogout = () => {
-    router.push('/logout');
-  };
+  const { dangerouslyCastedData, logOut } = useSession();
 
   return (
     <Container>
@@ -33,7 +27,7 @@ const NavDropdown = () => {
               </Typography>
             </UserDropdownItem>
             <Dropdown.Divider />
-            <LogoutDropdownItem onSelect={handleLogout}>
+            <LogoutDropdownItem onSelect={logOut}>
               <IcoLogOut24 />
               {t('log-out')}
             </LogoutDropdownItem>

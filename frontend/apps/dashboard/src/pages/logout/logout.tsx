@@ -1,17 +1,16 @@
-import { useRouter } from 'next/router';
+import { Typography } from '@onefootprint/ui';
+import React, { useEffect } from 'react';
 import useSession from 'src/hooks/use-session';
-import { useEffectOnce } from 'usehooks-ts';
 
 const Logout = () => {
-  const router = useRouter();
   const session = useSession();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     session.logOut();
-    router.push('/login');
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  return null;
+  return <Typography variant="body-1">You are logged out</Typography>;
 };
 
 export default Logout;

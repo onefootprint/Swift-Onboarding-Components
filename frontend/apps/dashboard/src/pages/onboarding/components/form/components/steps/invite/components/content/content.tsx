@@ -1,6 +1,12 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Button, Portal, SelectOption } from '@onefootprint/ui';
+import {
+  Box,
+  Button,
+  LinkButton,
+  Portal,
+  SelectOption,
+} from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -34,6 +40,7 @@ const Content = ({ id, onComplete, defaultRole, roles }: ContentProps) => {
   const { fields, append } = useFieldArray({
     control,
     name: 'invitations',
+    rules: { minLength: 1 },
   });
   const { errors } = formState;
   const shouldShowError = !!errors.invitations && errors.invitations[0];
@@ -43,21 +50,17 @@ const Content = ({ id, onComplete, defaultRole, roles }: ContentProps) => {
   };
 
   const handleAfterSubmit = (formData: FormData) => {
-    if (formData.invitations.length === 0) {
-      onComplete();
-    } else {
-      const invitations = formData.invitations
-        .filter(invite => invite.email && invite.role.value)
-        .map(invite => ({
-          email: invite.email,
-          roleId: invite.role.value,
-          redirectUrl: `${window.location.origin}/auth`,
-        }));
+    const invitations = formData.invitations
+      .filter(invite => invite.email && invite.role.value)
+      .map(invite => ({
+        email: invite.email,
+        roleId: invite.role.value,
+        redirectUrl: `${window.location.origin}/auth`,
+      }));
 
-      inviteMembersMutations.mutate(invitations, {
-        onSuccess: onComplete,
-      });
-    }
+    inviteMembersMutations.mutate(invitations, {
+      onSuccess: onComplete,
+    });
   };
 
   return (
@@ -72,6 +75,12 @@ const Content = ({ id, onComplete, defaultRole, roles }: ContentProps) => {
       <AddButton onClick={handleAddMore} />
       {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
       <Portal selector="#onboarding-cta-portal">
+        <LinkButton
+          onClick={onComplete}
+          disabled={inviteMembersMutations.isLoading}
+        >
+          {allT('skip')}
+        </LinkButton>
         <Button
           form={id}
           loading={inviteMembersMutations.isLoading}

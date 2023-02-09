@@ -33,9 +33,6 @@ const createUseRouterSpy = () => {
       query,
       replace,
       route,
-      events: {
-        on: jest.fn(),
-      },
     }));
   };
 };

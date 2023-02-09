@@ -116,7 +116,20 @@ describe('<Organizations />', () => {
           await userEvent.click(firstOrgButton);
 
           await waitFor(() => {
-            expect(useStore.getState().data).toBeDefined();
+            expect(useStore.getState().data?.user).toEqual({
+              id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
+              email: 'jane@onefootprint.com',
+              firstName: null,
+              lastName: null,
+            });
+          });
+          await waitFor(() => {
+            expect(useStore.getState().data?.org).toEqual({
+              isLive: true,
+              name: 'Footprint Live Integration Testing',
+              isSandboxRestricted: false,
+              logoUrl: null,
+            });
           });
         });
       });

@@ -1,3 +1,4 @@
+import { Organization, OrgMember } from '@onefootprint/types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -7,7 +8,6 @@ import {
 } from '../../config/constants';
 import {
   AuthHeaders,
-  MetaSession,
   OrgSession,
   Session,
   UserSession,
@@ -22,7 +22,7 @@ export const useStore = create<UserSessionState>()(
       update: (data?: Session) => set({ data }),
     }),
     {
-      version: 6,
+      version: 4,
       name: 'dashboard-storage',
     },
   ),
@@ -39,19 +39,24 @@ const useSession = () => {
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(isLive),
   } as AuthHeaders;
 
-  const logIn = (session: {
-    auth: string;
-    user: UserSession;
-    meta: MetaSession;
-    org: Omit<OrgSession, 'isLive'>;
-  }) => {
+  const logIn = (
+    authToken: string,
+    user: OrgMember,
+    organization: Organization,
+  ) => {
     update({
-      auth: session.auth,
-      user: session.user,
-      meta: session.meta,
+      auth: authToken,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
       org: {
-        ...session.org,
-        isLive: !session.org.isSandboxRestricted,
+        name: organization.name,
+        logoUrl: organization.logoUrl,
+        isSandboxRestricted: organization.isSandboxRestricted,
+        isLive: !organization.isSandboxRestricted,
       },
     });
   };
@@ -76,14 +81,6 @@ const useSession = () => {
     });
   };
 
-  const completeOnboarding = () => {
-    if (!data) return;
-    update({
-      ...data,
-      meta: { ...data.meta, requiresOnboarding: false },
-    });
-  };
-
   return {
     authHeaders,
     dangerouslyCastedData,
@@ -93,7 +90,6 @@ const useSession = () => {
     logOut,
     setOrg,
     setUser,
-    completeOnboarding,
   };
 };
 

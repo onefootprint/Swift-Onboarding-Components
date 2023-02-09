@@ -5,6 +5,7 @@ export type OrgAuthLoginResponse = {
   isFirstLogin: boolean;
   requiresOnboarding: boolean;
   authToken: string;
+
   user: OrgMember | null;
   tenant: Organization | null;
 };

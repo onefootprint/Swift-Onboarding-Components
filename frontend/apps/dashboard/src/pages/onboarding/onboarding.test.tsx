@@ -40,11 +40,6 @@ describe('<Onboarding />', () => {
           name: 'Acme',
           isSandboxRestricted: true,
         },
-        meta: {
-          createdNewTenant: false,
-          isFirstLogin: false,
-          requiresOnboarding: true,
-        },
       },
     });
   });
@@ -62,12 +57,12 @@ describe('<Onboarding />', () => {
   });
 
   describe('when completing all the steps', () => {
-    const push = jest.fn();
+    const replace = jest.fn();
 
     useRouterSpy({
       pathname: '/onboarding',
       query: {},
-      push,
+      replace,
     });
 
     it('should redirect to the /users page', async () => {
@@ -131,13 +126,12 @@ describe('<Onboarding />', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Complete' }));
       await waitFor(() => {
-        expect(push).toHaveBeenCalled();
+        expect(replace).toHaveBeenCalledTimes(1);
       });
 
+      await userEvent.click(screen.getByRole('button', { name: 'Skip' }));
       await waitFor(() => {
-        const requiresOnboarding =
-          useStore.getState().data?.meta.requiresOnboarding;
-        expect(requiresOnboarding).toBeFalsy();
+        expect(replace).toHaveBeenCalledTimes(2);
       });
     });
   });

@@ -20,11 +20,6 @@ beforeEach(() => {
         name: 'Acme',
         isSandboxRestricted: true,
       },
-      meta: {
-        createdNewTenant: false,
-        isFirstLogin: false,
-        requiresOnboarding: false,
-      },
     },
   });
 });

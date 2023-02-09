@@ -13,12 +13,15 @@ const originalState = useStore.getState();
 const useRouterSpy = createUseRouterSpy();
 
 describe('<Layout />', () => {
+  beforeEach(() => {
+    useRouterSpy({ pathname: '/lorem' });
+  });
+
   const renderLayout = ({ children = 'Foo', name }: Partial<LayoutProps>) =>
     customRender(<Layout name={name}>{children}</Layout>);
 
   describe('when the user is NOT logged', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/login' });
       useStore.setState(originalState);
     });
 
@@ -30,7 +33,6 @@ describe('<Layout />', () => {
 
   describe('when the user is logged', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/users' });
       useStore.setState({
         data: {
           auth: '1',
@@ -45,11 +47,6 @@ describe('<Layout />', () => {
             logoUrl: null,
             name: 'Acme',
             isSandboxRestricted: true,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
           },
         },
       });

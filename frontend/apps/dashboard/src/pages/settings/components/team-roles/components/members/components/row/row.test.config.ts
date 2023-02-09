@@ -20,11 +20,6 @@ export const withCurrentUserDifferentFromMember = () => {
         name: 'Acme',
         isSandboxRestricted: true,
       },
-      meta: {
-        createdNewTenant: false,
-        isFirstLogin: false,
-        requiresOnboarding: false,
-      },
     },
   });
 };
@@ -44,11 +39,6 @@ export const withCurrentUserSameAsMember = () => {
         logoUrl: null,
         name: 'Acme',
         isSandboxRestricted: true,
-      },
-      meta: {
-        createdNewTenant: false,
-        isFirstLogin: false,
-        requiresOnboarding: false,
       },
     },
   });

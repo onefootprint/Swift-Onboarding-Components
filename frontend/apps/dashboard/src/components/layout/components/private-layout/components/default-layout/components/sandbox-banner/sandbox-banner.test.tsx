@@ -30,11 +30,6 @@ describe('<SandboxBanner />', () => {
             isSandboxRestricted: false,
             logoUrl: null,
           },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
         },
       });
     });
@@ -74,11 +69,6 @@ describe('<SandboxBanner />', () => {
             isSandboxRestricted: true,
             logoUrl: null,
           },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
         },
       });
     });
@@ -112,11 +102,6 @@ describe('<SandboxBanner />', () => {
             name: 'Acme',
             isSandboxRestricted: false,
             logoUrl: null,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
           },
         },
       });

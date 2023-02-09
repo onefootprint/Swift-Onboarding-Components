@@ -94,6 +94,17 @@ describe('<Invite />', () => {
   });
 
   describe('when submitting the form', () => {
+    it('should show an error when the first input is not filled correctly', async () => {
+      await renderInviteAndWaitData({});
+
+      const submitButton = screen.getByRole('button', { name: 'Complete' });
+      await userEvent.click(submitButton);
+      const error = await screen.findByText(
+        'Please complete the fields above.',
+      );
+      expect(error).toBeInTheDocument();
+    });
+
     describe('when the request to invite a member succeeds', () => {
       beforeEach(() => {
         withInviteMember();
