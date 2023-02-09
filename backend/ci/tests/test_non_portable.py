@@ -49,12 +49,12 @@ class TestNonPortableVaultApi:
         data = {
             "id.phone_number": PHONE_NUMBER,
             "id.email": EMAIL,
-            **build_user_data()
+            "custom.hi": "bye",
+            **build_user_data(),
         }
         put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
         # check that the data is there now
-        params = {"fields": "id.first_name, id.last_name, id.zip, id.ssn9, id.city, id.phone_number, id.email"}
-        response = get(f"users/{fp_id}/vault", params, sandbox_tenant.sk.key)
+        response = get(f"users/{fp_id}/vault", None, sandbox_tenant.sk.key)
         assert response["id.first_name"]
         assert response["id.last_name"]
         assert response["id.zip"]
@@ -62,11 +62,19 @@ class TestNonPortableVaultApi:
         assert response["id.city"]
         assert response["id.phone_number"]
         assert response["id.email"]
+        assert response["custom.hi"]
 
         # decrypt the data
         data = dict(
             reason="test",
-            fields=["id.first_name", "id.zip", "id.city", "id.phone_number", "id.email"],
+            fields=[
+                "id.first_name",
+                "id.zip",
+                "id.city",
+                "id.phone_number",
+                "id.email",
+                "custom.hi",
+            ],
         )
         body = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         data = body
@@ -75,6 +83,7 @@ class TestNonPortableVaultApi:
         assert data["id.city"] == "Enclave"
         assert data["id.phone_number"] == PHONE_NUMBER.replace(" ", "")
         assert data["id.email"] == EMAIL
+        assert data["custom.hi"] == "bye"
 
         # verify access events created
         body = get(
@@ -90,6 +99,7 @@ class TestNonPortableVaultApi:
             "id.city",
             "id.phone_number",
             "id.email",
+            "custom.hi",
         }
 
     def test_custom_data(self, sandbox_tenant):

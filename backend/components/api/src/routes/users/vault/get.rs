@@ -1,6 +1,5 @@
-use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
+use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
 use crate::auth::{tenant::TenantSessionAuth, Either};
-use crate::errors::tenant::TenantError;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
@@ -18,7 +17,7 @@ use std::collections::HashMap;
 pub struct FieldsParams {
     /// Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`
     #[openapi(example = "id.last_name, custom.ach_account, id.dob, id.ssn9")]
-    fields: Csv<DataIdentifier>,
+    fields: Option<Csv<DataIdentifier>>,
 }
 
 flat_api_object_map_type!(
@@ -41,14 +40,7 @@ pub async fn get(
     let footprint_user_id = path.into_inner();
     let FieldsParams { fields } = request.into_inner();
 
-    if fields
-        .iter()
-        .any(|f| matches!(f, DataIdentifier::IdDocument(_) | DataIdentifier::Selfie(_)))
-    {
-        return Err(TenantError::CannotDecryptDocument.into());
-    }
-
-    let auth = auth.check_guard(CanDecrypt::new(fields.clone().to_vec()))?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 
@@ -61,8 +53,13 @@ pub async fn get(
         })
         .await??;
 
-    let results = uvw.get_populated_values(&fields)?;
-    let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.contains(&di))));
+    let populated = uvw.get_visible_populated_fields();
+    let keys = if let Some(fields) = fields {
+        fields.to_vec()
+    } else {
+        populated.clone()
+    };
+    let results = HashMap::from_iter(keys.into_iter().map(|di| (di.clone(), populated.contains(&di))));
     let out = GetUnifiedResponse { map: results };
 
     ResponseData::ok(out).json()

@@ -40,18 +40,6 @@ impl TenantUvw {
         Ok(())
     }
 
-    /// Returns a list of DataIdentifiers that exist in the vault
-    pub fn get_populated_values<T>(&self, ids: &[T]) -> ApiResult<Vec<T>>
-    where
-        T: Into<DataIdentifier> + Clone + Hash + Eq,
-    {
-        // This is a little extra restricted - it hides fields that were collected (and exist on the vault)
-        // but aren't decryptable.
-        self.check_ob_config_access(ids)?;
-        let results = self.get_e_datas(ids).into_keys().collect();
-        Ok(results)
-    }
-
     /// Util to decrypt a list of T where T represents a DataIdentifier. Returns a hashmap of T to
     /// the decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
