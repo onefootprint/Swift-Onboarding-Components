@@ -21,7 +21,8 @@ pub struct IDologyFeatures {
     pub is_id_scan_required: bool,
     pub verification_result: VerificationResultId,
     pub create_manual_review: bool,
-    pub potential_watchlist_hit: bool,
+    pub watchlist_potential_hit: bool,
+    pub watchlist_max_score: Option<i32>,
 }
 
 impl IDologyFeatures {
@@ -161,12 +162,14 @@ impl From<VendorResult> for FeatureVector {
             ParsedResponse::IDologyExpectID(resp) => {
                 let r = resp.response;
 
+                // TODO: fix this to just be id_located. Shouldn't have idv crate doing anything w.r.t. our DecisionStatus
                 let (status, create_manual_review) = r.status();
                 let reason_codes = r.parse_qualifiers();
                 let mut footprint_reason_codes: Vec<FootprintReasonCode> = reason_codes
                     .iter()
                     .flat_map(Into::<Option<FootprintReasonCode>>::into)
                     .collect();
+
                 // this is derived from IDologyReasonCodes as well as the response itself
                 if r.has_potential_watchlist_hit()
                     && !footprint_reason_codes.contains(&FootprintReasonCode::PotentialWatchlistHit)
@@ -183,7 +186,8 @@ impl From<VendorResult> for FeatureVector {
                     verification_result: verification_result_id,
                     reason_codes,
                     footprint_reason_codes,
-                    potential_watchlist_hit: r.has_potential_watchlist_hit(),
+                    watchlist_potential_hit: r.has_potential_watchlist_hit(),
+                    watchlist_max_score: r.max_watchlist_score(),
                 };
                 Self {
                     idology_features: Some(idology_features),
@@ -356,7 +360,8 @@ mod tests {
                 FootprintReasonCode::PotentialWatchlistHit,
             ],
             verification_result: idology_result.verification_result_id,
-            potential_watchlist_hit: true,
+            watchlist_potential_hit: true,
+            watchlist_max_score: Some(97),
         };
         let expected_feature_vector = FeatureVector {
             idology_features: Some(expected_idology_features),
@@ -402,11 +407,18 @@ mod tests {
           "restriction": {
             "key": "global.watch.list",
             "message": "you are bad",
-            "pa": {
+            "pa": [
+                {
                 "list": "Office of Foreign Asset Control",
                 "score": "97",
                 "dob": "02121978"
-              }
+              },
+              {
+              "list": "Office of Foreign Asset Control",
+                "score": "43",
+                "dob": "02121978"
+              },
+            ]
           },
           "qualifiers": {
             "qualifier": [
@@ -458,7 +470,8 @@ mod tests {
                 is_id_scan_required: false,
                 verification_result: VerificationResultId::from("123".to_owned()),
                 create_manual_review: false,
-                potential_watchlist_hit: false,
+                watchlist_potential_hit: false,
+                watchlist_max_score: None,
             }),
             idology_scan_onboarding_features: None,
             twilio_features: None,

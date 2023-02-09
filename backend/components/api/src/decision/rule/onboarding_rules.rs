@@ -86,8 +86,8 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
             name: RuleName::SsnIssuedPriorToDob,
         },
         Rule {
-            rule: { |f: &IDologyFeatures| f.potential_watchlist_hit },
-            name: RuleName::WatchlistPotentialHit,
+            rule: { |f: &IDologyFeatures| f.watchlist_max_score.map(|s| s > 93).unwrap_or(false) },
+            name: RuleName::WatchlistHit,
         },
     ];
 

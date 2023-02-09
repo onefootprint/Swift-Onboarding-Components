@@ -14,3 +14,7 @@ mod engine;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod utils;
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod rules;

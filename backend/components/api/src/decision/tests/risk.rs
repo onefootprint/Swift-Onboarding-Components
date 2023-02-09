@@ -60,7 +60,8 @@ fn test_final_decision(
         reason_codes: vec![],
         footprint_reason_codes: idology_reason_codes(base_rules_should_fail, conservative_rules_should_fail),
         verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
-        potential_watchlist_hit: false,
+        watchlist_potential_hit: false,
+        watchlist_max_score: None,
     };
 
     let feature_vector = FeatureVector {

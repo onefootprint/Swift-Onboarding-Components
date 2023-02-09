@@ -61,7 +61,7 @@ pub enum RuleName {
     SsnInputIsInvalid,
     SsnLocatedIsInvalid,
     SsnIssuedPriorToDob,
-    WatchlistPotentialHit,
+    WatchlistHit,
     ThinFile,
     AddressDoesNotMatch,
     AddressLocatedIsWarm,

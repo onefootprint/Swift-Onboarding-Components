@@ -88,6 +88,10 @@ impl Pa {
             _ => PaList::OtherWatchlist,
         }
     }
+
+    pub fn get_score(&self) -> Result<Option<i32>, std::num::ParseIntError> {
+        self.score.as_ref().map(|s| s.parse::<i32>()).transpose()
+    }
 }
 
 type CreateManualReview = bool;
@@ -149,8 +153,8 @@ impl Response {
             let key = r.key.as_ref();
             let is_global_wl = key.map(|k| k.starts_with("global")).unwrap_or(false);
 
-            if let Some(pa_lists) = r.parse_pa() {
-                pa_lists
+            if let Some(response_lists) = r.parse_pa() {
+                response_lists
                     .iter()
                     .map(|l| l.to_watchlist_enum())
                     .for_each(|l| lists.push(l))
@@ -166,6 +170,25 @@ impl Response {
 
     pub fn has_potential_watchlist_hit(&self) -> bool {
         self.watchlists().map(|w| !w.is_empty()).unwrap_or(false)
+    }
+
+    pub fn max_watchlist_score(&self) -> Option<i32> {
+        self.restriction.as_ref().and_then(|r| r.parse_pa().and_then(|response_lists| 
+                response_lists
+                    .iter()
+                    .flat_map(|p| {
+                        let score_res = p.get_score();
+                        match score_res {
+                            Ok(s) => s,
+                            Err(_) => {
+                                tracing::warn!(score=%format!("{:?}", p.score), "error parsing watchlist score");
+                                None
+                            }
+                        }
+                    })
+                    .max()
+            
+        ))
     }
 
     fn error(&self) -> Option<RequestError> {
@@ -280,7 +303,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_pa() {
+    fn test_restriction() {
         let raw_single = json!({"response": {
             "id-number": 3010453,
             "restriction": {
@@ -332,30 +355,60 @@ mod tests {
             }
         }});
 
-        let pa_single = parse_response(raw_single)
-            .expect("Could not parse response")
-            .response
-            .watchlists()
-            .unwrap();
-        let pa_multiple = parse_response(raw_multiple)
-            .expect("Could not parse response")
-            .response
-            .watchlists()
-            .unwrap();
-        let pa_missing_pa = parse_response(raw_missing_pa)
-            .expect("Could not parse response")
-            .response
-            .watchlists()
-            .unwrap();
-        let pa_malformed = parse_response(raw_malformed_pa)
-            .expect("Could not parse response")
-            .response
-            .watchlists()
-            .unwrap();
+        let raw_malformed_score = json!({"response": {
+            "id-number": 3010453,
+            "restriction": {
+                "key": "global.watch.list",
+                "message": "you are bad",
+                "pa":
+                  {
+                      "list": "Bad Boy list",
+                      "score": "this isn't a parsable int",
+                  },
+              },
+        }});
 
-        assert_eq!(vec![PaList::OFAC], pa_single);
-        assert_eq!(vec![PaList::OFAC, PaList::OtherWatchlist], pa_multiple);
-        assert_eq!(vec![PaList::OtherWatchlist], pa_missing_pa);
-        assert_eq!(vec![PaList::OtherWatchlist], pa_malformed);
+        let response_single = parse_response(raw_single)
+            .expect("Could not parse response")
+            .response;
+        let response_multiple = parse_response(raw_multiple)
+            .expect("Could not parse response")
+            .response;
+        let response_missing_pa = parse_response(raw_missing_pa)
+            .expect("Could not parse response")
+            .response;
+        let response_malformed = parse_response(raw_malformed_pa)
+            .expect("Could not parse response")
+            .response;
+        let response_malformed_score = parse_response(raw_malformed_score)
+            .expect("Could not parse response")
+            .response;
+        // PA has 1 record
+        assert_eq!(vec![PaList::OFAC], response_single.watchlists().unwrap());
+        assert_eq!(Some(97), response_single.max_watchlist_score());
+
+        // PA has 2 records
+        assert_eq!(
+            vec![PaList::OFAC, PaList::OtherWatchlist],
+            response_multiple.watchlists().unwrap()
+        );
+        assert_eq!(Some(98), response_multiple.max_watchlist_score());
+
+        // Response missing PA
+        assert_eq!(
+            vec![PaList::OtherWatchlist],
+            response_missing_pa.watchlists().unwrap()
+        );
+        assert_eq!(None, response_missing_pa.max_watchlist_score());
+
+        // Malformed PA
+        assert_eq!(
+            vec![PaList::OtherWatchlist],
+            response_malformed.watchlists().unwrap()
+        );
+        assert_eq!(None, response_malformed.max_watchlist_score());
+
+        // Malformed score
+        assert_eq!(None, response_malformed_score.max_watchlist_score())
     }
 }
