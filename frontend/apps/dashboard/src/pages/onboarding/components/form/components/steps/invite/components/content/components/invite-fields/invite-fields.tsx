@@ -12,7 +12,6 @@ const InviteFields = ({ index, roles }: InviteFieldsProps) => {
   const { t } = useTranslation('pages.onboarding.invite');
   const { register, control } = useFormContext();
   const shouldShowLabel = index === 0;
-  const isRequired = index === 0;
 
   return (
     <Grid.Row>
@@ -21,24 +20,13 @@ const InviteFields = ({ index, roles }: InviteFieldsProps) => {
           type="email"
           label={shouldShowLabel ? t('form.email.label') : undefined}
           placeholder={t('form.email.placeholder')}
-          {...register(
-            `invitations.${index}.email`,
-            isRequired
-              ? {
-                  required: {
-                    value: true,
-                    message: t('form.email.errors.required'),
-                  },
-                }
-              : undefined,
-          )}
+          {...register(`invitations.${index}.email`)}
         />
       </Grid.Column>
       <Grid.Column col={4}>
         <Controller
           control={control}
           name={`invitations.${index}.role`}
-          rules={{ required: isRequired }}
           render={select => (
             <Select
               hasError={!!select.fieldState.error}

@@ -41,6 +41,11 @@ describe('<Developers />', () => {
             isSandboxRestricted: false,
             logoUrl: null,
           },
+          meta: {
+            createdNewTenant: false,
+            isFirstLogin: false,
+            requiresOnboarding: false,
+          },
         },
       });
 
@@ -67,6 +72,11 @@ describe('<Developers />', () => {
               name: 'Acme',
               isSandboxRestricted: true,
               logoUrl: null,
+            },
+            meta: {
+              createdNewTenant: false,
+              isFirstLogin: false,
+              requiresOnboarding: false,
             },
           },
         });
@@ -96,6 +106,11 @@ describe('<Developers />', () => {
               name: 'Acme',
               isSandboxRestricted: false,
               logoUrl: null,
+            },
+            meta: {
+              createdNewTenant: false,
+              isFirstLogin: false,
+              requiresOnboarding: false,
             },
           },
         });
@@ -133,6 +148,11 @@ describe('<Developers />', () => {
             name: 'Acme',
             isSandboxRestricted: false,
             logoUrl: null,
+          },
+          meta: {
+            createdNewTenant: false,
+            isFirstLogin: false,
+            requiresOnboarding: false,
           },
         },
       });

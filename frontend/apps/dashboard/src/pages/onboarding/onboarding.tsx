@@ -2,8 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { DEFAULT_LOGGED_IN_ROUTE } from 'src/config/constants';
-import useSession from 'src/hooks/use-user-session';
+import useSession from 'src/hooks/use-session';
 import styled from 'styled-components';
 
 import Form from './components/form';
@@ -12,23 +11,24 @@ import LoggedUser from './components/logged-user';
 const Onboarding = () => {
   const { t } = useTranslation('pages.onboarding');
   const router = useRouter();
-  const { dangerouslyCastedData } = useSession();
+  const session = useSession();
 
   const handleCompleted = () => {
-    router.replace(DEFAULT_LOGGED_IN_ROUTE);
+    session.completeOnboarding();
+    router.push('/users');
   };
 
-  return (
+  return session.data ? (
     <>
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Container data-testid="onboarding-page">
+      <Container>
         <Form onComplete={handleCompleted} />
-        <LoggedUser email={dangerouslyCastedData.email} />
+        <LoggedUser email={session.data.user.email} />
       </Container>
     </>
-  );
+  ) : null;
 };
 
 const Container = styled.div`

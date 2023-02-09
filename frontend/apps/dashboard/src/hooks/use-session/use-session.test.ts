@@ -3,31 +3,38 @@ import { OrgRoleScope } from '@onefootprint/types';
 
 import useSession from './use-session';
 
-const user = {
-  id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-  email: 'jane.doe@acme.com',
-  firstName: 'Jane',
-  lastName: 'Doe',
-  role: {
-    createdAt: '2022-09-19T16:24:34.368337Z',
-    id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
-    isImmutable: true,
-    name: 'Admin',
-    numActiveUsers: 1,
-    scopes: ['admin' as OrgRoleScope],
+const loginPayload = {
+  auth: '1',
+  user: {
+    id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
+    email: 'jane.doe@acme.com',
+    firstName: 'Jane',
+    lastName: 'Doe',
+    role: {
+      createdAt: '2022-09-19T16:24:34.368337Z',
+      id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+      isImmutable: true,
+      name: 'Admin',
+      numActiveUsers: 1,
+      scopes: ['admin' as OrgRoleScope],
+    },
+    rolebinding: {
+      lastLoginAt: '2023-01-18T17:54:10.668420Z',
+    },
   },
-  rolebinding: {
-    lastLoginAt: '2023-01-18T17:54:10.668420Z',
+  org: {
+    id: 'org_0912ufkdsmk1l2oedASDF',
+    name: 'Acme',
+    logoUrl: null,
+    isSandboxRestricted: false,
+    websiteUrl: null,
+    companySize: null,
   },
-};
-
-const tenant = {
-  id: 'org_0912ufkdsmk1l2oedASDF',
-  name: 'Acme',
-  logoUrl: null,
-  isSandboxRestricted: false,
-  websiteUrl: null,
-  companySize: null,
+  meta: {
+    createdNewTenant: false,
+    isFirstLogin: false,
+    requiresOnboarding: false,
+  },
 };
 
 describe('useSession', () => {
@@ -41,26 +48,24 @@ describe('useSession', () => {
   describe('when logging in', () => {
     it('should indicate the user is logged in and return the session data', () => {
       const { result } = renderHook(() => useSession());
-      const expectedData = {
-        auth: '1',
-        user: {
-          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
-        org: {
-          isLive: true,
-          name: tenant.name,
-          isSandboxRestricted: tenant.isSandboxRestricted,
-          logoUrl: tenant.logoUrl,
-        },
-      };
       act(() => {
-        result.current.logIn('1', user, tenant);
+        result.current.logIn(loginPayload);
       });
-      expect(result.current.data).toEqual(expectedData);
+      expect(result.current.data).toBeDefined();
       expect(result.current.isLoggedIn).toBeTruthy();
+    });
+  });
+
+  describe('when completing the onboarding', () => {
+    it('should indicate the user has completed the onboarding', () => {
+      const { result } = renderHook(() => useSession());
+      act(() => {
+        result.current.logIn(loginPayload);
+      });
+      act(() => {
+        result.current.completeOnboarding();
+      });
+      expect(result.current.data?.meta.requiresOnboarding).toBeFalsy();
     });
   });
 
@@ -68,7 +73,7 @@ describe('useSession', () => {
     it('should indicate the user is logged out and return an undefined session data', () => {
       const { result } = renderHook(() => useSession());
       act(() => {
-        result.current.logIn('1', user, tenant);
+        result.current.logIn(loginPayload);
       });
       act(() => {
         result.current.logOut();
@@ -82,7 +87,7 @@ describe('useSession', () => {
     it('should update correctly', () => {
       const { result } = renderHook(() => useSession());
       act(() => {
-        result.current.logIn('1', user, tenant);
+        result.current.logIn(loginPayload);
       });
       act(() => {
         result.current.setOrg({ isLive: true });

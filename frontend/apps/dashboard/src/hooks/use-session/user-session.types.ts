@@ -19,10 +19,17 @@ export type OrgSession = {
   isLive: boolean;
 };
 
+export type MetaSession = {
+  createdNewTenant: boolean;
+  isFirstLogin: boolean;
+  requiresOnboarding: boolean;
+};
+
 export type Session = {
   auth: string;
   user: UserSession;
   org: OrgSession;
+  meta: MetaSession;
 };
 
 // Whenever changing this, make sure to read this guide:
