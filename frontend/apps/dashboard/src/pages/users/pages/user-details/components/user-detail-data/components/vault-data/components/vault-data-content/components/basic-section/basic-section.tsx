@@ -61,6 +61,7 @@ const BasicSection = ({ user, vaultData, isDecrypting }: BasicSectionProps) => {
       </LinkButton>
     );
   };
+
   const footer = user.isPortable && <RiskSignals type="basic" />;
 
   return (
