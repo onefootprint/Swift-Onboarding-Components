@@ -4,7 +4,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
 use enclave_proxy::DataTransform;
-use newtypes::{DataIdentifier, PiiString, SealedVaultBytes, SealedVaultDataKey, ValidatedPhoneNumber};
+use newtypes::{DataIdentifier, PhoneNumber, PiiString, SealedVaultBytes, SealedVaultDataKey};
 use std::collections::HashMap;
 use std::convert::Into;
 use std::hash::Hash;
@@ -66,32 +66,23 @@ impl UserVaultWrapper {
         Ok(decrypted_results)
     }
 
-    pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<ValidatedPhoneNumber, ApiError> {
+    pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<PhoneNumber, ApiError> {
         let number = self
             .phone_numbers()
             .iter()
             .next()
             .ok_or(ApiError::NoPhoneNumberForVault)?;
 
-        let e_datas = vec![&number.e_e164, &number.e_country];
         // TODO get rid of this bespoke decryption code. We need it right now because this function
-        // returns a ValidatedPhoneNumber, which contains the decrypted PhoneNumber.e_country.
-        // I don't think any codepaths that use this really need the e_country, so we can refactor
-        // this to not return a ValidatedPhoneNumber
-        let decrypt_response = state
+        // WIP
+        let e_e164 = &number.e_e164;
+        let e_private_key = &self.user_vault.e_private_key;
+        let e164 = state
             .enclave_client
-            .batch_decrypt_to_piistring(e_datas, &self.user_vault.e_private_key, DataTransform::Identity)
+            .decrypt_to_piistring(e_e164, e_private_key, DataTransform::Identity)
             .await?;
-        let e164 = decrypt_response
-            .get(0)
-            .ok_or_else(|| ApiError::AssertionError("No e164 found".to_owned()))?
-            .clone();
-        let country = decrypt_response
-            .get(1)
-            .ok_or_else(|| ApiError::AssertionError("No country found".to_owned()))?
-            .clone();
 
-        let validated_phone_number = ValidatedPhoneNumber::__build_from_vault(e164, country)?;
-        Ok(validated_phone_number)
+        let phone_number = PhoneNumber::parse(e164)?;
+        Ok(phone_number)
     }
 }

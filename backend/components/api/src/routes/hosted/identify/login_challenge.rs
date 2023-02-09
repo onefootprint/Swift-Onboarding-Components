@@ -56,7 +56,7 @@ pub async fn post(
         };
 
     // If we need to create a challenge, extract the phone number for the user
-    let validated_phone_number = uvw.get_decrypted_primary_phone(&state).await?;
+    let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
@@ -72,9 +72,8 @@ pub async fn post(
                         Some(challenge.challenge_json),
                     )
                 } else {
-                    let (challenge_state, time_before_retry_s) = twilio_client
-                        .send_challenge(&state, &validated_phone_number)
-                        .await?;
+                    let (challenge_state, time_before_retry_s) =
+                        twilio_client.send_challenge(&state, &phone_number).await?;
                     (
                         ChallengeKind::Sms,
                         ChallengeData::Sms(challenge_state),
@@ -85,9 +84,8 @@ pub async fn post(
             }
             ChallengeKind::Sms => {
                 // Fall back to SMS if the user requested webauthn but doesn't have any creds
-                let (challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge(&state, &validated_phone_number)
-                    .await?;
+                let (challenge_state, time_before_retry_s) =
+                    twilio_client.send_challenge(&state, &phone_number).await?;
                 (
                     ChallengeKind::Sms,
                     ChallengeData::Sms(challenge_state),
@@ -112,8 +110,8 @@ pub async fn post(
             challenge_data: UserChallengeData {
                 challenge_kind,
                 challenge_token,
-                phone_number_last_two: validated_phone_number.leak_last_two(),
-                phone_country: validated_phone_number.iso_country_code.leak_to_string(),
+                phone_number_last_two: phone_number.leak_last_two(),
+                phone_country_code: phone_number.iso_country_code().leak_to_string(),
                 biometric_challenge_json,
                 time_before_retry_s,
             },

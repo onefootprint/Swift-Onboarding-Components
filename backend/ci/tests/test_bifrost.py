@@ -419,7 +419,7 @@ class TestBifrost:
         )
         body = post("hosted/identify/login_challenge", data)
         assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-        assert body["challenge_data"]["phone_country"] == "US"
+        assert body["challenge_data"]["phone_country_code"] == "+1"
         assert body["challenge_data"]["challenge_kind"] == "biometric"
         assert body["challenge_data"]["biometric_challenge_json"]
 

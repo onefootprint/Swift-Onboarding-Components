@@ -4,7 +4,7 @@ export type ChallengeData = {
   challengeToken: string;
   challengeKind: ChallengeKind;
   phoneNumberLastTwo?: string;
-  phoneCountry?: string;
+  phoneCountryCode?: string;
   biometricChallengeJson?: string;
   retryDisabledUntil?: Date;
   timeBeforeRetryS?: number;

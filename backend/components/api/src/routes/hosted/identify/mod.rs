@@ -11,9 +11,9 @@ use crate::State;
 use chrono::{DateTime, Duration, Utc};
 use db::models::user_vault::UserVault;
 use newtypes::email::Email;
+use newtypes::UserVaultId;
 use newtypes::{Fingerprinter, PiiString};
 use newtypes::{IdentityDataKind, PhoneNumber};
-use newtypes::{UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
 
@@ -37,14 +37,15 @@ pub struct UserChallengeData {
     challenge_kind: ChallengeKind,
     challenge_token: ChallengeToken,
     phone_number_last_two: String,
-    phone_country: String,
+    phone_country_code: String,
     biometric_challenge_json: Option<String>,
     time_before_retry_s: i64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneChallengeState {
-    pub phone_number: ValidatedPhoneNumber,
+    /// Will also include sandbox suffix, if exists
+    pub phone_number_e164_with_suffix: PiiString,
     pub h_code: Vec<u8>,
 }
 
@@ -98,11 +99,9 @@ async fn get_user_by_identifier(
     state: &web::Data<State>,
     identifier: &Identifier,
 ) -> Result<Option<UserVault>, ApiError> {
-    let twilio_client = &state.twilio_client;
     let (data_attribute, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
-            let phone_number = twilio_client.standardize(phone_number).await?;
-            (IdentityDataKind::PhoneNumber, phone_number.to_piistring())
+            (IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
         }
         Identifier::Email(email) => (IdentityDataKind::Email, PiiString::from(email.clone())),
     };

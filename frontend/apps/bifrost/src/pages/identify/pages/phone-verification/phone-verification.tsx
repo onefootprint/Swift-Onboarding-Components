@@ -25,8 +25,8 @@ const PhoneVerification = () => {
 
   let phoneCountryCode = '';
   const filteredPhone = phone?.split('#')[0] ?? ''; // Filter out sandbox suffixes
-  if (challengeData?.phoneCountry) {
-    phoneCountryCode = getNumberByCountryValue(challengeData?.phoneCountry);
+  if (challengeData?.phoneCountryCode) {
+    phoneCountryCode = challengeData?.phoneCountryCode;
   } else if (phone) {
     const phoneCountryVal = getCountryByNumber(filteredPhone).value;
     phoneCountryCode = getNumberByCountryValue(phoneCountryVal);

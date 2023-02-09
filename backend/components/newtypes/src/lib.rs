@@ -58,8 +58,8 @@ pub use self::proxy_token::*;
 pub enum Error {
     #[error("Invalid email address")]
     InvalidEmail,
-    #[error("Invalid phone number")]
-    InvalidPhoneNumber,
+    #[error("{0}")]
+    PhoneNumber(#[from] fields::phone_number::Error),
     #[error("Invalid sandbox suffix. Suffix must be non-empty, alphanumeric string")]
     InvalidSandboxSuffix,
     #[error("Serde error")]
@@ -86,6 +86,7 @@ impl Error {
     where
         T: IntoIterator<Item = (IdentityDataKind, &'a str)>,
     {
+        // TODO can i rm this now?
         let errors = errors
             .into_iter()
             .map(|(idk, e)| (idk, Error::Custom(e.to_string())))

@@ -1,4 +1,3 @@
-use newtypes::ValidatedPhoneNumber;
 use std::fmt::Debug;
 
 #[derive(Debug, thiserror::Error)]
@@ -53,16 +52,8 @@ pub enum ConversionError {
     MissingDocumentType,
     #[error("Could not parse DOB")]
     CantParseDob,
-    #[error("zip code is unsupported length for socure API validation")]
-    UnsupportedZipFormat,
-    #[error("phone number must be 10 digits")]
-    UnsupportedPhoneNumber(ValidatedPhoneNumber),
-    #[error("unsupported country {0}, country must be US")]
-    UnsupportedCountry(String),
     #[error("Invalid country code: must be 3 characters")]
     InvalidCountryCode,
-    #[error("DocumentType unsupported for ScanVerify")]
-    UnsupportedDocumentType,
 }
 
 #[derive(Debug, thiserror::Error)]

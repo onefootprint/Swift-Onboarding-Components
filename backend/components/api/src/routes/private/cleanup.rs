@@ -4,14 +4,14 @@ use crate::types::response::ResponseData;
 use crate::State;
 use db::models::tenant::Tenant;
 use db::models::user_vault::UserVault;
-use newtypes::{Fingerprinter, IdentityDataKind, TenantId};
+use newtypes::{Fingerprinter, IdentityDataKind, PhoneNumber, TenantId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
-pub struct PhoneNumber {
-    phone_number: newtypes::PhoneNumber,
+pub struct Request {
+    phone_number: PhoneNumber,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -27,18 +27,17 @@ pub struct CleanupResponse {
 async fn post(
     state: web::Data<State>,
     _custodian: CustodianAuthContext,
-    request: web::Json<PhoneNumber>,
+    request: web::Json<Request>,
 ) -> actix_web::Result<Json<ResponseData<CleanupResponse>>, ApiError> {
     // allowed deletion #s
     let allowed_deletion_numbers: Vec<newtypes::PhoneNumber> = vec![
-        "16504600700",    // belce
-        "14259844138",    // elliott
-        "16178408644",    // alex
-        "16173839084",    // alex2
+        "+16504600700",   // belce
+        "+14259844138",   // elliott
+        "+16178408644",   // alex
+        "+16173839084",   // alex2
         "+5548988124050", // rafa
-        "16106807897",    // eli
+        "+16106807897",   // eli
         "+5561999771150", // pedro
-        "+15045007931",   // omar
         "+18434698223",   // karen
         "+16319027727",   // dave
         "+16787644785",   // keagan
@@ -47,22 +46,24 @@ async fn post(
     .map(newtypes::PhoneNumber::from_str)
     .collect::<Result<Vec<_>, _>>()?;
 
-    let requested_number = request.phone_number.clone();
+    let Request { phone_number } = request.into_inner();
 
-    let is_integration_test_phone_number = requested_number == state.config.integration_test_phone_number
-        || requested_number.leak().split('#').next()
-            == Some(state.config.integration_test_phone_number.leak());
-    let is_allowlisted_real_phone_number = allowed_deletion_numbers.contains(&requested_number);
+    // Use e164 without suffix to see if cleanup is allowed for this phone number
+    let is_integration_test_phone_number =
+        phone_number.e164() == state.config.integration_test_phone_number.e164();
+    let is_allowlisted_real_phone_number = allowed_deletion_numbers
+        .iter()
+        .any(|x| x.e164() == phone_number.e164());
 
     if !(is_integration_test_phone_number || is_allowlisted_real_phone_number) {
         return Err(ApiError::AssertionError(
             "Cannot clean up provided number".to_owned(),
         ));
     }
-    let twilio_client = &state.twilio_client;
-    let phone_number = twilio_client.standardize(&requested_number).await?;
+
+    // Use e164 with suffix to compute fingerprint
     let sh_data = state
-        .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.to_piistring())
+        .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
         .await?;
 
     let uv = state

@@ -14,7 +14,7 @@ use itertools::Itertools;
 use newtypes::email::Email;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, IdentityDataKind,
-    IdentityDataUpdate, PhoneNumber, PiiString, ValidatedPhoneNumber,
+    IdentityDataUpdate, PiiString,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use std::collections::HashMap;
@@ -55,7 +55,7 @@ pub async fn put(
     let id_fingerprints = build_fingerprints(&state, id_update.clone()).await?;
 
     // Extract phone and email from identity data since they are handled separately (for now)
-    let phone_number = parse_phone_number_info(&state, &mut id_update).await?;
+    let phone_number = id_update.remove(&IdentityDataKind::PhoneNumber);
     let email = id_update
         .remove(&IdentityDataKind::Email)
         .map(|p| Email::from_str(p.leak()))
@@ -94,29 +94,4 @@ pub async fn put(
         .await?;
 
     EmptyResponse::ok().json()
-}
-
-async fn parse_phone_number_info(
-    state: &State,
-    id_update: &mut IdentityDataUpdate,
-) -> ApiResult<Option<ValidatedPhoneNumber>> {
-    let phone_number = id_update
-        .remove(&IdentityDataKind::PhoneNumber)
-        .map(|p| PhoneNumber::from_str(p.leak()))
-        .transpose()?;
-    let Some(phone_number) = phone_number else {
-        return Ok(None);
-    };
-    let phone_number = state
-        .twilio_client
-        .standardize(&phone_number)
-        .await
-        .map_err(|e| {
-            tracing::error!(error=%e, "Error standardizing phone number");
-            newtypes::Error::new_validation_error(vec![(
-                IdentityDataKind::PhoneNumber,
-                "Could not validate phone number. Please provide in e164 format",
-            )])
-        })?;
-    Ok(Some(phone_number))
 }

@@ -11,8 +11,8 @@ use db::{
     PgConn,
 };
 use newtypes::{
-    DbActor, DecisionStatus, FootprintReasonCode, IdentityDocumentId, OnboardingId, TenantId,
-    ValidatedPhoneNumber, Vendor, VendorAPI,
+    DbActor, DecisionStatus, FootprintReasonCode, IdentityDocumentId, OnboardingId, PhoneNumber, TenantId,
+    Vendor, VendorAPI,
 };
 
 use super::vendor;
@@ -114,7 +114,7 @@ pub async fn should_initiate_sandbox_and_setup(
     state: &State,
     ob_id: OnboardingId,
     uvw: UserVaultWrapper,
-    phone_number: ValidatedPhoneNumber,
+    phone_number: PhoneNumber,
     should_setup_test_fixtures: bool,
 ) -> ApiResult<bool> {
     let (decision_status, create_manual_review) = decision_status_from_sandbox_suffix(phone_number);
@@ -126,10 +126,10 @@ pub async fn should_initiate_sandbox_and_setup(
     Ok(false)
 }
 
-pub fn decision_status_from_sandbox_suffix(phone_number: ValidatedPhoneNumber) -> (DecisionStatus, bool) {
-    if phone_number.suffix.starts_with("fail") {
+pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> (DecisionStatus, bool) {
+    if phone_number.sandbox_suffix.starts_with("fail") {
         (DecisionStatus::Fail, false)
-    } else if phone_number.suffix.starts_with("manualreview") {
+    } else if phone_number.sandbox_suffix.starts_with("manualreview") {
         (DecisionStatus::Fail, true)
     } else {
         (DecisionStatus::Pass, false)

@@ -18,8 +18,8 @@ pub(super) fn clean_and_validate_field(idk: IDK, input: PiiString) -> NtResult<P
         IDK::State => input, // maybe we'll want to validate state based on country some day
         IDK::Zip => clean_and_validate_zip(input)?,
         IDK::Country => clean_and_validate_country(input)?,
-        IDK::Email => Email::from_str(input.leak())?.into(),
-        IDK::PhoneNumber => PhoneNumber::from_str(input.leak())?.into(),
+        IDK::Email => Email::from_str(input.leak())?.to_piistring(),
+        IDK::PhoneNumber => PhoneNumber::parse(input)?.e164_with_suffix(),
     };
     Ok(result)
 }

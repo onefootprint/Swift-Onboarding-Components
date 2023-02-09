@@ -29,14 +29,9 @@ pub async fn post(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     // clean phone number
-    let req = request.into_inner();
-
-    let twilio_client = &state.twilio_client;
-
-    let phone_number = twilio_client.standardize(&req.phone_number).await?;
-
+    let SignupChallengeRequest { phone_number } = request.into_inner();
     let (challenge_state_data, time_before_retry_s) =
-        twilio_client.send_challenge(&state, &phone_number).await?;
+        state.twilio_client.send_challenge(&state, &phone_number).await?;
 
     let challenge_state = ChallengeState {
         data: ChallengeData::Sms(challenge_state_data),
@@ -54,7 +49,7 @@ pub async fn post(
                 challenge_kind: ChallengeKind::Sms,
                 challenge_token,
                 phone_number_last_two: phone_number.leak_last_two(),
-                phone_country: phone_number.iso_country_code.leak_to_string(),
+                phone_country_code: phone_number.iso_country_code().leak_to_string(),
                 biometric_challenge_json: None,
                 time_before_retry_s: time_before_retry_s.num_seconds(),
             },

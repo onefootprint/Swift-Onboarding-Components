@@ -3,7 +3,7 @@ use crate::{feature_flag::MockFeatureFlagClient, tests::fixtures};
 use db::tests::prelude::*;
 use macros::db_test;
 use mockall::predicate::*;
-use newtypes::{DecisionStatus, OnboardingId, ValidatedPhoneNumber};
+use newtypes::{DecisionStatus, OnboardingId, PhoneNumber};
 use std::str::FromStr;
 use test_case::test_case;
 
@@ -19,7 +19,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     let (_, _, uvw, _, _) = fixtures::user_vault_wrapper::create(conn, false);
     assert!(!uvw.user_vault.is_live);
     // it doesn't matter what we pass here, just don't want it to be true
-    let phone_number = ValidatedPhoneNumber::__build("1234".into(), "USA".into(), "idv".into());
+    let phone_number = PhoneNumber::parse("+1 123 456 7890#idv".into()).unwrap();
 
     let res = tokio_test::block_on(async {
         utils::should_initiate_sandbox_and_setup(state, onboarding_id, uvw, phone_number, false).await
@@ -83,9 +83,9 @@ fn test_handle_setup(conn: &mut TestPgConn) {
 #[test_case("failininin1234" => (DecisionStatus::Fail, false))]
 #[test_case("manualreview" => (DecisionStatus::Fail, true))]
 #[test_case("manualreview1234" => (DecisionStatus::Fail, true))]
-#[test_case("pass me please" => (DecisionStatus::Pass, false))]
+#[test_case("passmeplease" => (DecisionStatus::Pass, false))]
 #[test_case("idv" => (DecisionStatus::Pass, false))]
 fn test_decision_status_from_sandbox_suffix(suffix: &str) -> (DecisionStatus, bool) {
-    let phone_number = ValidatedPhoneNumber::__build("1234".into(), "USA".into(), suffix.into());
+    let phone_number = PhoneNumber::parse(format!("+1 123 456 7890#{}", suffix).into()).unwrap();
     utils::decision_status_from_sandbox_suffix(phone_number)
 }

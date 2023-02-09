@@ -7,7 +7,7 @@ use crate::{
 };
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use newtypes::{PhoneNumber, ValidatedPhoneNumber};
+use newtypes::PhoneNumber;
 
 use self::rate_limit::RateLimit;
 
@@ -40,20 +40,10 @@ impl TwilioClient {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn standardize(&self, phone_number: &PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
-        let response = self.client.validate_phone_number(phone_number.leak()).await?;
-        Ok(ValidatedPhoneNumber::__build(
-            response.phone_number,
-            response.country_code,
-            phone_number.suffix.clone(),
-        ))
-    }
-
-    #[tracing::instrument(skip_all)]
     pub async fn send_challenge(
         &self,
         state: &State,
-        destination: &ValidatedPhoneNumber,
+        destination: &PhoneNumber,
     ) -> Result<(PhoneChallengeState, SecondsBeforeRetry), ApiError> {
         let code = crypto::random::gen_rand_n_digit_code(6);
         let message_body = format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code);
@@ -74,7 +64,7 @@ impl TwilioClient {
         tokio::spawn(async move {
             let _ = client
                 .clone()
-                .send_message(destination_clone.e164.leak(), message_body)
+                .send_message(destination_clone.e164().leak(), message_body)
                 .await
                 .map_err(|err| {
                     tracing::error!(error=?err, "twilio error");
@@ -83,7 +73,7 @@ impl TwilioClient {
 
         Ok((
             PhoneChallengeState {
-                phone_number: destination.clone(),
+                phone_number_e164_with_suffix: destination.e164_with_suffix(),
                 h_code: sha256(code.as_bytes()).to_vec(),
             },
             self.duration_between_challenges,
@@ -94,7 +84,7 @@ impl TwilioClient {
     pub async fn send_d2p(
         &self,
         state: &State,
-        destination: &ValidatedPhoneNumber,
+        destination: &PhoneNumber,
         url: String,
     ) -> Result<SecondsBeforeRetry, ApiError> {
         let message_body = format!("Continue account verification using this link: {}", url);
@@ -110,12 +100,12 @@ impl TwilioClient {
 
         // spawn this async so we return immediately
         let client = self.client.clone();
-        let destination_clone = destination.clone();
+        let destination = destination.clone();
 
         tokio::spawn(async move {
             let _ = client
                 .clone()
-                .send_message(destination_clone.e164.leak(), message_body)
+                .send_message(destination.e164().leak(), message_body)
                 .await
                 .map_err(|err| {
                     tracing::error!(error=?err, "twilio error");
@@ -132,14 +122,15 @@ mod rate_limit {
     pub const D2P_LINK: &str = "d2p_session";
     pub const SMS_CHALLENGE: &str = "sms_challenge";
 
-    fn key(phone_number: &ValidatedPhoneNumber, scope: &str) -> String {
-        format!("{}:{}", phone_number.e164.leak(), scope)
+    fn key(phone_number: &PhoneNumber, scope: &str) -> String {
+        // Check SMS rate limits not including sandbox suffix to prevent spamming someone
+        format!("{}:{}", phone_number.e164().leak(), scope)
     }
 
     pub(super) struct RateLimit<'a> {
         pub(super) state: &'a State,
         pub(super) period: Duration,
-        pub(super) phone_number: &'a ValidatedPhoneNumber,
+        pub(super) phone_number: &'a PhoneNumber,
         pub(super) scope: &'a str,
     }
 

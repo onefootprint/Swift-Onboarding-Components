@@ -13,7 +13,7 @@ use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind,
-    IdentityDataUpdate, KvDataKey, PiiString, ValidatedPhoneNumber,
+    IdentityDataUpdate, KvDataKey, PiiString, SealedVaultBytes,
 };
 use std::collections::HashMap;
 
@@ -55,7 +55,7 @@ impl WriteableUvw {
     pub fn put_all_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        phone_number: Option<ValidatedPhoneNumber>,
+        phone_number: Option<PiiString>,
         email: Option<newtypes::email::Email>,
         uvd: IdentityDataUpdate,
         id_fingerprints: FingerprintMap,
@@ -101,8 +101,7 @@ impl WriteableUvw {
     fn add_phone_number_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        // TODO we shouldn't need ValidatedPhoneNumber here once we stop using the country code
-        phone_number: ValidatedPhoneNumber,
+        phone_number: PiiString,
         fingerprint: Fingerprint,
     ) -> ApiResult<()> {
         // Only used to add a phone number to a non-portable vault for now
@@ -119,8 +118,9 @@ impl WriteableUvw {
         // Add the new speculative phone
         let public_key = &self.user_vault.public_key;
         let phone_info = NewPhoneNumberArgs {
-            e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
-            e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
+            e_phone_number: public_key.seal_pii(&phone_number)?,
+            // not needed
+            e_phone_country: SealedVaultBytes(vec![]),
             sh_phone_number: fingerprint,
         };
         PhoneNumber::create(

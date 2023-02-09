@@ -20,7 +20,9 @@ use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::{NewUserInfo, UserVault};
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{Fingerprinter, IdentityDataKind, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
+use newtypes::{
+    Fingerprinter, IdentityDataKind, PhoneNumber, PiiString, SealedVaultBytes, SessionAuthToken, UserVaultId,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -144,9 +146,9 @@ async fn validate_sms_challenge(
         return Err(ChallengeError::IncorrectPin.into());
     }
 
-    let phone_number = challenge_state.phone_number;
+    let phone_number = challenge_state.phone_number_e164_with_suffix;
     let sh_phone_number = state
-        .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.to_piistring())
+        .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.clone())
         .await?;
     let existing_user = state
         .db_pool
@@ -156,7 +158,7 @@ async fn validate_sms_challenge(
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(state, &phone_number, ob_config).await?;
+            let user = create_new_user_vault(state, phone_number, ob_config).await?;
             (user.id, VerifyKind::UserCreated)
         }
     };
@@ -165,11 +167,12 @@ async fn validate_sms_challenge(
 
 async fn create_new_user_vault(
     state: &web::Data<State>,
-    phone_number: &ValidatedPhoneNumber,
+    phone_number: PiiString,
     ob_config: Option<ObConfiguration>,
 ) -> ApiResult<UserVault> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
+    let phone_number = PhoneNumber::parse(phone_number)?;
     if let Some(ob_config) = ob_config.as_ref() {
         // If we are making a ScopedUser here, verify that the ob config is_live matches the user vault
         if ob_config.is_live != phone_number.is_live() {
@@ -178,10 +181,11 @@ async fn create_new_user_vault(
     }
 
     let phone_info = NewPhoneNumberArgs {
-        e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
-        e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
+        e_phone_number: public_key.seal_pii(&phone_number.e164_with_suffix())?,
+        // TODO not needed
+        e_phone_country: SealedVaultBytes(vec![]),
         sh_phone_number: state
-            .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.to_piistring())
+            .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
             .await?,
     };
     let user_info = NewUserInfo {

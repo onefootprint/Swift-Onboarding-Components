@@ -132,8 +132,8 @@ mod test {
     #[test_case(Email, "flerp@derp.com" => Some("flerp@derp.com".to_owned()))]
     #[test_case(Email, "flerp@derp.com#sandbox" => Some("flerp@derp.com#sandbox".to_owned()))] // Sandbox email
     #[test_case(PhoneNumber, "flerp" => None)]
-    #[test_case(PhoneNumber, "1-555-555-5555" => Some("+15555555555".to_owned()))]
-    #[test_case(PhoneNumber, "15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
+    #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
+    #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
     fn test_clean_and_validate_field(idk: IDK, pii: &str) -> Option<String> {
         clean_and_validate_field(idk, PiiString::new(pii.to_owned()))
             .ok()

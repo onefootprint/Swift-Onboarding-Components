@@ -31,7 +31,7 @@ pub async fn build_idv_data_from_verification_request(
         .transpose()?;
     let phone_number = decrypted_values
         .remove(&IdentityDataKind::PhoneNumber)
-        .map(|x| PhoneNumber::from_str(x.leak()).map(|x| x.number))
+        .map(|x| PhoneNumber::from_str(x.leak()).map(|x| x.e164()))
         .transpose()?;
     let request = IdvData {
         first_name: decrypted_values.remove(&IdentityDataKind::FirstName),
