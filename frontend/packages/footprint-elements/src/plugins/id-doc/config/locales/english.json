@@ -50,12 +50,7 @@
     },
     "selfie-consent": {
       "title": "Footprint needs to collect and use your biometric data",
-      "subtitle": "By clicking \"Agree\", you agree that Footprint will:",
-      "terms": {
-        "collection": "Collect biometric data from your selfie and identity documents.",
-        "use": "Use this information for identity verification, fraud prevention and improving Footprint's services.",
-        "share": "Share this data with <a>third-party providers</a> for identity verification and fraud prevention purposes."
-      },
+      "subtitle": "By clicking \"Agree\", you agree that Footprint will collect biometric data from your selfie and identity document.",
       "cta": "Agree",
       "footer": "Please refer to our <a>Privacy Policy</a> for more details about how we handle and retain your biometric data."
     }

@@ -6,7 +6,6 @@ import { Trans } from 'react-i18next';
 
 import { HeaderTitle } from '../../../../components';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import Terms from './components/terms';
 import useConsent from './hooks/use-consent';
 
 type SelfieConsentProps = {
@@ -55,7 +54,6 @@ const SelfieConsent = ({ open, onConsent, onClose }: SelfieConsentProps) => {
         subtitle={t('subtitle')}
         sx={{ marginBottom: 4 }}
       />
-      <Terms />
       <Typography
         variant="body-2"
         color="secondary"
