@@ -776,16 +776,16 @@
           "description": "Our API ensures only the right parties can access the data they're allowed to see."
         },
         "feature-2": {
-          "title": "End-to-end encrypted",
-          "description": "Our advanced PII vaults are built on top of secure Nitro Enclaves. "
+          "title": "Transparency first",
+          "description": "Know exactly what data is accessed and when."
         },
         "feature-3": {
           "title": "Granular data access",
-          "description": "Only the bare minimum data is decrypted. Nothing else leaves our enclave-backed vaults. "
+          "description": "Only decrypt the bare minimum you need, control who can access what. Nothing else leaves our enclave-backed vaults."
         },
         "feature-4": {
           "title": "Secure enclave backed",
-          "description": "All PII data is always encrypted to our Nitro Enclaves."
+          "description": "Our advanced PII vaults use strong cryptography and are built on top of secure Nitro Enclaves."
         }
       }
     }
