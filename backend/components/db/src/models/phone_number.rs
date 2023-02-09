@@ -21,7 +21,6 @@ use super::{
 pub struct PhoneNumber {
     pub id: PhoneNumberId,
     pub e_e164: SealedVaultBytes,
-    pub e_country: SealedVaultBytes,
     pub is_verified: bool,
     pub priority: DataPriority,
     pub _created_at: DateTime<Utc>,
@@ -33,7 +32,6 @@ pub struct PhoneNumber {
 #[diesel(table_name = phone_number)]
 struct NewPhoneNumberRow {
     e_e164: SealedVaultBytes,
-    e_country: SealedVaultBytes,
     is_verified: bool,
     priority: DataPriority,
     lifetime_id: DataLifetimeId,
@@ -43,7 +41,6 @@ struct NewPhoneNumberRow {
 pub struct NewPhoneNumberArgs {
     pub e_phone_number: SealedVaultBytes,
     pub sh_phone_number: FingerprintData,
-    pub e_phone_country: SealedVaultBytes,
 }
 
 impl PhoneNumber {
@@ -88,7 +85,6 @@ impl PhoneNumber {
         let lifetime = DataLifetime::create(conn, uv_id, su_id, IdentityDataKind::PhoneNumber.into(), seqno)?;
         let new_row = NewPhoneNumberRow {
             e_e164: args.e_phone_number,
-            e_country: args.e_phone_country,
             is_verified: true,
             priority,
             lifetime_id: lifetime.id.clone(),

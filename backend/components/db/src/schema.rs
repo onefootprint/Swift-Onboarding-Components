@@ -315,7 +315,6 @@ table! {
     phone_number (id) {
         id -> Text,
         e_e164 -> Bytea,
-        e_country -> Bytea,
         is_verified -> Bool,
         priority -> Text,
         _created_at -> Timestamptz,

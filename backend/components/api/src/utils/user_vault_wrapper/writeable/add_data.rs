@@ -13,7 +13,7 @@ use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind,
-    IdentityDataUpdate, KvDataKey, PiiString, SealedVaultBytes,
+    IdentityDataUpdate, KvDataKey, PiiString,
 };
 use std::collections::HashMap;
 
@@ -119,8 +119,6 @@ impl WriteableUvw {
         let public_key = &self.user_vault.public_key;
         let phone_info = NewPhoneNumberArgs {
             e_phone_number: public_key.seal_pii(&phone_number)?,
-            // not needed
-            e_phone_country: SealedVaultBytes(vec![]),
             sh_phone_number: fingerprint,
         };
         PhoneNumber::create(

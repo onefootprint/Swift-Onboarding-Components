@@ -1,0 +1,2 @@
+ALTER TABLE phone_number ADD COLUMN e_country BYTEA NOT NULL DEFAULT '';
+ALTER TABLE phone_number ALTER COLUMN e_country DROP DEFAULT;

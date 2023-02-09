@@ -20,9 +20,7 @@ use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::{NewUserInfo, UserVault};
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{
-    Fingerprinter, IdentityDataKind, PhoneNumber, PiiString, SealedVaultBytes, SessionAuthToken, UserVaultId,
-};
+use newtypes::{Fingerprinter, IdentityDataKind, PhoneNumber, PiiString, SessionAuthToken, UserVaultId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -182,8 +180,6 @@ async fn create_new_user_vault(
 
     let phone_info = NewPhoneNumberArgs {
         e_phone_number: public_key.seal_pii(&phone_number.e164_with_suffix())?,
-        // TODO not needed
-        e_phone_country: SealedVaultBytes(vec![]),
         sh_phone_number: state
             .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
             .await?,

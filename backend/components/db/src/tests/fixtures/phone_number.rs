@@ -22,7 +22,6 @@ pub fn create(conn: &mut TxnPgConn, uv_id: &UserVaultId, su_id: Option<&ScopedUs
     let phone_info = NewPhoneNumberArgs {
         e_phone_number: SealedVaultBytes(vec![]),
         sh_phone_number: Fingerprint(random_phone_number().as_bytes().to_vec()),
-        e_phone_country: SealedVaultBytes(vec![]),
     };
     PhoneNumber::create_verified(conn, uv_id, phone_info, DataPriority::Primary, su_id).unwrap()
 }

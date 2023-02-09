@@ -4,7 +4,9 @@ use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
 use enclave_proxy::DataTransform;
-use newtypes::{DataIdentifier, PhoneNumber, PiiString, SealedVaultBytes, SealedVaultDataKey};
+use newtypes::{
+    DataIdentifier, IdentityDataKind, PhoneNumber, PiiString, SealedVaultBytes, SealedVaultDataKey,
+};
 use std::collections::HashMap;
 use std::convert::Into;
 use std::hash::Hash;
@@ -67,21 +69,11 @@ impl UserVaultWrapper {
     }
 
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<PhoneNumber, ApiError> {
-        let number = self
-            .phone_numbers()
-            .iter()
-            .next()
+        let e164 = self
+            .decrypt_unsafe(&state.enclave_client, &[IdentityDataKind::PhoneNumber])
+            .await?
+            .remove(&IdentityDataKind::PhoneNumber)
             .ok_or(ApiError::NoPhoneNumberForVault)?;
-
-        // TODO get rid of this bespoke decryption code. We need it right now because this function
-        // WIP
-        let e_e164 = &number.e_e164;
-        let e_private_key = &self.user_vault.e_private_key;
-        let e164 = state
-            .enclave_client
-            .decrypt_to_piistring(e_e164, e_private_key, DataTransform::Identity)
-            .await?;
-
         let phone_number = PhoneNumber::parse(e164)?;
         Ok(phone_number)
     }

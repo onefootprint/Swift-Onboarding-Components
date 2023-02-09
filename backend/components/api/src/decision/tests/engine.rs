@@ -45,7 +45,6 @@ async fn get_keys_and_new_phone_args(state: &State, phone_number: &String) -> Ke
         .unwrap();
     let phone_info = NewPhoneNumberArgs {
         e_phone_number: public_key.seal_pii(&PiiString::from(phone_number)).unwrap(),
-        e_phone_country: public_key.seal_pii(&PiiString::from("US")).unwrap(),
         sh_phone_number: sh_data,
     };
 
