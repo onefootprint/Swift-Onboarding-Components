@@ -20,6 +20,7 @@ TWILIO_API_KEY = get_secret("TWILIO_API_KEY")
 TWILIO_ACCOUNT_SID = get_secret("TWILIO_ACCOUNT_SID")
 TWILIO_API_KEY_SECRET = get_secret("TWILIO_API_KEY_SECRET")
 PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
+SCRUBBED_PHONE_NUMBER = f"+1 (***) ***-**{PHONE_NUMBER[-2:]}"
 EMAIL = "footprint.user.dev@gmail.com"
 CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
 

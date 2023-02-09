@@ -5,6 +5,7 @@ import pytest
 from tests.constants import (
     EMAIL,
     PHONE_NUMBER,
+    SCRUBBED_PHONE_NUMBER,
 )
 from tests.auth import FpAuth, OnboardingSessionToken
 from tests.bifrost_client import BifrostClient
@@ -418,8 +419,7 @@ class TestBifrost:
             preferred_challenge_kind="biometric",
         )
         body = post("hosted/identify/login_challenge", data)
-        assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-        assert body["challenge_data"]["phone_country_code"] == "+1"
+        assert body["challenge_data"]["scrubbed_phone_number"] == SCRUBBED_PHONE_NUMBER
         assert body["challenge_data"]["challenge_kind"] == "biometric"
         assert body["challenge_data"]["biometric_challenge_json"]
 

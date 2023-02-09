@@ -59,15 +59,27 @@ impl PhoneNumber {
         }
     }
 
-    // TODO rm this in exchange for more rich formatting
-    pub fn leak_last_two(&self) -> String {
-        let mut phone_number = self.e164().leak().to_owned();
-        let len = phone_number.len();
-        phone_number.drain((len - 2)..len).into_iter().collect()
-    }
-
-    pub fn iso_country_code(&self) -> PiiString {
-        format!("+{}", self.number.country().code()).into()
+    /// Formats the PhoneNumber with all digits except the country code and last two scrubbed
+    pub fn leak_formatted_last_two(&self) -> String {
+        // Use the phonenumber library to format the number as a national number.
+        // This includes nice formatting, aside from the country code
+        let national = format!("{}", self.number.format().mode(phonenumber::Mode::National));
+        let len = national.len();
+        let national: String = national
+            .chars()
+            .enumerate()
+            .map(|(i, c)| {
+                if i < len - 2 && c.is_alphanumeric() {
+                    // For all but the last 2 characters, if alphanumeric, scrub.
+                    // This preserves formatting characters, like (, -, and spaces
+                    '*'
+                } else {
+                    c
+                }
+            })
+            .collect();
+        // Prepend the country code to the scrubbed, formatted national
+        format!("+{} {}", self.number.country().code(), national)
     }
 }
 
@@ -103,16 +115,23 @@ mod tests {
             .leak_to_string()
     }
 
+    #[test_case("+1-415-123-1234" => "+1 (***) ***-**34".to_owned(); "US")]
+    #[test_case("+55 (12) 12345-1234" => "+55 (**) *****-**34".to_owned(); "brazil")]
+    #[test_case("+47 913 12 123" => "+47 *** ** *23".to_owned(); "norway")]
+    fn test_leak_formatted_last_two(number: &str) -> String {
+        PhoneNumber::parse(number.into())
+            .unwrap()
+            .leak_formatted_last_two()
+    }
+
     #[test]
     fn test_sandbox() {
         let phone_number = PhoneNumber::parse("+1-123-123-1234#sandbox".into()).unwrap();
         assert_eq!(phone_number.e164_with_suffix().leak(), "+11231231234#sandbox");
-        assert_eq!(phone_number.leak_last_two(), "34".to_owned());
         assert!(!phone_number.is_live());
 
         let phone_number = PhoneNumber::parse("+1-123-123-1234".into()).unwrap();
         assert_eq!(phone_number.e164_with_suffix().leak(), "+11231231234");
-        assert_eq!(phone_number.leak_last_two(), "34".to_owned());
         assert!(phone_number.is_live());
     }
 }

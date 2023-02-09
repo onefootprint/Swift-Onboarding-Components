@@ -23,9 +23,10 @@ def my1fp_sandbox_user(sandbox_user, twilio):
     def challenge():
         data = dict(identifier=identifier, preferred_challenge_kind="sms")
         body = post("hosted/identify/login_challenge", data)
+        last_two = sandbox_user.real_phone_number[-2:]
         assert (
-            body["challenge_data"]["phone_number_last_two"]
-            == sandbox_user.real_phone_number[-2:]
+            body["challenge_data"]["scrubbed_phone_number"]
+            == f"+1 (***) ***-**{last_two}"
         )
         assert body["challenge_data"]["challenge_kind"] == "sms"
         return body["challenge_data"]["challenge_token"]

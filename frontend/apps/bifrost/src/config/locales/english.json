@@ -78,7 +78,7 @@
         "new-user": "Let's verify your identity!",
         "existing-user": "Welcome back! 🎉"
       },
-      "subtitle": "Enter the 6-digit code sent to {{phoneCountryCode}} (•••) ••• ••{{phoneNumberLastTwo}}.",
+      "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
       "form": {
         "error": {
           "description": "Incorrect verification code"

@@ -123,7 +123,11 @@ def inherit_user(twilio, phone_number, tenant_pk):
             preferred_challenge_kind="sms",
         )
         body = post("hosted/identify/login_challenge", data)
-        assert body["challenge_data"]["phone_number_last_two"] == real_phone_number[-2:]
+        last_two = real_phone_number[-2:]
+        assert (
+            body["challenge_data"]["scrubbed_phone_number"]
+            == f"+1 (***) ***-**{last_two}"
+        )
         assert body["challenge_data"]["challenge_kind"] == "sms"
         return body["challenge_data"]["challenge_token"]
 

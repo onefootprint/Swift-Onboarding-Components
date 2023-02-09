@@ -36,8 +36,7 @@ pub(crate) enum ChallengeKind {
 pub struct UserChallengeData {
     challenge_kind: ChallengeKind,
     challenge_token: ChallengeToken,
-    phone_number_last_two: String,
-    phone_country_code: String,
+    scrubbed_phone_number: String,
     biometric_challenge_json: Option<String>,
     time_before_retry_s: i64,
 }

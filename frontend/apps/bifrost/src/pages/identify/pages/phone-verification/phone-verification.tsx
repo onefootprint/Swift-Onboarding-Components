@@ -3,11 +3,7 @@ import {
   NavigationHeader,
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  Box,
-  getCountryByNumber,
-  getNumberByCountryValue,
-} from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -23,16 +19,12 @@ const PhoneVerification = () => {
   const { context } = state;
   const { phone, challengeData, userFound } = context;
 
-  let phoneCountryCode = '';
   const filteredPhone = phone?.split('#')[0] ?? ''; // Filter out sandbox suffixes
-  if (challengeData?.phoneCountryCode) {
-    phoneCountryCode = challengeData?.phoneCountryCode;
-  } else if (phone) {
-    const phoneCountryVal = getCountryByNumber(filteredPhone).value;
-    phoneCountryCode = getNumberByCountryValue(phoneCountryVal);
-  }
-  const phoneNumberLastTwo =
-    challengeData?.phoneNumberLastTwo ?? filteredPhone.slice(-2);
+  const scrubbedPhoneNumber = (
+    challengeData?.scrubbedPhoneNumber || filteredPhone
+  )
+    .replaceAll('*', '•')
+    .replaceAll('-', ' ');
 
   return (
     <>
@@ -50,8 +42,7 @@ const PhoneVerification = () => {
             data-private
             title={userFound ? t('title.existing-user') : t('title.new-user')}
             subtitle={t('subtitle', {
-              phoneCountryCode,
-              phoneNumberLastTwo,
+              scrubbedPhoneNumber,
             })}
           />
         </Box>

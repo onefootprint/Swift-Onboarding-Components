@@ -110,8 +110,7 @@ pub async fn post(
             challenge_data: UserChallengeData {
                 challenge_kind,
                 challenge_token,
-                phone_number_last_two: phone_number.leak_last_two(),
-                phone_country_code: phone_number.iso_country_code().leak_to_string(),
+                scrubbed_phone_number: phone_number.leak_formatted_last_two(),
                 biometric_challenge_json,
                 time_before_retry_s,
             },

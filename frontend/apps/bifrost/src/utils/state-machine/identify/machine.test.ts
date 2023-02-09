@@ -31,8 +31,7 @@ describe('Identify Machine Tests', () => {
       const challengeData = {
         challengeToken: 'token',
         challengeKind: ChallengeKind.sms,
-        phoneNumberLastTwo: '00',
-        phoneCountryCode: '+1',
+        scrubbedPhoneNumber: '+1 (***) ***-**00',
       };
       state = machine.send({
         type: Events.emailIdentificationCompleted,
@@ -77,8 +76,7 @@ describe('Identify Machine Tests', () => {
       const challengeData = {
         challengeToken: 'token',
         challengeKind: ChallengeKind.sms,
-        phoneNumberLastTwo: '00',
-        phoneCountryCode: '+1',
+        scrubbedPhoneNumber: '+1 (***) ***-**00',
         retryDisabledUntil: new Date('Aug 07 2022 18:00:00'),
       };
       state = machine.send({
@@ -251,8 +249,7 @@ describe('Identify Machine Tests', () => {
       const smsChallenge = {
         challengeToken: 'token',
         challengeKind: ChallengeKind.sms,
-        phoneNumberLastTwo: '00',
-        phoneCountryCode: '+1',
+        scrubbedPhoneNumber: '+1 (***) ***-**00',
       };
       state = machine.send({
         type: Events.smsChallengeInitiated,
@@ -287,8 +284,7 @@ describe('Identify Machine Tests', () => {
       const smsChallenge1 = {
         challengeToken: 'token',
         challengeKind: ChallengeKind.sms,
-        phoneNumberLastTwo: '00',
-        phoneCountryCode: '+1',
+        scrubbedPhoneNumber: '+1 (***) ***-**00',
       };
       let state = machine.send({
         type: Events.emailIdentificationCompleted,
@@ -304,8 +300,7 @@ describe('Identify Machine Tests', () => {
       const smsChallenge2 = {
         challengeToken: 'token2',
         challengeKind: ChallengeKind.sms,
-        phoneNumberLastTwo: '00',
-        phoneCountryCode: '+1',
+        scrubbedPhoneNumber: '+1 (***) ***-**00',
         retryDisabledUntil: new Date('Aug 07 2022 18:00:00'),
       };
       state = machine.send({
