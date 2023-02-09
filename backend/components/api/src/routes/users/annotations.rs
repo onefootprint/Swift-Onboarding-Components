@@ -105,10 +105,7 @@ impl ValidateRequest for CreateAnnotationRequest {
     }
 }
 
-#[api_v2_operation(
-    description = "Creates a new freeform annotation.",
-    tags(Annotation, PublicApi)
-)]
+#[api_v2_operation(description = "Creates a new freeform annotation.", tags(Users, PublicApi))]
 #[post("/users/{footprint_user_id}/annotations")]
 pub fn post(
     state: web::Data<State>,

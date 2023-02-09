@@ -64,7 +64,7 @@ pub async fn get(
 }
 
 #[api_v2_operation(
-    description = "Decryptes images from in the document vault.",
+    description = "Decrypts images in the document vault.",
     tags(Vault, PublicApi, Users)
 )]
 #[actix::post("/users/{footprint_user_id}/vault/identity/document/decrypt")]
