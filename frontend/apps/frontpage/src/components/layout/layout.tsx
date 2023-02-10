@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { media } from '@onefootprint/ui';
 import { createPopup } from '@typeform/embed';
-import { useRouter } from 'next/router';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -16,13 +15,10 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
   const { t } = useTranslation('components');
-  const router = useRouter();
-  const navVariant = router.asPath === '/footprint-live' ? 'min' : 'default';
 
   return (
     <>
       <Navbar
-        navVariant={navVariant}
         cta={{
           text: t('navbar.cta'),
           onClick: toggleTypeform,

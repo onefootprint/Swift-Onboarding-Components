@@ -11,19 +11,17 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import DesktopNav from './components/desktop-nav';
-import LogoLink from './components/logo-link/logo-link';
 import MobileNav from './components/mobile-nav';
 import { NavEntry } from './types';
 
 type NavbarProps = {
-  navVariant: string;
   cta: {
     text: string;
     onClick: () => void;
   };
 };
 
-const Navbar = ({ cta, navVariant }: NavbarProps) => {
+const Navbar = ({ cta }: NavbarProps) => {
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
   const hasScroll = useHasScroll();
   const { t } = useTranslation('components.navbar');
@@ -78,29 +76,25 @@ const Navbar = ({ cta, navVariant }: NavbarProps) => {
   return (
     <Header isFloating={hasScroll && isFloatingEnabled}>
       <Container>
-        <Inner data-variant={navVariant}>
-          {navVariant === 'default' ? (
-            <>
-              <MobileNav
-                onOpen={disableFloating}
-                onClose={enableFloating}
-                cta={{
-                  text: cta.text,
-                  onClick: cta.onClick,
-                }}
-                entries={entries}
-              />
-              <DesktopNav
-                cta={{
-                  text: cta.text,
-                  onClick: cta.onClick,
-                }}
-                entries={entries}
-              />
-            </>
-          ) : (
-            <LogoLink />
-          )}
+        <Inner>
+          <>
+            <MobileNav
+              onOpen={disableFloating}
+              onClose={enableFloating}
+              cta={{
+                text: cta.text,
+                onClick: cta.onClick,
+              }}
+              entries={entries}
+            />
+            <DesktopNav
+              cta={{
+                text: cta.text,
+                onClick: cta.onClick,
+              }}
+              entries={entries}
+            />
+          </>
         </Inner>
       </Container>
     </Header>
@@ -126,18 +120,14 @@ const Header = styled.header<{ isFloating: boolean }>`
 `;
 
 const Inner = styled.div`
-  position: relative;
   ${({ theme }) => css`
+    position: relative;
     padding: ${theme.spacing[6]} 0 ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
       padding:  ${theme.spacing[4]} 0;
     `}
   `}
-  &[data-variant='min'] {
-    display: flex;
-    justify-content: center;
-  }
 `;
 
 export default Navbar;
