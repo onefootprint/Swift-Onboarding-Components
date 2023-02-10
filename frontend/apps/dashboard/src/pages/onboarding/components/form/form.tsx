@@ -44,18 +44,10 @@ const Form = ({ onComplete }: FormProps) => {
       data-step={id}
       layout
       transition={{
-        layout: { duration: 0.3, ease: 'easeOut' },
+        layout: { duration: 0.1, ease: 'linear' },
       }}
     >
-      <motion.span
-        key={id}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{
-          duration: 0.8,
-          ease: 'easeOut',
-        }}
-      >
+      <motion.span key={id} initial={{ scale: 1 }} animate={{ scale: 1 }}>
         <Step id={id} onComplete={handleComplete} />
       </motion.span>
       <Controls>
@@ -86,8 +78,8 @@ const Container = styled(motion.div)`
         transparent 50%
       ),
       radial-gradient(at 0% 0%, #f9dff7 20%, transparent 60%),
-      radial-gradient(at 100% 0%, #e9e2ff 40%, transparent 60%),
-      radial-gradient(at 100% 100%, #e0f6f9 40%, transparent 60%);
+      radial-gradient(at 100% 50%,#f0fdff  20%, transparent 60%),
+      radial-gradient(at 100% 0%, #e9e2ff 40%, transparent 60%);
   `}
 `;
 
