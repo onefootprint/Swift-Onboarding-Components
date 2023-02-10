@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
+use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder, Detail};
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 use newtypes::{ObConfigurationKey, TenantId, Uuid};
@@ -9,9 +9,12 @@ use thiserror::Error;
 use crate::decision::rule::RuleSetName;
 
 #[derive(Debug, Error)]
+#[allow(clippy::enum_variant_names)]
 pub enum FeatureFlagError {
-    #[error("Launch Darkly error: {0}")]
-    LaunchDarklyError(String),
+    #[error("Launch Darkly error when building Context: {0}")]
+    LaunchDarklyContextBuilderError(String),
+    #[error("Launch Darkly error: {0:?}")]
+    LaunchDarklyError(launchdarkly_server_sdk::EvalError),
     #[error("Launch Darkly client failed to initialize")]
     LaunchDarklyClientFailedToInitialize,
 }
@@ -61,32 +64,64 @@ impl LaunchDarklyFeatureFlagClient {
     }
 }
 
+impl LaunchDarklyFeatureFlagClient {
+    //bool_variation_detail
+    fn get_ld_bool_flag_detail(
+        &self,
+        flag_key: &str,
+        context_builder: ContextBuilder,
+    ) -> Result<Detail<bool>, FeatureFlagError> {
+        let context = context_builder
+            .build()
+            .map_err(FeatureFlagError::LaunchDarklyContextBuilderError)?;
+
+        let flag_value = self
+            .launch_darkly_client
+            .as_ref()
+            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)
+            .and_then(|c| {
+                let detail = c.bool_variation_detail(&context, flag_key, false);
+                match detail.reason {
+                    launchdarkly_server_sdk::Reason::Error { error } => {
+                        Err(FeatureFlagError::LaunchDarklyError(error))
+                    }
+                    _ => Ok(detail),
+                }
+            });
+        flag_value
+    }
+
+    fn get_and_log_ld_bool_flag(
+        &self,
+        flag_key: &str,
+        context_builder: ContextBuilder,
+    ) -> Result<bool, FeatureFlagError> {
+        let res = self.get_ld_bool_flag_detail(flag_key, context_builder);
+        match res {
+            Ok(detail) => {
+                tracing::info!(flag_key=%flag_key, detail=format!("{:?}", detail), "LaunchDarkly flag result");
+                Ok(detail.value.unwrap_or(false))
+            }
+            Err(err) => {
+                tracing::warn!(flag_key=%flag_key, err=%err, "LaunchDarklyError");
+                Err(err)
+            }
+        }
+    }
+}
+
 impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
     #[tracing::instrument(skip(self))]
     fn bool_flag(&self, flag_key: &str) -> Result<bool, FeatureFlagError> {
         let key = Uuid::new_v4().to_string();
-        let context = ContextBuilder::new(key)
-            .build()
-            .map_err(FeatureFlagError::LaunchDarklyError)?;
-        let flag_value = self
-            .launch_darkly_client
-            .as_ref()
-            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)
-            .map(|c| c.bool_variation(&context, flag_key, false));
-        flag_value
+        let context_builder = ContextBuilder::new(key);
+        self.get_and_log_ld_bool_flag(flag_key, context_builder)
     }
 
     #[tracing::instrument(skip(self))]
     fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError> {
-        let context = ContextBuilder::new(tenant_id.clone())
-            .build()
-            .map_err(FeatureFlagError::LaunchDarklyError)?;
-        let flag_value = self
-            .launch_darkly_client
-            .as_ref()
-            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)
-            .map(|c| c.bool_variation(&context, flag_key, false));
-        flag_value
+        let context_builder = ContextBuilder::new(tenant_id.clone());
+        self.get_and_log_ld_bool_flag(flag_key, context_builder)
     }
 
     #[tracing::instrument(skip(self))]
@@ -95,15 +130,8 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         flag_key: &str,
         ob_configuration_key: &ObConfigurationKey,
     ) -> Result<bool, FeatureFlagError> {
-        let context = ContextBuilder::new(ob_configuration_key.clone())
-            .build()
-            .map_err(FeatureFlagError::LaunchDarklyError)?;
-        let flag_value = self
-            .launch_darkly_client
-            .as_ref()
-            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)
-            .map(|c| c.bool_variation(&context, flag_key, false));
-        flag_value
+        let context_builder = ContextBuilder::new(ob_configuration_key.clone());
+        self.get_and_log_ld_bool_flag(flag_key, context_builder)
     }
 
     #[tracing::instrument(skip(self))]
@@ -112,14 +140,7 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         flag_key: &str,
         rule_set_name: &RuleSetName,
     ) -> Result<bool, FeatureFlagError> {
-        let context = ContextBuilder::new(rule_set_name.clone().to_string())
-            .build()
-            .map_err(FeatureFlagError::LaunchDarklyError)?;
-        let flag_value = self
-            .launch_darkly_client
-            .as_ref()
-            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)
-            .map(|c| c.bool_variation(&context, flag_key, false));
-        flag_value
+        let context_builder = ContextBuilder::new(rule_set_name.clone().to_string());
+        self.get_and_log_ld_bool_flag(flag_key, context_builder)
     }
 }
