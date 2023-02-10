@@ -56,7 +56,7 @@ const ResendCodeButton = () => {
       description: t('toast.success.description'),
     });
     send({
-      type: Events.smsChallengeResent,
+      type: Events.smsChallengeInitiated,
       payload: {
         challengeData: newChallengeData,
       },

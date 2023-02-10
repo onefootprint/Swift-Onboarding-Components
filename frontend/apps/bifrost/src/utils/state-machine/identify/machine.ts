@@ -1,5 +1,4 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ChallengeKind } from '@onefootprint/types';
 import validateBootstrapData from 'src/utils/validate-bootstrap-data';
 import { assign, createMachine } from 'xstate';
 
@@ -50,30 +49,25 @@ const createIdentifyMachine = ({
         },
         [States.emailIdentification]: {
           on: {
-            [Events.emailIdentificationCompleted]: [
+            [Events.identifyCompleted]: [
               {
                 target: States.phoneRegistration,
                 actions: [Actions.assignEmail, Actions.assignUserFound],
-                cond: (context, event) => !event.payload.userFound,
+                description:
+                  'Transition to phone registration only if could not find user or cannot initiate a challenge',
+                cond: (context, event) =>
+                  !event.payload.userFound ||
+                  (!!event.payload.availableChallengeKinds &&
+                    !event.payload.availableChallengeKinds?.length),
               },
+              {
+                actions: [Actions.assignEmail, Actions.assignUserFound],
+              },
+            ],
+            [Events.smsChallengeInitiated]: [
               {
                 target: States.phoneVerification,
-                actions: [
-                  Actions.assignEmail,
-                  Actions.assignUserFound,
-                  Actions.assignChallenge,
-                ],
-                cond: (context, event) =>
-                  event.payload.userFound &&
-                  event.payload.challengeData?.challengeKind ===
-                    ChallengeKind.sms,
-              },
-              {
-                actions: [
-                  Actions.assignEmail,
-                  Actions.assignUserFound,
-                  Actions.assignChallenge,
-                ],
+                actions: [Actions.assignChallenge],
               },
             ],
             [Events.biometricLoginSucceeded]: [
@@ -100,14 +94,26 @@ const createIdentifyMachine = ({
                 actions: [Actions.resetContext],
               },
             ],
-            [Events.phoneIdentificationCompleted]: [
+            [Events.identifyCompleted]: [
+              {
+                actions: [Actions.assignPhone, Actions.assignUserFound],
+              },
+            ],
+            [Events.smsChallengeInitiated]: [
               {
                 target: States.phoneVerification,
-                actions: [
-                  Actions.assignPhone,
-                  Actions.assignUserFound,
-                  Actions.assignChallenge,
-                ],
+                actions: [Actions.assignChallenge],
+              },
+            ],
+            [Events.biometricLoginSucceeded]: [
+              {
+                target: States.success,
+                actions: [Actions.assignAuthToken],
+              },
+            ],
+            [Events.biometricLoginFailed]: [
+              {
+                target: States.biometricLoginRetry,
               },
             ],
           },
@@ -123,7 +129,7 @@ const createIdentifyMachine = ({
                 target: States.emailIdentification,
               },
             ],
-            [Events.smsChallengeResent]: [
+            [Events.smsChallengeInitiated]: [
               {
                 actions: [Actions.assignChallenge],
               },
@@ -173,24 +179,32 @@ const createIdentifyMachine = ({
           return context;
         }),
         [Actions.assignEmail]: assign((context, event) => {
-          if (event.type === Events.emailIdentificationCompleted) {
-            context.email = event.payload.email;
+          if (event.type === Events.identifyCompleted) {
+            const emailIdentifier = Object.entries(
+              event.payload.identifier,
+            ).find(([key, value]) => key === 'email' && !!value);
+            if (emailIdentifier) {
+              const [, email] = emailIdentifier;
+              context.email = email;
+            }
           }
           return context;
         }),
         [Actions.assignPhone]: assign((context, event) => {
-          if (
-            event.type === Events.phoneIdentificationCompleted &&
-            event.payload.phone
-          ) {
-            context.phone = event.payload.phone;
+          if (event.type === Events.identifyCompleted) {
+            const phoneIdentifier = Object.entries(
+              event.payload.identifier,
+            ).find(([key, value]) => key === 'phoneNumber' && !!value);
+            if (phoneIdentifier) {
+              const [, phone] = phoneIdentifier;
+              context.phone = phone;
+            }
           }
           return context;
         }),
         [Actions.assignUserFound]: assign((context, event) => {
           if (
-            event.type === Events.emailIdentificationCompleted ||
-            event.type === Events.phoneIdentificationCompleted ||
+            event.type === Events.identifyCompleted ||
             event.type === Events.bootstrapDataProcessed
           ) {
             context.userFound = event.payload.userFound;
@@ -217,10 +231,7 @@ const createIdentifyMachine = ({
         [Actions.assignChallenge]: assign((context, event) => {
           if (
             event.type !== Events.bootstrapDataProcessed &&
-            event.type !== Events.emailIdentificationCompleted &&
-            event.type !== Events.phoneIdentificationCompleted &&
-            event.type !== Events.smsChallengeInitiated &&
-            event.type !== Events.smsChallengeResent
+            event.type !== Events.smsChallengeInitiated
           ) {
             return context;
           }

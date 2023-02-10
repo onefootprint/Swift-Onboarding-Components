@@ -8,7 +8,7 @@ import {
   IdentifyVerifyResponse,
   LoginChallengeResponse,
 } from '@onefootprint/types';
-import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
+import generateLoginDeviceResponse from 'src/pages/identify/utils/biometric/login-challenge-response';
 import { Events } from 'src/utils/state-machine/identify/types';
 
 import useIdentifyMachine from '../../../hooks/use-identify-machine';

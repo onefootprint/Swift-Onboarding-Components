@@ -11,7 +11,7 @@ import {
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '../../../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 
 const iOSPlatforms = [
   'iPad Simulator',
@@ -24,13 +24,15 @@ const iOSPlatforms = [
 
 type ChallengePickerProps = {
   open: boolean;
-  onClose: () => void;
+  isLoading?: boolean;
+  onClose?: () => void;
   onSelectSms: () => void;
   onSelectBiometric: () => void;
 };
 
 const ChallengePicker = ({
   open,
+  isLoading,
   onClose,
   onSelectSms,
   onSelectBiometric,
@@ -64,7 +66,7 @@ const ChallengePicker = ({
   ];
 
   const handleComplete = () => {
-    onClose();
+    onClose?.();
     if (challengeKind === ChallengeKind.sms) {
       onSelectSms();
     } else {
@@ -85,7 +87,7 @@ const ChallengePicker = ({
           defaultSelected={challengeKind}
           onSelect={handleSelect}
         />
-        <Button fullWidth onClick={handleComplete}>
+        <Button fullWidth onClick={handleComplete} loading={isLoading}>
           {t('cta')}
         </Button>
       </Body>

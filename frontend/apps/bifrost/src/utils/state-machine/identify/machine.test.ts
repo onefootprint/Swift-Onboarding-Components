@@ -28,26 +28,19 @@ describe('Identify Machine Tests', () => {
         hasSupportForWebauthn: true,
       });
 
-      const challengeData = {
-        challengeToken: 'token',
-        challengeKind: ChallengeKind.sms,
-        scrubbedPhoneNumber: '+1 (***) ***-**00',
-      };
       state = machine.send({
-        type: Events.emailIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          email: 'belce@onefootprint.com',
+          identifier: { email: 'belce@onefootprint.com' },
           userFound: true,
-          challengeData,
         },
       });
       expect(state.context.email).toEqual('belce@onefootprint.com');
       expect(state.context.userFound).toEqual(true);
-      expect(state.context.challengeData).toEqual(challengeData);
-      expect(state.value).toEqual(States.phoneVerification);
+      expect(state.value).toEqual(States.emailIdentification);
     });
 
-    it('successfully ids the user using phone number, after email mismatch', () => {
+    it('successfully ids the user using phone number, after email mismatch, starts sms challenge', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
@@ -63,9 +56,9 @@ describe('Identify Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.emailIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          email: 'belce@onefootprint.com',
+          identifier: { email: 'belce@onefootprint.com' },
           userFound: false,
         },
       });
@@ -73,25 +66,77 @@ describe('Identify Machine Tests', () => {
       expect(state.context.userFound).toEqual(false);
       expect(state.value).toEqual(States.phoneRegistration);
 
-      const challengeData = {
-        challengeToken: 'token',
-        challengeKind: ChallengeKind.sms,
-        scrubbedPhoneNumber: '+1 (***) ***-**00',
-        retryDisabledUntil: new Date('Aug 07 2022 18:00:00'),
-      };
       state = machine.send({
-        type: Events.phoneIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          phone: '+16509878899',
+          identifier: { phoneNumber: '+16509878899' },
           userFound: true,
-          challengeData,
         },
       });
 
       expect(state.context.userFound).toEqual(true);
       expect(state.context.phone).toEqual('+16509878899');
+      expect(state.value).toEqual(States.phoneRegistration);
+
+      const challengeData = {
+        challengeToken: 'token',
+        challengeKind: ChallengeKind.sms,
+        scrubbedPhoneNumber: '+1 (***) ***-**00',
+      };
+
+      state = machine.send({
+        type: Events.smsChallengeInitiated,
+        payload: { challengeData },
+      });
       expect(state.context.challengeData).toEqual(challengeData);
       expect(state.value).toEqual(States.phoneVerification);
+    });
+
+    it('successfully ids the user using phone number, after email mismatch, starts biometric challenge', () => {
+      const machine = interpret(
+        createMachine({
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        }),
+      );
+      machine.start();
+      let { state } = machine;
+      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.context.device).toEqual({
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      });
+
+      state = machine.send({
+        type: Events.identifyCompleted,
+        payload: {
+          identifier: { email: 'belce@onefootprint.com' },
+          userFound: false,
+        },
+      });
+      expect(state.context.email).toEqual('belce@onefootprint.com');
+      expect(state.context.userFound).toEqual(false);
+      expect(state.value).toEqual(States.phoneRegistration);
+
+      state = machine.send({
+        type: Events.identifyCompleted,
+        payload: {
+          identifier: { phoneNumber: '+16509878899' },
+          userFound: true,
+        },
+      });
+
+      expect(state.context.userFound).toEqual(true);
+      expect(state.context.phone).toEqual('+16509878899');
+      expect(state.value).toEqual(States.phoneRegistration);
+
+      state = machine.send({
+        type: Events.biometricLoginSucceeded,
+        payload: {
+          authToken: 'token',
+        },
+      });
+      expect(state.value).toEqual(States.success);
     });
   });
 
@@ -112,10 +157,11 @@ describe('Identify Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.emailIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          email: 'belce@onefootprint.com',
+          identifier: { email: 'belce@onefootprint.com' },
           userFound: false,
+          availableChallengeKinds: [],
         },
       });
       expect(state.context.email).toEqual('belce@onefootprint.com');
@@ -123,14 +169,29 @@ describe('Identify Machine Tests', () => {
       expect(state.value).toEqual(States.phoneRegistration);
 
       state = machine.send({
-        type: Events.phoneIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          phone: '+16509878899',
+          identifier: { phoneNumber: '+16509878899' },
           userFound: false,
         },
       });
       expect(state.context.userFound).toEqual(false);
       expect(state.context.phone).toEqual('+16509878899');
+      expect(state.value).toEqual(States.phoneRegistration);
+
+      const challengeData = {
+        challengeToken: 'token',
+        challengeKind: ChallengeKind.sms,
+        scrubbedPhoneNumber: '+1 (***) ***-**00',
+      };
+
+      state = machine.send({
+        type: Events.smsChallengeInitiated,
+        payload: {
+          challengeData,
+        },
+      });
+      expect(state.context.challengeData).toEqual(challengeData);
       expect(state.value).toEqual(States.phoneVerification);
 
       // Go back and change the phone number
@@ -140,14 +201,11 @@ describe('Identify Machine Tests', () => {
       expect(state.value).toEqual(States.phoneRegistration);
 
       state = machine.send({
-        type: Events.phoneIdentificationCompleted,
+        type: Events.smsChallengeInitiated,
         payload: {
-          phone: '+16501111111',
-          userFound: true,
+          challengeData,
         },
       });
-      expect(state.context.userFound).toEqual(true);
-      expect(state.context.phone).toEqual('+16501111111');
       expect(state.value).toEqual(States.phoneVerification);
     });
 
@@ -167,9 +225,9 @@ describe('Identify Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.emailIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          email: 'belce@onefootprint.com',
+          identifier: { email: 'belce@onefootprint.com' },
           userFound: false,
         },
       });
@@ -198,9 +256,9 @@ describe('Identify Machine Tests', () => {
       machine.start();
 
       let state = machine.send({
-        type: Events.emailIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          email: 'belce@onefootprint.com',
+          identifier: { email: 'belce@onefootprint.com' },
           userFound: true,
         },
       });
@@ -225,21 +283,14 @@ describe('Identify Machine Tests', () => {
       );
       machine.start();
 
-      const biometricChallenge = {
-        challengeToken: 'token',
-        challengeKind: ChallengeKind.biometric,
-        biometricChallengeJson: '',
-      };
       let state = machine.send({
-        type: Events.emailIdentificationCompleted,
+        type: Events.identifyCompleted,
         payload: {
-          email: 'belce@onefootprint.com',
+          identifier: { email: 'belce@onefootprint.com' },
           userFound: true,
-          challengeData: biometricChallenge,
         },
       });
       expect(state.value).toEqual(States.emailIdentification);
-      expect(state.context.challengeData).toEqual(biometricChallenge);
 
       state = machine.send({
         type: Events.biometricLoginFailed,
@@ -281,19 +332,27 @@ describe('Identify Machine Tests', () => {
       );
       machine.start();
 
+      let state = machine.send({
+        type: Events.identifyCompleted,
+        payload: {
+          identifier: { email: 'belce@onefootprint.com' },
+          userFound: true,
+        },
+      });
+      expect(state.value).toEqual(States.emailIdentification);
+
       const smsChallenge1 = {
         challengeToken: 'token',
         challengeKind: ChallengeKind.sms,
         scrubbedPhoneNumber: '+1 (***) ***-**00',
       };
-      let state = machine.send({
-        type: Events.emailIdentificationCompleted,
+      state = machine.send({
+        type: Events.smsChallengeInitiated,
         payload: {
-          email: 'belce@onefootprint.com',
-          userFound: true,
           challengeData: smsChallenge1,
         },
       });
+
       expect(state.value).toEqual(States.phoneVerification);
       expect(state.context.challengeData).toEqual(smsChallenge1);
 
@@ -304,7 +363,7 @@ describe('Identify Machine Tests', () => {
         retryDisabledUntil: new Date('Aug 07 2022 18:00:00'),
       };
       state = machine.send({
-        type: Events.smsChallengeResent,
+        type: Events.smsChallengeInitiated,
         payload: {
           challengeData: smsChallenge2,
         },

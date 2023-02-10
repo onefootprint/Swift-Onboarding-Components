@@ -5,7 +5,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 
-import useIdentifyMachine from '../../../../../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../../../../../../../hooks/use-identify-machine';
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
@@ -31,8 +31,9 @@ const EmailIdentificationForm = ({
   } = useForm<FormData>({ defaultValues: { email } });
 
   const getHint = () => {
-    if (errors.email) {
-      return errors.email.message;
+    const hasError = !!errors?.[UserDataAttribute.email];
+    if (hasError) {
+      return errors[UserDataAttribute.email]?.message;
     }
     return isSandbox ? t('email.hint') : undefined;
   };
@@ -47,8 +48,8 @@ const EmailIdentificationForm = ({
           label={t('email.label')}
           placeholder={t('email.placeholder')}
           type="email"
-          defaultValue={getValues('email')}
-          {...register('email', {
+          defaultValue={getValues(UserDataAttribute.email)}
+          {...register(UserDataAttribute.email, {
             required: {
               value: true,
               message: t('email.errors.required'),

@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ChallengeData } from '@onefootprint/types';
+import { ChallengeData, ChallengeKind, Identifier } from '@onefootprint/types';
 
 import { BootstrapData } from '../bifrost/types';
 
@@ -26,12 +26,10 @@ export type MachineContext = {
 export enum Events {
   bootstrapDataProcessed = 'bootstrapDataProcessed',
   bootstrapDataProcessErrored = 'bootstrapDataProcessErrored',
-  emailIdentificationCompleted = 'emailIdentificationCompleted',
-  phoneIdentificationCompleted = 'phoneIdentificationCompleted',
+  identifyCompleted = 'identifyCompleted',
   navigatedToPrevPage = 'navigatedToPrevPage',
   emailChangeRequested = 'emailChangeRequested',
   smsChallengeInitiated = 'smsChallengeInitiated',
-  smsChallengeResent = 'smsChallengeResent',
   smsChallengeSucceeded = 'smsChallengeSucceeded',
   biometricLoginSucceeded = 'biometricLoginSucceeded',
   biometricLoginFailed = 'livenessLoginFailed',
@@ -59,31 +57,17 @@ export type MachineEvents =
       type: Events.bootstrapDataProcessErrored;
     }
   | {
-      type: Events.emailIdentificationCompleted;
+      type: Events.identifyCompleted;
       payload: {
-        email: string;
+        identifier: Identifier;
         userFound: boolean;
-        challengeData?: ChallengeData; // if user was found
-      };
-    }
-  | {
-      type: Events.phoneIdentificationCompleted;
-      payload: {
-        userFound: boolean;
-        phone: string;
-        challengeData?: ChallengeData; // if user was found
+        availableChallengeKinds?: ChallengeKind[];
       };
     }
   | { type: Events.navigatedToPrevPage }
   | { type: Events.emailChangeRequested }
   | {
       type: Events.smsChallengeInitiated;
-      payload: {
-        challengeData: ChallengeData;
-      };
-    }
-  | {
-      type: Events.smsChallengeResent;
       payload: {
         challengeData: ChallengeData;
       };

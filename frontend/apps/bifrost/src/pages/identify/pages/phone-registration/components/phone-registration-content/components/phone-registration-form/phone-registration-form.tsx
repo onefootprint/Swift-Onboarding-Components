@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { UserDataAttribute } from '@onefootprint/types';
 import { Button, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,7 +13,7 @@ import {
 } from './phone-registration-form.constants';
 
 type FormData = {
-  phone: string;
+  [UserDataAttribute.phoneNumber]: string;
 };
 
 type PhoneRegistrationFormProps = {
@@ -36,13 +37,14 @@ const PhoneRegistrationForm = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      phone,
+      [UserDataAttribute.phoneNumber]: phone,
     },
   });
 
   const getHint = () => {
-    if (errors.phone) {
-      return errors.phone.message;
+    const hasError = !!errors?.[UserDataAttribute.phoneNumber];
+    if (hasError) {
+      return errors[UserDataAttribute.phoneNumber]?.message;
     }
     return isSandbox ? t('phone.hint') : undefined;
   };
@@ -52,15 +54,15 @@ const PhoneRegistrationForm = ({
       <PhoneInput
         data-private
         disableMask={isSandbox}
-        hasError={!!errors.phone}
+        hasError={!!errors[UserDataAttribute.phoneNumber]}
         hint={getHint()}
         label={t('phone.label')}
         placeholder={t('phone.placeholder')}
         onReset={() => {
-          setValue('phone', '');
+          setValue(UserDataAttribute.phoneNumber, '');
         }}
-        value={getValues('phone')}
-        {...register('phone', {
+        value={getValues(UserDataAttribute.phoneNumber)}
+        {...register(UserDataAttribute.phoneNumber, {
           required: {
             value: true,
             message: t('phone.errors.required'),
