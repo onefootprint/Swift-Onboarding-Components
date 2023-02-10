@@ -14,17 +14,10 @@ import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
 import { NavEntry } from './types';
 
-type NavbarProps = {
-  cta: {
-    text: string;
-    onClick: () => void;
-  };
-};
-
-const Navbar = ({ cta }: NavbarProps) => {
+const Navbar = () => {
+  const { t } = useTranslation('components.navbar');
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
   const hasScroll = useHasScroll();
-  const { t } = useTranslation('components.navbar');
 
   const entries: NavEntry[] = [
     { text: t('entries.compare.text'), href: t('entries.compare.href') },
@@ -77,24 +70,12 @@ const Navbar = ({ cta }: NavbarProps) => {
     <Header isFloating={hasScroll && isFloatingEnabled}>
       <Container>
         <Inner>
-          <>
-            <MobileNav
-              onOpen={disableFloating}
-              onClose={enableFloating}
-              cta={{
-                text: cta.text,
-                onClick: cta.onClick,
-              }}
-              entries={entries}
-            />
-            <DesktopNav
-              cta={{
-                text: cta.text,
-                onClick: cta.onClick,
-              }}
-              entries={entries}
-            />
-          </>
+          <MobileNav
+            onOpen={disableFloating}
+            onClose={enableFloating}
+            entries={entries}
+          />
+          <DesktopNav entries={entries} />
         </Inner>
       </Container>
     </Header>

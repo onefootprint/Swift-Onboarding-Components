@@ -1,54 +1,71 @@
-import { Box, Button, createFontStyles, media } from '@onefootprint/ui';
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
+import { useTranslation } from '@onefootprint/hooks';
+import { createFontStyles, media } from '@onefootprint/ui';
+import Link from 'next/link';
 import React from 'react';
+import LinkButton from 'src/components/link-button';
 import styled, { css } from 'styled-components';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';
 import LogoLink from '../logo-link';
-import DesktopNavLink from './components/desktop-nav-link/desktop-nav-link';
-import DesktopNavMenu from './components/desktop-nav-menu/desktop-nav-menu';
+import DesktopNavLink from './components/desktop-nav-link';
+import DesktopNavMenu from './components/desktop-nav-menu';
 
 type DesktopNavProps = {
-  cta: {
-    text: string;
-    onClick: () => void;
-  };
   entries: NavEntry[];
 };
 
-const DesktopNav = ({ cta, entries }: DesktopNavProps) => (
-  <Container>
-    <LogoLink />
-    <Nav>
-      {entries.map(entry => {
-        if (isNavLink(entry)) {
-          return <DesktopNavLink link={entry} key={entry.text} />;
-        }
-        if (isNavMenu(entry)) {
-          return <DesktopNavMenu menu={entry} key={entry.text} />;
-        }
-        return null;
-      })}
-    </Nav>
-    <Box>
-      <Button onClick={cta.onClick} fullWidth size="compact">
-        {cta.text}
-      </Button>
-    </Box>
-  </Container>
-);
+const DesktopNav = ({ entries }: DesktopNavProps) => {
+  const { t } = useTranslation('components.navbar');
+
+  return (
+    <Container>
+      <LogoLink />
+      <NavContainer>
+        <Nav>
+          {entries.map(entry => {
+            if (isNavLink(entry)) {
+              return <DesktopNavLink link={entry} key={entry.text} />;
+            }
+            if (isNavMenu(entry)) {
+              return <DesktopNavMenu menu={entry} key={entry.text} />;
+            }
+            return null;
+          })}
+        </Nav>
+        <SecondaryNav>
+          <Link href={`${DASHBOARD_BASE_URL}/login`} prefetch>
+            {t('login')}
+          </Link>
+          <LinkButton
+            href={`${DASHBOARD_BASE_URL}/sign-up`}
+            size="compact"
+            prefetch
+          >
+            {t('sign-up')}
+          </LinkButton>
+        </SecondaryNav>
+      </NavContainer>
+    </Container>
+  );
+};
 
 const Container = styled.div`
   ${({ theme }) => css`
     display: none;
 
     ${media.greaterThan('lg')`
-      align-items: center;
       display: flex;
-      flex-grow: 1;
+      align-items: center;
       gap: ${theme.spacing[7]};
-      justify-content: space-between;
     `}
   `}
+`;
+
+const NavContainer = styled.div`
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
 `;
 
 const Nav = styled.nav`
@@ -56,14 +73,22 @@ const Nav = styled.nav`
     align-items: center;
     display: flex;
     gap: ${theme.spacing[8]};
+
+    a {
+      text-decoration: none;
+    }
+
     a {
       ${createFontStyles('label-3')};
       color: ${theme.color.primary};
-      text-decoration: none;
-      &:hover {
-        text-decoration: underline;
-      }
+      outline-offset: ${theme.spacing[2]};
     }
+  `}
+`;
+
+const SecondaryNav = styled(Nav)`
+  ${({ theme }) => css`
+    gap: ${theme.spacing[5]};
   `}
 `;
 

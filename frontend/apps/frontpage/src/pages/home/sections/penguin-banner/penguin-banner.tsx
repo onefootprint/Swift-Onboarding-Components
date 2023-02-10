@@ -1,13 +1,14 @@
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { Button, Container, media, Typography } from '@onefootprint/ui';
-import { createPopup } from '@typeform/embed';
+import { Container, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import LinkButton from 'src/components/link-button';
 import styled, { css } from 'styled-components';
 
 const PenguinBanner = () => {
   const { t } = useTranslation('pages.home.banner');
-  const { toggle: toggleTypeform } = createPopup('COZNk70C');
+
   return (
     <Clipper>
       <ColorBackground />
@@ -30,7 +31,10 @@ const PenguinBanner = () => {
               {t('title')}
             </Typography>
           </ResponsiveHide>
-          <Button onClick={toggleTypeform}> {t('cta')}</Button>
+          <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+            {' '}
+            {t('cta')}
+          </LinkButton>
         </Content>
       </Container>
     </Clipper>

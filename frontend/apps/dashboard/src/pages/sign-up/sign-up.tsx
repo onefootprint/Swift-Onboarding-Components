@@ -4,10 +4,11 @@ import { Button, GoogleButton, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import TermsAndConditions from 'src/components/terms-and-conditions';
 import styled, { css } from 'styled-components';
 
 const Login = () => {
-  const { t } = useTranslation('pages.login');
+  const { t } = useTranslation('pages.sign-up');
   const router = useRouter();
 
   const handleGoggleButtonClick = () => {
@@ -43,6 +44,7 @@ const Login = () => {
               {t('email')}
             </Button>
           </ButtonsContainer>
+          <TermsAndConditions />
         </Inner>
       </Container>
     </>

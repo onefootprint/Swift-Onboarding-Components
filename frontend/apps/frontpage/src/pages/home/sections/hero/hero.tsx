@@ -1,9 +1,10 @@
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { Button, Container, media, Typography } from '@onefootprint/ui';
-import { createPopup } from '@typeform/embed';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
+import LinkButton from 'src/components/link-button';
 import styled, { css } from 'styled-components';
 
 import HeroBackground from './components/background';
@@ -21,7 +22,6 @@ const DynamicMobileIllustration = dynamic(
 );
 
 const DEMO_LINK = 'https://www.youtube.com/embed/ylHZgcW3fyI?autoplay=1';
-const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 const containerMotion = {
   hidden: { opacity: 0.8 },
@@ -70,7 +70,9 @@ const Hero = () => {
             <DynamicMobileIllustration />
             <DynamicTabletIllustration />
             <ButtonsContainer>
-              <Button onClick={toggleTypeform}> {t('primary-button')}</Button>
+              <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+                {t('primary-button')}
+              </LinkButton>
               <Button onClick={toggleDemo} variant="secondary">
                 {t('secondary-button')}
               </Button>

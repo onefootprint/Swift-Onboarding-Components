@@ -1,6 +1,10 @@
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24, IcoMenu24 } from '@onefootprint/icons';
-import { Button, media, useMediaQuery } from '@onefootprint/ui';
+import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
+import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
+import LinkButton from 'src/components/link-button';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
@@ -12,14 +16,11 @@ import MobileNavMenu from './components/mobile-nav-menu';
 type MobileNavProps = {
   onOpen: () => void;
   onClose: () => void;
-  cta: {
-    text: string;
-    onClick: () => void;
-  };
   entries: NavEntry[];
 };
 
-const MobileNav = ({ onOpen, onClose, cta, entries }: MobileNavProps) => {
+const MobileNav = ({ onOpen, onClose, entries }: MobileNavProps) => {
+  const { t } = useTranslation('components.navbar');
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
   const [isOpen, setOpen] = useState(false);
   useLockedBody(isOpen);
@@ -55,7 +56,11 @@ const MobileNav = ({ onOpen, onClose, cta, entries }: MobileNavProps) => {
     <Menu>
       <Header>
         <LogoLink onClick={handleLinkClick} />
-        <NavTriggerButton type="button" onClick={handleToggle}>
+        <NavTriggerButton
+          aria-label={t('nav-toggle.open')}
+          onClick={handleToggle}
+          type="button"
+        >
           <IcoClose24 />
         </NavTriggerButton>
       </Header>
@@ -84,16 +89,23 @@ const MobileNav = ({ onOpen, onClose, cta, entries }: MobileNavProps) => {
           })}
         </nav>
         <CtaContainer>
-          <Button onClick={cta.onClick} fullWidth>
-            {cta.text}
-          </Button>
+          <LoginLink href={`${DASHBOARD_BASE_URL}/login`}>
+            {t('login')}
+          </LoginLink>
+          <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+            {t('sign-up')}
+          </LinkButton>
         </CtaContainer>
       </Content>
     </Menu>
   ) : (
     <Container>
       <LogoLink onClick={handleLinkClick} />
-      <NavTriggerButton type="button" onClick={handleToggle}>
+      <NavTriggerButton
+        aria-label={t('nav-toggle.close')}
+        onClick={handleToggle}
+        type="button"
+      >
         <IcoMenu24 />
       </NavTriggerButton>
     </Container>
@@ -157,7 +169,24 @@ const NavTriggerButton = styled.button`
 
 const CtaContainer = styled.div`
   ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[5]};
     padding: ${theme.spacing[5]};
+
+    > a {
+      flex: 1;
+    }
+  `}
+`;
+
+const LoginLink = styled(Link)`
+  ${({ theme }) => css`
+    ${createFontStyles('label-1')};
+    align-items: center;
+    color: ${theme.color.primary};
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
   `}
 `;
 

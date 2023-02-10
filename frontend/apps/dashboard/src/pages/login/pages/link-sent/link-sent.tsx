@@ -1,11 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { LogoFpDefault } from '@onefootprint/icons';
 import { Button, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-
-import LogoAndText from '../../components/logo-and-text';
 
 const LinkSent = () => {
   const { t } = useTranslation('pages.link-sent');
@@ -19,8 +18,11 @@ const LinkSent = () => {
       </Head>
       <Container>
         <Inner>
-          <LogoAndText text={t('title')} />
-          <Typography variant="body-2" sx={{ marginBottom: 8 }}>
+          <LogoFpDefault />
+          <Typography variant="label-1" color="primary">
+            {t('title')}
+          </Typography>
+          <Typography variant="body-2">
             {t('instructions', { email })}
           </Typography>
           <Button onClick={() => router.push('/login')} fullWidth>
@@ -46,7 +48,8 @@ const Inner = styled.div`
     display: flex;
     max-width: 350px;
     flex-direction: column;
-    row-gap: ${theme.spacing[4]};
+    gap: ${theme.spacing[7]};
+    align-items: center;
   `}
 `;
 

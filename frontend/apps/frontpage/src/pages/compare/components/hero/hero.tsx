@@ -1,9 +1,8 @@
-import { Button, Typography } from '@onefootprint/ui';
-import { createPopup } from '@typeform/embed';
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import LinkButton from 'src/components/link-button';
 import styled from 'styled-components';
-
-const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 type HeroProps = {
   cta: string;
@@ -28,9 +27,7 @@ const Hero = ({ title, subtitle, cta }: HeroProps) => (
     >
       {subtitle}
     </Typography>
-    <Button onClick={toggleTypeform} type="button">
-      {cta}
-    </Button>
+    <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>{cta}</LinkButton>
   </Container>
 );
 

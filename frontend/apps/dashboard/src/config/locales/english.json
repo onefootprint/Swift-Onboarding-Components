@@ -106,9 +106,15 @@
     }
   },
   "pages": {
+    "sign-up": {
+      "page-title": "Footprint | Sign up to the Footprint",
+      "title": "Create your account",
+      "google": "Continue with Google",
+      "email": "Continue with email"
+    },
     "login": {
-      "page-title": "Footprint Login | Sign in to the Footprint Dashboard",
-      "title": "Sign up or log in to your company's dashboard",
+      "page-title": "Footprint | Log in to the Footprint",
+      "title": "Log into Footprint",
       "google": "Continue with Google",
       "email": "Continue with email"
     },

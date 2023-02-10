@@ -94,7 +94,6 @@ const ButtonContainer = styled.button<{
       justify-content: center;
       outline-offset: ${theme.spacing[2]};
       padding: 0 ${button.size[size].paddingHorizontal};
-      text-decoration: none;
       user-select: none;
       ${sx};
 

@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
-import Testimonial from 'src/components/testimonial';
+
+import Testimonial from './components/testimonial';
 
 const TestimonialSection = () => {
   const { t } = useTranslation('pages.compare.testimonial');

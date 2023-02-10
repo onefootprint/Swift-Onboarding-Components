@@ -1,7 +1,10 @@
+import '@typeform/embed/build/css/popup.css';
+
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Button, media, Typography } from '@onefootprint/ui';
-import { createPopup } from '@typeform/embed';
+import { Box, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import LinkButton from 'src/components/link-button';
 import styled, { css } from 'styled-components';
 
 import InfoDialog from '../../info-dialog';
@@ -10,8 +13,6 @@ import CheckedRow from '../components/checked-row';
 import FeatureRow from '../components/feature-row';
 import TableHeader from '../components/table-header';
 import Calculator from './components/calculator';
-
-const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 const CorePlan = () => {
   const { t } = useTranslation('pages.pricing');
@@ -128,13 +129,11 @@ const CorePlan = () => {
             </CheckedRow>
             <CheckedRow>{t('core-plan.features.ofac')}</CheckedRow>
           </Box>
-          <Button
-            variant="primary"
-            sx={{ width: '100%', marginTop: 4 }}
-            onClick={toggleTypeform}
-          >
-            Get started
-          </Button>
+          <Box sx={{ marginTop: 4 }}>
+            <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+              {t('cta')}
+            </LinkButton>
+          </Box>
         </Box>
       </Content>
     </TableContainer>

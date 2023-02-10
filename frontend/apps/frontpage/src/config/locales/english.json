@@ -4,7 +4,12 @@
   },
   "components": {
     "navbar": {
-      "cta": "Request early access",
+      "login": "Login",
+      "sign-up": "Sign up",
+      "nav-toggle": {
+        "open": "Open navigation",
+        "close": "Close navigation"
+      },
       "logo": {
         "aria-label": "Go to Footprint's main page"
       },
@@ -61,11 +66,6 @@
           "href": "/media"
         }
       }
-    },
-    "get-started": {
-      "cta": "Request early access",
-      "subtitle": "Join our waitlist to get a chance at your first year of KYC + security for free.",
-      "title": "Ready to get started?"
     },
     "subscribe-to-newsletter": {
       "title": "Subscribe to our newsletter",
@@ -168,7 +168,7 @@
         "subtitle": "Onboard users with the click of a button and offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
         "desktop-img-alt": "desktop mockup",
         "mobile-img-alt": "mobile mockup",
-        "primary-button": "Request early access",
+        "primary-button": "Get started",
         "secondary-button": "Watch demo",
         "demo-video-close": "Close"
       },
@@ -307,7 +307,7 @@
       },
       "banner": {
         "title": "The last identity form you'll ever fill out",
-        "cta": "Request early access",
+        "cta": "Get started",
         "alt": "Our penguin mascot"
       }
     },
@@ -415,6 +415,7 @@
     },
     "pricing": {
       "html-title": "Footprint - Pricing",
+      "cta": "Get started",
       "hero": {
         "micro-title": "Unlike bad actors, we have nothing to hide.",
         "title": "Our radical approach to pricing: minimize your spend."
@@ -594,7 +595,7 @@
       "hero": {
         "title": "Why Footprint is the best KYC + security solution for your business",
         "subtitle": "Spoiler alert: it removes the toggle between friction and accuracy.",
-        "cta": "Request early access"
+        "cta": "Get started"
       },
       "carousel": {
         "slide": {

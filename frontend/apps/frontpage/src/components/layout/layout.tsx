@@ -1,34 +1,21 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { media } from '@onefootprint/ui';
-import { createPopup } from '@typeform/embed';
 import React from 'react';
 import styled from 'styled-components';
 
 import Footer from '../footer';
 import Navbar from '../navbar';
 
-const { toggle: toggleTypeform } = createPopup('COZNk70C');
-
 type LayoutProps = {
   children: React.ReactNode;
 };
 
-const Layout = ({ children }: LayoutProps) => {
-  const { t } = useTranslation('components');
-
-  return (
-    <>
-      <Navbar
-        cta={{
-          text: t('navbar.cta'),
-          onClick: toggleTypeform,
-        }}
-      />
-      <Content>{children}</Content>
-      <Footer />
-    </>
-  );
-};
+const Layout = ({ children }: LayoutProps) => (
+  <>
+    <Navbar />
+    <Content>{children}</Content>
+    <Footer />
+  </>
+);
 
 const Content = styled.section`
   position: relative;

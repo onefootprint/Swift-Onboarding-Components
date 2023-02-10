@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { LogoFpDefault } from '@onefootprint/icons';
 import { OrgAuthMagicLinkRequest } from '@onefootprint/types';
-import { Button, TextInput, Typography } from '@onefootprint/ui';
+import { Box, Button, TextInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -8,7 +9,6 @@ import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import BackButton from '../../components/back-button/back-button';
-import LogoAndText from '../../components/logo-and-text';
 import useLoginEmail from './hooks/use-login-email';
 
 type FormData = {
@@ -48,8 +48,21 @@ const EmailLogin = () => {
       <BackButton />
       <Container>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <LogoAndText text={t('title')} />
           <Inner>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 7,
+                flexDirection: 'column',
+              }}
+            >
+              <LogoFpDefault />
+              <Typography variant="label-1" color="primary">
+                {t('title')}
+              </Typography>
+            </Box>
             <TextInput
               hasError={!!errors.email}
               hint={errors?.email?.message}
@@ -103,7 +116,7 @@ const Form = styled.form`
 const Inner = styled.div`
   ${({ theme }) => css`
     display: grid;
-    row-gap: ${theme.spacing[5]};
+    gap: ${theme.spacing[7]};
   `}
 `;
 
