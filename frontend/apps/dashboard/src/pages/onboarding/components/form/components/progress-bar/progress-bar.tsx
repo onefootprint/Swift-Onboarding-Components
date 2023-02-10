@@ -46,6 +46,7 @@ const ProgressBar = ({ value, max, onPrev }: ProgressBarProps) => {
                         type: 'spring',
                         stiffness: 0,
                         bounce: 0,
+                        duration: 0.3,
                       },
                     },
                     inactive: {

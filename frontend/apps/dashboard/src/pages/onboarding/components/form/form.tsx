@@ -44,10 +44,20 @@ const Form = ({ onComplete }: FormProps) => {
       data-step={id}
       layout
       transition={{
-        layout: { duration: 0.1, ease: 'easeOut' },
+        layout: { duration: 0.3, ease: 'easeOut' },
       }}
     >
-      <Step id={id} onComplete={handleComplete} />
+      <motion.span
+        key={id}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{
+          duration: 0.8,
+          ease: 'easeOut',
+        }}
+      >
+        <Step id={id} onComplete={handleComplete} />
+      </motion.span>
       <Controls>
         <ProgressBar max={stepsCount} onPrev={handlePrev} value={step} />
         <ButtonsContainer id="onboarding-cta-portal" />
