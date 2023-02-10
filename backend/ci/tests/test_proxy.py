@@ -207,7 +207,10 @@ class TestVaultProxy:
 
         # test the header came in
         assert response.headers["test-header"] == "test1234"
-        assert response.headers["x-ditto-client-cert-serial"] == "12431179266346922388"
+        assert (
+            response.headers["x-ditto-client-cert-serial"]
+            == "343209874978310929631036272380933492716043115756"
+        )
 
         # test the body came in
         result = response.json()
