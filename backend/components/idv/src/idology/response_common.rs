@@ -1,6 +1,7 @@
-use std::str::FromStr;
+use std::{convert::Infallible, str::FromStr};
 
-use newtypes::{FootprintReasonCode, IDologyReasonCode};
+use newtypes::{FootprintReasonCode, IDologyReasonCode, PiiString, ScrubbedPiiString};
+use serde::{Deserialize, Deserializer};
 use strum::EnumString;
 
 use super::error::RequestError;
@@ -79,6 +80,54 @@ pub struct IdologyResponseHelpers;
 impl IdologyResponseHelpers {
     pub fn parse_idology_error(error: String) -> RequestError {
         RequestError::from(error)
+    }
+}
+
+/// A touch-in-cheek representation of the fact that Idology sometimes sends integers
+/// OR strings in various response fields
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum IdologyInteger {
+    Str(String),
+    Int(i32),
+}
+
+pub fn from_string_or_int<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: TryFrom<IdologyInteger>,
+{
+    Ok(Option::<IdologyInteger>::deserialize(deserializer)?.and_then(|i| T::try_from(i).ok()))
+}
+
+impl TryFrom<IdologyInteger> for ScrubbedPiiString {
+    type Error = Infallible;
+    fn try_from(i: IdologyInteger) -> Result<Self, Self::Error> {
+        match i {
+            IdologyInteger::Str(s) => Ok(ScrubbedPiiString::new(PiiString::from(s))),
+            IdologyInteger::Int(i) => Ok(ScrubbedPiiString::new(PiiString::from(i.to_string()))),
+        }
+    }
+}
+
+impl TryFrom<IdologyInteger> for String {
+    type Error = Infallible;
+    fn try_from(i: IdologyInteger) -> Result<Self, Self::Error> {
+        match i {
+            IdologyInteger::Str(s) => Ok(s),
+            IdologyInteger::Int(i) => Ok(format!("{}", i)),
+        }
+    }
+}
+
+impl TryFrom<IdologyInteger> for i32 {
+    type Error = std::num::ParseIntError;
+
+    fn try_from(i: IdologyInteger) -> Result<Self, Self::Error> {
+        match i {
+            IdologyInteger::Str(s) => s.parse::<i32>(),
+            IdologyInteger::Int(i) => Ok(i),
+        }
     }
 }
 

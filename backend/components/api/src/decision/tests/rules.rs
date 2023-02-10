@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use newtypes::{DecisionStatus, FootprintReasonCode, IDologyReasonCode, OnboardingId, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId, VerificationResultId};
 
 use crate::decision::{
     features::IDologyFeatures,

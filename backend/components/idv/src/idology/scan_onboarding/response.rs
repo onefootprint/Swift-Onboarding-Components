@@ -1,15 +1,14 @@
 use crate::idology::{
     error as IdologyError,
-    response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
+    response_common::{from_string_or_int, IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
     IdologyError::RequestError,
 };
 use newtypes::{
     idology::{
         IdologyImageCaptureErrors, IdologyScanOnboardingCaptureDecision, IdologyScanOnboardingCaptureResult,
     },
-    PiiString, ScrubbedPiiString,
+    ScrubbedPiiString,
 };
-use serde::{Deserialize, Deserializer};
 
 pub fn parse_response(value: serde_json::Value) -> Result<ScanOnboardingAPIResponse, IdologyError::Error> {
     let response: ScanOnboardingAPIResponse = serde_json::value::from_value(value)?;
@@ -159,27 +158,12 @@ pub struct CaptureData {
     // shown in docs as String, proofing against the possibility a response gives us int
     pub document_number: Option<ScrubbedPiiString>,
     pub document_type: Option<String>,
+    #[serde(default)]
+    #[serde(deserialize_with = "from_string_or_int")]
     pub capture_confidence_score: Option<i32>,
+    #[serde(default)]
+    #[serde(deserialize_with = "from_string_or_int")]
     pub capture_facial_match_score: Option<i32>,
-}
-
-fn from_string_or_int<'de, D>(deserializer: D) -> Result<Option<ScrubbedPiiString>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    #[derive(Deserialize)]
-    #[serde(untagged)]
-    enum StringOrI32 {
-        Str(String),
-        Int(i32),
-    }
-
-    Ok(
-        Option::<StringOrI32>::deserialize(deserializer)?.map(|v| match v {
-            StringOrI32::Str(s) => ScrubbedPiiString::new(PiiString::from(s)),
-            StringOrI32::Int(i) => ScrubbedPiiString::new(PiiString::from(i.to_string())),
-        }),
-    )
 }
 
 #[cfg(test)]
@@ -187,6 +171,7 @@ mod tests {
     use crate::ParsedResponse;
 
     use super::*;
+    use newtypes::{PiiString, ScrubbedPiiString};
     use serde_json::json;
     use test_case::test_case;
 

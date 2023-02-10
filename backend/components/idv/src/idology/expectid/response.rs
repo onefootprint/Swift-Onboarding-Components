@@ -1,11 +1,10 @@
 use crate::idology::{
     error as IdologyError,
-    response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType},
+    response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType, from_string_or_int},
     IdologyError::RequestError,
 };
 use itertools::Itertools;
 use newtypes::{DecisionStatus, FootprintReasonCode, IDologyReasonCode};
-use serde::{Deserialize, Deserializer};
 use std::str::FromStr;
 
 // Given a raw response, deserialize
@@ -74,9 +73,11 @@ pub enum PaList {
 pub struct Pa {
     pub list: String,
     // shown in docs as String, proofing against the possibility a response gives us int
+    #[serde(default)]
     #[serde(deserialize_with = "from_string_or_int")]
     pub score: Option<String>,
     pub record_type: Option<String>,
+    #[serde(default)]
     #[serde(deserialize_with = "from_string_or_int")]
     pub dob: Option<String>,
 }
@@ -217,24 +218,6 @@ impl Response {
     }
 }
 
-fn from_string_or_int<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    #[derive(Deserialize)]
-    #[serde(untagged)]
-    enum StringOrI32 {
-        Str(String),
-        Int(i32),
-    }
-
-    Ok(
-        Option::<StringOrI32>::deserialize(deserializer)?.map(|v| match v {
-            StringOrI32::Str(s) => s,
-            StringOrI32::Int(i) => format!("{}", i),
-        }),
-    )
-}
 
 #[cfg(test)]
 mod tests {
