@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
 import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
-import { useCreateHandoffUrl } from '../../../../../hooks/handoff-url';
+import { useCreateHandoffUrl } from '../../../../../hooks/ui';
 import useDesktopMachine, {
   Events,
 } from '../../../hooks/desktop/use-desktop-machine';
