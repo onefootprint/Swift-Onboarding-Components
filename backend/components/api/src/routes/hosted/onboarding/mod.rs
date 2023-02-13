@@ -1,3 +1,4 @@
+use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
 use db::{
@@ -8,14 +9,13 @@ use db::{
     },
     DbError, PgConn,
 };
-use newtypes::{CollectedDataOption, IdDocKind, OnboardingId, SessionAuthToken, UserVaultId};
+use newtypes::{OnboardingId, SessionAuthToken, UserVaultId};
 use paperclip::actix::web;
 
 use crate::{
     auth::session::AuthSessionData,
     auth::user::{AuthedOnboardingInfo, ValidateUserToken},
     errors::ApiResult,
-    types::onboarding_requirement::OnboardingRequirement,
     utils::{
         self,
         session::AuthSession,
@@ -23,7 +23,6 @@ use crate::{
     },
 };
 use itertools::Itertools;
-use paperclip::actix::Apiv2Schema;
 
 pub mod authorize;
 pub mod d2p;
@@ -127,12 +126,6 @@ pub fn get_requirements(
 /// This function gets all the fields the User needs to authorize the Tenant having access to.
 /// Since we don't know the type of the document until the User selects it and we process it, we
 /// need to check the IdentityDocument table for documents gathered during the onboarding
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct AuthorizeFields {
-    collected_data: Vec<CollectedDataOption>,
-    identity_document_types: Vec<IdDocKind>,
-    selfie_collected: bool,
-}
 pub fn get_fields_to_authorize(
     conn: &mut PgConn,
     user_vault_id: &UserVaultId,

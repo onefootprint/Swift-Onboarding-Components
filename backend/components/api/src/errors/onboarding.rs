@@ -1,7 +1,6 @@
+use api_wire_types::hosted::onboarding_requirement::OnboardingRequirementDiscriminant;
 use newtypes::{output::Csv, CollectedDataOption};
 use thiserror::Error;
-
-use crate::types::onboarding_requirement::OnboardingRequirementDiscriminant;
 
 #[derive(Debug, Error)]
 pub enum OnboardingError {

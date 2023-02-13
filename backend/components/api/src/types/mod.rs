@@ -5,4 +5,3 @@ pub mod response;
 
 pub use request::*;
 pub use response::*;
-pub mod onboarding_requirement;
