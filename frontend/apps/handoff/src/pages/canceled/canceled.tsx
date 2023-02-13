@@ -1,7 +1,7 @@
+import { HeaderTitle } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import HeaderTitle from '../../components/header-title';
 import useHandoffMachine from '../../hooks/use-handoff-machine/use-handoff-machine';
 
 const Canceled = () => {

@@ -1,10 +1,12 @@
-import { useUpdateD2PStatus } from '@onefootprint/footprint-elements';
+import {
+  HeaderTitle,
+  useUpdateD2PStatus,
+} from '@onefootprint/footprint-elements';
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import HeaderTitle from '../../components/header-title';
 import useHandoffMachine from '../../hooks/use-handoff-machine';
 
 const SUCCESS_COUNTER_SECONDS = 3;

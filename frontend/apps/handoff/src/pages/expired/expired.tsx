@@ -1,9 +1,9 @@
+import { HeaderTitle } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../components/header-title';
 import useHandoffMachine from '../../hooks/use-handoff-machine/use-handoff-machine';
 
 const Expired = () => {
