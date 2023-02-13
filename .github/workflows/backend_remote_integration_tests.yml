@@ -39,6 +39,8 @@ on:
         required: true
       TWILIO_API_KEY_SECRET:
         required: true
+      SVIX_AUTH_TOKEN:
+        required: true
 
 jobs:
   run_tests:
@@ -56,6 +58,7 @@ jobs:
       TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
       DITTO_URL: 'https://ditto.footprint.dev'
+      SVIX_AUTH_TOKEN: ${{ secrets.SVIX_AUTH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v3

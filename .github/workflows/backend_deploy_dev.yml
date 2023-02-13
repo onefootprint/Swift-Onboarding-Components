@@ -33,7 +33,7 @@ jobs:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
       AIRPLANE_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
-      
+
   sentry_release:
     name: 'Sentry Release Integration'
     runs-on: ubuntu-latest
@@ -67,3 +67,4 @@ jobs:
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
       TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
+      SVIX_AUTH_TOKEN: ${{ secrets.SVIX_AUTH_TOKEN }}
