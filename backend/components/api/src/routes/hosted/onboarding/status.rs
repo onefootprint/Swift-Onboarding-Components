@@ -4,8 +4,8 @@ use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::hosted::onboarding::{get_fields_to_authorize, get_requirements};
 use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_wire_types::hosted::onboarding_requirement::OnboardingRequirement;
 use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -19,16 +19,15 @@ pub async fn get(
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    let (requirements, fields_to_authorize) = state
+    let (requirements, fields_to_authorize, ob_info) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(conn)?;
             let (requirements, _) = get_requirements(conn, &ob_info)?;
             let fields_to_authorize: AuthorizeFields =
                 get_fields_to_authorize(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
-            let res: (Vec<OnboardingRequirement>, AuthorizeFields) = (requirements, fields_to_authorize);
 
-            Ok(res)
+            Ok((requirements, fields_to_authorize, ob_info))
         })
         .await??;
 
@@ -40,9 +39,12 @@ pub async fn get(
         Some(fields_to_authorize)
     };
 
+    let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_info.ob_config, ob_info.tenant));
+
     ResponseData::ok(OnboardingStatusResponse {
         requirements,
         fields_to_authorize: auth_fields,
+        ob_configuration: ob_config,
     })
     .json()
 }

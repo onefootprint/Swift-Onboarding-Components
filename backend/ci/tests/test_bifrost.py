@@ -116,6 +116,7 @@ class TestBifrost:
         assert not body["validation_token"]
 
         body = get("hosted/onboarding/status", None, non_sandbox_auth_token)
+        assert body["ob_configuration"]["org_name"] == tenant.name
 
         req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
 

@@ -10,6 +10,4 @@ pub struct HandoffMetadata {
     pub opener: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub org_name: Option<String>,
 }

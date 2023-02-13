@@ -6,6 +6,7 @@ use super::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
 pub struct OnboardingStatusResponse {
     pub requirements: Vec<OnboardingRequirement>,
     pub fields_to_authorize: Option<AuthorizeFields>,
+    pub ob_configuration: OnboardingConfiguration,
 }
 
 export_schema!(OnboardingStatusResponse);
