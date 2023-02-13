@@ -61,7 +61,6 @@ const OnboardingDecisionEventHeader = ({
 
 const OrgDecisionContainer = styled.span`
   display: flex;
-  align-items: center;
 `;
 
 export default OnboardingDecisionEventHeader;

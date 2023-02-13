@@ -503,7 +503,8 @@
             "title": "Collected "
           },
           "kyc-data-collected-event": {
-            "title": "Collected "
+            "title": "Collected ",
+            "title-from-other-org": "Collected (from other companies) "
           },
           "onboarding-decision-event": {
             "verified-by-footprint": "Verified by Footprint",

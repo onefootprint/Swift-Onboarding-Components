@@ -24,7 +24,7 @@ const SecurityLogs = () => {
     ) || [];
 
   const items = accessEvents.map(item => ({
-    timestamp: item.timestamp,
+    time: { timestamp: item.timestamp },
     iconComponent: <Dot />,
     headerComponent: <SecurityLogHeader accessEvent={item} />,
     bodyComponent: <SecurityLogBody accessEvent={item} />,
@@ -68,7 +68,6 @@ const SecurityLogs = () => {
       </FiltersContainer>
       <Box sx={{ marginTop: 9, marginBottom: 9 }} />
       <Timeline
-        connectorVariant="tight"
         items={items}
         isLoading={
           getAccessEvents.isLoading || getAccessEvents.isFetchingNextPage

@@ -5,7 +5,6 @@ import {
   LivenessEventData,
   OnboardingDecisionEventData,
   Timeline as UserTimeline,
-  TimelineEvent,
   TimelineEventKind,
 } from '@onefootprint/types';
 import { Shimmer, Typography } from '@onefootprint/ui';
@@ -30,6 +29,9 @@ import {
   OnboardingDecisionEventHeader,
   OnboardingDecisionEventIcon,
 } from './components/onboarding-decision-event';
+import mergeAuditTrailTimelineEvents, {
+  AuditTrailTimelineEvent,
+} from './utils/merge-audit-trail-timeline-events/merge-audit-trail-timeline-events';
 
 export type AuditTrailTimelineProps = {
   timeline: UserTimeline;
@@ -47,17 +49,19 @@ const AuditTrailTimeline = ({
       <Shimmer sx={{ height: '100px' }} testID="audit-trail-timeline-loading" />
     );
   }
+  const mergedTimeline = mergeAuditTrailTimelineEvents(timeline);
 
   const items: TimelineItem[] = [];
-  timeline.forEach((timelineEvent: TimelineEvent) => {
+  mergedTimeline.forEach((event: AuditTrailTimelineEvent) => {
     const {
       event: { kind, data },
-      timestamp,
-    } = timelineEvent;
+      time,
+      isFromOtherOrg,
+    } = event;
     if (kind === TimelineEventKind.liveness) {
       const eventData = data as LivenessEventData;
       items.push({
-        timestamp,
+        time,
         iconComponent: <LivenessEventIcon data={eventData} />,
         headerComponent: <LivenessEventHeader data={eventData} />,
         bodyComponent: <LivenessEventBody data={eventData} />,
@@ -65,21 +69,28 @@ const AuditTrailTimeline = ({
     } else if (kind === TimelineEventKind.kycDataCollected) {
       const eventData = data as CollectedKycDataEventData;
       items.push({
-        timestamp,
-        iconComponent: <KycDataCollectedEventIcon data={eventData} />,
-        headerComponent: <KycDataCollectedEventHeader data={eventData} />,
+        time,
+        iconComponent: isFromOtherOrg ? undefined : (
+          <KycDataCollectedEventIcon data={eventData} />
+        ),
+        headerComponent: (
+          <KycDataCollectedEventHeader
+            data={eventData}
+            isFromOtherOrg={isFromOtherOrg}
+          />
+        ),
       });
     } else if (kind === TimelineEventKind.idDocUploaded) {
       const eventData = data as IdDocUploadedEventData;
       items.push({
-        timestamp,
+        time,
         iconComponent: <IdDocUploadedEventIcon data={eventData} />,
         headerComponent: <IdDocUploadedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.onboardingDecision) {
       const eventData = data as OnboardingDecisionEventData;
       items.push({
-        timestamp,
+        time,
         iconComponent: <OnboardingDecisionEventIcon data={eventData} />,
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
         bodyComponent: <OnboardingDecisionEventBody data={eventData} />,

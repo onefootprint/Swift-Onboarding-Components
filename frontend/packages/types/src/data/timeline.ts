@@ -59,6 +59,7 @@ export type TimelineEvent = {
     | IdDocUploadedEvent
     | OnboardingDecisionEvent;
   timestamp: string;
+  isFromOtherOrg?: boolean;
 };
 
 export type Timeline = TimelineEvent[];

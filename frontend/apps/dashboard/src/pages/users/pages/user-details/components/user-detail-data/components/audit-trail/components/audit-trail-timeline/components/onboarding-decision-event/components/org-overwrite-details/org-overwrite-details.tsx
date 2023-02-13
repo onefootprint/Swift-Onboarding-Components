@@ -58,6 +58,7 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
   return (
     <>
       <LinkButton
+        sx={{ lineHeight: '20px' }}
         onClick={() => {
           setDrawerOpen(true);
         }}

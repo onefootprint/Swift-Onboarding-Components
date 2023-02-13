@@ -9,10 +9,12 @@ import createTagList from 'src/utils/create-tag-list';
 
 type KycDataCollectedEventHeaderProps = {
   data: CollectedKycDataEventData;
+  isFromOtherOrg?: boolean;
 };
 
 const KycDataCollectedEventHeader = ({
   data,
+  isFromOtherOrg,
 }: KycDataCollectedEventHeaderProps) => {
   const { t, allT } = useTranslation(
     'pages.user-details.audit-trail.timeline.kyc-data-collected-event',
@@ -23,8 +25,12 @@ const KycDataCollectedEventHeader = ({
   );
 
   return (
-    <Typography variant="label-3" testID="kyc-data-collected-event-header">
-      {t('title')}
+    <Typography
+      variant="label-3"
+      testID="kyc-data-collected-event-header"
+      color={isFromOtherOrg ? 'tertiary' : 'primary'}
+    >
+      {isFromOtherOrg ? t('title-from-other-org') : t('title')}
       {createTagList(attributeLabels)}
     </Typography>
   );
