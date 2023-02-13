@@ -2890,6 +2890,7 @@ dependencies = [
  "tracing-test",
  "twilio",
  "url",
+ "uuid 1.2.2",
 ]
 
 [[package]]

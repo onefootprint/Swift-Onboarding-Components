@@ -10,6 +10,7 @@ use newtypes::{PiiJsonValue, Vendor};
 
 use socure::response::SocureIDPlusResponse;
 
+pub mod experian;
 pub mod idology;
 pub mod lexis;
 pub mod middesk;

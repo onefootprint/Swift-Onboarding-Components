@@ -14,6 +14,7 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 chrono = { workspace = true }
 itertools = { workspace = true }
+uuid = { workspace=true }
 levenshtein = "1.0.5"
 twilio = { path = "../twilio"}
 tracing = { workspace = true }
