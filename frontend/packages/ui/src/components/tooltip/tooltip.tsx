@@ -96,7 +96,7 @@ const TooltipContainer = styled.span<{ size: Size }>`
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[2]};
     color: ${theme.color.quinary};
-    max-width: 220px;
+    max-width: 300px;
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
   `}
 `;

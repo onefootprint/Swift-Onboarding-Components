@@ -8,9 +8,10 @@ import {
 export const riskSignalDetailsFixture: RiskSignal = {
   id: 'sig_ryxauTlDX8hIm3wVRmm',
   onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-  reasonCode: 'mobile_number',
+  reasonCode: 'phone_number_located_is_voip',
+  note: 'VOIP phone number',
   description:
-    "The consumer's phone number is possibly a wireless mobile number.",
+    "The consumer's phone number could be tied to an answering service, page, or VoIP.",
   severity: RiskSignalSeverity.Low,
   scopes: [SignalAttribute.phoneNumber],
   timestamp: '2022-10-24T21:56:12.682238Z',

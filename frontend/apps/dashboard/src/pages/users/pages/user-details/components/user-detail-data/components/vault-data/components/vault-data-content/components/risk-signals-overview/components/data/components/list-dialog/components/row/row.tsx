@@ -1,9 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoChevronRight24 } from '@onefootprint/icons';
+import { IcoChevronRight24, IcoInfo16 } from '@onefootprint/icons';
 import { RiskSignal, RiskSignalSeverity } from '@onefootprint/types';
-import { Badge, Box } from '@onefootprint/ui';
+import { Badge, Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 type RowProps = {
   riskSignal: RiskSignal;
@@ -25,8 +24,13 @@ const Row = ({ riskSignal }: RowProps) => {
           <Badge variant="info">{t('low')}</Badge>
         )}
       </td>
-      <td title={riskSignal.description}>
-        <Description>{riskSignal.description}</Description>
+      <td>
+        <Tooltip text={riskSignal.description}>
+          <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
+            {riskSignal.note}
+            <IcoInfo16 />
+          </Box>
+        </Tooltip>
       </td>
       <td>
         <Box
@@ -41,11 +45,5 @@ const Row = ({ riskSignal }: RowProps) => {
     </>
   );
 };
-
-const Description = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
 
 export default Row;

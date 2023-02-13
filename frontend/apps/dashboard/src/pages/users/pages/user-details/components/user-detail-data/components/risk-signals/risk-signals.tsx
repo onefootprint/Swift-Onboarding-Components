@@ -11,16 +11,16 @@ import Row from './components/row';
 import useRiskSignals from './hooks/use-risk-signals';
 import useRiskSignalsFilters from './hooks/use-risk-signals-filters';
 
-const renderTr = ({ item }: TableRow<RiskSignal>) => <Row signal={item} />;
+const renderTr = ({ item }: TableRow<RiskSignal>) => <Row riskSignal={item} />;
 
 const RiskSignals = () => {
   const { t } = useTranslation('pages.user-details.risk-signals');
   const { isLoading, error, data } = useRiskSignals();
   const filters = useRiskSignalsFilters();
   const columns = [
-    { text: t('table.header.severity'), width: '15%' },
-    { text: t('table.header.scopes'), width: '15%' },
-    { text: t('table.header.description'), width: '70%' },
+    { text: t('table.header.severity'), width: '12.5%' },
+    { text: t('table.header.scopes'), width: '12.5%' },
+    { text: t('table.header.note'), width: '70%' },
   ];
 
   const handleRowClick = (riskSignal: RiskSignal) => {

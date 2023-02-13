@@ -81,10 +81,14 @@ describe('<RiskSignals />', () => {
         const scopes = within(tr).getByText('Phone number');
         expect(scopes).toBeInTheDocument();
 
-        const note = within(tr).getByText(
-          "The consumer's phone number is possibly a wireless mobile number.",
-        );
+        const note = within(tr).getByText('VOIP phone number');
         expect(note).toBeInTheDocument();
+
+        await userEvent.hover(note);
+        const description = within(tr).getByText(
+          "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+        );
+        expect(description).toBeInTheDocument();
       });
 
       describe('when clicking on the table row', () => {

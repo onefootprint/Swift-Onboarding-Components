@@ -10,9 +10,10 @@ export const riskSignalsFixture: RiskSignal[] = [
     id: 'sig_ryxauTlDX8hIm3wVRmm',
     severity: RiskSignalSeverity.Low,
     scopes: [SignalAttribute.phoneNumber],
-    reasonCode: 'mobile_number',
+    reasonCode: 'phone_number_located_is_voip',
+    note: 'VOIP phone number',
     description:
-      "The consumer's phone number is possibly a wireless mobile number.",
+      "The consumer's phone number could be tied to an answering service, page, or VoIP.",
     deactivatedAt: null,
     onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
     vendors: ['idology'],
@@ -21,9 +22,10 @@ export const riskSignalsFixture: RiskSignal[] = [
   {
     id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
     onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-    reasonCode: 'corporate_email_domain',
+    reasonCode: 'email_domain_corporate',
+    note: 'Corporate email domain',
     description:
-      'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+      'The domain of the email address has been identified as belonging to a corporate entity.',
     severity: RiskSignalSeverity.Low,
     scopes: [SignalAttribute.email],
     timestamp: '2022-10-24T21:56:12.682238Z',

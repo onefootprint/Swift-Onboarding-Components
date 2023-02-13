@@ -44,9 +44,10 @@ describe('<Data />', () => {
             id: 'sig_ryxauTlDX8hIm3wVRmm',
             severity: RiskSignalSeverity.Low,
             scopes: [SignalAttribute.phoneNumber],
-            reasonCode: 'mobile_number',
+            reasonCode: 'phone_number_located_is_voip',
+            note: 'VOIP phone number',
             description:
-              "The consumer's phone number is possibly a wireless mobile number.",
+              "The consumer's phone number could be tied to an answering service, page, or VoIP.",
             deactivatedAt: null,
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
             vendors: ['idology'],
@@ -66,9 +67,10 @@ describe('<Data />', () => {
             id: 'sig_ryxauTlDX8hIm3wVRmm',
             severity: RiskSignalSeverity.Medium,
             scopes: [SignalAttribute.phoneNumber],
-            reasonCode: 'mobile_number',
+            reasonCode: 'phone_number_located_is_voip',
+            note: 'VOIP phone number',
             description:
-              "The consumer's phone number is possibly a wireless mobile number.",
+              "The consumer's phone number could be tied to an answering service, page, or VoIP.",
             deactivatedAt: null,
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
             vendors: ['idology'],
@@ -79,9 +81,10 @@ describe('<Data />', () => {
           {
             id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-            reasonCode: 'corporate_email_domain',
+            reasonCode: 'email_domain_corporate',
+            note: 'Corporate email domain',
             description:
-              'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              'The domain of the email address has been identified as belonging to a corporate entity.',
             severity: RiskSignalSeverity.Low,
             scopes: [SignalAttribute.email],
             timestamp: '2022-10-24T21:56:12.682238Z',
@@ -97,17 +100,15 @@ describe('<Data />', () => {
       const listDialog = screen.getByRole('dialog');
       expect(listDialog).toBeInTheDocument();
 
-      const firstSignalDescription =
-        "The consumer's phone number is possibly a wireless mobile number.";
-      expect(screen.getByText(firstSignalDescription)).toBeInTheDocument();
+      const firstNote = 'VOIP phone number';
+      expect(screen.getByText(firstNote)).toBeInTheDocument();
 
-      const secondSignalDescription =
-        'Indicates that the domain of the email address has been identified as belonging to a corporate entity.';
-      expect(screen.getByText(secondSignalDescription)).toBeInTheDocument();
+      const secondNote = 'Corporate email domain';
+      expect(screen.getByText(secondNote)).toBeInTheDocument();
     });
 
     describe('when clicking on the risk signal row', () => {
-      it('should append risk signal id and note to the url', async () => {
+      it('should append risk signal id to the url', async () => {
         const pushMockFn = jest.fn();
         useRouterSpy({
           pathname: '/users/detail',
@@ -122,9 +123,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -140,9 +142,8 @@ describe('<Data />', () => {
         const listDialog = screen.getByRole('dialog');
         expect(listDialog).toBeInTheDocument();
 
-        const description =
-          "The consumer's phone number is possibly a wireless mobile number.";
-        const riskSignalRow = within(listDialog).getByText(description);
+        const note = 'VOIP phone number';
+        const riskSignalRow = within(listDialog).getByText(note);
         await userEvent.click(riskSignalRow);
 
         expect(pushMockFn).toHaveBeenCalledWith(
@@ -167,9 +168,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -191,9 +193,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -202,9 +205,10 @@ describe('<Data />', () => {
             {
               id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'email_domain_corporate',
+              note: 'Corporate email domain',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -228,9 +232,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -252,9 +257,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -263,9 +269,10 @@ describe('<Data />', () => {
             {
               id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'email_domain_corporate',
+              note: 'Corporate email domain',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -289,9 +296,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.High,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -313,9 +321,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.High,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -324,9 +333,10 @@ describe('<Data />', () => {
             {
               id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'email_domain_corporate',
+              note: 'Corporate email domain',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.High,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -352,9 +362,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -365,9 +376,10 @@ describe('<Data />', () => {
             {
               id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'email_domain_corporate',
+              note: 'Corporate email domain',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -390,9 +402,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.High,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -404,9 +417,10 @@ describe('<Data />', () => {
             {
               id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'email_domain_corporate',
+              note: 'Corporate email domain',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -429,9 +443,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.High,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -442,9 +457,10 @@ describe('<Data />', () => {
             {
               id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -468,9 +484,10 @@ describe('<Data />', () => {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
               severity: RiskSignalSeverity.High,
               scopes: [SignalAttribute.phoneNumber],
-              reasonCode: 'mobile_number',
+              reasonCode: 'phone_number_located_is_voip',
+              note: 'VOIP phone number',
               description:
-                "The consumer's phone number is possibly a wireless mobile number.",
+                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               vendors: ['idology'],
@@ -481,9 +498,10 @@ describe('<Data />', () => {
             {
               id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'email_domain_corporate',
+              note: 'Corporate email domain',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -495,9 +513,10 @@ describe('<Data />', () => {
             {
               id: 'sig_l124S610Gg1427xUOkBSUL8NcC',
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              reasonCode: 'corporate_email_domain',
+              reasonCode: 'email_domain_corporate',
+              note: 'Corporate email domain',
               description:
-                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+                'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.name],
               timestamp: '2022-10-24T21:56:12.682238Z',

@@ -17,7 +17,7 @@ const Details = () => {
 
   const getDrawerTitle = () => {
     if (data) {
-      return data.description;
+      return data.note;
     }
     return isLoading ? t('notifications.loading') : t('notifications.error');
   };

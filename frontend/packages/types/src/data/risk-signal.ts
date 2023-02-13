@@ -10,6 +10,7 @@ export type RiskSignal = {
   deactivatedAt: Date | null;
   description: string;
   id: string;
+  note: string;
   onboardingDecisionId: string;
   reasonCode: string;
   scopes: SignalAttribute[];

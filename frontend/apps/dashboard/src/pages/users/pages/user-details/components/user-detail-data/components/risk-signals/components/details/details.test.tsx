@@ -68,10 +68,13 @@ describe('<Details />', () => {
         screen.queryByTestId('risk-signal-details-loading'),
       );
 
-      const titleAndDescription = screen.queryAllByText(
-        "The consumer's phone number is possibly a wireless mobile number.",
+      const title = screen.getByText('VOIP phone number');
+      expect(title).toBeInTheDocument();
+
+      const description = screen.getByText(
+        "The consumer's phone number could be tied to an answering service, page, or VoIP.",
       );
-      expect(titleAndDescription).toHaveLength(2);
+      expect(description).toBeInTheDocument();
 
       const vendors = screen.getByText('idology');
       expect(vendors).toBeInTheDocument();

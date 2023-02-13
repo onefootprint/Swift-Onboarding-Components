@@ -9,9 +9,10 @@ const createRiskSignal = (scopes: SignalAttribute[]): RiskSignal => ({
   id: faker.datatype.uuid(),
   severity: RiskSignalSeverity.Low,
   scopes,
-  reasonCode: 'mobile_number',
+  reasonCode: 'phone_number_located_is_voip',
+  note: 'VOIP phone number',
   description:
-    "The consumer's phone number is possibly a wireless mobile number.",
+    "The consumer's phone number could be tied to an answering service, page, or VoIP.",
   deactivatedAt: null,
   onboardingDecisionId: faker.datatype.uuid(),
   vendors: ['idology'],

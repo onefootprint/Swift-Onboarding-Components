@@ -1,31 +1,33 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoInfo16 } from '@onefootprint/icons';
 import { RiskSignal } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
+import { Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 
 import SeverityBadge from '../severity-badge';
 
 type RowProps = {
-  signal: RiskSignal;
+  riskSignal: RiskSignal;
 };
 
-const Row = ({ signal }: RowProps) => {
+const Row = ({ riskSignal }: RowProps) => {
   const { allT } = useTranslation('pages.user-details.risk-signals.severity');
 
   return (
     <>
       <td>
-        <SeverityBadge severity={signal.severity} />
+        <SeverityBadge severity={riskSignal.severity} />
       </td>
       <td>
-        {signal.scopes.map(signalAttribute =>
-          allT(`signal-attributes.${signalAttribute}`),
-        )}
+        {riskSignal.scopes.map(scope => allT(`signal-attributes.${scope}`))}
       </td>
       <td>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          {signal.description}
-        </Box>
+        <Tooltip text={riskSignal.description}>
+          <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
+            {riskSignal.note}
+            <IcoInfo16 />
+          </Box>
+        </Tooltip>
       </td>
     </>
   );

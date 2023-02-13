@@ -22,7 +22,7 @@ const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
   const [open, setOpen] = useState(false);
   const columns = [
     { id: 'severity', text: '', width: '20%' },
-    { id: 'description', text: '', width: '65%' },
+    { id: 'note', text: '', width: '65%' },
     { id: 'actions', text: '', width: '15%' },
   ];
 
