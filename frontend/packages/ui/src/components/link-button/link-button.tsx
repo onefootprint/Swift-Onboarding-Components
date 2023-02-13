@@ -111,7 +111,7 @@ export const LinkButtonStyled = styled.a.attrs<{
       background: transparent;
       border: none;
       color: ${linkButton.variant[variant].color.text.initial};
-      cursor: ${disabled ? 'auto' : 'pointer'};
+      cursor: ${disabled ? 'initial' : 'pointer'};
       display: inline-flex;
       height: ${linkButton.size[size].height}px;
       margin: 0;
