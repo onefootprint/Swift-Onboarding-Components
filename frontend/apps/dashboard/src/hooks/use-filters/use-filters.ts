@@ -40,6 +40,9 @@ export const stringToArray = (value?: string) => {
 export const queryToArray = (value?: string | string[]) => {
   if (!value) return [];
   if (typeof value === 'string') {
+    if (value.includes(',')) {
+      return value.split(',');
+    }
     return [value];
   }
   return value;

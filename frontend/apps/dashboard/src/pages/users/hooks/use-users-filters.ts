@@ -1,3 +1,4 @@
+import last from 'lodash/last';
 import { DEFAULT_PAGE_SIZE } from 'src/config/constants';
 import useFilters, { queryToArray, queryToString } from 'src/hooks/use-filters';
 import getDateRange from 'src/utils/get-date-range';
@@ -29,7 +30,7 @@ const useRiskSignalsFilters = () => {
   };
   const { from, to } = getDateRange(values.dateRange);
   const requestParams = {
-    cursor: queryToString(values.cursor),
+    cursor: last(values.cursor),
     fingerprint: values.search,
     pageSize: values.pageSize,
     statuses: queryToString(values.status),
