@@ -135,6 +135,7 @@ export abstract class ServiceContainers {
         secretsStore.socureSandboxApiKey.arn,
         secretsStore.socureProductionApiKey.arn,
         secretsStore.launchDarklySdkKey.arn,
+        secretsStore.svixAuthToken.arn,
       ])
       .apply(
         ([
@@ -155,6 +156,7 @@ export abstract class ServiceContainers {
           socureSandboxApiKey,
           socureProductionApiKey,
           launchDarklySdkKey,
+          svixAuthToken,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -216,6 +218,10 @@ export abstract class ServiceContainers {
               {
                 name: 'LAUNCH_DARKLY_SDK_KEY',
                 valueFrom: launchDarklySdkKey,
+              },
+              {
+                name: 'SVIX_AUTH_TOKEN',
+                valueFrom: svixAuthToken,
               },
             ],
             environment: [

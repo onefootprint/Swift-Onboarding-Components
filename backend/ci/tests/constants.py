@@ -13,8 +13,11 @@ def get_secret(name):
     return environ
 
 
+# The URL of which footprint-core to test against
+TEST_URL = os.environ.get("TEST_URL") or "http://localhost:8000"
+
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
-url = lambda path: "{}/{}".format(os.environ.get("TEST_URL"), path)
+url = lambda path: "{}/{}".format(TEST_URL, path)
 
 TWILIO_API_KEY = get_secret("TWILIO_API_KEY")
 TWILIO_ACCOUNT_SID = get_secret("TWILIO_ACCOUNT_SID")
@@ -25,6 +28,7 @@ EMAIL = "footprint.user.dev@gmail.com"
 CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
 
 CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
+SVIX_AUTH_TOKEN = get_secret("SVIX_AUTH_TOKEN")
 
 FIELDS_TO_DECRYPT = [
     ["id.last_name", "id.ssn9"],

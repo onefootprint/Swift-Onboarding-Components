@@ -9,9 +9,9 @@ import os
 
 from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
 from tests.auth import DashboardAuth, FpAuth
-from tests.constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
+from tests.constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER, TEST_URL
 
-url = lambda path: "{}/{}".format(os.environ.get("TEST_URL"), path)
+url = lambda path: "{}/{}".format(TEST_URL, path)
 
 SERVER_VERSION_HEADER = "x-footprint-server-version"
 

@@ -95,6 +95,9 @@ pub struct Config {
 
     #[envconfig(from = "LAUNCH_DARKLY_SDK_KEY")]
     pub launch_darkly_sdk_key: String,
+
+    #[envconfig(from = "SVIX_AUTH_TOKEN")]
+    pub svix_auth_token: String,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {

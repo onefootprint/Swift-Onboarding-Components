@@ -63,3 +63,6 @@ pub use self::user_facing_collected_document_status::*;
 
 pub mod proxy_config;
 pub use self::proxy_config::*;
+
+pub mod webhook_portal;
+pub use self::webhook_portal::*;

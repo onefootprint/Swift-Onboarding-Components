@@ -69,9 +69,9 @@ def configure_proxy(tenant, ingress_rules):
         "access_reason": "test decrypt",
         "client_identity": {
             "certificate": read_file(
-                "backend/components/ditto/src/dummy_cert/client.crt"
+                "backend/external_tools/ditto/src/dummy_cert/client.crt"
             ),
-            "key": read_file("backend/components/ditto/src/dummy_cert/client.key"),
+            "key": read_file("backend/external_tools/ditto/src/dummy_cert/client.key"),
         },
         "headers": [{"name": "my-test-header", "value": "my-test-value"}],
         "ingress_settings": {"rules": ingress_rules, "content_type": "json"}
@@ -80,7 +80,7 @@ def configure_proxy(tenant, ingress_rules):
         "method": "POST",
         "name": "test config",
         "pinned_server_certificates": [
-            read_file("backend/components/ditto/src/dummy_cert/server.crt"),
+            read_file("backend/external_tools/ditto/src/dummy_cert/server.crt"),
         ],
         "secret_headers": [{"name": "my-secret-header", "value": "footprintrocks"}],
         "url": "https://ditto.footprint.dev:8443",
@@ -188,17 +188,17 @@ class TestVaultProxy:
                 ProxyAccessReason("test reason"),
                 ProxyClientCertPem(
                     read_pem_file_to_header_encoded(
-                        "backend/components/ditto/src/dummy_cert/client.crt"
+                        "backend/external_tools/ditto/src/dummy_cert/client.crt"
                     )
                 ),
                 ProxyClientKeyPem(
                     read_pem_file_to_header_encoded(
-                        "backend/components/ditto/src/dummy_cert/client.key"
+                        "backend/external_tools/ditto/src/dummy_cert/client.key"
                     )
                 ),
                 ProxyServerCertPem(
                     read_pem_file_to_header_encoded(
-                        "backend/components/ditto/src/dummy_cert/server.crt"
+                        "backend/external_tools/ditto/src/dummy_cert/server.crt"
                     )
                 ),
             ],

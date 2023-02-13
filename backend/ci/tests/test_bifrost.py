@@ -6,6 +6,7 @@ from tests.constants import (
     EMAIL,
     PHONE_NUMBER,
     SCRUBBED_PHONE_NUMBER,
+    TEST_URL,
 )
 from tests.auth import FpAuth, OnboardingSessionToken
 from tests.bifrost_client import BifrostClient
@@ -312,7 +313,7 @@ class TestBifrost:
         body = post("hosted/user/biometric/init", None, d2p_auth_token)
         chal_token = body["challenge_token"]
         chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
-        attestation = WEBAUTHN_DEVICE.create(chal, os.environ.get("TEST_URL"))
+        attestation = WEBAUTHN_DEVICE.create(chal, TEST_URL)
         attestation = override_webauthn_attestation(attestation)
 
         # Register credential
@@ -431,7 +432,7 @@ class TestBifrost:
         chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
 
         webauthn_device = WEBAUTHN_DEVICE
-        attestation = webauthn_device.get(chal, os.environ.get("TEST_URL"))
+        attestation = webauthn_device.get(chal, TEST_URL)
         attestation["rawId"] = _b64_encode(attestation["rawId"])
         attestation["id"] = _b64_encode(attestation["id"])
         attestation["response"]["authenticatorData"] = _b64_encode(

@@ -1,0 +1,20 @@
+[package]
+name = "webhooks"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+svix = "0.78.0"
+serde = { workspace = true }
+serde_json = { workspace = true }
+derive_more = { workspace = true }
+paperclip = { workspace = true }
+thiserror = { workspace = true }
+newtypes = { path = "../newtypes" }
+strum_macros = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+chrono = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true}

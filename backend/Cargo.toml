@@ -18,7 +18,9 @@ members = [
     "components/twilio",
     "components/api_wire_types",
     "components/privacy_pass",
-    "components/ditto"
+    "components/webhooks",
+    "external_tools/ditto",
+    "external_tools/hooky",
 ]
 
 [workspace.dependencies]

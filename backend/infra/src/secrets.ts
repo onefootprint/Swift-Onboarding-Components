@@ -31,6 +31,7 @@ export interface StaticSecrets {
   socureSandboxApiKey: aws.ssm.Parameter;
   socureProductionApiKey: aws.ssm.Parameter;
   launchDarklySdkKey: aws.ssm.Parameter;
+  svixAuthToken: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -43,6 +44,7 @@ interface SecretConstants {
   airplane: Airplane;
   socure: Socure;
   launchDarkly: LaunchDarkly;
+  svix: Svix;
 }
 
 interface ElasticSecrets {
@@ -83,6 +85,10 @@ interface Airplane {
 
 interface LaunchDarkly {
   launchDarklySdkKey: string;
+}
+
+interface Svix {
+  authToken: string;
 }
 
 export async function LoadSecrets(
@@ -214,6 +220,10 @@ export async function LoadSecrets(
     launchDarklySdkKey: createSecretParameter(
       `launchDarklySdkKey-${stack}`,
       secretConstants.launchDarkly.launchDarklySdkKey,
+    ),
+    svixAuthToken: createSecretParameter(
+      `svixAuthToken-${stack}`,
+      secretConstants.svix.authToken,
     ),
   };
 }

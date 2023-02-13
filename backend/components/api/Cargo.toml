@@ -91,6 +91,8 @@ jsonpath_lib = "0.3.0"
 urlencoding = "2.1.2"
 actix-multipart = "0.5.0"
 
+webhooks = { path = "../webhooks"}
+
 [dev-dependencies]
 test-case = "2.1.0"
 enclave = { path = "../enclave/enclave"}

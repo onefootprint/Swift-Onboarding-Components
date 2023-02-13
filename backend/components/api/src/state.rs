@@ -33,6 +33,7 @@ pub struct State {
     #[allow(unused)]
     pub(crate) socure_production_client: SocureClient,
     pub(crate) feature_flag_client: LaunchDarklyFeatureFlagClient,
+    pub(crate) webhook_service_client: webhooks::WebhookServiceClient,
 }
 
 impl State {
@@ -100,6 +101,8 @@ impl State {
             SocureClient::new(config.socure_config.production_api_key.clone(), false)
                 .expect("failed to build socure certification client");
 
+        let webhook_service_client = webhooks::WebhookServiceClient::new(&config.svix_auth_token);
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -144,6 +147,7 @@ impl State {
             socure_sandbox_client,
             socure_production_client,
             feature_flag_client,
+            webhook_service_client,
         }
     }
 }

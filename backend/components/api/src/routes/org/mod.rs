@@ -4,13 +4,14 @@ pub mod access_events;
 pub mod api_keys;
 pub mod auth;
 pub mod index;
+pub mod logo;
 pub mod member;
 pub mod members;
 pub mod ob_config;
 pub mod proxy_configs;
 pub mod roles;
 pub mod settings;
-pub mod logo;
+pub mod webhook_portal;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -32,7 +33,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(roles::deactivate)
         .service(settings::get)
         .service(access_events::get)
-        .service(logo::put);
+        .service(logo::put)
+        .service(webhook_portal::get);
 
     auth::routes(config);
     api_keys::routes(config);

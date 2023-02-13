@@ -24,4 +24,13 @@ impl From<TerminalDecisionStatus> for DecisionStatus {
     }
 }
 
+impl From<TerminalDecisionStatus> for OnboardingStatus {
+    fn from(value: TerminalDecisionStatus) -> Self {
+        match value {
+            TerminalDecisionStatus::Pass => Self::Pass,
+            TerminalDecisionStatus::Fail => Self::Fail,
+        }
+    }
+}
+
 export_schema!(DecisionRequest);

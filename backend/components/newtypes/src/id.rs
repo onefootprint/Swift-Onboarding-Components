@@ -189,6 +189,7 @@ define_newtype_id!(
     "Identifier for a IdologyExpectIdResponse"
 );
 define_newtype_id!(ProxyRequestLogId, String, "Identifier for a log of proxy request");
+define_newtype_id!(WebhookServiceId, String, "Identifier for a webhook service");
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

@@ -1,5 +1,6 @@
 import json
 import os
+from tests.constants import TEST_URL
 
 from tests.types import User
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -86,7 +87,7 @@ class BifrostClient:
         body = post("hosted/user/biometric/init", None, self.auth_token)
         chal_token = body["challenge_token"]
         chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
-        attestation = webauthn_device.create(chal, os.environ.get("TEST_URL"))
+        attestation = webauthn_device.create(chal, TEST_URL)
         attestation = override_webauthn_attestation(attestation)
         data = dict(
             challenge_token=chal_token, device_response_json=json.dumps(attestation)

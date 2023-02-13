@@ -14,6 +14,7 @@ use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use newtypes::DbActor;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web};
+use webhooks::events::WebhookEvent;
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
@@ -28,9 +29,9 @@ pub async fn post(
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
-    let _actor = auth.actor();
     let is_live = auth.is_live()?;
     let fp_user_id = fp_user_id.into_inner();
+    let fp_user_id_clone = fp_user_id.clone();
     let actor = auth.actor();
 
     let DecisionRequest {
@@ -38,9 +39,9 @@ pub async fn post(
         status,
     } = request.into_inner();
 
-    state
+    let decision = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> ApiResult<Option<_>> {
             let (ob, su, manual_review, decision) =
                 Onboarding::lock_for_tenant(conn, &fp_user_id, &tenant_id, is_live)?;
 
@@ -50,7 +51,7 @@ pub async fn post(
 
             if !need_to_clear_manual_review && !status_changed {
                 // The operation is a no-op
-                return Ok(());
+                return Ok(None);
             }
             // If a manual review will be cleared or we will create a new decision, the operation
             // is not a no-op and we should create an annotation in the DB
@@ -77,12 +78,25 @@ pub async fn post(
 
             // If there is an outstanding review, creating this override decision clears it
             if let Some(manual_review) = manual_review {
-                manual_review.complete(conn, actor.clone(), decision.map(|d| d.id))?;
+                manual_review.complete(conn, actor.clone(), decision.as_ref().map(|d| d.id.clone()))?;
             }
 
-            Ok(())
+            Ok(decision)
         })
         .await?;
+
+    // notify any webhook listeners of the change
+    if let Some(decision) = decision {
+        state.webhook_service_client.send_event_to_tenant_non_blocking(
+            auth.tenant().id.clone(),
+            WebhookEvent::OnboardingStatusChanged {
+                footprint_user_id: fp_user_id_clone,
+                timestamp: decision.created_at,
+                new_status: status.into(),
+            },
+            None,
+        );
+    }
 
     EmptyResponse::ok().json()
 }

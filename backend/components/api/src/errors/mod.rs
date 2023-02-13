@@ -113,6 +113,8 @@ pub enum ApiError {
     DecisionError(#[from] crate::decision::Error),
     #[error("image upload error: {0}")]
     ImageUploadError(#[from] image_upload::ImageUploadError),
+    #[error("internal webhook error")]
+    WebhooksError(#[from] webhooks::Error),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -217,6 +219,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::VaultProxyError(_) => StatusCode::BAD_REQUEST,
             ApiError::ImageUploadError(_) => StatusCode::BAD_REQUEST,
             ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
+            ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

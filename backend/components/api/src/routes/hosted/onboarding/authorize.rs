@@ -11,6 +11,7 @@ use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use webhooks::events::WebhookEvent;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 pub struct CommitResponse {
@@ -31,7 +32,7 @@ pub async fn post(
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, status) = state
+    let (validation_token, status, tenant_id, wh_event) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             // Verify there are no unmet requirements
@@ -47,16 +48,29 @@ pub async fn post(
             ob.update(conn, OnboardingUpdate::is_authorized(true))?;
 
             // Return status as well
-            let (ob, _, _, latest_decision) = Onboarding::get(conn, &ob_id)?;
+            let (ob, scoped_user, manual_review, latest_decision) = Onboarding::get(conn, &ob_id)?;
 
-            let status = latest_decision
-                .and_then(|d| d.visible_status())
+            let (status, timestamp) = latest_decision
+                .and_then(|ld| ld.visible_status().map(|vs| (vs, ld.created_at)))
                 .ok_or(OnboardingError::NonTerminalState)?;
 
+            // create the webhook event to fire
+            let wh_event = WebhookEvent::OnboardingCompleted {
+                footprint_user_id: scoped_user.fp_user_id,
+                timestamp,
+                status,
+                onboarding_configuration_id: ob.ob_configuration_id,
+                requires_manual_review: manual_review.is_some(),
+            };
+
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
-            Ok((validation_token, status))
+            Ok((validation_token, status, scoped_user.tenant_id, wh_event))
         })
         .await??;
+
+    state
+        .webhook_service_client
+        .send_event_to_tenant_non_blocking(tenant_id, wh_event, None);
 
     Ok(Json(ResponseData {
         data: CommitResponse {

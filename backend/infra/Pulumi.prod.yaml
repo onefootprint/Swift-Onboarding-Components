@@ -12,10 +12,10 @@ config:
       enclaveVersion: latest
     deletionProtection: true
     domain:
-      base: api.onefootprint.com
-      prefix: ''
-      frontendBase: onefootprint.com
       assets: i.onefp.net
+      base: api.onefootprint.com
+      frontendBase: onefootprint.com
+      prefix: ''
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -69,6 +69,9 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
+    svix:
+      authToken:
+        secure: v1:EB18OjkgS2mqtf8b:ZZXYDnFMxA/wEoYGA40l7yBLtMB7MsZFCbMg402qqSuY9faTZ4AM7yV0i9zOc8MTh8kbAOoI
   infra:serverTailscaleKey:
     secure: v1:74fYef0kxnzqqVdG:dI4iBlokPSB9a81jK25wCB0bxARp1Mp3oEJ2N4Gsgek4eQ9PuNTBOpaan6UK8zX5djbZHm7UBoN2YUF0QCO0yBeUt1b2oDtl
   infra:tailscaleKey:

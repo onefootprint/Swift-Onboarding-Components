@@ -23,3 +23,4 @@ cryptography==37.0.2
 twilio==7.9.2
 aiohttp==3.8.3
 asyncio==3.4.3
+svix==0.78.0
