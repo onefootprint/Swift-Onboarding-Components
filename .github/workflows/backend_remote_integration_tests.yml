@@ -30,6 +30,11 @@ on:
         type: string
         required: false
 
+      environment:
+        description: 'secrets environment to use'
+        type: string
+        required: true
+
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER:
         required: true
@@ -46,6 +51,7 @@ jobs:
   run_tests:
     name: remote integration tests
     runs-on: beast
+    environment: ${{ inputs.environment }}
     strategy:
       matrix:
         python-version: ['3.9']

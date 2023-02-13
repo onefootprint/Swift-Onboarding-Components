@@ -87,6 +87,7 @@ jobs:
       isPR: false
       waitForDeploy: true
       expectedCommitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
+      environment: prod
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}

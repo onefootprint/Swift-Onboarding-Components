@@ -62,6 +62,7 @@ jobs:
       testUrl: '${{ needs.deploy_stack_dev.outputs.url }}'
       isPR: false
       waitForDeploy: true
+      environment: dev
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
