@@ -1,5 +1,8 @@
 use super::TenantUvw;
-use crate::auth::tenant::{CanDecrypt, IsGuardMet, TenantGuardDsl};
+use crate::{
+    auth::tenant::{CanDecrypt, IsGuardMet, TenantGuardDsl},
+    utils,
+};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, TenantScope};
 
@@ -35,7 +38,7 @@ impl TenantUvw {
             .identity_documents()
             .iter()
             .flat_map(|i| {
-                if i.selfie_image_s3_url.is_some() {
+                if utils::identity_document::id_doc_collected_selfie(i) {
                     vec![
                         DataIdentifier::IdDocument(i.document_type),
                         DataIdentifier::Selfie(i.document_type),

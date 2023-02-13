@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { DecryptedIdDocStatus } from '@onefootprint/types';
 import { Checkbox, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
@@ -13,6 +12,7 @@ import SuccessFlag from '../success-flag';
 export type ImageDataRowProps = {
   label: string;
   data?: IdDocDataValue;
+  isSuccessful?: boolean;
   checkbox: {
     disabled: boolean;
     checked: boolean;
@@ -21,7 +21,12 @@ export type ImageDataRowProps = {
   };
 };
 
-const ImageDataRow = ({ label, data, checkbox }: ImageDataRowProps) => {
+const ImageDataRow = ({
+  label,
+  data,
+  checkbox,
+  isSuccessful,
+}: ImageDataRowProps) => {
   const { t } = useTranslation(
     'pages.user-details.user-info.id-doc.id-doc-images',
   );
@@ -31,9 +36,6 @@ const ImageDataRow = ({ label, data, checkbox }: ImageDataRowProps) => {
   const handleToggleIdDocVisibility = () => {
     setImagesVisible(!imagesVisible);
   };
-  const isSuccessful = data?.some(
-    doc => doc.status === DecryptedIdDocStatus.success,
-  );
 
   if (visible) {
     return (

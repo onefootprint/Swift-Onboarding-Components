@@ -1,12 +1,12 @@
+use api_wire_types::IdentityDocumentKindForUser;
 use db::models::{onboarding::SerializableOnboardingInfo, scoped_user::ScopedUser};
-use newtypes::{DataIdentifier, IdDocKind, IdentityDataKind};
+use newtypes::{DataIdentifier, IdentityDataKind};
 
 use crate::utils::db2api::DbToApi;
 
 pub type UserDetail = (
     Vec<IdentityDataKind>,
-    Vec<IdDocKind>,
-    Vec<IdDocKind>,
+    Vec<IdentityDocumentKindForUser>,
     Vec<DataIdentifier>,
     Option<SerializableOnboardingInfo>,
     ScopedUser,
@@ -18,7 +18,6 @@ impl DbToApi<UserDetail> for api_wire_types::User {
         (
             identity_data_attributes,
             identity_document_types,
-            selfie_document_types,
             attributes,
             onboarding_info,
             scoped_user,
@@ -36,9 +35,8 @@ impl DbToApi<UserDetail> for api_wire_types::User {
             id: fp_user_id,
             is_portable,
             identity_data_attributes,
-            identity_document_types,
             attributes,
-            selfie_document_types,
+            identity_document_info: identity_document_types,
             start_timestamp,
             onboarding: onboarding_info.map(api_wire_types::Onboarding::from_db),
             ordering_id,
@@ -65,8 +63,7 @@ impl DbToApi<ScopedUser> for api_wire_types::User {
             id: fp_user_id,
             is_portable: false,
             identity_data_attributes: vec![],
-            identity_document_types: vec![],
-            selfie_document_types: vec![],
+            identity_document_info: vec![],
             attributes: vec![],
             start_timestamp,
             onboarding: None,

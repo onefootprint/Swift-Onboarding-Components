@@ -17,6 +17,7 @@ use crate::{
     errors::ApiResult,
     types::onboarding_requirement::OnboardingRequirement,
     utils::{
+        self,
         session::AuthSession,
         user_vault_wrapper::{UserVaultWrapper, UvwArgs},
     },
@@ -154,7 +155,7 @@ pub fn get_fields_to_authorize(
         if ob_config.can_access_selfie_image {
             selfie_collected = identity_documents
                 .iter()
-                .any(|id| id.selfie_image_s3_url.is_some());
+                .any(utils::identity_document::id_doc_collected_selfie);
         }
     }
 

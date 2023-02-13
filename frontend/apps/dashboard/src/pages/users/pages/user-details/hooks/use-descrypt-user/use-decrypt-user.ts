@@ -39,9 +39,11 @@ const useDecryptUser = () => {
         (vaultData.kycData[attr] === null ||
           vaultData.kycData[attr] === undefined),
     );
+
+    const docTypes = user.identityDocumentInfo.map(info => info.type);
     const idDoc = data.idDoc.filter(
       attr =>
-        user.identityDocumentTypes.includes(attr) &&
+        docTypes.includes(attr) &&
         (vaultData.idDoc[attr] === null || vaultData.idDoc[attr] === undefined),
     );
     decryptVaultData(

@@ -28,19 +28,20 @@ const useFormState = ({
     name: `idDoc.${IdDocType.driversLicense}`,
   });
 
+  const docTypes = user.identityDocumentInfo.map(info => info.type);
   const fieldsState = {
     [IdDocType.passport]: {
-      exists: user.identityDocumentTypes.includes(IdDocType.passport),
+      exists: docTypes.includes(IdDocType.passport),
       checked: !!passport,
       disabled: isCheckboxDisabled(vaultData.idDoc[IdDocType.passport]),
     },
     [IdDocType.idCard]: {
-      exists: user.identityDocumentTypes.includes(IdDocType.idCard),
+      exists: docTypes.includes(IdDocType.idCard),
       checked: !!idCard,
       disabled: isCheckboxDisabled(vaultData.idDoc[IdDocType.idCard]),
     },
     [IdDocType.driversLicense]: {
-      exists: user.identityDocumentTypes.includes(IdDocType.driversLicense),
+      exists: docTypes.includes(IdDocType.driversLicense),
       checked: !!driversLicense,
       disabled: isCheckboxDisabled(vaultData.idDoc[IdDocType.driversLicense]),
     },

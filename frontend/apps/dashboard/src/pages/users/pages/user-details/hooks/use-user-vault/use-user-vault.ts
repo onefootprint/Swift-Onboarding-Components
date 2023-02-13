@@ -7,7 +7,8 @@ const getVaultDataOrCreate = async (queryClient: QueryClient, user: User) => {
 
   const createInitialData = () => {
     const idDoc: UserVaultData['idDoc'] = {};
-    Object.values(user.identityDocumentTypes).forEach(attribute => {
+    const docTypes = user.identityDocumentInfo.map(info => info.type);
+    Object.values(docTypes).forEach(attribute => {
       idDoc[attribute] = null;
     });
     const kycData: UserVaultData['kycData'] = {};

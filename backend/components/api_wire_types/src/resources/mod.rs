@@ -58,5 +58,8 @@ pub use self::login::*;
 pub mod assume_role;
 pub use self::assume_role::*;
 
+pub mod user_facing_collected_document_status;
+pub use self::user_facing_collected_document_status::*;
+
 pub mod proxy_config;
 pub use self::proxy_config::*;

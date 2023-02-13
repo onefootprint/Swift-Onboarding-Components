@@ -8,6 +8,7 @@ import {
 } from '@onefootprint/test-utils';
 import {
   DecryptedIdDocStatus,
+  IdDocInfo,
   IdDocType,
   OnboardingStatus,
   UserDataAttribute,
@@ -34,15 +35,14 @@ describe('<VaultDataContent />', () => {
 
   const getUser = (
     identityDataAttributes: UserDataAttribute[],
-    identityDocumentTypes: IdDocType[],
+    identityDocumentInfo: IdDocInfo[],
   ): User => ({
     id: 'id',
     isPortable: false,
     identityDataAttributes,
     startTimestamp: 'time',
     orderingId: 'ordering',
-    identityDocumentTypes,
-    selfieDocumentTypes: [],
+    identityDocumentInfo,
     requiresManualReview: false,
     status: OnboardingStatus.verified,
   });
@@ -77,7 +77,18 @@ describe('<VaultDataContent />', () => {
           UserDataAttribute.city,
           UserDataAttribute.ssn4,
         ],
-        [IdDocType.passport, IdDocType.driversLicense],
+        [
+          {
+            type: IdDocType.passport,
+            status: DecryptedIdDocStatus.success,
+            selfieCollected: false,
+          },
+          {
+            type: IdDocType.driversLicense,
+            status: DecryptedIdDocStatus.success,
+            selfieCollected: false,
+          },
+        ],
       );
       const vaultData: UserVaultData = {
         kycData: {
@@ -170,7 +181,18 @@ describe('<VaultDataContent />', () => {
           UserDataAttribute.city,
           UserDataAttribute.ssn4,
         ],
-        [IdDocType.passport, IdDocType.driversLicense],
+        [
+          {
+            type: IdDocType.passport,
+            status: DecryptedIdDocStatus.success,
+            selfieCollected: false,
+          },
+          {
+            type: IdDocType.driversLicense,
+            status: DecryptedIdDocStatus.success,
+            selfieCollected: false,
+          },
+        ],
       );
       const vaultData: UserVaultData = {
         kycData: {

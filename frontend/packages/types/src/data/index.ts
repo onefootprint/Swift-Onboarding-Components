@@ -18,6 +18,7 @@ export { default as DecisionStatus } from './decision-status';
 export * from './decrypted-id-doc';
 export { default as IdDocBadImageError } from './id-doc-bad-image-error';
 export { default as IdDocDataAttribute } from './id-doc-data-attribute';
+export * from './id-doc-info';
 export { default as IdDocType } from './id-doc-type';
 export * from './identifier';
 export { default as IdentifyUserKind } from './identify-user-kind';

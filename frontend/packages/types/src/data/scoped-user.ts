@@ -1,4 +1,4 @@
-import IdDocType from './id-doc-type';
+import { IdDocInfo } from './id-doc-info';
 import { Onboarding } from './onboarding';
 import UserDataAttribute from './user-data-attribute';
 
@@ -9,6 +9,5 @@ export type ScopedUser = {
   onboarding?: Onboarding;
   orderingId: string;
   identityDataAttributes: UserDataAttribute[];
-  identityDocumentTypes: IdDocType[];
-  selfieDocumentTypes: IdDocType[];
+  identityDocumentInfo: IdDocInfo[];
 };

@@ -69,10 +69,10 @@ def test_get_users_detail(sandbox_user):
 
 
 @pytest.mark.parametrize(
-    "document_data,expected_identity_document_types,expected_selfie_document_types",
+    "document_data,expected_identity_document_info",
     [
-        (DocumentDataOptions.front_back, ["passport"], []),
-        (DocumentDataOptions.front_back_selfie, ["passport"], ["passport"]),
+        (DocumentDataOptions.front_back, [{'type': 'passport', 'status': 'success', 'selfie_collected': False}]),
+        (DocumentDataOptions.front_back_selfie, [{'type': 'passport', 'status': 'success', 'selfie_collected': True}]),
     ],
 )
 def test_get_users_detail_doc_and_selfie(
@@ -80,8 +80,7 @@ def test_get_users_detail_doc_and_selfie(
     twilio,
     doc_request_sandbox_ob_config,
     document_data,
-    expected_identity_document_types,
-    expected_selfie_document_types,
+    expected_identity_document_info,
 ):
     tenant = sandbox_user.tenant
     bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
@@ -89,8 +88,7 @@ def test_get_users_detail_doc_and_selfie(
     user = bifrost_client.onboard_user_onto_tenant(tenant)
 
     res = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
-    assert res["identity_document_types"] == expected_identity_document_types
-    assert res["selfie_document_types"] == expected_selfie_document_types
+    assert res["identity_document_info"] == expected_identity_document_info
 
 
 def test_liveness_list(sandbox_user):

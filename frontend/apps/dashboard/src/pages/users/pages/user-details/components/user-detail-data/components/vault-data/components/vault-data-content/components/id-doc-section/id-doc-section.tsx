@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24 } from '@onefootprint/icons';
-import { IdDocType } from '@onefootprint/types';
+import { DecryptedIdDocStatus, IdDocType } from '@onefootprint/types';
 import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -21,7 +21,12 @@ const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
   const { t, allT } = useTranslation('pages.user-details.user-info');
   const { idDoc } = vaultData;
   const idDocTypes = Object.keys(idDoc ?? {}) as IdDocType[];
-  const hasSelfie = user.selfieDocumentTypes.length > 0;
+  const successByIdDocType = Object.fromEntries(
+    user.identityDocumentInfo.map(info => [info.type, info.status]),
+  );
+  const hasSelfie = user.identityDocumentInfo.some(
+    info => !!info.selfieCollected,
+  );
   const { register, setValue, control } = useFormContext();
   const { areAllFieldsSelected, areAllFieldsDisabled, fieldsState } =
     useFormState({
@@ -82,6 +87,9 @@ const IdDocSection = ({ user, vaultData, isDecrypting }: IdDocSectionProps) => {
           key={type}
           label={allT(`id-doc-type.${type}`)}
           data={idDoc[type]}
+          isSuccessful={
+            successByIdDocType[type] === DecryptedIdDocStatus.success
+          }
           checkbox={{
             register: register(`idDoc.${type}`),
             ...fieldsState[type],

@@ -4,6 +4,7 @@ pub mod email;
 pub mod email_domain;
 pub mod fingerprint;
 pub mod headers;
+pub mod identity_document;
 pub mod liveness;
 pub mod magic_link;
 pub mod session;

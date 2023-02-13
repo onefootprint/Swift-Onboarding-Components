@@ -10,10 +10,12 @@ use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
+use crate::utils;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::TenantUvw;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
+use api_wire_types::IdentityDocumentKindForUser;
 use api_wire_types::ListUsersRequest;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
@@ -23,8 +25,8 @@ use newtypes::IdDocKind;
 use newtypes::{Fingerprint, Fingerprinter, IdentityDataKind};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-type UsersDetailResponse = api_wire_types::User;
-type UsersListResponse = Vec<UsersDetailResponse>;
+type UserDetailResponse = api_wire_types::User;
+type UsersListResponse = Vec<UserDetailResponse>;
 
 /// The UVW util to get_visible_populated_fields() has been updated to only return the more
 /// modern DataIdentifiers.
@@ -136,14 +138,17 @@ pub async fn get(
             // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
             let (attributes, identity_data_kinds, document_types, selfie_document_types) =
                 get_visible_populated_fields(uvw);
+            let is_portable = uvw.user_vault.is_portable;
+            let document_types_for_user: Vec<IdentityDocumentKindForUser> =
+                create_identity_document_info_for_user(uvw, document_types, selfie_document_types);
+
             let result = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
                 identity_data_kinds,
-                document_types,
-                selfie_document_types,
+                document_types_for_user,
                 attributes,
                 obs.remove(&su.id),
                 su,
-                uvw.user_vault.is_portable,
+                is_portable,
             ));
             Ok(result)
         })
@@ -161,7 +166,7 @@ pub async fn get_detail(
     state: web::Data<State>,
     footprint_user_id: web::Path<FootprintUserId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> actix_web::Result<JsonApiResponse<UsersDetailResponse>, ApiError> {
+) -> actix_web::Result<JsonApiResponse<UserDetailResponse>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
@@ -190,15 +195,41 @@ pub async fn get_detail(
     // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
     let (attributes, identity_data_kinds, document_types, selfie_document_types) =
         get_visible_populated_fields(&uvw);
-
+    let is_portable = uvw.user_vault.is_portable;
+    let document_types_for_user: Vec<IdentityDocumentKindForUser> =
+        create_identity_document_info_for_user(&uvw, document_types, selfie_document_types);
     let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
         identity_data_kinds,
-        document_types,
-        selfie_document_types,
+        document_types_for_user,
         attributes,
         ob,
         su,
-        uvw.user_vault.is_portable,
+        is_portable,
     ));
     Ok(ResponseData::ok(response).json())
+}
+
+fn create_identity_document_info_for_user(
+    uvw: &TenantUvw,
+    document_types: Vec<IdDocKind>,
+    selfie_document_types: Vec<IdDocKind>,
+) -> Vec<IdentityDocumentKindForUser> {
+    uvw.identity_documents()
+        .iter()
+        .filter(|id_doc_and_req| document_types.contains(&id_doc_and_req.document_type))
+        .filter_map(|id_doc_and_req| {
+            utils::identity_document::user_facing_status_for_document(&id_doc_and_req.document_request).map(
+                |status| {
+                    // we could have collected selfie, but user did not authorize it
+                    let selfie_collected = utils::identity_document::id_doc_collected_selfie(id_doc_and_req)
+                        && selfie_document_types.contains(&id_doc_and_req.document_type);
+                    IdentityDocumentKindForUser {
+                        kind: id_doc_and_req.document_type,
+                        status,
+                        selfie_collected,
+                    }
+                },
+            )
+        })
+        .collect()
 }
