@@ -12,6 +12,7 @@ import {
 import React from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import { Events } from 'src/hooks/use-identify-machine';
+import useSandboxMode from 'src/hooks/use-sandbox-mode';
 
 import { useLoginChallengePicker } from '../../../../components/login-challenge-picker/login-challenge-picker-provider';
 import EmailIdentificationFooter from './components/email-identification-footer';
@@ -21,8 +22,9 @@ import EmailIdentificationHeader from './components/email-identification-header'
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentificationContent = () => {
+  const { isSandbox } = useSandboxMode();
   const [state, send] = useIdentifyMachine();
-  const { device } = state.context;
+  const { email: smEmail, device } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
@@ -108,7 +110,12 @@ const EmailIdentificationContent = () => {
   return (
     <>
       <EmailIdentificationHeader />
-      <EmailIdentificationForm onSubmit={handleSubmit} isLoading={isLoading} />
+      <EmailIdentificationForm
+        isSandbox={isSandbox}
+        defaultEmail={smEmail}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+      />
       <EmailIdentificationFooter />
     </>
   );

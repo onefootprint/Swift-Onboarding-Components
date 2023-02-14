@@ -3,32 +3,31 @@ import { UserData, UserDataAttribute } from '@onefootprint/types';
 import { Box, Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useSandboxMode from 'src/hooks/use-sandbox-mode';
 
-import useIdentifyMachine from '../../../../../../../../hooks/use-identify-machine';
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';
 
-type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
+export type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
-type EmailIdentificationFormProps = {
-  isLoading: boolean;
+export type EmailIdentificationFormProps = {
+  defaultEmail?: string;
+  isLoading?: boolean;
+  isSandbox?: boolean;
   onSubmit: (formData: FormData) => void;
 };
 
 const EmailIdentificationForm = ({
+  defaultEmail,
   isLoading,
+  isSandbox,
   onSubmit,
 }: EmailIdentificationFormProps) => {
-  const [state] = useIdentifyMachine();
-  const { email } = state.context;
-  const { isSandbox } = useSandboxMode();
   const { t } = useTranslation('pages.email-identification.form');
   const {
     register,
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm<FormData>({ defaultValues: { email } });
+  } = useForm<FormData>({ defaultValues: { email: defaultEmail } });
 
   const getHint = () => {
     const hasError = !!errors?.[UserDataAttribute.email];
