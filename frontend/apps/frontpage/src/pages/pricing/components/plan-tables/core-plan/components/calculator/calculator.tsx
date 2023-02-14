@@ -239,6 +239,8 @@ const Banner = styled.div`
 
     &[data-type='info'] {
       background-color: ${theme.backgroundColor.info};
+      text-align: center;
+      white-space: nowrap;
     }
 
     &[data-type='success'] {
