@@ -1,21 +1,21 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgMember } from '@onefootprint/types';
+import { Member } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 
-import useOrgMembersFilters from '../../hooks/use-org-members-filters';
+import useMembersFilters from '../../hooks/use-members-filters';
 import Row from '../row';
 import Filters from './components/filters';
 
 type MembersTableProps = {
-  data?: OrgMember[];
+  data?: Member[];
   errorMessage?: string;
   isLoading?: boolean;
 };
 
 const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
   const { t } = useTranslation('pages.settings.members');
-  const filters = useOrgMembersFilters();
+  const filters = useMembersFilters();
   const columns = [
     { id: 'email', text: t('table.header.email'), width: '25%' },
     { id: 'lastActive', text: t('table.header.lastActive'), width: '20%' },
@@ -29,7 +29,7 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
   };
 
   return filters.isReady ? (
-    <Table<OrgMember>
+    <Table<Member>
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('table.empty-state')}

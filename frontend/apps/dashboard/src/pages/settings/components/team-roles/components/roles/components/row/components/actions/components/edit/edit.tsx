@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgRole, UpdateOrgRoleRequest } from '@onefootprint/types';
+import { Role, UpdateRoleRequest } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
@@ -11,7 +11,7 @@ export type EditHandler = {
 };
 
 export type EditProps = {
-  role: OrgRole;
+  role: Role;
 };
 
 const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
@@ -31,7 +31,7 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
     setOpen(false);
   };
 
-  const handleSubmit = (payload: UpdateOrgRoleRequest) => {
+  const handleSubmit = (payload: UpdateRoleRequest) => {
     editRoleMutation.mutate(payload, { onSuccess: handleClose });
   };
 

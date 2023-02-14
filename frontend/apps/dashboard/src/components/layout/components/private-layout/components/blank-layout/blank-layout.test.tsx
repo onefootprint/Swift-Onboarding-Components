@@ -5,11 +5,11 @@ import {
   userEvent,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import BlankLayout, { BlankLayoutProps } from './blank-layout';
 
-const originalState = useStore.getState();
 const useRouterSpy = createUseRouterSpy();
 
 describe('<BlankLayout />', () => {
@@ -19,32 +19,11 @@ describe('<BlankLayout />', () => {
     customRender(<BlankLayout>{children}</BlankLayout>);
 
   beforeEach(() => {
-    useStore.setState({
-      data: {
-        auth: '1',
-        user: {
-          id: 'org_rb_jDESK4Wm2DkIbSRhIdlwJT',
-          email: 'jane.doe@acme.com',
-          firstName: 'Jane',
-          lastName: 'Doe',
-        },
-        org: {
-          isLive: false,
-          logoUrl: null,
-          name: 'Acme',
-          isSandboxRestricted: true,
-        },
-        meta: {
-          createdNewTenant: false,
-          isFirstLogin: false,
-          requiresOnboarding: false,
-        },
-      },
-    });
+    asAdminUser();
   });
 
   afterAll(() => {
-    useStore.setState(originalState);
+    resetUser();
   });
 
   it('should render correctly', () => {

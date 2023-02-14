@@ -1,20 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgRole } from '@onefootprint/types';
+import { Role } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 
-import useOrgRolesFilters from '../../hooks/use-org-roles-filters';
+import useRolesFilters from '../../hooks/use-roles-filters';
 import Row from '../row';
 
 type RolesTableProps = {
-  data?: OrgRole[];
+  data?: Role[];
   errorMessage?: string;
   isLoading?: boolean;
 };
 
 const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
   const { t } = useTranslation('pages.settings.roles');
-  const filters = useOrgRolesFilters();
+  const filters = useRolesFilters();
   const columns = [
     { id: 'role', text: t('table.header.role'), width: '20%' },
     { id: 'active-users', text: t('table.header.active-users'), width: '15%' },
@@ -28,7 +28,7 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
   };
 
   return filters.isReady ? (
-    <Table<OrgRole>
+    <Table<Role>
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('table.empty-state')}

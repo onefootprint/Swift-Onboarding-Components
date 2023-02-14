@@ -1,7 +1,7 @@
-import { OrgMember } from '../data';
+import { Member } from '../data';
 
 export type UpdateMemberRequest = {
   roleId: string;
 };
 
-export type UpdateMemberResponse = OrgMember;
+export type UpdateMemberResponse = Member;

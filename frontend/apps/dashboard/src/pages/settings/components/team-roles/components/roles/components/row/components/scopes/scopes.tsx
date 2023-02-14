@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgRoleScope } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 import { Tag, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import groupScopes from './utils/group-scopes';
 
 export type ScopesProps = {
-  scopes: OrgRoleScope[];
+  scopes: RoleScope[];
 };
 
 const Scopes = ({ scopes }: ScopesProps) => {

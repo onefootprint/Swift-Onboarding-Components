@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgMember } from '@onefootprint/types';
+import { Member } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
 import useUserSession from 'src/hooks/use-user-session';
@@ -9,7 +9,7 @@ import Actions from './components/actions';
 import EditRole from './components/edit-role';
 
 export type RowProps = {
-  member: OrgMember;
+  member: Member;
 };
 
 const Row = ({ member }: RowProps) => {

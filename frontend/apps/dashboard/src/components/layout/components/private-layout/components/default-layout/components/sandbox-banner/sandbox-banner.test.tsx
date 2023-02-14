@@ -1,42 +1,25 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
+import {
+  asAdminUserInLive,
+  asAdminUserInSandbox,
+  asAdminUserInSandboxAndRestricted,
+  resetUser,
+} from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import SandboxBanner from './sandbox-banner';
 
-const originalState = useStore.getState();
-
 describe('<SandboxBanner />', () => {
   afterAll(() => {
-    useStore.setState(originalState);
+    resetUser();
   });
 
   const renderSandboxBanner = () => customRender(<SandboxBanner />);
 
   describe('when sandbox is enabled', () => {
     beforeEach(() => {
-      useStore.setState({
-        data: {
-          auth: '1',
-          user: {
-            id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-            email: 'jane.doe@acme.com',
-            firstName: 'Jane',
-            lastName: 'Doe',
-          },
-          org: {
-            isLive: false,
-            name: 'Acme',
-            isSandboxRestricted: false,
-            logoUrl: null,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
-        },
-      });
+      asAdminUserInSandbox();
     });
 
     it('should show the banner', () => {
@@ -59,28 +42,7 @@ describe('<SandboxBanner />', () => {
 
   describe('when sandbox is enabled, but is restricted', () => {
     beforeEach(() => {
-      useStore.setState({
-        data: {
-          auth: '1',
-          user: {
-            id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-            email: 'jane.doe@acme.com',
-            firstName: 'Jane',
-            lastName: 'Doe',
-          },
-          org: {
-            isLive: false,
-            name: 'Acme',
-            isSandboxRestricted: true,
-            logoUrl: null,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
-        },
-      });
+      asAdminUserInSandboxAndRestricted();
     });
 
     it('should show the banner', () => {
@@ -98,31 +60,10 @@ describe('<SandboxBanner />', () => {
 
   describe('when sandbox is disabled', () => {
     beforeEach(() => {
-      useStore.setState({
-        data: {
-          auth: '1',
-          user: {
-            id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-            email: 'jane.doe@acme.com',
-            firstName: 'Jane',
-            lastName: 'Doe',
-          },
-          org: {
-            isLive: true,
-            name: 'Acme',
-            isSandboxRestricted: false,
-            logoUrl: null,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
-        },
-      });
+      asAdminUserInLive();
     });
 
-    it('should NOT show the banner', () => {
+    it('should not show the banner', () => {
       renderSandboxBanner();
       const banner = screen.queryByRole('alert');
       expect(banner).not.toBeInTheDocument();

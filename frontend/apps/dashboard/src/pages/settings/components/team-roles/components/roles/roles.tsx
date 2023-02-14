@@ -3,10 +3,10 @@ import React from 'react';
 
 import Create from './components/create';
 import RolesTable from './components/roles-table';
-import useOrgRoles from './hooks/use-org-roles';
+import useRoles from './hooks/use-roles';
 
 const Roles = () => {
-  const { data: response, errorMessage, isLoading, pagination } = useOrgRoles();
+  const { data: response, errorMessage, isLoading, pagination } = useRoles();
 
   return (
     <Box testID="roles-table" as="section">

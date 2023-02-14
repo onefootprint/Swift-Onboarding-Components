@@ -7,6 +7,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import Onboarding from './onboarding';
@@ -18,35 +19,13 @@ import {
   withUpdateUser,
 } from './onboarding.test.config';
 
-const originalState = useStore.getState();
 const useRouterSpy = createUseRouterSpy();
 
 describe('<Onboarding />', () => {
   const renderOnboarding = () => customRender(<Onboarding />);
 
   beforeEach(() => {
-    useStore.setState({
-      data: {
-        auth: '1',
-        user: {
-          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-          email: 'jane.doe@acme.com',
-          firstName: 'Jane',
-          lastName: 'Doe',
-        },
-        org: {
-          isLive: false,
-          logoUrl: null,
-          name: 'Acme',
-          isSandboxRestricted: true,
-        },
-        meta: {
-          createdNewTenant: false,
-          isFirstLogin: false,
-          requiresOnboarding: true,
-        },
-      },
-    });
+    asAdminUser();
   });
 
   beforeEach(() => {
@@ -58,7 +37,7 @@ describe('<Onboarding />', () => {
   });
 
   afterAll(() => {
-    useStore.setState(originalState);
+    resetUser();
   });
 
   describe('when completing all the steps', () => {

@@ -7,6 +7,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import ApiKeys from './api-keys';
 import {
@@ -22,6 +23,14 @@ describe('<ApiKeys />', () => {
   const renderDevelopers = () => {
     customRender(<ApiKeys />);
   };
+
+  beforeAll(() => {
+    asAdminUser();
+  });
+
+  afterAll(() => {
+    resetUser();
+  });
 
   describe('listing the api keys', () => {
     describe('when the request fails', () => {

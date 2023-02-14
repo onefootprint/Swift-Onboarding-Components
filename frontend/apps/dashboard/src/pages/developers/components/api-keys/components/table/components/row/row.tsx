@@ -3,6 +3,7 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
 import { Badge, Box, Dropdown } from '@onefootprint/ui';
 import React from 'react';
+import PermissionGate, { Scope } from 'src/components/permission-gate';
 
 import KeyCell from './components/key-cell';
 import useReveal from './hooks/use-reveal-key';
@@ -37,9 +38,14 @@ const Row = ({ apiKey }: RowProps) => {
           }}
         >
           <Dropdown.Root>
-            <Dropdown.Trigger aria-label={t('aria-label')}>
-              <IcoDotsHorizontal24 />
-            </Dropdown.Trigger>
+            <PermissionGate
+              scope={Scope.apiKeys}
+              fallbackText={t('not-allowed')}
+            >
+              <Dropdown.Trigger aria-label={t('aria-label')}>
+                <IcoDotsHorizontal24 />
+              </Dropdown.Trigger>
+            </PermissionGate>
             <Dropdown.Content align="end">
               <Dropdown.Item onSelect={reveal.toggle}>
                 {apiKey.key ? t('reveal.hide') : t('reveal.show')}

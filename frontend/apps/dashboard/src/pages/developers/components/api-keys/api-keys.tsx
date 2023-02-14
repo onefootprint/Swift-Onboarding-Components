@@ -1,15 +1,16 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { Box, Button, Typography } from '@onefootprint/ui';
 import React from 'react';
+import PermissionGate, { Scope } from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
 import CreateDialog from './components/create-dialog';
 import Table from './components/table';
 
 const ApiKeys = () => {
+  const { t } = useTranslation('pages.developers.api-keys');
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
-  const { t } = useTranslation('pages.developers.api-keys');
 
   return (
     <section data-testid="api-keys-section">
@@ -20,9 +21,14 @@ const ApiKeys = () => {
           </Typography>
           <Typography variant="body-3">{t('header.subtitle')}</Typography>
         </Box>
-        <Button onClick={openCreateDialog} variant="secondary" size="small">
-          {t('header.cta')}
-        </Button>
+        <PermissionGate
+          fallbackText={t('header.cta-not-allowed')}
+          scope={Scope.apiKeys}
+        >
+          <Button onClick={openCreateDialog} size="small" variant="secondary">
+            {t('header.cta')}
+          </Button>
+        </PermissionGate>
       </Header>
       <Box sx={{ marginY: 5 }} />
       <Table />

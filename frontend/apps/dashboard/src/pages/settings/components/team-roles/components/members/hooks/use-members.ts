@@ -4,22 +4,22 @@ import request, {
   PaginatedRequestResponse,
 } from '@onefootprint/request';
 import {
-  GetOrgMembersRequest,
-  GetOrgMembersResponse,
-  OrgMember,
+  GetMembersRequest,
+  GetMembersResponse,
+  Member,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from 'src/hooks/use-pagination';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-import useOrgMembersFilters from './use-org-members-filters';
+import useMembersFilters from './use-members-filters';
 
-const getOrgMembersRequest = async (
+const getMembers = async (
   authHeaders: AuthHeaders,
-  params: GetOrgMembersRequest,
+  params: GetMembersRequest,
 ) => {
   const { data: response } = await request<
-    PaginatedRequestResponse<GetOrgMembersResponse>
+    PaginatedRequestResponse<GetMembersResponse>
   >({
     method: 'GET',
     url: '/org/members',
@@ -30,19 +30,19 @@ const getOrgMembersRequest = async (
   return response;
 };
 
-const useOrgMembers = () => {
+const useMembers = () => {
   const { authHeaders } = useSession();
   const { formatRelativeDate } = useIntl();
-  const filters = useOrgMembersFilters();
+  const filters = useMembersFilters();
   const { requestParams } = filters;
-  const orgMembersQuery = useQuery(
+  const membersQuery = useQuery(
     ['org', 'members', requestParams],
-    () => getOrgMembersRequest(authHeaders, requestParams),
+    () => getMembers(authHeaders, requestParams),
     {
       enabled: filters.isReady,
       select: response => ({
         meta: response.meta,
-        data: response.data.map((member: OrgMember) => ({
+        data: response.data.map((member: Member) => ({
           ...member,
           rolebinding: {
             lastLoginAt: member.rolebinding?.lastLoginAt
@@ -54,20 +54,20 @@ const useOrgMembers = () => {
     },
   );
   const pagination = usePagination({
-    count: orgMembersQuery.data?.meta.count,
-    next: orgMembersQuery.data?.meta.nextPage,
+    count: membersQuery.data?.meta.count,
+    next: membersQuery.data?.meta.nextPage,
     page: filters.values.page,
     onChange: newPage => filters.push({ members_page: newPage }),
   });
-  const errorMessage = orgMembersQuery.error
-    ? getErrorMessage(orgMembersQuery.error)
+  const errorMessage = membersQuery.error
+    ? getErrorMessage(membersQuery.error)
     : undefined;
 
   return {
-    ...orgMembersQuery,
+    ...membersQuery,
     errorMessage,
     pagination,
   };
 };
 
-export default useOrgMembers;
+export default useMembers;

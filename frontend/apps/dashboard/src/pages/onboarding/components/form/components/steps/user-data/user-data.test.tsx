@@ -5,42 +5,19 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
-import { useStore } from 'src/hooks/use-session';
+import { asAdminUser, asUser, resetUser } from 'src/config/tests';
 
 import UserData, { UserDataProps } from './user-data';
 import { withUpdateUser, withUpdateUserError } from './user-data.test.config';
 
-const originalState = useStore.getState();
-
 describe('<UserData />', () => {
   beforeEach(() => {
     withUpdateUser();
-    useStore.setState({
-      data: {
-        auth: '1',
-        user: {
-          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-          email: 'jane.doe@acme.com',
-          firstName: '',
-          lastName: '',
-        },
-        org: {
-          isLive: false,
-          logoUrl: null,
-          name: 'Acme',
-          isSandboxRestricted: true,
-        },
-        meta: {
-          createdNewTenant: false,
-          isFirstLogin: false,
-          requiresOnboarding: false,
-        },
-      },
-    });
+    asAdminUser();
   });
 
   afterAll(() => {
-    useStore.setState(originalState);
+    resetUser();
   });
 
   const renderUserData = ({
@@ -64,30 +41,6 @@ describe('<UserData />', () => {
   });
 
   describe('when the name is already filled', () => {
-    beforeEach(() => {
-      useStore.setState({
-        data: {
-          auth: '1',
-          user: {
-            id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-            email: 'jane.doe@acme.com',
-            firstName: 'Jane',
-            lastName: 'Doe',
-          },
-          org: {
-            isLive: false,
-            logoUrl: null,
-            name: 'Acme',
-            isSandboxRestricted: true,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
-        },
-      });
-    });
     it('should show the name of the user logged', () => {
       renderUserData({});
 
@@ -100,6 +53,7 @@ describe('<UserData />', () => {
 
   describe('when submitting the form', () => {
     it('should show an error when the first input is not filled correctly', async () => {
+      asUser({ firstName: '', lastName: '' });
       renderUserData({});
 
       const submitButton = screen.getByRole('button', { name: 'Next' });

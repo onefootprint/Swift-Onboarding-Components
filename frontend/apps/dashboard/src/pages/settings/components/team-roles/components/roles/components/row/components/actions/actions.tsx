@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { OrgRole } from '@onefootprint/types';
+import { Role } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 
@@ -8,7 +8,7 @@ import Edit, { EditHandler } from './components/edit';
 import Remove, { RemoveHandler } from './components/remove';
 
 export type ActionsProps = {
-  role: OrgRole;
+  role: Role;
 };
 
 const Actions = ({ role }: ActionsProps) => {

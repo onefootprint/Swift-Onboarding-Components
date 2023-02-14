@@ -1,8 +1,8 @@
-import { OrgMember } from '../data/org-member';
+import { Member } from '../data/org-member';
 import { Organization } from '../data/organization';
 
 export type OrgAssumeRoleResponse = {
-  user: OrgMember;
+  user: Member;
   tenant: Organization;
 };
 

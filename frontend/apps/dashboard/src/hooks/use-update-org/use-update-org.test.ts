@@ -1,39 +1,17 @@
 import { customRenderHook, waitFor } from '@onefootprint/test-utils';
+import { asAdminUserInSandbox, resetUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import { withUpdateOrg } from './udate-update-org.test.config';
 import useUpdateOrg from './use-update-org';
 
-const originalState = useStore.getState();
-
 describe('useUpdateOrg', () => {
   beforeAll(() => {
-    useStore.setState({
-      data: {
-        auth: '1',
-        user: {
-          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-          email: 'jane.doe@acme.com',
-          firstName: 'Jane',
-          lastName: 'Doe',
-        },
-        org: {
-          isLive: false,
-          logoUrl: null,
-          name: 'Acme',
-          isSandboxRestricted: true,
-        },
-        meta: {
-          createdNewTenant: false,
-          isFirstLogin: false,
-          requiresOnboarding: false,
-        },
-      },
-    });
+    asAdminUserInSandbox();
   });
 
   afterAll(() => {
-    useStore.setState(originalState);
+    resetUser();
   });
 
   describe('when the request succeeds', () => {

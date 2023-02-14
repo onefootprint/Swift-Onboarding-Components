@@ -1,4 +1,4 @@
-import { Organization } from '@onefootprint/types';
+import { Organization, Role } from '@onefootprint/types';
 
 import {
   DASHBOARD_AUTHORIZATION_HEADER,
@@ -10,6 +10,7 @@ export type UserSession = {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  role: Role;
 };
 
 export type OrgSession = {

@@ -1,11 +1,11 @@
-import { Organization, OrgMember } from '../data';
+import { Member, Organization } from '../data';
 
 export type OrgAuthLoginResponse = {
   createdNewTenant: boolean;
   isFirstLogin: boolean;
   requiresOnboarding: boolean;
   authToken: string;
-  user: OrgMember | null;
+  user: Member | null;
   tenant: Organization | null;
 };
 

@@ -2,12 +2,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Filters as FPFilter } from '@onefootprint/ui';
 import React from 'react';
 
-import useOrgMembersFilters from '../../../../hooks/use-org-members-filters';
+import useMembersFilters from '../../../../hooks/use-members-filters';
 import useRoles from '../../../../hooks/use-roles';
 
 const Filters = () => {
   const { t } = useTranslation('pages.settings.members.filters');
-  const filters = useOrgMembersFilters();
+  const filters = useMembersFilters();
   const rolesQuery = useRoles();
 
   return (

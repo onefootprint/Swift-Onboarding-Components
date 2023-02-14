@@ -1,5 +1,10 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Organization, OrgRole, UserUpdateResponse } from '@onefootprint/types';
+import {
+  Organization,
+  Role,
+  RoleScope,
+  UserUpdateResponse,
+} from '@onefootprint/types';
 
 export const userFixture: UserUpdateResponse = {
   email: 'jane.doe@acme.com',
@@ -16,20 +21,20 @@ export const orgFixture: Organization = {
   companySize: null,
 };
 
-export const orgRolesFixture: OrgRole[] = [
+export const RolesFixture: Role[] = [
   {
-    id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+    id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
     name: 'Admin',
-    scopes: ['admin'],
+    scopes: [RoleScope.admin],
     isImmutable: true,
     createdAt: '2022-09-19T16:24:35.367322Z',
     numActiveUsers: 1,
   },
   {
-    id: 'orgrole_erflKNWEF13143EWRWELJN',
+    id: 'Role_erflKNWEF13143EWRWELJN',
     name: 'Member',
     isImmutable: true,
-    scopes: ['read'],
+    scopes: [RoleScope.read],
     createdAt: '2023-01-06T05:11:08.415924Z',
     numActiveUsers: 0,
   },
@@ -56,12 +61,12 @@ export const withUpdateOrg = (response: Partial<Organization> = orgFixture) =>
     response,
   });
 
-export const withRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
+export const withRoles = (Roles: Role[] = RolesFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/roles',
     response: {
-      data: orgRoles,
+      data: Roles,
       meta: {
         next: null,
         count: null,

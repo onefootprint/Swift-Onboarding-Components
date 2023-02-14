@@ -1,8 +1,8 @@
-import { OrgRole, OrgRoleScope } from '../data';
+import { Role, RoleScope } from '../data';
 
-export type UpdateOrgRoleRequest = {
+export type UpdateRoleRequest = {
   name: string;
-  scopes: OrgRoleScope[];
+  scopes: RoleScope[];
 };
 
-export type UpdateOrgRoleResponse = OrgRole;
+export type UpdateRoleResponse = Role;

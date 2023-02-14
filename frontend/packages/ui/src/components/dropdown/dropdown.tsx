@@ -22,8 +22,12 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)`
       ${createOverlayBackground('darken-2', 'primary')};
     }
 
-    &:hover {
+    &:enabled:hover {
       ${createOverlayBackground('darken-1', 'primary')};
+    }
+
+    &:disabled {
+      opacity: 0.5;
     }
   `}
 `;

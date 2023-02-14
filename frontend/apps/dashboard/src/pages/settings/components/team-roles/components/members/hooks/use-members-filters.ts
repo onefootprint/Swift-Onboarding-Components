@@ -14,7 +14,7 @@ const defaultQueryParams: MembersQuery = {
   members_page_size: undefined,
 };
 
-const useOrgMembersFilters = () => {
+const useMembersFilters = () => {
   const filters = useFilters<MembersQuery>(defaultQueryParams);
   const { query } = filters;
   const values = {
@@ -36,4 +36,4 @@ const useOrgMembersFilters = () => {
   };
 };
 
-export default useOrgMembersFilters;
+export default useMembersFilters;

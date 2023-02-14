@@ -15,7 +15,7 @@ import {
   withCurrentUserDifferentFromMember,
   withCurrentUserSameAsMember,
   withEditMember,
-  withOrgRoles,
+  withRoles,
 } from './row.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -23,7 +23,7 @@ const useRouterSpy = createUseRouterSpy();
 describe('<Row />', () => {
   beforeEach(() => {
     withCurrentUserDifferentFromMember();
-    withOrgRoles();
+    withRoles();
     useRouterSpy({
       pathname: '/settings',
       query: {

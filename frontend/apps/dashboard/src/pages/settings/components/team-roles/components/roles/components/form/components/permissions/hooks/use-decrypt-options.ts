@@ -1,8 +1,8 @@
-import { CollectedKycDataOption, OrgRoleScope } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 
 export type Option = {
   label: string;
-  value: OrgRoleScope;
+  value: RoleScope;
 };
 
 export type Group = {
@@ -15,10 +15,10 @@ const useDecryptOptions = () => {
     {
       label: 'Basic Data',
       options: [
-        { value: `decrypt.${CollectedKycDataOption.name}`, label: 'Full name' },
-        { value: `decrypt.${CollectedKycDataOption.email}`, label: 'Email' },
+        { value: RoleScope.decryptName, label: 'Full name' },
+        { value: RoleScope.decryptEmail, label: 'Email' },
         {
-          value: `decrypt.${CollectedKycDataOption.phoneNumber}`,
+          value: RoleScope.decryptPhoneNumber,
           label: 'Phone number',
         },
       ],
@@ -27,29 +27,29 @@ const useDecryptOptions = () => {
       label: 'Identity data',
       options: [
         {
-          value: `decrypt.${CollectedKycDataOption.ssn9}`,
+          value: RoleScope.decryptSsn9,
           label: 'SSN',
         },
         {
-          value: `decrypt.${CollectedKycDataOption.ssn4}`,
+          value: RoleScope.decryptSsn4,
           label: 'SSN (last 4)',
         },
         {
-          value: `decrypt.${CollectedKycDataOption.dob}`,
+          value: RoleScope.decryptDob,
           label: 'Date of Birth',
         },
-        { value: 'decrypt_documents', label: 'ID document' },
+        { value: RoleScope.decryptDocuments, label: 'ID document' },
       ],
     },
     {
       label: 'Address data',
       options: [
         {
-          value: `decrypt.${CollectedKycDataOption.fullAddress}`,
+          value: RoleScope.decryptFullAddress,
           label: 'Full address',
         },
         {
-          value: `decrypt.${CollectedKycDataOption.partialAddress}`,
+          value: RoleScope.decryptPartialAddress,
           label: 'Partial address',
         },
       ],
@@ -58,7 +58,7 @@ const useDecryptOptions = () => {
       label: 'Other',
       options: [
         {
-          value: 'decrypt_custom',
+          value: RoleScope.decryptDocuments,
           label: 'Custom data',
         },
       ],

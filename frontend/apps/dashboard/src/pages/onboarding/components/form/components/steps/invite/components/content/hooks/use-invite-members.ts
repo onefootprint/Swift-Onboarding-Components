@@ -1,18 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import {
-  CreateOrgMembersRequest,
-  CreateOrgMembersResponse,
+  CreateMembersRequest,
+  CreateMembersResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useIsMutating, useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-const inviteMemberRequest = async (
+const inviteMember = async (
   authHeaders: AuthHeaders,
-  payload: CreateOrgMembersRequest,
+  payload: CreateMembersRequest,
 ) => {
-  const response = await request<CreateOrgMembersResponse>({
+  const response = await request<CreateMembersResponse>({
     method: 'POST',
     url: '/org/members',
     data: payload,
@@ -29,12 +29,12 @@ const useInviteMembers = () => {
   const session = useSession();
   const { mutateAsync } = useMutation({
     mutationKey: ['inviteMember'],
-    mutationFn: (payload: CreateOrgMembersRequest) =>
-      inviteMemberRequest(session.authHeaders, payload),
+    mutationFn: (payload: CreateMembersRequest) =>
+      inviteMember(session.authHeaders, payload),
   });
 
   const mutate = async (
-    invitations: CreateOrgMembersRequest[],
+    invitations: CreateMembersRequest[],
     options?: {
       onSuccess?: () => void;
       onError?: (error: unknown) => void;

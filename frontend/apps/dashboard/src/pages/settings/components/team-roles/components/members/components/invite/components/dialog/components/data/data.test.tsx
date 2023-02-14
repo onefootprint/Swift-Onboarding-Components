@@ -1,4 +1,5 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { RoleScope } from '@onefootprint/types';
 import React from 'react';
 
 import Data, { DataProps } from './data';
@@ -7,11 +8,11 @@ describe('<Data />', () => {
   const defaultRoles = [
     {
       label: 'Admin',
-      value: 'admin',
+      value: RoleScope.admin,
     },
     {
       label: 'Member',
-      value: 'read-only',
+      value: RoleScope.read,
     },
   ];
   const renderData = ({

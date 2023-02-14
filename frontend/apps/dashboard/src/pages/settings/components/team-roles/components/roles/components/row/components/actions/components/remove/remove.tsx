@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgRole } from '@onefootprint/types';
+import { Role } from '@onefootprint/types';
 import { createFontStyles, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';
@@ -13,7 +13,7 @@ export type RemoveHandler = {
 };
 
 export type RemoveProps = {
-  role: OrgRole;
+  role: Role;
 };
 
 const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {

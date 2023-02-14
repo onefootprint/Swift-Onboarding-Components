@@ -1,9 +1,9 @@
-import { OrgRole } from '@onefootprint/types';
+import { Role, RoleScope } from '@onefootprint/types';
 
-const roleFixture: OrgRole = {
-  id: 'orgrole_aExxJ5gSBpvqIJ2VcHH6J',
+const roleFixture: Role = {
+  id: 'Role_aExxJ5gSBpvqIJ2VcHH6J',
   name: 'Customer support',
-  scopes: ['api_keys'],
+  scopes: [RoleScope.apiKeys],
   isImmutable: false,
   createdAt: '2022-11-18T00:04:11.368107Z',
   numActiveUsers: 4,

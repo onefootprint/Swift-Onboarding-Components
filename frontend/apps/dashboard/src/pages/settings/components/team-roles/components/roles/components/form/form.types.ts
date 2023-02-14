@@ -1,8 +1,8 @@
-import { OrgRoleScope } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 
 export type FormData = {
-  decryptFields: { label: string; value: OrgRoleScope }[];
+  decryptFields: { label: string; value: RoleScope }[];
   name: string;
-  scopes: OrgRoleScope[];
+  scopes: RoleScope[];
   showDecrypt: boolean;
 };

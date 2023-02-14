@@ -8,24 +8,24 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { OrgRole } from '@onefootprint/types';
+import { Role, RoleScope } from '@onefootprint/types';
 import React from 'react';
 
 import Roles from './roles';
 import {
-  orgRolesCreatedAtFixture,
-  orgRolesFixture,
-  orgRolesScopesFixture,
-  orgRoleToEdit,
-  orgRoleWithoutActiveUsers,
-  withCreateOrgRole,
-  withCreateOrgRoleError,
-  withDisableOrgRole,
-  withDisableOrgRoleError,
-  withOrgRoles,
-  withOrgRolesError,
-  withUpdateOrgRole,
-  withUpdateOrgRoleError,
+  RolesCreatedAtFixture,
+  RolesFixture,
+  RolesScopesFixture,
+  RoleToEdit,
+  RoleWithoutActiveUsers,
+  withCreateRole,
+  withCreateRoleError,
+  withDisableRole,
+  withDisableRoleError,
+  withRoles,
+  withRolesError,
+  withUpdateRole,
+  withUpdateRoleError,
 } from './roles.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -69,7 +69,7 @@ describe('<Roles />', () => {
 
   describe('when the request to fetch the org roles fails', () => {
     beforeEach(() => {
-      withOrgRolesError();
+      withRolesError();
     });
 
     it('should show the error message', async () => {
@@ -84,12 +84,12 @@ describe('<Roles />', () => {
 
   describe('when the request to fetch the org roles succeeds', () => {
     beforeEach(() => {
-      withOrgRoles();
+      withRoles();
     });
 
     it('should role name, number of active users, created at and permissions', async () => {
       await renderRolesAndWaitData();
-      orgRolesFixture.forEach((role, index) => {
+      RolesFixture.forEach((role, index) => {
         const name = screen.getByText(role.name);
         expect(name).toBeInTheDocument();
 
@@ -97,12 +97,12 @@ describe('<Roles />', () => {
         expect(numActiveUsers).toBeInTheDocument();
 
         role.scopes.forEach((scope, scopeIndex) => {
-          const scopeText = orgRolesScopesFixture[scopeIndex];
+          const scopeText = RolesScopesFixture[scopeIndex];
           const permission = screen.getByText(scopeText);
           expect(permission).toBeInTheDocument();
         });
 
-        const formattedCreatedAt = orgRolesCreatedAtFixture[index];
+        const formattedCreatedAt = RolesCreatedAtFixture[index];
         const createdAt = screen.getByText(formattedCreatedAt);
         expect(createdAt).toBeInTheDocument();
       });
@@ -156,10 +156,10 @@ describe('<Roles />', () => {
     describe('when creating a role', () => {
       describe('when the request to create a role succeeds', () => {
         beforeEach(() => {
-          withCreateOrgRole({
-            id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6X',
+          withCreateRole({
+            id: 'Role_aExxJ6XgSBpvqIJ2VcHH6X',
             name: 'Customer Support',
-            scopes: ['read', 'api_keys'],
+            scopes: [RoleScope.read, RoleScope.apiKeys],
             isImmutable: false,
             createdAt: '2022-09-19T16:24:35.367322Z',
             numActiveUsers: 0,
@@ -167,12 +167,12 @@ describe('<Roles />', () => {
         });
 
         it('should create a role and show a confirmation message', async () => {
-          withOrgRoles([
-            ...orgRolesFixture,
+          withRoles([
+            ...RolesFixture,
             {
-              id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6X',
+              id: 'Role_aExxJ6XgSBpvqIJ2VcHH6X',
               name: 'Customer Support',
-              scopes: ['read', 'api_keys'],
+              scopes: [RoleScope.read, RoleScope.apiKeys],
               isImmutable: false,
               createdAt: '2022-09-19T16:24:35.367322Z',
               numActiveUsers: 0,
@@ -235,7 +235,7 @@ describe('<Roles />', () => {
 
       describe('when the request to create a role fails', () => {
         beforeEach(() => {
-          withCreateOrgRoleError();
+          withCreateRoleError();
         });
 
         it('should show an error message', async () => {
@@ -274,25 +274,25 @@ describe('<Roles />', () => {
     });
 
     describe('when updating a role', () => {
-      const updatedRole: OrgRole = {
-        ...orgRoleToEdit,
-        scopes: ['read', 'api_keys', 'manual_review'],
+      const updatedRole: Role = {
+        ...RoleToEdit,
+        scopes: [RoleScope.read, RoleScope.apiKeys, RoleScope.manualReview],
       };
-      const rolesWithoutUpdatedRole = orgRolesFixture.filter(
-        role => role.id !== orgRoleToEdit.id,
+      const rolesWithoutUpdatedRole = RolesFixture.filter(
+        role => role.id !== RoleToEdit.id,
       );
 
       describe('when the request to update a role succeeds', () => {
         beforeEach(() => {
-          withUpdateOrgRole(updatedRole);
+          withUpdateRole(updatedRole);
         });
 
         it('should edit a role and show a confirmation message', async () => {
           await renderRolesAndWaitData();
-          withOrgRoles([...rolesWithoutUpdatedRole, updatedRole]);
+          withRoles([...rolesWithoutUpdatedRole, updatedRole]);
 
           const actionButton = screen.getByRole('button', {
-            name: `Open actions for role ${orgRoleToEdit.name}`,
+            name: `Open actions for role ${RoleToEdit.name}`,
           });
           await userEvent.click(actionButton);
 
@@ -332,15 +332,15 @@ describe('<Roles />', () => {
 
       describe('when the request to update a role fails', () => {
         beforeEach(() => {
-          withUpdateOrgRoleError(updatedRole);
+          withUpdateRoleError(updatedRole);
         });
 
         it('should show the error message', async () => {
           await renderRolesAndWaitData();
-          withOrgRoles([...rolesWithoutUpdatedRole, updatedRole]);
+          withRoles([...rolesWithoutUpdatedRole, updatedRole]);
 
           const actionButton = screen.getByRole('button', {
-            name: `Open actions for role ${orgRoleToEdit.name}`,
+            name: `Open actions for role ${RoleToEdit.name}`,
           });
           await userEvent.click(actionButton);
 
@@ -371,18 +371,16 @@ describe('<Roles />', () => {
     });
 
     describe('when disabling a role with no active users', () => {
-      const roleToDisable = orgRoleWithoutActiveUsers;
+      const roleToDisable = RoleWithoutActiveUsers;
 
       describe('when the request to disable a role succeeds', () => {
         beforeEach(() => {
-          withDisableOrgRole(roleToDisable.id);
+          withDisableRole(roleToDisable.id);
         });
 
         it('should disable a role and show a confirmation message', async () => {
           await renderRolesAndWaitData();
-          withOrgRoles(
-            orgRolesFixture.filter(role => role.id !== roleToDisable.id),
-          );
+          withRoles(RolesFixture.filter(role => role.id !== roleToDisable.id));
 
           const actionButton = screen.getByRole('button', {
             name: `Open actions for role ${roleToDisable.name}`,
@@ -419,7 +417,7 @@ describe('<Roles />', () => {
 
       describe('when the request to disable a role fails', () => {
         beforeEach(() => {
-          withDisableOrgRoleError(roleToDisable.id);
+          withDisableRoleError(roleToDisable.id);
         });
 
         it('should disable a role and show a confirmation message', async () => {

@@ -5,12 +5,15 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import {
+  asAdminUserInLive,
+  asAdminUserInSandbox,
+  asAdminUserInSandboxAndRestricted,
+  resetUser,
+} from 'src/config/tests';
 
-import { useStore } from '../../hooks/use-session';
 import Developers from './developers';
 import { withApiKeys, withOnboardingConfigs } from './developers.test.config';
-
-const originalState = useStore.getState();
 
 describe('<Developers />', () => {
   beforeEach(() => {
@@ -19,36 +22,17 @@ describe('<Developers />', () => {
   });
 
   afterAll(() => {
-    useStore.setState(originalState);
+    resetUser();
   });
 
   const renderDevelopers = () => customRender(<Developers />);
 
   describe('when is in sandbox mode', () => {
-    it('should show a warning message', () => {
-      useStore.setState({
-        data: {
-          auth: '1',
-          user: {
-            id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-            email: 'jane.doe@acme.com',
-            firstName: 'Jane',
-            lastName: 'Doe',
-          },
-          org: {
-            isLive: false,
-            name: 'Acme',
-            isSandboxRestricted: false,
-            logoUrl: null,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
-        },
-      });
+    beforeEach(() => {
+      asAdminUserInSandbox();
+    });
 
+    it('should show a warning message', () => {
       renderDevelopers();
       const warning = screen.getByText(
         "You're viewing test keys. Disable sandbox mode to view live keys.",
@@ -57,32 +41,8 @@ describe('<Developers />', () => {
     });
 
     describe('when its restricted to use only the sandbox mode', () => {
-      beforeEach(() => {
-        useStore.setState({
-          data: {
-            auth: '1',
-            user: {
-              id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-              email: 'jane.doe@acme.com',
-              firstName: 'Jane',
-              lastName: 'Doe',
-            },
-            org: {
-              isLive: false,
-              name: 'Acme',
-              isSandboxRestricted: true,
-              logoUrl: null,
-            },
-            meta: {
-              createdNewTenant: false,
-              isFirstLogin: false,
-              requiresOnboarding: false,
-            },
-          },
-        });
-      });
-
       it('should disable the toggle and show a tooltip explaining', async () => {
+        asAdminUserInSandboxAndRestricted();
         renderDevelopers();
 
         const toggle = screen.getByRole('switch') as HTMLButtonElement;
@@ -91,31 +51,6 @@ describe('<Developers />', () => {
     });
 
     describe('when toggling', () => {
-      beforeEach(() => {
-        useStore.setState({
-          data: {
-            auth: '1',
-            user: {
-              id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-              email: 'jane.doe@acme.com',
-              firstName: 'Jane',
-              lastName: 'Doe',
-            },
-            org: {
-              isLive: false,
-              name: 'Acme',
-              isSandboxRestricted: false,
-              logoUrl: null,
-            },
-            meta: {
-              createdNewTenant: false,
-              isFirstLogin: false,
-              requiresOnboarding: false,
-            },
-          },
-        });
-      });
-
       it('should go to the sandbox to the live mode', async () => {
         renderDevelopers();
 
@@ -134,28 +69,7 @@ describe('<Developers />', () => {
 
   describe('when is in live mode', () => {
     beforeEach(() => {
-      useStore.setState({
-        data: {
-          auth: '1',
-          user: {
-            id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-            email: 'jane.doe@acme.com',
-            firstName: 'Jane',
-            lastName: 'Doe',
-          },
-          org: {
-            isLive: true,
-            name: 'Acme',
-            isSandboxRestricted: false,
-            logoUrl: null,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
-        },
-      });
+      asAdminUserInLive();
     });
 
     it('should show an info message', () => {
@@ -163,13 +77,13 @@ describe('<Developers />', () => {
       const info = screen.getByText(
         "You're viewing live keys. Enable sandbox mode to view test keys.",
       );
+
       expect(info).toBeInTheDocument();
     });
 
     describe('when toggling', () => {
       it('should go to live to the sandbox mode', async () => {
         renderDevelopers();
-
         const toggle = screen.getByRole('switch');
         await userEvent.click(toggle);
 

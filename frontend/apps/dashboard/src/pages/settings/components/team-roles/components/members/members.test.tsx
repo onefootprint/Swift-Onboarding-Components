@@ -8,26 +8,26 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { OrgRoleScope } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 import React from 'react';
 
 import Members from './members';
 import {
+  membersFixture,
+  membersRelativeTimeFixture,
   memberToEdit,
   memberToEditRole,
-  orgMembersFixture,
-  orgMembersRelativeTimeFixture,
-  orgRolesFixture,
-  withCreateOrgMembers,
-  withCreateOrgMembersError,
+  RolesFixture,
+  withCreateMembers,
+  withCreateMembersError,
   withEditMember,
   withEditMemberError,
-  withOrgMembers,
-  withOrgMembersError,
-  withOrgRoles,
-  withOrgRolesError,
-  withRemoveOrgMember,
-  withRemoveOrgMemberError,
+  withMembers,
+  withMembersError,
+  withRemoveMember,
+  withRemoveMemberError,
+  withRoles,
+  withRolesError,
 } from './members.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -44,7 +44,7 @@ describe('<Members />', () => {
   });
 
   beforeEach(() => {
-    withOrgRoles();
+    withRoles();
   });
 
   beforeAll(() => {
@@ -75,7 +75,7 @@ describe('<Members />', () => {
 
   describe('when the request to fetch the members fails', () => {
     beforeEach(() => {
-      withOrgMembersError();
+      withMembersError();
     });
 
     it('should render an error message', async () => {
@@ -90,13 +90,13 @@ describe('<Members />', () => {
 
   describe('when the request to fetch the members succeeds', () => {
     beforeEach(() => {
-      withOrgMembers();
+      withMembers();
     });
 
     it('should render the name and email of each member', async () => {
       await renderMembersAndWaitData();
 
-      orgMembersFixture.forEach((member, index) => {
+      membersFixture.forEach((member, index) => {
         const name = screen.getByText(`${member.firstName} ${member.lastName}`);
         expect(name).toBeInTheDocument();
 
@@ -104,7 +104,7 @@ describe('<Members />', () => {
         expect(email).toBeInTheDocument();
 
         const relativeTime = screen.getByText(
-          orgMembersRelativeTimeFixture[index],
+          membersRelativeTimeFixture[index],
         );
         expect(relativeTime).toBeInTheDocument();
       });
@@ -156,7 +156,7 @@ describe('<Members />', () => {
     });
 
     describe('when applying a filter by role', () => {
-      const [firstRole] = orgRolesFixture;
+      const [firstRole] = RolesFixture;
 
       it('should append members_role query', async () => {
         const push = jest.fn();
@@ -203,7 +203,7 @@ describe('<Members />', () => {
     describe('when inviting a member', () => {
       describe('when the request to load the roles fails', () => {
         beforeEach(() => {
-          withOrgRolesError();
+          withRolesError();
         });
 
         it('should render an error message', async () => {
@@ -229,7 +229,7 @@ describe('<Members />', () => {
 
       describe('when the request to create a member succeeds', () => {
         beforeEach(() => {
-          withCreateOrgMembers();
+          withCreateMembers();
         });
 
         it('should invite a teammate and display the invited user in the table', async () => {
@@ -252,8 +252,8 @@ describe('<Members />', () => {
           await userEvent.type(emailField, 'johnny@acme.com');
 
           // Updated list of members
-          withOrgMembers([
-            ...orgMembersFixture,
+          withMembers([
+            ...membersFixture,
             {
               id: 'orguser_IXNDrl9WcqJi18ZUnpMlVO',
               email: 'johnny@acme.com',
@@ -261,11 +261,11 @@ describe('<Members />', () => {
               lastName: null,
               role: {
                 createdAt: '2022-09-19T16:24:34.368337Z',
-                id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+                id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
                 isImmutable: true,
                 name: 'Admin',
                 numActiveUsers: 1,
-                scopes: ['admin' as OrgRoleScope],
+                scopes: [RoleScope.admin],
               },
               rolebinding: {
                 lastLoginAt: '2023-01-18T17:54:10.668420Z',
@@ -296,7 +296,7 @@ describe('<Members />', () => {
 
       describe('when the request to create a member fails', () => {
         beforeEach(() => {
-          withCreateOrgMembersError();
+          withCreateMembersError();
         });
 
         it('should show an error message', async () => {
@@ -395,10 +395,10 @@ describe('<Members />', () => {
 
     describe('when removing a member', () => {
       describe('when the request to remove a member fails', () => {
-        const [userToRemove] = orgMembersFixture;
+        const [userToRemove] = membersFixture;
 
         beforeEach(() => {
-          withRemoveOrgMemberError(userToRemove.id);
+          withRemoveMemberError(userToRemove.id);
         });
 
         it('should show an error message', async () => {
@@ -433,10 +433,10 @@ describe('<Members />', () => {
       });
 
       describe('when the request to remove a member succeeds', () => {
-        const [userToRemove] = orgMembersFixture;
+        const [userToRemove] = membersFixture;
 
         beforeEach(() => {
-          withRemoveOrgMember(userToRemove.id);
+          withRemoveMember(userToRemove.id);
         });
 
         it('should remove the member and update the list', async () => {
@@ -461,9 +461,7 @@ describe('<Members />', () => {
 
           // Necessary to mock the fetch request without the
           // user removed
-          withOrgMembers(
-            orgMembersFixture.filter(m => m.id !== userToRemove.id),
-          );
+          withMembers(membersFixture.filter(m => m.id !== userToRemove.id));
 
           const submitButton = within(confirmationDialog).getByRole('button', {
             name: 'Yes',

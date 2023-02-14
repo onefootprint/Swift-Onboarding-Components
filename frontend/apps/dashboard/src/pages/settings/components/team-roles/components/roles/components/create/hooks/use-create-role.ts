@@ -1,18 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
-import {
-  CreateOrgRoleRequest,
-  CreateOrgRoleResponse,
-} from '@onefootprint/types';
+import { CreateRoleRequest, CreateRoleResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const createRoleRequest = async (
   authHeaders: AuthHeaders,
-  payload: CreateOrgRoleRequest,
+  payload: CreateRoleRequest,
 ) => {
-  const { data } = await request<CreateOrgRoleResponse>({
+  const { data } = await request<CreateRoleResponse>({
     method: 'POST',
     url: '/org/roles',
     headers: authHeaders,
@@ -29,7 +26,7 @@ const useCreateRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateOrgRoleRequest) =>
+    mutationFn: (payload: CreateRoleRequest) =>
       createRoleRequest(session.authHeaders, payload),
     onError: (error: unknown) => {
       toast.show({

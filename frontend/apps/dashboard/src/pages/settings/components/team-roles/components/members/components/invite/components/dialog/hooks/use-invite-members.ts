@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import {
-  CreateOrgMembersRequest,
-  CreateOrgMembersResponse,
+  CreateMembersRequest,
+  CreateMembersResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import {
@@ -14,9 +14,9 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const inviteMemberRequest = async (
   authHeaders: AuthHeaders,
-  payload: CreateOrgMembersRequest,
+  payload: CreateMembersRequest,
 ) => {
-  const response = await request<CreateOrgMembersResponse>({
+  const response = await request<CreateMembersResponse>({
     method: 'POST',
     url: '/org/members',
     data: payload,
@@ -34,12 +34,12 @@ const useInviteMembers = () => {
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationKey: ['inviteMember'],
-    mutationFn: (payload: CreateOrgMembersRequest) =>
+    mutationFn: (payload: CreateMembersRequest) =>
       inviteMemberRequest(session.authHeaders, payload),
   });
 
   const mutate = async (
-    invitations: CreateOrgMembersRequest[],
+    invitations: CreateMembersRequest[],
     options?: {
       onSuccess?: () => void;
       onError?: (error: unknown) => void;

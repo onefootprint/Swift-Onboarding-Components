@@ -4,9 +4,9 @@ import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-import useOrgMembersFilters from '../../../../../hooks/use-org-members-filters';
+import useMembersFilters from '../../../../../hooks/use-members-filters';
 
-const removeOrgMemberRequest = async (authHeaders: AuthHeaders, id: string) => {
+const removeMemberRequest = async (authHeaders: AuthHeaders, id: string) => {
   const { data } = await request({
     method: 'POST',
     url: `/org/members/${id}/deactivate`,
@@ -16,15 +16,15 @@ const removeOrgMemberRequest = async (authHeaders: AuthHeaders, id: string) => {
   return data;
 };
 
-const useRemoveOrgMember = (email: string) => {
+const useRemoveMember = (email: string) => {
   const { t } = useTranslation('pages.settings.members.table.actions.remove');
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();
-  const { requestParams } = useOrgMembersFilters();
+  const { requestParams } = useMembersFilters();
 
   return useMutation({
-    mutationFn: (id: string) => removeOrgMemberRequest(session.authHeaders, id),
+    mutationFn: (id: string) => removeMemberRequest(session.authHeaders, id),
     onError: (error: unknown) => {
       toast.show({
         title: t('notification.error.title'),
@@ -43,4 +43,4 @@ const useRemoveOrgMember = (email: string) => {
   });
 };
 
-export default useRemoveOrgMember;
+export default useRemoveMember;

@@ -2,13 +2,13 @@ import request, {
   getErrorMessage,
   PaginatedRequestResponse,
 } from '@onefootprint/request';
-import { GetOrgRolesResponse } from '@onefootprint/types';
+import { GetRolesResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const getRolesRequest = async (authHeaders: AuthHeaders) => {
   const { data: response } = await request<
-    PaginatedRequestResponse<GetOrgRolesResponse>
+    PaginatedRequestResponse<GetRolesResponse>
   >({
     method: 'GET',
     url: '/org/roles',

@@ -1,13 +1,13 @@
-import { OrgRoleScope } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 
-const groupScopes = (scopes: OrgRoleScope[]) => {
-  const decryptScopes = scopes.filter((scope: OrgRoleScope) =>
+const groupScopes = (scopes: RoleScope[]) => {
+  const decryptScopes = scopes.filter((scope: RoleScope) =>
     scope.startsWith('decrypt'),
   );
   const nonDecryptScopes = scopes.filter(
-    (scope: OrgRoleScope) => !scope.startsWith('decrypt'),
+    (scope: RoleScope) => !scope.startsWith('decrypt'),
   );
-  const isAdmin = scopes.includes('admin');
+  const isAdmin = scopes.includes(RoleScope.admin);
   return { isAdmin, decryptScopes, nonDecryptScopes };
 };
 

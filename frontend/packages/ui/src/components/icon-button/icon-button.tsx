@@ -54,8 +54,8 @@ const Container = styled.button`
   `}
 
   &:disabled {
+    cursor: initial;
     opacity: 0.5;
-    cursor: not-allowed;
   }
 
   &:hover:enabled {

@@ -3,23 +3,16 @@ import request, {
   getErrorMessage,
   PaginatedRequestResponse,
 } from '@onefootprint/request';
-import {
-  GetOrgRolesRequest,
-  GetOrgRolesResponse,
-  OrgRole,
-} from '@onefootprint/types';
+import { GetRolesRequest, GetRolesResponse, Role } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from 'src/hooks/use-pagination';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-import useOrgRolesFilters from './use-org-roles-filters';
+import useRolesFilters from './use-roles-filters';
 
-const getOrgRolesRequest = async (
-  authHeaders: AuthHeaders,
-  params: GetOrgRolesRequest,
-) => {
+const getRoles = async (authHeaders: AuthHeaders, params: GetRolesRequest) => {
   const { data: response } = await request<
-    PaginatedRequestResponse<GetOrgRolesResponse>
+    PaginatedRequestResponse<GetRolesResponse>
   >({
     method: 'GET',
     url: '/org/roles',
@@ -30,19 +23,19 @@ const getOrgRolesRequest = async (
   return response;
 };
 
-const useOrgRoles = () => {
+const useRoles = () => {
   const { authHeaders } = useSession();
   const { formatDateWithTime } = useIntl();
-  const filters = useOrgRolesFilters();
+  const filters = useRolesFilters();
   const { requestParams } = filters;
-  const orgRolesQuery = useQuery(
+  const RolesQuery = useQuery(
     ['org', 'roles', requestParams],
-    () => getOrgRolesRequest(authHeaders, requestParams),
+    () => getRoles(authHeaders, requestParams),
     {
       enabled: filters.isReady,
       select: response => ({
         meta: response.meta,
-        data: response.data.map((role: OrgRole) => ({
+        data: response.data.map((role: Role) => ({
           ...role,
           createdAt: formatDateWithTime(new Date(role.createdAt)),
         })),
@@ -50,21 +43,21 @@ const useOrgRoles = () => {
     },
   );
   const pagination = usePagination({
-    count: orgRolesQuery.data?.meta.count,
-    next: orgRolesQuery.data?.meta.nextPage,
+    count: RolesQuery.data?.meta.count,
+    next: RolesQuery.data?.meta.nextPage,
     page: filters.values.page,
     onChange: newPage => filters.push({ roles_page: newPage }),
   });
-  const errorMessage = orgRolesQuery.error
-    ? getErrorMessage(orgRolesQuery.error)
+  const errorMessage = RolesQuery.error
+    ? getErrorMessage(RolesQuery.error)
     : undefined;
 
   return {
-    ...orgRolesQuery,
+    ...RolesQuery,
 
     errorMessage,
     pagination,
   };
 };
 
-export default useOrgRoles;
+export default useRoles;

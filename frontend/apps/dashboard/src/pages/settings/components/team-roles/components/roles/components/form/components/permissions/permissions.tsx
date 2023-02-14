@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgRoleScope } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 import {
   Box,
   Checkbox,
@@ -23,7 +23,7 @@ const Permissions = () => {
 
   useEffect(() => {
     if (!showDecryptSelect) {
-      const scopes = getValues('scopes') as OrgRoleScope[];
+      const scopes = getValues('scopes') as RoleScope[];
       const scopesWithoutDecryptFields = scopes.filter(
         scope => !scope.startsWith('decrypt'),
       );

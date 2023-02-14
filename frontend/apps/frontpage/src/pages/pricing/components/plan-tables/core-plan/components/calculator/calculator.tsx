@@ -181,7 +181,6 @@ const Button = styled.button`
     }
 
     &:disabled {
-      cursor: not-allowed;
       background-color: ${theme.backgroundColor.secondary};
       opacity: 0.5;
     }

@@ -4,6 +4,7 @@ import {
   screen,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { useStore } from '../../hooks/use-session';
 import Layout, { LayoutProps } from './layout';
@@ -31,28 +32,11 @@ describe('<Layout />', () => {
   describe('when the user is logged', () => {
     beforeEach(() => {
       useRouterSpy({ pathname: '/users' });
-      useStore.setState({
-        data: {
-          auth: '1',
-          user: {
-            id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-            email: 'jane.doe@acme.com',
-            firstName: 'Jane',
-            lastName: 'Doe',
-          },
-          org: {
-            isLive: false,
-            logoUrl: null,
-            name: 'Acme',
-            isSandboxRestricted: true,
-          },
-          meta: {
-            createdNewTenant: false,
-            isFirstLogin: false,
-            requiresOnboarding: false,
-          },
-        },
-      });
+      asAdminUser();
+    });
+
+    afterAll(() => {
+      resetUser();
     });
 
     it('should render the default template', () => {

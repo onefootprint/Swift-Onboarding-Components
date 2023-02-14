@@ -3,15 +3,10 @@ import React from 'react';
 
 import Invite from './components/invite';
 import MembersTable from './components/members-table';
-import useOrgMembers from './hooks/use-org-members';
+import useMembers from './hooks/use-members';
 
 const Members = () => {
-  const {
-    data: response,
-    errorMessage,
-    isLoading,
-    pagination,
-  } = useOrgMembers();
+  const { data: response, errorMessage, isLoading, pagination } = useMembers();
 
   return (
     <Box testID="people-table" as="section">

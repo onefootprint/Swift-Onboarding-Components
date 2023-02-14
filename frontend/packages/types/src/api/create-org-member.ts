@@ -1,9 +1,9 @@
-import { OrgMember } from '../data';
+import { Member } from '../data';
 
-export type CreateOrgMembersRequest = {
+export type CreateMembersRequest = {
   email: string;
   roleId: string;
   redirectUrl: string;
 };
 
-export type CreateOrgMembersResponse = OrgMember[];
+export type CreateMembersResponse = Member[];

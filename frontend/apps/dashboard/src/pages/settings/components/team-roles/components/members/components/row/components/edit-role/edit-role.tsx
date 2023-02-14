@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16, IcoChevronDown16 } from '@onefootprint/icons';
-import { OrgMember } from '@onefootprint/types';
+import { Member } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
 import React, { useState } from 'react';
@@ -11,7 +11,7 @@ import ScopesList from './components/scopes';
 import useUpdateMember from './hooks/use-update-member';
 
 export type EditRoleProps = {
-  member: OrgMember;
+  member: Member;
 };
 
 const EditRole = ({ member }: EditRoleProps) => {

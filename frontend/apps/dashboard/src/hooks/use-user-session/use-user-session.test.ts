@@ -1,5 +1,5 @@
 import { customRenderHook, screen, waitFor } from '@onefootprint/test-utils';
-import { useStore } from 'src/hooks/use-session';
+import { asAdminUserInSandbox, resetUser } from 'src/config/tests';
 
 import useUserSession from './use-user-session';
 import {
@@ -7,47 +7,24 @@ import {
   withUpdateUserError,
 } from './use-user-session.test.config';
 
-const originalState = useStore.getState();
-
 describe('useUserSession', () => {
-  afterAll(() => {
-    useStore.setState(originalState);
+  beforeEach(() => {
+    asAdminUserInSandbox();
+    withUpdateUser();
   });
 
-  beforeEach(() => {
-    withUpdateUser();
-    useStore.setState({
-      data: {
-        auth: '1',
-        user: {
-          id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-          email: 'jane.doe@acme.com',
-          firstName: '',
-          lastName: '',
-        },
-        org: {
-          isLive: false,
-          logoUrl: null,
-          name: 'Acme',
-          isSandboxRestricted: true,
-        },
-        meta: {
-          createdNewTenant: false,
-          isFirstLogin: false,
-          requiresOnboarding: false,
-        },
-      },
-    });
+  afterAll(() => {
+    resetUser();
   });
 
   it('should return the data', () => {
     const { result } = customRenderHook(() => useUserSession());
 
-    expect(result.current.dangerouslyCastedData).toEqual({
+    expect(result.current.dangerouslyCastedData).toMatchObject({
       id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
       email: 'jane.doe@acme.com',
-      firstName: '',
-      lastName: '',
+      firstName: 'Jane',
+      lastName: 'Doe',
     });
   });
 
@@ -57,11 +34,11 @@ describe('useUserSession', () => {
 
       result.current.mutation.mutate({ firstName: 'Jane', lastName: 'Doe' });
       await waitFor(() => {
-        expect(result.current.dangerouslyCastedData).toEqual({
+        expect(result.current.dangerouslyCastedData).toMatchObject({
           id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
           email: 'jane.doe@acme.com',
-          firstName: '',
-          lastName: '',
+          firstName: 'Jane',
+          lastName: 'Doe',
         });
       });
     });

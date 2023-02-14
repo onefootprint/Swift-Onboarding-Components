@@ -1,3 +1,3 @@
-export type OrgRolebinding = {
+export type Rolebinding = {
   lastLoginAt: string | null;
 };

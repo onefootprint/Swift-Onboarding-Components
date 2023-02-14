@@ -120,7 +120,7 @@ const ButtonContainer = styled.button<{
       }
 
       &:disabled {
-        cursor: not-allowed;
+        cursor: initial;
         background-color: ${button.variant[variant].disabled.bg};
         border-color: ${button.variant[variant].disabled.borderColor};
         color: ${button.variant[variant].disabled.color};

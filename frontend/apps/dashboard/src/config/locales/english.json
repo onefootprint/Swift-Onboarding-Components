@@ -573,7 +573,8 @@
         "header": {
           "title": "Secret API Keys",
           "subtitle": "These are like passwords. Keep them safe.",
-          "cta": "Create secret key"
+          "cta": "Create secret key",
+          "cta-not-allowed": "You're not allowed to create API keys"
         },
         "create": {
           "title": "Create secret key",
@@ -611,6 +612,7 @@
           },
           "manage": {
             "aria-label": "Manage secret key",
+            "not-allowed": "You're not allowed to manage API keys",
             "reveal": {
               "show": "Reveal secret key",
               "hide": "Hide secret key"

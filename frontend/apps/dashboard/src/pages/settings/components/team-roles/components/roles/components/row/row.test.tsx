@@ -4,6 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
+import { RoleScope } from '@onefootprint/types';
 import React from 'react';
 
 import Row, { RowProps } from './row';
@@ -29,20 +30,22 @@ describe('<Row />', () => {
 
   describe('when is admin', () => {
     it('should render "everything"', () => {
-      renderRow({ role: { ...roleFixture, scopes: ['admin'] } });
+      renderRow({ role: { ...roleFixture, scopes: [RoleScope.admin] } });
       expect(screen.getByText('Everything')).toBeInTheDocument();
     });
   });
 
   describe('when is not admin', () => {
     it('should render the scopes', () => {
-      renderRow({ role: { ...roleFixture, scopes: ['read'] } });
+      renderRow({ role: { ...roleFixture, scopes: [RoleScope.read] } });
       expect(screen.getByText('Read-only')).toBeInTheDocument();
     });
 
     describe('when it has one decrypt field', () => {
       it('should render the scope', () => {
-        renderRow({ role: { ...roleFixture, scopes: ['decrypt.name'] } });
+        renderRow({
+          role: { ...roleFixture, scopes: [RoleScope.decryptName] },
+        });
         const tag = screen.getByText('Decrypt Full name');
         expect(tag).toBeInTheDocument();
       });
@@ -51,7 +54,10 @@ describe('<Row />', () => {
     describe('when it has more than one decrypt field', () => {
       it('should render the number of fields and the details in a tooltip', async () => {
         renderRow({
-          role: { ...roleFixture, scopes: ['decrypt.name', 'decrypt.email'] },
+          role: {
+            ...roleFixture,
+            scopes: [RoleScope.decryptName, RoleScope.decryptEmail],
+          },
         });
         const tag = screen.getByText('Decrypt 2 fields');
         expect(tag).toBeInTheDocument();

@@ -1,11 +1,11 @@
-import { OrgRole } from '@onefootprint/types';
+import { Role } from '@onefootprint/types';
 import React from 'react';
 
 import Actions from './components/actions';
 import Scopes from './components/scopes';
 
 export type RowProps = {
-  role: OrgRole;
+  role: Role;
 };
 
 const Row = ({ role }: RowProps) => {

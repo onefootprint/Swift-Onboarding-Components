@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  CreateOrgRoleRequest,
-  OrgRoleScope,
-  UpdateOrgRoleRequest,
+  CreateRoleRequest,
+  RoleScope,
+  UpdateRoleRequest,
 } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
@@ -13,7 +13,7 @@ import type { FormData } from './form.types';
 
 export type FormProps = {
   defaultValues?: FormData;
-  onSubmit: (payload: CreateOrgRoleRequest | UpdateOrgRoleRequest) => void;
+  onSubmit: (payload: CreateRoleRequest | UpdateRoleRequest) => void;
 };
 
 const Form = ({
@@ -37,7 +37,7 @@ const Form = ({
     const { name, scopes, decryptFields } = formData;
     const decryptScopes = decryptFields.map(({ value }) => value);
     const allScopes = [
-      ...new Set<OrgRoleScope>(['read', ...scopes, ...decryptScopes]),
+      ...new Set<RoleScope>([RoleScope.read, ...scopes, ...decryptScopes]),
     ];
     onSubmit({
       name,

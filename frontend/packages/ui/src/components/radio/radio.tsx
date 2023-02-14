@@ -135,9 +135,9 @@ const Input = styled.input<Pick<RadioProps, 'hasError'>>`
     }
 
     &:disabled {
+      cursor: initial;
       background-color: ${theme.backgroundColor.senary};
       border-color: transparent;
-      cursor: not-allowed;
 
       &:checked::before {
         ${createCheckedStyled('quaternary')};

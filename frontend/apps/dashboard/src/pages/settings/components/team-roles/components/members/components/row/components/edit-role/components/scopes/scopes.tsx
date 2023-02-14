@@ -1,21 +1,21 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgRoleScope } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
 
-const groupScopes = (scopes: OrgRoleScope[]) => {
-  const decryptScopes = scopes.filter((scope: OrgRoleScope) =>
+const groupScopes = (scopes: RoleScope[]) => {
+  const decryptScopes = scopes.filter((scope: RoleScope) =>
     scope.startsWith('decrypt'),
   );
   const nonDecryptScopes = scopes.filter(
-    (scope: OrgRoleScope) => !scope.startsWith('decrypt'),
+    (scope: RoleScope) => !scope.startsWith('decrypt'),
   );
-  const isAdmin = scopes.includes('admin');
+  const isAdmin = scopes.includes(RoleScope.admin);
   return { isAdmin, decryptScopes, nonDecryptScopes };
 };
 
 export type ScopesListProps = {
-  scopes: OrgRoleScope[];
+  scopes: RoleScope[];
 };
 
 const ScopesList = ({ scopes }: ScopesListProps) => {

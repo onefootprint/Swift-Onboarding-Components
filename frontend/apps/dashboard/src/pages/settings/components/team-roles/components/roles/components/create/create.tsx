@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CreateOrgRoleRequest } from '@onefootprint/types';
+import { CreateRoleRequest } from '@onefootprint/types';
 import { Box, Button, Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -19,7 +19,7 @@ const Create = () => {
     setOpen(false);
   };
 
-  const handleSubmit = (payload: CreateOrgRoleRequest) => {
+  const handleSubmit = (payload: CreateRoleRequest) => {
     createRoleMutation.mutate(payload, { onSuccess: handleClose });
   };
 

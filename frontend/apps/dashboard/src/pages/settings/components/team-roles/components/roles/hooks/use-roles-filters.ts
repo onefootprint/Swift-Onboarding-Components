@@ -12,7 +12,7 @@ const defaultQueryParams: RolesQuery = {
   roles_page_size: undefined,
 };
 
-const useOrgMembersFilters = () => {
+const useRolesFilters = () => {
   const filters = useFilters<RolesQuery>(defaultQueryParams);
   const { query } = filters;
   const values = {
@@ -32,4 +32,4 @@ const useOrgMembersFilters = () => {
   };
 };
 
-export default useOrgMembersFilters;
+export default useRolesFilters;

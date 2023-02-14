@@ -1,51 +1,51 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { OrgRole } from '@onefootprint/types';
+import { Role, RoleScope } from '@onefootprint/types';
 
-export const orgRolesFixture: OrgRole[] = [
+export const RolesFixture: Role[] = [
   {
-    id: 'orgrole_aExxJ5gSBpvqIJ2VcHH6J',
+    id: 'Role_aExxJ5gSBpvqIJ2VcHH6J',
     name: 'Customer support',
-    scopes: ['api_keys'],
+    scopes: [RoleScope.apiKeys],
     isImmutable: false,
     createdAt: '2022-11-18T00:04:11.368107Z',
     numActiveUsers: 0,
   },
   {
-    id: 'orgrole_aExxJ6XgSBpvqIJ2VcHH6J',
+    id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
     name: 'Super',
-    scopes: ['admin'],
+    scopes: [RoleScope.admin],
     isImmutable: true,
     createdAt: '2023-01-25T21:47:22.679708Z',
     numActiveUsers: 1,
   },
   {
-    id: 'orgrole_erflKNWEF13143EWRWELJN',
+    id: 'Role_erflKNWEF13143EWRWELJN',
     name: 'Read only',
     isImmutable: true,
-    scopes: ['read'],
+    scopes: [RoleScope.read],
     createdAt: '2023-01-06T04:33:34.272399Z',
     numActiveUsers: 3,
   },
 ];
 
-export const orgRolesCreatedAtFixture = [
+export const RolesCreatedAtFixture = [
   '11/18/22, 12:04 AM',
   '1/25/23, 9:47 PM',
   '1/6/23, 4:33 AM',
 ];
 
-export const orgRolesScopesFixture = ['Everything', 'Read', 'Manage Api Keys'];
+export const RolesScopesFixture = ['Everything', 'Read', 'Manage Api Keys'];
 
-export const orgRoleWithoutActiveUsers = orgRolesFixture[0];
+export const RoleWithoutActiveUsers = RolesFixture[0];
 
-export const orgRoleToEdit = orgRolesFixture[0];
+export const RoleToEdit = RolesFixture[0];
 
-export const withOrgRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
+export const withRoles = (roles: Role[] = RolesFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/roles',
     response: {
-      data: orgRoles,
+      data: roles,
       meta: {
         next: null,
         count: null,
@@ -53,7 +53,7 @@ export const withOrgRoles = (orgRoles: OrgRole[] = orgRolesFixture) =>
     },
   });
 
-export const withOrgRolesError = () =>
+export const withRolesError = () =>
   mockRequest({
     method: 'get',
     path: '/org/roles',
@@ -65,14 +65,14 @@ export const withOrgRolesError = () =>
     },
   });
 
-export const withCreateOrgRole = (orgRole: OrgRole = orgRolesFixture[0]) =>
+export const withCreateRole = (role: Role = RolesFixture[0]) =>
   mockRequest({
     method: 'post',
     path: '/org/roles',
-    response: orgRole,
+    response: role,
   });
 
-export const withCreateOrgRoleError = () =>
+export const withCreateRoleError = () =>
   mockRequest({
     method: 'post',
     path: '/org/roles',
@@ -84,17 +84,17 @@ export const withCreateOrgRoleError = () =>
     },
   });
 
-export const withUpdateOrgRole = (orgRole: OrgRole) =>
+export const withUpdateRole = (role: Role) =>
   mockRequest({
     method: 'patch',
-    path: `/org/roles/${orgRole.id}`,
-    response: orgRole,
+    path: `/org/roles/${role.id}`,
+    response: role,
   });
 
-export const withUpdateOrgRoleError = (orgRole: OrgRole) =>
+export const withUpdateRoleError = (role: Role) =>
   mockRequest({
     method: 'patch',
-    path: `/org/roles/${orgRole.id}`,
+    path: `/org/roles/${role.id}`,
     statusCode: 400,
     response: {
       error: {
@@ -103,14 +103,14 @@ export const withUpdateOrgRoleError = (orgRole: OrgRole) =>
     },
   });
 
-export const withDisableOrgRole = (id: string) =>
+export const withDisableRole = (id: string) =>
   mockRequest({
     method: 'post',
     path: `/org/roles/${id}/deactivate`,
     response: null,
   });
 
-export const withDisableOrgRoleError = (id: string) =>
+export const withDisableRoleError = (id: string) =>
   mockRequest({
     method: 'post',
     path: `/org/roles/${id}/deactivate`,
@@ -122,4 +122,4 @@ export const withDisableOrgRoleError = (id: string) =>
     },
   });
 
-export default withOrgRoles;
+export default withRoles;
