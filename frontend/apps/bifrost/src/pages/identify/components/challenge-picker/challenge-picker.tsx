@@ -84,7 +84,7 @@ const ChallengePicker = ({
         <Typography variant="body-2">{t('title')}</Typography>
         <RadioSelect
           options={options}
-          defaultSelected={challengeKind}
+          value={challengeKind}
           onSelect={handleSelect}
         />
         <Button fullWidth onClick={handleComplete} loading={isLoading}>

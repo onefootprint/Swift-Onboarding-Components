@@ -6,7 +6,7 @@ import RadioSelect, { RadioSelectProps } from './radio-select';
 
 describe('<RadioSelect />', () => {
   const renderRadioSelect = ({
-    defaultSelected,
+    value,
     testID,
     onSelect = () => {},
   }: Partial<RadioSelectProps>) => {
@@ -27,7 +27,7 @@ describe('<RadioSelect />', () => {
     return customRender(
       <RadioSelect
         options={options}
-        defaultSelected={defaultSelected}
+        value={value}
         onSelect={onSelect}
         testID={testID}
       />,
@@ -44,18 +44,10 @@ describe('<RadioSelect />', () => {
 
     it('has selected option', () => {
       renderRadioSelect({
-        defaultSelected: 'Item 2',
+        value: 'Item 2',
       });
       const option = screen.getByLabelText(
         'Description 2',
-      ) as HTMLButtonElement;
-      expect((option as any).selected).toBeTruthy();
-    });
-
-    it('should have the first option selected by default', () => {
-      renderRadioSelect({});
-      const option = screen.getByLabelText(
-        'Description 1',
       ) as HTMLButtonElement;
       expect((option as any).selected).toBeTruthy();
     });

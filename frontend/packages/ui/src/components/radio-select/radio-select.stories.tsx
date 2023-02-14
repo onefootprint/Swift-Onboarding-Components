@@ -1,6 +1,6 @@
 import { IcoBook16, IcoHelp16 } from '@onefootprint/icons';
 import { Meta, Story } from '@storybook/react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import RadioSelect, { RadioSelectProps } from './radio-select';
 
@@ -8,9 +8,9 @@ export default {
   component: RadioSelect,
   title: 'Components/RadioSelect',
   argTypes: {
-    defaultSelected: {
-      control: 'number',
-      description: 'The index that is selected by default',
+    value: {
+      control: 'string',
+      description: 'The value that is selected',
       required: true,
     },
     testID: {
@@ -21,12 +21,14 @@ export default {
 } as Meta;
 
 const Template: Story<RadioSelectProps> = ({
-  defaultSelected,
+  value = 'Item 1',
   onSelect,
   testID,
 }: RadioSelectProps) => {
-  const handleSelect = (value: string) => {
-    onSelect?.(value);
+  const [selectedValue, setSelectedValue] = useState(value);
+  const handleSelect = (newVal: string) => {
+    setSelectedValue(newVal);
+    onSelect?.(newVal);
   };
   const options = [
     {
@@ -42,10 +44,11 @@ const Template: Story<RadioSelectProps> = ({
       value: 'Item 2',
     },
   ];
+
   return (
     <RadioSelect
       options={options}
-      defaultSelected={defaultSelected}
+      value={selectedValue}
       onSelect={handleSelect}
       testID={testID}
     />

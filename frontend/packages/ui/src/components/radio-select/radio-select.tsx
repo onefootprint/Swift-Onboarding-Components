@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import RadioSelectOption, {
@@ -7,43 +7,31 @@ import RadioSelectOption, {
 
 export type RadioSelectProps = {
   options: RadioSelectOptionFields[];
-  defaultSelected?: string;
+  value?: string;
   onSelect: (value: string) => void;
   testID?: string;
 };
 
-const RadioSelect = ({
-  options,
-  defaultSelected,
-  onSelect,
-  testID,
-}: RadioSelectProps) => {
-  const [selectedValue, setSelectedValue] = useState(
-    defaultSelected ?? (options.length ? options[0].value : ''),
-  );
-  if (!options.length) {
-    return null;
-  }
-
-  return (
+const RadioSelect = ({ options, value, onSelect, testID }: RadioSelectProps) =>
+  options.length > 0 ? (
     <OptionsContainer data-testid={testID}>
-      {options.map(({ title, description, IconComponent, value }) => (
-        <RadioSelectOption
-          key={value}
-          value={value}
-          title={title}
-          description={description}
-          IconComponent={IconComponent}
-          onClick={() => {
-            setSelectedValue(value);
-            onSelect(value);
-          }}
-          selected={selectedValue === value}
-        />
-      ))}
+      {options.map(
+        ({ title, description, IconComponent, value: optionValue }) => (
+          <RadioSelectOption
+            key={optionValue}
+            value={optionValue}
+            title={title}
+            description={description}
+            IconComponent={IconComponent}
+            onClick={() => {
+              onSelect(optionValue);
+            }}
+            selected={optionValue === value}
+          />
+        ),
+      )}
     </OptionsContainer>
-  );
-};
+  ) : null;
 
 const OptionsContainer = styled.div`
   display: flex;
