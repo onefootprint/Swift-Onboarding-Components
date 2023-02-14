@@ -22,6 +22,7 @@ const Complete = () => {
   const [state] = useBifrostMachine();
   const { validationToken, status } = state.context;
   const isVerified = status === OnboardingStatus.verified;
+  const [showConfetti, setShowConfetti] = React.useState(isVerified);
 
   useEffectOnce(() => {
     handleComplete(CLOSE_DELAY);
@@ -40,6 +41,10 @@ const Complete = () => {
     footprint.close();
   };
 
+  const handleCompleteAnimation = () => {
+    setShowConfetti(false);
+  };
+
   return (
     <>
       <NavigationHeader
@@ -48,7 +53,9 @@ const Complete = () => {
         }}
       />
       <Container>
-        {isVerified && <ConfettiAnimation />}
+        {showConfetti && (
+          <ConfettiAnimation onComplete={handleCompleteAnimation} />
+        )}
         <IcoCheckCircle40 color="success" />
         <Box sx={{ marginBottom: 4 }} />
         <HeaderTitle

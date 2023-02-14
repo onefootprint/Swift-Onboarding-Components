@@ -5,12 +5,21 @@ import styled, { css } from 'styled-components';
 
 import LottieFile from './confetti-lottie.json';
 
-const ConfettiAnimation = () => (
+type ConfettiAnimationProps = {
+  onComplete?: () => void;
+};
+
+const ConfettiAnimation = ({ onComplete }: ConfettiAnimationProps) => (
   <>
     <Overlay />
-    <AnimationContainer animationData={LottieFile} loop={false} />
+    <AnimationContainer
+      animationData={LottieFile}
+      loop={false}
+      onComplete={onComplete}
+    />
   </>
 );
+
 const AnimationContainer = styled(Lottie)`
   position: absolute;
   top: -30vh;
