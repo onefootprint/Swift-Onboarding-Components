@@ -1,4 +1,4 @@
-use crate::errors::workos_login::WorkOsLoginError;
+use crate::errors::workos::WorkOsError;
 use crate::errors::ApiError;
 use crate::State;
 use actix_web::HttpResponseBuilder;
@@ -33,7 +33,7 @@ async fn handler(
             connection_selector: ConnectionSelector::Provider(&Provider::GoogleOauth),
             state: None,
         })
-        .map_err(WorkOsLoginError::AuthorizationUrlError)?;
+        .map_err(WorkOsError::from)?;
 
     // get the redirect from workos
     let client = reqwest::ClientBuilder::new()

@@ -3,7 +3,10 @@ use workos::passwordless::{
     PasswordlessSessionType,
 };
 
-use crate::{errors::ApiResult, State};
+use crate::{
+    errors::{workos::WorkOsError, ApiResult},
+    State,
+};
 
 #[tracing::instrument(skip_all)]
 pub(crate) async fn create_magic_link(
@@ -21,7 +24,8 @@ pub(crate) async fn create_magic_link(
             // Can use this to pass more information to the client
             state: is_invite.then_some("invite"),
         })
-        .await?;
+        .await
+        .map_err(WorkOsError::from)?;
 
     let link = match &session.r#type {
         PasswordlessSessionType::MagicLink { email: _, link } => link.clone(),

@@ -1,4 +1,5 @@
 use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
+use crate::errors::workos::WorkOsError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
@@ -28,7 +29,8 @@ pub async fn get(
             .workos_client
             .organizations()
             .get_organization(&OrganizationId::from(org_id.as_str()))
-            .await?;
+            .await
+            .map_err(WorkOsError::from)?;
 
         org.domains.into_iter().map(|domain| domain.domain).collect()
     } else {

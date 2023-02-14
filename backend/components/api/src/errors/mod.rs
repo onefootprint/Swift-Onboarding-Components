@@ -8,7 +8,6 @@ use newtypes::{ErrorMessage, Uuid, VendorAPI};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
-use workos::WorkOsError;
 pub mod challenge;
 pub mod enclave;
 pub mod handoff;
@@ -18,7 +17,7 @@ pub mod onboarding;
 pub mod proxy;
 pub mod tenant;
 pub mod user;
-pub mod workos_login;
+pub mod workos;
 
 use crate::types::error::{ApiResponseError, FpResponseErrorInfo};
 
@@ -56,9 +55,7 @@ pub enum ApiError {
     #[error("{0}")]
     EnclaveError(#[from] enclave::EnclaveError),
     #[error("{0}")]
-    WorkOsApiError(String),
-    #[error("{0}")]
-    WorkOsLoginError(#[from] workos_login::WorkOsLoginError),
+    WorkOsError(#[from] workos::WorkOsError),
     #[error("{0}")]
     Webauthn(#[from] WebauthnError),
     #[error("No phone number for vault")]
@@ -115,15 +112,6 @@ pub enum ApiError {
     ImageUploadError(#[from] image_upload::ImageUploadError),
     #[error("internal webhook error")]
     WebhooksError(#[from] webhooks::Error),
-}
-
-impl<T> From<WorkOsError<T>> for ApiError
-where
-    T: std::fmt::Debug,
-{
-    fn from(e: WorkOsError<T>) -> Self {
-        ApiError::WorkOsApiError(format!("{:?}", e))
-    }
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -193,7 +181,17 @@ impl actix_web::ResponseError for ApiError {
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
             ApiError::ChallengeError(_) => StatusCode::BAD_REQUEST,
-            ApiError::WorkOsApiError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsError(e) => match e {
+                workos::WorkOsError::GetProfileAndToken(::workos::WorkOsError::Operation(e)) => {
+                    if e.error == *"invalid_grant" {
+                        // Should not 500 when the token is invalid
+                        StatusCode::BAD_REQUEST
+                    } else {
+                        StatusCode::INTERNAL_SERVER_ERROR
+                    }
+                }
+                _ => StatusCode::INTERNAL_SERVER_ERROR,
+            },
             ApiError::DecisionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::OnboardingError(_) => StatusCode::BAD_REQUEST,
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
@@ -208,7 +206,6 @@ impl actix_web::ResponseError for ApiError {
             | ApiError::InvalidQueryParam(_)
             | ApiError::SerdeJson(_)
             | ApiError::SerdeCbor(_) => StatusCode::BAD_REQUEST,
-            ApiError::WorkOsLoginError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EndpointNotFound => StatusCode::NOT_FOUND,
             ApiError::ResourceNotFound => StatusCode::NOT_FOUND,
             ApiError::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,

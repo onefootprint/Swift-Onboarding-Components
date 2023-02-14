@@ -4,7 +4,7 @@ use std::str::FromStr;
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::WorkOsSession;
 use crate::errors::tenant::TenantError;
-use crate::errors::workos_login::WorkOsLoginError;
+use crate::errors::workos::WorkOsError;
 use crate::errors::ApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::utils::email_domain;
@@ -50,7 +50,8 @@ async fn handler(
             client_id: &ClientId::from(state.config.workos_client_id.as_str()),
             code: &AuthorizationCode::from(code),
         })
-        .await?;
+        .await
+        .map_err(WorkOsError::from)?;
     tracing::info!(profile =?profile, "workos login");
 
     let profile2 = profile.clone();
@@ -163,7 +164,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
     if let Some(org_id) = &profile.organization_id {
         let tenant = get_opt_by_workos_org_id(&state.db_pool, org_id.to_string())
             .await?
-            .ok_or(WorkOsLoginError::TenantForOrgDoesNotExist)?;
+            .ok_or(WorkOsError::TenantForOrgDoesNotExist)?;
 
         tracing::info!("matched workos auth by org id");
         // TODO use a role inferred from the user's groups on workos when we create the user locally
@@ -181,12 +182,11 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
                 domains: Some(DomainFilters::from(vec![domain.as_str()])),
                 ..Default::default()
             })
-            .await?;
+            .await
+            .map_err(WorkOsError::from)?;
         if orgs.data.len() > 1 {
             // NOTE: there should only be 1 tenant returned as 1 domain supplied above
-            return Err(ApiError::WorkOsApiError(
-                "Invariant broken: multiple orgs for 1 domain returned".into(),
-            ));
+            return Err(WorkOsError::MultipleOrgsForDomain.into());
         }
 
         let workos_org_id = if let Some(org) = orgs.data.first() {
@@ -227,7 +227,8 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
                 allow_profiles_outside_organization: Some(&true),
                 domains: HashSet::new(),
             })
-            .await?;
+            .await
+            .map_err(WorkOsError::from)?;
         org.id
     };
 
