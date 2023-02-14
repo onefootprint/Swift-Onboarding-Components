@@ -724,14 +724,16 @@
         "title": "Settings"
       },
       "business-profile": {
-        "add": "Add {{label}}",
-        "edit": "Edit {{label}}",
         "header": {
           "title": "Business profile",
           "subtitle": "Manage your business details"
         },
+        "not-allowed": "You are not allowed to manage the organization",
+        "add": "Add {{label}}",
+        "edit": "Edit {{label}}",
         "logo": {
-          "cta": "Change logo"
+          "cta": "Change logo",
+          "not-allowed": "You are not allowed to change the organization logo"
         },
         "name": {
           "label": "Company name",

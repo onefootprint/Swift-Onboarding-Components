@@ -27,6 +27,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)`
     }
 
     &:disabled {
+      cursor: initial;
       opacity: 0.5;
     }
   `}

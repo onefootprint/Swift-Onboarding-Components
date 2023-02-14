@@ -1,9 +1,18 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Fieldset, { FieldsetProps } from './fieldset';
 
 describe('<Fieldset />', () => {
+  beforeEach(() => {
+    asAdminUser();
+  });
+
+  afterAll(() => {
+    resetUser();
+  });
+
   const renderFieldset = ({
     label = 'Label',
     value,

@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Organization } from '@onefootprint/types';
+import { Organization, RoleScope } from '@onefootprint/types';
 import { Avatar, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
 import useUpdateOrgLogo from './hooks/use-update-org-logo';
@@ -33,24 +34,35 @@ const Logo = ({ organization }: LogoProps) => {
       />
 
       <ButtonContainer>
-        <Label>
-          {t('cta')}
-          <StyledInput
-            type="file"
-            accept="image/svg+xml, image/png, image/jpeg"
-            onChange={handleChange}
-          />
-        </Label>
+        <PermissionGate
+          scope={RoleScope.orgSettings}
+          fallbackText={t('not-allowed')}
+        >
+          <Label>
+            {t('cta')}
+            <StyledInput
+              type="file"
+              accept="image/svg+xml, image/png, image/jpeg"
+              onChange={handleChange}
+            />
+          </Label>
+        </PermissionGate>
       </ButtonContainer>
     </LogoContainer>
   );
 };
 
-const Label = styled.label`
-  ${({ theme }) => css`
+const Label = styled.label<{ disabled?: boolean }>`
+  ${({ theme, disabled }) => css`
     ${createFontStyles('label-3')};
     color: ${theme.color.accent};
     cursor: pointer;
+
+    ${disabled &&
+    css`
+      pointer-events: none;
+      opacity: 0.5;
+    `}
   `}
 `;
 

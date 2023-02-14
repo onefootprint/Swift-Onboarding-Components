@@ -7,6 +7,7 @@ import {
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import BusinessProfile from './business-profile';
 import {
@@ -20,9 +21,14 @@ const useRouterSpy = createUseRouterSpy();
 
 describe('<BusinessProfile />', () => {
   beforeEach(() => {
+    asAdminUser();
     useRouterSpy({
       pathname: '/settings',
     });
+  });
+
+  afterAll(() => {
+    resetUser();
   });
 
   const renderBusinessProfile = () => {
