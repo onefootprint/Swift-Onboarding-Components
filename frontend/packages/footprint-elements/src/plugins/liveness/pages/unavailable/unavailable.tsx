@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../hooks';
 import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
 
@@ -30,6 +31,7 @@ const Unavailable = () => {
 
   return (
     <Container>
+      <NavigationHeader />
       <LoadingIndicator />
     </Container>
   );

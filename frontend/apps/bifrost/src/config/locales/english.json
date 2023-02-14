@@ -3,9 +3,6 @@
     "errors": {}
   },
   "components": {
-    "sandbox-banner": {
-      "label": "Sandbox mode"
-    },
     "exit-dialog": {
       "title": "Are you sure?",
       "description": "Leaving this flow will not save your data.",

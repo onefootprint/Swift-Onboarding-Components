@@ -20,7 +20,11 @@ const Success = () => {
   return (
     <>
       <IcoCheckCircle40 color="success" />
-      <Typography variant="label-3" color="success">
+      <Typography
+        variant="label-3"
+        color="success"
+        sx={{ textAlign: 'center' }}
+      >
         {t('success')}
       </Typography>
     </>

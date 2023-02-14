@@ -9,7 +9,7 @@ import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle } from '../../../../components';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import IdAnimation from '../../../../components/id-animation';
 import InfoBox from '../../../../components/info-box/info-box';
 import SelfieConsent from '../../components/selfie-consent';
@@ -46,6 +46,7 @@ const SelfiePrompt = () => {
 
   return (
     <Container>
+      <NavigationHeader />
       {type === 'passport' ? (
         <IdAnimation
           firstText={t('animation-selfie-from-passport.first-text')}

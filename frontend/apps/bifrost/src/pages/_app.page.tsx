@@ -14,8 +14,8 @@ import Script from 'next/script';
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
+import BifrostLayout from '../components/bifrost-layout';
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
-import Layout from '../components/layout';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
@@ -44,9 +44,9 @@ const App = ({ Component, pageProps }: AppProps) => {
             <DesignSystemProvider theme={theme.light}>
               <GlobalStyle />
               <FootprintProvider client={footprint}>
-                <Layout>
+                <BifrostLayout>
                   <Component {...pageProps} />
-                </Layout>
+                </BifrostLayout>
               </FootprintProvider>
             </DesignSystemProvider>
           </BifrostMachineProvider>

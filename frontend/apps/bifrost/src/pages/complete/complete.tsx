@@ -47,11 +47,7 @@ const Complete = () => {
 
   return (
     <>
-      <NavigationHeader
-        button={{
-          variant: 'close',
-        }}
-      />
+      <NavigationHeader button={{ variant: 'close' }} />
       <Container>
         {showConfetti && (
           <ConfettiAnimation onComplete={handleCompleteAnimation} />

@@ -22,6 +22,7 @@ import {
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import { NavigationHeader } from '../../../../components';
 import HeaderTitle from '../../../../components/header-title';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { Events } from '../../utils/state-machine/types';
@@ -89,6 +90,7 @@ const IdDocCountryAndType = () => {
 
   return (
     <Container>
+      <NavigationHeader />
       <IcoIdGeneric40 />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <CountrySelect

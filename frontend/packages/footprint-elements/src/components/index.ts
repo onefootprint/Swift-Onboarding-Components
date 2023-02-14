@@ -7,6 +7,7 @@ export { default as HeaderTitle } from './header-title';
 export * from './header-title';
 export * from './info-box';
 export { default as InfoBox } from './info-box';
+export { default as Layout } from './layout';
 export { default as NavigationHeader } from './navigation-header';
 export * from './navigation-header';
 export { default as SandboxBanner } from './sandbox-banner';

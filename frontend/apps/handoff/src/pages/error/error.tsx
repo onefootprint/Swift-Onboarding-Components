@@ -1,3 +1,4 @@
+import { NavigationHeader } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import { EmptyState } from '@onefootprint/ui';
@@ -11,15 +12,18 @@ const Error = ({ resetErrorBoundary }: ErrorProps) => {
   const { t } = useTranslation('pages.error');
 
   return (
-    <EmptyState
-      description={t('description')}
-      iconComponent={IcoForbid40}
-      title={t('title')}
-      cta={{
-        label: t('cta'),
-        onClick: resetErrorBoundary,
-      }}
-    />
+    <>
+      <NavigationHeader />
+      <EmptyState
+        description={t('description')}
+        iconComponent={IcoForbid40}
+        title={t('title')}
+        cta={{
+          label: t('cta'),
+          onClick: resetErrorBoundary,
+        }}
+      />
+    </>
   );
 };
 

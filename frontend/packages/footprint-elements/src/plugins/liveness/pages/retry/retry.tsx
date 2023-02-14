@@ -3,7 +3,7 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle } from '../../../../components';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../hooks';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
@@ -53,6 +53,7 @@ const Retry = () => {
 
   return (
     <Container>
+      <NavigationHeader />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       {biometricInitMutation.isSuccess ? (
         <LivenessSuccess />

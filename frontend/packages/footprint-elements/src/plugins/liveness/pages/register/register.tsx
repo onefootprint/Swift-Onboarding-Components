@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 
-import { HeaderTitle } from '../../../../components';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
 import useBiometricInit from '../../hooks/use-register-biometric';
@@ -37,6 +37,7 @@ const Register = () => {
 
   return (
     <Box>
+      <NavigationHeader />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       {biometricInitMutation.isSuccess ? (
         <LivenessSuccess />

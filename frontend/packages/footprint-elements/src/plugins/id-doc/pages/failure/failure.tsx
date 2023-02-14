@@ -3,11 +3,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
+import NavigationHeader from '../../../../components/navigation-header/navigation-header';
 
 const Failure = () => {
   const { t } = useTranslation('pages.failure');
   return (
     <Container>
+      <NavigationHeader />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
     </Container>
   );

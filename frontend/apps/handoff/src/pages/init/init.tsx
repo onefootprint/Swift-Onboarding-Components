@@ -1,5 +1,6 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
+  NavigationHeader,
   useGetD2PStatus,
   useGetOnboardingStatus,
   useParseHandoffUrl,
@@ -12,6 +13,7 @@ import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import convertRequirements from 'src/utils/convert-requirements';
 import { Events } from 'src/utils/state-machine';
+import styled from 'styled-components';
 
 const Init = () => {
   const [state, send] = useHandoffMachine();
@@ -96,7 +98,20 @@ const Init = () => {
     },
   });
 
-  return <LoadingIndicator />;
+  return (
+    <LoadingContainer>
+      <NavigationHeader />
+      <LoadingIndicator />
+    </LoadingContainer>
+  );
 };
+
+const LoadingContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+`;
 
 export default Init;

@@ -1,4 +1,7 @@
-import { HeaderTitle } from '@onefootprint/footprint-elements';
+import {
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
@@ -16,19 +19,22 @@ const Expired = () => {
   };
 
   return (
-    <Container>
-      <HeaderTitle
-        title={t('title')}
-        subtitle={
-          opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
-        }
-      />
-      {opener === 'mobile' && (
-        <Button onClick={handleClick} fullWidth>
-          {t('cta')}
-        </Button>
-      )}
-    </Container>
+    <>
+      <NavigationHeader />
+      <Container>
+        <HeaderTitle
+          title={t('title')}
+          subtitle={
+            opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
+          }
+        />
+        {opener === 'mobile' && (
+          <Button onClick={handleClick} fullWidth>
+            {t('cta')}
+          </Button>
+        )}
+      </Container>
+    </>
   );
 };
 

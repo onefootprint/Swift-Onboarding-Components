@@ -20,7 +20,7 @@ const RetryLimitExceeded = () => {
   return (
     <>
       <IcoClose40 color="error" />
-      <Typography variant="label-3" color="error">
+      <Typography variant="label-3" color="error" sx={{ textAlign: 'center' }}>
         {t('error')}
       </Typography>
     </>

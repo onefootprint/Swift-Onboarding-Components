@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
+import { NavigationHeader } from '../../../../components';
 import HeaderTitle from '../../../../components/header-title';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import Error from './components/error';
@@ -74,6 +75,7 @@ const ProcessingDocuments = () => {
 
   return (
     <Container>
+      <NavigationHeader />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       {status === DocStatusKind.pending && <Loading />}
       {status === DocStatusKind.complete && <Success />}

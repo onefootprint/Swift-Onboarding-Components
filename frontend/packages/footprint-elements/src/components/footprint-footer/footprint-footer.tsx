@@ -43,8 +43,6 @@ const FootprintFooter = () => {
 const FootprintFooterContainer = styled.footer`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.secondary};
-    border-radius: 0 0 ${theme.borderRadius.default}
-      ${theme.borderRadius.default};
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: row;

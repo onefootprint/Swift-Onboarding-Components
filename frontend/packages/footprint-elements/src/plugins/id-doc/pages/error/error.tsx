@@ -4,7 +4,7 @@ import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle } from '../../../../components';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
@@ -22,28 +22,41 @@ const Error = () => {
     errors?.filter(error => !!BadImageErrorLabel[error]) ?? [];
   const hasErrors = cleanedErrors.length > 0;
 
-  return hasErrors ? (
+  return (
     <Container>
-      <IcoWarning40 color="error" />
-      <HeaderTitle title={t('title')} subtitle={t('description-with-errors')} />
-      <ErrorsContainer>
-        {cleanedErrors.map(error => (
-          <Typography key={error} variant="body-2" color="secondary" as="li">
-            {BadImageErrorLabel[error]}
-          </Typography>
-        ))}
-      </ErrorsContainer>
-      <Button fullWidth onClick={handleClick}>
-        {t('cta')}
-      </Button>
-    </Container>
-  ) : (
-    <Container>
-      <IcoWarning40 color="error" />
-      <HeaderTitle title={t('title')} subtitle={t('description')} />
-      <Button fullWidth onClick={handleClick}>
-        {t('cta')}
-      </Button>
+      <NavigationHeader />
+      {hasErrors ? (
+        <>
+          <IcoWarning40 color="error" />
+          <HeaderTitle
+            title={t('title')}
+            subtitle={t('description-with-errors')}
+          />
+          <ErrorsContainer>
+            {cleanedErrors.map(error => (
+              <Typography
+                key={error}
+                variant="body-2"
+                color="secondary"
+                as="li"
+              >
+                {BadImageErrorLabel[error]}
+              </Typography>
+            ))}
+          </ErrorsContainer>
+          <Button fullWidth onClick={handleClick}>
+            {t('cta')}
+          </Button>
+        </>
+      ) : (
+        <>
+          <IcoWarning40 color="error" />
+          <HeaderTitle title={t('title')} subtitle={t('description')} />
+          <Button fullWidth onClick={handleClick}>
+            {t('cta')}
+          </Button>
+        </>
+      )}
     </Container>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { NavigationHeader } from '../../../../components';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image/use-process-image';
 import Camera from './components/camera';
@@ -58,15 +59,20 @@ const SelfiePhoto = () => {
     setImage(newImage);
   };
 
-  return image ? (
-    <Preview
-      imageSrc={image}
-      onRetake={handleRetake}
-      onConfirm={handleConfirm}
-      isLoading={isLoading}
-    />
-  ) : (
-    <Camera onCapture={handleCapture} onError={handleError} />
+  return (
+    <>
+      <NavigationHeader />
+      {image ? (
+        <Preview
+          imageSrc={image}
+          onRetake={handleRetake}
+          onConfirm={handleConfirm}
+          isLoading={isLoading}
+        />
+      ) : (
+        <Camera onCapture={handleCapture} onError={handleError} />
+      )}
+    </>
   );
 };
 

@@ -1,6 +1,7 @@
 import { IcoIdBack40 } from '@onefootprint/icons';
 import React from 'react';
 
+import { NavigationHeader } from '../../../../components';
 import IdDocPhotoPrompt from '../../components/id-doc-photo-prompt';
 import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
 
@@ -24,13 +25,16 @@ const IdDocBackPhoto = () => {
   };
 
   return (
-    <IdDocPhotoPrompt
-      iconComponent={IcoIdBack40}
-      showGuidelines
-      side="back"
-      type={type}
-      onComplete={handleComplete}
-    />
+    <>
+      <NavigationHeader />
+      <IdDocPhotoPrompt
+        iconComponent={IcoIdBack40}
+        showGuidelines
+        side="back"
+        type={type}
+        onComplete={handleComplete}
+      />
+    </>
   );
 };
 

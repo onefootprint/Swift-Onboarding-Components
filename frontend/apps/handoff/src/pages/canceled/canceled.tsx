@@ -1,4 +1,7 @@
-import { HeaderTitle } from '@onefootprint/footprint-elements';
+import {
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
@@ -10,12 +13,15 @@ const Canceled = () => {
   const { t } = useTranslation('pages.canceled');
 
   return (
-    <HeaderTitle
-      title={t('title')}
-      subtitle={
-        opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
-      }
-    />
+    <>
+      <NavigationHeader />
+      <HeaderTitle
+        title={t('title')}
+        subtitle={
+          opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
+        }
+      />
+    </>
   );
 };
 

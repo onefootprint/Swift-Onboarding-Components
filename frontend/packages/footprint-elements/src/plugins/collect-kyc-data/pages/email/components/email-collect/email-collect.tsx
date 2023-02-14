@@ -75,12 +75,12 @@ const EmailCollect = ({
     <>
       {hideHeader ? null : (
         <>
+          <NavigationHeader />
           <HeaderTitle
             title={t('title')}
             subtitle={t('subtitle')}
             sx={{ marginBottom: 7 }}
           />
-          <NavigationHeader />
         </>
       )}
       <form onSubmit={handleSubmit(onSubmitForm)}>

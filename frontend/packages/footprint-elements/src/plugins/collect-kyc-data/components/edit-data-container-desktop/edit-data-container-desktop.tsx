@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Divider, Typography } from '@onefootprint/ui';
+import { Divider } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -26,11 +26,10 @@ const EditDataContainerDesktop = ({
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onClick: handlePrev }}>
-        <Typography variant="label-2">
-          {t('edit-sheet.title', { name })}
-        </Typography>
-      </NavigationHeader>
+      <NavigationHeader
+        button={{ variant: 'back', onClick: handlePrev }}
+        content={{ kind: 'static', title: t('edit-sheet.title', { name }) }}
+      />
       <StyledDivider />
       <Container>{children}</Container>
     </>

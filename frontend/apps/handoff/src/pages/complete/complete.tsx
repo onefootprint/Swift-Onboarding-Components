@@ -1,5 +1,6 @@
 import {
   HeaderTitle,
+  NavigationHeader,
   useUpdateD2PStatus,
 } from '@onefootprint/footprint-elements';
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
@@ -34,14 +35,17 @@ const Complete = () => {
   });
 
   return (
-    <HeaderTitle
-      title={t('title')}
-      subtitle={
-        shouldShowCounter
-          ? t('subtitle.with-countdown', { seconds: countdown })
-          : t('subtitle.without-countdown')
-      }
-    />
+    <>
+      <NavigationHeader />
+      <HeaderTitle
+        title={t('title')}
+        subtitle={
+          shouldShowCounter
+            ? t('subtitle.with-countdown', { seconds: countdown })
+            : t('subtitle.without-countdown')
+        }
+      />
+    </>
   );
 };
 
