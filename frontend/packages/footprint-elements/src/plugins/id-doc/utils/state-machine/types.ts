@@ -21,6 +21,7 @@ export enum States {
 export enum Events {
   receivedContext = 'receivedContext',
   idDocCountryAndTypeSelected = 'idDocCountryAndTypeSelected',
+  navigatedToPrev = 'navigatedToPrev',
   cameraErrored = 'cameraErrored',
   receivedIdDocFrontImage = 'receivedIdDocFrontImage',
   receivedIdDocBackImage = 'receivedIdDocBackImage',
@@ -78,6 +79,9 @@ export type MachineEvents =
         type: IdDocType;
         country: CountryCode3;
       };
+    }
+  | {
+      type: Events.navigatedToPrev;
     }
   | {
       type: Events.cameraErrored;

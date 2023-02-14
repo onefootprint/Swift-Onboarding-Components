@@ -24,9 +24,17 @@ const IdDocFrontPhoto = () => {
     });
   };
 
+  const handleClickBack = () => {
+    send({
+      type: Events.navigatedToPrev,
+    });
+  };
+
   return (
     <>
-      <NavigationHeader />
+      <NavigationHeader
+        button={{ variant: 'back', onClick: handleClickBack }}
+      />{' '}
       <IdDocPhotoPrompt
         iconComponent={IcoIdFront40}
         showGuidelines

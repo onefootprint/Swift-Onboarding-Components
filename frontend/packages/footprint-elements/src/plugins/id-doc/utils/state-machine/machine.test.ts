@@ -285,4 +285,64 @@ describe('Id Doc Machine Tests', () => {
     expect(state.context.idDoc.backImage).toEqual(undefined);
     expect(state.value).toBe(States.idDocFrontImage);
   });
+
+  it('can return to id doc country and type selection', () => {
+    const machine = interpret(createMachine());
+    machine.start();
+    let { state } = machine;
+    expect(state.value).toBe(States.init);
+    state = machine.send({
+      type: Events.receivedContext,
+      payload: {
+        authToken: 'token',
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+        idDocRequired: true,
+        selfieRequired: true,
+      },
+    });
+    expect(state.context).toEqual({
+      authToken: 'token',
+      device: {
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      },
+      idDoc: {
+        required: true,
+      },
+      selfie: {
+        required: true,
+      },
+    });
+    expect(state.value).toEqual(States.idDocCountryAndType);
+
+    state = machine.send({
+      type: Events.idDocCountryAndTypeSelected,
+      payload: {
+        type: IdDocType.idCard,
+        country: 'USA',
+      },
+    });
+    expect(state.value).toEqual(States.idDocFrontImage);
+    expect(state.context.idDoc.type).toEqual(IdDocType.idCard);
+    expect(state.context.idDoc.country).toEqual('USA');
+
+    state = machine.send({
+      type: Events.navigatedToPrev,
+    });
+    expect(state.value).toEqual(States.idDocCountryAndType);
+
+    state = machine.send({
+      type: Events.idDocCountryAndTypeSelected,
+      payload: {
+        type: IdDocType.driversLicense,
+        country: 'AFG',
+      },
+    });
+    expect(state.value).toEqual(States.idDocFrontImage);
+    expect(state.context.idDoc.type).toEqual(IdDocType.driversLicense);
+    expect(state.context.idDoc.country).toEqual('AFG');
+  });
 });

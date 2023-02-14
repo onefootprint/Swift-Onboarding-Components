@@ -49,6 +49,9 @@ const createIdDocMachine = () =>
         },
         [States.idDocFrontImage]: {
           on: {
+            [Events.navigatedToPrev]: {
+              target: States.idDocCountryAndType,
+            },
             [Events.receivedIdDocFrontImage]: [
               {
                 target: States.idDocBackImage,
