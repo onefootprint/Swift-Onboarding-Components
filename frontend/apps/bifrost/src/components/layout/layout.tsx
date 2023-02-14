@@ -1,24 +1,50 @@
-import { FootprintFooter } from '@onefootprint/footprint-elements';
+import {
+  FootprintFooter,
+  NavigationHeaderContainer,
+  SandboxBanner,
+  SandboxBannerHandler,
+} from '@onefootprint/footprint-elements';
+import { useTranslation } from '@onefootprint/hooks';
 import { media } from '@onefootprint/ui';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
 
-import BifrostNavigationHeaderContainer from '../bifrost-navigation-header-container';
-import SandboxBanner from '../sandbox-banner';
 import BIFROST_CONTAINER_ID from './constants';
 
 type LayoutProps = {
   children: React.ReactNode;
 };
 
-const Layout = ({ children }: LayoutProps) => (
-  <LayoutContainer id={BIFROST_CONTAINER_ID}>
-    <SandboxBanner />
-    <BifrostNavigationHeaderContainer />
-    <Body>{children}</Body>
-    <FootprintFooter />
-  </LayoutContainer>
-);
+const Layout = ({ children }: LayoutProps) => {
+  const { t } = useTranslation('components.sandbox-banner');
+  const { isSandbox } = useSandboxMode();
+  const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
+
+  const measuredRef = useCallback((handler: SandboxBannerHandler) => {
+    if (!handler) {
+      return;
+    }
+    const height = handler.getHeight();
+    if (height) {
+      setSandboxBannerHeight(height);
+    }
+  }, []);
+
+  return (
+    <LayoutContainer id={BIFROST_CONTAINER_ID}>
+      <Header>
+        {isSandbox && <SandboxBanner ref={measuredRef} label={t('label')} />}
+        <NavigationHeaderContainer
+          top={isSandbox ? sandboxBannerHeight : undefined}
+          containerId={BIFROST_CONTAINER_ID}
+        />
+      </Header>
+      <Body>{children}</Body>
+      <FootprintFooter />
+    </LayoutContainer>
+  );
+};
 
 const LayoutContainer = styled.div`
   ${({ theme }) => css`
@@ -60,6 +86,15 @@ const Body = styled.div`
     ${media.greaterThan('md')`
       padding: 0 ${theme.spacing[7]} ${theme.spacing[7]};
     `}
+  `}
+`;
+
+const Header = styled.div`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.primary};
+    position: sticky;
+    top: 0;
+    z-index: ${theme.zIndex.sticky};
   `}
 `;
 

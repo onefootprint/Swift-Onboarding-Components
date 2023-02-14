@@ -1,0 +1,16 @@
+import { customRender, screen } from '@onefootprint/test-utils';
+import React from 'react';
+
+import SandboxBanner from './sandbox-banner';
+
+describe('<SandboxBanner />', () => {
+  const renderSandboxBanner = () => {
+    customRender(<SandboxBanner />);
+  };
+
+  it('should render a banner', () => {
+    renderSandboxBanner();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText('Sandbox Mode')).toBeInTheDocument();
+  });
+});

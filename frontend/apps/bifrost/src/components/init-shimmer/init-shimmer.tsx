@@ -1,10 +1,11 @@
+import { NAVIGATION_HEADER_PORTAL_SELECTOR } from '@onefootprint/footprint-elements';
 import { Box, Portal, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 const InitShimmer = () => (
   <Box>
-    <Portal selector="#navigation-header-portal" removeContent>
+    <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR} removeContent>
       <HeaderContainer>
         <CloseButton />
       </HeaderContainer>

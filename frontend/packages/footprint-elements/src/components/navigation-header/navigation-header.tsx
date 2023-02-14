@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 
 import NavigationBackButton from './components/navigation-back-button';
 import NavigationCloseButton from './components/navigation-close-button';
+import { NAVIGATION_HEADER_PORTAL_SELECTOR } from './constants';
 
 export type NavigationHeaderProps = {
   children?: React.ReactNode;
@@ -15,7 +16,7 @@ export type NavigationHeaderProps = {
 };
 
 const NavigationHeader = ({ children, button }: NavigationHeaderProps) => (
-  <Portal selector="#navigation-header-portal" removeContent>
+  <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR} removeContent>
     <Container>
       <Box>
         {button.variant === 'close' && (

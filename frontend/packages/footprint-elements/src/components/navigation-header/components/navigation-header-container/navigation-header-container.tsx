@@ -1,24 +1,31 @@
 import { media } from '@onefootprint/ui';
 import React from 'react';
-import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
 
-import useBifrostHasScroll from '../../hooks/use-bifrost-has-scroll';
+import { NAVIGATION_HEADER_PORTAL_ID } from '../../constants';
+import useContainerHasScroll from '../../hooks/use-container-has-scroll';
 
-const BifrostNavigationHeaderContainer = () => {
-  const hasScroll = useBifrostHasScroll();
-  const { isSandbox } = useSandboxMode();
+type NavigationHeaderContainerProps = {
+  top?: number;
+  containerId: string;
+};
+
+const NavigationHeaderContainer = ({
+  top,
+  containerId,
+}: NavigationHeaderContainerProps) => {
+  const hasScroll = useContainerHasScroll(containerId);
 
   return (
     <Header
+      style={{ top }}
       hasScroll={hasScroll}
-      isSandbox={isSandbox}
-      id="navigation-header-portal"
+      id={NAVIGATION_HEADER_PORTAL_ID}
     />
   );
 };
 
-const Header = styled.header<{ isSandbox: boolean; hasScroll: boolean }>`
+const Header = styled.header<{ hasScroll: boolean }>`
   ${({ theme }) => css`
     padding: 0 ${theme.spacing[5]};
     height: var(--navigation-header-height);
@@ -32,18 +39,16 @@ const Header = styled.header<{ isSandbox: boolean; hasScroll: boolean }>`
     `}
   `}
 
-  ${({ isSandbox }) =>
-    isSandbox &&
-    css`
-      top: 45px; // Height of sandbox banner
-    `}
-
   ${({ theme, hasScroll }) =>
     hasScroll &&
     css`
       background: ${theme.backgroundColor.primary};
       border-bottom: 1px solid ${theme.borderColor.tertiary};
+
+      &:empty {
+        border: none;
+      }
     `}
 `;
 
-export default BifrostNavigationHeaderContainer;
+export default NavigationHeaderContainer;

@@ -9,4 +9,6 @@ export * from './info-box';
 export { default as InfoBox } from './info-box';
 export { default as NavigationHeader } from './navigation-header';
 export * from './navigation-header';
+export { default as SandboxBanner } from './sandbox-banner';
+export * from './sandbox-banner';
 export { default as SecuredByFootprint } from './secured-by-footprint';

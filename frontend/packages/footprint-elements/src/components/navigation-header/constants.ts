@@ -1,0 +1,2 @@
+export const NAVIGATION_HEADER_PORTAL_ID = 'navigation-header-portal';
+export const NAVIGATION_HEADER_PORTAL_SELECTOR = `#${NAVIGATION_HEADER_PORTAL_ID}`;
