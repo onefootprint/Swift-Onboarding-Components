@@ -775,6 +775,7 @@
           "pending-invite": "Pending",
           "actions": {
             "aria-label": "Open actions for member {{email}}",
+            "not-allowed": "You are not allowed to change teammates",
             "remove": {
               "cta": "Remove member",
               "confirmation": {
@@ -801,6 +802,7 @@
         },
         "invite": {
           "title": "Invite teammates",
+          "not-allowed": "You are not allowed to invite teammates",
           "form": {
             "email": {
               "label": "Email address",

@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Member } from '@onefootprint/types';
+import { Member, RoleScope } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
+import usePermissions from 'src/hooks/use-permissions';
 import useUserSession from 'src/hooks/use-user-session';
 import styled from 'styled-components';
 
@@ -15,6 +16,7 @@ export type RowProps = {
 const Row = ({ member }: RowProps) => {
   const { t } = useTranslation('pages.settings.members.table');
   const session = useUserSession();
+  const { hasPermission } = usePermissions();
   const { id, email, firstName, lastName } = member;
   const lastLoginAt = member.rolebinding?.lastLoginAt;
   const isMemberCurrentUser = session.data?.id === id;
@@ -30,7 +32,11 @@ const Row = ({ member }: RowProps) => {
       </Td>
       <Td>{lastLoginAt || '-'}</Td>
       <Td>
-        {shouldShowActions ? <EditRole member={member} /> : member.role.name}
+        {shouldShowActions && hasPermission(RoleScope.orgSettings) ? (
+          <EditRole member={member} />
+        ) : (
+          member.role.name
+        )}
       </Td>
       <Td>
         {!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}

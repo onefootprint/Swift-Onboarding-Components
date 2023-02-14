@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Member } from '@onefootprint/types';
+import { Member, RoleScope } from '@onefootprint/types';
 import {
   Box,
   createFontStyles,
@@ -10,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
+import PermissionGate from 'src/components/permission-gate';
 import styled from 'styled-components';
 
 import useRemoveMember from './hooks/use-remove-org-member';
@@ -18,7 +19,6 @@ export type ActionsProps = {
   member: Member;
 };
 
-// TODO: https://linear.app/footprint/issue/FP-1877/add-dropdown-to-member-row-to-change-role-only-if-logged-in-user-is
 const Actions = ({ member }: ActionsProps) => {
   const { t, allT } = useTranslation('pages.settings.members.table.actions');
   const { email, firstName, lastName, id } = member;
@@ -53,9 +53,15 @@ const Actions = ({ member }: ActionsProps) => {
       }}
     >
       <Dropdown.Root>
-        <Dropdown.Trigger aria-label={t('aria-label', { email })}>
-          <IcoDotsHorizontal24 />
-        </Dropdown.Trigger>
+        <PermissionGate
+          scope={RoleScope.orgSettings}
+          fallbackText={t('not-allowed')}
+        >
+          <Dropdown.Trigger aria-label={t('aria-label', { email })}>
+            <IcoDotsHorizontal24 />
+          </Dropdown.Trigger>
+        </PermissionGate>
+
         <Dropdown.Content align="end">
           <Dropdown.Item onSelect={handleRemove}>
             {t('remove.cta')}
