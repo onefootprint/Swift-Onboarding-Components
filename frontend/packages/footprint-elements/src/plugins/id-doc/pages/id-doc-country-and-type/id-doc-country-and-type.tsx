@@ -93,18 +93,20 @@ const IdDocCountryAndType = () => {
       <NavigationHeader />
       <IcoIdGeneric40 />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <CountrySelect
-        data-private
-        label={t('form.country')}
-        onChange={handleCountryChange}
-        value={country}
-      />
-      <Divider />
-      <RadioSelect
-        defaultSelected={options.length ? options[0].value : undefined}
-        options={options}
-        onSelect={handleDocTypeChange}
-      />
+      <InputsContainer>
+        <CountrySelect
+          data-private
+          label={t('form.country')}
+          onChange={handleCountryChange}
+          value={country}
+        />
+        <Divider />
+        <RadioSelect
+          defaultSelected={options.length ? options[0].value : undefined}
+          options={options}
+          onSelect={handleDocTypeChange}
+        />
+      </InputsContainer>
       <Button fullWidth onClick={handleSubmit}>
         {t('form.cta')}
       </Button>
@@ -112,17 +114,28 @@ const IdDocCountryAndType = () => {
   );
 };
 
-const Container = styled.div`
+const InputsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[8]};
+    row-gap: ${theme.spacing[5]};
     justify-content: center;
     align-items: center;
+    width: 100%;
 
     > div {
       width: 100%;
     }
+  `}
+`;
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[7]};
+    justify-content: center;
+    align-items: center;
   `}
 `;
 
