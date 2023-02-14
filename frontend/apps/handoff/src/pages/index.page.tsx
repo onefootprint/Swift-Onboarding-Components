@@ -73,7 +73,7 @@ const Root = () => {
               device,
             }}
             onDone={() => {
-              send({ type: Events.livenessCompleted });
+              send({ type: Events.requirementCompleted });
             }}
           />
         </DeviceSignals>
@@ -91,7 +91,7 @@ const Root = () => {
               },
             }}
             onDone={() => {
-              send({ type: Events.idDocCompleted });
+              send({ type: Events.requirementCompleted });
             }}
           />
         </DeviceSignals>

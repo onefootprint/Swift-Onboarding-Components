@@ -48,7 +48,7 @@ export const createHandoffMachine = () =>
                 description:
                   'Only transition to next state if all required info is collected',
                 actions: [Actions.assignInitContext],
-                target: States.checkRequirements,
+                target: States.router,
                 cond: (context, event) => initContextComplete(context, event),
               },
               {
@@ -62,42 +62,41 @@ export const createHandoffMachine = () =>
             ],
           },
         },
-        [States.checkRequirements]: {
-          on: {
-            [Events.requirementsReceived]: [
-              {
-                target: States.liveness,
-                actions: [Actions.assignRequirements],
-                cond: (context, event) => !!event.payload.missingLiveness,
-              },
-              {
-                target: States.idDoc,
-                actions: [Actions.assignRequirements],
-                cond: (context, event) => !!event.payload.missingIdDoc,
-              },
-              {
-                target: States.complete,
-              },
-            ],
-          },
+        [States.router]: {
+          always: [
+            {
+              target: States.liveness,
+              cond: context => !!context.requirements?.missingLiveness,
+            },
+            {
+              target: States.idDoc,
+              cond: context => !!context.requirements?.missingIdDoc,
+            },
+            {
+              target: States.complete,
+            },
+          ],
         },
+
         [States.liveness]: {
           on: {
-            [Events.livenessCompleted]: [
-              {
-                target: States.idDoc,
-                cond: context => !!context.requirements?.missingIdDoc,
-              },
-              {
-                target: States.complete,
-              },
-            ],
+            [Events.requirementCompleted]: {
+              target: States.checkRequirements,
+            },
           },
         },
         [States.idDoc]: {
           on: {
-            [Events.idDocCompleted]: {
-              target: States.complete,
+            [Events.requirementCompleted]: {
+              target: States.checkRequirements,
+            },
+          },
+        },
+        [States.checkRequirements]: {
+          on: {
+            [Events.requirementsReceived]: {
+              target: States.router,
+              actions: [Actions.assignRequirements],
             },
           },
         },
@@ -118,11 +117,19 @@ export const createHandoffMachine = () =>
           if (event.type !== Events.initContextUpdated) {
             return context;
           }
-          const { device, authToken, opener } = event.payload;
+          const { device, authToken, opener, onboardingConfig, requirements } =
+            event.payload;
+
           context.device = device !== undefined ? device : context.device;
           context.opener = opener !== undefined ? opener : context.opener;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
+          context.onboardingConfig =
+            onboardingConfig !== undefined
+              ? onboardingConfig
+              : context.onboardingConfig;
+          context.requirements =
+            requirements !== undefined ? requirements : context.requirements;
 
           return context;
         }),

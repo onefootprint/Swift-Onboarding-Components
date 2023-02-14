@@ -1,6 +1,7 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
   useGetD2PStatus,
+  useGetOnboardingStatus,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/footprint-elements';
@@ -9,6 +10,7 @@ import { D2PStatusUpdate, GetD2PResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
+import convertRequirements from 'src/utils/convert-requirements';
 import { Events } from 'src/utils/state-machine';
 
 const Init = () => {
@@ -80,6 +82,18 @@ const Init = () => {
         device,
       },
     });
+  });
+
+  useGetOnboardingStatus(authToken ?? '', {
+    onSuccess: ({ obConfiguration, requirements }) => {
+      send({
+        type: Events.initContextUpdated,
+        payload: {
+          onboardingConfig: obConfiguration,
+          requirements: convertRequirements(requirements),
+        },
+      });
+    },
   });
 
   return <LoadingIndicator />;

@@ -1,8 +1,9 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { D2PStatus } from '@onefootprint/types';
+import { D2PStatus, OnboardingConfig } from '@onefootprint/types';
 
 export enum States {
   init = 'init',
+  router = 'router',
   checkRequirements = 'checkRequirements',
   liveness = 'liveness',
   idDoc = 'idDoc',
@@ -14,8 +15,7 @@ export enum States {
 export enum Events {
   initContextUpdated = 'initContextUpdated',
   requirementsReceived = 'requirementsReceived', // Fetching onboarding requirements is complete
-  livenessCompleted = 'livenessCompleted',
-  idDocCompleted = 'idDocCompleted',
+  requirementCompleted = 'requirementCompleted',
   statusReceived = 'statusReceived', // Fetching d2p status is complete
   d2pAlreadyCompleted = 'd2pAlreadyCompleted',
   reset = 'reset',
@@ -31,12 +31,15 @@ export type MachineContext = {
   device?: DeviceInfo;
   opener?: string;
   authToken?: string;
-  requirements?: {
-    missingIdDoc?: boolean;
-    missingLiveness?: boolean;
-    missingSelfie?: boolean;
-    missingConsent?: boolean;
-  };
+  onboardingConfig?: OnboardingConfig;
+  requirements?: Requirements;
+};
+
+export type Requirements = {
+  missingIdDoc?: boolean;
+  missingLiveness?: boolean;
+  missingSelfie?: boolean;
+  missingConsent?: boolean;
 };
 
 export type MachineEvents =
@@ -49,6 +52,8 @@ export type MachineEvents =
         authToken?: string;
         opener?: string;
         device?: DeviceInfo;
+        onboardingConfig?: OnboardingConfig;
+        requirements?: Requirements;
       };
     }
   | {
@@ -68,10 +73,7 @@ export type MachineEvents =
       };
     }
   | {
-      type: Events.livenessCompleted;
-    }
-  | {
-      type: Events.idDocCompleted;
+      type: Events.requirementCompleted;
     }
   | {
       type: Events.reset;

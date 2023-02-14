@@ -1,7 +1,27 @@
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+
 import { Events, MachineContext, MachineEvents } from '../../types';
 import initContextComplete from './init-context-complete';
 
 describe('initContextComplete', () => {
+  const TestOnboardingConfig: OnboardingConfig = {
+    createdAt: 'date',
+    id: 'id',
+    isLive: true,
+    key: 'key',
+    logoUrl: 'url',
+    privacyPolicyUrl: 'url',
+    name: 'tenant',
+    orgName: 'tenantOrg',
+    status: 'enabled',
+    mustCollectData: [CollectedKycDataOption.name],
+    mustCollectIdentityDocument: false,
+    mustCollectSelfie: false,
+    canAccessData: [CollectedKycDataOption.name],
+    canAccessIdentityDocumentImages: false,
+    canAccessSelfieImage: false,
+  };
+
   describe('when init context info is complete', () => {
     it('when all data is in the machine context', () => {
       const context: MachineContext = {
@@ -11,6 +31,8 @@ describe('initContextComplete', () => {
         },
         authToken: 'token',
         opener: 'mobile',
+        requirements: {},
+        onboardingConfig: TestOnboardingConfig,
       };
       const event: MachineEvents = {
         type: Events.initContextUpdated,
@@ -23,6 +45,8 @@ describe('initContextComplete', () => {
       const context: MachineContext = {
         authToken: 'token',
         opener: 'mobile',
+        requirements: {},
+        onboardingConfig: TestOnboardingConfig,
       };
       const event: MachineEvents = {
         type: Events.initContextUpdated,
@@ -47,6 +71,7 @@ describe('initContextComplete', () => {
             type: 'mobile',
             hasSupportForWebauthn: true,
           },
+          onboardingConfig: TestOnboardingConfig,
         },
       };
       expect(initContextComplete(context, event)).toEqual(false);

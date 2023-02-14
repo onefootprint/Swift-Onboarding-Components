@@ -1,3 +1,4 @@
+import { OnboardingConfig } from '../data';
 import { CollectedKycDataOption } from '../data/collected-kyc-data-option';
 import IdDocType from '../data/id-doc-type';
 
@@ -44,6 +45,7 @@ export type AuthorizeFields = {
 };
 
 export type OnboardingStatusResponse = {
+  obConfiguration: OnboardingConfig;
   requirements: OnboardingRequirement[];
   fieldsToAuthorize?: AuthorizeFields;
 };
