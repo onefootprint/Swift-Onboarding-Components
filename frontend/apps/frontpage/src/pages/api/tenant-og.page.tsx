@@ -29,7 +29,7 @@ export default async function handler(req: NextRequest) {
           textAlign: 'center',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundImage: 'url(/background-og.png)',
+          backgroundImage: 'url(https://onefootprint.com/background-og.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           gap: 86,
