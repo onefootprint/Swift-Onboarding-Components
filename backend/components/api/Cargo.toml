@@ -94,7 +94,7 @@ actix-multipart = "0.5.0"
 webhooks = { path = "../webhooks"}
 
 [dev-dependencies]
-test-case = "2.1.0"
+test-case = { workspace = true }
 enclave = { path = "../enclave/enclave"}
 portpicker = "0.1.1"
 mockall = "0.9.1"

@@ -28,9 +28,9 @@ enum Error<T> {
 }
 
 /// Util to run a single function inside of a test transaction
-pub fn run_test_txn<F>(f: F)
+pub fn run_test_txn<F, TRes>(f: F) -> TRes
 where
-    F: FnOnce(&mut TestPgConn) + Send + 'static,
+    F: FnOnce(&mut TestPgConn) -> TRes + Send + 'static,
 {
     run_test_txn_with_args(|conn, _| f(conn), ())
 }

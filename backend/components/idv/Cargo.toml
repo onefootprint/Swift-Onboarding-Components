@@ -30,6 +30,6 @@ derive_more = { workspace = true }
 url = "2.2.2"
 
 [dev-dependencies]
-test-case = "2.1.0"
+test-case = { workspace = true }
 actix-rt = "2.7.0"
 mockall = "0.9.1"
