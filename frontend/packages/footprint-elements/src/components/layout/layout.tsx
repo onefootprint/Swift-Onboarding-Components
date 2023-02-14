@@ -70,7 +70,6 @@ const Container = styled.div<{ hasBorderRadius: boolean }>`
     css`
       ${media.greaterThan('md')`
       border-radius: ${theme.components.bifrost.dialog.borderRadius};
-      overflow: hidden;
     `}
     `}
 `;
