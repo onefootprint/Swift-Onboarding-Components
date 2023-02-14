@@ -2,20 +2,21 @@ import { media } from '@onefootprint/ui';
 import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import FootprintFooter, { FootprintFooterVariant } from '../footprint-footer';
 import NavigationHeaderContainer from '../navigation-header/components/navigation-header-container';
 import SandboxBanner, { SandboxBannerHandler } from '../sandbox-banner';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
 
 type LayoutProps = {
   children: React.ReactNode;
-  footer: React.ReactNode;
+  footerVariant: FootprintFooterVariant;
   isSandbox?: boolean;
   hasBorderRadius?: boolean;
 };
 
 const Layout = ({
   children,
-  footer,
+  footerVariant,
   isSandbox,
   hasBorderRadius = false,
 }: LayoutProps) => {
@@ -41,7 +42,7 @@ const Layout = ({
         />
       </Header>
       <Body>{children}</Body>
-      {footer}
+      <FootprintFooter variant={footerVariant} />
     </Container>
   );
 };

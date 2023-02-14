@@ -1,6 +1,5 @@
-import { Layout, SecuredByFootprint } from '@onefootprint/footprint-elements';
+import { Layout } from '@onefootprint/footprint-elements';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import useSandboxMode from '../../hooks/use-sandbox-mode';
 
@@ -14,26 +13,10 @@ const HandoffLayout = ({ children }: LayoutProps) => {
   const { isSandbox } = useSandboxMode();
 
   return (
-    <Layout
-      isSandbox={isSandbox}
-      footer={
-        <Footer>
-          <SecuredByFootprint />
-        </Footer>
-      }
-    >
+    <Layout isSandbox={isSandbox} footerVariant="mobile">
       {children}
     </Layout>
   );
 };
-
-const Footer = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[4]} ${theme.spacing[7]};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `}
-`;
 
 export default HandoffLayout;

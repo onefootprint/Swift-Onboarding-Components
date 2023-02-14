@@ -4,9 +4,16 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SecuredByFootprint from '../secured-by-footprint';
-import type { Link } from './footprint-footer.types';
 
-const FootprintFooter = () => {
+export type FootprintFooterVariant = 'modal' | 'mobile';
+
+type FootprintFooterProps = {
+  variant?: FootprintFooterVariant;
+};
+
+type Link = { label: string; href: string };
+
+const FootprintFooter = ({ variant = 'modal' }: FootprintFooterProps) => {
   const router = useRouter();
 
   const links: Link[] = [
@@ -23,7 +30,7 @@ const FootprintFooter = () => {
   ];
 
   return (
-    <FootprintFooterContainer>
+    <FootprintFooterContainer variant={variant}>
       <SecuredByFootprint />
       <LinksContainer>
         {links.map(({ href, label }) => (
@@ -40,15 +47,28 @@ const FootprintFooter = () => {
   );
 };
 
-const FootprintFooterContainer = styled.footer`
+const FootprintFooterContainer = styled.footer<{ variant: 'modal' | 'mobile' }>`
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.secondary};
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
   `}
+
+  ${({ variant, theme }) =>
+    variant === 'modal' &&
+    css`
+      background-color: ${theme.backgroundColor.secondary};
+      border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      flex-direction: row;
+    `}
+
+  ${({ variant, theme }) =>
+    variant === 'mobile' &&
+    css`
+      gap: ${theme.spacing[4]};
+      align-items: center;
+      flex-direction: column;
+    `}
 `;
 
 const LinksContainer = styled.ul`

@@ -1,4 +1,4 @@
-import { FootprintFooter, Layout } from '@onefootprint/footprint-elements';
+import { Layout } from '@onefootprint/footprint-elements';
 import React from 'react';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 
@@ -12,7 +12,7 @@ const BifrostLayout = ({ children }: LayoutProps) => {
   const { isSandbox } = useSandboxMode();
 
   return (
-    <Layout isSandbox={isSandbox} footer={<FootprintFooter />} hasBorderRadius>
+    <Layout isSandbox={isSandbox} footerVariant="modal" hasBorderRadius>
       {children}
     </Layout>
   );
