@@ -22,7 +22,7 @@ type FormData = Required<Pick<UserData, UserDataAttribute.phoneNumber>>;
 
 const PhoneRegistrationContent = () => {
   const [state, send] = useIdentifyMachine();
-  const { device } = state.context;
+  const { device, email } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
@@ -128,10 +128,17 @@ const PhoneRegistrationContent = () => {
     );
   };
 
+  const handleChangeEmail = () => {
+    send({ type: Events.emailChangeRequested });
+  };
+
   return (
     <>
       <PhoneRegistrationHeader />
-      <PhoneRegistrationEmailPreview />
+      <PhoneRegistrationEmailPreview
+        email={email}
+        onChange={handleChangeEmail}
+      />
       <PhoneRegistrationForm onSubmit={handleSubmit} isLoading={isLoading} />
     </>
   );

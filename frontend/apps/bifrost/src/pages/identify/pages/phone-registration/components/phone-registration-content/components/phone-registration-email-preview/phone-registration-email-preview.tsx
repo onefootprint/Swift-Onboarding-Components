@@ -2,17 +2,18 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoEmail24 } from '@onefootprint/icons';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
-import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
 import styled, { css } from 'styled-components';
 
-const PhoneRegistrationEmailPreview = () => {
-  const { t } = useTranslation('pages.phone-registration');
-  const [state, send] = useIdentifyMachine();
-  const { email } = state.context;
+export type PhoneRegistrationEmailPreviewProps = {
+  email?: string;
+  onChange: () => void;
+};
 
-  const handleChangeEmail = () => {
-    send({ type: Events.emailChangeRequested });
-  };
+const PhoneRegistrationEmailPreview = ({
+  email,
+  onChange,
+}: PhoneRegistrationEmailPreviewProps) => {
+  const { t } = useTranslation('pages.phone-registration');
 
   return email ? (
     <EmailCard>
@@ -24,7 +25,7 @@ const PhoneRegistrationEmailPreview = () => {
           {email}
         </Typography>
       </EmailCardContent>
-      <LinkButton size="compact" onClick={handleChangeEmail}>
+      <LinkButton size="compact" onClick={onChange}>
         {t('email-card.cta')}
       </LinkButton>
     </EmailCard>
