@@ -10,15 +10,14 @@ import useSendFingerprintPage from './hooks/use-send-fingerprint-page';
 
 type FingerprintProps = SDKIntegrationProps;
 
-const Fingerprint = ({ page, fpAuthToken }: FingerprintProps) => {
-  if (!FINGERPRINT_API_KEY) {
-    console.warn(
-      'Fingerprint API key is not available. Skipping Fingerprint SDK initialization',
-    );
-    return null;
-  }
+if (!FINGERPRINT_API_KEY) {
+  console.warn(
+    'Fingerprint API key is not available. Skipping Fingerprint SDK initialization',
+  );
+}
 
-  return (
+const Fingerprint = ({ page, fpAuthToken }: FingerprintProps) =>
+  FINGERPRINT_API_KEY ? (
     <FpjsProvider
       loadOptions={{
         apiKey: FINGERPRINT_API_KEY,
@@ -27,8 +26,8 @@ const Fingerprint = ({ page, fpAuthToken }: FingerprintProps) => {
     >
       <FingerprintIntegration page={page} fpAuthToken={fpAuthToken} />
     </FpjsProvider>
-  );
-};
+  ) : null;
+
 const FingerprintIntegration = ({ page, fpAuthToken }: FingerprintProps) => {
   const sendFingerprintPageMutation = useSendFingerprintPage(fpAuthToken);
   const { data } = useVisitorData();
