@@ -1,3 +1,4 @@
+import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheckCircle24,
@@ -7,10 +8,10 @@ import {
   IcoShield40,
 } from '@onefootprint/icons';
 import { Container, media, Typography } from '@onefootprint/ui';
+import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import SEO from '../../components/seo';
 import FeatureCard from './components/feature-card';
 import PartnersLogos from './components/partners-logos';
 
@@ -23,20 +24,33 @@ type TenantPageProps = {
 
 const TenantPage = ({ tenant }: TenantPageProps) => {
   const { t } = useTranslation('pages.tenant');
-  const tenantLogoUrl = tenant.logoUrl;
-  const tenantName = tenant.name;
 
   return (
     <>
-      <SEO title={t('html-title', { tenantName })} />
+      <Head>
+        <meta
+          property="og:title"
+          content={t('html-title', { tenantName: tenant.name })}
+        />
+        <meta property="og:description" content={t('html-description')} />
+        {tenant.logoUrl ? (
+          <meta
+            property="og:image"
+            content={`${FRONTPAGE_BASE_URL}/api/tenant-og?logo_url=${tenant.logoUrl}`}
+          />
+        ) : null}
+      </Head>
       <StyledContainer>
-        <PartnersLogos tenantName={tenantName} tenantLogoUrl={tenantLogoUrl} />
+        <PartnersLogos
+          tenantName={tenant.name}
+          tenantLogoUrl={tenant.logoUrl}
+        />
         <HeadingContainer>
           <Typography as="h1" variant="display-2">
             {t('title')}
           </Typography>
           <Typography as="p" variant="display-4" color="secondary">
-            {t('subtitle', { tenantName })}
+            {t('subtitle', { tenantName: tenant.name })}
           </Typography>
         </HeadingContainer>
         <FeaturesContainer>

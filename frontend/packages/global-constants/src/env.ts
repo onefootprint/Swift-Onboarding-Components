@@ -58,3 +58,9 @@ export const HANDOFF_BASE_URL = createGetProjectUrl({
   previewAlias: 'handoff',
   prodAlias: 'handoff',
 })(env, branchName);
+
+export const FRONTPAGE_BASE_URL = createGetProjectUrl({
+  port: '3003',
+  previewAlias: 'frontpage',
+  prodAlias: 'frontpage',
+})(env, branchName);
