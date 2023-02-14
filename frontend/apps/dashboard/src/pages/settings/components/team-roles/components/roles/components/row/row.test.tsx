@@ -6,11 +6,20 @@ import {
 } from '@onefootprint/test-utils';
 import { RoleScope } from '@onefootprint/types';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Row, { RowProps } from './row';
 import roleFixture from './row.test.config';
 
 describe('<Row />', () => {
+  beforeEach(() => {
+    asAdminUser();
+  });
+
+  afterAll(() => {
+    resetUser();
+  });
+
   const renderRow = ({ role = roleFixture }: Partial<RowProps>) => {
     customRender(
       <table>

@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Role } from '@onefootprint/types';
+import { Role, RoleScope } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
 import React, { useRef } from 'react';
+import PermissionGate from 'src/components/permission-gate';
 
 import Edit, { EditHandler } from './components/edit';
 import Remove, { RemoveHandler } from './components/remove';
@@ -28,9 +29,14 @@ const Actions = ({ role }: ActionsProps) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Dropdown.Root>
-        <Dropdown.Trigger aria-label={t('aria-label', { name })}>
-          <IcoDotsHorizontal24 />
-        </Dropdown.Trigger>
+        <PermissionGate
+          scope={RoleScope.orgSettings}
+          fallbackText={t('not-allowed')}
+        >
+          <Dropdown.Trigger aria-label={t('aria-label', { name })}>
+            <IcoDotsHorizontal24 />
+          </Dropdown.Trigger>
+        </PermissionGate>
         <Dropdown.Content align="end">
           <Dropdown.Item onSelect={handleEdit}>{t('edit')}</Dropdown.Item>
           <Dropdown.Item onSelect={handleRemove}>{t('remove')}</Dropdown.Item>

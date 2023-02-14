@@ -858,12 +858,14 @@
           "empty-state": "No roles found",
           "actions": {
             "aria-label": "Open actions for role {{name}}",
+            "not-allowed": "You are not allowed to manage roles",
             "remove": "Remove role",
             "edit": "Edit role"
           }
         },
         "create": {
           "title": "Create role",
+          "not-allowed": "You are not allowed to add roles",
           "notifications": {
             "success": {
               "title": "Role created",

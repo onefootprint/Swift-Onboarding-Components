@@ -10,6 +10,7 @@ import {
 } from '@onefootprint/test-utils';
 import { Role, RoleScope } from '@onefootprint/types';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Roles from './roles';
 import {
@@ -33,6 +34,7 @@ const testDate = new Date('2023-01-19T14:10:20.503Z');
 
 describe('<Roles />', () => {
   beforeEach(() => {
+    asAdminUser();
     useRouterSpy({
       pathname: '/settings',
       query: {
@@ -47,6 +49,7 @@ describe('<Roles />', () => {
 
   afterAll(() => {
     MockDate.reset();
+    resetUser();
   });
 
   const renderRoles = () =>
