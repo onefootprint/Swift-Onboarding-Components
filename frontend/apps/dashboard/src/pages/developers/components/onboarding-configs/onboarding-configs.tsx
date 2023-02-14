@@ -1,7 +1,9 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import { RoleScope } from '@onefootprint/types';
 import { Box, Button, Typography } from '@onefootprint/ui';
 import React from 'react';
+import PermissionGate from 'src/components/permission-gate';
 import styled from 'styled-components';
 
 import CreateDialog from './components/create-onboarding-config';
@@ -11,9 +13,9 @@ import OnboardingConfigsLoading from './components/onboarding-configs-loading';
 import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
 const OnboardingConfigs = () => {
+  const { t } = useTranslation('pages.developers.onboarding-configs');
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
-  const { t } = useTranslation('pages.developers.onboarding-configs');
   const { data, error, isLoading, refetch } = useOnboardingConfigs();
 
   return (
@@ -25,9 +27,14 @@ const OnboardingConfigs = () => {
           </Typography>
           <Typography variant="body-3">{t('header.subtitle')}</Typography>
         </Box>
-        <Button onClick={openCreateDialog} variant="secondary" size="small">
-          {t('header.cta')}
-        </Button>
+        <PermissionGate
+          fallbackText={t('header.cta-not-allowed')}
+          scope={RoleScope.onboardingConfiguration}
+        >
+          <Button onClick={openCreateDialog} variant="secondary" size="small">
+            {t('header.cta')}
+          </Button>
+        </PermissionGate>
       </Header>
       <Box sx={{ marginY: 5 }} />
       {data && <OnboardingConfigsData data={data} />}

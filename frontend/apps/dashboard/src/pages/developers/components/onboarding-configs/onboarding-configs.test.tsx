@@ -7,6 +7,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import OnboardingConfigs from './onboarding-configs';
 import {
@@ -21,6 +22,14 @@ describe('<OnboardingConfigs />', () => {
   const renderOnboardingConfigs = () => {
     customRender(<OnboardingConfigs />);
   };
+
+  beforeEach(() => {
+    asAdminUser();
+  });
+
+  afterAll(() => {
+    resetUser();
+  });
 
   describe('list the api keys', () => {
     describe('when the request fails', () => {

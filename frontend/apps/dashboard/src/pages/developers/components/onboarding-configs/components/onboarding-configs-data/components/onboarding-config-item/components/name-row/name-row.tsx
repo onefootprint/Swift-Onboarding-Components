@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil16 } from '@onefootprint/icons';
-import { OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig, RoleScope } from '@onefootprint/types';
 import { IconButton, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
+import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
 import useUpdateOnboardingConfig from '../../hooks/use-update-onboarding-config';
@@ -36,15 +37,20 @@ const NameRow = ({ data, onEdit }: NameRowProps) => {
       </th>
       <th>&nbsp;</th>
       <th>
-        <LinkButton
-          onClick={toggleStatus}
-          size="tiny"
-          variant={status === 'enabled' ? 'destructive' : 'default'}
+        <PermissionGate
+          fallbackText={t('toggle-status.not-allowed')}
+          scope={RoleScope.onboardingConfiguration}
         >
-          {status === 'enabled'
-            ? t('toggle-status.disable')
-            : t('toggle-status.enable')}
-        </LinkButton>
+          <LinkButton
+            onClick={toggleStatus}
+            size="tiny"
+            variant={status === 'enabled' ? 'destructive' : 'default'}
+          >
+            {status === 'enabled'
+              ? t('toggle-status.disable')
+              : t('toggle-status.enable')}
+          </LinkButton>
+        </PermissionGate>
       </th>
     </tr>
   );

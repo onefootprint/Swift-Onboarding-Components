@@ -629,7 +629,8 @@
         "header": {
           "title": "Onboarding configurations",
           "subtitle": "Set up requirements for customers onboarding onto your platform.",
-          "cta": "Create onboarding config"
+          "cta": "Create onboarding config",
+          "cta-not-allowed": "You're not allowed to create API keys"
         },
         "list": {
           "no-results": "You haven't created any onboarding configurations just yet."
@@ -640,7 +641,8 @@
           "edit": "Edit onboarding config",
           "toggle-status": {
             "disable": "Disable",
-            "enable": "Enable"
+            "enable": "Enable",
+            "not-allowed": "You're not allowed to manage onboarding configs"
           },
           "required-data": {
             "label": "Required data to be collected",
