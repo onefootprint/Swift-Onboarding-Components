@@ -1,79 +1,60 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { Box, Toggle, Tooltip, Typography } from '@onefootprint/ui';
+import { useQueryState, useTranslation } from '@onefootprint/hooks';
+import { Tab, Tabs } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
-import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 import ApiKeys from './components/api-keys';
+import Header from './components/header';
 import OnboardingConfigs from './components/onboarding-configs';
+
+enum TabName {
+  apiKeys = 'api_keys',
+  onboardingConfigs = 'onboarding_configs',
+}
 
 const Developers = () => {
   const { t } = useTranslation('pages.developers');
-  const { sandbox } = useOrgSession();
+  const [tab, setTab] = useQueryState<TabName>({
+    query: 'tab',
+    defaultValue: TabName.apiKeys,
+  });
+  const tabs = [
+    { label: t('tabs.api-keys'), value: TabName.apiKeys },
+    { label: t('tabs.onboarding-configs'), value: TabName.onboardingConfigs },
+  ];
 
   return (
     <>
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Header>
-        <Box>
-          <Typography variant="heading-3" as="h2" sx={{ marginBottom: 2 }}>
-            {t('header.title')}
-          </Typography>
-          <Typography
-            variant="body-2"
-            color={sandbox.isSandbox ? 'warning' : 'success'}
+      <Header />
+      <Tabs variant="underlined">
+        {tabs.map(({ value, label }) => (
+          <Tab
+            as="button"
+            key={value}
+            onClick={() => setTab(value)}
+            selected={tab === value}
           >
-            {sandbox.isSandbox
-              ? t('header.subtitle.sandbox')
-              : t('header.subtitle.live')}
-          </Typography>
-        </Box>
-        <ToggleContainer>
-          <Tooltip
-            disabled={sandbox.canToggle}
-            size="compact"
-            text={t('header.toggle-sandbox.tooltip')}
-          >
-            <Box>
-              <Toggle
-                checked={sandbox.isSandbox}
-                disabled={!sandbox.canToggle}
-                label={t('header.toggle-sandbox.label')}
-                onChange={sandbox.toggle}
-              />
-            </Box>
-          </Tooltip>
-        </ToggleContainer>
-      </Header>
-      <Box sx={{ marginBottom: 9 }}>
-        <ApiKeys />
-      </Box>
-      <Box sx={{ marginBottom: 9 }} />
-      <Box>
-        <OnboardingConfigs />
-      </Box>
+            {label}
+          </Tab>
+        ))}
+      </Tabs>
+      <Content>
+        {tab === TabName.apiKeys && <ApiKeys />}
+        {tab === TabName.onboardingConfigs && <OnboardingConfigs />}
+      </Content>
     </>
   );
 };
 
-const Header = styled.header`
+const Content = styled.div`
   ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: ${theme.spacing[9]};
-  `};
-`;
-
-const ToggleContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    gap: ${theme.spacing[3]};
-  `};
+    width: 100%;
+    margin-top: ${theme.spacing[9]};
+  `}
 `;
 
 export default Developers;

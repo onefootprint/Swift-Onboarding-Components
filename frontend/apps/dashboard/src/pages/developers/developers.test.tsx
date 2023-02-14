@@ -1,4 +1,5 @@
 import {
+  createUseRouterSpy,
   customRender,
   screen,
   userEvent,
@@ -15,10 +16,18 @@ import {
 import Developers from './developers';
 import { withApiKeys, withOnboardingConfigs } from './developers.test.config';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<Developers />', () => {
   beforeEach(() => {
     withApiKeys();
     withOnboardingConfigs();
+    useRouterSpy({
+      pathname: '/developers',
+      query: {
+        tab: 'api_keys',
+      },
+    });
   });
 
   afterAll(() => {

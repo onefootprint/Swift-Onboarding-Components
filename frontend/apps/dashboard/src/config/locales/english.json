@@ -569,6 +569,10 @@
           "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
         }
       },
+      "tabs": {
+        "api-keys": "Secret API Keys",
+        "onboarding-configs": "Onboarding configurations"
+      },
       "api-keys": {
         "header": {
           "title": "Secret API Keys",
