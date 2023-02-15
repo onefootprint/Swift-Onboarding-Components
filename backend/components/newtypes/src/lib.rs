@@ -275,6 +275,7 @@ pub mod util {
                 .unwrap_or_else(|_| "postgresql://localhost/footprint_db".to_string());
 
             let mut connection = PgConnection::establish(&db_url).expect("failed to connect to db");
+            connection.begin_test_transaction().unwrap();
 
             connection
                 .batch_execute(
