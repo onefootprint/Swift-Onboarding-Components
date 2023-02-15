@@ -29,7 +29,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
         data_lifetime, fingerprint, manual_review, onboarding, onboarding_decision, scoped_user, user_vault,
     };
     let authorized_ids = onboarding::table
-        .filter(onboarding::is_authorized.eq(true))
+        .filter(not(onboarding::authorized_at.is_null()))
         .select(onboarding::scoped_user_id)
         .distinct();
 

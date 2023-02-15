@@ -29,18 +29,18 @@ pub fn build_verification_requests_and_checkpoint(
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     let ob = Onboarding::lock(conn, ob_id)?;
     // Can only initiate IDV reqs one time for an onboarding
-    // Once we set idv_reqs_initiated below, this lock will make sure we can't save multiple sets of VerificationRequests
+    // Once we set idv_reqs_initiated_at below, this lock will make sure we can't save multiple sets of VerificationRequests
     // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
-    if ob.idv_reqs_initiated {
+    if ob.idv_reqs_initiated_at.is_some() {
         // In the case of a step up (for similar race condition related reasons) we notate on the OB whether we _do_ need
         // to produce a new decision, despite not needing to initiate verification requests again.
-        if !ob.has_final_decision {
+        if ob.decision_made_at.is_none() {
             return Ok(vec![]);
         } else {
             return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
         }
     }
-    // Always set the idv_reqs_initiated to true in order to checkpoint
+    // Always set the idv_reqs_initiated_at in order to checkpoint
     let ob = ob.into_inner();
     ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
     // From the data in the vault, figure out which vendors we need to send to

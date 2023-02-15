@@ -52,7 +52,7 @@ pub async fn create_final_decision(
             let scoped_user = ScopedUser::get(conn, &ob.scoped_user_id)?;
 
             // prevent race conditions from producing 2 decisions
-            if ob.has_final_decision {
+            if ob.decision_made_at.is_some() {
                 return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
             }
 

@@ -78,9 +78,10 @@ pub async fn post(
             user_auth.update_session(conn, &session_key, data)?;
 
             // If the user has already onboarded onto this same ob config, return a validation token
-            let validation_token =
-                ob.is_authorized
-                    .then_some(create_onboarding_validation_token(conn, &session_key, ob.id)?);
+            let validation_token = ob
+                .authorized_at
+                .map(|_| create_onboarding_validation_token(conn, &session_key, ob.id))
+                .transpose()?;
 
             Ok(validation_token)
         })

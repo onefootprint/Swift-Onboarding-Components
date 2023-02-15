@@ -22,7 +22,7 @@ pub fn pre_add_data_checks(
         return Err(UserError::NotAllowedWithoutTenant.into());
     };
     if let Some(ob) = user_auth.onboarding(conn)? {
-        if ob.onboarding.idv_reqs_initiated {
+        if ob.onboarding.idv_reqs_initiated_at.is_some() {
             // One day, we'll want to allow editing data after IDV reqs are initiated ONLY
             // when KYC checks don't pass and we want the user to update their info.
             // Until then, this introduces a race condition where we could commit data that

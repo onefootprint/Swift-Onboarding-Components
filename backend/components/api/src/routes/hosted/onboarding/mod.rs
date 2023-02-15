@@ -105,7 +105,8 @@ pub fn get_requirements(
     //   2. we need to re-run the decision engine to produce a decision after a step up (!has_final_decision)\
     //
     // TODO this is slightly overloaded and maybe we need another requirement?
-    let identity_check_required = !(onboarding.idv_reqs_initiated && onboarding.has_final_decision);
+    let identity_check_required =
+        !(onboarding.idv_reqs_initiated_at.is_some() && onboarding.decision_made_at.is_some());
 
     let requirements = vec![
         (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData { missing_attributes }),

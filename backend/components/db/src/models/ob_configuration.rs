@@ -6,6 +6,7 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
+use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -141,7 +142,7 @@ impl ObConfiguration {
         let obcs = ob_configuration::table
             .inner_join(onboarding::table)
             .filter(onboarding::scoped_user_id.eq(scoped_user_id))
-            .filter(onboarding::is_authorized.eq(true))
+            .filter(not(onboarding::authorized_at.is_null()))
             .select(ob_configuration::all_columns)
             .get_results(conn)?;
         Ok(obcs)
@@ -156,7 +157,7 @@ impl ObConfiguration {
         let obcs: HashMap<ScopedUserId, Vec<Self>> = ob_configuration::table
             .inner_join(onboarding::table)
             .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
-            .filter(onboarding::is_authorized.eq(true))
+            .filter(not(onboarding::authorized_at.is_null()))
             .select((onboarding::scoped_user_id, ob_configuration::all_columns))
             .get_results::<(ScopedUserId, ObConfiguration)>(conn)?
             .into_iter()

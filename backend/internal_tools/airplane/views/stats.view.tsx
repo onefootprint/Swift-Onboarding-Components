@@ -41,7 +41,7 @@ const Stats = () => {
           SELECT count(*) FROM onboarding 
           INNER JOIN scoped_user on scoped_user.id = onboarding.scoped_user_id
           INNER JOIN tenant on tenant.id = scoped_user.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_user.is_live = true AND onboarding.is_authorized = true;
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_user.is_live = true AND onboarding.authorized_at IS NOT NULL;
           `}
         ></OverviewCard>
       </Stack>

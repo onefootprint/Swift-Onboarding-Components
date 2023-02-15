@@ -58,7 +58,7 @@ const OrgList = () => {
           FROM tenant
             INNER JOIN scoped_user as su ON su.tenant_id=tenant.id
             INNER JOIN onboarding as ob ON ob.scoped_user_id=su.id
-          WHERE tenant.id NOT LIKE '_private_it%' and ob.is_authorized='t'            
+          WHERE tenant.id NOT LIKE '_private_it%' and ob.authorized_at IS NOT NULL
           GROUP BY tenant.id;
           `,
         },

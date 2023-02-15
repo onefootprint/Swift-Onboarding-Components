@@ -30,9 +30,6 @@ pub struct Onboarding {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
-    pub is_authorized: bool,
-    pub idv_reqs_initiated: bool,
-    pub has_final_decision: bool,
     pub authorized_at: Option<DateTime<Utc>>,
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
@@ -45,17 +42,11 @@ struct NewOnboarding {
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
-    is_authorized: bool,
-    idv_reqs_initiated: bool,
-    has_final_decision: bool,
 }
 
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = onboarding)]
 pub struct OnboardingUpdate {
-    is_authorized: Option<bool>,
-    idv_reqs_initiated: Option<bool>,
-    has_final_decision: Option<bool>,
     authorized_at: Option<Option<DateTime<Utc>>>,
     idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
     decision_made_at: Option<Option<DateTime<Utc>>>,
@@ -72,7 +63,6 @@ pub struct OnboardingCreateArgs {
 impl OnboardingUpdate {
     pub fn is_authorized(is_authorized: bool) -> Self {
         Self {
-            is_authorized: Some(is_authorized),
             authorized_at: Some(is_authorized.then_some(Utc::now())),
             ..Self::default()
         }
@@ -80,7 +70,6 @@ impl OnboardingUpdate {
 
     pub fn idv_reqs_initiated(idv_reqs_initiated: bool) -> Self {
         Self {
-            idv_reqs_initiated: Some(idv_reqs_initiated),
             idv_reqs_initiated_at: Some(idv_reqs_initiated.then_some(Utc::now())),
             ..Self::default()
         }
@@ -88,7 +77,6 @@ impl OnboardingUpdate {
 
     pub fn has_final_decision(has_final_decision: bool) -> Self {
         Self {
-            has_final_decision: Some(has_final_decision),
             decision_made_at: Some(has_final_decision.then_some(Utc::now())),
             ..Self::default()
         }
@@ -96,9 +84,7 @@ impl OnboardingUpdate {
 
     pub fn idv_reqs_and_has_final_decision(has_final_decision: bool, idv_reqs_initiated: bool) -> Self {
         Self {
-            idv_reqs_initiated: Some(idv_reqs_initiated),
             idv_reqs_initiated_at: Some(idv_reqs_initiated.then_some(Utc::now())),
-            has_final_decision: Some(has_final_decision),
             decision_made_at: Some(has_final_decision.then_some(Utc::now())),
             ..Self::default()
         }
@@ -323,9 +309,6 @@ impl Onboarding {
             ob_configuration_id: args.ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
-            is_authorized: false,
-            idv_reqs_initiated: false,
-            has_final_decision: false,
         };
         let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)

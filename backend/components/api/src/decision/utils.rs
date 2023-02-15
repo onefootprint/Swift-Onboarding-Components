@@ -170,7 +170,7 @@ async fn setup_test_fixtures(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &ob_id)?;
-            if ob.idv_reqs_initiated {
+            if ob.idv_reqs_initiated_at.is_some() {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
 
