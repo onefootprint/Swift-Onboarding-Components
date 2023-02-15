@@ -30,9 +30,9 @@ config:
         secure: v1:VdwOY1dTgkXEMk4W:i3PexS68jj8BwxdeHPPugmMQdl6ygvRTfBXb3K60uQwpJnuMy3N1HEERTa3t0tM2PBSJZbhCobPfOq2LtQG7ALfSKn32zpU75nujiT5KViRm7ZJWNHmaJ0kl15WZj/gRr/tvLsupnW8U/E3hAfkQoqN/IknVqW3qjeQdlL3oP88QHce1PBbAQM+oepcJlLFNrrVgaHdEqwsZJn/4
     idology:
       password:
-        secure: v1:0T7JXcOqCj/ALDLA:SdlXHzzLhRKqtndyJ/vVcsSuVsrplD0jJcKJ0h2yJf1eWclnEjxT6P5R0sTV+3JyX6Avsd9mFGNElFlHgJpQ
+        secure: v1:TBB0qHiZFw3gwDSW:nXXk0InuunaS/PY9J/bvSwVW4tD5OSFbtkrWWKm03o9FlvUePlLzFzgPoe5bixLpYr+Nb88rj5bJhtYRmUw=
       username:
-        secure: v1:HsF1HEg79e8expaz:fokpqJA0wJKs6QToHPa/vAlaprFGXLJ6EvyiFPn2
+        secure: v1:eE5PgSdUCZgqxINP:UskiQw508mR4BiZs+8NX5pxZYJEbIeQULdqjbURx0opNjV5SHA0E
     launchDarkly:
       launchDarklySdkKey:
         secure: v1:dciHCf/fftQ6m3Ow:1DK10r1oCUFAP3D/KPb+MNTlmPe+0d6g2kkuB8xWetrlK8M5baXgcdsVD5+iOn4ms07N/1CLVVo=
@@ -56,22 +56,22 @@ config:
         secure: v1:qvdpWPO/cjNqw2E9:8M9wZQ9/AzdQJEAg/sDilSmjFpzmQDqBHkbNrg7idxWmtFNlW95Mdkoj+VMkW1n33iRlzQ==
       sandboxApiKey:
         secure: v1:E/Vv2txLN2q/bNr8:dTiRlaKK+HXTMsYVV4xUwg4V3MUNBBMd52Q9iP6UKW3HjbyLAQTvO1T67TbUHu16+mKE8g==
+    svix:
+      authToken:
+        secure: v1:62LpQHhq4cJ7TcAM:1pW6m/ihRXBX0d9wzlYpR3EMilk0E95608Zq9RPCrcFITw6rk7tlGKN1LMitafcFkvJ3IANJ8rj7ww==
     twilio:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
-    svix:
-      authToken:
-        secure: v1:62LpQHhq4cJ7TcAM:1pW6m/ihRXBX0d9wzlYpR3EMilk0E95608Zq9RPCrcFITw6rk7tlGKN1LMitafcFkvJ3IANJ8rj7ww==
   infra:serverTailscaleKey:
     secure: v1:YBhIVkjgy+ZPhPEJ:+AT6qs41kdA+kWaQUhMooSAC9ETulX8+7EX6MIpJR/gAQxEDlrCORv4oorz061KD5xwljnJ4pbPwPiaG5XUcRuCG+SwR2sKg6g==
   infra:tailscaleKey:
