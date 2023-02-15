@@ -409,6 +409,7 @@
           }
         },
         "controls": {
+          "not-allowed": "You're not allowed to decrypt data",
           "start": "Decrypt data",
           "next": "Continue",
           "cancel": "Cancel"

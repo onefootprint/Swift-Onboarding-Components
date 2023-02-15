@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Button } from '@onefootprint/ui';
+import { Box, Button, Tooltip } from '@onefootprint/ui';
 import React from 'react';
+import usePermissions from 'src/hooks/use-permissions';
 
 import { Event, State } from '../../../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../../../decrypt-machine-provider';
@@ -8,8 +9,8 @@ import DecryptReasonDialog from '../decrypt-reason-dialog';
 
 const DecryptControls = () => {
   const { t } = useTranslation('pages.user-details.decrypt.controls');
+  const { canDecrypt } = usePermissions();
   const [state, send] = useDecryptMachine();
-
   const decryptReasonDialogOpen =
     state.matches(State.confirmingReason) || state.matches(State.decrypting);
   const decryptSelectionInProgress =
@@ -30,9 +31,18 @@ const DecryptControls = () => {
   return (
     <>
       {decryptIdle && (
-        <Button size="small" variant="secondary" onClick={handleStart}>
-          {t('start')}
-        </Button>
+        <Tooltip disabled={canDecrypt} text={t('not-allowed')}>
+          <Box>
+            <Button
+              disabled={!canDecrypt}
+              onClick={handleStart}
+              size="small"
+              variant="secondary"
+            >
+              {t('start')}
+            </Button>
+          </Box>
+        </Tooltip>
       )}
       {decryptSelectionInProgress && (
         <Box sx={{ display: 'flex', gap: 3 }}>
