@@ -1,0 +1,1 @@
+ALTER TABLE TENANT ADD COLUMN stripe_customer_id TEXT;

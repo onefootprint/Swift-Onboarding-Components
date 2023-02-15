@@ -84,6 +84,7 @@ define_newtype_id!(
 
 // define our raw ids here
 define_newtype_id!(TenantId, String, "Identifier for a Org");
+define_newtype_id!(StripeCustomerId, String, "Identifier for stripe customer");
 define_newtype_id!(TenantRoleId, String, "Identifier for a Org role");
 define_newtype_id!(TenantRolebindingId, String, "Identifier for a Org rolebinding");
 define_newtype_id!(TenantUserId, String, "Identifier for a Org user");

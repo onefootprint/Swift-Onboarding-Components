@@ -489,6 +489,7 @@ table! {
         website_url -> Nullable<Text>,
         company_size -> Nullable<Text>,
         privacy_policy_url -> Nullable<Text>,
+        stripe_customer_id -> Nullable<Text>,
     }
 }
 

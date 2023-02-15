@@ -1,0 +1,1 @@
+ALTER TABLE TENANT DROP COLUMN stripe_customer_id;

@@ -8,7 +8,9 @@ use diesel::prelude::*;
 use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
-use newtypes::{CompanySize, EncryptedVaultPrivateKey, TenantId, UserVaultId, VaultPublicKey};
+use newtypes::{
+    CompanySize, EncryptedVaultPrivateKey, StripeCustomerId, TenantId, UserVaultId, VaultPublicKey,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -26,6 +28,7 @@ pub struct Tenant {
     pub website_url: Option<String>,
     pub company_size: Option<CompanySize>,
     pub privacy_policy_url: Option<String>,
+    pub stripe_customer_id: Option<StripeCustomerId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
