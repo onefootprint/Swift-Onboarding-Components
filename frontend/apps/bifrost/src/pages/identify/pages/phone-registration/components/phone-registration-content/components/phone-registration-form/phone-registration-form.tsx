@@ -3,10 +3,8 @@ import { UserDataAttribute } from '@onefootprint/types';
 import { Button, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '../../../../../../hooks/use-identify-machine';
 import {
   PHONE_REGEX,
   PHONE_SANDBOX_REGEX,
@@ -16,18 +14,19 @@ type FormData = {
   [UserDataAttribute.phoneNumber]: string;
 };
 
-type PhoneRegistrationFormProps = {
-  isLoading: boolean;
+export type PhoneRegistrationFormProps = {
+  defaultPhone?: string;
+  isLoading?: boolean;
+  isSandbox?: boolean;
   onSubmit: (formData: FormData) => void;
 };
 
 const PhoneRegistrationForm = ({
   isLoading,
+  defaultPhone,
+  isSandbox,
   onSubmit,
 }: PhoneRegistrationFormProps) => {
-  const { isSandbox } = useSandboxMode();
-  const [state] = useIdentifyMachine();
-  const { phone } = state.context;
   const { t } = useTranslation('pages.phone-registration.form');
   const {
     setValue,
@@ -37,7 +36,7 @@ const PhoneRegistrationForm = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.phoneNumber]: phone,
+      [UserDataAttribute.phoneNumber]: defaultPhone,
     },
   });
 

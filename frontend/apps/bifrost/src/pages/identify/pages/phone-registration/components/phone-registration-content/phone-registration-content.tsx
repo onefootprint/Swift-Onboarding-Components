@@ -12,6 +12,7 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
+import useSandboxMode from 'src/hooks/use-sandbox-mode/use-sandbox-mode';
 
 import { useLoginChallengePicker } from '../../../../components/login-challenge-picker/login-challenge-picker-provider';
 import PhoneRegistrationEmailPreview from './components/phone-registration-email-preview';
@@ -21,8 +22,9 @@ import PhoneRegistrationHeader from './components/phone-registration-header';
 type FormData = Required<Pick<UserData, UserDataAttribute.phoneNumber>>;
 
 const PhoneRegistrationContent = () => {
+  const { isSandbox } = useSandboxMode();
   const [state, send] = useIdentifyMachine();
-  const { device, email } = state.context;
+  const { device, phone, email } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
@@ -66,9 +68,9 @@ const PhoneRegistrationContent = () => {
     );
   };
 
-  const requestSignupChallenge = (phone: string) => {
+  const requestSignupChallenge = (phoneNumber: string) => {
     signupChallengeMutation.mutate(
-      { phoneNumber: phone },
+      { phoneNumber },
       {
         onSuccess({ challengeData }) {
           send({
@@ -139,7 +141,12 @@ const PhoneRegistrationContent = () => {
         email={email}
         onChange={handleChangeEmail}
       />
-      <PhoneRegistrationForm onSubmit={handleSubmit} isLoading={isLoading} />
+      <PhoneRegistrationForm
+        isSandbox={isSandbox}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+        defaultPhone={phone}
+      />
     </>
   );
 };
