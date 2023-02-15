@@ -1,5 +1,5 @@
 from tests.constants import SVIX_AUTH_TOKEN
-from tests.utils import HttpError, create_sandbox_user
+from tests.utils import EXPECTED_SERVER_VERSION_GIT_HASH, HttpError, create_sandbox_user
 from tests.utils import get
 import requests
 from svix.api import Svix, ApplicationIn, EndpointIn
@@ -26,7 +26,12 @@ def test_webhook_e2e(sandbox_tenant, twilio):
     assert app.id == app_id  # ensure that we're creating app id's in svix properly
 
     hooky_url = create_hooky_url()
-    svix.endpoint.create(app.id, EndpointIn(url=hooky_url, version=1))
+    channels = (
+        [EXPECTED_SERVER_VERSION_GIT_HASH] if EXPECTED_SERVER_VERSION_GIT_HASH else None
+    )
+    svix.endpoint.create(
+        app.id, EndpointIn(url=hooky_url, version=1, channels=channels)
+    )
 
     # 3. fire off a codepath that triggers the webhook (i.e. an onboarding)
     user = create_sandbox_user(sandbox_tenant, twilio)

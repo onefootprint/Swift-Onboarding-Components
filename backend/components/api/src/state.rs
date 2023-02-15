@@ -8,6 +8,7 @@ use crate::{
     s3,
     signed_hash::SignedHashClient,
     utils::{email::SendgridClient, twilio::TwilioClient},
+    GIT_HASH,
 };
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
@@ -101,8 +102,10 @@ impl State {
             SocureClient::new(config.socure_config.production_api_key.clone(), false)
                 .expect("failed to build socure certification client");
 
-        let webhook_service_client = webhooks::WebhookServiceClient::new(&config.svix_auth_token);
-
+        let webhook_service_client = webhooks::WebhookServiceClient::new(
+            &config.svix_auth_token,
+            vec![&GIT_HASH, &config.service_config.environment],
+        );
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await

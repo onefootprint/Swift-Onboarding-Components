@@ -11,6 +11,7 @@ from tests.constants import (
     TENANT_ID2,
 )
 from tests.utils import (
+    EXPECTED_SERVER_VERSION_GIT_HASH,
     IncorrectServerVersion,
     create_sandbox_user,
     _make_request,
@@ -25,7 +26,7 @@ def wait_for_deploy():
     """
     Run once per test session to make sure that the correct version of code is deployed
     """
-    expected_version = os.environ.get("EXPECTED_SERVER_VERSION", None)
+    expected_version = EXPECTED_SERVER_VERSION_GIT_HASH
     if not expected_version:
         # Running locally, no need to wait for server version
         return

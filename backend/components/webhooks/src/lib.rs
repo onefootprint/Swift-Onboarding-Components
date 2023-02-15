@@ -9,6 +9,7 @@ pub mod events;
 #[derive(Clone)]
 pub struct WebhookServiceClient {
     auth_token: String,
+    channels: Vec<String>,
 }
 impl Debug for WebhookServiceClient {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -26,9 +27,10 @@ pub enum Error {
 }
 
 impl WebhookServiceClient {
-    pub fn new(auth_token: &str) -> Self {
+    pub fn new(auth_token: &str, channels: Vec<&str>) -> Self {
         Self {
             auth_token: auth_token.to_string(),
+            channels: channels.into_iter().map(|s| s.to_string()).collect(),
         }
     }
 
@@ -95,7 +97,8 @@ impl WebhookServiceClient {
                 MessageIn {
                     event_type: event.event_type(),
                     payload: serde_json::to_value(&event)?,
-                    ..MessageIn::default()
+                    channels: Some(self.channels.clone()),
+                    ..Default::default()
                 },
                 idempotency_key.map(|ik| PostOptions {
                     idempotency_key: Some(ik),

@@ -14,6 +14,7 @@ from tests.constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER, TEST_URL
 url = lambda path: "{}/{}".format(TEST_URL, path)
 
 SERVER_VERSION_HEADER = "x-footprint-server-version"
+EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", None)
 
 
 class HttpError(Exception):
@@ -36,7 +37,7 @@ def _make_request(method, path, data, params, status_code, auths, files):
             response.status_code,
             f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nResponse: {response.content}",
         )
-    expected_version = os.environ.get("EXPECTED_SERVER_VERSION", None)
+    expected_version = EXPECTED_SERVER_VERSION_GIT_HASH
     actual_version = response.headers.get(SERVER_VERSION_HEADER)
     if expected_version and actual_version != expected_version:
         raise IncorrectServerVersion(expected_version, actual_version)
