@@ -30,6 +30,15 @@ jobs:
     steps:
       - run: echo "Not required"
 
+  typecheck:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+
   format:
     runs-on: ${{ matrix.os }}
     strategy:
