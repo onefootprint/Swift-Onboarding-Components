@@ -318,6 +318,16 @@ export abstract class ServiceContainers {
                 value: nitroService.serviceEndpoint,
               },
             ],
+            healthCheck: {
+              command: [
+                'CMD-SHELL',
+                `curl -f http://localhost:${appPort}/health || exit 1`,
+              ],
+              interval: 5,
+              retries: 3,
+              startPeriod: 30,
+              timeout: 5,
+            },
             dependsOn: [
               {
                 containerName: traceOtelCollectorContainerName,
@@ -334,7 +344,7 @@ export abstract class ServiceContainers {
             logConfiguration: {
               logDriver: 'awslogs',
               options: {
-                'awslogs-group': `/ecs/${name}_logs`,
+                'awslogs-group': `/ecs/${name}-${metadata.shortStackName}-logs`,
                 'awslogs-region': `${region}`,
                 'awslogs-create-group': 'true',
                 'awslogs-stream-prefix': 'ecs',

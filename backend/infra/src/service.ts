@@ -124,7 +124,7 @@ export async function CreateApiService(
       requiresCompatibilities: ['FARGATE'],
       executionRoleArn: execRole.arn,
       taskRoleArn: taskRoleRole.arn,
-      family: `fpc-task-family`,
+      family: `fpc-${stackMetadata.shortStackName}`,
       containerDefinitions,
     },
     { provider, dependsOn: [cluster] },
