@@ -28,6 +28,7 @@
 //!   for example, `CDO::Name` cannot be collected without collecting _both_ `IDK::FirstName` and
 //!   `IDK::LastName`.
 
+mod business_data_kind;
 mod collected_data;
 mod data_lifetime_kind;
 mod id_doc_kind;
@@ -35,7 +36,8 @@ mod identity_data_kind;
 mod uvd_kind;
 
 pub use self::{
-    collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*, uvd_kind::*,
+    business_data_kind::*, collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*,
+    uvd_kind::*,
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
@@ -75,6 +77,7 @@ pub enum DataIdentifier {
     Custom(KvDataKey),
     IdDocument(IdDocKind),
     Selfie(IdDocKind),
+    Business(BusinessDataKind),
 }
 
 string_api_data_type_alias!(DataIdentifier);
@@ -101,6 +104,7 @@ impl std::fmt::Display for DataIdentifier {
             Self::Custom(s) => s.to_string(),
             Self::IdDocument(s) => s.to_string(),
             Self::Selfie(s) => s.to_string(),
+            Self::Business(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -133,6 +137,9 @@ impl FromStr for DataIdentifier {
             DataIdentifierDiscriminants::Selfie => {
                 Self::Selfie(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
+            DataIdentifierDiscriminants::Business => {
+                Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
         };
         Ok(result)
     }
@@ -151,6 +158,8 @@ mod tests {
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataIdentifier::IdDocument(IdDocKind::IdCard) => "id_document.id_card")]
     #[test_case(DataIdentifier::Selfie(IdDocKind::IdCard) => "selfie.id_card")]
+    #[test_case(DataIdentifier::Business(BusinessDataKind::Ein) => "business.ein")]
+    #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -162,6 +171,8 @@ mod tests {
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
     #[test_case("id_document.driver_license" => DataIdentifier::IdDocument(IdDocKind::DriverLicense))]
     #[test_case("selfie.passport" => DataIdentifier::Selfie(IdDocKind::Passport))]
+    #[test_case("business.ein" => DataIdentifier::Business(BusinessDataKind::Ein))]
+    #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

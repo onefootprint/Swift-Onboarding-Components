@@ -24,6 +24,7 @@ impl UserVaultWrapper {
                 // Decrypt key here
                 DataIdentifier::IdDocument(_) => todo!(),
                 DataIdentifier::Selfie(_) => todo!(),
+                DataIdentifier::Business(_) => todo!(),
             }
             .map(|e_data| (di.clone(), e_data))
         }))

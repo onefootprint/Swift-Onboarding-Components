@@ -113,6 +113,7 @@ impl IsGuardMet for CanDecrypt {
             DataIdentifier::IdDocument(_) => Right(token_scopes.contains(&TenantScope::DecryptDocuments)),
             // For now, permissions to decrypt documents gives permissions to decrypt selfies
             DataIdentifier::Selfie(_) => Right(token_scopes.contains(&TenantScope::DecryptDocuments)),
+            DataIdentifier::Business(_) => todo!(), // TODO: for now, no permissions setup for viewing Business data
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different

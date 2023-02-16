@@ -1,8 +1,6 @@
 use std::str::FromStr;
 
-use crate::{
-    errors::{proxy::VaultProxyError, ApiError},
-};
+use crate::errors::{proxy::VaultProxyError, ApiError};
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
 use newtypes::{DataIdentifier, FootprintUserId, ProxyToken, ProxyTokenError};
@@ -81,9 +79,10 @@ impl TryFrom<&str> for IngressRule {
         // TODO: support non-portable ID vaulting
         match proxy_token.identifier {
             DataIdentifier::Custom(_) => {}
-            DataIdentifier::Selfie(_) | DataIdentifier::Id(_) | DataIdentifier::IdDocument(_) => {
-                return Err(VaultProxyError::CannotProxyVaultNonCustomData)?
-            }
+            DataIdentifier::Selfie(_)
+            | DataIdentifier::Id(_)
+            | DataIdentifier::IdDocument(_)
+            | DataIdentifier::Business(_) => return Err(VaultProxyError::CannotProxyVaultNonCustomData)?,
         }
 
         Ok(Self { proxy_token, target })
