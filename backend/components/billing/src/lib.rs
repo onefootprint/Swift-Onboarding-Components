@@ -7,9 +7,9 @@ use newtypes::{ScopedUserId, StripeCustomerId, TenantId};
 use std::{collections::HashMap, ops::Add, str::FromStr};
 pub use stripe::Client as StripeClient;
 use stripe::{
-    CreateCustomer, CreateSubscription, CreateSubscriptionItems, CreateUsageRecord, Customer, ListCustomers,
-    ListSubscriptions, Subscription, SubscriptionItem, SubscriptionProrationBehavior, UpdateSubscriptionItem,
-    UsageRecord, UsageRecordAction,
+    CreateCustomer, CreateSubscription, CreateSubscriptionItem, CreateSubscriptionItems, CreateUsageRecord,
+    Customer, ListCustomers, ListSubscriptions, Subscription, SubscriptionItem,
+    SubscriptionProrationBehavior, UpdateSubscriptionItem, UsageRecord, UsageRecordAction,
 };
 
 pub type BResult<T> = Result<T, Error>;
@@ -85,27 +85,30 @@ async fn find_subscription_item_for(
     price_id: stripe::PriceId,
 ) -> BResult<SubscriptionItem> {
     // TODO implement this with search API rather than iterating through list in RAM
+    // First, get or create the single subscription we have per tenant
     let params = ListSubscriptions {
         customer: Some(customer_id.clone()),
         limit: Some(10),
         ..Default::default()
     };
     let subscriptions = Subscription::list(client, &params).await?;
-    let result = subscriptions.data.into_iter().find_map(|s| {
-        s.items
-            .data
-            .into_iter()
-            .find(|si| si.price.as_ref().map(|p| &p.id) == Some(&price_id))
-    });
-    let result = if let Some(si) = result {
-        si
+    let subscription = subscriptions
+        .data
+        .into_iter()
+        .find(|s| s.metadata.get("primary-subscription") == Some(&"true".to_string()));
+    let subscription = if let Some(s) = subscription {
+        s
     } else {
-        let si = CreateSubscriptionItems {
-            price: Some(price_id.to_string()),
-            ..Default::default()
-        };
+        // Subscription doesn't yet exist - create one that has all of the items on it.
         let mut params = CreateSubscription::new(customer_id);
-        params.items = Some(vec![si]);
+        let items = [KYC_PRICE_ID, PII_PRICE_ID]
+            .into_iter()
+            .map(|price_id| CreateSubscriptionItems {
+                price: Some(price_id.to_owned()),
+                ..Default::default()
+            })
+            .collect();
+        params.items = Some(items);
         let today = Utc::now().naive_utc().date();
         let next_month = today.add(Months::new(1));
         let first_day_of_next_month = NaiveDate::from_ymd_opt(next_month.year(), next_month.month(), 1)
@@ -113,10 +116,31 @@ async fn find_subscription_item_for(
             .and_hms_opt(0, 0, 0)
             .ok_or(Error::DateError)?;
         params.billing_cycle_anchor = Some(first_day_of_next_month.timestamp());
-        let s = Subscription::create(client, params).await?;
-        s.items.data.into_iter().next().ok_or(Error::NoSubscriptionItem)?
+        params.description = Some("Footprint charges");
+        params.metadata = Some(HashMap::from_iter([(
+            "primary-subscription".to_string(),
+            "true".to_string(),
+        )]));
+        params.proration_behavior =
+            Some(stripe::generated::billing::subscription::SubscriptionProrationBehavior::None);
+        Subscription::create(client, params).await?
     };
-    Ok(result)
+
+    // Then, get or create the subscription item for this price
+    let si = subscription
+        .items
+        .data
+        .into_iter()
+        .find(|si| si.price.as_ref().map(|p| &p.id) == Some(&price_id));
+    let si = if let Some(si) = si {
+        si
+    } else {
+        // Subscription item doesn't exist yet - create one attached to the subscription
+        let mut si = CreateSubscriptionItem::new(subscription.id);
+        si.price = Some(price_id.to_owned());
+        SubscriptionItem::create(client, si).await?
+    };
+    Ok(si)
 }
 
 #[tracing::instrument(skip(client))]
