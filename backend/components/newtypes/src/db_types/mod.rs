@@ -19,6 +19,7 @@ mod sealed_bytes;
 mod tenant_scope;
 mod user_timeline_event;
 mod vault_key_pair;
+mod vault_kind;
 mod vendor;
 mod verification_status;
 
@@ -27,5 +28,5 @@ pub use self::{
     d2p_session_status::*, data_priority::*, decision_status::*, document_request_status::*, fingerprint::*,
     footprint_reason_code::*, liveness_source::*, ob_config_status::*, onboarding_status::*,
     org_member_email::*, proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, tenant_scope::*,
-    user_timeline_event::*, vault_key_pair::*, vendor::*, verification_status::*,
+    user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*, verification_status::*,
 };

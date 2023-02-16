@@ -1,0 +1,21 @@
+use crate::util::impl_enum_str_diesel;
+pub use derive_more::Display;
+use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
+use serde_json;
+use strum::AsRefStr;
+use strum_macros::EnumString;
+
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Apiv2Schema, AsExpression, FromSqlRow, EnumString, AsRefStr,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum VaultKind {
+    Person,
+    Business,
+}
+
+impl_enum_str_diesel!(VaultKind);

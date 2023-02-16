@@ -99,14 +99,14 @@ mod test {
             .await
             .expect("couldn't make DB query");
 
-        let new_user = crate::models::user_vault::NewUserVaultArgs {
+        let new_user = crate::models::user_vault::NewPortablePersonUserVaultArgs {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
             is_live: false,
             is_portable: true,
         };
         pool.db_transaction(|conn| -> DbResult<_> {
-            let result = UserVault::create(conn, new_user)?.into_inner();
+            let result = UserVault::create_person_vault(conn, new_user)?.into_inner();
             Ok(result)
         })
         .await

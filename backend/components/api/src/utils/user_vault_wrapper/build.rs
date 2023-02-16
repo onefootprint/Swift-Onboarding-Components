@@ -93,13 +93,13 @@ impl UserVaultWrapper {
         ob_config: Option<ObConfiguration>,
         phone_args: NewPhoneNumberArgs,
     ) -> ApiResult<Locked<UserVault>> {
-        let new_user_vault = db::models::user_vault::NewUserVaultArgs {
+        let new_user_vault = db::models::user_vault::NewPortablePersonUserVaultArgs {
             e_private_key: user_info.e_private_key,
             public_key: user_info.public_key,
             is_live: user_info.is_live,
             is_portable: true,
         };
-        let uv = UserVault::create(conn, new_user_vault)?;
+        let uv = UserVault::create_person_vault(conn, new_user_vault)?;
         let su_id = if let Some(ob_config) = ob_config {
             let su = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
             Some(su.id)

@@ -617,6 +617,7 @@ table! {
         _updated_at -> Timestamptz,
         is_live -> Bool,
         is_portable -> Bool,
+        kind -> Text,
     }
 }
 

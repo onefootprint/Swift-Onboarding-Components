@@ -10,7 +10,7 @@ use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
     EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, Locked, OnboardingId, ScopedUserId, TenantId,
-    UserVaultId, VaultPublicKey,
+    UserVaultId, VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -27,6 +27,7 @@ pub struct UserVault {
     pub _updated_at: DateTime<Utc>,
     pub is_live: IsLive,
     pub is_portable: bool,
+    pub kind: VaultKind,
 }
 
 pub enum UserVaultIdentifier<'a> {
@@ -149,20 +150,43 @@ impl UserVault {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn create(conn: &mut PgConn, new_user: NewUserVaultArgs) -> DbResult<Locked<UserVault>> {
+    fn create(conn: &mut PgConn, new_user: NewUserVaultArgs) -> DbResult<Locked<UserVault>> {
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user)
             .get_result::<UserVault>(conn)?;
         Ok(Locked::new(user_vault))
     }
 
+    #[tracing::instrument(skip_all)]
+    pub fn create_person_vault(
+        conn: &mut PgConn,
+        args: NewPortablePersonUserVaultArgs,
+    ) -> DbResult<Locked<UserVault>> {
+        let NewPortablePersonUserVaultArgs {
+            e_private_key,
+            public_key,
+            is_live,
+            is_portable,
+        } = args;
+
+        let args = NewUserVaultArgs {
+            e_private_key,
+            public_key,
+            is_live,
+            is_portable,
+            kind: VaultKind::Person,
+        };
+
+        Self::create(conn, args)
+    }
+
     /// Create a NON-portable, tenant-scoped vault + a scoped user for the tenant and the vault
     #[tracing::instrument(skip_all)]
-    pub fn create_non_portable(
+    pub fn create_non_portable_person_vault(
         conn: &mut TxnPgConn,
-        req: NewNonPortableUserVaultReq,
+        req: NewNonPortablePersonUserVaultReq,
     ) -> DbResult<ScopedUser> {
-        let NewNonPortableUserVaultReq {
+        let NewNonPortablePersonUserVaultReq {
             e_private_key,
             public_key,
             is_live,
@@ -174,6 +198,7 @@ impl UserVault {
             public_key,
             is_live,
             is_portable: false,
+            kind: VaultKind::Person,
         };
         let user_vault = Self::create(conn, new_user_vault)?;
         let scoped_user = ScopedUser::create_non_portable(conn, user_vault, tenant_id)?;
@@ -217,11 +242,12 @@ impl UserVault {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = user_vault)]
-pub struct NewUserVaultArgs {
-    pub e_private_key: EncryptedVaultPrivateKey,
-    pub public_key: VaultPublicKey,
-    pub is_live: IsLive,
-    pub is_portable: bool,
+struct NewUserVaultArgs {
+    e_private_key: EncryptedVaultPrivateKey,
+    public_key: VaultPublicKey,
+    is_live: IsLive,
+    is_portable: bool,
+    kind: VaultKind,
 }
 
 pub struct NewUserInfo {
@@ -230,7 +256,14 @@ pub struct NewUserInfo {
     pub is_live: IsLive,
 }
 
-pub struct NewNonPortableUserVaultReq {
+pub struct NewPortablePersonUserVaultArgs {
+    pub e_private_key: EncryptedVaultPrivateKey,
+    pub public_key: VaultPublicKey,
+    pub is_live: IsLive,
+    pub is_portable: bool,
+}
+
+pub struct NewNonPortablePersonUserVaultReq {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub is_live: IsLive,
