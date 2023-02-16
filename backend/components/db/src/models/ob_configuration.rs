@@ -286,7 +286,7 @@ impl ObConfiguration {
     /// or not they can decrypt it.
     /// Don't use this on Onboardings that have not been authorized
     pub fn visible_scopes(&self) -> Vec<TenantScope> {
-        let data_scopes = self.can_access_data.iter().cloned().map(TenantScope::Decrypt);
+        let data_scopes = self.must_collect_data.iter().cloned().map(TenantScope::Decrypt);
         let scopes = [self
             .must_collect_identity_document
             .then_some(TenantScope::DecryptDocuments)];
