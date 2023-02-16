@@ -9,3 +9,5 @@ async-stripe = { version = "0.18.2", features = ["runtime-tokio-hyper"] }
 db = { path = "../db" }
 newtypes = { path = "../newtypes" }
 thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

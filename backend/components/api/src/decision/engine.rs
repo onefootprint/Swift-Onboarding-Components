@@ -1,6 +1,6 @@
 use crate::{
     enclave_client::EnclaveClient,
-    errors::{onboarding::OnboardingError, ApiError},
+    errors::{onboarding::OnboardingError, ApiError, ApiResult},
     feature_flag::FeatureFlagClient,
     metrics,
     utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs},
@@ -11,7 +11,6 @@ use super::{vendor::vendor_trait::VendorAPICall, *};
 use db::{
     models::{
         onboarding::Onboarding,
-        onboarding_decision::OnboardingDecision,
         user_vault::UserVault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
     },
@@ -40,7 +39,7 @@ pub async fn run(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> Result<OnboardingDecision, ApiError> {
+) -> ApiResult<()> {
     let obid = ob.id.clone();
     let requests_and_results = db_pool
         .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
@@ -126,7 +125,7 @@ pub async fn run(
         metric.inc();
     }
 
-    Ok(onboarding_decision)
+    Ok(())
 }
 
 type ShouldRunDecisionEngine = bool;

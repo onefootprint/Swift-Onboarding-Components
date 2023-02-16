@@ -9,8 +9,8 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, OnboardingStatus, TenantId};
 
-#[derive(Clone)]
-pub struct OnboardingListQueryParams {
+#[derive(Clone, Default)]
+pub struct ScopedUserListQueryParams {
     pub tenant_id: TenantId,
     pub is_live: bool,
     pub statuses: Vec<OnboardingStatus>,
@@ -21,7 +21,7 @@ pub struct OnboardingListQueryParams {
     pub requires_manual_review: Option<bool>,
 }
 
-pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {
+pub fn list_authorized_for_tenant_query<'a>(params: ScopedUserListQueryParams) -> BoxedQuery<'a, Pg> {
     // Filter out onboardings that haven't been explicitly authorized by the user - these should
     // not be visible in the dashboard since the tenant doesn't have permissions to view anything
     // about the user
@@ -107,7 +107,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
 
 pub fn count_authorized_for_tenant(
     conn: &mut PgConn,
-    params: OnboardingListQueryParams,
+    params: ScopedUserListQueryParams,
 ) -> Result<i64, DbError> {
     let count = list_authorized_for_tenant_query(params)
         .count()
@@ -118,7 +118,7 @@ pub fn count_authorized_for_tenant(
 /// lists all scoped_users across all configurations
 pub fn list_authorized_for_tenant(
     conn: &mut PgConn,
-    params: OnboardingListQueryParams,
+    params: ScopedUserListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
 ) -> Result<Vec<(ScopedUser, UserVault)>, DbError> {

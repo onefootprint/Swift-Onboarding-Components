@@ -28,10 +28,15 @@ pub async fn post(
         tenant_id: auth.tenant().id.clone(),
     };
 
-    let scoped = state
+    let scoped_user = state
         .db_pool
         .db_transaction(|conn| UserVault::create_non_portable_person_vault(conn, request))
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::User::from_db(scoped))))
+    let su = scoped_user.clone();
+    if su.is_live && crate::decision::utils::should_bill(&state.feature_flag_client, &su.tenant_id) {
+        billing::update_pii_charge(state.stripe_client.clone(), state.db_pool.clone(), su.tenant_id);
+    }
+
+    Ok(Json(ResponseData::ok(api_wire_types::User::from_db(scoped_user))))
 }

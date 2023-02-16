@@ -32,7 +32,7 @@ pub async fn post(
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, status, tenant_id, wh_event) = state
+    let (validation_token, status, su, wh_event) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             // Verify there are no unmet requirements
@@ -56,7 +56,7 @@ pub async fn post(
 
             // create the webhook event to fire
             let wh_event = WebhookEvent::OnboardingCompleted {
-                footprint_user_id: scoped_user.fp_user_id,
+                footprint_user_id: scoped_user.fp_user_id.clone(),
                 timestamp,
                 status,
                 onboarding_configuration_id: ob.ob_configuration_id,
@@ -64,13 +64,17 @@ pub async fn post(
             };
 
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
-            Ok((validation_token, status, scoped_user.tenant_id, wh_event))
+            Ok((validation_token, status, scoped_user, wh_event))
         })
         .await??;
 
+    let tenant_id = su.tenant_id.clone();
     state
         .webhook_service_client
         .send_event_to_tenant_non_blocking(tenant_id, wh_event, None);
+    if su.is_live && crate::decision::utils::should_bill(&state.feature_flag_client, &su.tenant_id) {
+        billing::update_pii_charge(state.stripe_client.clone(), state.db_pool.clone(), su.tenant_id);
+    }
 
     Ok(Json(ResponseData {
         data: CommitResponse {

@@ -18,7 +18,7 @@ use crate::State;
 use api_wire_types::IdentityDocumentKindForUser;
 use api_wire_types::ListUsersRequest;
 use db::models::onboarding::Onboarding;
-use db::scoped_user::OnboardingListQueryParams;
+use db::scoped_user::ScopedUserListQueryParams;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::IdDocKind;
@@ -96,7 +96,7 @@ pub async fn get(
     };
 
     let tenant_id = tenant.id.clone();
-    let query_params = OnboardingListQueryParams {
+    let query_params = ScopedUserListQueryParams {
         tenant_id: tenant_id.clone(),
         is_live: auth.is_live()?,
         requires_manual_review,
@@ -170,7 +170,7 @@ pub async fn get_detail(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let query_params = OnboardingListQueryParams {
+    let query_params = ScopedUserListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
         requires_manual_review: None,

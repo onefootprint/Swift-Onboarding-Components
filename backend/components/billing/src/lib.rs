@@ -1,11 +1,15 @@
 use std::{collections::HashMap, str::FromStr};
 
-use db::models::tenant::Tenant;
-use newtypes::{ScopedUserId, StripeCustomerId};
+use db::{
+    models::tenant::Tenant,
+    scoped_user::{count_authorized_for_tenant, ScopedUserListQueryParams},
+};
+use newtypes::{ScopedUserId, StripeCustomerId, TenantId};
 pub use stripe::Client as StripeClient;
 use stripe::{
     CreateCustomer, CreateSubscription, CreateSubscriptionItems, CreateUsageRecord, Customer, ListCustomers,
-    ListSubscriptions, Subscription, SubscriptionItem, UsageRecord, UsageRecordAction,
+    ListSubscriptions, Subscription, SubscriptionItem, SubscriptionProrationBehavior, UpdateSubscriptionItem,
+    UsageRecord, UsageRecordAction,
 };
 
 pub type BResult<T> = Result<T, Error>;
@@ -16,19 +20,23 @@ pub enum Error {
     Stripe(#[from] stripe::StripeError),
     #[error("{0}")]
     ParseIdError(#[from] stripe::ParseIdError),
+    #[error("{0}")]
+    DbError(#[from] db::DbError),
     #[error("No subscription item found")]
     NoSubscriptionItem,
+    #[error("Tenant does not yet have an associated customer ID")]
+    NoCustomerId,
 }
 
 // Will put these in either config or launch darkly
-#[allow(unused)]
-const PII_PRICE: &str = "price_1Mbq7GGerPBo41PtfQcCkjzw";
-const KYC_PRICE: &str = "price_1Mbq6cGerPBo41PtZfrxXBTs";
+const PII_PRICE_ID: &str = "price_1Mbq7GGerPBo41PtfQcCkjzw";
+const KYC_PRICE_ID: &str = "price_1Mbq6cGerPBo41PtZfrxXBTs";
 
 pub fn init_client(secret_key: String) -> StripeClient {
     StripeClient::new(secret_key)
 }
 
+#[tracing::instrument(skip(client))]
 pub async fn get_or_create_customer(
     client: &StripeClient,
     tenant: &Tenant,
@@ -68,6 +76,7 @@ pub async fn get_or_create_customer(
     Ok(customer.id.to_string().into())
 }
 
+#[tracing::instrument(skip(client))]
 async fn find_subscription_item_for(
     client: &StripeClient,
     customer_id: stripe::CustomerId,
@@ -103,6 +112,7 @@ async fn find_subscription_item_for(
     Ok(result)
 }
 
+#[tracing::instrument(skip(client))]
 pub async fn charge_for_kyc(
     client: &StripeClient,
     customer_id: StripeCustomerId,
@@ -110,7 +120,7 @@ pub async fn charge_for_kyc(
 ) -> BResult<()> {
     // TODO better way to convert between newtypes and stripe SDK newtypes
     let customer_id = stripe::CustomerId::from_str(&customer_id)?;
-    let kyc_price_id = stripe::PriceId::from_str(KYC_PRICE)?;
+    let kyc_price_id = stripe::PriceId::from_str(KYC_PRICE_ID)?;
     let si = find_subscription_item_for(client, customer_id, kyc_price_id).await?;
     let create_ur = CreateUsageRecord {
         quantity: 1,
@@ -120,4 +130,49 @@ pub async fn charge_for_kyc(
     // TODO idempotent id header, scoped_user.id
     UsageRecord::create(client, &si.id, create_ur).await?;
     Ok(())
+}
+
+#[tracing::instrument(skip(client, pool))]
+async fn update_pii_charge_inner(client: StripeClient, pool: db::DbPool, tenant_id: TenantId) -> BResult<()> {
+    // Do we want a different product for non-portable and portable?
+    let params = ScopedUserListQueryParams {
+        tenant_id: tenant_id.clone(),
+        is_live: true,
+        ..Default::default()
+    };
+    // Not ideal, but since there isn't a convenient way to simply increment the subscription count
+    // by one for non-metered billing, we just sum up the count of users for which to charge PII
+    // storage every time.
+    // Maybe we will move this to a daily job one day
+    let (tenant, count) = pool
+        .db_query(move |conn| -> BResult<_> {
+            let tenant = Tenant::get(conn, &tenant_id)?;
+            let count = count_authorized_for_tenant(conn, params)?;
+            Ok((tenant, count))
+        })
+        .await??;
+    let customer_id = tenant
+        .stripe_customer_id
+        .map(|ci| stripe::CustomerId::from_str(&ci))
+        .transpose()?
+        .ok_or(Error::NoCustomerId)?;
+    let pii_price_id = stripe::PriceId::from_str(PII_PRICE_ID)?;
+    let si = find_subscription_item_for(&client, customer_id, pii_price_id).await?;
+    let si_update = UpdateSubscriptionItem {
+        quantity: Some(count as u64),
+        proration_behavior: Some(SubscriptionProrationBehavior::None),
+        ..Default::default()
+    };
+    SubscriptionItem::update(&client, &si.id, si_update).await?;
+    Ok(())
+}
+
+#[tracing::instrument(skip(client, pool))]
+pub fn update_pii_charge(client: StripeClient, pool: db::DbPool, tenant_id: TenantId) {
+    tokio::spawn(async move {
+        let result = update_pii_charge_inner(client, pool, tenant_id).await;
+        if let Err(e) = result {
+            tracing::error!("Couldn't update PII vaulting charge: {}", e);
+        }
+    });
 }
