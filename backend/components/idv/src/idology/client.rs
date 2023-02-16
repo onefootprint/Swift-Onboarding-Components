@@ -59,24 +59,16 @@ impl IdologyClient {
         // TODO load these as env or something else
         let url = "https://web.idologylive.com/api/idscanperform.svc";
         let req_data = scan_verify::request::SubmissionRequestData::try_from(docv_data)?;
-        let req = serde_urlencoded::to_string(scan_verify::request::SubmissionRequest {
+        let req = scan_verify::request::SubmissionRequest {
             username: self.username.clone(),
             password: self.password.clone(),
             data: req_data,
-        })
-        .map_err(IdologyError::SerializationError::from)?;
+        };
 
         let response = self
             .client
             .post(url)
-            .body(req)
-            .headers(reqwest::header::HeaderMap::from_iter(
-                vec![(
-                    reqwest::header::CONTENT_TYPE,
-                    "application/x-www-form-urlencoded".parse().unwrap(),
-                )]
-                .into_iter(),
-            ))
+            .form(&req)
             .send()
             .await
             .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;
@@ -96,24 +88,16 @@ impl IdologyClient {
         // TODO load these as env or something else
         let url = "https://web.idologylive.com/api/idscan.svc";
         let req_data = scan_verify::request::ResultsRequestData::from(query_id);
-        let req = serde_urlencoded::to_string(scan_verify::request::ResultsRequest {
+        let req = scan_verify::request::ResultsRequest {
             username: self.username.clone(),
             password: self.password.clone(),
             data: req_data,
-        })
-        .map_err(IdologyError::SerializationError::from)?;
+        };
 
         let response = self
             .client
             .post(url)
-            .body(req)
-            .headers(reqwest::header::HeaderMap::from_iter(
-                vec![(
-                    reqwest::header::CONTENT_TYPE,
-                    "application/x-www-form-urlencoded".parse().unwrap(),
-                )]
-                .into_iter(),
-            ))
+            .form(&req)
             .send()
             .await
             .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;
@@ -151,24 +135,16 @@ impl IdologyClient {
         // TODO load these as env or something else
         let url = "https://web.idologylive.com/api/scan-capture.svc";
         let req_data = scan_onboarding::request::SubmissionRequestData::try_from(docv_data)?;
-        let req = serde_urlencoded::to_string(scan_onboarding::request::SubmissionRequest {
+        let req = scan_onboarding::request::SubmissionRequest {
             username: self.username.clone(),
             password: self.password.clone(),
             data: req_data,
-        })
-        .map_err(IdologyError::SerializationError::from)?;
+        };
 
         let response = self
             .client
             .post(url)
-            .body(req)
-            .headers(reqwest::header::HeaderMap::from_iter(
-                vec![(
-                    reqwest::header::CONTENT_TYPE,
-                    "application/x-www-form-urlencoded".parse().unwrap(),
-                )]
-                .into_iter(),
-            ))
+            .form(&req)
             .send()
             .await
             .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;

@@ -8,8 +8,6 @@ pub enum Error {
     ReqwestError(#[from] ReqwestError),
     #[error("Json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
-    #[error("Request serialization error: {0}")]
-    SerializationError(#[from] SerializationError),
     #[error("Could not parse error code: {0}")]
     UnknownError(String),
     #[error("Could not parse response status: {0}")]
@@ -64,12 +62,6 @@ pub enum ReqwestError {
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("error sending request to socure api: {0}")]
     SendError(String),
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum SerializationError {
-    #[error("error serializing request: {0}")]
-    UrlEncodingSerializationError(#[from] serde_urlencoded::ser::Error),
 }
 
 // Errors we may get

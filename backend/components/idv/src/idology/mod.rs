@@ -131,8 +131,11 @@ mod test {
     #[ignore]
     #[tokio::test]
     async fn test_e2e_scan_verify() {
-        // First get a queryID from expectID
+        // !!!!!
+        // Note: this will fail unless ScanVerify is enabled in the Idology enterprise portal!!
+        //!!!!!
 
+        // First get a queryID from expectID
         let test_data = fixtures::test_data::ExpectIDTestData::load_passing_sandbox_data();
         let client =
             super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
