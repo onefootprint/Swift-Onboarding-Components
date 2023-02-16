@@ -20,8 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     if: success()
     steps:
+      - uses: actions/checkout@v3
       - name: Airplane deploy
-        working-directory: ./backend/internal_tools/airplane
+        working-directory: backend/internal_tools/airplane
         run: |
           curl -L https://github.com/airplanedev/cli/releases/latest/download/install.sh | sh
           /home/runner/.airplane/bin/airplane deploy --env prod .
