@@ -211,6 +211,7 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::Tenant(&suid)))
         .await??;
+    let uv_id = uvw.user_vault.id.clone();
     let should_initiate_verification_requests =
         decision::utils::should_initiate_idv_or_else_setup_test_fixtures(
             &state,
@@ -274,6 +275,7 @@ pub async fn post(
         .await?;
     } else {
         // mark as complete if we are testing
+        let su_id = auth_info.scoped_user.id.clone();
         state
             .db_pool
             .db_query(move |conn| -> Result<(), ApiError> {
@@ -282,6 +284,15 @@ pub async fn post(
                     ..Default::default()
                 };
                 db_document_request.update(conn, update)?;
+
+                UserTimeline::create(
+                    conn,
+                    newtypes::DocumentUploadedInfo {
+                        id: identity_document.id.clone(),
+                    },
+                    uv_id,
+                    Some(su_id),
+                )?;
 
                 Ok(())
             })
