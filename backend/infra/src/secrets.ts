@@ -32,6 +32,7 @@ export interface StaticSecrets {
   socureProductionApiKey: aws.ssm.Parameter;
   launchDarklySdkKey: aws.ssm.Parameter;
   svixAuthToken: aws.ssm.Parameter;
+  stripeApiKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -45,6 +46,7 @@ interface SecretConstants {
   socure: Socure;
   launchDarkly: LaunchDarkly;
   svix: Svix;
+  stripe: Stripe;
 }
 
 interface ElasticSecrets {
@@ -89,6 +91,10 @@ interface LaunchDarkly {
 
 interface Svix {
   authToken: string;
+}
+
+interface Stripe {
+  apiKey: string;
 }
 
 export async function LoadSecrets(
@@ -224,6 +230,10 @@ export async function LoadSecrets(
     svixAuthToken: createSecretParameter(
       `svixAuthToken-${stack}`,
       secretConstants.svix.authToken,
+    ),
+    stripeApiKey: createSecretParameter(
+      `stripeApiKey-${stack}`,
+      secretConstants.stripe.apiKey,
     ),
   };
 }

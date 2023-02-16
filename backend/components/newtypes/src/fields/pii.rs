@@ -5,7 +5,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Debug, Display},
-    str::Utf8Error,
+    str::{FromStr, Utf8Error},
 };
 
 /// Represents a string that hides PII
@@ -60,6 +60,13 @@ where
 {
     fn from(pii: T) -> Self {
         Self(format!("{}", pii))
+    }
+}
+
+impl FromStr for PiiString {
+    type Err = crate::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(s.to_owned()))
     }
 }
 

@@ -1,0 +1,9 @@
+[package]
+name = "billing"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+async-stripe = { version = "0.18.2", features = ["runtime-tokio-hyper"] }
+db = { path = "../db" }

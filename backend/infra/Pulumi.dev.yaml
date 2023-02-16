@@ -56,6 +56,9 @@ config:
         secure: v1:qvdpWPO/cjNqw2E9:8M9wZQ9/AzdQJEAg/sDilSmjFpzmQDqBHkbNrg7idxWmtFNlW95Mdkoj+VMkW1n33iRlzQ==
       sandboxApiKey:
         secure: v1:E/Vv2txLN2q/bNr8:dTiRlaKK+HXTMsYVV4xUwg4V3MUNBBMd52Q9iP6UKW3HjbyLAQTvO1T67TbUHu16+mKE8g==
+    stripe:
+      apiKey:
+        secure: v1:CwuAHUsNqEspf1Cy:gGUJpTuJz+qJXLj8S1+XhxH06h4R57xymLwcO8gWD7ulKVCtRH7opUXAttjxIEBLb+XN0f4e0bkP3zslcWWLYITmsajivNyQXaG5sjCyp02voARB9V4N/SM6tGzkGf4EGPyVIV4T0P0e2sZDJ2oT9aZorJV3IqSsDvBN
     svix:
       authToken:
         secure: v1:62LpQHhq4cJ7TcAM:1pW6m/ihRXBX0d9wzlYpR3EMilk0E95608Zq9RPCrcFITw6rk7tlGKN1LMitafcFkvJ3IANJ8rj7ww==

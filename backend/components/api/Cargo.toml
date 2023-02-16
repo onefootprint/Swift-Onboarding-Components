@@ -92,6 +92,7 @@ urlencoding = "2.1.2"
 actix-multipart = "0.5.0"
 
 webhooks = { path = "../webhooks"}
+billing = { path = "../billing"}
 
 [dev-dependencies]
 test-case = { workspace = true }

@@ -1,5 +1,5 @@
 use envconfig::Envconfig;
-use newtypes::PhoneNumber;
+use newtypes::{PhoneNumber, PiiString};
 
 #[derive(Envconfig, Clone)]
 
@@ -98,6 +98,9 @@ pub struct Config {
 
     #[envconfig(from = "SVIX_AUTH_TOKEN")]
     pub svix_auth_token: String,
+
+    #[envconfig(nested = true)]
+    pub stripe: StripeConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -216,4 +219,10 @@ pub struct SocureConfig {
 
     #[envconfig(from = "SOCURE_PRODUCTION_API_KEY")]
     pub production_api_key: String,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct StripeConfig {
+    #[envconfig(from = "STRIPE_API_KEY")]
+    pub api_key: PiiString,
 }
