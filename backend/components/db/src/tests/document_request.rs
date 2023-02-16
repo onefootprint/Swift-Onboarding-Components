@@ -43,7 +43,7 @@ fn test_get_latest_verification_result(conn: &mut TestPgConn) {
     let vr1_result = VerificationResult::create(
         conn,
         vr1.id,
-        serde_json::json!({"test": "response"}),
+        newtypes::ScrubbedJsonValue(serde_json::json!({"test": "response"})),
         newtypes::SealedVaultBytes(
             PiiJsonValue::new(serde_json::json!({"test": "response"}))
                 .leak_to_vec()

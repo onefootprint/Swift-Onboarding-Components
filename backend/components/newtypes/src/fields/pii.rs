@@ -177,3 +177,30 @@ impl TryFrom<PiiBytes> for PiiJsonValue {
         Self::try_from(value.into_leak())
     }
 }
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ScrubbedJsonValue(pub serde_json::Value);
+impl ScrubbedJsonValue {
+    pub fn scrub<T: serde::Serialize>(s: T) -> Result<Self, serde_json::Error> {
+        let val = serde_json::to_value(s)?;
+        Ok(Self(val))
+    }
+}
+
+impl From<ScrubbedJsonValue> for serde_json::Value {
+    fn from(v: ScrubbedJsonValue) -> Self {
+        v.0
+    }
+}
+
+impl From<serde_json::Value> for ScrubbedJsonValue {
+    fn from(v: serde_json::Value) -> Self {
+        Self(v)
+    }
+}
+
+impl From<ScrubbedJsonValue> for PiiJsonValue {
+    fn from(s: ScrubbedJsonValue) -> Self {
+        Self(s.0)
+    }
+}

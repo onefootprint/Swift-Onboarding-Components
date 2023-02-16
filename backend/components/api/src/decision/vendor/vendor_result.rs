@@ -70,6 +70,7 @@ impl VendorResult {
                         response: VendorResponse {
                             vendor: request.vendor,
                             response: parsed_response,
+                            // When we are loading the response from DB, the response has been scrubbed
                             raw_response: result.response.into(),
                         },
                         verification_request_id: request.id,

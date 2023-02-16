@@ -3,15 +3,16 @@ use crate::{schema::verification_result, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{SealedVaultBytes, VerificationRequestId, VerificationResultId};
+use newtypes::{ScrubbedJsonValue, SealedVaultBytes, VerificationRequestId, VerificationResultId};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
 #[diesel(table_name = verification_result)]
 pub struct VerificationResult {
     pub id: VerificationResultId,
     pub request_id: VerificationRequestId,
-    pub response: serde_json::Value,
+    #[diesel(deserialize_as = serde_json::Value)]
+    pub response: ScrubbedJsonValue,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -22,7 +23,9 @@ pub struct VerificationResult {
 #[diesel(table_name = verification_result)]
 struct NewVerificationResult {
     pub request_id: VerificationRequestId,
-    pub response: serde_json::Value,
+    // ScrubbedJson is so that we know that, although this is a serde_json::Value, some important fields have been scrubbed and you need to use the e_response
+    #[diesel(serialize_as = serde_json::Value)]
+    pub response: ScrubbedJsonValue,
     pub timestamp: DateTime<Utc>,
     pub e_response: Option<SealedVaultBytes>,
 }
@@ -33,7 +36,7 @@ impl VerificationResult {
         conn: &mut PgConn,
         request_id: VerificationRequestId,
         // To be removed once we are finished testing
-        response: serde_json::Value,
+        response: ScrubbedJsonValue,
         e_response: SealedVaultBytes,
     ) -> Result<VerificationResult, DbError> {
         let new_result = NewVerificationResult {

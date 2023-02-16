@@ -18,8 +18,8 @@ use idv::{
     ParsedResponse, VendorResponse,
 };
 use newtypes::{
-    EncryptedVaultPrivateKey, PiiJsonValue, SealedVaultBytes, VaultPublicKey, VerificationRequestId,
-    VerificationResultId,
+    EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedJsonValue, SealedVaultBytes, VaultPublicKey,
+    VerificationRequestId, VerificationResultId,
 };
 use twilio::response::lookup::LookupV2Response;
 
@@ -36,7 +36,7 @@ pub(super) async fn save_verification_result(
         .db_transaction(
             move |conn| -> Result<(VerificationResult, Option<StructuredVendorResponse>), ApiError> {
                 // For testing rollout of footprint
-                let scrubbed_json = serde_json::to_value(&vendor_response.response)?;
+                let scrubbed_json = ScrubbedJsonValue::scrub(&vendor_response.response)?;
 
                 let e_response = encrypt_verification_result_response(
                     vendor_response.raw_response,

@@ -355,7 +355,8 @@ pub async fn get(
     let mut status = latest_request.status.into();
     if should_return_errors {
         if let Some(result) = previous_request_verification_result {
-            let parsed = idv::idology::scan_onboarding::response::parse_response(result.response)
+            // TODO: we need to decrypt this
+            let parsed = idv::idology::scan_onboarding::response::parse_response(result.response.0)
                 .map_err(|_| ApiError::AssertionError("Could not parse ScanOnboarding response".into()))?;
             if let Some((None, image_errors)) = parsed.response.error() {
                 previous_request_errors = image_errors;
