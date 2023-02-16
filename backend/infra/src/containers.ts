@@ -463,7 +463,7 @@ export abstract class ServiceContainers {
             'ghcr.io/onefootprint/heartbeat@sha256:56773827f9fb79264e46b95d128f448c0a4e49b9692ae3dd5bb408812e0efe82',
           essential: true,
           secrets,
-          dependsOn: [{ containerName: appName, condition: 'START' }],
+          dependsOn: [{ containerName: appName, condition: 'HEALTHY' }],
           environment: [
             {
               name: 'FPC_MONITOR_URL',
