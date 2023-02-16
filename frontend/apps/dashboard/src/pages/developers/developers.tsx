@@ -17,11 +17,11 @@ const Developers = () => {
   const { t } = useTranslation('pages.developers');
   const [tab, setTab] = useQueryState<TabName>({
     query: 'tab',
-    defaultValue: TabName.apiKeys,
+    defaultValue: TabName.onboardingConfigs,
   });
   const tabs = [
-    { label: t('tabs.api-keys'), value: TabName.apiKeys },
     { label: t('tabs.onboarding-configs'), value: TabName.onboardingConfigs },
+    { label: t('tabs.api-keys'), value: TabName.apiKeys },
   ];
 
   return (
