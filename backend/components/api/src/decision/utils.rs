@@ -24,6 +24,7 @@ use crate::{
 };
 
 pub const IS_DEMO_TENANT_FLAG_NAME: &str = "IsDemoTenant";
+pub const SHOULD_BILL: &str = "EnableBilling";
 
 type ShouldInitiateVerificationRequests = bool;
 
@@ -94,6 +95,13 @@ pub(self) fn is_demo_tenant(feature_flag_client: &impl FeatureFlagClient, tenant
     tracing::info!(tenant_id=%tenant_id, is_demo=%res, "is demo tenant");
 
     res
+}
+
+/// Logic to determine if we should send send billing information to stripe for this tenant
+pub fn should_bill(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
+    feature_flag_client
+        .bool_flag_by_tenant_id(SHOULD_BILL, tenant_id)
+        .unwrap_or(false)
 }
 
 // If socure fails, we shouldn't fail the DE run

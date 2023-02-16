@@ -67,6 +67,8 @@ pub enum ApiError {
     #[error("{0}")]
     NewtypeError(#[from] newtypes::Error),
     #[error("{0}")]
+    BillingError(#[from] billing::Error),
+    #[error("{0}")]
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
     #[error("{0}")]
     InvalidJsonBody(JsonPayloadError),
@@ -180,6 +182,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Twilio(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
+            ApiError::BillingError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::ChallengeError(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsError(e) => match e {
                 workos::WorkOsError::GetProfileAndToken(::workos::WorkOsError::Operation(e)) => {

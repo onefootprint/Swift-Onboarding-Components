@@ -23,6 +23,7 @@ macro_rules! define_newtype_id {
             Default,
             DieselNewType,
             JsonSchema,
+            derive_more::Deref,
         )]
         #[serde(transparent)]
         pub struct $name($type);

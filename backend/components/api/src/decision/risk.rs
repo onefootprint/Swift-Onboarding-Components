@@ -45,7 +45,6 @@ pub async fn create_final_decision(
 
     let decision = final_decision(&features, obid.clone(), ff_client)?;
 
-    // let obid = obid.clone();
     let obd = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &obid)?;

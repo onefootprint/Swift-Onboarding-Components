@@ -84,7 +84,7 @@ impl Tenant {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn update(conn: &mut PgConn, id: TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
+    pub fn update(conn: &mut PgConn, id: &TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
         let result = diesel::update(tenant::table)
             .filter(tenant::id.eq(id))
             .set(update_tenant)
@@ -112,4 +112,5 @@ pub struct UpdateTenant {
     pub website_url: Option<String>,
     pub company_size: Option<CompanySize>,
     pub privacy_policy_url: Option<String>,
+    pub stripe_customer_id: Option<StripeCustomerId>,
 }
