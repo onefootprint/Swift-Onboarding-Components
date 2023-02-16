@@ -1,10 +1,10 @@
-use std::{collections::HashMap, str::FromStr};
-
+use chrono::{Datelike, Months, NaiveDate, Utc};
 use db::{
     models::tenant::Tenant,
     scoped_user::{count_authorized_for_tenant, ScopedUserListQueryParams},
 };
 use newtypes::{ScopedUserId, StripeCustomerId, TenantId};
+use std::{collections::HashMap, ops::Add, str::FromStr};
 pub use stripe::Client as StripeClient;
 use stripe::{
     CreateCustomer, CreateSubscription, CreateSubscriptionItems, CreateUsageRecord, Customer, ListCustomers,
@@ -26,6 +26,8 @@ pub enum Error {
     NoSubscriptionItem,
     #[error("Tenant does not yet have an associated customer ID")]
     NoCustomerId,
+    #[error("Cannot calculate date")]
+    DateError,
 }
 
 // Will put these in either config or launch darkly
@@ -104,8 +106,13 @@ async fn find_subscription_item_for(
         };
         let mut params = CreateSubscription::new(customer_id);
         params.items = Some(vec![si]);
-        // TODO anchor to first of the months
-        params.billing_cycle_anchor = None;
+        let today = Utc::now().naive_utc().date();
+        let next_month = today.add(Months::new(1));
+        let first_day_of_next_month = NaiveDate::from_ymd_opt(next_month.year(), next_month.month(), 1)
+            .ok_or(Error::DateError)?
+            .and_hms_opt(0, 0, 0)
+            .ok_or(Error::DateError)?;
+        params.billing_cycle_anchor = Some(first_day_of_next_month.timestamp());
         let s = Subscription::create(client, params).await?;
         s.items.data.into_iter().next().ok_or(Error::NoSubscriptionItem)?
     };
