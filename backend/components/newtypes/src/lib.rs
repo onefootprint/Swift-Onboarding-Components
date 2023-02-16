@@ -68,8 +68,6 @@ pub enum Error {
     DeserializeError,
     #[error("{0}")]
     ProxyTokenError(#[from] ProxyTokenError),
-    #[error("Cannot convert to UvdKind: {0}")]
-    UvdKindConversionError(IdentityDataKind),
     #[error("Expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
     #[error("{0}")]
@@ -78,6 +76,8 @@ pub enum Error {
     ValidationError(#[from] DataValidationError),
     #[error("{0}")]
     Custom(String),
+    #[error("{0}")]
+    UvdKindConversionError(#[from] UvdKindConversionError),
 }
 
 impl Error {

@@ -13,8 +13,8 @@ use db::{
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate, PiiString, ScopedUserId,
-    UserVaultId, UvdKind, VaultPublicKey,
+    CollectedDataOption, DataLifetimeId, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate,
+    PersonVaultDataKind, PiiString, ScopedUserId, UserVaultId, VaultPublicKey,
 };
 use std::collections::HashMap;
 
@@ -28,7 +28,7 @@ impl UvdBuilder {
     pub fn build(update: IdentityDataUpdate, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
         let mut data = vec![];
 
-        let mut add_sealed = |pii: PiiString, kind: UvdKind| -> ApiResult<()> {
+        let mut add_sealed = |pii: PiiString, kind: PersonVaultDataKind| -> ApiResult<()> {
             let sealed = vault_public_key.seal_pii(&pii)?;
             data.push(NewUserVaultData { kind, e_data: sealed });
             Ok(())
@@ -36,7 +36,7 @@ impl UvdBuilder {
 
         let (update, invalid_fields): (Vec<_>, Vec<_>) =
             update.into_inner().into_iter().partition_map(|(kind, pii)| {
-                if let Some(kind) = kind.uvd_kind() {
+                if let Some(kind) = kind.person_vault_data_kind() {
                     Left((kind, pii))
                 } else {
                     Right(kind)
@@ -92,8 +92,16 @@ impl UvdBuilder {
         let uvds = UserVaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding UVD row
-        let kind_to_lifetime: HashMap<IdentityDataKind, _> =
-            HashMap::from_iter(uvds.into_iter().map(|uvd| (uvd.kind.into(), uvd.lifetime_id)));
+        let kind_and_lifetime: Vec<(IdentityDataKind, DataLifetimeId)> = uvds
+            .into_iter()
+            .map(|uvd| {
+                IdentityDataKind::try_from(uvd.kind)
+                    .map(|idk| (idk, uvd.lifetime_id))
+                    .map_err(|e| ApiError::NewtypeError(newtypes::Error::UvdKindConversionError(e)))
+            })
+            .collect::<Result<Vec<(IdentityDataKind, DataLifetimeId)>, ApiError>>()?;
+        let kind_to_lifetime: HashMap<IdentityDataKind, DataLifetimeId> =
+            HashMap::from_iter(kind_and_lifetime);
         let fingerprints: Vec<_> = fingerprints
             .into_iter()
             .map(|(kind, sh_data)| -> ApiResult<_> {

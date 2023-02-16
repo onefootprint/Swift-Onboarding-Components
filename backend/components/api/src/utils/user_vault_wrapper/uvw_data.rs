@@ -5,10 +5,9 @@ use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
 use db::{HasLifetime, HasSealedIdentityData};
-use newtypes::{DataLifetimeId, SealedVaultBytes};
+use newtypes::{DataLifetimeId, SealedVaultBytes, UvdKind};
 use newtypes::{IdentityDataKind, KvDataKey};
 use std::collections::{HashMap, HashSet};
-use std::convert::Into;
 use strum::IntoEnumIterator;
 
 use crate::errors::ApiError;
@@ -121,9 +120,10 @@ impl UvwData {
 
 impl UvwData {
     fn uvd(&self, kind: IdentityDataKind) -> Option<&UserVaultData> {
-        self.uvd
-            .iter()
-            .find(|d| Into::<IdentityDataKind>::into(d.kind) == kind)
+        self.uvd.iter().find(|d| match d.kind {
+            UvdKind::Id(p) => IdentityDataKind::from(p) == kind,
+            UvdKind::Business(_) => false,
+        })
     }
 
     /// Dispatch queries for a piece of data with a given DataAttribute kind to the underlying data

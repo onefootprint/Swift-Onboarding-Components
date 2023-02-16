@@ -1,4 +1,4 @@
-use newtypes::{Locked, SealedVaultBytes, UvdKind};
+use newtypes::{Locked, PersonVaultDataKind, SealedVaultBytes};
 
 use db::{
     models::{
@@ -29,15 +29,15 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> UvwSetup {
     // Add identity data
     let data = vec![
         NewUserVaultData {
-            kind: UvdKind::FirstName,
+            kind: PersonVaultDataKind::FirstName,
             e_data: SealedVaultBytes(vec![1]),
         },
         NewUserVaultData {
-            kind: UvdKind::LastName,
+            kind: PersonVaultDataKind::LastName,
             e_data: SealedVaultBytes(vec![2]),
         },
         NewUserVaultData {
-            kind: UvdKind::Ssn4,
+            kind: PersonVaultDataKind::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },
     ];

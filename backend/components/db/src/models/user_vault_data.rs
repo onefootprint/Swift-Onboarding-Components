@@ -9,6 +9,7 @@ use diesel::prelude::*;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::IdentityDataKind;
+use newtypes::PersonVaultDataKind;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
 use newtypes::UserVaultId;
@@ -32,7 +33,7 @@ pub struct UserVaultData {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = user_vault_data)]
 pub struct NewUserVaultData {
-    pub kind: UvdKind,
+    pub kind: PersonVaultDataKind,
     pub e_data: SealedVaultBytes,
 }
 
@@ -68,7 +69,7 @@ impl UserVaultData {
             .zip(lifetimes.into_iter())
             .map(|(new_uvd, lifetime)| NewUserVaultDataRow {
                 lifetime_id: lifetime.id,
-                kind: new_uvd.kind,
+                kind: new_uvd.kind.into(),
                 e_data: new_uvd.e_data,
             })
             .collect();

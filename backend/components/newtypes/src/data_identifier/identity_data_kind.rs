@@ -1,4 +1,4 @@
-use crate::{PiiString, SaltedFingerprint, UvdKind};
+use crate::{PersonVaultDataKind, PiiString, SaltedFingerprint};
 use crypto::sha256;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -51,26 +51,6 @@ pub enum IdentityDataKind {
 
 crate::util::impl_enum_str_diesel!(IdentityDataKind);
 
-// UvdKind is a subset of IdentityDataKind, where UvdKind just represents the types of data stored in
-// the UserVaultData table
-impl From<UvdKind> for IdentityDataKind {
-    fn from(value: UvdKind) -> Self {
-        match value {
-            UvdKind::FirstName => Self::FirstName,
-            UvdKind::LastName => Self::LastName,
-            UvdKind::Dob => Self::Dob,
-            UvdKind::Ssn4 => Self::Ssn4,
-            UvdKind::Ssn9 => Self::Ssn9,
-            UvdKind::AddressLine1 => Self::AddressLine1,
-            UvdKind::AddressLine2 => Self::AddressLine2,
-            UvdKind::City => Self::City,
-            UvdKind::State => Self::State,
-            UvdKind::Zip => Self::Zip,
-            UvdKind::Country => Self::Country,
-        }
-    }
-}
-
 impl IdentityDataKind {
     /// Returns true if we store a fingerprint of this value to allow exact match searching.
     pub fn allows_fingerprint(&self) -> bool {
@@ -103,8 +83,8 @@ impl IdentityDataKind {
     }
 
     /// Gets the UvdKind represented by this IdentityDataKind, if exists
-    pub fn uvd_kind(&self) -> Option<UvdKind> {
-        UvdKind::iter().find(|k| Self::from(*k) == *self)
+    pub fn person_vault_data_kind(&self) -> Option<PersonVaultDataKind> {
+        PersonVaultDataKind::iter().find(|k| Self::from(*k) == *self)
     }
 }
 

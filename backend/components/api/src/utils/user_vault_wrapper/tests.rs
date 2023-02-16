@@ -17,7 +17,7 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::IdentityDataUpdate;
 use newtypes::KvDataKey;
 use newtypes::SealedVaultBytes;
-use newtypes::{PiiString, UvdKind};
+use newtypes::{PersonVaultDataKind, PiiString};
 use std::str::FromStr;
 
 #[db_test]
@@ -30,15 +30,15 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     // Add identity data
     let data = vec![
         NewUserVaultData {
-            kind: UvdKind::FirstName,
+            kind: PersonVaultDataKind::FirstName,
             e_data: SealedVaultBytes(vec![1]),
         },
         NewUserVaultData {
-            kind: UvdKind::LastName,
+            kind: PersonVaultDataKind::LastName,
             e_data: SealedVaultBytes(vec![2]),
         },
         NewUserVaultData {
-            kind: UvdKind::Ssn4,
+            kind: PersonVaultDataKind::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },
     ];
