@@ -36,8 +36,12 @@ const OnboardingDecisionEventBody = ({
   }
 
   if (status === DecisionStatus.pass) {
-    const vendorsList = createStringList(
-      vendors?.map(vendor => allT(`vendors.${vendor}`)) ?? [],
+    const vendorsList = Array.from(
+      new Set(
+        createStringList(
+          vendors?.map(vendor => allT(`vendors.${vendor}`)) ?? [],
+        ),
+      ),
     );
 
     const collectedDataLabels = [
