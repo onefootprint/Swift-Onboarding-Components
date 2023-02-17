@@ -163,10 +163,16 @@ impl From<VendorResult> for FeatureVector {
                     footprint_reason_codes.push(FootprintReasonCode::PotentialWatchlistHit)
                 }
 
+                // Add reason code for not locating
+                let id_located = r.id_located();
+                if !id_located {
+                    footprint_reason_codes.push(FootprintReasonCode::IdNotLocated)
+                }
+
                 let idology_features = IDologyFeatures {
                     status,
                     create_manual_review,
-                    id_located: r.id_located(),
+                    id_located,
                     is_id_scan_required: r.is_id_scan_required(),
                     id_number_for_scan_required: r.id_number,
                     verification_result: verification_result_id,

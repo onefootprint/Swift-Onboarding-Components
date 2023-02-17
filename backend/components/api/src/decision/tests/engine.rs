@@ -143,28 +143,28 @@ async fn create_user_and_onboarding(
     Some("resultcode.high.risk.email.recently.verified".to_string()),
     SocureEnabled::Yes,
     DecisionStatus::Pass,
-    FootprintReasonCode::EmailRecentlyVerified
+    vec![FootprintReasonCode::EmailRecentlyVerified]
 )]
 #[test_case(
-    "result.failed".to_string(),
+    "result.no.match".to_string(),
     Some("resultcode.high.risk.email.recently.verified".to_string()),
     SocureEnabled::Yes,
     DecisionStatus::Fail,
-    FootprintReasonCode::EmailRecentlyVerified
+    vec![FootprintReasonCode::IdNotLocated, FootprintReasonCode::EmailRecentlyVerified]
 )]
 #[test_case(
     "result.match".to_string(),
     Some("resultcode.input.address.is.po.box".to_string()),
     SocureEnabled::Yes,
     DecisionStatus::Fail,
-    FootprintReasonCode::AddressInputIsPoBox
+    vec![FootprintReasonCode::AddressInputIsPoBox]
 )]
 #[test_case(
-    "result.match".to_string(),
+    "result.match.restricted".to_string(),
     Some("resultcode.high.risk.email.recently.verified".to_string()),
     SocureEnabled::No,
     DecisionStatus::Pass,
-    FootprintReasonCode::EmailRecentlyVerified
+    vec![FootprintReasonCode::EmailRecentlyVerified]
 )]
 #[tokio::test]
 async fn test_run(
@@ -172,7 +172,7 @@ async fn test_run(
     idology_qualifier: Option<String>,
     socure_enabled: SocureEnabled,
     expected_decision_status: DecisionStatus,
-    expected_footprint_reason_code: FootprintReasonCode,
+    expected_footprint_reason_codes: Vec<FootprintReasonCode>,
 ) {
     //
     // Setup
@@ -269,8 +269,14 @@ async fn test_run(
 
             let risk_signals = RiskSignal::list_by_onboarding_decision_id(conn, &onboarding_decisions[0].id)
                 .expect("RiskSignal should be created");
-            assert_eq!(1, risk_signals.len());
-            assert_eq!(expected_footprint_reason_code, risk_signals[0].reason_code);
+            assert_eq!(expected_footprint_reason_codes.len(), risk_signals.len());
+            assert_eq!(
+                expected_footprint_reason_codes,
+                risk_signals
+                    .iter()
+                    .map(|rs| rs.reason_code.clone())
+                    .collect::<Vec<_>>()
+            );
             assert_eq!(vec![Vendor::Idology], risk_signals[0].vendors);
 
             db::private_cleanup_integration_tests(conn, &uvid).unwrap();

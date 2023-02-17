@@ -89,6 +89,9 @@ footprint_reason_code_enum! {
         #[note = "Watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A strong potential match on a governmental watchlist (OFAC, PEP or NonSDN Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
         WatchlistHit,
 
+        #[note = "Identity not located", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob, SignalScope::Ssn, SignalScope::Address], description = "Identity could not be located with the information provided"]
+        IdNotLocated,
+
         // ~~~~~~~~~ Address ~~~~~~~~~~~~~~~
 
         #[note = "Address does not match", severity = SignalSeverity::High, scopes =  vec![SignalScope::Address], description = "Address located does not match address input."]
