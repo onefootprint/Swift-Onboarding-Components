@@ -167,7 +167,6 @@ impl Onboarding {
                 onboarding_decision::onboarding_id.eq(onboarding::id)
                 .and(onboarding_decision::deactivated_at.is_null())
             ))
-            .filter(onboarding_decision::deactivated_at.is_null())
             .into_boxed();
 
         match id.into() {
