@@ -1,11 +1,13 @@
 import { useState } from 'react';
 
-import { LoginChallengePickerProps } from '../login-challenge-picker';
+import { LoginChallengeBottomSheetProps } from '../login-challenge-bottom-sheet';
 
-const useLocalLoginChallengePicker = () => {
-  const [picker, setPicker] = useState<LoginChallengePickerProps | undefined>();
+const useLocalLoginChallengeBottomSheet = () => {
+  const [picker, setPicker] = useState<
+    LoginChallengeBottomSheetProps | undefined
+  >();
 
-  const show = (props: Omit<LoginChallengePickerProps, 'open'>) => {
+  const show = (props: Omit<LoginChallengeBottomSheetProps, 'open'>) => {
     setPicker({ ...props, open: true });
   };
 
@@ -27,4 +29,4 @@ const useLocalLoginChallengePicker = () => {
   return { picker, show, hide };
 };
 
-export default useLocalLoginChallengePicker;
+export default useLocalLoginChallengeBottomSheet;

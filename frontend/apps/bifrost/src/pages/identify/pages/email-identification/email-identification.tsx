@@ -1,12 +1,12 @@
 import React from 'react';
 
-import LoginChallengePickerProvider from '../../components/login-challenge-picker/login-challenge-picker-provider';
+import LoginChallengeBottomSheetProvider from '../../components/login-challenge-bottom-sheet/login-challenge-bottom-sheet-provider';
 import EmailIdentificationContent from './components/email-identification-content';
 
 const EmailIdentification = () => (
-  <LoginChallengePickerProvider>
+  <LoginChallengeBottomSheetProvider>
     <EmailIdentificationContent />
-  </LoginChallengePickerProvider>
+  </LoginChallengeBottomSheetProvider>
 );
 
 export default EmailIdentification;

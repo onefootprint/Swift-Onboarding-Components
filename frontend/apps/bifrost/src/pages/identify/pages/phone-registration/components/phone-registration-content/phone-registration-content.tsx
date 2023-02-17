@@ -14,7 +14,7 @@ import React from 'react';
 import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
 import useSandboxMode from 'src/hooks/use-sandbox-mode/use-sandbox-mode';
 
-import { useLoginChallengePicker } from '../../../../components/login-challenge-picker/login-challenge-picker-provider';
+import { useLoginChallengeBottomSheet } from '../../../../components/login-challenge-bottom-sheet/login-challenge-bottom-sheet-provider';
 import PhoneRegistrationEmailPreview from './components/phone-registration-email-preview';
 import PhoneRegistrationForm from './components/phone-registration-form';
 import PhoneRegistrationHeader from './components/phone-registration-header';
@@ -28,7 +28,7 @@ const PhoneRegistrationContent = () => {
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
-  const loginChallengePicker = useLoginChallengePicker();
+  const loginChallengeBottomSheet = useLoginChallengeBottomSheet();
 
   const identifyMutation = useIdentify();
   const loginChallengeMutation = useLoginChallenge();
@@ -114,7 +114,7 @@ const PhoneRegistrationContent = () => {
     }
 
     // We need to ask the user what challenge kind they prefer
-    loginChallengePicker.show({ identifier: { phoneNumber } });
+    loginChallengeBottomSheet.show({ identifier: { phoneNumber } });
   };
 
   const handleSubmit = (formData: FormData) => {

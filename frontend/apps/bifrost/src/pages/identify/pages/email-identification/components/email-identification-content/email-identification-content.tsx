@@ -14,7 +14,7 @@ import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import { Events } from 'src/hooks/use-identify-machine';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 
-import { useLoginChallengePicker } from '../../../../components/login-challenge-picker/login-challenge-picker-provider';
+import { useLoginChallengeBottomSheet } from '../../../../components/login-challenge-bottom-sheet/login-challenge-bottom-sheet-provider';
 import EmailIdentificationFooter from './components/email-identification-footer';
 import EmailIdentificationForm from './components/email-identification-form';
 import EmailIdentificationHeader from './components/email-identification-header';
@@ -28,7 +28,7 @@ const EmailIdentificationContent = () => {
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
-  const loginChallengePicker = useLoginChallengePicker();
+  const loginChallengeBottomSheet = useLoginChallengeBottomSheet();
 
   const identifyMutation = useIdentify();
   const loginChallengeMutation = useLoginChallenge();
@@ -92,7 +92,7 @@ const EmailIdentificationContent = () => {
     }
 
     // We need to ask the user what challenge kind they prefer
-    loginChallengePicker.show({ identifier: { email } });
+    loginChallengeBottomSheet.show({ identifier: { email } });
   };
 
   const handleSubmit = (data: FormData) => {

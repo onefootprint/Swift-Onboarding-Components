@@ -8,19 +8,19 @@ import React from 'react';
 
 import useIdentifyMachine, { Events } from '../../hooks/use-identify-machine';
 import generateLoginDeviceResponse from '../../utils/biometric/login-challenge-response';
-import ChallengePicker from '../challenge-picker';
+import ChallengePicker from './components/challenge-picker';
 
-export type LoginChallengePickerProps = {
+export type LoginChallengeBottomSheetProps = {
   identifier: Identifier;
   open: boolean;
   onClose?: () => void;
 };
 
-const LoginChallengePicker = ({
+const LoginChallengeBottomSheet = ({
   identifier,
   open,
   onClose,
-}: LoginChallengePickerProps) => {
+}: LoginChallengeBottomSheetProps) => {
   const [state, send] = useIdentifyMachine();
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeMutation = useLoginChallenge();
@@ -117,4 +117,4 @@ const LoginChallengePicker = ({
   );
 };
 
-export default LoginChallengePicker;
+export default LoginChallengeBottomSheet;

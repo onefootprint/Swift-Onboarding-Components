@@ -1,12 +1,12 @@
 import React from 'react';
 
-import LoginChallengePickerProvider from '../../components/login-challenge-picker/login-challenge-picker-provider';
+import LoginChallengeBottomSheetProvider from '../../components/login-challenge-bottom-sheet/login-challenge-bottom-sheet-provider';
 import PhoneRegistrationContent from './components/phone-registration-content/phone-registration-content';
 
 const PhoneRegistration = () => (
-  <LoginChallengePickerProvider>
+  <LoginChallengeBottomSheetProvider>
     <PhoneRegistrationContent />
-  </LoginChallengePickerProvider>
+  </LoginChallengeBottomSheetProvider>
 );
 
 export default PhoneRegistration;

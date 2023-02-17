@@ -11,7 +11,7 @@ import {
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const iOSPlatforms = [
   'iPad Simulator',
