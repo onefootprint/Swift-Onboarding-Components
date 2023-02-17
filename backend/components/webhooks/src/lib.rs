@@ -6,6 +6,9 @@ use svix::api::{AppPortalAccessIn, ApplicationIn, MessageIn, PostOptions, Svix};
 
 pub mod events;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Clone)]
 pub struct WebhookServiceClient {
     auth_token: String,

@@ -89,11 +89,11 @@ pub async fn post(
     if let Some(decision) = decision {
         state.webhook_service_client.send_event_to_tenant_non_blocking(
             auth.tenant().id.clone(),
-            WebhookEvent::OnboardingStatusChanged {
+            WebhookEvent::OnboardingStatusChanged(webhooks::events::OnboardingStatusChangedPayload {
                 footprint_user_id: fp_user_id_clone,
                 timestamp: decision.created_at,
                 new_status: status.into(),
-            },
+            }),
             None,
         );
     }

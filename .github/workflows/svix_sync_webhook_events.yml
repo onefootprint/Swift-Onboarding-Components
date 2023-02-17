@@ -1,0 +1,30 @@
+name: Svix Webhook Event Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'secrets environment to use'
+        type: environment
+        required: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  svix_event_sync:
+    runs-on: beast
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: rust-toolchain
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+
+      - name: Generate Schemas
+        working-directory: ./backend
+        run: cargo test --package webhooks --lib -- tests::sync_webhook_event_types --exact --nocapture --ignored
+        env:
+          SVIX_AUTH_TOKEN: ${{ secrets.SVIX_AUTH_TOKEN }}

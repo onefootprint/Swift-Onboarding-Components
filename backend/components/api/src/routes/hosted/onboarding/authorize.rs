@@ -55,13 +55,13 @@ pub async fn post(
                 .ok_or(OnboardingError::NonTerminalState)?;
 
             // create the webhook event to fire
-            let wh_event = WebhookEvent::OnboardingCompleted {
+            let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
                 footprint_user_id: scoped_user.fp_user_id.clone(),
                 timestamp,
                 status,
                 onboarding_configuration_id: ob.ob_configuration_id,
                 requires_manual_review: manual_review.is_some(),
-            };
+            });
 
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
             Ok((validation_token, status, scoped_user, wh_event))

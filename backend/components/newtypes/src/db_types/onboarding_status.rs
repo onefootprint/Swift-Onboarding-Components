@@ -6,7 +6,7 @@ use strum_macros::{AsRefStr, EnumString};
 
 use crate::DecisionStatus;
 
-/// The status of the onboarding. This includes in-progress statuses
+/// The status of the onboarding, a go,no-go decision.
 #[derive(
     Debug,
     Display,
@@ -23,10 +23,15 @@ use crate::DecisionStatus;
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
-// This is a dynamically computed status enum that is never saved in the DB.
 pub enum OnboardingStatus {
     Pass,
     Fail,
+}
+
+impl Default for OnboardingStatus {
+    fn default() -> Self {
+        Self::Pass
+    }
 }
 
 impl From<DecisionStatus> for Option<OnboardingStatus> {
