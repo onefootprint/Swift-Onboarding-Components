@@ -13,9 +13,9 @@ import React from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import { Events } from 'src/hooks/use-identify-machine';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
+import LegalFooter from 'src/pages/identify/components/legal-footer';
 
 import { useLoginChallengeBottomSheet } from '../../../../components/login-challenge-bottom-sheet/login-challenge-bottom-sheet-provider';
-import EmailIdentificationFooter from './components/email-identification-footer';
 import EmailIdentificationForm from './components/email-identification-form';
 import EmailIdentificationHeader from './components/email-identification-header';
 
@@ -116,7 +116,7 @@ const EmailIdentificationContent = () => {
         onSubmit={handleSubmit}
         isLoading={isLoading}
       />
-      <EmailIdentificationFooter />
+      <LegalFooter />
     </>
   );
 };

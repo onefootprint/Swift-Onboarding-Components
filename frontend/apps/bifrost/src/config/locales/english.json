@@ -3,6 +3,9 @@
     "errors": {}
   },
   "components": {
+    "legal-footer": {
+      "label": "By clicking \"Continue\", I agree to the <termsLink>Terms of Service</termsLink> and acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
+    },
     "exit-dialog": {
       "title": "Are you sure?",
       "description": "Leaving this flow will not save your data.",
@@ -61,7 +64,6 @@
         },
         "cta": "Continue"
       },
-      "footer": "By clicking \"Continue\", I agree to the <termsLink>Terms of Service</termsLink> and acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>.",
       "challenge-picker": {
         "header": "Welcome back! 🎉",
         "title": "How would you like to continue?",

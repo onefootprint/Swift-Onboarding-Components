@@ -3,10 +3,10 @@ import Link from 'next/link';
 import React from 'react';
 import { Trans } from 'react-i18next';
 
-const EmailIdentificationFooter = () => (
+const LegalFooter = () => (
   <Typography color="tertiary" sx={{ textAlign: 'center' }} variant="caption-1">
     <Trans
-      i18nKey="pages.email-identification.footer"
+      i18nKey="components.legal-footer.label"
       components={{
         termsLink: (
           <Link
@@ -27,4 +27,4 @@ const EmailIdentificationFooter = () => (
   </Typography>
 );
 
-export default EmailIdentificationFooter;
+export default LegalFooter;
