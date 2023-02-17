@@ -22,6 +22,9 @@ const Socure = ({ page, fpAuthToken }: SocureProps) => {
 
   const initializeSdk = (publicKey: string) => {
     const devicer = getDevicer();
+    if (!devicer) {
+      return;
+    }
     const options: SocureRequest = {
       publicKey,
       endpoint: SOCURE_ENDPOINT,
