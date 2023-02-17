@@ -11,6 +11,35 @@
     }
   },
   "pages": {
+    "outcomes": {
+      "title": "Select test outcome",
+      "subtitle": "Select the outcome you want to test.",
+      "outcome": {
+        "options": {
+          "success": {
+            "title": "Success",
+            "description": "User will be fully verified."
+          },
+          "manual-review": {
+            "title": "Manual review",
+            "description": "User will need to be manually reviewed."
+          },
+          "fail": {
+            "title": "Fail",
+            "description": "User will not be validated."
+          }
+        }
+      },
+      "test-id": {
+        "label": "Test ID",
+        "placeholder": "Enter test ID",
+        "hint": "Test ID helps you create different user onboardings with your email and phone number. Do not use spaces or #.",
+        "errors": {
+          "required": "Test ID is required"
+        }
+      },
+      "cta": "Continue"
+    },
     "email-identification": {
       "header": {
         "title": "Hey there! 👋",

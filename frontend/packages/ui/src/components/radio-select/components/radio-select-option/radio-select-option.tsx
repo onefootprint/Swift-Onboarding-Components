@@ -31,11 +31,12 @@ const RadioSelectOption = ({
 
   return (
     <Option
-      key={value}
-      selected={selected}
-      onClick={handleClick}
-      aria-selected={selected}
       aria-label={description}
+      aria-selected={selected}
+      key={value}
+      onClick={handleClick}
+      selected={selected}
+      type="button"
     >
       <IconContainer selected={selected}>
         <IconComponent color={selected ? 'quinary' : undefined} />
