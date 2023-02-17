@@ -17,8 +17,8 @@ describe('createStringList', () => {
 
   it('list with 2+ items renders correctly', () => {
     const items = ['apple', 'pear', 'berry'];
-    expect(createStringList(items)).toEqual('apple, pear and berry');
-    expect(createStringList(items, ' and ')).toEqual(
+    expect(createStringList(items)).toEqual('apple, pear, and berry');
+    expect(createStringList(items, ' and ', ' and ')).toEqual(
       'apple and pear and berry',
     );
     expect(createStringList(items, ', ', ' & ')).toEqual('apple, pear & berry');
