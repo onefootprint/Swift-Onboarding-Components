@@ -11,7 +11,7 @@ const MobileIllustration = () => {
   return (
     <IllustrationContainer>
       <Image
-        src="/new-home/new-approach-illu/phone.png"
+        src="/home/new-approach-illu/phone.png"
         height={463}
         width={226}
         alt={t('features.alt')}
@@ -19,7 +19,7 @@ const MobileIllustration = () => {
         priority
       />
       <Image
-        src="/new-home/new-approach-illu/code.png"
+        src="/home/new-approach-illu/code.png"
         height={255}
         width={480}
         alt={t('features.alt')}

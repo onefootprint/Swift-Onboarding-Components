@@ -1,14 +1,21 @@
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { Container, media, Typography } from '@onefootprint/ui';
+import { Box, Container, media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import LinkButton from 'src/components/link-button';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import Carousel from './components/carousel';
-import ComparisonTable from './components/comparison-table';
-import CompetitorAnalysis from './components/competitor-analysis';
-import Hero from './components/hero';
-import TestimonialSection from './components/testimonial-section';
+import ComparisonTable from './components/comparison-table/comparison-table';
+import HorizontalCard from './components/horizontal-card/horizontal-card';
+import Biometrics from './components/illustrations/biometrics';
+import BoostConversions from './components/illustrations/boost-conversions';
+import CodeSnippet from './components/illustrations/code-snippet/code-snippet';
+import PiiVaulting from './components/illustrations/pii-vaulting/pii-vaulting';
+import SaveMoney from './components/illustrations/save-money/save-money';
+import SecurityLogs from './components/illustrations/security-logs/security-logs';
+import Shield from './components/illustrations/shield/shield';
+import VerticalCard from './components/vertical-card/vertical-card';
 
 const Compare = () => {
   const { t } = useTranslation('pages.compare');
@@ -16,71 +23,86 @@ const Compare = () => {
   return (
     <>
       <SEO title={t('html-title')} slug="/compare" />
-      <HeroContainer>
-        <Container>
-          <Hero
-            cta={t('hero.cta')}
-            subtitle={t('hero.subtitle')}
-            title={t('hero.title')}
-          />
-        </Container>
-      </HeroContainer>
-      <CarouselContainer>
-        <Carousel />
-      </CarouselContainer>
       <Container>
-        <IntroductionContainer>
-          <Typography color="primary" variant="body-1" as="p">
+        <HeroContainer>
+          <Typography color="primary" variant="display-2" as="h1">
+            {t('hero.title')}
+          </Typography>
+          <Typography color="secondary" variant="body-1" as="p">
+            {t('hero.subtitle')}
+          </Typography>
+          <Box sx={{ marginBottom: 4 }} />
+          <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`} prefetch>
+            {t('hero.cta')}
+          </LinkButton>
+          <Box sx={{ marginBottom: 10 }} />
+        </HeroContainer>
+        <NarrowContainer>
+          <Typography color="secondary" variant="body-1" as="p">
             {t('introduction')}
           </Typography>
-        </IntroductionContainer>
-      </Container>
-      <Container>
-        <ComparisonTableContainer>
           <ComparisonTable />
-        </ComparisonTableContainer>
-      </Container>
-      <Container>
-        <RestContainer>
-          <CompetitorAnalysis
-            anchor="footprint-vs-rest"
-            content={t('competitor.rest.content') as unknown as string[]}
-            title={t('competitor.rest.title')}
-          />
-        </RestContainer>
-      </Container>
-      <TestimonialContainer>
-        <TestimonialSection />
-      </TestimonialContainer>
-      <Container>
-        <CompetitorAnalysisContainer>
-          <CompetitorAnalysis
-            anchor="footprint-vs-persona"
-            content={t('competitor.persona.content') as unknown as string[]}
-            coverImgUrl="/compare/competitor-analysis/persona.png"
-            title={t('competitor.persona.title')}
-          />
-        </CompetitorAnalysisContainer>
-      </Container>
-      <Container>
-        <CompetitorAnalysisContainer>
-          <CompetitorAnalysis
-            anchor="footprint-vs-alloy"
-            content={t('competitor.alloy.content') as unknown as string[]}
-            coverImgUrl="/compare/competitor-analysis/alloy.png"
-            title={t('competitor.alloy.title')}
-          />
-        </CompetitorAnalysisContainer>
-      </Container>
-      <Container>
-        <CompetitorAnalysisContainer>
-          <CompetitorAnalysis
-            anchor="footprint-vs-vgs"
-            content={t('competitor.vgs.content') as unknown as string[]}
-            coverImgUrl="/compare/competitor-analysis/vgs.png"
-            title={t('competitor.vgs.title')}
-          />
-        </CompetitorAnalysisContainer>
+        </NarrowContainer>
+        <Box sx={{ marginBottom: 10 }} />
+        <Typography variant="display-2" sx={{ textAlign: 'center' }}>
+          {t('why-footptint.title')}
+        </Typography>
+        <CardsContainer>
+          <HorizontalCard
+            title={t('why-footptint.user-experience.title')}
+            description={t('why-footptint.user-experience.description')}
+            orientation="left"
+          >
+            <BoostConversions />
+          </HorizontalCard>
+          <HorizontalCard
+            title={t('why-footptint.biometrics.title')}
+            description={t('why-footptint.biometrics.description')}
+            orientation="right"
+          >
+            <Biometrics />
+          </HorizontalCard>
+          <HorizontalCard
+            title={t('why-footptint.dev-exp.title')}
+            description={t('why-footptint.dev-exp.description')}
+            orientation="left"
+            theme="dark"
+            cta={t('why-footptint.dev-exp.cta')}
+            href="https://docs.onefootprint.com/kyc-with-pii/getting-started"
+          >
+            <CodeSnippet />
+          </HorizontalCard>
+          <HorizontalCard
+            title={t('why-footptint.save-money.title')}
+            description={t('why-footptint.save-money.description')}
+            orientation="left"
+            cta={t('why-footptint.save-money.cta')}
+            href="/pricing"
+          >
+            <SaveMoney />
+          </HorizontalCard>
+          <VerticalCardsContainer>
+            <VerticalCard
+              title={t('why-footptint.pii-vaulting.title')}
+              description={t('why-footptint.pii-vaulting.description')}
+            >
+              <PiiVaulting />
+            </VerticalCard>
+            <VerticalCard
+              title={t('why-footptint.vault-proxy.title')}
+              description={t('why-footptint.vault-proxy.description')}
+            >
+              <SecurityLogs />
+            </VerticalCard>
+          </VerticalCardsContainer>
+          <HorizontalCard
+            title={t('why-footptint.security-design.title')}
+            description={t('why-footptint.security-design.description')}
+            orientation="left"
+          >
+            <Shield />
+          </HorizontalCard>
+        </CardsContainer>
       </Container>
     </>
   );
@@ -89,72 +111,59 @@ const Compare = () => {
 const HeroContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[10]};
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: ${theme.spacing[5]};
+    margin: auto;
+    max-width: 640px;
+    padding-top: ${theme.spacing[10]};
+
+    ${media.greaterThan('md')`
+      max-width: 830px;
+      padding-top: ${theme.spacing[8]};
+    `}
   `}
 `;
 
-const CarouselContainer = styled.div`
+const NarrowContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[10]};
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+    margin: auto;
 
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[11]};
+    max-width: 640px;
+
+    ${media.greaterThan('md')`
+      max-width: 830px;
     `}
   `}
 `;
 
-const IntroductionContainer = styled.div`
+const CardsContainer = styled.div`
   ${({ theme }) => css`
-    max-width: 800px;
-    margin: 0 auto ${theme.spacing[10]};
-
-    ${media.greaterThan('lg')`
-      text-align: initial;
-    `}
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[8]};
+    margin: ${theme.spacing[10]} auto ${theme.spacing[11]} auto;
   `}
 `;
 
-const ComparisonTableContainer = styled.div`
+const VerticalCardsContainer = styled.div`
   ${({ theme }) => css`
-    overflow: auto;
-    margin: 0 0 ${theme.spacing[10]};
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[7]};
 
-    ${media.greaterThan('lg')`
-      margin: 0 0 ${theme.spacing[10]};
-      text-align: initial;
+    ${media.greaterThan('md')` 
+      flex-direction: row;
+      gap: ${theme.spacing[7]};
     `}
-  `}
-`;
-
-const RestContainer = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]};
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[12]};
-    `}
-  `}
-`;
-
-const TestimonialContainer = styled.div`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    margin-bottom: ${theme.spacing[10]};
-    padding: ${theme.spacing[11]} 0;
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[12]};
-    `}
-  `}
-`;
-
-const CompetitorAnalysisContainer = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[11]};
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[14]};
-    `}
-  `}
+  `};
 `;
 
 export default Compare;

@@ -148,7 +148,7 @@ const ButtonsContainer = styled.div`
 
 const NoiseLayer = styled.div`
   position: absolute;
-  background-image: url('/new-home/hero/noise.png');
+  background-image: url('/home/hero/noise.png');
   background-blend-mode: overlay;
   opacity: 0.1;
   width: 100%;

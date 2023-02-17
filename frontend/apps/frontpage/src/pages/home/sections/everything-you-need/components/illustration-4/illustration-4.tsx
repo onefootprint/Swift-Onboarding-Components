@@ -11,14 +11,14 @@ const Illustration4 = () => {
     <>
       <ImageContainer data-viewport="desktop">
         <Image
-          src="/new-home/everything-you-need-section/feature-4/create-role.png"
+          src="/home/everything-you-need-section/feature-4/create-role.png"
           alt={t('features.feature-4.alt-1')}
           height={405}
           width={393}
           data-type="main"
         />
         <Image
-          src="/new-home/everything-you-need-section/feature-4/table-view.png"
+          src="/home/everything-you-need-section/feature-4/table-view.png"
           alt={t('features.feature-4.alt-2')}
           height={285}
           width={800}
@@ -27,14 +27,14 @@ const Illustration4 = () => {
       </ImageContainer>
       <ImageContainer data-viewport="tablet">
         <Image
-          src="/new-home/everything-you-need-section/feature-4/create-role.png"
+          src="/home/everything-you-need-section/feature-4/create-role.png"
           alt={t('features.feature-4.alt-1')}
           height={457.5}
           width={444}
           data-type="main"
         />
         <Image
-          src="/new-home/everything-you-need-section/feature-4/table-view.png"
+          src="/home/everything-you-need-section/feature-4/table-view.png"
           alt={t('features.feature-4.alt-2')}
           height={285}
           width={800}
@@ -43,14 +43,14 @@ const Illustration4 = () => {
       </ImageContainer>
       <ImageContainer data-viewport="mobile">
         <Image
-          src="/new-home/everything-you-need-section/feature-4/create-role.png"
+          src="/home/everything-you-need-section/feature-4/create-role.png"
           alt={t('features.feature-4.alt-1')}
           height={305}
           width={296}
           data-type="main"
         />
         <Image
-          src="/new-home/everything-you-need-section/feature-4/table-view.png"
+          src="/home/everything-you-need-section/feature-4/table-view.png"
           alt={t('features.feature-4.alt-2')}
           height={285}
           width={800}

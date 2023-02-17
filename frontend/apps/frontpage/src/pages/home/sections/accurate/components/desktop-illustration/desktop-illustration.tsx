@@ -45,7 +45,7 @@ const DesktopIllustration = () => {
         id="main-img"
       >
         <Image
-          src="/new-home/accurate-section/audit-trail.png"
+          src="/home/accurate-section/audit-trail.png"
           height={394}
           width={520}
           alt={t('alt')}

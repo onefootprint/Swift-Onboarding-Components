@@ -16,7 +16,7 @@ const PenguinBanner = () => {
       <Container as="section" id="penguin-banner">
         <Content>
           <Image
-            src="/new-home/banner/penguin.png"
+            src="/home/banner/penguin.png"
             height={190}
             width={268}
             alt={t('alt')}
@@ -124,7 +124,7 @@ const ColorBackground = styled.div`
 
 const NoiseLayer = styled.div`
   position: absolute;
-  background-image: url('/new-home/hero/noise.png');
+  background-image: url('/home/hero/noise.png');
   background-blend-mode: overlay;
   opacity: 0.1;
   width: 100%;

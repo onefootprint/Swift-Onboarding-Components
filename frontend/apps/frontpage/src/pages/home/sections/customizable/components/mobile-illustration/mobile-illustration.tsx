@@ -9,7 +9,7 @@ const MobileIllustration = () => (
   <IllustrationContainer>
     <ImageContainer data-position="center">
       <Image
-        src="/new-home/customizable/1.png"
+        src="/home/customizable/1.png"
         height={240}
         width={300}
         alt="illustration"
@@ -17,7 +17,7 @@ const MobileIllustration = () => (
     </ImageContainer>
     <ImageContainer data-position="top-right">
       <Image
-        src="/new-home/customizable/2.png"
+        src="/home/customizable/2.png"
         height={200}
         width={250}
         alt="illustration"
@@ -26,7 +26,7 @@ const MobileIllustration = () => (
 
     <ImageContainer data-position="bottom-right">
       <Image
-        src="/new-home/customizable/3.png"
+        src="/home/customizable/3.png"
         height={200}
         width={250}
         alt="illustration"
@@ -35,7 +35,7 @@ const MobileIllustration = () => (
 
     <ImageContainer data-position="top-left">
       <Image
-        src="/new-home/customizable/4.png"
+        src="/home/customizable/4.png"
         height={200}
         width={250}
         alt="illustration"
@@ -44,7 +44,7 @@ const MobileIllustration = () => (
 
     <ImageContainer data-position="bottom-left">
       <Image
-        src="/new-home/customizable/5.png"
+        src="/home/customizable/5.png"
         height={200}
         width={250}
         alt="illustration"

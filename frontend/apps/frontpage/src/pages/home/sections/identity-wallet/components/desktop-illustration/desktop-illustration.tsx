@@ -42,7 +42,7 @@ const DesktopIllustration = () => {
         variants={mainImgVariants}
       >
         <Image
-          src="/new-home/id-wallet/id-wallet.png"
+          src="/home/id-wallet/id-wallet.png"
           height={740}
           width={1020}
           alt={t('alt')}

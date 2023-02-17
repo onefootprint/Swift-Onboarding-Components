@@ -10,14 +10,14 @@ const Illustration1 = () => {
     <>
       <ImageContainer data-viewport="desktop">
         <Image
-          src="/new-home/everything-you-need-section/feature-1/multiple-names.png"
+          src="/home/everything-you-need-section/feature-1/multiple-names.png"
           alt="{t('features.feature-1.alt-1')}"
           height={389}
           width={370}
           data-type="main"
         />
         <Image
-          src="/new-home/everything-you-need-section/feature-1/risk-insights.png"
+          src="/home/everything-you-need-section/feature-1/risk-insights.png"
           alt={t('features.feature-1.alt-1')}
           height={358}
           width={659}
@@ -27,14 +27,14 @@ const Illustration1 = () => {
 
       <ImageContainer data-viewport="tablet">
         <Image
-          src="/new-home/everything-you-need-section/feature-1/multiple-names.png"
+          src="/home/everything-you-need-section/feature-1/multiple-names.png"
           alt={t('features.feature-1.alt-1')}
           height={528}
           width={502.4}
           data-type="main"
         />
         <Image
-          src="/new-home/everything-you-need-section/feature-1/risk-insights.png"
+          src="/home/everything-you-need-section/feature-1/risk-insights.png"
           alt={t('features.feature-1.alt-1')}
           height={358}
           width={659}
@@ -44,14 +44,14 @@ const Illustration1 = () => {
 
       <ImageContainer data-viewport="mobile">
         <Image
-          src="/new-home/everything-you-need-section/feature-1/multiple-names.png"
+          src="/home/everything-you-need-section/feature-1/multiple-names.png"
           alt={t('features.feature-1.alt-1')}
           height={330}
           width={314}
           data-type="main"
         />
         <Image
-          src="/new-home/everything-you-need-section/feature-1/risk-insights.png"
+          src="/home/everything-you-need-section/feature-1/risk-insights.png"
           alt={t('features.feature-1.alt-1')}
           height={358}
           width={659}

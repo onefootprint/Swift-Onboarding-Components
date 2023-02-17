@@ -11,14 +11,14 @@ const MobileIllustration = () => {
       <Inner>
         <MockupContainer>
           <Image
-            src="/new-home/hero/dashboard.png"
+            src="/home/hero/dashboard.png"
             fill
             alt={t('desktop-img-alt')}
             priority
           />
         </MockupContainer>
         <Image
-          src="/new-home/hero/phone.png"
+          src="/home/hero/phone.png"
           height={292.8}
           width={144}
           alt={t('mobile-img-alt')}

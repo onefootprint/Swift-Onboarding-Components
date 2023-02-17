@@ -11,14 +11,14 @@ const TabletIllustration = () => {
       <Inner>
         <MockupContainer>
           <Image
-            src="/new-home/hero/dashboard.png"
+            src="/home/hero/dashboard.png"
             alt={t('desktop-img-alt')}
             priority
             fill
           />
         </MockupContainer>
         <Image
-          src="/new-home/hero/phone.png"
+          src="/home/hero/phone.png"
           height={480}
           width={240}
           alt={t('mobile-img-alt')}

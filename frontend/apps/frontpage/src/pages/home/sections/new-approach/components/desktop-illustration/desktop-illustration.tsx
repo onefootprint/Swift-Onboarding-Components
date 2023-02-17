@@ -62,7 +62,7 @@ const DesktopIllustration = () => {
         className="phone-image"
       >
         <Image
-          src="/new-home/new-approach-illu/phone.png"
+          src="/home/new-approach-illu/phone.png"
           height={760}
           width={370}
           alt={t('features.alt')}
@@ -77,7 +77,7 @@ const DesktopIllustration = () => {
         className="code-image"
       >
         <Image
-          src="/new-home/new-approach-illu/code.png"
+          src="/home/new-approach-illu/code.png"
           height={255}
           width={480}
           alt={t('features.alt')}
@@ -94,7 +94,7 @@ const IllustrationContainer = styled(BaseIllustration)`
     radial-gradient(at 0% 100%, #f2f9ff 0%, rgba(200, 228, 255, 0) 100%),
     radial-gradient(at 100% 50%, #fefff0 0%, white 100%), white;
 
-  ${media.greaterThan('md')`
+  ${media.greaterThan('lg')`
       display: block;
     `}
 

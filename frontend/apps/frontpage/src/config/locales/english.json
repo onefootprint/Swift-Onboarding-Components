@@ -594,99 +594,115 @@
       "html-title": "Footprint - Compare",
       "hero": {
         "title": "Why Footprint is the best KYC + security solution for your business",
-        "subtitle": "Spoiler alert: it removes the toggle between friction and accuracy.",
-        "cta": "Get started"
-      },
-      "carousel": {
-        "slide": {
-          "button-label": "Slide image {{index}}",
-          "integration": {
-            "alt": "Onboard users with one-click",
-            "tooltip": "one-click Onboarding"
-          },
-          "one-click": {
-            "alt": "Know the data you're sharing",
-            "tooltip": "Transparent"
-          },
-          "dashboard-overview": {
-            "alt": "Manage everything with our dashboard",
-            "tooltip": "Dashboard"
-          },
-          "dashboard-user": {
-            "alt": "See user's relevant information",
-            "tooltip": "User Details"
-          },
-          "my-footprint": {
-            "alt": "With my.onefootprint.com, you can manage and see how is accessing your information",
-            "tooltip": "Identity Wallet"
-          }
-        },
-        "back": "Previous slide",
-        "next": "Next slide"
+        "subtitle": "Spoiler alert: it's frictionless, secure and easy to integrate.",
+        "cta": "Sign up"
       },
       "introduction": "In 2015, VGS ushered in the idea of tokenizing PII data and Alloy introduced an orchestration tool to handle KYC requests in an automated fashion. Both wanted to help a new era of financial companies more easily onboard customers and store data. Footprint was founded seven years later to leverage brand-new technology to these early ideas into a more elegant, secure, and frictionless all-in-one solution that provides best-in-class KYC and PII vaulting.",
       "table": {
         "companies": {
           "footprint": "Footprint",
-          "persona": "Persona",
           "alloy": "Alloy",
           "vgs": "VGS"
         },
         "features": {
-          "kyc": "KYC Check",
-          "tokenization": "Tokenization",
-          "piiVaulting": "PII Vaulting",
-          "accessControl": "Access control",
-          "liveness": "Liveness/Biometrics",
-          "faceId": "Face ID Compatible",
-          "zeroTrustSecurity": "Zero-trust Security",
-          "oneClick": "One-Click capabilities",
-          "simpleIntegration": "Under 5 lines of code",
-          "fancyAI": "Fancy AI"
+          "kyc-check": {
+            "title": "KYC Check",
+            "footprint": true,
+            "alloy": true,
+            "vgs": false
+          },
+          "tokenization": {
+            "title": "Tokenization",
+            "footprint": true,
+            "alloy": false,
+            "vgs": true
+          },
+          "pii-vaulting": {
+            "title": "PII Vaulting",
+            "footprint": true,
+            "alloy": false,
+            "vgs": true
+          },
+          "liveness": {
+            "title": "Liveness",
+            "footprint": true,
+            "alloy": false,
+            "vgs": false
+          },
+          "biometrics": {
+            "title": "Biometrics",
+            "footprint": true,
+            "alloy": false,
+            "vgs": false
+          },
+          "one-click-compatibility": {
+            "title": "One-click compatibility",
+            "footprint": true,
+            "alloy": false,
+            "vgs": false
+          },
+          "zero-trust-security": {
+            "title": "Zero-trust security",
+            "footprint": true,
+            "alloy": false,
+            "vgs": true
+          },
+          "under-8-lines-of-code": {
+            "title": "Under 8 lines of code",
+            "footprint": true,
+            "alloy": false,
+            "vgs": false
+          },
+          "fancy-ai": {
+            "title": "Fancy AI",
+            "footprint": false,
+            "alloy": true,
+            "vgs": false
+          },
+          "vault-proxy": {
+            "title": "Vault Proxy",
+            "footprint": true,
+            "alloy": false,
+            "vgs": false
+          }
         }
       },
-      "competitor": {
-        "rest": {
-          "title": "Footprint vs. the Rest",
-          "content": [
-            "First let us say that we have a lot of respect for the companies that came before us, for ushering in a better age of fintech + data security. They are certainly much better than the options companies had a decade ago. However, we wouldn’t be here if we didn’t see a massive opportunity for improvement. We are selling results, not a black-box solution wrapped in unexplainable AI.",
-            "Footprint is built to solve two problems, KYC + PII Vaulting, in an easy-to-use solution that does not make you choose between friction and accuracy. It seemed silly to us that both of these functions were previously performed statically, often upon account creation at a moment in time. Not only does this make companies (and users) waste time and money going through the same process, but it lowers accuracy by not leaning on shared knowledge. Footprint enables companies to create a shared knowledge database of bad actors. Companies can prevent losses if they know that an actor has been marked as fraudulent by another institution. Conversely, given that every company is storing essentially the same six attributes for KYC, it seems extremely unnecessary for each company to build out its own vault to store this universal information.",
-            "With Footprint, in five lines of code, you get KYC and PII Vaulting taken care of in one solution that will be up and running in a day.  However, we are not simply better because we do both. We believe we have a better KYC experience than companies such as Persona and Alloy, and a better PII Vaulting service than competitors like VGS."
-          ]
+      "why-footptint": {
+        "title": "Why Companies Choose Footprint",
+        "user-experience": {
+          "title": "User Experience: Boost Conversion 25% with a More Streamlined Flow ",
+          "description": "Footprint is built to optimize conversion without compromising accuracy. We’re the only company to use FaceID for liveness to give users a seamless experience. Footprint will be the only KYC company to support one-click KYC. After a user signs up for an account using Footprint once, the next time it is as easy as them typing in their email and doing FaceID."
         },
-        "persona": {
-          "title": "Footprint vs. Persona (KYC)",
-          "content": [
-            "Footprint keeps the great APIs, UX + liveness checks of Persona, but improves it by increasing accuracy through more novel biometrics, offering an easier developer experience, and of course, offloading compliance.",
-            "Instead of customizing which KYC attributes are pulled and when (ie. take an SSN and then scan a driver’s license), we remove abstraction by giving a standard KYC flow with top accuracy to all customers. However, we have modular customization that for specific business types. For example, many investment apps want to know someone’s risk tolerance, their investment time horizon, and the amount of capital to deploy. Instead of creating custom flows, we let you choose from templates that work.",
-            "Persona got (deserved) praise for ushering us into an age of selfie checks as a first step to liveness checks. However, as fraud continues to increase, it is clear that spoofing here has been able to evade these checks while consumers continue to face high friction in completing these checks. Instead of using faulty and cumbersome selfie checks, we leverage the biometric technology your users already have in their pockets — like FaceID."
-          ]
+        "biometrics": {
+          "title": "Improve Accuracy with Cutting-Edge Biometrics",
+          "description": "Footprint is the only KYC company that is built to be FIDO2 native and leverages passkeys. What this means is that we use novel biometrics such as the FaceID built directly into peoples’ phones to get attestations of liveness. Passkeys also enable us to verify things such as users being on a non-jailbroken device, coming from non-spoofed IP addresses, as well as dozens of other device attributes."
         },
-        "alloy": {
-          "title": "Footprint vs. Alloy (KYC)",
-          "content": [
-            "Footprint is designed to be an easier dev experience to integrate and requires less attention from your engineers to maintain.",
-            "Alloy has become quite complex to use over the years—they now give you a buffet of vendors to choose from and provide deployed engineers to help you integrate their product. We don’t think you need data from over 100 vendors to solve KYC—you only need that if you want to increase burn. We work with fewer sources overall data sources, but those that represent the highest quality data. As a result, we don’t charge you for letting us make the decision each time of which vendor to call upon.",
-            "At Footprint, we want to prevent fraud before it gets in the door. We don’t spin up a fancy risk engine every time; we actually verify good actors from the start, and flag bad actors in real-time across our ecosystem. We don’t have any upside in having you buy a premium package with 10 vendors. We want to make KYC simple, not complex. Our goal is to save you money and reduce fraud—that is how we win and our business model. "
-          ]
+        "dev-exp": {
+          "title": "Developer Experience: Integrate in Minutes",
+          "description": "Footprint is five lines of code. Our belief is that KYC should not be an arduous choose-your-own-adventure novel to set up; it should just work. Footprint is also designed to deliver a streamlined experience that feels native to your company. Our platform allows for easy customization of over 80 attributes so that the UI will feel like your own.",
+          "cta": "Read the docs"
         },
-        "vgs": {
-          "title": "Footprint vs. VGS (PII Vaulting)",
-          "content": [
-            "Footprint abstracts away the complexities of storing and managing sensitive data using our cutting-edge encryption infrastructure based on secure nitro enclaves.",
-            "With classic vaulting services like VGS, you have to carefully architect your data model around their APIs: you need to choose what fields to tokenize, how they should tokenized, and where the tokenization happens (on the client side or remotely on your server). In some cases, this customization is helpful— especially if you’re building non-standard workflows—however KYC should be straightforward. Footprint combines identity verification with PII vaulting so you don’t need to glue two disparate pieces of software together. We abstract away all this complexity.",
-            "In one embedded front-end flow, Footprint collects user data directly, verifies it, performs a liveness check and then securely encrypts and tokenizes this entire user identity into a single token that binds to the audit trail of how we verified it. To integrate Footprint, you simply need to store a single user token — the “footprint user token” — which gives you granular access rights to specified identity attributes of that user.",
-            "Our simple API supports a variety of scopes and controls to maintain zero trust, least privilege principles. Generate credentials that have access to specific data attributes — or functions of those data attributes (like someone’s age versus their birthdate). All of this is invisible to your code or data model, and all you need to worry about is a single user footprint token that can be stored easily in plain-text."
-          ]
+        "vault-proxy": {
+          "title": "Vault Proxy PCI + PII",
+          "description": "Send information securely to the third parties who need it. Whether it is issuing a card number or transmitting tax information to the IRS, our simple API supports a variety of scopes and controls to maintain zero trust, least privilege principles. By offloading PCI, you can get PCI Certified by being out of scope. "
+        },
+        "security-design": {
+          "title": "Security by design",
+          "description": "In one embedded front-end flow, Footprint collects user data directly, verifies it, performs a liveness check, and then securely encrypts and tokenizes this entire user identity into a single token. To integrate Footprint, you simply need to store a single user token — the “footprint user token” — which gives you granular access rights to specified identity attributes of that user."
+        },
+        "pii-vaulting": {
+          "title": "PII Vaulting",
+          "description": "Generate credentials that have access to specific data attributes — or functions of those data attributes (like someone’s age versus their birthdate). All of this is invisible to your code or data model, and you only need to worry about a single user footprint token that can be stored easily in plain text."
+        },
+        "save-money": {
+          "title": "Save Money by Combining Tools",
+          "description": "Vaulting companies charge per decrypt because that’s where the bulk of their revenue comes from. KYC platforms try to upsell modules on the KYC due to drawing their profits from onboarding. Footprint, in contrast, makes money by onboarding good actors and then securely storing that information across tenants. As a result, we can see companies save up to 50% of their costs across both KYC and PII Vaulting by unifying it into one tool. Not to mention all of the technical benefits!",
+          "cta": "Learn more"
         }
       },
-      "testimonial": {
-        "quote": "Footprint is the first platform that delivers verification that is both low-friction and high accuracy. The platform's opinionated data storage architecture facilitates this breakthrough.",
-        "author": {
-          "name": "Shardul Shah",
-          "img-alt": "Picture of Shardul Shah",
-          "role": "Partner at Index Ventures"
-        }
+      "banner": {
+        "title": "The only solution you need KYC & security",
+        "cta": "Get started"
       }
     },
     "privacy-policy": {

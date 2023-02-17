@@ -1,233 +1,97 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { IcoCheck24 } from '@onefootprint/icons';
+import { IcoCheck16 } from '@onefootprint/icons';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const ComparisonTable = () => {
-  const { t } = useTranslation('pages.compare.table');
+import options from '../../../../config/locales/english.json';
 
-  const header = [
-    '',
-    t('companies.footprint'),
-    t('companies.persona'),
-    t('companies.alloy'),
-    t('companies.vgs'),
-  ];
-  const kyc = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: true },
-    { key: 'Alloy', value: true },
-    { key: 'VGS', value: false },
-  ];
-  const tokenization = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: false },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: true },
-  ];
-  const piiVaulting = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: false },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: true },
-  ];
-  const accessControl = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: false },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: false },
-  ];
-  const liveness = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: true },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: false },
-  ];
-  const faceId = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: false },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: false },
-  ];
-  const oneClick = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: false },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: false },
-  ];
-  const zeroTrustSecurity = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: false },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: true },
-  ];
-  const simpleIntegration = [
-    { key: 'Footprint', value: true },
-    { key: 'Persona', value: true },
-    { key: 'Alloy', value: false },
-    { key: 'VGS', value: false },
-  ];
-  const fancyAI = [
-    { key: 'Footprint', value: false },
-    { key: 'Persona', value: true },
-    { key: 'Alloy', value: true },
-    { key: 'VGS', value: false },
-  ];
+const tableOptions = options.pages.compare.table;
 
-  return (
-    <Container>
-      <Table>
-        <thead>
-          <tr>
-            {header.map(text => (
-              <th key={text}>
-                <Typography color="primary" variant="label-3">
-                  {text}
-                </Typography>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.kyc')}
-              </Typography>
-            </td>
-            {kyc.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.tokenization')}
-              </Typography>
-            </td>
-            {tokenization.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.piiVaulting')}
-              </Typography>
-            </td>
-            {piiVaulting.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.accessControl')}
-              </Typography>
-            </td>
-            {accessControl.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.liveness')}
-              </Typography>
-            </td>
-            {liveness.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.faceId')}
-              </Typography>
-            </td>
-            {faceId.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.oneClick')}
-              </Typography>
-            </td>
-            {oneClick.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.zeroTrustSecurity')}
-              </Typography>
-            </td>
-            {zeroTrustSecurity.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.simpleIntegration')}
-              </Typography>
-            </td>
-            {simpleIntegration.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>
-              <Typography color="secondary" variant="body-3">
-                {t('features.fancyAI')}
-              </Typography>
-            </td>
-            {fancyAI.map(({ key, value }) => (
-              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-            ))}
-          </tr>
-        </tbody>
-      </Table>
-    </Container>
-  );
-};
+const ComparisonTable = () => (
+  <TableContainer>
+    <Header>
+      <Row data-type="header">
+        {Object.values(tableOptions.companies).map(header => (
+          <Typography key={header} variant="body-2">
+            {header}
+          </Typography>
+        ))}
+      </Row>
+    </Header>
+    {Object.values(tableOptions.features).map(feature => (
+      <div key={feature.title}>
+        <Row>
+          <Cell data-area="title">
+            <Typography variant="body-2">{feature.title}</Typography>
+          </Cell>
+          <Cell data-area="footprint">
+            {feature.footprint && <IcoCheck16 />}
+          </Cell>
+          <Cell data-area="alloy">{feature.alloy && <IcoCheck16 />}</Cell>
+          <Cell data-area="vgs">{feature.vgs && <IcoCheck16 />}</Cell>
+        </Row>
+      </div>
+    ))}
+  </TableContainer>
+);
 
-const Container = styled.div`
-  min-width: 590px;
+const TableContainer = styled.table`
+  ${({ theme }) => css`
+    border-collapse: collapse;
+    width: 100%;
+    margin: ${theme.spacing[10]} 0;
+  `}
 `;
 
-const Table = styled.table`
+const Header = styled.thead`
   ${({ theme }) => css`
-    width: 100%;
+    background-color: ${theme.backgroundColor.primary};
+    color: ${theme.color.primary};
+    text-align: left;
+    padding: ${theme.spacing[2]};
+    text-align: center;
+  `}
+`;
 
-    th {
-      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    }
+const Row = styled.tr`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[2]};
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
+    grid-template-areas: 'title footprint alloy vgs';
+    padding: ${theme.spacing[4]};
+    border-bottom: 1px dashed ${theme.borderColor.tertiary};
 
-    th,
-    td {
-      height: 44px;
-      text-align: center;
-      vertical-align: middle;
-      width: 16%;
-
-      &:first-child {
-        padding-left: ${theme.spacing[5]};
-        text-align: left;
-        width: 20%;
-      }
-    }
-
-    tbody {
-      tr:nth-child(even) {
-        background: ${theme.backgroundColor.secondary};
+    &[data-type='header'] {
+      border-bottom: 1px solid ${theme.borderColor.tertiary};
+      &::before {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 100%;
       }
     }
   `}
 `;
 
+const Cell = styled.td`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &[data-area='title'] {
+    grid-area: title;
+    justify-content: left;
+  }
+
+  &[data-area='footprint'] {
+    grid-area: footprint;
+  }
+  &[data-area='alloy'] {
+    grid-area: alloy;
+  }
+  &[data-area='vgs'] {
+    grid-area: vgs;
+  }
+`;
 export default ComparisonTable;

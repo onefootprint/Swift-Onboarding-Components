@@ -52,7 +52,7 @@ const DesktopIllustration = () => {
         variants={mainImgVariants}
       >
         <Image
-          src="/new-home/own-data/decrypt-data.png"
+          src="/home/own-data/decrypt-data.png"
           height={430}
           width={372}
           alt={t('alt')}
@@ -66,7 +66,7 @@ const DesktopIllustration = () => {
         variants={secondaryImgVariants}
       >
         <Image
-          src="/new-home/own-data/table.png"
+          src="/home/own-data/table.png"
           height={528}
           width={750}
           alt={t('alt')}
@@ -95,7 +95,7 @@ const IlllustrationContainer = styled(BaseIllustration)`
     bottom: 10%;
     left: 10%;
   }
-  ${media.greaterThan('md')`
+  ${media.greaterThan('lg')`
     display: flex;
   `}
 `;

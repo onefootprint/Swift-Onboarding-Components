@@ -60,7 +60,7 @@ const DesktopIllustration = () => {
       <OuterMockupContainer>
         <MockupContainer as={motion.div} variants={mockup} key={2}>
           <Image
-            src="/new-home/hero/dashboard.png"
+            src="/home/hero/dashboard.png"
             fill
             alt={t('desktop-img-alt')}
             priority
@@ -69,7 +69,7 @@ const DesktopIllustration = () => {
       </OuterMockupContainer>
       <PhoneContainer as={motion.div} variants={phone} key={3}>
         <Image
-          src="/new-home/hero/phone.png"
+          src="/home/hero/phone.png"
           height={575}
           width={284}
           alt={t('mobile-img-alt')}

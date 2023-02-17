@@ -11,14 +11,14 @@ const TabletIllustration = () => {
   return (
     <IllustrationContainer>
       <Image
-        src="/new-home/own-data/decrypt-data.png"
+        src="/home/own-data/decrypt-data.png"
         height={468}
         width={405}
         alt={t('alt')}
         className="main-img"
       />
       <Image
-        src="/new-home/own-data/table.png"
+        src="/home/own-data/table.png"
         height={528}
         width={750}
         alt={t('alt')}
@@ -38,7 +38,7 @@ const IllustrationContainer = styled(BaseIllustration)`
   .main-img {
     transform: translate(-50%, 50%);
     left: 50%;
-    bottom: 30%;
+    bottom: 20%;
     position: absolute;
     z-index: 1;
   }
@@ -55,7 +55,7 @@ const IllustrationContainer = styled(BaseIllustration)`
     display: block;
   `}
 
-  ${media.greaterThan('md')`
+  ${media.greaterThan('lg')`
     display: none;
   `}
 `;

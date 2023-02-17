@@ -10,7 +10,7 @@ const Illustration2 = () => {
   return (
     <ImageContainer>
       <Image
-        src="/new-home/everything-you-need-section/feature-2/security-logs.png"
+        src="/home/everything-you-need-section/feature-2/security-logs.png"
         alt={t('features.feature-2.alt')}
         height={446}
         width={698}

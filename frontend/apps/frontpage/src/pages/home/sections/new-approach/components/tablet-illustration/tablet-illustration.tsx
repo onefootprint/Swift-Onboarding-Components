@@ -6,12 +6,12 @@ import styled from 'styled-components';
 
 import BaseIllustration from '../../../../components/base-illustration';
 
-const DesktopIllustration = () => {
+const TabletIllustration = () => {
   const { t } = useTranslation('pages.home.new-approach-section');
   return (
     <IllustrationContainer>
       <Image
-        src="/new-home/new-approach-illu/phone.png"
+        src="/home/new-approach-illu/phone.png"
         height={694.5}
         width={339}
         alt={t('features.alt')}
@@ -19,7 +19,7 @@ const DesktopIllustration = () => {
         priority
       />
       <Image
-        src="/new-home/new-approach-illu/code.png"
+        src="/home/new-approach-illu/code.png"
         height={382.5}
         width={720}
         alt={t('features.alt')}
@@ -56,8 +56,8 @@ const IllustrationContainer = styled(BaseIllustration)`
       display: block;
   `}
 
-  ${media.greaterThan('md')`
+  ${media.greaterThan('lg')`
       display: none;
   `}
 `;
-export default DesktopIllustration;
+export default TabletIllustration;

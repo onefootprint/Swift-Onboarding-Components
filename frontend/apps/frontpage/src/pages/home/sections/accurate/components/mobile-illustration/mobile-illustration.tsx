@@ -11,7 +11,7 @@ const MobileIllustration = () => {
   return (
     <IllustrationContainer>
       <Image
-        src="/new-home/accurate-section/audit-trail.png"
+        src="/home/accurate-section/audit-trail.png"
         height={349}
         width={460}
         alt={t('alt')}

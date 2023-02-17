@@ -126,7 +126,7 @@ const DesktopIllustration = () => {
         animate={controls}
       >
         <Image
-          src="/new-home/customizable/1.png"
+          src="/home/customizable/1.png"
           height={398}
           width={500}
           alt="slider"
@@ -140,7 +140,7 @@ const DesktopIllustration = () => {
         animate={controls}
       >
         <Image
-          src="/new-home/customizable/2.png"
+          src="/home/customizable/2.png"
           height={318}
           width={380}
           alt="slider"
@@ -154,7 +154,7 @@ const DesktopIllustration = () => {
         animate={controls}
       >
         <Image
-          src="/new-home/customizable/3.png"
+          src="/home/customizable/3.png"
           height={318}
           width={380}
           alt="slider"
@@ -168,7 +168,7 @@ const DesktopIllustration = () => {
         animate={controls}
       >
         <Image
-          src="/new-home/customizable/4.png"
+          src="/home/customizable/4.png"
           height={318}
           width={380}
           alt="slider"
@@ -182,7 +182,7 @@ const DesktopIllustration = () => {
         animate={controls}
       >
         <Image
-          src="/new-home/customizable/5.png"
+          src="/home/customizable/5.png"
           height={318}
           width={380}
           alt="slider"
