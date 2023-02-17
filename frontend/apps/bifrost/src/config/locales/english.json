@@ -8,6 +8,10 @@
       "description": "Leaving this flow will not save your data.",
       "yes": "Yes",
       "no": "No"
+    },
+    "login-with-different-account": {
+      "missing-phone": "Don't have access to this phone number?",
+      "cta": "Login with a different account"
     }
   },
   "pages": {
