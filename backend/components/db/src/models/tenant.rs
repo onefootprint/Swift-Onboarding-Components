@@ -69,6 +69,14 @@ impl Tenant {
         Ok(tenant)
     }
 
+    #[tracing::instrument(skip_all)]
+    pub fn list_live(conn: &mut PgConn) -> DbResult<Vec<Self>> {
+        let results = tenant::table
+            .filter(tenant::sandbox_restricted.eq(false))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
     #[tracing::instrument(skip_all)]

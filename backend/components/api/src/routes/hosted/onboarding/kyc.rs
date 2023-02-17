@@ -69,15 +69,6 @@ pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonAp
             &state.twilio_client.client,
         )
         .await?;
-        if ob_info.scoped_user.is_live
-            && decision::utils::should_bill(&state.feature_flag_client, &ob_info.tenant.id)
-        {
-            // TODO don't get or create customer inline. Should create as part of graduating a tenant to prod
-            let customer_id =
-                crate::utils::billing::get_or_create_customer_id(&state, ob_info.tenant).await?;
-            // TODO more advaned charging aside from just KYC
-            billing::charge_for_kyc(&state.stripe_client, customer_id, ob_info.scoped_user.id).await?;
-        }
     }
 
     EmptyResponse::ok().json()

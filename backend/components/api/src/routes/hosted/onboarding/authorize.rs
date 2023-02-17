@@ -68,13 +68,9 @@ pub async fn post(
         })
         .await??;
 
-    let tenant_id = su.tenant_id.clone();
     state
         .webhook_service_client
-        .send_event_to_tenant_non_blocking(tenant_id, wh_event, None);
-    if su.is_live && crate::decision::utils::should_bill(&state.feature_flag_client, &su.tenant_id) {
-        billing::update_pii_charge(state.stripe_client.clone(), state.db_pool.clone(), su.tenant_id);
-    }
+        .send_event_to_tenant_non_blocking(su.tenant_id, wh_event, None);
 
     Ok(Json(ResponseData {
         data: CommitResponse {

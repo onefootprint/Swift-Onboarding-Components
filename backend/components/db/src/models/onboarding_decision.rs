@@ -10,9 +10,11 @@ use crate::{
     DbResult,
 };
 use chrono::{DateTime, Utc};
+use diesel::dsl::count_star;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
+use newtypes::TenantId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, Locked, OnboardingDecisionId,
     OnboardingDecisionInfo, OnboardingId, OnboardingStatus, UserVaultId, VerificationResultId,
@@ -185,5 +187,25 @@ impl OnboardingDecision {
             .filter(onboarding_decision::onboarding_id.eq(onboarding_id))
             .get_results(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_billable_count(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+    ) -> DbResult<i64> {
+        use crate::schema::{onboarding, scoped_user};
+        let count = onboarding_decision::table
+            .inner_join(onboarding::table.inner_join(scoped_user::table))
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(true))
+            // TODO filter on not(onboarding::authorized_at.is_null())?
+            .filter(onboarding_decision::created_at.ge(start_date))
+            .filter(onboarding_decision::created_at.lt(end_date))
+            .select(count_star())
+            .get_result(conn)?;
+        Ok(count)
     }
 }

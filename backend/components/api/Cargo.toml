@@ -51,6 +51,7 @@ actix-cors = "0.6"
 paperclip = { workspace = true }
 mime = "0.3.16"
 chrono = { workspace = true }
+chronoutil = "0.2.3"
 strum_macros = { workspace = true }
 actix-web-httpauth = "0.8.0"
 actix-web-prom = "0.6.0"

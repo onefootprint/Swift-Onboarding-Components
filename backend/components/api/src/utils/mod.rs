@@ -1,4 +1,3 @@
-pub mod billing;
 pub mod challenge;
 pub mod db2api;
 pub mod email;
