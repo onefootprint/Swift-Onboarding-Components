@@ -1,4 +1,5 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant, UserSession};
+use crate::auth::SessionContext;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
@@ -15,8 +16,7 @@ use db::models::user_consent::UserConsent;
 use db::models::user_timeline::UserTimeline;
 use db::models::user_vault::UserVault;
 use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
-use db::{DbError, DbResult, PgConn};
+use db::{DbError, DbPool, DbResult, PgConn};
 use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
@@ -311,51 +311,62 @@ pub async fn get(
 ) -> actix_web::Result<Json<ResponseData<DocumentResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    // Load our document request and check the status
-    let (latest_request, previous_request_verification_result, retry_limit_exceeded) = state
-        .db_pool
-        .db_query(
-            move |conn| -> Result<(DbDocumentRequest, Option<VerificationResult>, bool), ApiError> {
-                let Some(auth_info) = user_auth.onboarding(conn)? else {
-                return Err(ApiError::from(OnboardingError::NoOnboarding))
-            };
-                // Get the latest document request for the scoped user, and the previous result (for errors).
-                // We don't just stash the errors on the document request because with multiple vendors, we'll need
-                // to handle each set of errors appropriately
-                let (latest_request, previous_request_verification_result) =
-                    DbDocumentRequest::get_latest_with_verification_result(conn, &auth_info.scoped_user.id)?;
-                let retry_limit_exceeded =
-                    retry_limit_exceeded(conn, &latest_request.scoped_user_id).unwrap_or_default();
+    let response = get_inner(&state.db_pool, user_auth).await?;
 
-                Ok((
-                    latest_request,
-                    previous_request_verification_result,
-                    retry_limit_exceeded,
-                ))
-            },
-        )
+    // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
+    // otherwise, we'll pass through the status
+    ResponseData::ok(response).json()
+}
+
+pub async fn get_inner(
+    db_pool: &DbPool,
+    user_auth: SessionContext<UserSession>,
+) -> Result<DocumentResponse, ApiError> {
+    let scoped_user_id = db_pool
+        .db_query(move |conn| -> Result<ScopedUserId, ApiError> {
+            let Some(auth_info) = user_auth.onboarding(conn)? else {
+        return Err(ApiError::from(OnboardingError::NoOnboarding))
+    };
+            Ok(auth_info.scoped_user.id)
+        })
         .await??;
 
-    // Assemble our response
-    // +------------------------------+---------------------------------------------+--------------------------------------------+
-    // | Latest DocumentRequestStatus | Previous DocumentRequest VerificationResult |                Explanation                 |
-    // +------------------------------+---------------------------------------------+--------------------------------------------+
-    // | Pending                      | N                                           | New doc request                            |
-    // | Pending                      | Y                                           | there were errors and we need to recollect |
-    // | Complete                     | -                                           | We are done                                |
-    // | Uploaded                     | -                                           | Waiting on vendor                          |
-    // | Failed                       | -                                           | terminal failure (exceeded retries)        |
-    // +------------------------------+---------------------------------------------+--------------------------------------------+
+    let (status, errors) = db_pool
+        .db_query(move |conn| construct_get_response(conn, scoped_user_id))
+        .await??;
+
+    Ok(DocumentResponse {
+        status,
+        errors,
+        // TODO: Remove these fields
+        front_image_error: None,
+        back_image_error: None,
+    })
+}
+
+/// Based on the current and previous requests, map to our API response
+pub fn construct_get_response(
+    conn: &mut PgConn,
+    scoped_user_id: ScopedUserId,
+) -> Result<(DocumentResponseStatus, Vec<DocumentImageError>), ApiError> {
+    // Get the latest document request for the scoped user, and the previous result (for errors).
+    // We don't just stash the errors on the document request because with multiple vendors, we'll need
+    // to handle each set of errors appropriately
+    let (current_request, previous_request, previous_request_verification_result) =
+        DbDocumentRequest::get_latest_with_previous_request_and_result(conn, &scoped_user_id)?;
+    let retry_limit_exceeded = retry_limit_exceeded(conn, &current_request.scoped_user_id).unwrap_or(false);
+
     let should_return_errors = matches!(
-        latest_request.status,
+        current_request.status,
         DocumentRequestStatus::Pending | DocumentRequestStatus::UploadFailed
     );
     let mut previous_request_errors: Vec<IdologyImageCaptureErrors> = vec![];
     let mut current_request_internal_errors_needing_retry: Vec<DocumentImageError> = vec![];
-    let mut status = latest_request.status.into();
+    let mut status = current_request.status.into();
+
     if should_return_errors {
         if let Some(result) = previous_request_verification_result {
-            // TODO: we need to decrypt this
+            // TODO: need to decrypt this
             let parsed = idv::idology::scan_onboarding::response::parse_response(result.response.0)
                 .map_err(|_| ApiError::AssertionError("Could not parse ScanOnboarding response".into()))?;
             if let Some((None, image_errors)) = parsed.response.error() {
@@ -365,15 +376,18 @@ pub async fn get(
                 status = DocumentResponseStatus::Error;
             }
 
-            // we don't get image errors for internal errors, but still want to return an error.
+            // we don't get image errors for idology internal errors, but still want to return an error.
             if parsed.response.capture_result_is_internal_error() {
                 status = DocumentResponseStatus::Error;
                 previous_request_errors = vec![IdologyImageCaptureErrors::ImageError]
             }
         }
 
-        // If s3 or postgres errors when writing an identity document, we should ask client to retry
-        if latest_request.status == DocumentRequestStatus::UploadFailed {
+        // If s3 or postgres errors when writing an identity document, we should ask client to retry (we handle retry limit exceeded below)
+        if previous_request
+            .map(|d| d.status == DocumentRequestStatus::UploadFailed)
+            .unwrap_or(false)
+        {
             current_request_internal_errors_needing_retry.push(DocumentImageError::InternalError)
         }
     };
@@ -382,20 +396,13 @@ pub async fn get(
         status = DocumentResponseStatus::RetryLimitExceeded
     }
 
-    // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
-    // otherwise, we'll pass through the status
-    ResponseData::ok(DocumentResponse {
-        status,
-        errors: previous_request_errors
-            .into_iter()
-            .map(DocumentImageError::from)
-            .chain(current_request_internal_errors_needing_retry.into_iter())
-            .collect(),
-        // TODO: Remove these fields
-        front_image_error: None,
-        back_image_error: None,
-    })
-    .json()
+    let errors = previous_request_errors
+        .into_iter()
+        .map(DocumentImageError::from)
+        .chain(current_request_internal_errors_needing_retry.into_iter())
+        .collect();
+
+    Ok((status, errors))
 }
 
 #[tracing::instrument(skip(state, document_request, document_verification_request))]
@@ -536,10 +543,13 @@ async fn handle_s3_upload_error(
         .await
 }
 
-// We only allow users to have NUM_RETRIES tries. If we are the source of the error (UploadFailed), we shouldn't
-// count that towards their retries
+// We only allow users to have NUM_RETRIES tries. We'll handle Failed vs. UpploadFailed differently when creating a decision
 fn retry_limit_exceeded(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> Result<bool, DbError> {
-    let num_failed = DbDocumentRequest::count_status(conn, scoped_user_id, DocumentRequestStatus::Failed)?;
+    let num_failed = DbDocumentRequest::count_statuses(
+        conn,
+        scoped_user_id,
+        vec![DocumentRequestStatus::Failed, DocumentRequestStatus::UploadFailed],
+    )?;
 
     Ok(num_failed >= NUM_RETRIES)
 }

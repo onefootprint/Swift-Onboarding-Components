@@ -1,4 +1,5 @@
 pub mod data_lifetime;
+pub mod document_request;
 pub mod email;
 pub mod fingerprint;
 pub mod identity_document;

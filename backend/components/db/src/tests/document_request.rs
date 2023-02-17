@@ -1,68 +1,38 @@
-use crate::models::{
-    document_request::{DocumentRequest, DocumentRequestUpdate},
-    identity_document::IdentityDocument,
-    verification_request::VerificationRequest,
-    verification_result::VerificationResult,
-};
+use crate::models::document_request::DocumentRequest;
+use crate::tests::fixtures;
 use crate::tests::prelude::*;
 use macros::db_test;
-use newtypes::{
-    DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedUserId, SealedVaultDataKey, UserVaultId,
-    VendorAPI,
-};
 
 use super::prelude::TestPgConn;
 
 #[db_test]
 fn test_get_latest_verification_result(conn: &mut TestPgConn) {
-    let uv_id = UserVaultId::from("uv1".to_string());
-    let su_id: ScopedUserId = "su1".to_string().into();
+    let dr1_opts = fixtures::document_request::DocumentRequestFixtureCreateOpts {
+        collected_doc_opts: fixtures::document_request::CollectedDocOpts {
+            id_doc_collected: true,
+            has_verification_result: true,
+            ..Default::default()
+        },
+        desired_status: newtypes::DocumentRequestStatus::Complete,
+        ..Default::default()
+    };
+    let su_id = dr1_opts.scoped_user_id.clone();
 
-    // Create the first document request -> id doc -> verification request -> verification result
-    let dr1 = DocumentRequest::create(conn.conn(), su_id.clone(), None, false, None).unwrap();
-    let id1 = IdentityDocument::create(
-        conn,
-        dr1.id.clone(),
-        &uv_id,
-        None,
-        None,
-        None,
-        newtypes::IdDocKind::DriverLicense,
-        "USA".into(),
-        Some(&su_id),
-        SealedVaultDataKey(vec![]),
-    )
-    .unwrap();
-    let vr1 = VerificationRequest::create_document_verification_request(
-        conn,
-        VendorAPI::IdologyScanOnboarding,
-        OnboardingId::from("ob1".to_string()),
-        id1.id,
-    )
-    .unwrap();
-    let vr1_result = VerificationResult::create(
-        conn,
-        vr1.id,
-        newtypes::ScrubbedJsonValue(serde_json::json!({"test": "response"})),
-        newtypes::SealedVaultBytes(
-            PiiJsonValue::new(serde_json::json!({"test": "response"}))
-                .leak_to_vec()
-                .unwrap(),
-        ),
-    )
-    .unwrap();
-    let update = DocumentRequestUpdate::idv_reqs_initiated();
-    let dr1 = dr1.update(conn.conn(), update).unwrap();
-    let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
-    let dr1 = dr1.update(conn.conn(), update).unwrap();
+    let (dr1, verification_info) = fixtures::document_request::create(conn, dr1_opts);
+    let (_, vres1) = verification_info.unwrap();
 
-    // Now create second one
-    let dr2 = DocumentRequest::create(conn.conn(), su_id.clone(), None, false, Some(dr1.id)).unwrap();
+    let dr2_opts = fixtures::document_request::DocumentRequestFixtureCreateOpts {
+        previous_document_request_id: Some(dr1.id.clone()),
+        scoped_user_id: su_id.clone(),
+        ..Default::default()
+    };
+    let (dr2, _) = fixtures::document_request::create(conn, dr2_opts);
 
-    let (latest_doc, previous_result) =
-        DocumentRequest::get_latest_with_verification_result(conn.conn(), &su_id).unwrap();
+    let (latest_doc, previous_doc, previous_result) =
+        DocumentRequest::get_latest_with_previous_request_and_result(conn.conn(), &su_id).unwrap();
 
     // Assert everything worked
     assert_eq!(latest_doc.id, dr2.id);
-    assert_eq!(vr1_result.id, previous_result.unwrap().id);
+    assert_eq!(previous_doc.unwrap().id, dr1.id);
+    assert_eq!(vres1, previous_result.unwrap().id);
 }

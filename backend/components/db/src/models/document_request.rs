@@ -131,37 +131,46 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn count_status(
+    pub fn count_statuses(
         conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
-        status: DocumentRequestStatus,
+        statuses: Vec<DocumentRequestStatus>,
     ) -> DbResult<i64> {
         let num_status: i64 = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
-            .filter(document_request::status.eq(status))
+            .filter(document_request::status.eq_any(statuses))
             .count()
             .get_result(conn)?;
         Ok(num_status)
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_latest_with_verification_result(
+    pub fn get_latest_with_previous_request_and_result(
         conn: &mut PgConn,
         scoped_user_id: &ScopedUserId,
-    ) -> DbResult<(DocumentRequest, Option<VerificationResult>)> {
+    ) -> DbResult<(
+        DocumentRequest,
+        Option<DocumentRequest>,
+        Option<VerificationResult>,
+    )> {
         let latest_doc_request: Self = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .order_by(document_request::created_at.desc())
             .first(conn)?;
 
         if let Some(previous_doc_request_id) = latest_doc_request.previous_document_request_id.clone() {
-            let previous_identity_doc: Option<IdentityDocumentId> = document_request::table
+            let (previous_identity_doc, previous_doc_request): (
+                Option<IdentityDocumentId>,
+                Option<DocumentRequest>,
+            ) = document_request::table
                 .filter(document_request::id.eq(previous_doc_request_id))
                 .filter(document_request::scoped_user_id.eq(scoped_user_id))
                 .inner_join(identity_document::table)
-                .select(identity_document::id)
-                .first::<IdentityDocumentId>(conn)
-                .ok();
+                .select((identity_document::id, document_request::all_columns))
+                .first::<(IdentityDocumentId, DocumentRequest)>(conn)
+                .ok()
+                .map(|(id_doc, doc_req)| (Some(id_doc), Some(doc_req)))
+                .unwrap_or((None, None));
 
             // TODO: this breaks when we have more than 1 verification result corresponding to a single identity document
             let previous_verif_result: Option<VerificationResult> = verification_request::table
@@ -171,9 +180,9 @@ impl DocumentRequest {
             .first::<VerificationResult>(conn) // <-- this needs to go away with multiple vendors, and we should return a vec of results
             .ok();
 
-            Ok((latest_doc_request, previous_verif_result))
+            Ok((latest_doc_request, previous_doc_request, previous_verif_result))
         } else {
-            Ok((latest_doc_request, None))
+            Ok((latest_doc_request, None, None))
         }
     }
 

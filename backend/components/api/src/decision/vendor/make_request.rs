@@ -18,6 +18,7 @@ use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
+use newtypes::idology::IdologyScanOnboardingCaptureResult;
 use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, Vendor, VendorAPI};
 use prometheus::labels;
 
@@ -333,7 +334,10 @@ pub async fn send_scan_onboarding_docv_request(
             .await
             .map_err(ApiError::from)
     } else {
-        let response = idv::test_fixtures::scan_onboarding_fake_passing_response();
+        let response = idv::test_fixtures::scan_onboarding_fake_response(
+            IdologyScanOnboardingCaptureResult::Completed,
+            None,
+        );
 
         let parsed_response = idv::idology::scan_onboarding::response::parse_response(response.clone())
             .map_err(|e| ApiError::from(idv::Error::from(e)))?;

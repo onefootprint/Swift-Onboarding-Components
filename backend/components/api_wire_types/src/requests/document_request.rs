@@ -18,7 +18,7 @@ pub struct DocumentRequest {
 }
 
 /// Status of identity document collection
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, PartialEq, Eq)]
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentResponseStatus {
@@ -64,7 +64,7 @@ pub struct DocumentResponse {
 }
 
 /// Image errors from idology. See status_code/idology.rs for descriptions
-#[derive(Debug, Apiv2Schema, JsonSchema, serde::Serialize)]
+#[derive(Debug, Apiv2Schema, JsonSchema, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentImageError {
     ImageTooSmall,
