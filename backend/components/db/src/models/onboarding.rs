@@ -254,10 +254,14 @@ impl Onboarding {
             .inner_join(scoped_user::table.left_join(liveness_event::table))
             .inner_join(insight_event::table)
             // Only fetch active manual review for this onboarding
-            .left_join(manual_review::table)
-            .filter(manual_review::completed_at.is_null())
-            .left_join(onboarding_decision::table)
-            .filter(onboarding_decision::deactivated_at.is_null())
+            .left_join(manual_review::table.on(
+                manual_review::onboarding_id.eq(onboarding::id)
+                .and(manual_review::completed_at.is_null())
+            ))
+            .left_join(onboarding_decision::table.on(
+                onboarding_decision::onboarding_id.eq(onboarding::id)
+                .and(onboarding_decision::deactivated_at.is_null())
+            ))
             .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
             .order_by(onboarding::scoped_user_id)
             .load(conn)?;
