@@ -12,6 +12,11 @@
       "yes": "Yes",
       "no": "No"
     },
+    "login-challenge-segmented-control": {
+      "sms": "SMS",
+      "biometric": "Biometric",
+      "aria-label": "Select a login challenge type."
+    },
     "login-with-different-account": {
       "missing-phone": "Don't have access to this phone number?",
       "cta": "Login with a different account"

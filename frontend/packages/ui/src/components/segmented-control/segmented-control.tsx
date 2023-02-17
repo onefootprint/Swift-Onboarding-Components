@@ -2,13 +2,15 @@ import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import Typography from '../typography';
+import SegmentedControlOption, {
+  SegmentedControlOptionFields,
+} from './components/segmented-control-option';
 
 export type SegmentedControlProps = {
   'aria-label': string;
-  options: string[];
+  options: SegmentedControlOptionFields[];
   value: string;
-  onChange: (newValue: string) => void;
+  onChange: (value: string) => void;
 };
 
 const SegmentedControl = ({
@@ -17,12 +19,16 @@ const SegmentedControl = ({
   options,
   onChange,
 }: SegmentedControlProps) => (
-  <Tabs.Root defaultValue={value} onValueChange={onChange}>
+  <Tabs.Root value={value} onValueChange={onChange}>
     <OptionsContainer aria-label={ariaLabel}>
-      {options.map(option => (
-        <OptionTrigger role="button" value={option} key={option}>
-          <Typography variant="label-4">{option}</Typography>
-        </OptionTrigger>
+      {options.map(({ value: optionValue, label, IconComponent }) => (
+        <SegmentedControlOption
+          value={optionValue}
+          label={label}
+          IconComponent={IconComponent}
+          key={optionValue}
+          selected={optionValue === value}
+        />
       ))}
     </OptionsContainer>
   </Tabs.Root>
@@ -39,27 +45,6 @@ const OptionsContainer = styled(Tabs.List)`
     padding: ${theme.spacing[2]};
     background-color: ${theme.backgroundColor.primary};
   `};
-`;
-
-const OptionTrigger = styled(Tabs.Trigger)`
-  ${({ theme }) => css`
-    border: none;
-    background-color: transparent;
-    border-radius: ${theme.borderRadius.full};
-    padding: ${theme.spacing[2]} ${theme.spacing[4]};
-    &[data-state='active'] {
-      background-color: ${theme.backgroundColor.tertiary};
-      & > * {
-        font-weight: 700;
-        color: ${theme.color.quinary};
-      }
-    }
-    &[data-state='inactive'] {
-      & > * {
-        color: ${theme.color.tertiary};
-      }
-    }
-  `}
 `;
 
 export default SegmentedControl;

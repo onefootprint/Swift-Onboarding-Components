@@ -16,9 +16,17 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
     'pages.user-details.user-info.id-doc.preview',
   );
   const [index, setIndex] = useState(0);
-  const idDocSegment = allT('collected-id-doc-attributes.id-doc-image');
-  const selfieSegment = allT('collected-id-doc-attributes.selfie-image');
-  const [segment, setSegment] = useState<string>(idDocSegment);
+  const options = [
+    {
+      label: allT('collected-id-doc-attributes.id-doc-image'),
+      value: 'id-doc',
+    },
+    {
+      label: allT('collected-id-doc-attributes.selfie-image'),
+      value: 'selfie',
+    },
+  ];
+  const [segment, setSegment] = useState<string>(options[0].value);
   const selectedImage = images[index];
   const showImageIndex = (selectedIndex: number) => {
     setIndex(selectedIndex);
@@ -28,22 +36,18 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
     return null;
   }
 
-  const handleChangeSegment = (newSegment: string) => {
-    setSegment(newSegment);
-  };
-
   return (
     <Container>
       {selectedImage.selfie && (
         <SegmentedControl
           aria-label={t('segment-control')}
           value={segment}
-          onChange={handleChangeSegment}
-          options={[idDocSegment, selfieSegment]}
+          onChange={setSegment}
+          options={options}
         />
       )}
       <ImagesContainer>
-        {segment === idDocSegment && (
+        {segment === options[0].value && (
           <>
             <StyledImage
               src={selectedImage.front}
@@ -61,7 +65,7 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
             )}
           </>
         )}
-        {segment === selfieSegment && selectedImage.selfie && (
+        {segment === options[1].value && selectedImage.selfie && (
           <StyledImage
             src={selectedImage.selfie}
             width={350}

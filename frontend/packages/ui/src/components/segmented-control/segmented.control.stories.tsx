@@ -1,5 +1,6 @@
+import { IcoFaceid16, IcoFingerprint16 } from '@onefootprint/icons';
 import { Meta, Story } from '@storybook/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import SegmentedControl, { SegmentedControlProps } from './segmented-control';
 
@@ -34,19 +35,46 @@ const Template: Story<SegmentedControlProps> = ({
   onChange,
   options,
   value,
-}: SegmentedControlProps) => (
-  <SegmentedControl
-    aria-label={ariaLabel}
-    onChange={onChange}
-    options={options}
-    value={value}
-  />
-);
+}: SegmentedControlProps) => {
+  const [segment, setSegment] = React.useState(value);
+  const handleChange = (newVal: string) => {
+    setSegment(newVal);
+    onChange(newVal);
+  };
+
+  useEffect(() => {
+    setSegment(value);
+  }, [value]);
+
+  return (
+    <SegmentedControl
+      aria-label={ariaLabel}
+      onChange={handleChange}
+      options={options}
+      value={segment}
+    />
+  );
+};
 
 export const Base = Template.bind({});
 Base.args = {
   'aria-label': 'Segmented Control',
-  onChange: () => console.log,
-  options: ['Option 1', 'Option 2', 'Option 3'],
-  value: 'Option 1',
+  onChange: console.log,
+  options: [
+    {
+      label: 'Option 1',
+      value: 'option-1',
+      IconComponent: IcoFaceid16,
+    },
+    {
+      label: 'Option 2',
+      value: 'option-2',
+      IconComponent: IcoFingerprint16,
+    },
+    {
+      label: 'Option 3',
+      value: 'option-3',
+    },
+  ],
+  value: 'option-1',
 };

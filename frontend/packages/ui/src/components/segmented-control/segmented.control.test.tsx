@@ -8,8 +8,17 @@ describe('<SegmentedControl />', () => {
   const renderSegmentedControl = ({
     'aria-label': ariaLabel = 'Segmented Control',
     onChange = jest.fn(),
-    options = ['Option 1', 'Option 2'],
-    value = 'Option 1',
+    options = [
+      {
+        label: 'Option 1',
+        value: 'option-1',
+      },
+      {
+        label: 'Option 2',
+        value: 'option-2',
+      },
+    ],
+    value = 'option-1',
   }: Partial<SegmentedControlProps>) =>
     customRender(
       <SegmentedControl
@@ -33,8 +42,7 @@ describe('<SegmentedControl />', () => {
   describe('when an option is selected', () => {
     it('should have a different style in order to highlight it', () => {
       renderSegmentedControl({
-        options: ['Option 1', 'Option 2'],
-        value: 'Option 2',
+        value: 'option-2',
       });
       const selectedOption = screen.getByRole('button', { name: 'Option 2' });
       expect(selectedOption).toHaveStyle({
@@ -49,7 +57,7 @@ describe('<SegmentedControl />', () => {
       renderSegmentedControl({ onChange });
       const option = screen.getByRole('button', { name: 'Option 2' });
       await userEvent.click(option);
-      expect(onChange).toHaveBeenCalledWith('Option 2');
+      expect(onChange).toHaveBeenCalledWith('option-2');
     });
   });
 });
