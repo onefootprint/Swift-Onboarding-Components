@@ -1,9 +1,9 @@
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import IsEmail from 'isemail';
 
-import { BootstrapData } from '../state-machine/bifrost/types';
+import { BootstrapData } from '../../../../utils/state-machine/bifrost/types';
 
-const validateBootstrapData = (bootstrapData: BootstrapData) => {
+const legacyValidateBootstrapData = (bootstrapData: BootstrapData) => {
   // Strip any sandbox suffixes before checking for validity.
   const { email, phoneNumber } = bootstrapData;
 
@@ -35,4 +35,4 @@ const validateBootstrapData = (bootstrapData: BootstrapData) => {
   };
 };
 
-export default validateBootstrapData;
+export default legacyValidateBootstrapData;

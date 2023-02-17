@@ -25,7 +25,7 @@ type UseProcessBootstrapDataArgs = {
   };
 };
 
-const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
+const useLegacyProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
   const {
     bootstrapData: { email, phoneNumber },
     options,
@@ -118,4 +118,4 @@ const useProcessBootstrapData = (args: UseProcessBootstrapDataArgs) => {
   });
 };
 
-export default useProcessBootstrapData;
+export default useLegacyProcessBootstrapData;

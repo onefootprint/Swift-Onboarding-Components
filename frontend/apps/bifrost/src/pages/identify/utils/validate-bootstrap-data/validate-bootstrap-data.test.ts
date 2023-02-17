@@ -55,44 +55,12 @@ describe('validateBootstrapData', () => {
       validateBootstrapData({
         phoneNumber: '+16204623730#erwerwer',
       }),
-    ).toEqual({
-      phoneNumber: '+16204623730#erwerwer',
-    });
+    ).toEqual({});
 
     expect(
       validateBootstrapData({
         email: 'belce@onefootprint.com#ooooo',
       }),
-    ).toEqual({
-      email: 'belce@onefootprint.com#ooooo',
-    });
-
-    expect(
-      validateBootstrapData({
-        email: 'belce@onefootprint.com#123',
-        phoneNumber: '+16204623730#123',
-      }),
-    ).toEqual({
-      email: 'belce@onefootprint.com#123',
-      phoneNumber: '+16204623730#123',
-    });
-
-    expect(
-      validateBootstrapData({
-        email: 'invalid-email#234234',
-        phoneNumber: '+16204623730#123',
-      }),
-    ).toEqual({
-      phoneNumber: '+16204623730#123',
-    });
-
-    expect(
-      validateBootstrapData({
-        email: 'belce@onefootprint.com#123',
-        phoneNumber: 'invalid-phone#1232131',
-      }),
-    ).toEqual({
-      email: 'belce@onefootprint.com#123',
-    });
+    ).toEqual({});
   });
 });

@@ -4,7 +4,14 @@ import { ChallengeData, ChallengeKind, Identifier } from '@onefootprint/types';
 import { BootstrapData } from '../bifrost/types';
 
 export enum States {
-  processBootstrapData = 'processBootstrapData',
+  // Legacy Bootstrap States
+  legacyProcessBootstrapData = 'legacyProcessBootstrapData',
+
+  // New Bootstrap States
+  initBootstrap = 'initBootstrap',
+  bootstrapChallenge = 'bootstrapChallenge',
+
+  // Other Events
   emailIdentification = 'emailIdentification',
   phoneRegistration = 'phoneRegistration',
   phoneVerification = 'phoneVerification',
@@ -24,8 +31,16 @@ export type MachineContext = {
 };
 
 export enum Events {
-  bootstrapDataProcessed = 'bootstrapDataProcessed',
-  bootstrapDataProcessErrored = 'bootstrapDataProcessErrored',
+  // Legacy Bootstrap Events
+  legacyBootstrapDataProcessed = 'legacyBootstrapDataProcessed',
+  legacyBootstrapDataProcessErrored = 'legacyBootstrapDataProcessErrored',
+
+  // New Bootstrap Events
+  loginWithDifferentAccount = 'loginWithDifferentAccount',
+  loginChallengeSucceeded = 'loginChallengeSucceeded',
+  bootstrapIdentifyFailed = 'bootstrapIdentifyFailed',
+
+  // Other Events
   identifyCompleted = 'identifyCompleted',
   navigatedToPrevPage = 'navigatedToPrevPage',
   emailChangeRequested = 'emailChangeRequested',
@@ -36,7 +51,13 @@ export enum Events {
 }
 
 export enum Actions {
+  // Legacy Bootstrap Actions
+  assignLegacyBootstrapData = 'assignLegacyBootstrapData',
+
+  // New Bootstrap Actions
   assignBootstrapData = 'assignBootstrapData',
+
+  // Other Actions
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
   assignUserFound = 'assignUserFound',
@@ -46,16 +67,34 @@ export enum Actions {
 }
 
 export type MachineEvents =
+  // Legacy Bootstrap Events
   | {
-      type: Events.bootstrapDataProcessed;
+      type: Events.legacyBootstrapDataProcessed;
       payload: {
         userFound: boolean;
         challengeData: ChallengeData;
       };
     }
   | {
-      type: Events.bootstrapDataProcessErrored;
+      type: Events.legacyBootstrapDataProcessErrored;
     }
+
+  // New Bootstrap Events
+  | {
+      type: Events.loginWithDifferentAccount;
+    }
+  | {
+      type: Events.loginChallengeSucceeded;
+    }
+  | {
+      type: Events.bootstrapIdentifyFailed;
+      payload: {
+        email?: string;
+        phoneNumber?: string;
+      };
+    }
+
+  // Other Events
   | {
       type: Events.identifyCompleted;
       payload: {

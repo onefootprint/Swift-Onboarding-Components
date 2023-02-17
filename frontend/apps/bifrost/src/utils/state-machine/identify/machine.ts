@@ -1,5 +1,6 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import validateBootstrapData from 'src/utils/validate-bootstrap-data';
+import legacyValidateBootstrapData from 'src/pages/identify/utils/legacy-validate-bootstrap-data';
+// import validateBootstrapData from 'src/pages/identify/utils/validate-bootstrap-data';
 import { assign, createMachine } from 'xstate';
 
 import { BootstrapData } from '../bifrost/types';
@@ -19,34 +20,68 @@ type IdentifyMachineArgs = {
 
 const createIdentifyMachine = ({
   device,
-  bootstrapData,
+  bootstrapData: rawBootstrapData,
   tenantPk,
 }: IdentifyMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
       id: 'identify',
-      initial: bootstrapData
-        ? States.processBootstrapData
+      initial: rawBootstrapData
+        ? States.legacyProcessBootstrapData
         : States.emailIdentification,
       context: {
         device,
-        bootstrapData: bootstrapData ?? {},
+        bootstrapData: rawBootstrapData ?? {},
         tenantPk,
       },
       states: {
-        [States.processBootstrapData]: {
-          entry: [Actions.assignBootstrapData],
+        // Legacy bootstrap transitions
+        [States.legacyProcessBootstrapData]: {
+          entry: [Actions.assignLegacyBootstrapData],
           on: {
-            [Events.bootstrapDataProcessed]: {
+            [Events.legacyBootstrapDataProcessed]: {
               target: States.phoneVerification,
               actions: [Actions.assignChallenge, Actions.assignUserFound],
             },
-            [Events.bootstrapDataProcessErrored]: {
+            [Events.legacyBootstrapDataProcessErrored]: {
               target: States.emailIdentification,
             },
           },
         },
+
+        // New bootstrap transitions
+        // [States.initBootstrap]: {
+        //   entry: [Actions.assignBootstrapData],
+        //   on: {
+        //     [Events.bootstrapIdentifyFailed]: [
+        //       {
+        //         target: States.emailIdentification,
+        //         actions: [Actions.assignEmail, Actions.assignPhone],
+        //         cond: (context, event) => !!event.payload.email,
+        //       },
+        //       {
+        //         target: States.phoneRegistration,
+        //         actions: [Actions.assignEmail, Actions.assignPhone],
+        //         cond: (context, event) => !!event.payload.phoneNumber,
+        //       },
+        //     ],
+        //   },
+        // },
+        // [States.bootstrapChallenge]: {
+        //   on: {
+        //     [Events.loginChallengeSucceeded]: {
+        //       target: States.success,
+        //       actions: [Actions.assignAuthToken],
+        //     },
+        //     [Events.loginWithDifferentAccount]: {
+        //       target: States.emailIdentification,
+        //       actions: [Actions.resetContext],
+        //     },
+        //   },
+        // },
+
+        // Other transitions
         [States.emailIdentification]: {
           on: {
             [Events.identifyCompleted]: [
@@ -170,14 +205,27 @@ const createIdentifyMachine = ({
     },
     {
       actions: {
-        [Actions.assignBootstrapData]: assign(context => {
-          const { email, phoneNumber } = validateBootstrapData(
+        // Legacy Bootstrap Actions
+        [Actions.assignLegacyBootstrapData]: assign(context => {
+          const { email, phoneNumber } = legacyValidateBootstrapData(
             context.bootstrapData,
           );
           context.phone = phoneNumber;
           context.email = email;
           return context;
         }),
+
+        // New Bootstrap Actions
+        // [Actions.assignBootstrapData]: assign(context => {
+        //   const { email, phoneNumber } = validateBootstrapData(
+        //     context.bootstrapData,
+        //   );
+        //   context.phone = phoneNumber;
+        //   context.email = email;
+        //   return context;
+        // }),
+
+        // Other Actions
         [Actions.assignEmail]: assign((context, event) => {
           if (event.type === Events.identifyCompleted) {
             const emailIdentifier = Object.entries(
@@ -205,7 +253,7 @@ const createIdentifyMachine = ({
         [Actions.assignUserFound]: assign((context, event) => {
           if (
             event.type === Events.identifyCompleted ||
-            event.type === Events.bootstrapDataProcessed
+            event.type === Events.legacyBootstrapDataProcessed
           ) {
             context.userFound = event.payload.userFound;
           }
@@ -230,7 +278,7 @@ const createIdentifyMachine = ({
         }),
         [Actions.assignChallenge]: assign((context, event) => {
           if (
-            event.type !== Events.bootstrapDataProcessed &&
+            event.type !== Events.legacyBootstrapDataProcessed &&
             event.type !== Events.smsChallengeInitiated
           ) {
             return context;

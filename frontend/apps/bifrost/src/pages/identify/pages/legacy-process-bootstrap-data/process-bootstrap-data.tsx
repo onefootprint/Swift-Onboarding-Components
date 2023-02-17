@@ -4,7 +4,7 @@ import InitShimmer from 'src/components/init-shimmer';
 import { Events } from 'src/hooks/use-identify-machine';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-import useProcessBootstrapData from './hooks/use-process-bootstrap-data';
+import useProcessBootstrapData from './hooks/use-legacy-process-bootstrap-data';
 
 const ProcessBootstrapData = () => {
   const [state, send] = useIdentifyMachine();
@@ -12,7 +12,7 @@ const ProcessBootstrapData = () => {
 
   const handleError = () => {
     send({
-      type: Events.bootstrapDataProcessErrored,
+      type: Events.legacyBootstrapDataProcessErrored,
     });
   };
 
@@ -21,7 +21,7 @@ const ProcessBootstrapData = () => {
     challengeData: ChallengeData,
   ) => {
     send({
-      type: Events.bootstrapDataProcessed,
+      type: Events.legacyBootstrapDataProcessed,
       payload: {
         userFound,
         challengeData,
