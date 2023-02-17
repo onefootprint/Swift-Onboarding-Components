@@ -7,10 +7,12 @@ import styled, { css } from 'styled-components';
 import ApiKeys from './components/api-keys';
 import Header from './components/header';
 import OnboardingConfigs from './components/onboarding-configs';
+import Webhooks from './components/webhooks/webhooks';
 
 enum TabName {
   apiKeys = 'api_keys',
   onboardingConfigs = 'onboarding_configs',
+  webhooks = 'webhook',
 }
 
 const Developers = () => {
@@ -22,6 +24,7 @@ const Developers = () => {
   const tabs = [
     { label: t('tabs.onboarding-configs'), value: TabName.onboardingConfigs },
     { label: t('tabs.api-keys'), value: TabName.apiKeys },
+    { label: t('tabs.webhooks'), value: TabName.webhooks },
   ];
 
   return (
@@ -45,6 +48,7 @@ const Developers = () => {
       <Content>
         {tab === TabName.apiKeys && <ApiKeys />}
         {tab === TabName.onboardingConfigs && <OnboardingConfigs />}
+        {tab === TabName.webhooks && <Webhooks />}
       </Content>
     </>
   );

@@ -572,7 +572,8 @@
       },
       "tabs": {
         "api-keys": "Secret API Keys",
-        "onboarding-configs": "Onboarding configurations"
+        "onboarding-configs": "Onboarding configurations",
+        "webhooks": "Webhooks"
       },
       "api-keys": {
         "header": {
@@ -635,7 +636,7 @@
           "title": "Onboarding configurations",
           "subtitle": "Set up requirements for customers onboarding onto your platform.",
           "cta": "Create onboarding config",
-          "cta-not-allowed": "You're not allowed to create API keys"
+          "cta-not-allowed": "You're not allowed to create onboarding configurations"
         },
         "list": {
           "no-results": "You haven't created any onboarding configurations just yet."
@@ -723,6 +724,14 @@
           "cta": "Save",
           "cancel": "Cancel"
         }
+      },
+      "webhooks": {
+        "header": {
+          "title": "Webhooks",
+          "subtitle": "Setup webhooks to receive updates when events happen in Footprint.",
+          "not-allowed": "You're not allowed to create or modify webhooks"
+        },
+        "loading": "Loading..."
       }
     },
     "settings": {

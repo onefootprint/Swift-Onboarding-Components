@@ -13,7 +13,9 @@ export type GetOnboardingConfigsRequest = {
 
 export type GetOnboardingConfigsResponse = OnboardingConfig[];
 
-const getApiKeys = async ({ authHeaders }: GetOnboardingConfigsRequest) => {
+const getOnboardingConfigs = async ({
+  authHeaders,
+}: GetOnboardingConfigsRequest) => {
   const { data: response } = await request<
     PaginatedRequestResponse<GetOnboardingConfigsResponse>
   >({
@@ -29,7 +31,7 @@ const useOnboardingConfigs = () => {
   const { authHeaders } = useSession();
   return useQuery<GetOnboardingConfigsResponse, RequestError>(
     ['onboarding-configs', authHeaders],
-    () => getApiKeys({ authHeaders }),
+    () => getOnboardingConfigs({ authHeaders }),
     {
       select: response =>
         response.map((onboardingKey: OnboardingConfig) => ({

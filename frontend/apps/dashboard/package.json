@@ -46,7 +46,8 @@
     "ua-parser-js": "^1.0.33",
     "usehooks-ts": "^2.9.1",
     "xstate": "^4.35.1",
-    "zustand": "^4.3.2"
+    "zustand": "^4.3.2",
+    "svix-react": "1.4.2"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
