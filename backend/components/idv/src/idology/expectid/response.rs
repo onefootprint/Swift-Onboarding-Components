@@ -119,7 +119,7 @@ impl Response {
     /// Whether the ID was located on IDology
     pub fn id_located(&self) -> bool {
         if let Some(ref results) = self.results {
-            results.key.as_str() == "result.match"
+            results.key.starts_with("result.match")
         } else {
             false
         }
@@ -456,4 +456,22 @@ mod tests {
         }
         .footprint_reason_codes()
     }
+
+    #[test_case("result.match" => true)]
+    #[test_case("result.match.restricted" => true)]
+    #[test_case("result.no.match" => false)]
+    fn test_id_located(results_key: &str) -> bool {
+        Response {
+            qualifiers: None,
+            results: Some(KeyResponse {
+                key: results_key.to_owned()
+            }),
+            summary_result: None,
+            id_number: None,
+            id_scan: None,
+            error: None,
+            restriction: None,
+        }.id_located()
+    }
+
 }
