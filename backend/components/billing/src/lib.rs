@@ -1,4 +1,5 @@
 use db::models::tenant::Tenant;
+use interval::BillingInterval;
 use newtypes::StripeCustomerId;
 use std::{collections::HashMap, str::FromStr};
 pub use stripe::Client as StripeClient;
@@ -6,7 +7,6 @@ use stripe::{
     CreateCustomer, CreateInvoice, CreateInvoiceItem, Customer, CustomerId, Invoice, InvoiceItem,
     InvoiceStatusFilter, ListCustomers, ListInvoiceItems, ListInvoices, PriceId, UpdateInvoiceItem,
 };
-use interval::BillingInterval;
 
 pub type BResult<T> = Result<T, Error>;
 
@@ -121,20 +121,24 @@ fn is_managed(metadata: &HashMap<String, String>) -> bool {
     metadata.get("auto-managed") == Some(&"true".to_string())
 }
 
+#[derive(Debug)]
+pub struct BillingInfo {
+    pub customer_id: StripeCustomerId,
+    pub count_pii: i64,
+    pub count_kyc: i64,
+}
+
 #[tracing::instrument(skip(client))]
 pub async fn bill_for_tenant(
     client: &StripeClient,
     interval: BillingInterval,
-    // TODO use a struct
-    customer_id: StripeCustomerId,
-    count_pii: i64,
-    count_kyc: i64,
+    info: BillingInfo,
 ) -> BResult<()> {
-    if count_pii == 0 && count_kyc == 0 {
+    if info.count_pii == 0 && info.count_kyc == 0 {
         return Ok(());
     }
 
-    let customer_id = stripe::CustomerId::from_str(&customer_id)?;
+    let customer_id = stripe::CustomerId::from_str(&info.customer_id)?;
     // See if there's an existing draft invoice for the tenant and cancel
     // TODO use search API rather than filtering in RAM
     let list_invoice = ListInvoices {
@@ -156,7 +160,7 @@ pub async fn bill_for_tenant(
     // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
     let pii_price_id = stripe::PriceId::from_str(PII_PRICE_ID)?;
     let kyc_price_id = stripe::PriceId::from_str(KYC_PRICE_ID)?;
-    let items = [(pii_price_id, count_pii), (kyc_price_id, count_kyc)]
+    let items = [(pii_price_id, info.count_pii), (kyc_price_id, info.count_kyc)]
         .into_iter()
         .map(|(price_id, count)| get_or_create_invoice_item(client, customer_id.clone(), price_id, count));
     futures::future::join_all(items)

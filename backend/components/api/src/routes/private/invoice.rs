@@ -2,6 +2,7 @@ use crate::auth::tenant::TenantRbAuthContext;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
+use billing::BillingInfo;
 use chrono::Utc;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::tenant::{Tenant, UpdateTenant};
@@ -63,7 +64,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> 
         ..Default::default()
     };
     let tenant_id = tenant.id.clone();
-    let (count_pii_storage, count_billable_kyc) = state
+    let (count_pii, count_kyc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let count_pii_storage = count_authorized_for_tenant(conn, params)?;
@@ -73,13 +74,11 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> 
         })
         .await??;
     let customer_id = get_or_create_customer_id(state, &tenant).await?;
-    billing::bill_for_tenant(
-        &state.stripe_client,
-        interval,
+    let info = BillingInfo {
         customer_id,
-        count_pii_storage,
-        count_billable_kyc,
-    )
-    .await?;
+        count_pii,
+        count_kyc,
+    };
+    billing::bill_for_tenant(&state.stripe_client, interval, info).await?;
     Ok(())
 }
