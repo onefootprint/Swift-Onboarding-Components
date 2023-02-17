@@ -20,8 +20,6 @@ pub struct IDologyFeatures {
     pub is_id_scan_required: bool,
     pub verification_result: VerificationResultId,
     pub create_manual_review: bool,
-    pub watchlist_potential_hit: bool,
-    pub watchlist_max_score: Option<i32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -154,8 +152,12 @@ impl From<VendorResult> for FeatureVector {
                 // TODO: fix this to just be id_located. Shouldn't have idv crate doing anything w.r.t. our DecisionStatus
                 let (status, create_manual_review) = r.status();
                 let mut footprint_reason_codes: Vec<FootprintReasonCode> = r.footprint_reason_codes();
-                // this is derived from IDologyReasonCodes as well as the response itself
-                if r.has_potential_watchlist_hit()
+
+                if r.max_watchlist_score().map(|s| s > 93).unwrap_or(false)
+                    && !footprint_reason_codes.contains(&FootprintReasonCode::WatchlistHit)
+                {
+                    footprint_reason_codes.push(FootprintReasonCode::WatchlistHit)
+                } else if r.has_potential_watchlist_hit()
                     && !footprint_reason_codes.contains(&FootprintReasonCode::PotentialWatchlistHit)
                 {
                     footprint_reason_codes.push(FootprintReasonCode::PotentialWatchlistHit)
@@ -169,8 +171,6 @@ impl From<VendorResult> for FeatureVector {
                     id_number_for_scan_required: r.id_number,
                     verification_result: verification_result_id,
                     footprint_reason_codes,
-                    watchlist_potential_hit: r.has_potential_watchlist_hit(),
-                    watchlist_max_score: r.max_watchlist_score(),
                 };
                 Self {
                     idology_features: Some(idology_features),
@@ -336,11 +336,9 @@ mod tests {
             footprint_reason_codes: vec![
                 FootprintReasonCode::IpNotLocated,
                 FootprintReasonCode::AddressStreetNameDoesNotMatch,
-                FootprintReasonCode::PotentialWatchlistHit,
+                FootprintReasonCode::WatchlistHit,
             ],
             verification_result: idology_result.verification_result_id,
-            watchlist_potential_hit: true,
-            watchlist_max_score: Some(97),
         };
         let expected_feature_vector = FeatureVector {
             idology_features: Some(expected_idology_features),
@@ -448,8 +446,6 @@ mod tests {
                 is_id_scan_required: false,
                 verification_result: VerificationResultId::from("123".to_owned()),
                 create_manual_review: false,
-                watchlist_potential_hit: false,
-                watchlist_max_score: None,
             }),
             idology_scan_onboarding_features: None,
             twilio_features: None,

@@ -86,7 +86,12 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
             name: RuleName::SsnIssuedPriorToDob,
         },
         Rule {
-            rule: { |f: &IDologyFeatures| f.watchlist_max_score.map(|s| s > 93).unwrap_or(false) },
+            rule: {
+                |f: &IDologyFeatures| {
+                    f.footprint_reason_codes
+                        .contains(&FootprintReasonCode::WatchlistHit)
+                }
+            },
             name: RuleName::WatchlistHit,
         },
     ];

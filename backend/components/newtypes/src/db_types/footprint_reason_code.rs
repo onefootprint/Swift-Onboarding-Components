@@ -83,8 +83,11 @@ footprint_reason_code_enum! {
     pub enum FootprintReasonCode {
 
         // ~~~~~~~~~ Identity ~~~~~~~~~~~~~~~
-        #[note = "Potential watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Address], description = "Potential match on a governmental watchlist (OFAC, PEP or NonSDN Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
+        #[note = "Potential watchlist hit", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A weak potential match on a governmental watchlist (OFAC, PEP or NonSDN Consolidated Sanctions (PLC, FSE, ISA, SSI)) was found"]
         PotentialWatchlistHit,
+
+        #[note = "Watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A strong potential match on a governmental watchlist (OFAC, PEP or NonSDN Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
+        WatchlistHit,
 
         // ~~~~~~~~~ Address ~~~~~~~~~~~~~~~
 

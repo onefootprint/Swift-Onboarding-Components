@@ -59,8 +59,6 @@ fn test_final_decision(
         id_number_for_scan_required: Some(3010453),
         footprint_reason_codes: idology_reason_codes(base_rules_should_fail, conservative_rules_should_fail),
         verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
-        watchlist_potential_hit: false,
-        watchlist_max_score: None,
     };
 
     let feature_vector = FeatureVector {
