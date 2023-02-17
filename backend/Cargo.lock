@@ -1318,6 +1318,7 @@ dependencies = [
  "db",
  "futures",
  "newtypes",
+ "test-case",
  "thiserror",
  "tokio",
  "tracing",

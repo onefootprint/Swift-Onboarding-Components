@@ -6,8 +6,11 @@ use stripe::{
     CreateCustomer, CreateInvoice, CreateInvoiceItem, Customer, CustomerId, Invoice, InvoiceItem,
     InvoiceStatusFilter, ListCustomers, ListInvoiceItems, ListInvoices, PriceId, UpdateInvoiceItem,
 };
+use interval::BillingInterval;
 
 pub type BResult<T> = Result<T, Error>;
+
+pub mod interval;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -15,6 +18,8 @@ pub enum Error {
     Stripe(#[from] stripe::StripeError),
     #[error("{0}")]
     ParseIdError(#[from] stripe::ParseIdError),
+    #[error("Error computing billing interval")]
+    CannotComputeBillingInterval,
 }
 
 // Will put these in either config or launch darkly
@@ -49,13 +54,11 @@ pub async fn get_or_create_customer(
     let customer = if let Some(c) = existing_customer {
         c
     } else {
-        let metadata = [
+        let extra_metadata = [
             ("tenant.id".to_string(), tenant.id.to_string()),
             ("environment".to_string(), environment),
-        ]
-        .into_iter()
-        .chain(managed_metadata())
-        .collect();
+        ];
+        let metadata = extra_metadata.into_iter().chain(managed_metadata()).collect();
         let new_customer = CreateCustomer {
             name: Some(&tenant.name),
             email: None,
@@ -121,6 +124,8 @@ fn is_managed(metadata: &HashMap<String, String>) -> bool {
 #[tracing::instrument(skip(client))]
 pub async fn bill_for_tenant(
     client: &StripeClient,
+    interval: BillingInterval,
+    // TODO use a struct
     customer_id: StripeCustomerId,
     count_pii: i64,
     count_kyc: i64,
@@ -142,7 +147,7 @@ pub async fn bill_for_tenant(
     let existing_invoice = existing_invoices
         .data
         .into_iter()
-        .find(|i| is_managed(&i.metadata));
+        .find(|i| is_managed(&i.metadata) && i.metadata.get("billing-interval") == Some(&interval.label));
     if let Some(i) = existing_invoice {
         // Delete the existing draft invoice that was created from a previous run
         Invoice::delete(client, &i.id).await?;
@@ -159,9 +164,11 @@ pub async fn bill_for_tenant(
         .into_iter()
         .collect::<BResult<_>>()?;
 
+    let extra_metadata = [("billing-interval".to_owned(), interval.label)];
+    let metadata = extra_metadata.into_iter().chain(managed_metadata()).collect();
     let new_invoice = CreateInvoice {
         customer: Some(customer_id.clone()),
-        metadata: Some(managed_metadata()),
+        metadata: Some(metadata),
         auto_advance: Some(false), // Don't let stripe automatically send out this invoice
         description: None,
         ..Default::default()

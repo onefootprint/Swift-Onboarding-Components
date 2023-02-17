@@ -13,3 +13,6 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true }
 futures = { workspace = true }
+
+[dev-dependencies]
+test-case = { workspace = true }
