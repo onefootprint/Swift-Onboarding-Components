@@ -4,7 +4,7 @@ const createStringList = (
   finalConnector?: string,
 ) => {
   const conn = connector ?? ', ';
-  const finalConn = finalConnector ?? (items.length > 2 ? ', and ' : ' and ');
+  const finalConn = finalConnector ?? ' and ';
 
   const list: string[] = [];
   items

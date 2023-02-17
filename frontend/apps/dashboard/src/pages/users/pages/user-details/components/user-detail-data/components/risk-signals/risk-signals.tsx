@@ -19,8 +19,8 @@ const RiskSignals = () => {
   const filters = useRiskSignalsFilters();
   const columns = [
     { text: t('table.header.severity'), width: '12.5%' },
-    { text: t('table.header.scopes'), width: '12.5%' },
-    { text: t('table.header.note'), width: '70%' },
+    { text: t('table.header.scopes'), width: '20%' },
+    { text: t('table.header.note'), width: '67.5%' },
   ];
 
   const handleRowClick = (riskSignal: RiskSignal) => {
