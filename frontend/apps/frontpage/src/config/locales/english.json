@@ -594,7 +594,7 @@
       "html-title": "Footprint - Compare",
       "hero": {
         "title": "Why Footprint is the best KYC + security solution for your business",
-        "subtitle": "Spoiler alert: it's frictionless, secure and easy to integrate.",
+        "subtitle": "Spoiler alert: it's frictionless, secure, and easy to integrate.",
         "cta": "Sign up"
       },
       "introduction": "In 2015, VGS ushered in the idea of tokenizing PII data and Alloy introduced an orchestration tool to handle KYC requests in an automated fashion. Both wanted to help a new era of financial companies more easily onboard customers and store data. Footprint was founded seven years later to leverage brand-new technology to these early ideas into a more elegant, secure, and frictionless all-in-one solution that provides best-in-class KYC and PII vaulting.",
@@ -668,35 +668,35 @@
         }
       },
       "why-footptint": {
-        "title": "Why Companies Choose Footprint",
+        "title": "Why companies choose Footprint",
         "user-experience": {
-          "title": "User Experience: Boost Conversion 25% with a More Streamlined Flow ",
+          "title": "User experience: boost conversion with a flow that is 25% more streamlined",
           "description": "Footprint is built to optimize conversion without compromising accuracy. We’re the only company to use FaceID for liveness to give users a seamless experience. Footprint will be the only KYC company to support one-click KYC. After a user signs up for an account using Footprint once, the next time it is as easy as them typing in their email and doing FaceID."
         },
         "biometrics": {
-          "title": "Improve Accuracy with Cutting-Edge Biometrics",
-          "description": "Footprint is the only KYC company that is built to be FIDO2 native and leverages passkeys. What this means is that we use novel biometrics such as the FaceID built directly into peoples’ phones to get attestations of liveness. Passkeys also enable us to verify things such as users being on a non-jailbroken device, coming from non-spoofed IP addresses, as well as dozens of other device attributes."
+          "title": "Improve accuracy with cutting-edge biometrics",
+          "description": "Footprint is the only KYC company that is built to be FIDO2 native and leverages passkeys. We use novel biometrics such as the FaceID built directly into peoples’ phones to get attestations of liveness. Passkeys also enable us to verify the user is on a non-jailbroken device, traffic is coming from non-spoofed IP addresses, and dozens of other device attributes."
         },
         "dev-exp": {
-          "title": "Developer Experience: Integrate in Minutes",
-          "description": "Footprint is five lines of code. Our belief is that KYC should not be an arduous choose-your-own-adventure novel to set up; it should just work. Footprint is also designed to deliver a streamlined experience that feels native to your company. Our platform allows for easy customization of over 80 attributes so that the UI will feel like your own.",
+          "title": "Developer experience: integrate in minutes",
+          "description": "Footprint is five lines of code. Our belief is that KYC should not be an arduous choose-your-own-adventure novel to set up; it should just work. Footprint is also designed to deliver a streamlined experience that feels native to your company. Our platform allows for easy customization of over 80 attributes so the UI will feel like your own.",
           "cta": "Read the docs"
         },
         "vault-proxy": {
           "title": "Vault Proxy PCI + PII",
-          "description": "Send information securely to the third parties who need it. Whether it is issuing a card number or transmitting tax information to the IRS, our simple API supports a variety of scopes and controls to maintain zero trust, least privilege principles. By offloading PCI, you can get PCI Certified by being out of scope. "
+          "description": "Send information securely to the third parties who need it. Whether it is issuing a card number or transmitting tax information to the IRS, our simple API supports a variety of scopes and controls to maintain zero-trust, least-privilege principles. By offloading PCI, you can get PCI Certified by being out of scope. "
         },
         "security-design": {
           "title": "Security by design",
-          "description": "In one embedded front-end flow, Footprint collects user data directly, verifies it, performs a liveness check, and then securely encrypts and tokenizes this entire user identity into a single token. To integrate Footprint, you simply need to store a single user token — the “footprint user token” — which gives you granular access rights to specified identity attributes of that user."
+          "description": "In one embedded front-end flow, Footprint collects user data, verifies it, performs a liveness check, and then securely encrypts and tokenizes this entire user identity into a single token. To integrate Footprint, you simply need to store a single user token — the “footprint user token” — which gives you granular access rights to specified identity attributes of that user."
         },
         "pii-vaulting": {
           "title": "PII Vaulting",
-          "description": "Generate credentials that have access to specific data attributes — or functions of those data attributes (like someone’s age versus their birthdate). All of this is invisible to your code or data model, and you only need to worry about a single user footprint token that can be stored easily in plain text."
+          "description": "Generate credentials that have access to specific data attributes — or functions of those data attributes (like someone’s age versus their birthdate). All of this is invisible to your code or data model, and you only need to worry about a single footprint user token that can be stored easily in plain text."
         },
         "save-money": {
-          "title": "Save Money by Combining Tools",
-          "description": "Vaulting companies charge per decrypt because that’s where the bulk of their revenue comes from. KYC platforms try to upsell modules on the KYC due to drawing their profits from onboarding. Footprint, in contrast, makes money by onboarding good actors and then securely storing that information across tenants. As a result, we can see companies save up to 50% of their costs across both KYC and PII Vaulting by unifying it into one tool. Not to mention all of the technical benefits!",
+          "title": "Save money by combining tools",
+          "description": "Vaulting companies charge per decrypt because that’s where the bulk of their revenue comes from. KYC platforms try to upsell modules on the KYC due to drawing their profits from onboarding. Footprint, in contrast, makes money by onboarding good actors and then securely storing that information across products. As a result, we can see companies save up to 50% of their costs across both KYC and PII Vaulting by unifying it into one tool. Not to mention all of the technical benefits!",
           "cta": "Learn more"
         }
       },
@@ -786,7 +786,7 @@
       "html-title": "{{tenantName}} ♥ Footprint",
       "html-description": "We care about your PII data and privacy. That's why {{tenantName}} has partnered with Footprint to achieve the highest security standards, so that your personal information is always safe and secure.",
       "title": "We care about your PII data and privacy.",
-      "subtitle": "That's why {{tenantName}} has partnered with Footprint to achieve the highest security standards, so that your personal information is always safe and secure.",
+      "subtitle": "That's why {{tenantName}} has partnered with Footprint to achieve the highest security standards, so your personal information is always safe and secure.",
       "features": {
         "title": "How Footprint guards your PII",
         "feature-1": {

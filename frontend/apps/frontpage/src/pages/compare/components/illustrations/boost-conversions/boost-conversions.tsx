@@ -22,6 +22,7 @@ const ImageContainer = styled.div`
   justify-content: center;
   width: 100%;
   height: 240px;
+  pointer-events: none;
 
   ${media.greaterThan('md')`
     width: 480px;
@@ -68,10 +69,21 @@ const StyledImage = styled(Image)`
   z-index: 0;
   mask: radial-gradient(50% 90% at 50% 50%, #fff 0%, transparent 20%);
 
+  ${media.greaterThan('sm')`
+    left: 50%;
+    top: 24%;
+  `}
+
   ${media.greaterThan('md')`
     mask: radial-gradient(50% 70% at 50% 60%, #fff 0%, transparent 40%);
     left: 50%;
-    top: 36%;
+    top: 40%;
+  `}
+
+  ${media.greaterThan('lg')`
+    mask: radial-gradient(50% 70% at 50% 60%, #fff 0%, transparent 40%);
+    left: 50%;
+    top: 34%;
   `}
 `;
 
