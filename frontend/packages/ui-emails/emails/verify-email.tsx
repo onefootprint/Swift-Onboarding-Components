@@ -8,9 +8,9 @@ import * as React from 'react';
 
 import Button from './components/button';
 import FootprintLogo from './components/logo';
-import Footer from './components/footer';
 import { Link } from '@react-email/link';
 import { Text } from '@react-email/text';
+import { Container } from '@react-email/container';
 
 const content = {
   title: 'Verify your email',
@@ -22,6 +22,7 @@ const content = {
   copyLink: {
     href: 'https://www.onefootprint.com/confirmation/XjasoI1k2',
   },
+  address: '158 W 23rd St Apt 7 New York New York 10011',
 };
 
 const Email = () => {
@@ -47,7 +48,12 @@ const Email = () => {
               {content.copyLink.href}
             </Link>
           </BaseContainer>
-          <Footer />
+          <Container style={footer}>
+            <Text style={footerText}>{content.address}</Text>
+            <Text style={footerText}>
+              © {new Date().getFullYear()} One Footprint Inc.
+            </Text>
+          </Container>
         </BaseContainer>
       </Section>
     </Html>
@@ -59,7 +65,6 @@ const main = {
   backgroundColor: '#f5f5f5',
   padding: '32px 0',
   margin: '0 auto',
-  width: '100%',
 };
 
 const emailContainer = {
@@ -67,8 +72,8 @@ const emailContainer = {
   backgroundColor: '#fff',
   borderRadius: '5px',
   margin: '40px auto',
-  padding: '20px',
-  width: '70%',
+  padding: '16px',
+  width: '80%',
   textAlign: 'center' as const,
 };
 
@@ -88,8 +93,8 @@ const hyperlink = {
 const messageContainer = {
   gap: '16px',
   textAlign: 'center' as const,
-  width: '90%',
   margin: '32px auto',
+  width: '85%',
 };
 
 const h1 = {
@@ -107,6 +112,20 @@ const text = {
   textAlign: 'center' as const,
   fontSize: '14px',
   lineHeight: '24px',
+  margin: '0',
+};
+
+const footer = {
+  width: '100%',
+  padding: '24px 0 8px 0',
+  borderTop: '1px solid #E2E2E2',
+};
+
+const footerText = {
+  fontSize: '12px',
+  lineHeight: '16px',
+  color: '#8D8D8D',
+  textAlign: 'center' as const,
   margin: '0',
 };
 

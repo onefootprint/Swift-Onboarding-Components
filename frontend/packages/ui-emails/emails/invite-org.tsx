@@ -4,49 +4,56 @@ import { Html } from '@react-email/html';
 
 import { Preview } from '@react-email/preview';
 import { Section } from '@react-email/section';
+
 import * as React from 'react';
 
 import Button from './components/button';
-import FootprintLogo from './components/logo';
-import { Link } from '@react-email/link';
+
 import { Text } from '@react-email/text';
 import { Container } from '@react-email/container';
+import { Img } from '@react-email/img';
 
 const content = {
-  title: 'Verify your email',
-  body: 'To secure your account and complete your registration, we need to verify your email address.',
+  title: 'Elliot has invited you to collaborate on Ramp`s organization',
+  body: 'You can accept or decline this invitation by clicking the button below.',
   button: {
-    label: 'Verify your email',
-    href: 'https://footprint.com/verify-email',
+    label: 'View invitation',
+    href: 'https://onefootprint.com/',
   },
-  copyLink: {
-    href: 'https://www.onefootprint.com/confirmation/XjasoI1k2',
-  },
-  address: '201 Varick St FRNT 1 #1016, New York NY 10014',
+  note: 'Note: This invitation was intended for elliotfiorde@onefootprint.com. If you were not expecting this invitation, please ignore this email.',
+  address: '158 W 23rd St Apt 7 New York New York 10011',
 };
 
-const Email = () => {
+const InviteOrg = () => {
   return (
     <Html>
       <Head />
       <Preview>{content.title}</Preview>
       <Section style={main}>
         <BaseContainer style={emailContainer}>
-          <Section style={{ marginTop: '32px' }}>
-            <FootprintLogo />
-          </Section>
+          <Container style={logosContainer}>
+            <Img
+              src="/static/ico-footprint-40.svg"
+              width="100"
+              height="21"
+              alt="Footprint"
+              style={logoCircularFp}
+            />
+            <Img
+              src="/static/ico-ramp-40.svg"
+              width="100"
+              height="21"
+              alt="Footprint"
+              style={logoCircularPartner}
+            />
+          </Container>
           <BaseContainer style={messageContainer}>
             <Text style={h1}>{content.title}</Text>
             <Text style={text}>{content.body}</Text>
           </BaseContainer>
           <Button href={content.button.href} label={content.button.label} />
-          <BaseContainer style={copyLinkContainer}>
-            <Text style={text}>
-              Or copy and paste this link into your browser:
-            </Text>
-            <Link href={content.copyLink.href} style={hyperlink}>
-              {content.copyLink.href}
-            </Link>
+          <BaseContainer style={messageContainer}>
+            <Text style={textSecondary}>{content.note}</Text>
           </BaseContainer>
           <Container style={footer}>
             <Text style={footerText}>{content.address}</Text>
@@ -77,19 +84,6 @@ const emailContainer = {
   textAlign: 'center' as const,
 };
 
-const copyLinkContainer = {
-  fontSize: '14px',
-  lineHeight: '24px',
-  margin: '32px 0',
-};
-
-const hyperlink = {
-  color: '#4A24DB',
-  textDecoration: 'none',
-  alignText: 'center' as const,
-  overflowWrap: 'break-word' as const,
-};
-
 const messageContainer = {
   gap: '16px',
   textAlign: 'center' as const,
@@ -112,7 +106,15 @@ const text = {
   textAlign: 'center' as const,
   fontSize: '14px',
   lineHeight: '24px',
-  margin: '0',
+  margin: 'auto',
+};
+
+const textSecondary = {
+  color: '#8D8D8D',
+  textAlign: 'center' as const,
+  fontSize: '12px',
+  lineHeight: '16px',
+  margin: 'auto',
 };
 
 const footer = {
@@ -129,4 +131,34 @@ const footerText = {
   margin: '0',
 };
 
-export default Email;
+const logoCircularFp = {
+  padding: '8px',
+  borderRadius: '50%',
+  backgroundColor: '#fff',
+  border: '1px solid #E2E2E2',
+  boxShadow: '0 1px 2px 0 rgba(0,0,0,0.1)',
+  width: 'fit-content',
+  position: 'absolute',
+  transform: 'translateX(-50%)',
+  left: '47%',
+};
+
+const logoCircularPartner = {
+  padding: '8px',
+  borderRadius: '50%',
+  backgroundColor: '#fff',
+  border: '1px solid #E2E2E2',
+  boxShadow: '0 1px 2px 0 rgba(0,0,0,0.1)',
+  width: 'fit-content',
+  position: 'absolute',
+  transform: 'translateX(-50%)',
+  left: '53%',
+};
+
+const logosContainer = {
+  position: 'relative',
+  height: '40px',
+  padding: '24px 0 0 0',
+};
+
+export default InviteOrg;
