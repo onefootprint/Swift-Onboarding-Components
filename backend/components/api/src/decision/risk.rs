@@ -130,14 +130,15 @@ pub fn final_decision(
     .collect();
 
     // Evaluate our rules
-    let failed = rule::evaluate_onboarding_rules(prod_rules, idology_features, &onboarding_id);
+    let base = rule::rules_engine::evaluate_onboarding_rules(prod_rules, idology_features, &onboarding_id);
 
     // Evaluate conservative rules
-    let failed_conservative =
-        rule::evaluate_onboarding_rules(additional_rules, idology_features, &onboarding_id);
+    let conservative =
+        rule::rules_engine::evaluate_onboarding_rules(additional_rules, idology_features, &onboarding_id);
+    let all_rules = base.join(conservative);
 
     // If we no rules that triggered, we consider that a pass
-    let decision_status = if failed || failed_conservative {
+    let decision_status = if all_rules.triggered {
         DecisionStatus::Fail
     } else {
         DecisionStatus::Pass
@@ -149,13 +150,12 @@ pub fn final_decision(
 
     // Log evaluation
     tracing::info!(
-       failed_base=%failed,
-       failed_conservative=%failed_conservative,
+       rules_triggered=%rule::rules_to_string(&all_rules.rules_triggered),
+       rules_not_triggered=%rule::rules_to_string(&all_rules.rules_not_triggered),
        create_manual_review=%create_manual_review,
        decision=%decision_status,
        onboarding_id=%&onboarding_id,
-       msg="decision",
-       "{}", rule::RULE_LOG_LINE,
+       "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
     );
 
     let output = DecisionOutput {

@@ -15,6 +15,7 @@ pub struct ActionableRuleSet<T: Clone> {
 }
 
 /// The result of evaluating an ActionableRuleSet
+#[derive(Clone)]
 pub struct ActionableRuleSetResult {
     pub ruleset_name: RuleSetName,
     pub ruleset_result: RuleSetResult,

@@ -4,7 +4,7 @@ use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId, VerificationRe
 
 use crate::decision::{
     features::IDologyFeatures,
-    rule::{evaluate_onboarding_rules, onboarding_rules::idology_base_rule_set},
+    rule::{onboarding_rules::idology_base_rule_set, rules_engine::evaluate_onboarding_rules},
 };
 use test_case::test_case;
 
@@ -38,4 +38,5 @@ fn test_idology_base_rule_set(idology_features: IDologyFeatures) -> bool {
         &idology_features,
         &OnboardingId::from_str("ob1").unwrap(),
     )
+    .triggered
 }

@@ -14,7 +14,7 @@ pub struct RuleSet<T: Clone> {
 
 /// Trait representing the evaluation of a RuleSet
 pub trait EvaluateRuleSet<T> {
-    type RuleResult: EvaluatedRuleSet;
+    type RuleResult: EvaluatedRuleSet + Clone;
     fn evaluate(&self, rule_input: &T) -> Self::RuleResult;
 }
 
@@ -89,74 +89,28 @@ impl EvaluatedRuleSet for RuleSetResult {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::decision::rule::test_fixtures::*;
     use test_case::test_case;
 
-    #[derive(Clone)]
-    struct Test {
-        pub name: String,
-    }
-    impl Test {
-        pub fn new(s: &str) -> Self {
-            Test { name: s.into() }
-        }
-    }
-
-    fn test_ruleset_name() -> RuleSetName {
-        RuleSetName::Test("Test Rules".into())
-    }
-
-    fn test_ruleset_other_name() -> RuleSetName {
-        RuleSetName::Test("Other Test rules".into())
-    }
-
-    fn test_ruleset_a() -> RuleSet<Test> {
-        // 3 rules
-        let hello_rule: Rule<Test> = Rule {
-            name: RuleName::Test("test.hello".into()),
-            rule: { |t| t.name == *"hello" },
-        };
-
-        let length_rule: Rule<Test> = Rule {
-            name: RuleName::Test("test.length_gt_3".into()),
-            rule: { |t| t.name.len() > 3 },
-        };
-
-        RuleSet {
-            name: test_ruleset_name(),
-            rules: vec![hello_rule, length_rule],
-        }
-    }
-    fn test_ruleset_b() -> RuleSet<Test> {
-        let world_rule: Rule<Test> = Rule {
-            name: RuleName::Test("test.world".into()),
-            rule: { |t| t.name == *"world" },
-        };
-
-        RuleSet {
-            name: test_ruleset_other_name(),
-            rules: vec![world_rule],
-        }
-    }
-
-    #[test_case(test_ruleset_a(), Test::new("hello") =>  RuleSetResult {
+    #[test_case(test_ruleset_a(), TestFeatures::new("hello") =>  RuleSetResult {
             ruleset_name: test_ruleset_name(),
             rules_triggered: vec![RuleName::Test("test.hello".into()), RuleName::Test("test.length_gt_3".into())],
             rules_not_triggered: vec![],
             triggered: true
         })]
-    #[test_case(test_ruleset_a(), Test::new("world") =>  RuleSetResult {
+    #[test_case(test_ruleset_a(), TestFeatures::new("world") =>  RuleSetResult {
             ruleset_name: test_ruleset_name(),
             rules_triggered: vec![RuleName::Test("test.length_gt_3".into())],
             rules_not_triggered: vec![RuleName::Test("test.hello".into())],
             triggered: true
         })]
-    #[test_case(test_ruleset_b(), Test::new("goodbye") =>  RuleSetResult {
+    #[test_case(test_ruleset_b(), TestFeatures::new("goodbye") =>  RuleSetResult {
             ruleset_name: test_ruleset_other_name(),
             rules_triggered: vec![],
             rules_not_triggered: vec![RuleName::Test("test.world".into())],
             triggered: false
         })]
-    fn test_rule_set(rule_set: RuleSet<Test>, input_data: Test) -> RuleSetResult {
+    fn test_rule_set(rule_set: RuleSet<TestFeatures>, input_data: TestFeatures) -> RuleSetResult {
         rule_set.evaluate(&input_data)
     }
 }
