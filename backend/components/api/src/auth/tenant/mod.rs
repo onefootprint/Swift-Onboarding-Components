@@ -84,9 +84,9 @@ trait CanCheckTenantGuard: Sized {
     fn role(&self) -> &TenantRole;
 
     /// The list of TenantPermissions scopes that are allowed by this auth token
-    fn token_scopes(&self) -> &[TenantScope] {
-        &self.role().scopes
-    }
+    /// Though the impl is usually the same, don't provide a default since using Either will
+    /// overwrite any custom impl
+    fn token_scopes(&self) -> Vec<TenantScope>;
 
     /// The boxed TenantAuth trait object that can be utilized once permissions are checked
     fn tenant_auth(self) -> Box<dyn TenantAuth>;
@@ -98,7 +98,7 @@ trait CanCheckTenantGuard: Sized {
 /// sufficient to meet the guard.
 /// If so, returns a usable boxed TenantAuth. Otherwise, returns an AuthError.
 pub trait CheckTenantGuard {
-    fn check_guard<T>(self, gaurd: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    fn check_guard<T>(self, guard: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
         T: IsGuardMet;
 }
@@ -107,15 +107,15 @@ impl<TAuthExtractor> CheckTenantGuard for TAuthExtractor
 where
     TAuthExtractor: CanCheckTenantGuard,
 {
-    /// Checks if the gaurd is met by self.token_permissions().
-    /// If so, returns self.tenant_auth(), otherwise returns
-    fn check_guard<T>(self, gaurd: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    /// Checks if the guard is met by self.token_permissions().
+    /// If so, returns self.tenant_auth(), otherwise returns an auth error
+    fn check_guard<T>(self, guard: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
         T: IsGuardMet,
     {
-        let requested_permission_str = format!("{}", gaurd);
-        let permission_to_check = gaurd.or_admin(); // Admin user can always do anything
-        if permission_to_check.is_met(self.token_scopes()) {
+        let requested_permission_str = format!("{}", guard);
+        let permission_to_check = guard.or_admin(); // Admin user can always do anything
+        if permission_to_check.is_met(&self.token_scopes()) {
             Ok(self.tenant_auth())
         } else {
             Err(AuthError::MissingTenantPermission(requested_permission_str))

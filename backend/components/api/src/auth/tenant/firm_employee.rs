@@ -5,6 +5,7 @@ use crate::{
         AuthError, SessionContext,
     },
     errors::ApiResult,
+    feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient},
 };
 use db::{
     models::{
@@ -15,7 +16,7 @@ use db::{
     },
     PgConn,
 };
-use newtypes::{TenantId, TenantUserId};
+use newtypes::{TenantId, TenantScope, TenantUserId};
 use paperclip::actix::{Apiv2Schema, Apiv2Security};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -38,6 +39,7 @@ pub struct FirmEmployeeAuth {
     tenant: Tenant,
     tenant_user: TenantUser,
     role: TenantRole,
+    is_risk_ops: bool,
 }
 
 /// Nests a private FirmEmployeeAuth and implements traits required to extract this session from an
@@ -62,7 +64,11 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConn) -> ApiResult<Self> {
+    fn try_from(
+        auth_session: AuthSessionData,
+        conn: &mut PgConn,
+        ff_client: LaunchDarklyFeatureFlagClient,
+    ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::FirmEmployee(data) => data,
             _ => {
@@ -80,11 +86,16 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         // permissions for other tenants
         let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
 
+        let is_risk_ops = ff_client
+            .bool_flag_with_key(LaunchDarklyFeatureFlagClient::IS_RISK_OPS, &tenant_user.email)
+            .unwrap_or(false);
+
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
         Ok(Self(FirmEmployeeAuth {
             tenant,
             tenant_user,
             role,
+            is_risk_ops,
         }))
     }
 }
@@ -94,17 +105,18 @@ impl CanCheckTenantGuard for FirmEmployeeAuthContext {
         &self.data.0.role
     }
 
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        // TODO check if there's a header that approves write access
+        self.role()
+            .scopes
+            .iter()
+            .cloned()
+            .chain(self.data.0.is_risk_ops.then_some(TenantScope::ManualReview))
+            .collect()
+    }
+
     fn tenant_auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.map(|d| d.0))
-    }
-}
-
-impl FirmEmployeeAuthContext {
-    /// Similar to check_guard, but allows bypassing scope checking
-    pub fn has_explicitly_approved_write_permissions(self) -> ApiResult<Box<dyn TenantAuth>> {
-        // TODO require that the client send a header that explicitly opts into making writes
-        let auth = self.tenant_auth();
-        Ok(auth)
     }
 }
 

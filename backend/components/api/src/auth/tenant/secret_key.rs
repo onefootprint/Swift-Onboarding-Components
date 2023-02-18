@@ -11,6 +11,7 @@ use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
+use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -125,6 +126,10 @@ impl TenantAuth for SecretTenantAuthContext {
 impl CanCheckTenantGuard for SecretTenantAuthContext {
     fn role(&self) -> &TenantRole {
         &self.role
+    }
+
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        CanCheckTenantGuard::role(self).scopes.clone()
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {

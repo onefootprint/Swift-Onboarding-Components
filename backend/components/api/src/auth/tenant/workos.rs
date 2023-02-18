@@ -8,6 +8,7 @@ use crate::{
         AuthError,
     },
     errors::ApiResult,
+    feature_flag::LaunchDarklyFeatureFlagClient,
 };
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -21,7 +22,11 @@ impl ExtractableAuthSession for WorkOsSession {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(auth_session: AuthSessionData, _conn: &mut PgConn) -> ApiResult<Self> {
+    fn try_from(
+        auth_session: AuthSessionData,
+        _: &mut PgConn,
+        _: LaunchDarklyFeatureFlagClient,
+    ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::WorkOs(data) => data,
             _ => {

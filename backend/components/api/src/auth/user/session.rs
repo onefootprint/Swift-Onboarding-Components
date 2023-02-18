@@ -16,6 +16,7 @@ use crate::{
         AuthError, SessionContext,
     },
     errors::{ApiError, ApiResult},
+    feature_flag::LaunchDarklyFeatureFlagClient,
 };
 
 /// A user-specific session. Permissions for the session are defined by the set of scopes.
@@ -159,7 +160,11 @@ impl ExtractableAuthSession for ParsedUserSession {
         vec!["X-Fp-Authorization"]
     }
 
-    fn try_from(value: AuthSessionData, _conn: &mut PgConn) -> Result<Self, ApiError> {
+    fn try_from(
+        value: AuthSessionData,
+        _: &mut PgConn,
+        _: LaunchDarklyFeatureFlagClient,
+    ) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {
                 tracing::info!(user_vault_id=%data.user_vault_id, "user session authenticated");

@@ -23,6 +23,13 @@ pub enum FeatureFlagError {
 pub trait FeatureFlagClient: Sync + Send {
     fn bool_flag(&self, flag_key: &str) -> Result<bool, FeatureFlagError>;
 
+    fn bool_flag_with_key<T: ToString + std::fmt::Debug + 'static>(
+        &self,
+        flag_key: &str,
+        key: &T,
+    ) -> Result<bool, FeatureFlagError>;
+
+    // TODO replace these calls with bool_flag_with_key
     fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError>;
 
     fn bool_flag_by_ob_configuration_key(
@@ -44,6 +51,8 @@ pub struct LaunchDarklyFeatureFlagClient {
 }
 
 impl LaunchDarklyFeatureFlagClient {
+    pub const IS_RISK_OPS: &str = "IsFirmEmployeeRiskOps";
+
     pub fn new() -> Self {
         Self {
             launch_darkly_client: None,
@@ -119,9 +128,18 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
     }
 
     #[tracing::instrument(skip(self))]
-    fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError> {
-        let context_builder = ContextBuilder::new(tenant_id.clone());
+    fn bool_flag_with_key<T: ToString + std::fmt::Debug>(
+        &self,
+        flag_key: &str,
+        key: &T,
+    ) -> Result<bool, FeatureFlagError> {
+        let context_builder = ContextBuilder::new(key.to_string());
         self.get_and_log_ld_bool_flag(flag_key, context_builder)
+    }
+
+    #[tracing::instrument(skip(self))]
+    fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError> {
+        self.bool_flag_with_key(flag_key, tenant_id)
     }
 
     #[tracing::instrument(skip(self))]
@@ -130,8 +148,7 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         flag_key: &str,
         ob_configuration_key: &ObConfigurationKey,
     ) -> Result<bool, FeatureFlagError> {
-        let context_builder = ContextBuilder::new(ob_configuration_key.clone());
-        self.get_and_log_ld_bool_flag(flag_key, context_builder)
+        self.bool_flag_with_key(flag_key, ob_configuration_key)
     }
 
     #[tracing::instrument(skip(self))]

@@ -5,7 +5,10 @@ use db::{
 use newtypes::{ObConfigurationId, TenantId};
 use paperclip::actix::Apiv2Security;
 
-use crate::auth::session::{AuthSessionData, ExtractableAuthSession};
+use crate::{
+    auth::session::{AuthSessionData, ExtractableAuthSession},
+    feature_flag::LaunchDarklyFeatureFlagClient,
+};
 use crate::{auth::AuthError, errors::ApiError};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -32,7 +35,11 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         vec!["X-Onboarding-Session-Token"]
     }
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConn) -> Result<Self, ApiError> {
+    fn try_from(
+        auth_session: AuthSessionData,
+        conn: &mut PgConn,
+        _: LaunchDarklyFeatureFlagClient,
+    ) -> Result<Self, ApiError> {
         let data = match auth_session {
             AuthSessionData::OnboardingSession(data) => data,
             _ => {

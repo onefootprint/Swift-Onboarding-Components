@@ -144,6 +144,13 @@ where
         }
     }
 
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        match self {
+            Either::Left(l) => l.token_scopes(),
+            Either::Right(r) => r.token_scopes(),
+        }
+    }
+
     fn tenant_auth(self) -> Box<dyn TenantAuth> {
         match self {
             Either::Left(l) => l.tenant_auth(),

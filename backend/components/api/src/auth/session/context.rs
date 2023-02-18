@@ -96,10 +96,11 @@ where
             // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
             // we fail
             let raw_session_data = session.data.clone();
+            let ff_client = state.feature_flag_client.clone();
             let parsed_session_data = state
                 .db_pool
                 .db_query(move |conn| {
-                    T::try_from(raw_session_data, conn)
+                    T::try_from(raw_session_data, conn, ff_client)
                         .map_err(|_| AuthError::InvalidTokenForHeader(allowed_headers))
                 })
                 .await??;

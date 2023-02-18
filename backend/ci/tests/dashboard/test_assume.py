@@ -94,7 +94,7 @@ def test_cannot_patch(assumed_token, path):
         #     "users/some_fp_user_id/decisions",
         #     dict(status="pass", annotation=dict(note="", is_pinned=False)),
         # ),
-        ("users/some_fp_user_id/annotations", dict(note="", is_pinned=False)),
+        # ("users/some_fp_user_id/annotations", dict(note="", is_pinned=False)),
         (
             "org/onboarding_configs",
             dict(name="", must_collect_data=[], can_access_data=[]),

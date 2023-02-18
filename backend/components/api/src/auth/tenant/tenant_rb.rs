@@ -5,6 +5,7 @@ use crate::{
         AuthError, SessionContext,
     },
     errors::ApiResult,
+    feature_flag::LaunchDarklyFeatureFlagClient,
 };
 use db::{
     models::{
@@ -13,7 +14,7 @@ use db::{
     },
     PgConn,
 };
-use newtypes::TenantRolebindingId;
+use newtypes::{TenantRolebindingId, TenantScope};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -64,7 +65,11 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(auth_session: AuthSessionData, conn: &mut PgConn) -> ApiResult<Self> {
+    fn try_from(
+        auth_session: AuthSessionData,
+        conn: &mut PgConn,
+        _: LaunchDarklyFeatureFlagClient,
+    ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
             _ => {
@@ -97,6 +102,10 @@ pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
 impl CanCheckTenantGuard for TenantRbAuthContext {
     fn role(&self) -> &TenantRole {
         &self.data.0.tenant_role
+    }
+
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        CanCheckTenantGuard::role(self).scopes.clone()
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {
