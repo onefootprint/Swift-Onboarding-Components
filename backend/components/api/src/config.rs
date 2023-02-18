@@ -78,6 +78,9 @@ pub struct Config {
     #[envconfig(from = "CUSTODIAN_KEY", default = "onefootprint")]
     pub custodian_key: String,
 
+    #[envconfig(from = "PROTECTED_CUSTODIAN_KEY")]
+    pub protected_custodian_key: Option<String>,
+
     #[envconfig(nested = true)]
     pub idology_config: IdologyConfig,
 

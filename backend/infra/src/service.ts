@@ -245,9 +245,9 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  // dont't allow external traffic to hit the /metrics endpoint
+  // dont't allow external traffic to hit the disallowed endpoints
   web.addListenerRule(
-    `fpc-lb-metrics-rule-${serviceName}`,
+    `fpc-lb-metrics-rules-${serviceName}`,
     {
       priority: 1,
       actions: [

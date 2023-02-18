@@ -33,6 +33,8 @@ export interface StaticSecrets {
   launchDarklySdkKey: aws.ssm.Parameter;
   svixAuthToken: aws.ssm.Parameter;
   stripeApiKey: aws.ssm.Parameter;
+  fpcProtectedCustodianKey: pulumi.Output<string>;
+  fpcProtectedCustodianKeyParameter: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -130,15 +132,18 @@ export async function LoadSecrets(
     }),
   });
 
-  const auroraDbPasswordOld = new random.RandomPassword('db_password', {
-    length: 44,
-    special: false,
-  });
-
   const auroraDbPassword = new random.RandomPassword('db_password_020223', {
     length: 44,
     special: false,
   });
+
+  const fpcProtectedCustodianKey = new random.RandomPassword(
+    'fpc_protected_custodian_key_021723',
+    {
+      length: 44,
+      special: false,
+    },
+  );
 
   const secretConstants =
     config.requireSecretObject<SecretConstants>('constants');
@@ -234,6 +239,11 @@ export async function LoadSecrets(
     stripeApiKey: createSecretParameter(
       `stripeApiKey-${stack}`,
       secretConstants.stripe.apiKey,
+    ),
+    fpcProtectedCustodianKey: pulumi.secret(fpcProtectedCustodianKey.result),
+    fpcProtectedCustodianKeyParameter: createSecretParameter(
+      `fpcPrivateProectedToken-${stack}`,
+      fpcProtectedCustodianKey.result,
     ),
   };
 }

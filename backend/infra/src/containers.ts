@@ -137,6 +137,7 @@ export abstract class ServiceContainers {
         secretsStore.launchDarklySdkKey.arn,
         secretsStore.svixAuthToken.arn,
         secretsStore.stripeApiKey.arn,
+        secretsStore.fpcProtectedCustodianKeyParameter.arn,
       ])
       .apply(
         ([
@@ -158,7 +159,8 @@ export abstract class ServiceContainers {
           socureProductionApiKey,
           launchDarklySdkKey,
           svixAuthToken,
-          stripeApiKey,
+          stripeApiKeyArn,
+          fpcProtectedArn,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -227,7 +229,11 @@ export abstract class ServiceContainers {
               },
               {
                 name: 'STRIPE_API_KEY',
-                valueFrom: stripeApiKey,
+                valueFrom: stripeApiKeyArn,
+              },
+              {
+                name: 'PROTECTED_CUSTODIAN_KEY',
+                valueFrom: fpcProtectedArn,
               },
             ],
             environment: [

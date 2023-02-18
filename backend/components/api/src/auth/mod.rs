@@ -10,6 +10,7 @@ mod either;
 pub use self::either::Either;
 pub mod tenant;
 pub mod user;
+pub mod protected_custodian;
 
 #[derive(Debug, Error)]
 pub enum AuthError {

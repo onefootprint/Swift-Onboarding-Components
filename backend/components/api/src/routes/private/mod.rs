@@ -2,9 +2,10 @@ use paperclip::actix::web;
 
 mod assume;
 mod cleanup;
+mod invoice;
+mod protected;
 mod test;
 mod test_tenant;
-mod invoice;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -13,4 +14,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(test_tenant::post)
         .service(invoice::post)
         .service(test::post);
+
+    protected::routes(config);
 }

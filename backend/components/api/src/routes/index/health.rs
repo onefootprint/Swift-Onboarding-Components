@@ -116,17 +116,17 @@ async fn enclave_decrypt(
 }
 
 #[api_v2_operation(tags(Private))]
-#[tracing::instrument(name = "panic")]
-#[get("/panic")]
-async fn panic_handler(_: CustodianAuthContext) -> StringResponse {
-    tracing::debug!("about to panic");
-    panic!("at the disco");
-}
-
-#[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "fail")]
 #[get("/fail")]
 async fn fail_handler() -> StringResponse {
     tracing::debug!("about to fail");
     Err(ApiError::AssertionError("Hit /fail endpoint".to_owned()))
+}
+
+#[api_v2_operation(tags(Private))]
+#[tracing::instrument(name = "panic")]
+#[get("/panic")]
+async fn panic_handler(_: CustodianAuthContext) -> StringResponse {
+    tracing::debug!("about to panic");
+    panic!("at the disco");
 }

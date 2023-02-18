@@ -91,6 +91,16 @@ export function CreateAirplaneAgentStack(g: GlobalState): AirplaneOutput {
     },
   );
 
+  const fpcPrivateProtectedToken = new AirplaneConfigResource(
+    `airplane-env-conf-fpc-protected-token-${g.stackMetadata.shortStackName}`,
+    {
+      envSlug: envSlug,
+      apiToken: g.secretsStore.airplaneApiToken,
+      name: 'FPC_PRIVATE_PROECTED_TOKEN',
+      value: g.secretsStore.fpcProtectedCustodianKey,
+    },
+  );
+
   return {
     envSlug,
   };
