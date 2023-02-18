@@ -7,7 +7,10 @@ use crate::{
     State,
 };
 
-use super::{vendor::vendor_trait::VendorAPICall, *};
+use super::{
+    vendor::{vendor_result::VendorResult, vendor_trait::VendorAPICall},
+    *,
+};
 use db::{
     models::{
         onboarding::Onboarding,
@@ -22,6 +25,7 @@ use idv::{
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
 
+use newtypes::OnboardingId;
 use prometheus::labels;
 ///
 /// Run loads saved VerificationRequests and (potentially) VerificationResults and produces a Decision
@@ -40,7 +44,36 @@ pub async fn run(
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
 ) -> ApiResult<()> {
-    let obid = ob.id.clone();
+    let all_vendor_results = make_outstanding_vendor_requests(
+        &ob.id,
+        db_pool,
+        enclave_client,
+        is_production,
+        ff_client,
+        idology_client,
+        socure_client,
+        twilio_client,
+    )
+    .await?;
+    make_onboarding_decision(all_vendor_results, db_pool, ff_client, &ob.id).await
+}
+
+#[allow(clippy::too_many_arguments)]
+pub async fn make_outstanding_vendor_requests(
+    onboarding_id: &OnboardingId,
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    is_production: bool,
+    ff_client: &impl FeatureFlagClient,
+    idology_client: &impl VendorAPICall<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >,
+    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+) -> ApiResult<Vec<VendorResult>> {
+    let obid = onboarding_id.clone();
     let requests_and_results = db_pool
         .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
             // Load our requests and results
@@ -49,7 +82,7 @@ pub async fn run(
         })
         .await??;
 
-    let obid = ob.id.clone();
+    let obid = onboarding_id.clone();
     let uv = db_pool
         .db_query(move |conn| UserVault::get(conn, &obid))
         .await??;
@@ -87,19 +120,19 @@ pub async fn run(
     .await?;
     // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
     let has_errors = raw_results
-        .iter()
-        .filter_map(|r| r.as_ref().err())
-        .find(|&err| match err {
-            &ApiError::VendorRequestFailed(vendor_api) => {
-                if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api) {
-                    true
-                } else {
-                    tracing::warn!(vendor_api=%vendor_api, "Vendor request failed, but not bailing out of decision engine run");
-                    false
-                }
+    .iter()
+    .filter_map(|r| r.as_ref().err())
+    .find(|&err| match err {
+        &ApiError::VendorRequestFailed(vendor_api) => {
+            if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api) {
+                true
+            } else {
+                tracing::warn!(vendor_api=%vendor_api, "Vendor request failed, but not bailing out of decision engine run");
+                false
             }
-            _ => true,
-        });
+        }
+        _ => true,
+    });
 
     if has_errors.is_some() {
         return Err(ApiError::VendorRequestsFailed);
@@ -112,11 +145,23 @@ pub async fn run(
         .chain(previous_results.into_iter())
         .collect();
 
+    Ok(results)
+}
+
+pub async fn make_onboarding_decision(
+    vendor_results: Vec<VendorResult>,
+    db_pool: &DbPool,
+    ff_client: &impl FeatureFlagClient,
+    onboarding_id: &OnboardingId,
+) -> ApiResult<()> {
     // From our results, create a FeatureVector for the final decision output
-    let features = features::create_features(results);
+    let features = features::create_features(vendor_results);
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    let onboarding_decision = risk::create_final_decision(ob.id, features, db_pool, ff_client).await?;
+    // TODO: breakup create_final_decision into 1 func that creates DecisionOutput and 1 func that actually writes an OBD (+risksignals) from that
+    //       onboading_id is only currently needed for the first part in logging in the rules, but we should be able to remove and put that logging outside
+    let onboarding_decision =
+        risk::create_final_decision(onboarding_id.clone(), features, db_pool, ff_client).await?;
 
     let status = onboarding_decision.status.to_string();
     if let Ok(metric) =
