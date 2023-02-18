@@ -22,6 +22,9 @@ impl DbToApi<SaturatedActor> for Actor {
             }
             SaturatedActor::TenantApiKey(tak) => Actor::ApiKey { name: tak.name },
             SaturatedActor::Footprint => Actor::Footprint,
+            // Don't serialize any information on which firm employee performed the action. Maybe
+            // one day we will show this when authed as a firm employee
+            SaturatedActor::FirmEmployee(_) => Actor::FirmEmployee,
         }
     }
 }

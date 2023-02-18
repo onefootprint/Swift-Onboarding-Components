@@ -40,6 +40,7 @@ pub trait TenantAuth {
 pub enum AuthActor {
     TenantUser(TenantUserId),
     TenantApiKey(TenantApiKeyId),
+    FirmEmployee(TenantUserId),
 }
 
 impl From<TenantUserId> for AuthActor {
@@ -61,6 +62,7 @@ impl From<AuthActor> for DbActor {
             AuthActor::TenantApiKey(tenant_api_key_id) => DbActor::TenantApiKey {
                 id: tenant_api_key_id,
             },
+            AuthActor::FirmEmployee(tenant_user_id) => DbActor::FirmEmployee { id: tenant_user_id },
         }
     }
 }

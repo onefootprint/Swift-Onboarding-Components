@@ -10,6 +10,7 @@ fn saturated_actor_to_principal_string(saturated_actor: &SaturatedActor) -> Stri
         db::actor::SaturatedActor::TenantUser(tu) => tu.email.0.clone(),
         db::actor::SaturatedActor::TenantApiKey(tak) => tak.name.clone(),
         db::actor::SaturatedActor::Footprint => "Footprint".to_owned(),
+        db::actor::SaturatedActor::FirmEmployee(_) => "Footprint".to_owned(),
     }
 }
 

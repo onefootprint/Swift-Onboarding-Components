@@ -25,6 +25,7 @@ async fn get(
     let rb = auth.rolebinding().cloned();
     let user_id = match auth.actor() {
         AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
+        AuthActor::FirmEmployee(tenant_user_id) => tenant_user_id,
         _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
     };
     let user = state

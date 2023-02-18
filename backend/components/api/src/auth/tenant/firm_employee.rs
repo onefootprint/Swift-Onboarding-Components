@@ -132,6 +132,6 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
     }
 
     fn actor(&self) -> AuthActor {
-        AuthActor::from(self.data.tenant_user.id.clone())
+        AuthActor::FirmEmployee(self.data.tenant_user.id.clone())
     }
 }

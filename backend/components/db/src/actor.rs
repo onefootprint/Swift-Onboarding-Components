@@ -17,6 +17,7 @@ pub enum SaturatedActor {
     TenantUser(TenantUser),
     TenantApiKey(TenantApiKey),
     Footprint,
+    FirmEmployee(TenantUser),
 }
 
 pub trait HasActor {
@@ -49,6 +50,7 @@ where
 
     let tenant_user_ids = actors.iter().flat_map(|a| match a {
         DbActor::TenantUser { id } => Some(id),
+        DbActor::FirmEmployee { id } => Some(id),
         _ => None,
     });
 
@@ -88,6 +90,13 @@ where
                         .clone(),
                 ),
                 DbActor::Footprint => SaturatedActor::Footprint,
+                DbActor::FirmEmployee{id} => SaturatedActor::FirmEmployee(
+                    tenant_users_map
+                        .get(&id)
+                        .ok_or(DbError::RelatedObjectNotFound)?
+                        .clone(),
+
+                ),
             };
             Ok((ha, saturated_actor))
         })

@@ -12,4 +12,5 @@ pub enum DbActor {
     TenantUser { id: TenantUserId },
     TenantApiKey { id: TenantApiKeyId },
     Footprint,
+    FirmEmployee { id: TenantUserId },
 }
