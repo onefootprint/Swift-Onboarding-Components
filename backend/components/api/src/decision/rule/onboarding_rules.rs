@@ -18,6 +18,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
         //
         // These rules fire when the id is located, but there's red flags
         //
+        // This is an IDology recommended "always fail" rule
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
@@ -36,6 +37,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
             },
             name: RuleName::AddressInputIsPoBox,
         },
+        // This is an IDology recommended "always fail" rule
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
@@ -48,12 +50,8 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
-                    // it does not match, and it is not a close mismatch
                     f.footprint_reason_codes
                         .contains(&FootprintReasonCode::SsnDoesNotMatch)
-                        && !f
-                            .footprint_reason_codes
-                            .contains(&FootprintReasonCode::SsnDoesNotMatchWithin1Digit)
                 }
             },
             name: RuleName::SsnDoesNotMatch,
@@ -76,6 +74,17 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
             },
             name: RuleName::SsnLocatedIsInvalid,
         },
+        // This is an IDology recommended "always fail" rule
+        Rule {
+            rule: {
+                |f: &IDologyFeatures| {
+                    f.footprint_reason_codes
+                        .contains(&FootprintReasonCode::MultipleRecordsFound)
+                }
+            },
+            name: RuleName::MultipleRecordsFound,
+        },
+        // This is an IDology recommended "always fail" rule
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
@@ -85,6 +94,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
             },
             name: RuleName::SsnIssuedPriorToDob,
         },
+        // This is an IDology recommended "always fail" rule
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
@@ -167,5 +177,34 @@ pub fn temp_watchlist() -> RuleSet<IDologyFeatures> {
     RuleSet {
         rules: vec![rule],
         name: RuleSetName::TempWatchlist,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use super::idology_base_rule_set;
+    use crate::decision::rule::RuleName;
+
+    #[test]
+    fn test_onboarding_rules_has_minimum() {
+        let expected_rules: HashSet<RuleName> = HashSet::from_iter(
+            vec![
+                // important failures from idology they told us to always fail on
+                RuleName::IdNotLocated,
+                RuleName::SubjectDeceased,
+                RuleName::MultipleRecordsFound,
+                RuleName::SsnIssuedPriorToDob,
+                RuleName::CoppaAlert,
+                // potential watchlist hits
+                RuleName::WatchlistHit,
+            ]
+            .into_iter(),
+        );
+
+        let rules = HashSet::from_iter(idology_base_rule_set().rules.into_iter().map(|r| r.name));
+
+        assert!(expected_rules.is_subset(&rules))
     }
 }

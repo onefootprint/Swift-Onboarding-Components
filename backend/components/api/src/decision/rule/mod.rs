@@ -51,7 +51,7 @@ pub enum RuleSetName {
     Test(String),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Display)]
+#[derive(Debug, Clone, PartialEq, Eq, Display, Hash)]
 #[strum(serialize_all = "snake_case")]
 pub enum RuleName {
     IdNotLocated,
@@ -67,6 +67,7 @@ pub enum RuleName {
     AddressDoesNotMatch,
     AddressLocatedIsWarm,
     AddressLocatedIsHighRiskAddress,
+    MultipleRecordsFound,
     #[cfg(test)]
     Test(String),
 }
