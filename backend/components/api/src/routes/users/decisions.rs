@@ -1,6 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
+use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
@@ -27,12 +28,15 @@ pub async fn post(
     request: web::Json<DecisionRequest>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(TenantGuard::ManualReview)?;
+    let auth = match auth {
+        Either::Left(auth) => auth.check_guard(TenantGuard::ManualReview)?,
+        Either::Right(auth) => auth.has_explicitly_approved_write_permissions()?,
+    };
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
+    let actor = auth.actor();
     let fp_user_id = fp_user_id.into_inner();
     let fp_user_id_clone = fp_user_id.clone();
-    let actor = auth.actor();
 
     let DecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },

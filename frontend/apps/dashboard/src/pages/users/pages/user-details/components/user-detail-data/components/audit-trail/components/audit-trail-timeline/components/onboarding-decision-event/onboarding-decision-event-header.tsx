@@ -8,7 +8,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-import OrgOverwriteDetails from './components/org-overwrite-details';
+import AnnotationDetails from './components/annotation-details';
 
 type OnboardingDecisionEventHeaderProps = {
   data: OnboardingDecisionEventData;
@@ -40,6 +40,26 @@ const OnboardingDecisionEventHeader = ({
     );
   }
 
+  if (source.kind === DecisionSourceKind.firmEmployee) {
+    return (
+      <OrgDecisionContainer>
+        <Typography
+          variant="label-3"
+          color={color}
+          testID="onboarding-decision-event-header"
+        >
+          {isVerified
+            ? t('verified-by-firm-employee')
+            : t('not-verified-by-firm-employee')}
+        </Typography>
+        <Typography variant="label-3" sx={{ marginLeft: 2, marginRight: 2 }}>
+          •
+        </Typography>
+        <AnnotationDetails data={data} source={source} />
+      </OrgDecisionContainer>
+    );
+  }
+
   if (source.kind === DecisionSourceKind.organization) {
     const decision = t(`decision-status.${status}`);
 
@@ -51,7 +71,7 @@ const OnboardingDecisionEventHeader = ({
         <Typography variant="label-3" sx={{ marginLeft: 2, marginRight: 2 }}>
           •
         </Typography>
-        <OrgOverwriteDetails data={data} source={source} />
+        <AnnotationDetails data={data} source={source} />
       </OrgDecisionContainer>
     );
   }

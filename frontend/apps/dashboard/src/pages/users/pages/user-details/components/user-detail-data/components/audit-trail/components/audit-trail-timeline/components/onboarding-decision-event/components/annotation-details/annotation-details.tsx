@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  DecisionSourceOrganization,
+  DecisionSource,
+  DecisionSourceKind,
   DecisionStatus,
   OnboardingDecisionEventData,
 } from '@onefootprint/types';
@@ -11,12 +12,12 @@ import useUpdateAnnotation from 'src/pages/users/pages/user-details/hooks/use-up
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import styled, { css } from 'styled-components';
 
-type OrgOverwriteDetailsProps = {
+type AnnotationDetailsProps = {
   data: OnboardingDecisionEventData;
-  source: DecisionSourceOrganization;
+  source: DecisionSource;
 };
 
-const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
+const AnnotationDetails = ({ data, source }: AnnotationDetailsProps) => {
   const { t } = useTranslation(
     'pages.user-details.audit-trail.timeline.onboarding-decision-event',
   );
@@ -84,12 +85,14 @@ const OrgOverwriteDetails = ({ data, source }: OrgOverwriteDetailsProps) => {
               {t(`decision-status.${status}`)}
             </Typography>
           </ItemContainer>
-          <ItemContainer>
-            <Typography variant="label-3" color="tertiary">
-              {t('org-overwrite.drawer.reviewer')}
-            </Typography>
-            <Typography variant="body-3">{source.member}</Typography>
-          </ItemContainer>
+          {source.kind === DecisionSourceKind.organization && (
+            <ItemContainer>
+              <Typography variant="label-3" color="tertiary">
+                {t('org-overwrite.drawer.reviewer')}
+              </Typography>
+              <Typography variant="body-3">{source.member}</Typography>
+            </ItemContainer>
+          )}
           <ItemContainer>
             <Typography variant="label-3" color="tertiary">
               {t('org-overwrite.drawer.date')}
@@ -152,4 +155,4 @@ const NoteContainer = styled.div`
   `}
 `;
 
-export default OrgOverwriteDetails;
+export default AnnotationDetails;

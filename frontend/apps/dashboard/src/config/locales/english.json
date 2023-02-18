@@ -510,6 +510,8 @@
           "onboarding-decision-event": {
             "verified-by-footprint": "Verified by Footprint",
             "not-verified-by-footprint": "Could not be verified by Footprint",
+            "verified-by-firm-employee": "Verified by Footprint Risk Ops",
+            "not-verified-by-firm-employee": "Could not be verified by Footprint Risk Ops",
             "verified": "Verified",
             "not-verified": "Failed",
             "decision-status": {

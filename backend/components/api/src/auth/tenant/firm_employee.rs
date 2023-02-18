@@ -99,6 +99,15 @@ impl CanCheckTenantGuard for FirmEmployeeAuthContext {
     }
 }
 
+impl FirmEmployeeAuthContext {
+    /// Similar to check_guard, but allows bypassing scope checking
+    pub fn has_explicitly_approved_write_permissions(self) -> ApiResult<Box<dyn TenantAuth>> {
+        // TODO require that the client send a header that explicitly opts into making writes
+        let auth = self.tenant_auth();
+        Ok(auth)
+    }
+}
+
 impl TenantAuth for SessionContext<FirmEmployeeAuth> {
     fn is_live(&self) -> ApiResult<bool> {
         // TODO dedupe this logic

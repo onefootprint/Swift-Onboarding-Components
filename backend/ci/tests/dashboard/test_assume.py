@@ -81,10 +81,11 @@ def test_cannot_patch(assumed_token, path):
             "users/some_fp_user_id/vault/identity/document/decrypt",
             dict(document_type="passport", reason="blah"),
         ),
-        (
-            "users/some_fp_user_id/decisions",
-            dict(status="pass", annotation=dict(note="", is_pinned=False)),
-        ),
+        # TODO: reinstate this when we require a header
+        # (
+        #     "users/some_fp_user_id/decisions",
+        #     dict(status="pass", annotation=dict(note="", is_pinned=False)),
+        # ),
         ("users/some_fp_user_id/annotations", dict(note="", is_pinned=False)),
         (
             "org/onboarding_configs",

@@ -4,11 +4,16 @@ import Vendor from './vendor';
 
 export enum DecisionSourceKind {
   footprint = 'footprint',
+  firmEmployee = 'firm_employee',
   organization = 'organization',
 }
 
 export type DecisionSourceFootprint = {
   kind: DecisionSourceKind.footprint;
+};
+
+export type DecisionSourceFirmEmployee = {
+  kind: DecisionSourceKind.firmEmployee;
 };
 
 export type DecisionSourceOrganization = {
@@ -18,7 +23,8 @@ export type DecisionSourceOrganization = {
 
 export type DecisionSource =
   | DecisionSourceFootprint
-  | DecisionSourceOrganization;
+  | DecisionSourceOrganization
+  | DecisionSourceFirmEmployee;
 
 export type OnboardingDecision = {
   id: string;
