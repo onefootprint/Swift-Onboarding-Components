@@ -34,6 +34,7 @@ export async function CreateAssetCdn(
   }
 
   const logsBucket = new aws.s3.Bucket('requestLogs', {
+    forceDestroy: !constants.deletionProtection,
     bucket: `${domain}-logs`,
     acl: 'private',
   });
