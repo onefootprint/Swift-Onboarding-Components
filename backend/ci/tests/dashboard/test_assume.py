@@ -15,6 +15,10 @@ def assumed_token(tenant, sandbox_tenant_data):
     assert body["id"] == original_tenant.id
     assert body["name"] == "Footprint Sandbox Integration Testing"
 
+    body = get("org/member", None, auth_token)
+    assert body["is_firm_employee"]
+    assert body["rolebinding"]
+
     # Integration testing tenant should not be able to assume role for a real org
     post(
         "private/assume",
@@ -36,6 +40,10 @@ def assumed_token(tenant, sandbox_tenant_data):
     body = get("org", None, auth_token)
     assert body["id"] == tenant.id
     assert body["name"] == "Footprint Live Integration Testing"
+
+    body = get("org/member", None, auth_token)
+    assert body["is_firm_employee"]
+    assert not body["rolebinding"]
 
     return auth_token
 
