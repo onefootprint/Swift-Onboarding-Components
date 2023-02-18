@@ -4,7 +4,7 @@ on:
     types: [labeled, opened, synchronize]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: 'ephem-stack-group-${{ github.head_ref }}'
 
 jobs:
   ephemeral_stack:
@@ -69,7 +69,7 @@ jobs:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
       AIRPLANE_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
-      
+
   run_tests:
     name: 'ephemeral integration tests'
     needs: [deploy_ephemeral_stack]
