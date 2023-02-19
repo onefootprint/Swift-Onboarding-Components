@@ -3,7 +3,7 @@ use std::str::FromStr;
 use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId};
 use test_case::test_case;
 
-use crate::decision::risk::{final_decision, DecisionOutput};
+use crate::decision::risk::final_decision;
 fn ob_id(id: &str) -> OnboardingId {
     OnboardingId::from_str(id).unwrap()
 }
@@ -20,26 +20,26 @@ fn idology_reason_codes(should_fail: bool, should_fail_conservative: bool) -> Ve
 
     codes
 }
-
+type CreateManualReview = bool;
 // passing status but hit a conservative rule -> fail
-#[test_case(true, true, false, DecisionStatus::Pass, ob_id("ob1") => DecisionOutput {decision_status: DecisionStatus::Fail, onboarding_id: ob_id("ob1"), create_manual_review: true})]
+#[test_case(true, true, false, DecisionStatus::Pass, ob_id("ob1") => (DecisionStatus::Fail, ob_id("ob1"), true))]
 // passing status but hit a base rule -> fail
-#[test_case(true, false, true, DecisionStatus::Pass, ob_id("ob2") => DecisionOutput {decision_status: DecisionStatus::Fail, onboarding_id: ob_id("ob2"), create_manual_review: true})]
+#[test_case(true, false, true, DecisionStatus::Pass, ob_id("ob2") => (DecisionStatus::Fail, ob_id("ob2"), true))]
 // failing status and hit no rules -> fail (needs a pass)
-#[test_case(true, false, false, DecisionStatus::Fail, ob_id("ob3") => DecisionOutput {decision_status: DecisionStatus::Fail, onboarding_id: ob_id("ob3"), create_manual_review: true})]
+#[test_case(true, false, false, DecisionStatus::Fail, ob_id("ob3") => (DecisionStatus::Fail, ob_id("ob3"), true))]
 // // passing status and hit no rules -> pass
-#[test_case(true, false, false, DecisionStatus::Pass, ob_id("ob4") => DecisionOutput {decision_status: DecisionStatus::Pass, onboarding_id: ob_id("ob4"), create_manual_review: false})]
+#[test_case(true, false, false, DecisionStatus::Pass, ob_id("ob4") => (DecisionStatus::Pass, ob_id("ob4"), false))]
 // don't use rule flags, but we still pass because the passing rules are permanent
-#[test_case(false, false, true, DecisionStatus::Pass, ob_id("ob5") => DecisionOutput {decision_status: DecisionStatus::Pass, onboarding_id: ob_id("ob5"), create_manual_review: false})]
+#[test_case(false, false, true, DecisionStatus::Pass, ob_id("ob5") => (DecisionStatus::Pass, ob_id("ob5"), false))]
 // don't use rule flags, and we still fail bc idology failed
-#[test_case(false, true, true, DecisionStatus::Fail, ob_id("ob6") => DecisionOutput {decision_status: DecisionStatus::Fail, onboarding_id: ob_id("ob6"), create_manual_review: true})]
+#[test_case(false, true, true, DecisionStatus::Fail, ob_id("ob6") => (DecisionStatus::Fail, ob_id("ob6"), true))]
 fn test_final_decision(
     should_use_conservative_rules: bool,
     base_rules_should_fail: bool,
     conservative_rules_should_fail: bool,
     idology_status: DecisionStatus,
     onboarding_id: OnboardingId,
-) -> DecisionOutput {
+) -> (DecisionStatus, OnboardingId, CreateManualReview) {
     use crate::{
         decision::{
             features::{FeatureVector, IDologyFeatures},
@@ -94,5 +94,12 @@ fn test_final_decision(
         .return_once(move |_, _| Ok(should_use_conservative_rules));
 
     // function under test
-    final_decision(&feature_vector, onboarding_id, &mock_ff_client).unwrap()
+    let d = final_decision(&feature_vector, onboarding_id, &mock_ff_client).unwrap();
+
+    assert!(!d.rules_not_triggered.is_empty());
+    if d.decision_status == DecisionStatus::Fail {
+        assert!(!d.rules_triggered.is_empty())
+    }
+
+    (d.decision_status, d.onboarding_id, d.create_manual_review)
 }

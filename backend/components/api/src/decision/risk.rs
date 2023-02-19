@@ -13,7 +13,7 @@ use db::{
 
 use super::{
     features::*,
-    rule::{self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules},
+    rule::{self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules, RuleName},
     utils,
 };
 use crate::feature_flag::FeatureFlagClient;
@@ -106,6 +106,8 @@ pub struct DecisionOutput {
     pub decision_status: DecisionStatus,
     pub onboarding_id: OnboardingId,
     pub create_manual_review: bool,
+    pub rules_triggered: Vec<RuleName>,
+    pub rules_not_triggered: Vec<RuleName>,
 }
 pub fn final_decision(
     features: &FeatureVector,
@@ -135,10 +137,10 @@ pub fn final_decision(
     // Evaluate conservative rules
     let conservative =
         rule::rules_engine::evaluate_onboarding_rules(additional_rules, idology_features, &onboarding_id);
-    let all_rules = base.join(conservative);
+    let onboarding_rule_evaluation_result = base.join(conservative);
 
     // If we no rules that triggered, we consider that a pass
-    let decision_status = if all_rules.triggered {
+    let decision_status = if onboarding_rule_evaluation_result.triggered {
         DecisionStatus::Fail
     } else {
         DecisionStatus::Pass
@@ -150,8 +152,8 @@ pub fn final_decision(
 
     // Log evaluation
     tracing::info!(
-       rules_triggered=%rule::rules_to_string(&all_rules.rules_triggered),
-       rules_not_triggered=%rule::rules_to_string(&all_rules.rules_not_triggered),
+       rules_triggered=%rule::rules_to_string(&onboarding_rule_evaluation_result.rules_triggered),
+       rules_not_triggered=%rule::rules_to_string(&onboarding_rule_evaluation_result.rules_not_triggered),
        create_manual_review=%create_manual_review,
        decision=%decision_status,
        onboarding_id=%&onboarding_id,
@@ -162,6 +164,8 @@ pub fn final_decision(
         decision_status,
         onboarding_id,
         create_manual_review,
+        rules_triggered: onboarding_rule_evaluation_result.rules_triggered,
+        rules_not_triggered: onboarding_rule_evaluation_result.rules_not_triggered,
     };
     Ok(output)
 }
