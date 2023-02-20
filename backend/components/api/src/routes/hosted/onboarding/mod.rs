@@ -63,6 +63,7 @@ fn create_onboarding_validation_token(
     Ok(validation_token)
 }
 
+#[tracing::instrument(skip_all)]
 pub fn get_requirements(
     conn: &mut PgConn,
     ob_info: &AuthedOnboardingInfo,
@@ -120,6 +121,8 @@ pub fn get_requirements(
     .flatten()
     .chain(document_request_requirements)
     .collect();
+
+    tracing::info!(onboarding_id=%onboarding.id, requirements=%format!("{:?}", requirements), scoped_user_id=%scoped_user_id, "get_requirements result");
 
     Ok((requirements, onboarding))
 }
