@@ -8,11 +8,11 @@ import RadioSelectOption, {
 export type RadioSelectProps = {
   options: RadioSelectOptionFields[];
   value?: string;
-  onSelect: (value: string) => void;
+  onChange: (value: string) => void;
   testID?: string;
 };
 
-const RadioSelect = ({ options, value, onSelect, testID }: RadioSelectProps) =>
+const RadioSelect = ({ options, value, onChange, testID }: RadioSelectProps) =>
   options.length > 0 ? (
     <OptionsContainer data-testid={testID}>
       {options.map(
@@ -24,7 +24,7 @@ const RadioSelect = ({ options, value, onSelect, testID }: RadioSelectProps) =>
             description={description}
             IconComponent={IconComponent}
             onClick={() => {
-              onSelect(optionValue);
+              onChange(optionValue);
             }}
             selected={optionValue === value}
           />

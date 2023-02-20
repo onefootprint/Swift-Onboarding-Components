@@ -8,7 +8,7 @@ describe('<RadioSelect />', () => {
   const renderRadioSelect = ({
     value,
     testID,
-    onSelect = () => {},
+    onChange = () => {},
   }: Partial<RadioSelectProps>) => {
     const options = [
       {
@@ -28,7 +28,7 @@ describe('<RadioSelect />', () => {
       <RadioSelect
         options={options}
         value={value}
-        onSelect={onSelect}
+        onChange={onChange}
         testID={testID}
       />,
     );
@@ -53,16 +53,16 @@ describe('<RadioSelect />', () => {
     });
 
     describe('when clicking on an option', () => {
-      it('should trigger onSelect event', async () => {
-        const onSelectMockFn = jest.fn();
+      it('should trigger onChange event', async () => {
+        const onChangeMockFn = jest.fn();
         renderRadioSelect({
-          onSelect: onSelectMockFn,
+          onChange: onChangeMockFn,
         });
         const option = screen.getByLabelText(
           'Description 2',
         ) as HTMLButtonElement;
         await userEvent.click(option);
-        expect(onSelectMockFn).toHaveBeenCalled();
+        expect(onChangeMockFn).toHaveBeenCalled();
       });
     });
   });

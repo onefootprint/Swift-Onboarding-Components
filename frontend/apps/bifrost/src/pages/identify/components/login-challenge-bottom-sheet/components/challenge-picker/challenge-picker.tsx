@@ -74,7 +74,7 @@ const ChallengePicker = ({
     }
   };
 
-  const handleSelect = (value: string) => {
+  const handleChange = (value: string) => {
     setChallengeKind(value as ChallengeKind);
   };
 
@@ -85,7 +85,7 @@ const ChallengePicker = ({
         <RadioSelect
           options={options}
           value={challengeKind}
-          onSelect={handleSelect}
+          onChange={handleChange}
         />
         <Button fullWidth onClick={handleComplete} loading={isLoading}>
           {t('cta')}

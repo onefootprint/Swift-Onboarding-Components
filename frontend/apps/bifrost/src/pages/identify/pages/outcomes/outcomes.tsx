@@ -66,7 +66,7 @@ const Outcomes = () => {
                 },
               ]}
               value={field.value}
-              onSelect={field.onChange}
+              onChange={field.onChange}
             />
           )}
         />

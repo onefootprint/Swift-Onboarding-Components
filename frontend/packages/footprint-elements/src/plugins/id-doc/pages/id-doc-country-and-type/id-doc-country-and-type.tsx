@@ -120,7 +120,7 @@ const IdDocCountryAndType = () => {
         <RadioSelect
           value={optionByDocType[docType].value}
           options={options}
-          onSelect={handleDocTypeChange}
+          onChange={handleDocTypeChange}
         />
       </InputsContainer>
       <Button fullWidth onClick={handleSubmit}>

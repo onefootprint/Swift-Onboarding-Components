@@ -17,39 +17,45 @@ export default {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
+    onChange: {
+      description: 'Event called after selecting an option',
+      required: true,
+    },
   },
 } as Meta;
 
+const options = [
+  {
+    title: 'Item 1',
+    description: 'Description 1',
+    IconComponent: IcoBook16,
+    value: 'Item 1',
+  },
+  {
+    title: 'Item 2',
+    description: 'Description 2',
+    IconComponent: IcoHelp16,
+    value: 'Item 2',
+  },
+];
+
 const Template: Story<RadioSelectProps> = ({
   value = 'Item 1',
-  onSelect,
+  onChange,
   testID,
 }: RadioSelectProps) => {
   const [selectedValue, setSelectedValue] = useState(value);
-  const handleSelect = (newVal: string) => {
-    setSelectedValue(newVal);
-    onSelect?.(newVal);
+
+  const handleChange = (newValue: string) => {
+    setSelectedValue(newValue);
+    onChange?.(newValue);
   };
-  const options = [
-    {
-      title: 'Item 1',
-      description: 'Description 1',
-      IconComponent: IcoBook16,
-      value: 'Item 1',
-    },
-    {
-      title: 'Item 2',
-      description: 'Description 2',
-      IconComponent: IcoHelp16,
-      value: 'Item 2',
-    },
-  ];
 
   return (
     <RadioSelect
       options={options}
       value={selectedValue}
-      onSelect={handleSelect}
+      onChange={handleChange}
       testID={testID}
     />
   );
@@ -57,6 +63,6 @@ const Template: Story<RadioSelectProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
-  onSelect: console.log,
+  onChange: console.log,
   testID: 'radio-select-test-id',
 };
