@@ -31,12 +31,6 @@ const Stats = () => {
         ></OverviewCard>
         <OverviewCard
           title={'Portable IDs'}
-          query={
-            'select count(*) from user_vault where is_portable=true and is_live=true;'
-          }
-        ></OverviewCard>
-        <OverviewCard
-          title={'Live Verifications'}
           query={`
           SELECT count(*) FROM onboarding 
           INNER JOIN scoped_user on scoped_user.id = onboarding.scoped_user_id

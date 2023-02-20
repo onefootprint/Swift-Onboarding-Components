@@ -49,6 +49,11 @@ export default airplane.task(
       case 'org':
         query = `SELECT * from tenant WHERE id='${id}';`;
         break;
+      case 'ob_config_id':
+        query = `
+        SELECT * from ob_configuration WHERE id='${id}'
+        INNER JOIN tenant on tenant.id=ob_configuration.tenant_id;`;
+        break;
       case 'fp_id':
         query = `
         SELECT * from scoped_user
