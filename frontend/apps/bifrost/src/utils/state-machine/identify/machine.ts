@@ -253,6 +253,12 @@ const createIdentifyMachine = ({
           }
           return context;
         }),
+        [Actions.assignHasSyncablePassKey]: assign((context, event) => {
+          if (event.type === Events.identifyCompleted) {
+            context.hasSyncablePassKey = event.payload.hasSyncablePassKey;
+          }
+          return context;
+        }),
         [Actions.assignUserFound]: assign((context, event) => {
           if (
             event.type === Events.identifyCompleted ||

@@ -66,7 +66,11 @@ const EmailIdentificationContent = () => {
 
   const handleIdentifySuccess = (
     email: string,
-    { userFound, availableChallengeKinds }: IdentifyResponse,
+    {
+      userFound,
+      availableChallengeKinds,
+      hasSyncablePassKey,
+    }: IdentifyResponse,
   ) => {
     send({
       type: Events.identifyCompleted,
@@ -74,6 +78,7 @@ const EmailIdentificationContent = () => {
         userFound,
         identifier: { email },
         availableChallengeKinds,
+        hasSyncablePassKey,
       },
     });
 

@@ -25,6 +25,7 @@ export type MachineContext = {
   device: DeviceInfo;
   email?: string;
   userFound?: boolean;
+  hasSyncablePassKey?: boolean;
   challengeData?: ChallengeData;
   phone?: string;
   authToken?: string;
@@ -65,6 +66,7 @@ export enum Actions {
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
   assignUserFound = 'assignUserFound',
+  assignHasSyncablePassKey = 'assignHasSyncablePassKey',
   assignChallenge = 'assignChallengeData',
   assignAuthToken = 'assignAuthToken',
   resetContext = 'resetContext',
@@ -105,6 +107,7 @@ export type MachineEvents =
         identifier: Identifier;
         userFound: boolean;
         availableChallengeKinds?: ChallengeKind[];
+        hasSyncablePassKey?: boolean;
       };
     }
   | { type: Events.navigatedToPrevPage }

@@ -88,13 +88,18 @@ const PhoneRegistrationContent = () => {
 
   const handleIdentifySuccess = (
     phoneNumber: string,
-    { userFound, availableChallengeKinds }: IdentifyResponse,
+    {
+      userFound,
+      availableChallengeKinds,
+      hasSyncablePassKey,
+    }: IdentifyResponse,
   ) => {
     send({
       type: Events.identifyCompleted,
       payload: {
         userFound,
         identifier: { phoneNumber },
+        hasSyncablePassKey,
       },
     });
 

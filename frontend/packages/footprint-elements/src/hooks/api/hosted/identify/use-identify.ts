@@ -8,11 +8,13 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     url: '/hosted/identify',
     data: payload,
   });
-  const { userFound, availableChallengeKinds } = response.data;
+  const { userFound, availableChallengeKinds, hasSyncablePassKey } =
+    response.data;
 
   return {
     userFound,
     availableChallengeKinds,
+    hasSyncablePassKey,
   };
 };
 const useIdentify = () => useMutation(identifyRequest);
