@@ -15,7 +15,10 @@ import useIdentifyMachine from '../../../hooks/use-identify-machine';
 
 const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
-  const { email, tenantPk } = state.context;
+  const {
+    identify: { email },
+    tenantPk,
+  } = state.context;
   const loginChallengeMutation = useLoginChallenge();
   const identityVerifyMutation = useIdentifyVerify();
 
@@ -66,7 +69,7 @@ const useBiometricLoginRetry = () => {
       {
         onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
           send({
-            type: Events.biometricLoginSucceeded,
+            type: Events.challengeSucceeded,
             payload: {
               authToken,
             },
@@ -78,7 +81,7 @@ const useBiometricLoginRetry = () => {
 
   const handlePhoneChallenge = (challengeData: ChallengeData) => {
     send({
-      type: Events.smsChallengeInitiated,
+      type: Events.challengeInitiated,
       payload: {
         challengeData,
       },

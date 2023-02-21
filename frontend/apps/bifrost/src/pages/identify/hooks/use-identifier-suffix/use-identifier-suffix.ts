@@ -4,7 +4,7 @@ const appendSuffix = (value: string, suffix: string) => `${value}${suffix}`;
 
 const useIdentifierSuffix = () => {
   const [state] = useIdentifyMachine();
-  const { identifierSuffix } = state.context;
+  const { identifierSuffix } = state.context.identify;
 
   const append = (value: string = '') => {
     if (identifierSuffix) {

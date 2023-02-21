@@ -17,7 +17,10 @@ const PhoneVerification = () => {
   const { t } = useTranslation('pages.phone-verification');
   const [state, send] = useIdentifyMachine();
   const { context } = state;
-  const { phone, challengeData, userFound } = context;
+  const {
+    identify: { phoneNumber: phone, userFound },
+    challenge: { challengeData },
+  } = context;
 
   const filteredPhone = phone?.split('#')[0] ?? ''; // Filter out sandbox suffixes
   const scrubbedPhoneNumber = (

@@ -26,7 +26,11 @@ const PhoneVerificationPinForm = ({
   const { t } = useTranslation('pages.phone-verification.form');
   const [state, send] = useIdentifyMachine();
   const [shouldShowSuccess, setShouldShowSuccess] = useState(false);
-  const { email, userFound, challengeData, tenantPk } = state.context;
+  const {
+    identify: { email, userFound },
+    challenge: { challengeData },
+    tenantPk,
+  } = state.context;
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
   const shouldShowLoading =
@@ -36,7 +40,7 @@ const PhoneVerificationPinForm = ({
     setShouldShowSuccess(true);
     setTimeout(() => {
       send({
-        type: Events.smsChallengeSucceeded,
+        type: Events.challengeSucceeded,
         payload: {
           authToken,
         },

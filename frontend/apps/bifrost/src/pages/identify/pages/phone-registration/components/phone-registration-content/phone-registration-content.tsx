@@ -24,7 +24,10 @@ type FormData = Required<Pick<UserData, UserDataAttribute.phoneNumber>>;
 
 const PhoneRegistrationContent = () => {
   const [state, send] = useIdentifyMachine();
-  const { device, phone, email } = state.context;
+  const {
+    device,
+    identify: { phoneNumber: smPhoneNumber, email },
+  } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
@@ -58,7 +61,7 @@ const PhoneRegistrationContent = () => {
           }
 
           send({
-            type: Events.smsChallengeInitiated,
+            type: Events.challengeInitiated,
             payload: {
               challengeData,
             },
@@ -75,7 +78,7 @@ const PhoneRegistrationContent = () => {
       {
         onSuccess({ challengeData }) {
           send({
-            type: Events.smsChallengeInitiated,
+            type: Events.challengeInitiated,
             payload: {
               challengeData,
             },
@@ -95,10 +98,11 @@ const PhoneRegistrationContent = () => {
     }: IdentifyResponse,
   ) => {
     send({
-      type: Events.identifyCompleted,
+      type: Events.identified,
       payload: {
+        phoneNumber,
         userFound,
-        identifier: { phoneNumber },
+        availableChallengeKinds,
         hasSyncablePassKey,
       },
     });
@@ -139,7 +143,7 @@ const PhoneRegistrationContent = () => {
   };
 
   const handleChangeEmail = () => {
-    send({ type: Events.emailChangeRequested });
+    send({ type: Events.identifyReset });
   };
 
   return (
@@ -152,7 +156,7 @@ const PhoneRegistrationContent = () => {
       <PhoneRegistrationForm
         onSubmit={handleSubmit}
         isLoading={isLoading}
-        defaultPhone={idSuffix.remove(phone)}
+        defaultPhone={idSuffix.remove(smPhoneNumber)}
       />
       <SandboxOutcomeFooter />
     </>

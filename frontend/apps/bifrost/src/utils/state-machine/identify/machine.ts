@@ -1,6 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import legacyValidateBootstrapData from 'src/pages/identify/utils/legacy-validate-bootstrap-data';
-// import validateBootstrapData from 'src/pages/identify/utils/validate-bootstrap-data';
 import { assign, createMachine } from 'xstate';
 
 import { BootstrapData } from '../bifrost/types';
@@ -21,7 +20,7 @@ type IdentifyMachineArgs = {
 
 const createIdentifyMachine = ({
   device,
-  bootstrapData: rawBootstrapData,
+  bootstrapData,
   tenantPk,
   identifierSuffix,
 }: IdentifyMachineArgs) =>
@@ -29,14 +28,17 @@ const createIdentifyMachine = ({
     {
       predictableActionArguments: true,
       id: 'identify',
-      initial: rawBootstrapData
+      initial: bootstrapData
         ? States.legacyProcessBootstrapData
         : States.emailIdentification,
       context: {
         device,
-        bootstrapData: rawBootstrapData ?? {},
+        bootstrapData: bootstrapData ?? {},
         tenantPk,
-        identifierSuffix,
+        identify: {
+          identifierSuffix,
+        },
+        challenge: {},
       },
       states: {
         // Legacy bootstrap transitions
@@ -45,7 +47,7 @@ const createIdentifyMachine = ({
           on: {
             [Events.legacyBootstrapDataProcessed]: {
               target: States.phoneVerification,
-              actions: [Actions.assignChallenge, Actions.assignUserFound],
+              actions: [Actions.assignChallengeData, Actions.assignUserFound],
             },
             [Events.legacyBootstrapDataProcessErrored]: {
               target: States.emailIdentification,
@@ -55,9 +57,8 @@ const createIdentifyMachine = ({
 
         // New bootstrap transitions
         // [States.initBootstrap]: {
-        //   entry: [Actions.assignBootstrapData],
         //   on: {
-        //     [Events.bootstrapIdentifyFailed]: [
+        //     [Events.identifyFailed]: [
         //       {
         //         target: States.emailIdentification,
         //         actions: [Actions.assignEmail, Actions.assignPhone],
@@ -73,13 +74,13 @@ const createIdentifyMachine = ({
         // },
         // [States.bootstrapChallenge]: {
         //   on: {
-        //     [Events.loginChallengeSucceeded]: {
+        //     [Events.challengeSucceeded]: {
         //       target: States.success,
         //       actions: [Actions.assignAuthToken],
         //     },
-        //     [Events.loginWithDifferentAccount]: {
+        //     [Events.identifyReset]: {
         //       target: States.emailIdentification,
-        //       actions: [Actions.resetContext],
+        //       actions: [Actions.reset],
         //     },
         //   },
         // },
@@ -87,10 +88,16 @@ const createIdentifyMachine = ({
         // Other transitions
         [States.emailIdentification]: {
           on: {
-            [Events.identifyCompleted]: [
+            [Events.identified]: [
               {
                 target: States.phoneRegistration,
-                actions: [Actions.assignEmail, Actions.assignUserFound],
+                actions: [
+                  Actions.assignEmail,
+                  Actions.assignUserFound,
+                  Actions.assignSuccessfulIdentifier,
+                  Actions.assignAvailableChallengeKinds,
+                  Actions.assignHasSyncablePassKey,
+                ],
                 description:
                   'Transition to phone registration only if could not find user or cannot initiate a challenge',
                 cond: (context, event) =>
@@ -99,26 +106,28 @@ const createIdentifyMachine = ({
                     !event.payload.availableChallengeKinds?.length),
               },
               {
-                actions: [Actions.assignEmail, Actions.assignUserFound],
+                actions: [
+                  Actions.assignEmail,
+                  Actions.assignUserFound,
+                  Actions.assignSuccessfulIdentifier,
+                  Actions.assignAvailableChallengeKinds,
+                  Actions.assignHasSyncablePassKey,
+                ],
               },
             ],
-            [Events.smsChallengeInitiated]: [
-              {
-                target: States.phoneVerification,
-                actions: [Actions.assignChallenge],
-              },
-            ],
-            [Events.biometricLoginSucceeded]: [
-              {
-                target: States.success,
-                actions: [Actions.assignAuthToken],
-              },
-            ],
-            [Events.biometricLoginFailed]: [
-              {
-                target: States.biometricLoginRetry,
-              },
-            ],
+            [Events.challengeInitiated]: {
+              target: States.phoneVerification,
+              actions: [Actions.assignChallengeData],
+            },
+
+            [Events.challengeSucceeded]: {
+              target: States.success,
+              actions: [Actions.assignAuthToken],
+            },
+
+            [Events.challengeFailed]: {
+              target: States.biometricLoginRetry,
+            },
           },
         },
         [States.phoneRegistration]: {
@@ -126,34 +135,30 @@ const createIdentifyMachine = ({
             [Events.navigatedToPrevPage]: {
               target: States.emailIdentification,
             },
-            [Events.emailChangeRequested]: [
-              {
-                target: States.emailIdentification,
-                actions: [Actions.resetContext],
-              },
-            ],
-            [Events.identifyCompleted]: [
-              {
-                actions: [Actions.assignPhone, Actions.assignUserFound],
-              },
-            ],
-            [Events.smsChallengeInitiated]: [
-              {
-                target: States.phoneVerification,
-                actions: [Actions.assignChallenge],
-              },
-            ],
-            [Events.biometricLoginSucceeded]: [
-              {
-                target: States.success,
-                actions: [Actions.assignAuthToken],
-              },
-            ],
-            [Events.biometricLoginFailed]: [
-              {
-                target: States.biometricLoginRetry,
-              },
-            ],
+            [Events.identifyReset]: {
+              target: States.emailIdentification,
+              actions: [Actions.reset],
+            },
+            [Events.identified]: {
+              actions: [
+                Actions.assignPhone,
+                Actions.assignUserFound,
+                Actions.assignSuccessfulIdentifier,
+                Actions.assignAvailableChallengeKinds,
+                Actions.assignHasSyncablePassKey,
+              ],
+            },
+            [Events.challengeInitiated]: {
+              target: States.phoneVerification,
+              actions: [Actions.assignChallengeData],
+            },
+            [Events.challengeSucceeded]: {
+              target: States.success,
+              actions: [Actions.assignAuthToken],
+            },
+            [Events.challengeFailed]: {
+              target: States.biometricLoginRetry,
+            },
           },
         },
         [States.phoneVerification]: {
@@ -161,47 +166,41 @@ const createIdentifyMachine = ({
             [Events.navigatedToPrevPage]: [
               {
                 target: States.phoneRegistration,
-                cond: context => !context.userFound || !!context.phone,
+                cond: context =>
+                  !context.identify.userFound || !!context.identify.phoneNumber,
               },
               {
                 target: States.emailIdentification,
               },
             ],
-            [Events.smsChallengeInitiated]: [
-              {
-                actions: [Actions.assignChallenge],
-              },
-            ],
-            [Events.smsChallengeSucceeded]: [
-              {
-                target: States.success,
-                actions: [Actions.assignAuthToken],
-              },
-            ],
+            [Events.challengeInitiated]: {
+              actions: [Actions.assignChallengeData],
+            },
+
+            [Events.challengeSucceeded]: {
+              target: States.success,
+              actions: [Actions.assignAuthToken],
+            },
           },
         },
         [States.biometricLoginRetry]: {
           on: {
-            [Events.biometricLoginSucceeded]: [
-              {
-                target: States.success,
-                actions: [Actions.assignAuthToken],
-              },
-            ],
-            [Events.smsChallengeInitiated]: [
-              {
-                target: States.phoneVerification,
-                actions: [Actions.assignChallenge],
-              },
-            ],
+            [Events.challengeInitiated]: {
+              target: States.phoneVerification,
+              actions: [Actions.assignChallengeData],
+            },
+            [Events.challengeSucceeded]: {
+              target: States.success,
+              actions: [Actions.assignAuthToken],
+            },
           },
         },
         [States.success]: {
           type: 'final',
           data: {
-            authToken: (context: MachineContext) => context.authToken,
-            userFound: (context: MachineContext) => context.userFound,
-            email: (context: MachineContext) => context.email,
+            authToken: (context: MachineContext) => context.challenge.authToken,
+            userFound: (context: MachineContext) => context.identify.userFound,
+            email: (context: MachineContext) => context.identify.email,
           },
         },
       },
@@ -213,90 +212,84 @@ const createIdentifyMachine = ({
           const { email, phoneNumber } = legacyValidateBootstrapData(
             context.bootstrapData,
           );
-          context.phone = phoneNumber;
-          context.email = email;
+          context.identify.phoneNumber = phoneNumber;
+          context.identify.email = email;
           return context;
         }),
 
-        // New Bootstrap Actions
-        // [Actions.assignBootstrapData]: assign(context => {
-        //   const { email, phoneNumber } = validateBootstrapData(
-        //     context.bootstrapData,
-        //   );
-        //   context.phone = phoneNumber;
-        //   context.email = email;
-        //   return context;
-        // }),
-
         // Other Actions
         [Actions.assignEmail]: assign((context, event) => {
-          if (event.type === Events.identifyCompleted) {
-            const emailIdentifier = Object.entries(
-              event.payload.identifier,
-            ).find(([key, value]) => key === 'email' && !!value);
-            if (emailIdentifier) {
-              const [, email] = emailIdentifier;
-              context.email = email;
-            }
+          if (event.type === Events.identified) {
+            context.identify.email = event.payload.email;
           }
           return context;
         }),
         [Actions.assignPhone]: assign((context, event) => {
-          if (event.type === Events.identifyCompleted) {
-            const phoneIdentifier = Object.entries(
-              event.payload.identifier,
-            ).find(([key, value]) => key === 'phoneNumber' && !!value);
-            if (phoneIdentifier) {
-              const [, phone] = phoneIdentifier;
-              context.phone = phone;
-            }
+          if (event.type === Events.identified) {
+            context.identify.phoneNumber = event.payload.phoneNumber;
+          }
+          return context;
+        }),
+        [Actions.assignAvailableChallengeKinds]: assign((context, event) => {
+          if (event.type === Events.identified) {
+            context.challenge.availableChallengeKinds =
+              event.payload.availableChallengeKinds;
+          }
+          return context;
+        }),
+        [Actions.assignSuccessfulIdentifier]: assign((context, event) => {
+          if (event.type !== Events.identified) {
+            return context;
+          }
+          const { userFound, email, phoneNumber } = event.payload;
+          if (!userFound) {
+            return context;
+          }
+          if (email) {
+            context.identify.successfulIdentifier = { email };
+          }
+          if (phoneNumber) {
+            context.identify.successfulIdentifier = { phoneNumber };
           }
           return context;
         }),
         [Actions.assignHasSyncablePassKey]: assign((context, event) => {
-          if (event.type === Events.identifyCompleted) {
-            context.hasSyncablePassKey = event.payload.hasSyncablePassKey;
+          if (event.type === Events.identified) {
+            context.challenge.hasSyncablePassKey =
+              event.payload.hasSyncablePassKey;
           }
           return context;
         }),
         [Actions.assignUserFound]: assign((context, event) => {
           if (
-            event.type === Events.identifyCompleted ||
+            event.type === Events.identified ||
             event.type === Events.legacyBootstrapDataProcessed
           ) {
-            context.userFound = event.payload.userFound;
+            context.identify.userFound = event.payload.userFound;
+          }
+          return context;
+        }),
+        [Actions.assignChallengeData]: assign((context, event) => {
+          if (
+            event.type === Events.legacyBootstrapDataProcessed ||
+            event.type === Events.challengeInitiated
+          ) {
+            context.challenge.challengeData = event.payload.challengeData;
           }
           return context;
         }),
         [Actions.assignAuthToken]: assign((context, event) => {
-          if (
-            event.type === Events.smsChallengeSucceeded ||
-            event.type === Events.biometricLoginSucceeded
-          ) {
-            context.authToken = event.payload.authToken;
+          if (event.type === Events.challengeSucceeded) {
+            context.challenge.authToken = event.payload.authToken;
           }
           return context;
         }),
-        [Actions.resetContext]: assign(context => {
-          context.email = undefined;
-          context.phone = undefined;
-          context.userFound = false;
-          context.authToken = undefined;
-          context.challengeData = undefined;
-          return context;
-        }),
-        [Actions.assignChallenge]: assign((context, event) => {
-          if (
-            event.type !== Events.legacyBootstrapDataProcessed &&
-            event.type !== Events.smsChallengeInitiated
-          ) {
-            return context;
-          }
-          const { challengeData } = event.payload;
-          if (!challengeData) {
-            return context;
-          }
-          context.challengeData = { ...challengeData };
+        [Actions.reset]: assign(context => {
+          // Don't allow resetting the identifier suffix
+          context.identify = {
+            identifierSuffix: context.identify.identifierSuffix,
+          };
+          context.challenge = {};
           return context;
         }),
       },

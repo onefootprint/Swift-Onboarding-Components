@@ -22,16 +22,24 @@ export enum States {
 }
 
 export type MachineContext = {
-  device: DeviceInfo;
-  email?: string;
-  userFound?: boolean;
-  hasSyncablePassKey?: boolean;
-  challengeData?: ChallengeData;
-  phone?: string;
-  authToken?: string;
-  bootstrapData: BootstrapData;
   tenantPk?: string;
-  identifierSuffix?: string;
+  device: DeviceInfo;
+  bootstrapData: BootstrapData;
+
+  identify: {
+    phoneNumber?: string;
+    email?: string;
+    userFound?: boolean;
+    successfulIdentifier?: Identifier;
+    identifierSuffix?: string;
+  };
+
+  challenge: {
+    hasSyncablePassKey?: boolean;
+    availableChallengeKinds?: ChallengeKind[];
+    challengeData?: ChallengeData;
+    authToken?: string;
+  };
 };
 
 export enum Events {
@@ -39,40 +47,40 @@ export enum Events {
   legacyBootstrapDataProcessed = 'legacyBootstrapDataProcessed',
   legacyBootstrapDataProcessErrored = 'legacyBootstrapDataProcessErrored',
 
-  // New Bootstrap Events
-  loginWithDifferentAccount = 'loginWithDifferentAccount',
-  loginChallengeSucceeded = 'loginChallengeSucceeded',
-  bootstrapIdentifyFailed = 'bootstrapIdentifyFailed',
-
   // Other Events
-  identifyCompleted = 'identifyCompleted',
+  identified = 'identified',
+  identifyFailed = 'identifyFailed',
+  identifyReset = 'identifyReset',
   navigatedToPrevPage = 'navigatedToPrevPage',
-  emailChangeRequested = 'emailChangeRequested',
-  smsChallengeInitiated = 'smsChallengeInitiated',
-  smsChallengeSucceeded = 'smsChallengeSucceeded',
-  biometricLoginSucceeded = 'biometricLoginSucceeded',
-  biometricLoginFailed = 'livenessLoginFailed',
+  challengeInitiated = 'challengeInitiated',
+  challengeSucceeded = 'challengeSucceeded',
+  challengeFailed = 'challengeFailed',
 }
 
 export enum Actions {
   // Legacy Bootstrap Actions
   assignLegacyBootstrapData = 'assignLegacyBootstrapData',
 
-  // New Bootstrap Actions
-  assignBootstrapData = 'assignBootstrapData',
-
   // Other Actions
   assignSandboxOutcome = 'assignSandboxOutcome',
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
-  assignUserFound = 'assignUserFound',
+  assignAvailableChallengeKinds = 'assignAvailableChallengeKinds',
+  assignSuccessfulIdentifier = 'assignSuccessfulIdentifier',
   assignHasSyncablePassKey = 'assignHasSyncablePassKey',
-  assignChallenge = 'assignChallengeData',
+  assignUserFound = 'assignUserFound',
+  assignChallengeData = 'assignChallengeData',
   assignAuthToken = 'assignAuthToken',
-  resetContext = 'resetContext',
+  reset = 'reset',
 }
 
 export type MachineEvents =
+  | BootstrapEvents
+  | IdentifyEvents
+  | ChallengeEvents
+  | OtherEvents;
+
+type BootstrapEvents =
   // Legacy Bootstrap Events
   | {
       type: Events.legacyBootstrapDataProcessed;
@@ -83,51 +91,41 @@ export type MachineEvents =
     }
   | {
       type: Events.legacyBootstrapDataProcessErrored;
-    }
+    };
 
-  // New Bootstrap Events
+type IdentifyEvents =
   | {
-      type: Events.loginWithDifferentAccount;
-    }
-  | {
-      type: Events.loginChallengeSucceeded;
-    }
-  | {
-      type: Events.bootstrapIdentifyFailed;
+      type: Events.identified;
       payload: {
         email?: string;
         phoneNumber?: string;
-      };
-    }
-
-  // Other Events
-  | {
-      type: Events.identifyCompleted;
-      payload: {
-        identifier: Identifier;
         userFound: boolean;
         availableChallengeKinds?: ChallengeKind[];
         hasSyncablePassKey?: boolean;
       };
     }
-  | { type: Events.navigatedToPrevPage }
-  | { type: Events.emailChangeRequested }
   | {
-      type: Events.smsChallengeInitiated;
+      type: Events.identifyFailed;
+      payload: {
+        email?: string;
+        phoneNumber?: string;
+      };
+    }
+  | { type: Events.identifyReset };
+
+type ChallengeEvents =
+  | {
+      type: Events.challengeInitiated;
       payload: {
         challengeData: ChallengeData;
       };
     }
   | {
-      type: Events.smsChallengeSucceeded;
+      type: Events.challengeSucceeded;
       payload: {
         authToken: string;
       };
     }
-  | {
-      type: Events.biometricLoginSucceeded;
-      payload: {
-        authToken: string;
-      };
-    }
-  | { type: Events.biometricLoginFailed };
+  | { type: Events.challengeFailed };
+
+type OtherEvents = { type: Events.navigatedToPrevPage };

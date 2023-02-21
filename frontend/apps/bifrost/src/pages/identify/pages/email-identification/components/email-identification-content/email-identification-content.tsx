@@ -24,7 +24,10 @@ type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentificationContent = () => {
   const [state, send] = useIdentifyMachine();
-  const { email: smEmail, device } = state.context;
+  const {
+    identify: { email: smEmail },
+    device,
+  } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
@@ -53,7 +56,7 @@ const EmailIdentificationContent = () => {
           }
 
           send({
-            type: Events.smsChallengeInitiated,
+            type: Events.challengeInitiated,
             payload: {
               challengeData,
             },
@@ -73,12 +76,12 @@ const EmailIdentificationContent = () => {
     }: IdentifyResponse,
   ) => {
     send({
-      type: Events.identifyCompleted,
+      type: Events.identified,
       payload: {
         userFound,
-        identifier: { email },
-        availableChallengeKinds,
+        email,
         hasSyncablePassKey,
+        availableChallengeKinds,
       },
     });
 

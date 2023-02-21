@@ -12,7 +12,9 @@ const mockUseIdentifierSuffix = (identifierSuffix: string) =>
   jest.spyOn(identifyMachine, 'useIdentifyMachine').mockImplementation(() => [
     {
       context: {
-        identifierSuffix,
+        identify: {
+          identifierSuffix,
+        },
       },
     },
   ]);

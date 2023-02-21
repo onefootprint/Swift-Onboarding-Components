@@ -25,7 +25,10 @@ const ResendCodeButton = () => {
   const toast = useToast();
   const { t } = useTranslation('pages.phone-verification.form.resend-code');
   const [state, send] = useIdentifyMachine();
-  const { phone, email, challengeData, userFound } = state.context;
+  const {
+    identify: { phoneNumber: smPhoneNumber, email, userFound },
+    challenge: { challengeData },
+  } = state.context;
   const loginChallengeMutation = useLoginChallenge();
   const signupChallengeMutation = useSignupChallenge();
   const showRequestErrorToast = useRequestErrorToast();
@@ -56,7 +59,7 @@ const ResendCodeButton = () => {
       description: t('toast.success.description'),
     });
     send({
-      type: Events.smsChallengeInitiated,
+      type: Events.challengeInitiated,
       payload: {
         challengeData: newChallengeData,
       },
@@ -105,8 +108,8 @@ const ResendCodeButton = () => {
     // through the phone-registration page) handle resending differently
     if (userFound) {
       requestLoginChallenge();
-    } else if (phone) {
-      requestSignupChallenge(phone);
+    } else if (smPhoneNumber) {
+      requestSignupChallenge(smPhoneNumber);
     }
   };
 

@@ -51,7 +51,7 @@ const LoginChallengeBottomSheet = ({
       {
         onSuccess: ({ authToken }) => {
           send({
-            type: Events.biometricLoginSucceeded,
+            type: Events.challengeSucceeded,
             payload: {
               authToken,
             },
@@ -59,7 +59,7 @@ const LoginChallengeBottomSheet = ({
         },
         onError: error => {
           showRequestErrorToast(error);
-          send({ type: Events.biometricLoginFailed });
+          send({ type: Events.challengeFailed });
         },
         onSettled: onClose,
       },
@@ -77,7 +77,7 @@ const LoginChallengeBottomSheet = ({
           const { challengeKind } = challengeData;
           if (challengeKind === ChallengeKind.sms) {
             send({
-              type: Events.smsChallengeInitiated,
+              type: Events.challengeInitiated,
               payload: {
                 challengeData,
               },
