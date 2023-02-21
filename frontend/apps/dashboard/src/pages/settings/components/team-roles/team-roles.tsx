@@ -1,9 +1,9 @@
 import { useQueryState, useTranslation } from '@onefootprint/hooks';
 import { Tab, Tabs } from '@onefootprint/ui';
 import React from 'react';
+import SectionHeader from 'src/components/section-header';
 import styled, { css } from 'styled-components';
 
-import SectionHeader from '../section-header';
 import Members from './components/members';
 import Roles from './components/roles';
 

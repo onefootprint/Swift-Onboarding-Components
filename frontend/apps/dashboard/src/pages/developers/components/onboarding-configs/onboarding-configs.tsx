@@ -1,10 +1,10 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { RoleScope } from '@onefootprint/types';
-import { Box, Button, Typography } from '@onefootprint/ui';
+import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
-import styled from 'styled-components';
+import SectionHeader from 'src/components/section-header';
 
 import CreateDialog from './components/create-onboarding-config';
 import OnboardingConfigsData from './components/onboarding-configs-data';
@@ -20,13 +20,7 @@ const OnboardingConfigs = () => {
 
   return (
     <section data-testid="onboarding-configs-section">
-      <Header>
-        <Box>
-          <Typography variant="label-1" as="h3" sx={{ marginBottom: 2 }}>
-            {t('header.title')}
-          </Typography>
-          <Typography variant="body-3">{t('header.subtitle')}</Typography>
-        </Box>
+      <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
         <PermissionGate
           fallbackText={t('header.cta-not-allowed')}
           scope={RoleScope.onboardingConfiguration}
@@ -35,7 +29,7 @@ const OnboardingConfigs = () => {
             {t('header.cta')}
           </Button>
         </PermissionGate>
-      </Header>
+      </SectionHeader>
       <Box sx={{ marginY: 5 }} />
       {data && <OnboardingConfigsData data={data} />}
       {isLoading && <OnboardingConfigsLoading />}
@@ -48,11 +42,5 @@ const OnboardingConfigs = () => {
     </section>
   );
 };
-
-const Header = styled.header`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-`;
 
 export default OnboardingConfigs;
