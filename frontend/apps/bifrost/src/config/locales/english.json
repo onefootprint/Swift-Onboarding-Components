@@ -76,6 +76,10 @@
       },
       "cta": "Continue"
     },
+    "bootstrap-challenge": {
+      "title": "Welcome back!",
+      "subtitle": "We've found an account with the information your provided."
+    },
     "email-identification": {
       "header": {
         "title": "Hey there! 👋",
