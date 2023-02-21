@@ -83,6 +83,10 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> 
         count_pii,
         count_kyc,
     };
-    state.billing_client.bill_tenant(info).await?;
+    state.billing_client.bill_tenant(info).await.map_err(|e| {
+        // Log error since the request only fails with a single tenant's error message
+        tracing::error!(tenant_id = %tenant.id, "Couldn't bill tenant {}", e);
+        e
+    })?;
     Ok(())
 }

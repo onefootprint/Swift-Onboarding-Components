@@ -20,6 +20,14 @@ pub enum Error {
     ParseIdError(#[from] stripe::ParseIdError),
     #[error("Error computing billing interval")]
     CannotComputeBillingInterval,
+    #[error("Line item is not an InvoiceItem: {0}")]
+    NonInvoiceLineItem(String),
+    #[error("Unknown InvoiceItem: {0}")]
+    UnknownInvoiceItem(String),
+    #[error("Quantity of line item doesn't match InvoiceItem: {0}")]
+    InvalidLineItemQuantity(String),
+    #[error("Invoice is missing a line item. Has {0} line items, expected to have {1} line items")]
+    InvoiceMissingItem(usize, usize),
 }
 
 #[derive(Clone)]
@@ -86,10 +94,11 @@ impl BillingClient {
         customer_id: CustomerId,
         price_id: PriceId,
         quantity: i64,
-    ) -> BResult<()> {
+    ) -> BResult<Option<InvoiceItem>> {
         if quantity == 0 {
-            return Ok(());
+            return Ok(None);
         }
+        // First check if there's already a pending invoice item
         let list_items = ListInvoiceItems {
             customer: Some(customer_id.clone()),
             pending: Some(true),
@@ -100,20 +109,23 @@ impl BillingClient {
             .data
             .iter()
             .find(|l| l.price.as_ref().map(|p| &p.id) == Some(&price_id) && is_managed(&l.metadata));
-        if let Some(item) = existing_item {
+
+        let item = if let Some(item) = existing_item {
+            // If the pending invoice item for this price exists, just update it
             let update = UpdateInvoiceItem {
                 quantity: Some(quantity as u64),
                 ..Default::default()
             };
-            InvoiceItem::update(&self.client, &item.id, update).await?;
+            InvoiceItem::update(&self.client, &item.id, update).await?
         } else {
+            // Otherwise, make a new one
             let mut new_invoice_item = CreateInvoiceItem::new(customer_id);
             new_invoice_item.price = Some(price_id);
             new_invoice_item.quantity = Some(quantity as u64);
             new_invoice_item.metadata = Some(managed_metadata());
-            InvoiceItem::create(&self.client, new_invoice_item).await?;
-        }
-        Ok(())
+            InvoiceItem::create(&self.client, new_invoice_item).await?
+        };
+        Ok(Some(item))
     }
 
     #[tracing::instrument(skip(self))]
@@ -146,11 +158,16 @@ impl BillingClient {
         let items = [(pii_price_id, info.count_pii), (kyc_price_id, info.count_kyc)]
             .into_iter()
             .map(|(price_id, count)| self.get_or_create_invoice_item(customer_id.clone(), price_id, count));
-        futures::future::join_all(items)
+        let items: HashMap<_, _> = futures::future::join_all(items)
             .await
             .into_iter()
-            .collect::<BResult<_>>()?;
+            .collect::<BResult<Vec<_>>>()?
+            .into_iter()
+            .flatten()
+            .map(|i| (i.id.clone(), i))
+            .collect();
 
+        // Create the invoice, which will automatically include these billing items
         let extra_metadata = [("billing-interval".to_owned(), info.interval.label)];
         let metadata = extra_metadata.into_iter().chain(managed_metadata()).collect();
         let new_invoice = CreateInvoice {
@@ -160,8 +177,27 @@ impl BillingClient {
             description: None,
             ..Default::default()
         };
-        Invoice::create(&self.client, new_invoice).await?;
-        // TODO could probably do some basic validation of the invoice here
+        let invoice = Invoice::create(&self.client, new_invoice).await?;
+
+        // Do some basic validation on the invoice. When the invoice is created, it will
+        // include all pending InvoiceItems. Let's make sure we didn't accidentally include an extra
+        // line item we didn't know about
+        let data = invoice.lines.data;
+        data.iter().try_for_each(|l| -> BResult<_> {
+            let Some(item_id) = l.invoice_item.as_ref() else {
+                    return Err(Error::NonInvoiceLineItem(l.id.to_string()));
+                };
+            let Some(item) = items.get(&stripe::InvoiceItemId::from_str(item_id)?) else {
+                    return Err(Error::UnknownInvoiceItem(l.id.to_string()));
+                };
+            if item.quantity != l.quantity {
+                return Err(Error::InvalidLineItemQuantity(l.id.to_string()));
+            }
+            Ok(())
+        })?;
+        if data.len() < items.len() {
+            return Err(Error::InvoiceMissingItem(data.len(), items.len()));
+        }
 
         Ok(())
     }
