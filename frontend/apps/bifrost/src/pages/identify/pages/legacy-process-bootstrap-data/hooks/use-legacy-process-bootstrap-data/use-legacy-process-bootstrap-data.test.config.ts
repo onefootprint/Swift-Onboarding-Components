@@ -3,7 +3,6 @@ import {
   ChallengeKind,
   IdentifyResponse,
   LoginChallengeResponse,
-  SignupChallengeResponse,
 } from '@onefootprint/types';
 
 const identifyFixture: IdentifyResponse = {
@@ -55,19 +54,5 @@ export const withLoginChallenge = (data = loginChallengeFixture) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify/login_challenge',
-    response: data,
-  });
-
-const signupChallengeFixture: SignupChallengeResponse = {
-  challengeData: {
-    challengeToken: 'challengeToken',
-    challengeKind: ChallengeKind.sms,
-  },
-};
-
-export const withSignupChallenge = (data = signupChallengeFixture) =>
-  mockRequest({
-    method: 'post',
-    path: '/hosted/identify/signup_challenge',
     response: data,
   });
