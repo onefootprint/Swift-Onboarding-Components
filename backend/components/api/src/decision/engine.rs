@@ -78,7 +78,7 @@ pub async fn make_outstanding_vendor_requests(
         .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
             // Load our requests and results
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
-            VerificationRequest::get_requests_and_results_for_onboarding(conn, obid)
+            VerificationRequest::get_latest_requests_and_results_for_onboarding(conn, obid)
         })
         .await??;
 

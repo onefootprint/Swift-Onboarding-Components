@@ -30,3 +30,8 @@ mod document_request;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod user_vault;
+
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod verification_request;

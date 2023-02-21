@@ -67,26 +67,57 @@ impl VerificationRequest {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
-    pub fn get_for_onboarding(conn: &mut PgConn, onboarding_id: OnboardingId) -> DbResult<Vec<Self>> {
-        let res = verification_request::table
-            .filter(verification_request::onboarding_id.eq(onboarding_id))
-            .get_results(conn)?;
-
-        Ok(res)
-    }
     /// Based on VerificationRequests for the onboarding, get VerificationResults
     #[tracing::instrument(skip_all)]
-    pub fn get_requests_and_results_for_onboarding(
+    pub fn get_latest_requests_and_results_for_onboarding(
         conn: &mut PgConn,
         onboarding_id: OnboardingId,
     ) -> DbResult<Vec<RequestAndMaybeResult>> {
-        let req_and_res: Vec<(VerificationRequest, Option<VerificationResult>)> = verification_request::table
+        let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
             .filter(verification_request::onboarding_id.eq(onboarding_id))
             .left_join(verification_result::table)
+            .order((
+                verification_request::vendor_api,
+                verification_request::uvw_snapshot_seqno.desc(),
+            ))
+            .distinct_on(verification_request::vendor_api)
             .get_results(conn)?;
 
-        Ok(req_and_res)
+        let (doc_scan_requests, kyc_requests): (Vec<RequestAndMaybeResult>, Vec<RequestAndMaybeResult>) =
+            req_and_res
+                .into_iter()
+                .partition(|(req, _)| req.vendor_api.is_doc_scan_call());
+
+        let max_kyc_seq_no = kyc_requests.iter().map(|(req, _)| req.uvw_snapshot_seqno).max();
+
+        let (kyc_requests_with_max_seqno, kyc_requests_with_earlier_seqno): (
+            Vec<RequestAndMaybeResult>,
+            Vec<RequestAndMaybeResult>,
+        ) = kyc_requests.into_iter().partition(|(req, _)| {
+            max_kyc_seq_no
+                .map(|seqno| req.uvw_snapshot_seqno == seqno)
+                .unwrap_or_else(|| false)
+        });
+
+        if !kyc_requests_with_earlier_seqno.is_empty() {
+            tracing::error!(kyc_requests_with_earlier_seqno=kyc_requests_with_earlier_seqno.iter().map(|(req, _)| format!("{:?}", req)).collect::<Vec<_>>().join(","), "get_latest_requests_and_results_for_onboarding: KYC vendor requests with unexpected earlier seqno");
+        }
+        if doc_scan_requests.len() > 1 {
+            tracing::error!(
+                doc_scan_requests = doc_scan_requests
+                    .iter()
+                    .map(|(req, _)| format!("{:?}", req))
+                    .collect::<Vec<_>>()
+                    .join(","),
+                "get_latest_requests_and_results_for_onboarding: more than 1 doc scan request found"
+            );
+        }
+
+        let ret: Vec<RequestAndMaybeResult> = kyc_requests_with_max_seqno
+            .into_iter()
+            .chain(doc_scan_requests.into_iter())
+            .collect();
+        Ok(ret)
     }
 
     #[tracing::instrument(skip_all)]

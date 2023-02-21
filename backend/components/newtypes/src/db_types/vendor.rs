@@ -84,3 +84,16 @@ impl From<VendorAPI> for Vendor {
         }
     }
 }
+
+impl VendorAPI {
+    pub fn is_doc_scan_call(&self) -> bool {
+        match self {
+            VendorAPI::IdologyExpectID => false,
+            VendorAPI::IdologyScanVerifySubmission => true,
+            VendorAPI::IdologyScanVerifyResults => true,
+            VendorAPI::IdologyScanOnboarding => true,
+            VendorAPI::TwilioLookupV2 => false,
+            VendorAPI::SocureIDPlus => false,
+        }
+    }
+}

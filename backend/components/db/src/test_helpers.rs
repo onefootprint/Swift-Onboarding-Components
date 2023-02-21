@@ -29,3 +29,10 @@ pub fn test_db_pool() -> DbPool {
 
     crate::init(&db_url).unwrap()
 }
+
+pub fn have_same_elements<T>(l: Vec<T>, r: Vec<T>) -> bool
+where
+    T: Eq,
+{
+    l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()
+}
