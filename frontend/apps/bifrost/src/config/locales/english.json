@@ -20,6 +20,21 @@
     "login-with-different-account": {
       "missing-phone": "Don't have access to this phone number?",
       "cta": "Login with a different account"
+    },
+    "sms-challenge-verification": {
+      "error": "Incorrect code",
+      "loading": "Verifying...",
+      "success": "Success!",
+      "resend-button": {
+        "cta": "Resend code",
+        "disabled": "Please wait {{seconds}} seconds to resend it...",
+        "toast": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
+          }
+        }
+      }
     }
   },
   "pages": {
