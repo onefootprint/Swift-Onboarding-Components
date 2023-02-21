@@ -8,6 +8,8 @@ use crate::{
 };
 
 use super::{
+    features::FeatureVector,
+    risk::OnboardingRulesDecisionOutput,
     vendor::{vendor_result::VendorResult, vendor_trait::VendorAPICall},
     *,
 };
@@ -55,7 +57,12 @@ pub async fn run(
         twilio_client,
     )
     .await?;
-    make_onboarding_decision(all_vendor_results, db_pool, ff_client, &ob.id).await
+
+    // Calculate output from rules + features
+    let (rules_output, features) = calculate_decision(all_vendor_results, ff_client, &ob.id)?;
+
+    // Save/action/emit risk signals for the decision
+    make_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, features).await
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -148,20 +155,31 @@ pub async fn make_outstanding_vendor_requests(
     Ok(results)
 }
 
-pub async fn make_onboarding_decision(
+/// Separate creating decision from saving decision. Used to "dry run" a decision before applying
+pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
-    db_pool: &DbPool,
     ff_client: &impl FeatureFlagClient,
     onboarding_id: &OnboardingId,
-) -> ApiResult<()> {
+) -> ApiResult<(OnboardingRulesDecisionOutput, FeatureVector)> {
     // From our results, create a FeatureVector for the final decision output
     let features = features::create_features(vendor_results);
 
+    let decision = risk::evaluate_onboarding_rules(&features, onboarding_id.clone(), ff_client)?;
+
+    Ok((decision, features))
+}
+
+/// Create and save an onboarding decision
+pub async fn make_onboarding_decision(
+    db_pool: &DbPool,
+    ff_client: &impl FeatureFlagClient,
+    onboarding_id: &OnboardingId,
+    rules_output: OnboardingRulesDecisionOutput,
+    features: FeatureVector,
+) -> ApiResult<()> {
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    // TODO: breakup create_final_decision into 1 func that creates DecisionOutput and 1 func that actually writes an OBD (+risksignals) from that
-    //       onboading_id is only currently needed for the first part in logging in the rules, but we should be able to remove and put that logging outside
     let onboarding_decision =
-        risk::create_final_decision(onboarding_id.clone(), features, db_pool, ff_client).await?;
+        risk::save_final_decision(onboarding_id.clone(), features, db_pool, ff_client, rules_output).await?;
 
     let status = onboarding_decision.status.to_string();
     if let Ok(metric) =

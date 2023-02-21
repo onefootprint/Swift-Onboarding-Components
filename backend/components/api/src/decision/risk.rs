@@ -25,11 +25,12 @@ use strum::IntoEnumIterator;
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
 #[tracing::instrument(skip(features, db_pool, ff_client))]
-pub async fn create_final_decision(
+pub async fn save_final_decision(
     ob_id: OnboardingId,
     features: FeatureVector,
     db_pool: &DbPool,
     ff_client: &impl FeatureFlagClient,
+    decision: OnboardingRulesDecisionOutput,
 ) -> ApiResult<OnboardingDecision> {
     // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: Create our risk signals!
@@ -42,8 +43,6 @@ pub async fn create_final_decision(
         .tenant_id;
 
     let tenant_can_view_socure_risk_signal = utils::can_see_socure_results(ff_client, tenant_id);
-
-    let decision = final_decision(&features, obid.clone(), ff_client)?;
 
     let obd = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -102,18 +101,18 @@ pub async fn create_final_decision(
 }
 
 #[derive(PartialEq, Eq, Debug)]
-pub struct DecisionOutput {
+pub struct OnboardingRulesDecisionOutput {
     pub decision_status: DecisionStatus,
     pub onboarding_id: OnboardingId,
     pub create_manual_review: bool,
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
 }
-pub fn final_decision(
+pub fn evaluate_onboarding_rules(
     features: &FeatureVector,
     onboarding_id: OnboardingId,
     feature_flag_client: &impl FeatureFlagClient,
-) -> ApiResult<DecisionOutput> {
+) -> ApiResult<OnboardingRulesDecisionOutput> {
     // Run our rules and log
     let idology_features = features
         .idology_features
@@ -160,7 +159,7 @@ pub fn final_decision(
        "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
     );
 
-    let output = DecisionOutput {
+    let output = OnboardingRulesDecisionOutput {
         decision_status,
         onboarding_id,
         create_manual_review,

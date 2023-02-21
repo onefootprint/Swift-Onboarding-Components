@@ -3,7 +3,7 @@ use std::str::FromStr;
 use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId};
 use test_case::test_case;
 
-use crate::decision::risk::final_decision;
+use crate::decision::risk::evaluate_onboarding_rules;
 fn ob_id(id: &str) -> OnboardingId {
     OnboardingId::from_str(id).unwrap()
 }
@@ -94,7 +94,7 @@ fn test_final_decision(
         .return_once(move |_, _| Ok(should_use_conservative_rules));
 
     // function under test
-    let d = final_decision(&feature_vector, onboarding_id, &mock_ff_client).unwrap();
+    let d = evaluate_onboarding_rules(&feature_vector, onboarding_id, &mock_ff_client).unwrap();
 
     assert!(!d.rules_not_triggered.is_empty());
     if d.decision_status == DecisionStatus::Fail {
