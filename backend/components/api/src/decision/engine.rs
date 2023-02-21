@@ -204,10 +204,23 @@ pub async fn perform_pre_run_operations(
                 return Err(OnboardingError::MissingAttributes(missing_attributes.into()).into());
             }
 
+            // Can only initiate IDV reqs one time for an onboarding
+            // Once we set idv_reqs_initiated_at below, this lock will make sure we can't save multiple sets of VerificationRequests
+            // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
+            if ob.idv_reqs_initiated_at.is_some() {
+                // In the case of a step up (for similar race condition related reasons) we notate on the OB whether we _do_ need
+                // to produce a new decision, despite not needing to initiate verification requests again.
+                if ob.decision_made_at.is_none() {
+                    return Ok(());
+                } else {
+                    return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+                }
+            }
+
             // Checkpoint and create VerificationRequests
             vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
 
-            Ok(true)
+            Ok(())
         })
         .await?;
 

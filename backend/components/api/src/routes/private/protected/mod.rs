@@ -1,3 +1,5 @@
+mod risk;
+
 use paperclip::actix::{
     api_v2_operation, get,
     web::{self},
@@ -6,7 +8,7 @@ use paperclip::actix::{
 use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 
 pub fn routes(config: &mut web::ServiceConfig) {
-    config.service(check);
+    config.service(check).service(risk::make_vendor_calls);
 }
 
 #[api_v2_operation(tags(Private, Protected))]
