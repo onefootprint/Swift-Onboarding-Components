@@ -36,7 +36,10 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
     } else {
         // If there's no customer ID for the tenant, create it and save to the row
         let environment = state.config.service_config.environment.clone();
-        let customer_id = billing::get_or_create_customer(&state.stripe_client, tenant, environment).await?;
+        let customer_id = state
+            .billing_client
+            .get_or_create_customer(tenant, environment)
+            .await?;
         let tenant_id = tenant.id.clone();
         let update = UpdateTenant {
             stripe_customer_id: Some(customer_id.clone()),
@@ -75,10 +78,11 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> 
         .await??;
     let customer_id = get_or_create_customer_id(state, &tenant).await?;
     let info = BillingInfo {
+        interval,
         customer_id,
         count_pii,
         count_kyc,
     };
-    billing::bill_for_tenant(&state.stripe_client, interval, info).await?;
+    state.billing_client.bill_tenant(info).await?;
     Ok(())
 }

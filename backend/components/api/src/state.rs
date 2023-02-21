@@ -36,7 +36,7 @@ pub struct State {
     pub(crate) feature_flag_client: LaunchDarklyFeatureFlagClient,
     pub(crate) webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
-    pub(crate) stripe_client: billing::StripeClient,
+    pub(crate) billing_client: billing::BillingClient,
 }
 
 impl State {
@@ -109,7 +109,7 @@ impl State {
             vec![&GIT_HASH, &config.service_config.environment],
         );
 
-        let stripe_client = billing::init_client(config.stripe.api_key.leak_to_string());
+        let billing_client = billing::BillingClient::new(config.stripe.api_key.clone());
 
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
@@ -156,7 +156,7 @@ impl State {
             socure_production_client,
             feature_flag_client,
             webhook_service_client,
-            stripe_client,
+            billing_client,
         }
     }
 }
