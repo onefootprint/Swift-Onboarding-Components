@@ -3,7 +3,8 @@ import { assign, createMachine } from 'xstate';
 import createIdentifyMachine from '../identify';
 import createOnboardingMachine from '../onboarding';
 import { Actions, BifrostContext, BifrostEvent, Events, States } from './types';
-import initContextComplete from './utils/init-context-complete';
+import isContextReady from './utils/is-context-ready';
+import shouldShowSandboxOutcome from './utils/should-show-sandbox-outcome';
 
 const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
   {
@@ -25,16 +26,28 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           },
           [Events.initContextUpdated]: [
             {
-              description:
-                'Only transition to next state if all required info is collected',
+              target: States.sandboxOutcome,
               actions: [Actions.assignInitContext],
+              cond: (context, event) =>
+                shouldShowSandboxOutcome(context, event),
+            },
+            {
               target: States.identify,
-              cond: (context, event) => initContextComplete(context, event),
+              actions: [Actions.assignInitContext],
+              cond: (context, event) => isContextReady(context, event),
             },
             {
               actions: [Actions.assignInitContext],
             },
           ],
+        },
+      },
+      [States.sandboxOutcome]: {
+        on: {
+          [Events.sandboxOutcomeSubmitted]: {
+            target: States.identify,
+            actions: [Actions.assignSandboxOutcome],
+          },
         },
       },
       [States.identify]: {
@@ -45,6 +58,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               device: { ...context.device! },
               bootstrapData: context.bootstrapData ?? {},
               tenantPk: context.config?.key,
+              identifierSuffix: context.sandboxSuffix,
             }),
           onDone: [
             {
@@ -107,6 +121,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         context.bootstrapData =
           bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
 
+        return context;
+      }),
+      [Actions.assignSandboxOutcome]: assign((context, event) => {
+        if (event.type === Events.sandboxOutcomeSubmitted) {
+          context.sandboxSuffix = event.payload.sandboxSuffix;
+        }
         return context;
       }),
       [Actions.assignUserFound]: assign((context, event) => {

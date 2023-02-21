@@ -5,10 +5,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import {
-  PHONE_REGEX,
-  PHONE_SANDBOX_REGEX,
-} from './phone-registration-form.constants';
+import PHONE_REGEX from './phone-registration-form.constants';
 
 type FormData = {
   [UserDataAttribute.phoneNumber]: string;
@@ -17,14 +14,12 @@ type FormData = {
 export type PhoneRegistrationFormProps = {
   defaultPhone?: string;
   isLoading?: boolean;
-  isSandbox?: boolean;
   onSubmit: (formData: FormData) => void;
 };
 
 const PhoneRegistrationForm = ({
   isLoading,
   defaultPhone,
-  isSandbox,
   onSubmit,
 }: PhoneRegistrationFormProps) => {
   const { t } = useTranslation('pages.phone-registration.form');
@@ -39,22 +34,17 @@ const PhoneRegistrationForm = ({
       [UserDataAttribute.phoneNumber]: defaultPhone,
     },
   });
-
-  const getHint = () => {
-    const hasError = !!errors?.[UserDataAttribute.phoneNumber];
-    if (hasError) {
-      return errors[UserDataAttribute.phoneNumber]?.message;
-    }
-    return isSandbox ? t('phone.hint') : undefined;
-  };
+  const hasError = !!errors[UserDataAttribute.phoneNumber];
+  const hint = hasError
+    ? errors[UserDataAttribute.phoneNumber]?.message
+    : undefined;
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <PhoneInput
         data-private
-        disableMask={isSandbox}
-        hasError={!!errors[UserDataAttribute.phoneNumber]}
-        hint={getHint()}
+        hasError={hasError}
+        hint={hint}
         label={t('phone.label')}
         placeholder={t('phone.placeholder')}
         onReset={() => {
@@ -66,15 +56,10 @@ const PhoneRegistrationForm = ({
             value: true,
             message: t('phone.errors.required'),
           },
-          pattern: isSandbox
-            ? {
-                value: PHONE_SANDBOX_REGEX,
-                message: t('phone.errors.sandbox-pattern'),
-              }
-            : {
-                value: PHONE_REGEX,
-                message: t('phone.errors.pattern'),
-              },
+          pattern: {
+            value: PHONE_REGEX,
+            message: t('phone.errors.pattern'),
+          },
         })}
       />
       <Button fullWidth loading={isLoading} type="submit">

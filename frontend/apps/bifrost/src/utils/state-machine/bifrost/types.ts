@@ -3,6 +3,7 @@ import { OnboardingConfig, OnboardingStatus } from '@onefootprint/types';
 
 export enum States {
   init = 'Init',
+  sandboxOutcome = 'sandboxOutcome',
   identify = 'identify',
   configInvalid = 'configInvalid',
   authenticationSuccess = 'authenticationSuccess',
@@ -13,6 +14,7 @@ export enum States {
 export enum Events {
   initContextUpdated = 'initContextUpdated',
   configRequestFailed = 'configRequestFailed',
+  sandboxOutcomeSubmitted = 'sandboxOutcomeSubmitted',
   authenticationSucceeded = 'authenticationSucceeded',
   identifyCompleted = 'done.invoke.identify',
   onboardingCompleted = 'done.invoke.onboarding',
@@ -21,6 +23,7 @@ export enum Events {
 
 export enum Actions {
   assignInitContext = 'assignInitContext',
+  assignSandboxOutcome = 'assignSandboxOutcome',
   assignUserFound = 'assignUserFound',
   assignAuthToken = 'assignAuthToken',
   assignEmail = 'assignEmail',
@@ -43,6 +46,7 @@ export type BifrostContext = {
   validationToken?: string;
   bootstrapData?: BootstrapData;
   status?: OnboardingStatus;
+  sandboxSuffix?: string;
 };
 
 export type BifrostEvent =
@@ -56,6 +60,12 @@ export type BifrostEvent =
     }
   | {
       type: Events.configRequestFailed;
+    }
+  | {
+      type: Events.sandboxOutcomeSubmitted;
+      payload: {
+        sandboxSuffix: string;
+      };
     }
   | {
       type: Events.identifyCompleted;

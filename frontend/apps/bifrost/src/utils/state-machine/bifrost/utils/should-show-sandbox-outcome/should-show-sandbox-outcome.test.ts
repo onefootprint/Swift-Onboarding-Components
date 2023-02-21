@@ -1,10 +1,10 @@
 import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
 import { BifrostContext, BifrostEvent, Events } from '../../types';
-import initContextComplete from './init-context-complete';
+import shouldShowSandboxOutcome from './should-show-sandbox-outcome';
 
-describe('initContextComplete', () => {
-  const TestOnboardingConfig: OnboardingConfig = {
+describe('shouldShowSandboxOutcome', () => {
+  const testOnboardingConfig: OnboardingConfig = {
     createdAt: 'date',
     id: 'id',
     isLive: true,
@@ -23,25 +23,25 @@ describe('initContextComplete', () => {
   };
 
   describe('when init context info is complete', () => {
-    it('when all data is in the machine context', () => {
+    it('should return true if key is not live', () => {
       const context: BifrostContext = {
         device: {
           type: 'mobile',
           hasSupportForWebauthn: true,
         },
-        config: { ...TestOnboardingConfig },
+        config: { ...testOnboardingConfig, isLive: false },
         bootstrapData: {},
       };
       const event: BifrostEvent = {
         type: Events.initContextUpdated,
         payload: {},
       };
-      expect(initContextComplete(context, event)).toEqual(true);
+      expect(shouldShowSandboxOutcome(context, event)).toEqual(true);
     });
 
-    it('when some data is in the machine context and some in the event payload', () => {
+    it('should return false if key is live', () => {
       const context: BifrostContext = {
-        config: { ...TestOnboardingConfig },
+        config: { ...testOnboardingConfig, isLive: true },
         bootstrapData: {},
       };
       const event: BifrostEvent = {
@@ -53,12 +53,12 @@ describe('initContextComplete', () => {
           },
         },
       };
-      expect(initContextComplete(context, event)).toEqual(true);
+      expect(shouldShowSandboxOutcome(context, event)).toEqual(false);
     });
   });
 
   describe('when init context is incomplete', () => {
-    it('when context and payload have missing data', () => {
+    it('should return false', () => {
       const context: BifrostContext = {
         bootstrapData: {},
       };
@@ -71,7 +71,7 @@ describe('initContextComplete', () => {
           },
         },
       };
-      expect(initContextComplete(context, event)).toEqual(false);
+      expect(shouldShowSandboxOutcome(context, event)).toEqual(false);
     });
   });
 });

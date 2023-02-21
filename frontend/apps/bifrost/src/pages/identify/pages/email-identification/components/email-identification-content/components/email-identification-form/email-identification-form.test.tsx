@@ -14,13 +14,11 @@ describe('<EmailIdentificationForm />', () => {
   const renderForm = ({
     defaultEmail,
     isLoading,
-    isSandbox,
     onSubmit = () => {},
   }: Partial<EmailIdentificationFormProps>) =>
     customRender(
       <EmailIdentificationForm
         defaultEmail={defaultEmail}
-        isSandbox={isSandbox}
         onSubmit={onSubmit}
         isLoading={isLoading}
       />,
@@ -31,18 +29,6 @@ describe('<EmailIdentificationForm />', () => {
     expect(screen.getByText('Email')).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText('your.email@email.com'),
-    ).toBeInTheDocument();
-    const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
-  });
-
-  it('should render correctly in sandbox mode', async () => {
-    renderForm({ isSandbox: true });
-    expect(screen.getByText('Email')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Add ”#string” (e.g., #test1) at the end of your email address.',
-      ),
     ).toBeInTheDocument();
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
@@ -97,23 +83,5 @@ describe('<EmailIdentificationForm />', () => {
     const button = screen.getByRole('button');
     await userEvent.click(button);
     expect(screen.getByText('Email is required')).toBeInTheDocument();
-  });
-
-  it('should show error if sandbox email is invalid', async () => {
-    const onSubmit = jest.fn();
-    renderForm({
-      onSubmit,
-      isSandbox: true,
-      defaultEmail: 'piip@onefootprint.com',
-    });
-
-    const button = screen.getByRole('button');
-    await userEvent.click(button);
-
-    expect(
-      screen.getByText(
-        'Add ”#string” (e.g., #test1) at the end of your email address.',
-      ),
-    ).toBeInTheDocument();
   });
 });

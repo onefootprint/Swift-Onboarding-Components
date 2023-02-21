@@ -1,6 +1,9 @@
 import { BifrostContext, BifrostEvent, Events } from '../../types';
 
-const initContextComplete = (context: BifrostContext, event: BifrostEvent) => {
+const shouldShowSandboxOutcome = (
+  context: BifrostContext,
+  event: BifrostEvent,
+) => {
   if (event.type !== Events.initContextUpdated) {
     return false;
   }
@@ -9,8 +12,11 @@ const initContextComplete = (context: BifrostContext, event: BifrostEvent) => {
   const bootstrapData = context.bootstrapData || event.payload.bootstrapData;
 
   return (
-    device !== undefined && config !== undefined && bootstrapData !== undefined
+    device !== undefined &&
+    config !== undefined &&
+    bootstrapData !== undefined &&
+    !config.isLive
   );
 };
 
-export default initContextComplete;
+export default shouldShowSandboxOutcome;

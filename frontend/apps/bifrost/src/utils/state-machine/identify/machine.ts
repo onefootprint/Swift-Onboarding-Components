@@ -16,12 +16,14 @@ type IdentifyMachineArgs = {
   device: DeviceInfo;
   bootstrapData?: BootstrapData;
   tenantPk?: string;
+  identifierSuffix?: string;
 };
 
 const createIdentifyMachine = ({
   device,
   bootstrapData: rawBootstrapData,
   tenantPk,
+  identifierSuffix,
 }: IdentifyMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
@@ -34,6 +36,7 @@ const createIdentifyMachine = ({
         device,
         bootstrapData: rawBootstrapData ?? {},
         tenantPk,
+        identifierSuffix,
       },
       states: {
         // Legacy bootstrap transitions

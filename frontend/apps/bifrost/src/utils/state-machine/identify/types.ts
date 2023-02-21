@@ -12,6 +12,8 @@ export enum States {
   bootstrapChallenge = 'bootstrapChallenge',
 
   // Other Events
+  processBootstrapData = 'processBootstrapData',
+  sandboxOutcome = 'sandboxOutcome',
   emailIdentification = 'emailIdentification',
   phoneRegistration = 'phoneRegistration',
   phoneVerification = 'phoneVerification',
@@ -28,6 +30,7 @@ export type MachineContext = {
   authToken?: string;
   bootstrapData: BootstrapData;
   tenantPk?: string;
+  identifierSuffix?: string;
 };
 
 export enum Events {
@@ -58,6 +61,7 @@ export enum Actions {
   assignBootstrapData = 'assignBootstrapData',
 
   // Other Actions
+  assignSandboxOutcome = 'assignSandboxOutcome',
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
   assignUserFound = 'assignUserFound',

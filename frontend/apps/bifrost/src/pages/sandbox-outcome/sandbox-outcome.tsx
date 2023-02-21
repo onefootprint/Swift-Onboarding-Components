@@ -7,18 +7,27 @@ import { IcoCheck24, IcoUser24, IcoWarning24 } from '@onefootprint/icons';
 import { Box, Button, RadioSelect, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';
+
+import useSkipIfHasBootstrapData from './hooks/use-skip-if-has-bootstrap-data';
+import parseTestID from './utils/parse-suffix';
+
+export enum Outcomes {
+  success = '',
+  manualReview = 'manualreview',
+  fail = 'fail',
+}
 
 type FormData = {
   testID: string;
-  outcome: 'success' | 'manualreview' | 'fail';
+  outcome: Outcomes;
 };
 
-// TODO:
-// Inject to the state machine and continue
-
-const Outcomes = () => {
+const SandboxOutcome = () => {
   const { t } = useTranslation('pages.outcomes');
+  useSkipIfHasBootstrapData();
+  const [state, send] = useBifrostMachine();
   const {
     control,
     register,
@@ -26,12 +35,18 @@ const Outcomes = () => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      outcome: 'success',
+      outcome: Outcomes.success,
+      testID: parseTestID(state.context.bootstrapData?.email),
     },
   });
 
   const handleAfterSubmit = (formData: FormData) => {
-    console.log(formData);
+    send({
+      type: Events.sandboxOutcomeSubmitted,
+      payload: {
+        sandboxSuffix: `#${formData.outcome}${formData.testID}`,
+      },
+    });
   };
 
   return (
@@ -42,26 +57,25 @@ const Outcomes = () => {
         <Controller
           control={control}
           name="outcome"
-          rules={{ required: true }}
           render={({ field }) => (
             <RadioSelect
               options={[
                 {
                   title: t('outcome.options.success.title'),
                   description: t('outcome.options.success.description'),
-                  value: 'success',
+                  value: Outcomes.success,
                   IconComponent: IcoCheck24,
                 },
                 {
                   title: t('outcome.options.manual-review.title'),
                   description: t('outcome.options.manual-review.description'),
-                  value: 'manualreview',
+                  value: Outcomes.manualReview,
                   IconComponent: IcoUser24,
                 },
                 {
                   title: t('outcome.options.fail.title'),
                   description: t('outcome.options.fail.description'),
-                  value: 'fail',
+                  value: Outcomes.fail,
                   IconComponent: IcoWarning24,
                 },
               ]}
@@ -98,4 +112,4 @@ const Form = styled.form`
   `}
 `;
 
-export default Outcomes;
+export default SandboxOutcome;

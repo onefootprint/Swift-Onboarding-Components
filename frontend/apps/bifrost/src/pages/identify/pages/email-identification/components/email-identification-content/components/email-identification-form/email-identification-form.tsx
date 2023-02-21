@@ -4,21 +4,17 @@ import { Box, Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';
-
 export type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 export type EmailIdentificationFormProps = {
   defaultEmail?: string;
   isLoading?: boolean;
-  isSandbox?: boolean;
   onSubmit: (formData: FormData) => void;
 };
 
 const EmailIdentificationForm = ({
   defaultEmail,
   isLoading,
-  isSandbox,
   onSubmit,
 }: EmailIdentificationFormProps) => {
   const { t } = useTranslation('pages.email-identification.form');
@@ -28,22 +24,16 @@ const EmailIdentificationForm = ({
     getValues,
     formState: { errors },
   } = useForm<FormData>({ defaultValues: { email: defaultEmail } });
-
-  const getHint = () => {
-    const hasError = !!errors?.[UserDataAttribute.email];
-    if (hasError) {
-      return errors[UserDataAttribute.email]?.message;
-    }
-    return isSandbox ? t('email.hint') : undefined;
-  };
+  const hasError = !!errors[UserDataAttribute.email];
+  const hint = hasError ? errors[UserDataAttribute.email]?.message : undefined;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate={isSandbox}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Box sx={{ marginBottom: 7 }}>
         <TextInput
           data-private
-          hasError={!!errors.email}
-          hint={getHint()}
+          hasError={hasError}
+          hint={hint}
           label={t('email.label')}
           placeholder={t('email.placeholder')}
           type="email"
@@ -53,12 +43,6 @@ const EmailIdentificationForm = ({
               value: true,
               message: t('email.errors.required'),
             },
-            pattern: isSandbox
-              ? {
-                  value: EMAIL_SANDBOX_REGEX,
-                  message: t('email.errors.pattern'),
-                }
-              : undefined,
           })}
         />
       </Box>

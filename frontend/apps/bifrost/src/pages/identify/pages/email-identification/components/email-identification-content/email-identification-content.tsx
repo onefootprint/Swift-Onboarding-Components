@@ -11,24 +11,25 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
+import SandboxOutcomeFooter from 'src/components/sandbox-outcome-footer';
 import { Events } from 'src/hooks/use-identify-machine';
-import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import LegalFooter from 'src/pages/identify/components/legal-footer';
 
 import { useLoginChallengeBottomSheet } from '../../../../components/login-challenge-bottom-sheet/login-challenge-bottom-sheet-provider';
+import useIdentifierSuffix from '../../../../hooks/use-identifier-suffix';
 import EmailIdentificationForm from './components/email-identification-form';
 import EmailIdentificationHeader from './components/email-identification-header';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentificationContent = () => {
-  const { isSandbox } = useSandboxMode();
   const [state, send] = useIdentifyMachine();
   const { email: smEmail, device } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeBottomSheet = useLoginChallengeBottomSheet();
+  const idSuffix = useIdentifierSuffix();
 
   const identifyMutation = useIdentify();
   const loginChallengeMutation = useLoginChallenge();
@@ -95,8 +96,8 @@ const EmailIdentificationContent = () => {
     loginChallengeBottomSheet.show({ identifier: { email } });
   };
 
-  const handleSubmit = (data: FormData) => {
-    const { email } = data;
+  const handleSubmit = (formData: FormData) => {
+    const email = idSuffix.append(formData.email);
     identifyMutation.mutate(
       { identifier: { email } },
       {
@@ -111,12 +112,12 @@ const EmailIdentificationContent = () => {
     <>
       <EmailIdentificationHeader />
       <EmailIdentificationForm
-        isSandbox={isSandbox}
-        defaultEmail={smEmail}
+        defaultEmail={idSuffix.remove(smEmail)}
         onSubmit={handleSubmit}
         isLoading={isLoading}
       />
       <LegalFooter />
+      <SandboxOutcomeFooter />
     </>
   );
 };

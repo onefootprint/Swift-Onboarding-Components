@@ -14,6 +14,7 @@ import Error from './error';
 import Identify from './identify';
 import Init from './init';
 import Onboarding from './onboarding';
+import SandboxOutcome from './sandbox-outcome';
 
 const Root = () => {
   const [state, send] = useBifrostMachine();
@@ -32,6 +33,7 @@ const Root = () => {
     >
       {state.matches(States.init) && <Init />}
       {state.matches(States.configInvalid) && <ConfigInvalid />}
+      {state.matches(States.sandboxOutcome) && <SandboxOutcome />}
       {state.matches(States.identify) && <Identify />}
       {state.matches(States.onboarding) && <Onboarding />}
       {state.matches(States.authenticationSuccess) && <AuthenticationSuccess />}

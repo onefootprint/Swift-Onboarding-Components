@@ -11,10 +11,11 @@ import {
   UserDataAttribute,
 } from '@onefootprint/types';
 import React from 'react';
+import SandboxOutcomeFooter from 'src/components/sandbox-outcome-footer';
 import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
-import useSandboxMode from 'src/hooks/use-sandbox-mode/use-sandbox-mode';
 
 import { useLoginChallengeBottomSheet } from '../../../../components/login-challenge-bottom-sheet/login-challenge-bottom-sheet-provider';
+import useIdentifierSuffix from '../../../../hooks/use-identifier-suffix';
 import PhoneRegistrationEmailPreview from './components/phone-registration-email-preview';
 import PhoneRegistrationForm from './components/phone-registration-form';
 import PhoneRegistrationHeader from './components/phone-registration-header';
@@ -22,13 +23,13 @@ import PhoneRegistrationHeader from './components/phone-registration-header';
 type FormData = Required<Pick<UserData, UserDataAttribute.phoneNumber>>;
 
 const PhoneRegistrationContent = () => {
-  const { isSandbox } = useSandboxMode();
   const [state, send] = useIdentifyMachine();
   const { device, phone, email } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeBottomSheet = useLoginChallengeBottomSheet();
+  const idSuffix = useIdentifierSuffix();
 
   const identifyMutation = useIdentify();
   const loginChallengeMutation = useLoginChallenge();
@@ -118,7 +119,9 @@ const PhoneRegistrationContent = () => {
   };
 
   const handleSubmit = (formData: FormData) => {
-    const phoneNumber = formData[UserDataAttribute.phoneNumber];
+    const phoneNumber = idSuffix.append(
+      formData[UserDataAttribute.phoneNumber],
+    );
     // First we try to identify the user via phone number before sending any challenges
     identifyMutation.mutate(
       { identifier: { phoneNumber } },
@@ -138,15 +141,15 @@ const PhoneRegistrationContent = () => {
     <>
       <PhoneRegistrationHeader />
       <PhoneRegistrationEmailPreview
-        email={email}
+        email={idSuffix.remove(email)}
         onChange={handleChangeEmail}
       />
       <PhoneRegistrationForm
-        isSandbox={isSandbox}
         onSubmit={handleSubmit}
         isLoading={isLoading}
-        defaultPhone={phone}
+        defaultPhone={idSuffix.remove(phone)}
       />
+      <SandboxOutcomeFooter />
     </>
   );
 };

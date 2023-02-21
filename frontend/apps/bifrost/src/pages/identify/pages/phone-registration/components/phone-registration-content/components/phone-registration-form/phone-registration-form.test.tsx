@@ -8,13 +8,11 @@ import PhoneRegistrationForm, {
 describe.skip('<PhoneRegistrationForm />', () => {
   const renderForm = ({
     defaultPhone,
-    isSandbox,
     isLoading,
     onSubmit = () => {},
   }: Partial<PhoneRegistrationFormProps>) =>
     customRender(
       <PhoneRegistrationForm
-        isSandbox={isSandbox}
         onSubmit={onSubmit}
         isLoading={isLoading}
         defaultPhone={defaultPhone}
@@ -25,18 +23,6 @@ describe.skip('<PhoneRegistrationForm />', () => {
     renderForm({});
     expect(screen.getByText('Phone number')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('123-456-7890')).toBeInTheDocument();
-    const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
-  });
-
-  it('should render correctly in sandbox mode', async () => {
-    renderForm({ isSandbox: true });
-    expect(screen.getByText('Phone number')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Add ”#string” (e.g., #test1) at the end of your phone number.',
-      ),
-    ).toBeInTheDocument();
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
   });
