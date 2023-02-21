@@ -413,7 +413,8 @@
         "controls": {
           "start": "Decrypt data",
           "next": "Continue",
-          "cancel": "Cancel"
+          "cancel": "Cancel",
+          "not-allowed": "You're not allowed to decrypt data"
         },
         "reason-dialog": {
           "title": "Decrypt data",
