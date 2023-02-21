@@ -13,13 +13,14 @@
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
   "dependencies": {
+    "@onefootprint/design-tokens": "*",
+    "@onefootprint/footprint-js": "*",
+    "@onefootprint/footprint-react": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
-    "@onefootprint/design-tokens": "*",
     "@onefootprint/ui": "*",
-    "@onefootprint/footprint-js": "*",
-    "@onefootprint/footprint-react": "*",
+    "framer-motion": "^9.0.7",
     "next": "13.1.6",
     "react": "18.2.0",
     "styled-components": "^5.3.6"

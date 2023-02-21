@@ -14,6 +14,35 @@
     },
     "disclaimer": "Footprint will not be able to access (or decrypt) any sensitive data. We will only get access to your name, phone, and email address."
   },
+  "ending": {
+    "html-title": "Your identity is safe now.",
+    "chip": "Meet your new Footprint vault",
+    "title": "Your identity is safe now.",
+    "subtitle": "The next time you see the Footprint button, you can be certain your data is protected.",
+    "new-approach": {
+      "title": "A new approach to privacy.",
+      "description": "Your PII is secured with Footprint, so you can safely allow companies to access it whenever you want, however you want. Regain the ownership of your data."
+    },
+    "features": {
+      "title": "How Footprint guards your PII",
+      "zero-trust": {
+        "title": "Zero-trust by design",
+        "description": "Our API ensures only the right parties can access the data they're allowed to see."
+      },
+      "end-to-end": {
+        "title": "End-to-end encrypted",
+        "description": "Our advanced PII vaults are built on top of secure Nitro Enclaves. "
+      },
+      "granular-data": {
+        "title": "Granular data access",
+        "description": "Only the bare minimum data is decrypted. Nothing else leaves our enclave-backed vaults."
+      },
+      "secure-enclave": {
+        "title": "Secure enclave backed",
+        "description": "All PII data is always encrypted in our Nitro Enclaves."
+      }
+    }
+  },
   "404": {
     "html-title": "Oops! Page not found.",
     "title": "Oops! Page not found.",

@@ -4,6 +4,7 @@ import { LogoFpDefault } from '@onefootprint/icons';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
+import router from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -38,7 +39,13 @@ const Live = () => {
                 {t('subtitle')}
               </Typography>
               <ActionsContainer>
-                <FootprintButton publicKey={publicKey} label={t('cta')} />
+                <FootprintButton
+                  publicKey={publicKey}
+                  label={t('cta')}
+                  onCompleted={() => {
+                    router.push('/ending');
+                  }}
+                />
                 <Typography as="p" variant="body-2" color="secondary">
                   {t('disclaimer')}
                 </Typography>
