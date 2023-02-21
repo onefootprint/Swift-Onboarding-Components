@@ -17,6 +17,11 @@
       "biometric": "Biometric",
       "aria-label": "Select a login challenge type."
     },
+    "biometric-challenge-verification": {
+      "loading": "Waiting...",
+      "success": "Success!",
+      "cta": "Launch biometrics"
+    },
     "login-with-different-account": {
       "missing-phone": "Don't have access to this phone number?",
       "cta": "Login with a different account"
