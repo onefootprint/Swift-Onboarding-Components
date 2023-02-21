@@ -1,20 +1,13 @@
-import {
-  HeaderTitle,
-  NavigationHeader,
-} from '@onefootprint/footprint-elements';
-import { useTranslation } from '@onefootprint/hooks';
-import { Box } from '@onefootprint/ui';
+import { NavigationHeader } from '@onefootprint/footprint-elements';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Events } from '../../../../utils/state-machine/identify/types';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-import PhoneVerificationLoading from './components/phone-verification-loading';
-import PhoneVerificationPinForm from './components/phone-verification-pin-form';
-import PhoneVerificationSuccess from './components/phone-verification-success';
+import PhoneVerificationForm from './components/phone-verification-form';
+import PhoneVerificationHeader from './components/phone-verification-header';
 
 const PhoneVerification = () => {
-  const { t } = useTranslation('pages.phone-verification');
   const [state, send] = useIdentifyMachine();
   const { context } = state;
   const {
@@ -22,39 +15,24 @@ const PhoneVerification = () => {
     challenge: { challengeData },
   } = context;
 
-  const filteredPhone = phone?.split('#')[0] ?? ''; // Filter out sandbox suffixes
-  const scrubbedPhoneNumber = (
-    challengeData?.scrubbedPhoneNumber || filteredPhone
-  )
-    .replaceAll('*', '•')
-    .replaceAll('-', ' ');
+  const onNavigateToPrev = () => {
+    send(Events.navigatedToPrevPage);
+  };
 
   return (
-    <>
+    <Form autoComplete="off" role="presentation">
       <NavigationHeader
         button={{
           variant: 'back',
-          onClick: () => {
-            send(Events.navigatedToPrevPage);
-          },
+          onClick: onNavigateToPrev,
         }}
       />
-      <Form autoComplete="off" role="presentation">
-        <Box>
-          <HeaderTitle
-            data-private
-            title={userFound ? t('title.existing-user') : t('title.new-user')}
-            subtitle={t('subtitle', {
-              scrubbedPhoneNumber,
-            })}
-          />
-        </Box>
-        <PhoneVerificationPinForm
-          renderLoadingComponent={PhoneVerificationLoading}
-          renderSuccessComponent={PhoneVerificationSuccess}
-        />
-      </Form>
-    </>
+      <PhoneVerificationHeader
+        phone={challengeData?.scrubbedPhoneNumber || phone}
+        userFound={userFound}
+      />
+      <PhoneVerificationForm />
+    </Form>
   );
 };
 

@@ -9,7 +9,6 @@ const useSize = (target: React.RefObject<HTMLElement | undefined>) => {
     width: number;
     height: number;
   }>();
-
   useLayoutEffect(() => {
     if (!target?.current) {
       return;
