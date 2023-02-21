@@ -143,7 +143,7 @@ pub(crate) async fn send_email_challenge(
     let session_data = AuthSessionData::EmailVerify(EmailVerifySession { email_id });
 
     // create new session
-    let token = AuthSession::create(state, session_data, chrono::Duration::days(7)).await?;
+    let token = AuthSession::create(state, session_data, chrono::Duration::days(30)).await?;
 
     // add unique url query param to avoid incorrect caching by browser/client
     let unique_param = gen_random_alphanumeric_code(5);
