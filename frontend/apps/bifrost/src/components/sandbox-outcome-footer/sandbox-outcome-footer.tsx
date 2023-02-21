@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Typography } from '@onefootprint/ui';
+import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';
@@ -38,11 +38,13 @@ const Container = styled.footer`
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     justify-content: space-between;
-    margin-bottom: calc(-1 * ${theme.spacing[7]});
-    margin-left: calc(-1 * ${theme.spacing[7]});
-    margin-right: calc(-1 * ${theme.spacing[7]});
-    margin-top: ${theme.spacing[7]};
+    margin: auto calc(-1 * ${theme.spacing[5]}) calc(-1 * ${theme.spacing[5]})
+      calc(-1 * ${theme.spacing[5]});
     padding: ${theme.spacing[2]} ${theme.spacing[5]};
+
+    ${media.greaterThan('md')`
+      margin:  ${theme.spacing[7]}  calc(-1 * ${theme.spacing[7]})  calc(-1 * ${theme.spacing[7]})  calc(-1 * ${theme.spacing[7]})
+    `}
   `}
 `;
 
