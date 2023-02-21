@@ -606,9 +606,33 @@
         },
         "features": {
           "kyc-check": {
-            "title": "KYC Check",
+            "title": "KYC + AML Check",
             "footprint": true,
             "alloy": true,
+            "vgs": false
+          },
+          "liveness": {
+            "title": "Liveness",
+            "footprint": true,
+            "alloy": true,
+            "vgs": false
+          },
+          "under-8-lines-of-code": {
+            "title": "Under 8 lines of code",
+            "footprint": true,
+            "alloy": false,
+            "vgs": false
+          },
+          "biometrics": {
+            "title": "Passkeys/Face ID Biometrics",
+            "footprint": true,
+            "alloy": false,
+            "vgs": false
+          },
+          "one-click-compatibility": {
+            "title": "Access Control",
+            "footprint": true,
+            "alloy": false,
             "vgs": false
           },
           "tokenization": {
@@ -623,47 +647,11 @@
             "alloy": false,
             "vgs": true
           },
-          "liveness": {
-            "title": "Liveness",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
-          },
-          "biometrics": {
-            "title": "Biometrics",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
-          },
-          "one-click-compatibility": {
-            "title": "One-click compatibility",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
-          },
-          "zero-trust-security": {
-            "title": "Zero-trust security",
+          "vault-proxy": {
+            "title": "Vault Proxying",
             "footprint": true,
             "alloy": false,
             "vgs": true
-          },
-          "under-8-lines-of-code": {
-            "title": "Under 8 lines of code",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
-          },
-          "fancy-ai": {
-            "title": "Fancy AI",
-            "footprint": false,
-            "alloy": true,
-            "vgs": false
-          },
-          "vault-proxy": {
-            "title": "Vault Proxy",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
           }
         }
       },
