@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { USER_HEADER_ACTIONS_ID } from 'src/pages/users/pages/user-details/constants';
 import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import getOnboardingStatusBadgeVariant from 'src/pages/users/utils/get-onboarding-status-badge-variant';
@@ -9,7 +10,6 @@ import styled, { css } from 'styled-components';
 
 import { State } from '../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../decrypt-machine-provider';
-import DecryptControls from './components/decrypt-controls';
 import ManualReview from './components/manual-review';
 
 const UserHeader = () => {
@@ -58,7 +58,7 @@ const UserHeader = () => {
           <CodeInline>{data.id}</CodeInline>
         </RowContainer>
         <RowContainer>
-          <DecryptControls />
+          <div id={USER_HEADER_ACTIONS_ID} />
           {shouldShowManualReview && <ManualReview />}
         </RowContainer>
       </SplitRow>

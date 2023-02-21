@@ -1,7 +1,7 @@
 import type { Placement } from '@popperjs/core';
 import React, { useCallback, useId, useState } from 'react';
 import { usePopper } from 'react-popper';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useUpdateEffect } from 'usehooks-ts';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -30,6 +30,7 @@ const Tooltip = ({
   text,
 }: TooltipProps) => {
   const id = useId();
+  const theme = useTheme();
   const [refElement, setRefElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const {
@@ -80,7 +81,10 @@ const Tooltip = ({
           ref={setPopperElement}
           role="tooltip"
           size={size}
-          style={styles.popper}
+          style={{
+            ...styles.popper,
+            zIndex: theme.zIndex.tooltip,
+          }}
         >
           {text}
         </TooltipContainer>

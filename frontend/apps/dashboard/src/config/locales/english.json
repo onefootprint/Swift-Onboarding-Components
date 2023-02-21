@@ -313,13 +313,14 @@
           "vault-only": "Vault"
         }
       },
-      "vault-data": {
-        "empty-state": "No vault data found"
-      },
       "user-info": {
         "cta": {
           "select-all": "Select all",
           "deselect-all": "Deselect all"
+        },
+        "decrypt": {
+          "not-allowed": "You're not allowed to decrypt data",
+          "empty": "This field was not filled in, so it cannot be decrypted"
         },
         "basic": {
           "title": "Basic data"
@@ -334,6 +335,7 @@
           "title": "ID documents",
           "title-with-selfie": "ID documents & Selfie",
           "success-flag": "Successful",
+          "not-allowed": "You 're not allowed to decrypt ID documents",
           "id-doc-images": {
             "show": "Show",
             "hide": "Hide"
@@ -409,7 +411,6 @@
           }
         },
         "controls": {
-          "not-allowed": "You're not allowed to decrypt data",
           "start": "Decrypt data",
           "next": "Continue",
           "cancel": "Cancel"

@@ -13,10 +13,8 @@ export type Onboarding = {
   timestamp: string;
   isLivenessSkipped: boolean;
   insightEvent: InsightEvent;
-
   canAccessData: CollectedKycDataOption[];
   canAccessDataAttributes: UserDataAttribute[];
   canAccessIdentityDocumentImages: boolean;
-
   latestDecision?: OnboardingDecision;
 };

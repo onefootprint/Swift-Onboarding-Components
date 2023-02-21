@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { UserDataAttribute } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
+import { Portal, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { USER_HEADER_ACTIONS_SELECTOR } from 'src/pages/users/pages/user-details/constants';
 import useDecryptUser from 'src/pages/users/pages/user-details/hooks/use-descrypt-user';
 import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
@@ -13,20 +14,20 @@ import { useUpdateEffect } from 'usehooks-ts';
 
 import { Event, Fields, State } from '../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../decrypt-machine-provider';
-import VaultDataContent, { FormData } from './components/vault-data-content';
+import Content from './components/content';
+import DecryptControls from './components/decrypt-controls';
+import type { FormData } from './vault-data.types';
 
 const VaultData = () => {
   const { t } = useTranslation('pages.user-details');
   const toast = useToast();
   const decryptUser = useDecryptUser();
-
   const [state, send] = useDecryptMachine();
   const { fields, reason } = state.context;
   const isDecrypting =
     state.matches(State.selectingFields) ||
     state.matches(State.confirmingReason) ||
     state.matches(State.decrypting);
-
   const formMethods = useForm<FormData>({
     defaultValues: state.context.fields || {
       kycData: {},
@@ -34,7 +35,6 @@ const VaultData = () => {
     },
   });
   const { handleSubmit, reset } = formMethods;
-
   const userId = useUserId();
   const userQuery = useUser(userId);
   const userVaultDataQuery = useUserVault(userId, userQuery.data);
@@ -114,15 +114,20 @@ const VaultData = () => {
   };
 
   return shouldShow ? (
-    <form onSubmit={handleSubmit(handleBeforeSubmit)} id="decrypt-form">
-      <FormProvider {...formMethods}>
-        <VaultDataContent
-          user={userQuery.data}
-          vaultData={vaultData}
-          isDecrypting={isDecrypting}
-        />
-      </FormProvider>
-    </form>
+    <>
+      <Portal selector={USER_HEADER_ACTIONS_SELECTOR}>
+        <DecryptControls />
+      </Portal>
+      <form onSubmit={handleSubmit(handleBeforeSubmit)} id="decrypt-form">
+        <FormProvider {...formMethods}>
+          <Content
+            user={userQuery.data}
+            vaultData={vaultData}
+            isDecrypting={isDecrypting}
+          />
+        </FormProvider>
+      </form>
+    </>
   ) : null;
 };
 

@@ -1,0 +1,112 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { RoleScope } from '@onefootprint/types';
+import { Checkbox, LinkButton, Typography } from '@onefootprint/ui';
+import React, { useState } from 'react';
+import { UseFormRegisterReturn } from 'react-hook-form';
+import EncryptedCell from 'src/components/encrypted-cell';
+import PermissionGate from 'src/components/permission-gate';
+import { IdDocDataValue } from 'src/pages/users/users.types';
+import styled, { css } from 'styled-components';
+
+import DecryptedDataPreview from '../decrypted-data-preview';
+import SuccessFlag from '../success-flag';
+
+export type ImageDataRowProps = {
+  label: string;
+  data?: IdDocDataValue;
+  isSuccessful?: boolean;
+  checkbox: {
+    disabled: boolean;
+    checked: boolean;
+    visible: boolean;
+    register: UseFormRegisterReturn;
+  };
+};
+
+const ImageDataRow = ({
+  label,
+  data,
+  checkbox,
+  isSuccessful,
+}: ImageDataRowProps) => {
+  const { t } = useTranslation('pages.user-details.user-info.id-doc');
+  const { disabled, checked, visible, register } = checkbox;
+  const [imagesVisible, setImagesVisible] = useState(false);
+  const hasImageData = !!data;
+  const handleToggleIdDocVisibility = () => {
+    setImagesVisible(!imagesVisible);
+  };
+
+  if (visible) {
+    return (
+      <Container role="row" aria-label={label}>
+        <TitleContainer>
+          <PermissionGate
+            scope={RoleScope.decryptDocuments}
+            fallbackText={t('not-allowed')}
+          >
+            <Checkbox
+              checked={disabled || checked}
+              {...register}
+              disabled={disabled}
+              label={label}
+            />
+          </PermissionGate>
+          {isSuccessful && <SuccessFlag />}
+        </TitleContainer>
+      </Container>
+    );
+  }
+
+  return (
+    <Container role="row" aria-label={label}>
+      <RowContainer>
+        <TitleContainer>
+          <Typography variant="label-3" color="tertiary">
+            {label}
+          </Typography>
+          {isSuccessful && <SuccessFlag />}
+        </TitleContainer>
+        {data === null && <EncryptedCell />}
+        {data === undefined && (
+          <Typography
+            variant="body-3"
+            color="primary"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            -
+          </Typography>
+        )}
+        {hasImageData && (
+          <LinkButton onClick={handleToggleIdDocVisibility} size="compact">
+            {imagesVisible ? t('id-doc-images.hide') : t('id-doc-images.show')}
+          </LinkButton>
+        )}
+      </RowContainer>
+      {hasImageData && imagesVisible && <DecryptedDataPreview images={data} />}
+    </Container>
+  );
+};
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const RowContainer = styled.div`
+  display: flex;
+  flex-direction: column wrap;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const TitleContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column wrap;
+    justify-content: flex-start;
+    gap: ${theme.spacing[7]};
+  `}
+`;
+
+export default ImageDataRow;
