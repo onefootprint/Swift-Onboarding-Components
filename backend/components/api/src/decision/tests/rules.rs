@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
 
 use crate::decision::{
     features::IDologyFeatures,
@@ -33,10 +33,5 @@ fn idology_features(status: DecisionStatus, fp_reason_codes: Vec<FootprintReason
 #[test_case(idology_features(DecisionStatus::Pass, vec![FootprintReasonCode::SsnIssuedPriorToDob]) => true)]
 
 fn test_idology_base_rule_set(idology_features: IDologyFeatures) -> bool {
-    evaluate_onboarding_rules(
-        vec![idology_base_rule_set()],
-        &idology_features,
-        &OnboardingId::from_str("ob1").unwrap(),
-    )
-    .triggered
+    evaluate_onboarding_rules(vec![idology_base_rule_set()], &idology_features).triggered
 }

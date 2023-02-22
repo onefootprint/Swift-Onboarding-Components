@@ -68,7 +68,17 @@ pub async fn run(
         .collect();
 
     // Calculate output from rules + features
-    let (rules_output, features) = calculate_decision(all_vendor_results, ff_client, &ob.id)?;
+    let (rules_output, features) = calculate_decision(all_vendor_results, ff_client)?;
+
+    // Log decision output
+    tracing::info!(
+       rules_triggered=%rule::rules_to_string(&rules_output.rules_triggered),
+       rules_not_triggered=%rule::rules_to_string(&rules_output.rules_not_triggered),
+       create_manual_review=%rules_output.create_manual_review,
+       decision=%rules_output.decision_status,
+       onboarding_id=%ob.id,
+       "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
+    );
 
     // Save/action/emit risk signals for the decision
     make_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, features).await
@@ -181,12 +191,11 @@ pub async fn make_vendor_requests(
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
     ff_client: &impl FeatureFlagClient,
-    onboarding_id: &OnboardingId,
 ) -> ApiResult<(OnboardingRulesDecisionOutput, FeatureVector)> {
     // From our results, create a FeatureVector for the final decision output
     let features = features::create_features(vendor_results);
 
-    let decision = risk::evaluate_onboarding_rules(&features, onboarding_id.clone(), ff_client)?;
+    let decision = risk::evaluate_onboarding_rules(&features, ff_client)?;
 
     Ok((decision, features))
 }

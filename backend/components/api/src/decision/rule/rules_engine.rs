@@ -4,13 +4,11 @@ use super::{
     rule_set::{EvaluateRuleSet, EvaluatedRuleSet},
     *,
 };
-use newtypes::OnboardingId;
 
 /// Evaluate a list of rulesets for a given input type T
 pub fn evaluate_onboarding_rules<T, R: EvaluateRuleSet<T>>(
     rulesets: Vec<R>,
     rule_input: &T,
-    onboarding_id: &OnboardingId,
 ) -> OnboardingEvaluationResult {
     let (actionable_rulesets_with_triggered_rules, actionable_rulesets_with_no_triggered_rules): (
         Vec<_>,
@@ -26,7 +24,6 @@ pub fn evaluate_onboarding_rules<T, R: EvaluateRuleSet<T>>(
                 rule_set_name=%evaluated_ruleset.ruleset_name(),
                 can_action=%evaluated_ruleset.can_action(),
                 triggered=%evaluated_ruleset.triggered(),
-                onboarding_id=%onboarding_id,
                 rules_triggered=%super::rules_to_string(evaluated_ruleset.rules_triggered()),
                 rules_not_triggered=%super::rules_to_string(evaluated_ruleset.rules_not_triggered()),
                 RULE_LOG_LINE
@@ -141,7 +138,6 @@ mod tests {
         let result = evaluate_onboarding_rules(
             vec![test_ruleset_a(), test_ruleset_b()],
             &TestFeatures::new("hello"),
-            &OnboardingId::from("ob1".to_string()),
         );
 
         assert_eq!(expected, result)

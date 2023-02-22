@@ -103,14 +103,12 @@ pub async fn save_final_decision(
 #[derive(PartialEq, Eq, Debug)]
 pub struct OnboardingRulesDecisionOutput {
     pub decision_status: DecisionStatus,
-    pub onboarding_id: OnboardingId,
     pub create_manual_review: bool,
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
 }
 pub fn evaluate_onboarding_rules(
     features: &FeatureVector,
-    onboarding_id: OnboardingId,
     feature_flag_client: &impl FeatureFlagClient,
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
     // Run our rules and log
@@ -131,11 +129,10 @@ pub fn evaluate_onboarding_rules(
     .collect();
 
     // Evaluate our rules
-    let base = rule::rules_engine::evaluate_onboarding_rules(prod_rules, idology_features, &onboarding_id);
+    let base = rule::rules_engine::evaluate_onboarding_rules(prod_rules, idology_features);
 
     // Evaluate conservative rules
-    let conservative =
-        rule::rules_engine::evaluate_onboarding_rules(additional_rules, idology_features, &onboarding_id);
+    let conservative = rule::rules_engine::evaluate_onboarding_rules(additional_rules, idology_features);
     let onboarding_rule_evaluation_result = base.join(conservative);
 
     // If we no rules that triggered, we consider that a pass
@@ -149,19 +146,8 @@ pub fn evaluate_onboarding_rules(
     // what reviews we want to be doing
     let create_manual_review = decision_status == DecisionStatus::Fail;
 
-    // Log evaluation
-    tracing::info!(
-       rules_triggered=%rule::rules_to_string(&onboarding_rule_evaluation_result.rules_triggered),
-       rules_not_triggered=%rule::rules_to_string(&onboarding_rule_evaluation_result.rules_not_triggered),
-       create_manual_review=%create_manual_review,
-       decision=%decision_status,
-       onboarding_id=%&onboarding_id,
-       "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
-    );
-
     let output = OnboardingRulesDecisionOutput {
         decision_status,
-        onboarding_id,
         create_manual_review,
         rules_triggered: onboarding_rule_evaluation_result.rules_triggered,
         rules_not_triggered: onboarding_rule_evaluation_result.rules_not_triggered,
