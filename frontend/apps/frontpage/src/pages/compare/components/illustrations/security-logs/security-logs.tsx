@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 const SecurityLogs = () => (
   <ImageContainer>
     <StyledImage
-      src="/compare/security-logs.png"
+      src="/compare/vault-proxy.png"
       alt="Illustration 3"
       width={1440}
       height={1024}
@@ -42,12 +42,11 @@ const StyledImage = styled(Image)`
     transform-origin: top left;
     left: ${theme.spacing[8]};
     top: ${theme.spacing[8]};
-    box-shadow: ${theme.elevation[1]};
+    box-shadow: ${theme.elevation[2]};
     mask: linear-gradient(180deg, #fff 40%, transparent 45%);
     mask-mode: alpha;
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
-    box-shadow: ${theme.elevation[1]};
   `}
 `;
 

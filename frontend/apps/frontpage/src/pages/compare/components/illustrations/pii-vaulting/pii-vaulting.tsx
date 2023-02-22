@@ -46,7 +46,7 @@ const StyledImage = styled(Image)`
     box-shadow: ${theme.elevation[1]};
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
-    mask: linear-gradient(180deg, #fff 50%, transparent 65%);
+    mask: linear-gradient(180deg, #fff 45%, transparent 46%);
     mask-mode: alpha;
     background-size: cover;
     box-shadow: ${theme.elevation[1]};
