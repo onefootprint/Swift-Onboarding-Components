@@ -8,5 +8,7 @@ pub mod onboarding;
 pub mod phone_number;
 pub mod scoped_user;
 pub mod tenant;
+pub mod tenant_role;
+pub mod tenant_user;
 pub mod user_vault;
 pub mod verification_request;

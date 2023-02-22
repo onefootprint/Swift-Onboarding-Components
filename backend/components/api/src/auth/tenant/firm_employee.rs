@@ -156,3 +156,34 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
         AuthActor::FirmEmployee(self.data.tenant_user.id.clone())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::super::CanCheckTenantGuard;
+    use super::{FirmEmployeeAuth, FirmEmployeeSession, ParsedFirmEmployeeAuth};
+    use crate::auth::{session::AuthSessionData, SessionContext};
+    use db::tests::prelude::*;
+    use macros::db_test_case;
+    use newtypes::TenantScope;
+
+    #[db_test_case(false => vec![TenantScope::Read])]
+    #[db_test_case(true => vec![TenantScope::Read, TenantScope::ManualReview])]
+    fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
+        let tenant = db::tests::fixtures::tenant::create(conn);
+        let role = db::tests::fixtures::tenant_role::create_ro(conn, &tenant.id);
+        let tenant_user = db::tests::fixtures::tenant_user::create(conn);
+        let session_data = AuthSessionData::FirmEmployee(FirmEmployeeSession {
+            tenant_user_id: tenant_user.id.clone(),
+            tenant_id: tenant.id.clone(),
+        });
+        let data = FirmEmployeeAuth {
+            tenant,
+            tenant_user,
+            role,
+            is_risk_ops,
+        };
+        let data = ParsedFirmEmployeeAuth(data);
+        let auth = SessionContext::create_fixture(data, session_data);
+        auth.token_scopes()
+    }
+}

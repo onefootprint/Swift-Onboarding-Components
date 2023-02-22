@@ -136,3 +136,32 @@ impl<A> SessionContext<A> {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{MaskedHeaderMap, SessionContext};
+    use crate::{auth::session::AuthSessionData, utils::session::AuthSession};
+    use actix_web::http::header::HeaderMap;
+    use chrono::Utc;
+    use newtypes::SessionAuthToken;
+    use std::marker::PhantomData;
+
+    impl<T> SessionContext<T> {
+        pub(in crate::auth) fn create_fixture(data: T, session_data: AuthSessionData) -> Self {
+            let map = HeaderMap::new();
+            let auth_token = SessionAuthToken::generate();
+            let session = AuthSession {
+                key: auth_token.id(),
+                expires_at: Utc::now(),
+                data: session_data,
+            };
+            Self {
+                data,
+                auth_token,
+                headers: MaskedHeaderMap(map),
+                session,
+                phantom: PhantomData,
+            }
+        }
+    }
+}
