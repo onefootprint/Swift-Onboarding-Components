@@ -41,7 +41,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
     mock_ff_client
-        .expect_bool_flag_by_tenant_id()
+        .expect_bool_flag_with_key()
         .with(eq("IsDemoTenant"), eq(tenant.id.clone()))
         .times(1)
         .return_once(|_, _| Ok(false));
@@ -66,7 +66,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
     mock_ff_client
-        .expect_bool_flag_by_tenant_id()
+        .expect_bool_flag_with_key()
         .with(eq(utils::IS_DEMO_TENANT_FLAG_NAME), eq(tenant.id.clone()))
         .times(1)
         .return_once(|_, _| Ok(true));

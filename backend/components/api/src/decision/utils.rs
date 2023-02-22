@@ -88,7 +88,7 @@ pub fn create_document_verification_request(
 /// Logic to determine if we should send IDV requests for a tenant in production. Separated out for testing
 pub(self) fn is_demo_tenant(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
     let res = feature_flag_client
-        .bool_flag_by_tenant_id(IS_DEMO_TENANT_FLAG_NAME, tenant_id)
+        .bool_flag_with_key(IS_DEMO_TENANT_FLAG_NAME, tenant_id)
         .unwrap_or(false);
 
     // Log this so we can observe if something is amiss
@@ -100,7 +100,7 @@ pub(self) fn is_demo_tenant(feature_flag_client: &impl FeatureFlagClient, tenant
 /// Logic to determine if we should send send billing information to stripe for this tenant
 pub fn should_bill(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
     feature_flag_client
-        .bool_flag_by_tenant_id(SHOULD_BILL, tenant_id)
+        .bool_flag_with_key(SHOULD_BILL, tenant_id)
         .unwrap_or(false)
 }
 
@@ -112,7 +112,7 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
 
 pub fn can_see_socure_results(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
     feature_flag_client
-        .bool_flag_by_tenant_id("TenantCanViewSocureRiskSignal", tenant_id)
+        .bool_flag_with_key("TenantCanViewSocureRiskSignal", tenant_id)
         .unwrap_or(false)
 }
 

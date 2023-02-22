@@ -69,7 +69,7 @@ fn test_final_decision(
     let mut mock_ff_client = MockFeatureFlagClient::new();
     // this is a permanent rule so we never request this flag value
     mock_ff_client
-        .expect_bool_flag_by_rule_set_name()
+        .expect_bool_flag_with_key()
         .with(
             eq("EnableRuleSetForDecision"),
             eq(onboarding_rules::idology_base_rule_set().name),
@@ -77,7 +77,7 @@ fn test_final_decision(
         .never();
 
     mock_ff_client
-        .expect_bool_flag_by_rule_set_name()
+        .expect_bool_flag_with_key()
         .with(
             eq("EnableRuleSetForDecision"),
             eq(onboarding_rules::idology_conservative_rule_set().name),
@@ -85,7 +85,7 @@ fn test_final_decision(
         .times(1)
         .return_once(move |_, _| Ok(should_use_conservative_rules));
     mock_ff_client
-        .expect_bool_flag_by_rule_set_name()
+        .expect_bool_flag_with_key()
         .with(
             eq("EnableRuleSetForDecision"),
             eq(onboarding_rules::temp_watchlist().name),

@@ -151,10 +151,7 @@ pub async fn send_idology_idv_request(
 ) -> Result<VendorResponse, ApiError> {
     if is_production
         || feature_flag_client
-            .bool_flag_by_ob_configuration_key(
-                "EnableIdologyIdvCallsInNonProdEnvironment",
-                &ob_configuration_key,
-            )
+            .bool_flag_with_key("EnableIdologyIdvCallsInNonProdEnvironment", &ob_configuration_key)
             .unwrap_or(false)
     {
         let res = idology_api_call
@@ -255,10 +252,7 @@ pub async fn send_socure_idv_request(
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
     } else if is_production
         || feature_flag_client
-            .bool_flag_by_ob_configuration_key(
-                "EnableSocureIdvCallsInNonProdEnvironment",
-                &ob_configuration_key,
-            )
+            .bool_flag_with_key("EnableSocureIdvCallsInNonProdEnvironment", &ob_configuration_key)
             .unwrap_or(false)
     {
         let res = socure_client
@@ -324,7 +318,7 @@ pub async fn send_scan_onboarding_docv_request(
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
     } else if state.config.service_config.is_production()
         || feature_flag_client
-            .bool_flag_by_ob_configuration_key(
+            .bool_flag_with_key(
                 "EnableScanOnboardingCallsInNonProdEnvironment",
                 &ob_configuration_key,
             )
@@ -539,7 +533,7 @@ mod tests {
         >::new();
 
         mock_ff_client
-            .expect_bool_flag_by_ob_configuration_key()
+            .expect_bool_flag_with_key()
             .with(
                 eq("EnableIdologyIdvCallsInNonProdEnvironment"),
                 eq(ob_configuration_key.clone()),

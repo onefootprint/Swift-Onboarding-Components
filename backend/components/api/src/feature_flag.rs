@@ -3,10 +3,8 @@ use std::sync::Arc;
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder, Detail};
 #[cfg(test)]
 use mockall::{automock, predicate::*};
-use newtypes::{ObConfigurationKey, TenantId, Uuid};
+use newtypes::Uuid;
 use thiserror::Error;
-
-use crate::decision::rule::RuleSetName;
 
 #[derive(Debug, Error)]
 #[allow(clippy::enum_variant_names)]
@@ -27,21 +25,6 @@ pub trait FeatureFlagClient: Sync + Send {
         &self,
         flag_key: &str,
         key: &T,
-    ) -> Result<bool, FeatureFlagError>;
-
-    // TODO replace these calls with bool_flag_with_key
-    fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError>;
-
-    fn bool_flag_by_ob_configuration_key(
-        &self,
-        flag_key: &str,
-        ob_configuration_key: &ObConfigurationKey,
-    ) -> Result<bool, FeatureFlagError>;
-
-    fn bool_flag_by_rule_set_name(
-        &self,
-        flag_key: &str,
-        rule_set_name: &RuleSetName,
     ) -> Result<bool, FeatureFlagError>;
 }
 
@@ -134,30 +117,6 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         key: &T,
     ) -> Result<bool, FeatureFlagError> {
         let context_builder = ContextBuilder::new(key.to_string());
-        self.get_and_log_ld_bool_flag(flag_key, context_builder)
-    }
-
-    #[tracing::instrument(skip(self))]
-    fn bool_flag_by_tenant_id(&self, flag_key: &str, tenant_id: &TenantId) -> Result<bool, FeatureFlagError> {
-        self.bool_flag_with_key(flag_key, tenant_id)
-    }
-
-    #[tracing::instrument(skip(self))]
-    fn bool_flag_by_ob_configuration_key(
-        &self,
-        flag_key: &str,
-        ob_configuration_key: &ObConfigurationKey,
-    ) -> Result<bool, FeatureFlagError> {
-        self.bool_flag_with_key(flag_key, ob_configuration_key)
-    }
-
-    #[tracing::instrument(skip(self))]
-    fn bool_flag_by_rule_set_name(
-        &self,
-        flag_key: &str,
-        rule_set_name: &RuleSetName,
-    ) -> Result<bool, FeatureFlagError> {
-        let context_builder = ContextBuilder::new(rule_set_name.clone().to_string());
         self.get_and_log_ld_bool_flag(flag_key, context_builder)
     }
 }

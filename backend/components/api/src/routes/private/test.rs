@@ -30,7 +30,7 @@ async fn post(
     let feature_flag_client = &state.feature_flag_client;
     let test_flag_value = feature_flag_client.bool_flag("TestFlag")?;
     let test_tenant_flag_value =
-        feature_flag_client.bool_flag_by_tenant_id("TestTenantSpecificFlag", &request.tenant_id)?;
+        feature_flag_client.bool_flag_with_key("TestTenantSpecificFlag", &request.tenant_id)?;
 
     let message = format!("TestFlag: {test_flag_value}, TestTenantSpecificFlag: {test_tenant_flag_value}");
 

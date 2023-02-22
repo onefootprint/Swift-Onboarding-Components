@@ -1,4 +1,5 @@
 use crate::decision::engine;
+use crate::decision::rule::RuleSetName;
 use crate::State;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
@@ -26,11 +27,11 @@ use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 
 use mockall::predicate::*;
-use newtypes::Fingerprinter;
 use newtypes::{
     DecisionStatus, EncryptedVaultPrivateKey, FootprintReasonCode, IdentityDataKind, IdentityDataUpdate,
     PiiString, UserVaultId, VaultPublicKey, Vendor, VendorAPI,
 };
+use newtypes::{Fingerprinter, TenantId};
 use rand::Rng;
 
 use std::collections::HashMap;
@@ -200,16 +201,16 @@ async fn test_run(
         MockVendorAPICall::<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>::new();
 
     mock_ff_client
-        .expect_bool_flag_by_tenant_id()
+        .expect_bool_flag_with_key()
         .times(1)
         .with(eq("TenantCanViewSocureRiskSignal"), always())
-        .return_once(|_, _| Ok(false));
+        .return_once(|_, _: &TenantId| Ok(false));
 
     mock_ff_client
-        .expect_bool_flag_by_rule_set_name()
+        .expect_bool_flag_with_key()
         .times(2)
         .with(eq("EnableRuleSetForDecision"), always())
-        .returning(|_, _| Ok(true));
+        .returning(|_, _: &RuleSetName| Ok(true));
 
     mock_twilio_api_call
         .expect_make_request()

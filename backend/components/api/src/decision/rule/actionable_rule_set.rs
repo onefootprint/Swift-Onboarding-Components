@@ -65,7 +65,7 @@ impl<T: Clone> ActionableRuleSetBuilder<T> {
 
     pub fn build(self, feature_flag_client: &impl FeatureFlagClient) -> ActionableRuleSet<T> {
         let can_action = feature_flag_client
-            .bool_flag_by_rule_set_name(RULE_ENABLE_FLAG, &self.ruleset.name)
+            .bool_flag_with_key(RULE_ENABLE_FLAG, &self.ruleset.name)
             .unwrap_or(false);
 
         ActionableRuleSet {
