@@ -54,37 +54,42 @@ const createIdentifyMachine = ({
             },
           },
         },
-
-        // New bootstrap transitions
-        // [States.initBootstrap]: {
-        //   on: {
-        //     [Events.identifyFailed]: [
-        //       {
-        //         target: States.emailIdentification,
-        //         actions: [Actions.assignEmail, Actions.assignPhone],
-        //         cond: (context, event) => !!event.payload.email,
-        //       },
-        //       {
-        //         target: States.phoneRegistration,
-        //         actions: [Actions.assignEmail, Actions.assignPhone],
-        //         cond: (context, event) => !!event.payload.phoneNumber,
-        //       },
-        //     ],
-        //   },
-        // },
-        // [States.bootstrapChallenge]: {
-        //   on: {
-        //     [Events.challengeSucceeded]: {
-        //       target: States.success,
-        //       actions: [Actions.assignAuthToken],
-        //     },
-        //     [Events.identifyReset]: {
-        //       target: States.emailIdentification,
-        //       actions: [Actions.reset],
-        //     },
-        //   },
-        // },
-
+        // New bootstrap transitions (not used in this machine for now)
+        [States.initBootstrap]: {
+          on: {
+            [Events.bootstrapDataInvalid]: {
+              target: States.emailIdentification,
+              actions: [Actions.reset],
+            },
+            [Events.identifyFailed]: {
+              target: States.emailIdentification,
+              actions: [Actions.assignEmail, Actions.assignPhone],
+            },
+            [Events.identified]: {
+              target: States.bootstrapChallenge,
+              actions: [
+                Actions.assignEmail,
+                Actions.assignPhone,
+                Actions.assignUserFound,
+                Actions.assignSuccessfulIdentifier,
+                Actions.assignAvailableChallengeKinds,
+                Actions.assignHasSyncablePassKey,
+              ],
+            },
+          },
+        },
+        [States.bootstrapChallenge]: {
+          on: {
+            [Events.challengeSucceeded]: {
+              target: States.success,
+              actions: [Actions.assignAuthToken],
+            },
+            [Events.identifyReset]: {
+              target: States.emailIdentification,
+              actions: [Actions.reset],
+            },
+          },
+        },
         // Other transitions
         [States.emailIdentification]: {
           on: {
@@ -238,18 +243,9 @@ const createIdentifyMachine = ({
           return context;
         }),
         [Actions.assignSuccessfulIdentifier]: assign((context, event) => {
-          if (event.type !== Events.identified) {
-            return context;
-          }
-          const { userFound, email, phoneNumber } = event.payload;
-          if (!userFound) {
-            return context;
-          }
-          if (email) {
-            context.identify.successfulIdentifier = { email };
-          }
-          if (phoneNumber) {
-            context.identify.successfulIdentifier = { phoneNumber };
+          if (event.type === Events.identified) {
+            context.identify.successfulIdentifier =
+              event.payload.successfulIdentifier;
           }
           return context;
         }),

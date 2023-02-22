@@ -80,6 +80,7 @@ const EmailIdentificationContent = () => {
       payload: {
         userFound,
         email,
+        successfulIdentifier: { email },
         hasSyncablePassKey,
         availableChallengeKinds,
       },

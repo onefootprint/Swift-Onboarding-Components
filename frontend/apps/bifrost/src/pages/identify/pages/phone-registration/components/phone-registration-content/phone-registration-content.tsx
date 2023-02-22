@@ -102,6 +102,7 @@ const PhoneRegistrationContent = () => {
       payload: {
         phoneNumber,
         userFound,
+        successfulIdentifier: { phoneNumber },
         availableChallengeKinds,
         hasSyncablePassKey,
       },

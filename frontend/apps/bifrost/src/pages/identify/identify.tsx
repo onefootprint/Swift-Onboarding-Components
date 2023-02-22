@@ -7,9 +7,9 @@ import MachineProvider, {
 import { States } from 'src/utils/state-machine/identify';
 
 import BiometricLoginRetry from './pages/biometric-login-retry';
-// import BootstrapChallenge from './pages/bootstrap-challenge';
+import BootstrapChallenge from './pages/bootstrap-challenge';
 import EmailIdentification from './pages/email-identification';
-// import InitBootstrap from './pages/init-bootstrap';
+import InitBootstrap from './pages/init-bootstrap';
 import LegacyProcessBootstrapData from './pages/legacy-process-bootstrap-data';
 import PhoneRegistration from './pages/phone-registration';
 import PhoneVerification from './pages/phone-verification';
@@ -24,12 +24,12 @@ const Identify = () => {
   }
 
   // New bootstrap pages
-  // if (state.matches(States.initBootstrap)) {
-  //   return <InitBootstrap />;
-  // }
-  // if (state.matches(States.bootstrapChallenge)) {
-  //   return <BootstrapChallenge />;
-  // }
+  if (state.matches(States.initBootstrap)) {
+    return <InitBootstrap />;
+  }
+  if (state.matches(States.bootstrapChallenge)) {
+    return <BootstrapChallenge />;
+  }
 
   // Other pages
   if (state.matches(States.emailIdentification)) {

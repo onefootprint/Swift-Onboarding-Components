@@ -47,6 +47,9 @@ export enum Events {
   legacyBootstrapDataProcessed = 'legacyBootstrapDataProcessed',
   legacyBootstrapDataProcessErrored = 'legacyBootstrapDataProcessErrored',
 
+  // New Bootstrap Events
+  bootstrapDataInvalid = 'bootstrapDataInvalid',
+
   // Other Events
   identified = 'identified',
   identifyFailed = 'identifyFailed',
@@ -91,6 +94,10 @@ type BootstrapEvents =
     }
   | {
       type: Events.legacyBootstrapDataProcessErrored;
+    }
+  // New Bootstrap Events
+  | {
+      type: Events.bootstrapDataInvalid;
     };
 
 type IdentifyEvents =
@@ -99,6 +106,7 @@ type IdentifyEvents =
       payload: {
         email?: string;
         phoneNumber?: string;
+        successfulIdentifier?: Identifier;
         userFound: boolean;
         availableChallengeKinds?: ChallengeKind[];
         hasSyncablePassKey?: boolean;

@@ -36,6 +36,7 @@ describe('Identify Machine Tests', () => {
         type: Events.identified,
         payload: {
           email: 'belce@onefootprint.com',
+          successfulIdentifier: { email: 'belce@onefootprint.com' },
           userFound: true,
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: true,
@@ -87,6 +88,7 @@ describe('Identify Machine Tests', () => {
         type: Events.identified,
         payload: {
           phoneNumber: '+16509878899',
+          successfulIdentifier: { phoneNumber: '+16509878899' },
           userFound: true,
           availableChallengeKinds: [ChallengeKind.sms],
           hasSyncablePassKey: false,
@@ -154,6 +156,7 @@ describe('Identify Machine Tests', () => {
         type: Events.identified,
         payload: {
           phoneNumber: '+16509878899',
+          successfulIdentifier: { phoneNumber: '+16509878899' },
           userFound: true,
           availableChallengeKinds: [ChallengeKind.sms],
           hasSyncablePassKey: false,
@@ -324,6 +327,7 @@ describe('Identify Machine Tests', () => {
         type: Events.identified,
         payload: {
           email: 'belce@onefootprint.com',
+          successfulIdentifier: { email: 'belce@onefootprint.com' },
           userFound: true,
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: true,
@@ -368,6 +372,7 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: true,
+          successfulIdentifier: { email: 'belce@onefootprint.com' },
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: false,
         },
@@ -433,6 +438,7 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: true,
+          successfulIdentifier: { email: 'belce@onefootprint.com' },
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: true,
         },
