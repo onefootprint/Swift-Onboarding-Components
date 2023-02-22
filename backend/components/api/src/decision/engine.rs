@@ -81,7 +81,7 @@ pub async fn run(
     );
 
     // Save/action/emit risk signals for the decision
-    make_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, features).await
+    make_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, features, true).await
 }
 
 pub struct VendorRequests {
@@ -207,10 +207,18 @@ pub async fn make_onboarding_decision(
     onboarding_id: &OnboardingId,
     rules_output: OnboardingRulesDecisionOutput,
     features: FeatureVector,
+    assert_is_first_decision_for_onboarding: bool,
 ) -> ApiResult<()> {
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    let onboarding_decision =
-        risk::save_final_decision(onboarding_id.clone(), features, db_pool, ff_client, rules_output).await?;
+    let onboarding_decision = risk::save_final_decision(
+        onboarding_id.clone(),
+        features,
+        db_pool,
+        ff_client,
+        rules_output,
+        assert_is_first_decision_for_onboarding,
+    )
+    .await?;
 
     let status = onboarding_decision.status.to_string();
     if let Ok(metric) =

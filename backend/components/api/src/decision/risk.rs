@@ -23,6 +23,9 @@ use crate::{
 use strum::IntoEnumIterator;
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
+/// assert_is_first_decision_for_onboarding determines if an error should be thrown if the onboarding already has a decision made
+///     we set this true to perform this check during the initial decisioning we make at the end of Bifrost.
+///     we also can make decisions post-Bifrost, when we manually trigger a running of decisioning and in those cases we would set this false
 #[tracing::instrument(skip(features, db_pool, ff_client))]
 pub async fn save_final_decision(
     ob_id: OnboardingId,
@@ -30,6 +33,7 @@ pub async fn save_final_decision(
     db_pool: &DbPool,
     ff_client: &impl FeatureFlagClient,
     decision: OnboardingRulesDecisionOutput,
+    assert_is_first_decision_for_onboarding: bool,
 ) -> ApiResult<OnboardingDecision> {
     // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: Create our risk signals!
@@ -50,7 +54,7 @@ pub async fn save_final_decision(
             let scoped_user = ScopedUser::get(conn, &ob.scoped_user_id)?;
 
             // prevent race conditions from producing 2 decisions
-            if ob.decision_made_at.is_some() {
+            if assert_is_first_decision_for_onboarding && ob.decision_made_at.is_some() {
                 return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
             }
 

@@ -20,8 +20,8 @@ pub struct MakeVendorCallsRequest {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct MakeVendorCallsResponse {
-    request_ids: Vec<VerificationRequestId>,
-    response_ids: Vec<VerificationResultId>,
+    new_vendor_request_ids: Vec<VerificationRequestId>,
+    new_vendor_result_ids: Vec<VerificationResultId>,
     decision_output: DecisionOutput,
 }
 
@@ -102,8 +102,88 @@ async fn make_vendor_calls(
         .unzip();
 
     Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
-        request_ids,
-        response_ids,
+        new_vendor_request_ids: request_ids,
+        new_vendor_result_ids: response_ids,
         decision_output: rules_output.into(),
     })))
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct MakeDecisionRequest {
+    pub tenant_id: TenantId,
+    pub fp_user_id: FootprintUserId,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct MakeDecisionResponse {
+    // ID's of the VerificationResult's used for the decision engine run
+    vendor_result_ids: Vec<VerificationResultId>,
+    // TODO: add OnboardingRulesDecisionOutput here
+}
+
+#[api_v2_operation(
+    description = "Runs decisioning logic on latest completed vendor requests and writes a new onboarding decision",
+    tags(Private)
+)]
+#[post("/private/protected/risk/make_decision")]
+async fn make_decision(
+    state: web::Data<State>,
+    _: ProtectedCustodianAuthContext,
+    request: Json<MakeDecisionRequest>,
+) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
+    let MakeDecisionRequest {
+        tenant_id,
+        fp_user_id,
+    } = request.into_inner();
+
+    let ob = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let uv = UserVault::get(conn, &scoped_user.id)?;
+            let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
+            Ok(ob)
+        })
+        .await?;
+
+    let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
+        &ob.id,
+        &state.db_pool,
+        &state.enclave_client,
+    )
+    .await?;
+
+    if !vendor_requests.outstanding_requests.is_empty() {
+        return Err(ApiError::AssertionError(
+            "Outstanding vendor requests found".to_owned(),
+        ));
+    }
+    if vendor_requests.completed_requests.is_empty() {
+        // Don't think this should ever be possible, but worth asserting
+        return Err(ApiError::AssertionError(
+            "No completed vendor requests found".to_owned(),
+        ));
+    }
+
+    let vendor_result_ids = vendor_requests
+        .completed_requests
+        .as_slice()
+        .iter()
+        .map(|vr| vr.verification_result_id.clone())
+        .collect();
+
+    let (rules_output, features) =
+        decision::engine::calculate_decision(vendor_requests.completed_requests, &state.feature_flag_client)?;
+
+    decision::engine::make_onboarding_decision(
+        &state.db_pool,
+        &state.feature_flag_client,
+        &ob.id,
+        rules_output,
+        features,
+        false,
+    )
+    .await?;
+
+    Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
 }
