@@ -56,10 +56,6 @@ const InitBootstrap = () => {
   };
 
   const processBootstrapData = async () => {
-    if (!bootstrapData) {
-      return;
-    }
-
     const { email, phoneNumber } = validateBootstrapData(bootstrapData);
     if (!email && !phoneNumber) {
       // If we don't have a valid email or phone number, ignore the bootstrap

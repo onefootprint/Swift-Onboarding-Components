@@ -3,9 +3,12 @@ import IsEmail from 'isemail';
 
 import { BootstrapData } from '../../../../utils/state-machine/bifrost/types';
 
-const validateBootstrapData = (bootstrapData: BootstrapData) => {
-  const { email, phoneNumber } = bootstrapData;
+const validateBootstrapData = (bootstrapData?: BootstrapData) => {
+  if (!bootstrapData) {
+    return { email: undefined, phoneNumber: undefined };
+  }
 
+  const { email, phoneNumber } = bootstrapData;
   const isEmailValid = email && IsEmail.validate(email ?? '');
 
   let isPhoneValid = false;
