@@ -1,15 +1,18 @@
 use crate::{email::Email, NtResult};
-use chrono::NaiveDate;
+use chrono::{Datelike, NaiveDate};
 use regex::Regex;
 use std::str::FromStr;
 
 use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
 
-pub(super) fn clean_and_validate_field(idk: IDK, input: PiiString) -> NtResult<PiiString> {
+/// Performs basic cleaning and validation for all data that we store in our vaults.
+/// When `for_bifrost` is true, performs more advanced validation that attempts to proactively
+/// prevent sending invalid data for verification to vendors
+pub(super) fn clean_and_validate_field(idk: IDK, input: PiiString, for_bifrost: bool) -> NtResult<PiiString> {
     let result = match idk {
         IDK::FirstName => input,
         IDK::LastName => input,
-        IDK::Dob => clean_and_validate_dob(input)?,
+        IDK::Dob => clean_and_validate_dob(input, for_bifrost)?,
         IDK::Ssn4 => clean_and_validate_ssn4(input)?,
         IDK::Ssn9 => clean_and_validate_ssn9(input)?,
         IDK::AddressLine1 => input,
@@ -37,12 +40,17 @@ pub enum Error {
     InvalidCountry,
     #[error("Invalid date: must provide a valid date in ISO 8601 format, YYYY-MM-DD")]
     InvalidDate,
+    #[error("The entered date of birth results in an improbable age")]
+    ImprobableDob,
 }
 
 pub(super) type VResult<T> = Result<T, Error>;
 
-fn clean_and_validate_dob(input: PiiString) -> VResult<PiiString> {
+fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     let date = NaiveDate::parse_from_str(input.leak(), "%Y-%m-%d").map_err(|_| Error::InvalidDate)?;
+    if for_bifrost && date.year() < 1900 {
+        return Err(Error::ImprobableDob);
+    }
     Ok(PiiString::new(date.format("%Y-%m-%d").to_string()))
 }
 
@@ -108,4 +116,56 @@ fn clean_and_validate_country(input: PiiString) -> VResult<PiiString> {
         return Err(Error::InvalidCountry);
     }
     Ok(input)
+}
+
+#[cfg(test)]
+mod test {
+    use super::clean_and_validate_field;
+    use super::IDK::*;
+    use crate::IdentityDataKind as IDK;
+    use crate::PiiString;
+    use test_case::test_case;
+
+    #[test_case(FirstName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]
+    #[test_case(LastName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]
+    #[test_case(Dob, "1234" => None)]
+    #[test_case(Dob, "2023-13-25" => None)]
+    #[test_case(Dob, "2023-12-32" => None)]
+    #[test_case(Dob, "1876-12-25" => Some("1876-12-25".to_owned()))]
+    #[test_case(Dob, "2019-02-29" => None)]
+    #[test_case(Dob, "2020-02-29" => Some("2020-02-29".to_owned()))] // leap year
+    #[test_case(Ssn4, "678" => None)]
+    #[test_case(Ssn4, "6789" => Some("6789".to_owned()))]
+    #[test_case(Ssn9, "123-45-678" => None)]
+    #[test_case(Ssn9, "123-45-6789" => Some("123456789".to_owned()))]
+    #[test_case(AddressLine1, "100 Nitro Way@" => Some("100 Nitro Way@".to_owned()))]
+    #[test_case(AddressLine1, "100 Enclave Way" => Some("100 Enclave Way".to_owned()))]
+    #[test_case(AddressLine2, "#1" => Some("#1".to_owned()))]
+    #[test_case(City, "Footprint" => Some("Footprint".to_owned()))]
+    #[test_case(City, "_Footprint1" => Some("_Footprint1".to_owned()))] // We don't care about special chars
+    #[test_case(State, "CA" => Some("CA".to_owned()))]
+    #[test_case(State, "CA1" => Some("CA1".to_owned()))] // We don't care about special chars
+    #[test_case(Zip, "flerp!" => None)]
+    #[test_case(Zip, "12345" => Some("12345".to_owned()))]
+    #[test_case(Country, "BLERP" => None)]
+    #[test_case(Country, "US" => Some("US".to_owned()))]
+    #[test_case(Email, "flerp@derp@" => None)]
+    #[test_case(Email, "flerp@derp.com" => Some("flerp@derp.com".to_owned()))]
+    #[test_case(Email, "flerp@derp.com#sandbox" => Some("flerp@derp.com#sandbox".to_owned()))] // Sandbox email
+    #[test_case(PhoneNumber, "flerp" => None)]
+    #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
+    #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
+    fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
+        clean_and_validate_field(idk, PiiString::new(pii.to_owned()), false)
+            .ok()
+            .map(|pii| pii.leak_to_string())
+    }
+
+    #[test_case(Dob, "1876-12-25" => None)]
+    #[test_case(Dob, "1976-12-25" => Some("1976-12-25".to_owned()))]
+    fn test_clean_and_validate_field_for_bifrost(idk: IDK, pii: &str) -> Option<String> {
+        clean_and_validate_field(idk, PiiString::new(pii.to_owned()), true)
+            .ok()
+            .map(|pii| pii.leak_to_string())
+    }
 }

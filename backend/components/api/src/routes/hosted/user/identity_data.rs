@@ -30,7 +30,7 @@ async fn post_speculative(
     user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
     // TODO filter out email, phone number - data not stored in UvData
-    IdentityDataUpdate::new(request.into_inner().into())?;
+    IdentityDataUpdate::new_for_bifrost(request.into_inner().into())?;
 
     // We've already parsed the request and done validation on the input. Return a successful
     // response before writing anything to the DB
@@ -46,7 +46,7 @@ async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
-    let (update, _) = IdentityDataUpdate::new(request.into_inner().into())?;
+    let (update, _) = IdentityDataUpdate::new_for_bifrost(request.into_inner().into())?;
     let fingerprints = build_fingerprints(&state, update.clone()).await?;
 
     state

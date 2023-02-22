@@ -13,18 +13,30 @@ type IdentityDataRequest = HashMap<IDK, PiiString>;
 pub struct IdentityDataUpdate(IdentityDataRequest);
 
 impl IdentityDataUpdate {
-    /// Composes a new IdentityDataUpdate with cleaned and validated data, and returns any other
-    /// non-identity key-value pairs included in the input DataRequest
-    pub fn new(map: DataRequest) -> NtResult<(Self, DataRequest)> {
+    fn new_inner(map: DataRequest, for_bifrost: bool) -> NtResult<(Self, DataRequest)> {
         let (id_data, other_data): (HashMap<_, _>, HashMap<_, _>) =
             map.into_iter().partition_map(|(k, v)| match k {
                 DataIdentifier::Id(idk) => Left((idk, v)),
                 k => Right((k, v)),
             });
 
-        let clean_id_data = clean_and_validate_id_data(id_data)?;
+        let clean_id_data = clean_and_validate_id_data(id_data, for_bifrost)?;
         let id_update = Self(clean_id_data);
         Ok((id_update, other_data))
+    }
+
+    /// Composes a new IdentityDataUpdate with cleaned and validated data, and returns any other
+    /// non-identity key-value pairs included in the input DataRequest.
+    pub fn new(map: DataRequest) -> NtResult<(Self, DataRequest)> {
+        Self::new_inner(map, false)
+    }
+
+    /// Composes a new IdentityDataUpdate with cleaned and validated data, and returns any other
+    /// non-identity key-value pairs included in the input DataRequest.
+    /// Additionally, performs more advanced validation that attempts to proactively prevent
+    /// sending invalid data for verification to vendors
+    pub fn new_for_bifrost(map: DataRequest) -> NtResult<(Self, DataRequest)> {
+        Self::new_inner(map, true)
     }
 
     pub fn into_inner(self) -> IdentityDataRequest {
@@ -32,7 +44,10 @@ impl IdentityDataUpdate {
     }
 }
 
-fn clean_and_validate_id_data(id_data: IdentityDataRequest) -> NtResult<IdentityDataRequest> {
+fn clean_and_validate_id_data(
+    id_data: IdentityDataRequest,
+    for_bifrost: bool,
+) -> NtResult<IdentityDataRequest> {
     // Custom case to always populate ssn4 if we have ssn9.
     // TODO clean this up
     let mut id_data = id_data;
@@ -56,7 +71,7 @@ fn clean_and_validate_id_data(id_data: IdentityDataRequest) -> NtResult<Identity
     let (cleaned_id_data, errors): (HashMap<_, _>, HashMap<_, _>) =
         id_data
             .into_iter()
-            .partition_map(|(k, v)| match clean_and_validate_field(k, v) {
+            .partition_map(|(k, v)| match clean_and_validate_field(k, v, for_bifrost) {
                 Ok(v) => Left((k, v)),
                 Err(v) => Right((k, v)),
             });
@@ -80,10 +95,9 @@ fn extra_id_kinds(id_kinds: Vec<IDK>) -> Vec<IDK> {
 
 #[cfg(test)]
 mod test {
+    use super::extra_id_kinds;
     use super::IDK::*;
-    use super::{clean_and_validate_field, extra_id_kinds};
     use crate::IdentityDataKind as IDK;
-    use crate::PiiString;
     use itertools::Itertools;
     use std::collections::HashSet;
     use test_case::test_case;
@@ -103,40 +117,5 @@ mod test {
         let extra: HashSet<_> = extra_id_kinds(idks.to_vec()).into_iter().collect();
         let expected: HashSet<_> = expected_extra.iter().cloned().collect();
         assert!(extra.symmetric_difference(&expected).collect_vec().is_empty())
-    }
-
-    #[test_case(FirstName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]
-    #[test_case(LastName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]
-    #[test_case(Dob, "1234" => None)]
-    #[test_case(Dob, "2023-13-25" => None)]
-    #[test_case(Dob, "2023-12-32" => None)]
-    #[test_case(Dob, "2023-12-25" => Some("2023-12-25".to_owned()))]
-    #[test_case(Dob, "2019-02-29" => None)]
-    #[test_case(Dob, "2020-02-29" => Some("2020-02-29".to_owned()))] // leap year
-    #[test_case(Ssn4, "678" => None)]
-    #[test_case(Ssn4, "6789" => Some("6789".to_owned()))]
-    #[test_case(Ssn9, "123-45-678" => None)]
-    #[test_case(Ssn9, "123-45-6789" => Some("123456789".to_owned()))]
-    #[test_case(AddressLine1, "100 Nitro Way@" => Some("100 Nitro Way@".to_owned()))]
-    #[test_case(AddressLine1, "100 Enclave Way" => Some("100 Enclave Way".to_owned()))]
-    #[test_case(AddressLine2, "#1" => Some("#1".to_owned()))]
-    #[test_case(City, "Footprint" => Some("Footprint".to_owned()))]
-    #[test_case(City, "_Footprint1" => Some("_Footprint1".to_owned()))] // We don't care about special chars
-    #[test_case(State, "CA" => Some("CA".to_owned()))]
-    #[test_case(State, "CA1" => Some("CA1".to_owned()))] // We don't care about special chars
-    #[test_case(Zip, "flerp!" => None)]
-    #[test_case(Zip, "12345" => Some("12345".to_owned()))]
-    #[test_case(Country, "BLERP" => None)]
-    #[test_case(Country, "US" => Some("US".to_owned()))]
-    #[test_case(Email, "flerp@derp@" => None)]
-    #[test_case(Email, "flerp@derp.com" => Some("flerp@derp.com".to_owned()))]
-    #[test_case(Email, "flerp@derp.com#sandbox" => Some("flerp@derp.com#sandbox".to_owned()))] // Sandbox email
-    #[test_case(PhoneNumber, "flerp" => None)]
-    #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
-    #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
-    fn test_clean_and_validate_field(idk: IDK, pii: &str) -> Option<String> {
-        clean_and_validate_field(idk, PiiString::new(pii.to_owned()))
-            .ok()
-            .map(|pii| pii.leak_to_string())
     }
 }
