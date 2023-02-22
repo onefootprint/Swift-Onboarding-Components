@@ -9,6 +9,7 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
     ) -> Self {
         let Onboarding { start_timestamp, .. } = onboarding;
         let status = latest_decision.as_ref().and_then(|d| d.0.visible_status());
+        let can_decrypt_scopes = config.can_decrypt_scopes();
         let db::models::ob_configuration::ObConfiguration {
             name,
             can_access_data,
@@ -28,6 +29,7 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
                 .map(|s| matches!(s.liveness_source, LivenessSource::Skipped))
                 .unwrap_or_default(),
             insight_event: api_wire_types::InsightEvent::from_db(insight),
+            can_access_permissions: can_decrypt_scopes,
             can_access_data,
             can_access_data_attributes,
             can_access_identity_document_images,
