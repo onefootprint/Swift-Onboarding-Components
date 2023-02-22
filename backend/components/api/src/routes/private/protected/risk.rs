@@ -38,7 +38,7 @@ async fn make_vendor_calls(
         fp_user_id,
     } = request.into_inner();
 
-    let onboarding = state
+    let requests = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
@@ -47,17 +47,17 @@ async fn make_vendor_calls(
 
             let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
 
-            vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
+            let requests = vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
 
-            Ok(ob)
+            Ok(requests)
         })
         .await?;
 
-    let vendor_results = decision::engine::make_outstanding_vendor_requests(
-        &onboarding.id,
+    let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
         &state.enclave_client,
         state.config.service_config.is_production(),
+        requests,
         &state.feature_flag_client,
         &state.idology_client,
         &state.socure_production_client,

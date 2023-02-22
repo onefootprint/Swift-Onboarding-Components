@@ -46,17 +46,26 @@ pub async fn run(
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
 ) -> ApiResult<()> {
-    let all_vendor_results = make_outstanding_vendor_requests(
-        &ob.id,
+    let vendor_requests =
+        get_latest_verification_requests_and_results(&ob.id, db_pool, enclave_client).await?;
+
+    let completed_outstanding_vendor_requests = make_vendor_requests(
         db_pool,
         enclave_client,
         is_production,
+        vendor_requests.outstanding_requests,
         ff_client,
         idology_client,
         socure_client,
         twilio_client,
     )
     .await?;
+
+    let all_vendor_results = vendor_requests
+        .completed_requests
+        .into_iter()
+        .chain(completed_outstanding_vendor_requests.into_iter())
+        .collect();
 
     // Calculate output from rules + features
     let (rules_output, features) = calculate_decision(all_vendor_results, ff_client, &ob.id)?;
@@ -65,21 +74,16 @@ pub async fn run(
     make_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, features).await
 }
 
-#[allow(clippy::too_many_arguments)]
-pub async fn make_outstanding_vendor_requests(
+pub struct VendorRequests {
+    pub completed_requests: Vec<VendorResult>,
+    pub outstanding_requests: Vec<VerificationRequest>, // requests that we do not yet have results for
+}
+
+pub async fn get_latest_verification_requests_and_results(
     onboarding_id: &OnboardingId,
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
-    is_production: bool,
-    ff_client: &impl FeatureFlagClient,
-    idology_client: &impl VendorAPICall<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >,
-    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> ApiResult<Vec<VendorResult>> {
+) -> ApiResult<VendorRequests> {
     let obid = onboarding_id.clone();
     let requests_and_results = db_pool
         .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
@@ -100,7 +104,6 @@ pub async fn make_outstanding_vendor_requests(
         &uv.e_private_key,
     )
     .await?;
-
     let requests: Vec<VerificationRequest> = requests_and_results
         .into_iter()
         .filter_map(|(request, result)| {
@@ -113,6 +116,27 @@ pub async fn make_outstanding_vendor_requests(
         })
         .collect();
 
+    Ok(VendorRequests {
+        completed_requests: previous_results,
+        outstanding_requests: requests,
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+pub async fn make_vendor_requests(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    is_production: bool,
+    requests: Vec<VerificationRequest>,
+    ff_client: &impl FeatureFlagClient,
+    idology_client: &impl VendorAPICall<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >,
+    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+) -> ApiResult<Vec<VendorResult>> {
     // Make requests
     let raw_results = vendor::make_request::make_vendor_requests(
         requests,
@@ -149,9 +173,7 @@ pub async fn make_outstanding_vendor_requests(
         .into_iter()
         // We return early above if any fail, so this should not drop any results
         .filter_map(|r| r.ok())
-        .chain(previous_results.into_iter())
         .collect();
-
     Ok(results)
 }
 
