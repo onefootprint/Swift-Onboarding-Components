@@ -1,6 +1,7 @@
 import { IdDocInfo } from './id-doc-info';
 import { Onboarding } from './onboarding';
 import UserDataAttribute from './user-data-attribute';
+import UserStatus from './user-status';
 
 // TODO: Deprecate UserDataAttribute
 // https://linear.app/footprint/issue/FP-2909/add-new-format-for-attributes-in-onboarding
@@ -34,4 +35,14 @@ export type ScopedUser = {
   orderingId: number;
   identityDataAttributes: UserDataAttribute[];
   identityDocumentInfo: IdDocInfo[];
+};
+
+export const statusForScopedUser = (su: ScopedUser) => {
+  if (!su.isPortable) {
+    return UserStatus.vaultOnly;
+  }
+  // TODO can be incomplete with a decision for the onboarding!
+  return (
+    (su.onboarding?.status as UserStatus | undefined) || UserStatus.incomplete
+  );
 };

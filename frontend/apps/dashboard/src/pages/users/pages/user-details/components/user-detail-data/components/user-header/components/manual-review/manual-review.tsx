@@ -1,4 +1,4 @@
-import { OnboardingStatus, ReviewStatus } from '@onefootprint/types';
+import { ReviewStatus, UserStatus } from '@onefootprint/types';
 import React, { useState } from 'react';
 import useRefetchUser from 'src/pages/users/pages/user-details/hooks/use-refetch-user';
 import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
@@ -14,7 +14,7 @@ const ManualReview = () => {
   const refetchUser = useRefetchUser(userId);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
-  const shouldRender = data && data.status !== OnboardingStatus.vaultOnly;
+  const shouldRender = data && data.status !== UserStatus.vaultOnly;
 
   const handleOpenDialog = (dialogStatus: ReviewStatus) => {
     setReviewStatus(dialogStatus);

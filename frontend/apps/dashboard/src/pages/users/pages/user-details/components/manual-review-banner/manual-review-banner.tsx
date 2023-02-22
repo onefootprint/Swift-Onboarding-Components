@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OnboardingStatus } from '@onefootprint/types';
+import { UserStatus } from '@onefootprint/types';
 import { InlineAlert, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 
 type ManualReviewBannerProps = {
-  status: OnboardingStatus;
+  status: UserStatus;
   onClickAuditTrailLink?: () => void;
 };
 
@@ -15,15 +15,13 @@ const ManualReviewBanner = ({
   const { t } = useTranslation(
     'components.private-layout.manual-review-banner',
   );
-  if (status === OnboardingStatus.vaultOnly) {
+  if (status === UserStatus.vaultOnly) {
     return null;
   }
 
   return (
-    <InlineAlert
-      variant={status === OnboardingStatus.failed ? 'error' : 'warning'}
-    >
-      {status === OnboardingStatus.failed
+    <InlineAlert variant={status === UserStatus.failed ? 'error' : 'warning'}>
+      {status === UserStatus.failed
         ? t('failed-needs-review')
         : t('verified-needs-review')}
       {onClickAuditTrailLink && (

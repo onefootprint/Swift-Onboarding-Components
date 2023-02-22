@@ -41,5 +41,6 @@ export { default as SignalAttribute } from './signal-attribute';
 export * from './timeline';
 export * from './user-data';
 export { default as UserDataAttribute } from './user-data-attribute';
+export { default as UserStatus } from './user-status';
 export { default as Vendor } from './vendor';
 export { default as VerificationStatus } from './verification-status';

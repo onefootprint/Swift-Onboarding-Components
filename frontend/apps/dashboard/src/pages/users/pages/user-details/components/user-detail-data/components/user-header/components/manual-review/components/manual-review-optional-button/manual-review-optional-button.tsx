@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OnboardingStatus, ReviewStatus } from '@onefootprint/types';
+import { ReviewStatus, UserStatus } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 
 type ManualReviewOptionalButtonProps = {
-  status: OnboardingStatus;
+  status: UserStatus;
   onOpenDialog: (reviewStatus: ReviewStatus) => void;
 };
 
@@ -14,7 +14,7 @@ const ManualReviewOptionalButton = ({
 }: ManualReviewOptionalButtonProps) => {
   const { t } = useTranslation('pages.user-details.manual-review');
   const reviewStatus =
-    status === OnboardingStatus.failed ? ReviewStatus.pass : ReviewStatus.fail;
+    status === UserStatus.failed ? ReviewStatus.pass : ReviewStatus.fail;
 
   const handleClick = () => {
     onOpenDialog(reviewStatus);

@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OnboardingStatus, ReviewStatus } from '@onefootprint/types';
+import { ReviewStatus, UserStatus } from '@onefootprint/types';
 import { Button, Dropdown } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 type ManualReviewRequiredButtonProps = {
-  status: OnboardingStatus;
+  status: UserStatus;
   onOpenDialog: (reviewStatus: ReviewStatus) => void;
 };
 
@@ -30,7 +30,7 @@ const ManualReviewRequiredButton = ({
             }}
           >
             <div>
-              {status === OnboardingStatus.verified
+              {status === UserStatus.verified
                 ? t('dropdown.keep-as', { status: pass })
                 : t('dropdown.mark-as', { status: pass })}
             </div>
@@ -41,7 +41,7 @@ const ManualReviewRequiredButton = ({
             }}
           >
             <div>
-              {status === OnboardingStatus.failed
+              {status === UserStatus.failed
                 ? t('dropdown.keep-as', { status: fail })
                 : t('dropdown.mark-as', { status: fail })}
             </div>

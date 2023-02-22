@@ -5,7 +5,7 @@ import React from 'react';
 import { USER_HEADER_ACTIONS_ID } from 'src/pages/users/pages/user-details/constants';
 import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
-import getOnboardingStatusBadgeVariant from 'src/pages/users/utils/get-onboarding-status-badge-variant';
+import getUserStatusBadgeVariant from 'src/pages/users/utils/get-user-status-badge-variant';
 import styled, { css } from 'styled-components';
 
 import { State } from '../../../../utils/decrypt-state-machine';
@@ -22,7 +22,7 @@ const UserHeader = () => {
     return null;
   }
 
-  const badgeVariant = getOnboardingStatusBadgeVariant(
+  const badgeVariant = getUserStatusBadgeVariant(
     data.status,
     data.requiresManualReview,
   );

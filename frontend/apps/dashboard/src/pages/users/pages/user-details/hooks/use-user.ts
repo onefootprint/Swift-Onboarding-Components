@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { OnboardingStatus, ScopedUser } from '@onefootprint/types';
+import { ScopedUser, statusForScopedUser } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
@@ -15,7 +15,7 @@ const getUserRequest = async (authHeaders: AuthHeaders, userId: string) => {
   return {
     ...data,
     requiresManualReview: data.onboarding?.requiresManualReview || false,
-    status: data.onboarding?.status || OnboardingStatus.vaultOnly,
+    status: statusForScopedUser(data),
   };
 };
 

@@ -1,14 +1,14 @@
 import {
   DecryptedIdDoc,
   IdDocType,
-  OnboardingStatus,
   ScopedUser,
   UserDataAttribute,
+  UserStatus,
 } from '@onefootprint/types';
 
 export type User = ScopedUser & {
   requiresManualReview: boolean;
-  status: OnboardingStatus;
+  status: UserStatus;
 };
 
 export type UserVaultData = {

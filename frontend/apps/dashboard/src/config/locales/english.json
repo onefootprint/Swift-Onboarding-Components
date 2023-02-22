@@ -310,7 +310,8 @@
         "status": {
           "pass": "Verified",
           "fail": "Failed",
-          "vault-only": "Vault"
+          "vault-only": "Vault",
+          "incomplete": "Incomplete"
         }
       },
       "user-info": {

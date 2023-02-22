@@ -1,7 +1,7 @@
 import request, { PaginatedRequestResponse } from '@onefootprint/request';
 import {
-  OnboardingStatus,
   ScopedUser,
+  statusForScopedUser,
   UsersRequest,
   UsersResponse,
 } from '@onefootprint/types';
@@ -42,7 +42,7 @@ const useUsers = () => {
           ...metadata,
           requiresManualReview:
             metadata.onboarding?.requiresManualReview || false,
-          status: metadata.onboarding?.status || OnboardingStatus.vaultOnly,
+          status: statusForScopedUser(metadata),
         })),
       }),
     },

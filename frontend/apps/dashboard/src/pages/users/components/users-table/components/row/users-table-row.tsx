@@ -7,7 +7,7 @@ import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder'
 import useUserVault from 'src/pages/users/pages/user-details/hooks/use-user-vault';
 import { User } from 'src/pages/users/users.types';
 import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
-import getOnboardingStatusBadgeVariant from 'src/pages/users/utils/get-onboarding-status-badge-variant';
+import getUserStatusBadgeVariant from 'src/pages/users/utils/get-user-status-badge-variant';
 
 type RowProps = {
   user: User;
@@ -16,7 +16,7 @@ type RowProps = {
 const Row = ({ user }: RowProps) => {
   const { allT } = useTranslation('pages.users');
   const { data: vaultData } = useUserVault(user.id, user);
-  const badgeVariant = getOnboardingStatusBadgeVariant(
+  const badgeVariant = getUserStatusBadgeVariant(
     user.status,
     user.requiresManualReview,
   );
