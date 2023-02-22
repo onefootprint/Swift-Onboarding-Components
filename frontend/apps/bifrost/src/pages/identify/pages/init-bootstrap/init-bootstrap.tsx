@@ -1,5 +1,4 @@
 import { useIdentify } from '@onefootprint/footprint-elements';
-import { ChallengeKind, Identifier } from '@onefootprint/types';
 import React from 'react';
 import InitShimmer from 'src/components/init-shimmer';
 import validateBootstrapData from 'src/pages/identify/utils/validate-bootstrap-data';
@@ -13,45 +12,49 @@ const InitBootstrap = () => {
   const identifyMutation = useIdentify();
 
   const identify = async (email?: string, phoneNumber?: string) => {
-    let emailIdentify;
-    let phoneIdentify;
-
+    // If both email and phone identified successfully, we will give preference to phone
     try {
-      if (email) {
-        emailIdentify = await identifyMutation.mutateAsync({
-          identifier: { email },
-        });
-      }
       if (phoneNumber) {
-        phoneIdentify = await identifyMutation.mutateAsync({
+        const phoneIdentify = await identifyMutation.mutateAsync({
           identifier: { phoneNumber },
         });
+
+        if (phoneIdentify.userFound) {
+          return {
+            userFound: true,
+            successfulIdentifier: { phoneNumber },
+            hasSyncablePassKey: !!phoneIdentify.hasSyncablePassKey,
+            availableChallengeKinds: phoneIdentify.availableChallengeKinds,
+          };
+        }
       }
     } catch (e) {
       console.error(e);
     }
 
-    //
-    // If both email and phone identified successfully, we will give preference to phone
-    let successfulIdentifier: Identifier | undefined;
-    let hasSyncablePassKey = false;
-    let availableChallengeKinds: ChallengeKind[] | undefined = [];
-    if (emailIdentify?.userFound && email) {
-      successfulIdentifier = { email };
-      hasSyncablePassKey = !!emailIdentify.hasSyncablePassKey;
-      availableChallengeKinds = emailIdentify.availableChallengeKinds;
-    }
-    if (phoneIdentify?.userFound && phoneNumber) {
-      successfulIdentifier = { phoneNumber };
-      hasSyncablePassKey = !!phoneIdentify.hasSyncablePassKey;
-      availableChallengeKinds = phoneIdentify.availableChallengeKinds;
+    try {
+      if (email) {
+        const emailIdentify = await identifyMutation.mutateAsync({
+          identifier: { email },
+        });
+
+        if (emailIdentify.userFound) {
+          return {
+            userFound: true,
+            successfulIdentifier: { email },
+            hasSyncablePassKey: !!emailIdentify.hasSyncablePassKey,
+            availableChallengeKinds: emailIdentify.availableChallengeKinds,
+          };
+        }
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     return {
-      successfulIdentifier,
-      userFound: !!emailIdentify?.userFound || !!phoneIdentify?.userFound,
-      availableChallengeKinds,
-      hasSyncablePassKey,
+      email,
+      phoneNumber,
+      userFound: false,
     };
   };
 
