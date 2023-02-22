@@ -1,8 +1,8 @@
 use crate::decision::utils;
+use crate::feature_flag::FeatureFlag;
 use crate::{feature_flag::MockFeatureFlagClient, tests::fixtures};
 use db::tests::prelude::*;
 use macros::db_test;
-use mockall::predicate::*;
 use newtypes::{DecisionStatus, OnboardingId, PhoneNumber};
 use std::str::FromStr;
 use test_case::test_case;
@@ -40,11 +40,12 @@ fn test_handle_setup(conn: &mut TestPgConn) {
 
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
+    let tenant_id = tenant.id.clone();
     mock_ff_client
-        .expect_bool_flag_with_key()
-        .with(eq("IsDemoTenant"), eq(tenant.id.clone()))
+        .expect_flag()
+        .withf(move |f| *f == FeatureFlag::IsDemoTenant(&tenant_id))
         .times(1)
-        .return_once(|_, _| Ok(false));
+        .return_once(|_| false);
 
     let res = tokio_test::block_on(async {
         utils::should_initiate_prod_and_setup(state, ob.id, uvw, tenant.id, &mock_ff_client, false).await
@@ -65,11 +66,12 @@ fn test_handle_setup(conn: &mut TestPgConn) {
 
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
+    let tenant_id = tenant.id.clone();
     mock_ff_client
-        .expect_bool_flag_with_key()
-        .with(eq(utils::IS_DEMO_TENANT_FLAG_NAME), eq(tenant.id.clone()))
+        .expect_flag()
+        .withf(move |f| *f == FeatureFlag::IsDemoTenant(&tenant_id))
         .times(1)
-        .return_once(|_, _| Ok(true));
+        .return_once(|_| true);
 
     let res = tokio_test::block_on(async {
         utils::should_initiate_prod_and_setup(state, ob.id, uvw, tenant.id, &mock_ff_client, false).await

@@ -4,7 +4,6 @@ mod assume;
 mod cleanup;
 mod invoice;
 mod protected;
-mod test;
 mod test_tenant;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -12,8 +11,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(cleanup::post)
         .service(assume::post)
         .service(test_tenant::post)
-        .service(invoice::post)
-        .service(test::post);
+        .service(invoice::post);
 
     protected::routes(config);
 }

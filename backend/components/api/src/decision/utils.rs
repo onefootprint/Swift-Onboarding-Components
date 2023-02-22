@@ -16,15 +16,12 @@ use newtypes::{
 };
 
 use super::vendor;
-use crate::feature_flag::FeatureFlagClient;
+use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
-
-pub const IS_DEMO_TENANT_FLAG_NAME: &str = "IsDemoTenant";
-pub const SHOULD_BILL: &str = "EnableBilling";
 
 type ShouldInitiateVerificationRequests = bool;
 
@@ -85,35 +82,10 @@ pub fn create_document_verification_request(
     .map_err(ApiError::from)
 }
 
-/// Logic to determine if we should send IDV requests for a tenant in production. Separated out for testing
-pub(self) fn is_demo_tenant(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
-    let res = feature_flag_client
-        .bool_flag_with_key(IS_DEMO_TENANT_FLAG_NAME, tenant_id)
-        .unwrap_or(false);
-
-    // Log this so we can observe if something is amiss
-    tracing::info!(tenant_id=%tenant_id, is_demo=%res, "is demo tenant");
-
-    res
-}
-
-/// Logic to determine if we should send send billing information to stripe for this tenant
-pub fn should_bill(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
-    feature_flag_client
-        .bool_flag_with_key(SHOULD_BILL, tenant_id)
-        .unwrap_or(false)
-}
-
 // If socure fails, we shouldn't fail the DE run
 pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &VendorAPI) -> bool {
     // Socure plus isn't used by anyone except Footprint (at this time)
     !matches!(vendor_api, VendorAPI::SocureIDPlus)
-}
-
-pub fn can_see_socure_results(feature_flag_client: &impl FeatureFlagClient, tenant_id: &TenantId) -> bool {
-    feature_flag_client
-        .bool_flag_with_key("TenantCanViewSocureRiskSignal", tenant_id)
-        .unwrap_or(false)
 }
 
 #[tracing::instrument(skip_all)]
@@ -150,10 +122,10 @@ pub async fn should_initiate_prod_and_setup(
     ob_id: OnboardingId,
     uvw: UserVaultWrapper,
     tenant_id: TenantId,
-    feature_flag_client: &impl FeatureFlagClient,
+    ff_client: &impl FeatureFlagClient,
     should_setup_test_fixtures: bool,
 ) -> ApiResult<bool> {
-    if is_demo_tenant(feature_flag_client, &tenant_id) {
+    if ff_client.flag(FeatureFlag::IsDemoTenant(&tenant_id)) {
         if should_setup_test_fixtures {
             setup_test_fixtures(state, ob_id, false, DecisionStatus::Pass, uvw).await?;
         }

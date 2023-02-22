@@ -4,6 +4,8 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 
+use crate::feature_flag::FeatureFlag;
+use crate::feature_flag::FeatureFlagClient;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 
@@ -31,8 +33,9 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();
     // Not all tenants should see socure related risk signals
-    let tenant_can_view_socure_risk_signal =
-        crate::decision::utils::can_see_socure_results(&state.feature_flag_client, &tenant_id);
+    let tenant_can_view_socure_risk_signal = state
+        .feature_flag_client
+        .flag(FeatureFlag::CanViewSocureRiskSignals(&tenant_id));
 
     let events = state
         .db_pool

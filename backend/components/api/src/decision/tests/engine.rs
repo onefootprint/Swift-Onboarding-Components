@@ -1,15 +1,15 @@
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
+use crate::feature_flag::FeatureFlag;
 use crate::State;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
     feature_flag::MockFeatureFlagClient,
     utils::{mock_enclave::StateWithMockEnclave, user_vault_wrapper::UserVaultWrapper},
 };
-
 use db::models::ob_configuration::ObConfiguration;
+use db::models::tenant::Tenant;
 use db::models::user_vault::UserVault;
-
 use db::DbPool;
 use db::{
     models::{
@@ -20,20 +20,15 @@ use db::{
     tests::fixtures,
     DbError, TxnPgConn,
 };
-
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
-
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
-
-use mockall::predicate::*;
+use newtypes::Fingerprinter;
 use newtypes::{
     DecisionStatus, EncryptedVaultPrivateKey, FootprintReasonCode, IdentityDataKind, IdentityDataUpdate,
     PiiString, UserVaultId, VaultPublicKey, Vendor, VendorAPI,
 };
-use newtypes::{Fingerprinter, TenantId};
 use rand::Rng;
-
 use std::collections::HashMap;
 use test_case::test_case;
 
@@ -107,7 +102,7 @@ async fn create_user_and_onboarding(
     state: &State,
     db_pool: &DbPool,
     phone_number: &String,
-) -> (Onboarding, UserVaultId) {
+) -> (Tenant, Onboarding, UserVaultId) {
     let keys_and_phone = get_keys_and_new_phone_args(state, phone_number).await;
 
     db_pool
@@ -130,7 +125,7 @@ async fn create_user_and_onboarding(
                 ],
             );
 
-            Ok((onboarding, uv.id))
+            Ok((tenant, onboarding, uv.id))
         })
         .await
         .unwrap()
@@ -182,7 +177,7 @@ async fn test_run(
     let state = &StateWithMockEnclave::init().await.state;
     let phone_number = random_phone_number();
 
-    let (onboarding, uvid) = create_user_and_onboarding(state, &db_pool, &phone_number).await;
+    let (tenant, onboarding, uvid) = create_user_and_onboarding(state, &db_pool, &phone_number).await;
 
     //
     // Mocking
@@ -201,16 +196,22 @@ async fn test_run(
         MockVendorAPICall::<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>::new();
 
     mock_ff_client
-        .expect_bool_flag_with_key()
+        .expect_flag()
         .times(1)
-        .with(eq("TenantCanViewSocureRiskSignal"), always())
-        .return_once(|_, _: &TenantId| Ok(false));
+        .withf(move |f| *f == FeatureFlag::CanViewSocureRiskSignals(&tenant.id))
+        .return_once(|_| false);
 
     mock_ff_client
-        .expect_bool_flag_with_key()
-        .times(2)
-        .with(eq("EnableRuleSetForDecision"), always())
-        .returning(|_, _: &RuleSetName| Ok(true));
+        .expect_flag()
+        .times(1)
+        .withf(|f| *f == FeatureFlag::EnableRuleSetForDecision(&RuleSetName::IdologyConservativeFailingRules))
+        .returning(|_| true);
+
+    mock_ff_client
+        .expect_flag()
+        .times(1)
+        .withf(|f| *f == FeatureFlag::EnableRuleSetForDecision(&RuleSetName::TempWatchlist))
+        .returning(|_| true);
 
     mock_twilio_api_call
         .expect_make_request()
@@ -228,10 +229,10 @@ async fn test_run(
         });
 
     mock_ff_client
-        .expect_bool_flag()
+        .expect_flag()
         .times(1)
-        .with(eq("DisableAllSocureIdvCalls"))
-        .return_once(move |_| Ok(matches!(socure_enabled, SocureEnabled::No)));
+        .withf(|f| *f == FeatureFlag::DisableAllSocure)
+        .return_once(move |_| matches!(socure_enabled, SocureEnabled::No));
 
     if matches!(socure_enabled, SocureEnabled::Yes) {
         mock_socure_api_call

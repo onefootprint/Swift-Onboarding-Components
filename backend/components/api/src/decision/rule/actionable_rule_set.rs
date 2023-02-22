@@ -1,11 +1,10 @@
-use crate::feature_flag::FeatureFlagClient;
+use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 
 use super::{
     rule_set::{EvaluateRuleSet, EvaluatedRuleSet, RuleSet, RuleSetResult},
     RuleName, RuleSetName,
 };
 
-const RULE_ENABLE_FLAG: &str = "EnableRuleSetForDecision";
 /// An actionable rule set is a ruleset that we need to check if we can action on
 /// This allows for us to slow rollout some rule sets behind feature flags, or have them only
 /// apply in certain situations (e.g. in the future, can_action can be driven by TenantId or some other attribute)
@@ -64,9 +63,7 @@ impl<T: Clone> ActionableRuleSetBuilder<T> {
     }
 
     pub fn build(self, feature_flag_client: &impl FeatureFlagClient) -> ActionableRuleSet<T> {
-        let can_action = feature_flag_client
-            .bool_flag_with_key(RULE_ENABLE_FLAG, &self.ruleset.name)
-            .unwrap_or(false);
+        let can_action = feature_flag_client.flag(FeatureFlag::EnableRuleSetForDecision(&self.ruleset.name));
 
         ActionableRuleSet {
             ruleset: self.ruleset,

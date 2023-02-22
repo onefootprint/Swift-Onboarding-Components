@@ -5,7 +5,7 @@ use crate::{
         AuthError, SessionContext,
     },
     errors::ApiResult,
-    feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient},
+    feature_flag::{FeatureFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient},
 };
 use db::{
     models::{
@@ -86,9 +86,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         // permissions for other tenants
         let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
 
-        let is_risk_ops = ff_client
-            .bool_flag_with_key(LaunchDarklyFeatureFlagClient::IS_RISK_OPS, &tenant_user.email)
-            .unwrap_or(false);
+        let is_risk_ops = ff_client.flag(FeatureFlag::IsRiskOps(&tenant_user.email));
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
         Ok(Self(FirmEmployeeAuth {

@@ -3,7 +3,7 @@ use std::str::FromStr;
 use newtypes::{DecisionStatus, FootprintReasonCode, OnboardingId};
 use test_case::test_case;
 
-use crate::decision::risk::evaluate_onboarding_rules;
+use crate::{decision::risk::evaluate_onboarding_rules, feature_flag::FeatureFlag};
 fn ob_id(id: &str) -> OnboardingId {
     OnboardingId::from_str(id).unwrap()
 }
@@ -47,7 +47,6 @@ fn test_final_decision(
         },
         feature_flag::MockFeatureFlagClient,
     };
-    use mockall::predicate::*;
     use newtypes::VerificationResultId;
 
     // Set up a feature vector
@@ -69,29 +68,26 @@ fn test_final_decision(
     let mut mock_ff_client = MockFeatureFlagClient::new();
     // this is a permanent rule so we never request this flag value
     mock_ff_client
-        .expect_bool_flag_with_key()
-        .with(
-            eq("EnableRuleSetForDecision"),
-            eq(onboarding_rules::idology_base_rule_set().name),
-        )
+        .expect_flag()
+        .withf(|f| {
+            *f == FeatureFlag::EnableRuleSetForDecision(&onboarding_rules::idology_base_rule_set().name)
+        })
         .never();
 
     mock_ff_client
-        .expect_bool_flag_with_key()
-        .with(
-            eq("EnableRuleSetForDecision"),
-            eq(onboarding_rules::idology_conservative_rule_set().name),
-        )
+        .expect_flag()
+        .withf(|f| {
+            *f == FeatureFlag::EnableRuleSetForDecision(
+                &onboarding_rules::idology_conservative_rule_set().name,
+            )
+        })
         .times(1)
-        .return_once(move |_, _| Ok(should_use_conservative_rules));
+        .return_once(move |_| should_use_conservative_rules);
     mock_ff_client
-        .expect_bool_flag_with_key()
-        .with(
-            eq("EnableRuleSetForDecision"),
-            eq(onboarding_rules::temp_watchlist().name),
-        )
+        .expect_flag()
+        .withf(|f| *f == FeatureFlag::EnableRuleSetForDecision(&onboarding_rules::temp_watchlist().name))
         .times(1)
-        .return_once(move |_, _| Ok(should_use_conservative_rules));
+        .return_once(move |_| should_use_conservative_rules);
 
     // function under test
     let d = evaluate_onboarding_rules(&feature_vector, onboarding_id, &mock_ff_client).unwrap();

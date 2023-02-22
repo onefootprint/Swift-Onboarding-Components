@@ -5,7 +5,7 @@ use crate::enclave_client::EnclaveClient;
 use crate::metrics;
 use crate::{errors::ApiError, State};
 
-use crate::feature_flag::FeatureFlagClient;
+use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use db::DbPool;
 use db::{
     models::{
@@ -147,13 +147,9 @@ pub async fn send_idology_idv_request(
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    feature_flag_client: &impl FeatureFlagClient,
+    ff_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
-    if is_production
-        || feature_flag_client
-            .bool_flag_with_key("EnableIdologyIdvCallsInNonProdEnvironment", &ob_configuration_key)
-            .unwrap_or(false)
-    {
+    if is_production || ff_client.flag(FeatureFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
         let res = idology_api_call
             .make_request(IdologyExpectIDRequest { idv_data: data })
             .await;
@@ -224,7 +220,7 @@ pub async fn send_socure_idv_request(
     is_production: bool,
     db_pool: &DbPool,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    feature_flag_client: &impl FeatureFlagClient,
+    ff_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
     let onboarding_id = request.onboarding_id.clone();
     let (socure_device_session_id, ip_address, ob_configuration_key) = db_pool
@@ -245,16 +241,9 @@ pub async fn send_socure_idv_request(
         )
         .await??;
 
-    if feature_flag_client
-        .bool_flag("DisableAllSocureIdvCalls")
-        .unwrap_or(false)
-    {
+    if ff_client.flag(FeatureFlag::DisableAllSocure) {
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
-    } else if is_production
-        || feature_flag_client
-            .bool_flag_with_key("EnableSocureIdvCallsInNonProdEnvironment", &ob_configuration_key)
-            .unwrap_or(false)
-    {
+    } else if is_production || ff_client.flag(FeatureFlag::EnableSocureInNonProd(&ob_configuration_key)) {
         let res = socure_client
             .make_request(SocureIDPlusRequest {
                 idv_data: data,
@@ -301,7 +290,7 @@ pub async fn send_scan_onboarding_docv_request(
     request: VerificationRequest,
     data: DocVData,
 ) -> Result<VendorResponse, ApiError> {
-    let feature_flag_client = &state.feature_flag_client;
+    let ff_client = &state.feature_flag_client;
 
     let onboarding_id = request.onboarding_id.clone();
     let ob_configuration_key = state
@@ -311,18 +300,10 @@ pub async fn send_scan_onboarding_docv_request(
         })
         .await??;
 
-    if feature_flag_client
-        .bool_flag("DisableAllScanOnboardingCalls")
-        .unwrap_or(false)
-    {
+    if ff_client.flag(FeatureFlag::DisableAllScanOnboarding) {
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
     } else if state.config.service_config.is_production()
-        || feature_flag_client
-            .bool_flag_with_key(
-                "EnableScanOnboardingCallsInNonProdEnvironment",
-                &ob_configuration_key,
-            )
-            .unwrap_or(false)
+        || ff_client.flag(FeatureFlag::EnableScanOnboardingInNonProd(&ob_configuration_key))
     {
         idv::idology::send_scan_onboarding_request(&state.idology_client, data)
             .await
@@ -499,29 +480,25 @@ pub async fn make_vendor_requests(
 mod tests {
     use super::*;
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-    use crate::feature_flag::{FeatureFlagError, MockFeatureFlagClient};
+    use crate::feature_flag::MockFeatureFlagClient;
 
     use idv::idology::{
         expectid::{response::ExpectIDResponse, response::Response},
         IdologyExpectIDAPIResponse,
     };
-    use mockall::predicate::*;
-
     use newtypes::PiiJsonValue;
     use serde_json::json;
     use std::str::FromStr;
     use test_case::test_case;
 
-    #[test_case(true, Ok(false), true)]
-    #[test_case(false, Ok(true), true)]
-    #[test_case(false, Ok(false), false)]
-    #[test_case(true, Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize), true)]
-    #[test_case(false, Err(FeatureFlagError::LaunchDarklyClientFailedToInitialize), false)]
+    #[test_case(true, false, true)]
+    #[test_case(false, true, true)]
+    #[test_case(false, false, false)]
     #[tokio::test]
     async fn test_send_idology_idv_request(
         // Proof of concept test
         is_production: bool,
-        flag_response: Result<bool, FeatureFlagError>,
+        flag_value: bool,
         expect_api_call: bool,
     ) {
         let ob_configuration_key = ObConfigurationKey::from_str("obc123").unwrap();
@@ -532,13 +509,11 @@ mod tests {
             idv::idology::error::Error,
         >::new();
 
+        let ob_config_key = ob_configuration_key.clone();
         mock_ff_client
-            .expect_bool_flag_with_key()
-            .with(
-                eq("EnableIdologyIdvCallsInNonProdEnvironment"),
-                eq(ob_configuration_key.clone()),
-            )
-            .return_once(|_, _| flag_response);
+            .expect_flag()
+            .withf(move |f| *f == FeatureFlag::EnableIdologyInNonProd(&ob_config_key))
+            .return_once(move |_| flag_value);
 
         if expect_api_call {
             mock_api.expect_make_request().times(1).return_once(|_| {

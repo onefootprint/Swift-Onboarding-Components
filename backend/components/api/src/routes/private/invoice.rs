@@ -1,5 +1,6 @@
 use crate::auth::tenant::TenantRbAuthContext;
 use crate::errors::ApiResult;
+use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use billing::BillingInfo;
@@ -56,7 +57,10 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
 
 #[tracing::instrument(skip_all)]
 async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> {
-    if !crate::decision::utils::should_bill(&state.feature_flag_client, &tenant.id) {
+    if !state
+        .feature_flag_client
+        .flag(FeatureFlag::ShouldBill(&tenant.id))
+    {
         return Ok(());
     }
     let interval = billing::interval::get_billing_interval(Utc::now().date_naive())?;

@@ -14,9 +14,8 @@ use db::{
 use super::{
     features::*,
     rule::{self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules, RuleName},
-    utils,
 };
-use crate::feature_flag::FeatureFlagClient;
+use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::user_vault_wrapper::UserVaultWrapper,
@@ -37,12 +36,13 @@ pub async fn save_final_decision(
     // Save status
 
     let obid = ob_id.clone();
-    let tenant_id = &db_pool
+    let tenant_id = db_pool
         .db_query(move |conn| ScopedUser::get(conn, &ob_id))
         .await??
         .tenant_id;
 
-    let tenant_can_view_socure_risk_signal = utils::can_see_socure_results(ff_client, tenant_id);
+    let tenant_can_view_socure_risk_signal =
+        ff_client.flag(FeatureFlag::CanViewSocureRiskSignals(&tenant_id));
 
     let obd = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
