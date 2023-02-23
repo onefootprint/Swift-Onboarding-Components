@@ -10,12 +10,12 @@ use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
 /// prevent sending invalid data for verification to vendors
 pub(super) fn clean_and_validate_field(idk: IDK, input: PiiString, for_bifrost: bool) -> NtResult<PiiString> {
     let result = match idk {
-        IDK::FirstName => input,
-        IDK::LastName => input,
+        IDK::FirstName => validate_name(input, for_bifrost)?,
+        IDK::LastName => validate_name(input, for_bifrost)?,
         IDK::Dob => clean_and_validate_dob(input, for_bifrost)?,
         IDK::Ssn4 => clean_and_validate_ssn4(input)?,
         IDK::Ssn9 => clean_and_validate_ssn9(input)?,
-        IDK::AddressLine1 => input,
+        IDK::AddressLine1 => validate_address(input, for_bifrost)?,
         IDK::AddressLine2 => input,
         IDK::City => input,
         IDK::State => input, // maybe we'll want to validate state based on country some day
@@ -52,6 +52,22 @@ fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiStr
         return Err(Error::ImprobableDob);
     }
     Ok(PiiString::new(date.format("%Y-%m-%d").to_string()))
+}
+
+fn validate_name(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
+    if for_bifrost && input.leak().is_empty() || input.leak().len() > 1000 {
+        return Err(Error::InvalidLength);
+    }
+
+    Ok(input)
+}
+
+fn validate_address(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
+    if for_bifrost && input.leak().is_empty() || input.leak().len() > 1000 {
+        return Err(Error::InvalidLength);
+    }
+
+    Ok(input)
 }
 
 fn clean_and_validate_ssn4(input: PiiString) -> VResult<PiiString> {
@@ -163,6 +179,12 @@ mod test {
 
     #[test_case(Dob, "1876-12-25" => None)]
     #[test_case(Dob, "1976-12-25" => Some("1976-12-25".to_owned()))]
+    #[test_case(FirstName, "" => None)]
+    #[test_case(LastName, "" => None)]
+    #[test_case(AddressLine1, "" => None)]
+    #[test_case(FirstName, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
+    #[test_case(LastName, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
+    #[test_case(AddressLine1, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
     fn test_clean_and_validate_field_for_bifrost(idk: IDK, pii: &str) -> Option<String> {
         clean_and_validate_field(idk, PiiString::new(pii.to_owned()), true)
             .ok()

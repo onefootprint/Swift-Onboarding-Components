@@ -56,6 +56,7 @@ impl TryFrom<IdvData> for RequestData {
             email,
             phone_number,
         } = d;
+        // these are minimum required fields for idology, so we error.
         let first_name = first_name.ok_or(IdologyError::ConversionError::MissingFirstName)?;
         let last_name = last_name.ok_or(IdologyError::ConversionError::MissingLastName)?;
         let address = address_line1.ok_or(IdologyError::ConversionError::MissingAddress)?; // TODO
