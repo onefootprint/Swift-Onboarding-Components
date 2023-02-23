@@ -24,7 +24,7 @@ const PhoneVerificationForm = () => {
   const {
     identify: { email, phoneNumber, userFound },
     challenge: { challengeData },
-    tenantPk,
+    config,
   } = context;
 
   const toast = useToast();
@@ -102,7 +102,7 @@ const PhoneVerificationForm = () => {
       {
         challengeResponse: pin,
         challengeToken,
-        tenantPk,
+        tenantPk: config?.key,
       },
       {
         onSuccess: handlePinValidationSucceeded,

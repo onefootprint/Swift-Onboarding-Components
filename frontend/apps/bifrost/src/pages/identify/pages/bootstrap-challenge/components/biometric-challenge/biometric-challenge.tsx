@@ -17,7 +17,7 @@ const BiometricChallenge = () => {
   const {
     identify: { successfulIdentifier },
     challenge: { challengeData },
-    tenantPk,
+    config,
   } = state.context;
 
   const showRequestErrorToast = useRequestErrorToast();
@@ -25,6 +25,7 @@ const BiometricChallenge = () => {
   const identifyVerifyMutation = useIdentifyVerify();
 
   const [isSuccess, setSuccess] = useState(false);
+  const [isRetry, setIsRetry] = useState(false);
   const isLoading =
     loginChallengeMutation.isLoading || identifyVerifyMutation.isLoading;
 
@@ -38,7 +39,7 @@ const BiometricChallenge = () => {
       biometricChallengeJson,
     );
     identifyVerifyMutation.mutate(
-      { challengeResponse, challengeToken, tenantPk },
+      { challengeResponse, challengeToken, tenantPk: config?.key },
       {
         onSuccess: ({ authToken }) => {
           setSuccess(true);
@@ -51,9 +52,8 @@ const BiometricChallenge = () => {
             });
           }, SUCCESS_EVENT_DELAY_MS);
         },
-        onError: error => {
-          handleRequestError(error);
-          send({ type: Events.challengeFailed });
+        onError: () => {
+          setIsRetry(true);
         },
       },
     );
@@ -103,6 +103,7 @@ const BiometricChallenge = () => {
     <BiometricChallengeVerification
       isLoading={isLoading}
       isSuccess={isSuccess}
+      isRetry={isRetry}
       onComplete={handleComplete}
     />
   );

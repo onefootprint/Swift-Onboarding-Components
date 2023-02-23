@@ -27,7 +27,7 @@ const LoginChallengeBottomSheet = ({
   const identifyVerifyMutation = useIdentifyVerify();
   const isLoading =
     loginChallengeMutation.isLoading || identifyVerifyMutation.isLoading;
-  const { device, tenantPk } = state.context;
+  const { device, config } = state.context;
   const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
 
@@ -47,7 +47,7 @@ const LoginChallengeBottomSheet = ({
       biometricChallengeJson,
     );
     identifyVerifyMutation.mutate(
-      { challengeResponse, challengeToken, tenantPk },
+      { challengeResponse, challengeToken, tenantPk: config?.key },
       {
         onSuccess: ({ authToken }) => {
           send({

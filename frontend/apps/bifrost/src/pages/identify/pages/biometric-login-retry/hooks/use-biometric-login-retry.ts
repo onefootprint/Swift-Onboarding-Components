@@ -17,7 +17,7 @@ const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { email },
-    tenantPk,
+    config,
   } = state.context;
   const loginChallengeMutation = useLoginChallenge();
   const identityVerifyMutation = useIdentifyVerify();
@@ -64,7 +64,7 @@ const useBiometricLoginRetry = () => {
       {
         challengeResponse,
         challengeToken,
-        tenantPk,
+        tenantPk: config?.key,
       },
       {
         onSuccess: ({ authToken }: IdentifyVerifyResponse) => {

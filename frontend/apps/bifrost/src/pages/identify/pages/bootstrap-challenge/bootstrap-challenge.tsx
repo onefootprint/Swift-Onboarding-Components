@@ -1,7 +1,9 @@
-import { HeaderTitle } from '@onefootprint/footprint-elements';
+import {
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
-import { Divider } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -19,6 +21,7 @@ const BootstrapChallenge = () => {
     device: { type, hasSupportForWebauthn },
     bootstrapData,
     challenge: { availableChallengeKinds },
+    config,
   } = state.context;
 
   const [selectedChallengeKind, setSelectedChallengeKind] =
@@ -44,7 +47,11 @@ const BootstrapChallenge = () => {
 
   return (
     <Container>
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+      <NavigationHeader button={{ variant: 'close' }} />
+      <HeaderTitle
+        title={t('title')}
+        subtitle={t('subtitle', { tenantName: config?.orgName })}
+      />
       {canChallengeBiometric && (
         <LoginChallengeSegmentedControl onChange={handleChangeChallengeKind} />
       )}
@@ -54,10 +61,7 @@ const BootstrapChallenge = () => {
       )}
       <LegalFooter />
       {bootstrapData && (
-        <>
-          <Divider />
-          <LoginWithDifferentAccount onClick={handleLoginWithDifferent} />
-        </>
+        <LoginWithDifferentAccount onClick={handleLoginWithDifferent} />
       )}
     </Container>
   );

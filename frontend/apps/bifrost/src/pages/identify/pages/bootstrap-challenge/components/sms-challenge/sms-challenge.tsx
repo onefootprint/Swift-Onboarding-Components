@@ -21,7 +21,7 @@ const SmsChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier },
-    tenantPk,
+    config,
     challenge: { challengeData },
   } = state.context;
 
@@ -84,7 +84,7 @@ const SmsChallenge = () => {
       {
         challengeResponse: pin,
         challengeToken,
-        tenantPk,
+        tenantPk: config?.key,
       },
       {
         onSuccess: handlePinValidationSucceeded,

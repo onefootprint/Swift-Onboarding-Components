@@ -1,4 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
+import { OnboardingConfig } from '@onefootprint/types';
 import legacyValidateBootstrapData from 'src/pages/identify/utils/legacy-validate-bootstrap-data';
 import { assign, createMachine } from 'xstate';
 
@@ -14,14 +15,14 @@ import {
 type IdentifyMachineArgs = {
   device: DeviceInfo;
   bootstrapData?: BootstrapData;
-  tenantPk?: string;
+  config?: OnboardingConfig;
   identifierSuffix?: string;
 };
 
 const createIdentifyMachine = ({
   device,
   bootstrapData,
-  tenantPk,
+  config,
   identifierSuffix,
 }: IdentifyMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
@@ -34,7 +35,7 @@ const createIdentifyMachine = ({
       context: {
         device,
         bootstrapData: bootstrapData ?? {},
-        tenantPk,
+        config,
         identify: {
           identifierSuffix,
         },
@@ -80,13 +81,16 @@ const createIdentifyMachine = ({
         },
         [States.bootstrapChallenge]: {
           on: {
-            [Events.challengeSucceeded]: {
-              target: States.success,
-              actions: [Actions.assignAuthToken],
-            },
             [Events.identifyReset]: {
               target: States.emailIdentification,
               actions: [Actions.reset],
+            },
+            [Events.challengeInitiated]: {
+              actions: [Actions.assignChallengeData],
+            },
+            [Events.challengeSucceeded]: {
+              target: States.success,
+              actions: [Actions.assignAuthToken],
             },
           },
         },

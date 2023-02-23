@@ -4,7 +4,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 
 const LegalFooter = () => (
-  <Typography color="tertiary" sx={{ textAlign: 'center' }} variant="caption-1">
+  <Typography color="tertiary" sx={{ textAlign: 'center' }} variant="caption-2">
     <Trans
       i18nKey="components.legal-footer.label"
       components={{

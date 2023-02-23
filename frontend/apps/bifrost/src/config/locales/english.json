@@ -24,7 +24,8 @@
     "biometric-challenge-verification": {
       "loading": "Waiting...",
       "success": "Success!",
-      "cta": "Launch biometrics"
+      "cta": "Launch biometrics",
+      "cta-retry": "Retry biometrics"
     },
     "login-with-different-account": {
       "missing-phone": "Don't have access to this phone number?",
@@ -78,7 +79,7 @@
     },
     "bootstrap-challenge": {
       "title": "Welcome back!",
-      "subtitle": "We've found an account with the information your provided."
+      "subtitle": "We found a Footprint account with the information you provided to {{tenantName}}."
     },
     "email-identification": {
       "header": {

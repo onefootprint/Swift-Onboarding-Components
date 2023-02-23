@@ -43,12 +43,15 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     gap: ${theme.spacing[7]};
+
+    > * {
+      width: 100%;
+    }
   `}
 `;
 
 const ButtonContainer = styled.div`
   ${({ theme }) => css`
-    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;

@@ -7,12 +7,14 @@ import styled, { css } from 'styled-components';
 export type BiometricChallengeVerificationProps = {
   isLoading?: boolean;
   isSuccess?: boolean;
+  isRetry?: boolean;
   onComplete: () => void;
 };
 
 const BiometricChallengeVerification = ({
   isLoading,
   isSuccess,
+  isRetry,
   onComplete,
 }: BiometricChallengeVerificationProps) => {
   const { t } = useTranslation('components.biometric-challenge-verification');
@@ -37,7 +39,11 @@ const BiometricChallengeVerification = ({
           </Typography>
         </>
       )}
-      {isCta && <Button onClick={onComplete}>{t('cta')}</Button>}
+      {isCta && (
+        <Button onClick={onComplete}>
+          {isRetry ? t('cta-retry') : t('cta')}
+        </Button>
+      )}
     </Container>
   );
 };

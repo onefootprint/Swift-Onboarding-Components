@@ -1,5 +1,10 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ChallengeData, ChallengeKind, Identifier } from '@onefootprint/types';
+import {
+  ChallengeData,
+  ChallengeKind,
+  Identifier,
+  OnboardingConfig,
+} from '@onefootprint/types';
 
 import { BootstrapData } from '../bifrost/types';
 
@@ -22,7 +27,7 @@ export enum States {
 }
 
 export type MachineContext = {
-  tenantPk?: string;
+  config?: OnboardingConfig;
   device: DeviceInfo;
   bootstrapData: BootstrapData;
 

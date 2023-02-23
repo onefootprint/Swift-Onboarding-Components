@@ -1,15 +1,37 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ChallengeKind } from '@onefootprint/types';
+import {
+  ChallengeKind,
+  CollectedKycDataOption,
+  OnboardingConfig,
+} from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';
 import { Events, States } from './types';
 
 describe('Identify Machine Tests', () => {
+  const getOnboardingConfig = (isLive?: boolean): OnboardingConfig => ({
+    isLive: isLive ?? true,
+    createdAt: 'date',
+    id: 'id',
+    key: 'key',
+    logoUrl: 'url',
+    privacyPolicyUrl: 'url',
+    name: 'tenant',
+    orgName: 'tenantOrg',
+    status: 'enabled',
+    mustCollectData: [CollectedKycDataOption.name],
+    mustCollectIdentityDocument: false,
+    mustCollectSelfie: false,
+    canAccessData: [CollectedKycDataOption.name],
+    canAccessIdentityDocumentImages: false,
+    canAccessSelfieImage: false,
+  });
+
   const createMachine = (deviceInfo: DeviceInfo, identifierSuffix?: string) =>
     createIdentifyMachine({
       device: deviceInfo,
-      tenantPk: '',
+      config: getOnboardingConfig(),
       identifierSuffix,
     });
 
