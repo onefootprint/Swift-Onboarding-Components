@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { PinInput } from '@onefootprint/ui';
+import { PinInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -8,6 +8,7 @@ import ResendButton, { ResendButtonProps } from './components/resend-button';
 import Success from './components/success';
 
 export type SmsChallengeVerificationProps = ResendButtonProps & {
+  title?: string;
   isLoading?: boolean;
   isSuccess?: boolean;
   hasError?: boolean;
@@ -15,6 +16,7 @@ export type SmsChallengeVerificationProps = ResendButtonProps & {
 };
 
 const SmsChallengeVerification = ({
+  title,
   isLoading,
   isSuccess,
   hasError,
@@ -34,6 +36,11 @@ const SmsChallengeVerification = ({
 
   return (
     <Container>
+      {title && (
+        <Typography variant="body-2" color="secondary" as="h3">
+          {title}
+        </Typography>
+      )}
       <PinInput
         onComplete={onComplete}
         hasError={hasError}

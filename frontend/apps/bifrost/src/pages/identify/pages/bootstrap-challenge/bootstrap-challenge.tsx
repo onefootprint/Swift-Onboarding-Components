@@ -2,9 +2,10 @@ import {
   HeaderTitle,
   NavigationHeader,
 } from '@onefootprint/footprint-elements';
-import { useTranslation } from '@onefootprint/hooks';
+import { DeviceInfo, useTranslation } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { MachineChallengeContext } from 'src/utils/state-machine/identify';
 import styled, { css } from 'styled-components';
 
 import LegalFooter from '../../components/legal-footer';
@@ -14,13 +15,29 @@ import LoginChallengeSegmentedControl from './components/login-challenge-segment
 import LoginWithDifferentAccount from './components/login-with-different-account';
 import SmsChallenge from './components/sms-challenge';
 
+const getCanChallengeBiometrics = (
+  device: DeviceInfo,
+  challengeContext: MachineChallengeContext,
+) => {
+  const hasAvailableBiometricChallenge =
+    challengeContext.availableChallengeKinds?.includes(ChallengeKind.biometric);
+  if (!hasAvailableBiometricChallenge) {
+    return false;
+  }
+  if (device.type === 'mobile') {
+    return device.hasSupportForWebauthn;
+  }
+  return device.hasSupportForWebauthn && challengeContext.hasSyncablePassKey;
+};
+
 const BootstrapChallenge = () => {
   const { t } = useTranslation('pages.bootstrap-challenge');
   const [state, send] = useIdentifyMachine();
   const {
-    device: { type, hasSupportForWebauthn },
+    device,
     bootstrapData,
-    challenge: { availableChallengeKinds },
+    challenge,
+    identify: { successfulIdentifier },
     config,
   } = state.context;
 
@@ -30,14 +47,10 @@ const BootstrapChallenge = () => {
     setSelectedChallengeKind(challengeKind);
   };
 
-  // TODO: add logic for showing the toggle on desktop
   // TODO: add logic for showing the transfer QR code
-  // TODO: add logic for showMissingPhoneLabel
-  const isMobileDeviceWithWebauthnSupport =
-    type === 'mobile' && hasSupportForWebauthn;
-  const canChallengeBiometric =
-    availableChallengeKinds?.includes(ChallengeKind.biometric) &&
-    isMobileDeviceWithWebauthnSupport;
+  const showToggle = getCanChallengeBiometrics(device, challenge);
+  const showMissingPhoneLabel =
+    successfulIdentifier && 'email' in successfulIdentifier;
 
   const handleLoginWithDifferent = () => {
     send({
@@ -52,7 +65,7 @@ const BootstrapChallenge = () => {
         title={t('title')}
         subtitle={t('subtitle', { tenantName: config?.orgName })}
       />
-      {canChallengeBiometric && (
+      {showToggle && (
         <LoginChallengeSegmentedControl onChange={handleChangeChallengeKind} />
       )}
       {selectedChallengeKind === ChallengeKind.sms && <SmsChallenge />}
@@ -61,7 +74,10 @@ const BootstrapChallenge = () => {
       )}
       <LegalFooter />
       {bootstrapData && (
-        <LoginWithDifferentAccount onClick={handleLoginWithDifferent} />
+        <LoginWithDifferentAccount
+          showMissingPhoneLabel={showMissingPhoneLabel}
+          onClick={handleLoginWithDifferent}
+        />
       )}
     </Container>
   );

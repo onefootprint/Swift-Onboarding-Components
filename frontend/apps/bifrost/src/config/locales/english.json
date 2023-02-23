@@ -79,7 +79,14 @@
     },
     "bootstrap-challenge": {
       "title": "Welcome back!",
-      "subtitle": "We found a Footprint account with the information you provided to {{tenantName}}."
+      "subtitle": "We found a Footprint account with the information you provided to {{tenantName}}.",
+      "sms-challenge": {
+        "title": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "resend-success": {
+          "title": "Success",
+          "description": "We sent you a new code."
+        }
+      }
     },
     "email-identification": {
       "header": {

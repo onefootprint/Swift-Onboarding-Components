@@ -24,6 +24,7 @@ describe('<SmsChallengeVerification />', () => {
   });
 
   const renderVerification = ({
+    title,
     isLoading,
     isSuccess,
     hasError,
@@ -33,6 +34,7 @@ describe('<SmsChallengeVerification />', () => {
   }: Partial<SmsChallengeVerificationProps>) =>
     customRender(
       <SmsChallengeVerification
+        title={title}
         isLoading={isLoading}
         isSuccess={isSuccess}
         hasError={hasError}
@@ -42,8 +44,9 @@ describe('<SmsChallengeVerification />', () => {
       />,
     );
 
-  it('renders default state correctly', () => {
-    renderVerification({});
+  it('renders default state with title correctly', () => {
+    renderVerification({ title: 'Title' });
+    expect(screen.getByText('Title')).toBeInTheDocument();
     expect(screen.getByText('Resend code')).toBeInTheDocument();
     expect(
       screen.getByTestId('sms-challenge-verification-pin-input'),

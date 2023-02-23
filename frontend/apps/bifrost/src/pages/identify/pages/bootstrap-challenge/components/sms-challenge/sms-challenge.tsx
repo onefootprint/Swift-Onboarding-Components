@@ -12,18 +12,40 @@ import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
 import SmsChallengeVerification from 'src/pages/identify/components/sms-challenge-verification';
+import {
+  MachineChallengeContext,
+  MachineIdentifyContext,
+} from 'src/utils/state-machine/identify';
 import { useEffectOnce } from 'usehooks-ts';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
+const getScrubbedPhoneNumber = (
+  identifyContext: MachineIdentifyContext,
+  challengeContext: MachineChallengeContext,
+) => {
+  const { successfulIdentifier, phoneNumber } = identifyContext;
+  const { challengeData } = challengeContext;
+  const identifyPhone =
+    successfulIdentifier && 'phoneNumber' in successfulIdentifier
+      ? phoneNumber
+      : null;
+  const challengePhone = challengeData?.scrubbedPhoneNumber;
+  // Give preference to the scrubbed phone number from challenge data
+  const displayPhone = challengePhone || identifyPhone;
+  const scrubbedPhoneNumber = displayPhone
+    ?.replaceAll('*', '•')
+    .replaceAll('-', ' ');
+
+  return scrubbedPhoneNumber;
+};
+
 const SmsChallenge = () => {
   const { t } = useTranslation('pages.bootstrap-challenge.sms-challenge');
   const [state, send] = useIdentifyMachine();
-  const {
-    identify: { successfulIdentifier },
-    config,
-    challenge: { challengeData },
-  } = state.context;
+  const { identify, config, challenge } = state.context;
+  const { successfulIdentifier } = identify;
+  const { challengeData } = challenge;
 
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
@@ -35,6 +57,7 @@ const SmsChallenge = () => {
   const hasError = identifyVerifyMutation.isError;
   const isLoading =
     loginChallengeMutation.isLoading || identifyVerifyMutation.isLoading;
+  const scrubbedPhoneNumber = getScrubbedPhoneNumber(identify, challenge);
 
   const handlePinValidationSucceeded = ({
     authToken,
@@ -109,8 +132,8 @@ const SmsChallenge = () => {
       {
         onSuccess: payload => {
           toast.show({
-            title: t('resend.success.title'),
-            description: t('resend.success.description'),
+            title: t('resend-success.title'),
+            description: t('resend-success.description'),
           });
           handleRequestChallengeSuccess(payload);
         },
@@ -146,6 +169,7 @@ const SmsChallenge = () => {
 
   return (
     <SmsChallengeVerification
+      title={scrubbedPhoneNumber && t('title', { scrubbedPhoneNumber })}
       isLoading={isLoading}
       isSuccess={isSuccess}
       hasError={hasError}

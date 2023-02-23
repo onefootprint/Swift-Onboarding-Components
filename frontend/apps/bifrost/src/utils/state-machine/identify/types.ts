@@ -30,21 +30,23 @@ export type MachineContext = {
   config?: OnboardingConfig;
   device: DeviceInfo;
   bootstrapData: BootstrapData;
+  identify: MachineIdentifyContext;
+  challenge: MachineChallengeContext;
+};
 
-  identify: {
-    phoneNumber?: string;
-    email?: string;
-    userFound?: boolean;
-    successfulIdentifier?: Identifier;
-    identifierSuffix?: string;
-  };
+export type MachineIdentifyContext = {
+  phoneNumber?: string;
+  email?: string;
+  userFound?: boolean;
+  successfulIdentifier?: Identifier;
+  identifierSuffix?: string;
+};
 
-  challenge: {
-    hasSyncablePassKey?: boolean;
-    availableChallengeKinds?: ChallengeKind[];
-    challengeData?: ChallengeData;
-    authToken?: string;
-  };
+export type MachineChallengeContext = {
+  hasSyncablePassKey?: boolean;
+  availableChallengeKinds?: ChallengeKind[];
+  challengeData?: ChallengeData;
+  authToken?: string;
 };
 
 export enum Events {
