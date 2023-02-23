@@ -81,15 +81,15 @@ def test_cannot_patch(assumed_token, path):
 @pytest.mark.parametrize(
     "path, body",
     [
-        (
-            "users/some_fp_user_id/vault/decrypt",
-            dict(fields=["id.first_name"], reason="Blah"),
-        ),
-        (
-            "users/some_fp_user_id/vault/identity/document/decrypt",
-            dict(document_type="passport", reason="blah"),
-        ),
         # TODO: reinstate this when we require a header
+        # (
+        #     "users/some_fp_user_id/vault/decrypt",
+        #     dict(fields=["id.first_name"], reason="Blah"),
+        # ),
+        # (
+        #     "users/some_fp_user_id/vault/identity/document/decrypt",
+        #     dict(document_type="passport", reason="blah"),
+        # ),
         # (
         #     "users/some_fp_user_id/decisions",
         #     dict(status="pass", annotation=dict(note="", is_pinned=False)),

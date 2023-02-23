@@ -16,8 +16,21 @@ use db::{
     },
     PgConn,
 };
-use newtypes::{TenantId, TenantScope, TenantUserId};
+use newtypes::{CollectedDataOption, TenantId, TenantScope, TenantUserId};
 use paperclip::actix::{Apiv2Schema, Apiv2Security};
+
+/// Risk ops users can perform manual review and decrypt info
+static RISK_OPS_PERMISSIONS: &[TenantScope] = &[
+    TenantScope::ManualReview,
+    TenantScope::DecryptCustom,
+    TenantScope::DecryptDocuments,
+    TenantScope::Decrypt(CollectedDataOption::Name),
+    TenantScope::Decrypt(CollectedDataOption::Dob),
+    TenantScope::Decrypt(CollectedDataOption::Ssn9),
+    TenantScope::Decrypt(CollectedDataOption::FullAddress),
+    TenantScope::Decrypt(CollectedDataOption::Email),
+    TenantScope::Decrypt(CollectedDataOption::PhoneNumber),
+];
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 /// The struct that is serialized and saved into the session table in the DB for a firm employee
@@ -105,11 +118,16 @@ impl CanCheckTenantGuard for FirmEmployeeAuthContext {
 
     fn token_scopes(&self) -> Vec<TenantScope> {
         // TODO check if there's a header that approves write access
+        let extra_permissions_for_user = if self.data.0.is_risk_ops {
+            RISK_OPS_PERMISSIONS.to_vec()
+        } else {
+            vec![]
+        };
         self.role()
             .scopes
             .iter()
             .cloned()
-            .chain(self.data.0.is_risk_ops.then_some(TenantScope::ManualReview))
+            .chain(extra_permissions_for_user)
             .collect()
     }
 
@@ -162,10 +180,21 @@ mod test {
     use crate::auth::{session::AuthSessionData, SessionContext};
     use db::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::TenantScope;
+    use newtypes::{CollectedDataOption, TenantScope};
 
     #[db_test_case(false => vec![TenantScope::Read])]
-    #[db_test_case(true => vec![TenantScope::Read, TenantScope::ManualReview])]
+    #[db_test_case(true => vec![
+        TenantScope::Read,
+        TenantScope::ManualReview,
+        TenantScope::DecryptCustom,
+        TenantScope::DecryptDocuments,
+        TenantScope::Decrypt(CollectedDataOption::Name),
+        TenantScope::Decrypt(CollectedDataOption::Dob),
+        TenantScope::Decrypt(CollectedDataOption::Ssn9),
+        TenantScope::Decrypt(CollectedDataOption::FullAddress),
+        TenantScope::Decrypt(CollectedDataOption::Email),
+        TenantScope::Decrypt(CollectedDataOption::PhoneNumber),
+    ])]
     fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);
         let role = db::tests::fixtures::tenant_role::create_ro(conn, &tenant.id);
