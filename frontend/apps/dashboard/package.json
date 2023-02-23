@@ -67,6 +67,9 @@
     "preset": "@onefootprint/jest-presets/jest/web",
     "setupFiles": [
       "<rootDir>/src/config/initializers/react-i18next-test.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "@/proxy-configs/(.*)": "<rootDir>/src/pages/developers/components/proxy-configs/$1"
+    }
   }
 }

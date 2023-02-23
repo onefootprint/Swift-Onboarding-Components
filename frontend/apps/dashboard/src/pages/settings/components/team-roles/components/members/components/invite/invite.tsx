@@ -1,35 +1,27 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { RoleScope } from '@onefootprint/types';
-import { Box, Button } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { Button } from '@onefootprint/ui';
+import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
 import Dialog from './components/dialog';
 
 const Invite = () => {
   const { t } = useTranslation('pages.settings.members.invite');
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const [isOpen, open, close] = useToggle(false);
 
   return (
-    <Box>
+    <>
       <PermissionGate
         scope={RoleScope.orgSettings}
         fallbackText={t('not-allowed')}
       >
-        <Button size="small" variant="secondary" onClick={handleOpen}>
+        <Button size="small" variant="secondary" onClick={open}>
           {t('title')}
         </Button>
       </PermissionGate>
-      <Dialog onClose={handleClose} open={open} />
-    </Box>
+      <Dialog onClose={close} open={isOpen} />
+    </>
   );
 };
 

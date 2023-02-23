@@ -6,7 +6,8 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "src/*": ["./src/*"]
+      "src/*": ["./src/*"],
+      "@/proxy-configs/*": ["./src/pages/developers/components/proxy-configs/*"],
     }
   },
   "include": ["src", "next-env.d.ts"]

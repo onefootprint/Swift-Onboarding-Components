@@ -739,26 +739,6 @@
         "loading": "Loading..."
       }
     },
-    "proxy-configs": {
-      "page-title": "Footprint | Proxy",
-      "title": "Vault Proxying configurations",
-      "subtitle": "Manage your vault proxying configurations",
-      "create": {
-        "cta": "Create vault proxying config",
-        "cta-not-allowed": "You're not allowed to create vault proxying configurations"
-      },
-      "table": {
-        "aria-label": "Proxy configurations",
-        "header": {
-          "name": "Configuration name",
-          "url": "URL",
-          "method": "HTTP method",
-          "status": "Status",
-          "created_at": "Created at"
-        },
-        "empty-state": "You haven't created any vault proxying configurations just yet."
-      }
-    },
     "settings": {
       "page-title": "Footprint | Settings",
       "header": {
@@ -996,6 +976,109 @@
             "phone_number": "Phone number",
             "documents": "Documents",
             "custom": "Custom attributes"
+          }
+        }
+      }
+    },
+    "proxy-configs": {
+      "page-title": "Footprint | Proxy",
+      "title": "Vault Proxying configurations",
+      "subtitle": "Manage your vault proxying configurations",
+      "table": {
+        "aria-label": "Proxy configurations",
+        "header": {
+          "name": "Configuration name",
+          "url": "URL",
+          "method": "HTTP method",
+          "status": "Status",
+          "created_at": "Created at"
+        },
+        "empty-state": "You haven't created any vault proxying configurations just yet."
+      },
+      "create": {
+        "cta": "Create vault proxying config",
+        "cta-not-allowed": "You're not allowed to create vault proxying configurations",
+        "form": {
+          "title": "Create vault proxying config",
+          "name": {
+            "label": "Vault proxying configuration name",
+            "placeholder": "My vault proxying config"
+          },
+          "basic-configuration": {
+            "title": "Basic configuration",
+            "url": {
+              "label": "URL",
+              "placeholder": "www.website.com",
+              "errors": {
+                "required": "Please enter a URL"
+              }
+            },
+            "method": {
+              "label": "Method",
+              "errors": {
+                "required": "Please enter a URL"
+              }
+            },
+            "access-reason": {
+              "label": "Decryption reason",
+              "placeholder": "Reason",
+              "errors": {
+                "required": "Please enter a reason"
+              }
+            }
+          },
+          "custom-header": {
+            "title": "Custom header values",
+            "name": {
+              "label": "Name"
+            },
+            "value": {
+              "label": "Value"
+            },
+            "secret": {
+              "label": "Secret"
+            },
+            "add-more": "Add another"
+          },
+          "client-certificates": {
+            "title": "Client certificate authentication (mTLS)",
+            "certificate": {
+              "label": "Certificate",
+              "placeholder": "Paste blob",
+              "cta": "Upload PEM file"
+            },
+            "key": {
+              "label": "Key (Encrypted)",
+              "placeholder": "Paste blob",
+              "cta": "Upload PEM file"
+            }
+          },
+          "pinned-server-certificates": {
+            "title": "Pinned server certificates",
+            "certificate": {
+              "label": "Certificate",
+              "placeholder": "Paste blob",
+              "cta": "Upload PEM file"
+            },
+            "add-more": "Add another"
+          },
+          "ingress-vaulting": {
+            "title": "Ingress vaulting",
+            "content-type": {
+              "label": "Content type"
+            },
+            "vaulting-rules": {
+              "title": "Vaulting rules  (Optional)",
+              "token": {
+                "label": "Token",
+                "placeholder": "card_number"
+              },
+              "target": {
+                "label": "Target",
+                "placeholder": "card_number"
+              }
+            },
+            "add-more": "Add another"
           }
         }
       }

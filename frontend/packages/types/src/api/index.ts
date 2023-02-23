@@ -2,6 +2,7 @@ export * from './biometric-register';
 export * from './consent';
 export * from './create-org-member';
 export * from './create-org-role';
+export * from './create-proxy-config';
 export * from './d2p-generate';
 export * from './d2p-sms';
 export * from './decrypt-data';
