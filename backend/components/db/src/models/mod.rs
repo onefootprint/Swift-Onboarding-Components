@@ -6,7 +6,6 @@ pub mod email;
 pub mod fingerprint;
 pub mod fingerprint_visit_event;
 pub mod identity_document;
-pub mod idology_expect_id_response;
 pub mod insight_event;
 pub mod kv_data;
 pub mod liveness_event;

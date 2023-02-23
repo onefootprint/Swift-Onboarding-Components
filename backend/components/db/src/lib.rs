@@ -193,10 +193,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &UserVaultI
 
     use schema::{
         access_event, annotation, data_lifetime, document_request, email, fingerprint,
-        fingerprint_visit_event, identity_document, idology_expect_id_response, liveness_event,
-        manual_review, onboarding, onboarding_decision, onboarding_decision_verification_result_junction,
-        phone_number, risk_signal, scoped_user, socure_device_session, user_timeline, user_vault,
-        user_vault_data, verification_request, verification_result, webauthn_credential,
+        fingerprint_visit_event, identity_document, liveness_event, manual_review, onboarding,
+        onboarding_decision, onboarding_decision_verification_result_junction, phone_number, risk_signal,
+        scoped_user, socure_device_session, user_timeline, user_vault, user_vault_data, verification_request,
+        verification_result, webauthn_credential,
     };
     let mut deleted_rows = 0;
 
@@ -319,16 +319,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &UserVaultI
                 let verification_request_ids = verification_request::table
                     .filter(verification_request::onboarding_id.eq_any(ob_ids))
                     .select(verification_request::id);
-
-                let verification_result_ids = verification_result::table
-                    .filter(verification_result::request_id.eq_any(verification_request_ids))
-                    .select(verification_result::id);
-
-                deleted_rows += diesel::delete(idology_expect_id_response::table)
-                    .filter(
-                        idology_expect_id_response::verification_result_id.eq_any(verification_result_ids),
-                    )
-                    .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(verification_result::table)
                     .filter(verification_result::request_id.eq_any(verification_request_ids))

@@ -143,25 +143,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    idology_expect_id_response (id) {
-        id -> Text,
-        verification_result_id -> Text,
-        created_at -> Timestamptz,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-        id_number -> Nullable<Int8>,
-        id_scan -> Nullable<Text>,
-        error -> Nullable<Text>,
-        results -> Nullable<Text>,
-        summary_result -> Nullable<Text>,
-        qualifiers -> Array<Text>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     insight_event (id) {
         id -> Text,
         timestamp -> Timestamptz,
@@ -699,7 +680,6 @@ joinable!(fingerprint_visit_event -> scoped_user (scoped_user_id));
 joinable!(fingerprint_visit_event -> user_vault (user_vault_id));
 joinable!(identity_document -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
-joinable!(idology_expect_id_response -> verification_result (verification_result_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_user (scoped_user_id));
 joinable!(manual_review -> onboarding (onboarding_id));
@@ -749,7 +729,6 @@ allow_tables_to_appear_in_same_query!(
     fingerprint,
     fingerprint_visit_event,
     identity_document,
-    idology_expect_id_response,
     insight_event,
     kv_data,
     liveness_event,

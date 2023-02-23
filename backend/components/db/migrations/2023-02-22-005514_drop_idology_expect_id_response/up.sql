@@ -1,0 +1,1 @@
+DROP TABLE idology_expect_id_response;
