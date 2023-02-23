@@ -20,12 +20,12 @@ const Footer = () => {
       <RightColumn>
         <Link rel="noopener noreferrer" href={TWITTER_URL}>
           <Typography variant="label-4" color="tertiary">
-            {t('twitter')}
+            {t('footer.twitter')}
           </Typography>
         </Link>
         <Link rel="noopener noreferrer" href={LINKEDIN_URL}>
           <Typography variant="label-4" color="tertiary">
-            {t('linkedin')}
+            {t('footer.linkedin')}
           </Typography>
         </Link>
         <Image

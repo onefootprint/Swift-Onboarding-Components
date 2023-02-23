@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import SEO from '../../components/seo';
 import FeatureCard from './components/feature-card';
 import Footer from './components/footer';
 import Illustration from './components/illustration/illustration';
@@ -27,7 +28,9 @@ const Ending = () => {
 
   return (
     <>
+      <SEO title={t('title')} description={t('description')} />
       <Navigation />
+
       <StyledContainer>
         <HeadingContainer>
           <Chip>{t('chip')}</Chip>
