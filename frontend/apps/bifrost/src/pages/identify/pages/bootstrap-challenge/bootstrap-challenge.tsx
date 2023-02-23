@@ -68,10 +68,14 @@ const BootstrapChallenge = () => {
       {showToggle && (
         <LoginChallengeSegmentedControl onChange={handleChangeChallengeKind} />
       )}
-      {selectedChallengeKind === ChallengeKind.sms && <SmsChallenge />}
-      {selectedChallengeKind === ChallengeKind.biometric && (
+      <ChallengeContainer visible={selectedChallengeKind === ChallengeKind.sms}>
+        <SmsChallenge />
+      </ChallengeContainer>
+      <ChallengeContainer
+        visible={selectedChallengeKind === ChallengeKind.biometric}
+      >
         <BiometricChallenge />
-      )}
+      </ChallengeContainer>
       <LegalFooter />
       {bootstrapData && (
         <LoginWithDifferentAccount
@@ -90,6 +94,15 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     gap: ${theme.spacing[7]};
+  `}
+`;
+
+const ChallengeContainer = styled.div<{ visible: boolean }>`
+  ${({ visible }) => css`
+    display: ${visible ? 'flex' : 'none'};
+    width: 100%;
+    justify-content: center;
+    align-items: center;
   `}
 `;
 

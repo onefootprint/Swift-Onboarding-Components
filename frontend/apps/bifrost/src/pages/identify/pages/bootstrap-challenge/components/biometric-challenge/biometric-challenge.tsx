@@ -26,8 +26,11 @@ const BiometricChallenge = () => {
 
   const [isSuccess, setSuccess] = useState(false);
   const [isRetry, setIsRetry] = useState(false);
+  const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isLoading =
-    loginChallengeMutation.isLoading || identifyVerifyMutation.isLoading;
+    isRunningWebauthn ||
+    loginChallengeMutation.isLoading ||
+    identifyVerifyMutation.isLoading;
 
   const handleComplete = async () => {
     const { biometricChallengeJson, challengeToken } = challengeData || {};
@@ -35,9 +38,21 @@ const BiometricChallenge = () => {
       return;
     }
 
-    const challengeResponse = await generateLoginDeviceResponse(
-      biometricChallengeJson,
-    );
+    setIsRunningWebauthn(true);
+    let challengeResponse;
+    try {
+      challengeResponse = await generateLoginDeviceResponse(
+        biometricChallengeJson,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (!challengeResponse) {
+      setIsRunningWebauthn(false);
+      return;
+    }
+
     identifyVerifyMutation.mutate(
       { challengeResponse, challengeToken, tenantPk: config?.key },
       {
@@ -55,12 +70,15 @@ const BiometricChallenge = () => {
         onError: () => {
           setIsRetry(true);
         },
+        onSettled: () => {
+          setIsRunningWebauthn(false);
+        },
       },
     );
   };
 
   const handleRequestChallengeSuccess = (payload: LoginChallengeResponse) => {
-    if (payload.challengeData.challengeKind !== ChallengeKind.sms) {
+    if (payload.challengeData.challengeKind !== ChallengeKind.biometric) {
       console.error(
         'Received sms challenge after requesting bootstrap biometric challenge',
       );

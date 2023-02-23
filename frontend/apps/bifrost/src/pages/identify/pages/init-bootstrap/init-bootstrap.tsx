@@ -77,16 +77,6 @@ const InitBootstrap = () => {
       hasSyncablePassKey,
     } = await identify(email, phoneNumber);
 
-    // If all identify calls failed, we need to re-collect email/phone data
-    // (perhaps the data was invalid?) so don't pre-fill the form fields
-    if (!successfulIdentifier) {
-      send({
-        type: Events.bootstrapDataInvalid,
-      });
-
-      return;
-    }
-
     if (!userFound || !availableChallengeKinds?.length) {
       // If the user is not found, take them through the normal identify flow but
       // prefill the form fields

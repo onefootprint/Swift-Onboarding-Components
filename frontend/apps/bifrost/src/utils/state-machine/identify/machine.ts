@@ -228,13 +228,19 @@ const createIdentifyMachine = ({
 
         // Other Actions
         [Actions.assignEmail]: assign((context, event) => {
-          if (event.type === Events.identified) {
+          if (
+            event.type === Events.identified ||
+            event.type === Events.identifyFailed
+          ) {
             context.identify.email = event.payload.email;
           }
           return context;
         }),
         [Actions.assignPhone]: assign((context, event) => {
-          if (event.type === Events.identified) {
+          if (
+            event.type === Events.identified ||
+            event.type === Events.identifyFailed
+          ) {
             context.identify.phoneNumber = event.payload.phoneNumber;
           }
           return context;

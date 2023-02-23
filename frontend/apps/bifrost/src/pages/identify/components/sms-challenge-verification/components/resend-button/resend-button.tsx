@@ -1,7 +1,7 @@
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 export type ResendButtonProps = {
   resendDisabledUntil?: Date;
@@ -56,11 +56,12 @@ const ResendButton = ({ resendDisabledUntil, onResend }: ResendButtonProps) => {
         disabled={resendClicked && countdown > 0}
         onClick={handleClick}
         size="compact"
+        sx={{ marginBottom: 2 }}
       >
         {t('cta')}
       </LinkButton>
       {resendClicked && countdown > 0 && (
-        <Typography variant="body-4" color="tertiary">
+        <Typography variant="body-4" color="tertiary" sx={{ marginTop: 3 }}>
           {t('disabled', { seconds: countdown })}
         </Typography>
       )}
@@ -69,13 +70,10 @@ const ResendButton = ({ resendDisabledUntil, onResend }: ResendButtonProps) => {
 };
 
 const Container = styled.div`
-  ${({ theme }) => css`
-    row-gap: ${theme.spacing[4]};
-    flex-direction: column;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `}
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default ResendButton;

@@ -20,6 +20,19 @@ const BiometricChallengeVerification = ({
   const { t } = useTranslation('components.biometric-challenge-verification');
   const isCta = !isLoading && !isSuccess;
 
+  if (isSuccess) {
+    return (
+      <Container>
+        <SuccessContainer>
+          <IcoCheckCircle40 color="success" />
+          <Typography variant="label-3" color="success">
+            {t('success')}
+          </Typography>
+        </SuccessContainer>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <IconContainer>
@@ -27,26 +40,32 @@ const BiometricChallengeVerification = ({
         <IcoFaceid24 />
       </IconContainer>
       {isLoading && (
-        <Typography variant="label-3" color="secondary">
+        <Typography
+          variant="label-3"
+          color="secondary"
+          sx={{ marginBottom: 6 }}
+        >
           {t('loading')}
         </Typography>
       )}
-      {isSuccess && (
-        <>
-          <IcoCheckCircle40 color="success" />
-          <Typography variant="label-3" color="success">
-            {t('success')}
-          </Typography>
-        </>
-      )}
       {isCta && (
-        <Button onClick={onComplete}>
+        <Button onClick={onComplete} size="compact">
           {isRetry ? t('cta-retry') : t('cta')}
         </Button>
       )}
     </Container>
   );
 };
+
+const SuccessContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[4]};
+    align-items: center;
+    margin: ${theme.spacing[5]} 0;
+  `}
+`;
 
 const IconContainer = styled.div`
   ${({ theme }) => css`
@@ -57,6 +76,7 @@ const IconContainer = styled.div`
     align-items: center;
     width: 40px;
     height: 40px;
+    box-shadow: ${theme.elevation[1]};
   `}
 `;
 
@@ -71,6 +91,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     text-align: center;
+    width: 100%;
   `}
 `;
 
