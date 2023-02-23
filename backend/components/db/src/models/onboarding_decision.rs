@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use crate::actor::SaturatedActor;
 use crate::models::verification_request::VerificationRequest;
+use crate::schema::onboarding;
+use crate::schema::scoped_user;
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{
@@ -14,6 +16,7 @@ use diesel::dsl::count_star;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
+use newtypes::FootprintUserId;
 use newtypes::TenantId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, Locked, OnboardingDecisionId,
@@ -182,11 +185,31 @@ impl OnboardingDecision {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Vec<Self>> {
+    pub fn list_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Vec<Self>> {
         let result = onboarding_decision::table
             .filter(onboarding_decision::onboarding_id.eq(onboarding_id))
             .get_results(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn latest_footprint_actor_decision(
+        conn: &mut PgConn,
+        footprint_user_id: &FootprintUserId,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> DbResult<Option<Self>> {
+        let res = onboarding_decision::table
+            .filter(onboarding_decision::actor.eq(DbActor::Footprint))
+            .inner_join(onboarding::table.inner_join(scoped_user::table))
+            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(is_live))
+            .order_by(onboarding_decision::created_at.desc())
+            .select(onboarding_decision::all_columns)
+            .first(conn)
+            .optional()?;
+        Ok(res)
     }
 
     #[tracing::instrument(skip_all)]

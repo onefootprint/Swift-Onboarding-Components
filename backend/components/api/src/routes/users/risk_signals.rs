@@ -4,6 +4,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 
+use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 
@@ -11,6 +12,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 
 use api_wire_types::RiskSignalFilters;
+use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use itertools::Itertools;
 use newtypes::FootprintUserId;
@@ -39,8 +41,21 @@ pub async fn get(
 
     let signals = state
         .db_pool
-        .db_query(move |conn| RiskSignal::list(conn, &footprint_user_id, &tenant_id, is_live))
+        .db_query(move |conn| -> ApiResult<Vec<RiskSignal>> {
+            let latest_onboarding_decision = OnboardingDecision::latest_footprint_actor_decision(
+                conn,
+                &footprint_user_id,
+                &tenant_id,
+                is_live,
+            )?;
+
+            match latest_onboarding_decision {
+                Some(obd) => Ok(RiskSignal::list_by_onboarding_decision_id(conn, &obd.id)?),
+                None => Ok(vec![]),
+            }
+        })
         .await??;
+
     // TODO this is fine to do in RAM when there aren't many signals. Will be harder with pagination.
     // Maybe we should store the note, severity, and scopes in the DB
     let signals = filter_and_sort(signals, filters.into_inner());

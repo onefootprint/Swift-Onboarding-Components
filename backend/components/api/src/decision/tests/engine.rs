@@ -265,7 +265,7 @@ async fn test_run(
     //
     db_pool
         .db_transaction(move |conn| -> Result<(), DbError> {
-            let onboarding_decisions = OnboardingDecision::get_by_onboarding_id(conn, &onboarding_id)
+            let onboarding_decisions = OnboardingDecision::list_by_onboarding_id(conn, &onboarding_id)
                 .expect("OnboardingDecision should be created");
 
             assert_eq!(1, onboarding_decisions.len());

@@ -77,17 +77,6 @@ impl RiskSignal {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list(
-        conn: &mut PgConn,
-        footprint_user_id: &FootprintUserId,
-        tenant_id: &TenantId,
-        is_live: bool,
-    ) -> DbResult<Vec<Self>> {
-        let results = Self::query(footprint_user_id, tenant_id, is_live).load::<Self>(conn)?;
-        Ok(results)
-    }
-
-    #[tracing::instrument(skip_all)]
     pub fn get(
         conn: &mut PgConn,
         id: &RiskSignalId,
