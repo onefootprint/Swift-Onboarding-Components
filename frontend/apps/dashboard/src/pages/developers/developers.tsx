@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import ApiKeys from './components/api-keys';
 import Header from './components/header';
 import OnboardingConfigs from './components/onboarding-configs';
-import Webhooks from './components/webhooks/webhooks';
+import Webhooks from './components/webhooks';
 
 enum TabName {
   apiKeys = 'api_keys',

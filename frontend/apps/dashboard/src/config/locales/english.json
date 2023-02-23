@@ -739,6 +739,26 @@
         "loading": "Loading..."
       }
     },
+    "proxy-configs": {
+      "page-title": "Footprint | Proxy",
+      "title": "Vault Proxying configurations",
+      "subtitle": "Manage your vault proxying configurations",
+      "create": {
+        "cta": "Create vault proxying config",
+        "cta-not-allowed": "You're not allowed to create vault proxying configurations"
+      },
+      "table": {
+        "aria-label": "Proxy configurations",
+        "header": {
+          "name": "Configuration name",
+          "url": "URL",
+          "method": "HTTP method",
+          "status": "Status",
+          "created_at": "Created at"
+        },
+        "empty-state": "You haven't created any vault proxying configurations just yet."
+      }
+    },
     "settings": {
       "page-title": "Footprint | Settings",
       "header": {
