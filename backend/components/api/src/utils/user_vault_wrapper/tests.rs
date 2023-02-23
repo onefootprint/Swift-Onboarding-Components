@@ -4,7 +4,7 @@ use super::UserVaultWrapper;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
-use db::models::user_vault_data::NewUserVaultData;
+use db::models::user_vault_data::NewPersonVaultData;
 use db::models::user_vault_data::UserVaultData;
 use db::tests::fixtures;
 use db::tests::prelude::*;
@@ -29,15 +29,15 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
 
     // Add identity data
     let data = vec![
-        NewUserVaultData {
+        NewPersonVaultData {
             kind: PersonVaultDataKind::FirstName,
             e_data: SealedVaultBytes(vec![1]),
         },
-        NewUserVaultData {
+        NewPersonVaultData {
             kind: PersonVaultDataKind::LastName,
             e_data: SealedVaultBytes(vec![2]),
         },
-        NewUserVaultData {
+        NewPersonVaultData {
             kind: PersonVaultDataKind::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },

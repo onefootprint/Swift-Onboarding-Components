@@ -7,7 +7,7 @@ use db::{
         scoped_user::ScopedUser,
         tenant::Tenant,
         user_vault::UserVault,
-        user_vault_data::{NewUserVaultData, UserVaultData},
+        user_vault_data::{NewPersonVaultData, UserVaultData},
     },
     tests::prelude::TestPgConn,
 };
@@ -28,15 +28,15 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> UvwSetup {
 
     // Add identity data
     let data = vec![
-        NewUserVaultData {
+        NewPersonVaultData {
             kind: PersonVaultDataKind::FirstName,
             e_data: SealedVaultBytes(vec![1]),
         },
-        NewUserVaultData {
+        NewPersonVaultData {
             kind: PersonVaultDataKind::LastName,
             e_data: SealedVaultBytes(vec![2]),
         },
-        NewUserVaultData {
+        NewPersonVaultData {
             kind: PersonVaultDataKind::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },

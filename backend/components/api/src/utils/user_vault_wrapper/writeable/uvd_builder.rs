@@ -8,7 +8,7 @@ use db::{
     models::{
         data_lifetime::DataLifetime,
         fingerprint::{Fingerprint, NewFingerprint},
-        user_vault_data::{NewUserVaultData, UserVaultData},
+        user_vault_data::{NewPersonVaultData, UserVaultData},
     },
     TxnPgConn,
 };
@@ -21,7 +21,7 @@ use newtypes::{
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
 pub struct UvdBuilder {
-    data: Vec<NewUserVaultData>,
+    data: Vec<NewPersonVaultData>,
 }
 
 impl UvdBuilder {
@@ -31,7 +31,7 @@ impl UvdBuilder {
 
         let mut add_sealed = |pii: PiiString, kind: PersonVaultDataKind| -> ApiResult<()> {
             let sealed = vault_public_key.seal_pii(&pii)?;
-            data.push(NewUserVaultData { kind, e_data: sealed });
+            data.push(NewPersonVaultData { kind, e_data: sealed });
             Ok(())
         };
 

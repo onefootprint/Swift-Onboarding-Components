@@ -1,4 +1,4 @@
-use crate::{EnumDotNotationError, IdDocKind, IdentityDataKind, KvDataKey};
+use crate::{BusinessDataKind, EnumDotNotationError, IdDocKind, IdentityDataKind, KvDataKey};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
@@ -31,6 +31,7 @@ pub enum DataLifetimeKind {
     Id(IdentityDataKind),
     Custom(KvDataKey),
     IdDocument(IdDocKind),
+    Business(BusinessDataKind),
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeKind);
@@ -53,6 +54,12 @@ impl From<IdDocKind> for DataLifetimeKind {
     }
 }
 
+impl From<BusinessDataKind> for DataLifetimeKind {
+    fn from(value: BusinessDataKind) -> Self {
+        Self::Business(value)
+    }
+}
+
 /// A custom implementation to make the appearance of serialized DataLifetimeKind much more reasonable.
 /// We serialize DLKs as `prefix.suffix`
 impl std::fmt::Display for DataLifetimeKind {
@@ -62,6 +69,7 @@ impl std::fmt::Display for DataLifetimeKind {
             Self::Id(s) => s.to_string(),
             Self::Custom(s) => s.to_string(),
             Self::IdDocument(s) => s.to_string(),
+            Self::Business(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -91,6 +99,9 @@ impl FromStr for DataLifetimeKind {
             DataLifetimeKindDiscriminants::IdDocument => {
                 Self::IdDocument(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
+            DataLifetimeKindDiscriminants::Business => {
+                Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
         };
         Ok(result)
     }
@@ -106,6 +117,8 @@ mod tests {
     #[test_case(DataLifetimeKind::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataLifetimeKind::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataLifetimeKind::IdDocument(IdDocKind::IdCard) => "id_document.id_card")]
+    #[test_case(DataLifetimeKind::Business(BusinessDataKind::AddressLine1) => "business.address_line1")]
+    #[test_case(DataLifetimeKind::Business(BusinessDataKind::Website) => "business.website")]
     fn test_to_string(identifier: DataLifetimeKind) -> String {
         identifier.to_string()
     }
@@ -116,6 +129,8 @@ mod tests {
     #[test_case("custom.hello.today.there." => DataLifetimeKind::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataLifetimeKind::Custom(KvDataKey::escape_hatch("".to_owned())))]
     #[test_case("id_document.driver_license" => DataLifetimeKind::IdDocument(IdDocKind::DriverLicense))]
+    #[test_case("business.address_line1" => DataLifetimeKind::Business(BusinessDataKind::AddressLine1))]
+    #[test_case("business.website" => DataLifetimeKind::Business(BusinessDataKind::Website))]
     fn test_from_str(input: &str) -> DataLifetimeKind {
         DataLifetimeKind::from_str(input).unwrap()
     }

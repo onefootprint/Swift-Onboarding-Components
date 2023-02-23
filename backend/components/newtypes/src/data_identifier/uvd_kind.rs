@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumIter, EnumString};
 
-use crate::{BusinessDataKind, EnumDotNotationError, IdentityDataKind};
+use crate::{BusinessDataKind, DataLifetimeKind, EnumDotNotationError, IdentityDataKind};
 
 #[derive(
     Debug,
@@ -76,6 +76,12 @@ impl From<PersonVaultDataKind> for UvdKind {
     }
 }
 
+impl From<BusinessDataKind> for UvdKind {
+    fn from(value: BusinessDataKind) -> Self {
+        UvdKind::Business(value)
+    }
+}
+
 impl From<PersonVaultDataKind> for IdentityDataKind {
     fn from(value: PersonVaultDataKind) -> Self {
         match value {
@@ -91,6 +97,12 @@ impl From<PersonVaultDataKind> for IdentityDataKind {
             PersonVaultDataKind::Zip => Self::Zip,
             PersonVaultDataKind::Country => Self::Country,
         }
+    }
+}
+
+impl From<PersonVaultDataKind> for DataLifetimeKind {
+    fn from(value: PersonVaultDataKind) -> Self {
+        IdentityDataKind::from(value).into()
     }
 }
 
