@@ -32,7 +32,10 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           property="og:title"
           content={t('html-title', { tenantName: tenant.name })}
         />
-        <meta property="og:description" content={t('html-description')} />
+        <meta
+          property="og:description"
+          content={t('html-description', { tenantName: tenant.name })}
+        />
         {tenant.logoUrl ? (
           <meta
             property="og:image"
