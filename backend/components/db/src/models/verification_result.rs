@@ -21,7 +21,7 @@ pub struct VerificationResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = verification_result)]
-struct NewVerificationResult {
+pub struct NewVerificationResult {
     pub request_id: VerificationRequestId,
     // ScrubbedJson is so that we know that, although this is a serde_json::Value, some important fields have been scrubbed and you need to use the e_response
     #[diesel(serialize_as = serde_json::Value)]
@@ -48,6 +48,16 @@ impl VerificationResult {
         let result = diesel::insert_into(verification_result::table)
             .values(new_result)
             .get_result(conn)?;
+        Ok(result)
+    }
+
+    pub fn bulk_create(
+        conn: &mut PgConn,
+        new_verification_results: Vec<NewVerificationResult>,
+    ) -> Result<Vec<VerificationResult>, DbError> {
+        let result = diesel::insert_into(verification_result::table)
+            .values(new_verification_results)
+            .get_results(conn)?;
         Ok(result)
     }
 }

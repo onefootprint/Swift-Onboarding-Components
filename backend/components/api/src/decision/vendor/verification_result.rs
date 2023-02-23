@@ -1,46 +1,49 @@
+use chrono::Utc;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
-use db::{models::verification_result::VerificationResult, DbPool};
+use db::{
+    models::verification_result::{NewVerificationResult, VerificationResult},
+    DbPool,
+};
 use enclave_proxy::DataTransform;
-use idv::VendorResponse;
-use newtypes::{
-    EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedJsonValue, SealedVaultBytes, VaultPublicKey,
-    VerificationRequestId,
-};
+use newtypes::{EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedJsonValue, SealedVaultBytes, VaultPublicKey};
 
-use crate::{
-    enclave_client::EnclaveClient,
-    errors::{ApiError, ApiResult},
-};
+use crate::{enclave_client::EnclaveClient, errors::ApiError};
+
+use super::make_request::VerificationRequestWithVendorResponse;
 
 /// Save a verification result, encrypting the response payload in the process
-pub(super) async fn save_verification_result(
+pub async fn save_verification_result(
     db_pool: &DbPool,
-    verification_request_id: VerificationRequestId,
-    vendor_response: VendorResponse,
-    user_vault_public_key: VaultPublicKey, // passed in so unit testing is easier
-) -> Result<VerificationResult, ApiError> {
-    let res = db_pool
-        .db_transaction(move |conn| -> ApiResult<VerificationResult> {
+    vendor_responses: Vec<VerificationRequestWithVendorResponse>,
+    user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
+) -> Result<Vec<VerificationResult>, ApiError> {
+    let now = Utc::now();
+    let new_verification_results: Vec<NewVerificationResult> = vendor_responses
+        .into_iter()
+        .map(|(req, res)| {
             // For testing rollout of footprint
-            let scrubbed_json = ScrubbedJsonValue::scrub(&vendor_response.response)?;
+            let scrubbed_json = ScrubbedJsonValue::scrub(&res.response)?;
 
-            let e_response =
-                encrypt_verification_result_response(vendor_response.raw_response, user_vault_public_key)?;
+            let e_response = encrypt_verification_result_response(res.raw_response, user_vault_public_key)?;
 
-            let verification_result =
-                VerificationResult::create(conn, verification_request_id, scrubbed_json, e_response)?;
-
-            Ok(verification_result)
+            Ok(NewVerificationResult {
+                request_id: req.id,
+                response: scrubbed_json,
+                timestamp: now,
+                e_response: Some(e_response),
+            })
         })
-        .await?;
+        .collect::<Result<Vec<NewVerificationResult>, ApiError>>()?;
 
-    Ok(res)
+    db_pool
+        .db_query(move |conn| Ok(VerificationResult::bulk_create(conn, new_verification_results)?))
+        .await?
 }
 
 // Encrypt payload using UV
 pub fn encrypt_verification_result_response(
     response: PiiJsonValue,
-    user_vault_public_key: VaultPublicKey,
+    user_vault_public_key: &VaultPublicKey,
 ) -> Result<SealedVaultBytes, ApiError> {
     user_vault_public_key
         .seal_bytes(response.leak_to_vec()?.as_slice())

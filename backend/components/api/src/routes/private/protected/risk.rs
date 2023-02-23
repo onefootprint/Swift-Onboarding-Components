@@ -66,7 +66,7 @@ async fn make_vendor_calls(
         fp_user_id,
     } = request.into_inner();
 
-    let requests = state
+    let (requests, ob) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
@@ -77,11 +77,11 @@ async fn make_vendor_calls(
 
             let requests = vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
 
-            Ok(requests)
+            Ok((requests, ob))
         })
         .await?;
 
-    let vendor_results = decision::engine::make_vendor_requests(
+    let vendor_responses = decision::engine::make_vendor_requests(
         &state.db_pool,
         &state.enclave_client,
         state.config.service_config.is_production(),
@@ -92,6 +92,9 @@ async fn make_vendor_calls(
         &state.twilio_client.client,
     )
     .await?;
+
+    let vendor_results =
+        decision::engine::save_vendor_responses(&state.db_pool, vendor_responses, &ob.id).await?;
 
     let (rules_output, _) =
         crate::decision::engine::calculate_decision(vendor_results.clone(), &state.feature_flag_client)?;

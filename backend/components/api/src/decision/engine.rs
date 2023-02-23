@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
@@ -10,7 +12,10 @@ use crate::{
 use super::{
     features::FeatureVector,
     risk::OnboardingRulesDecisionOutput,
-    vendor::{vendor_result::VendorResult, vendor_trait::VendorAPICall},
+    vendor::{
+        make_request::VerificationRequestWithVendorResponse, vendor_result::VendorResult,
+        vendor_trait::VendorAPICall, verification_result,
+    },
     *,
 };
 use db::{
@@ -18,6 +23,7 @@ use db::{
         onboarding::Onboarding,
         user_vault::UserVault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
+        verification_result::VerificationResult,
     },
     DbError, DbPool,
 };
@@ -27,7 +33,7 @@ use idv::{
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
 
-use newtypes::OnboardingId;
+use newtypes::{OnboardingId, VerificationRequestId};
 use prometheus::labels;
 ///
 /// Run loads saved VerificationRequests and (potentially) VerificationResults and produces a Decision
@@ -61,10 +67,13 @@ pub async fn run(
     )
     .await?;
 
+    let completed_oustanding_vendor_responses =
+        save_vendor_responses(db_pool, completed_outstanding_vendor_requests, &ob.id).await?;
+
     let all_vendor_results = vendor_requests
         .completed_requests
         .into_iter()
-        .chain(completed_outstanding_vendor_requests.into_iter())
+        .chain(completed_oustanding_vendor_responses.into_iter())
         .collect();
 
     // Calculate output from rules + features
@@ -82,6 +91,41 @@ pub async fn run(
 
     // Save/action/emit risk signals for the decision
     make_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, features, true).await
+}
+
+pub async fn save_vendor_responses(
+    db_pool: &DbPool,
+    vendor_responses: Vec<VerificationRequestWithVendorResponse>,
+    onboarding_id: &OnboardingId,
+) -> ApiResult<Vec<VendorResult>> {
+    let obid = onboarding_id.clone();
+    let uv = db_pool
+        .db_query(move |conn| UserVault::get(conn, &obid))
+        .await??;
+
+    let mut verification_results: HashMap<VerificationRequestId, VerificationResult> =
+        verification_result::save_verification_result(db_pool, vendor_responses.clone(), &uv.public_key)
+            .await?
+            .into_iter()
+            .map(|vr| (vr.request_id.clone(), vr))
+            .collect();
+
+    let results: Vec<VendorResult> = vendor_responses
+        .into_iter()
+        .map(|(req, res)| -> ApiResult<VendorResult> {
+            let verification_result = verification_results
+                .remove(&req.id)
+                .ok_or(DbError::RelatedObjectNotFound)?;
+
+            Ok(VendorResult {
+                response: res,
+                verification_result_id: verification_result.id,
+                verification_request_id: req.id,
+            })
+        })
+        .collect::<Result<Vec<VendorResult>, _>>()?;
+
+    Ok(results)
 }
 
 pub struct VendorRequests {
@@ -146,7 +190,7 @@ pub async fn make_vendor_requests(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> ApiResult<Vec<VendorResult>> {
+) -> ApiResult<Vec<VerificationRequestWithVendorResponse>> {
     // Make requests
     let raw_results = vendor::make_request::make_vendor_requests(
         requests,

@@ -170,7 +170,7 @@ async fn setup_test_fixtures(
             let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
             let e_response = vendor::verification_result::encrypt_verification_result_response(
                 raw_response.clone().into(),
-                uv.public_key,
+                &uv.public_key,
             )?;
 
             // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create

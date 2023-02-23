@@ -339,10 +339,7 @@ pub async fn make_idv_request(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> Result<vendor_result::VendorResult, ApiError> {
-    let request_id = request.id.clone();
-    let requestid = request.id.clone();
-
+) -> Result<VendorResponse, ApiError> {
     let data =
         build_request::build_idv_data_from_verification_request(db_pool, enclave_client, request.clone())
             .await?;
@@ -358,25 +355,7 @@ pub async fn make_idv_request(
         twilio_client,
     )
     .await?;
-    let uv = db_pool
-        .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
-        .await??;
-    // TODO: pull out saving VR here to enable RAM-only smoke testing
-    let verification_result = verification_result::save_verification_result(
-        db_pool,
-        request_id.clone(),
-        vendor_response.clone(),
-        uv.public_key,
-    )
-    .await?;
-
-    let result = vendor_result::VendorResult {
-        response: vendor_response,
-        verification_result_id: verification_result.id,
-        verification_request_id: request_id,
-    };
-
-    Ok(result)
+    Ok(vendor_response)
 }
 
 /// Make our requests to a vendor, building data from the cached VerificationRequest
@@ -396,19 +375,20 @@ pub async fn make_docv_request(
         build_request::build_docv_data_for_submission_from_verification_request(state, request.clone())
             .await?;
 
-    let vendor_response = send_docv_request(state, request, data).await?;
+    let vendor_response = send_docv_request(state, request.clone(), data).await?;
     let uv = state
         .db_pool
         .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
         .await??;
 
-    let verification_result = verification_result::save_verification_result(
-        &state.db_pool,
-        request_id.clone(),
-        vendor_response.clone(),
-        uv.public_key,
-    )
-    .await?;
+    let vendor_responses: Vec<VerificationRequestWithVendorResponse> =
+        vec![(request.clone(), vendor_response.clone())];
+
+    let verification_result =
+        verification_result::save_verification_result(&state.db_pool, vendor_responses, &uv.public_key)
+            .await?
+            .pop()
+            .ok_or(DbError::IncorrectNumberOfRowsUpdated)?; // not really the most apt error but this should never happen
 
     let result = vendor_result::VendorResult {
         response: vendor_response,
@@ -418,6 +398,8 @@ pub async fn make_docv_request(
 
     Ok(result)
 }
+
+pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
 
 #[tracing::instrument(skip_all)]
 pub async fn make_vendor_requests(
@@ -433,10 +415,10 @@ pub async fn make_vendor_requests(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> Result<Vec<Result<vendor_result::VendorResult, ApiError>>, ApiError> {
+) -> Result<Vec<Result<VerificationRequestWithVendorResponse, ApiError>>, ApiError> {
     let raw_futures_with_vendors = requests.into_iter().map(|r| {
         (
-            r.vendor_api,
+            r.clone(),
             make_idv_request(
                 r,
                 db_pool,
@@ -450,15 +432,15 @@ pub async fn make_vendor_requests(
         )
     });
 
-    let (vendor_apis, raw_futures): (Vec<_>, Vec<_>) = raw_futures_with_vendors.into_iter().unzip();
+    let (reqs, raw_futures): (Vec<_>, Vec<_>) = raw_futures_with_vendors.into_iter().unzip();
     let raw_results = futures::future::join_all(raw_futures).await;
     let results = raw_results
         .into_iter()
         .enumerate()
         .map(|(idx, res)| match res {
-            Ok(_) => res,
+            Ok(vr) => Ok((reqs[idx].clone(), vr)),
             Err(ref e) => {
-                let vendor_api = vendor_apis[idx];
+                let vendor_api = reqs[idx].vendor_api;
                 tracing::warn!(
                     vendor_api = %vendor_api,
                     err = format!("{:?}", e),
