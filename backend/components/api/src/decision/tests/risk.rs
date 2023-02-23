@@ -1,5 +1,5 @@
 use crate::decision::risk::evaluate_onboarding_rules;
-use feature_flag::FeatureFlag;
+use feature_flag::BoolFlag;
 use newtypes::{DecisionStatus, FootprintReasonCode};
 use std::str::FromStr;
 use test_case::test_case;
@@ -62,23 +62,19 @@ fn test_final_decision(
     // this is a permanent rule so we never request this flag value
     mock_ff_client
         .expect_flag()
-        .withf(|f| {
-            *f == FeatureFlag::EnableRuleSetForDecision(&onboarding_rules::idology_base_rule_set().name)
-        })
+        .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&onboarding_rules::idology_base_rule_set().name))
         .never();
 
     mock_ff_client
         .expect_flag()
         .withf(|f| {
-            *f == FeatureFlag::EnableRuleSetForDecision(
-                &onboarding_rules::idology_conservative_rule_set().name,
-            )
+            *f == BoolFlag::EnableRuleSetForDecision(&onboarding_rules::idology_conservative_rule_set().name)
         })
         .times(1)
         .return_once(move |_| should_use_conservative_rules);
     mock_ff_client
         .expect_flag()
-        .withf(|f| *f == FeatureFlag::EnableRuleSetForDecision(&onboarding_rules::temp_watchlist().name))
+        .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&onboarding_rules::temp_watchlist().name))
         .times(1)
         .return_once(move |_| should_use_conservative_rules);
 

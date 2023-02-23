@@ -101,7 +101,7 @@ pub enum ApiError {
     #[error("{0}")]
     AssertionError(String),
     #[error("{0}")]
-    FeatureFlagError(#[from] feature_flag::FeatureFlagError),
+    FeatureFlagError(#[from] feature_flag::Error),
     #[error("Invalid body: proxy requests must contain utf8 only")]
     InvalidProxyBody,
     #[error("Missing required header: {0}")]

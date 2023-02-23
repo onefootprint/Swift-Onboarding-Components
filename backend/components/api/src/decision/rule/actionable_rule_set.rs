@@ -1,4 +1,4 @@
-use feature_flag::{FeatureFlag, FeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient};
 
 use super::{
     rule_set::{EvaluateRuleSet, EvaluatedRuleSet, RuleSet, RuleSetResult},
@@ -63,7 +63,7 @@ impl<T: Clone> ActionableRuleSetBuilder<T> {
     }
 
     pub fn build(self, feature_flag_client: &impl FeatureFlagClient) -> ActionableRuleSet<T> {
-        let can_action = feature_flag_client.flag(FeatureFlag::EnableRuleSetForDecision(&self.ruleset.name));
+        let can_action = feature_flag_client.flag(BoolFlag::EnableRuleSetForDecision(&self.ruleset.name));
 
         ActionableRuleSet {
             ruleset: self.ruleset,

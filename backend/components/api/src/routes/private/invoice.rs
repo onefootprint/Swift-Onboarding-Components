@@ -7,7 +7,7 @@ use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::scoped_user::{count_authorized_for_tenant, ScopedUserListQueryParams};
-use feature_flag::{FeatureFlag, FeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::StripeCustomerId;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -57,10 +57,7 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
 
 #[tracing::instrument(skip_all)]
 async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> {
-    if !state
-        .feature_flag_client
-        .flag(FeatureFlag::ShouldBill(&tenant.id))
-    {
+    if !state.feature_flag_client.flag(BoolFlag::ShouldBill(&tenant.id)) {
         return Ok(());
     }
     let interval = billing::interval::get_billing_interval(Utc::now().date_naive())?;

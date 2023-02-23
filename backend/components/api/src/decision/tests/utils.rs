@@ -1,7 +1,7 @@
 use crate::decision::utils;
 use crate::tests::fixtures;
 use db::tests::prelude::*;
-use feature_flag::{FeatureFlag, MockFeatureFlagClient};
+use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::db_test;
 use newtypes::{DecisionStatus, OnboardingId, PhoneNumber};
 use std::str::FromStr;
@@ -43,7 +43,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
-        .withf(move |f| *f == FeatureFlag::IsDemoTenant(&tenant_id))
+        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .times(1)
         .return_once(|_| false);
 
@@ -69,7 +69,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
-        .withf(move |f| *f == FeatureFlag::IsDemoTenant(&tenant_id))
+        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .times(1)
         .return_once(|_| true);
 

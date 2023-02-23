@@ -19,7 +19,7 @@ use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::user_vault_wrapper::UserVaultWrapper,
 };
-use feature_flag::{FeatureFlag, FeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use strum::IntoEnumIterator;
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
@@ -45,8 +45,7 @@ pub async fn save_final_decision(
         .await??
         .tenant_id;
 
-    let tenant_can_view_socure_risk_signal =
-        ff_client.flag(FeatureFlag::CanViewSocureRiskSignals(&tenant_id));
+    let tenant_can_view_socure_risk_signal = ff_client.flag(BoolFlag::CanViewSocureRiskSignals(&tenant_id));
 
     let obd = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {

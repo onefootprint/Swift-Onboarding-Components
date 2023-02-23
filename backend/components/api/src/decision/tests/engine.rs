@@ -19,7 +19,7 @@ use db::{
     DbError, TxnPgConn,
 };
 #[cfg(test)]
-use feature_flag::{FeatureFlag, MockFeatureFlagClient};
+use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
@@ -200,19 +200,19 @@ async fn test_run(
     mock_ff_client
         .expect_flag()
         .times(1)
-        .withf(move |f| *f == FeatureFlag::CanViewSocureRiskSignals(&tenant.id))
+        .withf(move |f| *f == BoolFlag::CanViewSocureRiskSignals(&tenant.id))
         .return_once(|_| false);
 
     mock_ff_client
         .expect_flag()
         .times(1)
-        .withf(|f| *f == FeatureFlag::EnableRuleSetForDecision(&RuleSetName::IdologyConservativeFailingRules))
+        .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&RuleSetName::IdologyConservativeFailingRules))
         .returning(|_| true);
 
     mock_ff_client
         .expect_flag()
         .times(1)
-        .withf(|f| *f == FeatureFlag::EnableRuleSetForDecision(&RuleSetName::TempWatchlist))
+        .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&RuleSetName::TempWatchlist))
         .returning(|_| true);
 
     mock_twilio_api_call
@@ -233,7 +233,7 @@ async fn test_run(
     mock_ff_client
         .expect_flag()
         .times(1)
-        .withf(|f| *f == FeatureFlag::DisableAllSocure)
+        .withf(|f| *f == BoolFlag::DisableAllSocure)
         .return_once(move |_| matches!(socure_enabled, SocureEnabled::No));
 
     if matches!(socure_enabled, SocureEnabled::Yes) {

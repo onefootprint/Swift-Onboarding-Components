@@ -21,7 +21,7 @@ use crate::{
     utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
-use feature_flag::{FeatureFlag, FeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient};
 
 type ShouldInitiateVerificationRequests = bool;
 
@@ -125,7 +125,7 @@ pub async fn should_initiate_prod_and_setup(
     ff_client: &impl FeatureFlagClient,
     should_setup_test_fixtures: bool,
 ) -> ApiResult<bool> {
-    if ff_client.flag(FeatureFlag::IsDemoTenant(&tenant_id)) {
+    if ff_client.flag(BoolFlag::IsDemoTenant(&tenant_id)) {
         if should_setup_test_fixtures {
             setup_test_fixtures(state, ob_id, false, DecisionStatus::Pass, uvw).await?;
         }

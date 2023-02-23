@@ -15,7 +15,7 @@ use db::{
     },
     PgConn,
 };
-use feature_flag::{FeatureFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::{CollectedDataOption, TenantId, TenantScope, TenantUserId};
 use paperclip::actix::{Apiv2Schema, Apiv2Security};
 
@@ -99,7 +99,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         // permissions for other tenants
         let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
 
-        let is_risk_ops = ff_client.flag(FeatureFlag::IsRiskOps(&tenant_user.email));
+        let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
         Ok(Self(FirmEmployeeAuth {

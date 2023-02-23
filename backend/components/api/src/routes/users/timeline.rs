@@ -6,7 +6,7 @@ use crate::auth::Either;
 
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
-use feature_flag::FeatureFlag;
+use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 
 use crate::utils::db2api::DbToApi;
@@ -35,7 +35,7 @@ pub async fn get(
     // Not all tenants should see socure related risk signals
     let tenant_can_view_socure_risk_signal = state
         .feature_flag_client
-        .flag(FeatureFlag::CanViewSocureRiskSignals(&tenant_id));
+        .flag(BoolFlag::CanViewSocureRiskSignals(&tenant_id));
 
     let events = state
         .db_pool

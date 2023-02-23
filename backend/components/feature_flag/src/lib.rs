@@ -1,22 +1,22 @@
 use std::sync::Arc;
 
-use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder, Detail};
+use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
 use mockall::{automock, predicate::*};
-use newtypes::{ObConfigurationKey, OrgMemberEmail, TenantId, Uuid};
+use newtypes::Uuid;
 use thiserror::Error;
 
-use newtypes::decision::RuleSetName;
-use serde_json::json;
+mod flags;
+pub use flags::*;
 
 #[derive(Debug, Error)]
 #[allow(clippy::enum_variant_names)]
-pub enum FeatureFlagError {
+pub enum Error {
     #[error("Launch Darkly error when building Context: {0}")]
-    LaunchDarklyContextBuilderError(String),
+    ContextBuilderError(String),
     #[error("Launch Darkly error: {0:?}")]
-    LaunchDarklyError(launchdarkly_server_sdk::EvalError),
+    LdError(launchdarkly_server_sdk::EvalError),
     #[error("Launch Darkly client failed to initialize")]
-    LaunchDarklyClientFailedToInitialize,
+    ClientFailedToInit,
     #[error("{0}")]
     SerdeJson(#[from] serde_json::Error),
 }
@@ -47,146 +47,35 @@ impl LaunchDarklyFeatureFlagClient {
         }
     }
 
-    #[tracing::instrument(skip(self))]
-    fn bool_flag(&self, flag_name: &str) -> Result<bool, FeatureFlagError> {
-        let key = Uuid::new_v4().to_string();
-        let context_builder = ContextBuilder::new(key);
-        self.get_and_log_ld_bool_flag(flag_name, context_builder)
-    }
-
-    #[tracing::instrument(skip(self))]
-    fn bool_flag_with_key(&self, flag_name: &str, key: String) -> Result<bool, FeatureFlagError> {
-        let context_builder = ContextBuilder::new(key);
-        self.get_and_log_ld_bool_flag(flag_name, context_builder)
-    }
-
-    fn unwrap_client(&self) -> Result<&Arc<Client>, FeatureFlagError> {
+    fn unwrap_client(&self) -> Result<&Arc<Client>, Error> {
         let client = self
             .launch_darkly_client
             .as_ref()
-            .ok_or(FeatureFlagError::LaunchDarklyClientFailedToInitialize)?;
+            .ok_or(Error::ClientFailedToInit)?;
         Ok(client)
     }
 
-    //bool_variation_detail
-    fn get_ld_bool_flag_detail(
-        &self,
-        flag_name: &str,
-        context_builder: ContextBuilder,
-    ) -> Result<Detail<bool>, FeatureFlagError> {
-        let context = context_builder
+    fn get_bool_flag<'a>(&self, flag: &'a BoolFlag<'a>) -> Result<bool, Error> {
+        let key = flag.key().unwrap_or_else(|| Uuid::new_v4().to_string());
+        let context = ContextBuilder::new(key)
             .build()
-            .map_err(FeatureFlagError::LaunchDarklyContextBuilderError)?;
+            .map_err(Error::ContextBuilderError)?;
 
         let client = self.unwrap_client()?;
-        let detail = client.bool_variation_detail(&context, flag_name, false);
-        match detail.reason {
-            launchdarkly_server_sdk::Reason::Error { error } => {
-                Err(FeatureFlagError::LaunchDarklyError(error))
+        let detail = client.bool_variation_detail(&context, &flag.flag_name(), flag.default());
+        if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
+            return Err(Error::LdError(error));
+        }
+        let val = detail.value.unwrap_or_else(|| flag.default());
+        Ok(val)
+    }
+
+    fn log_flag<T: std::fmt::Debug>(result: &Result<T, Error>, flag_name: String) {
+        match result {
+            Ok(ref result) => {
+                tracing::info!(flag_name=%flag_name, detail=format!("{:?}", result), "LaunchDarkly flag result")
             }
-            _ => Ok(detail),
-        }
-    }
-
-    fn get_and_log_ld_bool_flag(
-        &self,
-        flag_name: &str,
-        context_builder: ContextBuilder,
-    ) -> Result<bool, FeatureFlagError> {
-        let res = self.get_ld_bool_flag_detail(flag_name, context_builder);
-        match res {
-            Ok(detail) => {
-                tracing::info!(flag_name=%flag_name, detail=format!("{:?}", detail), "LaunchDarkly flag result");
-                Ok(detail.value.unwrap_or(false))
-            }
-            Err(err) => {
-                tracing::warn!(flag_name=%flag_name, err=%err, "LaunchDarklyError");
-                Err(err)
-            }
-        }
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, strum::Display)]
-pub enum FeatureFlag<'a> {
-    #[strum(to_string = "IsFirmEmployeeRiskOps")]
-    IsRiskOps(&'a OrgMemberEmail),
-    #[strum(to_string = "IsDemoTenant")]
-    IsDemoTenant(&'a TenantId),
-    #[strum(to_string = "EnableBilling")]
-    ShouldBill(&'a TenantId),
-    #[strum(to_string = "TenantCanViewSocureRiskSignal")]
-    CanViewSocureRiskSignals(&'a TenantId),
-    #[strum(to_string = "EnableRuleSetForDecision")]
-    EnableRuleSetForDecision(&'a RuleSetName),
-    #[strum(to_string = "EnableIdologyIdvCallsInNonProdEnvironment")]
-    EnableIdologyInNonProd(&'a ObConfigurationKey),
-    #[strum(to_string = "EnableSocureIdvCallsInNonProdEnvironment")]
-    EnableSocureInNonProd(&'a ObConfigurationKey),
-    #[strum(to_string = "EnableScanOnboardingCallsInNonProdEnvironment")]
-    EnableScanOnboardingInNonProd(&'a ObConfigurationKey),
-    #[strum(to_string = "DisableAllScanOnboardingCalls")]
-    DisableAllScanOnboarding,
-    #[strum(to_string = "DisableAllSocureIdvCalls")]
-    DisableAllSocure,
-}
-
-impl<'a> FeatureFlag<'a> {
-    fn flag_name(&self) -> String {
-        self.to_string()
-    }
-
-    fn key(&self) -> Option<String> {
-        match self {
-            Self::IsRiskOps(k) => Some(k.to_string()),
-            Self::IsDemoTenant(k) => Some(k.to_string()),
-            Self::ShouldBill(k) => Some(k.to_string()),
-            Self::CanViewSocureRiskSignals(k) => Some(k.to_string()),
-            Self::EnableRuleSetForDecision(k) => Some(k.to_string()),
-            Self::EnableScanOnboardingInNonProd(k) => Some(k.to_string()),
-            Self::EnableIdologyInNonProd(k) => Some(k.to_string()),
-            Self::EnableSocureInNonProd(k) => Some(k.to_string()),
-            Self::DisableAllScanOnboarding => None,
-            Self::DisableAllSocure => None,
-        }
-    }
-
-    fn default(&self) -> bool {
-        match self {
-            Self::IsRiskOps(_) => false,
-            Self::IsDemoTenant(_) => false,
-            Self::ShouldBill(_) => false,
-            Self::CanViewSocureRiskSignals(_) => false,
-            Self::EnableRuleSetForDecision(_) => false,
-            Self::EnableScanOnboardingInNonProd(_) => false,
-            Self::EnableIdologyInNonProd(_) => false,
-            Self::EnableSocureInNonProd(_) => false,
-            Self::DisableAllScanOnboarding => false,
-            Self::DisableAllSocure => false,
-        }
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, strum::Display)]
-pub enum JsonFlag<'a> {
-    #[strum(to_string = "BillingProfile")]
-    BillingProfile(&'a TenantId),
-}
-
-impl<'a> JsonFlag<'a> {
-    fn flag_name(&self) -> String {
-        self.to_string()
-    }
-
-    fn key(&self) -> Option<String> {
-        match self {
-            Self::BillingProfile(k) => Some(k.to_string()),
-        }
-    }
-
-    fn default(&self) -> serde_json::Value {
-        match self {
-            Self::BillingProfile(_) => json!({}),
+            Err(ref err) => tracing::warn!(flag_name=%flag_name, err=%err, "LaunchDarklyError"),
         }
     }
 }
@@ -194,36 +83,35 @@ impl<'a> JsonFlag<'a> {
 #[automock]
 pub trait FeatureFlagClient: Sync + Send {
     #[allow(clippy::needless_lifetimes)]
-    fn flag<'a>(&self, flag: FeatureFlag<'a>) -> bool;
+    fn flag<'a>(&self, flag: BoolFlag<'a>) -> bool;
 }
 
 impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
     #[tracing::instrument(skip(self))]
-    fn flag<'a>(&self, flag: FeatureFlag<'a>) -> bool {
-        let result = if let Some(key) = flag.key() {
-            self.bool_flag_with_key(&flag.flag_name(), key)
-        } else {
-            self.bool_flag(&flag.flag_name())
-        };
+    /// Fetches the value for the provided BoolFlag
+    fn flag<'a>(&self, flag: BoolFlag<'a>) -> bool {
+        let result = self.get_bool_flag(&flag);
+        Self::log_flag(&result, flag.flag_name());
         result.unwrap_or_else(|_| flag.default())
     }
 }
 
 impl LaunchDarklyFeatureFlagClient {
+    /// Fetches the value for the provided JsonFlag and deserializes into T
     #[tracing::instrument(skip(self))]
-    pub fn json_flag<'a, T>(&self, flag: JsonFlag<'a>) -> Result<T, FeatureFlagError>
+    pub fn json_flag<'a, T>(&self, flag: JsonFlag<'a>) -> Result<T, Error>
     where
         T: serde::de::DeserializeOwned,
     {
-        // TODO why do we do this?
+        // Could put this on the FeatureFlagClient trait if we want to mock it
         let key = flag.key().unwrap_or_else(|| Uuid::new_v4().to_string());
         let context = ContextBuilder::new(key)
             .build()
-            .map_err(FeatureFlagError::LaunchDarklyContextBuilderError)?;
+            .map_err(Error::ContextBuilderError)?;
         let client = self.unwrap_client()?;
         let detail = client.json_variation_detail(&context, &flag.flag_name(), flag.default());
         if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
-            return Err(FeatureFlagError::LaunchDarklyError(error));
+            return Err(Error::LdError(error));
         }
         let val = detail.value.unwrap_or_else(|| flag.default());
         let val = serde_json::value::from_value(val)?;
@@ -233,7 +121,7 @@ impl LaunchDarklyFeatureFlagClient {
 
 #[cfg(test)]
 mod test {
-    use super::FeatureFlag as FF;
+    use super::BoolFlag as FF;
     use newtypes::{OrgMemberEmail, TenantId};
     use test_case::test_case;
 

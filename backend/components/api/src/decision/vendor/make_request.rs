@@ -12,7 +12,7 @@ use db::{
     },
     DbError,
 };
-use feature_flag::{FeatureFlag, FeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
@@ -148,7 +148,7 @@ pub async fn send_idology_idv_request(
     >,
     ff_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
-    if is_production || ff_client.flag(FeatureFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
+    if is_production || ff_client.flag(BoolFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
         let res = idology_api_call
             .make_request(IdologyExpectIDRequest { idv_data: data })
             .await;
@@ -240,9 +240,9 @@ pub async fn send_socure_idv_request(
         )
         .await??;
 
-    if ff_client.flag(FeatureFlag::DisableAllSocure) {
+    if ff_client.flag(BoolFlag::DisableAllSocure) {
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
-    } else if is_production || ff_client.flag(FeatureFlag::EnableSocureInNonProd(&ob_configuration_key)) {
+    } else if is_production || ff_client.flag(BoolFlag::EnableSocureInNonProd(&ob_configuration_key)) {
         let res = socure_client
             .make_request(SocureIDPlusRequest {
                 idv_data: data,
@@ -299,10 +299,10 @@ pub async fn send_scan_onboarding_docv_request(
         })
         .await??;
 
-    if ff_client.flag(FeatureFlag::DisableAllScanOnboarding) {
+    if ff_client.flag(BoolFlag::DisableAllScanOnboarding) {
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
     } else if state.config.service_config.is_production()
-        || ff_client.flag(FeatureFlag::EnableScanOnboardingInNonProd(&ob_configuration_key))
+        || ff_client.flag(BoolFlag::EnableScanOnboardingInNonProd(&ob_configuration_key))
     {
         idv::idology::send_scan_onboarding_request(&state.idology_client, data)
             .await
@@ -490,7 +490,7 @@ mod tests {
         let ob_config_key = ob_configuration_key.clone();
         mock_ff_client
             .expect_flag()
-            .withf(move |f| *f == FeatureFlag::EnableIdologyInNonProd(&ob_config_key))
+            .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
             .return_once(move |_| flag_value);
 
         if expect_api_call {

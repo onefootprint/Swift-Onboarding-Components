@@ -32,7 +32,7 @@ pub enum Error {
     #[error("Invoice is missing a line item. Has {0} line items, expected to have {1} line items")]
     InvoiceMissingItem(usize, usize),
     #[error("{0}")]
-    FeatureFlagError(#[from] feature_flag::FeatureFlagError),
+    FeatureFlagError(#[from] feature_flag::Error),
 }
 
 #[derive(Clone)]
