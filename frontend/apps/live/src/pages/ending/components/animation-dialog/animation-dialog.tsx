@@ -1,0 +1,149 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { IcoCheck24 } from '@onefootprint/icons';
+import { Typography } from '@onefootprint/ui';
+import Rive from '@rive-app/react-canvas';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
+import { useTimeout } from 'usehooks-ts';
+
+import Sparkles from '../sparkles/sparkles';
+
+const ID_ANIMATION_DURATION = 2500;
+const SUCCESS_ANIMATION_DURATION = 2000;
+const END_MESSAGE_DURATION = 6000;
+
+const messageVariants = {
+  initial: {
+    display: 'none',
+    opacity: 0,
+    y: 20,
+  },
+  animate: {
+    display: 'flex',
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1,
+      ease: 'easeOut',
+    },
+  },
+  exit: {
+    display: 'none',
+    opacity: 0,
+    y: 20,
+    transition: {
+      duration: 0.4,
+      ease: 'easeIn',
+    },
+  },
+};
+
+type AnimationDialogContentProps = {
+  onClose: () => void;
+};
+
+const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
+  const { t } = useTranslation('ending');
+  const [showIdAnimation, setShowIdAnimation] = useState(true);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showEndMessage, setShowEndMessage] = useState(false);
+
+  useTimeout(() => {
+    setShowIdAnimation(false);
+    setShowSuccessMessage(true);
+
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+      setShowEndMessage(true);
+    }, SUCCESS_ANIMATION_DURATION);
+
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+      onClose();
+    }, END_MESSAGE_DURATION);
+  }, ID_ANIMATION_DURATION);
+
+  return (
+    <>
+      <AnimatePresence>
+        {showIdAnimation && (
+          <AnimationContainer
+            variants={messageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            <IconContainer>
+              <Rive src="/animations/face-id-2.riv" />
+            </IconContainer>
+            <Typography
+              as="p"
+              variant="label-4"
+              color="secondary"
+              sx={{ marginTop: 4 }}
+            >
+              {t('animation.validating-biometrics')}
+            </Typography>
+          </AnimationContainer>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showSuccessMessage && (
+          <AnimationContainer
+            variants={messageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            <IcoCheck24 />
+            <Typography
+              as="p"
+              variant="label-4"
+              color="secondary"
+              sx={{ marginTop: 4 }}
+            >
+              {t('animation.success')}
+            </Typography>
+          </AnimationContainer>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showEndMessage && (
+          <Sparkles color="#76FB8F">
+            <AnimationContainer
+              variants={messageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <Typography as="p" variant="label-3" color="secondary">
+                {t('animation.end')}
+              </Typography>
+            </AnimationContainer>
+          </Sparkles>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
+const AnimationContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[6]} ${theme.spacing[8]} ${theme.spacing[5]}
+      ${theme.spacing[8]};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+    text-align: center;
+  `};
+`;
+
+const IconContainer = styled.div`
+  width: 40px;
+  height: 40px;
+`;
+
+export default AnimationDialog;

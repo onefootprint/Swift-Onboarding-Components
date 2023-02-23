@@ -41,6 +41,15 @@
         "title": "Secure enclave backed",
         "description": "Our advanced PII vaults use strong cryptography and are built on top of secure Nitro Enclaves."
       }
+    },
+    "animation": {
+      "validating-biometrics": "Validating biometrics...",
+      "success": "You're all set!",
+      "end": "Next time, verifying your identity will be as easy as this!"
+    },
+    "footer": {
+      "linkedin": "linkedin",
+      "twitter": "twitter"
     }
   },
   "404": {

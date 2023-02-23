@@ -24,6 +24,7 @@ import Navigation from './components/navigation';
 
 const Ending = () => {
   const { t } = useTranslation('ending');
+
   return (
     <>
       <Navigation />
@@ -56,18 +57,7 @@ const Ending = () => {
             {t('new-approach.description')}
           </Typography>
           <Box sx={{ marginBottom: 5 }} />
-          <FeaturesContainer
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            transition={{
-              delay: 0.8,
-              duration: 0.5,
-            }}
-          >
+          <FeaturesContainer>
             <TitleContainer>
               <IcoShield40 />
               <Typography as="h2" variant="heading-2">

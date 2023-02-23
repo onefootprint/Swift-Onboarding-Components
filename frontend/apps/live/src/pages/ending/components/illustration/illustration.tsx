@@ -1,36 +1,44 @@
 import { FootprintButton } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
-const Illustration = () => (
-  <Container
-    initial={{
-      opacity: 0,
-    }}
-    animate={{
-      opacity: 1,
-    }}
-    transition={{
-      delay: 0.3,
-      duration: 0.5,
-    }}
-  >
-    <FootprintButton />
-    <Lines src="/ending/lines.svg" alt="Decorative" height={698} width={924} />
-  </Container>
-);
+import AnimationDialog from '../animation-dialog';
+
+const Illustration = () => {
+  const [showDialog, setShowDialog] = useState(false);
+  const handleClose = () => setShowDialog(false);
+  const handleClick = () => setShowDialog(true);
+
+  return (
+    <Container>
+      <FootprintButton sx={{ marginTop: 5 }} onClick={handleClick} />
+      <AnimatePresence>
+        {showDialog && (
+          <DialogContainer
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <AnimationDialog onClose={handleClose} />
+          </DialogContainer>
+        )}
+      </AnimatePresence>
+      <Lines
+        src="/ending/lines.svg"
+        alt="Decorative"
+        height={698}
+        width={924}
+      />
+    </Container>
+  );
+};
 
 const Container = styled(motion.span)`
-  position: relative;
-  z-index: -1;
   user-select: none;
-  pointer-events: none;
-
-  button {
-    box-shadow: ${({ theme }) => theme.elevation[3]};
-  }
+  position: relative;
 
   &::after {
     content: '';
@@ -46,6 +54,11 @@ const Container = styled(motion.span)`
       radial-gradient(50% 60% at 46% 60%, #e8eaff 0%, transparent 57%);
     background-blend-mode: multiply;
   }
+
+  button {
+    position: relative;
+    z-index: 1;
+  }
 `;
 
 const Lines = styled(Image)`
@@ -56,6 +69,21 @@ const Lines = styled(Image)`
   z-index: 0;
   mask: radial-gradient(90% 90% at 50% 60%, #fff 0%, transparent 40%);
   mix-blend-mode: overlay;
+`;
+
+const DialogContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    z-index: ${theme.zIndex.dialog};
+    position: fixed;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    box-shadow: ${theme.elevation[3]};
+    border-radius: ${theme.borderRadius.default};
+    border: 1px solid rgba(255, 255, 255, 0.47);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+  `}
 `;
 
 export default Illustration;
