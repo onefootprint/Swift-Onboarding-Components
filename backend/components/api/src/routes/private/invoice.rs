@@ -82,15 +82,20 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> 
         .await??;
     let customer_id = get_or_create_customer_id(state, &tenant).await?;
     let info = BillingInfo {
+        tenant_id: tenant.id.clone(),
         interval,
         customer_id,
         count_pii,
         count_kyc,
     };
-    state.billing_client.bill_tenant(info).await.map_err(|e| {
-        // Log error since the request only fails with a single tenant's error message
-        tracing::error!(tenant_id = %tenant.id, "Couldn't bill tenant {}", e);
-        e
-    })?;
+    state
+        .billing_client
+        .bill_tenant(&state.feature_flag_client, info)
+        .await
+        .map_err(|e| {
+            // Log error since the request only fails with a single tenant's error message
+            tracing::error!(tenant_id = %tenant.id, "Couldn't bill tenant {}", e);
+            e
+        })?;
     Ok(())
 }

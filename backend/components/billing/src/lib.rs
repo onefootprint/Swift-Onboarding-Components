@@ -1,6 +1,8 @@
 use db::models::tenant::Tenant;
+use feature_flag::LaunchDarklyFeatureFlagClient;
 use interval::BillingInterval;
-use newtypes::{PiiString, StripeCustomerId};
+use newtypes::{PiiString, StripeCustomerId, TenantId};
+use profile::BillingProfile;
 use std::{collections::HashMap, str::FromStr};
 pub use stripe::Client;
 use stripe::{
@@ -11,6 +13,7 @@ use stripe::{
 pub type BResult<T> = Result<T, Error>;
 
 pub mod interval;
+mod profile;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -28,6 +31,8 @@ pub enum Error {
     InvalidLineItemQuantity(String),
     #[error("Invoice is missing a line item. Has {0} line items, expected to have {1} line items")]
     InvoiceMissingItem(usize, usize),
+    #[error("{0}")]
+    FeatureFlagError(#[from] feature_flag::FeatureFlagError),
 }
 
 #[derive(Clone)]
@@ -36,10 +41,6 @@ pub struct BillingClient {
 }
 
 impl BillingClient {
-    // Will put these in either config or launch darkly
-    const PII_PRICE_ID: &str = "price_1MbzcbGerPBo41PttkOIt6Xs";
-    const KYC_PRICE_ID: &str = "price_1McCYdGerPBo41Pt9VmDrsDZ";
-
     pub fn new(secret_key: PiiString) -> Self {
         let client = Client::new(secret_key.leak_to_string());
         Self { client }
@@ -128,8 +129,12 @@ impl BillingClient {
         Ok(Some(item))
     }
 
-    #[tracing::instrument(skip(self))]
-    pub async fn bill_tenant(&self, info: BillingInfo) -> BResult<()> {
+    #[tracing::instrument(skip(self, ff_client))]
+    pub async fn bill_tenant(
+        &self,
+        ff_client: &LaunchDarklyFeatureFlagClient,
+        info: BillingInfo,
+    ) -> BResult<()> {
         if info.count_pii == 0 && info.count_kyc == 0 {
             return Ok(());
         }
@@ -153,9 +158,8 @@ impl BillingClient {
         }
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
-        let pii_price_id = stripe::PriceId::from_str(Self::PII_PRICE_ID)?;
-        let kyc_price_id = stripe::PriceId::from_str(Self::KYC_PRICE_ID)?;
-        let items = [(pii_price_id, info.count_pii), (kyc_price_id, info.count_kyc)]
+        let prices = BillingProfile::get_for(ff_client, &info.tenant_id)?;
+        let items = [(prices.pii, info.count_pii), (prices.kyc, info.count_kyc)]
             .into_iter()
             .map(|(price_id, count)| self.get_or_create_invoice_item(customer_id.clone(), price_id, count));
         let items: HashMap<_, _> = futures::future::join_all(items)
@@ -218,6 +222,7 @@ fn is_managed(metadata: &HashMap<String, String>) -> bool {
 
 #[derive(Debug)]
 pub struct BillingInfo {
+    pub tenant_id: TenantId,
     pub customer_id: StripeCustomerId,
     pub interval: BillingInterval,
     pub count_pii: i64,

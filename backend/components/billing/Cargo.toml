@@ -8,11 +8,13 @@ authors = { workspace = true }
 async-stripe = { version = "0.18.2", features = ["runtime-tokio-hyper"] }
 db = { path = "../db" }
 newtypes = { path = "../newtypes" }
+feature_flag = { path = "../feature_flag" }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true }
 futures = { workspace = true }
+serde = { workspace = true }
 
 [dev-dependencies]
 test-case = { workspace = true }
