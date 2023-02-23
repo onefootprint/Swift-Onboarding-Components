@@ -4,25 +4,28 @@ import InitShimmer from 'src/components/init-shimmer';
 import validateBootstrapData from 'src/pages/identify/utils/validate-bootstrap-data';
 import { useEffectOnce } from 'usehooks-ts';
 
+import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
 import useIdentifyMachine, { Events } from '../../hooks/use-identify-machine';
 
 const InitBootstrap = () => {
   const [state, send] = useIdentifyMachine();
   const { bootstrapData } = state.context;
   const identifyMutation = useIdentify();
+  const idSuffix = useIdentifierSuffix();
 
   const identify = async (email?: string, phoneNumber?: string) => {
     // If both email and phone identified successfully, we will give preference to phone
     try {
       if (phoneNumber) {
+        const identifier = { phoneNumber: idSuffix.append(phoneNumber) };
         const phoneIdentify = await identifyMutation.mutateAsync({
-          identifier: { phoneNumber },
+          identifier,
         });
 
         if (phoneIdentify.userFound) {
           return {
             userFound: true,
-            successfulIdentifier: { phoneNumber },
+            successfulIdentifier: identifier,
             hasSyncablePassKey: !!phoneIdentify.hasSyncablePassKey,
             availableChallengeKinds: phoneIdentify.availableChallengeKinds,
           };
@@ -34,14 +37,15 @@ const InitBootstrap = () => {
 
     try {
       if (email) {
+        const identifier = { email: idSuffix.append(email) };
         const emailIdentify = await identifyMutation.mutateAsync({
-          identifier: { email },
+          identifier,
         });
 
         if (emailIdentify.userFound) {
           return {
             userFound: true,
-            successfulIdentifier: { email },
+            successfulIdentifier: identifier,
             hasSyncablePassKey: !!emailIdentify.hasSyncablePassKey,
             availableChallengeKinds: emailIdentify.availableChallengeKinds,
           };
