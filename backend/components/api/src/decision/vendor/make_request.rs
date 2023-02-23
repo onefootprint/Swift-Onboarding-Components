@@ -362,7 +362,7 @@ pub async fn make_idv_request(
         .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
         .await??;
     // TODO: pull out saving VR here to enable RAM-only smoke testing
-    let (verification_result, structured_vendor_response) = verification_result::save_verification_result(
+    let verification_result = verification_result::save_verification_result(
         db_pool,
         request_id.clone(),
         vendor_response.clone(),
@@ -374,7 +374,6 @@ pub async fn make_idv_request(
         response: vendor_response,
         verification_result_id: verification_result.id,
         verification_request_id: request_id,
-        structured_vendor_response,
     };
 
     Ok(result)
@@ -403,7 +402,7 @@ pub async fn make_docv_request(
         .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
         .await??;
 
-    let (verification_result, structured_vendor_response) = verification_result::save_verification_result(
+    let verification_result = verification_result::save_verification_result(
         &state.db_pool,
         request_id.clone(),
         vendor_response.clone(),
@@ -415,7 +414,6 @@ pub async fn make_docv_request(
         response: vendor_response,
         verification_result_id: verification_result.id,
         verification_request_id: request_id,
-        structured_vendor_response,
     };
 
     Ok(result)

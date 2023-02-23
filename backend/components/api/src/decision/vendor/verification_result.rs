@@ -1,29 +1,16 @@
-use chrono::Utc;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
-use db::{
-    models::{
-        idology_expect_id_response::{IdologyExpectIdResponse, NewIdologyExpectIdResponse},
-        verification_result::VerificationResult,
-    },
-    DbPool, DbResult, PgConn,
-};
+use db::{models::verification_result::VerificationResult, DbPool};
 use enclave_proxy::DataTransform;
-use idv::{
-    idology::{
-        expectid::response::ExpectIDResponse,
-        scan_onboarding::response::ScanOnboardingAPIResponse,
-        scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse},
-    },
-    socure::response::SocureIDPlusResponse,
-    ParsedResponse, VendorResponse,
-};
+use idv::VendorResponse;
 use newtypes::{
     EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedJsonValue, SealedVaultBytes, VaultPublicKey,
-    VerificationRequestId, VerificationResultId,
+    VerificationRequestId,
 };
-use twilio::response::lookup::LookupV2Response;
 
-use crate::{enclave_client::EnclaveClient, errors::ApiError};
+use crate::{
+    enclave_client::EnclaveClient,
+    errors::{ApiError, ApiResult},
+};
 
 /// Save a verification result, encrypting the response payload in the process
 pub(super) async fn save_verification_result(
@@ -31,27 +18,20 @@ pub(super) async fn save_verification_result(
     verification_request_id: VerificationRequestId,
     vendor_response: VendorResponse,
     user_vault_public_key: VaultPublicKey, // passed in so unit testing is easier
-) -> Result<(VerificationResult, Option<StructuredVendorResponse>), ApiError> {
+) -> Result<VerificationResult, ApiError> {
     let res = db_pool
-        .db_transaction(
-            move |conn| -> Result<(VerificationResult, Option<StructuredVendorResponse>), ApiError> {
-                // For testing rollout of footprint
-                let scrubbed_json = ScrubbedJsonValue::scrub(&vendor_response.response)?;
+        .db_transaction(move |conn| -> ApiResult<VerificationResult> {
+            // For testing rollout of footprint
+            let scrubbed_json = ScrubbedJsonValue::scrub(&vendor_response.response)?;
 
-                let e_response = encrypt_verification_result_response(
-                    vendor_response.raw_response,
-                    user_vault_public_key,
-                )?;
+            let e_response =
+                encrypt_verification_result_response(vendor_response.raw_response, user_vault_public_key)?;
 
-                let verification_result =
-                    VerificationResult::create(conn, verification_request_id, scrubbed_json, e_response)?;
-                let structured_vendor_response = vendor_response
-                    .response
-                    .save_vendor_response(conn, verification_result.id.clone())?;
+            let verification_result =
+                VerificationResult::create(conn, verification_request_id, scrubbed_json, e_response)?;
 
-                Ok((verification_result, structured_vendor_response))
-            },
-        )
+            Ok(verification_result)
+        })
         .await?;
 
     Ok(res)
@@ -84,115 +64,4 @@ pub async fn decrypt_verification_result_response(
         .into_iter()
         .map(|b| PiiJsonValue::try_from(b).map_err(ApiError::from))
         .collect()
-}
-
-#[derive(Clone)]
-pub enum StructuredVendorResponse {
-    IDologyExpectID(IdologyExpectIdResponse),
-    //TODO: add other vendors
-}
-
-trait SaveStructuredVendorResponse {
-    fn save_vendor_response(
-        &self,
-        conn: &mut PgConn,
-        verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>>; //TODO: remove Option here when all structured vendor responses have been implemented
-}
-
-impl SaveStructuredVendorResponse for ExpectIDResponse {
-    fn save_vendor_response(
-        &self,
-        conn: &mut PgConn,
-        verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>> {
-        let new_idology_expect_id_response = NewIdologyExpectIdResponse {
-            verification_result_id,
-            created_at: Utc::now(),
-            id_number: self.response.id_number.and_then(|u| i64::try_from(u).ok()),
-            id_scan: self.response.id_scan.clone(),
-            error: self.response.error.clone(),
-            results: self.response.results.as_ref().map(|r| r.key.clone()),
-            summary_result: self.response.summary_result.as_ref().map(|r| r.key.clone()),
-            qualifiers: self
-                .response
-                .qualifiers
-                .as_ref()
-                .map(|q| q.parse_qualifiers().into_iter().map(|p| p.0.key).collect())
-                .unwrap_or_default(),
-        };
-        IdologyExpectIdResponse::create(conn, new_idology_expect_id_response)
-            .map(|i| Some(StructuredVendorResponse::IDologyExpectID(i)))
-    }
-}
-
-impl SaveStructuredVendorResponse for ScanVerifyAPIResponse {
-    fn save_vendor_response(
-        &self,
-        _conn: &mut PgConn,
-        _verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>> {
-        Ok(None) // TODO:
-    }
-}
-
-impl SaveStructuredVendorResponse for ScanVerifySubmissionAPIResponse {
-    fn save_vendor_response(
-        &self,
-        _conn: &mut PgConn,
-        _verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>> {
-        Ok(None) // TODO:
-    }
-}
-
-impl SaveStructuredVendorResponse for ScanOnboardingAPIResponse {
-    fn save_vendor_response(
-        &self,
-        _conn: &mut PgConn,
-        _verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>> {
-        Ok(None) // TODO:
-    }
-}
-
-impl SaveStructuredVendorResponse for LookupV2Response {
-    fn save_vendor_response(
-        &self,
-        _conn: &mut PgConn,
-        _verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>> {
-        Ok(None) // TODO:
-    }
-}
-
-impl SaveStructuredVendorResponse for SocureIDPlusResponse {
-    fn save_vendor_response(
-        &self,
-        _conn: &mut PgConn,
-        _verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>> {
-        Ok(None) // TODO:
-    }
-}
-
-impl SaveStructuredVendorResponse for ParsedResponse {
-    fn save_vendor_response(
-        &self,
-        conn: &mut PgConn,
-        verification_result_id: VerificationResultId,
-    ) -> DbResult<Option<StructuredVendorResponse>> {
-        match self {
-            ParsedResponse::IDologyExpectID(r) => r.save_vendor_response(conn, verification_result_id),
-            ParsedResponse::IDologyScanVerifyResult(r) => {
-                r.save_vendor_response(conn, verification_result_id)
-            }
-            ParsedResponse::IDologyScanVerifySubmission(r) => {
-                r.save_vendor_response(conn, verification_result_id)
-            }
-            ParsedResponse::IDologyScanOnboarding(r) => r.save_vendor_response(conn, verification_result_id),
-            ParsedResponse::TwilioLookupV2(r) => r.save_vendor_response(conn, verification_result_id),
-            ParsedResponse::SocureIDPlus(r) => r.save_vendor_response(conn, verification_result_id),
-        }
-    }
 }

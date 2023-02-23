@@ -4,14 +4,13 @@ use db::models::{verification_request::VerificationRequest, verification_result:
 use idv::{ParsedResponse, VendorResponse};
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes, VerificationRequestId, VerificationResultId};
 
-use super::verification_result::{decrypt_verification_result_response, StructuredVendorResponse};
+use super::verification_result::decrypt_verification_result_response;
 
 #[derive(Clone)]
 pub struct VendorResult {
     pub response: VendorResponse,
     pub verification_result_id: VerificationResultId,
     pub verification_request_id: VerificationRequestId,
-    pub structured_vendor_response: Option<StructuredVendorResponse>, // TODO: once structured vendor responses for all vendors have been implemented, remove this Option and have FeatureVector use this instead
 }
 
 impl VendorResult {
@@ -75,7 +74,6 @@ impl VendorResult {
                         },
                         verification_request_id: request.id,
                         verification_result_id: result.id,
-                        structured_vendor_response: None, // TODO: implement this in a followup
                     };
                     Ok(res)
                 },
