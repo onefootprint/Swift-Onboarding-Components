@@ -90,7 +90,9 @@ fn create_user_and_populate_vault(
             PiiString::new("Boberto".to_owned()),
         ),
     ];
-    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update), false)
+        .unwrap()
+        .0;
 
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_identity_data(conn, update, HashMap::new()).unwrap();

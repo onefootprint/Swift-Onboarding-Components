@@ -118,7 +118,9 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
         (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
         (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
     ];
-    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update), false)
+        .unwrap()
+        .0;
     uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
 
     // Make the user can't see the name and email until it's portable
@@ -266,7 +268,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
             is_allowed,
         } = test;
         let uvw = UserVaultWrapper::lock_for_onboarding(conn, su_id).unwrap();
-        let update = IdentityDataUpdate::new(HashMap::from_iter(update.into_iter()))
+        let update = IdentityDataUpdate::new(HashMap::from_iter(update.into_iter()), false)
             .unwrap()
             .0;
         let result = uvw.update_identity_data(conn, update, HashMap::new());
@@ -296,7 +298,9 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
         (IDK::LastName.into(), PiiString::new("Merp".to_owned())),
         (IDK::Ssn4.into(), PiiString::new("1234".to_owned())),
     ];
-    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update), false)
+        .unwrap()
+        .0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
     // Get the ssn4 as was written by tenant 1
@@ -306,7 +310,9 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
 
     // Add speculative ssn9 by tenant 2
     let update = [(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))];
-    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update), false)
+        .unwrap()
+        .0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
     uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
@@ -365,7 +371,7 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
     ];
 
     for update in updates {
-        let update = IdentityDataUpdate::new(HashMap::from_iter(update.into_iter()))
+        let update = IdentityDataUpdate::new(HashMap::from_iter(update.into_iter()), false)
             .unwrap()
             .0;
         let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
@@ -438,7 +444,9 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
 
     // Add some identity data
     let update = [(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))];
-    let update = IdentityDataUpdate::new(HashMap::from_iter(update)).unwrap().0;
+    let update = IdentityDataUpdate::new(HashMap::from_iter(update), false)
+        .unwrap()
+        .0;
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
 

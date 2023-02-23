@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use crate::{
     errors::{user::UserError, ApiError, ApiResult},
-    utils::fingerprint::FingerprintMap,
+    utils::fingerprint::NewFingerprints,
 };
 use db::{
     models::{
@@ -13,10 +15,9 @@ use db::{
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataLifetimeId, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate,
-    PersonVaultDataKind, PiiString, ScopedUserId, UserVaultId, VaultPublicKey,
+    CollectedDataOption, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate, PersonVaultDataKind,
+    PiiString, ScopedUserId, UserVaultId, VaultPublicKey,
 };
-use std::collections::HashMap;
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
 pub struct UvdBuilder {
@@ -60,7 +61,7 @@ impl UvdBuilder {
         existing_fields: Vec<IdentityDataKind>, // portable or speculative on UVW
         user_vault_id: UserVaultId,
         scoped_user_id: ScopedUserId,
-        fingerprints: FingerprintMap,
+        fingerprints: NewFingerprints,
     ) -> ApiResult<Vec<CollectedDataOption>> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
@@ -92,16 +93,14 @@ impl UvdBuilder {
         let uvds = UserVaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding UVD row
-        let kind_and_lifetime: Vec<(IdentityDataKind, DataLifetimeId)> = uvds
+        let kind_to_lifetime = uvds
             .into_iter()
             .map(|uvd| {
                 IdentityDataKind::try_from(uvd.kind)
                     .map(|idk| (idk, uvd.lifetime_id))
                     .map_err(|e| ApiError::NewtypeError(newtypes::Error::UvdKindConversionError(e)))
             })
-            .collect::<Result<Vec<(IdentityDataKind, DataLifetimeId)>, ApiError>>()?;
-        let kind_to_lifetime: HashMap<IdentityDataKind, DataLifetimeId> =
-            HashMap::from_iter(kind_and_lifetime);
+            .collect::<Result<HashMap<_, _>, ApiError>>()?;
         let fingerprints: Vec<_> = fingerprints
             .into_iter()
             .map(|(kind, sh_data)| -> ApiResult<_> {

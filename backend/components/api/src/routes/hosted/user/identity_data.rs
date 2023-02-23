@@ -6,17 +6,9 @@ use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
-use newtypes::flat_api_object_map_type;
-use newtypes::DataIdentifier;
+use newtypes::fields::put_data_request::PutDataRequest;
 use newtypes::IdentityDataUpdate;
-use newtypes::PiiString;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
-
-flat_api_object_map_type!(
-    PostIdentityDataRequest<DataIdentifier, PiiString>,
-    description="Key-value map for data to store in the vault",
-    example=r#"{ "id.first_name": "Frank", "id.last_name": "Footprint" }"#
-);
 
 #[api_v2_operation(
     tags(Hosted),
@@ -25,12 +17,12 @@ flat_api_object_map_type!(
 #[actix::post("/hosted/user/data/identity/validate")]
 async fn post_speculative(
     user_auth: UserAuthContext,
-    request: web::Json<PostIdentityDataRequest>,
+    request: web::Json<PutDataRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
     // TODO filter out email, phone number - data not stored in UvData
-    IdentityDataUpdate::new_for_bifrost(request.into_inner().into())?;
+    IdentityDataUpdate::new(request.into_inner().into(), true)?;
 
     // We've already parsed the request and done validation on the input. Return a successful
     // response before writing anything to the DB
@@ -42,12 +34,13 @@ async fn post_speculative(
 async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-    request: web::Json<PostIdentityDataRequest>,
+    request: web::Json<PutDataRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
-    let (update, _) = IdentityDataUpdate::new_for_bifrost(request.into_inner().into())?;
-    let fingerprints = build_fingerprints(&state, update.clone()).await?;
+    let request = request.into_inner();
+    let (update, _) = IdentityDataUpdate::new(request.into(), true)?;
+    let fingerprints = build_fingerprints(&state, update.clone().into_inner()).await?;
 
     state
         .db_pool

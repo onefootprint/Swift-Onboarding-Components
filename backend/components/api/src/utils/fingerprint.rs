@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 
 use futures::TryFutureExt;
-use newtypes::{Fingerprint, Fingerprinter, IdentityDataKind, IdentityDataUpdate};
+use newtypes::{put_data_request::FingerprintableData, Fingerprint, Fingerprinter, IdentityDataKind};
 
 use crate::{errors::ApiResult, State};
 
-pub type FingerprintMap = HashMap<IdentityDataKind, Fingerprint>;
+pub type NewFingerprints = HashMap<IdentityDataKind, Fingerprint>;
 
 /// Computes the fingerprints for a provided IdentityDataUpdate
 #[tracing::instrument(skip_all)]
-pub async fn build_fingerprints(state: &State, update: IdentityDataUpdate) -> ApiResult<FingerprintMap> {
-    let fut_fingerprints = update.into_inner().into_iter().map(|(kind, pii)| {
+pub async fn build_fingerprints(state: &State, update: FingerprintableData) -> ApiResult<NewFingerprints> {
+    let fut_fingerprints = update.into_iter().map(|(kind, pii)| {
         let pii = pii.clean_for_fingerprint();
         state
             .compute_fingerprint(kind, pii)

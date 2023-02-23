@@ -19,6 +19,7 @@ from tests.utils import (
     override_webauthn_challenge,
     get,
     post,
+    put,
     clean_up_user,
     identify_verify,
     get_requirement_from_requirements,
@@ -263,17 +264,17 @@ class TestBifrost:
             "id.country": "US",
             "id.ssn9": _gen_random_ssn(),
         }
-        post("hosted/user/data/identity/validate", data, non_sandbox_auth_token)
+        post("hosted/user/vault/validate", data, non_sandbox_auth_token)
 
         # Actually set the data
-        post("hosted/user/data/identity", data, non_sandbox_auth_token)
+        put("hosted/user/vault", data, non_sandbox_auth_token)
 
         # Should be allowed to update speculative fields that are already set
         data = {
             "id.first_name": "Flerp2",
             "id.last_name": "Derp2",
         }
-        post("hosted/user/data/identity", data, non_sandbox_auth_token)
+        put("hosted/user/vault", data, non_sandbox_auth_token)
 
     def test_add_email(self, non_sandbox_auth_token):
         post("hosted/user/email", {"email": EMAIL}, non_sandbox_auth_token)

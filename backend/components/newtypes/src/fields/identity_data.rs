@@ -13,7 +13,7 @@ type IdentityDataRequest = HashMap<IDK, PiiString>;
 pub struct IdentityDataUpdate(IdentityDataRequest);
 
 impl IdentityDataUpdate {
-    fn new_inner(map: DataRequest, for_bifrost: bool) -> NtResult<(Self, DataRequest)> {
+    pub fn new(map: DataRequest, for_bifrost: bool) -> NtResult<(Self, DataRequest)> {
         let (id_data, other_data): (HashMap<_, _>, HashMap<_, _>) =
             map.into_iter().partition_map(|(k, v)| match k {
                 DataIdentifier::Id(idk) => Left((idk, v)),
@@ -23,20 +23,6 @@ impl IdentityDataUpdate {
         let clean_id_data = clean_and_validate_id_data(id_data, for_bifrost)?;
         let id_update = Self(clean_id_data);
         Ok((id_update, other_data))
-    }
-
-    /// Composes a new IdentityDataUpdate with cleaned and validated data, and returns any other
-    /// non-identity key-value pairs included in the input DataRequest.
-    pub fn new(map: DataRequest) -> NtResult<(Self, DataRequest)> {
-        Self::new_inner(map, false)
-    }
-
-    /// Composes a new IdentityDataUpdate with cleaned and validated data, and returns any other
-    /// non-identity key-value pairs included in the input DataRequest.
-    /// Additionally, performs more advanced validation that attempts to proactively prevent
-    /// sending invalid data for verification to vendors
-    pub fn new_for_bifrost(map: DataRequest) -> NtResult<(Self, DataRequest)> {
-        Self::new_inner(map, true)
     }
 
     pub fn into_inner(self) -> IdentityDataRequest {

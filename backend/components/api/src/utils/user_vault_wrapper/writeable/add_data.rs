@@ -3,7 +3,7 @@ use super::WriteableUvw;
 use crate::auth::AuthError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
-use crate::utils::fingerprint::FingerprintMap;
+use crate::utils::fingerprint::NewFingerprints;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
@@ -11,6 +11,7 @@ use db::models::phone_number::{NewPhoneNumberArgs, PhoneNumber};
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
+use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind,
     IdentityDataUpdate, KvDataKey, PiiString,
@@ -38,7 +39,7 @@ impl WriteableUvw {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         update: IdentityDataUpdate,
-        fingerprints: FingerprintMap,
+        fingerprints: NewFingerprints,
     ) -> ApiResult<()> {
         self.update_identity_data_unsafe(conn, update, fingerprints)
     }
@@ -55,42 +56,46 @@ impl WriteableUvw {
     pub fn put_all_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        phone_number: Option<PiiString>,
-        email: Option<newtypes::email::Email>,
-        uvd: IdentityDataUpdate,
-        id_fingerprints: FingerprintMap,
-        custom: HashMap<KvDataKey, PiiString>,
+        request: DecomposedPutRequest,
+        fingerprints: NewFingerprints,
+        for_bifrost: bool,
     ) -> ApiResult<()> {
+        let DecomposedPutRequest {
+            phone_number,
+            email,
+            id_update,
+            custom_data,
+        } = request;
         // TODO can we combine these codepaths with POST /hosted/user/email,
         // POST /hosted/user/identity_data, and identify verify (where we make phone numbers)
-        let mut id_fingerprints = id_fingerprints;
-        let assert_portable = || -> Result<_, _> {
-            // Certain operations can only occur on portable vaults
-            if self.user_vault().is_portable {
+        let mut fingerprints = fingerprints;
+        let assert_non_portable = || -> Result<_, _> {
+            // Cannot add identity data to a portable vault unless we are in bifrost
+            if !for_bifrost && self.user_vault().is_portable {
                 return Err(AuthError::CannotModifyPortableUser);
             }
             Ok(())
         };
-        if !custom.is_empty() {
-            self.update_custom_data_unsafe(conn, custom)?;
+        if !custom_data.is_empty() {
+            self.update_custom_data_unsafe(conn, custom_data)?;
         }
         if let Some(phone_number) = phone_number {
-            assert_portable()?;
-            let Some(fp) = id_fingerprints.remove(&IdentityDataKind::PhoneNumber) else {
+            assert_non_portable()?;
+            let Some(fp) = fingerprints.remove(&IdentityDataKind::PhoneNumber) else {
                 return Err(ApiError::AssertionError("No fingerprint found for phone number".to_owned()));
             };
             self.add_phone_number_unsafe(conn, phone_number, fp)?;
         }
         if let Some(email) = email {
-            assert_portable()?;
-            let Some(fp) = id_fingerprints.remove(&IdentityDataKind::Email) else {
+            assert_non_portable()?;
+            let Some(fp) = fingerprints.remove(&IdentityDataKind::Email) else {
                 return Err(ApiError::AssertionError("No fingerprint found for email".to_owned()));
             };
             self.add_email_unsafe(conn, email, fp)?;
         }
-        if !uvd.is_empty() {
-            assert_portable()?;
-            self.update_identity_data_unsafe(conn, uvd, id_fingerprints)?;
+        if !id_update.is_empty() {
+            assert_non_portable()?;
+            self.update_identity_data_unsafe(conn, id_update, fingerprints)?;
         }
         Ok(())
     }
@@ -172,7 +177,7 @@ impl WriteableUvw {
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
         update: IdentityDataUpdate,
-        fingerprints: FingerprintMap,
+        fingerprints: NewFingerprints,
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_identity_fields();
         let uv = self.user_vault();

@@ -10,6 +10,7 @@ from tests.utils import (
     create_basic_sandbox_user,
     get,
     post,
+    put,
     override_webauthn_challenge,
     override_webauthn_attestation,
     get_requirement_from_requirements,
@@ -72,11 +73,11 @@ class BifrostClient:
         post("hosted/user/email", email_data, self.auth_token)
 
     def add_identity_data(self):
-        """Add identity data via hosted/user/data/identity"""
+        """Add identity data via hosted/user/vault"""
         # TODO: maybe add onboarding id
         # Populate the user's data
-        post(
-            "hosted/user/data/identity",
+        put(
+            "hosted/user/vault",
             self.user_data,
             self.auth_token,
         )
