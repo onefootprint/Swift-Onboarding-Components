@@ -6,7 +6,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
-use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding::Onboarding;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
@@ -19,11 +19,11 @@ use std::collections::HashMap;
 impl UserVaultWrapper {
     pub fn build_for_tenant(conn: &mut PgConn, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
         let uvw = Self::build(conn, UvwArgs::Tenant(su_id))?;
-        let ob_configs = ObConfiguration::list_authorized_for_user(conn, su_id)?;
+        let onboarding = Onboarding::bulk_get_for_users(conn, vec![su_id])?.remove(su_id);
         Ok(TenantUvw {
             uvw,
             scoped_user_id: su_id.clone(),
-            authorized_ob_configs: ob_configs,
+            onboarding,
         })
     }
 
@@ -50,7 +50,7 @@ impl UserVaultWrapper {
         let identity_document_map = IdentityDocumentAndRequest::bulk_get(conn, &active_lifetime_list)?;
         let kv_data_map = KeyValueData::bulk_get(conn, &active_lifetime_list)?;
         let scoped_user_ids = users.iter().map(|(su, _)| &su.id).collect();
-        let ob_config_map = ObConfiguration::list_authorized_for_users(conn, scoped_user_ids)?;
+        let onboarding_map = Onboarding::bulk_get_for_users(conn, scoped_user_ids)?;
 
         // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
         let results = users
@@ -75,7 +75,7 @@ impl UserVaultWrapper {
                 let uvw = TenantUvw {
                     uvw,
                     scoped_user_id: su.id.clone(),
-                    authorized_ob_configs: ob_config_map.get(&su.id).cloned().unwrap_or_default(),
+                    onboarding: onboarding_map.get(&su.id).cloned(),
                 };
                 Ok((su.id, uvw))
             })

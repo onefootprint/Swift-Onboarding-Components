@@ -6,7 +6,7 @@ mod decrypt_request;
 pub mod checks;
 pub mod identity_document;
 
-use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding::OnboardingAndConfig;
 pub use decrypt_request::DecryptRequest;
 
 use super::UserVaultWrapper;
@@ -22,5 +22,5 @@ pub struct TenantUvw {
     #[deref]
     uvw: UserVaultWrapper,
     scoped_user_id: ScopedUserId,
-    authorized_ob_configs: Vec<ObConfiguration>,
+    onboarding: Option<OnboardingAndConfig>,
 }

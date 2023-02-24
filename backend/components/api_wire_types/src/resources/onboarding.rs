@@ -6,6 +6,7 @@ use crate::*;
 
 pub struct Onboarding {
     pub id: OnboardingId,
+    pub is_authorized: bool,
     pub name: String,
     pub config_id: ObConfigurationId,
     // incomplete onboardings will show as null here. There is no codepath that does this today

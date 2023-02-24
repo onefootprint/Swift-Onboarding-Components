@@ -16,10 +16,10 @@ impl TenantUvw {
             return vec![TenantScope::Admin];
         }
 
-        // Visibility of fields in portable vaults is controlled by approved onboarding configs
-        self.authorized_ob_configs
+        // Visibility of fields in portable vaults is controlled by onboarding configs.
+        self.onboarding
             .iter()
-            .flat_map(|x| x.visible_scopes())
+            .flat_map(|ob| ob.visible_scopes())
             // Always allowed to see custom data
             .chain([TenantScope::DecryptCustom])
             .collect_vec()

@@ -65,6 +65,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> 
     let params = ScopedUserListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: true,
+        only_billable: true,
         ..Default::default()
     };
     let tenant_id = tenant.id.clone();

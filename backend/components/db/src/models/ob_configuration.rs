@@ -1,21 +1,17 @@
-use std::collections::HashMap;
-
+use super::tenant::Tenant;
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
-use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{ApiKeyStatus, TenantScope};
+use newtypes::ApiKeyStatus;
+use newtypes::OnboardingId;
 use newtypes::{CollectedDataOption, ObConfigurationId, ObConfigurationKey, TenantId};
-use newtypes::{OnboardingId, ScopedUserId};
 use serde::{Deserialize, Serialize};
-
-use super::tenant::Tenant;
 
 pub type IsLive = bool;
 
@@ -137,39 +133,6 @@ impl ObConfiguration {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list_authorized_for_user(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Vec<Self>> {
-        // For now, this will be either 0 or 1 result
-        let obcs = ob_configuration::table
-            .inner_join(onboarding::table)
-            .filter(onboarding::scoped_user_id.eq(scoped_user_id))
-            .filter(not(onboarding::authorized_at.is_null()))
-            .select(ob_configuration::all_columns)
-            .get_results(conn)?;
-        Ok(obcs)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn list_authorized_for_users(
-        conn: &mut PgConn,
-        scoped_user_ids: Vec<&ScopedUserId>,
-    ) -> DbResult<HashMap<ScopedUserId, Vec<Self>>> {
-        // For now, this will be either 0 or 1 result
-        let obcs: HashMap<ScopedUserId, Vec<Self>> = ob_configuration::table
-            .inner_join(onboarding::table)
-            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
-            .filter(not(onboarding::authorized_at.is_null()))
-            .select((onboarding::scoped_user_id, ob_configuration::all_columns))
-            .get_results::<(ScopedUserId, ObConfiguration)>(conn)?
-            .into_iter()
-            .fold(HashMap::new(), |mut acc, (su, ob)| {
-                acc.entry(su).or_default().push(ob);
-                acc
-            });
-
-        Ok(obcs)
-    }
-
-    #[tracing::instrument(skip_all)]
     pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
@@ -265,31 +228,5 @@ impl ObConfiguration {
             .get_result(conn)?;
 
         Ok(ob_config)
-    }
-}
-
-impl ObConfiguration {
-    /// returns the TenantScopes to which this ObConfiguration (upon authorization!) grants access
-    /// to decrypt.
-    /// Don't use this on Onboardings that have not been authorized
-    pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
-        let data_scopes = self.can_access_data.iter().cloned().map(TenantScope::Decrypt);
-        let scopes = [self
-            .can_access_identity_document_images
-            .then_some(TenantScope::DecryptDocuments)];
-        scopes.into_iter().flatten().chain(data_scopes).collect()
-    }
-
-    /// Returns the TenantScopes that represent the data this ObConfiguration grants access to see.
-    /// NOTE: this is not the same as the data that is allowed to be decrypted.
-    /// If an ob config intended to collect a field, a tenant is able to see that it exists whether
-    /// or not they can decrypt it.
-    /// Don't use this on Onboardings that have not been authorized
-    pub fn visible_scopes(&self) -> Vec<TenantScope> {
-        let data_scopes = self.must_collect_data.iter().cloned().map(TenantScope::Decrypt);
-        let scopes = [self
-            .must_collect_identity_document
-            .then_some(TenantScope::DecryptDocuments)];
-        scopes.into_iter().flatten().chain(data_scopes).collect()
     }
 }

@@ -98,6 +98,7 @@ pub async fn get(
     let tenant_id = tenant.id.clone();
     let query_params = ScopedUserListQueryParams {
         tenant_id: tenant_id.clone(),
+        only_billable: false,
         is_live: auth.is_live()?,
         requires_manual_review,
         statuses,
@@ -173,6 +174,7 @@ pub async fn get_detail(
     let query_params = ScopedUserListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
+        only_billable: false,
         requires_manual_review: None,
         statuses: vec![],
         fingerprints: None,

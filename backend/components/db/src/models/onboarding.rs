@@ -16,7 +16,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
     FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
-    ScopedUserId, TenantId, UserVaultId,
+    ScopedUserId, TenantId, TenantScope, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -136,6 +136,9 @@ type OnboardingInfo<TDecision> = (
     Option<TDecision>,
 );
 
+#[derive(Clone)]
+pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
+
 fn map_ob_info<T, U, Fn>(i: OnboardingInfo<T>, f: Fn) -> DbResult<OnboardingInfo<U>>
 where
     Fn: FnOnce(T) -> DbResult<U>,
@@ -243,6 +246,24 @@ impl Onboarding {
             .for_no_key_update()
             .get_result(conn.conn())?;
         Ok(Locked::new(result))
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn bulk_get_for_users(
+        conn: &mut PgConn,
+        scoped_user_ids: Vec<&ScopedUserId>,
+    ) -> DbResult<HashMap<ScopedUserId, OnboardingAndConfig>> {
+        // For now, this will be either 0 or 1 result per user
+        use crate::schema::ob_configuration;
+        let results = onboarding::table
+            .inner_join(ob_configuration::table)
+            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
+            .get_results::<(Self, ObConfiguration)>(conn)?
+            .into_iter()
+            .map(|(ob, obc)| (ob.scoped_user_id.clone(), OnboardingAndConfig(ob, obc)))
+            .collect();
+
+        Ok(results)
     }
 
     #[tracing::instrument(skip_all)]
@@ -376,5 +397,39 @@ impl Onboarding {
             .select(count_star())
             .get_result(conn)?;
         Ok(count)
+    }
+}
+
+impl OnboardingAndConfig {
+    /// returns the TenantScopes to which this ObConfiguration (upon authorization!) grants access
+    /// to decrypt.
+    /// Don't use this on Onboardings that have not been authorized
+    pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
+        let Self(ob, obc) = &self;
+        if ob.authorized_at.is_none() {
+            // Only authorized onboardings give permission to decrypt data
+            vec![]
+        } else {
+            let data_scopes = obc.can_access_data.iter().cloned().map(TenantScope::Decrypt);
+            let scopes = [obc
+                .can_access_identity_document_images
+                .then_some(TenantScope::DecryptDocuments)];
+            scopes.into_iter().flatten().chain(data_scopes).collect()
+        }
+    }
+
+    /// Returns the TenantScopes that represent the data this ObConfiguration grants access to see.
+    /// NOTE: this is not the same as the data that is allowed to be decrypted.
+    /// If an ob config intended to collect a field, a tenant is able to see that it exists whether
+    /// or not they can decrypt it.
+    /// Don't use this on Onboardings that have not been authorized
+    pub fn visible_scopes(&self) -> Vec<TenantScope> {
+        // Even un-approved onboardings give permissions to see data, just not decrypt
+        let Self(_, obc) = &self;
+        let data_scopes = obc.must_collect_data.iter().cloned().map(TenantScope::Decrypt);
+        let scopes = [obc
+            .must_collect_identity_document
+            .then_some(TenantScope::DecryptDocuments)];
+        scopes.into_iter().flatten().chain(data_scopes).collect()
     }
 }

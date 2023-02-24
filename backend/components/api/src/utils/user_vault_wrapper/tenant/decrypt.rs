@@ -20,9 +20,9 @@ impl TenantUvw {
         }
 
         let can_decrypt_scopes: Vec<_> = self
-            .authorized_ob_configs
+            .onboarding
             .iter()
-            .flat_map(|x| x.can_decrypt_scopes())
+            .flat_map(|ob| ob.can_decrypt_scopes())
             // All custom data belonging to the tenant is allowed to be decrypted
             .chain([TenantScope::DecryptCustom])
             .collect();

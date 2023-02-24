@@ -13,6 +13,8 @@ use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, OnboardingStatus, T
 pub struct ScopedUserListQueryParams {
     pub tenant_id: TenantId,
     pub is_live: bool,
+    /// When true, only returns the scoped users that are either (1) authorized or (2) non-portable
+    pub only_billable: bool,
     pub statuses: Vec<OnboardingStatus>,
     pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
@@ -28,26 +30,27 @@ pub fn list_authorized_for_tenant_query<'a>(params: ScopedUserListQueryParams) -
     use crate::schema::{
         data_lifetime, fingerprint, manual_review, onboarding, onboarding_decision, scoped_user, user_vault,
     };
-    let authorized_ids = onboarding::table
-        .filter(not(onboarding::authorized_at.is_null()))
-        .select(onboarding::scoped_user_id)
-        .distinct();
-
     let mut query = scoped_user::table
         .filter(scoped_user::tenant_id.eq(params.tenant_id))
         .filter(scoped_user::is_live.eq(params.is_live))
         .into_boxed();
 
-    let non_portable_vault_ids = user_vault::table
-        .filter(user_vault::is_portable.eq(false))
-        .select(user_vault::id);
-    query = query.filter(
-        // Allow seeing any authorized scoped users for portable vaults OR non-portable vaults owned
-        // by the tenant
-        scoped_user::id
-            .eq_any(authorized_ids)
-            .or(scoped_user::user_vault_id.eq_any(non_portable_vault_ids)),
-    );
+    if params.only_billable {
+        // Only allow seeing any authorized scoped users for portable vaults OR non-portable vaults
+        // owned by the tenant
+        let authorized_ids = onboarding::table
+            .filter(not(onboarding::authorized_at.is_null()))
+            .select(onboarding::scoped_user_id)
+            .distinct();
+        let non_portable_vault_ids = user_vault::table
+            .filter(user_vault::is_portable.eq(false))
+            .select(user_vault::id);
+        query = query.filter(
+            scoped_user::id
+                .eq_any(authorized_ids)
+                .or(scoped_user::user_vault_id.eq_any(non_portable_vault_ids)),
+        );
+    }
 
     // Filter on whether user is in manual review
     if let Some(requires_manual_review) = params.requires_manual_review {
