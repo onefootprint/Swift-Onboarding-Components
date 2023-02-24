@@ -14,45 +14,45 @@ const AddOns = () => {
         title={t('add-ons.title')}
         microtitle={t('add-ons.micro-title')}
       />
-      <Box sx={{ marginBottom: 5 }} />
-      <FeatureRow
-        title={t('add-ons.features.drivers-license')}
-        credits={4}
-        unitFirst={t('units.scan')}
-      />
-
-      <FeatureRow
-        title={t('add-ons.features.kyb')}
-        credits={20}
-        unitFirst={t('units.business')}
-      />
-      <FeatureRow
-        title={t('add-ons.features.data-vaulting.title')}
-        details={t('add-ons.features.data-vaulting.details')}
-        credits={1}
-        unitFirst={t('units.person')}
-        unitSecond={t('units.year')}
-      />
-      <FeatureRow
-        title={t('add-ons.features.kba')}
-        credits={5}
-        unitFirst={t('units.person')}
-      />
-      <FeatureRow
-        title={t('add-ons.features.vault-proxy.title')}
-        details={t('add-ons.features.vault-proxy.details')}
-        credits={4}
-        unitFirst={t('units.person')}
-        unitSecond={t('units.year')}
-      />
-      <FeatureRow
-        title={t('add-ons.features.continuous-ofac.title')}
-        labelRight={t('labels.contact-us')}
-      />
-      <FeatureRow
-        title={t('add-ons.features.ach-verification.title')}
-        labelRight={t('labels.contact-us')}
-      />
+      <Box sx={{ marginBottom: 5, marginTop: 5 }}>
+        <FeatureRow
+          title={t('core-plan.price-table.KYB.title')}
+          cost={4}
+          unitFirst={t('units.verification')}
+        />
+        <FeatureRow
+          title={t('core-plan.price-table.custom-data-vaulting.title')}
+          details={t('core-plan.price-table.custom-data-vaulting.details')}
+          cost={0.02}
+          unitFirst={t('units.person')}
+          unitSecond={t('units.month')}
+        />
+        <FeatureRow
+          title={t('core-plan.price-table.vault-proxy.title')}
+          details={t('core-plan.price-table.vault-proxy.details')}
+          cost={0.05}
+          unitFirst={t('units.person')}
+          unitSecond={t('units.month')}
+        />
+        <FeatureRow
+          title={t('add-ons.features.drivers-license')}
+          cost={1}
+          unitFirst={t('units.scan')}
+        />
+        <FeatureRow
+          title={t('add-ons.features.kba')}
+          cost={1}
+          unitFirst={t('units.person')}
+        />
+        <FeatureRow
+          title={t('add-ons.features.continuous-ofac.title')}
+          labelRight={t('labels.contact-us')}
+        />
+        <FeatureRow
+          title={t('add-ons.features.ach-verification.title')}
+          labelRight={t('labels.contact-us')}
+        />
+      </Box>
     </TableContainer>
   );
 };

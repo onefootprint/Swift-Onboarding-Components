@@ -13,11 +13,11 @@ type FeatureRowType = {
   title: string;
   details?: string;
   moreDetailsCta?: string;
-  credits?: number;
+  cost?: number;
   unitFirst?: string;
   unitSecond?: string;
   labelRight?: string;
-  noBorderBottom?: boolean;
+  hideBorderBottom?: boolean;
   backgroundColor?: boolean;
   handleClickTrigger?: () => void;
 };
@@ -26,19 +26,19 @@ const FeatureRow = ({
   title,
   details,
   moreDetailsCta,
-  credits,
+  cost,
   unitFirst,
   unitSecond,
   labelRight,
   backgroundColor,
-  noBorderBottom,
+  hideBorderBottom,
   handleClickTrigger,
 }: FeatureRowType) => {
   const { t } = useTranslation('pages.pricing');
 
   return (
     <RowContainer
-      data-border-bottom={noBorderBottom ? 'no-border-bottom' : null}
+      data-border-bottom={hideBorderBottom ? 'no-border-bottom' : null}
       data-background-color={backgroundColor ? 'with-background-color' : null}
     >
       <Title>
@@ -69,18 +69,12 @@ const FeatureRow = ({
       ) : (
         <CreditsAndUnits>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Typography variant="label-2" as="p" sx={{ textAlign: 'right' }}>
-              {credits}
+            <Typography variant="label-2" as="p">
+              {t('units.dollar')}
             </Typography>
-            {credits! > 1 ? (
-              <Typography variant="label-2" as="p" sx={{ textAlign: 'right' }}>
-                {t('units.credits')}
-              </Typography>
-            ) : (
-              <Typography variant="label-2" as="p">
-                {t('units.credit')}
-              </Typography>
-            )}
+            <Typography variant="label-2" as="p" sx={{ textAlign: 'right' }}>
+              {cost?.toFixed(2)}
+            </Typography>
           </Box>
           {unitFirst ? (
             <Typography variant="caption-1" color="tertiary">

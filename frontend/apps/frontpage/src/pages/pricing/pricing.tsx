@@ -49,11 +49,6 @@ const Pricing = () => {
           title={t('faq.title')}
           items={[
             {
-              id: 'credits',
-              content: faq('credits.content'),
-              title: faq('credits.title'),
-            },
-            {
               id: 'one-click-kyc-difference',
               content: faq('one-click-kyc-difference.content'),
               title: faq('one-click-kyc-difference.title'),

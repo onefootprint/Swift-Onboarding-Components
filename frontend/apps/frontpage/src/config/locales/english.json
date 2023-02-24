@@ -425,20 +425,21 @@
         "contact-us": "Contact us"
       },
       "units": {
-        "credit": "credit",
-        "credits": "credits",
+        "dollar": "$",
+        "verification": "verification",
         "person": "person",
         "year": "year",
+        "month": "month",
         "business": "business",
         "scan": "scan"
       },
       "core-plan": {
         "promo": {
           "title": "For a limited time: recoup the cost of your KYC!",
-          "cta": "More details",
+          "cta": "Learn more",
           "dialog": {
             "title": "Recoup the cost of your KYC",
-            "content": "We'll give back a rebate of the two credits it costs to do a standard KYC the next time that same person does a one-click KYC on another platform. \n \n By virtue of you simply onboarding your users, you'll get back credits to use on any Footprint products. For example, if you onboard 100.000 people who are new to Footprint, you'll spend $50,000 on KYC, and you'll get all of that back in credits."
+            "content": "We'll give back a rebate of the cost to do a standard KYC the next time that same person does a one-click KYC on another platform. \n \n By virtue of you simply onboarding your users, you'll get back the money to use on any Footprint products. \n \n Assume you onboard 100,000 users who are new to Footprint and they later sign up for other products using Footprint. Then, you will get $50K back that will be applied to your future Footprint bills."
           }
         },
         "calculator": {
@@ -454,19 +455,22 @@
         "title": "KYC + PII Security",
         "subtitle": "Next-gen encryption infrastructure to offload compliance, risk, and cost.",
         "price-table": {
-          "footprint-credit": {
-            "title": "Footprint credit",
-            "cta": "Why do we use a credits system?",
-            "dialog": {
-              "title": "Why do we use a credits system?",
-              "content": "We hope credits are a transparent and simple ways for companies to keep track of pricing. We also use credits as a way to reward our early users: we give back a rebate of the two credits it costs to do a standard KYC the next time that same person does a one-click KYC on another platform.\n \n By virtue of you simply onboarding your users, you'll get back credits to use on any Footprint products. For example, if you onboard 100.000 people who are new to Footprint, you'll spend $50,000 on KYC, and you'll get all of that back in credits."
-            }
+          "KYC": {
+            "title": "KYC"
           },
-          "secure-pii-storage": {
-            "title": "Secure PII Storage"
+          "KYB": {
+            "title": "KYB"
           },
-          "standard-KYC": {
-            "title": "Standard KYC"
+          "pii-storage": {
+            "title": "PII Storage"
+          },
+          "custom-data-vaulting": {
+            "title": "Custom Data Vaulting",
+            "details": "Unlimited tokens & decryptions"
+          },
+          "vault-proxy": {
+            "title": "Vault Proxy",
+            "details": "Process transactions without handling sensitive card data"
           },
           "one-click-KYC": {
             "title": "One-click KYC",
@@ -493,6 +497,11 @@
           "step-up-verification": "Automatic step-up verification if needed",
           "ofac": "OFAC/Criminal watchlists"
         },
+        "one-click-kyc": {
+          "label": "Plus:",
+          "title": "One-click KYC",
+          "details": "Any user who is already on Footprint will be able to create an account in your platform and allow access to their PII with only one click."
+        },
         "cta": "Get started"
       },
       "add-ons": {
@@ -500,17 +509,7 @@
         "title": "Customize your plan",
         "features": {
           "drivers-license": "Driver's license scan",
-          "kyb": "KYB (Know Your Business)",
-          "data-vaulting": {
-            "title": "Custom data vaulting",
-            "details": "Unlimited tokens & decryptions"
-          },
-          "kba": "KBA (Knowledge Based Answers)",
-          "vault-proxy": {
-            "title": "Vault Proxy",
-            "details": "Process transactions without handling sensitive card data",
-            "cta": "More details"
-          },
+          "kba": "KBA (Knowledge based answers)",
           "continuous-ofac": {
             "title": "Continuous OFAC monitoring"
           },
@@ -570,7 +569,7 @@
             ]
           },
           "business-model": {
-            "title": "What is Footprint’s Business Model?",
+            "title": "What is Footprint’s business model?",
             "content": [
               "We operate a bit differently. We don’t want to make money by making verifications unnecessarily expensive. It’s why we give away biometric checks (e.g. FaceID, TouchID, etc) for free, and actually don’t recommend doing a driver’s license scan in many instances. While we’d be happy to make more money by doing a fairly simple task such as that scan, it really isn’t worth the money in most cases and adds unfortunate friction. Our business model has two core tenets to work: 1) democratize access to a best-in-class comprehensive security suite (with encryption, vaulting, access control, and audit logs), and 2) work toward a one-click future of identity. We charge accordingly."
             ]
