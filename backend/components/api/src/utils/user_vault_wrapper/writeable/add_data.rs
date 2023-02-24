@@ -24,6 +24,7 @@ use std::collections::HashMap;
 /// They use the private, xxx_unsafe methods, which cannot be exposed publically because they don't
 /// take ownership over the UserVaultWrapper that is potentially stale after an update
 impl WriteableUvw {
+    #[allow(unused)]
     pub fn add_email(
         self, // Intentionally consume to prevent using stale UVW
         conn: &mut TxnPgConn,
@@ -35,6 +36,7 @@ impl WriteableUvw {
 
     /// Applies the provided IdentityDataUpdate to the UVW.
     /// NOTE: if the update contains a phone number or email, we will ignore it
+    #[allow(unused)]
     pub fn update_identity_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
