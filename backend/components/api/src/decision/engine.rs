@@ -26,6 +26,7 @@ use db::{
     },
     DbError, DbPool,
 };
+use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::{
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
@@ -33,6 +34,7 @@ use idv::{
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
 
+use itertools::Itertools;
 use newtypes::{OnboardingId, VerificationRequestId};
 use prometheus::labels;
 ///
@@ -55,7 +57,7 @@ pub async fn run(
     let vendor_requests =
         get_latest_verification_requests_and_results(&ob.id, db_pool, enclave_client).await?;
 
-    let completed_outstanding_vendor_requests = make_vendor_requests(
+    let vendor_results = make_vendor_requests(
         db_pool,
         enclave_client,
         is_production,
@@ -67,8 +69,13 @@ pub async fn run(
     )
     .await?;
 
+    // We want to always save the successful results even if some request has a hard error
     let completed_oustanding_vendor_responses =
-        save_vendor_responses(db_pool, completed_outstanding_vendor_requests, &ob.id).await?;
+        save_vendor_responses(db_pool, vendor_results.successful, &ob.id).await?;
+
+    if !vendor_results.critical_errors.is_empty() {
+        return Err(ApiError::VendorRequestsFailed);
+    }
 
     let all_vendor_results = vendor_requests
         .completed_requests
@@ -176,6 +183,44 @@ pub async fn get_latest_verification_requests_and_results(
     })
 }
 
+pub struct VendorResults {
+    pub successful: Vec<VerificationRequestWithVendorResponse>,
+    pub non_critical_errors: Vec<ApiError>,
+    pub critical_errors: Vec<ApiError>,
+}
+
+fn partition_vendor_errors(
+    raw_results: Vec<Result<VerificationRequestWithVendorResponse, ApiError>>,
+) -> VendorResults {
+    // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
+
+    let (successful, errors): (Vec<VerificationRequestWithVendorResponse>, Vec<ApiError>) =
+        raw_results.into_iter().partition_map(|r| match r {
+            Ok(vr) => Either::Left(vr),
+            Err(e) => Either::Right(e),
+        });
+
+    let (critical_errors, non_critical_errors) = errors.into_iter().partition(|e| {
+        match e {
+            &ApiError::VendorRequestFailed(vendor_api) => {
+                if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api) {
+                    true
+                } else {
+                    tracing::warn!(vendor_api=%vendor_api, "Vendor request failed, but not bailing out of decision engine run");
+                    false
+                }
+            }
+            _ => true,
+        }
+    });
+
+    VendorResults {
+        successful,
+        non_critical_errors,
+        critical_errors,
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 pub async fn make_vendor_requests(
     db_pool: &DbPool,
@@ -190,9 +235,9 @@ pub async fn make_vendor_requests(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> ApiResult<Vec<VerificationRequestWithVendorResponse>> {
+) -> ApiResult<VendorResults> {
     // Make requests
-    let raw_results = vendor::make_request::make_vendor_requests(
+    let results = vendor::make_request::make_vendor_requests(
         requests,
         db_pool,
         enclave_client,
@@ -203,32 +248,8 @@ pub async fn make_vendor_requests(
         twilio_client,
     )
     .await?;
-    // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
-    let has_errors = raw_results
-    .iter()
-    .filter_map(|r| r.as_ref().err())
-    .find(|&err| match err {
-        &ApiError::VendorRequestFailed(vendor_api) => {
-            if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api) {
-                true
-            } else {
-                tracing::warn!(vendor_api=%vendor_api, "Vendor request failed, but not bailing out of decision engine run");
-                false
-            }
-        }
-        _ => true,
-    });
 
-    if has_errors.is_some() {
-        return Err(ApiError::VendorRequestsFailed);
-    }
-
-    let results = raw_results
-        .into_iter()
-        // We return early above if any fail, so this should not drop any results
-        .filter_map(|r| r.ok())
-        .collect();
-    Ok(results)
+    Ok(partition_vendor_errors(results))
 }
 
 /// Separate creating decision from saving decision. Used to "dry run" a decision before applying
