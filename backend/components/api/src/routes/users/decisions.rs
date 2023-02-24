@@ -1,6 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
+use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
@@ -44,6 +45,11 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<Option<_>> {
             let (ob, su, manual_review, decision) =
                 Onboarding::lock_for_tenant(conn, &fp_user_id, &tenant_id, is_live)?;
+
+            if ob.authorized_at.is_none() {
+                // Can't make a decision on an onboarding that doesn't already have one
+                return Err(TenantError::CannotMakeDecision.into());
+            }
 
             let need_to_clear_manual_review = manual_review.is_some();
             // The status changed if either there is no current decision OR the status of the existing decision is different

@@ -12,4 +12,6 @@ pub enum TenantError {
     NotIntegrationTestTenant,
     #[error("Cannot decrypt identity document in this endpoint")]
     CannotDecryptDocument,
+    #[error("Cannot manually review a user with an incomplete onboarding")]
+    CannotMakeDecision,
 }
