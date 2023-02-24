@@ -26,8 +26,6 @@ pub enum OnboardingError {
     NonTerminalState,
     #[error("No pending document request found")]
     NoPendingDocumentRequestFound,
-    #[error("No decision can be made from decision engine")]
-    NoDecisionMade,
     #[error("Cannot onboard a non-portable scoped user onto any ob config")]
     NonPortableScopedUser,
     #[error("Cannot edit completed onboarding")]

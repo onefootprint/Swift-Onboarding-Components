@@ -101,7 +101,7 @@ where
                 .db_pool
                 .db_query(move |conn| {
                     T::try_from(raw_session_data, conn, ff_client)
-                        .map_err(|_| AuthError::InvalidTokenForHeader(allowed_headers))
+                        .map_err(|_| AuthError::InvalidHeader(allowed_headers))
                 })
                 .await??;
             Ok(Self {

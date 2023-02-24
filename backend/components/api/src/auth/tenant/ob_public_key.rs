@@ -41,14 +41,14 @@ impl FromRequest for PublicOnboardingContext {
             .headers()
             .get(HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or(AuthError::MissingClientPublicAuthHeader);
+            .ok_or_else(|| AuthError::MissingHeader(HEADER_NAME.to_owned()));
 
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
         Box::pin(async move {
             let key = newtypes::ObConfigurationKey::try_from(config_key?)
-                .map_err(|_| AuthError::InvalidTokenForHeader(HEADER_NAME.to_string()))?;
+                .map_err(|_| AuthError::InvalidHeader(HEADER_NAME.to_owned()))?;
             let (ob_config, tenant) = state
                 .db_pool
                 .db_query(move |conn| ObConfiguration::get_enabled(conn, &key))

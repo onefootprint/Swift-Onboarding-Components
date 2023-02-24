@@ -30,7 +30,7 @@ impl FromRequest for ProtectedCustodianAuthContext {
             .headers()
             .get(HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or(AuthError::MissingCustodianAuthHeader);
+            .ok_or_else(|| AuthError::MissingHeader(HEADER_NAME.to_owned()));
 
         #[allow(clippy::unwrap_used)]
         let expected_custodian_key = req
@@ -43,7 +43,7 @@ impl FromRequest for ProtectedCustodianAuthContext {
         Box::pin(async move {
             let Some(expected_custodian_key) = expected_custodian_key else {
                 tracing::error!("protected custodian key not set, aborting");
-                return Err(AuthError::InvalidCustodianAuthHeader.into())
+                return Err(AuthError::InvalidHeader(HEADER_NAME.to_owned()).into());
             };
 
             let custodian_key = custodian_key?;
@@ -53,7 +53,7 @@ impl FromRequest for ProtectedCustodianAuthContext {
                     phantom: PhantomData,
                 })
             } else {
-                Err(AuthError::InvalidCustodianAuthHeader.into())
+                Err(AuthError::InvalidHeader(HEADER_NAME.to_owned()).into())
             }
         })
     }

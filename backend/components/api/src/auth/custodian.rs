@@ -30,7 +30,7 @@ impl FromRequest for CustodianAuthContext {
             .headers()
             .get(HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or(AuthError::MissingCustodianAuthHeader);
+            .ok_or_else(|| AuthError::MissingHeader(HEADER_NAME.to_owned()));
 
         #[allow(clippy::unwrap_used)]
         let expected_custodian_key = req
@@ -48,7 +48,7 @@ impl FromRequest for CustodianAuthContext {
                     phantom: PhantomData,
                 })
             } else {
-                Err(AuthError::InvalidCustodianAuthHeader.into())
+                Err(AuthError::InvalidHeader(HEADER_NAME.to_owned()).into())
             }
         })
     }
