@@ -1,4 +1,4 @@
-use super::UserVaultWrapper;
+use super::{Person, UserVaultWrapper};
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
@@ -11,7 +11,7 @@ use newtypes::{CollectedDataOption, SealedVaultBytes};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
-impl UserVaultWrapper {
+impl UserVaultWrapper<Person> {
     pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
         ob_config
             .must_collect_data
@@ -59,7 +59,7 @@ impl UserVaultWrapper {
     }
 }
 
-impl UserVaultWrapper {
+impl UserVaultWrapper<Person> {
     pub fn get_identity_e_field(&self, kind: IdentityDataKind) -> Option<&SealedVaultBytes> {
         self.speculative
             .get_identity_e_field(kind)
@@ -81,7 +81,7 @@ impl UserVaultWrapper {
     }
 }
 
-impl UserVaultWrapper {
+impl UserVaultWrapper<Person> {
     /// helper to expose a reference/deref coercion to the underlying UV (normally from a LockedUserVaultWrapper)
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault

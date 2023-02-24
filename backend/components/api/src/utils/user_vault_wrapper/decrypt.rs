@@ -1,4 +1,4 @@
-use super::UserVaultWrapper;
+use super::{Person, UserVaultWrapper};
 use crate::enclave_client::EnclaveClient;
 use crate::errors::{ApiError, ApiResult};
 use crate::State;
@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::convert::Into;
 use std::hash::Hash;
 
-impl UserVaultWrapper {
+impl UserVaultWrapper<Person> {
     /// Retrieve the e_data for each of the provided DataIdentifiers, if exists
     pub(super) fn get_e_datas<T>(&self, ids: &[T]) -> HashMap<T, &SealedVaultBytes>
     where
@@ -55,7 +55,7 @@ impl UserVaultWrapper {
 }
 
 // TODO should we gate these permissions somehow? Make access events in these?
-impl UserVaultWrapper {
+impl UserVaultWrapper<Person> {
     pub async fn decrypt_data_keys(
         &self,
         state: &State,

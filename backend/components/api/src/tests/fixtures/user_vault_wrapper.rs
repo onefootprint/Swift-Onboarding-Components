@@ -12,11 +12,11 @@ use db::{
     tests::prelude::TestPgConn,
 };
 
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
+use crate::utils::user_vault_wrapper::{Person, UserVaultWrapper, UvwArgs};
 pub type UvwSetup = (
     ScopedUser,
     ObConfiguration,
-    UserVaultWrapper,
+    UserVaultWrapper<Person>,
     Tenant,
     Locked<UserVault>,
 );

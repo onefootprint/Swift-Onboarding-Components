@@ -1,6 +1,6 @@
 use super::uvw_data::UvwData;
-use super::UserVaultWrapper;
 use super::UvwArgs;
+use super::{Person, UserVaultWrapper};
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
@@ -11,6 +11,7 @@ use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
+use db::models::user_vault::NewPortablePersonUserVaultArgs;
 use db::models::user_vault::NewUserInfo;
 use db::models::user_vault::UserVault;
 use db::models::user_vault_data::UserVaultData;
@@ -24,7 +25,7 @@ use newtypes::DataPriority;
 use newtypes::Locked;
 use std::marker::PhantomData;
 
-impl UserVaultWrapper {
+impl<Type> UserVaultWrapper<Type> {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn build_internal(
         user_vault: UserVault,
@@ -84,7 +85,9 @@ impl UserVaultWrapper {
         )?;
         Ok(result)
     }
+}
 
+impl UserVaultWrapper<Person> {
     /// Custom util function to create a user vault, its phone number, and optionally associate it
     /// with a provided ob_config
     pub fn create_user_vault(
@@ -93,7 +96,7 @@ impl UserVaultWrapper {
         ob_config: Option<ObConfiguration>,
         phone_args: NewPhoneNumberArgs,
     ) -> ApiResult<Locked<UserVault>> {
-        let new_user_vault = db::models::user_vault::NewPortablePersonUserVaultArgs {
+        let new_user_vault = NewPortablePersonUserVaultArgs {
             e_private_key: user_info.e_private_key,
             public_key: user_info.public_key,
             is_live: user_info.is_live,

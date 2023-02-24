@@ -1,6 +1,6 @@
 use newtypes::{Locked, ScopedUserId};
 
-use super::UserVaultWrapper;
+use super::{Person, UserVaultWrapper};
 use derive_more::Deref;
 
 mod add_data;
@@ -27,6 +27,6 @@ mod uvd_builder;
 #[derive(Deref)]
 pub struct WriteableUvw {
     #[deref]
-    uvw: Locked<UserVaultWrapper>,
+    uvw: Locked<UserVaultWrapper<Person>>,
     scoped_user_id: ScopedUserId,
 }

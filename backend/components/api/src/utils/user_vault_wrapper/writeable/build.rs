@@ -3,12 +3,12 @@ use newtypes::{Locked, ScopedUserId};
 
 use crate::{
     errors::ApiResult,
-    utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs},
+    utils::user_vault_wrapper::{Person, UserVaultWrapper, UvwArgs},
 };
 
 use super::WriteableUvw;
 
-impl UserVaultWrapper {
+impl UserVaultWrapper<Person> {
     /// Builds a locked UVW that sees portable data AND speculative data for the tenant.
     /// This should be used during onboarding operations in order to allow the tenant to see
     /// speculative data that has been added by previous operations

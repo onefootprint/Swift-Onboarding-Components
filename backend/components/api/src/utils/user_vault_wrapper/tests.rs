@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
-use super::UserVaultWrapper;
+use super::{Business, UserVaultWrapper};
 use crate::utils::user_vault_wrapper::UvwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
+use db::models::user_vault_data::NewBusinessVaultData;
 use db::models::user_vault_data::NewPersonVaultData;
 use db::models::user_vault_data::UserVaultData;
 use db::tests::fixtures;
@@ -12,9 +13,8 @@ use itertools::Itertools;
 use macros::db_test;
 use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
-use newtypes::IdentityDataUpdate;
 use newtypes::KvDataKey;
-use newtypes::SealedVaultBytes;
+use newtypes::{BusinessDataKind as BDK, SealedVaultBytes};
 use newtypes::{PersonVaultDataKind, PiiString};
 use std::str::FromStr;
 
@@ -90,6 +90,49 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     for test in tests {
         let (attribute, expected_value) = test;
         assert_eq!(uvw.get_identity_e_field(attribute), expected_value.as_ref());
+    }
+}
+
+#[db_test]
+fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
+    let uv = db::tests::fixtures::user_vault::create(conn, true);
+    let tenant = db::tests::fixtures::tenant::create(conn);
+    let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let su = db::tests::fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+
+    let data = vec![
+        NewBusinessVaultData {
+            kind: BDK::Name,
+            e_data: SealedVaultBytes(vec![1]),
+        },
+        NewBusinessVaultData {
+            kind: BDK::Website,
+            e_data: SealedVaultBytes(vec![2]),
+        },
+        NewBusinessVaultData {
+            kind: BDK::PhoneNumber,
+            e_data: SealedVaultBytes(vec![3]),
+        },
+    ];
+    let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+    UserVaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
+
+    let bvw = UserVaultWrapper::<Business>::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
+    let tests = vec![
+        (BDK::Name, Some(SealedVaultBytes(vec![1]))),
+        (BDK::Website, Some(SealedVaultBytes(vec![2]))),
+        (BDK::PhoneNumber, Some(SealedVaultBytes(vec![3]))),
+        (BDK::Ein, None),
+        (BDK::AddressLine1, None),
+        (BDK::AddressLine2, None),
+        (BDK::City, None),
+        (BDK::State, None),
+        (BDK::Zip, None),
+        (BDK::Country, None),
+    ];
+    for test in tests {
+        let (attribute, expected_value) = test;
+        assert_eq!(bvw.get_business_data_e_field(attribute), expected_value.as_ref());
     }
 }
 

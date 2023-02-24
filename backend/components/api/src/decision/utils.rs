@@ -18,7 +18,7 @@ use newtypes::{
 use super::vendor;
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
-    utils::user_vault_wrapper::UserVaultWrapper,
+    utils::user_vault_wrapper::{Person, UserVaultWrapper},
     State,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -28,7 +28,7 @@ type ShouldInitiateVerificationRequests = bool;
 #[tracing::instrument(skip_all)]
 pub async fn should_initiate_idv_or_else_setup_test_fixtures(
     state: &State,
-    uvw: UserVaultWrapper,
+    uvw: UserVaultWrapper<Person>,
     ob_id: OnboardingId,
     should_setup_test_fixtures: bool,
 ) -> ApiResult<ShouldInitiateVerificationRequests> {
@@ -93,7 +93,7 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
 pub async fn should_initiate_sandbox_and_setup(
     state: &State,
     ob_id: OnboardingId,
-    uvw: UserVaultWrapper,
+    uvw: UserVaultWrapper<Person>,
     phone_number: PhoneNumber,
     should_setup_test_fixtures: bool,
 ) -> ApiResult<bool> {
@@ -120,7 +120,7 @@ pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> (Decisi
 pub async fn should_initiate_prod_and_setup(
     state: &State,
     ob_id: OnboardingId,
-    uvw: UserVaultWrapper,
+    uvw: UserVaultWrapper<Person>,
     tenant_id: TenantId,
     ff_client: &impl FeatureFlagClient,
     should_setup_test_fixtures: bool,
@@ -144,7 +144,7 @@ async fn setup_test_fixtures(
     ob_id: OnboardingId,
     create_manual_review: bool,
     decision_status: DecisionStatus,
-    uvw: UserVaultWrapper,
+    uvw: UserVaultWrapper<Person>,
 ) -> ApiResult<()> {
     state
         .db_pool

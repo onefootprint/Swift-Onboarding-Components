@@ -1,5 +1,5 @@
 use super::TenantUvw;
-use super::UserVaultWrapper;
+use super::{Person, UserVaultWrapper};
 use crate::errors::ApiResult;
 use crate::utils::user_vault_wrapper::UvwArgs;
 use db::models::data_lifetime::DataLifetime;
@@ -16,7 +16,7 @@ use db::PgConn;
 use newtypes::{ScopedUserId, TenantId};
 use std::collections::HashMap;
 
-impl UserVaultWrapper {
+impl UserVaultWrapper<Person> {
     pub fn build_for_tenant(conn: &mut PgConn, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
         let uvw = Self::build(conn, UvwArgs::Tenant(su_id))?;
         let onboarding = Onboarding::bulk_get_for_users(conn, vec![su_id])?.remove(su_id);

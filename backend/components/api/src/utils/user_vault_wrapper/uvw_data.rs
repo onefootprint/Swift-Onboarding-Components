@@ -5,16 +5,19 @@ use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::user_vault_data::UserVaultData;
 use db::{HasLifetime, HasSealedIdentityData};
-use newtypes::{DataLifetimeId, SealedVaultBytes, UvdKind};
+use newtypes::{BusinessDataKind, DataLifetimeId, SealedVaultBytes, UvdKind};
 use newtypes::{IdentityDataKind, KvDataKey};
 use std::collections::{HashMap, HashSet};
+use std::marker::PhantomData;
 use strum::IntoEnumIterator;
 
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 
+use super::{Business, Person};
+
 #[derive(Clone, Debug)]
-pub(super) struct UvwData {
+pub(super) struct UvwData<Type> {
     pub(super) uvd: Vec<UserVaultData>,
     pub(super) phone_numbers: Vec<PhoneNumber>,
     pub(super) emails: Vec<Email>,
@@ -24,9 +27,10 @@ pub(super) struct UvwData {
 
     // A map of all of the DataLifetimes for this data.
     lifetimes: HashMap<DataLifetimeId, DataLifetime>,
+    phantom: PhantomData<Type>,
 }
 
-impl UvwData {
+impl<Type> UvwData<Type> {
     pub(super) fn partition(
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
@@ -114,11 +118,12 @@ impl UvwData {
             identity_documents,
             kv_data: kv_data.into_iter().map(|d| (d.data_key.clone(), d)).collect(),
             lifetimes,
+            phantom: PhantomData,
         }
     }
 }
 
-impl UvwData {
+impl UvwData<Person> {
     fn uvd(&self, kind: IdentityDataKind) -> Option<&UserVaultData> {
         self.uvd.iter().find(|d| match d.kind {
             UvdKind::Id(p) => IdentityDataKind::from(p) == kind,
@@ -175,5 +180,19 @@ impl UvwData {
         IdentityDataKind::iter()
             .filter(|k| self.get_identity_e_field(*k).is_some())
             .collect()
+    }
+}
+
+impl UvwData<Business> {
+    fn bdk(&self, kind: BusinessDataKind) -> Option<&UserVaultData> {
+        self.uvd.iter().find(|d| match d.kind {
+            UvdKind::Business(b) => b == kind,
+            UvdKind::Id(_) => false,
+        })
+    }
+
+    pub fn get_business_data_e_field(&self, kind: BusinessDataKind) -> Option<&SealedVaultBytes> {
+        let value = self.bdk(kind).map(|uvd| uvd as &dyn HasSealedIdentityData);
+        value.map(|v| v.e_data())
     }
 }
