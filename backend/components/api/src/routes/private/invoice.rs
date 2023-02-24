@@ -1,4 +1,6 @@
+use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::auth::tenant::TenantRbAuthContext;
+use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
@@ -26,9 +28,12 @@ struct CreateInvoiceRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateInvoiceRequest>,
-    auth: TenantRbAuthContext,
+    auth: Either<TenantRbAuthContext, ProtectedCustodianAuthContext>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let _firm_employee = auth.firm_employee_user()?;
+    if let Either::Left(tenant_rb) = auth {
+        // Make sure only firm employees can hit this endpoint
+        tenant_rb.firm_employee_user()?;
+    }
     let CreateInvoiceRequest {
         tenant_id,
         billing_date,
@@ -50,8 +55,14 @@ async fn post(
     tags(Private)
 )]
 #[post("/private/invoices")]
-async fn post_all(state: web::Data<State>, auth: TenantRbAuthContext) -> JsonApiResponse<EmptyResponse> {
-    let _firm_employee = auth.firm_employee_user()?;
+async fn post_all(
+    state: web::Data<State>,
+    auth: Either<TenantRbAuthContext, ProtectedCustodianAuthContext>,
+) -> JsonApiResponse<EmptyResponse> {
+    if let Either::Left(tenant_rb) = auth {
+        // Make sure only firm employees can hit this endpoint
+        tenant_rb.firm_employee_user()?;
+    }
 
     let tenants = state.db_pool.db_query(Tenant::list_live).await??;
 
