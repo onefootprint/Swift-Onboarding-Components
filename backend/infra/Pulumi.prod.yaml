@@ -35,7 +35,7 @@ config:
         secure: v1:NEy9kUqxfuQKj1Xb:BQoRc+VSA5pdkg2mv79OwGSNnUEZ71DUfFOTN+lT7/lASQlbI0ol
     launchDarkly:
       launchDarklySdkKey:
-        secure: v1:Ejh/oU+Ev4JTICIn:fEH+pIJ8Ekb258tFuoTMdU7hOw75grl5XniVgeGFOHcNCUgbSYalBuPQyc8ICbOQLuowMHQDF9U=
+        secure: v1:DrKn4q/fyK2+S+sJ:V/huczZNR1v2VKctscz6cCDZhx3nl8DyDBw+njGsun69ftSiRh7Z08QDoYAKBCyG9ItmpSiL0YY=
     resources:
       cpuUnits: 2048
       instances: 2
