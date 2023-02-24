@@ -5,7 +5,8 @@ pub use data::*;
 
 use db::PgConn;
 
-use crate::{errors::ApiError, feature_flag::LaunchDarklyFeatureFlagClient};
+use crate::errors::ApiError;
+use feature_flag::LaunchDarklyFeatureFlagClient;
 
 /// Allows an auth session to be extracted from an actix request using the extractor SessionContext utility
 pub trait ExtractableAuthSession: Sized + Send + Sync + 'static {

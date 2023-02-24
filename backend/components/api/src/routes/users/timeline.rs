@@ -4,10 +4,10 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 
-use crate::feature_flag::FeatureFlag;
-use crate::feature_flag::FeatureFlagClient;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
+use feature_flag::FeatureFlag;
+use feature_flag::FeatureFlagClient;
 
 use crate::utils::db2api::DbToApi;
 use crate::State;

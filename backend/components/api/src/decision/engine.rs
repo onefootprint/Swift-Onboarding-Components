@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use crate::{
     enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
-    feature_flag::FeatureFlagClient,
     metrics,
     utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs},
     State,
@@ -27,6 +26,7 @@ use db::{
     },
     DbError, DbPool,
 };
+use feature_flag::FeatureFlagClient;
 use idv::{
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
     socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},

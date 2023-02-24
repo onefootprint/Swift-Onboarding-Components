@@ -1,12 +1,11 @@
 use std::sync::Arc;
 
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder, Detail};
-#[cfg(test)]
 use mockall::{automock, predicate::*};
 use newtypes::{ObConfigurationKey, OrgMemberEmail, TenantId, Uuid};
 use thiserror::Error;
 
-use crate::decision::rule::RuleSetName;
+use newtypes::decision::RuleSetName;
 
 #[derive(Debug, Error)]
 #[allow(clippy::enum_variant_names)]
@@ -25,6 +24,7 @@ pub struct LaunchDarklyFeatureFlagClient {
 }
 
 impl LaunchDarklyFeatureFlagClient {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             launch_darkly_client: None,
@@ -162,7 +162,7 @@ impl<'a> FeatureFlag<'a> {
     }
 }
 
-#[cfg_attr(test, automock)]
+#[automock]
 pub trait FeatureFlagClient: Sync + Send {
     #[allow(clippy::needless_lifetimes)]
     fn flag<'a>(&self, flag: FeatureFlag<'a>) -> bool;

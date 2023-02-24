@@ -5,7 +5,6 @@ use crate::{
         AuthError, SessionContext,
     },
     errors::ApiResult,
-    feature_flag::LaunchDarklyFeatureFlagClient,
 };
 use db::{
     models::{
@@ -14,6 +13,7 @@ use db::{
     },
     PgConn,
 };
+use feature_flag::LaunchDarklyFeatureFlagClient;
 use newtypes::{TenantRolebindingId, TenantScope};
 use paperclip::actix::Apiv2Security;
 

@@ -5,11 +5,9 @@ use db::{
 use newtypes::{ObConfigurationId, TenantId};
 use paperclip::actix::Apiv2Security;
 
-use crate::{
-    auth::session::{AuthSessionData, ExtractableAuthSession},
-    feature_flag::LaunchDarklyFeatureFlagClient,
-};
+use crate::auth::session::{AuthSessionData, ExtractableAuthSession};
 use crate::{auth::AuthError, errors::ApiError};
+use feature_flag::LaunchDarklyFeatureFlagClient;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct OnboardingSession {

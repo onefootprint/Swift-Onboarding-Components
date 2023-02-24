@@ -15,11 +15,11 @@ use super::{
     features::*,
     rule::{self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules, RuleName},
 };
-use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::user_vault_wrapper::UserVaultWrapper,
 };
+use feature_flag::{FeatureFlag, FeatureFlagClient};
 use strum::IntoEnumIterator;
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals

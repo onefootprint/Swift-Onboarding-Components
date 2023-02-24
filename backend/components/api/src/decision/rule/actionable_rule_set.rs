@@ -1,4 +1,4 @@
-use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
+use feature_flag::{FeatureFlag, FeatureFlagClient};
 
 use super::{
     rule_set::{EvaluateRuleSet, EvaluatedRuleSet, RuleSet, RuleSetResult},

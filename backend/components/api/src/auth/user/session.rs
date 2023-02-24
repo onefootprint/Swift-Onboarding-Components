@@ -16,8 +16,8 @@ use crate::{
         AuthError, SessionContext,
     },
     errors::{ApiError, ApiResult},
-    feature_flag::LaunchDarklyFeatureFlagClient,
 };
+use feature_flag::LaunchDarklyFeatureFlagClient;
 
 /// A user-specific session. Permissions for the session are defined by the set of scopes.
 /// IMPORTANT: Purposefully doesn't implement TryFrom<AuthSessionData> or HeaderName to prevent

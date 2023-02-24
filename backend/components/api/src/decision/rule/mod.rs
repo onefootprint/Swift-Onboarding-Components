@@ -15,15 +15,7 @@ pub fn rules_to_string(rules: &[RuleName]) -> String {
     rules.iter().map(|r| r.to_string()).collect::<Vec<_>>().join(",")
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Display)]
-#[strum(serialize_all = "snake_case")]
-pub enum RuleSetName {
-    IdologyBaseRules,
-    IdologyConservativeFailingRules,
-    TempWatchlist,
-    #[cfg(test)]
-    Test(String),
-}
+pub use newtypes::decision::RuleSetName;
 
 #[derive(Debug, Clone, PartialEq, Eq, Display, Hash)]
 #[strum(serialize_all = "snake_case")]

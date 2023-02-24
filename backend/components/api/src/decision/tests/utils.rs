@@ -1,7 +1,7 @@
 use crate::decision::utils;
-use crate::feature_flag::FeatureFlag;
-use crate::{feature_flag::MockFeatureFlagClient, tests::fixtures};
+use crate::tests::fixtures;
 use db::tests::prelude::*;
+use feature_flag::{FeatureFlag, MockFeatureFlagClient};
 use macros::db_test;
 use newtypes::{DecisionStatus, OnboardingId, PhoneNumber};
 use std::str::FromStr;

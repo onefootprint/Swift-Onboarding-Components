@@ -4,7 +4,6 @@ use crate::{
     config::Config,
     enclave_client::EnclaveClient,
     errors::ApiError,
-    feature_flag::LaunchDarklyFeatureFlagClient,
     s3,
     signed_hash::SignedHashClient,
     utils::{email::SendgridClient, twilio::TwilioClient},
@@ -13,7 +12,7 @@ use crate::{
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
 use idv::{idology::client::IdologyClient, socure::client::SocureClient};
-
+use feature_flag::LaunchDarklyFeatureFlagClient;
 use workos::{ApiKey, WorkOs};
 
 #[derive(Clone)]

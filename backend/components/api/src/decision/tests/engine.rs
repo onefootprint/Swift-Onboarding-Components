@@ -1,10 +1,8 @@
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
-use crate::feature_flag::FeatureFlag;
 use crate::State;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
-    feature_flag::MockFeatureFlagClient,
     utils::{mock_enclave::StateWithMockEnclave, user_vault_wrapper::UserVaultWrapper},
 };
 use db::models::ob_configuration::ObConfiguration;
@@ -20,6 +18,8 @@ use db::{
     tests::fixtures,
     DbError, TxnPgConn,
 };
+#[cfg(test)]
+use feature_flag::{FeatureFlag, MockFeatureFlagClient};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};

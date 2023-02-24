@@ -14,6 +14,8 @@ pub use idv::*;
 pub mod docv;
 pub use docv::*;
 
+pub mod decision;
+
 pub mod fields;
 pub use fields::*;
 

@@ -8,8 +8,8 @@ use crate::{
         AuthError,
     },
     errors::ApiResult,
-    feature_flag::LaunchDarklyFeatureFlagClient,
 };
+use feature_flag::LaunchDarklyFeatureFlagClient;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 pub struct WorkOsSession {

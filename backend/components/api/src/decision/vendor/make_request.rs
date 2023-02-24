@@ -4,8 +4,6 @@ use super::*;
 use crate::enclave_client::EnclaveClient;
 use crate::metrics;
 use crate::{errors::ApiError, State};
-
-use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use db::DbPool;
 use db::{
     models::{
@@ -14,6 +12,7 @@ use db::{
     },
     DbError,
 };
+use feature_flag::{FeatureFlag, FeatureFlagClient};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
@@ -460,8 +459,7 @@ pub async fn make_vendor_requests(
 mod tests {
     use super::*;
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-    use crate::feature_flag::MockFeatureFlagClient;
-
+    use feature_flag::MockFeatureFlagClient;
     use idv::idology::{
         expectid::{response::ExpectIDResponse, response::Response},
         IdologyExpectIDAPIResponse,

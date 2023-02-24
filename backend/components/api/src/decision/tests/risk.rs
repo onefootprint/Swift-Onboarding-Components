@@ -1,9 +1,8 @@
-use std::str::FromStr;
-
+use crate::decision::risk::evaluate_onboarding_rules;
+use feature_flag::FeatureFlag;
 use newtypes::{DecisionStatus, FootprintReasonCode};
+use std::str::FromStr;
 use test_case::test_case;
-
-use crate::{decision::risk::evaluate_onboarding_rules, feature_flag::FeatureFlag};
 
 // these tests kinda stink, need to refactor
 fn idology_reason_codes(should_fail: bool, should_fail_conservative: bool) -> Vec<FootprintReasonCode> {
@@ -36,13 +35,11 @@ fn test_final_decision(
     conservative_rules_should_fail: bool,
     idology_status: DecisionStatus,
 ) -> (DecisionStatus, CreateManualReview) {
-    use crate::{
-        decision::{
-            features::{FeatureVector, IDologyFeatures},
-            rule::onboarding_rules,
-        },
-        feature_flag::MockFeatureFlagClient,
+    use crate::decision::{
+        features::{FeatureVector, IDologyFeatures},
+        rule::onboarding_rules,
     };
+    use feature_flag::MockFeatureFlagClient;
     use newtypes::VerificationResultId;
 
     // Set up a feature vector

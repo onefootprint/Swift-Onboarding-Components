@@ -16,12 +16,12 @@ use newtypes::{
 };
 
 use super::vendor;
-use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
+use feature_flag::{FeatureFlag, FeatureFlagClient};
 
 type ShouldInitiateVerificationRequests = bool;
 

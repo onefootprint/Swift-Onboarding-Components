@@ -1,6 +1,5 @@
 use crate::auth::tenant::TenantRbAuthContext;
 use crate::errors::ApiResult;
-use crate::feature_flag::{FeatureFlag, FeatureFlagClient};
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use billing::BillingInfo;
@@ -8,6 +7,7 @@ use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::scoped_user::{count_authorized_for_tenant, ScopedUserListQueryParams};
+use feature_flag::{FeatureFlag, FeatureFlagClient};
 use newtypes::StripeCustomerId;
 use paperclip::actix::{api_v2_operation, post, web};
 
