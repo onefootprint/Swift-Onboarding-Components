@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OnboardingStatus } from '@onefootprint/types';
+import { UserStatus } from '@onefootprint/types';
 import { Filters as FPFilter } from '@onefootprint/ui';
 import React from 'react';
 
@@ -18,12 +18,20 @@ const Filters = () => {
           kind: 'multi-select',
           options: [
             {
-              value: OnboardingStatus.verified,
+              value: UserStatus.verified,
               label: t('status.options.verified'),
             },
             {
-              value: OnboardingStatus.failed,
+              value: UserStatus.failed,
               label: t('status.options.failed'),
+            },
+            {
+              value: UserStatus.incomplete,
+              label: t('status.options.incomplete'),
+            },
+            {
+              value: UserStatus.vaultOnly,
+              label: t('status.options.vault_only'),
             },
           ],
           selectedOptions: filters.values.status,

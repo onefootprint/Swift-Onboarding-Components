@@ -3,7 +3,7 @@
 enum UserStatus {
   verified = 'pass',
   failed = 'fail',
-  vaultOnly = 'vault-only',
+  vaultOnly = 'vault_only',
   incomplete = 'incomplete',
 }
 

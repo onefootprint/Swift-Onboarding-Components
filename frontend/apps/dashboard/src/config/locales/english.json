@@ -267,7 +267,9 @@
           "label": "Status",
           "options": {
             "verified": "Verified",
-            "failed": "Failed"
+            "failed": "Failed",
+            "incomplete": "Incomplete",
+            "vault_only": "Vault"
           }
         },
         "date-range": {
@@ -314,7 +316,7 @@
         "status": {
           "pass": "Verified",
           "fail": "Failed",
-          "vault-only": "Vault",
+          "vault_only": "Vault",
           "incomplete": "Incomplete"
         }
       },
