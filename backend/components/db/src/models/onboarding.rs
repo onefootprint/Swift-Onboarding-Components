@@ -398,6 +398,13 @@ impl Onboarding {
             .get_result(conn)?;
         Ok(count)
     }
+
+    /// Returns true if this onboarding has been entirely completed by the customer
+    pub fn is_complete(&self) -> bool {
+        self.idv_reqs_initiated_at.is_some()
+            && self.decision_made_at.is_some()
+            && self.authorized_at.is_some()
+    }
 }
 
 impl OnboardingAndConfig {

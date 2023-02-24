@@ -91,7 +91,7 @@ async fn authorize_privacy_pass(
                 .ok_or(OnboardingError::NoOnboarding)?
                 .into_inner();
 
-            if onboarding.authorized_at.is_some() {
+            if onboarding.is_complete() {
                 return Err(OnboardingError::AlreadyCompleted.into());
             }
 

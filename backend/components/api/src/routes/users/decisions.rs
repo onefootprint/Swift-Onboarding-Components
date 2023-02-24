@@ -46,7 +46,7 @@ pub async fn post(
             let (ob, su, manual_review, decision) =
                 Onboarding::lock_for_tenant(conn, &fp_user_id, &tenant_id, is_live)?;
 
-            if ob.authorized_at.is_none() {
+            if !ob.is_complete() {
                 // Can't make a decision on an onboarding that doesn't already have one
                 return Err(TenantError::CannotMakeDecision.into());
             }
