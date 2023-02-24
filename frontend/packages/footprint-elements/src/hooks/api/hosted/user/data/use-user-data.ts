@@ -9,12 +9,15 @@ import { useMutation } from '@tanstack/react-query';
 import { AUTH_HEADER } from '../../../../../config/constants';
 
 const userDataRequest = async (payload: UserDataRequest) => {
+  let method;
   let url;
   if (payload.speculative) {
     // For some requests, we just send data to the backend to validate it
-    url = '/hosted/user/data/identity/validate';
+    method = 'POST';
+    url = '/hosted/user/vault/validate';
   } else {
-    url = '/hosted/user/data/identity';
+    method = 'PUT';
+    url = '/hosted/user/vault';
   }
   // Transform the data into the format expected by the API
   const data = Object.fromEntries(
@@ -30,7 +33,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
       .map(([k, v]) => [`id.${k}`, v]),
   );
   const response = await requestWithoutCaseConverter<UserDataResponse>({
-    method: 'POST',
+    method,
     url,
     data,
     headers: {
