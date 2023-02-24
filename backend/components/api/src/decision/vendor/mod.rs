@@ -1,4 +1,7 @@
-use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper};
+use crate::{
+    errors::{ApiError, ApiResult},
+    utils::user_vault_wrapper::UserVaultWrapper,
+};
 
 use db::{
     models::{
@@ -7,7 +10,7 @@ use db::{
     },
     TxnPgConn,
 };
-use newtypes::OnboardingId;
+use newtypes::{OnboardingId, VendorAPI};
 
 pub(super) mod build_request;
 pub mod make_request;
@@ -28,6 +31,15 @@ pub fn build_verification_requests_and_checkpoint(
     // Always set the idv_reqs_initiated_at in order to checkpoint
     let ob = ob.into_inner();
     ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
+
+    let vendor_apis = desired_vendor_apis(uvw)?;
+
+    let requests_to_initiate = VerificationRequest::bulk_create(conn, ob_id.clone(), vendor_apis)?;
+
+    Ok(requests_to_initiate)
+}
+
+pub fn desired_vendor_apis(uvw: &UserVaultWrapper) -> ApiResult<Vec<VendorAPI>> {
     // From the data in the vault, figure out which vendors we need to send to
     let vendor_apis =
         idv::requirements::available_vendor_apis(uvw.get_populated_identity_fields().as_slice());
@@ -36,8 +48,5 @@ pub fn build_verification_requests_and_checkpoint(
             "Not enough information to send to any vendors".into(),
         ));
     } // probably should add some more validations in the future, like make sure we are _at least_ sending to a KYC vendor
-
-    let requests_to_initiate = VerificationRequest::bulk_create(conn, ob_id.clone(), vendor_apis)?;
-
-    Ok(requests_to_initiate)
+    Ok(vendor_apis)
 }

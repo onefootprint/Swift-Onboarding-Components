@@ -11,7 +11,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(check)
         .service(risk::make_vendor_calls)
-        .service(risk::make_decision);
+        .service(risk::make_decision)
+        .service(risk::shadow_run);
 }
 
 #[api_v2_operation(tags(Private, Protected))]

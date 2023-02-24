@@ -1,16 +1,23 @@
 use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::decision::risk::OnboardingRulesDecisionOutput;
 use crate::decision::vendor;
+use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
 use crate::{decision, State};
+use chrono::Utc;
+use db::models::data_lifetime::DataLifetime;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
-use newtypes::{DecisionStatus, FootprintUserId, TenantId, VerificationRequestId, VerificationResultId};
+use db::models::verification_request::VerificationRequest;
+use newtypes::{
+    DecisionStatus, FootprintUserId, TenantId, Vendor, VerificationRequestId, VerificationResultId,
+};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct MakeVendorCallsRequest {
@@ -193,4 +200,106 @@ async fn make_decision(
     .await?;
 
     Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct ShadowRunRequest {
+    pub tenant_id: TenantId,
+    pub fp_user_id: FootprintUserId,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct ShadowRunResult {
+    decision_status: DecisionStatus, // TODO: add DecisionOutput when merged in
+}
+
+#[api_v2_operation(
+    description = "Makes vendor calls and runs and return output of Decisioning logic, without writing any data into postgres.",
+    tags(Private)
+)]
+#[post("/private/protected/risk/shadow_run_vendor_calls_and_decisioning")]
+async fn shadow_run(
+    state: web::Data<State>,
+    _: ProtectedCustodianAuthContext,
+    request: Json<ShadowRunRequest>,
+) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
+    let ShadowRunRequest {
+        tenant_id,
+        fp_user_id,
+    } = request.into_inner();
+
+    let requests = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let uv = UserVault::get(conn, &scoped_user.id)?;
+            let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
+            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+
+            let vendor_apis = vendor::desired_vendor_apis(&uvw)?;
+            let memory_only_requests = vendor_apis
+                .into_iter()
+                .map(|v| VerificationRequest {
+                    #[allow(clippy::unwrap_used)]
+                    id: VerificationRequestId::from_str("fake in-memory-only VerificationRequest").unwrap(),
+                    vendor: Vendor::from(v),
+                    timestamp: Utc::now(),
+                    _created_at: Utc::now(),
+                    _updated_at: Utc::now(),
+                    onboarding_id: ob.id.clone(),
+                    vendor_api: v,
+                    uvw_snapshot_seqno: seqno,
+                    identity_document_id: None,
+                })
+                .collect();
+
+            Ok(memory_only_requests)
+        })
+        .await?;
+
+    let vendor_results = decision::engine::make_vendor_requests(
+        &state.db_pool,
+        &state.enclave_client,
+        state.config.service_config.is_production(),
+        requests,
+        &state.feature_flag_client,
+        &state.idology_client,
+        &state.socure_production_client,
+        &state.twilio_client.client,
+    )
+    .await?;
+
+    let all_vendor_errors: Vec<&ApiError> = vendor_results
+        .critical_errors
+        .iter()
+        .chain(vendor_results.non_critical_errors.iter())
+        .collect();
+
+    if !all_vendor_errors.is_empty() {
+        return Err(ApiError::AssertionError(format!(
+            "Vendor call(s) failed: {:?}",
+            &all_vendor_errors
+        )));
+    }
+
+    // calculate_decision currently requires Vec<VendorResult> which we normally get from saving VerificationResult's to PG
+    // since we want to keep things in-memory-only, we manually create VendorResult's here with dummy VerificationResultId's
+    let vendor_results = vendor_results
+        .successful
+        .into_iter()
+        .map(|(req, res)| VendorResult {
+            response: res,
+            #[allow(clippy::unwrap_used)]
+            verification_result_id: VerificationResultId::from_str("fake in-memory-only VerificationResult")
+                .unwrap(),
+            verification_request_id: req.id,
+        })
+        .collect();
+
+    let (rules_output, _) = decision::engine::calculate_decision(vendor_results, &state.feature_flag_client)?;
+
+    Ok(Json(ResponseData::ok(ShadowRunResult {
+        decision_status: rules_output.decision_status,
+    })))
 }
