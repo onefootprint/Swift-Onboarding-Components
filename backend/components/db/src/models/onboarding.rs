@@ -11,6 +11,7 @@ use crate::schema::{onboarding, scoped_user};
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
+use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
@@ -352,5 +353,28 @@ impl Onboarding {
             .set(update)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_billable_count(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+    ) -> DbResult<i64> {
+        use crate::schema::{onboarding, scoped_user};
+        let count = onboarding::table
+            .inner_join(scoped_user::table)
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(true))
+            // We won't charge tenants for onboardings that didn't finish authorizing, even if we
+            // already ran KYC checks
+            .filter(not(onboarding::authorized_at.is_null()))
+            // Filter for onboardings that had their final decision made during this billing period
+            .filter(onboarding::decision_made_at.ge(start_date))
+            .filter(onboarding::decision_made_at.lt(end_date))
+            .select(count_star())
+            .get_result(conn)?;
+        Ok(count)
     }
 }

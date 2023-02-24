@@ -83,6 +83,7 @@ pub async fn save_final_decision(
             // If we are done, we no longer need a decision
             if !obd.status.new_decision_required() {
                 let ob = ob.into_inner();
+                // Make a billable event here
                 ob.update(conn, OnboardingUpdate::has_final_decision(true))?;
             }
 

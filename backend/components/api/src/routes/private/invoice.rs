@@ -5,7 +5,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use billing::BillingInfo;
 use chrono::Utc;
-use db::models::onboarding_decision::OnboardingDecision;
+use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::scoped_user::{count_authorized_for_tenant, ScopedUserListQueryParams};
 use newtypes::StripeCustomerId;
@@ -76,7 +76,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> 
         .db_query(move |conn| -> ApiResult<_> {
             let count_pii_storage = count_authorized_for_tenant(conn, params)?;
             let billable_kyc =
-                OnboardingDecision::get_billable_count(conn, &tenant_id, interval.start, interval.end)?;
+                Onboarding::get_billable_count(conn, &tenant_id, interval.start, interval.end)?;
             Ok((count_pii_storage, billable_kyc))
         })
         .await??;
