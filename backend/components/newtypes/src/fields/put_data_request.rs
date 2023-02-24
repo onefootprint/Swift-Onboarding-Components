@@ -1,8 +1,7 @@
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
 use crate::{
-    email::Email, flat_api_object_map_type, DataIdentifier, Error, IdentityDataKind, IdentityDataUpdate,
-    KvDataKey, NtResult, PiiString,
+    flat_api_object_map_type, DataIdentifier, Error, IdentityDataUpdate, KvDataKey, NtResult, PiiString,
 };
 
 flat_api_object_map_type!(
@@ -13,28 +12,15 @@ flat_api_object_map_type!(
 
 pub struct DecomposedPutRequest {
     pub id_update: IdentityDataUpdate,
-    pub phone_number: Option<PiiString>,
-    pub email: Option<Email>,
     pub custom_data: HashMap<KvDataKey, PiiString>,
 }
-
-pub type FingerprintableData = HashMap<IdentityDataKind, PiiString>;
 
 impl PutDataRequest {
     /// Decomposes the hashmap of DataIdentifier -> PiiString into its parts that live in different
     /// underlying database tables.
-    pub fn decompose(self, for_bifrost: bool) -> NtResult<(DecomposedPutRequest, FingerprintableData)> {
+    pub fn decompose(self, for_bifrost: bool) -> NtResult<DecomposedPutRequest> {
         // Parse identity data
-        let (mut id_update, other_data) = IdentityDataUpdate::new(self.into(), for_bifrost)?;
-
-        let fingerprintable_data = id_update.clone().into_inner();
-
-        // Extract phone and email from identity data since they are handled separately (for now)
-        let phone_number = id_update.remove(&IdentityDataKind::PhoneNumber);
-        let email = id_update
-            .remove(&IdentityDataKind::Email)
-            .map(|p| Email::from_str(p.leak()))
-            .transpose()?;
+        let (id_update, other_data) = IdentityDataUpdate::new(self.into(), for_bifrost)?;
 
         // Parse custom data
         let custom_data = other_data
@@ -46,10 +32,8 @@ impl PutDataRequest {
             .collect::<NtResult<HashMap<_, _>>>()?;
         let result = DecomposedPutRequest {
             id_update,
-            phone_number,
-            email,
             custom_data,
         };
-        Ok((result, fingerprintable_data))
+        Ok(result)
     }
 }

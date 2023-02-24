@@ -17,6 +17,7 @@ use newtypes::{
     IdentityDataUpdate, KvDataKey, PiiString,
 };
 use std::collections::HashMap;
+use std::str::FromStr;
 
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
 /// we have built the UserVaultWrapper for a specific tenant.
@@ -24,28 +25,6 @@ use std::collections::HashMap;
 /// They use the private, xxx_unsafe methods, which cannot be exposed publically because they don't
 /// take ownership over the UserVaultWrapper that is potentially stale after an update
 impl WriteableUvw {
-    #[allow(unused)]
-    pub fn add_email(
-        self, // Intentionally consume to prevent using stale UVW
-        conn: &mut TxnPgConn,
-        email: NewtypeEmail,
-        fingerprint: Fingerprint,
-    ) -> ApiResult<EmailId> {
-        self.add_email_unsafe(conn, email, fingerprint)
-    }
-
-    /// Applies the provided IdentityDataUpdate to the UVW.
-    /// NOTE: if the update contains a phone number or email, we will ignore it
-    #[allow(unused)]
-    pub fn update_identity_data(
-        self, // consume self, since we don't want stale data getting used
-        conn: &mut TxnPgConn,
-        update: IdentityDataUpdate,
-        fingerprints: NewFingerprints,
-    ) -> ApiResult<()> {
-        self.update_identity_data_unsafe(conn, update, fingerprints)
-    }
-
     pub fn update_custom_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
@@ -55,7 +34,7 @@ impl WriteableUvw {
     }
 
     /// Util function to make updates to multiple pieces of the UserVault in one transaction
-    pub fn put_all_data(
+    pub fn put_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DecomposedPutRequest,
@@ -63,12 +42,20 @@ impl WriteableUvw {
         for_bifrost: bool,
     ) -> ApiResult<Option<EmailId>> {
         let DecomposedPutRequest {
-            phone_number,
-            email,
             id_update,
             custom_data,
         } = request;
+        let new_cdos = CollectedDataOption::list_from(id_update.keys().cloned().collect());
+
+        // Extract phone and email from identity data since they are handled separately (for now)
+        let mut id_update = id_update;
         let mut fingerprints = fingerprints;
+        let phone_number = id_update.remove(&IdentityDataKind::PhoneNumber);
+        let email = id_update
+            .remove(&IdentityDataKind::Email)
+            .map(|p| newtypes::email::Email::from_str(p.leak()))
+            .transpose()?;
+
         let assert_non_portable = || -> Result<_, _> {
             // Cannot add identity data to a portable vault unless we are in bifrost
             if !for_bifrost && self.user_vault().is_portable {
@@ -76,9 +63,11 @@ impl WriteableUvw {
             }
             Ok(())
         };
+        // Update custom data
         if !custom_data.is_empty() {
             self.update_custom_data_unsafe(conn, custom_data)?;
         }
+        // Update PhoneNumber
         if let Some(phone_number) = phone_number {
             assert_non_portable()?;
             let Some(fp) = fingerprints.remove(&IdentityDataKind::PhoneNumber) else {
@@ -86,6 +75,7 @@ impl WriteableUvw {
             };
             self.add_phone_number_unsafe(conn, phone_number, fp)?;
         }
+        // Update Email
         let new_email_id = if let Some(email) = email {
             assert_non_portable()?;
             let Some(fp) = fingerprints.remove(&IdentityDataKind::Email) else {
@@ -96,9 +86,23 @@ impl WriteableUvw {
         } else {
             None
         };
+        // Update UserVaultData
         if !id_update.is_empty() {
             assert_non_portable()?;
             self.update_identity_data_unsafe(conn, id_update, fingerprints)?;
+        }
+
+        // Add UserTimeline for all the newly added data
+        if !new_cdos.is_empty() {
+            // Create a timeline event that shows all the new data that was added
+            UserTimeline::create(
+                conn,
+                DataCollectedInfo {
+                    attributes: new_cdos.into_iter().collect(),
+                },
+                self.user_vault.id.clone(),
+                Some(self.scoped_user_id.clone()),
+            )?;
         }
         Ok(new_email_id)
     }
@@ -138,7 +142,6 @@ impl WriteableUvw {
             seqno,
             false,
         )?;
-        self.add_user_timeline(conn, vec![CollectedDataOption::PhoneNumber])?;
 
         Ok(())
     }
@@ -171,7 +174,6 @@ impl WriteableUvw {
             &self.scoped_user_id,
             seqno,
         )?;
-        self.add_user_timeline(conn, vec![CollectedDataOption::Email])?;
 
         Ok(email.id)
     }
@@ -186,14 +188,13 @@ impl WriteableUvw {
         let uv = self.user_vault();
 
         let builder = UvdBuilder::build(update, uv.public_key.clone())?;
-        let created_cd_options = builder.validate_and_save(
+        builder.validate_and_save(
             conn,
             existing_fields,
             uv.id.clone(),
             self.scoped_user_id.clone(),
             fingerprints,
         )?;
-        self.add_user_timeline(conn, created_cd_options)?;
 
         Ok(())
     }
@@ -222,17 +223,31 @@ impl WriteableUvw {
         KeyValueData::bulk_create(conn, &self.user_vault().id, &self.scoped_user_id, updates, seqno)?;
         Ok(())
     }
+}
 
-    fn add_user_timeline(&self, conn: &mut TxnPgConn, attributes: Vec<CollectedDataOption>) -> ApiResult<()> {
-        if !attributes.is_empty() {
-            // Create a timeline event that shows all the new data that was added
-            UserTimeline::create(
-                conn,
-                DataCollectedInfo { attributes },
-                self.user_vault.id.clone(),
-                Some(self.scoped_user_id.clone()),
-            )?;
+#[cfg(test)]
+mod test {
+    use crate::{errors::ApiResult, utils::user_vault_wrapper::WriteableUvw};
+    use db::TxnPgConn;
+    use newtypes::{put_data_request::PutDataRequest, DataIdentifier, Fingerprint, PiiString};
+    use std::collections::HashMap;
+
+    impl WriteableUvw {
+        /// Shorthand to add data to a user vault in tests
+        pub fn add_data_test(
+            self,
+            conn: &mut TxnPgConn,
+            data: Vec<(DataIdentifier, PiiString)>,
+        ) -> ApiResult<()> {
+            let request = PutDataRequest::from(HashMap::from_iter(data.into_iter()));
+            let request = request.decompose(true)?;
+            let fingerprints = request
+                .id_update
+                .keys()
+                .map(|idk| (*idk, Fingerprint(vec![])))
+                .collect();
+            self.put_data(conn, request, fingerprints, true)?;
+            Ok(())
         }
-        Ok(())
     }
 }

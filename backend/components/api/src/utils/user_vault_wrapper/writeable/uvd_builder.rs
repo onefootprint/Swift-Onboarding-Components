@@ -62,7 +62,7 @@ impl UvdBuilder {
         user_vault_id: UserVaultId,
         scoped_user_id: ScopedUserId,
         fingerprints: NewFingerprints,
-    ) -> ApiResult<Vec<CollectedDataOption>> {
+    ) -> ApiResult<()> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
         let new_fields = self.data.iter().map(|d| d.kind.into()).collect();
@@ -116,6 +116,6 @@ impl UvdBuilder {
             })
             .collect::<ApiResult<_>>()?;
         Fingerprint::bulk_create(conn, fingerprints)?;
-        Ok(new.into_iter().collect())
+        Ok(())
     }
 }

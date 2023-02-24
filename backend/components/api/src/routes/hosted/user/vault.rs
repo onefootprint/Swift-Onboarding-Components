@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::auth::user::{UserAuthContext, UserAuthScope};
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
@@ -7,7 +9,9 @@ use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
+use newtypes::email::Email;
 use newtypes::put_data_request::PutDataRequest;
+use newtypes::IdentityDataKind;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -36,10 +40,14 @@ pub async fn put(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
-    let request = request.into_inner();
-    let (request, fingerprintable_data) = request.decompose(true)?;
-    let fingerprints = build_fingerprints(&state, fingerprintable_data).await?;
-    let email = request.email.clone();
+    let request = request.into_inner().decompose(true)?;
+    let fingerprints = build_fingerprints(&state, request.id_update.clone()).await?;
+    let email = request
+        .id_update
+        .get(&IdentityDataKind::Email)
+        .map(|p| Email::from_str(p.leak()))
+        .transpose()?;
+    let email_is_live = email.as_ref().map(|e| e.is_live());
 
     let email_id = state
         .db_pool
@@ -47,15 +55,15 @@ pub async fn put(
             let scoped_user_id = pre_add_data_checks(&user_auth, conn)?;
             let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
             // Enforce that sandbox emails/phones are used for sandbox users
-            if let Some(email) = request.email.as_ref() {
-                if email.is_live() != uvw.user_vault().is_live {
+            if let Some(is_live) = email_is_live {
+                if is_live != uvw.user_vault().is_live {
                     return Err(UserError::SandboxMismatch.into());
                 }
             }
 
             // Even though this accepts id.phone_number, it will always error at runtime since we
             // only allow a vault to have one phone number
-            let email_id = uvw.put_all_data(conn, request, fingerprints, true)?;
+            let email_id = uvw.put_data(conn, request, fingerprints, true)?;
             Ok(email_id)
         })
         .await?;

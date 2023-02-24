@@ -25,11 +25,10 @@ use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use newtypes::Fingerprinter;
 use newtypes::{
-    DecisionStatus, EncryptedVaultPrivateKey, FootprintReasonCode, IdentityDataKind, IdentityDataUpdate,
-    PiiString, UserVaultId, VaultPublicKey, Vendor, VendorAPI,
+    DecisionStatus, EncryptedVaultPrivateKey, FootprintReasonCode, IdentityDataKind, PiiString, UserVaultId,
+    VaultPublicKey, Vendor, VendorAPI,
 };
 use rand::Rng;
-use std::collections::HashMap;
 use test_case::test_case;
 
 type KeysAndNewPhoneNumberArgs = (VaultPublicKey, EncryptedVaultPrivateKey, NewPhoneNumberArgs);
@@ -80,7 +79,7 @@ fn create_user_and_populate_vault(
 
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
-    let update = [
+    let update = vec![
         (
             IdentityDataKind::FirstName.into(),
             PiiString::new("Bob".to_owned()),
@@ -90,12 +89,9 @@ fn create_user_and_populate_vault(
             PiiString::new("Boberto".to_owned()),
         ),
     ];
-    let update = IdentityDataUpdate::new(HashMap::from_iter(update), false)
-        .unwrap()
-        .0;
 
     let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.update_identity_data(conn, update, HashMap::new()).unwrap();
+    uvw.add_data_test(conn, update).unwrap();
 
     (uv.into_inner(), su)
 }
