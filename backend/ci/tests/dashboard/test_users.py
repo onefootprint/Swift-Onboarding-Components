@@ -21,6 +21,28 @@ def sandbox_user2(sandbox_tenant, twilio):
     return create_sandbox_user(sandbox_tenant, twilio)
 
 
+@pytest.fixture(scope="module")
+def incomplete_user(sandbox_tenant, twilio):
+    from tests.bifrost_client import BifrostClient
+
+    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
+    bifrost_client.init_user_for_onboarding(twilio)
+    bifrost_client.initialize_onboarding()
+
+    # Get the user by searching by fingerprint in the admin API since we can't get the fp_user_id otherwise
+    body = get(
+        "users",
+        dict(fingerprint=bifrost_client.phone_number.replace(" ", "")),
+        sandbox_tenant.sk.key,
+    )
+    return body["data"][0]["id"]
+
+
+@pytest.fixture(scope="module")
+def vault_user(sandbox_tenant):
+    return post("users", None, sandbox_tenant.sk.key)["id"]
+
+
 def test_get_org(sandbox_user):
     body = get("org", None, sandbox_user.tenant.sk.key)
     tenant = body
@@ -29,19 +51,59 @@ def test_get_org(sandbox_user):
     tenant["logo_url"]
 
 
-def test_get_users_list(sandbox_user, sandbox_user2):
+def test_get_users_list(sandbox_user, sandbox_user2, vault_user, incomplete_user):
     tenant = sandbox_user.tenant
     body = get("users", None, tenant.sk.key)
     scoped_users = body["data"]
     assert len(scoped_users)
 
     # Check both scoped users exist
+    all_fp_user_ids = [
+        sandbox_user.fp_user_id,
+        sandbox_user2.fp_user_id,
+        vault_user,
+        incomplete_user,
+    ]
+    assert set(u["id"] for u in scoped_users) > set(all_fp_user_ids)
     for fp_user_id in [sandbox_user.fp_user_id, sandbox_user2.fp_user_id]:
         scoped_user = next(u for u in scoped_users if u["id"] == fp_user_id)
         assert set(["first_name", "last_name"]) < set(
             scoped_user["identity_data_attributes"]
         )
         assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
+
+
+@pytest.mark.parametrize(
+    "filters,expected_user_idxs",
+    [
+        (dict(statuses="pass"), [0, 1]),
+        (dict(statuses="fail"), []),
+        (dict(statuses="vault_only"), [2]),
+        (dict(statuses="incomplete"), [3]),
+        (dict(statuses="pass,vault_only"), [0, 1, 2]),
+        (dict(statuses="pass,incomplete"), [0, 1, 3]),
+        (dict(statuses="pass,incomplete,vault_only"), [0, 1, 2, 3]),
+    ],
+)
+def test_get_users_filter(
+    sandbox_user,
+    sandbox_user2,
+    vault_user,
+    incomplete_user,
+    filters,
+    expected_user_idxs,
+):
+    tenant = sandbox_user.tenant
+    body = get("users", filters, tenant.sk.key)
+    scoped_users = body["data"]
+    all_fp_user_ids = [
+        sandbox_user.fp_user_id,
+        sandbox_user2.fp_user_id,
+        vault_user,
+        incomplete_user,
+    ]
+    expected_user_ids = [all_fp_user_ids[i] for i in expected_user_idxs]
+    assert set(u["id"] for u in scoped_users) > set(expected_user_ids)
 
 
 def test_get_users_list_pagination(sandbox_user, sandbox_user2):
@@ -71,8 +133,14 @@ def test_get_users_detail(sandbox_user):
 @pytest.mark.parametrize(
     "document_data,expected_identity_document_info",
     [
-        (DocumentDataOptions.front_back, [{'type': 'passport', 'status': 'success', 'selfie_collected': False}]),
-        (DocumentDataOptions.front_back_selfie, [{'type': 'passport', 'status': 'success', 'selfie_collected': True}]),
+        (
+            DocumentDataOptions.front_back,
+            [{"type": "passport", "status": "success", "selfie_collected": False}],
+        ),
+        (
+            DocumentDataOptions.front_back_selfie,
+            [{"type": "passport", "status": "success", "selfie_collected": True}],
+        ),
     ],
 )
 def test_get_users_detail_doc_and_selfie(

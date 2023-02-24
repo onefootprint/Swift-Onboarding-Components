@@ -6,7 +6,7 @@ use strum_macros::{AsRefStr, EnumString};
 
 use crate::DecisionStatus;
 
-/// The status of the onboarding, a go,no-go decision.
+/// The status of the onboarding, a go, no-go decision.
 #[derive(
     Debug,
     Display,
@@ -28,6 +28,29 @@ pub enum OnboardingStatus {
     Fail,
 }
 
+#[derive(
+    Debug, Display, Clone, Copy, PartialEq, Eq, Deserialize, EnumString, AsRefStr, Apiv2Schema, JsonSchema,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum OnboardingStatusFilter {
+    Pass,
+    Fail,
+    Incomplete,
+    VaultOnly,
+}
+
+impl DecisionStatus {
+    pub fn try_from(value: &OnboardingStatusFilter) -> Option<Self> {
+        match value {
+            OnboardingStatusFilter::Pass => Some(Self::Pass),
+            OnboardingStatusFilter::Fail => Some(Self::Fail),
+            OnboardingStatusFilter::Incomplete => None,
+            OnboardingStatusFilter::VaultOnly => None,
+        }
+    }
+}
+
 impl Default for OnboardingStatus {
     fn default() -> Self {
         Self::Pass
@@ -42,15 +65,6 @@ impl From<DecisionStatus> for Option<OnboardingStatus> {
             // OnboardingStatus has no way of representing in-progress onboardings
             // since we hide in-progress onboardings from the API
             DecisionStatus::StepUpRequired => None,
-        }
-    }
-}
-
-impl From<OnboardingStatus> for DecisionStatus {
-    fn from(s: OnboardingStatus) -> Self {
-        match s {
-            OnboardingStatus::Fail => Self::Fail,
-            OnboardingStatus::Pass => Self::Pass,
         }
     }
 }

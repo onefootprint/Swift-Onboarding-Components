@@ -7,7 +7,8 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, OnboardingStatus, TenantId};
+use newtypes::OnboardingStatusFilter;
+use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, TenantId};
 
 #[derive(Clone, Default)]
 pub struct ScopedUserListQueryParams {
@@ -15,7 +16,7 @@ pub struct ScopedUserListQueryParams {
     pub is_live: bool,
     /// When true, only returns the scoped users that are either (1) authorized or (2) non-portable
     pub only_billable: bool,
-    pub statuses: Vec<OnboardingStatus>,
+    pub statuses: Vec<OnboardingStatusFilter>,
     pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
@@ -66,15 +67,58 @@ pub fn list_authorized_for_tenant_query<'a>(params: ScopedUserListQueryParams) -
         }
     }
 
-    // Filter on whether user has passed or failed
+    // Filter on onboarding status: pass/fail/incomplete/vault only
     if !params.statuses.is_empty() {
-        let decision_statuses: Vec<_> = params.statuses.into_iter().map(DecisionStatus::from).collect();
-        let matching_ids = onboarding_decision::table
-            .inner_join(onboarding::table)
-            .filter(onboarding_decision::status.eq_any(decision_statuses))
-            .filter(onboarding_decision::deactivated_at.is_null())
-            .select(onboarding::scoped_user_id);
-        query = query.filter(scoped_user::id.eq_any(matching_ids))
+        // Filter on incomplete users that never authorized the onboarding
+        let q_incomplete = if params.statuses.contains(&OnboardingStatusFilter::Incomplete) {
+            let su_ids = onboarding::table
+                .filter(onboarding::authorized_at.is_null())
+                .select(onboarding::scoped_user_id);
+            Some(scoped_user::id.eq_any(su_ids))
+        } else {
+            None
+        };
+
+        // Filter on non-portable users
+        let q_vault_only = if params.statuses.contains(&OnboardingStatusFilter::VaultOnly) {
+            let uv_ids = user_vault::table
+                .filter(user_vault::is_portable.eq(false))
+                .select(user_vault::id);
+            Some(scoped_user::user_vault_id.eq_any(uv_ids))
+        } else {
+            None
+        };
+
+        // Filter on authorized OBs with a given decision status
+        let decision_statuses: Vec<_> = params
+            .statuses
+            .iter()
+            .filter_map(DecisionStatus::try_from)
+            .collect();
+        let q_decision_status = if !decision_statuses.is_empty() {
+            let su_ids = onboarding_decision::table
+                .inner_join(onboarding::table)
+                .filter(onboarding_decision::status.eq_any(decision_statuses))
+                .filter(onboarding_decision::deactivated_at.is_null())
+                .filter(not(onboarding::authorized_at.is_null()))
+                .select(onboarding::scoped_user_id);
+            Some(scoped_user::id.eq_any(su_ids))
+        } else {
+            None
+        };
+        // This is tricky... If any filtering status is provided, we only want to return results
+        // that match the filters. But, the filters are determined through a handful of different
+        // queries.
+        match (q_incomplete, q_vault_only, q_decision_status) {
+            (Some(q1), Some(q2), Some(q3)) => query = query.filter(q1.or(q2).or(q3)),
+            (Some(q1), Some(q2), None) => query = query.filter(q1.or(q2)),
+            (Some(q1), None, Some(q2)) => query = query.filter(q1.or(q2)),
+            (None, Some(q1), Some(q2)) => query = query.filter(q1.or(q2)),
+            (Some(q1), None, None) => query = query.filter(q1),
+            (None, Some(q1), None) => query = query.filter(q1),
+            (None, None, Some(q1)) => query = query.filter(q1),
+            (None, None, None) => {}
+        }
     }
 
     if let Some(footprint_user_id) = params.footprint_user_id {
