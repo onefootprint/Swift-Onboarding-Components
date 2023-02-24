@@ -41,8 +41,10 @@ export const statusForScopedUser = (su: ScopedUser) => {
   if (!su.isPortable) {
     return UserStatus.vaultOnly;
   }
-  // TODO can be incomplete with a decision for the onboarding!
   return (
-    (su.onboarding?.status as UserStatus | undefined) || UserStatus.incomplete
+    (su.onboarding &&
+      su.onboarding.isAuthorized &&
+      (su.onboarding.status as unknown as UserStatus)) ||
+    UserStatus.incomplete
   );
 };

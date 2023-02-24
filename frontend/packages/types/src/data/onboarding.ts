@@ -6,6 +6,7 @@ import UserDataAttribute from './user-data-attribute';
 
 export type Onboarding = {
   id: string;
+  isAuthorized: boolean;
   name: string;
   configId: string;
   requiresManualReview: boolean;

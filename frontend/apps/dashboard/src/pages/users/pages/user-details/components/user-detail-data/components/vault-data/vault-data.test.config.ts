@@ -68,6 +68,7 @@ export const userFixture: ScopedUser = {
   startTimestamp: '2023-02-04T00:02:09.690721Z',
   onboarding: {
     id: 'ob_HpQ61LblrLgXnx764kaE8F',
+    isAuthorized: true,
     name: 'User ID verification',
     configId: 'ob_config_id_HPuJsnhKSX4GwuK6FXG9F3',
     requiresManualReview: false,
