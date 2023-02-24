@@ -3,25 +3,62 @@ use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use billing::BillingInfo;
-use chrono::Utc;
+use chrono::{NaiveDate, Utc};
 use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::scoped_user::{count_authorized_for_tenant, ScopedUserListQueryParams};
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::StripeCustomerId;
-use paperclip::actix::{api_v2_operation, post, web};
+use newtypes::{StripeCustomerId, TenantId};
+use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
+
+#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+struct CreateInvoiceRequest {
+    tenant_id: TenantId,
+    /// When provided,
+    billing_date: Option<NaiveDate>,
+}
+
+#[api_v2_operation(
+    description = "Private endpoint to issue draft invoices for a specific tenant on a specific billing period.",
+    tags(Private)
+)]
+#[post("/private/invoice")]
+async fn post(
+    state: web::Data<State>,
+    request: web::Json<CreateInvoiceRequest>,
+    auth: TenantRbAuthContext,
+) -> JsonApiResponse<EmptyResponse> {
+    let _firm_employee = auth.firm_employee_user()?;
+    let CreateInvoiceRequest {
+        tenant_id,
+        billing_date,
+    } = request.into_inner();
+    let billing_date = billing_date.unwrap_or_else(|| Utc::now().date_naive());
+
+    let tenant = state
+        .db_pool
+        .db_query(move |conn| Tenant::get(conn, &tenant_id))
+        .await??;
+
+    create_bill_for_tenant(&state, tenant, billing_date).await?;
+
+    EmptyResponse::ok().json()
+}
 
 #[api_v2_operation(
     description = "Private endpoint to issue draft invoices for all billable tenants.",
     tags(Private)
 )]
-#[post("/private/invoice")]
-async fn post(state: web::Data<State>, auth: TenantRbAuthContext) -> JsonApiResponse<EmptyResponse> {
+#[post("/private/invoices")]
+async fn post_all(state: web::Data<State>, auth: TenantRbAuthContext) -> JsonApiResponse<EmptyResponse> {
     let _firm_employee = auth.firm_employee_user()?;
 
     let tenants = state.db_pool.db_query(Tenant::list_live).await??;
 
-    let fut_bill_tenant = tenants.into_iter().map(|t| create_bill_for_tenant(&state, t));
+    let billing_date = Utc::now().date_naive();
+    let fut_bill_tenant = tenants
+        .into_iter()
+        .map(|t| create_bill_for_tenant(&state, t, billing_date));
     futures::future::join_all(fut_bill_tenant)
         .await
         .into_iter()
@@ -56,11 +93,11 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
 }
 
 #[tracing::instrument(skip_all)]
-async fn create_bill_for_tenant(state: &State, tenant: Tenant) -> ApiResult<()> {
+async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: NaiveDate) -> ApiResult<()> {
     if !state.feature_flag_client.flag(BoolFlag::ShouldBill(&tenant.id)) {
         return Ok(());
     }
-    let interval = billing::interval::get_billing_interval(Utc::now().date_naive())?;
+    let interval = billing::interval::get_billing_interval(billing_date)?;
 
     let params = ScopedUserListQueryParams {
         tenant_id: tenant.id.clone(),

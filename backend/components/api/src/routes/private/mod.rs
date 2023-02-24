@@ -11,7 +11,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(cleanup::post)
         .service(assume::post)
         .service(test_tenant::post)
-        .service(invoice::post);
+        .service(invoice::post)
+        .service(invoice::post_all);
 
     protected::routes(config);
 }
