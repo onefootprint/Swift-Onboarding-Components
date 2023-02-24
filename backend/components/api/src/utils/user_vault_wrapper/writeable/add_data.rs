@@ -59,7 +59,7 @@ impl WriteableUvw {
         request: DecomposedPutRequest,
         fingerprints: NewFingerprints,
         for_bifrost: bool,
-    ) -> ApiResult<()> {
+    ) -> ApiResult<Option<EmailId>> {
         let DecomposedPutRequest {
             phone_number,
             email,
@@ -86,18 +86,21 @@ impl WriteableUvw {
             };
             self.add_phone_number_unsafe(conn, phone_number, fp)?;
         }
-        if let Some(email) = email {
+        let new_email_id = if let Some(email) = email {
             assert_non_portable()?;
             let Some(fp) = fingerprints.remove(&IdentityDataKind::Email) else {
                 return Err(ApiError::AssertionError("No fingerprint found for email".to_owned()));
             };
-            self.add_email_unsafe(conn, email, fp)?;
-        }
+            let email_id = self.add_email_unsafe(conn, email, fp)?;
+            Some(email_id)
+        } else {
+            None
+        };
         if !id_update.is_empty() {
             assert_non_portable()?;
             self.update_identity_data_unsafe(conn, id_update, fingerprints)?;
         }
-        Ok(())
+        Ok(new_email_id)
     }
 }
 

@@ -1,6 +1,8 @@
 use crate::auth::user::{UserAuthContext, UserAuthScope};
+use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
+use crate::utils::email::send_email_challenge;
 use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -37,17 +39,31 @@ pub async fn put(
     let request = request.into_inner();
     let (request, fingerprintable_data) = request.decompose(true)?;
     let fingerprints = build_fingerprints(&state, fingerprintable_data).await?;
+    let email = request.email.clone();
 
-    state
+    let email_id = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user_id = pre_add_data_checks(&user_auth, conn)?;
             let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
-            uvw.put_all_data(conn, request, fingerprints, true)?;
+            // Enforce that sandbox emails/phones are used for sandbox users
+            if let Some(email) = request.email.as_ref() {
+                if email.is_live() != uvw.user_vault().is_live {
+                    return Err(UserError::SandboxMismatch.into());
+                }
+            }
 
-            Ok(())
+            // Even though this accepts id.phone_number, it will always error at runtime since we
+            // only allow a vault to have one phone number
+            let email_id = uvw.put_all_data(conn, request, fingerprints, true)?;
+            Ok(email_id)
         })
         .await?;
+
+    // If we just added a new email address to the vault, send a verification email
+    if let Some((email, id)) = email.and_then(|e| email_id.map(|id| (e, id))) {
+        send_email_challenge(&state, id, &email.email).await?;
+    }
 
     EmptyResponse::ok().json()
 }

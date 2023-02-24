@@ -246,10 +246,11 @@ class TestBifrost:
     def test_user_data(self, non_sandbox_auth_token):
         # Test failed validation
         data = {
-            "email": "flerpderp",
-            "speculative": True,
+            "id.email": "flerpderp",
         }
-        post("hosted/user/email", data, non_sandbox_auth_token, status_code=400)
+        post(
+            "hosted/user/vault/validate", data, non_sandbox_auth_token, status_code=400
+        )
 
         # Test validating data before setting
         data = {
@@ -277,7 +278,7 @@ class TestBifrost:
         put("hosted/user/vault", data, non_sandbox_auth_token)
 
     def test_add_email(self, non_sandbox_auth_token):
-        post("hosted/user/email", {"email": EMAIL}, non_sandbox_auth_token)
+        put("hosted/user/vault", {"id.email": EMAIL}, non_sandbox_auth_token)
 
     def test_d2p_biometric(self, non_sandbox_auth_token):
         # Try generating tokens with no metadata for backwards compatibility

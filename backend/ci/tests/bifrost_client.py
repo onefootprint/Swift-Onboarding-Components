@@ -69,8 +69,8 @@ class BifrostClient:
         )
 
     def add_email(self, sandbox_email):
-        email_data = {"email": sandbox_email}
-        post("hosted/user/email", email_data, self.auth_token)
+        email_data = {"id.email": sandbox_email}
+        put("hosted/user/vault", email_data, self.auth_token)
 
     def add_identity_data(self):
         """Add identity data via hosted/user/vault"""
