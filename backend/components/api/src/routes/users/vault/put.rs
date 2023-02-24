@@ -15,6 +15,22 @@ use newtypes::{AccessEventKind, FootprintUserId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[api_v2_operation(
+    description = "Checks if provided data is valid before adding it to the vault",
+    tags(Vault, PublicApi, Users)
+)]
+#[actix::post("/users/{footprint_user_id}/vault/validate")]
+pub async fn post_validate(
+    _path: Path<FootprintUserId>,
+    request: Json<PutDataRequest>,
+    tenant_auth: SecretTenantAuthContext,
+) -> JsonApiResponse<EmptyResponse> {
+    tenant_auth.check_guard(TenantGuard::Admin)?;
+    request.into_inner().decompose(true)?;
+
+    EmptyResponse::ok().json()
+}
+
+#[api_v2_operation(
     description = "Updates data in a user vault. Can be used to update `id.` data or `custom.` data, but `id.` data can only be specified for user vaults created via API.",
     tags(Vault, PublicApi, Users)
 )]

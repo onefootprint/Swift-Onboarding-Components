@@ -7,6 +7,7 @@ pub mod put;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
+        .service(put::post_validate)
         .service(put::put)
         .service(get::get)
         .service(decrypt::post)

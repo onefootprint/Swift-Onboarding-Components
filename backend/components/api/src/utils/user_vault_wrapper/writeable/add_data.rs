@@ -68,8 +68,6 @@ impl WriteableUvw {
             id_update,
             custom_data,
         } = request;
-        // TODO can we combine these codepaths with POST /hosted/user/email,
-        // POST /hosted/user/identity_data, and identify verify (where we make phone numbers)
         let mut fingerprints = fingerprints;
         let assert_non_portable = || -> Result<_, _> {
             // Cannot add identity data to a portable vault unless we are in bifrost

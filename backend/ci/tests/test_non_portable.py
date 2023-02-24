@@ -37,6 +37,8 @@ class TestNonPortableVaultApi:
         # Should have a JSON error message with the invalid field identifier as the key
         print(body["error"]["message"][key])
         assert body["error"]["message"][key] == expected_error
+        # Validate endpoint should also fail
+        post(f"users/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
     def test_vault_create_write_decrypt(self, tenant):
         # create the vault
