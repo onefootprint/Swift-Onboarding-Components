@@ -6,7 +6,7 @@ export default airplane.task(
     slug: 'generate_invoices',
     name: 'Generate invoices (cron)',
     schedules: {
-      every_four_hours: {
+      every_hour: {
         // every 1 hour, for now
         cron: '0 */1 * * *',
       },
@@ -21,7 +21,7 @@ export default airplane.task(
     const apiUrl = process.env.API_URL;
 
     const { data } = await axios
-      .get(`${apiUrl}/private/invoices`, {
+      .post(`${apiUrl}/private/invoices`, {
         headers: {
           'X-Fp-Protected-Custodian-Key': authToken,
         },
