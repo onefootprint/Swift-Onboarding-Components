@@ -1,3 +1,4 @@
+import { UserStatus } from '@onefootprint/types';
 import usePermissions from 'src/hooks/use-permissions';
 import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
@@ -7,7 +8,10 @@ const useCanDecrypt = () => {
   const userQuery = useUser(userId);
   const { hasDecryptionPermissionByAttribute } = usePermissions();
 
-  if (!userQuery.data?.onboarding) {
+  if (
+    !userQuery.data?.onboarding ||
+    userQuery.data?.status === UserStatus.incomplete
+  ) {
     return false;
   }
   const { canAccessDataAttributes, canAccessIdentityDocumentImages } =

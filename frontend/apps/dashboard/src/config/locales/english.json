@@ -94,15 +94,19 @@
         "title": "Sandbox mode.",
         "disable": "Disable",
         "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
-      },
-      "manual-review-banner": {
-        "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
-        "failed-needs-review": "This user could not be verified and needs to be manually reviewed.",
-        "see-timeline": "See timeline"
       }
     },
     "terms-and-conditions": {
       "text": "By continuing you agree to our <a1>Terms of Service</a1> and <a2>Privacy Policy</a2>."
+    },
+    "manual-review-banner": {
+      "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
+      "failed-needs-review": "This user could not be verified and needs to be manually reviewed.",
+      "see-timeline": "See timeline"
+    },
+    "incomplete-banner": {
+      "header": "User dropped off before providing all information.",
+      "see-timeline": "See audit trail"
     }
   },
   "pages": {
@@ -535,6 +539,9 @@
                 "pin-note": "Pin note to the top of the page"
               }
             }
+          },
+          "abandoned-event": {
+            "title": "User dropped off before providing all information"
           }
         }
       }

@@ -1,27 +1,19 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserStatus } from '@onefootprint/types';
 import { InlineAlert, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 
 type ManualReviewBannerProps = {
-  status: UserStatus;
   onClickAuditTrailLink?: () => void;
 };
 
-const ManualReviewBanner = ({
-  status,
+const IncopmleteBanner = ({
   onClickAuditTrailLink,
 }: ManualReviewBannerProps) => {
-  const { t } = useTranslation('components.manual-review-banner');
-  if (status === UserStatus.vaultOnly) {
-    return null;
-  }
+  const { t } = useTranslation('components.incomplete-banner');
 
   return (
-    <InlineAlert variant={status === UserStatus.failed ? 'error' : 'warning'}>
-      {status === UserStatus.failed
-        ? t('failed-needs-review')
-        : t('verified-needs-review')}
+    <InlineAlert variant="warning">
+      {t('header')}
       {onClickAuditTrailLink && (
         <LinkButton onClick={onClickAuditTrailLink} sx={{ marginLeft: 2 }}>
           {t('see-timeline')}
@@ -31,4 +23,4 @@ const ManualReviewBanner = ({
   );
 };
 
-export default ManualReviewBanner;
+export default IncopmleteBanner;

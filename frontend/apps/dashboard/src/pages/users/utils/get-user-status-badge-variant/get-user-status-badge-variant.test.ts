@@ -17,7 +17,7 @@ describe('getUserStatusBadgeVariant', () => {
       'neutral',
     );
     expect(getUserStatusBadgeVariant(UserStatus.incomplete, true)).toEqual(
-      'neutral',
+      'warning',
     );
   });
 });

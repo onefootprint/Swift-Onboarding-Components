@@ -1,4 +1,9 @@
-import { customRender, screen, within } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  customRender,
+  screen,
+  within,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import AuditTrailTimeline, {
@@ -6,7 +11,18 @@ import AuditTrailTimeline, {
 } from './audit-trail-timeline';
 import TimelineFixture from './audit-trail-timeline.test.config';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<AuditTrailTimeline />', () => {
+  beforeAll(() => {
+    useRouterSpy({
+      pathname: '/users/detail',
+      query: {
+        footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+      },
+    });
+  });
+
   const renderAuditTrailTimeline = ({
     timeline,
     isLoading,

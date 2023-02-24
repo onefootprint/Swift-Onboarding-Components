@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { UserStatus } from '@onefootprint/types';
 import { Box, Breadcrumb, BreadcrumbItem } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import useUserVault from 'src/pages/users/pages/user-details/hooks/use-user-vault';
 
 import DecryptMachineProvider from './components/decrypt-machine-provider';
+import IncompleteBanner from './components/incomplete-banner';
 import ManualReviewBanner from './components/manual-review-banner';
 import UserDetailsData from './components/user-detail-data';
 import UserDetailEmptyState from './components/user-detail-empty-state';
@@ -22,8 +24,12 @@ const UserDetails = () => {
   const shouldShowLoading =
     userQuery.isLoading || (!!userQuery.data && userVaultDataQuery.isLoading);
   const shouldShowEmptyState = !userQuery.data && !userQuery.isLoading;
+  const shouldShowIncompleteBanner =
+    shouldShowData && userQuery.data.status === UserStatus.incomplete;
   const shouldShowManualReviewBanner =
-    shouldShowData && userQuery.data.requiresManualReview;
+    !shouldShowIncompleteBanner &&
+    shouldShowData &&
+    userQuery.data.requiresManualReview;
 
   const handleClickAuditTrailLink = () => {
     const auditTrail = document.getElementById('audit-trail');
@@ -35,6 +41,11 @@ const UserDetails = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
+      {shouldShowIncompleteBanner && (
+        <Box sx={{ marginBottom: 7 }}>
+          <IncompleteBanner onClickAuditTrailLink={handleClickAuditTrailLink} />
+        </Box>
+      )}
       {shouldShowManualReviewBanner && (
         <Box sx={{ marginBottom: 7 }}>
           <ManualReviewBanner

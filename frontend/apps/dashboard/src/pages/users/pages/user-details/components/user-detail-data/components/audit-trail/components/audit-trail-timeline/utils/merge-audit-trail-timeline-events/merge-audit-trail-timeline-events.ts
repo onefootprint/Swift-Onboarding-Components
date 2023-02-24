@@ -16,29 +16,21 @@ const mergeAuditTrailTimelineEvents = (
   const mergedTimeline: AuditTrailTimelineEvent[] = [];
 
   events.forEach((event: TimelineEvent) => {
-    // If the event is not from another tenant, or is not a ky data collection event, add it as is
     const isEventKycDataCollection =
       event.event.kind === TimelineEventKind.kycDataCollected;
-    if (
-      !event.isFromOtherOrg ||
-      !mergedTimeline.length ||
-      !isEventKycDataCollection
-    ) {
-      mergedTimeline.push({
-        event: event.event,
-        isFromOtherOrg: event.isFromOtherOrg,
-        time: {
-          timestamp: event.timestamp,
-        },
-      });
-      return;
-    }
-
-    // If the previously added event is not a kyc data collection event, add the current event as is
     const lastEvent = mergedTimeline[mergedTimeline.length - 1];
     const isLastEventKycDataCollection =
-      lastEvent.event.kind === TimelineEventKind.kycDataCollected;
-    if (!lastEvent.isFromOtherOrg || !isLastEventKycDataCollection) {
+      lastEvent?.event.kind === TimelineEventKind.kycDataCollected;
+    if (
+      // If the event is not from another tenant, or is not a kyc data collection event, add it as is
+      !event.isFromOtherOrg ||
+      !isEventKycDataCollection ||
+      // If this is the first event, add it as is
+      !mergedTimeline.length ||
+      // If the previously added event is not a kyc data collection event, add the current event as is
+      !lastEvent?.isFromOtherOrg ||
+      !isLastEventKycDataCollection
+    ) {
       mergedTimeline.push({
         event: event.event,
         isFromOtherOrg: event.isFromOtherOrg,

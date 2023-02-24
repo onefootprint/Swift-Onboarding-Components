@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
+import { UserStatus } from '@onefootprint/types';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { USER_HEADER_ACTIONS_ID } from 'src/pages/users/pages/user-details/constants';
@@ -17,10 +18,11 @@ const UserHeader = () => {
   const { data } = useUser(userId);
   const { t } = useTranslation('pages.user-details.user-header.status');
   const [state] = useDecryptMachine();
-  const shouldShowManualReview = state.matches(State.idle);
   if (!data) {
     return null;
   }
+  const shouldShowManualReview =
+    state.matches(State.idle) && data.status !== UserStatus.incomplete;
 
   const badgeVariant = getUserStatusBadgeVariant(
     data.status,

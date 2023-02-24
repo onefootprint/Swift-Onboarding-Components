@@ -5,7 +5,7 @@ const statusToVariant: Record<UserStatus, UIState> = {
   [UserStatus.verified]: 'success',
   [UserStatus.failed]: 'error',
   [UserStatus.vaultOnly]: 'neutral',
-  [UserStatus.incomplete]: 'neutral',
+  [UserStatus.incomplete]: 'warning',
 };
 
 const getUserStatusBadgeVariant = (
