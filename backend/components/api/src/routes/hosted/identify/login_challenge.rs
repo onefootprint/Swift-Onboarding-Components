@@ -59,41 +59,25 @@ pub async fn post(
     let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
 
     // Initiate the challenge of the requested type
-    let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
-        match preferred_challenge_kind {
-            ChallengeKind::Biometric => {
-                if !creds.is_empty() {
-                    let challenge =
-                        initiate_biometric_challenge_for_user(&state, &uvw.user_vault.id, creds).await?;
-                    (
-                        ChallengeKind::Biometric,
-                        ChallengeData::Biometric(challenge.state),
-                        0,
-                        Some(challenge.challenge_json),
-                    )
-                } else {
-                    let (challenge_state, time_before_retry_s) =
-                        twilio_client.send_challenge(&state, &phone_number).await?;
-                    (
-                        ChallengeKind::Sms,
-                        ChallengeData::Sms(challenge_state),
-                        time_before_retry_s.num_seconds(),
-                        None,
-                    )
-                }
-            }
-            ChallengeKind::Sms => {
-                // Fall back to SMS if the user requested webauthn but doesn't have any creds
-                let (challenge_state, time_before_retry_s) =
-                    twilio_client.send_challenge(&state, &phone_number).await?;
-                (
-                    ChallengeKind::Sms,
-                    ChallengeData::Sms(challenge_state),
-                    time_before_retry_s.num_seconds(),
-                    None,
-                )
-            }
-        };
+    let challenge_kind = if creds.is_empty() {
+        // Fall back to SMS if the user requested webauthn but doesn't have any creds
+        ChallengeKind::Sms
+    } else {
+        preferred_challenge_kind
+    };
+    let (challenge_state_data, time_before_retry_s, biometric_challenge_json) = match challenge_kind {
+        ChallengeKind::Biometric => {
+            let challenge = initiate_biometric_challenge_for_user(&state, &uvw.user_vault.id, creds).await?;
+            let challenge_data = ChallengeData::Biometric(challenge.state);
+            (challenge_data, 0, Some(challenge.challenge_json))
+        }
+        ChallengeKind::Sms => {
+            let (challenge_state, time_before_retry_s) =
+                twilio_client.send_challenge(&state, &phone_number).await?;
+            let challenge_data = ChallengeData::Sms(challenge_state);
+            (challenge_data, time_before_retry_s.num_seconds(), None)
+        }
+    };
 
     let challenge_state = ChallengeState {
         data: challenge_state_data,
