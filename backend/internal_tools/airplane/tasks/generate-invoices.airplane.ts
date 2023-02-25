@@ -21,7 +21,7 @@ export default airplane.task(
     const apiUrl = process.env.API_URL;
 
     const { data } = await axios
-      .post(`${apiUrl}/private/invoices`, {
+      .post(`${apiUrl}/private/invoices`, null, {
         headers: {
           'X-Fp-Protected-Custodian-Key': authToken,
         },
