@@ -10,8 +10,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Identifiable, Insertable, Queryable};
 use newtypes::{
-    ProxyConfigId, ProxyConfigIngressRuleId, ProxyConfigItemId, ProxyIngressContentType, SealedVaultBytes,
-    TenantId,
+    ApiKeyStatus, ProxyConfigId, ProxyConfigIngressRuleId, ProxyConfigItemId, ProxyConfigSecretHeaderId,
+    ProxyIngressContentType, SealedVaultBytes, TenantId,
 };
 
 #[derive(Debug, Queryable, Identifiable)]
@@ -30,6 +30,7 @@ pub struct ProxyConfig {
     pub e_client_identity_key_der: Option<SealedVaultBytes>,
     pub ingress_content_type: Option<ProxyIngressContentType>,
     pub access_reason: Option<String>,
+    pub status: ApiKeyStatus,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -69,7 +70,7 @@ struct NewProxyConfigIngressRule {
 #[derive(Queryable, Debug, Identifiable)]
 #[diesel(table_name = proxy_config_secret_header)]
 pub struct ProxyConfigSecretHeader {
-    pub id: ProxyConfigItemId,
+    pub id: ProxyConfigSecretHeaderId,
     pub config_id: ProxyConfigId,
     pub name: String,
     pub e_data: SealedVaultBytes,
@@ -113,6 +114,20 @@ struct NewProxyConfig {
     e_client_identity_key_der: Option<SealedVaultBytes>,
     ingress_content_type: Option<ProxyIngressContentType>,
     access_reason: Option<String>,
+    status: ApiKeyStatus,
+}
+
+#[derive(Debug, AsChangeset)]
+#[diesel(table_name = proxy_config)]
+struct UpdateProxyConfig {
+    name: Option<String>,
+    url: Option<String>,
+    method: Option<String>,
+    client_identity_cert_der: Option<Option<Vec<u8>>>,
+    e_client_identity_key_der: Option<Option<SealedVaultBytes>>,
+    ingress_content_type: Option<Option<ProxyIngressContentType>>,
+    access_reason: Option<String>,
+    status: Option<ApiKeyStatus>,
 }
 
 #[derive(Debug)]
@@ -132,6 +147,26 @@ pub struct NewProxyConfigArgs {
     pub access_reason: Option<String>,
 }
 
+#[derive(Debug)]
+pub struct UpdateProxyConfigArgs {
+    pub tenant_id: TenantId,
+    pub is_live: bool,
+    pub config_id: ProxyConfigId,
+    pub status: Option<ApiKeyStatus>,
+    pub name: Option<String>,
+    pub url: Option<String>,
+    pub method: Option<String>,
+    pub client_identity_cert_der: Option<Option<Vec<u8>>>,
+    pub e_client_identity_key_der: Option<Option<SealedVaultBytes>>,
+    pub ingress_content_type: Option<Option<ProxyIngressContentType>>,
+    pub custom_headers: Option<Vec<(String, String)>>,
+    pub custom_header_secrets: Option<Vec<(String, SealedVaultBytes)>>,
+    pub delete_custom_header_secrets: Vec<ProxyConfigSecretHeaderId>,
+    pub server_certs: Option<Vec<Vec<u8>>>,
+    pub ingress_rules: Option<Vec<(String, String)>>,
+    pub access_reason: Option<String>,
+}
+
 /// a helper type for holding all of the proxy config
 /// related rows in a single type
 pub type DbProxyConfigAll = (
@@ -145,7 +180,7 @@ pub type DbProxyConfigAll = (
 impl ProxyConfig {
     /// create a new proxy config along with other config tables
     #[tracing::instrument(skip_all)]
-    pub fn create_new(conn: &mut TxnPgConn, args: NewProxyConfigArgs) -> DbResult<Self> {
+    pub fn create_new(conn: &mut TxnPgConn, args: NewProxyConfigArgs) -> DbResult<DbProxyConfigAll> {
         let NewProxyConfigArgs {
             tenant_id,
             is_live,
@@ -172,6 +207,7 @@ impl ProxyConfig {
             e_client_identity_key_der,
             ingress_content_type,
             access_reason,
+            status: ApiKeyStatus::Enabled,
         };
 
         let proxy_config: ProxyConfig = diesel::insert_into(proxy_config::table)
@@ -187,9 +223,9 @@ impl ProxyConfig {
             })
             .collect::<Vec<NewProxyConfigHeader>>();
 
-        diesel::insert_into(crate::schema::proxy_config_header::table)
+        let custom_headers = diesel::insert_into(crate::schema::proxy_config_header::table)
             .values(custom_headers)
-            .execute(conn.conn())?;
+            .get_results(conn.conn())?;
 
         let custom_secret_headers = custom_header_secrets
             .into_iter()
@@ -200,9 +236,9 @@ impl ProxyConfig {
             })
             .collect::<Vec<_>>();
 
-        diesel::insert_into(crate::schema::proxy_config_secret_header::table)
+        let custom_secret_headers = diesel::insert_into(crate::schema::proxy_config_secret_header::table)
             .values(custom_secret_headers)
-            .execute(conn.conn())?;
+            .get_results(conn.conn())?;
 
         let server_certs = server_certs
             .into_iter()
@@ -213,9 +249,9 @@ impl ProxyConfig {
             })
             .collect::<Vec<_>>();
 
-        diesel::insert_into(crate::schema::proxy_config_server_cert::table)
+        let server_certs = diesel::insert_into(crate::schema::proxy_config_server_cert::table)
             .values(server_certs)
-            .execute(conn.conn())?;
+            .get_results(conn.conn())?;
 
         let ingress_rules = ingress_rules
             .into_iter()
@@ -226,11 +262,154 @@ impl ProxyConfig {
             })
             .collect::<Vec<_>>();
 
-        diesel::insert_into(crate::schema::proxy_config_ingress_rule::table)
+        let ingress_rules = diesel::insert_into(crate::schema::proxy_config_ingress_rule::table)
             .values(ingress_rules)
-            .execute(conn.conn())?;
+            .get_results(conn.conn())?;
 
-        Ok(proxy_config)
+        Ok((
+            proxy_config,
+            custom_headers,
+            custom_secret_headers,
+            server_certs,
+            ingress_rules,
+        ))
+    }
+
+    /// updates an existing proxy configuration
+    #[tracing::instrument(skip_all)]
+    pub fn update(conn: &mut TxnPgConn, args: UpdateProxyConfigArgs) -> DbResult<DbProxyConfigAll> {
+        let UpdateProxyConfigArgs {
+            tenant_id,
+            is_live,
+            config_id,
+            status,
+            name,
+            url,
+            method,
+            client_identity_cert_der,
+            e_client_identity_key_der,
+            ingress_content_type,
+            custom_headers,
+            custom_header_secrets,
+            delete_custom_header_secrets,
+            server_certs,
+            ingress_rules,
+            access_reason,
+        } = args;
+
+        let update = UpdateProxyConfig {
+            name,
+            url,
+            status,
+            method,
+            client_identity_cert_der,
+            e_client_identity_key_der,
+            ingress_content_type,
+            access_reason,
+        };
+
+        let proxy_config: ProxyConfig = diesel::update(proxy_config::table)
+            .filter(proxy_config::id.eq(&config_id))
+            .filter(proxy_config::tenant_id.eq(tenant_id))
+            .filter(proxy_config::is_live.eq(is_live))
+            .set(update)
+            .get_result(conn.conn())?;
+
+        // for each dependent list of values, delete the old, insert the new
+        let headers: Vec<ProxyConfigHeader> = if let Some(custom_headers) = custom_headers {
+            let _ = diesel::delete(proxy_config_header::table)
+                .filter(proxy_config_header::config_id.eq(&config_id))
+                .execute(conn.conn())?;
+
+            let custom_headers = custom_headers
+                .into_iter()
+                .map(|(name, value)| NewProxyConfigHeader {
+                    config_id: proxy_config.id.clone(),
+                    name,
+                    value,
+                })
+                .collect::<Vec<NewProxyConfigHeader>>();
+
+            diesel::insert_into(crate::schema::proxy_config_header::table)
+                .values(custom_headers)
+                .get_results(conn.conn())?
+        } else {
+            proxy_config_header::table
+                .filter(proxy_config_header::config_id.eq(&config_id))
+                .get_results(conn.conn())?
+        };
+
+        // secret headers are added additively as cannot be updated atomically.
+        if let Some(custom_header_secrets) = custom_header_secrets {
+            let _ = diesel::delete(proxy_config_secret_header::table)
+                .filter(proxy_config_secret_header::config_id.eq(&config_id))
+                .filter(proxy_config_secret_header::id.eq_any(&delete_custom_header_secrets))
+                .execute(conn.conn())?;
+
+            let custom_secret_headers = custom_header_secrets
+                .into_iter()
+                .map(|(name, e_data)| NewProxyConfigSecretHeader {
+                    config_id: proxy_config.id.clone(),
+                    name,
+                    e_data,
+                })
+                .collect::<Vec<_>>();
+
+            let _ = diesel::insert_into(crate::schema::proxy_config_secret_header::table)
+                .values(custom_secret_headers)
+                .execute(conn.conn())?;
+        }
+        let secret_headers = proxy_config_secret_header::table
+            .filter(proxy_config_secret_header::config_id.eq(&config_id))
+            .get_results(conn.conn())?;
+
+        let server_certs: Vec<ProxyConfigServerCert> = if let Some(server_certs) = server_certs {
+            let _ = diesel::delete(proxy_config_server_cert::table)
+                .filter(proxy_config_server_cert::config_id.eq(&config_id))
+                .execute(conn.conn())?;
+
+            let server_certs = server_certs
+                .into_iter()
+                .map(|cert_der| NewProxyConfigServerCert {
+                    config_id: proxy_config.id.clone(),
+                    cert_hash: crypto::sha256(&cert_der).to_vec(),
+                    cert_der,
+                })
+                .collect::<Vec<_>>();
+
+            diesel::insert_into(crate::schema::proxy_config_server_cert::table)
+                .values(server_certs)
+                .get_results(conn.conn())?
+        } else {
+            proxy_config_server_cert::table
+                .filter(proxy_config_server_cert::config_id.eq(&config_id))
+                .get_results(conn.conn())?
+        };
+
+        let ingress_rules: Vec<ProxyConfigIngressRule> = if let Some(ingress_rules) = ingress_rules {
+            let _ = diesel::delete(proxy_config_ingress_rule::table)
+                .filter(proxy_config_ingress_rule::config_id.eq(&config_id))
+                .execute(conn.conn())?;
+
+            let ingress_rules = ingress_rules
+                .into_iter()
+                .map(|(token_path, target)| NewProxyConfigIngressRule {
+                    config_id: proxy_config.id.clone(),
+                    token_path,
+                    target,
+                })
+                .collect::<Vec<_>>();
+
+            diesel::insert_into(crate::schema::proxy_config_ingress_rule::table)
+                .values(ingress_rules)
+                .get_results(conn.conn())?
+        } else {
+            proxy_config_ingress_rule::table
+                .filter(proxy_config_ingress_rule::config_id.eq(&config_id))
+                .get_results(conn.conn())?
+        };
+
+        Ok((proxy_config, headers, secret_headers, server_certs, ingress_rules))
     }
 
     #[tracing::instrument(skip_all)]

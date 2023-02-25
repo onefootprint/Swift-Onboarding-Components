@@ -83,8 +83,52 @@ pub struct ProxyIngressRule {
     pub target: String,
 }
 
+/// Patch a new proxy configuration
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+pub struct PatchProxyConfigRequest {
+    /// enable or disable the config
+    pub status: Option<ApiKeyStatus>,
+
+    /// a friendly name for this proxy config
+    pub name: Option<String>,
+
+    /// the proxy destination URL
+    /// Can include path and query params
+    pub url: Option<String>,
+
+    /// HTTP method: POST, GET, PUT, PATCH, DELETE
+    pub method: Option<String>,
+
+    /// Custom headers
+    pub headers: Option<Vec<PlainCustomHeader>>,
+
+    /// Custom headers containing auth secrets to add
+    pub add_secret_headers: Option<Vec<SecretCustomHeader>>,
+
+    /// A list of secret headers to delete (by it's ID)
+    pub delete_secret_headers: Option<Vec<ProxyConfigSecretHeaderId>>,
+
+    /// A certificate and key to authenticate via mTLS
+    /// omit to not make changes, set to null to remove
+    pub client_identity: Option<Option<ClientIdentity>>,
+
+    /// A list of PEM-encoded x509 certificates or chains
+    /// that are either CAs or self-signed. These certificates
+    /// will be used to verify the root-of-trust of the certificate
+    /// presented by the proxy
+    pub pinned_server_certificates: Option<Vec<String>>,
+
+    /// access reason to use during proxy decryptions
+    pub access_reason: Option<String>,
+
+    /// Ingress configuration    
+    /// omit to not change, set to null to remove
+    pub ingress_settings: Option<Option<IngressSettings>>,
+}
+
 export_schema!(CreateProxyConfigRequest);
 export_schema!(ClientIdentity);
 export_schema!(PlainCustomHeader);
 export_schema!(SecretCustomHeader);
 export_schema!(ProxyIngressRule);
+export_schema!(PatchProxyConfigRequest);

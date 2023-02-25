@@ -43,6 +43,8 @@ pub enum TenantScope {
     ApiKeys,
     /// Allows updating org settings, roles, and users
     OrgSettings,
+    /// Allows updating and creating vault proxy configuration
+    VaultProxy,
     /// Allows performing manual review actions on users, like making a new decision or adding an annotation
     ManualReview,
 
@@ -102,6 +104,7 @@ impl FromStr for TenantScope {
             TenantScopeDiscriminants::DecryptCustom => Self::DecryptCustom,
             TenantScopeDiscriminants::DecryptDocuments => Self::DecryptDocuments,
             TenantScopeDiscriminants::ManualReview => Self::ManualReview,
+            TenantScopeDiscriminants::VaultProxy => Self::VaultProxy,
         };
         Ok(result)
     }

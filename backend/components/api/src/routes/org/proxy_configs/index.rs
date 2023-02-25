@@ -7,12 +7,13 @@ use crate::errors::ApiResult;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_wire_types::CreateProxyConfigRequest;
-use db::models::proxy_config::{NewProxyConfigArgs, ProxyConfig};
+use api_wire_types::{CreateProxyConfigRequest, PatchProxyConfigRequest};
+use db::models::proxy_config::{NewProxyConfigArgs, ProxyConfig, UpdateProxyConfigArgs};
 use db::DbError;
+use newtypes::ProxyConfigId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfig>>>;
+type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfigBasic>>>;
 
 #[api_v2_operation(
     description = "List the organization's proxy configurations",
@@ -32,12 +33,37 @@ pub async fn get(
         .db_query(move |conn| -> Result<_, DbError> { ProxyConfig::list(conn, &tenant_id, is_live) })
         .await??;
 
-    let configs: Vec<api_wire_types::ProxyConfig> = configs
+    let configs = configs
         .into_iter()
-        .map(api_wire_types::ProxyConfig::from_db)
+        .map(api_wire_types::ProxyConfigBasic::from_db)
         .collect();
 
     ResponseData::ok(configs).json()
+}
+
+#[api_v2_operation(
+    description = "Get a proxy configuration with details",
+    tags(Organization, PublicApi)
+)]
+#[actix::get("/org/proxy_configs/{proxy_config_id}")]
+pub async fn get_detail(
+    state: web::Data<State>,
+    proxy_config_id: web::Path<ProxyConfigId>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
+    let auth = auth.check_guard(TenantGuard::Read)?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let proxy_config_id = proxy_config_id.into_inner();
+
+    let config = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, DbError> {
+            ProxyConfig::find(conn, &tenant_id, is_live, proxy_config_id)
+        })
+        .await??;
+
+    ResponseData::ok(api_wire_types::ProxyConfigDetailed::from_db(config)).json()
 }
 
 #[api_v2_operation(
@@ -49,7 +75,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CreateProxyConfigRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfig>>> {
+) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -67,11 +93,8 @@ pub async fn post(
         ingress_settings,
     } = request.into_inner();
 
-    let mut client_identity_cert_der = None;
-    let mut e_client_identity_key_der = None;
-
     // setup the client certificate
-    if let Some(id) = client_identity {
+    let (client_identity_cert_der, e_client_identity_key_der) = if let Some(id) = client_identity {
         // validate the identity
         let _ = crate::proxy::config::ClientCertificateKey::parse_cert_and_key(
             id.certificate.as_bytes(),
@@ -82,9 +105,13 @@ pub async fn post(
         let cert_der = crypto::pem::parse(id.certificate).map_err(VaultProxyError::from)?;
         let key_der = crypto::pem::parse(id.key).map_err(VaultProxyError::from)?;
 
-        e_client_identity_key_der = Some(tenant.public_key.seal_bytes(&key_der.contents)?);
-        client_identity_cert_der = Some(cert_der.contents);
-    }
+        (
+            Some(cert_der.contents),
+            Some(tenant.public_key.seal_bytes(&key_der.contents)?),
+        )
+    } else {
+        (None, None)
+    };
 
     // seal secret headers
     let custom_header_secrets = secret_headers
@@ -141,7 +168,152 @@ pub async fn post(
         .db_transaction(move |conn| -> Result<_, DbError> { ProxyConfig::create_new(conn, args) })
         .await?;
 
-    let config = api_wire_types::ProxyConfig::from_db(config);
+    let config = api_wire_types::ProxyConfigDetailed::from_db(config);
+
+    ResponseData::ok(config).json()
+}
+
+#[api_v2_operation(
+    description = "Create a new proxy configuration",
+    tags(Organization, PublicApi)
+)]
+#[actix::patch("/org/proxy_configs/{proxy_config_id}")]
+pub async fn patch(
+    state: web::Data<State>,
+    request: Json<PatchProxyConfigRequest>,
+    proxy_config_id: web::Path<ProxyConfigId>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
+    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let tenant = auth.tenant();
+    let tenant_id = tenant.id.clone();
+    let is_live = auth.is_live()?;
+    let proxy_config_id = proxy_config_id.into_inner();
+
+    let PatchProxyConfigRequest {
+        name,
+        status,
+        url,
+        method,
+        headers,
+        client_identity,
+        pinned_server_certificates,
+        access_reason,
+        ingress_settings,
+        add_secret_headers,
+        delete_secret_headers,
+    } = request.into_inner();
+
+    // setup the client certificate
+    let (client_identity_cert_der, e_client_identity_key_der) = match client_identity {
+        Some(Some(id)) => {
+            // validate the identity
+            let _ = crate::proxy::config::ClientCertificateKey::parse_cert_and_key(
+                id.certificate.as_bytes(),
+                id.key.as_bytes(),
+            )?;
+
+            // validate pem
+            let cert_der = crypto::pem::parse(id.certificate).map_err(VaultProxyError::from)?;
+            let key_der = crypto::pem::parse(id.key).map_err(VaultProxyError::from)?;
+
+            (
+                Some(Some(cert_der.contents)),
+                Some(Some(tenant.public_key.seal_bytes(&key_der.contents)?)),
+            )
+        }
+        Some(None) => (Some(None), Some(None)),
+        None => (None, None),
+    };
+
+    // seal secret headers
+    let custom_header_secrets = if let Some(nsh) = add_secret_headers {
+        Some(
+            nsh.into_iter()
+                .map(|h| {
+                    let e_value = tenant.public_key.seal_bytes(h.value.leak().as_bytes())?;
+                    Ok((h.name, e_value))
+                })
+                .collect::<Result<Vec<_>, crypto::Error>>()?,
+        )
+    } else {
+        None
+    };
+
+    // parse server certs
+    let server_certs = if let Some(psc) = pinned_server_certificates {
+        Some(
+            psc.into_iter()
+                .map(|cert| {
+                    let _ = reqwest::Certificate::from_pem(cert.as_bytes())
+                        .map_err(VaultProxyError::ServerPinCertificate)?;
+                    crypto::pem::parse(cert)
+                        .map_err(VaultProxyError::from)
+                        .map(|cert| cert.contents)
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+        )
+    } else {
+        None
+    };
+
+    let url = if let Some(url) = url {
+        Some(url::Url::parse(&url).map_err(|_| VaultProxyError::InvalidDestinationUrl)?)
+    } else {
+        None
+    };
+
+    let method = if let Some(method) = method {
+        Some(reqwest::Method::from_str(&method).map_err(|_| VaultProxyError::InvalidDestinationMethod)?)
+    } else {
+        None
+    };
+
+    // ingress
+    let (ingress_content_type, ingress_rules) = if let Some(ingress) = ingress_settings {
+        if let Some(ingress) = ingress {
+            (
+                Some(Some(ingress.content_type)),
+                Some(
+                    ingress
+                        .rules
+                        .into_iter()
+                        .map(|rule| (rule.token.to_string(), rule.target))
+                        .collect(),
+                ),
+            )
+        } else {
+            (Some(None), Some(vec![]))
+        }
+    } else {
+        (None, None)
+    };
+
+    let args = UpdateProxyConfigArgs {
+        tenant_id,
+        is_live,
+        config_id: proxy_config_id,
+        name,
+        status,
+        url: url.map(|url| url.to_string()),
+        method: method.map(|m| m.to_string()),
+        client_identity_cert_der,
+        e_client_identity_key_der,
+        ingress_content_type,
+        custom_headers: headers.map(|hdrs| hdrs.into_iter().map(|h| (h.name, h.value)).collect()),
+        custom_header_secrets,
+        delete_custom_header_secrets: delete_secret_headers.unwrap_or_default(),
+        server_certs,
+        ingress_rules,
+        access_reason,
+    };
+
+    let config = state
+        .db_pool
+        .db_transaction(move |conn| -> Result<_, DbError> { ProxyConfig::update(conn, args) })
+        .await?;
+
+    let config = api_wire_types::ProxyConfigDetailed::from_db(config);
 
     ResponseData::ok(config).json()
 }

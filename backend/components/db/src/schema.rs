@@ -322,6 +322,7 @@ table! {
         e_client_identity_key_der -> Nullable<Bytea>,
         ingress_content_type -> Nullable<Text>,
         access_reason -> Nullable<Text>,
+        status -> Text,
     }
 }
 

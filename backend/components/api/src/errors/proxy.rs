@@ -61,4 +61,6 @@ pub enum VaultProxyError {
     ProxyTokenError(#[from] ProxyTokenError),
     #[error("must specifiy footprint user token header for ingress rules")]
     MissingFootprintUserTokenParameter,
+    #[error("Proxy configuration is disabled. Please enable it to use it.")]
+    ProxyConfigDisabled,
 }

@@ -1,4 +1,5 @@
-from tests.utils import _make_request
+from tests.cert_fixtures import GOOGLE_CERT
+from tests.utils import _make_request, patch
 from tests.auth import BaseAuth
 import pytest
 from tests.utils import url
@@ -323,3 +324,42 @@ class TestVaultProxy:
         data = dict(reason="test", fields=["custom.card_number"])
         response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["custom.card_number"] == "4242424242424242424"
+
+    def test_get_patch_proxy_config(self, sandbox_tenant):
+        proxy_id = configure_proxy(
+            sandbox_tenant,
+            [{"target": "$.data.card_number", "token": "custom.card_number"}],
+        )
+
+        proxy_config = get(f"org/proxy_configs/{proxy_id}", None, sandbox_tenant.sk.key)
+        assert proxy_config["id"] == proxy_id
+        assert len(proxy_config["headers"]) == 1
+        assert len(proxy_config["secret_headers"]) == 1
+        assert len(proxy_config["pinned_server_certificates"]) == 1
+
+        data = {
+            "access_reason": "test decrypt2",
+            "name": "test config2",
+            "status": "disabled",
+            "pinned_server_certificates": [
+                read_file("backend/external_tools/ditto/src/dummy_cert/server.crt"),
+                GOOGLE_CERT,
+            ],
+            "headers": [],
+            "add_secret_headers": [
+                {"name": "my-secret-header2", "value": "twofootprintrocks"},
+            ],
+        }
+
+        new_proxy_config = patch(
+            f"org/proxy_configs/{proxy_id}",
+            data,
+            sandbox_tenant.sk.key,
+        )
+
+        assert new_proxy_config["access_reason"] == "test decrypt2"
+        assert new_proxy_config["name"] == "test config2"
+        assert new_proxy_config["status"] == "disabled"
+        assert len(new_proxy_config["secret_headers"]) == 2
+        assert len(new_proxy_config["pinned_server_certificates"]) == 2
+        assert len(new_proxy_config["headers"]) == 0

@@ -1,7 +1,7 @@
 use actix_web::{http::header::HeaderMap, FromRequest};
 
 use futures::Future;
-use newtypes::{FootprintUserId, PiiString, ProxyConfigId, ProxyIngressContentType};
+use newtypes::{ApiKeyStatus, FootprintUserId, PiiString, ProxyConfigId, ProxyIngressContentType};
 use paperclip::actix::Apiv2Header;
 use reqwest::Method;
 use std::{pin::Pin, str::FromStr};
@@ -231,6 +231,11 @@ impl ProxyConfig {
             })
             .await??;
 
+        // do not allow using a disabled proxy configuration
+        if db_config.status != ApiKeyStatus::Enabled {
+            return Err(VaultProxyError::ProxyConfigDisabled)?;
+        }
+
         let db::models::proxy_config::ProxyConfig {
             id,
             tenant_id: _,
@@ -245,6 +250,7 @@ impl ProxyConfig {
             e_client_identity_key_der,
             ingress_content_type,
             access_reason,
+            status: _,
         } = db_config;
 
         // get the base url and/or path and query from headers

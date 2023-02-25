@@ -181,6 +181,12 @@ define_newtype_id!(
     "Identifier for a Proxy Configuration detail"
 );
 define_newtype_id!(
+    ProxyConfigSecretHeaderId,
+    String,
+    "Identifier for a Proxy Configuration secret header"
+);
+
+define_newtype_id!(
     ProxyConfigIngressRuleId,
     String,
     "Identifier for a Proxy Configuration Ingress Rule"

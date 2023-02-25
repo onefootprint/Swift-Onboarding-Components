@@ -1,0 +1,1 @@
+ALTER TABLE proxy_config DROP COLUMN status;
