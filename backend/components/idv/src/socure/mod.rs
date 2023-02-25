@@ -270,9 +270,6 @@ mod tests {
                       "Doe John",
                       "Jack Doe"
                     ],
-                    "politicalPosition": [
-                      "Member of the Cabinet of Ministers"
-                    ],
                     "region": [
                       "Ontario"
                     ],
@@ -300,31 +297,39 @@ mod tests {
                     vec![
                         GlobalWatchlistMatch {
                             entity_id: "ZaP+/U4QWUgpfG5fDlsPzz3ul+37G0Q".to_owned(),
-                            match_fields: vec!["nameEquivalent".to_owned()],
-                            source_urls: vec!["https://www.socure.com".to_owned()],
-                            comments: GlobalWatchlistMatchComment {
-                                name: vec![ScrubbedPiiString::new(PiiString::new("John C. Doe".to_owned()))],
-                                original_country_text: vec!["EN, Politician".to_owned()],
-                                aka: vec![ScrubbedPiiString::new(PiiString::new("John Doe".to_owned()))],
-                                political_position: vec!["Child of Henry Doe (Politician)".to_owned()],
-                                offense: vec!["Pep,Pep Class 2,Pep Class 4".to_owned()]
-                            },
+                            match_fields: Some(vec!["nameEquivalent".to_owned()]),
+                            source_urls: Some(vec!["https://www.socure.com".to_owned()]),
+                            comments: Some(GlobalWatchlistMatchComment {
+                                name: Some(vec![ScrubbedPiiString::new(PiiString::new(
+                                    "John C. Doe".to_owned()
+                                ))]),
+                                original_country_text: Some(vec!["EN, Politician".to_owned()]),
+                                aka: Some(vec![ScrubbedPiiString::new(PiiString::new(
+                                    "John Doe".to_owned()
+                                ))]),
+                                political_position: Some(vec!["Child of Henry Doe (Politician)".to_owned()]),
+                                offense: Some(vec!["Pep,Pep Class 2,Pep Class 4".to_owned()])
+                            }),
                             match_score: 98.0
                         },
                         GlobalWatchlistMatch {
                             entity_id: "ZaP+/U4QWUgjZmsjDltrtDGFl5D6Alw".to_owned(),
-                            match_fields: vec!["nameExact".to_owned()],
-                            source_urls: vec!["https://www.example.org/members/current/ministers".to_owned()],
-                            comments: GlobalWatchlistMatchComment {
-                                name: vec![ScrubbedPiiString::new(PiiString::from("John Doe".to_owned()))],
-                                original_country_text: vec!["Any Country".to_owned()],
-                                aka: vec![
+                            match_fields: Some(vec!["nameExact".to_owned()]),
+                            source_urls: Some(vec![
+                                "https://www.example.org/members/current/ministers".to_owned()
+                            ]),
+                            comments: Some(GlobalWatchlistMatchComment {
+                                name: Some(vec![ScrubbedPiiString::new(PiiString::from(
+                                    "John Doe".to_owned()
+                                ))]),
+                                original_country_text: Some(vec!["Any Country".to_owned()]),
+                                aka: Some(vec![
                                     ScrubbedPiiString::new(PiiString::new("Doe John".to_owned())),
                                     ScrubbedPiiString::new(PiiString::new("Jack Doe".to_owned()))
-                                ],
-                                political_position: vec!["Member of the Cabinet of Ministers".to_owned()],
-                                offense: vec!["Pep Class 2".to_owned()]
-                            },
+                                ]),
+                                political_position: None,
+                                offense: Some(vec!["Pep Class 2".to_owned()])
+                            }),
                             match_score: 97.0
                         }
                     ]

@@ -125,9 +125,9 @@ pub struct GlobalWatchlist {
 #[serde(rename_all = "camelCase")]
 pub struct GlobalWatchlistMatch {
     pub entity_id: String,
-    pub match_fields: Vec<String>,
-    pub source_urls: Vec<String>,
-    pub comments: GlobalWatchlistMatchComment,
+    pub match_fields: Option<Vec<String>>,
+    pub source_urls: Option<Vec<String>>,
+    pub comments: Option<GlobalWatchlistMatchComment>,
     pub match_score: f32,
 }
 
@@ -146,11 +146,11 @@ impl PartialEq for GlobalWatchlistMatch {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GlobalWatchlistMatchComment {
-    pub name: Vec<ScrubbedPiiString>,
-    pub original_country_text: Vec<String>,
-    pub aka: Vec<ScrubbedPiiString>,
-    pub political_position: Vec<String>,
-    pub offense: Vec<String>,
+    pub name: Option<Vec<ScrubbedPiiString>>,
+    pub original_country_text: Option<Vec<String>>,
+    pub aka: Option<Vec<ScrubbedPiiString>>,
+    pub political_position: Option<Vec<String>>,
+    pub offense: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
