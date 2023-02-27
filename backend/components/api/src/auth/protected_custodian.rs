@@ -14,7 +14,8 @@ pub struct ProtectedCustodianAuthContext {
         name = "X-Fp-Protected-Custodian-Key",
         description = "The footprint (protected) custodian key"
     )]
-    protected_custodian_key: String,
+    // This isn't used anywhere, just need it for the open API specs
+    protected_custodian_key: bool,
     #[openapi(skip)]
     phantom: PhantomData<()>,
 }
@@ -49,7 +50,7 @@ impl FromRequest for ProtectedCustodianAuthContext {
             let custodian_key = custodian_key?;
             if crypto::safe_compare(custodian_key.as_bytes(), expected_custodian_key.as_bytes()) {
                 Ok(Self {
-                    protected_custodian_key: custodian_key,
+                    protected_custodian_key: true,
                     phantom: PhantomData,
                 })
             } else {

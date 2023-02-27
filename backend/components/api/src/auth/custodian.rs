@@ -14,7 +14,8 @@ pub struct CustodianAuthContext {
         name = "X-Footprint-Custodian-Key",
         description = "The footprint custodian key"
     )]
-    custodian_key: String,
+    // This isn't used anywhere, just need it for the open API specs
+    custodian_key: bool,
     #[openapi(skip)]
     phantom: PhantomData<()>,
 }
@@ -44,7 +45,7 @@ impl FromRequest for CustodianAuthContext {
             let custodian_key = custodian_key?;
             if crypto::safe_compare(custodian_key.as_bytes(), expected_custodian_key.as_bytes()) {
                 Ok(Self {
-                    custodian_key,
+                    custodian_key: true,
                     phantom: PhantomData,
                 })
             } else {
