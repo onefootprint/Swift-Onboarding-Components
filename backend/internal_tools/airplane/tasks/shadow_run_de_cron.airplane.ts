@@ -1,5 +1,4 @@
 import airplane from 'airplane';
-import axios from 'axios';
 
 export default airplane.task(
   {
@@ -30,17 +29,43 @@ export default airplane.task(
       ],
     ];
 
-    for (const [params, expected_decision_status] of TEST_CASES) {
-      const run = await airplane.execute<object>('shadow_run_de', {
-        tenant_id: params['tenant_id'],
-        fp_user_id: params['fp_user_id'],
-      });
-      const decision_status = run.output['decision_status'];
-      if (decision_status != expected_decision_status) {
-        throw `decision_status = ${decision_status}, expected = ${expected_decision_status}, params = ${JSON.stringify(
-          params,
-        )}`;
+    class Run {
+      params: object;
+      error?: string;
+
+      constructor(params, error) {
+        this.params = params;
+        this.error = error;
       }
     }
+
+    let runs: Run[] = [];
+    for (const [params, expected_decision_status] of TEST_CASES) {
+      let error;
+      try {
+        const run = await airplane.execute<object>('shadow_run_de', {
+          tenant_id: params['tenant_id'],
+          fp_user_id: params['fp_user_id'],
+        });
+
+        const decision_status = run.output['decision_status'];
+        if (decision_status != expected_decision_status) {
+          error = `decision_status = ${decision_status}, expected = ${expected_decision_status}`;
+        }
+      } catch (e) {
+        error = `${e}`;
+      }
+      runs.push(new Run(params, error));
+    }
+
+    let errors = runs.filter(r => r.error);
+    if (errors.length > 0) {
+      const message = `*Cron Shadow Run Decision Engine - Error(s)*\n  • ${errors
+        .map(e => JSON.stringify(e))
+        .join('\n  • ')}`;
+      await airplane.slack.message('risk-alerts', message);
+      throw message;
+    }
+    return runs;
   },
 );

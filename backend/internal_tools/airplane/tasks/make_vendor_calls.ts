@@ -3,8 +3,8 @@ import { protected_custodian_api_call } from '../utils';
 
 export default airplane.task(
   {
-    slug: 'shadow_run_de',
-    name: 'Shadow Run Decision Engine',
+    slug: 'make_vendor_calls',
+    name: 'Creates new VerificationRequests, re-pings all vendors, and writes VerificationResults for the passed in fp_user_id',
     parameters: {
       fp_user_id: {
         name: 'fp_user_id',
@@ -22,7 +22,7 @@ export default airplane.task(
   },
   async params => {
     return await protected_custodian_api_call(
-      'private/protected/risk/shadow_run_vendor_calls_and_decisioning',
+      'private/protected/risk/make_vendor_calls',
       params,
     );
   },
