@@ -1,14 +1,19 @@
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 export type ResendButtonProps = {
+  isResendLoading?: boolean;
   resendDisabledUntil?: Date;
   onResend: () => void;
 };
 
-const ResendButton = ({ resendDisabledUntil, onResend }: ResendButtonProps) => {
+const ResendButton = ({
+  isResendLoading,
+  resendDisabledUntil,
+  onResend,
+}: ResendButtonProps) => {
   const { t } = useTranslation(
     'components.sms-challenge-verification.resend-button',
   );
@@ -50,7 +55,9 @@ const ResendButton = ({ resendDisabledUntil, onResend }: ResendButtonProps) => {
     onResend();
   };
 
-  return (
+  return isResendLoading ? (
+    <LoadingIndicator />
+  ) : (
     <Container>
       <LinkButton
         disabled={resendClicked && countdown > 0}

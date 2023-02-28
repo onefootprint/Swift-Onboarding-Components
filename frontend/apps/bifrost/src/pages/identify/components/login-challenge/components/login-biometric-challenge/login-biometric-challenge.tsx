@@ -1,0 +1,125 @@
+import {
+  useIdentifyVerify,
+  useLoginChallenge,
+} from '@onefootprint/footprint-elements';
+import { useRequestErrorToast } from '@onefootprint/hooks';
+import { ChallengeKind, LoginChallengeResponse } from '@onefootprint/types';
+import React, { useState } from 'react';
+import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
+import BiometricChallengeVerification from 'src/pages/identify/components/biometric-challenge-verification';
+import generateLoginDeviceResponse from 'src/pages/identify/utils/biometric/login-challenge-response';
+
+const SUCCESS_EVENT_DELAY_MS = 1500;
+
+const LoginBiometricChallenge = () => {
+  const [state, send] = useIdentifyMachine();
+  const {
+    identify: { successfulIdentifier },
+    config,
+  } = state.context;
+  const showRequestErrorToast = useRequestErrorToast();
+  const loginChallengeMutation = useLoginChallenge();
+  const identifyVerifyMutation = useIdentifyVerify();
+
+  const [isSuccess, setSuccess] = useState(false);
+  const [isRetry, setIsRetry] = useState(false);
+  const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
+  const isWaiting = isRunningWebauthn || identifyVerifyMutation.isLoading;
+  const { isLoading } = loginChallengeMutation;
+
+  const handleComplete = async () => {
+    if (!successfulIdentifier) {
+      console.error(
+        'No successful identifier found while initiating login biometric challenge',
+      );
+      return;
+    }
+
+    loginChallengeMutation
+      .mutateAsync(
+        {
+          identifier: successfulIdentifier,
+          preferredChallengeKind: ChallengeKind.biometric,
+        },
+        {
+          onSuccess: handleRequestChallengeSuccess,
+          onError: handleRequestError,
+        },
+      )
+      .catch((error: unknown) => {
+        handleRequestError(error);
+      });
+  };
+
+  const handleRequestChallengeSuccess = async (
+    payload: LoginChallengeResponse,
+  ) => {
+    const { biometricChallengeJson, challengeToken, challengeKind } =
+      payload.challengeData || {};
+
+    if (challengeKind !== ChallengeKind.biometric) {
+      console.error(
+        'Received sms challenge after requesting login biometric challenge',
+      );
+      return;
+    }
+    if (!biometricChallengeJson || !challengeToken) {
+      return;
+    }
+
+    setIsRunningWebauthn(true);
+    let challengeResponse;
+    try {
+      challengeResponse = await generateLoginDeviceResponse(
+        biometricChallengeJson,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (!challengeResponse) {
+      setIsRunningWebauthn(false);
+      return;
+    }
+
+    identifyVerifyMutation.mutate(
+      { challengeResponse, challengeToken, tenantPk: config?.key },
+      {
+        onSuccess: ({ authToken }) => {
+          setSuccess(true);
+          setTimeout(() => {
+            send({
+              type: Events.challengeSucceeded,
+              payload: {
+                authToken,
+              },
+            });
+          }, SUCCESS_EVENT_DELAY_MS);
+        },
+        onError: () => {
+          setIsRetry(true);
+        },
+        onSettled: () => {
+          setIsRunningWebauthn(false);
+        },
+      },
+    );
+  };
+
+  const handleRequestError = (error: unknown) => {
+    showRequestErrorToast(error);
+    console.error(error);
+  };
+
+  return (
+    <BiometricChallengeVerification
+      isWaiting={isWaiting}
+      isSuccess={isSuccess}
+      isRetry={isRetry}
+      onComplete={handleComplete}
+      isLoading={isLoading}
+    />
+  );
+};
+
+export default LoginBiometricChallenge;

@@ -25,22 +25,24 @@ describe('<SmsChallengeVerification />', () => {
 
   const renderVerification = ({
     title,
-    isLoading,
+    isVerifying,
     isSuccess,
     hasError,
     onComplete = () => {},
     resendDisabledUntil,
     onResend = () => {},
+    isResendLoading,
   }: Partial<SmsChallengeVerificationProps>) =>
     customRender(
       <SmsChallengeVerification
         title={title}
-        isLoading={isLoading}
+        isVerifying={isVerifying}
         isSuccess={isSuccess}
         hasError={hasError}
         onComplete={onComplete}
         resendDisabledUntil={resendDisabledUntil}
         onResend={onResend}
+        isResendLoading={isResendLoading}
       />,
     );
 
@@ -56,8 +58,9 @@ describe('<SmsChallengeVerification />', () => {
     expect(button).not.toBeDisabled();
   });
 
-  it('renders loading correctly', () => {
-    renderVerification({ isLoading: true });
+  it('renders verifying correctly', () => {
+    renderVerification({ isVerifying: true });
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.getByText('Verifying...')).toBeInTheDocument();
     expect(screen.queryByText('Resend code')).not.toBeInTheDocument();
     expect(
@@ -107,6 +110,15 @@ describe('<SmsChallengeVerification />', () => {
     const button = screen.getByRole('button', { name: 'Resend code' });
     expect(button).toBeInTheDocument();
     expect(button).not.toBeDisabled();
+  });
+
+  it('renders button correctly when resend is loading', async () => {
+    const onResend = jest.fn();
+    renderVerification({ onResend, isResendLoading: true });
+    expect(
+      screen.getByTestId('sms-challenge-verification-pin-input'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders button correctly when resend is disabled', async () => {

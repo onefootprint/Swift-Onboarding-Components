@@ -3,13 +3,13 @@ import { PinInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Loading from './components/loading';
 import ResendButton, { ResendButtonProps } from './components/resend-button';
 import Success from './components/success';
+import Verifying from './components/verifying';
 
 export type SmsChallengeVerificationProps = ResendButtonProps & {
   title?: string;
-  isLoading?: boolean;
+  isVerifying?: boolean;
   isSuccess?: boolean;
   hasError?: boolean;
   onComplete: (code: string) => void;
@@ -17,12 +17,13 @@ export type SmsChallengeVerificationProps = ResendButtonProps & {
 
 const SmsChallengeVerification = ({
   title,
-  isLoading,
+  isVerifying,
   isSuccess,
   hasError,
   onComplete,
   resendDisabledUntil,
   onResend,
+  isResendLoading,
 }: SmsChallengeVerificationProps) => {
   const { t } = useTranslation('components.sms-challenge-verification');
 
@@ -30,12 +31,12 @@ const SmsChallengeVerification = ({
     return <Success />;
   }
 
-  if (isLoading) {
-    return <Loading />;
+  if (isVerifying) {
+    return <Verifying />;
   }
 
   return (
-    <Container>
+    <Form autoComplete="off" role="presentation">
       {title && (
         <Typography variant="body-2" color="secondary" as="h3">
           {title}
@@ -48,14 +49,15 @@ const SmsChallengeVerification = ({
         testID="sms-challenge-verification-pin-input"
       />
       <ResendButton
+        isResendLoading={isResendLoading}
         resendDisabledUntil={resendDisabledUntil}
         onResend={onResend}
       />
-    </Container>
+    </Form>
   );
 };
 
-const Container = styled.div`
+const Form = styled.form`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

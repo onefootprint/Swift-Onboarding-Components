@@ -5,6 +5,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 export type BiometricChallengeVerificationProps = {
+  isWaiting?: boolean;
   isLoading?: boolean;
   isSuccess?: boolean;
   isRetry?: boolean;
@@ -12,13 +13,14 @@ export type BiometricChallengeVerificationProps = {
 };
 
 const BiometricChallengeVerification = ({
+  isWaiting,
   isLoading,
   isSuccess,
   isRetry,
   onComplete,
 }: BiometricChallengeVerificationProps) => {
   const { t } = useTranslation('components.biometric-challenge-verification');
-  const isCta = !isLoading && !isSuccess;
+  const hasCta = !isWaiting && !isSuccess;
 
   if (isSuccess) {
     return (
@@ -39,7 +41,7 @@ const BiometricChallengeVerification = ({
         {/* TODO: https://linear.app/footprint/issue/FP-2910 */}
         <IcoFaceid24 />
       </IconContainer>
-      {isLoading && (
+      {isWaiting && (
         <Typography
           variant="label-3"
           color="secondary"
@@ -48,8 +50,8 @@ const BiometricChallengeVerification = ({
           {t('loading')}
         </Typography>
       )}
-      {isCta && (
-        <Button onClick={onComplete} size="compact">
+      {hasCta && (
+        <Button onClick={onComplete} size="compact" loading={isLoading}>
           {isRetry ? t('cta-retry') : t('cta')}
         </Button>
       )}

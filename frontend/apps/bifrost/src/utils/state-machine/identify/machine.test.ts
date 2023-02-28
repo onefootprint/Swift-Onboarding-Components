@@ -74,7 +74,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual(States.challenge);
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts sms challenge', () => {
@@ -104,7 +104,7 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneRegistration);
+      expect(state.value).toEqual(States.phoneIdentification);
 
       state = machine.send({
         type: Events.identified,
@@ -126,23 +126,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual(States.phoneRegistration);
-
-      const challengeData = {
-        challengeToken: 'token',
-        challengeKind: ChallengeKind.sms,
-        scrubbedPhoneNumber: '+1 (***) ***-**00',
-      };
-      state = machine.send({
-        type: Events.challengeInitiated,
-        payload: { challengeData },
-      });
-      expect(state.context.challenge).toEqual({
-        availableChallengeKinds: [ChallengeKind.sms],
-        hasSyncablePassKey: false,
-        challengeData,
-      });
-      expect(state.value).toEqual(States.phoneVerification);
+      expect(state.value).toEqual(States.challenge);
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts biometric challenge', () => {
@@ -172,7 +156,7 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneRegistration);
+      expect(state.value).toEqual(States.phoneIdentification);
 
       state = machine.send({
         type: Events.identified,
@@ -194,7 +178,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual(States.phoneRegistration);
+      expect(state.value).toEqual(States.challenge);
 
       state = machine.send({
         type: Events.challengeSucceeded,
@@ -239,7 +223,7 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneRegistration);
+      expect(state.value).toEqual(States.phoneIdentification);
 
       state = machine.send({
         type: Events.identified,
@@ -254,40 +238,22 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneRegistration);
-
-      const challengeData = {
-        challengeToken: 'token',
-        challengeKind: ChallengeKind.sms,
-        scrubbedPhoneNumber: '+1 (***) ***-**00',
-      };
-      state = machine.send({
-        type: Events.challengeInitiated,
-        payload: {
-          challengeData,
-        },
-      });
-      expect(state.context.challenge).toEqual({
-        challengeData,
-      });
-      expect(state.value).toEqual(States.phoneVerification);
+      expect(state.value).toEqual(States.challenge);
 
       // Go back and change the phone number
       state = machine.send({
         type: Events.navigatedToPrevPage,
       });
-      expect(state.value).toEqual(States.phoneRegistration);
+      expect(state.value).toEqual(States.phoneIdentification);
 
       state = machine.send({
-        type: Events.challengeInitiated,
+        type: Events.identified,
         payload: {
-          challengeData,
+          phoneNumber: '+16509878899',
+          userFound: false,
         },
       });
-      expect(state.context.challenge).toEqual({
-        challengeData,
-      });
-      expect(state.value).toEqual(States.phoneVerification);
+      expect(state.value).toEqual(States.challenge);
     });
 
     it('editing email while registering phone', () => {
@@ -321,7 +287,7 @@ describe('Identify Machine Tests', () => {
         identifierSuffix: '#test1',
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneRegistration);
+      expect(state.value).toEqual(States.phoneIdentification);
 
       // Edit the email address
       state = machine.send({
@@ -364,7 +330,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual(States.challenge);
 
       state = machine.send({
         type: Events.challengeSucceeded,
@@ -399,24 +365,12 @@ describe('Identify Machine Tests', () => {
           hasSyncablePassKey: false,
         },
       });
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual(States.challenge);
 
       state = machine.send({
         type: Events.challengeFailed,
       });
-      expect(state.value).toEqual(States.biometricLoginRetry);
 
-      const smsChallenge = {
-        challengeToken: 'token',
-        challengeKind: ChallengeKind.sms,
-        scrubbedPhoneNumber: '+1 (***) ***-**00',
-      };
-      state = machine.send({
-        type: Events.challengeInitiated,
-        payload: {
-          challengeData: smsChallenge,
-        },
-      });
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: true,
@@ -425,9 +379,8 @@ describe('Identify Machine Tests', () => {
       expect(state.context.challenge).toEqual({
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: false,
-        challengeData: smsChallenge,
       });
-      expect(state.value).toEqual(States.phoneVerification);
+      expect(state.value).toEqual(States.challenge);
 
       state = machine.send({
         type: Events.challengeSucceeded,
@@ -438,7 +391,6 @@ describe('Identify Machine Tests', () => {
       expect(state.context.challenge).toEqual({
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: false,
-        challengeData: smsChallenge,
         authToken: 'authToken',
       });
       expect(state.value).toEqual(States.success);
@@ -465,19 +417,6 @@ describe('Identify Machine Tests', () => {
           hasSyncablePassKey: true,
         },
       });
-      expect(state.value).toEqual(States.emailIdentification);
-
-      const smsChallenge1 = {
-        challengeToken: 'token',
-        challengeKind: ChallengeKind.sms,
-        scrubbedPhoneNumber: '+1 (***) ***-**00',
-      };
-      state = machine.send({
-        type: Events.challengeInitiated,
-        payload: {
-          challengeData: smsChallenge1,
-        },
-      });
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: true,
@@ -486,28 +425,8 @@ describe('Identify Machine Tests', () => {
       expect(state.context.challenge).toEqual({
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
-        challengeData: smsChallenge1,
       });
-      expect(state.value).toEqual(States.phoneVerification);
-
-      const smsChallenge2 = {
-        challengeToken: 'token2',
-        challengeKind: ChallengeKind.sms,
-        scrubbedPhoneNumber: '+1 (***) ***-**00',
-        retryDisabledUntil: new Date('Aug 07 2022 18:00:00'),
-      };
-      state = machine.send({
-        type: Events.challengeInitiated,
-        payload: {
-          challengeData: smsChallenge2,
-        },
-      });
-      expect(state.context.challenge).toEqual({
-        availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
-        hasSyncablePassKey: true,
-        challengeData: smsChallenge2,
-      });
-      expect(state.value).toEqual(States.phoneVerification);
+      expect(state.value).toEqual(States.challenge);
 
       state = machine.send({
         type: Events.challengeSucceeded,
@@ -518,7 +437,6 @@ describe('Identify Machine Tests', () => {
       expect(state.context.challenge).toEqual({
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
-        challengeData: smsChallenge2,
         authToken: 'authToken',
       });
       expect(state.value).toEqual(States.success);

@@ -1,6 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
-import legacyValidateBootstrapData from 'src/pages/identify/utils/legacy-validate-bootstrap-data';
 import { assign, createMachine } from 'xstate';
 
 import { BootstrapData } from '../bifrost/types';
@@ -30,7 +29,7 @@ const createIdentifyMachine = ({
       predictableActionArguments: true,
       id: 'identify',
       initial: bootstrapData
-        ? States.legacyProcessBootstrapData
+        ? States.initBootstrap
         : States.emailIdentification,
       context: {
         device,
@@ -42,19 +41,6 @@ const createIdentifyMachine = ({
         challenge: {},
       },
       states: {
-        // Legacy bootstrap transitions
-        [States.legacyProcessBootstrapData]: {
-          entry: [Actions.assignLegacyBootstrapData],
-          on: {
-            [Events.legacyBootstrapDataProcessed]: {
-              target: States.phoneVerification,
-              actions: [Actions.assignChallengeData, Actions.assignUserFound],
-            },
-            [Events.legacyBootstrapDataProcessErrored]: {
-              target: States.emailIdentification,
-            },
-          },
-        },
         // New bootstrap transitions (not used in this machine for now)
         [States.initBootstrap]: {
           on: {
@@ -85,9 +71,6 @@ const createIdentifyMachine = ({
               target: States.emailIdentification,
               actions: [Actions.reset],
             },
-            [Events.challengeInitiated]: {
-              actions: [Actions.assignChallengeData],
-            },
             [Events.challengeSucceeded]: {
               target: States.success,
               actions: [Actions.assignAuthToken],
@@ -99,7 +82,7 @@ const createIdentifyMachine = ({
           on: {
             [Events.identified]: [
               {
-                target: States.phoneRegistration,
+                target: States.phoneIdentification,
                 actions: [
                   Actions.assignEmail,
                   Actions.assignUserFound,
@@ -108,13 +91,14 @@ const createIdentifyMachine = ({
                   Actions.assignHasSyncablePassKey,
                 ],
                 description:
-                  'Transition to phone registration only if could not find user or cannot initiate a challenge',
+                  'Transition to phone registration only if could not find user or will not be able to initiate a challenge',
                 cond: (context, event) =>
                   !event.payload.userFound ||
-                  (!!event.payload.availableChallengeKinds &&
-                    !event.payload.availableChallengeKinds?.length),
+                  !event.payload.availableChallengeKinds ||
+                  event.payload.availableChallengeKinds.length === 0,
               },
               {
+                target: States.challenge,
                 actions: [
                   Actions.assignEmail,
                   Actions.assignUserFound,
@@ -124,22 +108,9 @@ const createIdentifyMachine = ({
                 ],
               },
             ],
-            [Events.challengeInitiated]: {
-              target: States.phoneVerification,
-              actions: [Actions.assignChallengeData],
-            },
-
-            [Events.challengeSucceeded]: {
-              target: States.success,
-              actions: [Actions.assignAuthToken],
-            },
-
-            [Events.challengeFailed]: {
-              target: States.biometricLoginRetry,
-            },
           },
         },
-        [States.phoneRegistration]: {
+        [States.phoneIdentification]: {
           on: {
             [Events.navigatedToPrevPage]: {
               target: States.emailIdentification,
@@ -149,6 +120,7 @@ const createIdentifyMachine = ({
               actions: [Actions.reset],
             },
             [Events.identified]: {
+              target: States.challenge,
               actions: [
                 Actions.assignPhone,
                 Actions.assignUserFound,
@@ -157,24 +129,13 @@ const createIdentifyMachine = ({
                 Actions.assignHasSyncablePassKey,
               ],
             },
-            [Events.challengeInitiated]: {
-              target: States.phoneVerification,
-              actions: [Actions.assignChallengeData],
-            },
-            [Events.challengeSucceeded]: {
-              target: States.success,
-              actions: [Actions.assignAuthToken],
-            },
-            [Events.challengeFailed]: {
-              target: States.biometricLoginRetry,
-            },
           },
         },
-        [States.phoneVerification]: {
+        [States.challenge]: {
           on: {
             [Events.navigatedToPrevPage]: [
               {
-                target: States.phoneRegistration,
+                target: States.phoneIdentification,
                 cond: context =>
                   !context.identify.userFound || !!context.identify.phoneNumber,
               },
@@ -182,22 +143,6 @@ const createIdentifyMachine = ({
                 target: States.emailIdentification,
               },
             ],
-            [Events.challengeInitiated]: {
-              actions: [Actions.assignChallengeData],
-            },
-
-            [Events.challengeSucceeded]: {
-              target: States.success,
-              actions: [Actions.assignAuthToken],
-            },
-          },
-        },
-        [States.biometricLoginRetry]: {
-          on: {
-            [Events.challengeInitiated]: {
-              target: States.phoneVerification,
-              actions: [Actions.assignChallengeData],
-            },
             [Events.challengeSucceeded]: {
               target: States.success,
               actions: [Actions.assignAuthToken],
@@ -216,44 +161,49 @@ const createIdentifyMachine = ({
     },
     {
       actions: {
-        // Legacy Bootstrap Actions
-        [Actions.assignLegacyBootstrapData]: assign(context => {
-          const { email, phoneNumber } = legacyValidateBootstrapData(
-            context.bootstrapData,
-          );
-          context.identify.phoneNumber = phoneNumber;
-          context.identify.email = email;
-          return context;
-        }),
-
-        // Other Actions
         [Actions.assignEmail]: assign((context, event) => {
           if (
-            event.type === Events.identified ||
-            event.type === Events.identifyFailed
+            event.type !== Events.identified &&
+            event.type !== Events.identifyFailed
           ) {
-            context.identify.email = event.payload.email;
+            return context;
           }
+          const { email } = event.payload;
+          if (!email) {
+            return context;
+          }
+          context.identify.email = email;
           return context;
         }),
         [Actions.assignPhone]: assign((context, event) => {
           if (
-            event.type === Events.identified ||
-            event.type === Events.identifyFailed
+            event.type !== Events.identified &&
+            event.type !== Events.identifyFailed
           ) {
-            context.identify.phoneNumber = event.payload.phoneNumber;
+            return context;
           }
+          const { phoneNumber } = event.payload;
+          if (!phoneNumber) {
+            return context;
+          }
+          context.identify.phoneNumber = phoneNumber;
           return context;
         }),
         [Actions.assignAvailableChallengeKinds]: assign((context, event) => {
-          if (event.type === Events.identified) {
+          if (
+            event.type === Events.identified &&
+            event.payload.availableChallengeKinds
+          ) {
             context.challenge.availableChallengeKinds =
               event.payload.availableChallengeKinds;
           }
           return context;
         }),
         [Actions.assignSuccessfulIdentifier]: assign((context, event) => {
-          if (event.type === Events.identified) {
+          if (
+            event.type === Events.identified &&
+            event.payload.successfulIdentifier
+          ) {
             context.identify.successfulIdentifier =
               event.payload.successfulIdentifier;
           }
@@ -267,20 +217,8 @@ const createIdentifyMachine = ({
           return context;
         }),
         [Actions.assignUserFound]: assign((context, event) => {
-          if (
-            event.type === Events.identified ||
-            event.type === Events.legacyBootstrapDataProcessed
-          ) {
+          if (event.type === Events.identified) {
             context.identify.userFound = event.payload.userFound;
-          }
-          return context;
-        }),
-        [Actions.assignChallengeData]: assign((context, event) => {
-          if (
-            event.type === Events.legacyBootstrapDataProcessed ||
-            event.type === Events.challengeInitiated
-          ) {
-            context.challenge.challengeData = event.payload.challengeData;
           }
           return context;
         }),

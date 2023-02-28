@@ -1,6 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  ChallengeData,
   ChallengeKind,
   Identifier,
   OnboardingConfig,
@@ -9,20 +8,11 @@ import {
 import { BootstrapData } from '../bifrost/types';
 
 export enum States {
-  // Legacy Bootstrap States
-  legacyProcessBootstrapData = 'legacyProcessBootstrapData',
-
-  // New Bootstrap States
   initBootstrap = 'initBootstrap',
   bootstrapChallenge = 'bootstrapChallenge',
-
-  // Other Events
-  processBootstrapData = 'processBootstrapData',
-  sandboxOutcome = 'sandboxOutcome',
   emailIdentification = 'emailIdentification',
-  phoneRegistration = 'phoneRegistration',
-  phoneVerification = 'phoneVerification',
-  biometricLoginRetry = 'biometricLoginRetry',
+  phoneIdentification = 'phoneIdentification',
+  challenge = 'challenge',
   success = 'success',
 }
 
@@ -45,33 +35,20 @@ export type MachineIdentifyContext = {
 export type MachineChallengeContext = {
   hasSyncablePassKey?: boolean;
   availableChallengeKinds?: ChallengeKind[];
-  challengeData?: ChallengeData;
   authToken?: string;
 };
 
 export enum Events {
-  // Legacy Bootstrap Events
-  legacyBootstrapDataProcessed = 'legacyBootstrapDataProcessed',
-  legacyBootstrapDataProcessErrored = 'legacyBootstrapDataProcessErrored',
-
-  // New Bootstrap Events
   bootstrapDataInvalid = 'bootstrapDataInvalid',
-
-  // Other Events
   identified = 'identified',
   identifyFailed = 'identifyFailed',
   identifyReset = 'identifyReset',
   navigatedToPrevPage = 'navigatedToPrevPage',
-  challengeInitiated = 'challengeInitiated',
   challengeSucceeded = 'challengeSucceeded',
   challengeFailed = 'challengeFailed',
 }
 
 export enum Actions {
-  // Legacy Bootstrap Actions
-  assignLegacyBootstrapData = 'assignLegacyBootstrapData',
-
-  // Other Actions
   assignSandboxOutcome = 'assignSandboxOutcome',
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
@@ -90,22 +67,9 @@ export type MachineEvents =
   | ChallengeEvents
   | OtherEvents;
 
-type BootstrapEvents =
-  // Legacy Bootstrap Events
-  | {
-      type: Events.legacyBootstrapDataProcessed;
-      payload: {
-        userFound: boolean;
-        challengeData: ChallengeData;
-      };
-    }
-  | {
-      type: Events.legacyBootstrapDataProcessErrored;
-    }
-  // New Bootstrap Events
-  | {
-      type: Events.bootstrapDataInvalid;
-    };
+type BootstrapEvents = {
+  type: Events.bootstrapDataInvalid;
+};
 
 type IdentifyEvents =
   | {
@@ -129,12 +93,6 @@ type IdentifyEvents =
   | { type: Events.identifyReset };
 
 type ChallengeEvents =
-  | {
-      type: Events.challengeInitiated;
-      payload: {
-        challengeData: ChallengeData;
-      };
-    }
   | {
       type: Events.challengeSucceeded;
       payload: {

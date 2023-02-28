@@ -16,6 +16,18 @@
       "yes": "Yes",
       "no": "No"
     },
+    "login-challenge": {
+      "sms-challenge": {
+        "title-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "title-without-phone": "Enter the 6-digit code sent to your phone.",
+        "toast": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
+          }
+        }
+      }
+    },
     "login-challenge-segmented-control": {
       "sms": "SMS",
       "biometric": "Biometric",
@@ -33,17 +45,11 @@
     },
     "sms-challenge-verification": {
       "error": "Incorrect code",
-      "loading": "Verifying...",
+      "verifying": "Verifying...",
       "success": "Success!",
       "resend-button": {
         "cta": "Resend code",
-        "disabled": "Please wait {{seconds}} seconds to resend it...",
-        "toast": {
-          "success": {
-            "title": "Success",
-            "description": "We sent you a new code."
-          }
-        }
+        "disabled": "Please wait {{seconds}} seconds to resend it..."
       }
     }
   },
@@ -79,14 +85,7 @@
     },
     "bootstrap-challenge": {
       "title": "Welcome back!",
-      "subtitle": "We found a Footprint account with the information you provided to {{tenantName}}.",
-      "sms-challenge": {
-        "title": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
-        "resend-success": {
-          "title": "Success",
-          "description": "We sent you a new code."
-        }
-      }
+      "subtitle": "We found a Footprint account with the information you provided to {{tenantName}}."
     },
     "email-identification": {
       "header": {
@@ -102,29 +101,9 @@
           }
         },
         "cta": "Continue"
-      },
-      "challenge-picker": {
-        "header": "Welcome back! 🎉",
-        "title": "How would you like to continue?",
-        "sms": {
-          "title": "SMS",
-          "description": "Get a text message on your phone"
-        },
-        "biometric": {
-          "title": "Biometric",
-          "description-ios": "Use FaceID or TouchID",
-          "description-default": "Use device biometrics"
-        },
-        "cta": "Continue"
       }
     },
-    "biometric-login-retry": {
-      "title": "Biometrics not recognized",
-      "subtitle": "You can try biometrics again or you can use your phone number to complete your authentication.",
-      "cta": "Try biometrics again",
-      "use-phone": "Use phone number"
-    },
-    "phone-registration": {
+    "phone-identification": {
       "title": "Let's verify your identity! 😊",
       "subtitle": "Enter your phone number to proceed.",
       "email-card": {
@@ -142,31 +121,17 @@
         "cta": "Continue"
       }
     },
-    "phone-verification": {
+    "challenge": {
       "title": {
         "new-user": "Let's verify your identity!",
         "existing-user": "Welcome back! 🎉"
       },
-      "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
-      "form": {
-        "error": {
-          "description": "Incorrect verification code"
-        },
-        "loading": {
-          "description": "Verifying..."
-        },
-        "success": {
-          "onboarding-description": "Phone verified",
-          "authentication-description": "Success! Logging in..."
-        },
-        "resend-code": {
-          "cta": "Resend code",
-          "disabled": "Please wait {{seconds}} seconds to resend it...",
-          "toast": {
-            "success": {
-              "title": "Success",
-              "description": "We sent you a new code."
-            }
+      "signup-challenge": {
+        "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "toast": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
           }
         }
       }

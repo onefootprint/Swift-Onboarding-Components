@@ -6,21 +6,20 @@ import {
   UserDataAttribute,
 } from '@onefootprint/types';
 import React from 'react';
-import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import SandboxOutcomeFooter from 'src/components/sandbox-outcome-footer';
-import { Events } from 'src/hooks/use-identify-machine';
-import LegalFooter from 'src/pages/identify/components/legal-footer';
+import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
 
 import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
-import EmailIdentificationForm from './components/email-identification-form';
-import EmailIdentificationHeader from './components/email-identification-header';
+import PhoneIdentificationEmailPreview from './components/phone-identification-email-preview';
+import PhoneIdentificationForm from './components/phone-identification-form';
+import PhoneIdentificationHeader from './components/phone-identification-header';
 
-type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
+type FormData = Required<Pick<UserData, UserDataAttribute.phoneNumber>>;
 
-const EmailIdentification = () => {
+const PhoneIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { email },
+    identify: { phoneNumber, email },
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -28,10 +27,11 @@ const EmailIdentification = () => {
   const idSuffix = useIdentifierSuffix();
 
   const handleSubmit = (formData: FormData) => {
-    const emailFromForm = formData[UserDataAttribute.email];
-    const emailWithSuffix = idSuffix.append(emailFromForm);
+    const phoneFromForm = formData[UserDataAttribute.phoneNumber];
+    const phoneNumberWithSuffix = idSuffix.append(phoneFromForm);
+    // First we try to identify the user via phone number before sending any challenges
     identifyMutation.mutate(
-      { identifier: { email: emailWithSuffix } },
+      { identifier: { phoneNumber: phoneNumberWithSuffix } },
       {
         onSuccess: ({
           userFound,
@@ -41,11 +41,11 @@ const EmailIdentification = () => {
           send({
             type: Events.identified,
             payload: {
+              phoneNumber: phoneFromForm,
               userFound,
-              email: emailFromForm,
-              successfulIdentifier: { email: emailWithSuffix },
-              hasSyncablePassKey,
+              successfulIdentifier: { phoneNumber: phoneNumberWithSuffix },
               availableChallengeKinds,
+              hasSyncablePassKey,
             },
           });
         },
@@ -57,18 +57,25 @@ const EmailIdentification = () => {
     );
   };
 
+  const handleChangeEmail = () => {
+    send({ type: Events.identifyReset });
+  };
+
   return (
     <>
-      <EmailIdentificationHeader />
-      <EmailIdentificationForm
-        defaultEmail={email}
+      <PhoneIdentificationHeader />
+      <PhoneIdentificationEmailPreview
+        email={email}
+        onChange={handleChangeEmail}
+      />
+      <PhoneIdentificationForm
         onSubmit={handleSubmit}
         isLoading={isLoading}
+        defaultPhone={phoneNumber}
       />
-      <LegalFooter />
       <SandboxOutcomeFooter />
     </>
   );
 };
 
-export default EmailIdentification;
+export default PhoneIdentification;

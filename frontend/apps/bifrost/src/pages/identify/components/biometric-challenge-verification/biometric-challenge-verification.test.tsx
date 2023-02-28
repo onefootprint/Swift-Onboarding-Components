@@ -7,13 +7,13 @@ import BiometricChallengeVerification, {
 
 describe('<BiometricChallengeVerification />', () => {
   const renderVerification = ({
-    isLoading,
+    isWaiting: isLoading,
     isSuccess,
     onComplete = () => {},
   }: Partial<BiometricChallengeVerificationProps>) =>
     customRender(
       <BiometricChallengeVerification
-        isLoading={isLoading}
+        isWaiting={isLoading}
         isSuccess={isSuccess}
         onComplete={onComplete}
       />,
@@ -26,7 +26,7 @@ describe('<BiometricChallengeVerification />', () => {
   });
 
   it('renders loading correctly', () => {
-    renderVerification({ isLoading: true });
+    renderVerification({ isWaiting: true });
     expect(
       screen.queryByRole('button', { name: 'Launch biometrics' }),
     ).toBeNull();
