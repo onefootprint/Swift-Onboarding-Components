@@ -26,6 +26,7 @@ const useRows = (
     const value = kycData[attribute];
     const isFilled = user.identityDataAttributes.includes(attribute);
     const canAccess =
+      !user.isPortable ||
       user.onboarding?.canAccessDataAttributes.includes(attribute);
     const isDataDecrypted = !!vaultData.kycData[attribute];
 

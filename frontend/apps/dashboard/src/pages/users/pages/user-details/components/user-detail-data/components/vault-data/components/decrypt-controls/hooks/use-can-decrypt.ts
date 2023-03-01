@@ -8,10 +8,15 @@ const useCanDecrypt = () => {
   const userQuery = useUser(userId);
   const { hasDecryptionPermissionByAttribute } = usePermissions();
 
+  if (userQuery.data?.isPortable === false) {
+    // Non-portable vaults belong to the tenant, so they can do anything
+    return true;
+  }
   if (
     !userQuery.data?.onboarding ||
     userQuery.data?.status === UserStatus.incomplete
   ) {
+    // If there's no onboarding, or the status is incopmlete, can't decrypt
     return false;
   }
   const { canAccessDataAttributes, canAccessIdentityDocumentImages } =
