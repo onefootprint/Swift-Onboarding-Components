@@ -4,7 +4,8 @@ use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::{FirmEmployeeSession, TenantRbAuthContext};
 use crate::auth::AuthError;
 use crate::errors::ApiResult;
-use crate::types::{EmptyResponse, JsonApiResponse};
+use crate::types::{JsonApiResponse, ResponseData};
+use crate::utils::db2api::DbToApi;
 use crate::State;
 use db::models::tenant::Tenant;
 use newtypes::{OrgMemberEmail, TenantId, INTEGRATION_TEST_USER_EMAIL};
@@ -25,7 +26,7 @@ async fn post(
     state: web::Data<State>,
     auth: TenantRbAuthContext,
     request: Json<AssumeRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Organization> {
     let firm_employee = auth.firm_employee_user()?;
     let session_sealing_key = state.session_sealing_key.clone();
     let tenant_id = request.into_inner().tenant_id;
@@ -37,20 +38,22 @@ async fn post(
         return Err(AuthError::NotFirmEmployee.into());
     }
 
-    state
+    let tenant = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             // Verify the tenant_id is real
-            Tenant::get(conn, &tenant_id)?;
+            let tenant = Tenant::get(conn, &tenant_id)?;
 
             let session = FirmEmployeeSession {
                 tenant_user_id: firm_employee.id,
                 tenant_id,
             };
             auth.update_session(conn, &session_sealing_key, AuthSessionData::FirmEmployee(session))?;
-            Ok(())
+            Ok(tenant)
         })
         .await??;
 
-    EmptyResponse::ok().json()
+    Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
+        tenant,
+    ))))
 }
