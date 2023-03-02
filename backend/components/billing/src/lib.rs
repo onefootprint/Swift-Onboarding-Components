@@ -52,12 +52,6 @@ impl BillingClient {
         tenant: &Tenant,
         environment: String,
     ) -> BResult<StripeCustomerId> {
-        let description = match (tenant.website_url.as_ref(), tenant.company_size.as_ref()) {
-            (Some(url), Some(size)) => Some(format!("{}, {}", url, size)),
-            (Some(a), None) => Some(a.to_string()),
-            (None, Some(a)) => Some(format!("{}", a)),
-            (None, None) => None,
-        };
         // TODO use search API instead of paginating
         let params = ListCustomers {
             limit: Some(100),
@@ -74,12 +68,13 @@ impl BillingClient {
             let extra_metadata = [
                 ("tenant.id".to_string(), tenant.id.to_string()),
                 ("environment".to_string(), environment),
+                ("org_name".to_string(), tenant.name.clone()),
             ];
             let metadata = extra_metadata.into_iter().chain(managed_metadata()).collect();
             let new_customer = CreateCustomer {
                 name: Some(&tenant.name),
                 email: None,
-                description: description.as_deref(),
+                description: tenant.website_url.as_deref(),
                 // Add information to help us look up the customer
                 metadata: Some(metadata),
                 ..Default::default()
