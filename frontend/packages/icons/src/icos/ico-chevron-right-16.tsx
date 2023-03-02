@@ -20,11 +20,10 @@ const IcoChevronRight16 = ({
       aria-hidden="true"
     >
       <path
-        d="M6.25 4.75 9.75 8l-3.5 3.25"
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M5.7 4.24a.75.75 0 0 1 1.06-.04l3.5 3.25a.75.75 0 0 1 0 1.1l-3.5 3.25a.75.75 0 1 1-1.02-1.1L8.648 8 5.74 5.3a.75.75 0 0 1-.04-1.06Z"
+        fill={theme.color[color]}
       />
     </svg>
   );

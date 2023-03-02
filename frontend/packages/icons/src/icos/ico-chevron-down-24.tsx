@@ -20,11 +20,10 @@ const IcoChevronDown24 = ({
       aria-hidden="true"
     >
       <path
-        d="m16 9.85-4 4.308L8 9.85"
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.49 9.3a.75.75 0 0 1 1.06.04L12 13.056l3.45-3.716a.75.75 0 1 1 1.1 1.02l-4 4.308a.75.75 0 0 1-1.1 0l-4-4.308a.75.75 0 0 1 .04-1.06Z"
+        fill={theme.color[color]}
       />
     </svg>
   );
