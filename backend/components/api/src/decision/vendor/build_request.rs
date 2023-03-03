@@ -1,5 +1,5 @@
 use crate::enclave_client::EnclaveClient;
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{errors::ApiError, State};
 use crypto::aead::AeadSealedBytes;
 use db::DbPool;
@@ -19,7 +19,7 @@ pub async fn build_idv_data_from_verification_request(
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
     let uvw = db_pool
-        .db_query(|conn| UserVaultWrapper::build(conn, UvwArgs::Idv(request)))
+        .db_query(|conn| VaultWrapper::build(conn, VwArgs::Idv(request)))
         .await??;
 
     let all_identity_data_kinds: Vec<_> = IdentityDataKind::iter().collect();
@@ -67,17 +67,17 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     let (doc, ref_id, uvw) = state
         .db_pool
         .db_query(
-            move |conn| -> Result<(IdentityDocument, Option<String>, UserVaultWrapper<_>), ApiError> {
+            move |conn| -> Result<(IdentityDocument, Option<String>, VaultWrapper<_>), ApiError> {
                 let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
                 // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
                 // This would allow us to re-use the uvw util to decrypt an image
-                let uvw = UserVaultWrapper::build(conn, UvwArgs::Idv(request))?;
+                let uvw = VaultWrapper::build(conn, VwArgs::Idv(request))?;
                 Ok((doc, ref_id.ref_id, uvw))
             },
         )
         .await??;
 
-    let images = crate::utils::user_vault_wrapper::identity_document::fetch_image(state, doc).await?;
+    let images = crate::utils::vault_wrapper::identity_document::fetch_image(state, doc).await?;
     let unsealed_key = uvw.decrypt_data_keys(state, vec![images.e_data_key]).await?.pop();
     let Some(key) = unsealed_key else {
         return Err(ApiError::AssertionError("Could not decrypt data key".into()));

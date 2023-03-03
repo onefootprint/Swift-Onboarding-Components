@@ -17,7 +17,7 @@ use super::{
 };
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
-    utils::user_vault_wrapper::UserVaultWrapper,
+    utils::vault_wrapper::VaultWrapper,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use strum::IntoEnumIterator;
@@ -59,7 +59,7 @@ pub async fn save_final_decision(
 
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision.decision_status == DecisionStatus::Pass {
-                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
+                let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
                 let seqno = uvw.commit_identity_data(conn)?;
                 Some(seqno)
             } else {

@@ -10,7 +10,7 @@ use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::session::AuthSession;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 
 use chrono::Duration;
@@ -192,7 +192,7 @@ async fn create_new_user_vault(
     let user = state
         .db_pool
         .db_transaction(|conn| -> ApiResult<_> {
-            let uv = UserVaultWrapper::create_user_vault(conn, user_info, ob_config, phone_info)?;
+            let uv = VaultWrapper::create_user_vault(conn, user_info, ob_config, phone_info)?;
             Ok(uv.into_inner())
         })
         .await?;

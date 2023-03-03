@@ -24,7 +24,7 @@ pub struct VerificationRequest {
     pub onboarding_id: OnboardingId,
     pub vendor_api: VendorAPI,
     // The current seqno when this VerificationRequest was created.
-    // This is used to reconstruct the UserVaultWrapper at the time the request was sent.
+    // This is used to reconstruct the VaultWrapper at the time the request was sent.
     pub uvw_snapshot_seqno: DataLifetimeSeqno,
     // If we are verifying an identity document, we want to know exactly which one we were verifying since there
     // could be multiple in the vault, seqno doesn't help us

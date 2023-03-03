@@ -16,7 +16,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
         &tokio_test::block_on(async { crate::utils::mock_enclave::StateWithMockEnclave::init().await }).state;
 
     let onboarding_id = OnboardingId::from_str("ob_123").unwrap();
-    let (_, _, uvw, _, _) = fixtures::user_vault_wrapper::create(conn, false);
+    let (_, _, uvw, _, _) = fixtures::vault_wrapper::create(conn, false);
     assert!(!uvw.user_vault.is_live);
     // it doesn't matter what we pass here, just don't want it to be true
     let phone_number = PhoneNumber::parse("+1 123 456 7890#idv".into()).unwrap();
@@ -33,7 +33,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     //
 
     // create a live UV and ob_config
-    let (su, ob_config, uvw, tenant, _) = fixtures::user_vault_wrapper::create(conn, true);
+    let (su, ob_config, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
     assert!(uvw.user_vault.is_live);
     // from the things we set up with UVW, create an onboarding
     let ob = db::tests::fixtures::onboarding::create(conn, su.id, ob_config.id);
@@ -59,7 +59,7 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     //
 
     // create a live UV and ob_config
-    let (su, ob_config, uvw, tenant, _) = fixtures::user_vault_wrapper::create(conn, true);
+    let (su, ob_config, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
     assert!(uvw.user_vault.is_live);
     // from the things we set up with UVW, create an onboarding
     let ob = db::tests::fixtures::onboarding::create(conn, su.id, ob_config.id);

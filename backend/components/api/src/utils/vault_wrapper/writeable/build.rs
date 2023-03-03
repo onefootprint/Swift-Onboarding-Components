@@ -3,12 +3,12 @@ use newtypes::{Locked, ScopedUserId};
 
 use crate::{
     errors::ApiResult,
-    utils::user_vault_wrapper::{Person, UserVaultWrapper, UvwArgs},
+    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
 };
 
 use super::WriteableUvw;
 
-impl UserVaultWrapper<Person> {
+impl VaultWrapper<Person> {
     /// Builds a locked UVW that sees portable data AND speculative data for the tenant.
     /// This should be used during onboarding operations in order to allow the tenant to see
     /// speculative data that has been added by previous operations
@@ -18,7 +18,7 @@ impl UserVaultWrapper<Person> {
     ) -> ApiResult<WriteableUvw> {
         // Lock the UserVault in this transaction, then build the UVW
         UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
-        let uvw = Self::build(conn, UvwArgs::Tenant(scoped_user_id))?;
+        let uvw = Self::build(conn, VwArgs::Tenant(scoped_user_id))?;
         let ob_uvw = WriteableUvw {
             uvw: Locked::new(uvw),
             scoped_user_id: scoped_user_id.clone(),

@@ -18,7 +18,7 @@ use newtypes::{
 use super::vendor;
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
-    utils::user_vault_wrapper::{Person, UserVaultWrapper},
+    utils::vault_wrapper::{Person, VaultWrapper},
     State,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -28,7 +28,7 @@ type ShouldInitiateVerificationRequests = bool;
 #[tracing::instrument(skip_all)]
 pub async fn should_initiate_idv_or_else_setup_test_fixtures(
     state: &State,
-    uvw: UserVaultWrapper<Person>,
+    uvw: VaultWrapper<Person>,
     ob_id: OnboardingId,
     should_setup_test_fixtures: bool,
 ) -> ApiResult<ShouldInitiateVerificationRequests> {
@@ -93,7 +93,7 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
 pub async fn should_initiate_sandbox_and_setup(
     state: &State,
     ob_id: OnboardingId,
-    uvw: UserVaultWrapper<Person>,
+    uvw: VaultWrapper<Person>,
     phone_number: PhoneNumber,
     should_setup_test_fixtures: bool,
 ) -> ApiResult<bool> {
@@ -120,7 +120,7 @@ pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> (Decisi
 pub async fn should_initiate_prod_and_setup(
     state: &State,
     ob_id: OnboardingId,
-    uvw: UserVaultWrapper<Person>,
+    uvw: VaultWrapper<Person>,
     tenant_id: TenantId,
     ff_client: &impl FeatureFlagClient,
     should_setup_test_fixtures: bool,
@@ -144,7 +144,7 @@ async fn setup_test_fixtures(
     ob_id: OnboardingId,
     create_manual_review: bool,
     decision_status: DecisionStatus,
-    uvw: UserVaultWrapper<Person>,
+    uvw: VaultWrapper<Person>,
 ) -> ApiResult<()> {
     state
         .db_pool
@@ -177,7 +177,7 @@ async fn setup_test_fixtures(
             let result = VerificationResult::create(conn, request.id, raw_response.into(), e_response)?;
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision_status == DecisionStatus::Pass {
-                let uvw = UserVaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
+                let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
                 let seqno = uvw.commit_identity_data(conn)?;
                 Some(seqno)
             } else {

@@ -1,7 +1,7 @@
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
 use crate::auth::{tenant::TenantSessionAuth, Either};
 use crate::types::{JsonApiResponse, ResponseData};
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{errors::ApiError, State};
 use actix_web::web::Query;
 use db::models::scoped_user::ScopedUser;
@@ -48,7 +48,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = UserVaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })
         .await??;

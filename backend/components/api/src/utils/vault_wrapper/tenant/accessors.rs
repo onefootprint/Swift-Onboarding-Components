@@ -52,7 +52,7 @@ impl TenantUvw {
         id_docs
         .chain(id_data)
         .chain(kv_data)
-        // Reuse the tenant auth codepaths to filter out DataIdentifiers on this UserVaultWrapper
+        // Reuse the tenant auth codepaths to filter out DataIdentifiers on this VaultWrapper
         // that are visible given the approved onboarding configurations
         .filter(|x| {
             CanDecrypt::single(x.clone()).or_admin().is_met(&can_see_scopes)

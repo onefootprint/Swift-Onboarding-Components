@@ -4,7 +4,7 @@ pub use accessors::*;
 use db::models::user_vault::UserVault;
 use newtypes::DataLifetimeSeqno;
 
-use self::uvw_data::UvwData;
+use self::vw_data::VwData;
 
 mod accessors;
 mod args;
@@ -13,10 +13,10 @@ mod build;
 mod business;
 mod decrypt;
 mod tenant;
-mod uvw_data;
+mod vw_data;
 mod writeable;
 
-pub use args::UvwArgs;
+pub use args::VwArgs;
 pub use tenant::*;
 pub use writeable::*;
 
@@ -24,7 +24,7 @@ pub use writeable::*;
 pub struct Person;
 #[derive(Clone)]
 pub struct Business;
-/// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
+/// VaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
 /// about a particular user.
 ///
 /// In other words, the UserVault is a major dividing line in Footprint's product.
@@ -34,10 +34,10 @@ pub struct Business;
 ///         * it is the information we send to vendors (a UVW gets "serialized" in a `VerificationRequest` in the decision engine)
 ///         * it is the source of truth to know what we datums we have collected from a User
 #[derive(Debug, Clone)]
-pub struct UserVaultWrapper<Type> {
+pub struct VaultWrapper<Type> {
     pub user_vault: UserVault,
-    speculative: UvwData<Type>,
-    portable: UvwData<Type>,
+    speculative: VwData<Type>,
+    portable: VwData<Type>,
     // The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.
     _seqno: Option<DataLifetimeSeqno>,
     // Represents whether we have fetched the appropriate data

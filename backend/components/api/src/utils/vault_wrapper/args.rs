@@ -11,10 +11,10 @@ use newtypes::{DataLifetimeSeqno, ScopedUserId, UserVaultId};
 ///   - If the flow needs access to portable data, has the requester been granted access to see the portable data?
 ///     For example, a tenant shouldn't see portable data they didn't ask to collect (via an authorized OB config)
 ///
-/// The UvwArgs variants below are used to construct a UserVaultWrapper specific to the use case.
-pub enum UvwArgs<'a> {
+/// The VwArgs variants below are used to construct a VaultWrapper specific to the use case.
+pub enum VwArgs<'a> {
     /// Used to build a UVW that sees ALL portable data and speculative data
-    /// Allows reconstructing a UserVaultWrapper at the time a VerificationRequest was made
+    /// Allows reconstructing a VaultWrapper at the time a VerificationRequest was made
     /// This is only used during the onboarding process
     Idv(VerificationRequest),
     /// Used to build a UVW for a user that sees ALL portable data, or if it's non-portable, just speculative.
@@ -29,7 +29,7 @@ pub enum UvwArgs<'a> {
 
 type Args = (UserVault, Option<ScopedUserId>, Option<DataLifetimeSeqno>);
 
-impl<'a> UvwArgs<'a> {
+impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
         let args = match self {
             Self::Idv(req) => {
@@ -48,7 +48,7 @@ impl<'a> UvwArgs<'a> {
         };
         tracing::info!(
             user_vault_id=%args.0.id, scoped_user_id=%format!("{:?}", args.1), seqno=%format!("{:?}", args.2.as_ref()),
-            "Building UserVaultWrapper"
+            "Building VaultWrapper"
         );
         Ok(args)
     }

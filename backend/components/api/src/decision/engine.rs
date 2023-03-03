@@ -4,7 +4,7 @@ use crate::{
     enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     metrics,
-    utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs},
+    utils::vault_wrapper::{VaultWrapper, VwArgs},
     State,
 };
 
@@ -306,7 +306,7 @@ pub async fn perform_pre_run_operations(
 ) -> Result<ShouldRunDecisionEngine, ApiError> {
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::Tenant(&ob.scoped_user_id)))
+        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&ob.scoped_user_id)))
         .await??;
 
     let should_initiate_verification_requests =

@@ -1,7 +1,7 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::State;
 use db::models::email::Email;
 use db::models::phone_number::PhoneNumber;
@@ -57,7 +57,7 @@ pub async fn get(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::User(user_auth.user_vault_id()))?;
+            let uvw = VaultWrapper::build(conn, VwArgs::User(user_auth.user_vault_id()))?;
             Ok(uvw)
         })
         .await??;

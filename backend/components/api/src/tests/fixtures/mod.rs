@@ -1,2 +1,2 @@
 
-pub mod user_vault_wrapper;
+pub mod vault_wrapper;

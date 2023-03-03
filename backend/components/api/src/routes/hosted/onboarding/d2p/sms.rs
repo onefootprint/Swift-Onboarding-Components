@@ -1,7 +1,7 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -37,12 +37,12 @@ pub async fn handler(
                 // If the auth token is during an onboarding session, create a UVW that sees all
                 // speculative data for the tenant in order to see a speculative phone number
                 // that was added by this tenant.
-                UvwArgs::Tenant(&su.id)
+                VwArgs::Tenant(&su.id)
             } else {
                 // Otherwise, create a UVW that only sees portable data
-                UvwArgs::User(uv_id)
+                VwArgs::User(uv_id)
             };
-            let uvw = UserVaultWrapper::build(conn, args)?;
+            let uvw = VaultWrapper::build(conn, args)?;
             Ok(uvw)
         })
         .await??;

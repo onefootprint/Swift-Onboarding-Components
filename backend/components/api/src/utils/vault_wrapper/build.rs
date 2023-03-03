@@ -1,6 +1,6 @@
-use super::uvw_data::UvwData;
-use super::UvwArgs;
-use super::{Person, UserVaultWrapper};
+use super::vw_data::VwData;
+use super::VwArgs;
+use super::{Person, VaultWrapper};
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
@@ -25,7 +25,7 @@ use newtypes::DataPriority;
 use newtypes::Locked;
 use std::marker::PhantomData;
 
-impl<Type> UserVaultWrapper<Type> {
+impl<Type> VaultWrapper<Type> {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn build_internal(
         user_vault: UserVault,
@@ -38,7 +38,7 @@ impl<Type> UserVaultWrapper<Type> {
         lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<Self> {
         let (portable, speculative) =
-            UvwData::partition(uvd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
+            VwData::partition(uvd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
         let result = Self {
             user_vault,
             portable,
@@ -50,7 +50,7 @@ impl<Type> UserVaultWrapper<Type> {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn build(conn: &mut PgConn, args: UvwArgs) -> ApiResult<Self> {
+    pub fn build(conn: &mut PgConn, args: VwArgs) -> ApiResult<Self> {
         let (uv, su_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(seqno) = seqno {
             // We are reconstructing the UVW as it appeared at a given seqno
@@ -87,7 +87,7 @@ impl<Type> UserVaultWrapper<Type> {
     }
 }
 
-impl UserVaultWrapper<Person> {
+impl VaultWrapper<Person> {
     /// Custom util function to create a user vault, its phone number, and optionally associate it
     /// with a provided ob_config
     pub fn create_user_vault(

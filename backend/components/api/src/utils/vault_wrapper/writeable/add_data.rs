@@ -20,10 +20,10 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
-/// we have built the UserVaultWrapper for a specific tenant.
-/// These are the publically accessible utils to update data on a UserVaultWrapper.
+/// we have built the VaultWrapper for a specific tenant.
+/// These are the publically accessible utils to update data on a VaultWrapper.
 /// They use the private, xxx_unsafe methods, which cannot be exposed publically because they don't
-/// take ownership over the UserVaultWrapper that is potentially stale after an update
+/// take ownership over the VaultWrapper that is potentially stale after an update
 impl WriteableUvw {
     pub fn update_custom_data(
         self, // consume self, since we don't want stale data getting used
@@ -227,7 +227,7 @@ impl WriteableUvw {
 
 #[cfg(test)]
 mod test {
-    use crate::{errors::ApiResult, utils::user_vault_wrapper::WriteableUvw};
+    use crate::{errors::ApiResult, utils::vault_wrapper::WriteableUvw};
     use db::TxnPgConn;
     use newtypes::{put_data_request::PutDataRequest, DataIdentifier, Fingerprint, PiiString};
     use std::collections::HashMap;

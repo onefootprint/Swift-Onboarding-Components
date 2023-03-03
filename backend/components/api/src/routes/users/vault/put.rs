@@ -4,7 +4,7 @@ use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -60,7 +60,7 @@ pub async fn put(
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
-            let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
+            let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
             uvw.put_data(conn, request, fingerprints, false)?;
 
             // Create an access event to show data was added

@@ -1,6 +1,6 @@
 use crate::{
     errors::{ApiError, ApiResult},
-    utils::user_vault_wrapper::{Person, UserVaultWrapper},
+    utils::vault_wrapper::{Person, VaultWrapper},
 };
 
 use db::{
@@ -19,12 +19,12 @@ pub mod vendor_result;
 pub mod vendor_trait;
 pub mod verification_result;
 
-/// Build verification requests from the UserVaultWrapper and save.
+/// Build verification requests from the VaultWrapper and save.
 /// We save so that if something happens, we can always replay the requests
 #[tracing::instrument(skip(conn, uvw))]
 pub fn build_verification_requests_and_checkpoint(
     conn: &mut TxnPgConn,
-    uvw: &UserVaultWrapper<Person>,
+    uvw: &VaultWrapper<Person>,
     ob_id: &OnboardingId,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     let ob = Onboarding::lock(conn, ob_id)?;
@@ -39,7 +39,7 @@ pub fn build_verification_requests_and_checkpoint(
     Ok(requests_to_initiate)
 }
 
-pub fn desired_vendor_apis(uvw: &UserVaultWrapper<Person>) -> ApiResult<Vec<VendorAPI>> {
+pub fn desired_vendor_apis(uvw: &VaultWrapper<Person>) -> ApiResult<Vec<VendorAPI>> {
     // From the data in the vault, figure out which vendors we need to send to
     let vendor_apis =
         idv::requirements::available_vendor_apis(uvw.get_populated_identity_fields().as_slice());

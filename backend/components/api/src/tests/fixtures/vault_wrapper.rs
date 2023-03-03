@@ -12,15 +12,17 @@ use db::{
     tests::prelude::TestPgConn,
 };
 
-use crate::utils::user_vault_wrapper::{Person, UserVaultWrapper, UvwArgs};
-pub type UvwSetup = (
+use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
+
+pub type VwSetup = (
     ScopedUser,
     ObConfiguration,
-    UserVaultWrapper<Person>,
+    VaultWrapper<Person>,
     Tenant,
     Locked<UserVault>,
 );
-pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> UvwSetup {
+
+pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     let uv = db::tests::fixtures::user_vault::create(conn, uv_is_live);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, uv_is_live);
@@ -53,7 +55,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> UvwSetup {
     (
         su.clone(),
         ob_config,
-        UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap(),
+        VaultWrapper::build(conn, VwArgs::Tenant(&su.id)).unwrap(),
         tenant,
         uv,
     )

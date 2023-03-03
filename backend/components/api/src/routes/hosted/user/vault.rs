@@ -6,8 +6,8 @@ use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::email::send_email_challenge;
 use crate::utils::fingerprint::build_fingerprints;
-use crate::utils::user_vault_wrapper::checks::pre_add_data_checks;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::vault_wrapper::checks::pre_add_data_checks;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use newtypes::email::Email;
 use newtypes::put_data_request::PutDataRequest;
@@ -53,7 +53,7 @@ pub async fn put(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user_id = pre_add_data_checks(&user_auth, conn)?;
-            let uvw = UserVaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
+            let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
             // Enforce that sandbox emails/phones are used for sandbox users
             if let Some(is_live) = email_is_live {
                 if is_live != uvw.user_vault().is_live {

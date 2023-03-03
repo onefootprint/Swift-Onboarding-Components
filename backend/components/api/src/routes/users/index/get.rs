@@ -12,8 +12,8 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils;
 use crate::utils::db2api::DbToApi;
-use crate::utils::user_vault_wrapper::TenantUvw;
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::utils::vault_wrapper::TenantUvw;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_wire_types::IdentityDocumentKindForUser;
 use api_wire_types::ListUsersRequest;
@@ -117,7 +117,7 @@ pub async fn get(
                 (page_size + 1) as i64,
             )?;
             let count = db::scoped_user::count_authorized_for_tenant(conn, query_params).map(Some)?;
-            let uvws = UserVaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
+            let uvws = VaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
             let scoped_user_ids: Vec<_> = scoped_users.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
             Ok((scoped_users, obs, uvws, count))
@@ -188,7 +188,7 @@ pub async fn get_detail(
             let (su, _) = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let uvw = UserVaultWrapper::build_for_tenant(conn, &su.id)?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &su.id)?;
             let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?.remove(&su.id);
 
             Ok((su, ob, uvw))

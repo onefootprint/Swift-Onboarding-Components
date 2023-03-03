@@ -9,7 +9,7 @@ pub mod identity_document;
 use db::models::onboarding::OnboardingAndConfig;
 pub use decrypt_request::DecryptRequest;
 
-use super::{Person, UserVaultWrapper};
+use super::{Person, VaultWrapper};
 use newtypes::ScopedUserId;
 
 use derive_more::Deref;
@@ -20,7 +20,7 @@ use derive_more::Deref;
 #[derive(Deref)]
 pub struct TenantUvw {
     #[deref]
-    uvw: UserVaultWrapper<Person>,
+    uvw: VaultWrapper<Person>,
     scoped_user_id: ScopedUserId,
     onboarding: Option<OnboardingAndConfig>,
 }

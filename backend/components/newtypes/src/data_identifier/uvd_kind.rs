@@ -113,7 +113,7 @@ pub enum UvdKindConversionError {
 }
 
 // For now, we effectively only have PersonVaultDataKind in UserVault and this maps to IDK. But we are paving the way for BusinessDataKind to be in UserVault as well and this does not
-// map to IDK. In some places in the current UserVaultWrapper/UvdBuilder/UserVault, we rely on UvdKind<>IDK interop so for now we will use this TryFrom to continue to support this.
+// map to IDK. In some places in the current VaultWrapper/UvdBuilder/UserVault, we rely on UvdKind<>IDK interop so for now we will use this TryFrom to continue to support this.
 // In a follow, we'll make a seperate BusinessVaultWrapper and then have these two seperate wrappers depend on PersonVaultDataKind + BusinessDataKind and this can be removed
 impl TryFrom<UvdKind> for IdentityDataKind {
     type Error = UvdKindConversionError;

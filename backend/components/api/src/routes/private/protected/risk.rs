@@ -4,7 +4,7 @@ use crate::decision::vendor;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{decision, State};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
@@ -80,7 +80,7 @@ async fn make_vendor_calls(
             let uv = UserVault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
 
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
 
             let requests = vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
 
@@ -234,7 +234,7 @@ async fn shadow_run(
             let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
             let uv = UserVault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&scoped_user.id))?;
+            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let vendor_apis = vendor::desired_vendor_apis(&uvw)?;

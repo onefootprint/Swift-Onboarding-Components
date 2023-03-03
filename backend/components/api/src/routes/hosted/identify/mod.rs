@@ -1,7 +1,7 @@
 #[allow(clippy::module_inception)]
 pub mod identify;
 pub mod login_challenge;
-use crate::utils::user_vault_wrapper::{Person, UserVaultWrapper, UvwArgs};
+use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use db::models::webauthn_credential::WebauthnCredential;
 pub mod signup_challenge;
 pub mod verify;
@@ -119,14 +119,7 @@ async fn get_user_by_identifier(
 async fn get_user_challenge_context(
     state: &web::Data<State>,
     identifier: &Identifier,
-) -> Result<
-    Option<(
-        UserVaultWrapper<Person>,
-        Vec<WebauthnCredential>,
-        Vec<ChallengeKind>,
-    )>,
-    ApiError,
-> {
+) -> Result<Option<(VaultWrapper<Person>, Vec<WebauthnCredential>, Vec<ChallengeKind>)>, ApiError> {
     // Look up existing user vault by identifier
     let existing_user = if let Some(existing_user) = get_user_by_identifier(state, identifier).await? {
         existing_user
@@ -137,7 +130,7 @@ async fn get_user_challenge_context(
     let (uvw, creds) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&existing_user.id))?;
+            let uvw = VaultWrapper::build(conn, VwArgs::User(&existing_user.id))?;
             let creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
             Ok((uvw, creds))
         })

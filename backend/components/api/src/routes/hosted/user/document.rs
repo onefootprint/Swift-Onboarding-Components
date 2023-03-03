@@ -5,7 +5,7 @@ use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::large_json::LargeJson;
-use crate::utils::user_vault_wrapper::{UserVaultWrapper, UvwArgs};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{decision, State};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
@@ -209,7 +209,7 @@ pub async fn post(
     // Check if we should be initiating requests (e.g. check if we are testing)
     let uvw = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build(conn, UvwArgs::Tenant(&suid)))
+        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&suid)))
         .await??;
     let uv_id = uvw.user_vault.id.clone();
     let should_initiate_verification_requests =

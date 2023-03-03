@@ -3,7 +3,7 @@ use crate::decision::rule::RuleSetName;
 use crate::State;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
-    utils::{mock_enclave::StateWithMockEnclave, user_vault_wrapper::UserVaultWrapper},
+    utils::{mock_enclave::StateWithMockEnclave, vault_wrapper::VaultWrapper},
 };
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
@@ -69,7 +69,7 @@ fn create_user_and_populate_vault(
         is_live: true,
     };
 
-    let uv = UserVaultWrapper::create_user_vault(
+    let uv = VaultWrapper::create_user_vault(
         conn,
         user_info,
         Some(ob_config.clone()),
@@ -90,7 +90,7 @@ fn create_user_and_populate_vault(
         ),
     ];
 
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.add_data_test(conn, update).unwrap();
 
     (uv.into_inner(), su)

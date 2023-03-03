@@ -1,7 +1,7 @@
 use super::TenantUvw;
-use super::{Person, UserVaultWrapper};
+use super::{Person, VaultWrapper};
 use crate::errors::ApiResult;
-use crate::utils::user_vault_wrapper::UvwArgs;
+use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
@@ -16,9 +16,9 @@ use db::PgConn;
 use newtypes::{ScopedUserId, TenantId};
 use std::collections::HashMap;
 
-impl UserVaultWrapper<Person> {
+impl VaultWrapper<Person> {
     pub fn build_for_tenant(conn: &mut PgConn, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
-        let uvw = Self::build(conn, UvwArgs::Tenant(su_id))?;
+        let uvw = Self::build(conn, VwArgs::Tenant(su_id))?;
         let onboarding = Onboarding::bulk_get_for_users(conn, vec![su_id])?.remove(su_id);
         Ok(TenantUvw {
             uvw,
@@ -43,7 +43,7 @@ impl UserVaultWrapper<Person> {
 
         // For each data source, fetch data _for all users_ in the `user_vaults` list.
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
-        // UserVaultWrapper for each User
+        // VaultWrapper for each User
         let uvds = UserVaultData::bulk_get(conn, &active_lifetime_list)?;
         let phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
         let emails = Email::bulk_get(conn, &active_lifetime_list)?;
@@ -52,7 +52,7 @@ impl UserVaultWrapper<Person> {
         let scoped_user_ids = users.iter().map(|(su, _)| &su.id).collect();
         let onboarding_map = Onboarding::bulk_get_for_users(conn, scoped_user_ids)?;
 
-        // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
+        // Map over our UserVaults, assembling the VaultWrappers from the data we fetched above
         let results = users
             .into_iter()
             .map(move |(su, uv)| {

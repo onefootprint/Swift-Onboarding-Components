@@ -17,7 +17,7 @@ use crate::errors::ApiResult;
 use super::{Business, Person};
 
 #[derive(Clone, Debug)]
-pub(super) struct UvwData<Type> {
+pub(super) struct VwData<Type> {
     pub(super) uvd: Vec<UserVaultData>,
     pub(super) phone_numbers: Vec<PhoneNumber>,
     pub(super) emails: Vec<Email>,
@@ -30,7 +30,7 @@ pub(super) struct UvwData<Type> {
     phantom: PhantomData<Type>,
 }
 
-impl<Type> UvwData<Type> {
+impl<Type> VwData<Type> {
     pub(super) fn partition(
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
@@ -103,7 +103,7 @@ impl<Type> UvwData<Type> {
         ];
         let lifetime_ids: HashSet<_> = lifetime_ids.into_iter().flatten().collect();
         // Since all_lifetimes contains a superset of lifetimes represented by the data in this
-        // UvwData, we filter for only the lifetimes whose data are stored in this UvwData
+        // VwData, we filter for only the lifetimes whose data are stored in this VwData
         let lifetimes: HashMap<_, _> = all_lifetimes
             .iter()
             .filter(|l| lifetime_ids.contains(&l.id))
@@ -123,7 +123,7 @@ impl<Type> UvwData<Type> {
     }
 }
 
-impl UvwData<Person> {
+impl VwData<Person> {
     fn uvd(&self, kind: IdentityDataKind) -> Option<&UserVaultData> {
         self.uvd.iter().find(|d| match d.kind {
             UvdKind::Id(p) => IdentityDataKind::from(p) == kind,
@@ -183,7 +183,7 @@ impl UvwData<Person> {
     }
 }
 
-impl UvwData<Business> {
+impl VwData<Business> {
     fn bdk(&self, kind: BusinessDataKind) -> Option<&UserVaultData> {
         self.uvd.iter().find(|d| match d.kind {
             UvdKind::Business(b) => b == kind,

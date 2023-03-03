@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use super::{Business, UserVaultWrapper};
-use crate::utils::user_vault_wrapper::UvwArgs;
+use super::{Business, VaultWrapper};
+use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
 use db::models::user_vault_data::NewBusinessVaultData;
@@ -49,7 +49,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     // Create phone number
     let phone_number = fixtures::phone_number::create(conn, &uv.id, Some(&su.id));
 
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![
         (IDK::FirstName, Some(SealedVaultBytes(vec![1]))),
         (IDK::LastName, Some(SealedVaultBytes(vec![2]))),
@@ -71,7 +71,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     }
 
     // build_for_user should only show the phone number
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::User(&uv.id)).unwrap();
     let tests = vec![
         (IDK::FirstName, None),
         (IDK::LastName, None),
@@ -117,7 +117,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
     UserVaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
 
-    let bvw = UserVaultWrapper::<Business>::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
+    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![
         (BDK::Name, Some(SealedVaultBytes(vec![1]))),
         (BDK::Website, Some(SealedVaultBytes(vec![2]))),
@@ -144,17 +144,17 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     // Add an email
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     let email = PiiString::from_str("test@onefootprint.com").unwrap();
     uvw.add_data_test(conn, vec![(IDK::Email.into(), email)]).unwrap();
 
     // Allow replacing the email
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     let email = PiiString::from_str("test2@onefootprint.com").unwrap();
     uvw.add_data_test(conn, vec![(IDK::Email.into(), email)]).unwrap();
 
     // Add a name
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     let update = vec![
         (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
         (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
@@ -162,7 +162,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     uvw.add_data_test(conn, update).unwrap();
 
     // Make the user can't see the name and email until it's portable
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::User(&uv.id)).unwrap();
     assert!(!uvw.has_identity_field(IDK::FirstName));
     assert!(!uvw.has_identity_field(IDK::LastName));
     assert!(!uvw.has_identity_field(IDK::Email));
@@ -173,14 +173,14 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!timeline_events.iter().any(|x| x.0.is_portable));
 
     // Commit
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     assert!(uvw.has_identity_field(IDK::FirstName));
     assert!(uvw.has_identity_field(IDK::LastName));
     assert!(uvw.has_identity_field(IDK::Email));
     uvw.commit_identity_data(conn).unwrap();
 
     // Now we should see the portable name and email
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::User(&uv.id)).unwrap();
     assert!(uvw.has_identity_field(IDK::FirstName));
     assert!(uvw.has_identity_field(IDK::LastName));
     assert!(uvw.has_identity_field(IDK::Email));
@@ -305,7 +305,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
             su_id,
             is_allowed,
         } = test;
-        let uvw = UserVaultWrapper::lock_for_onboarding(conn, su_id).unwrap();
+        let uvw = VaultWrapper::lock_for_onboarding(conn, su_id).unwrap();
         let result = uvw.add_data_test(conn, update);
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
@@ -333,33 +333,33 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
         (IDK::LastName.into(), PiiString::new("Merp".to_owned())),
         (IDK::Ssn4.into(), PiiString::new("1234".to_owned())),
     ];
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.add_data_test(conn, update).unwrap();
     // Get the ssn4 as was written by tenant 1
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let ssn4_tenant1 = uvw.get_identity_e_field(IDK::Ssn4);
     assert!(!uvw.has_identity_field(IDK::Ssn9));
 
     // Add speculative ssn9 by tenant 2
     let update = vec![(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))];
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
     uvw.add_data_test(conn, update).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su2.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su2.id)).unwrap();
     let ssn4_tenant2 = uvw.get_identity_e_field(IDK::Ssn4);
     let ssn9_tenant2 = uvw.get_identity_e_field(IDK::Ssn9);
     assert_ne!(ssn4_tenant1, ssn4_tenant2);
 
     // Commit data for tenant2
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
     uvw.commit_identity_data(conn).unwrap();
 
     // Commit data for tenant1 - the new ssn4 should _not_ be portable
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.commit_identity_data(conn).unwrap();
 
     // Now, when getting portable data, we should still see the ssn9 added for tenant 2
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::User(&uv.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::User(&uv.id)).unwrap();
     assert_eq!(uvw.get_identity_e_field(IDK::Ssn4), ssn4_tenant2);
     assert_eq!(uvw.get_identity_e_field(IDK::Ssn9), ssn9_tenant2);
     // But, we should still have the name that was portable by tenant 1
@@ -400,10 +400,10 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
     ];
 
     for update in updates {
-        let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+        let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
         uvw.add_data_test(conn, update).unwrap();
     }
-    let uvw = UserVaultWrapper::build(conn, UvwArgs::Tenant(&su.id)).unwrap();
+    let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     assert!(uvw.has_identity_field(IDK::AddressLine1));
     // We should have cleared out line2 in the last update
     assert!(!uvw.has_identity_field(IDK::AddressLine2));
@@ -426,7 +426,7 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
     let k2 = KvDataKey::from_str("flerp").unwrap();
 
     // Add some custom data
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     let custom_data = HashMap::from_iter([
         (k1.clone(), PiiString::from("BLERP")),
         (k2.clone(), PiiString::from("FLERP")),
@@ -434,13 +434,13 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
     uvw.update_custom_data(conn, custom_data).unwrap();
 
     // Update k1 and make sure only it changed
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     let v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
     let v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
     let custom_data = HashMap::from_iter([(k1.clone(), PiiString::from("MERP"))]);
     uvw.update_custom_data(conn, custom_data).unwrap();
 
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     let new_v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
     let new_v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
     assert_ne!(new_v1, v1);
@@ -452,7 +452,7 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
         (k2.clone(), PiiString::from("bye")),
     ]);
     uvw.update_custom_data(conn, custom_data).unwrap();
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     let newest_v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
     let newest_v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
     assert_ne!(newest_v1, new_v1);
@@ -470,7 +470,7 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
 
     // Add some identity data
     let update = vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))];
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.add_data_test(conn, update).unwrap();
 
     // Also add an identity document
@@ -483,11 +483,11 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
         (custom_key1.clone(), PiiString::from("BLERP")),
         (custom_key2.clone(), PiiString::from("FLERP")),
     ]);
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.update_custom_data(conn, custom_data).unwrap();
 
     // Commit the identity data
-    let uvw = UserVaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
+    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.commit_identity_data(conn).unwrap();
 
     let (portable, speculative): (Vec<_>, Vec<_>) = DataLifetime::get_active(conn, &uv.id, Some(&su.id))
