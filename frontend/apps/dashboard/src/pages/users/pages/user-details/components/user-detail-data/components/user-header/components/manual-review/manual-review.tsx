@@ -14,7 +14,10 @@ const ManualReview = () => {
   const refetchUser = useRefetchUser(userId);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
-  const shouldRender = data && data.status !== UserStatus.vaultOnly;
+  const shouldRender =
+    data &&
+    data.status !== UserStatus.vaultOnly &&
+    data.status !== UserStatus.incomplete;
 
   const handleOpenDialog = (dialogStatus: ReviewStatus) => {
     setReviewStatus(dialogStatus);

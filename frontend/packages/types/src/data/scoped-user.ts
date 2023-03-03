@@ -48,3 +48,14 @@ export const statusForScopedUser = (su: ScopedUser) => {
     UserStatus.incomplete
   );
 };
+
+export const requiresManualReview = (su: ScopedUser) => {
+  const userStatus = statusForScopedUser(su);
+  return (
+    (su.onboarding?.requiresManualReview &&
+      // Cannot manually review if the user is incomplete or vault only
+      userStatus !== UserStatus.incomplete &&
+      userStatus !== UserStatus.vaultOnly) ||
+    false
+  );
+};

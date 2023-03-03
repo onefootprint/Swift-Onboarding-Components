@@ -1,5 +1,6 @@
 import request, { PaginatedRequestResponse } from '@onefootprint/request';
 import {
+  requiresManualReview,
   ScopedUser,
   statusForScopedUser,
   UsersRequest,
@@ -40,8 +41,7 @@ const useUsers = () => {
         meta: response.meta,
         data: response.data.map((metadata: ScopedUser) => ({
           ...metadata,
-          requiresManualReview:
-            metadata.onboarding?.requiresManualReview || false,
+          requiresManualReview: requiresManualReview(metadata),
           status: statusForScopedUser(metadata),
         })),
       }),

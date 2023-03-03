@@ -24,12 +24,11 @@ const UserDetails = () => {
   const shouldShowLoading =
     userQuery.isLoading || (!!userQuery.data && userVaultDataQuery.isLoading);
   const shouldShowEmptyState = !userQuery.data && !userQuery.isLoading;
+  // These are mutually exclusive
   const shouldShowIncompleteBanner =
     shouldShowData && userQuery.data.status === UserStatus.incomplete;
   const shouldShowManualReviewBanner =
-    !shouldShowIncompleteBanner &&
-    shouldShowData &&
-    userQuery.data.requiresManualReview;
+    shouldShowData && userQuery.data.requiresManualReview;
 
   const handleClickAuditTrailLink = () => {
     const auditTrail = document.getElementById('audit-trail');
