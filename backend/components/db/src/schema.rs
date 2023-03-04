@@ -323,6 +323,7 @@ table! {
         ingress_content_type -> Nullable<Text>,
         access_reason -> Nullable<Text>,
         status -> Text,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

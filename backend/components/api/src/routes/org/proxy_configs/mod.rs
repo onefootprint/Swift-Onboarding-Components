@@ -1,4 +1,5 @@
 use paperclip::actix::web;
+mod deactivate;
 mod index;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -7,4 +8,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(index::get_detail)
         .service(index::post)
         .service(index::patch);
+
+    deactivate::routes(config);
 }

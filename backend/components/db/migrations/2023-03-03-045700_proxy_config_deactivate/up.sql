@@ -1,0 +1,1 @@
+ALTER TABLE proxy_config ADD COLUMN deactivated_at TIMESTAMPTZ;

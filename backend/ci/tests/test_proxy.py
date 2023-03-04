@@ -325,7 +325,7 @@ class TestVaultProxy:
         response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["custom.card_number"] == "4242424242424242424"
 
-    def test_get_patch_proxy_config(self, sandbox_tenant):
+    def test_get_patch_deactivate_proxy_config(self, sandbox_tenant):
         proxy_id = configure_proxy(
             sandbox_tenant,
             [{"target": "$.data.card_number", "token": "custom.card_number"}],
@@ -363,3 +363,16 @@ class TestVaultProxy:
         assert len(new_proxy_config["secret_headers"]) == 2
         assert len(new_proxy_config["pinned_server_certificates"]) == 2
         assert len(new_proxy_config["headers"]) == 0
+
+        post(
+            f"org/proxy_configs/{proxy_id}/deactivate",
+            None,
+            sandbox_tenant.sk.key,
+        )
+
+        get(
+            f"org/proxy_configs/{proxy_id}",
+            None,
+            sandbox_tenant.sk.key,
+            status_code=404,
+        )

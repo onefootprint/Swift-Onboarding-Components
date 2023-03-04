@@ -12,6 +12,7 @@ pub struct ProxyConfigBasic {
     pub status: ApiKeyStatus,
     pub url: String,
     pub method: String,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 /// Proxy configuration
@@ -24,6 +25,7 @@ pub struct ProxyConfigDetailed {
     pub name: String,
     pub created_at: DateTime<Utc>,
     pub status: ApiKeyStatus,
+    pub deactivated_at: Option<DateTime<Utc>>,
 
     /// proxy url
     pub url: String,

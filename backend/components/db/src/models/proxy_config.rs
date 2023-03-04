@@ -31,6 +31,7 @@ pub struct ProxyConfig {
     pub ingress_content_type: Option<ProxyIngressContentType>,
     pub access_reason: Option<String>,
     pub status: ApiKeyStatus,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -417,6 +418,8 @@ impl ProxyConfig {
         let result = proxy_config::table
             .filter(proxy_config::tenant_id.eq(tenant_id))
             .filter(proxy_config::is_live.eq(is_live))
+            .filter(proxy_config::deactivated_at.is_null())
+            .order_by(proxy_config::created_at.desc())
             .get_results(conn)?;
 
         Ok(result)
@@ -433,6 +436,7 @@ impl ProxyConfig {
             .filter(proxy_config::tenant_id.eq(tenant_id))
             .filter(proxy_config::is_live.eq(is_live))
             .filter(proxy_config::id.eq(proxy_config_id))
+            .filter(proxy_config::deactivated_at.is_null())
             .get_result(conn)?;
 
         let headers = proxy_config_header::table
@@ -449,5 +453,23 @@ impl ProxyConfig {
             .get_results(conn)?;
 
         Ok((config, headers, secret_headers, server_certs, ingress_rules))
+    }
+
+    /// updates an existing proxy configuration
+    #[tracing::instrument(skip(conn))]
+    pub fn deactivate(
+        conn: &mut TxnPgConn,
+        proxy_config_id: ProxyConfigId,
+        tenant_id: TenantId,
+        is_live: bool,
+    ) -> DbResult<()> {
+        diesel::update(proxy_config::table)
+            .filter(proxy_config::tenant_id.eq(tenant_id))
+            .filter(proxy_config::is_live.eq(is_live))
+            .filter(proxy_config::id.eq(proxy_config_id))
+            .set(proxy_config::deactivated_at.eq(Utc::now()))
+            .execute(conn.conn())?;
+
+        Ok(())
     }
 }

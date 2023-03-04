@@ -22,6 +22,7 @@ impl DbToApi<ProxyConfig> for api_wire_types::ProxyConfigBasic {
             ingress_content_type: _,
             access_reason: _,
             status,
+            deactivated_at,
         } = config;
 
         api_wire_types::ProxyConfigBasic {
@@ -32,6 +33,7 @@ impl DbToApi<ProxyConfig> for api_wire_types::ProxyConfigBasic {
             url,
             method,
             status,
+            deactivated_at
         }
     }
 }
@@ -53,6 +55,7 @@ impl DbToApi<DbProxyConfigAll> for api_wire_types::ProxyConfigDetailed {
             ingress_content_type,
             access_reason,
             status,
+            deactivated_at,
         } = config;
 
         let client_certificate = client_identity_cert_der.map(der_to_pem);
@@ -68,6 +71,7 @@ impl DbToApi<DbProxyConfigAll> for api_wire_types::ProxyConfigDetailed {
             ingress_content_type,
             access_reason,
             status,
+            deactivated_at,
             headers: headers
                 .into_iter()
                 .map(|header| PlainCustomHeader {

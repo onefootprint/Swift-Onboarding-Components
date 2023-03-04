@@ -4,7 +4,7 @@ use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard
 use crate::auth::Either;
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiResult;
-use crate::types::ResponseData;
+use crate::types::{ResponseData};
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_wire_types::{CreateProxyConfigRequest, PatchProxyConfigRequest};

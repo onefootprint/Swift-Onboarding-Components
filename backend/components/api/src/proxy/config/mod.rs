@@ -251,6 +251,7 @@ impl ProxyConfig {
             ingress_content_type,
             access_reason,
             status: _,
+            deactivated_at: _
         } = db_config;
 
         // get the base url and/or path and query from headers
