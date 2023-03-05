@@ -51,7 +51,7 @@ impl<'a> From<(&'a TenantUserId, &'a TenantId)> for TenantRolebindingIdentifier<
 impl TenantRolebinding {
     /// Gets or creates the TenantUser with the provided email, and creates a rolebinding to
     /// associate the TenantUser with the provided role
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument(skip(conn))]
     pub fn create(
         conn: &mut TxnPgConn,
         tenant_user_id: TenantUserId,
