@@ -1,49 +1,45 @@
-import { Box, Button, Container } from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import Loading from '../auth/components/loading';
 import useAssumeTenant from './hooks/use-assume-tenant';
 
 const Assume = () => {
   const router = useRouter();
   const {
     query: { tenantId },
+    isReady,
   } = router;
 
-  const useAssumeTenantHook = useAssumeTenant();
+  const useAssumeTenantMutation = useAssumeTenant();
 
-  const handleClick = () => {
-    if (!tenantId || Array.isArray(tenantId)) {
+  useEffect(() => {
+    if (!isReady || !tenantId || Array.isArray(tenantId)) {
       return;
     }
-    useAssumeTenantHook.mutate(
+    useAssumeTenantMutation.mutate(
       { tenantId },
       {
         onSuccess: () => {
           router.replace('/');
         },
+        onError: () => {
+          router.push('/users');
+        },
       },
     );
-  };
+  }, [router.isReady, tenantId]);
 
   return (
     <>
       <Head>
         <title>Assume Role</title>
       </Head>
-      <Container>
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            height: '100vh',
-            justifyContent: 'center',
-          }}
-        >
-          <Button onClick={handleClick}>{`Assume  "${tenantId}"`}</Button>
-        </Box>
-      </Container>
+      <Box aria-busy>
+        <Loading />
+      </Box>
     </>
   );
 };
