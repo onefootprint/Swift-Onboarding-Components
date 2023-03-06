@@ -29,6 +29,7 @@ const baseMeta = {
   createdNewTenant: false,
   isFirstLogin: false,
   requiresOnboarding: false,
+  isAssumed: false,
 };
 
 export const asUser = (user?: Partial<typeof baseUser>) => {
@@ -133,6 +134,20 @@ export const asUserWithScope = (scopes: RoleScope[]) => {
       },
       org: baseOrg,
       meta: baseMeta,
+    },
+  });
+};
+
+export const asAssumedUser = () => {
+  useStore.setState({
+    data: {
+      auth: '1',
+      user: baseUser,
+      org: baseOrg,
+      meta: {
+        ...baseMeta,
+        isAssumed: true,
+      },
     },
   });
 };

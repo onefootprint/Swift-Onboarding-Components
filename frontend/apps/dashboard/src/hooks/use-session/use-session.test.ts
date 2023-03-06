@@ -34,6 +34,7 @@ const loginPayload = {
     createdNewTenant: false,
     isFirstLogin: false,
     requiresOnboarding: false,
+    isAssumed: false,
   },
 };
 

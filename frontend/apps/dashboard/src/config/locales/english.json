@@ -94,6 +94,10 @@
         "title": "Sandbox mode.",
         "disable": "Disable",
         "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
+      },
+      "assume-banner": {
+        "title": "You're logged into {{orgName}} as a firm employee.",
+        "log-out": "Log out"
       }
     },
     "terms-and-conditions": {

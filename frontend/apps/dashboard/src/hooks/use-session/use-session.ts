@@ -56,6 +56,15 @@ const useSession = () => {
     });
   };
 
+  const setAssumedOrg = (nextOrg: Partial<OrgSession>) => {
+    if (!data) return;
+    update({
+      ...data,
+      org: { ...data.org, ...nextOrg },
+      meta: { ...data.meta, isAssumed: true },
+    });
+  };
+
   const logOut = () => {
     reset();
   };
@@ -93,6 +102,7 @@ const useSession = () => {
     logOut,
     setOrg,
     setUser,
+    setAssumedOrg,
     completeOnboarding,
   };
 };

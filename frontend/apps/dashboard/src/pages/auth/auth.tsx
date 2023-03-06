@@ -58,6 +58,7 @@ const Auth = () => {
                 isFirstLogin,
                 requiresOnboarding,
                 createdNewTenant,
+                isAssumed: user.rolebinding == null, // If there's no rolebinding, we have an assumed session
               },
             });
             waitForAnimation(() => {

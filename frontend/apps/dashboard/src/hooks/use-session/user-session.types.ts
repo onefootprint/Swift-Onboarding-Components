@@ -24,6 +24,7 @@ export type MetaSession = {
   createdNewTenant: boolean;
   isFirstLogin: boolean;
   requiresOnboarding: boolean;
+  isAssumed: boolean;
 };
 
 export type Session = {

@@ -14,6 +14,7 @@ import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
+import AssumeBanner from './components/assume-banner';
 import NavDropdown from './components/nav-dropdown';
 import SandboxBanner from './components/sandbox-banner';
 
@@ -39,6 +40,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
       initial={{ opacity: 0 }}
     >
       <Header data-testid="private-default-layout">
+        <AssumeBanner />
         <SandboxBanner />
         <Container>
           <Footprint>

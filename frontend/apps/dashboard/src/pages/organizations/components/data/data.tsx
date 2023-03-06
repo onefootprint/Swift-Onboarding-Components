@@ -33,6 +33,7 @@ const Data = ({ authToken, organizations }: DataProps) => {
               isFirstLogin: false,
               requiresOnboarding: false,
               createdNewTenant: false,
+              isAssumed: user.rolebinding == null, // If there's no rolebinding, we have an assumed session
             },
           });
           router.push('/users');
