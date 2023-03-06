@@ -144,7 +144,7 @@ const Company = () => {
       <SEO title={t('html-title')} slug="/company" />
       <Container>
         <HeroContainer>
-          <Typography variant="display-1" as="h1" sx={{ marginBottom: 5 }}>
+          <Typography variant="display-2" as="h1" sx={{ marginBottom: 5 }}>
             {t('title')}
           </Typography>
           <Typography variant="display-4" as="h2" color="secondary">

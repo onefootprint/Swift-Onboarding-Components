@@ -19,7 +19,7 @@ const Media = ({ articles }: MediaProps) => {
       <SEO title={t('html-title')} slug="/media" />
       <Container>
         <Hero>
-          <Typography variant="display-1" as="h1">
+          <Typography variant="display-2" as="h1">
             {t('title')}
           </Typography>
           <Typography variant="display-4" as="h2" color="secondary">
