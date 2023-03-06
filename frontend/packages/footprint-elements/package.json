@@ -26,7 +26,7 @@
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@tanstack/react-query": "^4.26.0",
-    "@xstate/react": "^3.0.1",
+    "@xstate/react": "^3.2.1",
     "base64url": "^3.0.1",
     "browser-image-compression": "^2.0.0",
     "constate": "^3.3.2",
