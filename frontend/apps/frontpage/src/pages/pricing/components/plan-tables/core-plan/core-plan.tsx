@@ -7,8 +7,8 @@ import React, { useState } from 'react';
 import LinkButton from 'src/components/link-button';
 import styled, { css } from 'styled-components';
 
+import Banner from '../../banner';
 import InfoDialog from '../../info-dialog';
-import Banner from '../components/banner';
 import CheckedRow from '../components/checked-row';
 import FeatureRow from '../components/feature-row';
 import TableHeader from '../components/table-header';
@@ -32,6 +32,7 @@ const CorePlan = () => {
         title={t('core-plan.promo.title')}
         cta={t('core-plan.promo.cta')}
         handleClickTrigger={handleClickTriggeBanner}
+        hideSparkles
       />
       <InfoDialog
         dialogTitle={t('core-plan.promo.dialog.title')}

@@ -109,6 +109,7 @@ const Sparkle = ({ size, color, style }: SparkleProps) => {
 };
 
 const Container = styled.span`
+  width: 100%;
   display: inline-block;
   position: relative;
 `;

@@ -442,15 +442,6 @@
             "content": "We'll give back a rebate of the cost to do a standard KYC the next time that same person does a one-click KYC on another platform. \n \n By virtue of you simply onboarding your users, you'll get back the money to use on any Footprint products. \n \n Assume you onboard 100,000 users who are new to Footprint and they later sign up for other products using Footprint. Then, you will get $50K back that will be applied to your future Footprint bills."
           }
         },
-        "calculator": {
-          "onboarding": "Onboarding",
-          "users-month": "users/month",
-          "will-have-a-cost-of": " will have a cost of",
-          "per-month": "/month",
-          "banner-recoup": "And you can recoup up to 100% of the KYC cost the first year in credits!",
-          "unblocks": "unblocks",
-          "banner-custom": "custom pricing!"
-        },
         "micro-title": "Core",
         "title": "KYC + PII Security",
         "subtitle": "Next-gen encryption infrastructure to offload compliance, risk, and cost.",
@@ -515,6 +506,37 @@
           },
           "ach-verification": {
             "title": "ACH verification"
+          }
+        }
+      },
+      "calculator": {
+        "title": "Estimate your cost",
+        "rows": {
+          "kyc": "KYC",
+          "kyb": "KYB",
+          "pii-storage": "PII storage",
+          "custom-data-vaulting": "Custom data vaulting",
+          "vault-proxy": "Vault proxy",
+          "drivers-license-scan": "Driver's license scan",
+          "total": "Total cost",
+          "per-month": "per month"
+        },
+        "units": {
+          "verifications": "verifications",
+          "month": "month",
+          "persons": "persons",
+          "scans": "scans"
+        },
+        "banners": {
+          "recoup": {
+            "title": "And you can recoup 100% of the cost the first year!",
+            "cta": "More details",
+            "link": "/"
+          },
+          "custom-pricing": {
+            "title": "With more than 10,000+ verifications per month you get custom pricing",
+            "cta": "Contact us",
+            "link": "/"
           }
         }
       },
