@@ -95,6 +95,21 @@ const Footer = () => {
             </SectionColumn>
             <SectionColumn>
               <Typography variant="label-3">
+                {t('links.developers.title')}
+              </Typography>
+              <FooterLink
+                text={t('links.developers.docs.text')}
+                href={t('links.developers.docs.href')}
+                newWindow
+              />
+              <FooterLink
+                text={t('links.developers.status.text')}
+                href={t('links.developers.status.href')}
+                newWindow
+              />
+            </SectionColumn>
+            <SectionColumn>
+              <Typography variant="label-3">
                 {t('links.resources.title')}
               </Typography>
               <FooterLink
@@ -112,21 +127,6 @@ const Footer = () => {
               <FooterLink
                 text={t('links.resources.supported-id-documents.text')}
                 href={t('links.resources.supported-id-documents.href')}
-              />
-            </SectionColumn>
-            <SectionColumn>
-              <Typography variant="label-3">
-                {t('links.developers.title')}
-              </Typography>
-              <FooterLink
-                text={t('links.developers.docs.text')}
-                href={t('links.developers.docs.href')}
-                newWindow
-              />
-              <FooterLink
-                text={t('links.developers.status.text')}
-                href={t('links.developers.status.href')}
-                newWindow
               />
             </SectionColumn>
           </LinksContainer>
