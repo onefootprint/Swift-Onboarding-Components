@@ -207,3 +207,79 @@ pub fn scan_onboarding_fake_response(
         })
     }
 }
+
+pub fn fingerprint_server_api_fake_event() -> serde_json::Value {
+    serde_json::json!({
+      "products": {
+        "identification": {
+          "data": {
+            "visitorId": "Ibk1527CUFmcnjLwIs4A9",
+            "requestId": "0KSh65EnVoB85JBmloQK",
+            "incognito": true,
+            "linkedId": "somelinkedId",
+            "time": "2019-05-21T16:40:13Z",
+            // timestamp of the event with millisecond precision. Truncated in fake response due to i32 defaults of serde_json
+            // which i didn't think it was important to fix since we are deser as i64
+            "timestamp": 158229,
+            "url": "https://www.example.com/login",
+            "ip": "61.127.217.15",
+            "ipLocation": {
+              "accuracyRadius": 10,
+              "latitude": 49.982,
+              "longitude": 36.2566,
+              "postalCode": "61202",
+              "timezone": "Europe/Dusseldorf",
+              "city": {
+                "name": "Dusseldorf"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "code": "DE",
+                "name": "Germany"
+              },
+              "subdivisions": [
+                {
+                  "isoCode": "63",
+                  "name": "North Rhine-Westphalia"
+                }
+              ],
+            },
+            "browserDetails": {
+              "browserName": "Chrome",
+              "browserMajorVersion": "74",
+              "browserFullVersion": "74.0.3729",
+              "os": "Windows",
+              "osVersion": "7",
+              "device": "Other",
+              "userAgent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) ....",
+            },
+            "confidence": {
+               "score": 0.97
+            },
+            "visitorFound": true,
+            "firstSeenAt": {
+               "global": "2022-03-16T11:26:45.362Z",
+               "subscription": "2022-03-16T11:31:01.101Z"
+            },
+            "lastSeenAt": {
+              "global": "2022-03-16T11:28:34.023Z",
+              "subscription": null
+            }
+          }
+        },
+        "botd": {
+          "data": {
+            "bot": {
+              "result": "notDetected"
+            },
+            "url": "https://example.com/login",
+            "ip": "61.127.217.15",
+            "time": "2019-05-21T16:40:13Z"
+          }
+        }
+      }
+    })
+}
