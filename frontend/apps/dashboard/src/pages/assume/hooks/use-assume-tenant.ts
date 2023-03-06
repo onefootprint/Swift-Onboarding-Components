@@ -1,5 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
+import { Organization } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
@@ -11,7 +12,7 @@ const postAssumeTenantReadOnly = async (
   authHeaders: AuthHeaders,
   tenantId: string,
 ) => {
-  await request({
+  const { data } = await request<Organization>({
     method: 'POST',
     url: '/private/assume',
     headers: authHeaders,
@@ -19,16 +20,19 @@ const postAssumeTenantReadOnly = async (
       tenantId,
     },
   });
+  return data;
 };
 
 const useAssumeTenant = () => {
   const { authHeaders } = useSession();
+  const session = useSession();
   const showErrorToast = useRequestErrorToast();
 
   return useMutation(
     (data: PostAssumeRequest) =>
       postAssumeTenantReadOnly(authHeaders, data.tenantId),
     {
+      onSuccess: session.setOrg,
       onError: showErrorToast,
     },
   );
