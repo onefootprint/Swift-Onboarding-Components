@@ -1,6 +1,5 @@
 import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
 
-import { States } from '../state-machine/types';
 import {
   getCurrentStepFromMissingAttributes,
   getMaxStepFromMissingAttributes,
@@ -251,7 +250,7 @@ describe('MissingAttributesUtils', () => {
   describe('getCurrentStepFromMissingAttributes', () => {
     it('returns 0 when there are no missing attributes', () => {
       expect(
-        getCurrentStepFromMissingAttributes([], States.basicInformation),
+        getCurrentStepFromMissingAttributes([], 'basicInformation'),
       ).toEqual(0);
     });
 
@@ -259,7 +258,7 @@ describe('MissingAttributesUtils', () => {
       expect(
         getCurrentStepFromMissingAttributes(
           [CollectedKycDataOption.partialAddress],
-          States.residentialAddress,
+          'residentialAddress',
         ),
       ).toEqual(1);
     });
@@ -268,14 +267,14 @@ describe('MissingAttributesUtils', () => {
       expect(
         getCurrentStepFromMissingAttributes(
           [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
-          States.basicInformation,
+          'basicInformation',
         ),
       ).toEqual(1);
 
       expect(
         getCurrentStepFromMissingAttributes(
           [CollectedKycDataOption.dob, CollectedKycDataOption.fullAddress],
-          States.residentialAddress,
+          'residentialAddress',
         ),
       ).toEqual(2);
     });

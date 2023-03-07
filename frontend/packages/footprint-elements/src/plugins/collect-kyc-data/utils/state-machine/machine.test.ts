@@ -7,7 +7,6 @@ import {
 import { interpret } from 'xstate';
 
 import createCollectKycDataMachine from './machine';
-import { Events, States } from './types';
 
 describe('Collect KYC Data Machine Tests', () => {
   const TestOnboardingConfig: OnboardingConfig = {
@@ -40,7 +39,7 @@ describe('Collect KYC Data Machine Tests', () => {
     const machine = interpret(createCollectKycDataMachine());
     machine.start();
     machine.send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         userFound,
         authToken: 'authToken',
@@ -79,10 +78,10 @@ describe('Collect KYC Data Machine Tests', () => {
         'piip@onefootprint.com',
       );
       expect(context.receivedEmail).toEqual(true);
-      expect(state.value).toEqual(States.basicInformation);
+      expect(state.value).toEqual('basicInformation');
 
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Otto',
@@ -90,17 +89,17 @@ describe('Collect KYC Data Machine Tests', () => {
           },
         },
       });
-      expect(state.value).toEqual(States.residentialAddress);
+      expect(state.value).toEqual('residentialAddress');
       context = state.context;
       expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.basicInformation);
+      expect(state.value).toEqual('basicInformation');
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Diffie',
@@ -110,26 +109,26 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       context = state.context;
       expect(context.data[UserDataAttribute.firstName]).toEqual('Diffie');
-      expect(state.value).toEqual(States.residentialAddress);
+      expect(state.value).toEqual('residentialAddress');
 
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'US', zip: '94107' },
         },
       });
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
       context = state.context;
       expect(context.data.country).toEqual('US');
       expect(context.data.zip).toEqual('94107');
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.residentialAddress);
+      expect(state.value).toEqual('residentialAddress');
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'TR', zip: '94107' },
         },
@@ -137,23 +136,23 @@ describe('Collect KYC Data Machine Tests', () => {
       context = state.context;
       expect(context.data.country).toEqual('TR');
       expect(context.data.zip).toEqual('94107');
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       state = machine.send({
-        type: Events.confirmed,
+        type: 'confirmed',
       });
       context = state.context;
-      expect(state.value).toEqual(States.completed);
+      expect(state.value).toEqual('completed');
     });
 
     it('Skips states without missing attributes', () => {
@@ -169,10 +168,10 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.receivedEmail).toEqual(false);
-      expect(state.value).toEqual(States.basicInformation);
+      expect(state.value).toEqual('basicInformation');
 
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Otto',
@@ -180,17 +179,17 @@ describe('Collect KYC Data Machine Tests', () => {
           },
         },
       });
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
       context = state.context;
       expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.basicInformation);
+      expect(state.value).toEqual('basicInformation');
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Otto2',
@@ -200,23 +199,23 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       context = state.context;
       expect(context.data[UserDataAttribute.firstName]).toEqual('Otto2');
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       state = machine.send({
-        type: Events.confirmed,
+        type: 'confirmed',
       });
       context = state.context;
-      expect(state.value).toEqual(States.completed);
+      expect(state.value).toEqual('completed');
     });
   });
 
@@ -224,7 +223,7 @@ describe('Collect KYC Data Machine Tests', () => {
     it('Onboarding ends', () => {
       const machine = createMachine(true, []);
       const { state } = machine;
-      expect(state.value).toEqual(States.completed);
+      expect(state.value).toEqual('completed');
     });
   });
 
@@ -245,15 +244,15 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.receivedEmail).toEqual(false);
-      expect(state.value).toEqual(States.email);
+      expect(state.value).toEqual('email');
 
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'piip@onefootprint.com',
         },
       });
-      expect(state.value).toEqual(States.basicInformation);
+      expect(state.value).toEqual('basicInformation');
       context = state.context;
       expect(context.data[UserDataAttribute.email]).toEqual(
         'piip@onefootprint.com',
@@ -261,23 +260,23 @@ describe('Collect KYC Data Machine Tests', () => {
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.email);
+      expect(state.value).toEqual('email');
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'piip@onefootprint.com',
         },
       });
-      expect(state.value).toEqual(States.basicInformation);
+      expect(state.value).toEqual('basicInformation');
       context = state.context;
       expect(context.data[UserDataAttribute.email]).toEqual(
         'piip@onefootprint.com',
       );
 
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Otto',
@@ -285,17 +284,17 @@ describe('Collect KYC Data Machine Tests', () => {
           },
         },
       });
-      expect(state.value).toEqual(States.residentialAddress);
+      expect(state.value).toEqual('residentialAddress');
       context = state.context;
       expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.basicInformation);
+      expect(state.value).toEqual('basicInformation');
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Diffie',
@@ -305,26 +304,26 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       context = state.context;
       expect(context.data[UserDataAttribute.firstName]).toEqual('Diffie');
-      expect(state.value).toEqual(States.residentialAddress);
+      expect(state.value).toEqual('residentialAddress');
 
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'US', zip: '94107' },
         },
       });
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
       context = state.context;
       expect(context.data.country).toEqual('US');
       expect(context.data.zip).toEqual('94107');
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.residentialAddress);
+      expect(state.value).toEqual('residentialAddress');
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'TR', zip: '94107' },
         },
@@ -332,23 +331,23 @@ describe('Collect KYC Data Machine Tests', () => {
       context = state.context;
       expect(context.data.country).toEqual('TR');
       expect(context.data.zip).toEqual('94107');
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       state = machine.send({
-        type: Events.confirmed,
+        type: 'confirmed',
       });
       context = state.context;
-      expect(state.value).toEqual(States.completed);
+      expect(state.value).toEqual('completed');
     });
 
     it('Skips states without missing attributes', () => {
@@ -363,15 +362,15 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.receivedEmail).toEqual(false);
-      expect(state.value).toEqual(States.email);
+      expect(state.value).toEqual('email');
 
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'piip@onefootprint.com',
         },
       });
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
       context = state.context;
       expect(context.data[UserDataAttribute.email]).toEqual(
         'piip@onefootprint.com',
@@ -379,51 +378,51 @@ describe('Collect KYC Data Machine Tests', () => {
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.email);
+      expect(state.value).toEqual('email');
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'piip@onefootprint.com',
         },
       });
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
       context = state.context;
       expect(context.data[UserDataAttribute.email]).toEqual(
         'piip@onefootprint.com',
       );
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       // Navigate to prev
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       state = machine.send({
-        type: Events.confirmed,
+        type: 'confirmed',
       });
       context = state.context;
-      expect(state.value).toEqual(States.completed);
+      expect(state.value).toEqual('completed');
     });
 
     it('when email is received in the initial context', () => {
@@ -445,23 +444,23 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.data[UserDataAttribute.email]).toEqual(
         'piip@onefootprint.com',
       );
-      expect(state.value).toEqual(States.ssn);
+      expect(state.value).toEqual('ssn');
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       state = machine.send({
-        type: Events.confirmed,
+        type: 'confirmed',
       });
       context = state.context;
-      expect(state.value).toEqual(States.completed);
+      expect(state.value).toEqual('completed');
     });
   });
 
@@ -492,14 +491,14 @@ describe('Collect KYC Data Machine Tests', () => {
 
       // Collect all fields first
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'piip@onefootprint.com',
         },
       });
 
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Otto',
@@ -509,51 +508,51 @@ describe('Collect KYC Data Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'US', zip: '94107' },
         },
       });
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
 
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       // On mobile, these events shouldn't trigger any state changes
       state = machine.send({
-        type: Events.editEmail,
+        type: 'editEmail',
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
       state = machine.send({
-        type: Events.editBasicInfo,
+        type: 'editBasicInfo',
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
       state = machine.send({
-        type: Events.editAddress,
+        type: 'editAddress',
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
       state = machine.send({
-        type: Events.editIdentity,
+        type: 'editIdentity',
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       // On mobile, we should be able to edit the data from the confirm state
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'new-email',
         },
       });
       expect(state.context.data[UserDataAttribute.email]).toEqual('new-email');
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Belce',
@@ -563,26 +562,26 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.context.data[UserDataAttribute.firstName]).toEqual('Belce');
       expect(state.context.data[UserDataAttribute.lastName]).toEqual('Dogru');
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'TR', zip: '00000' },
         },
       });
       expect(state.context.data.country).toEqual('TR');
       expect(state.context.data.zip).toEqual('00000');
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '99999999',
         },
       });
       expect(state.context.data[UserDataAttribute.ssn9]).toEqual('99999999');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
     });
 
     it('when on desktop', () => {
@@ -611,14 +610,14 @@ describe('Collect KYC Data Machine Tests', () => {
 
       // Collect all fields first
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'piip@onefootprint.com',
         },
       });
 
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Otto',
@@ -628,35 +627,35 @@ describe('Collect KYC Data Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'US', zip: '94107' },
         },
       });
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '101010101',
         },
       });
 
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       // On desktop, these events shouldn't trigger any state changes
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'new-email',
         },
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
       expect(state.context.data[UserDataAttribute.email]).toEqual(
         'piip@onefootprint.com',
       );
 
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'NEW',
@@ -664,61 +663,61 @@ describe('Collect KYC Data Machine Tests', () => {
           },
         },
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
       expect(state.context.data[UserDataAttribute.firstName]).toEqual('Otto');
       expect(state.context.data[UserDataAttribute.lastName]).toEqual(
         'Footprint',
       );
 
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'TR', zip: '02118' },
         },
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
       expect(state.context.data.country).toEqual('US');
       expect(state.context.data.zip).toEqual('94107');
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn4: '9999',
         },
       });
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
       expect(state.context.data[UserDataAttribute.ssn9]).toEqual('101010101');
       expect(state.context.data[UserDataAttribute.ssn4]).toBeUndefined();
 
       // The following actions on desktop should take the user to edit states
       state = machine.send({
-        type: Events.editEmail,
+        type: 'editEmail',
       });
-      expect(state.value).toEqual(States.emailEditDesktop);
+      expect(state.value).toEqual('emailEditDesktop');
       state = machine.send({
-        type: Events.emailSubmitted,
+        type: 'emailSubmitted',
         payload: {
           email: 'new-email',
         },
       });
       expect(state.context.data[UserDataAttribute.email]).toEqual('new-email');
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.editEmail,
+        type: 'editEmail',
       });
-      expect(state.value).toEqual(States.emailEditDesktop);
+      expect(state.value).toEqual('emailEditDesktop');
       state = machine.send({
-        type: Events.returnToSummary,
+        type: 'returnToSummary',
       });
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.editBasicInfo,
+        type: 'editBasicInfo',
       });
-      expect(state.value).toEqual(States.basicInfoEditDesktop);
+      expect(state.value).toEqual('basicInfoEditDesktop');
       state = machine.send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
             [UserDataAttribute.firstName]: 'Belce',
@@ -728,62 +727,62 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.context.data[UserDataAttribute.firstName]).toEqual('Belce');
       expect(state.context.data[UserDataAttribute.lastName]).toEqual('Dogru');
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.editBasicInfo,
+        type: 'editBasicInfo',
       });
-      expect(state.value).toEqual(States.basicInfoEditDesktop);
+      expect(state.value).toEqual('basicInfoEditDesktop');
       state = machine.send({
-        type: Events.returnToSummary,
+        type: 'returnToSummary',
       });
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.editAddress,
+        type: 'editAddress',
       });
-      expect(state.value).toEqual(States.addressEditDesktop);
+      expect(state.value).toEqual('addressEditDesktop');
       state = machine.send({
-        type: Events.residentialAddressSubmitted,
+        type: 'residentialAddressSubmitted',
         payload: {
           residentialAddress: { country: 'TR', zip: '00000' },
         },
       });
       expect(state.context.data.country).toEqual('TR');
       expect(state.context.data.zip).toEqual('00000');
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.editAddress,
+        type: 'editAddress',
       });
-      expect(state.value).toEqual(States.addressEditDesktop);
+      expect(state.value).toEqual('addressEditDesktop');
       state = machine.send({
-        type: Events.returnToSummary,
+        type: 'returnToSummary',
       });
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
 
       state = machine.send({
-        type: Events.editIdentity,
+        type: 'editIdentity',
       });
-      expect(state.value).toEqual(States.identityEditDesktop);
+      expect(state.value).toEqual('identityEditDesktop');
 
       state = machine.send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: {
           ssn9: '99999999',
         },
       });
       expect(state.context.data[UserDataAttribute.ssn9]).toEqual('99999999');
-      expect(state.value).toEqual(States.confirm);
+      expect(state.value).toEqual('confirm');
 
       state = machine.send({
-        type: Events.editIdentity,
+        type: 'editIdentity',
       });
-      expect(state.value).toEqual(States.identityEditDesktop);
+      expect(state.value).toEqual('identityEditDesktop');
       state = machine.send({
-        type: Events.returnToSummary,
+        type: 'returnToSummary',
       });
-      expect(state.value).toBe(States.confirm);
+      expect(state.value).toBe('confirm');
     });
   });
 });

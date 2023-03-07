@@ -5,9 +5,7 @@ import React from 'react';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../components/navigation-header';
-import useCollectKycDataMachine, {
-  Events,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { BasicInformation as BasicInformationData } from '../../utils/data-types';
 import DobForm from './components/dob-form';
@@ -34,7 +32,7 @@ const BasicInformation = ({
   const onSubmit = (basicInformation: BasicInformationData) => {
     const handleSuccess = () => {
       send({
-        type: Events.basicInformationSubmitted,
+        type: 'basicInformationSubmitted',
         payload: {
           basicInformation,
         },

@@ -4,8 +4,7 @@ import {
   UserData,
   UserDataAttribute,
 } from '@onefootprint/types';
-
-import { States } from '../state-machine/types';
+import { StateValue } from 'xstate';
 
 // The list of CollectedKycDataOption that may be input on the basic info screen
 const BASIC_ATTRIBUTES = [
@@ -91,7 +90,7 @@ export const getMaxStepFromMissingAttributes = (
 
 export const getCurrentStepFromMissingAttributes = (
   attributes: readonly CollectedKycDataOption[],
-  state: States,
+  state: StateValue,
 ) => {
   if (!hasMissingAttributes(attributes)) {
     return 0;
@@ -99,19 +98,19 @@ export const getCurrentStepFromMissingAttributes = (
   let currentStep = 0;
   if (isMissingBasicAttribute(attributes)) {
     currentStep += 1;
-    if (state === States.basicInformation) {
+    if (state === 'basicInformation') {
       return currentStep;
     }
   }
   if (isMissingResidentialAttribute(attributes)) {
     currentStep += 1;
-    if (state === States.residentialAddress) {
+    if (state === 'residentialAddress') {
       return currentStep;
     }
   }
   if (isMissingSsnAttribute(attributes)) {
     currentStep += 1;
-    if (state === States.ssn) {
+    if (state === 'ssn') {
       return currentStep;
     }
   }

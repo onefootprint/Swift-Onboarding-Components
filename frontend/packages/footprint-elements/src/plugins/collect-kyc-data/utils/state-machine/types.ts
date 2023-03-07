@@ -17,23 +17,6 @@ export type OnboardingData = {
   validationToken?: string;
 };
 
-export enum States {
-  // Initial Collection
-  init = 'init',
-  email = 'email',
-  basicInformation = 'basicInformation',
-  residentialAddress = 'residentialAddress',
-  ssn = 'ssn',
-  // Confirm
-  confirm = 'confirm',
-  emailEditDesktop = 'emailEditDesktop',
-  basicInfoEditDesktop = 'basicInfoEditDesktop',
-  addressEditDesktop = 'addressEditDesktop',
-  identityEditDesktop = 'identityEditDesktop',
-
-  completed = 'completed',
-}
-
 export type MachineContext = {
   // Plugin context
   device?: DeviceInfo;
@@ -46,32 +29,9 @@ export type MachineContext = {
   data: UserData;
 };
 
-export enum Events {
-  receivedContext = 'receivedContext',
-  emailSubmitted = 'emailSubmitted',
-  basicInformationSubmitted = 'basicInformationSubmitted',
-  residentialAddressSubmitted = 'residentialAddressSubmitted',
-  ssnSubmitted = 'ssnSubmitted',
-  navigatedToPrevPage = 'navigatedToPrevPage',
-  confirmed = 'confirmed',
-  editEmail = 'editEmail',
-  editBasicInfo = 'editBasicInfo',
-  editAddress = 'editAddress',
-  editIdentity = 'editIdentity',
-  returnToSummary = 'returnToSummary',
-}
-
-export enum Actions {
-  assignInitialContext = 'assignInitialContext',
-  assignEmail = 'assignEmail',
-  assignBasicInformation = 'assignBasicInformation',
-  assignResidentialAddress = 'assignResidentialAddress',
-  assignSsn = 'assignSsn',
-}
-
 export type MachineEvents =
   | {
-      type: Events.receivedContext;
+      type: 'receivedContext';
       payload: {
         authToken: string;
         missingAttributes: readonly CollectedKycDataOption[];
@@ -82,31 +42,31 @@ export type MachineEvents =
       };
     }
   | {
-      type: Events.emailSubmitted;
+      type: 'emailSubmitted';
       payload: {
         email?: string;
       };
     }
   | {
-      type: Events.basicInformationSubmitted;
+      type: 'basicInformationSubmitted';
       payload: {
         basicInformation: BasicInformation;
       };
     }
   | {
-      type: Events.residentialAddressSubmitted;
+      type: 'residentialAddressSubmitted';
       payload: {
         residentialAddress: ResidentialAddress;
       };
     }
   | {
-      type: Events.ssnSubmitted;
+      type: 'ssnSubmitted';
       payload: SSNInformation;
     }
-  | { type: Events.navigatedToPrevPage }
-  | { type: Events.confirmed }
-  | { type: Events.editEmail }
-  | { type: Events.editBasicInfo }
-  | { type: Events.editAddress }
-  | { type: Events.editIdentity }
-  | { type: Events.returnToSummary };
+  | { type: 'navigatedToPrevPage' }
+  | { type: 'confirmed' }
+  | { type: 'editEmail' }
+  | { type: 'editBasicInfo' }
+  | { type: 'editAddress' }
+  | { type: 'editIdentity' }
+  | { type: 'returnToSummary' };

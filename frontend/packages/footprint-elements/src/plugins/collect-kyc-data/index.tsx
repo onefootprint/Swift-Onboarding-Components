@@ -11,7 +11,6 @@ import {
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
-import { Events } from './utils/state-machine/types';
 
 const i18n = configureI18next();
 
@@ -25,7 +24,7 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
     }
     const { missingAttributes, userFound, email, config } = customData;
     send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         device,
         authToken,

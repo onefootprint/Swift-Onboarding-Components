@@ -1,8 +1,6 @@
 import React from 'react';
 
-import useCollectKycDataMachine, {
-  Events,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import EmailCollect from './components/email-collect';
 
 type EmailProps = {
@@ -17,7 +15,7 @@ const Email = ({ onComplete, ctaLabel, hideHeader }: EmailProps) => {
 
   const handleSubmit = (submittedEmail?: string) => {
     send({
-      type: Events.emailSubmitted,
+      type: 'emailSubmitted',
       payload: {
         email: submittedEmail,
       },

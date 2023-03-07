@@ -3,9 +3,7 @@ import { CollectedKycDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
-import useCollectKycDataMachine, {
-  Events,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { SSNInformation } from '../../utils/data-types';
 import SSN4 from './components/ssn4';
@@ -33,7 +31,7 @@ const SSN = ({
   const onSubmit = (ssnInfo: SSNInformation) => {
     const handleSuccess = () => {
       send({
-        type: Events.ssnSubmitted,
+        type: 'ssnSubmitted',
         payload: ssnInfo,
       });
       onComplete?.();

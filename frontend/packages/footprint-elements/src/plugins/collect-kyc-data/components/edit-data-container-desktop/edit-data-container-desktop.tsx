@@ -4,9 +4,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import NavigationHeader from '../../../../components/navigation-header';
-import useCollectKycDataMachine, {
-  Events,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 
 type EditDataContainerDesktopProps = {
   name: string;
@@ -21,7 +19,7 @@ const EditDataContainerDesktop = ({
   const [, send] = useCollectKycDataMachine();
 
   const handlePrev = () => {
-    send({ type: Events.returnToSummary });
+    send({ type: 'returnToSummary' });
   };
 
   return (

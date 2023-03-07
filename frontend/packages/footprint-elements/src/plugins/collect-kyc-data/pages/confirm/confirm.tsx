@@ -6,9 +6,7 @@ import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
 import NavigationHeader from '../../../../components/navigation-header';
-import useCollectKycDataMachine, {
-  Events,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncEmail from '../../hooks/use-sync-email';
 import { isMissingEmailAttribute } from '../../utils/missing-attributes/missing-attributes';
@@ -41,7 +39,7 @@ const Confirm = () => {
 
   const handleSyncSuccess = () => {
     send({
-      type: Events.confirmed,
+      type: 'confirmed',
     });
   };
 
@@ -72,14 +70,14 @@ const Confirm = () => {
   };
 
   const handlePrev = () => {
-    send({ type: Events.navigatedToPrevPage });
+    send({ type: 'navigatedToPrevPage' });
   };
 
   const handleEmailEdit = () => {
     if (isMobile) {
       setEditContent(EditSection.email);
     } else {
-      send({ type: Events.editEmail });
+      send({ type: 'editEmail' });
     }
   };
 
@@ -87,7 +85,7 @@ const Confirm = () => {
     if (isMobile) {
       setEditContent(EditSection.basicInfo);
     } else {
-      send({ type: Events.editBasicInfo });
+      send({ type: 'editBasicInfo' });
     }
   };
 
@@ -95,7 +93,7 @@ const Confirm = () => {
     if (isMobile) {
       setEditContent(EditSection.address);
     } else {
-      send({ type: Events.editAddress });
+      send({ type: 'editAddress' });
     }
   };
 
@@ -103,7 +101,7 @@ const Confirm = () => {
     if (isMobile) {
       setEditContent(EditSection.identity);
     } else {
-      send({ type: Events.editIdentity });
+      send({ type: 'editIdentity' });
     }
   };
 

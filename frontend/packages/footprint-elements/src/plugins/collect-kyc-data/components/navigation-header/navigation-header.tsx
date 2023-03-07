@@ -1,10 +1,7 @@
 import React from 'react';
 
 import FootprintNavigationHeader from '../../../../components/navigation-header';
-import useCollectKycDataMachine, {
-  Events,
-  States,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import getCurrentStepFromMissingAttributes from './utils/current-step-from-missing-attributes';
 
 const NavigationHeader = () => {
@@ -12,12 +9,12 @@ const NavigationHeader = () => {
   const { missingAttributes } = state.context;
   const value = getCurrentStepFromMissingAttributes(
     missingAttributes,
-    state.value as States,
+    state.value,
   );
   const shouldShowCloseButton = value === 1;
 
   const handleBackButtonClick = () => {
-    send(Events.navigatedToPrevPage);
+    send('navigatedToPrevPage');
   };
 
   return (

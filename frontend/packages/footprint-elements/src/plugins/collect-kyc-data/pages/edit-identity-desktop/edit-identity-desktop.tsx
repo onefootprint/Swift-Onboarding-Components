@@ -2,9 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import EditDataContainerDesktop from '../../components/edit-data-container-desktop/edit-data-container-desktop';
-import useCollectKycDataMachine, {
-  Events,
-} from '../../hooks/use-collect-kyc-data-machine';
+import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import SSN from '../ssn';
 
 const EditIdentityDesktop = () => {
@@ -12,7 +10,7 @@ const EditIdentityDesktop = () => {
   const [, send] = useCollectKycDataMachine();
 
   const handlePrev = () => {
-    send({ type: Events.returnToSummary });
+    send({ type: 'returnToSummary' });
   };
 
   return (

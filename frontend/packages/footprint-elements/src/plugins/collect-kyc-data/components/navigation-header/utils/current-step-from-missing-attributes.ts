@@ -1,4 +1,5 @@
 import { CollectedKycDataOption } from '@onefootprint/types';
+import { StateValue } from 'xstate';
 
 import {
   hasMissingAttributes,
@@ -6,11 +7,10 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from '../../../utils/missing-attributes';
-import { States } from '../../../utils/state-machine/types';
 
 const getCurrentStepFromMissingAttributes = (
   mustCollect: readonly CollectedKycDataOption[],
-  state: States,
+  state: StateValue,
 ) => {
   if (!hasMissingAttributes(mustCollect)) {
     return 0;
@@ -18,25 +18,25 @@ const getCurrentStepFromMissingAttributes = (
   let currentStep = 0;
   if (mustCollect.includes(CollectedKycDataOption.email)) {
     currentStep += 1;
-    if (state === States.email) {
+    if (state === 'email') {
       return currentStep;
     }
   }
   if (isMissingBasicAttribute(mustCollect)) {
     currentStep += 1;
-    if (state === States.basicInformation) {
+    if (state === 'basicInformation') {
       return currentStep;
     }
   }
   if (isMissingResidentialAttribute(mustCollect)) {
     currentStep += 1;
-    if (state === States.residentialAddress) {
+    if (state === 'residentialAddress') {
       return currentStep;
     }
   }
   if (isMissingSsnAttribute(mustCollect)) {
     currentStep += 1;
-    if (state === States.ssn) {
+    if (state === 'ssn') {
       return currentStep;
     }
   }

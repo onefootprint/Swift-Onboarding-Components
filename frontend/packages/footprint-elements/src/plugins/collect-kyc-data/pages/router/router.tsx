@@ -2,7 +2,6 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
-import { States } from '../../utils/state-machine/types';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
 import EditAddressDesktop from '../edit-address-desktop';
@@ -19,7 +18,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useCollectKycDataMachine();
-  const isDone = state.matches(States.completed);
+  const isDone = state.matches('completed');
   useLogStateMachine('collect-kyc-data', state);
 
   useEffect(() => {
@@ -28,31 +27,31 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches(States.email)) {
+  if (state.matches('email')) {
     return <Email />;
   }
-  if (state.matches(States.basicInformation)) {
+  if (state.matches('basicInformation')) {
     return <BasicInformation />;
   }
-  if (state.matches(States.residentialAddress)) {
+  if (state.matches('residentialAddress')) {
     return <Address />;
   }
-  if (state.matches(States.ssn)) {
+  if (state.matches('ssn')) {
     return <Ssn />;
   }
-  if (state.matches(States.confirm)) {
+  if (state.matches('confirm')) {
     return <Confirm />;
   }
-  if (state.matches(States.emailEditDesktop)) {
+  if (state.matches('emailEditDesktop')) {
     return <EditEmailDesktop />;
   }
-  if (state.matches(States.basicInfoEditDesktop)) {
+  if (state.matches('basicInfoEditDesktop')) {
     return <EditBasicInfoDesktop />;
   }
-  if (state.matches(States.addressEditDesktop)) {
+  if (state.matches('addressEditDesktop')) {
     return <EditAddressDesktop />;
   }
-  if (state.matches(States.identityEditDesktop)) {
+  if (state.matches('identityEditDesktop')) {
     return <EditIdentityDesktop />;
   }
 
