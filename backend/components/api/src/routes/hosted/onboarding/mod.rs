@@ -20,7 +20,7 @@ use db::{
     DbError, PgConn,
 };
 use itertools::Itertools;
-use newtypes::{OnboardingId, SessionAuthToken, UserVaultId};
+use newtypes::{OnboardingId, SessionAuthToken, VaultId};
 use paperclip::actix::web;
 
 pub mod authorize;
@@ -133,7 +133,7 @@ pub fn get_requirements(
 /// need to check the IdentityDocument table for documents gathered during the onboarding
 pub fn get_fields_to_authorize(
     conn: &mut PgConn,
-    user_vault_id: &UserVaultId,
+    user_vault_id: &VaultId,
     ob_config: &ObConfiguration,
 ) -> ApiResult<AuthorizeFields> {
     let (onboarding, _, _, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;

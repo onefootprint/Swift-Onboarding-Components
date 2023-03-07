@@ -1,6 +1,6 @@
 use newtypes::{
     DocumentRequestId, DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedUserId, SealedVaultDataKey,
-    UserVaultId, VendorAPI, VerificationRequestId, VerificationResultId,
+    VaultId, VendorAPI, VerificationRequestId, VerificationResultId,
 };
 
 use crate::{
@@ -16,7 +16,7 @@ use crate::{
 #[derive(Clone)]
 pub struct DocumentRequestFixtureCreateOpts {
     pub scoped_user_id: ScopedUserId,
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub onboarding_id: OnboardingId,
     pub collected_doc_opts: CollectedDocOpts,
     pub previous_document_request_id: Option<DocumentRequestId>,

@@ -3,7 +3,7 @@ use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::*;
 use macros::db_test;
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, IdDocKind, IdentityDataKind, ScopedUserId, TenantId, UserVaultId,
+    DataLifetimeId, DataLifetimeSeqno, IdDocKind, IdentityDataKind, ScopedUserId, TenantId, VaultId,
 };
 use std::collections::HashSet;
 
@@ -19,9 +19,9 @@ where
 struct TestData {
     t_id: TenantId,
     t2_id: TenantId,
-    uv_id: UserVaultId,
-    uv2_id: UserVaultId,
-    uvx_id: UserVaultId,
+    uv_id: VaultId,
+    uv2_id: VaultId,
+    uvx_id: VaultId,
     su_id: ScopedUserId,
     seqno0: DataLifetimeSeqno,
     seqno1: DataLifetimeSeqno,
@@ -49,9 +49,9 @@ impl TestData {
         let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id, true).id;
 
         // Create user vaults (without phone number)
-        let uv_id = fixtures::user_vault::create(conn, true).into_inner().id;
-        let uv2_id = fixtures::user_vault::create(conn, true).into_inner().id;
-        let uvx_id = fixtures::user_vault::create(conn, true).into_inner().id;
+        let uv_id = fixtures::vault::create_person(conn, true).into_inner().id;
+        let uv2_id = fixtures::vault::create_person(conn, true).into_inner().id;
+        let uvx_id = fixtures::vault::create_person(conn, true).into_inner().id;
 
         // Create scoped users
         let su_id = fixtures::scoped_user::create(conn, &uv_id, &ob_config_id).id;

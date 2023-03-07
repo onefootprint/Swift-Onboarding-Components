@@ -9,11 +9,11 @@ use diesel::Queryable;
 use newtypes::IdentityDataKind;
 use newtypes::{DataLifetimeId, DataLifetimeSeqno};
 use newtypes::{
-    DataPriority, EmailId, Fingerprint as FingerprintData, ScopedUserId, SealedVaultBytes, UserVaultId,
+    DataPriority, EmailId, Fingerprint as FingerprintData, ScopedUserId, SealedVaultBytes, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
-use super::user_vault::UserVault;
+use super::vault::Vault;
 use super::{
     data_lifetime::DataLifetime,
     fingerprint::{Fingerprint, NewFingerprint},
@@ -42,7 +42,7 @@ pub struct NewEmail {
 
 impl Email {
     #[tracing::instrument(skip_all)]
-    pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<Self>> {
         let results = email::table
             .inner_join(data_lifetime::table)
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
@@ -55,7 +55,7 @@ impl Email {
     #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
-        uv_id: &UserVaultId,
+        uv_id: &VaultId,
         e_data: SealedVaultBytes,
         fingerprint: FingerprintData,
         priority: DataPriority,
@@ -88,7 +88,7 @@ impl Email {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get(conn: &mut PgConn, id: &EmailId, user_vault_id: &UserVaultId) -> DbResult<(Email, UserVault)> {
+    pub fn get(conn: &mut PgConn, id: &EmailId, user_vault_id: &VaultId) -> DbResult<(Email, Vault)> {
         use crate::schema::user_vault;
         let result = email::table
             .inner_join(data_lifetime::table.inner_join(user_vault::table))

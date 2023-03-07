@@ -1,5 +1,5 @@
 use super::fixtures;
-use crate::models::{data_lifetime::DataLifetime, user_vault::UserVault};
+use crate::models::{data_lifetime::DataLifetime, vault::Vault};
 use crate::tests::prelude::*;
 use macros::db_test_case;
 use newtypes::{Fingerprint, IdentityDataKind as IDK};
@@ -11,7 +11,7 @@ use newtypes::{Fingerprint, IdentityDataKind as IDK};
 fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivated: bool) -> bool {
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let uv = fixtures::user_vault::create(conn, true).into_inner();
+    let uv = fixtures::vault::create_person(conn, true).into_inner();
     let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
@@ -28,6 +28,6 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     );
     fixtures::fingerprint::create(conn, lifetime.id, fingerprint.clone(), IDK::PhoneNumber.into());
 
-    let u = UserVault::find_portable(conn, fingerprint).unwrap();
+    let u = Vault::find_portable(conn, fingerprint).unwrap();
     u.is_some()
 }

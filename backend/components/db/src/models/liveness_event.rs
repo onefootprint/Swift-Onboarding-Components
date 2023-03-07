@@ -18,7 +18,7 @@ use newtypes::InsightEventId;
 use newtypes::LivenessAttributes;
 
 use newtypes::TenantId;
-use newtypes::UserVaultId;
+use newtypes::VaultId;
 use newtypes::{LivenessEventId, LivenessSource, ScopedUserId};
 
 use serde::{Deserialize, Serialize};
@@ -42,7 +42,7 @@ impl LivenessEvent {
     #[tracing::instrument(skip_all)]
     pub fn get_by_user_vault_id(
         conn: &mut PgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
     ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
         use schema::insight_event;
         let results = liveness_event::table

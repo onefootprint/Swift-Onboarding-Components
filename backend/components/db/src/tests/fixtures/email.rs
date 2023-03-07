@@ -1,11 +1,11 @@
-use newtypes::{DataLifetimeSeqno, DataPriority, Fingerprint, ScopedUserId, SealedVaultBytes, UserVaultId};
+use newtypes::{DataLifetimeSeqno, DataPriority, Fingerprint, ScopedUserId, SealedVaultBytes, VaultId};
 
 use crate::models::email::Email;
 use crate::TxnPgConn;
 
 pub fn create(
     conn: &mut TxnPgConn,
-    uv_id: &UserVaultId,
+    uv_id: &VaultId,
     su_id: &ScopedUserId,
     seqno: DataLifetimeSeqno,
 ) -> Email {

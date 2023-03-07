@@ -29,7 +29,7 @@ mod document_request;
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
-mod user_vault;
+mod vault;
 
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]

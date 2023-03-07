@@ -6,7 +6,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{
     DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, KeyValueDataId, KvDataKey, ScopedUserId,
-    SealedVaultBytes, UserVaultId,
+    SealedVaultBytes, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +41,7 @@ impl KeyValueData {
     #[tracing::instrument(skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
         scoped_user_id: &ScopedUserId,
         data: Vec<NewKeyValueDataArgs>,
         seqno: DataLifetimeSeqno,

@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 use newtypes::{
     Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdDocKind, IdentityDocumentId,
-    ScopedUserId, SealedVaultDataKey, UserVaultId,
+    ScopedUserId, SealedVaultDataKey, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -53,7 +53,7 @@ impl IdentityDocument {
     pub fn s3_path_for_document_image(
         image_type: &str,
         document_request_id: DocumentRequestId,
-        user_vault_id: UserVaultId,
+        user_vault_id: VaultId,
     ) -> String {
         // Store documents in a path like "documents/encrypted/uv_1234/front/dr_1234"
         format!(
@@ -83,7 +83,7 @@ impl IdentityDocument {
     pub fn create(
         conn: &mut TxnPgConn,
         request_id: DocumentRequestId,
-        uv_id: &UserVaultId,
+        uv_id: &VaultId,
         front_image_s3_url: Option<String>,
         back_image_s3_url: Option<String>,
         selfie_image_s3_url: Option<String>,
@@ -203,7 +203,7 @@ mod tests {
                 let id_doc = IdentityDocument::create(
                     conn,
                     DocumentRequestId::from(String::from("dr_id")),
-                    &UserVaultId::from(String::from("uv_id")),
+                    &VaultId::from(String::from("uv_id")),
                     Some("s3_123".to_string()),
                     Some("s3_345".to_string()),
                     Some("s3_678".to_string()),

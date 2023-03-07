@@ -20,7 +20,7 @@ use super::{
 use db::{
     models::{
         onboarding::Onboarding,
-        user_vault::UserVault,
+        vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
     },
@@ -106,9 +106,7 @@ pub async fn save_vendor_responses(
     onboarding_id: &OnboardingId,
 ) -> ApiResult<Vec<VendorResult>> {
     let obid = onboarding_id.clone();
-    let uv = db_pool
-        .db_query(move |conn| UserVault::get(conn, &obid))
-        .await??;
+    let uv = db_pool.db_query(move |conn| Vault::get(conn, &obid)).await??;
 
     let mut verification_results: HashMap<VerificationRequestId, VerificationResult> =
         verification_result::save_verification_result(db_pool, vendor_responses.clone(), &uv.public_key)
@@ -155,9 +153,7 @@ pub async fn get_latest_verification_requests_and_results(
         .await??;
 
     let obid = onboarding_id.clone();
-    let uv = db_pool
-        .db_query(move |conn| UserVault::get(conn, &obid))
-        .await??;
+    let uv = db_pool.db_query(move |conn| Vault::get(conn, &obid)).await??;
 
     let previous_results = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
         requests_and_results.clone(),

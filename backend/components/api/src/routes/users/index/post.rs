@@ -6,8 +6,8 @@ use crate::errors::ApiError;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use db::models::user_vault::NewNonPortablePersonUserVaultReq;
-use db::models::user_vault::UserVault;
+use db::models::vault::NewNonPortablePersonUserVaultReq;
+use db::models::vault::Vault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
@@ -30,7 +30,7 @@ pub async fn post(
 
     let scoped_user = state
         .db_pool
-        .db_transaction(|conn| UserVault::create_non_portable_person_vault(conn, request))
+        .db_transaction(|conn| Vault::create_non_portable_person_vault(conn, request))
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::User::from_db(scoped_user))))

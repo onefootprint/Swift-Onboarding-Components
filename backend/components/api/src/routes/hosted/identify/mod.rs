@@ -9,9 +9,9 @@ use crate::errors::ApiError;
 use crate::utils::challenge::ChallengeToken;
 use crate::State;
 use chrono::{DateTime, Duration, Utc};
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use newtypes::email::Email;
-use newtypes::UserVaultId;
+use newtypes::VaultId;
 use newtypes::{Fingerprinter, PiiString};
 use newtypes::{IdentityDataKind, PhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
@@ -51,7 +51,7 @@ pub struct PhoneChallengeState {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BiometricChallengeState {
     pub state: AuthenticationState,
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     #[serde(default)]
     pub non_synced_cred_ids: Vec<Base64UrlSafeData>,
 }
@@ -97,7 +97,7 @@ impl ChallengeState {
 async fn get_user_by_identifier(
     state: &web::Data<State>,
     identifier: &Identifier,
-) -> Result<Option<UserVault>, ApiError> {
+) -> Result<Option<Vault>, ApiError> {
     let (data_attribute, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
             (IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
@@ -110,7 +110,7 @@ async fn get_user_by_identifier(
     // TODO should we only look for verified emails?
     let existing_user = state
         .db_pool
-        .db_query(|conn| UserVault::find_portable(conn, sh_data))
+        .db_query(|conn| Vault::find_portable(conn, sh_data))
         .await??;
     Ok(existing_user)
 }

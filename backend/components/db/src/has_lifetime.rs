@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::PgConn;
 use itertools::Itertools;
-use newtypes::{DataLifetimeId, SealedVaultBytes, UserVaultId};
+use newtypes::{DataLifetimeId, SealedVaultBytes, VaultId};
 
 use crate::{models::data_lifetime::DataLifetime, DbError, DbResult};
 
@@ -20,12 +20,12 @@ pub trait HasLifetime {
 
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to potentially multiple user vaults.
-    fn bulk_get(conn: &mut PgConn, lifetimes: &[&DataLifetime]) -> DbResult<HashMap<UserVaultId, Vec<Self>>>
+    fn bulk_get(conn: &mut PgConn, lifetimes: &[&DataLifetime]) -> DbResult<HashMap<VaultId, Vec<Self>>>
     where
         Self: Sized,
     {
         let lifetime_ids: Vec<_> = lifetimes.iter().map(|l| l.id.clone()).collect();
-        let lifetime_id_to_uv_id: HashMap<DataLifetimeId, UserVaultId> =
+        let lifetime_id_to_uv_id: HashMap<DataLifetimeId, VaultId> =
             HashMap::from_iter(lifetimes.iter().map(|l| (l.id.clone(), l.user_vault_id.clone())));
 
         // Use the existing util to fetch all the rows for these lifetimes

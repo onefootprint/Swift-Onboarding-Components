@@ -18,9 +18,9 @@ use crypto::sha256;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::scoped_user::ScopedUser;
-use db::models::user_vault::{NewUserInfo, UserVault};
+use db::models::vault::{NewVaultInfo, Vault};
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{Fingerprinter, IdentityDataKind, PhoneNumber, PiiString, SessionAuthToken, UserVaultId};
+use newtypes::{Fingerprinter, IdentityDataKind, PhoneNumber, PiiString, SessionAuthToken, VaultId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -79,7 +79,7 @@ pub async fn post(
             // This already happens if we make a UserVault. But if we are logging into an existing
             // user vault to onboard onto a new ob config, we need to make the ScopedUser
             .db_transaction(move |conn| -> ApiResult<_> {
-                let uv = UserVault::lock(conn, &user_vault_id)?;
+                let uv = Vault::lock(conn, &user_vault_id)?;
                 let result = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
                 Ok(result)
             })
@@ -111,7 +111,7 @@ async fn validate_biometric_challenge(
     state: &web::Data<State>,
     challenge_state: BiometricChallengeState,
     challenge_response: &str,
-) -> ApiResult<(UserVaultId, VerifyKind)> {
+) -> ApiResult<(VaultId, VerifyKind)> {
     // Decode and validate the response to the biometric challenge
     let webauthn = LivenessWebauthnConfig::new(state);
     let auth_resp = serde_json::from_str(challenge_response)?;
@@ -139,7 +139,7 @@ async fn validate_sms_challenge(
     challenge_state: PhoneChallengeState,
     challenge_response: &str,
     ob_config: Option<ObConfiguration>,
-) -> Result<(UserVaultId, VerifyKind), ApiError> {
+) -> Result<(VaultId, VerifyKind), ApiError> {
     if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
     }
@@ -150,7 +150,7 @@ async fn validate_sms_challenge(
         .await?;
     let existing_user = state
         .db_pool
-        .db_query(|conn| UserVault::find_portable(conn, sh_phone_number))
+        .db_query(|conn| Vault::find_portable(conn, sh_phone_number))
         .await??;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
@@ -167,7 +167,7 @@ async fn create_new_user_vault(
     state: &web::Data<State>,
     phone_number: PiiString,
     ob_config: Option<ObConfiguration>,
-) -> ApiResult<UserVault> {
+) -> ApiResult<Vault> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let phone_number = PhoneNumber::parse(phone_number)?;
@@ -184,7 +184,7 @@ async fn create_new_user_vault(
             .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
             .await?,
     };
-    let user_info = NewUserInfo {
+    let user_info = NewVaultInfo {
         e_private_key,
         public_key,
         is_live: phone_number.is_live(),

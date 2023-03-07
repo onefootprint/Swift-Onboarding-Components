@@ -10,7 +10,7 @@ use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::VendorAPI;
-use newtypes::{DbUserTimelineEvent, ScopedUserId, UserTimelineId, UserVaultId};
+use newtypes::{DbUserTimelineEvent, ScopedUserId, UserTimelineId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
@@ -29,7 +29,7 @@ pub struct UserTimeline {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     /// Designates whether the UserTimeline event can be seen by tenants other than the one that created it
     pub is_portable: bool,
 }
@@ -37,7 +37,7 @@ pub struct UserTimeline {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = user_timeline)]
 pub struct NewUserTimeline {
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub scoped_user_id: Option<ScopedUserId>,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
@@ -66,7 +66,7 @@ impl UserTimeline {
     pub fn create<T>(
         conn: &mut PgConn,
         event: T,
-        user_vault_id: UserVaultId,
+        user_vault_id: VaultId,
         // Is only ever null during my1fp account creation in identify verify. Should we get rid of
         // that codepath?
         scoped_user_id: Option<ScopedUserId>,
@@ -244,7 +244,7 @@ mod tests {
     #[db_test]
     fn test_list(conn: &mut TestPgConn) {
         let is_live = true;
-        let user_vault = fixtures::user_vault::create(conn, true).into_inner();
+        let user_vault = fixtures::vault::create_person(conn, true).into_inner();
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
         let scoped_user = fixtures::scoped_user::create(conn, &user_vault.id, &ob_config.id);

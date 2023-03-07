@@ -1,4 +1,4 @@
-use db::{models::user_vault::UserVault, TxnPgConn};
+use db::{models::vault::Vault, TxnPgConn};
 use newtypes::{Locked, ScopedUserId};
 
 use crate::{
@@ -17,7 +17,7 @@ impl VaultWrapper<Person> {
         scoped_user_id: &ScopedUserId,
     ) -> ApiResult<WriteableUvw> {
         // Lock the UserVault in this transaction, then build the UVW
-        UserVault::lock_by_scoped_user(conn, scoped_user_id)?;
+        Vault::lock_by_scoped_user(conn, scoped_user_id)?;
         let uvw = Self::build(conn, VwArgs::Tenant(scoped_user_id))?;
         let ob_uvw = WriteableUvw {
             uvw: Locked::new(uvw),

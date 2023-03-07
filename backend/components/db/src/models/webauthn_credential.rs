@@ -4,7 +4,7 @@ use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::{AttestationType, InsightEventId, UserVaultId, WebauthnCredentialId};
+use newtypes::{AttestationType, InsightEventId, VaultId, WebauthnCredentialId};
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::InsightEvent;
@@ -14,7 +14,7 @@ use super::insight_event::InsightEvent;
 #[diesel(table_name = webauthn_credential)]
 pub struct WebauthnCredential {
     pub id: WebauthnCredentialId,
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub counter: i32,
@@ -37,7 +37,7 @@ struct UpdateCredentialBackupState {
 
 impl WebauthnCredential {
     #[tracing::instrument(skip_all)]
-    pub fn get_for_user_vault(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
+    pub fn get_for_user_vault(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<Self>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
             .get_results(conn)?;
@@ -46,7 +46,7 @@ impl WebauthnCredential {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
+    pub fn list(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
             .inner_join(schema::insight_event::table)
@@ -69,11 +69,7 @@ impl WebauthnCredential {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn update_backup_state(
-        conn: &mut PgConn,
-        user_vault_id: &UserVaultId,
-        cred_id: &[u8],
-    ) -> DbResult<()> {
+    pub fn update_backup_state(conn: &mut PgConn, user_vault_id: &VaultId, cred_id: &[u8]) -> DbResult<()> {
         diesel::update(webauthn_credential::table)
             .filter(webauthn_credential::user_vault_id.eq(user_vault_id))
             .filter(webauthn_credential::credential_id.eq(cred_id))
@@ -86,7 +82,7 @@ impl WebauthnCredential {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = webauthn_credential)]
 pub struct NewWebauthnCredential {
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub attestation_data: Vec<u8>,

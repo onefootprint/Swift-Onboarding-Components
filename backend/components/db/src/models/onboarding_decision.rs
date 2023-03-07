@@ -19,7 +19,7 @@ use newtypes::FootprintUserId;
 use newtypes::TenantId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, Locked, OnboardingDecisionId,
-    OnboardingDecisionInfo, OnboardingId, OnboardingStatus, UserVaultId, VerificationResultId,
+    OnboardingDecisionInfo, OnboardingId, OnboardingStatus, VaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -63,7 +63,7 @@ pub struct OnboardingDecisionJunction {
 
 #[derive(Debug)]
 pub struct OnboardingDecisionCreateArgs<'a> {
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub onboarding: &'a Locked<Onboarding>,
     pub logic_git_hash: String,
     pub status: DecisionStatus,

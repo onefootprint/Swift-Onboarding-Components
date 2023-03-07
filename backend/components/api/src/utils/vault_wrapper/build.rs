@@ -11,10 +11,10 @@ use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
-use db::models::user_vault::NewPortablePersonUserVaultArgs;
-use db::models::user_vault::NewUserInfo;
-use db::models::user_vault::UserVault;
 use db::models::user_vault_data::UserVaultData;
+use db::models::vault::NewPortablePersonUserVaultArgs;
+use db::models::vault::NewVaultInfo;
+use db::models::vault::Vault;
 use db::HasLifetime;
 use db::PgConn;
 use db::TxnPgConn;
@@ -28,7 +28,7 @@ use std::marker::PhantomData;
 impl<Type> VaultWrapper<Type> {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn build_internal(
-        user_vault: UserVault,
+        user_vault: Vault,
         seqno: Option<DataLifetimeSeqno>,
         uvd: Vec<UserVaultData>,
         phone_numbers: Vec<PhoneNumber>,
@@ -92,17 +92,17 @@ impl VaultWrapper<Person> {
     /// with a provided ob_config
     pub fn create_user_vault(
         conn: &mut TxnPgConn,
-        user_info: NewUserInfo,
+        user_info: NewVaultInfo,
         ob_config: Option<ObConfiguration>,
         phone_args: NewPhoneNumberArgs,
-    ) -> ApiResult<Locked<UserVault>> {
+    ) -> ApiResult<Locked<Vault>> {
         let new_user_vault = NewPortablePersonUserVaultArgs {
             e_private_key: user_info.e_private_key,
             public_key: user_info.public_key,
             is_live: user_info.is_live,
             is_portable: true,
         };
-        let uv = UserVault::create_person_vault(conn, new_user_vault)?;
+        let uv = Vault::create_person_vault(conn, new_user_vault)?;
         let su_id = if let Some(ob_config) = ob_config {
             let su = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
             Some(su.id)

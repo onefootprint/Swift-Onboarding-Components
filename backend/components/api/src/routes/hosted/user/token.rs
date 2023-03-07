@@ -2,12 +2,12 @@ use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope, UserAuthScopeD
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use chrono::{DateTime, Utc};
-use newtypes::UserVaultId;
+use newtypes::VaultId;
 use paperclip::actix::{self, api_v2_operation, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct TokenResponse {
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub scopes: Vec<UserAuthScopeDiscriminant>,
     pub expires_at: DateTime<Utc>,
 }

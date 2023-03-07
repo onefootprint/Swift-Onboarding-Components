@@ -9,7 +9,7 @@ use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedUserId;
 use newtypes::TenantId;
-use newtypes::{DataLifetimeId, UserVaultId};
+use newtypes::{DataLifetimeId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use crate::nextval;
@@ -64,7 +64,7 @@ pub struct DataLifetime {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     // Ownership attributes
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub scoped_user_id: Option<ScopedUserId>,
     // Lifecycle attributes
     pub created_at: DateTime<Utc>,
@@ -80,7 +80,7 @@ pub struct DataLifetime {
 #[diesel(table_name = data_lifetime)]
 struct NewDataLifetime {
     // This is just denormalized for fast querying.
-    user_vault_id: UserVaultId,
+    user_vault_id: VaultId,
     // We might want to not support creating data not linked to a tenant. Right now this is only
     // used for the my1fp login flow
     scoped_user_id: Option<ScopedUserId>,
@@ -134,7 +134,7 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
         scoped_user_id: Option<&ScopedUserId>,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
@@ -159,7 +159,7 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub(crate) fn create(
         conn: &mut TxnPgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
         scoped_user_id: Option<&ScopedUserId>,
         kind: DataLifetimeKind,
         seqno: DataLifetimeSeqno,
@@ -262,7 +262,7 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub fn get_active(
         conn: &mut PgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
         scoped_user_id: Option<&ScopedUserId>,
     ) -> DbResult<Vec<Self>> {
         let mut query = data_lifetime::table
@@ -291,9 +291,9 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub fn get_bulk_active_for_tenant(
         conn: &mut PgConn,
-        user_vault_ids: Vec<&UserVaultId>,
+        user_vault_ids: Vec<&VaultId>,
         tenant_id: &TenantId,
-    ) -> DbResult<HashMap<UserVaultId, Vec<Self>>> {
+    ) -> DbResult<HashMap<VaultId, Vec<Self>>> {
         use crate::schema::scoped_user;
         let q_is_portable = not(data_lifetime::portablized_seqno.is_null());
         let q_belongs_to_tenant = scoped_user::tenant_id.eq(tenant_id);
@@ -324,7 +324,7 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub fn get_active_at(
         conn: &mut PgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
         scoped_user_id: Option<&ScopedUserId>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {

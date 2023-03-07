@@ -1,11 +1,11 @@
 use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::TestPgConn;
-use newtypes::{DataLifetimeKind, DataLifetimeSeqno, ScopedUserId, UserVaultId};
+use newtypes::{DataLifetimeKind, DataLifetimeSeqno, ScopedUserId, VaultId};
 
 /// Util function to create multiple DataLifetimes with the provided info
 pub fn build<T: Into<DataLifetimeKind>>(
     conn: &mut TestPgConn,
-    uv_id: &UserVaultId,
+    uv_id: &VaultId,
     su_id: &ScopedUserId,
     created_seqno: DataLifetimeSeqno,
     portablized_seqno: Option<DataLifetimeSeqno>,

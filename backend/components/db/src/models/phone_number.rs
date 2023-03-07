@@ -5,7 +5,7 @@ use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::{
     DataLifetimeId, DataLifetimeSeqno, DataPriority, Fingerprint as FingerprintData, IdentityDataKind,
-    PhoneNumberId, ScopedUserId, SealedVaultBytes, UserVaultId,
+    PhoneNumberId, ScopedUserId, SealedVaultBytes, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +45,7 @@ pub struct NewPhoneNumberArgs {
 
 impl PhoneNumber {
     #[tracing::instrument(skip_all)]
-    pub fn list(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<Self>> {
         let results = phone_number::table
             .inner_join(data_lifetime::table)
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
@@ -59,7 +59,7 @@ impl PhoneNumber {
     pub fn get(
         conn: &mut PgConn,
         phone_number_id: &PhoneNumberId,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
     ) -> DbResult<Self> {
         let result = phone_number::table
             .inner_join(data_lifetime::table)
@@ -73,7 +73,7 @@ impl PhoneNumber {
     #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
-        uv_id: &UserVaultId,
+        uv_id: &VaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
         su_id: Option<&ScopedUserId>,
@@ -109,7 +109,7 @@ impl PhoneNumber {
     #[tracing::instrument(skip_all)]
     pub fn create_verified(
         conn: &mut TxnPgConn,
-        uv_id: &UserVaultId,
+        uv_id: &VaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
         su_id: Option<&ScopedUserId>,

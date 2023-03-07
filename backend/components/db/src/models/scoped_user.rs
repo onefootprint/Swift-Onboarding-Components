@@ -4,14 +4,12 @@ use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{
-    FootprintUserId, Locked, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, UserVaultId,
-};
+use newtypes::{FootprintUserId, Locked, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::{IsLive, ObConfiguration};
 use super::tenant::Tenant;
-use super::user_vault::UserVault;
+use super::vault::Vault;
 
 /// Creates a unique identifier specific to each onboarding configuration.
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
@@ -21,7 +19,7 @@ use super::user_vault::UserVault;
 pub struct ScopedUser {
     pub id: ScopedUserId,
     pub fp_user_id: FootprintUserId,
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -36,7 +34,7 @@ pub struct ScopedUser {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = scoped_user)]
 struct NewScopedUser {
-    user_vault_id: UserVaultId,
+    user_vault_id: VaultId,
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
@@ -52,7 +50,7 @@ pub enum ScopedUserIdentifier<'a> {
     },
     User {
         id: &'a ScopedUserId,
-        uv_id: &'a UserVaultId,
+        uv_id: &'a VaultId,
     },
     FpUserId {
         fp_user_id: &'a FootprintUserId,
@@ -73,8 +71,8 @@ impl<'a> From<&'a OnboardingId> for ScopedUserIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a ScopedUserId, &'a UserVaultId)> for ScopedUserIdentifier<'a> {
-    fn from((id, uv_id): (&'a ScopedUserId, &'a UserVaultId)) -> Self {
+impl<'a> From<(&'a ScopedUserId, &'a VaultId)> for ScopedUserIdentifier<'a> {
+    fn from((id, uv_id): (&'a ScopedUserId, &'a VaultId)) -> Self {
         Self::User { id, uv_id }
     }
 }
@@ -94,7 +92,7 @@ impl ScopedUser {
     #[tracing::instrument(skip_all)]
     pub fn get_or_create(
         conn: &mut TxnPgConn,
-        uv: &Locked<UserVault>,
+        uv: &Locked<Vault>,
         // OR should we take in the ObConfiguration?
         ob_configuration_id: ObConfigurationId,
     ) -> DbResult<Self> {
@@ -133,7 +131,7 @@ impl ScopedUser {
     #[tracing::instrument(skip_all)]
     pub fn create_non_portable(
         conn: &mut TxnPgConn,
-        uv: Locked<UserVault>,
+        uv: Locked<Vault>,
         tenant_id: TenantId,
     ) -> DbResult<Self> {
         let uv = uv.into_inner();
@@ -157,7 +155,7 @@ impl ScopedUser {
     #[tracing::instrument(skip_all)]
     pub fn list_for_user_vault(
         conn: &mut PgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
     ) -> DbResult<Vec<(ScopedUser, Tenant)>> {
         use crate::schema::tenant;
         let results = scoped_user::table

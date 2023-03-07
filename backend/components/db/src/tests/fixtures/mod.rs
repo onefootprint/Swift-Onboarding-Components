@@ -10,5 +10,5 @@ pub mod scoped_user;
 pub mod tenant;
 pub mod tenant_role;
 pub mod tenant_user;
-pub mod user_vault;
+pub mod vault;
 pub mod verification_request;

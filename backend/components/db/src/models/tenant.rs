@@ -8,9 +8,7 @@ use diesel::prelude::*;
 use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
-use newtypes::{
-    CompanySize, EncryptedVaultPrivateKey, StripeCustomerId, TenantId, UserVaultId, VaultPublicKey,
-};
+use newtypes::{CompanySize, EncryptedVaultPrivateKey, StripeCustomerId, TenantId, VaultId, VaultPublicKey};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -102,7 +100,7 @@ impl Tenant {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list_by_user_vault_id(conn: &mut PgConn, user_vault_id: &UserVaultId) -> DbResult<Vec<Tenant>> {
+    pub fn list_by_user_vault_id(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<Tenant>> {
         let res = scoped_user::table
             .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .inner_join(tenant::table)

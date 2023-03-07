@@ -13,7 +13,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingCreateArgs;
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -39,7 +39,7 @@ pub async fn post(
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            UserVault::lock(conn, user_auth.user_vault_id())?;
+            Vault::lock(conn, user_auth.user_vault_id())?;
             // By the time we call POST /hosted/onboarding, we expect that the user auth token was
             // created with a tenant's onboarding config PK. This will have already created a
             // ScopedUser and associated it with the user auth token.

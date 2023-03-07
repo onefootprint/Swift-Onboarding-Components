@@ -7,7 +7,7 @@ use crate::models::user_timeline::UserTimeline;
 use crate::PgConn;
 use crate::TxnPgConn;
 
-use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, UserVaultId};
+use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, VaultId};
 
 pub(crate) fn test_tenant_user(
     conn: &mut TxnPgConn,
@@ -29,7 +29,7 @@ pub(crate) fn test_annotation<T>(
     note: String,
     is_pinned: bool,
     scoped_user_id: ScopedUserId,
-    user_vault_id: UserVaultId,
+    user_vault_id: VaultId,
     actor: T,
 ) -> AnnotationInfo
 where
@@ -71,7 +71,7 @@ pub(crate) fn test_tenant_api_key(
 #[allow(clippy::module_inception)]
 #[cfg(test)]
 mod test {
-    use crate::models::{tenant::Tenant, user_vault::UserVault};
+    use crate::models::{tenant::Tenant, vault::Vault};
     use crate::{test_helpers, DbResult};
     use diesel::sql_types::Text;
     use diesel::{sql_query, RunQueryDsl};
@@ -99,14 +99,14 @@ mod test {
             .await
             .expect("couldn't make DB query");
 
-        let new_user = crate::models::user_vault::NewPortablePersonUserVaultArgs {
+        let new_user = crate::models::vault::NewPortablePersonUserVaultArgs {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
             is_live: false,
             is_portable: true,
         };
         pool.db_transaction(|conn| -> DbResult<_> {
-            let result = UserVault::create_person_vault(conn, new_user)?.into_inner();
+            let result = Vault::create_person_vault(conn, new_user)?.into_inner();
             Ok(result)
         })
         .await

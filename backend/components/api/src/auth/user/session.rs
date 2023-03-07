@@ -5,7 +5,7 @@ use db::{
     PgConn,
 };
 use itertools::Itertools;
-use newtypes::{ScopedUserId, UserVaultId};
+use newtypes::{ScopedUserId, VaultId};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthScope, UserAuthScopeDiscriminant};
@@ -24,7 +24,7 @@ use feature_flag::LaunchDarklyFeatureFlagClient;
 /// users from using this in an actix extractor. The ParsableUserSession
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct UserSession {
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     scopes: Vec<UserAuthScope>,
 }
 
@@ -32,7 +32,7 @@ pub struct UserSession {
 impl AllowSessionUpdate for UserSession {}
 
 impl UserSession {
-    pub fn make(user_vault_id: UserVaultId, scopes: Vec<UserAuthScope>) -> AuthSessionData {
+    pub fn make(user_vault_id: VaultId, scopes: Vec<UserAuthScope>) -> AuthSessionData {
         AuthSessionData::User(Self {
             user_vault_id,
             scopes,
@@ -66,7 +66,7 @@ impl UserSession {
 
 #[derive(Debug)]
 pub struct AuthedOnboardingInfo {
-    pub user_vault_id: UserVaultId,
+    pub user_vault_id: VaultId,
     pub onboarding: Onboarding,
     pub scoped_user: ScopedUser,
     pub ob_config: ObConfiguration,
@@ -135,7 +135,7 @@ impl SessionContext<UserSession> {
 }
 
 impl UserAuth for UserSession {
-    fn user_vault_id(&self) -> &UserVaultId {
+    fn user_vault_id(&self) -> &VaultId {
         &self.user_vault_id
     }
 }

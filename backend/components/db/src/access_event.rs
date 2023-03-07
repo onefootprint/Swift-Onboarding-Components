@@ -14,7 +14,7 @@ use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::TenantId;
-use newtypes::UserVaultId;
+use newtypes::VaultId;
 
 #[derive(Debug)]
 pub struct AccessEventListQueryParams {
@@ -126,7 +126,7 @@ pub struct AccessEventListItemForUser {
 
 impl AccessEventListItemForUser {
     /// get access events for a user
-    pub async fn get(pool: &DbPool, user_vault_id: UserVaultId) -> Result<Vec<Self>, DbError> {
+    pub async fn get(pool: &DbPool, user_vault_id: VaultId) -> Result<Vec<Self>, DbError> {
         let list_items = pool
             .db_query(move |conn| -> DbResult<_> {
                 let results: Vec<(AccessEvent, ScopedUser, Tenant)> = schema::access_event::table

@@ -15,7 +15,7 @@ use crypto::sha256;
 use db::models::{insight_event::CreateInsightEvent, user_timeline::UserTimeline};
 use db::models::{
     liveness_event::NewLivenessEvent,
-    user_vault::UserVault,
+    vault::Vault,
     webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
 };
 use newtypes::Base64Data;
@@ -215,7 +215,7 @@ pub async fn complete_post(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             // Protect against someone adding a webauthn credential while we verify that there's
             // only one
-            UserVault::lock(conn, user_auth.user_vault_id())?;
+            Vault::lock(conn, user_auth.user_vault_id())?;
             let creds = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
             if !creds.is_empty() {
                 return Err(ChallengeError::BiometricCredentialAlreadyExists.into());

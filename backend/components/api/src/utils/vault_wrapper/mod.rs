@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 pub use accessors::*;
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use newtypes::DataLifetimeSeqno;
 
 use self::vw_data::VwData;
@@ -35,7 +35,7 @@ pub struct Business;
 ///         * it is the source of truth to know what we datums we have collected from a User
 #[derive(Debug, Clone)]
 pub struct VaultWrapper<Type> {
-    pub user_vault: UserVault,
+    pub user_vault: Vault,
     speculative: VwData<Type>,
     portable: VwData<Type>,
     // The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.

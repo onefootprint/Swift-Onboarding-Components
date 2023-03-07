@@ -1,9 +1,9 @@
 use crate::errors::ApiResult;
 use db::{
-    models::{onboarding::Onboarding, user_vault::UserVault, verification_request::VerificationRequest},
+    models::{onboarding::Onboarding, vault::Vault, verification_request::VerificationRequest},
     PgConn,
 };
-use newtypes::{DataLifetimeSeqno, ScopedUserId, UserVaultId};
+use newtypes::{DataLifetimeSeqno, ScopedUserId, VaultId};
 
 /// There are a lot of places we build UVWs, under varying circumstances. Things to consider:
 ///   - Portable and Speculative data:
@@ -19,7 +19,7 @@ pub enum VwArgs<'a> {
     Idv(VerificationRequest),
     /// Used to build a UVW for a user that sees ALL portable data, or if it's non-portable, just speculative.
     /// This is generally used in user-authed APIs for my1fp
-    User(&'a UserVaultId),
+    User(&'a VaultId),
     /// Used to build a UVW that sees ALL portable data and speculative data
     /// Generally used during APIs on the bifrost onboarding path when WRITING data to the vault or
     /// in tenant-authed APIs when READING data from the vault.
@@ -27,22 +27,22 @@ pub enum VwArgs<'a> {
     Tenant(&'a ScopedUserId),
 }
 
-type Args = (UserVault, Option<ScopedUserId>, Option<DataLifetimeSeqno>);
+type Args = (Vault, Option<ScopedUserId>, Option<DataLifetimeSeqno>);
 
 impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
         let args = match self {
             Self::Idv(req) => {
                 let (_, su, _, _) = Onboarding::get(conn, &req.onboarding_id)?;
-                let uv = UserVault::get(conn, &su.user_vault_id)?;
+                let uv = Vault::get(conn, &su.user_vault_id)?;
                 (uv, Some(su.id), Some(req.uvw_snapshot_seqno))
             }
             Self::User(uv_id) => {
-                let user_vault = UserVault::get(conn, uv_id)?;
+                let user_vault = Vault::get(conn, uv_id)?;
                 (user_vault, None, None)
             }
             Self::Tenant(su_id) => {
-                let uv = UserVault::get(conn, su_id)?;
+                let uv = Vault::get(conn, su_id)?;
                 (uv, Some(su_id.clone()), None)
             }
         };

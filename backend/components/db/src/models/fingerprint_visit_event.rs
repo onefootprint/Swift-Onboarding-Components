@@ -3,9 +3,7 @@ use crate::{schema::fingerprint_visit_event, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{
-    FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedUserId, UserVaultId,
-};
+use newtypes::{FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedUserId, VaultId};
 use serde::{Deserialize, Serialize};
 
 /// Represents a single visit from a FootprintVisitorId
@@ -14,7 +12,7 @@ use serde::{Deserialize, Serialize};
 pub struct FingerprintVisitEvent {
     pub id: FingerprintVisitEventId,
     pub visitor_id: FingerprintVisitorId,
-    pub user_vault_id: Option<UserVaultId>,
+    pub user_vault_id: Option<VaultId>,
     pub scoped_user_id: Option<ScopedUserId>,
     pub path: String,
     pub session_id: Option<String>,
@@ -27,7 +25,7 @@ pub struct FingerprintVisitEvent {
 #[diesel(table_name = fingerprint_visit_event)]
 pub struct NewFingerprintVisit {
     pub visitor_id: FingerprintVisitorId,
-    pub user_vault_id: Option<UserVaultId>,
+    pub user_vault_id: Option<VaultId>,
     pub scoped_user_id: Option<ScopedUserId>,
     pub path: String,
     pub session_id: Option<String>,
@@ -40,7 +38,7 @@ impl FingerprintVisitEvent {
         conn: &mut PgConn,
         visitor_id: FingerprintVisitorId,
         request_id: FingerprintRequestId,
-        user_vault_id: Option<UserVaultId>,
+        user_vault_id: Option<VaultId>,
         scoped_user_id: Option<ScopedUserId>,
         path: String,
         session_id: Option<String>,

@@ -7,12 +7,12 @@ use crate::{
 };
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use db::DbPool;
 use db::{
     models::{
         onboarding::Onboarding, onboarding_decision::OnboardingDecision, phone_number::NewPhoneNumberArgs,
-        risk_signal::RiskSignal, scoped_user::ScopedUser, user_vault::NewUserInfo,
+        risk_signal::RiskSignal, scoped_user::ScopedUser, vault::NewVaultInfo,
     },
     test_helpers::test_db_pool,
     tests::fixtures,
@@ -25,7 +25,7 @@ use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use newtypes::Fingerprinter;
 use newtypes::{
-    DecisionStatus, EncryptedVaultPrivateKey, FootprintReasonCode, IdentityDataKind, PiiString, UserVaultId,
+    DecisionStatus, EncryptedVaultPrivateKey, FootprintReasonCode, IdentityDataKind, PiiString, VaultId,
     VaultPublicKey, Vendor, VendorAPI,
 };
 use rand::Rng;
@@ -62,8 +62,8 @@ fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     ob_config: ObConfiguration,
     keys_and_new_phone_args: KeysAndNewPhoneNumberArgs,
-) -> (UserVault, ScopedUser) {
-    let user_info = NewUserInfo {
+) -> (Vault, ScopedUser) {
+    let user_info = NewVaultInfo {
         e_private_key: keys_and_new_phone_args.1,
         public_key: keys_and_new_phone_args.0,
         is_live: true,
@@ -100,7 +100,7 @@ async fn create_user_and_onboarding(
     state: &State,
     db_pool: &DbPool,
     phone_number: &String,
-) -> (Tenant, Onboarding, UserVaultId) {
+) -> (Tenant, Onboarding, VaultId) {
     let keys_and_phone = get_keys_and_new_phone_args(state, phone_number).await;
 
     db_pool

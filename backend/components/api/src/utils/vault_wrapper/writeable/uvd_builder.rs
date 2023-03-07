@@ -16,7 +16,7 @@ use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate, PersonVaultDataKind,
-    PiiString, ScopedUserId, UserVaultId, VaultPublicKey,
+    PiiString, ScopedUserId, VaultId, VaultPublicKey,
 };
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
@@ -59,7 +59,7 @@ impl UvdBuilder {
         self,
         conn: &mut TxnPgConn,
         existing_fields: Vec<IdentityDataKind>, // portable or speculative on UVW
-        user_vault_id: UserVaultId,
+        user_vault_id: VaultId,
         scoped_user_id: ScopedUserId,
         fingerprints: NewFingerprints,
     ) -> ApiResult<()> {

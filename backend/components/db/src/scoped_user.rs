@@ -1,5 +1,5 @@
 use crate::models::scoped_user::ScopedUser;
-use crate::models::user_vault::UserVault;
+use crate::models::vault::Vault;
 use crate::schema;
 use crate::PgConn;
 use crate::{errors::DbError, schema::scoped_user::BoxedQuery};
@@ -168,7 +168,7 @@ pub fn list_authorized_for_tenant(
     params: ScopedUserListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<(ScopedUser, UserVault)>, DbError> {
+) -> Result<Vec<(ScopedUser, Vault)>, DbError> {
     let mut scoped_users = list_authorized_for_tenant_query(params)
         .order_by(schema::scoped_user::ordering_id.desc())
         .limit(page_size);

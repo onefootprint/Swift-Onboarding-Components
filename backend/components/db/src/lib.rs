@@ -29,7 +29,7 @@ use diesel::pg::PgConnection as DieselPgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
 use errors::TransactionError;
-use newtypes::UserVaultId;
+use newtypes::VaultId;
 
 #[allow(unused_imports)]
 pub mod schema;
@@ -187,7 +187,7 @@ pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
 }
 
 #[tracing::instrument(skip_all)]
-pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &UserVaultId) -> Result<usize, DbError> {
+pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -> Result<usize, DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.
 

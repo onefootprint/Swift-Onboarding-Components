@@ -9,7 +9,7 @@ use db::models::kv_data::KeyValueData;
 use db::models::onboarding::Onboarding;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use db::models::user_vault_data::UserVaultData;
 use db::HasLifetime;
 use db::PgConn;
@@ -33,7 +33,7 @@ impl VaultWrapper<Person> {
     #[tracing::instrument(skip_all)]
     pub fn multi_get_for_tenant(
         conn: &mut PgConn,
-        users: Vec<(ScopedUser, UserVault)>,
+        users: Vec<(ScopedUser, Vault)>,
         tenant_id: &TenantId,
     ) -> ApiResult<HashMap<ScopedUserId, TenantUvw>> {
         let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();

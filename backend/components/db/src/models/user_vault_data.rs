@@ -12,8 +12,8 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::PersonVaultDataKind;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
-use newtypes::UserVaultId;
 use newtypes::UvdKind;
+use newtypes::VaultId;
 use newtypes::{DataLifetimeId, UvdId};
 use serde::{Deserialize, Serialize};
 
@@ -52,7 +52,7 @@ impl UserVaultData {
     #[tracing::instrument(skip_all)]
     pub fn bulk_create<T>(
         conn: &mut TxnPgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
         scoped_user_id: Option<&ScopedUserId>,
         data: Vec<NewUserVaultData<T>>,
         seqno: DataLifetimeSeqno,

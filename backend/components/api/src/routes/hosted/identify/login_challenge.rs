@@ -10,7 +10,7 @@ use crate::State;
 use crate::{errors::ApiError, hosted::identify::ChallengeState};
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::UserVaultId;
+use newtypes::VaultId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
@@ -109,7 +109,7 @@ struct BiometricChallenge {
 
 async fn initiate_biometric_challenge_for_user(
     state: &web::Data<State>,
-    user_id: &UserVaultId,
+    user_id: &VaultId,
     creds: Vec<WebauthnCredential>,
 ) -> Result<BiometricChallenge, ApiError> {
     if creds.is_empty() {

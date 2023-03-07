@@ -10,7 +10,7 @@ use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
     EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, Locked, OnboardingId, ScopedUserId, TenantId,
-    UserVaultId, VaultKind, VaultPublicKey,
+    VaultId, VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -19,8 +19,8 @@ use super::scoped_user::ScopedUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vault)]
-pub struct UserVault {
-    pub id: UserVaultId,
+pub struct Vault {
+    pub id: VaultId,
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub _created_at: DateTime<Utc>,
@@ -30,8 +30,8 @@ pub struct UserVault {
     pub kind: VaultKind,
 }
 
-pub enum UserVaultIdentifier<'a> {
-    Id(&'a UserVaultId),
+pub enum VaultIdentifier<'a> {
+    Id(&'a VaultId),
     ScopedUserId(&'a ScopedUserId),
     FpUserId {
         fp_user_id: &'a FootprintUserId,
@@ -41,19 +41,19 @@ pub enum UserVaultIdentifier<'a> {
     OnboardingId(&'a OnboardingId),
 }
 
-impl<'a> From<&'a UserVaultId> for UserVaultIdentifier<'a> {
-    fn from(id: &'a UserVaultId) -> Self {
+impl<'a> From<&'a VaultId> for VaultIdentifier<'a> {
+    fn from(id: &'a VaultId) -> Self {
         Self::Id(id)
     }
 }
 
-impl<'a> From<&'a ScopedUserId> for UserVaultIdentifier<'a> {
+impl<'a> From<&'a ScopedUserId> for VaultIdentifier<'a> {
     fn from(id: &'a ScopedUserId) -> Self {
         Self::ScopedUserId(id)
     }
 }
 
-impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for UserVaultIdentifier<'a> {
+impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for VaultIdentifier<'a> {
     fn from((fp_user_id, tenant_id, is_live): (&'a FootprintUserId, &'a TenantId, IsLive)) -> Self {
         Self::FpUserId {
             fp_user_id,
@@ -63,17 +63,17 @@ impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for UserVaultIdentifi
     }
 }
 
-impl<'a> From<&'a OnboardingId> for UserVaultIdentifier<'a> {
+impl<'a> From<&'a OnboardingId> for VaultIdentifier<'a> {
     fn from(id: &'a OnboardingId) -> Self {
         Self::OnboardingId(id)
     }
 }
 
-impl UserVault {
-    fn query(id: UserVaultIdentifier) -> BoxedQuery<Pg> {
+impl Vault {
+    fn query(id: VaultIdentifier) -> BoxedQuery<Pg> {
         match id {
-            UserVaultIdentifier::Id(id) => user_vault::table.filter(user_vault::id.eq(id)).into_boxed(),
-            UserVaultIdentifier::ScopedUserId(scoped_user_id) => {
+            VaultIdentifier::Id(id) => user_vault::table.filter(user_vault::id.eq(id)).into_boxed(),
+            VaultIdentifier::ScopedUserId(scoped_user_id) => {
                 let uv_ids = scoped_user::table
                     .filter(scoped_user::id.eq(scoped_user_id))
                     .select(scoped_user::user_vault_id);
@@ -81,7 +81,7 @@ impl UserVault {
                     .filter(user_vault::id.eq_any(uv_ids))
                     .into_boxed()
             }
-            UserVaultIdentifier::FpUserId {
+            VaultIdentifier::FpUserId {
                 fp_user_id,
                 tenant_id,
                 is_live,
@@ -95,7 +95,7 @@ impl UserVault {
                     .filter(user_vault::id.eq_any(uv_ids))
                     .into_boxed()
             }
-            UserVaultIdentifier::OnboardingId(onboarding_id) => {
+            VaultIdentifier::OnboardingId(onboarding_id) => {
                 let uv_ids = onboarding::table
                     .filter(onboarding::id.eq(onboarding_id))
                     .inner_join(scoped_user::table)
@@ -111,14 +111,14 @@ impl UserVault {
     #[tracing::instrument(skip_all)]
     pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
     where
-        T: Into<UserVaultIdentifier<'a>>,
+        T: Into<VaultIdentifier<'a>>,
     {
         let user = Self::query(id.into()).first(conn)?;
         Ok(user)
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &UserVaultId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<Locked<Self>> {
         let user = user_vault::table
             .filter(user_vault::id.eq(id))
             .for_no_key_update()
@@ -150,10 +150,10 @@ impl UserVault {
     }
 
     #[tracing::instrument(skip_all)]
-    fn create(conn: &mut PgConn, new_user: NewUserVaultArgs) -> DbResult<Locked<UserVault>> {
+    fn create(conn: &mut PgConn, new_user: NewVaultRow) -> DbResult<Locked<Vault>> {
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user)
-            .get_result::<UserVault>(conn)?;
+            .get_result::<Vault>(conn)?;
         Ok(Locked::new(user_vault))
     }
 
@@ -161,7 +161,7 @@ impl UserVault {
     pub fn create_person_vault(
         conn: &mut PgConn,
         args: NewPortablePersonUserVaultArgs,
-    ) -> DbResult<Locked<UserVault>> {
+    ) -> DbResult<Locked<Vault>> {
         let NewPortablePersonUserVaultArgs {
             e_private_key,
             public_key,
@@ -169,7 +169,7 @@ impl UserVault {
             is_portable,
         } = args;
 
-        let args = NewUserVaultArgs {
+        let args = NewVaultRow {
             e_private_key,
             public_key,
             is_live,
@@ -193,7 +193,7 @@ impl UserVault {
             tenant_id,
         } = req;
 
-        let new_user_vault = NewUserVaultArgs {
+        let new_user_vault = NewVaultRow {
             e_private_key,
             public_key,
             is_live,
@@ -209,7 +209,7 @@ impl UserVault {
     #[tracing::instrument(skip_all)]
     /// Look for the portable user vault with a matching fingerprint
     #[tracing::instrument(skip_all)]
-    pub fn find_portable(conn: &mut PgConn, sh_data: Fingerprint) -> DbResult<Option<UserVault>> {
+    pub fn find_portable(conn: &mut PgConn, sh_data: Fingerprint) -> DbResult<Option<Vault>> {
         use crate::schema::{data_lifetime, fingerprint};
 
         let results = user_vault::table
@@ -220,7 +220,7 @@ impl UserVault {
             // Never allow finding a vault-only, non-portable user vault created via API
             .filter(user_vault::is_portable.eq(true))
             .select(user_vault::all_columns)
-            .get_results::<UserVault>(conn)?;
+            .get_results::<Vault>(conn)?;
 
         // we found more than 1 vault on this fingerprint
         if results.len() > 1 {
@@ -242,7 +242,7 @@ impl UserVault {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = user_vault)]
-struct NewUserVaultArgs {
+struct NewVaultRow {
     e_private_key: EncryptedVaultPrivateKey,
     public_key: VaultPublicKey,
     is_live: IsLive,
@@ -250,7 +250,7 @@ struct NewUserVaultArgs {
     kind: VaultKind,
 }
 
-pub struct NewUserInfo {
+pub struct NewVaultInfo {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub is_live: IsLive,

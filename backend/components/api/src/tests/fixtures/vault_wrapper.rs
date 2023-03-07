@@ -6,8 +6,8 @@ use db::{
         ob_configuration::ObConfiguration,
         scoped_user::ScopedUser,
         tenant::Tenant,
-        user_vault::UserVault,
         user_vault_data::{NewPersonVaultData, UserVaultData},
+        vault::Vault,
     },
     tests::prelude::TestPgConn,
 };
@@ -19,11 +19,11 @@ pub type VwSetup = (
     ObConfiguration,
     VaultWrapper<Person>,
     Tenant,
-    Locked<UserVault>,
+    Locked<Vault>,
 );
 
 pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
-    let uv = db::tests::fixtures::user_vault::create(conn, uv_is_live);
+    let uv = db::tests::fixtures::vault::create_person(conn, uv_is_live);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, uv_is_live);
     let su = db::tests::fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);

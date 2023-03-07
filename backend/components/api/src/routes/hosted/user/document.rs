@@ -14,15 +14,14 @@ use db::models::document_request::{DocumentRequest as DbDocumentRequest, Documen
 use db::models::identity_document::IdentityDocument;
 use db::models::user_consent::UserConsent;
 use db::models::user_timeline::UserTimeline;
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::{DbError, DbPool, DbResult, PgConn};
 use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
 use newtypes::{
-    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, ScopedUserId, SealedVaultDataKey,
-    UserVaultId,
+    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, ScopedUserId, SealedVaultDataKey, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -60,7 +59,7 @@ pub async fn post(
             // Move our request to Uploaded so any subsequent POSTs will fail
             let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
             let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
-            let uv = UserVault::get(conn, user_auth.user_vault_id())?;
+            let uv = Vault::get(conn, user_auth.user_vault_id())?;
 
             let user_consent = UserConsent::latest_for_onboarding(conn, &auth_info.onboarding.id)?;
 
@@ -411,7 +410,7 @@ async fn handle_scan_onboarding_request(
     document_request: DbDocumentRequest,
     document_verification_request: VerificationRequest,
     scoped_user_id: ScopedUserId,
-    user_vault_id: UserVaultId,
+    user_vault_id: VaultId,
     identity_document_id: IdentityDocumentId,
 ) -> Result<(), ApiError> {
     // Make document verification request

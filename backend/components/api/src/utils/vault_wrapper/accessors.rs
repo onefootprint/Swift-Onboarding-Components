@@ -4,7 +4,7 @@ use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use newtypes::IdentityDataKind;
 use newtypes::KvDataKey;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
@@ -84,7 +84,7 @@ impl VaultWrapper<Person> {
 
 impl VaultWrapper<Person> {
     /// helper to expose a reference/deref coercion to the underlying UV (normally from a LockedVaultWrapper)
-    pub fn user_vault(&self) -> &UserVault {
+    pub fn user_vault(&self) -> &Vault {
         &self.user_vault
     }
 }

@@ -10,7 +10,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
-use super::user_vault::UserVault;
+use super::vault::Vault;
 use super::verification_result::VerificationResult;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
@@ -143,7 +143,7 @@ impl VerificationRequest {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<UserVault> {
+    pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Vault> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
             .inner_join(onboarding::table.inner_join(scoped_user::table.inner_join(user_vault::table)))

@@ -3,7 +3,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
 use db::models::tenant::Tenant;
-use db::models::user_vault::UserVault;
+use db::models::vault::Vault;
 use newtypes::{Fingerprinter, IdentityDataKind, PhoneNumber, TenantId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -68,7 +68,7 @@ async fn post(
 
     let uv = state
         .db_pool
-        .db_query(|conn| UserVault::find_portable(conn, sh_data))
+        .db_query(|conn| Vault::find_portable(conn, sh_data))
         .await??;
     let user_vault_id = if let Some(uv) = uv {
         uv.id
@@ -90,7 +90,7 @@ async fn post(
     let num_deleted_rows = state
         .db_pool
         .db_transaction(move |conn| -> Result<usize, ApiError> {
-            UserVault::lock(conn, &user_vault_id)?;
+            Vault::lock(conn, &user_vault_id)?;
 
             if is_production && is_allowlisted_real_phone_number {
                 let impacted_tenants: Vec<Tenant> = Tenant::list_by_user_vault_id(conn, &user_vault_id)?;

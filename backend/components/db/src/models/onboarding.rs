@@ -16,7 +16,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
     CollectedDataOption as CDO, FootprintUserId, InsightEventId, Locked, ObConfigurationId,
-    OnboardingDecisionId, OnboardingId, ScopedUserId, TenantId, TenantScope, UserVaultId,
+    OnboardingDecisionId, OnboardingId, ScopedUserId, TenantId, TenantScope, VaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -97,10 +97,10 @@ pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
     ScopedUserId {
         su_id: &'a ScopedUserId,
-        user_vault_id: &'a UserVaultId,
+        user_vault_id: &'a VaultId,
     },
     ConfigId {
-        user_vault_id: &'a UserVaultId,
+        user_vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
     },
 }
@@ -112,14 +112,14 @@ impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
 }
 
 // TODO change this to su_id, user_vault_id?
-impl<'a> From<(&'a ScopedUserId, &'a UserVaultId)> for OnboardingIdentifier<'a> {
-    fn from((su_id, user_vault_id): (&'a ScopedUserId, &'a UserVaultId)) -> Self {
+impl<'a> From<(&'a ScopedUserId, &'a VaultId)> for OnboardingIdentifier<'a> {
+    fn from((su_id, user_vault_id): (&'a ScopedUserId, &'a VaultId)) -> Self {
         Self::ScopedUserId { su_id, user_vault_id }
     }
 }
 
-impl<'a> From<(&'a UserVaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a> {
-    fn from((user_vault_id, ob_config_id): (&'a UserVaultId, &'a ObConfigurationId)) -> Self {
+impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a> {
+    fn from((user_vault_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
         Self::ConfigId {
             user_vault_id,
             ob_config_id,
@@ -200,7 +200,7 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn lock_by_config(
         conn: &mut TxnPgConn,
-        user_vault_id: &UserVaultId,
+        user_vault_id: &VaultId,
         ob_configuration_id: &ObConfigurationId,
     ) -> DbResult<Option<Locked<Onboarding>>> {
         let su_ids = scoped_user::table
