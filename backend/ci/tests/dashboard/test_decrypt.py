@@ -185,12 +185,8 @@ def test_tenant_selfie_decrypt(
 
     ob_conf_data = {
         "name": "Flerp Config",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
-        "must_collect_identity_document": True,
-        "must_collect_selfie": True,
-        "can_access_identity_document_images": True,
-        "can_access_selfie_image": True,
+        "must_collect_data": must_collect_data + ["document_and_selfie"],
+        "can_access_data": can_access_data + ["document_and_selfie"],
     }
     ob_config = create_ob_config(sandbox_tenant.sk, ob_conf_data)
 

@@ -142,12 +142,12 @@ class TestBifrost:
         )
 
     @pytest.mark.parametrize(
-        "must_collect_identity_document,must_collect_selfie,can_access_identity_document_images,can_access_selfie_image",
+        "addl_must_collect_data,addl_can_access_data",
         [
-            (True, True, True, True),
-            (True, False, True, False),
-            (True, True, False, False),
-            (False, False, False, False),
+            (["document_and_selfie"], ["document_and_selfie"]),
+            (["document"], ["document"]),
+            (["document_and_selfie"], []),
+            ([], []),
         ],
     )
     def test_onboarding_config_document_requirements(
@@ -157,10 +157,8 @@ class TestBifrost:
         can_access_data,
         twilio,
         non_sandbox_auth_token,
-        must_collect_identity_document,
-        must_collect_selfie,
-        can_access_identity_document_images,
-        can_access_selfie_image,
+        addl_must_collect_data,
+        addl_can_access_data,
     ):
         # Not used in test, but want to make sure the user has been created before running this test
         non_sandbox_auth_token
@@ -169,12 +167,8 @@ class TestBifrost:
 
         ob_conf_data = {
             "name": "Flerp Config",
-            "must_collect_data": must_collect_data,
-            "can_access_data": can_access_data,
-            "must_collect_identity_document": must_collect_identity_document,
-            "must_collect_selfie": must_collect_selfie,
-            "can_access_identity_document_images": can_access_identity_document_images,
-            "can_access_selfie_image": can_access_selfie_image,
+            "must_collect_data": must_collect_data + addl_must_collect_data,
+            "can_access_data": can_access_data + addl_can_access_data,
         }
         ob_config = create_ob_config(tenant.sk, ob_conf_data)
 
@@ -183,16 +177,8 @@ class TestBifrost:
         listed_ob_config = next(
             obc for obc in onboarding_configs_res["data"] if obc["id"] == ob_config.id
         )
-        assert (
-            listed_ob_config["must_collect_identity_document"]
-            == must_collect_identity_document
-        )
-        assert listed_ob_config["must_collect_selfie"] == must_collect_selfie
-        assert (
-            listed_ob_config["can_access_identity_document_images"]
-            == can_access_identity_document_images
-        )
-        assert listed_ob_config["can_access_selfie_image"] == can_access_selfie_image
+        assert set(listed_ob_config["must_collect_data"]) > set(addl_must_collect_data)
+        assert set(listed_ob_config["can_access_data"]) > set(addl_can_access_data)
 
         # Create a user and begin onboarding
         auth_token = create_inherited_non_sandbox_user(
@@ -212,8 +198,13 @@ class TestBifrost:
         collect_document_req = get_requirement_from_requirements(
             "collect_document", body["requirements"]
         )
-        if must_collect_identity_document:
-            assert collect_document_req["should_collect_selfie"] == must_collect_selfie
+        if (
+            "document" in addl_must_collect_data
+            or "document_and_selfie" in addl_must_collect_data
+        ):
+            assert collect_document_req["should_collect_selfie"] == (
+                "document_and_selfie" in addl_must_collect_data
+            )
         else:
             assert collect_document_req is None
 

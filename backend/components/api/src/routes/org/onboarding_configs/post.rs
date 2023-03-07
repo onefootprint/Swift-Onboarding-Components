@@ -22,18 +22,6 @@ pub struct CreateOnboardingConfigurationRequest {
     name: String,
     must_collect_data: Vec<CollectedDataOption>,
     can_access_data: Vec<CollectedDataOption>,
-    #[serde(default)]
-    /// TODO: deprecate
-    must_collect_identity_document: bool,
-    #[serde(default)]
-    /// TODO: deprecate
-    can_access_identity_document_images: bool,
-    #[serde(default)]
-    /// TODO: deprecate
-    must_collect_selfie: bool,
-    #[serde(default)]
-    /// TODO: deprecate
-    can_access_selfie_image: bool,
 }
 
 const REQUIRED_FIELDS: [CollectedDataOption; 4] = [
@@ -65,19 +53,7 @@ impl CreateOnboardingConfigurationRequest {
             return Err(TenantError::ValidationError(
                 "Decryptable fields must be a subset of collected fields".to_owned(),
             ));
-        } else if self.must_collect_selfie && !self.must_collect_identity_document {
-            return Err(TenantError::ValidationError(
-                "Cannot collect selfie without collecting a document".to_owned(),
-            ));
-        } else if self.can_access_identity_document_images && !self.must_collect_identity_document {
-            return Err(TenantError::ValidationError(
-                "Cannot access document images without collecting them".to_owned(),
-            ));
-        } else if self.can_access_selfie_image && !self.must_collect_selfie {
-            return Err(TenantError::ValidationError(
-                "Cannot access selfie images without collecting them".to_owned(),
-            ));
-        };
+        }
         let missing_required_fields: Vec<_> = REQUIRED_FIELDS
             .into_iter()
             .filter(|x| !self.must_collect_data.contains(x))
@@ -107,24 +83,9 @@ pub async fn post(
     let tenant = auth.tenant().clone();
     let CreateOnboardingConfigurationRequest {
         name,
-        mut must_collect_data,
-        mut can_access_data,
-        must_collect_identity_document,
-        can_access_identity_document_images,
-        must_collect_selfie,
-        can_access_selfie_image,
+        must_collect_data,
+        can_access_data,
     } = request.into_inner();
-    if must_collect_identity_document && must_collect_selfie {
-        must_collect_data.push(CollectedDataOption::DocumentAndSelfie)
-    } else if must_collect_identity_document {
-        must_collect_data.push(CollectedDataOption::Document)
-    }
-    if can_access_identity_document_images && can_access_selfie_image {
-        can_access_data.push(CollectedDataOption::DocumentAndSelfie)
-    } else if can_access_identity_document_images {
-        can_access_data.push(CollectedDataOption::Document)
-    }
-
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
     let obc = state

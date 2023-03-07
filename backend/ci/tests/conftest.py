@@ -127,9 +127,8 @@ def sandbox_tenant(sandbox_tenant_data):
 def doc_request_ob_config(tenant, must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Doc request config",
-        "must_collect_data": must_collect_data,
+        "must_collect_data": must_collect_data + ["document"],
         "can_access_data": can_access_data,
-        "must_collect_identity_document": True,
     }
     return create_ob_config(tenant.sk, ob_conf_data)
 
@@ -138,9 +137,8 @@ def doc_request_ob_config(tenant, must_collect_data, can_access_data):
 def doc_request_ob_config2(tenant, must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Doc request config",
-        "must_collect_data": must_collect_data,
+        "must_collect_data": must_collect_data + ["document"],
         "can_access_data": can_access_data,
-        "must_collect_identity_document": True,
     }
     return create_ob_config(tenant.sk, ob_conf_data)
 
@@ -149,12 +147,8 @@ def doc_request_ob_config2(tenant, must_collect_data, can_access_data):
 def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Doc request config",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
-        "must_collect_identity_document": True,
-        "can_access_identity_document_images": True,
-        "must_collect_selfie": True,
-        "can_access_selfie_image": True,
+        "must_collect_data": must_collect_data + ["document_and_selfie"],
+        "can_access_data": can_access_data + ["document_and_selfie"],
     }
     return create_ob_config(sandbox_tenant.sk, ob_conf_data)
 
