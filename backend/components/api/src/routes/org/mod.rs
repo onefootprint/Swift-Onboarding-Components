@@ -1,26 +1,22 @@
 use paperclip::actix::web;
 
-pub mod access_events;
-pub mod api_keys;
-pub mod auth;
-pub mod index;
-pub mod logo;
-pub mod member;
-pub mod members;
-pub mod ob_config;
-pub mod proxy_configs;
-pub mod roles;
-pub mod settings;
-pub mod webhook_portal;
+mod access_events;
+mod api_keys;
+mod auth;
+mod index;
+mod logo;
+mod member;
+mod members;
+mod onboarding_configs;
+mod proxy_configs;
+mod roles;
+mod settings;
+mod webhook_portal;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(index::get)
         .service(index::patch)
-        .service(ob_config::get)
-        .service(ob_config::get_detail)
-        .service(ob_config::patch)
-        .service(ob_config::post)
         .service(members::get)
         .service(members::post)
         .service(members::patch)
@@ -36,6 +32,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(logo::put)
         .service(webhook_portal::get);
 
+    onboarding_configs::routes(config);
     auth::routes(config);
     api_keys::routes(config);
     proxy_configs::routes(config);
