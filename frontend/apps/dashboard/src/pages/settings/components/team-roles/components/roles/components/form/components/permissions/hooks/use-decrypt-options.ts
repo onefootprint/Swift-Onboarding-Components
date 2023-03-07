@@ -58,7 +58,7 @@ const useDecryptOptions = () => {
       label: 'Other',
       options: [
         {
-          value: RoleScope.decryptDocuments,
+          value: RoleScope.decryptCustom,
           label: 'Custom data',
         },
       ],
