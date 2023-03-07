@@ -156,7 +156,7 @@ jobs:
           cargo build -p enclave_proxy
           cargo build -p footprint-core
                     
-          make run-local &
+          make run-local &> server_output.txt &
           server_pid=$!
 
           attempt_counter=0
