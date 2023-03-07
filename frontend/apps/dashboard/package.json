@@ -33,6 +33,7 @@
     "axios": "^1.2.1",
     "constate": "^3.3.2",
     "csstype": "^3.1.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^9.0.1",
     "google-map-react": "^2.2.0",
     "i18next": "^22.0.4",
@@ -43,17 +44,18 @@
     "react-hook-form": "^7.43.5",
     "react-i18next": "^12.0.0",
     "styled-components": "^5.3.8",
+    "svix-react": "1.4.2",
     "ua-parser-js": "^1.0.33",
     "usehooks-ts": "^2.9.1",
     "xstate": "^4.35.1",
-    "zustand": "^4.3.2",
-    "svix-react": "1.4.2"
+    "zustand": "^4.3.2"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
     "@next/bundle-analyzer": "^12.3.4",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
+    "@types/file-saver": "^2.0.5",
     "@types/google-map-react": "^2.1.7",
     "@types/lodash": "^4.14.191",
     "@types/node": "^17.0.12",

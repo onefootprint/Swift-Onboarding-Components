@@ -18,6 +18,7 @@ export * from './get-members';
 export * from './get-onboarding-config';
 export * from './get-org';
 export * from './get-pinned-annotations';
+export * from './get-proxy-config';
 export * from './get-proxy-configs';
 export * from './get-risk-signal-details';
 export * from './get-risk-signals';

@@ -112,7 +112,9 @@ const Table = <T,>({
                   data-testid={getKeyForRow(item)}
                   data-clickable={!!onRowClick}
                   key={getKeyForRow(item)}
-                  onClick={onRowClick && (() => onRowClick(item))}
+                  onClick={() => {
+                    onRowClick?.(item);
+                  }}
                 >
                   {renderTr({ index, item })}
                 </Tr>

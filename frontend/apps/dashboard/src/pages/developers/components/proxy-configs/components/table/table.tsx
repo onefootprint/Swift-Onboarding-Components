@@ -3,6 +3,7 @@ import { ProxyConfig } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import React from 'react';
 
+import useFilters from '../../hooks/use-filters';
 import Row from './components/row';
 
 type TableProps = {
@@ -13,13 +14,19 @@ type TableProps = {
 
 const Table = ({ data, isLoading, errorMessage }: TableProps) => {
   const { t } = useTranslation('pages.proxy-configs');
+  const filters = useFilters();
   const columns = [
-    { id: 'name', text: t('table.header.name'), width: '25%' },
+    { id: 'name', text: t('table.header.name'), width: '20%' },
     { id: 'url', text: t('table.header.url'), width: '25%' },
     { id: 'httpMethod', text: t('table.header.method'), width: '15%' },
     { id: 'created', text: t('table.header.created_at'), width: '15%' },
+    { id: 'status', text: t('table.header.status'), width: '20%' },
     { id: 'actions', text: '', width: '5%' },
   ];
+
+  const handleClick = (proxyConfig: ProxyConfig) => {
+    filters.push({ proxy_config_id: proxyConfig.id });
+  };
 
   return (
     <UITable<ProxyConfig>
@@ -29,7 +36,8 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
       getKeyForRow={proxyConfig => proxyConfig.id}
       isLoading={isLoading}
       items={data}
-      renderTr={({ item: proxyConfig }) => <Row proxy={proxyConfig} />}
+      onRowClick={handleClick}
+      renderTr={({ item: proxyConfig }) => <Row proxyConfig={proxyConfig} />}
     />
   );
 };

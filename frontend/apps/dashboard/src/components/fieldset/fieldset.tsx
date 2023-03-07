@@ -30,12 +30,12 @@ const Content = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[5]};
 
     ${Grid.Column} {
       display: flex;
       flex-direction: column;
-      gap: ${theme.spacing[3]};
+      gap: ${theme.spacing[5]};
     }
   `};
 `;

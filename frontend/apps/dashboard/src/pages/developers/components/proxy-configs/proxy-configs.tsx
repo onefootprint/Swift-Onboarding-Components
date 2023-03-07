@@ -5,6 +5,7 @@ import React from 'react';
 import SectionHeader from 'src/components/section-header';
 
 import Create from './components/create';
+import Details from './components/details';
 import Table from './components/table';
 import useProxyConfigs from './hooks/use-proxy-configs';
 
@@ -27,6 +28,7 @@ const ProxyConfigs = () => {
           errorMessage={query.errorMessage}
           isLoading={query.isLoading}
         />
+        <Details />
       </Box>
     </>
   );
