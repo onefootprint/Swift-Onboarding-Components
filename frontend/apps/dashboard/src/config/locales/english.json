@@ -545,6 +545,9 @@
                 "pin-note": "Pin note to the top of the page"
               }
             }
+          },
+          "abandoned-event": {
+            "title": "User dropped off before providing all information"
           }
         }
       }
