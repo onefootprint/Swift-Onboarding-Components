@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-export async function protected_custodian_api_call(path, params) {
-  const authToken = process.env.FPC_PRIVATE_PROECTED_TOKEN;
-  const apiUrl = process.env.API_URL;
-
+export async function protected_custodian_api_call(
+  authToken,
+  apiUrl,
+  path,
+  params,
+) {
   try {
     const { data } = await axios.post(`${apiUrl}/${path}`, params, {
       headers: {
@@ -15,7 +17,7 @@ export async function protected_custodian_api_call(path, params) {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw `Failed with status ${error.response?.status}: ${JSON.stringify(
-        error.response?.data,
+        error.response,
       )}`;
     } else {
       throw error;
