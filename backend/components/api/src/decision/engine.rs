@@ -321,7 +321,7 @@ pub async fn perform_pre_run_operations(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             // Can only start KYC checks for onboarding that has all required fields
             // Document Collection is handled synchronously in the frontend (to surface errors)
-            let missing_attributes = uvw.missing_fields(&ob_config);
+            let missing_attributes = uvw.missing_identity_fields(&ob_config);
             if !missing_attributes.is_empty() {
                 return Err(OnboardingError::MissingAttributes(missing_attributes.into()).into());
             }

@@ -10,10 +10,6 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         tenant_id.clone(),
         vec![CollectedDataOption::PhoneNumber],
         vec![CollectedDataOption::PhoneNumber],
-        false,
-        false,
-        false,
-        false,
         is_live,
     )
     .expect("Could not create ob config")

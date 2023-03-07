@@ -73,7 +73,10 @@ fn clean_and_validate_id_data(
 fn extra_id_kinds(id_kinds: Vec<IDK>) -> Vec<IDK> {
     // Get all the CDOs represented in here
     let cdos = CollectedDataOption::list_from(id_kinds.clone());
-    let represented_idks: HashSet<_> = cdos.into_iter().flat_map(|cdo| cdo.attributes()).collect();
+    let represented_idks: HashSet<_> = cdos
+        .into_iter()
+        .flat_map(|cdo| cdo.identity_attributes().unwrap_or_default())
+        .collect();
     let id_kinds: HashSet<_> = id_kinds.into_iter().collect();
     // Keys given minus represented keys
     id_kinds.difference(&represented_idks).cloned().collect_vec()

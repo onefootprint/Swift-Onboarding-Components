@@ -78,10 +78,16 @@ impl WriteableUvw {
             speculative: CollectedDataOption::list_from(uvw.speculative.get_populated_identity_fields()),
             portable: CollectedDataOption::list_from(uvw.portable.get_populated_identity_fields()),
         });
-        let speculative_kinds_to_commit: Vec<_> =
-            d.to_portablize.into_iter().flat_map(|o| o.attributes()).collect();
-        let speculative_kinds_to_deactivate: Vec<_> =
-            d.to_deactivate.into_iter().flat_map(|o| o.attributes()).collect();
+        let speculative_kinds_to_commit: Vec<_> = d
+            .to_portablize
+            .into_iter()
+            .flat_map(|o| o.identity_attributes().unwrap_or_default())
+            .collect();
+        let speculative_kinds_to_deactivate: Vec<_> = d
+            .to_deactivate
+            .into_iter()
+            .flat_map(|o| o.identity_attributes().unwrap_or_default())
+            .collect();
 
         //
         // Deactivate all existing, portable data that is about to be replaced by speculative data.

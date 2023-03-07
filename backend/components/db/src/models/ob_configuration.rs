@@ -10,7 +10,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::ApiKeyStatus;
 use newtypes::OnboardingId;
-use newtypes::{CollectedDataOption, ObConfigurationId, ObConfigurationKey, TenantId};
+use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
 pub type IsLive = bool;
@@ -27,12 +27,8 @@ pub struct ObConfiguration {
     pub is_live: IsLive,
     pub status: ApiKeyStatus,
     pub created_at: DateTime<Utc>,
-    pub must_collect_data: Vec<CollectedDataOption>,
-    pub can_access_data: Vec<CollectedDataOption>,
-    pub must_collect_identity_document: bool,
-    pub can_access_identity_document_images: bool,
-    pub must_collect_selfie: bool,
-    pub can_access_selfie_image: bool,
+    pub must_collect_data: Vec<CDO>,
+    pub can_access_data: Vec<CDO>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
@@ -44,14 +40,8 @@ struct NewObConfiguration {
     status: ApiKeyStatus,
     created_at: DateTime<Utc>,
 
-    must_collect_data: Vec<CollectedDataOption>,
-    can_access_data: Vec<CollectedDataOption>,
-
-    must_collect_identity_document: bool,
-    can_access_identity_document_images: bool,
-
-    must_collect_selfie: bool,
-    can_access_selfie_image: bool,
+    must_collect_data: Vec<CDO>,
+    can_access_data: Vec<CDO>,
 }
 
 #[derive(Debug)]
@@ -167,12 +157,8 @@ impl ObConfiguration {
         conn: &mut PgConn,
         name: String,
         tenant_id: TenantId,
-        must_collect_data: Vec<CollectedDataOption>,
-        can_access_data: Vec<CollectedDataOption>,
-        must_collect_identity_document: bool,
-        can_access_identity_document_images: bool,
-        must_collect_selfie: bool,
-        can_access_selfie_image: bool,
+        must_collect_data: Vec<CDO>,
+        can_access_data: Vec<CDO>,
         is_live: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
@@ -180,11 +166,7 @@ impl ObConfiguration {
             name,
             tenant_id,
             must_collect_data,
-            must_collect_identity_document,
-            can_access_identity_document_images,
             can_access_data,
-            must_collect_selfie,
-            can_access_selfie_image,
             is_live,
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
@@ -228,5 +210,25 @@ impl ObConfiguration {
             .get_result(conn)?;
 
         Ok(ob_config)
+    }
+}
+
+impl ObConfiguration {
+    pub fn must_collect_document(&self) -> bool {
+        self.must_collect_data.contains(&CDO::Document)
+            || self.must_collect_data.contains(&CDO::DocumentAndSelfie)
+    }
+
+    pub fn must_collect_selfie(&self) -> bool {
+        self.must_collect_data.contains(&CDO::DocumentAndSelfie)
+    }
+
+    pub fn can_access_document(&self) -> bool {
+        self.can_access_data.contains(&CDO::Document)
+            || self.can_access_data.contains(&CDO::DocumentAndSelfie)
+    }
+
+    pub fn can_access_selfie(&self) -> bool {
+        self.can_access_data.contains(&CDO::DocumentAndSelfie)
     }
 }

@@ -235,10 +235,6 @@ table! {
         created_at -> Timestamptz,
         must_collect_data -> Array<Text>,
         can_access_data -> Array<Text>,
-        must_collect_identity_document -> Bool,
-        can_access_identity_document_images -> Bool,
-        must_collect_selfie -> Bool,
-        can_access_selfie_image -> Bool,
     }
 }
 

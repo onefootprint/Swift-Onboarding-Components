@@ -83,7 +83,7 @@ impl UvdBuilder {
         // We will only deactivate speculative, uncommitted data here - never portable data
         let kinds_to_deactivate = new
             .iter()
-            .flat_map(|cdo| cdo.attributes())
+            .flat_map(|cdo| cdo.identity_attributes().unwrap_or_default())
             .map(DataLifetimeKind::from)
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;

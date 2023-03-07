@@ -19,6 +19,7 @@ pub enum CollectedData {
     Address,
     Email,
     PhoneNumber,
+    Document,
 }
 
 impl CollectedData {
@@ -35,6 +36,7 @@ impl CollectedData {
             // contain fewer fields are first
             Self::Ssn => vec![Ssn4, Ssn9],
             Self::Address => vec![PartialAddress, FullAddress],
+            Self::Document => vec![Document, DocumentAndSelfie],
         }
     }
 }
@@ -96,6 +98,8 @@ pub enum CollectedDataOption {
     PartialAddress,
     Email,
     PhoneNumber,
+    Document,
+    DocumentAndSelfie,
 }
 
 crate::util::impl_enum_str_diesel!(CollectedDataOption);
@@ -109,34 +113,37 @@ impl CollectedDataOption {
             Self::FullAddress | Self::PartialAddress => CollectedData::Address,
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
+            Self::Document => CollectedData::Document,
+            Self::DocumentAndSelfie => CollectedData::Document,
         }
     }
 
-    pub fn attributes(&self) -> Vec<IdentityDataKind> {
+    pub fn identity_attributes(&self) -> Option<Vec<IdentityDataKind>> {
+        // Maybe this could migrate to DataIdentifiers
         match self {
-            Self::Name => vec![IdentityDataKind::FirstName, IdentityDataKind::LastName],
-            Self::Dob => vec![IdentityDataKind::Dob],
-            Self::Ssn9 => vec![IdentityDataKind::Ssn9, IdentityDataKind::Ssn4],
-            Self::Ssn4 => vec![IdentityDataKind::Ssn4],
-            Self::FullAddress => vec![
+            Self::Name => Some(vec![IdentityDataKind::FirstName, IdentityDataKind::LastName]),
+            Self::Dob => Some(vec![IdentityDataKind::Dob]),
+            Self::Ssn9 => Some(vec![IdentityDataKind::Ssn9, IdentityDataKind::Ssn4]),
+            Self::Ssn4 => Some(vec![IdentityDataKind::Ssn4]),
+            Self::FullAddress => Some(vec![
                 IdentityDataKind::AddressLine1,
                 IdentityDataKind::AddressLine2,
                 IdentityDataKind::City,
                 IdentityDataKind::State,
                 IdentityDataKind::Zip,
                 IdentityDataKind::Country,
-            ],
-            Self::PartialAddress => vec![IdentityDataKind::Zip, IdentityDataKind::Country],
-            Self::Email => vec![IdentityDataKind::Email],
-            Self::PhoneNumber => vec![IdentityDataKind::PhoneNumber],
+            ]),
+            Self::PartialAddress => Some(vec![IdentityDataKind::Zip, IdentityDataKind::Country]),
+            Self::Email => Some(vec![IdentityDataKind::Email]),
+            Self::PhoneNumber => Some(vec![IdentityDataKind::PhoneNumber]),
+            Self::Document => None,
+            Self::DocumentAndSelfie => None,
         }
     }
 
-    pub fn required_attributes(&self) -> Vec<IdentityDataKind> {
-        self.attributes()
-            .into_iter()
-            .filter(|k| !k.is_optional())
-            .collect()
+    pub fn required_identity_attributes(&self) -> Option<Vec<IdentityDataKind>> {
+        self.identity_attributes()
+            .map(|options| options.into_iter().filter(|k| !k.is_optional()).collect())
     }
 
     /// Given a list of IdentityDataKinds (maybe collected via API), computes the set of
@@ -150,10 +157,15 @@ impl CollectedDataOption {
                 let possible_options = cd.options();
                 // Get the maximal option whose attributes are entirely contained in this list of kinds
                 // in the list of kinds
-                possible_options.into_iter().rev().find(|cdo| {
-                    let required_attrs = HashSet::from_iter(cdo.required_attributes().into_iter());
-                    kinds.is_superset(&required_attrs)
-                })
+                possible_options
+                    .into_iter()
+                    .rev()
+                    // Skip CDOs that don't have related IDKs, like Document
+                    .filter_map(|cdo| cdo.required_identity_attributes().map(|idks| (cdo, idks)))
+                    .find(|(_, idks)| {
+                        let required_attrs = HashSet::from_iter(idks.iter().cloned());
+                        kinds.is_superset(&required_attrs)
+                    }).map(|(cdo, _)| cdo)
             })
             .collect()
     }
@@ -164,6 +176,7 @@ impl CollectedDataOption {
         match self {
             Self::Ssn4 => Some(Self::Ssn9),
             Self::PartialAddress => Some(Self::FullAddress),
+            Self::Document => Some(Self::DocumentAndSelfie),
             _ => None,
         }
     }
@@ -189,9 +202,14 @@ mod test {
             // Enforce that the .full_variant() util stays in sync with .options()
             assert!(options.get(0).unwrap().full_variant() == options.get(1).cloned());
 
-            let attrs_for_options: Vec<_> =
-                options.into_iter().map(|dlk| dlk.required_attributes()).collect();
-            let is_sorted = attrs_for_options.windows(2).all(|w| w[0].len() <= w[1].len());
+            let attrs_for_options: Vec<_> = options
+                .into_iter()
+                .map(|dlk| dlk.required_identity_attributes())
+                .collect();
+            let is_sorted = attrs_for_options.windows(2).all(|w| {
+                w[0].as_ref().map(|o| o.len()).unwrap_or_default()
+                    <= w[1].as_ref().map(|o| o.len()).unwrap_or_default()
+            });
             assert!(
                 is_sorted,
                 "Options for CollectedData {} are not in ascending order",
@@ -216,7 +234,7 @@ mod test {
                 .parent()
                 .options()
                 .into_iter()
-                .flat_map(|cdo| cdo.attributes())
+                .flat_map(|cdo| cdo.identity_attributes().unwrap_or_default())
                 .contains(&idk));
         }
     }

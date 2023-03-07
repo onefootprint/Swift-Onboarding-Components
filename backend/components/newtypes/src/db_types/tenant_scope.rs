@@ -53,6 +53,7 @@ pub enum TenantScope {
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
     /// Allows decrypting identity documents
+    /// TODO: replace this with Decrypt(CDO::Document)
     DecryptDocuments,
 }
 

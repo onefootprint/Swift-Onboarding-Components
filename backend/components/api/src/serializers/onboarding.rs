@@ -13,18 +13,21 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
             authorized_at,
             ..
         } = onboarding.clone();
+        let can_access_identity_document_images = config.can_access_document();
         let db::models::ob_configuration::ObConfiguration {
             id: config_id,
             name,
             can_access_data,
-            can_access_identity_document_images,
             ..
         } = config.clone();
 
         let status = latest_decision.as_ref().and_then(|d| d.0.visible_status());
         let can_decrypt_scopes = OnboardingAndConfig(onboarding, config).can_decrypt_scopes();
 
-        let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
+        let can_access_data_attributes = can_access_data
+            .iter()
+            .flat_map(|x| x.identity_attributes().unwrap_or_default())
+            .collect();
         api_wire_types::Onboarding {
             id,
             is_authorized: authorized_at.is_some(),

@@ -23,12 +23,16 @@ pub struct CreateOnboardingConfigurationRequest {
     must_collect_data: Vec<CollectedDataOption>,
     can_access_data: Vec<CollectedDataOption>,
     #[serde(default)]
+    /// TODO: deprecate
     must_collect_identity_document: bool,
     #[serde(default)]
+    /// TODO: deprecate
     can_access_identity_document_images: bool,
     #[serde(default)]
+    /// TODO: deprecate
     must_collect_selfie: bool,
     #[serde(default)]
+    /// TODO: deprecate
     can_access_selfie_image: bool,
 }
 
@@ -103,31 +107,30 @@ pub async fn post(
     let tenant = auth.tenant().clone();
     let CreateOnboardingConfigurationRequest {
         name,
-        must_collect_data,
-        can_access_data,
+        mut must_collect_data,
+        mut can_access_data,
         must_collect_identity_document,
         can_access_identity_document_images,
         must_collect_selfie,
         can_access_selfie_image,
     } = request.into_inner();
+    if must_collect_identity_document && must_collect_selfie {
+        must_collect_data.push(CollectedDataOption::DocumentAndSelfie)
+    } else if must_collect_identity_document {
+        must_collect_data.push(CollectedDataOption::Document)
+    }
+    if can_access_identity_document_images && can_access_selfie_image {
+        can_access_data.push(CollectedDataOption::DocumentAndSelfie)
+    } else if can_access_identity_document_images {
+        can_access_data.push(CollectedDataOption::Document)
+    }
 
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
     let obc = state
         .db_pool
         .db_query(move |conn| {
-            ObConfiguration::create(
-                conn,
-                name,
-                tenant_id,
-                must_collect_data,
-                can_access_data,
-                must_collect_identity_document,
-                can_access_identity_document_images,
-                must_collect_selfie,
-                can_access_selfie_image,
-                is_live,
-            )
+            ObConfiguration::create(conn, name, tenant_id, must_collect_data, can_access_data, is_live)
         })
         .await??;
 

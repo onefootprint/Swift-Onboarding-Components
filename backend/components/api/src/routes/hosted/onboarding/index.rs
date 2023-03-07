@@ -1,26 +1,21 @@
+use super::create_onboarding_validation_token;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::auth::AuthError;
-
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
-
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
-
 use db::models::onboarding::OnboardingCreateArgs;
-
 use db::models::user_vault::UserVault;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-
-use super::create_onboarding_validation_token;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct OnboardingResponse {
@@ -58,8 +53,6 @@ pub async fn post(
             let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
 
             let insight_event = CreateInsightEvent::from(insights);
-            let should_create_document_request = ob_config.must_collect_identity_document;
-            let should_collect_selfie = ob_config.must_collect_selfie;
 
             let ob_create_args = OnboardingCreateArgs {
                 scoped_user_id: scoped_user.id,
@@ -67,8 +60,8 @@ pub async fn post(
                 insight_event,
                 // Create a `DocumentRequest` if specified in the ob config.
                 // We do this inside the OB creation to make this route more idempotent
-                should_create_document_request,
-                should_collect_selfie,
+                should_create_document_request: ob_config.must_collect_document(),
+                should_collect_selfie: ob_config.must_collect_selfie(),
             };
 
             let ob = Onboarding::get_or_create(conn, ob_create_args)?;

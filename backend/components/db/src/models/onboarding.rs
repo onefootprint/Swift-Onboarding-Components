@@ -15,8 +15,8 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
-    ScopedUserId, TenantId, TenantScope, UserVaultId,
+    CollectedDataOption as CDO, FootprintUserId, InsightEventId, Locked, ObConfigurationId,
+    OnboardingDecisionId, OnboardingId, ScopedUserId, TenantId, TenantScope, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -418,9 +418,9 @@ impl OnboardingAndConfig {
             vec![]
         } else {
             let data_scopes = obc.can_access_data.iter().cloned().map(TenantScope::Decrypt);
-            let scopes = [obc
-                .can_access_identity_document_images
-                .then_some(TenantScope::DecryptDocuments)];
+            let scopes = [(obc.can_access_data.contains(&CDO::Document)
+                || obc.can_access_data.contains(&CDO::DocumentAndSelfie))
+            .then_some(TenantScope::DecryptDocuments)];
             scopes.into_iter().flatten().chain(data_scopes).collect()
         }
     }
@@ -434,9 +434,9 @@ impl OnboardingAndConfig {
         // Even un-approved onboardings give permissions to see data, just not decrypt
         let Self(_, obc) = &self;
         let data_scopes = obc.must_collect_data.iter().cloned().map(TenantScope::Decrypt);
-        let scopes = [obc
-            .must_collect_identity_document
-            .then_some(TenantScope::DecryptDocuments)];
+        let scopes = [(obc.must_collect_data.contains(&CDO::Document)
+            || obc.must_collect_data.contains(&CDO::DocumentAndSelfie))
+        .then_some(TenantScope::DecryptDocuments)];
         scopes.into_iter().flatten().chain(data_scopes).collect()
     }
 }

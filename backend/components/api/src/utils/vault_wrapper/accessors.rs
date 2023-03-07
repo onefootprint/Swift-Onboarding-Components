@@ -12,12 +12,13 @@ use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
 impl VaultWrapper<Person> {
-    pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
+    pub fn missing_identity_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
         ob_config
             .must_collect_data
             .iter()
             .filter(|cdo| {
-                cdo.required_attributes()
+                cdo.required_identity_attributes()
+                    .unwrap_or_default()
                     .iter()
                     .any(|d| !self.has_identity_field(*d))
             })
