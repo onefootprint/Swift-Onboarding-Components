@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import { LinkButton, media, Typography } from '@onefootprint/ui';
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -11,6 +12,7 @@ type InvestorUpdatePreviewProps = {
   href: string;
   title: string;
   createdAt?: string;
+  image?: string;
 };
 
 const InvestorUpdatePreview = ({
@@ -19,72 +21,131 @@ const InvestorUpdatePreview = ({
   excerpt,
   href,
   title,
+  image,
 }: InvestorUpdatePreviewProps) => {
   const { t } = useTranslation('pages.investor-updates');
 
   return (
-    <Article>
-      <Header>
-        <Typography variant="label-2" sx={{ marginBottom: 6 }}>
-          {t('header-title-prefix', { index })}
-        </Typography>
-        {!!createdAt && (
-          <Typography variant="body-2" color="tertiary">
-            {createdAt}
-          </Typography>
+    <Link href={href} passHref legacyBehavior>
+      <Article>
+        {image && (
+          <ImageContainer>
+            <Image src={image} alt={title} height={400} width={400} />
+          </ImageContainer>
         )}
-      </Header>
-      <Content>
-        <Link href={href}>
-          <Typography variant="heading-1" sx={{ marginBottom: 8 }}>
-            {title}
-          </Typography>
-        </Link>
-        <Typography variant="body-2">{excerpt}</Typography>
-        <Link href={href} passHref legacyBehavior>
-          <LinkButton
-            sx={{ marginTop: 7, cursor: 'pointer' }}
-            iconComponent={IcoArrowRightSmall16}
-            iconPosition="right"
-            href={href}
-          >
-            {t('read-more')}
-          </LinkButton>
-        </Link>
-      </Content>
-    </Article>
+        <Content>
+          <Header>
+            <Typography
+              variant="label-2"
+              sx={{ marginBottom: 6, marginRight: 2 }}
+            >
+              {t('header-title-prefix', { index })}
+            </Typography>
+            {!!createdAt && (
+              <Typography variant="body-2" color="tertiary">
+                | {createdAt}
+              </Typography>
+            )}
+          </Header>
+          <ArticleDetails>
+            <Typography variant="heading-1" sx={{ marginBottom: 6 }}>
+              {title}
+            </Typography>
+            <Typography variant="body-2">{excerpt}</Typography>
+            <LinkButton
+              sx={{ marginTop: 7, cursor: 'pointer' }}
+              iconComponent={IcoArrowRightSmall16}
+              iconPosition="right"
+              href={href}
+            >
+              {t('read-more')}
+            </LinkButton>
+          </ArticleDetails>
+        </Content>
+      </Article>
+    </Link>
   );
 };
 
 const Article = styled.article`
+  ${({ theme }) => css`
   display: block;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+  border-radius: ${theme.borderRadius.default};
+  border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 
   ${media.greaterThan('md')`
     display: flex;
+    flex-direction: row;
+    gap: ${theme.spacing[8]};
+    padding: ${theme.spacing[8]};
+    border: none;
   `}
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: ${theme.backgroundColor.secondary};
+    }
+  `}
+  }
 `;
 
 const Content = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
+    width: 100%;
     height: 100%;
-    padding-bottom: ${theme.spacing[9]};
+    padding: ${theme.spacing[8]};
 
     a {
       text-decoration: none;
     }
+
+    ${media.greaterThan('md')`
+      padding: 0;
+    `}
   `}
 `;
 
 const Header = styled.div`
   ${({ theme }) => css`
-    --header-width: 240px;
-    width: var(--header-width);
-    min-width: var(--header-width);
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     margin-right: ${theme.spacing[7]};
+  `}
+`;
+
+const ImageContainer = styled.div`
+  overflow: hidden;
+  flex-shrink: 0;
+  height: 180px;
+  width: 100%;
+
+  img {
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  ${media.greaterThan('md')`
+    height: 240px;
+    width: 240px;
+  `}
+`;
+
+const ArticleDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  ${media.greaterThan('md')`
+    max-width: 80%;
   `}
 `;
 

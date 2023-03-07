@@ -2,7 +2,6 @@ import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { Container, Divider, media } from '@onefootprint/ui';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
-import WritingLayout from 'src/components/writing-layout';
 import { getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
 
@@ -29,7 +28,7 @@ const Blog = ({ posts }: BlogProps) => {
     <>
       <SEO title={t('html-title')} slug="/blog" />
       <Container>
-        <WritingLayout>
+        <BlogGrid>
           <TwitterBreadcrumb
             title={t('breadcrumb.title')}
             description={t('breadcrumb.description')}
@@ -53,6 +52,7 @@ const Blog = ({ posts }: BlogProps) => {
               excerpt={featuredPost.excerpt}
               key={featuredPost.uuid}
               title={featuredPost.title}
+              type="featured"
             />
           </FeaturedPost>
           <Posts>
@@ -70,11 +70,12 @@ const Blog = ({ posts }: BlogProps) => {
                 excerpt={post.excerpt}
                 key={post.uuid}
                 title={post.title}
+                type="regular"
               />
             ))}
           </Posts>
           <StyledDivider />
-        </WritingLayout>
+        </BlogGrid>
       </Container>
     </>
   );
@@ -84,6 +85,11 @@ const StyledDivider = styled(Divider)`
   ${({ theme }) => css`
     margin-top: ${theme.spacing[10]};
   `}
+`;
+
+const BlogGrid = styled.div`
+  margin: auto;
+  max-width: 960px;
 `;
 
 const FeaturedPost = styled.div`

@@ -13,6 +13,7 @@ export type PostPreviewProps = {
   href: string;
   primaryTag: string;
   title: string;
+  type: 'featured' | 'regular';
 };
 
 const PostPreview = ({
@@ -24,25 +25,22 @@ const PostPreview = ({
   href,
   primaryTag,
   title,
+  type,
 }: PostPreviewProps) => (
   <Container>
     <StyledLink href={href}>
-      <FeatureImageDesktopContainer>
-        <FeatureImage
+      <FeatureImageDesktopContainer data-type={type}>
+        <Image
           alt={featureImageAlt}
           height={228}
-          layout="responsive"
-          objectFit="cover"
           src={featureImageUrl}
           width={468}
         />
       </FeatureImageDesktopContainer>
-      <FeatureImageMobileContainer>
-        <FeatureImage
+      <FeatureImageMobileContainer data-type={type}>
+        <Image
           height={228}
           width={358}
-          layout="responsive"
-          objectFit="cover"
           alt={featureImageAlt}
           src={featureImageUrl}
         />
@@ -97,27 +95,67 @@ const StyledLink = styled(Link)`
     flex-direction: column;
     height: 100%;
     text-decoration: none;
-  `}
-`;
-const FeatureImage = styled(Image)`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
-      0;
-    object-fit: cover;
+    transition: background-color 0.4s ease-in-out;
+
+    @media (hover: hover) {
+      &:hover {
+        box-shadow: ${theme.elevation[0]};
+        background-color: ${theme.backgroundColor.secondary};
+      }
+    }
   `}
 `;
 
 const FeatureImageDesktopContainer = styled.div`
-  display: none;
+  ${({ theme }) => css`
+    display: none;
+    overflow: hidden;
+    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
+      0;
+    img {
+      object-fit: cover;
+      object-position: center;
+      width: 100%;
+      height: 100%;
+    }
 
-  ${media.greaterThan('md')`
+    &[data-type='featured'] {
+      max-height: 540px;
+    }
+
+    &[data-type='regular'] {
+      max-height: 228px;
+    }
+
+    ${media.greaterThan('md')`
     display: block;
+  `}
   `}
 `;
 
 const FeatureImageMobileContainer = styled.div`
-  ${media.greaterThan('md')`
-    display: none;
+  ${({ theme }) => css`
+    overflow: hidden;
+    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
+      0;
+    img {
+      object-fit: cover;
+      object-position: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    ${media.greaterThan('md')`
+      display: none;
+    `}
+
+    &[data-type='featured'] {
+      max-height: 228px;
+    }
+
+    &[data-type='regular'] {
+      max-height: 228px;
+    }
   `}
 `;
 

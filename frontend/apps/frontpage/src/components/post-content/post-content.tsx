@@ -146,13 +146,14 @@ const Content = styled.div`
       text-align: center;
     }
     blockquote {
+      ${createFontStyles('body-1')};
+      color: ${theme.color.primary};
+      padding-left: ${theme.spacing[5]};
+      margin-left: ${theme.spacing[1]};
+      display: block;
+      border-left: 1px solid ${theme.color.quaternary};
+
       em {
-        ${createFontStyles('body-1')};
-        color: ${theme.color.primary};
-        padding-left: ${theme.spacing[5]};
-        margin-left: ${theme.spacing[1]};
-        display: block;
-        border-left: 1px solid ${theme.color.quaternary};
         font-style: italic;
       }
     }

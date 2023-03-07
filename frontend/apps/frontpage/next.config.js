@@ -108,6 +108,10 @@ module.exports = withPlugins([withMDX], {
         protocol: 'https',
         hostname: 'i.onefp.net',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
 });
