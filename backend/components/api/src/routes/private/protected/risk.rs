@@ -105,7 +105,7 @@ async fn make_vendor_calls(
     }
 
     let vendor_results =
-        decision::engine::save_vendor_responses(&state.db_pool, vendor_results.successful, &ob.id).await?;
+        decision::engine::save_vendor_responses(&state.db_pool, &vendor_results.successful, &ob.id).await?;
 
     let (rules_output, _) =
         crate::decision::engine::calculate_decision(vendor_results.clone(), &state.feature_flag_client)?;
@@ -270,12 +270,7 @@ async fn shadow_run(
     )
     .await?;
 
-    let all_vendor_errors: Vec<&ApiError> = vendor_results
-        .critical_errors
-        .iter()
-        .chain(vendor_results.non_critical_errors.iter())
-        .collect();
-
+    let all_vendor_errors: Vec<&ApiError> = vendor_results.all_errors();
     if !all_vendor_errors.is_empty() {
         return Err(ApiError::AssertionError(format!(
             "Vendor call(s) failed: {:?}",

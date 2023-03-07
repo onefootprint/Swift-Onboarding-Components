@@ -14,20 +14,20 @@ use super::make_request::VerificationRequestWithVendorResponse;
 /// Save a verification result, encrypting the response payload in the process
 pub async fn save_verification_result(
     db_pool: &DbPool,
-    vendor_responses: Vec<VerificationRequestWithVendorResponse>,
+    vendor_responses: &[VerificationRequestWithVendorResponse],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
 ) -> Result<Vec<VerificationResult>, ApiError> {
     let now = Utc::now();
     let new_verification_results: Vec<NewVerificationResult> = vendor_responses
-        .into_iter()
+        .iter()
         .map(|(req, res)| {
             // For testing rollout of footprint
             let scrubbed_json = ScrubbedJsonValue::scrub(&res.response)?;
 
-            let e_response = encrypt_verification_result_response(res.raw_response, user_vault_public_key)?;
+            let e_response = encrypt_verification_result_response(&res.raw_response, user_vault_public_key)?;
 
             Ok(NewVerificationResult {
-                request_id: req.id,
+                request_id: req.id.clone(),
                 response: scrubbed_json,
                 timestamp: now,
                 e_response: Some(e_response),
@@ -42,7 +42,7 @@ pub async fn save_verification_result(
 
 // Encrypt payload using UV
 pub fn encrypt_verification_result_response(
-    response: PiiJsonValue,
+    response: &PiiJsonValue,
     user_vault_public_key: &VaultPublicKey,
 ) -> Result<SealedVaultBytes, ApiError> {
     user_vault_public_key

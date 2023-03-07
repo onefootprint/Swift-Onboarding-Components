@@ -380,8 +380,7 @@ pub async fn make_docv_request(
         .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
         .await??;
 
-    let vendor_responses: Vec<VerificationRequestWithVendorResponse> =
-        vec![(request.clone(), vendor_response.clone())];
+    let vendor_responses = &vec![(request.clone(), vendor_response.clone())];
 
     let verification_result =
         verification_result::save_verification_result(&state.db_pool, vendor_responses, &uv.public_key)

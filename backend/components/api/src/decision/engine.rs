@@ -71,10 +71,15 @@ pub async fn run(
 
     // We want to always save the successful results even if some request has a hard error
     let completed_oustanding_vendor_responses =
-        save_vendor_responses(db_pool, vendor_results.successful, &ob.id).await?;
+        save_vendor_responses(db_pool, &vendor_results.successful, &ob.id).await?;
 
+    // If required vendor calls failed, we cannot proceed with decisioning but we don't want to send a hard error to Bifrost so we short circuit here
     if !vendor_results.critical_errors.is_empty() {
-        return Err(ApiError::VendorRequestsFailed);
+        tracing::error!(
+            errors = format!("{:?}", vendor_results.all_errors()),
+            "VendorRequestsFailed"
+        );
+        return Ok(());
     }
 
     let all_vendor_results = vendor_requests
@@ -102,30 +107,30 @@ pub async fn run(
 
 pub async fn save_vendor_responses(
     db_pool: &DbPool,
-    vendor_responses: Vec<VerificationRequestWithVendorResponse>,
+    vendor_responses: &[VerificationRequestWithVendorResponse],
     onboarding_id: &OnboardingId,
 ) -> ApiResult<Vec<VendorResult>> {
     let obid = onboarding_id.clone();
     let uv = db_pool.db_query(move |conn| Vault::get(conn, &obid)).await??;
 
     let mut verification_results: HashMap<VerificationRequestId, VerificationResult> =
-        verification_result::save_verification_result(db_pool, vendor_responses.clone(), &uv.public_key)
+        verification_result::save_verification_result(db_pool, vendor_responses, &uv.public_key)
             .await?
             .into_iter()
             .map(|vr| (vr.request_id.clone(), vr))
             .collect();
 
     let results: Vec<VendorResult> = vendor_responses
-        .into_iter()
+        .iter()
         .map(|(req, res)| -> ApiResult<VendorResult> {
             let verification_result = verification_results
                 .remove(&req.id)
                 .ok_or(DbError::RelatedObjectNotFound)?;
 
             Ok(VendorResult {
-                response: res,
+                response: res.clone(),
                 verification_result_id: verification_result.id,
-                verification_request_id: req.id,
+                verification_request_id: req.id.clone(),
             })
         })
         .collect::<Result<Vec<VendorResult>, _>>()?;
@@ -183,6 +188,15 @@ pub struct VendorResults {
     pub successful: Vec<VerificationRequestWithVendorResponse>,
     pub non_critical_errors: Vec<ApiError>,
     pub critical_errors: Vec<ApiError>,
+}
+
+impl VendorResults {
+    pub fn all_errors(&self) -> Vec<&ApiError> {
+        self.critical_errors
+            .iter()
+            .chain(self.non_critical_errors.iter())
+            .collect()
+    }
 }
 
 fn partition_vendor_errors(

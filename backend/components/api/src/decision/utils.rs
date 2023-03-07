@@ -169,7 +169,7 @@ async fn setup_test_fixtures(
             // Verification result response is encrypted
             let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
             let e_response = vendor::verification_result::encrypt_verification_result_response(
-                raw_response.clone().into(),
+                &raw_response.clone().into(),
                 &uv.public_key,
             )?;
 
