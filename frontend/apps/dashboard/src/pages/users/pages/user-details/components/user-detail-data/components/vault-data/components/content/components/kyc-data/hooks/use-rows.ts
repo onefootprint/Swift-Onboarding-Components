@@ -50,7 +50,7 @@ const useRows = (
     fields: [
       {
         ...getData(UserDataAttribute.firstName, [RoleScope.decryptName]),
-        label: allT('collected-kyc-data-options.name'),
+        label: allT('collected-data-options.name'),
         value: getFullNameDataValue(
           kycData[UserDataAttribute.firstName],
           kycData[UserDataAttribute.lastName],

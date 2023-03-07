@@ -42,9 +42,7 @@ const OnboardingDecisionEventBody = ({
     );
 
     const collectedDataLabels = [
-      ...mustCollectData.map(attr =>
-        allT(`collected-kyc-data-options.${attr}`),
-      ),
+      ...mustCollectData.map(attr => allT(`collected-data-options.${attr}`)),
       // TODO: Add collected id document types here
       // https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to
       // ...collectedIdDocuments.map(idDoc => allT(`id-doc-type.${idDoc}`)),

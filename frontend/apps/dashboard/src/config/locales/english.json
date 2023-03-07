@@ -34,7 +34,7 @@
     "zip": "Zip code",
     "country": "Country"
   },
-  "collected-kyc-data-options": {
+  "collected-data-options": {
     "name": "Full name",
     "dob": "Date of Birth",
     "ssn9": "SSN",
@@ -42,7 +42,9 @@
     "full_address": "Address",
     "partial_address": "Address (Country & Zip Code)",
     "email": "Email",
-    "phone_number": "Phone number"
+    "phone_number": "Phone number",
+    "document": "ID Document",
+    "document_and_selfie": "ID Document & Selfie"
   },
   "id-doc-type": {
     "id_card": "ID card",
@@ -56,11 +58,6 @@
     "lexis_nexis": "LexisNexis",
     "experian": "Experian",
     "twilio": "Twilio"
-  },
-  "collected-id-doc-attributes": {
-    "id-doc-image": "ID Document",
-    "selfie-image": "Selfie",
-    "id-doc-image-with-selfie": "ID Document & Selfie"
   },
   "signal-attributes": {
     "name": "Full name",

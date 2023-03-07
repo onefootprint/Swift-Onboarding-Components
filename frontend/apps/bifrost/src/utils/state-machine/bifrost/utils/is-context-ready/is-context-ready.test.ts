@@ -15,11 +15,7 @@ describe('isContextReady', () => {
     orgName: 'tenantOrg',
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
-    mustCollectIdentityDocument: false,
-    mustCollectSelfie: false,
     canAccessData: [CollectedKycDataOption.name],
-    canAccessIdentityDocumentImages: false,
-    canAccessSelfieImage: false,
   };
 
   describe('when init context info is complete', () => {

@@ -21,11 +21,7 @@ describe('Onboarding Requirements Machine Tests', () => {
     orgName: 'tenantOrg',
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
-    mustCollectIdentityDocument: false,
-    mustCollectSelfie: false,
     canAccessData: [CollectedKycDataOption.name],
-    canAccessIdentityDocumentImages: false,
-    canAccessSelfieImage: false,
   };
 
   describe('with an existing user', () => {

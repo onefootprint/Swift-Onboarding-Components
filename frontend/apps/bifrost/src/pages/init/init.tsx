@@ -2,7 +2,7 @@ import { useObserveCollector } from '@onefootprint/dev-tools';
 import { useGetOnboardingConfig } from '@onefootprint/footprint-elements';
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import {
-  CollectedKycDataOptionLabels,
+  CollectedDataOptionLabels,
   OnboardingConfig,
 } from '@onefootprint/types';
 import React from 'react';
@@ -41,10 +41,10 @@ const Init = () => {
           config: {
             ...config,
             mustCollectData: config.mustCollectData.map(
-              (attr: string) => CollectedKycDataOptionLabels[attr],
+              (attr: string) => CollectedDataOptionLabels[attr],
             ),
             canAccessData: config.canAccessData.map(
-              (attr: string) => CollectedKycDataOptionLabels[attr],
+              (attr: string) => CollectedDataOptionLabels[attr],
             ),
           },
         },

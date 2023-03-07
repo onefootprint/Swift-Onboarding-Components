@@ -21,11 +21,7 @@ describe('handoff state machine', () => {
     orgName: 'tenantOrg',
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
-    mustCollectIdentityDocument: false,
-    mustCollectSelfie: false,
     canAccessData: [CollectedKycDataOption.name],
-    canAccessIdentityDocumentImages: false,
-    canAccessSelfieImage: false,
   };
 
   it('stays in init until all required info is collected', () => {

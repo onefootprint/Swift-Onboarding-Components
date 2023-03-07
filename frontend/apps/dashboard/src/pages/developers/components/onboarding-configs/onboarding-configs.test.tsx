@@ -31,7 +31,7 @@ describe('<OnboardingConfigs />', () => {
     resetUser();
   });
 
-  describe('list the api keys', () => {
+  describe('list the ob configs', () => {
     describe('when the request fails', () => {
       beforeEach(() => {
         withOnboardingConfigsError();

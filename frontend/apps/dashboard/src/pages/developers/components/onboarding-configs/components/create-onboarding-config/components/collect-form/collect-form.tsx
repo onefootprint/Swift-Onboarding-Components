@@ -103,22 +103,22 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
       />
       <CheckboxContainer>
         <Checkbox
-          label={allT('collected-kyc-data-options.phone_number')}
+          label={allT('collected-data-options.phone_number')}
           disabled
           checked
         />
         <Checkbox
-          label={allT('collected-kyc-data-options.email')}
+          label={allT('collected-data-options.email')}
           disabled
           checked
         />
         <Checkbox
-          label={allT('collected-kyc-data-options.name')}
+          label={allT('collected-data-options.name')}
           disabled
           checked
         />
         <Checkbox
-          label={allT('collected-kyc-data-options.dob')}
+          label={allT('collected-data-options.dob')}
           {...register(`kycData.${UserDataAttribute.dob}`)}
         />
         <Box>

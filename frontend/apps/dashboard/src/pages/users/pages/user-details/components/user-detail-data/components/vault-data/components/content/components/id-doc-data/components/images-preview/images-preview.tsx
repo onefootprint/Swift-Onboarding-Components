@@ -18,11 +18,11 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
   const [index, setIndex] = useState(0);
   const options = [
     {
-      label: allT('collected-id-doc-attributes.id-doc-image'),
+      label: allT('collected-data-options.document'),
       value: 'id-doc',
     },
     {
-      label: allT('collected-id-doc-attributes.selfie-image'),
+      label: allT('id-doc-type.selfie'),
       value: 'selfie',
     },
   ];

@@ -21,7 +21,7 @@ const KycDataCollectedEventHeader = ({
   );
   const { attributes } = data;
   const attributeLabels = attributes.map((attr: CollectedKycDataOption) =>
-    allT(`collected-kyc-data-options.${attr}`),
+    allT(`collected-data-options.${attr}`),
   );
 
   return (

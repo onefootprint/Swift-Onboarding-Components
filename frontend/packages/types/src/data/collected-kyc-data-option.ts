@@ -35,10 +35,7 @@ export const documentCdoFor = (
 };
 
 // Labels sent from the backend for each attribute
-export const CollectedKycDataOptionLabels: Record<
-  string,
-  CollectedKycDataOption
-> = {
+export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   name: CollectedKycDataOption.name,
   dob: CollectedKycDataOption.dob,
   email: CollectedKycDataOption.email,
@@ -47,6 +44,8 @@ export const CollectedKycDataOptionLabels: Record<
   full_address: CollectedKycDataOption.fullAddress,
   partial_address: CollectedKycDataOption.partialAddress,
   phone_number: CollectedKycDataOption.phoneNumber,
+  document: CollectedDocumentDataOption.document,
+  document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
 };
 
 export const OptionToRequiredAttributes: Record<

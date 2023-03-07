@@ -21,11 +21,7 @@ describe('Identify Machine Tests', () => {
     orgName: 'tenantOrg',
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
-    mustCollectIdentityDocument: false,
-    mustCollectSelfie: false,
     canAccessData: [CollectedKycDataOption.name],
-    canAccessIdentityDocumentImages: false,
-    canAccessSelfieImage: false,
   });
 
   const createMachine = (deviceInfo: DeviceInfo, identifierSuffix?: string) =>

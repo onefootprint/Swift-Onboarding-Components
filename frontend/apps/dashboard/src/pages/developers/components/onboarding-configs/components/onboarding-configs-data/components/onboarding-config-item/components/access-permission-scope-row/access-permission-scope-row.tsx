@@ -11,24 +11,13 @@ type AccessPermissionScopeRowProps = {
 };
 
 const AccessPermissionScopeRow = ({ data }: AccessPermissionScopeRowProps) => {
-  const {
-    id,
-    canAccessData,
-    canAccessIdentityDocumentImages,
-    canAccessSelfieImage,
-  } = data;
+  const { id, canAccessData } = data;
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.list-item.access-data',
   );
   const items = canAccessData.map(dataAttr =>
-    allT(`collected-kyc-data-options.${dataAttr}`),
+    allT(`collected-data-options.${dataAttr}`),
   );
-  // It is not possible to access selfie alone
-  if (canAccessIdentityDocumentImages && canAccessSelfieImage) {
-    items.push(allT('collected-id-doc-attributes.id-doc-image-with-selfie'));
-  } else if (canAccessIdentityDocumentImages) {
-    items.push(allT('collected-id-doc-attributes.id-doc-image'));
-  }
 
   return (
     <tr>

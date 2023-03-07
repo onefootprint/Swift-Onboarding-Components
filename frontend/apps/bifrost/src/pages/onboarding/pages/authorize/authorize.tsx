@@ -17,7 +17,12 @@ import {
   IcoSelfie24,
   IcoUserCircle24,
 } from '@onefootprint/icons';
-import { CollectedKycDataOption, IdDocType } from '@onefootprint/types';
+import {
+  CollectedDataOption,
+  CollectedDocumentDataOption,
+  CollectedKycDataOption,
+  IdDocType,
+} from '@onefootprint/types';
 import {
   FootprintButton,
   LoadingIndicator,
@@ -59,12 +64,7 @@ const Authorize = () => {
   const [collectedIdDocTypes, setCollectedIdDocTypes] = useState<IdDocType[]>();
   const {
     authToken,
-    config: {
-      orgName: tenantName,
-      privacyPolicyUrl,
-      canAccessData,
-      canAccessSelfieImage,
-    },
+    config: { orgName: tenantName, privacyPolicyUrl, canAccessData },
   } = state.context;
 
   const statusQuery = useGetOnboardingStatus(authToken, {
@@ -130,16 +130,21 @@ const Authorize = () => {
           subtitle={t('subtitle', { tenantName })}
         />
         <CategoriesContainer>
-          {canAccessData.map((kycDataOpt: CollectedKycDataOption) => (
-            <Category key={kycDataOpt}>
-              <IconContainer>
-                {IconByCollectedKycDataOption[kycDataOpt]}
-              </IconContainer>
-              <Typography variant="label-3">
-                {collectedKycDataOptionLabels[kycDataOpt]}
-              </Typography>
-            </Category>
-          ))}
+          {canAccessData
+            .filter(o => o in CollectedKycDataOption)
+            .map((dataOpt: CollectedDataOption) => {
+              const kycDataOpt = dataOpt as CollectedKycDataOption;
+              return (
+                <Category key={kycDataOpt}>
+                  <IconContainer>
+                    {IconByCollectedKycDataOption[kycDataOpt]}
+                  </IconContainer>
+                  <Typography variant="label-3">
+                    {collectedKycDataOptionLabels[kycDataOpt]}
+                  </Typography>
+                </Category>
+              );
+            })}
           {collectedIdDocTypes?.map((collectedDoc: IdDocType) => (
             <Category key={collectedDoc}>
               <IconContainer>{IconByIdDocType[collectedDoc]}</IconContainer>
@@ -148,7 +153,9 @@ const Authorize = () => {
               </Typography>
             </Category>
           ))}
-          {canAccessSelfieImage && (
+          {canAccessData.includes(
+            CollectedDocumentDataOption.documentAndSelfie,
+          ) && (
             <Category key="selfie">
               <IconContainer>
                 <IcoSelfie24 />

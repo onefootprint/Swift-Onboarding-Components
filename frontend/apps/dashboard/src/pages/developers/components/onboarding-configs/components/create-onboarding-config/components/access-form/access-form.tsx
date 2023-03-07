@@ -77,58 +77,58 @@ const AccessForm = ({
       <CheckboxContainer>
         {kycData.has(CollectedKycDataOption.phoneNumber) && (
           <Checkbox
-            label={allT('collected-kyc-data-options.phone_number')}
+            label={allT('collected-data-options.phone_number')}
             {...register(`kycData.${CollectedKycDataOption.phoneNumber}`)}
           />
         )}
         {kycData.has(CollectedKycDataOption.email) && (
           <Checkbox
-            label={allT('collected-kyc-data-options.email')}
+            label={allT('collected-data-options.email')}
             {...register(`kycData.${CollectedKycDataOption.email}`)}
           />
         )}
         {kycData.has(CollectedKycDataOption.name) && (
           <Checkbox
-            label={allT('collected-kyc-data-options.name')}
+            label={allT('collected-data-options.name')}
             {...register(`kycData.${CollectedKycDataOption.name}`)}
           />
         )}
         {kycData.has(CollectedKycDataOption.dob) && (
           <Checkbox
-            label={allT('collected-kyc-data-options.dob')}
+            label={allT('collected-data-options.dob')}
             {...register(`kycData.${CollectedKycDataOption.dob}`)}
           />
         )}
         {kycData.has(CollectedKycDataOption.ssn9) && (
           <Checkbox
-            label={allT('collected-kyc-data-options.ssn9')}
+            label={allT('collected-data-options.ssn9')}
             {...register(`kycData.${CollectedKycDataOption.ssn9}`)}
           />
         )}
         {kycData.has(CollectedKycDataOption.ssn4) && (
           <Checkbox
-            label={allT('collected-kyc-data-options.ssn4')}
+            label={allT('collected-data-options.ssn4')}
             {...register(`kycData.${CollectedKycDataOption.ssn4}`)}
           />
         )}
         {/* TODO: https://linear.app/footprint/issue/FP-1607/improve-toggle-react-hook-form-integration */}
         {kycData.has(CollectedKycDataOption.fullAddress) && (
           <Checkbox
-            label={allT('collected-kyc-data-options.full_address')}
+            label={allT('collected-data-options.full_address')}
             {...register(`kycData.${CollectedKycDataOption.fullAddress}`)}
           />
         )}
         <Box>
           {documents.idDoc && (
             <Checkbox
-              label={allT('collected-id-doc-attributes.id-doc-image')}
+              label={allT('collected-data-options.document')}
               {...register(`documents.idDoc`)}
               onChange={handleIdDocChange}
             />
           )}
           <AnimatedContainer isExpanded={isSelfieShown}>
             <Checkbox
-              label={allT('collected-id-doc-attributes.selfie-image')}
+              label={allT('id-doc-type.selfie')}
               {...register(`documents.selfie`)}
             />
           </AnimatedContainer>
