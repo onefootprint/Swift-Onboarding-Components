@@ -23,13 +23,13 @@ use paperclip::actix::{Apiv2Schema, Apiv2Security};
 static RISK_OPS_PERMISSIONS: &[TenantScope] = &[
     TenantScope::ManualReview,
     TenantScope::DecryptCustom,
-    TenantScope::DecryptDocuments,
     TenantScope::Decrypt(CollectedDataOption::Name),
     TenantScope::Decrypt(CollectedDataOption::Dob),
     TenantScope::Decrypt(CollectedDataOption::Ssn9),
     TenantScope::Decrypt(CollectedDataOption::FullAddress),
     TenantScope::Decrypt(CollectedDataOption::Email),
     TenantScope::Decrypt(CollectedDataOption::PhoneNumber),
+    TenantScope::Decrypt(CollectedDataOption::DocumentAndSelfie),
 ];
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -187,13 +187,13 @@ mod test {
         TenantScope::Read,
         TenantScope::ManualReview,
         TenantScope::DecryptCustom,
-        TenantScope::DecryptDocuments,
         TenantScope::Decrypt(CollectedDataOption::Name),
         TenantScope::Decrypt(CollectedDataOption::Dob),
         TenantScope::Decrypt(CollectedDataOption::Ssn9),
         TenantScope::Decrypt(CollectedDataOption::FullAddress),
         TenantScope::Decrypt(CollectedDataOption::Email),
         TenantScope::Decrypt(CollectedDataOption::PhoneNumber),
+        TenantScope::Decrypt(CollectedDataOption::DocumentAndSelfie),
     ])]
     fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);

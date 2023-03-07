@@ -48,13 +48,10 @@ pub enum TenantScope {
     /// Allows performing manual review actions on users, like making a new decision or adding an annotation
     ManualReview,
 
-    /// Allows decrypting identity data attributes belonging to the listed CollectedDataOptions
+    /// Allows decrypting data attributes belonging to the listed CollectedDataOption
     Decrypt(CollectedDataOption),
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
-    /// Allows decrypting identity documents
-    /// TODO: replace this with Decrypt(CDO::Document)
-    DecryptDocuments,
 }
 
 impl_enum_string_diesel!(TenantScope);
@@ -103,7 +100,6 @@ impl FromStr for TenantScope {
             TenantScopeDiscriminants::ApiKeys => Self::ApiKeys,
             TenantScopeDiscriminants::OrgSettings => Self::OrgSettings,
             TenantScopeDiscriminants::DecryptCustom => Self::DecryptCustom,
-            TenantScopeDiscriminants::DecryptDocuments => Self::DecryptDocuments,
             TenantScopeDiscriminants::ManualReview => Self::ManualReview,
             TenantScopeDiscriminants::VaultProxy => Self::VaultProxy,
         };
@@ -118,13 +114,13 @@ mod tests {
 
     #[test_case(TenantScope::Decrypt(CollectedDataOption::FullAddress) => "decrypt.full_address")]
     #[test_case(TenantScope::Decrypt(CollectedDataOption::Ssn4) => "decrypt.ssn4")]
+    #[test_case(TenantScope::Decrypt(CollectedDataOption::DocumentAndSelfie) => "decrypt.document_and_selfie")]
     #[test_case(TenantScope::Read => "read")]
     #[test_case(TenantScope::Admin => "admin")]
     #[test_case(TenantScope::OnboardingConfiguration => "onboarding_configuration")]
     #[test_case(TenantScope::ApiKeys => "api_keys")]
     #[test_case(TenantScope::OrgSettings => "org_settings")]
     #[test_case(TenantScope::DecryptCustom => "decrypt_custom")]
-    #[test_case(TenantScope::DecryptDocuments => "decrypt_documents")]
     #[test_case(TenantScope::ManualReview => "manual_review")]
     fn test_to_string(identifier: TenantScope) -> String {
         identifier.to_string()
@@ -132,13 +128,13 @@ mod tests {
 
     #[test_case("decrypt.full_address" => TenantScope::Decrypt(CollectedDataOption::FullAddress))]
     #[test_case("decrypt.ssn4" => TenantScope::Decrypt(CollectedDataOption::Ssn4))]
+    #[test_case("decrypt.document_and_selfie" => TenantScope::Decrypt(CollectedDataOption::DocumentAndSelfie))]
     #[test_case("read" => TenantScope::Read)]
     #[test_case("admin" => TenantScope::Admin)]
     #[test_case("onboarding_configuration" => TenantScope::OnboardingConfiguration)]
     #[test_case("api_keys" => TenantScope::ApiKeys)]
     #[test_case("org_settings" => TenantScope::OrgSettings)]
     #[test_case("decrypt_custom" => TenantScope::DecryptCustom)]
-    #[test_case("decrypt_documents" => TenantScope::DecryptDocuments)]
     #[test_case("manual_review" => TenantScope::ManualReview)]
     fn test_from_str(input: &str) -> TenantScope {
         TenantScope::from_str(input).unwrap()
