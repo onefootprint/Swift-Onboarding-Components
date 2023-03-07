@@ -2,7 +2,6 @@ import { IdDocBadImageError, IdDocType } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdDocMachine from './machine';
-import { Events, States } from './types';
 
 describe('Id Doc Machine Tests', () => {
   const createMachine = () => createIdDocMachine();
@@ -10,14 +9,14 @@ describe('Id Doc Machine Tests', () => {
     const machine = interpret(createMachine());
     machine.start();
     let { state } = machine;
-    expect(state.value).toBe(States.init);
+    expect(state.value).toBe('init');
     expect(state.context).toEqual({
       idDoc: {},
       selfie: {},
     });
 
     state = machine.send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         authToken: 'token',
         device: {
@@ -41,10 +40,10 @@ describe('Id Doc Machine Tests', () => {
         required: false,
       },
     });
-    expect(state.value).toEqual(States.idDocCountryAndType);
+    expect(state.value).toEqual('idDocCountryAndType');
 
     state = machine.send({
-      type: Events.idDocCountryAndTypeSelected,
+      type: 'idDocCountryAndTypeSelected',
       payload: {
         type: IdDocType.idCard,
         country: 'USA',
@@ -55,41 +54,41 @@ describe('Id Doc Machine Tests', () => {
       required: true,
       country: 'USA',
     });
-    expect(state.value).toEqual(States.idDocFrontImage);
+    expect(state.value).toEqual('idDocFrontImage');
 
     state = machine.send({
-      type: Events.receivedIdDocFrontImage,
+      type: 'receivedIdDocFrontImage',
       payload: {
         image: 'front',
       },
     });
     expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.value).toEqual(States.idDocBackImage);
+    expect(state.value).toEqual('idDocBackImage');
 
     state = machine.send({
-      type: Events.receivedIdDocBackImage,
+      type: 'receivedIdDocBackImage',
       payload: {
         image: 'back',
       },
     });
     expect(state.context.idDoc.frontImage).toEqual('front');
     expect(state.context.idDoc.backImage).toEqual('back');
-    expect(state.value).toEqual(States.processingDocuments);
+    expect(state.value).toEqual('processingDocuments');
 
     state = machine.send({
-      type: Events.succeeded,
+      type: 'succeeded',
     });
-    expect(state.value).toEqual(States.success);
+    expect(state.value).toEqual('success');
   });
 
   it('collects selfie only', () => {
     const machine = interpret(createMachine());
     machine.start();
     let { state } = machine;
-    expect(state.value).toBe(States.init);
+    expect(state.value).toBe('init');
 
     state = machine.send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         authToken: 'token',
         device: {
@@ -98,6 +97,7 @@ describe('Id Doc Machine Tests', () => {
         },
         idDocRequired: false,
         selfieRequired: true,
+        consentRequired: true,
       },
     });
     expect(state.context).toEqual({
@@ -111,37 +111,43 @@ describe('Id Doc Machine Tests', () => {
       },
       selfie: {
         required: true,
+        consentRequired: true,
       },
     });
-    expect(state.value).toEqual(States.selfiePrompt);
+    expect(state.value).toEqual('selfiePrompt');
 
     state = machine.send({
-      type: Events.consentReceived,
+      type: 'consentReceived',
     });
-    expect(state.value).toEqual(States.selfieImage);
+    expect(state.value).toEqual('selfiePrompt');
 
     state = machine.send({
-      type: Events.receivedSelfieImage,
+      type: 'startSelfieCapture',
+    });
+    expect(state.value).toEqual('selfieImage');
+
+    state = machine.send({
+      type: 'receivedSelfieImage',
       payload: {
         image: 'selfie',
       },
     });
     expect(state.context.selfie.image).toEqual('selfie');
-    expect(state.value).toEqual(States.processingDocuments);
+    expect(state.value).toEqual('processingDocuments');
 
     state = machine.send({
-      type: Events.succeeded,
+      type: 'succeeded',
     });
-    expect(state.value).toEqual(States.success);
+    expect(state.value).toEqual('success');
   });
 
   it('collects id doc + selfie', () => {
     const machine = interpret(createMachine());
     machine.start();
     let { state } = machine;
-    expect(state.value).toBe(States.init);
+    expect(state.value).toBe('init');
     state = machine.send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         authToken: 'token',
         device: {
@@ -165,64 +171,64 @@ describe('Id Doc Machine Tests', () => {
         required: true,
       },
     });
-    expect(state.value).toEqual(States.idDocCountryAndType);
+    expect(state.value).toEqual('idDocCountryAndType');
 
     state = machine.send({
-      type: Events.idDocCountryAndTypeSelected,
+      type: 'idDocCountryAndTypeSelected',
       payload: {
         type: IdDocType.idCard,
         country: 'USA',
       },
     });
-    expect(state.value).toEqual(States.idDocFrontImage);
+    expect(state.value).toEqual('idDocFrontImage');
 
     state = machine.send({
-      type: Events.receivedIdDocFrontImage,
+      type: 'receivedIdDocFrontImage',
       payload: {
         image: 'front',
       },
     });
     expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.value).toEqual(States.idDocBackImage);
+    expect(state.value).toEqual('idDocBackImage');
 
     state = machine.send({
-      type: Events.receivedIdDocBackImage,
+      type: 'receivedIdDocBackImage',
       payload: {
         image: 'back',
       },
     });
     expect(state.context.idDoc.frontImage).toEqual('front');
     expect(state.context.idDoc.backImage).toEqual('back');
-    expect(state.value).toEqual(States.selfiePrompt);
+    expect(state.value).toEqual('selfiePrompt');
 
     state = machine.send({
-      type: Events.consentReceived,
+      type: 'startSelfieCapture',
     });
-    expect(state.value).toEqual(States.selfieImage);
+    expect(state.value).toEqual('selfieImage');
 
     state = machine.send({
-      type: Events.receivedSelfieImage,
+      type: 'receivedSelfieImage',
       payload: {
         image: 'selfie',
       },
     });
     expect(state.context.selfie.image).toEqual('selfie');
-    expect(state.value).toEqual(States.processingDocuments);
+    expect(state.value).toEqual('processingDocuments');
 
     state = machine.send({
-      type: Events.succeeded,
+      type: 'succeeded',
     });
-    expect(state.value).toEqual(States.success);
+    expect(state.value).toEqual('success');
   });
 
   it('retries id doc images on error', () => {
     const machine = interpret(createMachine());
     machine.start();
     let { state } = machine;
-    expect(state.value).toBe(States.init);
+    expect(state.value).toBe('init');
 
     state = machine.send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         authToken: 'token',
         device: {
@@ -233,38 +239,38 @@ describe('Id Doc Machine Tests', () => {
         selfieRequired: false,
       },
     });
-    expect(state.value).toEqual(States.idDocCountryAndType);
+    expect(state.value).toEqual('idDocCountryAndType');
 
     state = machine.send({
-      type: Events.idDocCountryAndTypeSelected,
+      type: 'idDocCountryAndTypeSelected',
       payload: {
         type: IdDocType.idCard,
         country: 'USA',
       },
     });
-    expect(state.value).toEqual(States.idDocFrontImage);
+    expect(state.value).toEqual('idDocFrontImage');
 
     state = machine.send({
-      type: Events.receivedIdDocFrontImage,
+      type: 'receivedIdDocFrontImage',
       payload: {
         image: 'front',
       },
     });
     expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.value).toEqual(States.idDocBackImage);
+    expect(state.value).toEqual('idDocBackImage');
 
     state = machine.send({
-      type: Events.receivedIdDocBackImage,
+      type: 'receivedIdDocBackImage',
       payload: {
         image: 'back',
       },
     });
     expect(state.context.idDoc.frontImage).toEqual('front');
     expect(state.context.idDoc.backImage).toEqual('back');
-    expect(state.value).toEqual(States.processingDocuments);
+    expect(state.value).toEqual('processingDocuments');
 
     state = machine.send({
-      type: Events.errored,
+      type: 'errored',
       payload: {
         errors: [
           IdDocBadImageError.barcodeNotDetected,
@@ -272,27 +278,27 @@ describe('Id Doc Machine Tests', () => {
         ],
       },
     });
-    expect(state.value).toEqual(States.error);
+    expect(state.value).toEqual('error');
     expect(state.context.idDoc.errors).toEqual([
       IdDocBadImageError.barcodeNotDetected,
       IdDocBadImageError.documentBorderTooSmall,
     ]);
 
     state = machine.send({
-      type: Events.resubmitIdDocImages,
+      type: 'resubmitIdDocImages',
     });
     expect(state.context.idDoc.frontImage).toEqual(undefined);
     expect(state.context.idDoc.backImage).toEqual(undefined);
-    expect(state.value).toBe(States.idDocFrontImage);
+    expect(state.value).toBe('idDocFrontImage');
   });
 
   it('can return to id doc country and type selection', () => {
     const machine = interpret(createMachine());
     machine.start();
     let { state } = machine;
-    expect(state.value).toBe(States.init);
+    expect(state.value).toBe('init');
     state = machine.send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         authToken: 'token',
         device: {
@@ -316,32 +322,32 @@ describe('Id Doc Machine Tests', () => {
         required: true,
       },
     });
-    expect(state.value).toEqual(States.idDocCountryAndType);
+    expect(state.value).toEqual('idDocCountryAndType');
 
     state = machine.send({
-      type: Events.idDocCountryAndTypeSelected,
+      type: 'idDocCountryAndTypeSelected',
       payload: {
         type: IdDocType.idCard,
         country: 'USA',
       },
     });
-    expect(state.value).toEqual(States.idDocFrontImage);
+    expect(state.value).toEqual('idDocFrontImage');
     expect(state.context.idDoc.type).toEqual(IdDocType.idCard);
     expect(state.context.idDoc.country).toEqual('USA');
 
     state = machine.send({
-      type: Events.navigatedToPrev,
+      type: 'navigatedToPrev',
     });
-    expect(state.value).toEqual(States.idDocCountryAndType);
+    expect(state.value).toEqual('idDocCountryAndType');
 
     state = machine.send({
-      type: Events.idDocCountryAndTypeSelected,
+      type: 'idDocCountryAndTypeSelected',
       payload: {
         type: IdDocType.driversLicense,
         country: 'AFG',
       },
     });
-    expect(state.value).toEqual(States.idDocFrontImage);
+    expect(state.value).toEqual('idDocFrontImage');
     expect(state.context.idDoc.type).toEqual(IdDocType.driversLicense);
     expect(state.context.idDoc.country).toEqual('AFG');
   });

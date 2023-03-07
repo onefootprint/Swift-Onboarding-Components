@@ -5,45 +5,6 @@ import {
   IdDocType,
 } from '@onefootprint/types';
 
-export enum States {
-  init = 'init',
-  idDocCountryAndType = 'idDocCountryAndType',
-  idDocFrontImage = 'idDocFrontImage',
-  idDocBackImage = 'idDocBackImage',
-  selfiePrompt = 'selfiePrompt',
-  selfieImage = 'selfieImage',
-  processingDocuments = 'processingDocuments',
-  error = 'error',
-  success = 'success',
-  failure = 'failure',
-}
-
-export enum Events {
-  receivedContext = 'receivedContext',
-  idDocCountryAndTypeSelected = 'idDocCountryAndTypeSelected',
-  navigatedToPrev = 'navigatedToPrev',
-  cameraErrored = 'cameraErrored',
-  receivedIdDocFrontImage = 'receivedIdDocFrontImage',
-  receivedIdDocBackImage = 'receivedIdDocBackImage',
-  consentReceived = 'startSelfieCapture',
-  startSelfieCapture = 'startSelfieCapture',
-  receivedSelfieImage = 'receivedSelfieImage',
-  succeeded = 'succeeded',
-  errored = 'errored',
-  retryLimitExceeded = 'retryLimitExceeded',
-  resubmitIdDocImages = 'resubmitIdDocImages',
-}
-
-export enum Actions {
-  assignContext = 'assignContext',
-  assignIdDocCountryAndType = 'assignIdDocCountryAndType',
-  assignIdDocFrontImage = 'assignIdDocFrontImage',
-  assignIdDocBackImage = 'assignIdDocBackImage',
-  assignIdDocImageErrors = 'assignIdDocImageErrors',
-  assignConsent = 'assignConsent',
-  assignSelfie = 'assignSelfie',
-}
-
 export type MachineContext = {
   authToken?: string;
   device?: DeviceInfo;
@@ -64,7 +25,7 @@ export type MachineContext = {
 
 export type MachineEvents =
   | {
-      type: Events.receivedContext;
+      type: 'receivedContext';
       payload: {
         authToken: string;
         device: DeviceInfo;
@@ -74,52 +35,52 @@ export type MachineEvents =
       };
     }
   | {
-      type: Events.idDocCountryAndTypeSelected;
+      type: 'idDocCountryAndTypeSelected';
       payload: {
         type: IdDocType;
         country: CountryCode3;
       };
     }
   | {
-      type: Events.navigatedToPrev;
+      type: 'navigatedToPrev';
     }
   | {
-      type: Events.cameraErrored;
+      type: 'cameraErrored';
     }
   | {
-      type: Events.receivedIdDocFrontImage;
+      type: 'receivedIdDocFrontImage';
       payload: {
         image: string;
       };
     }
   | {
-      type: Events.receivedIdDocBackImage;
+      type: 'receivedIdDocBackImage';
       payload: {
         image: string;
       };
     }
   | {
-      type: Events.consentReceived;
+      type: 'consentReceived';
     }
   | {
-      type: Events.startSelfieCapture;
+      type: 'startSelfieCapture';
     }
   | {
-      type: Events.receivedSelfieImage;
+      type: 'receivedSelfieImage';
       payload: {
         image: string;
       };
     }
   | {
-      type: Events.succeeded;
+      type: 'succeeded';
     }
-  | { type: Events.retryLimitExceeded }
+  | { type: 'retryLimitExceeded' }
   | {
-      type: Events.errored;
+      type: 'errored';
       payload: {
         errors: IdDocBadImageError[];
       };
     }
   | {
-      type: Events.resubmitIdDocImages;
+      type: 'resubmitIdDocImages';
     };

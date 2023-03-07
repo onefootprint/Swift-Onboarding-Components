@@ -13,7 +13,7 @@ import { HeaderTitle, NavigationHeader } from '../../../../components';
 import IdAnimation from '../../../../components/id-animation';
 import InfoBox from '../../../../components/info-box/info-box';
 import SelfieConsent from '../../components/selfie-consent';
-import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
+import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const SelfiePrompt = () => {
   const [state, send] = useIdDocMachine();
@@ -31,16 +31,16 @@ const SelfiePrompt = () => {
   };
 
   const handleConsent = () => {
-    send({ type: Events.consentReceived });
+    send({ type: 'consentReceived' });
     setConsentVisible(false);
-    send({ type: Events.startSelfieCapture });
+    send({ type: 'startSelfieCapture' });
   };
 
   const handleClick = () => {
     if (consentRequired) {
       setConsentVisible(true);
     } else {
-      send({ type: Events.startSelfieCapture });
+      send({ type: 'startSelfieCapture' });
     }
   };
 

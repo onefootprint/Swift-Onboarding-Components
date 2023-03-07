@@ -25,7 +25,6 @@ import styled, { css } from 'styled-components';
 import { NavigationHeader } from '../../../../components';
 import HeaderTitle from '../../../../components/header-title';
 import { useIdDocMachine } from '../../components/machine-provider';
-import { Events } from '../../utils/state-machine/types';
 import IdDocTypesByCountry from './id-doc-types-by-country.constants';
 
 const getCountryFromCode = (countryCode?: CountryCode) => {
@@ -71,7 +70,7 @@ const IdDocCountryAndType = () => {
 
   const handleSubmit = () => {
     send({
-      type: Events.idDocCountryAndTypeSelected,
+      type: 'idDocCountryAndTypeSelected',
       payload: {
         type: docType,
         country:

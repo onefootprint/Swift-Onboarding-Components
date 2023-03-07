@@ -5,7 +5,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTimeout } from 'usehooks-ts';
 
-import useIdDocMachine, { Events } from '../../../../hooks/use-id-doc-machine';
+import useIdDocMachine from '../../../../hooks/use-id-doc-machine';
 import TRANSITION_DELAY from '../../transition-delay.constants';
 
 type ErrorProps = {
@@ -18,7 +18,7 @@ const Error = ({ errors }: ErrorProps) => {
 
   useTimeout(() => {
     send({
-      type: Events.errored,
+      type: 'errored',
       payload: {
         errors: errors ?? [],
       },

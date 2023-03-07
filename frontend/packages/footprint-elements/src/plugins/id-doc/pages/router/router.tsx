@@ -2,7 +2,6 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import { States } from '../../utils/state-machine/types';
 import Error from '../error';
 import Failure from '../failure';
 import IdDocBackPhoto from '../id-doc-back-photo';
@@ -18,7 +17,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useIdDocMachine();
-  const isDone = state.matches(States.success) || state.matches(States.failure);
+  const isDone = state.matches('success') || state.matches('failure');
   useLogStateMachine('id-doc', state);
 
   useEffect(() => {
@@ -27,28 +26,28 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches(States.idDocCountryAndType)) {
+  if (state.matches('idDocCountryAndType')) {
     return <IdDocCountryAndType />;
   }
-  if (state.matches(States.idDocFrontImage)) {
+  if (state.matches('idDocFrontImage')) {
     return <IdDocFrontPhoto />;
   }
-  if (state.matches(States.idDocBackImage)) {
+  if (state.matches('idDocBackImage')) {
     return <IdDocBackPhoto />;
   }
-  if (state.matches(States.selfiePrompt)) {
+  if (state.matches('selfiePrompt')) {
     return <SelfiePrompt />;
   }
-  if (state.matches(States.selfieImage)) {
+  if (state.matches('selfieImage')) {
     return <SelfiePhoto />;
   }
-  if (state.matches(States.processingDocuments)) {
+  if (state.matches('processingDocuments')) {
     return <ProcessingDocuments />;
   }
-  if (state.matches(States.error)) {
+  if (state.matches('error')) {
     return <Error />;
   }
-  if (state.matches(States.failure)) {
+  if (state.matches('failure')) {
     return <Failure />;
   }
 

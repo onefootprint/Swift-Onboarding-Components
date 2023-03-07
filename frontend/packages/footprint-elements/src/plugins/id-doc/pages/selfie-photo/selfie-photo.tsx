@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { NavigationHeader } from '../../../../components';
-import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
+import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image/use-process-image';
 import Camera from './components/camera';
 import Preview from './components/preview';
@@ -42,7 +42,7 @@ const SelfiePhoto = () => {
 
     setIsLoading(false);
     send({
-      type: Events.receivedSelfieImage,
+      type: 'receivedSelfieImage',
       payload: {
         image: imageString,
       },
@@ -51,7 +51,7 @@ const SelfiePhoto = () => {
 
   const handleError = () => {
     send({
-      type: Events.cameraErrored,
+      type: 'cameraErrored',
     });
   };
 

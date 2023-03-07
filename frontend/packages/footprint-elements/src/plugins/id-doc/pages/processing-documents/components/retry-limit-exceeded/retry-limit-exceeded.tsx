@@ -4,7 +4,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTimeout } from 'usehooks-ts';
 
-import useIdDocMachine, { Events } from '../../../../hooks/use-id-doc-machine';
+import useIdDocMachine from '../../../../hooks/use-id-doc-machine';
 import TRANSITION_DELAY from '../../transition-delay.constants';
 
 const RetryLimitExceeded = () => {
@@ -13,7 +13,7 @@ const RetryLimitExceeded = () => {
 
   useTimeout(() => {
     send({
-      type: Events.retryLimitExceeded,
+      type: 'retryLimitExceeded',
     });
   }, TRANSITION_DELAY);
 

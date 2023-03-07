@@ -1,61 +1,60 @@
 import { assign, createMachine } from 'xstate';
 
 import ImagesRequiredByIdDocType from '../../constants/images-required-by-id-doc-type';
-import {
-  Actions,
-  Events,
-  MachineContext,
-  MachineEvents,
-  States,
-} from './types';
+import { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = () =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine(
     {
       predictableActionArguments: true,
       id: 'idDoc',
-      initial: States.init,
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'init',
       context: {
         idDoc: {},
         selfie: {},
       },
       states: {
-        [States.init]: {
+        init: {
           on: {
-            [Events.receivedContext]: [
+            receivedContext: [
               {
-                target: States.idDocCountryAndType,
-                actions: Actions.assignContext,
+                target: 'idDocCountryAndType',
+                actions: 'assignContext',
                 cond: (context, event) => !!event.payload.idDocRequired,
               },
               {
-                target: States.selfiePrompt,
-                actions: Actions.assignContext,
+                target: 'selfiePrompt',
+                actions: 'assignContext',
                 cond: (context, event) => !!event.payload.selfieRequired,
               },
               {
-                target: States.success,
+                target: 'success',
               },
             ],
           },
         },
-        [States.idDocCountryAndType]: {
+        idDocCountryAndType: {
           on: {
-            [Events.idDocCountryAndTypeSelected]: {
-              target: States.idDocFrontImage,
-              actions: Actions.assignIdDocCountryAndType,
+            idDocCountryAndTypeSelected: {
+              target: 'idDocFrontImage',
+              actions: 'assignIdDocCountryAndType',
             },
           },
         },
-        [States.idDocFrontImage]: {
+        idDocFrontImage: {
           on: {
-            [Events.navigatedToPrev]: {
-              target: States.idDocCountryAndType,
+            navigatedToPrev: {
+              target: 'idDocCountryAndType',
             },
-            [Events.receivedIdDocFrontImage]: [
+            receivedIdDocFrontImage: [
               {
-                target: States.idDocBackImage,
-                actions: Actions.assignIdDocFrontImage,
+                target: 'idDocBackImage',
+                actions: 'assignIdDocFrontImage',
                 cond: context => {
                   const {
                     idDoc: { type },
@@ -64,140 +63,126 @@ const createIdDocMachine = () =>
                 },
               },
               {
-                target: States.selfiePrompt,
+                target: 'selfiePrompt',
                 cond: context => !!context.selfie.required,
-                actions: Actions.assignIdDocFrontImage,
+                actions: 'assignIdDocFrontImage',
               },
               {
-                target: States.processingDocuments,
-                actions: Actions.assignIdDocFrontImage,
+                target: 'processingDocuments',
+                actions: 'assignIdDocFrontImage',
               },
             ],
           },
         },
-        [States.idDocBackImage]: {
+        idDocBackImage: {
           on: {
-            [Events.receivedIdDocBackImage]: [
+            receivedIdDocBackImage: [
               {
-                target: States.selfiePrompt,
+                target: 'selfiePrompt',
                 cond: context => !!context.selfie.required,
-                actions: Actions.assignIdDocBackImage,
+                actions: 'assignIdDocBackImage',
               },
               {
-                target: States.processingDocuments,
-                actions: Actions.assignIdDocBackImage,
+                target: 'processingDocuments',
+                actions: 'assignIdDocBackImage',
               },
             ],
           },
         },
-        [States.selfiePrompt]: {
+        selfiePrompt: {
           on: {
-            [Events.consentReceived]: {
-              actions: [Actions.assignConsent],
+            consentReceived: {
+              actions: ['assignConsent'],
             },
-            [Events.startSelfieCapture]: {
-              target: States.selfieImage,
+            startSelfieCapture: {
+              target: 'selfieImage',
             },
           },
         },
-        [States.selfieImage]: {
+        selfieImage: {
           on: {
-            [Events.cameraErrored]: {
-              target: States.selfiePrompt,
+            cameraErrored: {
+              target: 'selfiePrompt',
             },
-            [Events.receivedSelfieImage]: {
-              target: States.processingDocuments,
-              actions: Actions.assignSelfie,
+            receivedSelfieImage: {
+              target: 'processingDocuments',
+              actions: 'assignSelfie',
             },
           },
         },
-        [States.processingDocuments]: {
+        processingDocuments: {
           on: {
-            [Events.succeeded]: {
-              target: States.success,
+            succeeded: {
+              target: 'success',
             },
-            [Events.errored]: [
+            errored: [
               {
-                target: States.error,
-                actions: Actions.assignIdDocImageErrors,
+                target: 'error',
+                actions: 'assignIdDocImageErrors',
               },
             ],
-            [Events.retryLimitExceeded]: {
-              target: States.failure,
+            retryLimitExceeded: {
+              target: 'failure',
             },
           },
         },
-        [States.error]: {
+        error: {
           on: {
-            [Events.resubmitIdDocImages]: {
-              target: States.idDocFrontImage,
+            resubmitIdDocImages: {
+              target: 'idDocFrontImage',
             },
           },
         },
-        [States.success]: {
+        success: {
           type: 'final',
         },
-        [States.failure]: {
+        failure: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        [Actions.assignContext]: assign((context, event) => {
-          if (event.type === Events.receivedContext) {
-            const {
-              authToken,
-              device,
-              idDocRequired,
-              selfieRequired,
-              consentRequired,
-            } = event.payload;
-            context.authToken = authToken;
-            context.device = { ...device };
-            context.idDoc.required = idDocRequired;
-            context.selfie.required = selfieRequired;
-            context.selfie.consentRequired = consentRequired;
-          }
+        assignContext: assign((context, event) => {
+          const {
+            authToken,
+            device,
+            idDocRequired,
+            selfieRequired,
+            consentRequired,
+          } = event.payload;
+          context.authToken = authToken;
+          context.device = { ...device };
+          context.idDoc.required = idDocRequired;
+          context.selfie.required = selfieRequired;
+          context.selfie.consentRequired = consentRequired;
           return context;
         }),
-        [Actions.assignIdDocCountryAndType]: assign((context, event) => {
-          if (event.type === Events.idDocCountryAndTypeSelected) {
-            context.idDoc.type = event.payload.type;
-            context.idDoc.country = event.payload.country;
-          }
+        assignIdDocCountryAndType: assign((context, event) => {
+          context.idDoc.type = event.payload.type;
+          context.idDoc.country = event.payload.country;
           return context;
         }),
-        [Actions.assignIdDocFrontImage]: assign((context, event) => {
-          if (event.type === Events.receivedIdDocFrontImage) {
-            context.idDoc.frontImage = event.payload.image;
-          }
+        assignIdDocFrontImage: assign((context, event) => {
+          context.idDoc.frontImage = event.payload.image;
           return context;
         }),
-        [Actions.assignIdDocBackImage]: assign((context, event) => {
-          if (event.type === Events.receivedIdDocBackImage) {
-            context.idDoc.backImage = event.payload.image;
-          }
+        assignIdDocBackImage: assign((context, event) => {
+          context.idDoc.backImage = event.payload.image;
           return context;
         }),
-        [Actions.assignConsent]: assign((context, event) => {
-          if (event.type === Events.consentReceived) {
-            context.selfie.consentRequired = false;
-          }
+        assignConsent: assign(context => {
+          context.selfie.consentRequired = false;
           return context;
         }),
-        [Actions.assignSelfie]: assign((context, event) => {
-          if (event.type === Events.receivedSelfieImage) {
-            context.selfie.image = event.payload.image;
-          }
+        assignSelfie: assign((context, event) => {
+          context.selfie.image = event.payload.image;
           return context;
         }),
-        [Actions.assignIdDocImageErrors]: assign((context, event) => {
-          if (event.type === Events.errored) {
-            context.idDoc.errors = event.payload.errors;
-            context.idDoc.frontImage = undefined;
-            context.idDoc.backImage = undefined;
-          }
+        assignIdDocImageErrors: assign((context, event) => {
+          context.idDoc.errors = event.payload.errors;
+          context.idDoc.frontImage = undefined;
+          context.idDoc.backImage = undefined;
           return context;
         }),
       },

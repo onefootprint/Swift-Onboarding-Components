@@ -3,7 +3,7 @@ import React from 'react';
 
 import { NavigationHeader } from '../../../../components';
 import IdDocPhotoPrompt from '../../components/id-doc-photo-prompt';
-import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
+import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const IdDocBackPhoto = () => {
   const [state, send] = useIdDocMachine();
@@ -17,7 +17,7 @@ const IdDocBackPhoto = () => {
 
   const handleComplete = (image: string) => {
     send({
-      type: Events.receivedIdDocBackImage,
+      type: 'receivedIdDocBackImage',
       payload: {
         image,
       },

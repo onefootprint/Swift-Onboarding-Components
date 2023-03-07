@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
-import useIdDocMachine, { Events } from '../../hooks/use-id-doc-machine';
+import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const Error = () => {
   const { t } = useTranslation('pages.error');
@@ -14,7 +14,7 @@ const Error = () => {
   const { errors } = state.context.idDoc;
   const handleClick = () => {
     send({
-      type: Events.resubmitIdDocImages,
+      type: 'resubmitIdDocImages',
     });
   };
   // In case backend sends us error codes we don't expect

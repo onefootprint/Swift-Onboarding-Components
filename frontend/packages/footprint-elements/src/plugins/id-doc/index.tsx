@@ -12,7 +12,6 @@ import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { IdDocProps } from './id-doc.types';
 import Router from './pages/router';
-import { Events } from './utils/state-machine/types';
 
 const App = ({ context, onDone }: IdDocProps) => {
   const [, send] = useIdDocMachine();
@@ -22,7 +21,7 @@ const App = ({ context, onDone }: IdDocProps) => {
 
   useEffectOnce(() => {
     send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         authToken,
         device,
