@@ -5,7 +5,7 @@ export enum RoleScope {
   apiKeys = 'api_keys',
   orgSettings = 'org_settings',
   decryptCustom = 'decrypt_custom',
-  decryptDocuments = 'decrypt_documents',
+  decryptDocuments = 'decrypt.document_and_selfie',
   decryptName = 'decrypt.name',
   decryptDob = 'decrypt.dob',
   decryptSsn4 = 'decrypt.ssn4',

@@ -38,7 +38,7 @@ const useDecryptOptions = () => {
           value: RoleScope.decryptDob,
           label: 'Date of Birth',
         },
-        { value: RoleScope.decryptDocuments, label: 'ID document' },
+        { value: RoleScope.decryptDocuments, label: 'ID documents' },
       ],
     },
     {
