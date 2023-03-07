@@ -1,6 +1,6 @@
 import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
-import { Events, MachineContext, MachineEvents } from '../../types';
+import { MachineContext, MachineEvents } from '../../types';
 import initContextComplete from './init-context-complete';
 
 describe('initContextComplete', () => {
@@ -35,7 +35,7 @@ describe('initContextComplete', () => {
         onboardingConfig: TestOnboardingConfig,
       };
       const event: MachineEvents = {
-        type: Events.initContextUpdated,
+        type: 'initContextUpdated',
         payload: {},
       };
       expect(initContextComplete(context, event)).toEqual(true);
@@ -49,7 +49,7 @@ describe('initContextComplete', () => {
         onboardingConfig: TestOnboardingConfig,
       };
       const event: MachineEvents = {
-        type: Events.initContextUpdated,
+        type: 'initContextUpdated',
         payload: {
           device: {
             type: 'mobile',
@@ -65,7 +65,7 @@ describe('initContextComplete', () => {
     it('when context and payload have missing data', () => {
       const context: MachineContext = {};
       const event: MachineEvents = {
-        type: Events.initContextUpdated,
+        type: 'initContextUpdated',
         payload: {
           device: {
             type: 'mobile',

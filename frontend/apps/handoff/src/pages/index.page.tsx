@@ -12,7 +12,6 @@ import { GetD2PResponse } from '@onefootprint/types';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
-import { Events, States } from 'src/utils/state-machine';
 
 import Canceled from './canceled';
 import CheckRequirements from './check-requirements';
@@ -33,7 +32,7 @@ const Root = () => {
     options: {
       onSuccess: (data: GetD2PResponse) => {
         send({
-          type: Events.statusReceived,
+          type: 'statusReceived',
           payload: {
             status: data.status,
           },
@@ -41,7 +40,7 @@ const Root = () => {
       },
       onError: () => {
         send({
-          type: Events.statusReceived,
+          type: 'statusReceived',
           payload: {
             isError: true,
           },
@@ -57,15 +56,15 @@ const Root = () => {
         observeCollector.logError('error', error, { stack });
       }}
       onReset={() => {
-        send({ type: Events.reset });
+        send({ type: 'reset' });
       }}
     >
-      {state.matches(States.init) && <Init />}
-      {state.matches(States.complete) && <Complete />}
-      {state.matches(States.canceled) && <Canceled />}
-      {state.matches(States.expired) && <Expired />}
-      {state.matches(States.checkRequirements) && <CheckRequirements />}
-      {state.matches(States.liveness) && !!authToken && !!device && (
+      {state.matches('init') && <Init />}
+      {state.matches('complete') && <Complete />}
+      {state.matches('canceled') && <Canceled />}
+      {state.matches('expired') && <Expired />}
+      {state.matches('checkRequirements') && <CheckRequirements />}
+      {state.matches('liveness') && !!authToken && !!device && (
         <DeviceSignals page="liveness" fpAuthToken={authToken}>
           <Liveness
             context={{
@@ -73,12 +72,12 @@ const Root = () => {
               device,
             }}
             onDone={() => {
-              send({ type: Events.requirementCompleted });
+              send({ type: 'requirementCompleted' });
             }}
           />
         </DeviceSignals>
       )}
-      {state.matches(States.idDoc) && !!authToken && !!device && (
+      {state.matches('idDoc') && !!authToken && !!device && (
         <DeviceSignals page="id-doc" fpAuthToken={authToken}>
           <IdDoc
             context={{
@@ -91,7 +90,7 @@ const Root = () => {
               },
             }}
             onDone={() => {
-              send({ type: Events.requirementCompleted });
+              send({ type: 'requirementCompleted' });
             }}
           />
         </DeviceSignals>

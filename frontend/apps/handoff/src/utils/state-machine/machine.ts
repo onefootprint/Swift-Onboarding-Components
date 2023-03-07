@@ -1,39 +1,38 @@
 import { D2PStatus } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import {
-  Actions,
-  Events,
-  MachineContext,
-  MachineEvents,
-  States,
-} from './types';
+import { MachineContext, MachineEvents } from './types';
 import initContextComplete from './utils/init-context-complete';
 
 export const createHandoffMachine = () =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine(
     {
       predictableActionArguments: true,
       id: 'handoff',
-      initial: States.init,
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'init',
       context: {},
       on: {
-        [Events.reset]: {
-          target: States.init,
-          actions: [Actions.resetContext],
+        reset: {
+          target: 'init',
+          actions: ['resetContext'],
         },
-        [Events.statusReceived]: [
+        statusReceived: [
           {
-            target: States.expired,
+            target: 'expired',
             cond: (context, event) => !!event.payload.isError,
           },
           {
-            target: States.canceled,
+            target: 'canceled',
             cond: (context, event) =>
               event.payload.status === D2PStatus.canceled,
           },
           {
-            target: States.complete,
+            target: 'complete',
             cond: (context, event) =>
               event.payload.status === D2PStatus.completed ||
               event.payload.status === D2PStatus.failed,
@@ -41,82 +40,79 @@ export const createHandoffMachine = () =>
         ],
       },
       states: {
-        [States.init]: {
+        init: {
           on: {
-            [Events.initContextUpdated]: [
+            initContextUpdated: [
               {
                 description:
                   'Only transition to next state if all required info is collected',
-                actions: [Actions.assignInitContext],
-                target: States.router,
+                actions: ['assignInitContext'],
+                target: 'router',
                 cond: (context, event) => initContextComplete(context, event),
               },
               {
-                actions: [Actions.assignInitContext],
+                actions: ['assignInitContext'],
               },
             ],
-            [Events.d2pAlreadyCompleted]: [
+            d2pAlreadyCompleted: [
               {
-                target: States.complete,
+                target: 'complete',
               },
             ],
           },
         },
-        [States.router]: {
+        router: {
           always: [
             {
-              target: States.liveness,
+              target: 'liveness',
               cond: context => !!context.requirements?.missingLiveness,
             },
             {
-              target: States.idDoc,
+              target: 'idDoc',
               cond: context => !!context.requirements?.missingIdDoc,
             },
             {
-              target: States.complete,
+              target: 'complete',
             },
           ],
         },
 
-        [States.liveness]: {
+        liveness: {
           on: {
-            [Events.requirementCompleted]: {
-              target: States.checkRequirements,
+            requirementCompleted: {
+              target: 'checkRequirements',
             },
           },
         },
-        [States.idDoc]: {
+        idDoc: {
           on: {
-            [Events.requirementCompleted]: {
-              target: States.checkRequirements,
+            requirementCompleted: {
+              target: 'checkRequirements',
             },
           },
         },
-        [States.checkRequirements]: {
+        checkRequirements: {
           on: {
-            [Events.requirementsReceived]: {
-              target: States.router,
-              actions: [Actions.assignRequirements],
+            requirementsReceived: {
+              target: 'router',
+              actions: ['assignRequirements'],
             },
           },
         },
-        [States.expired]: {
+        expired: {
           type: 'final',
         },
-        [States.canceled]: {
+        canceled: {
           type: 'final',
         },
-        [States.complete]: {
+        complete: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        [Actions.assignInitContext]: assign((context, event) => {
-          if (event.type !== Events.initContextUpdated) {
-            return context;
-          }
+        assignInitContext: assign((context, event) => {
           const { device, authToken, opener, onboardingConfig, requirements } =
             event.payload;
 
@@ -133,15 +129,13 @@ export const createHandoffMachine = () =>
 
           return context;
         }),
-        [Actions.assignRequirements]: assign((context, event) => {
-          if (event.type === Events.requirementsReceived) {
-            context.requirements = {
-              ...event.payload,
-            };
-          }
+        assignRequirements: assign((context, event) => {
+          context.requirements = {
+            ...event.payload,
+          };
           return context;
         }),
-        [Actions.resetContext]: assign(() => ({})),
+        resetContext: assign(() => ({})),
       },
     },
   );

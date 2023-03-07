@@ -12,7 +12,6 @@ import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import convertRequirements from 'src/utils/convert-requirements';
-import { Events } from 'src/utils/state-machine';
 import styled from 'styled-components';
 
 const Init = () => {
@@ -34,12 +33,12 @@ const Init = () => {
             // If the handoff was already completed, we will get an error about
             // trying to transition the status backwards
             send({
-              type: Events.d2pAlreadyCompleted,
+              type: 'd2pAlreadyCompleted',
             });
           },
           onSettled() {
             send({
-              type: Events.initContextUpdated,
+              type: 'initContextUpdated',
               payload: {
                 authToken: authTokenFromUrl,
               },
@@ -65,7 +64,7 @@ const Init = () => {
         });
 
         send({
-          type: Events.initContextUpdated,
+          type: 'initContextUpdated',
           payload: {
             opener,
           },
@@ -79,7 +78,7 @@ const Init = () => {
       device,
     });
     send({
-      type: Events.initContextUpdated,
+      type: 'initContextUpdated',
       payload: {
         device,
       },
@@ -89,7 +88,7 @@ const Init = () => {
   useGetOnboardingStatus(authToken ?? '', {
     onSuccess: ({ obConfiguration, requirements }) => {
       send({
-        type: Events.initContextUpdated,
+        type: 'initContextUpdated',
         payload: {
           onboardingConfig: obConfiguration,
           requirements: convertRequirements(requirements),

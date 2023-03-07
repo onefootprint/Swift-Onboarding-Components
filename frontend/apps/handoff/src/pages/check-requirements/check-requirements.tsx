@@ -7,7 +7,6 @@ import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import convertRequirements from 'src/utils/convert-requirements';
-import { Events } from 'src/utils/state-machine';
 import styled from 'styled-components';
 
 const CheckRequirements = () => {
@@ -17,7 +16,7 @@ const CheckRequirements = () => {
   useGetOnboardingStatus(authToken ?? '', {
     onSuccess: (response: OnboardingStatusResponse) => {
       send({
-        type: Events.requirementsReceived,
+        type: 'requirementsReceived',
         payload: convertRequirements(response.requirements),
       });
     },

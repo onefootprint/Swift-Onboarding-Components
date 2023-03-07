@@ -1,9 +1,9 @@
-import { Events, MachineContext, MachineEvents } from '../../types';
+import { InitContextUpdatedEvent, MachineContext } from '../../types';
 
-const initContextComplete = (context: MachineContext, event: MachineEvents) => {
-  if (event.type !== Events.initContextUpdated) {
-    return false;
-  }
+const initContextComplete = (
+  context: MachineContext,
+  event: InitContextUpdatedEvent,
+) => {
   const device = context.device || event.payload.device;
   const authToken = context.authToken || event.payload.authToken;
   const opener = context.opener || event.payload.opener;
