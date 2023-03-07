@@ -79,7 +79,7 @@ pub enum Error {
     #[error("{0}")]
     Custom(String),
     #[error("{0}")]
-    UvdKindConversionError(#[from] UvdKindConversionError),
+    VdKindConversionError(#[from] VdKindConversionError),
 }
 
 impl Error {

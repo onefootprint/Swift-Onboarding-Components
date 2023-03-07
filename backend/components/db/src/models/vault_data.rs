@@ -12,21 +12,21 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::PersonVaultDataKind;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
-use newtypes::UvdKind;
 use newtypes::VaultId;
-use newtypes::{DataLifetimeId, UvdId};
+use newtypes::VdKind;
+use newtypes::{DataLifetimeId, VdId};
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = user_vault_data)]
-pub struct UserVaultData {
-    pub id: UvdId,
+pub struct VaultData {
+    pub id: VdId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
-    pub kind: UvdKind,
+    pub kind: VdKind,
     pub e_data: SealedVaultBytes,
 }
 
@@ -34,7 +34,7 @@ pub type NewPersonVaultData = NewUserVaultData<PersonVaultDataKind>;
 pub type NewBusinessVaultData = NewUserVaultData<BusinessDataKind>;
 pub struct NewUserVaultData<T>
 where
-    T: Into<UvdKind> + Into<DataLifetimeKind> + Clone,
+    T: Into<VdKind> + Into<DataLifetimeKind> + Clone,
 {
     pub kind: T,
     pub e_data: SealedVaultBytes,
@@ -44,11 +44,11 @@ where
 #[diesel(table_name = user_vault_data)]
 pub struct NewUserVaultDataRow {
     pub lifetime_id: DataLifetimeId,
-    pub kind: UvdKind,
+    pub kind: VdKind,
     pub e_data: SealedVaultBytes,
 }
 
-impl UserVaultData {
+impl VaultData {
     #[tracing::instrument(skip_all)]
     pub fn bulk_create<T>(
         conn: &mut TxnPgConn,
@@ -58,7 +58,7 @@ impl UserVaultData {
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>>
     where
-        T: Into<UvdKind> + Into<DataLifetimeKind> + Clone,
+        T: Into<VdKind> + Into<DataLifetimeKind> + Clone,
     {
         // Make a DataLifetime row for each of the new pieces of data being inserted
         let lifetimes = DataLifetime::bulk_create(
@@ -71,10 +71,10 @@ impl UserVaultData {
         let new_rows: Vec<_> = data
             .into_iter()
             .zip(lifetimes.into_iter())
-            .map(|(new_uvd, lifetime)| NewUserVaultDataRow {
+            .map(|(new_vd, lifetime)| NewUserVaultDataRow {
                 lifetime_id: lifetime.id,
-                kind: new_uvd.kind.into(),
-                e_data: new_uvd.e_data,
+                kind: new_vd.kind.into(),
+                e_data: new_vd.e_data,
             })
             .collect();
         let results = diesel::insert_into(user_vault_data::table)
@@ -84,7 +84,7 @@ impl UserVaultData {
     }
 }
 
-impl HasLifetime for UserVaultData {
+impl HasLifetime for VaultData {
     fn lifetime_id(&self) -> &DataLifetimeId {
         &self.lifetime_id
     }
@@ -100,7 +100,7 @@ impl HasLifetime for UserVaultData {
     }
 }
 
-impl HasSealedIdentityData for UserVaultData {
+impl HasSealedIdentityData for VaultData {
     fn e_data(&self) -> &SealedVaultBytes {
         &self.e_data
     }

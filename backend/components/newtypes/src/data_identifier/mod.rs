@@ -7,6 +7,7 @@
 //! - `IdentityDataKind`: A subset of DataIdentifier that refers to what we colloquially have been calling
 //!   "identity data." This is the set of data that shows up on your virtual, Footprint ID card. It is the
 //!   set of data that we send to be verified by our KYC data vendors.
+//!    - TODO need to update this
 //!    - Identity data is stored inside of a handful of different tables. `UvdKind` is a subset of
 //!      `IdentityDataKind` that represents data that is stored only in the `UserVaultData` table.
 //! - `KvDataKey`: A subset of DataIdentifier that refers to custom, key-value data. A KvDataKey is just
@@ -33,11 +34,11 @@ mod collected_data;
 mod data_lifetime_kind;
 mod id_doc_kind;
 mod identity_data_kind;
-mod uvd_kind;
+mod vd_kind;
 
 pub use self::{
     business_data_kind::*, collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*,
-    uvd_kind::*,
+    vd_kind::*,
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,

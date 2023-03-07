@@ -4,9 +4,9 @@ use super::{Business, VaultWrapper};
 use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
-use db::models::user_vault_data::NewBusinessVaultData;
-use db::models::user_vault_data::NewPersonVaultData;
-use db::models::user_vault_data::UserVaultData;
+use db::models::vault_data::NewBusinessVaultData;
+use db::models::vault_data::NewPersonVaultData;
+use db::models::vault_data::VaultData;
 use db::tests::fixtures;
 use db::tests::prelude::*;
 use itertools::Itertools;
@@ -41,7 +41,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    UserVaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
+    VaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
 
     // Create email
     let email = fixtures::email::create(conn, &uv.id, &su.id, seqno);
@@ -115,7 +115,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    UserVaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
+    VaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![

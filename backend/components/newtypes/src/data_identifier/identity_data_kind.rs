@@ -82,7 +82,7 @@ impl IdentityDataKind {
         )
     }
 
-    /// Gets the UvdKind represented by this IdentityDataKind, if exists
+    /// Gets the PersonVaultDataKind represented by this IdentityDataKind, if exists
     pub fn person_vault_data_kind(&self) -> Option<PersonVaultDataKind> {
         PersonVaultDataKind::iter().find(|k| Self::from(*k) == *self)
     }

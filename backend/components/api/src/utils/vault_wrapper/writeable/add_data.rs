@@ -1,4 +1,4 @@
-use super::uvd_builder::UvdBuilder;
+use super::pvd_builder::PvdBuilder;
 use super::WriteableUvw;
 use crate::auth::AuthError;
 use crate::errors::user::UserError;
@@ -187,7 +187,7 @@ impl WriteableUvw {
         let existing_fields = self.get_populated_identity_fields();
         let uv = self.user_vault();
 
-        let builder = UvdBuilder::build(update, uv.public_key.clone())?;
+        let builder = PvdBuilder::build(update, uv.public_key.clone())?;
         builder.validate_and_save(
             conn,
             existing_fields,

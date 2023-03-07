@@ -3,9 +3,9 @@ use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
-use db::models::user_vault_data::UserVaultData;
+use db::models::vault_data::VaultData;
 use db::{HasLifetime, HasSealedIdentityData};
-use newtypes::{BusinessDataKind, DataLifetimeId, SealedVaultBytes, UvdKind};
+use newtypes::{BusinessDataKind, DataLifetimeId, SealedVaultBytes, VdKind};
 use newtypes::{IdentityDataKind, KvDataKey};
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
@@ -18,7 +18,7 @@ use super::{Business, Person};
 
 #[derive(Clone, Debug)]
 pub(super) struct VwData<Type> {
-    pub(super) uvd: Vec<UserVaultData>,
+    pub(super) vd: Vec<VaultData>,
     pub(super) phone_numbers: Vec<PhoneNumber>,
     pub(super) emails: Vec<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
@@ -32,7 +32,7 @@ pub(super) struct VwData<Type> {
 
 impl<Type> VwData<Type> {
     pub(super) fn partition(
-        uvd: Vec<UserVaultData>,
+        vd: Vec<VaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
@@ -53,7 +53,7 @@ impl<Type> VwData<Type> {
             data.into_iter()
                 .partition(|d| speculative_lifetime_ids.contains(d.lifetime_id()))
         }
-        let (portable_uvd, speculative_uvd) = partition(uvd, &speculative_lifetime_ids);
+        let (portable_vd, speculative_vd) = partition(vd, &speculative_lifetime_ids);
         let (portable_phone_numbers, speculative_phone_numbers) =
             partition(phone_numbers, &speculative_lifetime_ids);
         let (portable_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
@@ -68,7 +68,7 @@ impl<Type> VwData<Type> {
         }
 
         let portable = Self::build(
-            portable_uvd,
+            portable_vd,
             portable_phone_numbers,
             portable_emails,
             portable_identity_documents,
@@ -76,7 +76,7 @@ impl<Type> VwData<Type> {
             &all_lifetimes,
         );
         let speculative = Self::build(
-            speculative_uvd,
+            speculative_vd,
             speculative_phone_numbers,
             speculative_emails,
             speculative_identity_documents,
@@ -87,7 +87,7 @@ impl<Type> VwData<Type> {
     }
 
     fn build(
-        uvd: Vec<UserVaultData>,
+        vd: Vec<VaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
@@ -95,7 +95,7 @@ impl<Type> VwData<Type> {
         all_lifetimes: &[DataLifetime],
     ) -> Self {
         let lifetime_ids: Vec<Vec<_>> = vec![
-            uvd.iter().map(|d| d.lifetime_id()).collect(),
+            vd.iter().map(|d| d.lifetime_id()).collect(),
             phone_numbers.iter().map(|d| d.lifetime_id()).collect(),
             emails.iter().map(|d| d.lifetime_id()).collect(),
             identity_documents.iter().map(|d| d.lifetime_id()).collect(),
@@ -112,7 +112,7 @@ impl<Type> VwData<Type> {
             .collect();
 
         Self {
-            uvd,
+            vd,
             phone_numbers,
             emails,
             identity_documents,
@@ -124,10 +124,10 @@ impl<Type> VwData<Type> {
 }
 
 impl VwData<Person> {
-    fn uvd(&self, kind: IdentityDataKind) -> Option<&UserVaultData> {
-        self.uvd.iter().find(|d| match d.kind {
-            UvdKind::Id(p) => IdentityDataKind::from(p) == kind,
-            UvdKind::Business(_) => false,
+    fn vd(&self, kind: IdentityDataKind) -> Option<&VaultData> {
+        self.vd.iter().find(|d| match d.kind {
+            VdKind::Id(p) => IdentityDataKind::from(p) == kind,
+            VdKind::Business(_) => false,
         })
     }
 
@@ -138,7 +138,7 @@ impl VwData<Person> {
         let email = self.emails.first();
         let phone = self.phone_numbers.first();
         match kind {
-            // uvd
+            // vd
             IdentityDataKind::FirstName
             | IdentityDataKind::LastName
             | IdentityDataKind::Dob
@@ -149,7 +149,7 @@ impl VwData<Person> {
             | IdentityDataKind::City
             | IdentityDataKind::State
             | IdentityDataKind::Zip
-            | IdentityDataKind::Country => self.uvd(*kind).map(|uvd| uvd as &dyn HasSealedIdentityData),
+            | IdentityDataKind::Country => self.vd(*kind).map(|vd| vd as &dyn HasSealedIdentityData),
             // email
             IdentityDataKind::Email => email.map(|email| email as &dyn HasSealedIdentityData),
             // phone
@@ -184,15 +184,15 @@ impl VwData<Person> {
 }
 
 impl VwData<Business> {
-    fn bdk(&self, kind: BusinessDataKind) -> Option<&UserVaultData> {
-        self.uvd.iter().find(|d| match d.kind {
-            UvdKind::Business(b) => b == kind,
-            UvdKind::Id(_) => false,
+    fn bdk(&self, kind: BusinessDataKind) -> Option<&VaultData> {
+        self.vd.iter().find(|d| match d.kind {
+            VdKind::Business(b) => b == kind,
+            VdKind::Id(_) => false,
         })
     }
 
     pub fn get_business_data_e_field(&self, kind: BusinessDataKind) -> Option<&SealedVaultBytes> {
-        let value = self.bdk(kind).map(|uvd| uvd as &dyn HasSealedIdentityData);
+        let value = self.bdk(kind).map(|vd| vd as &dyn HasSealedIdentityData);
         value.map(|v| v.e_data())
     }
 }

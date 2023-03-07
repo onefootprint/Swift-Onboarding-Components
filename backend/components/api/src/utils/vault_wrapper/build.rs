@@ -11,10 +11,10 @@ use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
-use db::models::user_vault_data::UserVaultData;
 use db::models::vault::NewPortablePersonUserVaultArgs;
 use db::models::vault::NewVaultInfo;
 use db::models::vault::Vault;
+use db::models::vault_data::VaultData;
 use db::HasLifetime;
 use db::PgConn;
 use db::TxnPgConn;
@@ -30,7 +30,7 @@ impl<Type> VaultWrapper<Type> {
     pub(super) fn build_internal(
         user_vault: Vault,
         seqno: Option<DataLifetimeSeqno>,
-        uvd: Vec<UserVaultData>,
+        vd: Vec<VaultData>,
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
@@ -38,7 +38,7 @@ impl<Type> VaultWrapper<Type> {
         lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<Self> {
         let (portable, speculative) =
-            VwData::partition(uvd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
+            VwData::partition(vd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
         let result = Self {
             user_vault,
             portable,
@@ -63,7 +63,7 @@ impl<Type> VaultWrapper<Type> {
 
         // Fetch all the data related to the active lifetimes
         // Split into portable + speculative data
-        let data = UserVaultData::get_for(conn, &active_lifetime_ids)?;
+        let data = VaultData::get_for(conn, &active_lifetime_ids)?;
         let phone_numbers = PhoneNumber::get_for(conn, &active_lifetime_ids)?;
         let emails = Email::get_for(conn, &active_lifetime_ids)?;
         let identity_documents = IdentityDocumentAndRequest::get_for(conn, &active_lifetime_ids)?;

@@ -8,7 +8,7 @@ use db::{
     models::{
         data_lifetime::DataLifetime,
         fingerprint::{Fingerprint, NewFingerprint},
-        user_vault_data::{NewPersonVaultData, UserVaultData},
+        vault_data::{NewPersonVaultData, VaultData},
     },
     TxnPgConn,
 };
@@ -20,11 +20,11 @@ use newtypes::{
 };
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
-pub struct UvdBuilder {
+pub struct PvdBuilder {
     data: Vec<NewPersonVaultData>,
 }
 
-impl UvdBuilder {
+impl PvdBuilder {
     /// Construct the list of NewUserVaultData from an IdentityDataUpdate
     pub fn build(update: IdentityDataUpdate, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
         let mut data = vec![];
@@ -79,7 +79,7 @@ impl UvdBuilder {
             return Err(UserError::PartialUpdateNotAllowed(offending_partial_cdo).into());
         }
 
-        // Deactivate old UVDs that we have overwritten that belong to this tenant.
+        // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
         let kinds_to_deactivate = new
             .iter()
@@ -89,16 +89,16 @@ impl UvdBuilder {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::bulk_deactivate_speculative(conn, &scoped_user_id, kinds_to_deactivate, seqno)?;
 
-        // Create the new UVDs
-        let uvds = UserVaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;
+        // Create the new VDs
+        let vds = VaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;
 
-        // Point fingerprints to the same lifetime used for the corresponding UVD row
-        let kind_to_lifetime = uvds
+        // Point fingerprints to the same lifetime used for the corresponding VD row
+        let kind_to_lifetime = vds
             .into_iter()
-            .map(|uvd| {
-                IdentityDataKind::try_from(uvd.kind)
-                    .map(|idk| (idk, uvd.lifetime_id))
-                    .map_err(|e| ApiError::NewtypeError(newtypes::Error::UvdKindConversionError(e)))
+            .map(|vd| {
+                IdentityDataKind::try_from(vd.kind)
+                    .map(|idk| (idk, vd.lifetime_id))
+                    .map_err(|e| ApiError::NewtypeError(newtypes::Error::VdKindConversionError(e)))
             })
             .collect::<Result<HashMap<_, _>, ApiError>>()?;
         let fingerprints: Vec<_> = fingerprints

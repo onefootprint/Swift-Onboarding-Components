@@ -10,7 +10,7 @@ use db::models::onboarding::Onboarding;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::vault::Vault;
-use db::models::user_vault_data::UserVaultData;
+use db::models::vault_data::VaultData;
 use db::HasLifetime;
 use db::PgConn;
 use newtypes::{ScopedUserId, TenantId};
@@ -44,7 +44,7 @@ impl VaultWrapper<Person> {
         // For each data source, fetch data _for all users_ in the `user_vaults` list.
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
         // VaultWrapper for each User
-        let uvds = UserVaultData::bulk_get(conn, &active_lifetime_list)?;
+        let vds = VaultData::bulk_get(conn, &active_lifetime_list)?;
         let phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
         let emails = Email::bulk_get(conn, &active_lifetime_list)?;
         let identity_document_map = IdentityDocumentAndRequest::bulk_get(conn, &active_lifetime_list)?;
@@ -65,7 +65,7 @@ impl VaultWrapper<Person> {
                     // TODO: all of these should really be keyed on ScopedUserId, otherwise
                     // speculative data for ScopedUser A will show for ScopedUser B within the same
                     // tenant
-                    uvds.get(&uv_id).cloned().unwrap_or_default(),
+                    vds.get(&uv_id).cloned().unwrap_or_default(),
                     phone_numbers.get(&uv_id).cloned().unwrap_or_default(),
                     emails.get(&uv_id).cloned().unwrap_or_default(),
                     identity_document_map.get(&uv_id).cloned().unwrap_or_default(),
