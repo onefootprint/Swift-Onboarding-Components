@@ -1,7 +1,7 @@
 import { D2PStatusUpdate } from '@onefootprint/types';
 
 import { useUpdateD2PStatus } from '../../../../hooks';
-import useDesktopMachine, { Events } from './use-desktop-machine';
+import useDesktopMachine from './use-desktop-machine';
 
 const useCancelD2P = () => {
   const [state, send] = useDesktopMachine();
@@ -16,7 +16,7 @@ const useCancelD2P = () => {
       { authToken, status: D2PStatusUpdate.canceled },
       {
         onSuccess() {
-          send({ type: Events.qrCodeCanceled });
+          send({ type: 'qrCodeCanceled' });
         },
       },
     );

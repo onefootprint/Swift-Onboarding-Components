@@ -1,141 +1,133 @@
 import { assign, createMachine } from 'xstate';
 
-import {
-  Actions,
-  Events,
-  MachineContext,
-  MachineEvents,
-  States,
-} from './types';
+import { MachineContext, MachineEvents } from './types';
 
 const createDesktopMachine = () =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine(
     {
       predictableActionArguments: true,
       id: 'desktop',
-      initial: States.init,
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'init',
       context: {
         missingRequirements: {},
       },
       states: {
-        [States.init]: {
+        init: {
           on: {
-            [Events.receivedContext]: [
+            receivedContext: [
               {
-                target: States.success,
-                actions: Actions.assignContext,
+                target: 'success',
+                actions: 'assignContext',
                 cond: (context, event) =>
                   Object.keys(event.payload.missingRequirements).length === 0,
               },
               {
-                target: States.deviceSupport,
-                actions: Actions.assignContext,
+                target: 'deviceSupport',
+                actions: 'assignContext',
               },
             ],
           },
         },
-        [States.deviceSupport]: {
+        deviceSupport: {
           always: [
             {
-              target: States.qrRegister,
+              target: 'qrRegister',
               cond: context =>
                 context.device?.type !== 'mobile' ||
                 !context.device?.hasSupportForWebauthn,
             },
             {
-              target: States.success,
+              target: 'success',
             },
           ],
         },
-        [States.qrRegister]: {
+        qrRegister: {
           on: {
-            [Events.scopedAuthTokenGenerated]: {
-              actions: [Actions.assignScopedAuthToken],
+            scopedAuthTokenGenerated: {
+              actions: ['assignScopedAuthToken'],
             },
-            [Events.qrCodeLinkSentViaSms]: {
-              target: States.qrCodeSent,
+            qrCodeLinkSentViaSms: {
+              target: 'qrCodeSent',
             },
-            [Events.qrCodeScanned]: {
-              target: States.qrCodeScanned,
+            qrCodeScanned: {
+              target: 'qrCodeScanned',
             },
-            [Events.qrRegisterSucceeded]: {
-              target: States.success,
+            qrRegisterSucceeded: {
+              target: 'success',
             },
-            [Events.qrRegisterFailed]: {
-              target: States.failure,
+            qrRegisterFailed: {
+              target: 'failure',
             },
-            [Events.statusPollingErrored]: {
-              actions: [Actions.clearScopedAuthToken],
+            statusPollingErrored: {
+              actions: ['clearScopedAuthToken'],
             },
           },
         },
-        [States.qrCodeScanned]: {
+        qrCodeScanned: {
           on: {
-            [Events.qrCodeCanceled]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
+            qrCodeCanceled: {
+              target: 'qrRegister',
+              actions: ['clearScopedAuthToken'],
             },
-            [Events.qrRegisterSucceeded]: {
-              target: States.success,
+            qrRegisterSucceeded: {
+              target: 'success',
             },
-            [Events.qrRegisterFailed]: {
-              target: States.failure,
+            qrRegisterFailed: {
+              target: 'failure',
             },
-            [Events.statusPollingErrored]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
+            statusPollingErrored: {
+              target: 'qrRegister',
+              actions: ['clearScopedAuthToken'],
             },
           },
         },
-        [States.qrCodeSent]: {
+        qrCodeSent: {
           on: {
-            [Events.qrCodeCanceled]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
+            qrCodeCanceled: {
+              target: 'qrRegister',
+              actions: ['clearScopedAuthToken'],
             },
-            [Events.qrRegisterSucceeded]: {
-              target: States.success,
+            qrRegisterSucceeded: {
+              target: 'success',
             },
-            [Events.qrRegisterFailed]: {
-              target: States.failure,
+            qrRegisterFailed: {
+              target: 'failure',
             },
-            [Events.statusPollingErrored]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
+            statusPollingErrored: {
+              target: 'qrRegister',
+              actions: ['clearScopedAuthToken'],
             },
           },
         },
-        [States.success]: {
+        success: {
           type: 'final',
         },
-        [States.failure]: {
+        failure: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        [Actions.assignContext]: assign((context, event) => {
-          if (event.type === Events.receivedContext) {
-            const { authToken, device, missingRequirements } = event.payload;
-            context.authToken = authToken;
-            context.device = device;
-            context.missingRequirements = { ...missingRequirements };
-          }
-          return context;
-        }),
-        [Actions.assignScopedAuthToken]: assign((context, event) => {
-          if (event.type === Events.scopedAuthTokenGenerated) {
-            context.scopedAuthToken = event.payload.scopedAuthToken;
-          }
-          return context;
-        }),
-        [Actions.clearScopedAuthToken]: assign((context, event) => {
-          if (event.type === Events.statusPollingErrored) {
-            context.scopedAuthToken = '';
-          }
-          return context;
-        }),
+        assignContext: assign((context, event) => ({
+          ...context,
+          authToken: event.payload.authToken,
+          device: event.payload.device,
+          missingRequirements: { ...event.payload.missingRequirements },
+        })),
+        assignScopedAuthToken: assign((context, event) => ({
+          ...context,
+          scopedAuthToken: event.payload.scopedAuthToken,
+        })),
+        clearScopedAuthToken: assign(context => ({
+          ...context,
+          scopedAuthToken: undefined,
+        })),
       },
     },
   );

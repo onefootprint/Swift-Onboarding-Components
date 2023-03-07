@@ -1,7 +1,7 @@
 import { D2PStatus, GetD2PResponse } from '@onefootprint/types';
 
 import { useGetD2PStatus } from '../../../../hooks';
-import useMobileMachine, { Events } from './use-mobile-machine';
+import useMobileMachine from './use-mobile-machine';
 
 const useNewTabStatusUpdate = () => {
   const [state, send] = useMobileMachine();
@@ -11,18 +11,18 @@ const useNewTabStatusUpdate = () => {
     const { status } = response;
     if (status === D2PStatus.completed) {
       send({
-        type: Events.newTabRegisterSucceeded,
+        type: 'newTabRegisterSucceeded',
       });
     }
     if (status === D2PStatus.failed) {
       send({
-        type: Events.newTabRegisterFailed,
+        type: 'newTabRegisterFailed',
       });
     }
     if (status === D2PStatus.canceled) {
       tab?.close();
       send({
-        type: Events.newTabRegisterCanceled,
+        type: 'newTabRegisterCanceled',
       });
     }
   };
@@ -30,7 +30,7 @@ const useNewTabStatusUpdate = () => {
   const handleError = () => {
     tab?.close();
     send({
-      type: Events.statusPollingErrored,
+      type: 'statusPollingErrored',
     });
   };
 

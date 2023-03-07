@@ -1,19 +1,18 @@
 import { assign, createMachine } from 'xstate';
 
-import {
-  Actions,
-  Events,
-  MachineContext,
-  MachineEvents,
-  States,
-} from './types';
+import { MachineContext, MachineEvents } from './types';
 
 const createMobileMachine = () =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine(
     {
       predictableActionArguments: true,
       id: 'mobile',
-      initial: States.init,
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'init',
       context: {
         authToken: '',
         scopedAuthToken: '',
@@ -23,104 +22,89 @@ const createMobileMachine = () =>
         },
       },
       states: {
-        [States.init]: {
+        init: {
           on: {
-            [Events.receivedContext]: {
-              target: States.deviceSupport,
-              actions: Actions.assignInitialContext,
+            receivedContext: {
+              target: 'deviceSupport',
+              actions: 'assignInitialContext',
             },
           },
         },
-        [States.deviceSupport]: {
+        deviceSupport: {
           always: [
             {
-              target: States.newTabRequest,
+              target: 'newTabRequest',
               cond: context =>
                 context.device.type === 'mobile' &&
                 context.device.hasSupportForWebauthn,
             },
             {
-              target: States.skipLiveness,
+              target: 'skipLiveness',
             },
           ],
         },
-        [States.newTabRequest]: {
+        newTabRequest: {
           on: {
-            [Events.scopedAuthTokenGenerated]: {
-              actions: [Actions.assignScopedAuthToken],
+            scopedAuthTokenGenerated: {
+              actions: ['assignScopedAuthToken'],
             },
-            [Events.newTabOpened]: {
-              target: States.newTabProcessing,
-              actions: [Actions.assignTab],
+            newTabOpened: {
+              target: 'newTabProcessing',
+              actions: ['assignTab'],
             },
           },
         },
-        [States.newTabProcessing]: {
+        newTabProcessing: {
           on: {
-            [Events.newTabRegisterCanceled]: {
-              target: States.newTabRequest,
+            newTabRegisterCanceled: {
+              target: 'newTabRequest',
             },
-            [Events.newTabRegisterSucceeded]: {
-              target: States.success,
+            newTabRegisterSucceeded: {
+              target: 'success',
             },
-            [Events.newTabRegisterFailed]: {
-              target: States.skipLiveness,
+            newTabRegisterFailed: {
+              target: 'skipLiveness',
             },
-            [Events.statusPollingErrored]: {
-              target: States.newTabRequest,
-              actions: [Actions.clearScopedAuthToken],
+            statusPollingErrored: {
+              target: 'newTabRequest',
+              actions: ['clearScopedAuthToken'],
             },
           },
         },
-        [States.skipLiveness]: {
+        skipLiveness: {
           on: {
-            [Events.livenessSkipped]: {
-              target: States.failure,
+            livenessSkipped: {
+              target: 'failure',
             },
           },
         },
-        [States.success]: {
+        success: {
           type: 'final',
         },
-        [States.failure]: {
+        failure: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        [Actions.assignInitialContext]: assign((context, event) => {
-          if (event.type === Events.receivedContext) {
-            const { device, authToken } = event.payload;
-            context.device = device;
-            context.authToken = authToken;
-          }
-          return context;
-        }),
-        [Actions.assignScopedAuthToken]: assign((context, event) => {
-          if (event.type === Events.scopedAuthTokenGenerated) {
-            context.scopedAuthToken = event.payload.scopedAuthToken;
-          }
-          return context;
-        }),
-        [Actions.assignTab]: assign((context, event) => {
-          if (event.type === Events.newTabOpened) {
-            context.tab = event.payload.tab;
-          }
-          return context;
-        }),
-        [Actions.clearTab]: assign((context, event) => {
-          if (event.type === Events.newTabRegisterCanceled) {
-            context.tab = undefined;
-          }
-          return context;
-        }),
-        [Actions.clearScopedAuthToken]: assign((context, event) => {
-          if (event.type === Events.statusPollingErrored) {
-            context.scopedAuthToken = '';
-          }
-          return context;
-        }),
+        assignInitialContext: assign((context, event) => ({
+          ...context,
+          device: event.payload.device,
+          authToken: event.payload.authToken,
+        })),
+        assignScopedAuthToken: assign((context, event) => ({
+          ...context,
+          scopedAuthToken: event.payload.scopedAuthToken,
+        })),
+        assignTab: assign((context, event) => ({
+          ...context,
+          tab: event.payload.tab,
+        })),
+        clearScopedAuthToken: assign(context => ({
+          ...context,
+          scopedAuthToken: undefined,
+        })),
       },
     },
   );

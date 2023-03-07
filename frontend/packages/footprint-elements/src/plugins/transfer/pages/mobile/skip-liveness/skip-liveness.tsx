@@ -5,9 +5,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../../components/navigation-header';
 import { useSkipLiveness } from '../../../../../hooks';
-import useMobileMachine, {
-  Events,
-} from '../../../hooks/mobile/use-mobile-machine';
+import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 
 const SkipLiveness = () => {
   const [state, send] = useMobileMachine();
@@ -20,7 +18,7 @@ const SkipLiveness = () => {
       {
         onSuccess: () => {
           send({
-            type: Events.livenessSkipped,
+            type: 'livenessSkipped',
           });
         },
       },

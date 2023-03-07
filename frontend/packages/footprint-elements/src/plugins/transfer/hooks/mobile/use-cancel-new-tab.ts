@@ -1,7 +1,7 @@
 import { D2PStatusUpdate } from '@onefootprint/types';
 
 import { useUpdateD2PStatus } from '../../../../hooks';
-import useMobileMachine, { Events } from './use-mobile-machine';
+import useMobileMachine from './use-mobile-machine';
 
 const useCancelNewTab = () => {
   const [state, send] = useMobileMachine();
@@ -17,7 +17,7 @@ const useCancelNewTab = () => {
       { authToken: scopedAuthToken, status: D2PStatusUpdate.canceled },
       {
         onSuccess() {
-          send({ type: Events.newTabRegisterCanceled });
+          send({ type: 'newTabRegisterCanceled' });
         },
       },
     );

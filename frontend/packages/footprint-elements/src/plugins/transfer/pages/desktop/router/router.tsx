@@ -1,9 +1,7 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
-import useDesktopMachine, {
-  States,
-} from '../../../hooks/desktop/use-desktop-machine';
+import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import QRCodeScanned from '../qr-code-scanned';
 import QRCodeSent from '../qr-code-sent';
 import QRRegister from '../qr-register';
@@ -14,7 +12,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useDesktopMachine();
-  const isDone = state.matches(States.success) || state.matches(States.failure);
+  const isDone = state.matches('success') || state.matches('failure');
   useLogStateMachine('transfer-desktop', state);
 
   useEffect(() => {
@@ -23,15 +21,15 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches(States.qrCodeScanned)) {
+  if (state.matches('qrCodeScanned')) {
     return <QRCodeScanned />;
   }
 
-  if (state.matches(States.qrCodeSent)) {
+  if (state.matches('qrCodeSent')) {
     return <QRCodeSent />;
   }
 
-  if (state.matches(States.qrRegister)) {
+  if (state.matches('qrRegister')) {
     return <QRRegister />;
   }
 

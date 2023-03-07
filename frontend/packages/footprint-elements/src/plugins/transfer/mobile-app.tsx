@@ -8,7 +8,6 @@ import queryClient from './config/initializers/react-query';
 import useMobileMachine from './hooks/mobile/use-mobile-machine';
 import Router from './pages/mobile/router';
 import { TransferProps } from './types';
-import { Events } from './utils/mobile-state-machine/types';
 
 const i18n = configureI18next();
 
@@ -18,7 +17,7 @@ const MobileApp = ({ context, onDone }: TransferProps) => {
 
   useEffectOnce(() => {
     send({
-      type: Events.receivedContext,
+      type: 'receivedContext',
       payload: {
         authToken,
         device,

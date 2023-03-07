@@ -1,9 +1,7 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
-import useMobileMachine, {
-  States,
-} from '../../../hooks/mobile/use-mobile-machine';
+import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import NewTabProcessing from '../new-tab-processing';
 import NewTabRequest from '../new-tab-request';
 import SkipLiveness from '../skip-liveness';
@@ -14,7 +12,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useMobileMachine();
-  const isDone = state.matches(States.success) || state.matches(States.failure);
+  const isDone = state.matches('success') || state.matches('failure');
   useLogStateMachine('transfer-mobile', state);
 
   useEffect(() => {
@@ -23,15 +21,15 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches(States.newTabProcessing)) {
+  if (state.matches('newTabProcessing')) {
     return <NewTabProcessing />;
   }
 
-  if (state.matches(States.newTabRequest)) {
+  if (state.matches('newTabRequest')) {
     return <NewTabRequest />;
   }
 
-  if (state.matches(States.skipLiveness)) {
+  if (state.matches('skipLiveness')) {
     return <SkipLiveness />;
   }
 

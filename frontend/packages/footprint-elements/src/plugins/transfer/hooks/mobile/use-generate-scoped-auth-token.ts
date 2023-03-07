@@ -2,7 +2,7 @@ import { getSessionId } from '@onefootprint/dev-tools';
 import { useEffect } from 'react';
 
 import { useD2PGenerate } from '../../../../hooks';
-import useMobileMachine, { Events } from './use-mobile-machine';
+import useMobileMachine from './use-mobile-machine';
 
 const useGenerateScopedAuthToken = () => {
   const d2pGenerateMutation = useD2PGenerate();
@@ -30,7 +30,7 @@ const useGenerateScopedAuthToken = () => {
       {
         onSuccess(data) {
           send({
-            type: Events.scopedAuthTokenGenerated,
+            type: 'scopedAuthTokenGenerated',
             payload: {
               scopedAuthToken: data.authToken,
             },

@@ -8,9 +8,7 @@ import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
 import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
 import { useCreateHandoffUrl } from '../../../../../hooks/ui';
-import useDesktopMachine, {
-  Events,
-} from '../../../hooks/desktop/use-desktop-machine';
+import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import useGenerateScopedAuthToken from '../../../hooks/desktop/use-generate-scoped-auth-token';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
@@ -46,7 +44,7 @@ const QRRegister = () => {
       { authToken: scopedAuthToken, url },
       {
         onSuccess() {
-          send({ type: Events.qrCodeLinkSentViaSms });
+          send({ type: 'qrCodeLinkSentViaSms' });
         },
       },
     );

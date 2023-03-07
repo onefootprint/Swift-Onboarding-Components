@@ -7,9 +7,7 @@ import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
 import { useCreateHandoffUrl } from '../../../../../hooks/ui';
 import useGenerateScopedAuthToken from '../../../hooks/mobile/use-generate-scoped-auth-token';
-import useMobileMachine, {
-  Events,
-} from '../../../hooks/mobile/use-mobile-machine';
+import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.mobile.new-tab-requested');
@@ -25,7 +23,10 @@ const NewTabRequest = () => {
 
     const tab = window.open(url, '_blank');
     if (tab) {
-      send({ type: Events.newTabOpened, payload: { tab } });
+      send({
+        type: 'newTabOpened',
+        payload: { tab },
+      });
     } else {
       // TODO: What we should do?
       // https://linear.app/footprint/issue/FP-408/what-do-when-window-couldnt-be-opened
