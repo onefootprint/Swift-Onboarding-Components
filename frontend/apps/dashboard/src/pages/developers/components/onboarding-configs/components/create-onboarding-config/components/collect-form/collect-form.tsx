@@ -22,6 +22,7 @@ export type CollectFormData = {
 type FormData = {
   kycData: KycDataFormData & {
     showSSNOptions: boolean;
+    // TODO: these could be CollectedKycDataOptions instead of UserDataAttributes
     ssnKind?: UserDataAttribute.ssn4 | UserDataAttribute.ssn9;
   };
   documents: DocumentsFormData;

@@ -1,5 +1,10 @@
 import UserDataAttribute from './user-data-attribute';
 
+export type CollectedDataOption =
+  | CollectedKycDataOption
+  | CollectedDocumentDataOption;
+
+// TODO: the backend type for CDO has become more advanced and includes more than just KYC data
 export enum CollectedKycDataOption {
   name = 'name',
   dob = 'dob',
@@ -10,6 +15,24 @@ export enum CollectedKycDataOption {
   email = 'email',
   phoneNumber = 'phone_number',
 }
+
+export enum CollectedDocumentDataOption {
+  document = 'document',
+  documentAndSelfie = 'document_and_selfie',
+}
+
+export const documentCdoFor = (
+  collectDocument: boolean,
+  collectSelfie: boolean,
+) => {
+  if (collectDocument && collectSelfie) {
+    return CollectedDocumentDataOption.documentAndSelfie;
+  }
+  if (collectDocument) {
+    return CollectedDocumentDataOption.document;
+  }
+  return null;
+};
 
 // Labels sent from the backend for each attribute
 export const CollectedKycDataOptionLabels: Record<

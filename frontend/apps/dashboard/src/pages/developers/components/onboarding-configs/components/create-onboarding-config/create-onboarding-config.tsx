@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
+import { CollectedDataOption, documentCdoFor } from '@onefootprint/types';
 import { Dialog, useConfirmationDialog, useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -89,15 +90,30 @@ const CreateOnboardingConfig = ({
   };
 
   const handleSubmitAccess = (accessFormData: AccessFormData) => {
+    const documentCollection = documentCdoFor(
+      !!state.data.documents.idDoc,
+      !!state.data.documents.selfie,
+    );
+    const mustCollectData: Array<CollectedDataOption> =
+      getSelectedKycDataOptionsList(state.data.kycData);
+    if (documentCollection) {
+      mustCollectData.push(documentCollection);
+    }
+    const documentAccess = documentCdoFor(
+      !!accessFormData.documents.idDoc,
+      !!accessFormData.documents.selfie,
+    );
+    const canAccessData: Array<CollectedDataOption> =
+      getSelectedKycDataOptionsList(state.data.kycData);
+    if (documentAccess) {
+      canAccessData.push(documentAccess);
+    }
+
     mutation.mutate(
       {
         name: state.data.name,
-        mustCollectData: getSelectedKycDataOptionsList(state.data.kycData),
-        mustCollectIdentityDocument: !!state.data.documents.idDoc,
-        mustCollectSelfie: !!state.data.documents.selfie,
-        canAccessData: getSelectedKycDataOptionsList(accessFormData.kycData),
-        canAccessIdentityDocumentImages: !!accessFormData.documents.idDoc,
-        canAccessSelfieImage: !!accessFormData.documents.selfie,
+        mustCollectData,
+        canAccessData,
       },
       {
         onSuccess: () => {
