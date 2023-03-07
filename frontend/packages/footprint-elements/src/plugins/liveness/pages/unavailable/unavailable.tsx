@@ -5,7 +5,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../hooks';
-import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
+import useLivenessMachine from '../../hooks/use-liveness-machine';
 
 const Unavailable = () => {
   const [state, send] = useLivenessMachine();
@@ -22,7 +22,7 @@ const Unavailable = () => {
       {
         onSuccess: () => {
           send({
-            type: Events.completed,
+            type: 'completed',
           });
         },
       },

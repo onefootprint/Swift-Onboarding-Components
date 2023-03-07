@@ -1,27 +1,26 @@
 import { assign, createMachine } from 'xstate';
 
-import {
-  Actions,
-  Events,
-  MachineContext,
-  MachineEvents,
-  States,
-} from './types';
+import { MachineContext, MachineEvents } from './types';
 
 export const createLivenessMachine = () =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine(
     {
       predictableActionArguments: true,
       id: 'liveness',
-      initial: States.init,
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'init',
       context: {},
       states: {
-        [States.init]: {
+        init: {
           on: {
-            [Events.receivedContext]: [
+            receivedContext: [
               {
-                target: States.register,
-                actions: Actions.assignContext,
+                target: 'register',
+                actions: 'assignContext',
                 cond: (context, event) => {
                   const {
                     device: { type, hasSupportForWebauthn },
@@ -30,57 +29,54 @@ export const createLivenessMachine = () =>
                 },
               },
               {
-                target: States.unavailable,
-                actions: Actions.assignContext,
+                target: 'unavailable',
+                actions: 'assignContext',
               },
             ],
           },
         },
-        [States.register]: {
+        register: {
           on: {
-            [Events.failed]: {
-              target: States.retry,
+            failed: {
+              target: 'retry',
             },
-            [Events.succeeded]: {
-              target: States.completed,
+            succeeded: {
+              target: 'completed',
             },
           },
         },
-        [States.retry]: {
+        retry: {
           on: {
-            [Events.failed]: {
-              target: States.retry,
+            failed: {
+              target: 'retry',
             },
-            [Events.skipped]: {
-              target: States.completed,
+            skipped: {
+              target: 'completed',
             },
-            [Events.succeeded]: {
-              target: States.completed,
+            succeeded: {
+              target: 'completed',
             },
           },
         },
-        [States.unavailable]: {
+        unavailable: {
           on: {
-            [Events.completed]: {
-              target: States.completed,
+            completed: {
+              target: 'completed',
             },
           },
         },
-        [States.completed]: {
+        completed: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        [Actions.assignContext]: assign((context, event) => {
-          if (event.type === Events.receivedContext) {
-            const { authToken, device } = event.payload;
-            context.authToken = authToken;
-            context.device = device;
-          }
-          return context;
-        }),
+        assignContext: assign((context, event) => ({
+          ...context,
+          authToken: event.payload.authToken,
+          device: event.payload.device,
+        })),
       },
     },
   );

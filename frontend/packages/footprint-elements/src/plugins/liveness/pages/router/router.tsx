@@ -2,7 +2,6 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useLivenessMachine from '../../hooks/use-liveness-machine';
-import { States } from '../../utils/state-machine/types';
 import Register from '../register';
 import Retry from '../retry';
 import Unavailable from '../unavailable';
@@ -13,7 +12,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useLivenessMachine();
-  const isDone = state.matches(States.completed);
+  const isDone = state.matches('completed');
   useLogStateMachine('liveness', state);
 
   useEffect(() => {
@@ -22,13 +21,13 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches(States.register)) {
+  if (state.matches('register')) {
     return <Register />;
   }
-  if (state.matches(States.retry)) {
+  if (state.matches('retry')) {
     return <Retry />;
   }
-  if (state.matches(States.unavailable)) {
+  if (state.matches('unavailable')) {
     return <Unavailable />;
   }
   return null;

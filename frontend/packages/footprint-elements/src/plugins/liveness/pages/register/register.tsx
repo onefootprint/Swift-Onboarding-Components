@@ -4,7 +4,7 @@ import React from 'react';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import LivenessSuccess from '../../components/liveness-success';
-import useLivenessMachine, { Events } from '../../hooks/use-liveness-machine';
+import useLivenessMachine from '../../hooks/use-liveness-machine';
 import useBiometricInit from '../../hooks/use-register-biometric';
 
 const SUCCESS_TRANSITION_DELAY_MS = 1500;
@@ -25,11 +25,11 @@ const Register = () => {
       {
         onSuccess() {
           setTimeout(() => {
-            send({ type: Events.succeeded });
+            send({ type: 'succeeded' });
           }, SUCCESS_TRANSITION_DELAY_MS);
         },
         onError() {
-          send({ type: Events.failed });
+          send({ type: 'failed' });
         },
       },
     );
