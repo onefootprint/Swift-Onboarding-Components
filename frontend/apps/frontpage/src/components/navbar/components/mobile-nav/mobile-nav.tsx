@@ -4,7 +4,7 @@ import { IcoClose24, IcoMenu24 } from '@onefootprint/icons';
 import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-import LinkButton from 'src/components/link-button';
+import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 

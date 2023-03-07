@@ -1,12 +1,21 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { Button, Container, media, Typography } from '@onefootprint/ui';
+import { IcoCirclePlay24 } from '@onefootprint/icons';
+import {
+  Box,
+  Button,
+  Container,
+  LinkButton,
+  media,
+  Typography,
+} from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
-import LinkButton from 'src/components/link-button';
+import LinkingButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
+import ContactForm from '../../../../components/contact-form';
 import HeroBackground from './components/background';
 import DemoVideo from './components/demo-video';
 
@@ -54,28 +63,43 @@ const Hero = () => {
           animate="visible"
         >
           <Content>
-            <ResponsiveHide data-viewport="tablet-desktop">
-              <Typography as="h1" color="primary" variant="display-1">
-                {t('title')}
+            <Box sx={{ display: 'flex', gap: 5, flexDirection: 'column' }}>
+              <ResponsiveHide data-viewport="tablet-desktop">
+                <Typography as="h1" color="primary" variant="display-1">
+                  {t('title')}
+                </Typography>
+              </ResponsiveHide>
+              <ResponsiveHide data-viewport="mobile">
+                <Typography as="h1" color="primary" variant="display-2">
+                  {t('title')}
+                </Typography>
+              </ResponsiveHide>
+              <Typography as="h2" color="primary" variant="display-4">
+                {t('subtitle')}
               </Typography>
-            </ResponsiveHide>
-            <ResponsiveHide data-viewport="mobile">
-              <Typography as="h1" color="primary" variant="display-2">
-                {t('title')}
-              </Typography>
-            </ResponsiveHide>
-            <Typography as="h2" color="primary" variant="display-4">
-              {t('subtitle')}
-            </Typography>
+            </Box>
             <DynamicMobileIllustration />
             <DynamicTabletIllustration />
             <ButtonsContainer>
-              <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
-                {t('primary-button')}
-              </LinkButton>
-              <Button onClick={toggleDemo} variant="secondary">
-                {t('secondary-button')}
-              </Button>
+              <Row>
+                <LinkingButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+                  {t('primary-button')}
+                </LinkingButton>
+                <ContactForm>
+                  <Button type="button" variant="secondary">
+                    {t('secondary-button')}
+                  </Button>
+                </ContactForm>
+              </Row>
+              <WatchDemoContainer>
+                <LinkButton
+                  iconPosition="left"
+                  iconComponent={IcoCirclePlay24}
+                  onClick={toggleDemo}
+                >
+                  {t('tertiary-button')}
+                </LinkButton>
+              </WatchDemoContainer>
             </ButtonsContainer>
           </Content>
           <ImagesContainer>
@@ -115,7 +139,7 @@ const Inner = styled.div`
 
 const Content = styled.div`
   ${({ theme }) => css`
-    max-width: 820px;
+    max-width: 860px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -136,13 +160,8 @@ const ButtonsContainer = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: ${theme.spacing[4]};
+    gap: ${theme.spacing[6]};
     margin-top: ${theme.spacing[5]};
-
-    ${media.greaterThan(`md`)`
-      flex-direction: row;
-      justify-content: center;
-    `};
   `}
 `;
 
@@ -181,6 +200,25 @@ const ResponsiveHide = styled.span`
         display: block;
       `}
   }
+`;
+
+const Row = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: ${theme.spacing[4]};
+  `}
+`;
+
+const WatchDemoContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: ${theme.spacing[4]};
+    margin-top: ${theme.spacing[4]};
+  `}
 `;
 
 export default Hero;

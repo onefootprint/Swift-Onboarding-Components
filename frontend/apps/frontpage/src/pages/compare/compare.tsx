@@ -2,7 +2,7 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { Box, Container, media, Typography } from '@onefootprint/ui';
 import React from 'react';
-import LinkButton from 'src/components/link-button';
+import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';

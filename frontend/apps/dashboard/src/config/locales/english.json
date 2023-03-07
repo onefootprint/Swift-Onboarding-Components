@@ -108,6 +108,53 @@
     "incomplete-banner": {
       "header": "User dropped off before providing all information.",
       "see-timeline": "See audit trail"
+    },
+    "sandbox-banner": {
+      "title": "You're in sandbox mode.",
+      "activate": "Contact us to activate your account",
+      "toggle": "Turn sandbox mode off",
+      "contact-us-dialog": {
+        "title": "Activate account",
+        "description": "We need to book a call with you to activate your account. Please, fill out the form below and we'll get back to you as soon as possible.",
+        "cancel-button": "Cancel",
+        "send-button": "Send",
+        "submit-success": {
+          "title": "Thanks! We've received your message",
+          "description": "We'll get back to you as soon as possible."
+        },
+        "submit-error": {
+          "title": "Oops! Something went wrong",
+          "description": "Please, try again later."
+        },
+        "name": {
+          "label": "Full name",
+          "placeholder": "Jane Doe",
+          "errors": {
+            "required": "Please enter your name"
+          }
+        },
+        "email": {
+          "label": "Business email",
+          "placeholder": "janedoe@company.com",
+          "errors": {
+            "required": "Please enter an email"
+          }
+        },
+        "company": {
+          "label": "Company name",
+          "placeholder": "Acme Bank",
+          "errors": {
+            "required": "Please enter your company name"
+          }
+        },
+        "message": {
+          "label": "Anything else you'd like us to know?",
+          "placeholder": "I'm interested in...",
+          "errors": {
+            "required": "Message is required"
+          }
+        }
+      }
     }
   },
   "pages": {

@@ -1,32 +1,31 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Banner, Box, Tooltip } from '@onefootprint/ui';
+import { Banner } from '@onefootprint/ui';
 import React from 'react';
+import ContactForm from 'src/components/contact-form';
 import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 const SandboxBanner = () => {
-  const { t } = useTranslation('components.private-layout.sandbox-banner');
+  const { t } = useTranslation('components.sandbox-banner');
   const { sandbox } = useOrgSession();
 
   return sandbox.isSandbox ? (
     <SandboxBannerContainer>
       <Banner variant="warning">
         {t('title')}
-        <Tooltip
-          disabled={sandbox.canToggle}
-          size="compact"
-          text={t('tooltip')}
-        >
-          <Box as="span">
-            <button
-              type="button"
-              onClick={sandbox.toggle}
-              disabled={!sandbox.canToggle}
-            >
-              {t('disable')}
-            </button>
-          </Box>
-        </Tooltip>
+        {sandbox.canToggle ? (
+          <button
+            type="button"
+            onClick={sandbox.toggle}
+            disabled={!sandbox.canToggle}
+          >
+            {t('toggle')}
+          </button>
+        ) : (
+          <ContactForm>
+            <button type="button">{t('activate')}</button>
+          </ContactForm>
+        )}
       </Banner>
     </SandboxBannerContainer>
   ) : null;

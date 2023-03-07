@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
 
-export type LinkButtonProps = {
+export type LinkingButtonProps = {
   size?: 'default' | 'compact' | 'small' | 'large';
 };
 
-const LinkButton = styled(Link)<LinkButtonProps>`
+const LinkingButton = styled(Link)<LinkingButtonProps>`
   && {
     ${({ theme, size = 'default' }) => {
       const { button } = theme.components;
@@ -38,4 +38,4 @@ const LinkButton = styled(Link)<LinkButtonProps>`
   }
 `;
 
-export default LinkButton;
+export default LinkingButton;

@@ -59,7 +59,10 @@ export const getErrorMessage = (error?: unknown | Error): string => {
   return 'Something went wrong';
 };
 
-const getRequestOptions = (requestConfig: AxiosRequestConfig) => {
+const getRequestOptions = (
+  requestConfig: AxiosRequestConfig,
+  omitSessionId?: boolean,
+) => {
   const sessionId = getSessionId();
   return {
     baseURL: getCustomEnvVariable(
@@ -70,15 +73,18 @@ const getRequestOptions = (requestConfig: AxiosRequestConfig) => {
     withCredentials: true,
     ...requestConfig,
     headers: {
-      'x-fp-session-id': sessionId,
+      'x-fp-session-id': omitSessionId ? undefined : sessionId,
       ...requestConfig.headers,
     },
   };
 };
 
-const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
+const request = <Response = any>(
+  requestConfig: AxiosRequestConfig = {},
+  omitSessionId?: boolean,
+) => {
   const client = applyCaseMiddleware(axios.create());
-  const options = getRequestOptions(requestConfig);
+  const options = getRequestOptions(requestConfig, omitSessionId);
   return client.request<Response>(options);
 };
 

@@ -50,6 +50,8 @@ export { default as IcoChevronRight16 } from './ico-chevron-right-16';
 export { default as IcoChevronRight24 } from './ico-chevron-right-24';
 export { default as IcoChevronRightBig16 } from './ico-chevron-right-big-16';
 export { default as IcoChevronRightBig24 } from './ico-chevron-right-big-24';
+export { default as IcoCirclePlay16 } from './ico-circle-play-16';
+export { default as IcoCirclePlay24 } from './ico-circle-play-24';
 export { default as IcoClipboard16 } from './ico-clipboard-16';
 export { default as IcoClipboard24 } from './ico-clipboard-24';
 export { default as IcoClock16 } from './ico-clock-16';

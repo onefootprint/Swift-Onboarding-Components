@@ -3,7 +3,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Container, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
-import LinkButton from 'src/components/link-button';
+import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
 const PenguinBanner = () => {

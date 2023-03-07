@@ -4,7 +4,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 
 const DevContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' http://localhost:8000 *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.ingest.sentry.io; 
+  connect-src 'self' http://localhost:8000 *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.ingest.sentry.io getform.io; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';

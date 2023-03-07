@@ -3,6 +3,48 @@
     "errors": {}
   },
   "components": {
+    "contact-us-dialog": {
+      "title": "Book a demo",
+      "description": "Let us know where to get back to you and we'll find some options to chat.",
+      "send-button": "Send",
+      "cancel-button": "Cancel",
+      "submit-success": {
+        "title": "Message sent",
+        "description": "We'll get back to you as soon as possible."
+      },
+      "submit-error": {
+        "title": "Oops, something went wrong. Please try again.",
+        "description": "Please try again."
+      },
+      "name": {
+        "label": "Full name",
+        "placeholder": "Jane Doe",
+        "errors": {
+          "required": "Name is required"
+        }
+      },
+      "email": {
+        "label": "Business email address",
+        "placeholder": "janedoe@company.com",
+        "errors": {
+          "required": "Email is required"
+        }
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Company name",
+        "errors": {
+          "required": "Company name is required"
+        }
+      },
+      "message": {
+        "label": "Anything else?",
+        "placeholder": "I'm interested in a Footprint demo for...",
+        "errors": {
+          "required": "Message is required"
+        }
+      }
+    },
     "navbar": {
       "login": "Login",
       "sign-up": "Sign up",
@@ -162,14 +204,15 @@
   },
   "pages": {
     "home": {
-      "html-title": "Frictionless Identity Verification and PII Vaulting",
+      "html-title": "Onboard users and vault their data with one click",
       "hero": {
-        "title": "Frictionless identity verification and PII vaulting",
-        "subtitle": "Onboard users with the click of a button and offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
+        "title": "Onboard users and vault their data with one click",
+        "subtitle": "Frictionless identity verification & PII vaulting wrapped in the same platform and one API. \n KYC your users without worrying about storing their sensitive data afterwards.",
         "desktop-img-alt": "desktop mockup",
         "mobile-img-alt": "mobile mockup",
         "primary-button": "Get started",
-        "secondary-button": "Watch demo",
+        "secondary-button": "Book a demo",
+        "tertiary-button": "Watch demo",
         "demo-video-close": "Close"
       },
       "new-approach-section": {

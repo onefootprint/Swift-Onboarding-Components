@@ -3,7 +3,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { createFontStyles, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
-import LinkButton from 'src/components/link-button';
+import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';
