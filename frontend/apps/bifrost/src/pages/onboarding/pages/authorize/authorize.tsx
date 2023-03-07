@@ -19,6 +19,7 @@ import {
 } from '@onefootprint/icons';
 import {
   CollectedDataOption,
+  CollectedDataOptionLabels,
   CollectedDocumentDataOption,
   CollectedKycDataOption,
   IdDocType,
@@ -131,7 +132,7 @@ const Authorize = () => {
         />
         <CategoriesContainer>
           {canAccessData
-            .filter(o => o in CollectedKycDataOption)
+            .filter(o => o in CollectedDataOptionLabels)
             .map((dataOpt: CollectedDataOption) => {
               const kycDataOpt = dataOpt as CollectedKycDataOption;
               return (
