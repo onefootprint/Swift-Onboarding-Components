@@ -51,6 +51,7 @@ export * from './update-d2p-status';
 export * from './update-member';
 export * from './update-org';
 export * from './update-org-role';
+export * from './update-proxy-config';
 export * from './user-data-identity';
 export * from './user-decrypt';
 export * from './user-email';

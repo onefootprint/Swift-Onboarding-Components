@@ -101,3 +101,47 @@ export const withProxyConfigDetailsError = (id: string) =>
       },
     },
   });
+
+export const withEditProxyConfig = (
+  proxyConfig: ProxyConfigDetails,
+  newProxyConfig: Partial<ProxyConfigDetails>,
+) =>
+  mockRequest({
+    method: 'patch',
+    path: `/org/proxy_configs/${proxyConfig.id}`,
+    response: {
+      ...proxyConfig,
+      ...newProxyConfig,
+    },
+  });
+
+export const withEditProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
+  mockRequest({
+    method: 'patch',
+    path: `/org/proxy_configs/${proxyConfig.id}`,
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withRemoveProxyConfig = (proxyConfig: ProxyConfigDetails) =>
+  mockRequest({
+    method: 'delete',
+    path: `/org/proxy_configs/${proxyConfig.id}`,
+    response: {},
+  });
+
+export const withRemoveProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
+  mockRequest({
+    method: 'delete',
+    path: `/org/proxy_configs/${proxyConfig.id}`,
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });

@@ -8,13 +8,18 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { clickOnAction } from 'src/config/tests';
 
 import {
   proxyConfigDetailsFixture,
   proxyConfigsFixture,
+  withEditProxyConfig,
+  withEditProxyConfigError,
   withProxyConfigDetails,
   withProxyConfigs,
   withProxyConfigsError,
+  withRemoveProxyConfig,
+  withRemoveProxyConfigError,
 } from './proxy-config.test.config';
 import ProxyConfigs from './proxy-configs';
 
@@ -54,7 +59,7 @@ describe('<ProxyConfigs />', () => {
       withProxyConfigs();
     });
 
-    it('should render the name and email of each member', async () => {
+    it('should show the name and email of each proxy config', async () => {
       await renderProxyConfigsAndWaitData();
 
       proxyConfigsFixture.forEach(proxyConfig => {
@@ -69,7 +74,7 @@ describe('<ProxyConfigs />', () => {
       });
     });
 
-    describe('when clicking on the row', () => {
+    describe('when clicking on the proxy config row', () => {
       it('should append the proxy_config_id to the query params', async () => {
         const push = jest.fn();
         useRouterSpy({
@@ -201,6 +206,109 @@ describe('<ProxyConfigs />', () => {
         });
       });
     });
+
+    describe('when disabling a proxy config', () => {
+      describe('when the request to disable the proxy config fails', () => {
+        beforeEach(() => {
+          withEditProxyConfigError(proxyConfigDetailsFixture);
+        });
+
+        it('should show an error message', async () => {
+          await renderProxyConfigsAndWaitData();
+          await clickOnAction({
+            triggerLabel: `Open actions for proxy config ${proxyConfigDetailsFixture.name}`,
+            actionText: 'Disable',
+            confirmationDialogName: 'Disable proxy config',
+          });
+
+          await waitFor(() => {
+            const feedback = screen.getByText('Something went wrong');
+            expect(feedback).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to disable the proxy config succeeds', () => {
+        beforeEach(() => {
+          withEditProxyConfig(proxyConfigDetailsFixture, {
+            status: 'disabled',
+          });
+        });
+
+        it('should update the status of the proxy config', async () => {
+          await renderProxyConfigsAndWaitData();
+          await clickOnAction({
+            triggerLabel: `Open actions for proxy config ${proxyConfigDetailsFixture.name}`,
+            actionText: 'Disable',
+            confirmationDialogName: 'Disable proxy config',
+          });
+
+          withProxyConfigs([
+            {
+              ...proxyConfigDetailsFixture,
+              status: 'disabled',
+            },
+          ]);
+
+          await waitFor(() => {
+            const feedback = screen.getByText(
+              `${proxyConfigDetailsFixture.name} proxy config has been updated.`,
+            );
+            expect(feedback).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const status = screen.getByText('Disabled');
+            expect(status).toBeInTheDocument();
+          });
+        });
+      });
+    });
+
+    describe('when removing a proxy config', () => {
+      describe('when the request to remove the proxy config fails', () => {
+        beforeEach(() => {
+          withRemoveProxyConfigError(proxyConfigDetailsFixture);
+        });
+
+        it('should show an error message', async () => {
+          await renderProxyConfigsAndWaitData();
+          await clickOnAction({
+            triggerLabel: `Open actions for proxy config ${proxyConfigDetailsFixture.name}`,
+            actionText: 'Remove',
+            confirmationDialogName: 'Remove proxy config',
+          });
+
+          await waitFor(() => {
+            const feedback = screen.getByText('Something went wrong');
+            expect(feedback).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when the request to remove the proxy config succeeds', () => {
+        beforeEach(() => {
+          withRemoveProxyConfig(proxyConfigDetailsFixture);
+        });
+
+        it('should remove the proxy config', async () => {
+          await renderProxyConfigsAndWaitData();
+          await clickOnAction({
+            triggerLabel: `Open actions for proxy config ${proxyConfigDetailsFixture.name}`,
+            actionText: 'Remove',
+            confirmationDialogName: 'Remove proxy config',
+          });
+          withProxyConfigs([]);
+
+          await waitFor(() => {
+            const feedback = screen.getByText(
+              'Proxy config removed successfully.',
+            );
+            expect(feedback).toBeInTheDocument();
+          });
+        });
+      });
+    });
   });
 
   describe('when the request to fetch the proxy configs fails', () => {
@@ -208,12 +316,12 @@ describe('<ProxyConfigs />', () => {
       withProxyConfigsError();
     });
 
-    it('should render an error message', async () => {
+    it('should show an error message', async () => {
       renderProxyConfigs();
 
       await waitFor(() => {
-        const errorMessage = screen.getByText('Something went wrong');
-        expect(errorMessage).toBeInTheDocument();
+        const feedback = screen.getByText('Something went wrong');
+        expect(feedback).toBeInTheDocument();
       });
     });
   });

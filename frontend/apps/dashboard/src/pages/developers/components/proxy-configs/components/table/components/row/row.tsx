@@ -3,6 +3,8 @@ import { ProxyConfig } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
 import React from 'react';
 
+import Actions from './components/actions';
+
 export type RowProps = {
   proxyConfig: ProxyConfig;
 };
@@ -26,7 +28,9 @@ const Row = ({ proxyConfig }: RowProps) => {
           <Badge variant="error">{t('status.disabled')}</Badge>
         )}
       </td>
-      <td />
+      <td>
+        <Actions proxyConfig={proxyConfig} />
+      </td>
     </>
   );
 };
