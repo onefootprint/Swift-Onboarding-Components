@@ -1,3 +1,4 @@
+export { default as CollectKybData } from './collect-kyb-data';
 export { default as CollectKycData } from './collect-kyc-data';
 export { default as IdDoc } from './id-doc';
 export { default as Liveness } from './liveness';

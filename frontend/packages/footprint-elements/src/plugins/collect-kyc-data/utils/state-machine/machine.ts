@@ -13,7 +13,7 @@ const createCollectKycDataMachine = () =>
   createMachine(
     {
       predictableActionArguments: true,
-      id: 'kyc',
+      id: 'collect-kyc-data',
       schema: {
         context: {} as MachineContext,
         events: {} as MachineEvents,
