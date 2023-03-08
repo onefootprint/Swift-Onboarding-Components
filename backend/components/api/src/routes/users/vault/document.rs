@@ -153,9 +153,9 @@ fn create_image_data(
             status_map
                 .remove(&doc.identity_document_id)
                 .map(|(_, _, status, uploaded_at)| ImageData {
-                    front: doc.front.into_leak_base64().to_string_standard(),
-                    back: doc.back.map(|p| p.into_leak_base64().to_string_standard()),
-                    selfie: doc.selfie.map(|p| p.into_leak_base64().to_string_standard()),
+                    front: doc.front.into_leak_base64().to_string_standard().0,
+                    back: doc.back.map(|p| p.into_leak_base64().to_string_standard().0),
+                    selfie: doc.selfie.map(|p| p.into_leak_base64().to_string_standard().0),
                     status,
                     uploaded_at,
                 })

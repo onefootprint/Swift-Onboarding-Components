@@ -98,9 +98,9 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     
     Ok(DocVData {
         reference_id: parsed_reference_id,
-        front_image: Some(PiiString::from(front.to_string_standard())),
-        back_image: back.map(|b| PiiString::from(b.to_string_standard())),
-        selfie_image: selfie.map(|b| PiiString::from(b.to_string_standard())),
+        front_image: Some(PiiString::from(front.to_string_standard().0)),
+        back_image: back.map(|b| PiiString::from(b.to_string_standard().0)),
+        selfie_image: selfie.map(|b| PiiString::from(b.to_string_standard().0)),
         country_code: Some(images.document_country.into()),
         document_type: Some(images.document_type),
     })

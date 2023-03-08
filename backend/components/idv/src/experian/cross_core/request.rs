@@ -1,0 +1,312 @@
+use chrono::{DateTime, NaiveDate, SecondsFormat, Utc};
+use newtypes::{IdvData, PiiString};
+
+use crate::experian::error::{ConversionError, Error};
+
+/// This is the top level request to CrossCore
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CrossCoreAPIRequest {
+    pub header: BodyHeader,
+    pub payload: BodyPayload,
+}
+
+impl CrossCoreAPIRequest {
+    // need to use our own method since we require more than IdvData to build the req
+    pub fn try_from(idv_data: IdvData, config: PreciseIDRequestConfig) -> Result<Self, Error> {
+        let control_options = config.control_options.clone();
+        let body_header = BodyHeader::from(config);
+
+        let contact = Contact::try_from(idv_data)?;
+        let application_contact = ApplicationContact::new(&contact);
+
+        let application = Application {
+            applicants: vec![application_contact],
+            product_details: None,
+        };
+
+        let body_payload = BodyPayload {
+            control: control_options,
+            contacts: vec![contact],
+            application,
+        };
+
+        Ok(Self {
+            header: body_header,
+            payload: body_payload,
+        })
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BodyHeader {
+    // The ID for our instance
+    pub tenant_id: String,
+    // This is the scenario defined in the CrossCore configuration used to determine which back- ing applications are contacted and in what order.
+    pub request_type: String,
+    // Reference ID that you provide for each specific call to CrossCore. This ID does not have to be unique.
+    // You can reuse the same ID if desired, although using a unique ID for each call is best practice.
+    pub client_reference_id: String,
+    // The time of the request.
+    // MUST be in RFC3339 format (YYYY-MM-DDTHH:MM:SSZ)
+    pub message_time: String,
+    // must be provided, but can be empty
+    pub options: BodyHeaderOptions,
+}
+
+impl From<PreciseIDRequestConfig> for BodyHeader {
+    fn from(config: PreciseIDRequestConfig) -> Self {
+        let message_time = config.message_time.to_rfc3339_opts(SecondsFormat::Secs, true);
+        Self {
+            tenant_id: config.tenant_id,
+            request_type: config.request_type,
+            client_reference_id: config.client_reference_id,
+            message_time,
+            // can be empty, but is required
+            options: BodyHeaderOptions { ..Default::default() },
+        }
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct BodyHeaderOptions {
+    pub version: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BodyPayload {
+    pub control: Vec<ControlOption>,
+    pub contacts: Vec<Contact>,
+    pub application: Application,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ControlOption {
+    pub option: PiiString,
+    pub value: PiiString,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Contact {
+    // Value used to cross-reference pieces of data to other objects within the message. The value is whatever you decide to code it as.
+    // When you need to reference this object, you will use the id value from this object in the target object to associate this object to the target object.
+    pub id: String,
+    pub person: Person,
+    pub addresses: Vec<Address>,
+    pub telephones: Vec<Telephone>,
+    pub emails: Vec<Email>,
+    pub identity_documents: Vec<IdentityDocument>,
+}
+
+impl TryFrom<IdvData> for Contact {
+    type Error = ConversionError;
+    fn try_from(d: IdvData) -> Result<Self, Self::Error> {
+        let IdvData {
+            first_name,
+            last_name,
+            address_line1,
+            address_line2,
+            city,
+            state,
+            zip,
+            country,
+            // TODO figure out how to send this? prob a doc type enum
+            ssn4: _,
+            // TODO: was getting invalid errors when testing this when optional, so figure out if required
+            ssn9,
+            dob,
+            email,
+            phone_number,
+        } = d;
+
+        let first_name = first_name.ok_or(ConversionError::MissingFirstName)?;
+        let last_name = last_name.ok_or(ConversionError::MissingLastName)?;
+        let address = address_line1.ok_or(ConversionError::MissingAddress)?; // TODO
+        let person_details = if let Some(d) = dob {
+            let parsed_dob =
+                NaiveDate::parse_from_str(d.leak(), "%Y-%m-%d").map_err(|_| ConversionError::CantParseDob)?;
+
+            Some(PersonDetails {
+                date_of_birth: Some(parsed_dob.to_string()),
+            })
+        } else {
+            None
+        };
+
+        let person_name = PersonName {
+            id: "PERSON_NAME_1".into(),
+            first_name,
+            sur_name: last_name,
+        };
+
+        let person = Person {
+            names: vec![person_name],
+            type_of_person: "APPLICANT".to_string(),
+            person_identifier: None,
+            person_details,
+        };
+
+        let address = Address {
+            id: "ADDRESS_1".into(),
+            address_type: "CURRENT".into(),
+            street: address,
+            street2: address_line2,
+            post_town: city,
+            postal: zip,
+            state_province_code: state,
+            country_code: country,
+        };
+
+        let email = Email {
+            id: "EMAIL_1".into(),
+            email,
+        };
+        let phone = Telephone {
+            id: "PHONE_1".into(),
+            number: phone_number,
+        };
+        let doc_type = ssn9.as_ref().map(|_| "SSN".to_string());
+        let identity_document = IdentityDocument {
+            // TODO: figure out ssn4
+            document_number: ssn9,
+            document_type: doc_type,
+        };
+
+        Ok(Self {
+            id: "CONTACT_1".into(),
+            person,
+            addresses: vec![address],
+            telephones: vec![phone],
+            emails: vec![email],
+            identity_documents: vec![identity_document],
+        })
+    }
+}
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Person {
+    pub names: Vec<PersonName>,
+    // Indicator for the person type
+    // TODO enum, default is APPLICANT prob
+    pub type_of_person: String,
+    // Client identifier for person
+    pub person_identifier: Option<String>,
+    pub person_details: Option<PersonDetails>,
+}
+
+// Details relating to the person object.
+// There's A LOT more in the API spec we can use if we want
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PersonDetails {
+    // YYYY-MM-DD
+    pub date_of_birth: Option<String>,
+}
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PersonName {
+    // Value used to cross-reference pieces of data to other objects within the message.
+    pub id: String,
+    pub first_name: PiiString,
+    pub sur_name: PiiString,
+}
+
+/// Information pertaining to an address
+/// A lot more we can use here in the API spec
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Address {
+    // Value used to cross-reference pieces of data to other objects within the message.
+    pub id: String,
+    // TODO this is an enum
+    // CURRENT
+    pub address_type: String,
+    pub street: PiiString,
+    pub street2: Option<PiiString>,
+    pub post_town: Option<PiiString>,
+    pub postal: Option<PiiString>,
+    pub state_province_code: Option<PiiString>,
+    pub country_code: Option<PiiString>,
+}
+
+/// Information pertaining to a phone
+/// A lot more we can use here in the API spec
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Telephone {
+    // Value used to cross-reference pieces of data to other objects within the message.
+    pub id: String,
+    pub number: Option<PiiString>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Email {
+    // Value used to cross-reference pieces of data to other objects within the message.
+    pub id: String,
+    // The following special characters are not allowed, if included, the email address will not be included in the request to Precise ID: < > % & + = [ { ] : ; ? *
+    pub email: Option<PiiString>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+// TODO
+pub struct IdentityDocument {
+    pub document_number: Option<PiiString>,
+    // TODO: enum
+    pub document_type: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Application {
+    pub applicants: Vec<ApplicationContact>,
+    pub product_details: Option<ApplicationProductDetails>,
+}
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ApplicationProductDetails {
+    // Type of account or product being applied for.
+    // Only required for FCRA Resellers inquiries.
+    pub product_type: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ApplicationContact {
+    // unique identifier
+    pub id: String,
+    // Should be the same as Contact#id
+    pub contact_id: String,
+    // TODO enum
+    // should be APPLICANT for precise ID, since they only process 1 req at a time
+    pub applicant_type: String,
+}
+
+impl ApplicationContact {
+    fn new(c: &Contact) -> Self {
+        Self {
+            id: "APPLICATION_1".into(),
+            contact_id: c.id.clone(),
+            applicant_type: "APPLICANT".into(),
+        }
+    }
+}
+
+pub struct PreciseIDRequestConfig {
+    pub control_options: Vec<ControlOption>,
+    // The ID for our instance
+    pub tenant_id: String,
+    // This is the scenario defined in the CrossCore configuration used to determine which back- ing applications are contacted and in what order.
+    pub request_type: String,
+    // Reference ID that you provide for each specific call to CrossCore. This ID does not have to be unique.
+    // You can reuse the same ID if desired, although using a unique ID for each call is best practice.
+    pub client_reference_id: String,
+    // The time of the request.
+    pub message_time: DateTime<Utc>,
+}

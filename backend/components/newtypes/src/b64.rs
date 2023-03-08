@@ -10,19 +10,22 @@ pub use base64::DecodeError;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Apiv2Schema, JsonSchema)]
 pub struct Base64Data(pub Vec<u8>);
+/// represents a string that has been encoded as base 64
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Apiv2Schema, JsonSchema)]
+pub struct Base64EncodedString(pub String);
 
 impl Base64Data {
     pub fn from_str_standard(s: &str) -> Result<Self, base64::DecodeError> {
         base64::decode_config(s, base64::STANDARD).map(Self)
     }
 
-    pub fn into_string_standard(b: Vec<u8>) -> String {
-        base64::encode_config(b, base64::STANDARD)
+    pub fn into_string_standard(b: Vec<u8>) -> Base64EncodedString {
+        Base64EncodedString(base64::encode_config(b, base64::STANDARD))
     }
 }
 
 impl Base64Data {
-    pub fn to_string_standard(self) -> String {
+    pub fn to_string_standard(self) -> Base64EncodedString {
         Self::into_string_standard(self.0)
     }
 }

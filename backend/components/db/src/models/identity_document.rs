@@ -47,7 +47,7 @@ impl IdentityDocument {
         data_key: &ScopedSealingKey,
     ) -> Result<String, crypto::Error> {
         let bytes = data_key.unseal_bytes(image_bytes)?;
-        Ok(Base64Data::into_string_standard(bytes))
+        Ok(Base64Data::into_string_standard(bytes).0)
     }
 
     pub fn s3_path_for_document_image(

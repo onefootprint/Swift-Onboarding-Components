@@ -30,6 +30,7 @@ pub use handoff_metadata::*;
 
 mod b64;
 pub use b64::Base64Data;
+pub use b64::Base64EncodedString;
 pub use serde;
 use serde::ser::SerializeMap;
 
