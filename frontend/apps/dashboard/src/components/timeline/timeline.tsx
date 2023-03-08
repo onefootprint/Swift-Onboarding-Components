@@ -88,7 +88,7 @@ const TimeContainer = styled.div<{ hasDashedBorder: boolean; index: number }>`
     grid-column-start: 1;
     display: flex;
     align-items: flex-start;
-    justify-content: flex-end;
+    justify-content: flex-start;
     margin-right: ${theme.spacing[7]};
   `};
 

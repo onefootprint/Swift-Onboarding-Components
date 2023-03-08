@@ -52,8 +52,11 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
   if (shouldCollapseRange) {
     return (
       <TimeContainer>
-        <Typography variant="label-3" color="tertiary" sx={{ marginRight: 1 }}>
+        <Typography variant="label-3" color="tertiary" sx={{ marginRight: 4 }}>
           {start}
+        </Typography>
+        <Typography variant="label-3" color="tertiary">
+          --
         </Typography>
       </TimeContainer>
     );
