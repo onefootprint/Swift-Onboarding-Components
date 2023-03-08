@@ -112,6 +112,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
 
 const InputContainer = styled.div`
   position: relative;
+  width: inherit;
 `;
 
 const PrefixContainer = styled.div`

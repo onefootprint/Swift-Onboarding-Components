@@ -22,6 +22,10 @@ const InputAddon = styled.div`
   `}
 
   + .fp-input-container {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+
     input {
       border-top-left-radius: 0px;
       border-bottom-left-radius: 0px;
