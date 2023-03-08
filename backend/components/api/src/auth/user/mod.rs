@@ -21,12 +21,10 @@ pub use validate_user::*;
 #[strum_discriminants(vis(pub))]
 #[serde(rename = "snake_case")]
 pub enum UserAuthScope {
-    // This is just the initial scope - we will update this to have scopes that represent perms for
-    // all the different kinds of user tokens in the future
-    All,
     SignUp,
     OrgOnboardingInit { id: ScopedUserId },
     OrgOnboarding,
+    Business(VaultId),
     BasicProfile,
     ExtendedProfile,
     SensitiveProfile,

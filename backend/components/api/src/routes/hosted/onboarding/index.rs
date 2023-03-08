@@ -70,7 +70,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let user_vault = Vault::lock(conn, user_auth.user_vault_id())?;
-            if let Some(new_business_keypair) = new_business_keypair {
+            let business_scope = if let Some(new_business_keypair) = new_business_keypair {
                 let (public_key, e_private_key) = new_business_keypair;
                 let args = NewVaultArgs {
                     public_key,
@@ -81,8 +81,10 @@ pub async fn post(
                 };
                 let business_vault = Vault::create(conn, args)?;
                 BusinessOwner::create(conn, user_vault.id.clone(), business_vault.id.clone())?;
-                // TODO attach the business to the auth token
-            }
+                Some(UserAuthScope::Business(business_vault.into_inner().id))
+            } else {
+                None
+            };
 
             let insight_event = CreateInsightEvent::from(insights);
 
@@ -99,7 +101,11 @@ pub async fn post(
             let ob = Onboarding::get_or_create(conn, ob_create_args)?;
             // Update the auth session in the DB to have the OrgOnboarding scope, giving permission
             // to perform other operations
-            let data = user_auth.data.clone().add_scope(UserAuthScope::OrgOnboarding);
+            let new_scopes = vec![UserAuthScope::OrgOnboarding]
+                .into_iter()
+                .chain(business_scope.into_iter())
+                .collect();
+            let data = user_auth.data.clone().add_scopes(new_scopes);
             user_auth.update_session(conn, &session_key, data)?;
 
             // If the user has already onboarded onto this same ob config, return a validation token

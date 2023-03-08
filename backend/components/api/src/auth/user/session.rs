@@ -46,14 +46,17 @@ impl UserSession {
             .contains(scope)
     }
 
-    pub fn add_scope(self, new_scope: UserAuthScope) -> AuthSessionData {
-        let new_scope_kind = UserAuthScopeDiscriminant::from(&new_scope);
+    pub fn add_scopes(self, new_scopes: Vec<UserAuthScope>) -> AuthSessionData {
+        let new_scope_kinds = new_scopes
+            .iter()
+            .map(UserAuthScopeDiscriminant::from)
+            .collect_vec();
         let new_scopes = self.scopes
             .into_iter()
             // Filter out any old scope of the same type
-            .filter(|x| UserAuthScopeDiscriminant::from(x) != new_scope_kind)
+            .filter(|x| !new_scope_kinds.contains(&UserAuthScopeDiscriminant::from(x)))
             // And replace it with the new scope
-            .chain([new_scope].into_iter())
+            .chain(new_scopes.into_iter())
             .collect();
         Self::make(self.user_vault_id, new_scopes)
     }
