@@ -1,3 +1,4 @@
+mod experian;
 mod idology;
 mod signal;
 mod signal_attribute;
@@ -5,6 +6,7 @@ mod socure;
 
 use std::str::FromStr;
 
+pub use experian::*;
 pub use idology::*;
 pub use signal::*;
 pub use signal_attribute::*;

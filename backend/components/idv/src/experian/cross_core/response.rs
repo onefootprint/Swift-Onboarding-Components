@@ -1,3 +1,10 @@
+use newtypes::experian::ResponseCode;
+
+use crate::experian::{
+    error::{CrossCoreResponseError, Error},
+    precise_id::response::PreciseIDAPIResponse,
+};
+
 /// This is the top level response from CrossCore
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -6,17 +13,44 @@ pub struct CrossCoreAPIResponse {
     pub original_request_data: super::request::BodyPayload,
     pub client_response_payload: ClientResponsePayload,
 }
+
+impl CrossCoreAPIResponse {
+    // Helper to dig down to the precise id response from cross core wrapper
+    #[allow(dead_code)]
+    pub fn precise_id_response(&self) -> Result<Option<PreciseIDAPIResponse>, Error> {
+        let r = self
+            .client_response_payload
+            .decision_elements
+            .iter()
+            .find(|de| {
+                de.service_name
+                    .as_ref()
+                    .map(|n| n == "PreciseId")
+                    .unwrap_or(false)
+            })
+            .ok_or(CrossCoreResponseError::PreciseIDResponseNotFound)?
+            .clone()
+            .other_data
+            .and_then(|o| o.json)
+            .and_then(|j| j.fraud_solutions)
+            .and_then(|j| j.response)
+            .and_then(|r| r.products)
+            .and_then(|p| p.precise_id_server);
+
+        Ok(r)
+    }
+}
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseHeader {
-    // TODO: fix i_d
-    pub tenant_i_d: Option<String>,
+    #[serde(rename(deserialize = "tenantID"))]
+    pub tenant_id: Option<String>,
     pub request_type: Option<String>,
     pub client_reference_id: Option<String>,
     pub exp_request_id: Option<String>,
     pub message_time: Option<String>,
     pub overall_response: OverallResponse,
-    pub response_code: Option<String>,
+    pub response_code: Option<ResponseCode>,
     pub response_type: Option<String>,
     pub response_message: Option<String>,
     pub category: Option<String>,
@@ -25,15 +59,15 @@ pub struct ResponseHeader {
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OverallResponse {
-    // TODO: enum
     pub decision: Option<String>,
     pub score: Option<i32>,
-    // TODO: enum
+    // unfortunately no enum values listed
     pub decision_text: Option<String>,
-    // TODO: enum
+    // unfortunately no enum values listed
     pub decision_reasons: Option<Vec<String>>,
-    // TODO: enum
+    // unfortunately no enum values listed
     pub recommended_next_actions: Option<Vec<String>>,
+    // idk what this is
     pub spare_objects: Option<Vec<String>>,
 }
 
@@ -49,22 +83,13 @@ pub struct ClientResponsePayload {
 pub struct OrchestrationStepDecision {
     // Sequence/point in workflow that decision point was generated.
     pub sequence_id: Option<String>,
-    // Name of service for the decision. Values can be:
-    // FraudNet
-    // Hunter
-    // PreciseID
-    // ProveID
-    // TODO: enum
     pub decision_source: Option<String>,
-    // Decision from service. Value:
-    // Can be defined in individual strategy, but example values are: ACCEPT, REFER, NODECISION, STOP, REJECT.
-    // TODO: enum
+    // Decision from service.
     pub decision: Option<String>,
     // List of reasons for decision
     pub decision_reasons: Option<Vec<String>>,
     pub score: Option<i32>,
     // Informational decision text
-    // TODO: enum
     pub decision_text: Option<String>,
     // Next action recommended from the fraud engine
     pub next_action: Option<String>,
@@ -81,18 +106,28 @@ pub struct DecisionElement {
     pub service_name: Option<String>,
     pub applicant_id: Option<String>,
     pub normalized_score: Option<i32>,
-    pub warnings_errors: Vec<WarningError>,
-    pub other_data: OtherData,
+    pub warnings_errors: Option<Vec<WarningError>>,
+    pub other_data: Option<OtherData>,
+    pub matches: Option<serde_json::Value>,
+    pub decisions: Option<Vec<DecisionElementDecision>>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DecisionElementDecision {
+    // This is unlikely to be an enum - no indication we can use that.
+    pub element: Option<String>,
+    // This contains reason codes from across all the experian products, so will need to coalesce or have all reason codes in one enum (IEN, CrossCore, PreciseID etc)
+    // See the test_fixture response for an example
+    pub value: Option<String>,
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WarningError {
-    // TODO: enum
     pub response_type: Option<String>,
-    // TODO: enum
-    pub response_code: Option<String>,
-    // TODO: enum
+    pub response_code: Option<ResponseCode>,
     pub response_message: Option<String>,
 }
 
@@ -122,30 +157,35 @@ pub struct FraudSolutionResponse {
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FraudSolutionResponseProducts {
-    // TODO: fix i_d
-    pub precise_i_d_server: Option<FraudSolutionResponseProductsPreciseID>,
+    #[serde(rename(deserialize = "preciseIDServer"))]
+    pub precise_id_server: Option<PreciseIDAPIResponse>,
+    // This is data from the Identity Element Network (IEN). This data is returned separately, but also
+    // rolls up into the preciseID score and response
+    pub customer_management: Option<serde_json::Value>,
+    // we'd add syntheticID etc here
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FraudSolutionResponseProductsPreciseID {
-    pub error: Option<FraudSolutionResponseProductsError>,
-    pub pidxmlversion: Option<String>,
-}
-#[derive(Debug, Clone, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FraudSolutionResponseProductsError {
-    pub report_date: Option<String>,
-    pub report_time: Option<String>,
-    pub error_code: Option<String>,
-    pub error_description: Option<String>,
-    pub action_indicator: Option<ActionIndicator>,
-    pub reference_number: Option<String>,
-}
+// TODO: matches and fuzzy matching
 
-#[derive(Debug, Clone, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ActionIndicator {
-    pub value: Option<String>,
-    pub code: Option<String>,
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_fixtures::experian_cross_core_response;
+
+    #[test]
+    fn test_parses() {
+        let r: CrossCoreAPIResponse = serde_json::from_value(experian_cross_core_response())
+            .expect("could not parse experian cross core");
+
+        assert!(r
+            .precise_id_response()
+            .unwrap()
+            .unwrap()
+            .summary
+            .unwrap()
+            .scores
+            .unwrap()
+            .precise_id_score
+            .is_some())
+    }
 }

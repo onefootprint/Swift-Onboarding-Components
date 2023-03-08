@@ -1,5 +1,8 @@
 use chrono::{DateTime, NaiveDate, SecondsFormat, Utc};
-use newtypes::{IdvData, PiiString};
+use newtypes::{
+    experian::{AddressType, ApplicantType, DocumentType, TypeOfPerson},
+    IdvData, PiiString,
+};
 
 use crate::experian::error::{ConversionError, Error};
 
@@ -95,7 +98,7 @@ pub struct ControlOption {
 pub struct Contact {
     // Value used to cross-reference pieces of data to other objects within the message. The value is whatever you decide to code it as.
     // When you need to reference this object, you will use the id value from this object in the target object to associate this object to the target object.
-    pub id: String,
+    pub id: Option<String>,
     pub person: Person,
     pub addresses: Vec<Address>,
     pub telephones: Vec<Telephone>,
@@ -139,21 +142,21 @@ impl TryFrom<IdvData> for Contact {
         };
 
         let person_name = PersonName {
-            id: "PERSON_NAME_1".into(),
+            id: Some(ExperianRequestDatumIdentifiers::PersonName1.to_string()),
             first_name,
             sur_name: last_name,
         };
 
         let person = Person {
             names: vec![person_name],
-            type_of_person: "APPLICANT".to_string(),
+            type_of_person: TypeOfPerson::Applicant,
             person_identifier: None,
             person_details,
         };
 
         let address = Address {
-            id: "ADDRESS_1".into(),
-            address_type: "CURRENT".into(),
+            id: Some(ExperianRequestDatumIdentifiers::Address1.to_string()),
+            address_type: AddressType::Current,
             street: address,
             street2: address_line2,
             post_town: city,
@@ -163,14 +166,14 @@ impl TryFrom<IdvData> for Contact {
         };
 
         let email = Email {
-            id: "EMAIL_1".into(),
+            id: Some(ExperianRequestDatumIdentifiers::Email1.to_string()),
             email,
         };
         let phone = Telephone {
-            id: "PHONE_1".into(),
+            id: Some(ExperianRequestDatumIdentifiers::Phone1.to_string()),
             number: phone_number,
         };
-        let doc_type = ssn9.as_ref().map(|_| "SSN".to_string());
+        let doc_type = ssn9.as_ref().map(|_| DocumentType::Ssn);
         let identity_document = IdentityDocument {
             // TODO: figure out ssn4
             document_number: ssn9,
@@ -178,7 +181,7 @@ impl TryFrom<IdvData> for Contact {
         };
 
         Ok(Self {
-            id: "CONTACT_1".into(),
+            id: Some(ExperianRequestDatumIdentifiers::Contact1.to_string()),
             person,
             addresses: vec![address],
             telephones: vec![phone],
@@ -192,8 +195,7 @@ impl TryFrom<IdvData> for Contact {
 pub struct Person {
     pub names: Vec<PersonName>,
     // Indicator for the person type
-    // TODO enum, default is APPLICANT prob
-    pub type_of_person: String,
+    pub type_of_person: TypeOfPerson,
     // Client identifier for person
     pub person_identifier: Option<String>,
     pub person_details: Option<PersonDetails>,
@@ -211,7 +213,7 @@ pub struct PersonDetails {
 #[serde(rename_all = "camelCase")]
 pub struct PersonName {
     // Value used to cross-reference pieces of data to other objects within the message.
-    pub id: String,
+    pub id: Option<String>,
     pub first_name: PiiString,
     pub sur_name: PiiString,
 }
@@ -222,10 +224,8 @@ pub struct PersonName {
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     // Value used to cross-reference pieces of data to other objects within the message.
-    pub id: String,
-    // TODO this is an enum
-    // CURRENT
-    pub address_type: String,
+    pub id: Option<String>,
+    pub address_type: AddressType,
     pub street: PiiString,
     pub street2: Option<PiiString>,
     pub post_town: Option<PiiString>,
@@ -240,7 +240,7 @@ pub struct Address {
 #[serde(rename_all = "camelCase")]
 pub struct Telephone {
     // Value used to cross-reference pieces of data to other objects within the message.
-    pub id: String,
+    pub id: Option<String>,
     pub number: Option<PiiString>,
 }
 
@@ -248,7 +248,7 @@ pub struct Telephone {
 #[serde(rename_all = "camelCase")]
 pub struct Email {
     // Value used to cross-reference pieces of data to other objects within the message.
-    pub id: String,
+    pub id: Option<String>,
     // The following special characters are not allowed, if included, the email address will not be included in the request to Precise ID: < > % & + = [ { ] : ; ? *
     pub email: Option<PiiString>,
 }
@@ -258,8 +258,7 @@ pub struct Email {
 // TODO
 pub struct IdentityDocument {
     pub document_number: Option<PiiString>,
-    // TODO: enum
-    pub document_type: Option<String>,
+    pub document_type: Option<DocumentType>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -280,20 +279,19 @@ pub struct ApplicationProductDetails {
 #[serde(rename_all = "camelCase")]
 pub struct ApplicationContact {
     // unique identifier
-    pub id: String,
+    pub id: Option<String>,
     // Should be the same as Contact#id
-    pub contact_id: String,
-    // TODO enum
+    pub contact_id: Option<String>,
     // should be APPLICANT for precise ID, since they only process 1 req at a time
-    pub applicant_type: String,
+    pub applicant_type: ApplicantType,
 }
 
 impl ApplicationContact {
     fn new(c: &Contact) -> Self {
         Self {
-            id: "APPLICATION_1".into(),
+            id: Some(ExperianRequestDatumIdentifiers::Application1.to_string()),
             contact_id: c.id.clone(),
-            applicant_type: "APPLICANT".into(),
+            applicant_type: ApplicantType::Applicant,
         }
     }
 }
@@ -309,4 +307,16 @@ pub struct PreciseIDRequestConfig {
     pub client_reference_id: String,
     // The time of the request.
     pub message_time: DateTime<Utc>,
+}
+
+/// These are the keys we give our data as required by experian
+#[derive(Debug, strum::Display, strum::EnumString, Clone, Eq, PartialEq, serde::Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum ExperianRequestDatumIdentifiers {
+    Contact1,
+    Email1,
+    Address1,
+    PersonName1,
+    Phone1,
+    Application1,
 }

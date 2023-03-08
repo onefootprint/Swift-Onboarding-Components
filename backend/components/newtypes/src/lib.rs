@@ -52,6 +52,9 @@ pub use locked::*;
 pub mod status_code;
 pub use status_code::*;
 
+pub mod vendor;
+pub use vendor::*;
+
 pub use uuid::Uuid;
 
 pub mod proxy_token;

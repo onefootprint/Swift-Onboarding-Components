@@ -1,4 +1,5 @@
 use chrono::Utc;
+use newtypes::experian::ProductOptions;
 use newtypes::{IdvData, PiiString, Uuid};
 
 use crate::experian::auth::{self, response::JwtTokenResponse};
@@ -178,10 +179,9 @@ impl ExperianClient {
                 value: "OF".to_string().into(),
             },
             // defines us wanting precise id
-            // TODO: should be passed in?
             ControlOption {
                 option: "PRODUCT_OPTION".to_string().into(),
-                value: "01".to_string().into(),
+                value: ProductOptions::IDScreeningScore.to_string().into(),
             },
             ControlOption {
                 option: "DETAIL_REQUEST".to_string().into(),

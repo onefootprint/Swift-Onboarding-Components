@@ -1,3 +1,6 @@
+// for test fixture vendor responses json
+#![recursion_limit = "256"]
+
 use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
