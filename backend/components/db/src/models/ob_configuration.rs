@@ -8,8 +8,8 @@ use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::ApiKeyStatus;
 use newtypes::OnboardingId;
+use newtypes::{ApiKeyStatus, DataIdentifierKind};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -230,5 +230,11 @@ impl ObConfiguration {
 
     pub fn can_access_selfie(&self) -> bool {
         self.can_access_data.contains(&CDO::DocumentAndSelfie)
+    }
+
+    pub fn must_collect_business(&self) -> bool {
+        self.must_collect_data
+            .iter()
+            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierKind::Business)
     }
 }

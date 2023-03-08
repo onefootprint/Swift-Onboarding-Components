@@ -1,4 +1,4 @@
-use crate::{BusinessDataKind, IdentityDataKind};
+use crate::{BusinessDataKind, DataIdentifierKind, IdentityDataKind};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -51,6 +51,21 @@ impl CollectedData {
             Self::BusinessPhoneNumber => vec![BusinessPhoneNumber],
             Self::BusinessWebsite => vec![BusinessWebsite],
             Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners],
+        }
+    }
+
+    pub fn data_identifier_kind(&self) -> DataIdentifierKind {
+        match self {
+            Self::BusinessName
+            | Self::BusinessEin
+            | Self::BusinessAddress
+            | Self::BusinessPhoneNumber
+            | Self::BusinessWebsite
+            | Self::BusinessBeneficialOwners => DataIdentifierKind::Business,
+            Self::Name | Self::Dob | Self::Ssn | Self::Address | Self::Email | Self::PhoneNumber => {
+                DataIdentifierKind::Id
+            }
+            Self::Document => DataIdentifierKind::IdDocument,
         }
     }
 }
@@ -188,6 +203,7 @@ impl CollectedDataOption {
             ]),
             Self::BusinessPhoneNumber => Some(vec![BusinessDataKind::PhoneNumber]),
             Self::BusinessWebsite => Some(vec![BusinessDataKind::Website]),
+            Self::BusinessBeneficialOwners => Some(vec![BusinessDataKind::BeneficialOwners]),
             _ => None,
         }
     }

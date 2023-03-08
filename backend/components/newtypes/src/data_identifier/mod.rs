@@ -67,7 +67,12 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
     DeserializeFromStr,
     JsonSchema,
 )]
-#[strum_discriminants(derive(strum_macros::EnumString), strum(serialize_all = "snake_case"))]
+#[strum_discriminants(
+    name(DataIdentifierKind),
+    vis(pub),
+    derive(strum_macros::EnumString),
+    strum(serialize_all = "snake_case")
+)]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 /// Represents a piece of data stored inside the user vault.
@@ -121,24 +126,24 @@ impl FromStr for DataIdentifier {
             .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
         let prefix = &s[..period_idx];
         let suffix = &s[(period_idx + 1)..];
-        let prefix = DataIdentifierDiscriminants::from_str(prefix)
+        let prefix = DataIdentifierKind::from_str(prefix)
             .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
         // Parse the suffix differently depending on the prefix
         let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
         let result = match prefix {
-            DataIdentifierDiscriminants::Id => {
+            DataIdentifierKind::Id => {
                 Self::Id(IdentityDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
-            DataIdentifierDiscriminants::Custom => {
+            DataIdentifierKind::Custom => {
                 Self::Custom(KvDataKey::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
-            DataIdentifierDiscriminants::IdDocument => {
+            DataIdentifierKind::IdDocument => {
                 Self::IdDocument(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
-            DataIdentifierDiscriminants::Selfie => {
+            DataIdentifierKind::Selfie => {
                 Self::Selfie(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
-            DataIdentifierDiscriminants::Business => {
+            DataIdentifierKind::Business => {
                 Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
         };
