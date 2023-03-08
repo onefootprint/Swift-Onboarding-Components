@@ -37,6 +37,17 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    business_owner (id) {
+        id -> Text,
+        user_vault_id -> Text,
+        business_vault_id -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     data_lifetime (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -721,6 +732,7 @@ joinable!(webauthn_credential -> user_vault (user_vault_id));
 allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
+    business_owner,
     data_lifetime,
     document_request,
     email,

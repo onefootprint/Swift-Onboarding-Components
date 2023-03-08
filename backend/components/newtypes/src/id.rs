@@ -96,6 +96,7 @@ define_newtype_id!(
     "Identifier for an org api key access log"
 );
 define_newtype_id!(VaultId, String, "Identifier for a User Vault");
+define_newtype_id!(BoId, String, "Identifier for a business owner");
 
 define_newtype_id!(FingerprintId, String, "Identifier for a fingerprint");
 define_newtype_id!(AddressId, String, "Identifier for an address");
