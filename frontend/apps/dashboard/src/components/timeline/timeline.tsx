@@ -8,7 +8,7 @@ import TimelineItemTime, {
 } from './components/timeline-item-time';
 
 export type TimelineItem = {
-  time: TimelineItemTimeData;
+  time?: TimelineItemTimeData;
   iconComponent?: React.ReactNode; // If icon is not provided, we show a dashed line between prev and next items
   headerComponent: React.ReactNode;
   bodyComponent?: React.ReactNode;
@@ -19,8 +19,15 @@ type TimelineProps = {
   isLoading?: boolean;
 };
 
-export const getKeyForItemTime = (time: TimelineItemTimeData) =>
-  'timestamp' in time ? time.timestamp : `${time.start}-${time.end}`;
+export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
+  if (!time) {
+    return 'empty';
+  }
+  if ('timestamp' in time) {
+    return time.timestamp;
+  }
+  return `${time.start}-${time.end}`;
+};
 
 const Timeline = ({ items, isLoading }: TimelineProps) => {
   const { t } = useTranslation('components.timeline');
@@ -40,7 +47,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
           return (
             <Fragment key={key}>
               <TimeContainer hasDashedBorder={hasDashedBorder} index={i}>
-                <TimelineItemTime time={item.time} />
+                {item.time && <TimelineItemTime time={item.time} />}
               </TimeContainer>
               <TextContainer
                 hasDashedBorder={hasDashedBorder}

@@ -108,11 +108,9 @@ const AuditTrailTimeline = ({
     }
   });
   if (user?.status === UserStatus.incomplete) {
-    // Postpend a custom timeline item for incomplete users
+    // Postpend a custom timeline item for incomplete users with no timestamp
     items.push({
-      time: {
-        timestamp: new Date().toISOString(),
-      },
+      time: undefined,
       iconComponent: <IcoWarning16 />,
       headerComponent: <AbandonedEventHeader />,
       bodyComponent: <AbandonedEventBody />,

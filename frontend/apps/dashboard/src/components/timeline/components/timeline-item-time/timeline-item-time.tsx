@@ -17,7 +17,6 @@ type TimelineItemTimeProps = {
 
 const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
   const isTimestamp = 'timestamp' in time;
-
   if (isTimestamp) {
     return (
       <TimeContainer>
