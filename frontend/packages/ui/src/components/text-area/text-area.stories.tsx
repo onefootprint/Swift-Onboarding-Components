@@ -43,10 +43,6 @@ export default {
       required: false,
       name: 'Placeholder *',
     },
-    testID: {
-      control: 'text',
-      description: 'Append an attribute data-testid for testing purposes',
-    },
     value: {
       control: 'text',
       description: 'Controlled value',
@@ -64,7 +60,6 @@ const Template: Story<TextAreaProps> = ({
   onChange,
   onChangeText,
   placeholder,
-  testID,
   value: initialValue = '',
 }: TextAreaProps) => {
   const [value, setValue] = useState<
@@ -85,7 +80,6 @@ const Template: Story<TextAreaProps> = ({
       onChange={onChange}
       onChangeText={handleChangeText}
       placeholder={placeholder}
-      testID={testID}
       value={value}
     />
   );
@@ -99,7 +93,6 @@ Base.args = {
   onChange: console.log,
   onChangeText: console.log,
   placeholder: 'Give a detailed reason',
-  testID: 'textarea-test-id',
   value: '',
   hasError: false,
 };

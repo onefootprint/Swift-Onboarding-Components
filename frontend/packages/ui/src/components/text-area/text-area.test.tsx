@@ -13,7 +13,6 @@ describe('<TextArea />', () => {
     onChange = jest.fn(),
     onChangeText = jest.fn(),
     placeholder = 'placeholder-text',
-    testID = 'textarea-id',
     value = '',
   }: Partial<TextAreaProps>) =>
     customRender(
@@ -25,16 +24,9 @@ describe('<TextArea />', () => {
         onChange={onChange}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        testID={testID}
         value={value}
       />,
     );
-
-  it('should add a test id attribute', () => {
-    renderTextArea({ testID: 'textarea-id' });
-
-    expect(screen.getByTestId('textarea-id')).toBeInTheDocument();
-  });
 
   it('should render value', () => {
     renderTextArea({ value: '123' });
@@ -67,9 +59,8 @@ describe('<TextArea />', () => {
         placeholder: 'placeholder',
       });
 
-      const input = screen.getByPlaceholderText('placeholder');
-
-      expect(input).toHaveStyle({
+      const textarea = screen.getByPlaceholderText('placeholder');
+      expect(textarea).toHaveStyle({
         borderWidth: '1px',
         borderStyle: 'solid',
         borderColor: themes.light.borderColor.error,
@@ -83,7 +74,6 @@ describe('<TextArea />', () => {
       });
 
       const hint = screen.getByText('Hint');
-
       expect(hint).toHaveStyle({
         color: themes.light.color.error,
       });
@@ -98,8 +88,8 @@ describe('<TextArea />', () => {
         placeholder: 'placeholder text',
       });
 
-      const input = screen.getByPlaceholderText('placeholder text');
-      await userEvent.type(input, 'foo');
+      const textarea = screen.getByPlaceholderText('placeholder text');
+      await userEvent.type(textarea, 'foo');
 
       expect(onChangeMockFn).toHaveBeenCalled();
     });
@@ -108,11 +98,11 @@ describe('<TextArea />', () => {
       const onChangeTextMockFn = jest.fn();
       renderTextArea({
         onChangeText: onChangeTextMockFn,
-        testID: 'textarea-id',
+        label: 'Textarea',
       });
 
-      const input = screen.getByTestId('textarea-id');
-      await userEvent.type(input, 'f');
+      const textarea = screen.getByLabelText('Textarea');
+      await userEvent.type(textarea, 'f');
 
       expect(onChangeTextMockFn).toHaveBeenCalledWith('f');
     });
@@ -123,12 +113,11 @@ describe('<TextArea />', () => {
         renderTextArea({
           disabled: true,
           onChangeText: onChangeTextMockFn,
-          testID: 'textarea-id',
+          label: 'Textarea',
         });
 
-        const input = screen.getByTestId('textarea-id');
-        userEvent.type(input, 'foo');
-
+        const textarea = screen.getByLabelText('Textarea');
+        userEvent.type(textarea, 'foo');
         expect(onChangeTextMockFn).not.toHaveBeenCalled();
       });
     });

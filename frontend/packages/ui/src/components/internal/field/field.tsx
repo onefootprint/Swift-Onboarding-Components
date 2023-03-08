@@ -19,9 +19,7 @@ type FieldInternalProps = {
   options?: CleaveOptions;
 };
 
-const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
-  as,
-}))<FieldInternalProps>`
+const Field = styled(Cleave)<FieldInternalProps>`
   ${({ theme }) => {
     const {
       components: { input },

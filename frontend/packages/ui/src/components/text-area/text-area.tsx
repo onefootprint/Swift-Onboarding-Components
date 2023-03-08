@@ -3,25 +3,26 @@ import styled, { css } from 'styled-components';
 
 import Box from '../box';
 import Label from '../form-label';
-import Field, { FieldProps } from '../internal/field';
 import Hint from '../internal/hint';
 
-export type TextAreaProps = FieldProps &
-  TextareaHTMLAttributes<HTMLTextAreaElement>;
+export type TextAreaProps = {
+  hasError?: boolean;
+  hint?: string;
+  label?: string;
+  onChangeText?: (nextValue: string) => void;
+} & TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   (
     {
-      testID,
-      hasError,
+      hasError = false,
       hint,
       id: baseID,
       label,
       onChange,
       onChangeText,
       placeholder,
-      required,
-      ...remainingProps
+      ...props
     }: TextAreaProps,
     ref,
   ) => {
@@ -40,18 +41,14 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     return (
       <Box>
         {label && <Label htmlFor={id}>{label}</Label>}
-        <StyledField
-          {...remainingProps}
-          aria-required={required}
-          as="textarea"
+        <Textarea
           className="fp-textarea"
           data-has-error={hasError}
-          data-size="default"
-          data-testid={testID}
           id={id}
           onChange={handleChange}
           placeholder={placeholder}
           ref={ref}
+          {...props}
         />
         {hint && <Hint hasError={hasError}>{hint}</Hint>}
       </Box>
@@ -59,12 +56,63 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   },
 );
 
-const StyledField = styled(Field)<TextAreaProps>`
-  resize: none;
-  ${({ theme }) => css`
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    min-height: ${theme.spacing[11]};
-  `}
+const Textarea = styled.textarea`
+  ${({ theme }) => {
+    const { input } = theme.components;
+
+    return css`
+      background: ${input.state.default.initial.bg};
+      border-color: ${input.state.default.initial.border};
+      border-radius: ${input.global.borderRadius};
+      border-style: solid;
+      border-width: ${input.global.borderWidth};
+      color: ${input.global.color};
+      font: ${input.size.default.typography};
+      min-height: ${theme.spacing[11]};
+      outline: none;
+      padding: ${theme.spacing[4]} ${theme.spacing[5]};
+      resize: none;
+      width: 100%;
+
+      ::placeholder {
+        color: ${input.global.placeholderColor};
+      }
+
+      &[data-has-error='false'] {
+        &:enabled:hover {
+          background: ${input.state.default.hover.bg};
+          border-color: ${input.state.default.hover.border};
+        }
+
+        &:enabled:focus {
+          background: ${input.state.default.focus.bg};
+          border-color: ${input.state.default.focus.border};
+          box-shadow: ${input.state.default.focus.elevation};
+        }
+      }
+
+      &[data-has-error='true'] {
+        background: ${input.state.error.initial.bg};
+        border-color: ${input.state.error.initial.border};
+
+        &:enabled:hover {
+          background: ${input.state.error.hover.bg};
+          border-color: ${input.state.error.hover.border};
+        }
+
+        &:enabled:focus {
+          background: ${input.state.error.focus.bg};
+          border-color: ${input.state.error.focus.border};
+          box-shadow: ${input.state.error.focus.elevation};
+        }
+      }
+
+      &:disabled {
+        background: ${input.state.disabled.bg};
+        border-color: ${input.state.disabled.border};
+      }
+    `;
+  }}
 `;
 
 export default TextArea;
