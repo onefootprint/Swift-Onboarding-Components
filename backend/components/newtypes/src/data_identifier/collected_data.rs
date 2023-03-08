@@ -1,4 +1,4 @@
-use crate::{BusinessDataKind, DataIdentifierKind, IdentityDataKind};
+use crate::{BusinessDataKind as BDK, DataIdentifier, DataIdentifierKind, IdentityDataKind as IDK};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -70,9 +70,13 @@ impl CollectedData {
     }
 }
 
-impl IdentityDataKind {
-    /// Maps an IdentityDataKind to the CollectedData variant that contains this IDK
-    pub fn parent(&self) -> CollectedData {
+pub trait HasParentCdo {
+    fn parent(&self) -> CollectedData;
+}
+
+impl HasParentCdo for IDK {
+    /// Maps an IDK to the CollectedData variant that contains this IDK
+    fn parent(&self) -> CollectedData {
         match self {
             Self::FirstName => CollectedData::Name,
             Self::LastName => CollectedData::Name,
@@ -87,6 +91,25 @@ impl IdentityDataKind {
             Self::Country => CollectedData::Address,
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
+        }
+    }
+}
+
+impl HasParentCdo for BDK {
+    /// Maps an IDK to the CollectedData variant that contains this IDK
+    fn parent(&self) -> CollectedData {
+        match self {
+            Self::Name => CollectedData::BusinessName,
+            Self::Website => CollectedData::BusinessWebsite,
+            Self::PhoneNumber => CollectedData::BusinessPhoneNumber,
+            Self::Ein => CollectedData::BusinessEin,
+            Self::AddressLine1 => CollectedData::BusinessAddress,
+            Self::AddressLine2 => CollectedData::BusinessAddress,
+            Self::City => CollectedData::BusinessAddress,
+            Self::State => CollectedData::BusinessAddress,
+            Self::Zip => CollectedData::BusinessAddress,
+            Self::Country => CollectedData::BusinessAddress,
+            Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
         }
     }
 }
@@ -161,56 +184,69 @@ impl CollectedDataOption {
         }
     }
 
-    pub fn identity_attributes(&self) -> Option<Vec<IdentityDataKind>> {
+    pub fn attributes(&self) -> Option<Vec<DataIdentifier>> {
         // Maybe this could migrate to DataIdentifiers
         match self {
-            Self::Name => Some(vec![IdentityDataKind::FirstName, IdentityDataKind::LastName]),
-            Self::Dob => Some(vec![IdentityDataKind::Dob]),
-            Self::Ssn9 => Some(vec![IdentityDataKind::Ssn9, IdentityDataKind::Ssn4]),
-            Self::Ssn4 => Some(vec![IdentityDataKind::Ssn4]),
+            Self::Name => Some(vec![IDK::FirstName.into(), IDK::LastName.into()]),
+            Self::Dob => Some(vec![IDK::Dob.into()]),
+            Self::Ssn9 => Some(vec![IDK::Ssn9.into(), IDK::Ssn4.into()]),
+            Self::Ssn4 => Some(vec![IDK::Ssn4.into()]),
             Self::FullAddress => Some(vec![
-                IdentityDataKind::AddressLine1,
-                IdentityDataKind::AddressLine2,
-                IdentityDataKind::City,
-                IdentityDataKind::State,
-                IdentityDataKind::Zip,
-                IdentityDataKind::Country,
+                IDK::AddressLine1.into(),
+                IDK::AddressLine2.into(),
+                IDK::City.into(),
+                IDK::State.into(),
+                IDK::Zip.into(),
+                IDK::Country.into(),
             ]),
-            Self::PartialAddress => Some(vec![IdentityDataKind::Zip, IdentityDataKind::Country]),
-            Self::Email => Some(vec![IdentityDataKind::Email]),
-            Self::PhoneNumber => Some(vec![IdentityDataKind::PhoneNumber]),
-            _ => None,
-        }
-    }
-
-    pub fn required_identity_attributes(&self) -> Option<Vec<IdentityDataKind>> {
-        self.identity_attributes()
-            .map(|options| options.into_iter().filter(|k| !k.is_optional()).collect())
-    }
-
-    pub fn business_attributes(&self) -> Option<Vec<BusinessDataKind>> {
-        // Maybe this could migrate to DataIdentifiers
-        match self {
-            Self::BusinessName => Some(vec![BusinessDataKind::Name]),
-            Self::BusinessEin => Some(vec![BusinessDataKind::Ein]),
+            Self::PartialAddress => Some(vec![IDK::Zip.into(), IDK::Country.into()]),
+            Self::Email => Some(vec![IDK::Email.into()]),
+            Self::PhoneNumber => Some(vec![IDK::PhoneNumber.into()]),
+            Self::BusinessName => Some(vec![BDK::Name.into()]),
+            Self::BusinessEin => Some(vec![BDK::Ein.into()]),
             Self::BusinessAddress => Some(vec![
-                BusinessDataKind::AddressLine1,
-                BusinessDataKind::AddressLine2,
-                BusinessDataKind::City,
-                BusinessDataKind::State,
-                BusinessDataKind::Zip,
-                BusinessDataKind::Country,
+                BDK::AddressLine1.into(),
+                BDK::AddressLine2.into(),
+                BDK::City.into(),
+                BDK::State.into(),
+                BDK::Zip.into(),
+                BDK::Country.into(),
             ]),
-            Self::BusinessPhoneNumber => Some(vec![BusinessDataKind::PhoneNumber]),
-            Self::BusinessWebsite => Some(vec![BusinessDataKind::Website]),
-            Self::BusinessBeneficialOwners => Some(vec![BusinessDataKind::BeneficialOwners]),
+            Self::BusinessPhoneNumber => Some(vec![BDK::PhoneNumber.into()]),
+            Self::BusinessWebsite => Some(vec![BDK::Website.into()]),
+            Self::BusinessBeneficialOwners => Some(vec![BDK::BeneficialOwners.into()]),
             _ => None,
         }
+    }
+
+    pub fn identity_attributes(&self) -> Option<Vec<IDK>> {
+        self.attributes()?
+            .into_iter()
+            .map(|di| di.try_into())
+            .collect::<Result<_, _>>()
+            .ok()
+    }
+
+    pub fn required_identity_attributes(&self) -> Option<Vec<IDK>> {
+        let result = self
+            .identity_attributes()?
+            .into_iter()
+            .filter(|k| !k.is_optional())
+            .collect();
+        Some(result)
+    }
+
+    pub fn business_attributes(&self) -> Option<Vec<BDK>> {
+        self.attributes()?
+            .into_iter()
+            .map(|di| di.try_into())
+            .collect::<Result<_, _>>()
+            .ok()
     }
 
     /// Given a list of IdentityDataKinds (maybe collected via API), computes the set of
     /// CollectedDataOptions represented by this list of IdentityDataKinds
-    pub fn list_from(kinds: Vec<IdentityDataKind>) -> HashSet<Self> {
+    pub fn list_from(kinds: Vec<IDK>) -> HashSet<Self> {
         let kinds: HashSet<_> = kinds.into_iter().collect();
         // For each CollectedData variant, figure out which of the options (if any) is represented
         // in the list of kinds
@@ -246,12 +282,12 @@ impl CollectedDataOption {
 
 #[cfg(test)]
 mod test {
+    use super::HasParentCdo;
+    use crate::{CollectedData, CollectedDataOption as CDO, IdentityDataKind};
     use itertools::Itertools;
     use std::collections::HashSet;
     use strum::IntoEnumIterator;
     use test_case::test_case;
-
-    use crate::{CollectedData, CollectedDataOption as CDO, IdentityDataKind};
     use IdentityDataKind::*;
 
     #[test]

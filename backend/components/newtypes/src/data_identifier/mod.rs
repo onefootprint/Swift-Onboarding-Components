@@ -95,9 +95,35 @@ impl From<IdentityDataKind> for DataIdentifier {
     }
 }
 
+impl TryFrom<DataIdentifier> for IdentityDataKind {
+    type Error = crate::Error;
+    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+        match value {
+            DataIdentifier::Id(idk) => Ok(idk),
+            _ => Err(crate::Error::Custom("Can't convert into IDK".to_owned())),
+        }
+    }
+}
+
 impl From<KvDataKey> for DataIdentifier {
     fn from(value: KvDataKey) -> Self {
         Self::Custom(value)
+    }
+}
+
+impl From<BusinessDataKind> for DataIdentifier {
+    fn from(value: BusinessDataKind) -> Self {
+        Self::Business(value)
+    }
+}
+
+impl TryFrom<DataIdentifier> for BusinessDataKind {
+    type Error = crate::Error;
+    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+        match value {
+            DataIdentifier::Business(bdk) => Ok(bdk),
+            _ => Err(crate::Error::Custom("Can't convert into BDK".to_owned())),
+        }
     }
 }
 
