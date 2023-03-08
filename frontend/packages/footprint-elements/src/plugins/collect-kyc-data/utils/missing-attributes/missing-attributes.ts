@@ -69,25 +69,6 @@ export const hasMissingAttributes = (
     ),
   );
 
-export const getMaxStepFromMissingAttributes = (
-  attributes: readonly CollectedKycDataOption[],
-) => {
-  if (!hasMissingAttributes(attributes)) {
-    return 0;
-  }
-  let maxStep = 0;
-  if (isMissingBasicAttribute(attributes)) {
-    maxStep += 1;
-  }
-  if (isMissingResidentialAttribute(attributes)) {
-    maxStep += 1;
-  }
-  if (isMissingSsnAttribute(attributes)) {
-    maxStep += 1;
-  }
-  return maxStep;
-};
-
 export const getCurrentStepFromMissingAttributes = (
   attributes: readonly CollectedKycDataOption[],
   state: StateValue,

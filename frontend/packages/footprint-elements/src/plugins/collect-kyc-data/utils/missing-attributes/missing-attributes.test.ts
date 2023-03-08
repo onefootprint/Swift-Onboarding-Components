@@ -2,7 +2,6 @@ import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
 
 import {
   getCurrentStepFromMissingAttributes,
-  getMaxStepFromMissingAttributes,
   hasMissingAttributes,
   isMissingBasicAttribute,
   isMissingResidentialAttribute,
@@ -203,47 +202,6 @@ describe('MissingAttributesUtils', () => {
           },
         ),
       ).toEqual(true);
-    });
-  });
-
-  describe('getMaxStepFromMissingAttributes', () => {
-    it('returns 0 when there are no missing attributes', () => {
-      expect(getMaxStepFromMissingAttributes([])).toEqual(0);
-    });
-
-    it('returns correct max step', () => {
-      expect(
-        getMaxStepFromMissingAttributes([CollectedKycDataOption.name]),
-      ).toEqual(1);
-
-      expect(
-        getMaxStepFromMissingAttributes([
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.dob,
-        ]),
-      ).toEqual(1);
-
-      expect(
-        getMaxStepFromMissingAttributes([
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.ssn9,
-        ]),
-      ).toEqual(2);
-
-      expect(
-        getMaxStepFromMissingAttributes([
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.partialAddress,
-        ]),
-      ).toEqual(2);
-
-      expect(
-        getMaxStepFromMissingAttributes([
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.fullAddress,
-          CollectedKycDataOption.ssn9,
-        ]),
-      ).toEqual(3);
     });
   });
 

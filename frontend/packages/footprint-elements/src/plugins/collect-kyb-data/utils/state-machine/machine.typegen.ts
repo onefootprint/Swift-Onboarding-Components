@@ -18,6 +18,13 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'completed' | 'init';
+  matchesStates:
+    | 'basicData'
+    | 'beneficialOwners'
+    | 'businessAddress'
+    | 'completed'
+    | 'confirm'
+    | 'init'
+    | 'introduction';
   tags: never;
 }

@@ -22,13 +22,15 @@ const App = ({ context, onDone }: CollectKybDataProps) => {
     if (!customData) {
       return;
     }
-    const { config } = customData;
+
+    const { config, missingAttributes } = customData;
     send({
       type: 'receivedContext',
       payload: {
         device,
         authToken,
         config,
+        missingAttributes,
       },
     });
   });
