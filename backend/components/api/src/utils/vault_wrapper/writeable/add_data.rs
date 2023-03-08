@@ -13,8 +13,8 @@ use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataPriority, EmailId, Fingerprint, IdentityDataKind,
-    IdentityDataUpdate, KvDataKey, PiiString,
+    CollectedDataOption, DataCollectedInfo, DataPriority, DataRequest, EmailId, Fingerprint,
+    IdentityDataKind, KvDataKey, PiiString,
 };
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -181,7 +181,7 @@ impl WriteableUvw {
     fn update_identity_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        update: IdentityDataUpdate,
+        update: DataRequest<IdentityDataKind>,
         fingerprints: NewFingerprints,
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_identity_fields();

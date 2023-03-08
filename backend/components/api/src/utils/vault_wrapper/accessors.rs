@@ -5,7 +5,7 @@ use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
-use newtypes::IdentityDataKind;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
 use std::collections::HashMap;
@@ -17,7 +17,7 @@ impl VaultWrapper<Person> {
             .must_collect_data
             .iter()
             .filter(|cdo| {
-                cdo.required_identity_attributes()
+                cdo.required_attributes::<IDK>()
                     .unwrap_or_default()
                     .iter()
                     .any(|d| !self.has_identity_field(*d))
@@ -61,20 +61,18 @@ impl VaultWrapper<Person> {
 }
 
 impl VaultWrapper<Person> {
-    pub fn get_identity_e_field(&self, kind: IdentityDataKind) -> Option<&SealedVaultBytes> {
+    pub fn get_identity_e_field(&self, kind: IDK) -> Option<&SealedVaultBytes> {
         self.speculative
             .get_identity_e_field(kind)
             .or_else(|| self.portable.get_identity_e_field(kind))
     }
 
-    pub fn has_identity_field(&self, kind: IdentityDataKind) -> bool {
+    pub fn has_identity_field(&self, kind: IDK) -> bool {
         self.get_identity_e_field(kind).is_some()
     }
 
-    pub fn get_populated_identity_fields(&self) -> Vec<IdentityDataKind> {
-        IdentityDataKind::iter()
-            .filter(|k| self.has_identity_field(*k))
-            .collect()
+    pub fn get_populated_identity_fields(&self) -> Vec<IDK> {
+        IDK::iter().filter(|k| self.has_identity_field(*k)).collect()
     }
 
     pub fn get_populated_custom_data(&self) -> Vec<KvDataKey> {

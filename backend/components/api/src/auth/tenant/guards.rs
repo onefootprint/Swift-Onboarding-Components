@@ -3,7 +3,7 @@ use crate::auth::Either;
 use db::models::tenant_role::TenantRole;
 use either::Either::{Left, Right};
 use itertools::Itertools;
-use newtypes::{CollectedDataOption as CDO, DataIdentifier, TenantScope};
+use newtypes::{CollectedDataOption as CDO, DataIdentifier, IdentityDataKind as IDK, TenantScope};
 use std::collections::HashSet;
 use std::fmt;
 use strum::Display;
@@ -130,7 +130,7 @@ impl IsGuardMet for CanDecrypt {
                 TenantScope::Decrypt(cdo) => Some(cdo),
                 _ => None,
             })
-            .flat_map(|cdo| cdo.identity_attributes().unwrap_or_default())
+            .flat_map(|cdo| cdo.attributes::<IDK>().unwrap_or_default())
             .collect();
         let can_access_idks = accessible_idks.is_superset(&HashSet::from_iter(identity.into_iter()));
         // Next, check if we can decrypt custom + id documents

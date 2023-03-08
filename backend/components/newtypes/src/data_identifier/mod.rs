@@ -39,7 +39,7 @@ mod vd_kind;
 
 pub use self::{
     business_data_kind::*, collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*,
-    validation::*, vd_kind::*,
+    validation::Error as ValidationError, validation::*, vd_kind::*,
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
@@ -49,6 +49,7 @@ pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use schemars::JsonSchema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::hash::Hash;
 use std::str::FromStr;
 use strum_macros::{AsRefStr, EnumDiscriminants};
 
@@ -88,6 +89,13 @@ pub enum DataIdentifier {
 }
 
 string_api_data_type_alias!(DataIdentifier);
+
+/// Contains all of the functionality that each nested type of DataIdentifier must provide
+pub trait DataIdentifierSubtype:
+    Hash + Eq + Clone + TryFrom<DataIdentifier> + Into<DataIdentifier> + Validate + HasParentCdo
+{
+    fn is_optional(&self) -> bool;
+}
 
 impl From<IdentityDataKind> for DataIdentifier {
     fn from(value: IdentityDataKind) -> Self {

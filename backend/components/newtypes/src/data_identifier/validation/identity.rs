@@ -1,10 +1,8 @@
+use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
+use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
 use chrono::{Datelike, NaiveDate};
 use std::str::FromStr;
-
-use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
-
-use super::{Error, VResult};
 
 impl Validate for IDK {
     fn validate(&self, value: PiiString, for_bifrost: bool) -> NtResult<PiiString> {
@@ -26,6 +24,7 @@ impl Validate for IDK {
         Ok(result)
     }
 }
+
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     let date = NaiveDate::parse_from_str(input.leak(), "%Y-%m-%d").map_err(|_| Error::InvalidDate)?;
     if for_bifrost && date.year() < 1900 {

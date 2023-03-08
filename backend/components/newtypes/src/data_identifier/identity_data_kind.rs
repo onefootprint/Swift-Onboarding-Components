@@ -1,4 +1,4 @@
-use crate::{PersonVaultDataKind, PiiString, SaltedFingerprint};
+use crate::{DataIdentifierSubtype, PersonVaultDataKind, PiiString, SaltedFingerprint};
 use crypto::sha256;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -51,6 +51,12 @@ pub enum IdentityDataKind {
 
 crate::util::impl_enum_str_diesel!(IdentityDataKind);
 
+impl DataIdentifierSubtype for IdentityDataKind {
+    fn is_optional(&self) -> bool {
+        matches!(self, Self::AddressLine2)
+    }
+}
+
 impl IdentityDataKind {
     /// Returns true if we store a fingerprint of this value to allow exact match searching.
     pub fn allows_fingerprint(&self) -> bool {
@@ -58,10 +64,6 @@ impl IdentityDataKind {
             self,
             Self::PhoneNumber | Self::Email | Self::Ssn9 | Self::FirstName | Self::LastName | Self::Ssn4
         )
-    }
-
-    pub fn is_optional(&self) -> bool {
-        matches!(self, Self::AddressLine2)
     }
 
     pub fn fingerprintable() -> impl Iterator<Item = Self> {

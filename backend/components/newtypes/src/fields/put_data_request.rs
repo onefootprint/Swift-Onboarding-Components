@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use crate::{
-    flat_api_object_map_type, DataIdentifier, Error, IdentityDataUpdate, KvDataKey, NtResult, PiiString,
-};
+use crate::IdentityDataKind as IDK;
+use crate::{flat_api_object_map_type, DataIdentifier, DataRequest, Error, KvDataKey, NtResult, PiiString};
 
 flat_api_object_map_type!(
     PutDataRequest<DataIdentifier, PiiString>,
@@ -11,16 +10,27 @@ flat_api_object_map_type!(
 );
 
 pub struct DecomposedPutRequest {
-    pub id_update: IdentityDataUpdate,
+    pub id_update: DataRequest<IDK>,
+    // TODO parse with DataRequest
     pub custom_data: HashMap<KvDataKey, PiiString>,
+    // TODO add DataRequest<BDK>
 }
 
 impl PutDataRequest {
     /// Decomposes the hashmap of DataIdentifier -> PiiString into its parts that live in different
     /// underlying database tables.
-    pub fn decompose(self, for_bifrost: bool) -> NtResult<DecomposedPutRequest> {
+    pub fn decompose(mut self, for_bifrost: bool) -> NtResult<DecomposedPutRequest> {
+        // Custom logic to always populate ssn4 if ssn9 is provided
+        if let Some(ssn9) = self.get(&IDK::Ssn9.into()) {
+            #[allow(clippy::map_entry)]
+            if !self.contains_key(&IDK::Ssn4.into()) {
+                let ssn4 = PiiString::new(ssn9.leak().chars().skip(ssn9.leak().len() - 4).collect());
+                self.map.insert(IDK::Ssn4.into(), ssn4);
+            }
+        }
+
         // Parse identity data
-        let (id_update, other_data) = IdentityDataUpdate::new(self.into(), for_bifrost)?;
+        let (id_update, other_data) = DataRequest::<IDK>::new(self.into(), for_bifrost)?;
 
         // Parse custom data
         let custom_data = other_data

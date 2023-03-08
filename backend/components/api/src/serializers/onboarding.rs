@@ -1,4 +1,5 @@
 use db::models::onboarding::{Onboarding, OnboardingAndConfig, SerializableOnboardingInfo};
+use newtypes::IdentityDataKind as IDK;
 use newtypes::LivenessSource;
 
 use crate::utils::db2api::DbToApi;
@@ -26,7 +27,7 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
 
         let can_access_data_attributes = can_access_data
             .iter()
-            .flat_map(|x| x.identity_attributes().unwrap_or_default())
+            .flat_map(|x| x.attributes::<IDK>().unwrap_or_default())
             .collect();
         api_wire_types::Onboarding {
             id,

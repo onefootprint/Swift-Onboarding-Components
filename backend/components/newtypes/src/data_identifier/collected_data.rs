@@ -1,4 +1,7 @@
-use crate::{BusinessDataKind as BDK, DataIdentifier, DataIdentifierKind, IdentityDataKind as IDK};
+use crate::{
+    BusinessDataKind as BDK, DataIdentifier, DataIdentifierKind, DataIdentifierSubtype,
+    IdentityDataKind as IDK,
+};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -184,7 +187,7 @@ impl CollectedDataOption {
         }
     }
 
-    pub fn attributes(&self) -> Option<Vec<DataIdentifier>> {
+    pub fn data_identifiers(&self) -> Option<Vec<DataIdentifier>> {
         // Maybe this could migrate to DataIdentifiers
         match self {
             Self::Name => Some(vec![IDK::FirstName.into(), IDK::LastName.into()]),
@@ -219,34 +222,36 @@ impl CollectedDataOption {
         }
     }
 
-    pub fn identity_attributes(&self) -> Option<Vec<IDK>> {
-        self.attributes()?
-            .into_iter()
-            .map(|di| di.try_into())
-            .collect::<Result<_, _>>()
-            .ok()
+    pub fn attributes<T>(&self) -> Option<Vec<T>>
+    where
+        T: DataIdentifierSubtype,
+    {
+        self.data_identifiers().and_then(|dis| {
+            dis.into_iter()
+                .map(|di| di.try_into())
+                .collect::<Result<_, _>>()
+                .ok()
+        })
     }
 
-    pub fn required_identity_attributes(&self) -> Option<Vec<IDK>> {
+    pub fn required_attributes<T>(&self) -> Option<Vec<T>>
+    where
+        T: DataIdentifierSubtype,
+    {
         let result = self
-            .identity_attributes()?
+            .attributes::<T>()?
             .into_iter()
             .filter(|k| !k.is_optional())
             .collect();
         Some(result)
     }
 
-    pub fn business_attributes(&self) -> Option<Vec<BDK>> {
-        self.attributes()?
-            .into_iter()
-            .map(|di| di.try_into())
-            .collect::<Result<_, _>>()
-            .ok()
-    }
-
     /// Given a list of IdentityDataKinds (maybe collected via API), computes the set of
     /// CollectedDataOptions represented by this list of IdentityDataKinds
-    pub fn list_from(kinds: Vec<IDK>) -> HashSet<Self> {
+    pub fn list_from<T>(kinds: Vec<T>) -> HashSet<Self>
+    where
+        T: DataIdentifierSubtype,
+    {
         let kinds: HashSet<_> = kinds.into_iter().collect();
         // For each CollectedData variant, figure out which of the options (if any) is represented
         // in the list of kinds
@@ -258,10 +263,10 @@ impl CollectedDataOption {
                 possible_options
                     .into_iter()
                     .rev()
-                    // Skip CDOs that don't have related IDKs, like Document
-                    .filter_map(|cdo| cdo.required_identity_attributes().map(|idks| (cdo, idks)))
-                    .find(|(_, idks)| {
-                        let required_attrs = HashSet::from_iter(idks.iter().cloned());
+                    // Skip CDOs that aren't related to T
+                    .filter_map(|cdo| cdo.required_attributes::<T>().map(|attrs| (cdo, attrs)))
+                    .find(|(_, attrs)| {
+                        let required_attrs = HashSet::from_iter(attrs.iter().cloned());
                         kinds.is_superset(&required_attrs)
                     }).map(|(cdo, _)| cdo)
             })
@@ -282,13 +287,14 @@ impl CollectedDataOption {
 
 #[cfg(test)]
 mod test {
-    use super::HasParentCdo;
-    use crate::{CollectedData, CollectedDataOption as CDO, IdentityDataKind};
+    use crate::{
+        BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, DataIdentifierSubtype,
+        HasParentCdo, IdentityDataKind as IDK,
+    };
     use itertools::Itertools;
     use std::collections::HashSet;
     use strum::IntoEnumIterator;
     use test_case::test_case;
-    use IdentityDataKind::*;
 
     #[test]
     fn test_collected_data_options() {
@@ -302,7 +308,7 @@ mod test {
 
             let attrs_for_options: Vec<_> = options
                 .into_iter()
-                .map(|dlk| dlk.required_identity_attributes())
+                .map(|dlk| dlk.required_attributes::<IDK>())
                 .collect();
             let is_sorted = attrs_for_options.windows(2).all(|w| {
                 w[0].as_ref().map(|o| o.len()).unwrap_or_default()
@@ -326,32 +332,46 @@ mod test {
 
     #[test]
     fn test_idk_parent() {
-        for idk in IdentityDataKind::iter() {
+        for idk in IDK::iter() {
             // Parent's children should contain self
             assert!(idk
                 .parent()
                 .options()
                 .into_iter()
-                .flat_map(|cdo| cdo.identity_attributes().unwrap_or_default())
+                .flat_map(|cdo| cdo.attributes::<IDK>().unwrap_or_default())
                 .contains(&idk));
         }
     }
 
-    #[test_case(vec![FirstName] => HashSet::from_iter([]))]
-    #[test_case(vec![FirstName, LastName] => HashSet::from_iter([CDO::Name]))]
-    #[test_case(vec![FirstName, LastName, Dob, Email] => HashSet::from_iter([CDO::Name, CDO::Dob, CDO::Email]))]
-    #[test_case(vec![Ssn4, Dob] => HashSet::from_iter([CDO::Ssn4, CDO::Dob]))]
-    #[test_case(vec![Ssn4, Ssn9, Dob] => HashSet::from_iter([CDO::Ssn9, CDO::Dob]))]
-    #[test_case(vec![Ssn9] => HashSet::from_iter([]))]
-    #[test_case(vec![Zip, Country] => HashSet::from_iter([CDO::PartialAddress]))]
-    #[test_case(vec![AddressLine1, City, State, Zip, Country] => HashSet::from_iter([CDO::FullAddress]))]
-    #[test_case(vec![AddressLine1, AddressLine2, City, State, Zip, Country] => HashSet::from_iter([CDO::FullAddress]))]
-    #[test_case(vec![AddressLine1, AddressLine2, City, State, Zip, Country, FirstName] => HashSet::from_iter([CDO::FullAddress]))]
-    #[test_case(vec![AddressLine1, AddressLine2, City, State, Zip, Country, FirstName, LastName] => HashSet::from_iter([CDO::FullAddress, CDO::Name]))]
-    #[test_case(vec![Zip, Ssn4, LastName, Country, FirstName] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name]))]
-    #[test_case(vec![Zip, Ssn4, LastName, Country, FirstName, Dob, Email, PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
-    #[test_case(vec![City, State, Zip, Ssn4, LastName, Country, FirstName, Dob, Email, PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
-    fn test_parse_list_of_kinds(kinds: Vec<IdentityDataKind>) -> HashSet<CDO> {
+    // Identity CDOs
+    #[test_case(vec![IDK::FirstName] => HashSet::from_iter([]))]
+    #[test_case(vec![IDK::FirstName, IDK::LastName] => HashSet::from_iter([CDO::Name]))]
+    #[test_case(vec![IDK::FirstName, IDK::LastName, IDK::Dob, IDK::Email] => HashSet::from_iter([CDO::Name, CDO::Dob, CDO::Email]))]
+    #[test_case(vec![IDK::Ssn4, IDK::Dob] => HashSet::from_iter([CDO::Ssn4, CDO::Dob]))]
+    #[test_case(vec![IDK::Ssn4, IDK::Ssn9, IDK::Dob] => HashSet::from_iter([CDO::Ssn9, CDO::Dob]))]
+    #[test_case(vec![IDK::Ssn9] => HashSet::from_iter([]))]
+    #[test_case(vec![IDK::Zip, IDK::Country] => HashSet::from_iter([CDO::PartialAddress]))]
+    #[test_case(vec![IDK::AddressLine1, IDK::City, IDK::State, IDK::Zip, IDK::Country] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![IDK::AddressLine1, IDK::AddressLine2, IDK::City, IDK::State, IDK::Zip, IDK::Country] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![IDK::AddressLine1, IDK::AddressLine2, IDK::City, IDK::State, IDK::Zip, IDK::Country, IDK::FirstName] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![IDK::AddressLine1, IDK::AddressLine2, IDK::City, IDK::State, IDK::Zip, IDK::Country, IDK::FirstName, IDK::LastName] => HashSet::from_iter([CDO::FullAddress, CDO::Name]))]
+    #[test_case(vec![IDK::Zip, IDK::Ssn4, IDK::LastName, IDK::Country, IDK::FirstName] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name]))]
+    #[test_case(vec![IDK::Zip, IDK::Ssn4, IDK::LastName, IDK::Country, IDK::FirstName, IDK::Dob, IDK::Email, IDK::PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
+    #[test_case(vec![IDK::City, IDK::State, IDK::Zip, IDK::Ssn4, IDK::LastName, IDK::Country, IDK::FirstName, IDK::Dob, IDK::Email, IDK::PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
+    // Business CDOs
+    #[test_case(vec![BDK::Name] => HashSet::from_iter([CDO::BusinessName]))]
+    #[test_case(vec![BDK::Ein] => HashSet::from_iter([CDO::BusinessEin]))]
+    #[test_case(vec![BDK::AddressLine1] => HashSet::from_iter([]))]
+    #[test_case(vec![BDK::AddressLine2] => HashSet::from_iter([]))]
+    #[test_case(vec![BDK::AddressLine1, BDK::City, BDK::State, BDK::Zip, BDK::Country] => HashSet::from_iter([CDO::BusinessAddress]))]
+    #[test_case(vec![BDK::AddressLine1, BDK::AddressLine2, BDK::City, BDK::State, BDK::Zip, BDK::Country] => HashSet::from_iter([CDO::BusinessAddress]))]
+    #[test_case(vec![BDK::PhoneNumber] => HashSet::from_iter([CDO::BusinessPhoneNumber]))]
+    #[test_case(vec![BDK::Website] => HashSet::from_iter([CDO::BusinessWebsite]))]
+    #[test_case(vec![BDK::BeneficialOwners] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
+    fn test_parse_list_of_kinds<T>(kinds: Vec<T>) -> HashSet<CDO>
+    where
+        T: DataIdentifierSubtype,
+    {
         CDO::list_from(kinds)
     }
 }

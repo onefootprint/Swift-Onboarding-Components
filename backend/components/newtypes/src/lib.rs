@@ -77,7 +77,7 @@ pub enum Error {
     #[error("Expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
     #[error("{0}")]
-    ParsingError(#[from] data_identifier::Error),
+    ParsingError(#[from] data_identifier::ValidationError),
     #[error("{0}")]
     ValidationError(#[from] DataValidationError),
     #[error("{0}")]
@@ -86,30 +86,15 @@ pub enum Error {
     VdKindConversionError(#[from] VdKindConversionError),
 }
 
-impl Error {
-    /// Shorthand to create a key-value map of errors
-    pub fn new_validation_error<'a, T>(errors: T) -> Self
-    where
-        T: IntoIterator<Item = (IdentityDataKind, &'a str)>,
-    {
-        // TODO can i rm this now?
-        let errors = errors
-            .into_iter()
-            .map(|(idk, e)| (idk, Error::Custom(e.to_string())))
-            .collect();
-        DataValidationError::FieldValidationError(errors).into()
-    }
-}
-
 use std::collections::HashMap;
 use strum::Display;
 
 #[derive(Debug, Display)]
 pub enum DataValidationError {
-    /// There are additional IDKs provided that aren't part of any CDO
-    ExtraFieldError(Vec<IdentityDataKind>),
-    /// One or more IDKs weren't able to be verified
-    FieldValidationError(HashMap<IdentityDataKind, Error>),
+    /// There are additional data identifiers provided that aren't part of any CDO
+    ExtraFieldError(Vec<(CollectedData, DataIdentifier)>),
+    /// One or more data identifiers weren't able to be verified
+    FieldValidationError(HashMap<DataIdentifier, Error>),
 }
 
 #[derive(Debug, Clone)]
@@ -141,15 +126,12 @@ impl DataValidationError {
         let err = match self {
             Self::ExtraFieldError(x) => x
                 .iter()
-                .map(|idk| {
-                    let err_str = format!("Cannot vault without other {} data", idk.parent());
-                    (DataIdentifier::from(*idk).to_string(), err_str)
+                .map(|(cd, di): &(_, DataIdentifier)| {
+                    let err_str = format!("Cannot vault without other {} data", cd);
+                    (di.to_string(), err_str)
                 })
                 .collect(),
-            Self::FieldValidationError(x) => x
-                .iter()
-                .map(|(k, v)| (DataIdentifier::from(*k).to_string(), v.to_string()))
-                .collect(),
+            Self::FieldValidationError(x) => x.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
         };
         ErrorMessage::Map(err)
     }

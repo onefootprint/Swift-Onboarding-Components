@@ -15,7 +15,7 @@ use db::{
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataLifetimeKind, IdentityDataKind, IdentityDataUpdate, PersonVaultDataKind,
+    CollectedDataOption, DataLifetimeKind, DataRequest, IdentityDataKind as IDK, PersonVaultDataKind,
     PiiString, ScopedUserId, VaultId, VaultPublicKey,
 };
 
@@ -26,7 +26,7 @@ pub struct PvdBuilder {
 
 impl PvdBuilder {
     /// Construct the list of NewUserVaultData from an IdentityDataUpdate
-    pub fn build(update: IdentityDataUpdate, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
+    pub fn build(update: DataRequest<IDK>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
         let mut data = vec![];
 
         let mut add_sealed = |pii: PiiString, kind: PersonVaultDataKind| -> ApiResult<()> {
@@ -58,14 +58,14 @@ impl PvdBuilder {
     pub fn validate_and_save(
         self,
         conn: &mut TxnPgConn,
-        existing_fields: Vec<IdentityDataKind>, // portable or speculative on UVW
+        existing_fields: Vec<IDK>, // portable or speculative on UVW
         user_vault_id: VaultId,
         scoped_user_id: ScopedUserId,
         fingerprints: NewFingerprints,
     ) -> ApiResult<()> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
-        let new_fields = self.data.iter().map(|d| d.kind.into()).collect();
+        let new_fields = self.data.iter().map(|d| IDK::from(d.kind)).collect();
         let existing = CollectedDataOption::list_from(existing_fields);
         let new = CollectedDataOption::list_from(new_fields);
         let offending_partial_cdo =
@@ -83,7 +83,7 @@ impl PvdBuilder {
         // We will only deactivate speculative, uncommitted data here - never portable data
         let kinds_to_deactivate = new
             .iter()
-            .flat_map(|cdo| cdo.identity_attributes().unwrap_or_default())
+            .flat_map(|cdo| cdo.attributes::<IDK>().unwrap_or_default())
             .map(DataLifetimeKind::from)
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -96,7 +96,7 @@ impl PvdBuilder {
         let kind_to_lifetime = vds
             .into_iter()
             .map(|vd| {
-                IdentityDataKind::try_from(vd.kind)
+                IDK::try_from(vd.kind)
                     .map(|idk| (idk, vd.lifetime_id))
                     .map_err(|e| ApiError::NewtypeError(newtypes::Error::VdKindConversionError(e)))
             })

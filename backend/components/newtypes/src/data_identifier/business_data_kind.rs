@@ -3,6 +3,8 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
+use crate::DataIdentifierSubtype;
+
 #[derive(
     Debug,
     Display,
@@ -36,4 +38,10 @@ pub enum BusinessDataKind {
     Zip,
     Country,
     BeneficialOwners,
+}
+
+impl DataIdentifierSubtype for BusinessDataKind {
+    fn is_optional(&self) -> bool {
+        matches!(self, Self::AddressLine2)
+    }
 }
