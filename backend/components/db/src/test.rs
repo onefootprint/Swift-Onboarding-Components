@@ -75,7 +75,7 @@ mod test {
     use crate::{test_helpers, DbResult};
     use diesel::sql_types::Text;
     use diesel::{sql_query, RunQueryDsl};
-    use newtypes::{EncryptedVaultPrivateKey, VaultPublicKey};
+    use newtypes::{EncryptedVaultPrivateKey, VaultKind, VaultPublicKey};
 
     #[actix_rt::test]
     async fn test_db() {
@@ -99,14 +99,15 @@ mod test {
             .await
             .expect("couldn't make DB query");
 
-        let new_user = crate::models::vault::NewPortablePersonUserVaultArgs {
+        let new_user = crate::models::vault::NewVaultArgs {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
             is_live: false,
             is_portable: true,
+            kind: VaultKind::Person,
         };
         pool.db_transaction(|conn| -> DbResult<_> {
-            let result = Vault::create_person_vault(conn, new_user)?.into_inner();
+            let result = Vault::create(conn, new_user)?.into_inner();
             Ok(result)
         })
         .await

@@ -15,7 +15,6 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
-use super::scoped_user::ScopedUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vault)]
@@ -150,63 +149,13 @@ impl Vault {
     }
 
     #[tracing::instrument(skip_all)]
-    fn create(conn: &mut PgConn, new_user: NewVaultRow) -> DbResult<Locked<Vault>> {
+    pub fn create(conn: &mut PgConn, new_user: NewVaultArgs) -> DbResult<Locked<Vault>> {
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user)
             .get_result::<Vault>(conn)?;
         Ok(Locked::new(user_vault))
     }
 
-    #[tracing::instrument(skip_all)]
-    pub fn create_person_vault(
-        conn: &mut PgConn,
-        args: NewPortablePersonUserVaultArgs,
-    ) -> DbResult<Locked<Vault>> {
-        let NewPortablePersonUserVaultArgs {
-            e_private_key,
-            public_key,
-            is_live,
-            is_portable,
-        } = args;
-
-        let args = NewVaultRow {
-            e_private_key,
-            public_key,
-            is_live,
-            is_portable,
-            kind: VaultKind::Person,
-        };
-
-        Self::create(conn, args)
-    }
-
-    /// Create a NON-portable, tenant-scoped vault + a scoped user for the tenant and the vault
-    #[tracing::instrument(skip_all)]
-    pub fn create_non_portable_person_vault(
-        conn: &mut TxnPgConn,
-        req: NewNonPortablePersonUserVaultReq,
-    ) -> DbResult<ScopedUser> {
-        let NewNonPortablePersonUserVaultReq {
-            e_private_key,
-            public_key,
-            is_live,
-            tenant_id,
-        } = req;
-
-        let new_user_vault = NewVaultRow {
-            e_private_key,
-            public_key,
-            is_live,
-            is_portable: false,
-            kind: VaultKind::Person,
-        };
-        let user_vault = Self::create(conn, new_user_vault)?;
-        let scoped_user = ScopedUser::create_non_portable(conn, user_vault, tenant_id)?;
-
-        Ok(scoped_user)
-    }
-
-    #[tracing::instrument(skip_all)]
     /// Look for the portable user vault with a matching fingerprint
     #[tracing::instrument(skip_all)]
     pub fn find_portable(conn: &mut PgConn, sh_data: Fingerprint) -> DbResult<Option<Vault>> {
@@ -242,30 +191,16 @@ impl Vault {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = user_vault)]
-struct NewVaultRow {
-    e_private_key: EncryptedVaultPrivateKey,
-    public_key: VaultPublicKey,
-    is_live: IsLive,
-    is_portable: bool,
-    kind: VaultKind,
+pub struct NewVaultArgs {
+    pub e_private_key: EncryptedVaultPrivateKey,
+    pub public_key: VaultPublicKey,
+    pub is_live: IsLive,
+    pub is_portable: bool,
+    pub kind: VaultKind,
 }
 
 pub struct NewVaultInfo {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub is_live: IsLive,
-}
-
-pub struct NewPortablePersonUserVaultArgs {
-    pub e_private_key: EncryptedVaultPrivateKey,
-    pub public_key: VaultPublicKey,
-    pub is_live: IsLive,
-    pub is_portable: bool,
-}
-
-pub struct NewNonPortablePersonUserVaultReq {
-    pub e_private_key: EncryptedVaultPrivateKey,
-    pub public_key: VaultPublicKey,
-    pub is_live: IsLive,
-    pub tenant_id: TenantId,
 }

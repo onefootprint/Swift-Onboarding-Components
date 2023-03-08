@@ -11,18 +11,17 @@ use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
-use db::models::vault::NewPortablePersonUserVaultArgs;
-use db::models::vault::NewVaultInfo;
 use db::models::vault::Vault;
+use db::models::vault::{NewVaultArgs, NewVaultInfo};
 use db::models::vault_data::VaultData;
 use db::HasLifetime;
 use db::PgConn;
 use db::TxnPgConn;
-use newtypes::CollectedDataOption;
 use newtypes::DataCollectedInfo;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataPriority;
 use newtypes::Locked;
+use newtypes::{CollectedDataOption, VaultKind};
 use std::marker::PhantomData;
 
 impl<Type> VaultWrapper<Type> {
@@ -96,13 +95,14 @@ impl VaultWrapper<Person> {
         ob_config: Option<ObConfiguration>,
         phone_args: NewPhoneNumberArgs,
     ) -> ApiResult<Locked<Vault>> {
-        let new_user_vault = NewPortablePersonUserVaultArgs {
+        let new_user_vault = NewVaultArgs {
             e_private_key: user_info.e_private_key,
             public_key: user_info.public_key,
             is_live: user_info.is_live,
             is_portable: true,
+            kind: VaultKind::Person,
         };
-        let uv = Vault::create_person_vault(conn, new_user_vault)?;
+        let uv = Vault::create(conn, new_user_vault)?;
         let su_id = if let Some(ob_config) = ob_config {
             let su = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
             Some(su.id)
