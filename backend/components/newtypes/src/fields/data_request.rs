@@ -65,10 +65,7 @@ where
     fn extra_keys(keys: Vec<T>) -> Vec<T> {
         // Get all the CDOs represented in here
         let cdos = CollectedDataOption::list_from(keys.clone());
-        let represented_identifiers: HashSet<T> = cdos
-            .into_iter()
-            .flat_map(|cdo| cdo.attributes().unwrap_or_default())
-            .collect();
+        let represented_identifiers: HashSet<T> = cdos.into_iter().flat_map(|cdo| cdo.attributes()).collect();
         // Keys given minus represented keys
         let keys: HashSet<T> = keys.into_iter().collect();
         keys.difference(&represented_identifiers).cloned().collect_vec()

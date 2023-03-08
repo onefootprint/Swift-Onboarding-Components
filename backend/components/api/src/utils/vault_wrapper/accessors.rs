@@ -18,7 +18,6 @@ impl VaultWrapper<Person> {
             .iter()
             .filter(|cdo| {
                 cdo.required_attributes::<IDK>()
-                    .unwrap_or_default()
                     .iter()
                     .any(|d| !self.has_identity_field(*d))
             })

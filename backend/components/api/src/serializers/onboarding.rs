@@ -27,7 +27,7 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
 
         let can_access_data_attributes = can_access_data
             .iter()
-            .flat_map(|x| x.attributes::<IDK>().unwrap_or_default())
+            .flat_map(|x| x.attributes::<IDK>())
             .collect();
         api_wire_types::Onboarding {
             id,

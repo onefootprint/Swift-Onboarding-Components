@@ -82,12 +82,12 @@ impl WriteableUvw {
         let speculative_kinds_to_commit: Vec<_> = d
             .to_portablize
             .into_iter()
-            .flat_map(|o| o.attributes::<IDK>().unwrap_or_default())
+            .flat_map(|o| o.attributes::<IDK>())
             .collect();
         let speculative_kinds_to_deactivate: Vec<_> = d
             .to_deactivate
             .into_iter()
-            .flat_map(|o| o.attributes::<IDK>().unwrap_or_default())
+            .flat_map(|o| o.attributes::<IDK>())
             .collect();
 
         //

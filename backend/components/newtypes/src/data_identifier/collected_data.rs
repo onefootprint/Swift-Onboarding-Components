@@ -187,7 +187,8 @@ impl CollectedDataOption {
         }
     }
 
-    pub fn data_identifiers(&self) -> Option<Vec<DataIdentifier>> {
+    /// Maps each CDO to the list of DataIdentifiers to be collected for the option
+    fn data_identifiers(&self) -> Option<Vec<DataIdentifier>> {
         // Maybe this could migrate to DataIdentifiers
         match self {
             Self::Name => Some(vec![IDK::FirstName.into(), IDK::LastName.into()]),
@@ -222,28 +223,32 @@ impl CollectedDataOption {
         }
     }
 
-    pub fn attributes<T>(&self) -> Option<Vec<T>>
+    /// Maps the CDO to the list of Ts represented by the CDO, if self represents T. Otherwise,
+    /// returns an empty list.
+    pub fn attributes<T>(&self) -> Vec<T>
     where
         T: DataIdentifierSubtype,
     {
-        self.data_identifiers().and_then(|dis| {
-            dis.into_iter()
-                .map(|di| di.try_into())
-                .collect::<Result<_, _>>()
-                .ok()
-        })
+        self.data_identifiers()
+            .and_then(|dis| {
+                dis.into_iter()
+                    .map(|di| di.try_into())
+                    .collect::<Result<_, _>>()
+                    .ok()
+            })
+            .unwrap_or_default()
     }
 
-    pub fn required_attributes<T>(&self) -> Option<Vec<T>>
+    /// Maps the CDO to the list of Ts that are required and are represented by the CDO, if self
+    /// represents T. Otherwise, returns an empty list.
+    pub fn required_attributes<T>(&self) -> Vec<T>
     where
         T: DataIdentifierSubtype,
     {
-        let result = self
-            .attributes::<T>()?
+        self.attributes::<T>()
             .into_iter()
             .filter(|k| !k.is_optional())
-            .collect();
-        Some(result)
+            .collect()
     }
 
     /// Given a list of IdentityDataKinds (maybe collected via API), computes the set of
@@ -263,12 +268,16 @@ impl CollectedDataOption {
                 possible_options
                     .into_iter()
                     .rev()
-                    // Skip CDOs that aren't related to T
-                    .filter_map(|cdo| cdo.required_attributes::<T>().map(|attrs| (cdo, attrs)))
+                    .filter_map(|cdo| {
+                        let attributes = cdo.required_attributes::<T>();
+                        // Skip CDOs that aren't related to T
+                        (!attributes.is_empty()).then_some((cdo, attributes))
+                    })
                     .find(|(_, attrs)| {
                         let required_attrs = HashSet::from_iter(attrs.iter().cloned());
                         kinds.is_superset(&required_attrs)
-                    }).map(|(cdo, _)| cdo)
+                    })
+                    .map(|(cdo, _)| cdo)
             })
             .collect()
     }
@@ -307,13 +316,21 @@ mod test {
             assert!(options.get(0).unwrap().full_variant() == options.get(1).cloned());
 
             let attrs_for_options: Vec<_> = options
-                .into_iter()
+                .iter()
                 .map(|dlk| dlk.required_attributes::<IDK>())
                 .collect();
-            let is_sorted = attrs_for_options.windows(2).all(|w| {
-                w[0].as_ref().map(|o| o.len()).unwrap_or_default()
-                    <= w[1].as_ref().map(|o| o.len()).unwrap_or_default()
-            });
+            let is_sorted = attrs_for_options.windows(2).all(|w| w[0].len() <= w[1].len());
+            assert!(
+                is_sorted,
+                "Options for CollectedData {} are not in ascending order",
+                cd
+            );
+
+            let attrs_for_options: Vec<_> = options
+                .iter()
+                .map(|dlk| dlk.required_attributes::<BDK>())
+                .collect();
+            let is_sorted = attrs_for_options.windows(2).all(|w| w[0].len() <= w[1].len());
             assert!(
                 is_sorted,
                 "Options for CollectedData {} are not in ascending order",
@@ -338,8 +355,21 @@ mod test {
                 .parent()
                 .options()
                 .into_iter()
-                .flat_map(|cdo| cdo.attributes::<IDK>().unwrap_or_default())
+                .flat_map(|cdo| cdo.attributes::<IDK>())
                 .contains(&idk));
+        }
+    }
+
+    #[test]
+    fn test_bdk_parent() {
+        for bdk in BDK::iter() {
+            // Parent's children should contain self
+            assert!(bdk
+                .parent()
+                .options()
+                .into_iter()
+                .flat_map(|cdo| cdo.attributes::<BDK>())
+                .contains(&bdk));
         }
     }
 
