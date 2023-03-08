@@ -28,19 +28,11 @@ use strum_macros::{AsRefStr, EnumString};
 #[diesel(sql_type = Text)]
 pub enum DecisionStatus {
     // The ordering of this enum matters
-    StepUpRequired, // TODO maybe remove this variant in decisions v2
     Fail,
     Pass,
 }
 
 crate::util::impl_enum_str_diesel!(DecisionStatus);
-
-impl DecisionStatus {
-    /// We need to re-run identity check logic if the user is still in "StepUpRequired" state
-    pub fn new_decision_required(&self) -> bool {
-        matches!(self, Self::StepUpRequired)
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -49,8 +41,6 @@ mod tests {
     use super::DecisionStatus;
     use std::cmp::Ordering;
 
-    #[test_case(DecisionStatus::StepUpRequired, DecisionStatus::Fail => Ordering::Less)]
-    #[test_case(DecisionStatus::StepUpRequired, DecisionStatus::Pass => Ordering::Less)]
     #[test_case(DecisionStatus::Fail, DecisionStatus::Pass => Ordering::Less)]
     fn test_cmp_signal_severity(s1: DecisionStatus, s2: DecisionStatus) -> Ordering {
         // Test ordering since we rely on it to extract minimum status

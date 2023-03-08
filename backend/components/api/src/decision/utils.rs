@@ -221,7 +221,6 @@ async fn setup_test_fixtures(
                     FootprintReasonCode::PhoneNumberLocatedIsVoip,
                     FootprintReasonCode::EmailDomainCorporate,
                 ],
-                _ => vec![],
             };
             let signals = reason_codes
                 .into_iter()
