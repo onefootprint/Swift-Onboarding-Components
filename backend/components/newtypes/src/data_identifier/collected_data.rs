@@ -1,4 +1,4 @@
-use crate::IdentityDataKind;
+use crate::{BusinessDataKind, IdentityDataKind};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -20,6 +20,14 @@ pub enum CollectedData {
     Email,
     PhoneNumber,
     Document,
+
+    // TODO: maybe nest these
+    BusinessName,
+    BusinessEin,
+    BusinessAddress,
+    BusinessPhoneNumber,
+    BusinessWebsite,
+    BusinessBeneficialOwners,
 }
 
 impl CollectedData {
@@ -37,6 +45,12 @@ impl CollectedData {
             Self::Ssn => vec![Ssn4, Ssn9],
             Self::Address => vec![PartialAddress, FullAddress],
             Self::Document => vec![Document, DocumentAndSelfie],
+            Self::BusinessName => vec![BusinessName],
+            Self::BusinessEin => vec![BusinessEin],
+            Self::BusinessAddress => vec![BusinessAddress],
+            Self::BusinessPhoneNumber => vec![BusinessPhoneNumber],
+            Self::BusinessWebsite => vec![BusinessWebsite],
+            Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners],
         }
     }
 }
@@ -100,6 +114,14 @@ pub enum CollectedDataOption {
     PhoneNumber,
     Document,
     DocumentAndSelfie,
+
+    // TODO: maybe nest these
+    BusinessName,
+    BusinessEin,
+    BusinessAddress,
+    BusinessPhoneNumber,
+    BusinessWebsite,
+    BusinessBeneficialOwners,
 }
 
 crate::util::impl_enum_str_diesel!(CollectedDataOption);
@@ -115,6 +137,12 @@ impl CollectedDataOption {
             Self::PhoneNumber => CollectedData::PhoneNumber,
             Self::Document => CollectedData::Document,
             Self::DocumentAndSelfie => CollectedData::Document,
+            Self::BusinessName => CollectedData::BusinessName,
+            Self::BusinessEin => CollectedData::BusinessEin,
+            Self::BusinessAddress => CollectedData::BusinessAddress,
+            Self::BusinessPhoneNumber => CollectedData::BusinessPhoneNumber,
+            Self::BusinessWebsite => CollectedData::BusinessWebsite,
+            Self::BusinessBeneficialOwners => CollectedData::BusinessBeneficialOwners,
         }
     }
 
@@ -136,14 +164,32 @@ impl CollectedDataOption {
             Self::PartialAddress => Some(vec![IdentityDataKind::Zip, IdentityDataKind::Country]),
             Self::Email => Some(vec![IdentityDataKind::Email]),
             Self::PhoneNumber => Some(vec![IdentityDataKind::PhoneNumber]),
-            Self::Document => None,
-            Self::DocumentAndSelfie => None,
+            _ => None,
         }
     }
 
     pub fn required_identity_attributes(&self) -> Option<Vec<IdentityDataKind>> {
         self.identity_attributes()
             .map(|options| options.into_iter().filter(|k| !k.is_optional()).collect())
+    }
+
+    pub fn business_attributes(&self) -> Option<Vec<BusinessDataKind>> {
+        // Maybe this could migrate to DataIdentifiers
+        match self {
+            Self::BusinessName => Some(vec![BusinessDataKind::Name]),
+            Self::BusinessEin => Some(vec![BusinessDataKind::Ein]),
+            Self::BusinessAddress => Some(vec![
+                BusinessDataKind::AddressLine1,
+                BusinessDataKind::AddressLine2,
+                BusinessDataKind::City,
+                BusinessDataKind::State,
+                BusinessDataKind::Zip,
+                BusinessDataKind::Country,
+            ]),
+            Self::BusinessPhoneNumber => Some(vec![BusinessDataKind::PhoneNumber]),
+            Self::BusinessWebsite => Some(vec![BusinessDataKind::Website]),
+            _ => None,
+        }
     }
 
     /// Given a list of IdentityDataKinds (maybe collected via API), computes the set of

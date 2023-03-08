@@ -25,7 +25,7 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 #[serde(rename_all = "snake_case")]
 /// Represents data that is collected about a particular Business
 pub enum BusinessDataKind {
-    Name,
+    Name, // TODO DBA
     Website,
     PhoneNumber,
     Ein,
@@ -35,4 +35,5 @@ pub enum BusinessDataKind {
     State,
     Zip,
     Country,
+    BeneficialOwners,
 }
