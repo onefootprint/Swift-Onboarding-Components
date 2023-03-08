@@ -1,28 +1,28 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Label, { LabelProps } from './label';
+import FormLabel, { FormLabelProps } from './form-label';
 
-describe('<Label />', () => {
-  const renderLabel = ({
+describe('<FormLabel />', () => {
+  const renderFormLabelLabel = ({
     children = 'Lorem',
     htmlFor = 'ipsu',
     hasError = false,
     size = 'default',
-  }: Partial<LabelProps>) =>
+  }: Partial<FormLabelProps>) =>
     customRender(
-      <Label htmlFor={htmlFor} hasError={hasError} size={size}>
+      <FormLabel htmlFor={htmlFor} hasError={hasError} size={size}>
         {children}
-      </Label>,
+      </FormLabel>,
     );
 
   it('should render the text', () => {
-    renderLabel({ children: 'Lorem' });
+    renderFormLabelLabel({ children: 'Lorem' });
     expect(screen.getByText('Lorem')).toBeInTheDocument();
   });
 
   it('should append the attribute for', () => {
-    renderLabel({ children: 'Lorem', htmlFor: 'ipsum' });
+    renderFormLabelLabel({ children: 'Lorem', htmlFor: 'ipsum' });
     const label = screen.getByText('Lorem') as HTMLLabelElement;
     expect(label.getAttribute('for')).toEqual('ipsum');
   });

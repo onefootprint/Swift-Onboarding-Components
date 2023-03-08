@@ -1,21 +1,21 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export type LabelProps = {
+export type FormLabelProps = {
   children: string;
   hasError?: boolean;
-  htmlFor: string;
+  htmlFor?: string;
   id?: string;
   size?: 'default' | 'compact';
 };
 
-const Label = ({
+const FormLabel = ({
   children,
   hasError = false,
   htmlFor,
   id,
   size = 'default',
-}: LabelProps) => (
+}: FormLabelProps) => (
   <Container>
     <StyledLabel
       className="fp-label"
@@ -54,4 +54,4 @@ const StyledLabel = styled.label`
   }}
 `;
 
-export default Label;
+export default FormLabel;

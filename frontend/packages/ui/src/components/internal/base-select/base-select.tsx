@@ -3,8 +3,8 @@ import { usePopper } from 'react-popper';
 import ReactSelect, { OptionProps } from 'react-select';
 import styled, { useTheme } from 'styled-components';
 
+import Label from '../../form-label';
 import Hint from '../hint';
-import Label from '../label';
 import type { BaseSelectOption } from './base-select.types';
 import modifiers from './base-select.utils';
 import Control from './components/control';

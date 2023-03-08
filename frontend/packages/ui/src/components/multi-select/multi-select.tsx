@@ -9,7 +9,7 @@ import Select, {
 import { useTheme } from 'styled-components';
 
 import Box from '../box';
-import Label from '../internal/label';
+import Label from '../form-label';
 import {
   ClearIndicator,
   DropdownIndicator,

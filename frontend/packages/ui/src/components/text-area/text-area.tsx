@@ -2,9 +2,9 @@ import React, { forwardRef, TextareaHTMLAttributes, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import Box from '../box';
+import Label from '../form-label';
 import Field, { FieldProps } from '../internal/field';
 import Hint from '../internal/hint';
-import Label from '../internal/label';
 
 export type TextAreaProps = FieldProps &
   TextareaHTMLAttributes<HTMLTextAreaElement>;
