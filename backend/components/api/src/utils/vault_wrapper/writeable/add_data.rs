@@ -44,6 +44,10 @@ impl WriteableUvw {
         let DecomposedPutRequest {
             id_update,
             custom_data,
+            // TODO actually write this data
+            // TODO check that you don't add business data on a non-business vault
+            // TODO business writeable VW?
+            business_data: _,
         } = request;
         let new_cdos = CollectedDataOption::list_from(id_update.keys().cloned().collect());
 

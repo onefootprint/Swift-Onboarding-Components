@@ -90,6 +90,19 @@ impl SessionContext<UserSession> {
             .next()
     }
 
+    /// Extracts the business vault_id from the `UserAuthScope::Business` scope on this session, if
+    /// exists
+    pub fn scoped_business_id(&self) -> Option<ScopedUserId> {
+        self.data
+            .scopes
+            .iter()
+            .filter_map(|x| match x {
+                UserAuthScope::Business(id) => Some(id.clone()),
+                _ => None,
+            })
+            .next()
+    }
+
     /// Fetch the scoped_user info
     pub fn scoped_user(&self, conn: &mut PgConn) -> ApiResult<Option<ScopedUser>> {
         let Some(scoped_user_id) = self.scoped_user_id() else {
