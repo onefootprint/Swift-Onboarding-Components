@@ -1,10 +1,8 @@
-use crate::{CollectedDataOption, DataIdentifier, IdentityDataKind as IDK, PiiString};
+use crate::{CollectedDataOption, DataIdentifier, IdentityDataKind as IDK, PiiString, Validate};
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
-
-use super::parsing::clean_and_validate_field;
 
 type DataRequest = HashMap<DataIdentifier, PiiString>;
 type IdentityDataRequest = HashMap<IDK, PiiString>;
@@ -57,7 +55,7 @@ fn clean_and_validate_id_data(
     let (cleaned_id_data, errors): (HashMap<_, _>, HashMap<_, _>) =
         id_data
             .into_iter()
-            .partition_map(|(k, v)| match clean_and_validate_field(k, v, for_bifrost) {
+            .partition_map(|(k, v)| match k.validate(v, for_bifrost) {
                 Ok(v) => Left((k, v)),
                 Err(v) => Right((k, v)),
             });

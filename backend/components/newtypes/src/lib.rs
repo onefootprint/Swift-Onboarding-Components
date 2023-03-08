@@ -73,7 +73,7 @@ pub enum Error {
     #[error("Expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
     #[error("{0}")]
-    ParsingError(#[from] fields::parsing::Error),
+    ParsingError(#[from] data_identifier::Error),
     #[error("{0}")]
     ValidationError(#[from] DataValidationError),
     #[error("{0}")]

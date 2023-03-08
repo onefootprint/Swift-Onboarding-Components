@@ -34,11 +34,12 @@ mod collected_data;
 mod data_lifetime_kind;
 mod id_doc_kind;
 mod identity_data_kind;
+mod validation;
 mod vd_kind;
 
 pub use self::{
     business_data_kind::*, collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*,
-    vd_kind::*,
+    validation::*, vd_kind::*,
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,

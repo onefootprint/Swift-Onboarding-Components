@@ -7,7 +7,6 @@ mod pii;
 pub mod sandbox;
 pub use identity_data::*;
 pub use pii::*;
-pub mod parsing;
 pub mod put_data_request;
 
 pub mod api_schema_helper {

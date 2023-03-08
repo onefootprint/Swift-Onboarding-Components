@@ -1,51 +1,32 @@
-use crate::{email::Email, NtResult};
+use crate::{email::Email, NtResult, Validate};
 use chrono::{Datelike, NaiveDate};
 use regex::Regex;
 use std::str::FromStr;
 
 use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
 
-/// Performs basic cleaning and validation for all data that we store in our vaults.
-/// When `for_bifrost` is true, performs more advanced validation that attempts to proactively
-/// prevent sending invalid data for verification to vendors
-pub(super) fn clean_and_validate_field(idk: IDK, input: PiiString, for_bifrost: bool) -> NtResult<PiiString> {
-    let result = match idk {
-        IDK::FirstName => validate_name(input, for_bifrost)?,
-        IDK::LastName => validate_name(input, for_bifrost)?,
-        IDK::Dob => clean_and_validate_dob(input, for_bifrost)?,
-        IDK::Ssn4 => clean_and_validate_ssn4(input)?,
-        IDK::Ssn9 => clean_and_validate_ssn9(input)?,
-        IDK::AddressLine1 => validate_address(input, for_bifrost)?,
-        IDK::AddressLine2 => input,
-        IDK::City => input,
-        IDK::State => input, // maybe we'll want to validate state based on country some day
-        IDK::Zip => clean_and_validate_zip(input)?,
-        IDK::Country => clean_and_validate_country(input)?,
-        IDK::Email => Email::from_str(input.leak())?.to_piistring(),
-        IDK::PhoneNumber => PhoneNumber::parse(input)?.e164_with_suffix(),
-    };
-    Ok(result)
+use super::{Error, VResult};
+
+impl Validate for IDK {
+    fn validate(&self, value: PiiString, for_bifrost: bool) -> NtResult<PiiString> {
+        let result = match self {
+            IDK::FirstName => validate_name(value, for_bifrost)?,
+            IDK::LastName => validate_name(value, for_bifrost)?,
+            IDK::Dob => clean_and_validate_dob(value, for_bifrost)?,
+            IDK::Ssn4 => clean_and_validate_ssn4(value)?,
+            IDK::Ssn9 => clean_and_validate_ssn9(value)?,
+            IDK::AddressLine1 => validate_address(value, for_bifrost)?,
+            IDK::AddressLine2 => value,
+            IDK::City => value,
+            IDK::State => value, // maybe we'll want to validate state based on country some day
+            IDK::Zip => clean_and_validate_zip(value)?,
+            IDK::Country => clean_and_validate_country(value)?,
+            IDK::Email => Email::from_str(value.leak())?.to_piistring(),
+            IDK::PhoneNumber => PhoneNumber::parse(value)?.e164_with_suffix(),
+        };
+        Ok(result)
+    }
 }
-
-#[derive(Debug, thiserror::Error)]
-/// These are all of the errors that can occur when cleaning and validating input data
-pub enum Error {
-    #[error("Invalid length")]
-    InvalidLength,
-    #[error("Invalid character: can only provide ascii digits")]
-    NonDigitCharacter,
-    #[error("Invalid character: can only provide alphanumeric with `-` or ` `")]
-    InvalidZipCharacter,
-    #[error("Invalid country code: must provide two-digit ISO 3166 country code")]
-    InvalidCountry,
-    #[error("Invalid date: must provide a valid date in ISO 8601 format, YYYY-MM-DD")]
-    InvalidDate,
-    #[error("The entered date of birth results in an improbable age")]
-    ImprobableDob,
-}
-
-pub(super) type VResult<T> = Result<T, Error>;
-
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     let date = NaiveDate::parse_from_str(input.leak(), "%Y-%m-%d").map_err(|_| Error::InvalidDate)?;
     if for_bifrost && date.year() < 1900 {
@@ -136,10 +117,10 @@ fn clean_and_validate_country(input: PiiString) -> VResult<PiiString> {
 
 #[cfg(test)]
 mod test {
-    use super::clean_and_validate_field;
     use super::IDK::*;
     use crate::IdentityDataKind as IDK;
     use crate::PiiString;
+    use crate::Validate;
     use test_case::test_case;
 
     #[test_case(FirstName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]
@@ -172,7 +153,7 @@ mod test {
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
     #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
-        clean_and_validate_field(idk, PiiString::new(pii.to_owned()), false)
+        idk.validate(PiiString::new(pii.to_owned()), false)
             .ok()
             .map(|pii| pii.leak_to_string())
     }
@@ -186,7 +167,7 @@ mod test {
     #[test_case(LastName, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
     #[test_case(AddressLine1, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
     fn test_clean_and_validate_field_for_bifrost(idk: IDK, pii: &str) -> Option<String> {
-        clean_and_validate_field(idk, PiiString::new(pii.to_owned()), true)
+        idk.validate(PiiString::new(pii.to_owned()), true)
             .ok()
             .map(|pii| pii.leak_to_string())
     }
