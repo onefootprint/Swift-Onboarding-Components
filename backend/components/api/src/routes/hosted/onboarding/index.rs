@@ -14,6 +14,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingCreateArgs;
+use db::models::scoped_user::ScopedUser;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use newtypes::SessionAuthToken;
@@ -81,7 +82,11 @@ pub async fn post(
                 };
                 let business_vault = Vault::create(conn, args)?;
                 BusinessOwner::create(conn, user_vault.id.clone(), business_vault.id.clone())?;
-                Some(UserAuthScope::Business(business_vault.into_inner().id))
+                let ob_config_id = scoped_user.ob_configuration_id.ok_or_else(|| {
+                    ApiError::AssertionError("Expected scoped user vault to have ob config id".to_owned())
+                })?;
+                let su = ScopedUser::get_or_create(conn, &business_vault, ob_config_id)?;
+                Some(UserAuthScope::Business(su.id))
             } else {
                 None
             };

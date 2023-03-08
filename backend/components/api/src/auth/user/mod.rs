@@ -24,7 +24,7 @@ pub enum UserAuthScope {
     SignUp,
     OrgOnboardingInit { id: ScopedUserId },
     OrgOnboarding,
-    Business(VaultId),
+    Business(ScopedUserId),
     BasicProfile,
     ExtendedProfile,
     SensitiveProfile,

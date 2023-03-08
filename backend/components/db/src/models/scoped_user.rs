@@ -93,7 +93,6 @@ impl ScopedUser {
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
-        // OR should we take in the ObConfiguration?
         ob_configuration_id: ObConfigurationId,
     ) -> DbResult<Self> {
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
