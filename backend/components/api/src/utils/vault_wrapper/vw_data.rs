@@ -126,7 +126,7 @@ impl<Type> VwData<Type> {
 impl VwData<Person> {
     fn vd(&self, kind: IdentityDataKind) -> Option<&VaultData> {
         self.vd.iter().find(|d| match d.kind {
-            VdKind::Id(p) => IdentityDataKind::from(p) == kind,
+            VdKind::Id(p) => p == kind,
             VdKind::Business(_) => false,
         })
     }

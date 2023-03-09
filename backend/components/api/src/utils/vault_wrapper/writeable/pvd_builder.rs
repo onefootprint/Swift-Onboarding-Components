@@ -12,11 +12,9 @@ use db::{
     },
     TxnPgConn,
 };
-use either::Either::{Left, Right};
-use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataLifetimeKind, DataRequest, IdentityDataKind as IDK, PersonVaultDataKind,
-    PiiString, ScopedUserId, VaultId, VaultPublicKey,
+    CollectedDataOption, DataLifetimeKind, DataRequest, IdentityDataKind as IDK, PiiString, ScopedUserId,
+    VaultId, VaultPublicKey,
 };
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
@@ -29,25 +27,12 @@ impl PvdBuilder {
     pub fn build(update: DataRequest<IDK>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
         let mut data = vec![];
 
-        let mut add_sealed = |pii: PiiString, kind: PersonVaultDataKind| -> ApiResult<()> {
+        let mut add_sealed = |pii: PiiString, kind: IDK| -> ApiResult<()> {
             let sealed = vault_public_key.seal_pii(&pii)?;
             data.push(NewPersonVaultData { kind, e_data: sealed });
             Ok(())
         };
-
-        let (update, invalid_fields): (Vec<_>, Vec<_>) =
-            update.into_inner().into_iter().partition_map(|(kind, pii)| {
-                if let Some(kind) = kind.person_vault_data_kind() {
-                    Left((kind, pii))
-                } else {
-                    Right(kind)
-                }
-            });
-        if !invalid_fields.is_empty() {
-            return Err(UserError::InvalidDataKind(invalid_fields.into()).into());
-        }
-
-        for (kind, pii) in update {
+        for (kind, pii) in update.into_inner() {
             add_sealed(pii, kind)?;
         }
 
@@ -65,7 +50,7 @@ impl PvdBuilder {
     ) -> ApiResult<()> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
-        let new_fields = self.data.iter().map(|d| IDK::from(d.kind)).collect();
+        let new_fields = self.data.iter().map(|d| d.kind).collect();
         let existing = CollectedDataOption::list_from(existing_fields);
         let new = CollectedDataOption::list_from(new_fields);
         let offending_partial_cdo =

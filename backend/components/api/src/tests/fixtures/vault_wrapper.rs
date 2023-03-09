@@ -1,4 +1,4 @@
-use newtypes::{Locked, PersonVaultDataKind, SealedVaultBytes};
+use newtypes::{IdentityDataKind, Locked, SealedVaultBytes};
 
 use db::{
     models::{
@@ -6,8 +6,8 @@ use db::{
         ob_configuration::ObConfiguration,
         scoped_user::ScopedUser,
         tenant::Tenant,
-        vault_data::{NewPersonVaultData, VaultData},
         vault::Vault,
+        vault_data::{NewPersonVaultData, VaultData},
     },
     tests::prelude::TestPgConn,
 };
@@ -31,15 +31,15 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     // Add identity data
     let data = vec![
         NewPersonVaultData {
-            kind: PersonVaultDataKind::FirstName,
+            kind: IdentityDataKind::FirstName,
             e_data: SealedVaultBytes(vec![1]),
         },
         NewPersonVaultData {
-            kind: PersonVaultDataKind::LastName,
+            kind: IdentityDataKind::LastName,
             e_data: SealedVaultBytes(vec![2]),
         },
         NewPersonVaultData {
-            kind: PersonVaultDataKind::Ssn4,
+            kind: IdentityDataKind::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },
     ];

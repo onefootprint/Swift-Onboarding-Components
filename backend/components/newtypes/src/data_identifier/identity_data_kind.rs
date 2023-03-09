@@ -1,4 +1,4 @@
-use crate::{IsDataIdentifierDiscriminant, PersonVaultDataKind, PiiString, SaltedFingerprint};
+use crate::{IsDataIdentifierDiscriminant, PiiString, SaltedFingerprint};
 use crypto::sha256;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -82,11 +82,6 @@ impl IdentityDataKind {
                 | Self::AddressLine1
                 | Self::Dob
         )
-    }
-
-    /// Gets the PersonVaultDataKind represented by this IdentityDataKind, if exists
-    pub fn person_vault_data_kind(&self) -> Option<PersonVaultDataKind> {
-        PersonVaultDataKind::iter().find(|k| Self::from(*k) == *self)
     }
 }
 

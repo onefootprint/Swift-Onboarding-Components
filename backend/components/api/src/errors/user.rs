@@ -1,4 +1,4 @@
-use newtypes::{output::Csv, CollectedDataOption, DataIdentifier, IdentityDataKind};
+use newtypes::{CollectedDataOption, DataIdentifier, IdentityDataKind};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -14,5 +14,5 @@ pub enum UserError {
     #[error("Data update is not allowed without business")]
     NotAllowedWithoutBusiness,
     #[error("Unable to add {0} in this method")]
-    InvalidDataKind(Csv<IdentityDataKind>),
+    InvalidDataKind(IdentityDataKind),
 }

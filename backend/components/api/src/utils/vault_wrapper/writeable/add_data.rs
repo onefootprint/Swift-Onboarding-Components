@@ -191,6 +191,13 @@ impl WriteableUvw {
         let existing_fields = self.get_populated_identity_fields();
         let uv = self.user_vault();
 
+        // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
+        if let Some(idk) = [IdentityDataKind::PhoneNumber, IdentityDataKind::Email]
+            .iter()
+            .find(|k| update.contains_key(k))
+        {
+            return Err(UserError::InvalidDataKind(*idk).into());
+        }
         let builder = PvdBuilder::build(update, uv.public_key.clone())?;
         builder.validate_and_save(
             conn,

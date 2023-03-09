@@ -9,7 +9,7 @@ use diesel::prelude::*;
 use newtypes::BusinessDataKind;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
-use newtypes::PersonVaultDataKind;
+use newtypes::IdentityDataKind;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
 use newtypes::VaultId;
@@ -30,7 +30,7 @@ pub struct VaultData {
     pub e_data: SealedVaultBytes,
 }
 
-pub type NewPersonVaultData = NewUserVaultData<PersonVaultDataKind>;
+pub type NewPersonVaultData = NewUserVaultData<IdentityDataKind>;
 pub type NewBusinessVaultData = NewUserVaultData<BusinessDataKind>;
 pub struct NewUserVaultData<T>
 where
