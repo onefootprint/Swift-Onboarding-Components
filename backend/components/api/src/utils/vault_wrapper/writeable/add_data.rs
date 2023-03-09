@@ -1,9 +1,10 @@
 use super::vd_builder::VdBuilder;
-use super::WriteableUvw;
+use super::WriteableVw;
 use crate::auth::AuthError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::utils::fingerprint::NewFingerprints;
+use crate::utils::vault_wrapper::{Business, Person};
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
@@ -16,7 +17,7 @@ use newtypes::{
     BusinessDataKind, CollectedDataOption, DataCollectedInfo, DataPriority, DataRequest, EmailId,
     Fingerprint, IdentityDataKind as IDK, KvDataKey, PiiString,
 };
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
@@ -24,7 +25,7 @@ use std::str::FromStr;
 /// These are the publically accessible utils to update data on a VaultWrapper.
 /// They use the private, xxx_unsafe methods, which cannot be exposed publically because they don't
 /// take ownership over the VaultWrapper that is potentially stale after an update
-impl WriteableUvw {
+impl<Type> WriteableVw<Type> {
     pub fn update_custom_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
@@ -32,9 +33,11 @@ impl WriteableUvw {
     ) -> ApiResult<()> {
         self.update_custom_data_unsafe(conn, update)
     }
+}
 
-    /// Util function to make updates to multiple pieces of the UserVault in one transaction
-    pub fn put_data(
+impl WriteableVw<Person> {
+    /// Util function to make updates to multiple pieces of the Vault in one transaction
+    pub fn put_person_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DecomposedPutRequest,
@@ -44,9 +47,7 @@ impl WriteableUvw {
         let DecomposedPutRequest {
             id_update,
             custom_data,
-            // TODO check that you don't add business data on a non-business vault
-            // TODO business writeable VW?
-            business_data,
+            business_data: _, // TODO error if business data provided
         } = request;
         let new_cdos = CollectedDataOption::list_from(id_update.keys().cloned().collect());
 
@@ -66,10 +67,6 @@ impl WriteableUvw {
             }
             Ok(())
         };
-        // Update business data
-        if !business_data.is_empty() {
-            self.update_business_data_unsafe(conn, business_data)?;
-        }
         // Update custom data
         if !custom_data.is_empty() {
             self.update_custom_data_unsafe(conn, custom_data)?;
@@ -93,30 +90,52 @@ impl WriteableUvw {
         } else {
             None
         };
-        // Update UserVaultData
+        // Update VaultData
         if !id_update.is_empty() {
             assert_non_portable()?;
             self.update_identity_data_unsafe(conn, id_update, id_fingerprints)?;
         }
 
-        // Add UserTimeline for all the newly added data
-        if !new_cdos.is_empty() {
-            // Create a timeline event that shows all the new data that was added
-            UserTimeline::create(
-                conn,
-                DataCollectedInfo {
-                    attributes: new_cdos.into_iter().collect(),
-                },
-                self.vault.id.clone(),
-                Some(self.scoped_user_id.clone()),
-            )?;
-        }
+        // Add timeline event for all the newly added data
+        self.add_timeline_event(conn, new_cdos)?;
+
         Ok(new_email_id)
     }
 }
 
+impl WriteableVw<Business> {
+    /// Util function to make updates to multiple pieces of the Vault in one transaction
+    pub fn put_business_data(
+        self, // consume self, since we don't want stale data getting used
+        conn: &mut TxnPgConn,
+        request: DecomposedPutRequest,
+    ) -> ApiResult<()> {
+        let DecomposedPutRequest {
+            id_update: _, // TODO error if ID data
+            custom_data,
+            // TODO check that you don't add business data on a non-business vault
+            business_data,
+        } = request;
+        let new_cdos = CollectedDataOption::list_from(business_data.keys().cloned().collect());
+
+        // Update business data
+        if !business_data.is_empty() {
+            self.update_business_data_unsafe(conn, business_data)?;
+        }
+        // Update custom data
+        if !custom_data.is_empty() {
+            self.update_custom_data_unsafe(conn, custom_data)?;
+        }
+
+        // Add timeline event for all the newly added data
+        self.add_timeline_event(conn, new_cdos)?;
+
+        Ok(())
+    }
+}
+
 // Private methods that don't consume self to allow batching multiple
-impl WriteableUvw {
+impl WriteableVw<Person> {
     fn add_phone_number_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
@@ -212,7 +231,9 @@ impl WriteableUvw {
 
         Ok(())
     }
+}
 
+impl WriteableVw<Business> {
     fn update_business_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
@@ -233,7 +254,9 @@ impl WriteableUvw {
 
         Ok(())
     }
+}
 
+impl<Type> WriteableVw<Type> {
     fn update_custom_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
@@ -258,16 +281,35 @@ impl WriteableUvw {
         KeyValueData::bulk_create(conn, &self.vault().id, &self.scoped_user_id, updates, seqno)?;
         Ok(())
     }
+
+    fn add_timeline_event(&self, conn: &mut TxnPgConn, cdos: HashSet<CollectedDataOption>) -> ApiResult<()> {
+        // Add UserTimeline for all the newly added data
+        if !cdos.is_empty() {
+            // Create a timeline event that shows all the new data that was added
+            UserTimeline::create(
+                conn,
+                DataCollectedInfo {
+                    attributes: cdos.into_iter().collect(),
+                },
+                self.vault.id.clone(),
+                Some(self.scoped_user_id.clone()),
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{errors::ApiResult, utils::vault_wrapper::WriteableUvw};
+    use crate::{
+        errors::ApiResult,
+        utils::vault_wrapper::{Person, WriteableVw},
+    };
     use db::TxnPgConn;
     use newtypes::{put_data_request::PutDataRequest, DataIdentifier, Fingerprint, PiiString};
     use std::collections::HashMap;
 
-    impl WriteableUvw {
+    impl WriteableVw<Person> {
         /// Shorthand to add data to a user vault in tests
         pub fn add_data_test(
             self,
@@ -281,7 +323,7 @@ mod test {
                 .keys()
                 .map(|idk| (*idk, Fingerprint(vec![])))
                 .collect();
-            self.put_data(conn, request, fingerprints, true)?;
+            self.put_person_data(conn, request, fingerprints, true)?;
             Ok(())
         }
     }

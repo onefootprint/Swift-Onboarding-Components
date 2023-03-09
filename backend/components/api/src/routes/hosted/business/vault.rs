@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::vault_wrapper::checks::pre_add_data_checks;
-use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
 use newtypes::put_data_request::PutDataRequest;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -45,11 +43,11 @@ pub async fn put(
             let scoped_business_id = user_auth
                 .scoped_business_id()
                 .ok_or(UserError::NotAllowedWithoutBusiness)?;
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_business_id)?;
+            let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &scoped_business_id)?;
 
             // TODO fingerprints
             // TODO make this do something with business data
-            uvw.put_data(conn, request, HashMap::new(), true)?;
+            uvw.put_business_data(conn, request)?;
             Ok(())
         })
         .await?;

@@ -1,6 +1,7 @@
-use super::WriteableUvw;
+use super::WriteableVw;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::Person;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
@@ -61,7 +62,8 @@ fn decide_data_to_commit(data: CurrentData) -> DataToCommit {
     }
 }
 
-impl WriteableUvw {
+// Can only commit identity data
+impl WriteableVw<Person> {
     /// Marks all speculative identity data data as portable in order to make it portable after
     /// it is verified by an approved onboarding.
     /// Intentionally consumes the UVW to prevent using a stale reference

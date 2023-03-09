@@ -52,11 +52,6 @@ impl VaultWrapper<Person> {
             &self.portable.identity_documents
         }
     }
-
-    pub fn kv_data(&self) -> &HashMap<KvDataKey, KeyValueData> {
-        // We don't currently support portable kv data
-        &self.speculative.kv_data
-    }
 }
 
 impl VaultWrapper<Person> {
@@ -83,5 +78,10 @@ impl<Type> VaultWrapper<Type> {
     /// helper to expose a reference/deref coercion to the underlying vault (normally from a LockedVaultWrapper)
     pub fn vault(&self) -> &Vault {
         &self.vault
+    }
+
+    pub fn kv_data(&self) -> &HashMap<KvDataKey, KeyValueData> {
+        // We don't currently support portable kv data
+        &self.speculative.kv_data
     }
 }

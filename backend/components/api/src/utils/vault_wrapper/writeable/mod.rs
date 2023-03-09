@@ -1,6 +1,6 @@
 use newtypes::{Locked, ScopedUserId};
 
-use super::{Person, VaultWrapper};
+use super::VaultWrapper;
 use derive_more::Deref;
 
 mod add_data;
@@ -25,8 +25,8 @@ mod vd_builder;
 /// Since LockedVaultWrapper is not Sync/Send, we know that it cannot enter multiple threads at once AND (more importantly) it cannot be returned from a closure, leading
 /// to us using the stale data.
 #[derive(Deref)]
-pub struct WriteableUvw {
+pub struct WriteableVw<Type> {
     #[deref]
-    uvw: Locked<VaultWrapper<Person>>,
+    uvw: Locked<VaultWrapper<Type>>,
     scoped_user_id: ScopedUserId,
 }

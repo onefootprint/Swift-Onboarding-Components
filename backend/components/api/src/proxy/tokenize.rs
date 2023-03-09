@@ -2,6 +2,7 @@ use super::IngressRule;
 use crate::auth::tenant::TenantAuth;
 use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
+use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::access_event::NewAccessEvent;
@@ -43,7 +44,8 @@ pub async fn vault_pii(
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let scoped_user = ScopedUser::get(conn, (&fp_id, &tenant_id, is_live))?;
-                let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
+                // TODO what happens if we want to vault data in a business vault?
+                let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_user.id)?;
 
                 // vault the custom data
                 let custom: HashMap<KvDataKey, _> = values

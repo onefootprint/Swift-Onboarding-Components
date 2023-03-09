@@ -61,7 +61,7 @@ pub async fn put(
             let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-            uvw.put_data(conn, request, fingerprints, false)?;
+            uvw.put_person_data(conn, request, fingerprints, false)?;
 
             // Create an access event to show data was added
             NewAccessEvent {
