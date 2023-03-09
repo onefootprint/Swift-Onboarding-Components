@@ -77,14 +77,20 @@ const Article = styled.article`
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-shadow: ${theme.elevation[1]};
 
   ${media.greaterThan('md')`
     display: flex;
     flex-direction: row;
+    box-shadow: ${theme.elevation[0]};
     gap: ${theme.spacing[8]};
     padding: ${theme.spacing[8]};
     border: none;
   `}
+
+  &:hover {
+    box-shadow: ${theme.elevation[0]};
+   }
 
   @media (hover: hover) {
     &:hover {
@@ -122,21 +128,24 @@ const Header = styled.div`
 `;
 
 const ImageContainer = styled.div`
-  overflow: hidden;
-  flex-shrink: 0;
-  height: 180px;
-  width: 100%;
-
-  img {
-    object-fit: cover;
-    object-position: center;
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadius.default};
+    overflow: hidden;
+    flex-shrink: 0;
+    height: 180px;
     width: 100%;
-    height: 100%;
-  }
 
-  ${media.greaterThan('md')`
-    height: 240px;
-    width: 240px;
+    img {
+      object-fit: cover;
+      object-position: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    ${media.greaterThan('md')`
+      height: 240px;
+      width: 240px;
+    `}
   `}
 `;
 

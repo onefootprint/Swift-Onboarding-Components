@@ -27,44 +27,51 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
     <>
       <SEO title={t('html-title')} slug="/investor-updates" />
       <Container>
-        <TwitterBreadcrumb
-          title={t('breadcrumb.title')}
-          description={t('breadcrumb.description')}
-          twitterLabel={t('breadcrumb.twitter')}
-        />
-        <Posts>
-          {posts.map((post, index) => {
-            const createdDate = new Date(post.created_at);
-            const shouldHideDate =
-              createdDate < INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE;
-            const formattedCreatedDate = shouldHideDate
-              ? undefined
-              : formatDateWithLongMonth(createdDate);
+        <InvestorsContent>
+          <TwitterBreadcrumb
+            title={t('breadcrumb.title')}
+            description={t('breadcrumb.description')}
+            twitterLabel={t('breadcrumb.twitter')}
+          />
+          <Posts>
+            {posts.map((post, index) => {
+              const createdDate = new Date(post.created_at);
+              const shouldHideDate =
+                createdDate < INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE;
+              const formattedCreatedDate = shouldHideDate
+                ? undefined
+                : formatDateWithLongMonth(createdDate);
 
-            return (
-              <InvestorUpdatePreview
-                index={posts.length - index}
-                href={`/investor-updates/${post.slug}`}
-                createdAt={formattedCreatedDate}
-                excerpt={post.excerpt}
-                key={post.uuid}
-                title={post.title}
-                image={post.feature_image}
-              />
-            );
-          })}
-        </Posts>
-        <Divider />
-        <SubscribeToNewsletter />
+              return (
+                <InvestorUpdatePreview
+                  index={posts.length - index}
+                  href={`/investor-updates/${post.slug}`}
+                  createdAt={formattedCreatedDate}
+                  excerpt={post.excerpt}
+                  key={post.uuid}
+                  title={post.title}
+                  image={post.feature_image}
+                />
+              );
+            })}
+          </Posts>
+          <Divider />
+          <SubscribeToNewsletter />
+        </InvestorsContent>
       </Container>
     </>
   );
 };
 
+const InvestorsContent = styled.div`
+  max-width: 960px;
+  margin: auto;
+`;
+
 const Posts = styled.div`
   ${({ theme }) => css`
     display: grid;
-    grid-gap: ${theme.spacing[8]};
+    grid-gap: ${theme.spacing[7]};
     margin-bottom: ${theme.spacing[8]};
 
     ${media.greaterThan('md')`

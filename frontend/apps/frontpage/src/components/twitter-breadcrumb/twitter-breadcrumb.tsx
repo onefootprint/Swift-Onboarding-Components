@@ -41,8 +41,8 @@ const Breadcrumb = styled.div`
     border-radius: ${theme.borderRadius.default};
     display: flex;
     justify-content: space-between;
-    margin: 0 calc(${theme.spacing[5]} * -1) 0;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    width: 100%;
 
     ${media.greaterThan('lg')`
       margin: initial;
