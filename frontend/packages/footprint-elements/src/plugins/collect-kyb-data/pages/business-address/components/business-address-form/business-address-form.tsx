@@ -13,12 +13,11 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import { BusinessAddressData } from '../../../../utils/state-machine/types';
 import getAddressComponent from '../../utils/get-address-components';
 import getInitialCountry from '../../utils/get-initial-country';
 import getInitialState from '../../utils/get-initial-state';
-import CityField from '../city-field/city-field';
+import CityField from '../city-field';
 import CountryField from '../country-field';
 import StateField from '../state-field';
 import ZipField from '../zip-field';
@@ -32,36 +31,35 @@ type FormData = {
   [BusinessDataAttribute.zip]: string;
 };
 
-type BusinessAddressFormProps = {
+export type BusinessAddressFormProps = {
+  defaultValues?: BusinessAddressData;
   isLoading: boolean;
   onSubmit: (businessAddress: BusinessAddressData) => void;
   ctaLabel?: string;
-  hideHeader?: boolean;
 };
 
 const BusinessAddressForm = ({
+  defaultValues,
   isLoading,
   ctaLabel,
   onSubmit,
 }: BusinessAddressFormProps) => {
-  const [state] = useCollectKybDataMachine();
-  const { data } = state.context;
   const { allT, t } = useTranslation('pages.business-address.form');
 
   const methods = useForm<FormData>({
     defaultValues: {
       [BusinessDataAttribute.country]: getInitialCountry(
-        data[BusinessDataAttribute.country],
+        defaultValues?.[BusinessDataAttribute.country],
       ),
       [BusinessDataAttribute.state]: getInitialState(
-        data[BusinessDataAttribute.state],
+        defaultValues?.[BusinessDataAttribute.state],
       ),
-      [BusinessDataAttribute.city]: data[BusinessDataAttribute.city],
-      [BusinessDataAttribute.zip]: data[BusinessDataAttribute.zip],
+      [BusinessDataAttribute.city]: defaultValues?.[BusinessDataAttribute.city],
+      [BusinessDataAttribute.zip]: defaultValues?.[BusinessDataAttribute.zip],
       [BusinessDataAttribute.addressLine1]:
-        data[BusinessDataAttribute.addressLine1],
+        defaultValues?.[BusinessDataAttribute.addressLine1],
       [BusinessDataAttribute.addressLine2]:
-        data[BusinessDataAttribute.addressLine2],
+        defaultValues?.[BusinessDataAttribute.addressLine2],
     },
   });
 

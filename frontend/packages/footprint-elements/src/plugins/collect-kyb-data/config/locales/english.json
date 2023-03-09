@@ -25,7 +25,7 @@
         },
         "ein": {
           "label": "Employer Identification Number (EIN)",
-          "placeholder": "12-9182031",
+          "placeholder": "12-3456789",
           "error": "EIN cannot be empty or is invalid"
         }
       }
@@ -45,7 +45,7 @@
         },
         "city": {
           "label": "City",
-          "placeholder": "Brooklyn",
+          "placeholder": "New York",
           "error": "City cannot be empty"
         },
         "state": {

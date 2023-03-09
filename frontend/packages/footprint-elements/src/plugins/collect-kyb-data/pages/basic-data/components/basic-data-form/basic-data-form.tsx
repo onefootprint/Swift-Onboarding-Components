@@ -5,24 +5,23 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import { BasicData } from '../../../../utils/state-machine/types';
 
 type FormData = BasicData;
 
-type BasicDataFormProps = {
+export type BasicDataFormProps = {
+  defaultValues?: BasicData;
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
   ctaLabel?: string;
 };
 
 const BasicDataForm = ({
+  defaultValues,
   isLoading,
   onSubmit,
   ctaLabel,
 }: BasicDataFormProps) => {
-  const [state] = useCollectKybDataMachine();
-  const { data } = state.context;
   const { allT, t } = useTranslation('pages.basic-data.form');
 
   const {
@@ -30,10 +29,7 @@ const BasicDataForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    defaultValues: {
-      [BusinessDataAttribute.name]: data[BusinessDataAttribute.name],
-      [BusinessDataAttribute.ein]: data[BusinessDataAttribute.ein],
-    },
+    defaultValues,
   });
 
   const onSubmitFormData = (formData: FormData) => {
@@ -59,6 +55,7 @@ const BasicDataForm = ({
         {...register(BusinessDataAttribute.name, { required: true })}
       />
       <TextInput
+        type="number"
         data-private
         hasError={!!errors[BusinessDataAttribute.ein]}
         hint={errors[BusinessDataAttribute.ein] ? t('ein.error') : undefined}

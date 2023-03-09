@@ -73,6 +73,9 @@
     "styled-components": "5.x"
   },
   "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
+    "preset": "@onefootprint/jest-presets/jest/web",
+    "setupFiles": [
+      "<rootDir>/src/plugins/collect-kyb-data/config/initializers/react-i18next-test.ts"
+    ]
   }
 }
