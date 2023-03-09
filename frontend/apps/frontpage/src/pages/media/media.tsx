@@ -29,7 +29,7 @@ const Media = ({ articles }: MediaProps) => {
         <Articles>
           {articles.map(article => (
             <ArticleItem
-              createdAt={article.createdAt}
+              publishedAt={article.publishedAt}
               excerpt={article.excerpt}
               id={article.id}
               imageAlt={article.imageAlt}

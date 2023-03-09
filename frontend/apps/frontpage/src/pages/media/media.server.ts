@@ -9,7 +9,7 @@ const getStaticProps: GetStaticProps = () => {
       url: 'https://www.fastcompany.com/90831259/this-gen-z-tech-ceo-wants-to-build-the-apple-pay-of-identity-a-one-stop-shop-for-your-data',
       imageUrl: '/media/fast-co.png',
       imageAlt: 'Our founder and CEO, Eli Wachs.',
-      createdAt: 'Jan 7, 2023',
+      publishedAt: 'Jan 7, 2023',
       website: 'Fast Company',
       title:
         'This Gen-Z tech CEO wants to build the Apple Pay of identity—a one-stop shop for your data',
@@ -21,7 +21,7 @@ const getStaticProps: GetStaticProps = () => {
       url: 'https://open.spotify.com/show/6k1YLBvORRMyosKy3x1xIl',
       imageUrl: '/media/not-boring.png',
       imageAlt: 'Our founders, Eli and Alex',
-      createdAt: 'Aug 5, 2022',
+      publishedAt: 'Aug 5, 2022',
       website: 'Not Boring Podcast',
       title: 'Not Boring founders: Eli Wachs & Alex Grinman',
       excerpt:
@@ -33,7 +33,7 @@ const getStaticProps: GetStaticProps = () => {
       imageUrl: '/media/techcrunch.png',
       imageAlt:
         'Young Asian woman using face recognition software via smartphone, in front of colourful neon signboards in busy downtown city street at night. Biometric verification and artificial intelligence concept',
-      createdAt: 'Aug 3, 2022',
+      publishedAt: 'Aug 3, 2022',
       website: 'TechCrunch',
       title:
         'Footprint wants to change how companis collect, store and share personal data',
@@ -45,7 +45,7 @@ const getStaticProps: GetStaticProps = () => {
       imageAlt: 'Eli, our co-founder, being interviewed by Shardul Shah',
       url: 'https://www.indexventures.com/perspectives/footprint-emerges-from-stealth-to-transform-digital-identity/',
       imageUrl: '/media/index-ventures.png',
-      createdAt: 'Aug 3, 2022',
+      publishedAt: 'Aug 3, 2022',
       website: 'Index Ventures',
       title: 'Footprint Emerges from Stealth to Transform Digital Identity',
       excerpt:
@@ -56,7 +56,7 @@ const getStaticProps: GetStaticProps = () => {
       imageAlt: 'Green silhouette of a person made up of 0 and 1',
       url: 'https://www.darkreading.com/dr-tech/new-startup-footprint-tackles-identity-verification',
       imageUrl: '/media/dark-reading.png',
-      createdAt: 'Aug 3, 2022',
+      publishedAt: 'Aug 3, 2022',
       website: 'DARKReading',
       title: 'Startup Footprint Tackles Identity Verification',
       excerpt:
@@ -67,7 +67,7 @@ const getStaticProps: GetStaticProps = () => {
       imageAlt: 'Footprint logo',
       url: 'https://lererhippeau.medium.com/please-welcome-footprint-the-last-identity-form-youll-ever-fill-out-cc917d252b4e',
       imageUrl: '/media/lerer-hippeau.png',
-      createdAt: 'Aug 3, 2022',
+      publishedAt: 'Aug 3, 2022',
       website: 'Lerer Hippeau',
       title:
         'Please welcome Footprint, the last identity form you’ll ever fill out',

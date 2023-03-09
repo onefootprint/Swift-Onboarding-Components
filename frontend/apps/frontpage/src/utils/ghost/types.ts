@@ -38,6 +38,7 @@ export type Tag = {
 
 export type Post = {
   created_at: string;
+  published_at: string;
   excerpt: string;
   reading_time: number;
   feature_image: string;
@@ -53,6 +54,7 @@ export type Post = {
 export type PostDetails = {
   canonical_url: string;
   created_at: string;
+  published_at: string;
   excerpt: string;
   feature_image_alt?: string;
   feature_image: string;

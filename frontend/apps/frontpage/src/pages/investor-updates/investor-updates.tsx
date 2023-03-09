@@ -9,7 +9,6 @@ import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import InvestorUpdatePreview from './components/investor-update-preview';
-import INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE from './constants';
 
 export const getStaticProps = async () => {
   const posts = await getInitialPosts(PostType.investorUpdate);
@@ -34,26 +33,19 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
             twitterLabel={t('breadcrumb.twitter')}
           />
           <Posts>
-            {posts.map((post, index) => {
-              const createdDate = new Date(post.created_at);
-              const shouldHideDate =
-                createdDate < INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE;
-              const formattedCreatedDate = shouldHideDate
-                ? undefined
-                : formatDateWithLongMonth(createdDate);
-
-              return (
-                <InvestorUpdatePreview
-                  index={posts.length - index}
-                  href={`/investor-updates/${post.slug}`}
-                  createdAt={formattedCreatedDate}
-                  excerpt={post.excerpt}
-                  key={post.uuid}
-                  title={post.title}
-                  image={post.feature_image}
-                />
-              );
-            })}
+            {posts.map((post, index) => (
+              <InvestorUpdatePreview
+                index={posts.length - index}
+                href={`/investor-updates/${post.slug}`}
+                publishedAt={formatDateWithLongMonth(
+                  new Date(post.published_at),
+                )}
+                excerpt={post.excerpt}
+                key={post.uuid}
+                title={post.title}
+                image={post.feature_image}
+              />
+            ))}
           </Posts>
           <Divider />
           <SubscribeToNewsletter />

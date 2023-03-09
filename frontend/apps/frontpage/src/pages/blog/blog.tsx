@@ -46,8 +46,8 @@ const Blog = ({ posts }: BlogProps) => {
               featureImageAlt={
                 featuredPost.feature_image_alt || featuredPost.title
               }
-              createdAt={formatDateWithLongMonth(
-                new Date(featuredPost.created_at),
+              publishedAt={formatDateWithLongMonth(
+                new Date(featuredPost.published_at),
               )}
               excerpt={featuredPost.excerpt}
               key={featuredPost.uuid}
@@ -66,7 +66,9 @@ const Blog = ({ posts }: BlogProps) => {
                 primaryTag={post.primary_tag?.name}
                 featureImageUrl={post.feature_image}
                 featureImageAlt={post.feature_image_alt || post.title}
-                createdAt={formatDateWithLongMonth(new Date(post.created_at))}
+                publishedAt={formatDateWithLongMonth(
+                  new Date(post.published_at),
+                )}
                 excerpt={post.excerpt}
                 key={post.uuid}
                 title={post.title}

@@ -8,7 +8,7 @@ import type { Article } from '../../media.types';
 type ArticleItemProps = Article;
 
 const ArticleItem = ({
-  createdAt,
+  publishedAt,
   excerpt,
   imageAlt,
   imageUrl,
@@ -34,7 +34,7 @@ const ArticleItem = ({
           {excerpt}
         </Typography>
         <Typography color="tertiary" variant="body-3" as="div">
-          {createdAt}
+          {publishedAt}
         </Typography>
       </Content>
       <Picture>

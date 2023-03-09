@@ -66,7 +66,9 @@ const Post = ({ post }: PostProps) => {
                 }}
               >
                 <PostInfo
-                  createdAt={formatDateWithLongMonth(new Date(post.created_at))}
+                  publishedAt={formatDateWithLongMonth(
+                    new Date(post.published_at),
+                  )}
                   author={{
                     name: post.primary_author.name,
                     profileImage: post.primary_author.profile_image,

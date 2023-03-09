@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 export type LibraryPostPreviewProps = {
   author: { avatarImgUrl: string; name: string };
-  createdAt: string;
+  publishedAt: string;
   excerpt: string;
   featureImageAlt: string;
   featureImageUrl: string;
@@ -16,7 +16,7 @@ export type LibraryPostPreviewProps = {
 
 const LibraryPostPreview = ({
   author,
-  createdAt,
+  publishedAt,
   excerpt,
   featureImageAlt,
   featureImageUrl,
@@ -70,7 +70,7 @@ const LibraryPostPreview = ({
               width={16}
             />
             <Typography color="tertiary" variant="body-4">
-              {author.name} | <time>{createdAt}</time>
+              {author.name} | <time>{publishedAt}</time>
             </Typography>
           </Footer>
         </Box>

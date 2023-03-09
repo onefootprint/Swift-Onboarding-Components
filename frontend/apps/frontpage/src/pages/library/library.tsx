@@ -42,7 +42,9 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
                 }}
                 featureImageUrl={post.feature_image}
                 featureImageAlt={post.feature_image_alt || post.title}
-                createdAt={formatDateWithLongMonth(new Date(post.created_at))}
+                publishedAt={formatDateWithLongMonth(
+                  new Date(post.published_at),
+                )}
                 excerpt={post.excerpt}
                 key={post.uuid}
                 title={post.title}

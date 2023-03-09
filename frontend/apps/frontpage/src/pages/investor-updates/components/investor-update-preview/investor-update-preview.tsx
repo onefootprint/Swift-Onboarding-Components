@@ -11,13 +11,13 @@ type InvestorUpdatePreviewProps = {
   excerpt: string;
   href: string;
   title: string;
-  createdAt?: string;
+  publishedAt: string;
   image?: string;
 };
 
 const InvestorUpdatePreview = ({
   index,
-  createdAt,
+  publishedAt,
   excerpt,
   href,
   title,
@@ -41,11 +41,9 @@ const InvestorUpdatePreview = ({
             >
               {t('header-title-prefix', { index })}
             </Typography>
-            {!!createdAt && (
-              <Typography variant="body-2" color="tertiary">
-                | {createdAt}
-              </Typography>
-            )}
+            <Typography variant="body-2" color="tertiary">
+              | {publishedAt}
+            </Typography>
           </Header>
           <ArticleDetails>
             <Typography variant="heading-1" sx={{ marginBottom: 6 }}>

@@ -13,10 +13,10 @@ export type PostInfoProps = {
   tag: {
     name: string;
   };
-  createdAt?: string;
+  publishedAt?: string;
 };
 
-const PostInfo = ({ author, createdAt, readingTime, tag }: PostInfoProps) => {
+const PostInfo = ({ author, publishedAt, readingTime, tag }: PostInfoProps) => {
   const { t } = useTranslation('pages.blog');
 
   return (
@@ -35,8 +35,8 @@ const PostInfo = ({ author, createdAt, readingTime, tag }: PostInfoProps) => {
           {tag.name}
         </Typography>
         <Typography variant="body-3" color="tertiary">
-          {createdAt}
-          {createdAt && <Separator />}
+          {publishedAt}
+          {publishedAt && <Separator />}
           {t('post.reading-time', {
             readingTime,
           })}

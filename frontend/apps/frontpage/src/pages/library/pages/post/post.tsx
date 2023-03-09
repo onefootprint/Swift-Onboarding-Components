@@ -18,9 +18,6 @@ export type PostProps = {
 const Post = ({ post }: PostProps) => {
   const { t } = useTranslation('pages.library');
   const { formatDateWithLongMonth } = useIntl();
-  const formattedCreatedDate = formatDateWithLongMonth(
-    new Date(post.created_at),
-  );
 
   return (
     <>
@@ -69,7 +66,9 @@ const Post = ({ post }: PostProps) => {
                 }}
               >
                 <PostInfo
-                  createdAt={formattedCreatedDate}
+                  publishedAt={formatDateWithLongMonth(
+                    new Date(post.published_at),
+                  )}
                   author={{
                     name: post.primary_author.name,
                     profileImage: post.primary_author.profile_image,

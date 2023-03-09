@@ -1,5 +1,5 @@
 export type Article = {
-  createdAt: string;
+  publishedAt: string;
   excerpt: string;
   id: string;
   imageAlt: string;
