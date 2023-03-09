@@ -139,7 +139,7 @@ pub async fn get(
             // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
             let (attributes, identity_data_kinds, document_types, selfie_document_types) =
                 get_visible_populated_fields(uvw);
-            let is_portable = uvw.user_vault.is_portable;
+            let is_portable = uvw.vault.is_portable;
             let document_types_for_user: Vec<IdentityDocumentKindForUser> =
                 create_identity_document_info_for_user(uvw, document_types, selfie_document_types);
 
@@ -197,7 +197,7 @@ pub async fn get_detail(
     // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
     let (attributes, identity_data_kinds, document_types, selfie_document_types) =
         get_visible_populated_fields(&uvw);
-    let is_portable = uvw.user_vault.is_portable;
+    let is_portable = uvw.vault.is_portable;
     let document_types_for_user: Vec<IdentityDocumentKindForUser> =
         create_identity_document_info_for_user(&uvw, document_types, selfie_document_types);
     let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((

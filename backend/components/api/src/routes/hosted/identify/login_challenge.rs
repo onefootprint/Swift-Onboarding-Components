@@ -67,7 +67,7 @@ pub async fn post(
     };
     let (challenge_state_data, time_before_retry_s, biometric_challenge_json) = match challenge_kind {
         ChallengeKind::Biometric => {
-            let challenge = initiate_biometric_challenge_for_user(&state, &uvw.user_vault.id, creds).await?;
+            let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
             let challenge_data = ChallengeData::Biometric(challenge.state);
             (challenge_data, 0, Some(challenge.challenge_json))
         }

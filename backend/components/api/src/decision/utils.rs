@@ -34,7 +34,7 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
 ) -> ApiResult<ShouldInitiateVerificationRequests> {
     // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
     // phone number's sandbox suffix
-    let is_sandbox = !uvw.user_vault.is_live;
+    let is_sandbox = !uvw.vault.is_live;
 
     if is_sandbox {
         let phone_number = uvw.get_decrypted_primary_phone(state).await?;
@@ -188,7 +188,7 @@ async fn setup_test_fixtures(
             // TODO should we move the creation of the decision onto the locked UVW since we also
             // commit the data there? Would dedupe this logic between tests + prod
             let new_decision = OnboardingDecisionCreateArgs {
-                user_vault_id: uvw.user_vault.id.clone(),
+                user_vault_id: uvw.vault.id.clone(),
                 onboarding: &ob,
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 status: decision_status,

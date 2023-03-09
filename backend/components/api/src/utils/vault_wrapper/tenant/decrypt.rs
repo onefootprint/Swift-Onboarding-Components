@@ -15,7 +15,7 @@ impl TenantUvw {
         T: Into<DataIdentifier> + Clone,
     {
         // tenants can do what they wish with NON-portable vaults they own
-        if !self.user_vault.is_portable {
+        if !self.vault.is_portable {
             return Ok(());
         }
 

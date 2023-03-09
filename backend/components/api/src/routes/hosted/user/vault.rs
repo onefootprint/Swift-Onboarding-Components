@@ -56,7 +56,7 @@ pub async fn put(
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
             // Enforce that sandbox emails/phones are used for sandbox users
             if let Some(is_live) = email_is_live {
-                if is_live != uvw.user_vault().is_live {
+                if is_live != uvw.vault().is_live {
                     return Err(UserError::SandboxMismatch.into());
                 }
             }

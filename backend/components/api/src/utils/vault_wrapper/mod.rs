@@ -35,7 +35,7 @@ pub struct Business;
 ///         * it is the source of truth to know what we datums we have collected from a User
 #[derive(Debug, Clone)]
 pub struct VaultWrapper<Type> {
-    pub user_vault: Vault,
+    pub vault: Vault,
     speculative: VwData<Type>,
     portable: VwData<Type>,
     // The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.

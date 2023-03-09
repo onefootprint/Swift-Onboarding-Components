@@ -210,7 +210,7 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&suid)))
         .await??;
-    let uv_id = uvw.user_vault.id.clone();
+    let uv_id = uvw.vault.id.clone();
     let should_initiate_verification_requests =
         decision::utils::should_initiate_idv_or_else_setup_test_fixtures(
             &state,

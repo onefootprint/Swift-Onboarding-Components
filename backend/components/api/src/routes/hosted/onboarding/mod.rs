@@ -71,7 +71,7 @@ pub fn get_requirements(
     let scoped_user_id = &ob_info.scoped_user.id;
 
     let uvw = VaultWrapper::build(conn, VwArgs::Tenant(scoped_user_id))?;
-    let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.user_vault.id, ob_config_id))?;
+    let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.vault.id, ob_config_id))?;
     let missing_id_fields = uvw.missing_identity_fields(&ob_info.ob_config);
     // Document requirements are determined by the presence of DocumentRequest database objects.
     // In various places in the codebase, we will determine if a DocumentRequest should be created
@@ -98,7 +98,7 @@ pub fn get_requirements(
 
     // TODO: force liveness checks to be re-done and not shared across tenants
     // RELATED: FP-1802 and FP-1800
-    let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.user_vault.id)?;
+    let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
 
     // See if we need to run identity checks and ultimately produce a decision. We do this in 2 scenarios:
     //   1. we have not done it at all (!idv_reqs_initiated)

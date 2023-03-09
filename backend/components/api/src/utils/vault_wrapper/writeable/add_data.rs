@@ -61,7 +61,7 @@ impl WriteableUvw {
 
         let assert_non_portable = || -> Result<_, _> {
             // Cannot add identity data to a portable vault unless we are in bifrost
-            if !for_bifrost && self.user_vault().is_portable {
+            if !for_bifrost && self.vault().is_portable {
                 return Err(AuthError::CannotModifyPortableUser);
             }
             Ok(())
@@ -107,7 +107,7 @@ impl WriteableUvw {
                 DataCollectedInfo {
                     attributes: new_cdos.into_iter().collect(),
                 },
-                self.user_vault.id.clone(),
+                self.vault.id.clone(),
                 Some(self.scoped_user_id.clone()),
             )?;
         }
@@ -135,14 +135,14 @@ impl WriteableUvw {
         DataLifetime::bulk_deactivate_speculative(conn, &self.scoped_user_id, kinds, seqno)?;
 
         // Add the new speculative phone
-        let public_key = &self.user_vault.public_key;
+        let public_key = &self.vault.public_key;
         let phone_info = NewPhoneNumberArgs {
             e_phone_number: public_key.seal_pii(&phone_number)?,
             sh_phone_number: fingerprint,
         };
         PhoneNumber::create(
             conn,
-            &self.user_vault.id,
+            &self.vault.id,
             phone_info,
             DataPriority::Primary,
             Some(&self.scoped_user_id),
@@ -171,10 +171,10 @@ impl WriteableUvw {
 
         // Add the new speculative email
         let email = email.to_piistring();
-        let e_data = self.user_vault.public_key.seal_pii(&email)?;
+        let e_data = self.vault.public_key.seal_pii(&email)?;
         let email = Email::create(
             conn,
-            &self.user_vault.id,
+            &self.vault.id,
             e_data,
             fingerprint,
             DataPriority::Primary,
@@ -192,7 +192,7 @@ impl WriteableUvw {
         fingerprints: NewFingerprints<IDK>,
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_identity_fields();
-        let uv = self.user_vault();
+        let uv = self.vault();
 
         // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
         if let Some(idk) = [IDK::PhoneNumber, IDK::Email]
@@ -220,7 +220,7 @@ impl WriteableUvw {
     ) -> Result<(), ApiError> {
         // TODO existing fields
         let existing_fields = vec![];
-        let uv = self.user_vault();
+        let uv = self.vault();
 
         let builder = VdBuilder::build(update, uv.public_key.clone())?;
         builder.validate_and_save(
@@ -247,7 +247,7 @@ impl WriteableUvw {
         let updates = update
             .into_iter()
             .map(|(data_key, pii)| {
-                let e_data = self.user_vault().public_key.seal_pii(&pii)?;
+                let e_data = self.vault().public_key.seal_pii(&pii)?;
                 Ok(NewKeyValueDataArgs { data_key, e_data })
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
@@ -255,7 +255,7 @@ impl WriteableUvw {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         // TODO: Should we use bulk_deactivate_speculative here? When we denormalize `key` onto DataLifetimeKind
         DataLifetime::bulk_deactivate(conn, existing_lifetime_ids, seqno)?;
-        KeyValueData::bulk_create(conn, &self.user_vault().id, &self.scoped_user_id, updates, seqno)?;
+        KeyValueData::bulk_create(conn, &self.vault().id, &self.scoped_user_id, updates, seqno)?;
         Ok(())
     }
 }

@@ -39,7 +39,7 @@ impl<Type> VaultWrapper<Type> {
         let (portable, speculative) =
             VwData::partition(vd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
         let result = Self {
-            user_vault,
+            vault: user_vault,
             portable,
             speculative,
             _seqno: seqno,

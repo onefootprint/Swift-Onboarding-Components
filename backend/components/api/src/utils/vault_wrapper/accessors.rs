@@ -79,9 +79,9 @@ impl VaultWrapper<Person> {
     }
 }
 
-impl VaultWrapper<Person> {
-    /// helper to expose a reference/deref coercion to the underlying UV (normally from a LockedVaultWrapper)
-    pub fn user_vault(&self) -> &Vault {
-        &self.user_vault
+impl<Type> VaultWrapper<Type> {
+    /// helper to expose a reference/deref coercion to the underlying vault (normally from a LockedVaultWrapper)
+    pub fn vault(&self) -> &Vault {
+        &self.vault
     }
 }
