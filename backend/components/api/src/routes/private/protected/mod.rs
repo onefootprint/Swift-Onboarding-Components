@@ -1,4 +1,5 @@
 mod risk;
+mod task;
 
 use paperclip::actix::{
     api_v2_operation, get,
@@ -12,7 +13,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(check)
         .service(risk::make_vendor_calls)
         .service(risk::make_decision)
-        .service(risk::shadow_run);
+        .service(risk::shadow_run)
+        .service(task::execute_tasks)
+        .service(task::create_task);
 }
 
 #[api_v2_operation(tags(Private, Protected))]
