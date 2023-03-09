@@ -4,7 +4,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
-use crate::{BusinessDataKind as BDK, EnumDotNotationError, IdentityDataKind as IDK};
+use crate::{BusinessDataKind as BDK, DataIdentifier, EnumDotNotationError, IdentityDataKind as IDK};
 
 #[derive(
     Debug,
@@ -36,17 +36,27 @@ pub enum VdKind {
     Business(BDK),
 }
 
+crate::util::impl_enum_string_diesel!(VdKind);
 crate::util::impl_enum_string_diesel!(BDK);
+
+impl From<VdKind> for DataIdentifier {
+    fn from(value: VdKind) -> Self {
+        match value {
+            VdKind::Business(b) => Self::Business(b),
+            VdKind::Id(b) => Self::Id(b),
+        }
+    }
+}
 
 impl From<IDK> for VdKind {
     fn from(value: IDK) -> Self {
-        VdKind::Id(value)
+        Self::Id(value)
     }
 }
 
 impl From<BDK> for VdKind {
     fn from(value: BDK) -> Self {
-        VdKind::Business(value)
+        Self::Business(value)
     }
 }
 
@@ -54,17 +64,6 @@ impl From<BDK> for VdKind {
 pub enum VdKindConversionError {
     #[error("Cannot convert from UvdKind: {0} to IDK")]
     ToIdentityDataKindError(VdKind),
-}
-
-impl TryFrom<VdKind> for IDK {
-    type Error = VdKindConversionError;
-
-    fn try_from(value: VdKind) -> Result<Self, Self::Error> {
-        match value {
-            VdKind::Id(p) => Ok(p),
-            VdKind::Business(_) => Err(VdKindConversionError::ToIdentityDataKindError(value)),
-        }
-    }
 }
 
 impl std::fmt::Display for VdKind {
@@ -125,8 +124,6 @@ impl FromStr for VdKind {
         Ok(result)
     }
 }
-
-crate::util::impl_enum_string_diesel!(VdKind);
 
 #[cfg(test)]
 mod tests {

@@ -4,8 +4,7 @@ use super::{Business, VaultWrapper};
 use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
-use db::models::vault_data::NewBusinessVaultData;
-use db::models::vault_data::NewPersonVaultData;
+use db::models::vault_data::NewVaultData;
 use db::models::vault_data::VaultData;
 use db::tests::fixtures;
 use db::tests::prelude::*;
@@ -27,15 +26,15 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
 
     // Add identity data
     let data = vec![
-        NewPersonVaultData {
+        NewVaultData {
             kind: IDK::FirstName,
             e_data: SealedVaultBytes(vec![1]),
         },
-        NewPersonVaultData {
+        NewVaultData {
             kind: IDK::LastName,
             e_data: SealedVaultBytes(vec![2]),
         },
-        NewPersonVaultData {
+        NewVaultData {
             kind: IDK::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },
@@ -101,15 +100,15 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     let su = db::tests::fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
 
     let data = vec![
-        NewBusinessVaultData {
+        NewVaultData {
             kind: BDK::Name,
             e_data: SealedVaultBytes(vec![1]),
         },
-        NewBusinessVaultData {
+        NewVaultData {
             kind: BDK::Website,
             e_data: SealedVaultBytes(vec![2]),
         },
-        NewBusinessVaultData {
+        NewVaultData {
             kind: BDK::PhoneNumber,
             e_data: SealedVaultBytes(vec![3]),
         },

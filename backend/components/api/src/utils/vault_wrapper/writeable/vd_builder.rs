@@ -8,28 +8,32 @@ use db::{
     models::{
         data_lifetime::DataLifetime,
         fingerprint::{Fingerprint, NewFingerprint},
-        vault_data::{NewPersonVaultData, VaultData},
+        vault_data::{NewVaultData, VaultData},
     },
     TxnPgConn,
 };
 use newtypes::{
-    CollectedDataOption, DataLifetimeKind, DataRequest, IdentityDataKind as IDK, PiiString, ScopedUserId,
-    VaultId, VaultPublicKey,
+    CollectedDataOption, DataIdentifier, DataLifetimeKind, DataRequest, IsDataIdentifierDiscriminant,
+    PiiString, ScopedUserId, VaultId, VaultPublicKey, VdKind,
 };
 
 /// Helps to process updates for data in an IdentityDataUpdate request.
-pub struct PvdBuilder {
-    data: Vec<NewPersonVaultData>,
+pub struct VdBuilder<T> {
+    data: Vec<NewVaultData<T>>,
 }
 
-impl PvdBuilder {
+impl<T> VdBuilder<T>
+where
+    T: IsDataIdentifierDiscriminant + Into<VdKind>,
+    DataLifetimeKind: From<T>,
+{
     /// Construct the list of NewUserVaultData from an IdentityDataUpdate
-    pub fn build(update: DataRequest<IDK>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
+    pub fn build(update: DataRequest<T>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
         let mut data = vec![];
 
-        let mut add_sealed = |pii: PiiString, kind: IDK| -> ApiResult<()> {
+        let mut add_sealed = |pii: PiiString, kind: T| -> ApiResult<()> {
             let sealed = vault_public_key.seal_pii(&pii)?;
-            data.push(NewPersonVaultData { kind, e_data: sealed });
+            data.push(NewVaultData::<T> { kind, e_data: sealed });
             Ok(())
         };
         for (kind, pii) in update.into_inner() {
@@ -43,14 +47,14 @@ impl PvdBuilder {
     pub fn validate_and_save(
         self,
         conn: &mut TxnPgConn,
-        existing_fields: Vec<IDK>, // portable or speculative on UVW
+        existing_fields: Vec<T>, // portable or speculative on UVW
         user_vault_id: VaultId,
         scoped_user_id: ScopedUserId,
-        fingerprints: NewFingerprints,
+        fingerprints: NewFingerprints<T>,
     ) -> ApiResult<()> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
-        let new_fields = self.data.iter().map(|d| d.kind).collect();
+        let new_fields = self.data.iter().map(|d| d.kind.clone()).collect();
         let existing = CollectedDataOption::list_from(existing_fields);
         let new = CollectedDataOption::list_from(new_fields);
         let offending_partial_cdo =
@@ -68,7 +72,7 @@ impl PvdBuilder {
         // We will only deactivate speculative, uncommitted data here - never portable data
         let kinds_to_deactivate = new
             .iter()
-            .flat_map(|cdo| cdo.attributes::<IDK>())
+            .flat_map(|cdo| cdo.attributes::<T>())
             .map(DataLifetimeKind::from)
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -81,16 +85,16 @@ impl PvdBuilder {
         let kind_to_lifetime = vds
             .into_iter()
             .map(|vd| {
-                IDK::try_from(vd.kind)
+                T::try_from(DataIdentifier::from(vd.kind))
                     .map(|idk| (idk, vd.lifetime_id))
-                    .map_err(|e| ApiError::NewtypeError(newtypes::Error::VdKindConversionError(e)))
+                    .map_err(|_| ApiError::AssertionError("Cannot convert from vd.kind to T".to_owned()))
             })
             .collect::<Result<HashMap<_, _>, ApiError>>()?;
         let fingerprints: Vec<_> = fingerprints
             .into_iter()
             .map(|(kind, sh_data)| -> ApiResult<_> {
                 Ok(NewFingerprint {
-                    kind: kind.into(),
+                    kind: DataLifetimeKind::from(kind.clone()),
                     sh_data,
                     lifetime_id: kind_to_lifetime
                         .get(&kind)

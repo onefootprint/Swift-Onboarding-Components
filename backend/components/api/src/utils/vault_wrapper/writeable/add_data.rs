@@ -1,4 +1,4 @@
-use super::pvd_builder::PvdBuilder;
+use super::vd_builder::VdBuilder;
 use super::WriteableUvw;
 use crate::auth::AuthError;
 use crate::errors::user::UserError;
@@ -13,8 +13,8 @@ use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataPriority, DataRequest, EmailId, Fingerprint,
-    IdentityDataKind, KvDataKey, PiiString,
+    BusinessDataKind, CollectedDataOption, DataCollectedInfo, DataPriority, DataRequest, EmailId,
+    Fingerprint, IdentityDataKind as IDK, KvDataKey, PiiString,
 };
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -38,25 +38,24 @@ impl WriteableUvw {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DecomposedPutRequest,
-        fingerprints: NewFingerprints,
+        id_fingerprints: NewFingerprints<IDK>,
         for_bifrost: bool,
     ) -> ApiResult<Option<EmailId>> {
         let DecomposedPutRequest {
             id_update,
             custom_data,
-            // TODO actually write this data
             // TODO check that you don't add business data on a non-business vault
             // TODO business writeable VW?
-            business_data: _,
+            business_data,
         } = request;
         let new_cdos = CollectedDataOption::list_from(id_update.keys().cloned().collect());
 
         // Extract phone and email from identity data since they are handled separately (for now)
         let mut id_update = id_update;
-        let mut fingerprints = fingerprints;
-        let phone_number = id_update.remove(&IdentityDataKind::PhoneNumber);
+        let mut id_fingerprints = id_fingerprints;
+        let phone_number = id_update.remove(&IDK::PhoneNumber);
         let email = id_update
-            .remove(&IdentityDataKind::Email)
+            .remove(&IDK::Email)
             .map(|p| newtypes::email::Email::from_str(p.leak()))
             .transpose()?;
 
@@ -67,6 +66,10 @@ impl WriteableUvw {
             }
             Ok(())
         };
+        // Update business data
+        if !business_data.is_empty() {
+            self.update_business_data_unsafe(conn, business_data)?;
+        }
         // Update custom data
         if !custom_data.is_empty() {
             self.update_custom_data_unsafe(conn, custom_data)?;
@@ -74,7 +77,7 @@ impl WriteableUvw {
         // Update PhoneNumber
         if let Some(phone_number) = phone_number {
             assert_non_portable()?;
-            let Some(fp) = fingerprints.remove(&IdentityDataKind::PhoneNumber) else {
+            let Some(fp) = id_fingerprints.remove(&IDK::PhoneNumber) else {
                 return Err(ApiError::AssertionError("No fingerprint found for phone number".to_owned()));
             };
             self.add_phone_number_unsafe(conn, phone_number, fp)?;
@@ -82,7 +85,7 @@ impl WriteableUvw {
         // Update Email
         let new_email_id = if let Some(email) = email {
             assert_non_portable()?;
-            let Some(fp) = fingerprints.remove(&IdentityDataKind::Email) else {
+            let Some(fp) = id_fingerprints.remove(&IDK::Email) else {
                 return Err(ApiError::AssertionError("No fingerprint found for email".to_owned()));
             };
             let email_id = self.add_email_unsafe(conn, email, fp)?;
@@ -93,7 +96,7 @@ impl WriteableUvw {
         // Update UserVaultData
         if !id_update.is_empty() {
             assert_non_portable()?;
-            self.update_identity_data_unsafe(conn, id_update, fingerprints)?;
+            self.update_identity_data_unsafe(conn, id_update, id_fingerprints)?;
         }
 
         // Add UserTimeline for all the newly added data
@@ -123,12 +126,12 @@ impl WriteableUvw {
         // Only used to add a phone number to a non-portable vault for now
         if !self.portable.phone_numbers.is_empty() {
             // We don't currently support adding a secondary phone
-            return Err(UserError::CannotReplaceData(IdentityDataKind::PhoneNumber.into()).into());
+            return Err(UserError::CannotReplaceData(IDK::PhoneNumber.into()).into());
         }
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         // Deactivate the old speculative phone, if exists
-        let kinds = vec![IdentityDataKind::PhoneNumber.into()];
+        let kinds = vec![IDK::PhoneNumber.into()];
         DataLifetime::bulk_deactivate_speculative(conn, &self.scoped_user_id, kinds, seqno)?;
 
         // Add the new speculative phone
@@ -158,12 +161,12 @@ impl WriteableUvw {
     ) -> ApiResult<EmailId> {
         if !self.portable.emails.is_empty() {
             // We don't currently support adding a secondary email
-            return Err(UserError::CannotReplaceData(IdentityDataKind::Email.into()).into());
+            return Err(UserError::CannotReplaceData(IDK::Email.into()).into());
         }
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         // Deactivate the old speculative email, if exists
-        let kinds = vec![IdentityDataKind::Email.into()];
+        let kinds = vec![IDK::Email.into()];
         DataLifetime::bulk_deactivate_speculative(conn, &self.scoped_user_id, kinds, seqno)?;
 
         // Add the new speculative email
@@ -185,26 +188,47 @@ impl WriteableUvw {
     fn update_identity_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        update: DataRequest<IdentityDataKind>,
-        fingerprints: NewFingerprints,
+        update: DataRequest<IDK>,
+        fingerprints: NewFingerprints<IDK>,
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_identity_fields();
         let uv = self.user_vault();
 
         // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
-        if let Some(idk) = [IdentityDataKind::PhoneNumber, IdentityDataKind::Email]
+        if let Some(idk) = [IDK::PhoneNumber, IDK::Email]
             .iter()
             .find(|k| update.contains_key(k))
         {
             return Err(UserError::InvalidDataKind(*idk).into());
         }
-        let builder = PvdBuilder::build(update, uv.public_key.clone())?;
+        let builder = VdBuilder::build(update, uv.public_key.clone())?;
         builder.validate_and_save(
             conn,
             existing_fields,
             uv.id.clone(),
             self.scoped_user_id.clone(),
             fingerprints,
+        )?;
+
+        Ok(())
+    }
+
+    fn update_business_data_unsafe(
+        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
+        conn: &mut TxnPgConn,
+        update: DataRequest<BusinessDataKind>,
+    ) -> Result<(), ApiError> {
+        // TODO existing fields
+        let existing_fields = vec![];
+        let uv = self.user_vault();
+
+        let builder = VdBuilder::build(update, uv.public_key.clone())?;
+        builder.validate_and_save(
+            conn,
+            existing_fields,
+            uv.id.clone(),
+            self.scoped_user_id.clone(),
+            HashMap::new(),
         )?;
 
         Ok(())

@@ -13,6 +13,12 @@ type RawDataRequest<T> = HashMap<T, PiiString>;
 /// Validated DataRequest of T -> PiiString where T is a subet of DataIdentifier
 pub struct DataRequest<T>(RawDataRequest<T>);
 
+impl<T> DataRequest<T> {
+    pub fn into_inner(self) -> RawDataRequest<T> {
+        self.0
+    }
+}
+
 impl<T> DataRequest<T>
 where
     T: IsDataIdentifierDiscriminant,
@@ -30,10 +36,6 @@ where
         let clean_id_data = Self::clean_and_validate_data(data, for_bifrost)?;
         let id_update = Self(clean_id_data);
         Ok((id_update, other_data))
-    }
-
-    pub fn into_inner(self) -> RawDataRequest<T> {
-        self.0
     }
 
     fn clean_and_validate_data(data: RawDataRequest<T>, for_bifrost: bool) -> NtResult<RawDataRequest<T>> {

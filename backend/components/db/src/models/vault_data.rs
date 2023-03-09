@@ -6,10 +6,8 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::BusinessDataKind;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
-use newtypes::IdentityDataKind;
 use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
 use newtypes::VaultId;
@@ -30,12 +28,7 @@ pub struct VaultData {
     pub e_data: SealedVaultBytes,
 }
 
-pub type NewPersonVaultData = NewUserVaultData<IdentityDataKind>;
-pub type NewBusinessVaultData = NewUserVaultData<BusinessDataKind>;
-pub struct NewUserVaultData<T>
-where
-    T: Into<VdKind> + Into<DataLifetimeKind> + Clone,
-{
+pub struct NewVaultData<T> {
     pub kind: T,
     pub e_data: SealedVaultBytes,
 }
@@ -54,18 +47,21 @@ impl VaultData {
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
         scoped_user_id: Option<&ScopedUserId>,
-        data: Vec<NewUserVaultData<T>>,
+        data: Vec<NewVaultData<T>>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>>
     where
-        T: Into<VdKind> + Into<DataLifetimeKind> + Clone,
+        T: Into<VdKind> + Clone,
+        DataLifetimeKind: From<T>,
     {
         // Make a DataLifetime row for each of the new pieces of data being inserted
         let lifetimes = DataLifetime::bulk_create(
             conn,
             user_vault_id,
             scoped_user_id,
-            data.iter().map(|d| d.kind.clone().into()).collect(),
+            data.iter()
+                .map(|d| DataLifetimeKind::from(d.kind.clone()))
+                .collect(),
             seqno,
         )?;
         let new_rows: Vec<_> = data
