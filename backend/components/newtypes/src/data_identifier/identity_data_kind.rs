@@ -1,4 +1,4 @@
-use crate::{DataIdentifierSubtype, PersonVaultDataKind, PiiString, SaltedFingerprint};
+use crate::{IsDataIdentifierDiscriminant, PersonVaultDataKind, PiiString, SaltedFingerprint};
 use crypto::sha256;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -51,7 +51,7 @@ pub enum IdentityDataKind {
 
 crate::util::impl_enum_str_diesel!(IdentityDataKind);
 
-impl DataIdentifierSubtype for IdentityDataKind {
+impl IsDataIdentifierDiscriminant for IdentityDataKind {
     fn is_optional(&self) -> bool {
         matches!(self, Self::AddressLine2)
     }

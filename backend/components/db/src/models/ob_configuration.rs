@@ -9,7 +9,7 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::OnboardingId;
-use newtypes::{ApiKeyStatus, DataIdentifierKind};
+use newtypes::{ApiKeyStatus, DataIdentifierDiscriminant};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -235,6 +235,6 @@ impl ObConfiguration {
     pub fn must_collect_business(&self) -> bool {
         self.must_collect_data
             .iter()
-            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierKind::Business)
+            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Business)
     }
 }

@@ -1,4 +1,4 @@
-use crate::{CollectedDataOption, DataIdentifier, DataIdentifierSubtype, PiiString};
+use crate::{CollectedDataOption, DataIdentifier, IsDataIdentifierDiscriminant, PiiString};
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
 use itertools::Itertools;
@@ -15,7 +15,7 @@ pub struct DataRequest<T>(RawDataRequest<T>);
 
 impl<T> DataRequest<T>
 where
-    T: DataIdentifierSubtype,
+    T: IsDataIdentifierDiscriminant,
 {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data

@@ -1,6 +1,6 @@
 use crate::{
-    BusinessDataKind as BDK, DataIdentifier, DataIdentifierKind, DataIdentifierSubtype,
-    IdentityDataKind as IDK,
+    BusinessDataKind as BDK, DataIdentifier, DataIdentifierDiscriminant, IdentityDataKind as IDK,
+    IsDataIdentifierDiscriminant,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -57,18 +57,18 @@ impl CollectedData {
         }
     }
 
-    pub fn data_identifier_kind(&self) -> DataIdentifierKind {
+    pub fn data_identifier_kind(&self) -> DataIdentifierDiscriminant {
         match self {
             Self::BusinessName
             | Self::BusinessEin
             | Self::BusinessAddress
             | Self::BusinessPhoneNumber
             | Self::BusinessWebsite
-            | Self::BusinessBeneficialOwners => DataIdentifierKind::Business,
+            | Self::BusinessBeneficialOwners => DataIdentifierDiscriminant::Business,
             Self::Name | Self::Dob | Self::Ssn | Self::Address | Self::Email | Self::PhoneNumber => {
-                DataIdentifierKind::Id
+                DataIdentifierDiscriminant::Id
             }
-            Self::Document => DataIdentifierKind::IdDocument,
+            Self::Document => DataIdentifierDiscriminant::IdDocument,
         }
     }
 }
@@ -227,7 +227,7 @@ impl CollectedDataOption {
     /// returns an empty list.
     pub fn attributes<T>(&self) -> Vec<T>
     where
-        T: DataIdentifierSubtype,
+        T: IsDataIdentifierDiscriminant,
     {
         self.data_identifiers()
             .and_then(|dis| {
@@ -243,7 +243,7 @@ impl CollectedDataOption {
     /// represents T. Otherwise, returns an empty list.
     pub fn required_attributes<T>(&self) -> Vec<T>
     where
-        T: DataIdentifierSubtype,
+        T: IsDataIdentifierDiscriminant,
     {
         self.attributes::<T>()
             .into_iter()
@@ -255,7 +255,7 @@ impl CollectedDataOption {
     /// CollectedDataOptions represented by this list of IdentityDataKinds
     pub fn list_from<T>(kinds: Vec<T>) -> HashSet<Self>
     where
-        T: DataIdentifierSubtype,
+        T: IsDataIdentifierDiscriminant,
     {
         let kinds: HashSet<_> = kinds.into_iter().collect();
         // For each CollectedData variant, figure out which of the options (if any) is represented
@@ -297,8 +297,8 @@ impl CollectedDataOption {
 #[cfg(test)]
 mod test {
     use crate::{
-        BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, DataIdentifierSubtype,
-        HasParentCdo, IdentityDataKind as IDK,
+        BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, HasParentCdo,
+        IdentityDataKind as IDK, IsDataIdentifierDiscriminant,
     };
     use itertools::Itertools;
     use std::collections::HashSet;
@@ -400,7 +400,7 @@ mod test {
     #[test_case(vec![BDK::BeneficialOwners] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
     fn test_parse_list_of_kinds<T>(kinds: Vec<T>) -> HashSet<CDO>
     where
-        T: DataIdentifierSubtype,
+        T: IsDataIdentifierDiscriminant,
     {
         CDO::list_from(kinds)
     }
