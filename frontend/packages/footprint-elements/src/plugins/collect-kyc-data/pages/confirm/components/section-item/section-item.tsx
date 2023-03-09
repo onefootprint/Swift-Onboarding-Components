@@ -15,10 +15,14 @@ const SectionItem = ({
   textColor = 'tertiary',
 }: SectionItemProps) => (
   <Container>
-    <Typography variant="label-3" color={textColor} data-private>
+    <Typography variant="label-3" color={textColor}>
       {text}
     </Typography>
-    {subtext && <Typography variant="body-3">{subtext}</Typography>}
+    {subtext && (
+      <Typography variant="body-3" isPrivate>
+        {subtext}
+      </Typography>
+    )}
   </Container>
 );
 

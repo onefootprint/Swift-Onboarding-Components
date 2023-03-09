@@ -55,7 +55,7 @@ const UserHeader = () => {
           <Typography variant="body-3" color="tertiary">
             ·
           </Typography>
-          <CodeInline>{data.id}</CodeInline>
+          <CodeInline isPrivate>{data.id}</CodeInline>
         </RowContainer>
         <RowContainer>
           <div id={USER_HEADER_ACTIONS_ID} />

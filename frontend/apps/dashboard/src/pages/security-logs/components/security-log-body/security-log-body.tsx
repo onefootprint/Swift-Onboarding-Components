@@ -18,7 +18,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
           Footprint token
         </Typography>
         <CodeContainer>
-          <CodeInline>{accessEvent.fpUserId}</CodeInline>
+          <CodeInline isPrivate>{accessEvent.fpUserId}</CodeInline>
         </CodeContainer>
       </DataGrid>
     </div>
@@ -29,19 +29,19 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
           <Typography variant="label-3" color="tertiary">
             Region
           </Typography>
-          <Typography variant="body-3">
+          <Typography variant="body-3" isPrivate>
             {getRegionForInsightEvent(accessEvent.insightEvent) || '-'}
           </Typography>
           <Typography variant="label-3" color="tertiary">
             IP Address
           </Typography>
-          <Typography variant="body-3">
+          <Typography variant="body-3" isPrivate>
             {accessEvent.insightEvent.ipAddress || '-'}
           </Typography>
           <Typography variant="label-3" color="tertiary">
             Country
           </Typography>
-          <Typography variant="body-3">
+          <Typography variant="body-3" isPrivate>
             {accessEvent.insightEvent.country || '-'}
           </Typography>
           <Typography variant="label-3" color="tertiary">
@@ -53,14 +53,14 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
               gridArea: '2 / 4 / span 2 / span 1',
             }}
           >
-            <Typography variant="body-3" sx={{ overflow: 'hidden' }}>
+            <Typography variant="body-3" sx={{ overflow: 'hidden' }} isPrivate>
               {displayForUserAgent(accessEvent.insightEvent.userAgent || '')}
             </Typography>
           </Box>
           <Typography variant="label-3" color="tertiary">
             Zip code
           </Typography>
-          <Typography variant="body-3">
+          <Typography variant="body-3" isPrivate>
             {accessEvent.insightEvent.postalCode || '-'}
           </Typography>
         </DataGrid>

@@ -28,6 +28,7 @@ export type TypographyProps = {
   testID?: string;
   title?: string;
   variant: FontVariant;
+  isPrivate?: boolean;
 };
 
 const Typography = forwardRef<HTMLElement, TypographyProps>(
@@ -41,6 +42,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       testID,
       title,
       variant,
+      isPrivate,
     }: TypographyProps,
     ref,
   ) => {
@@ -55,6 +57,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
         sx={sxStyles}
         title={title}
         variant={variant}
+        data-private={isPrivate ? 'true' : undefined}
       >
         {children}
       </StyledTypography>

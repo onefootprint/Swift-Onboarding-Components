@@ -10,6 +10,7 @@ import {
   CountrySelectProps,
   Select,
   TextInput,
+  Typography,
 } from '@onefootprint/ui';
 import React from 'react';
 
@@ -131,6 +132,60 @@ describe('getClickElementInfo', () => {
       const info = getClickedElementInfo(input);
       expect(info.name).toEqual(UNNAMED_ELEMENT_VALUE);
       expect(info.tag).toEqual('INPUT');
+    });
+  });
+
+  describe('with Typography', () => {
+    const renderTypography = (isPrivate?: boolean) => {
+      customRender(
+        <Typography variant="body-1" isPrivate={isPrivate} testID="typography">
+          Hello
+        </Typography>,
+      );
+    };
+
+    const renderTypographyWithParent = (isPrivate?: boolean) => {
+      customRender(
+        <div data-private={isPrivate ? 'true' : undefined} data-testid="parent">
+          <Typography variant="body-1">Hello</Typography>
+        </div>,
+      );
+    };
+
+    it('should redact data if any parent elem is marked as private', () => {
+      renderTypographyWithParent(true);
+      const input = screen.getByTestId('parent');
+      const info = getClickedElementInfo(input);
+      expect(info.name).toEqual(REDACTED_PRIVATE_DATA_VALUE);
+      expect(info.tag).toEqual('DIV');
+    });
+
+    it('should redact data if marked as private', () => {
+      renderTypography(true);
+
+      let input = screen.getByTestId('typography');
+      let info = getClickedElementInfo(input);
+      expect(info.name).toEqual(REDACTED_PRIVATE_DATA_VALUE);
+      expect(info.tag).toEqual('P');
+
+      input = screen.getByText('Hello');
+      info = getClickedElementInfo(input);
+      expect(info.name).toEqual(REDACTED_PRIVATE_DATA_VALUE);
+      expect(info.tag).toEqual('P');
+    });
+
+    it('should get text in typography if not private', () => {
+      renderTypography();
+
+      let input = screen.getByTestId('typography');
+      let info = getClickedElementInfo(input);
+      expect(info.name).toEqual('Hello');
+      expect(info.tag).toEqual('P');
+
+      input = screen.getByText('Hello');
+      info = getClickedElementInfo(input);
+      expect(info.name).toEqual('Hello');
+      expect(info.tag).toEqual('P');
     });
   });
 

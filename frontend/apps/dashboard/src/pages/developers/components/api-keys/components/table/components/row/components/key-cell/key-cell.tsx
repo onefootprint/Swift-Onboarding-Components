@@ -12,7 +12,13 @@ const KeyCell = ({ value, isLoading }: KeyCellProps) => {
     return <Shimmer sx={{ height: '24px', width: '280px' }} />;
   }
 
-  return value ? <CodeInline truncate>{value}</CodeInline> : <EncryptedCell />;
+  return value ? (
+    <CodeInline isPrivate truncate>
+      {value}
+    </CodeInline>
+  ) : (
+    <EncryptedCell />
+  );
 };
 
 export default KeyCell;

@@ -21,7 +21,7 @@ const PhoneIdentificationEmailPreview = ({
         <Box>
           <StyledIcoEmail24 />
         </Box>
-        <Typography variant="label-3" color="primary" data-private>
+        <Typography variant="label-3" color="primary" isPrivate>
           {email}
         </Typography>
       </EmailCardContent>

@@ -32,7 +32,9 @@ const Row = ({ user }: RowProps) => {
         />
       </td>
       <td>
-        <CodeInline truncate>{user.id}</CodeInline>
+        <CodeInline isPrivate truncate>
+          {user.id}
+        </CodeInline>
       </td>
       <td>
         <Badge variant={badgeVariant}>

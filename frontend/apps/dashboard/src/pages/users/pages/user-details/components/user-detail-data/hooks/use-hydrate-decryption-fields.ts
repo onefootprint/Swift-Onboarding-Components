@@ -47,4 +47,5 @@ const useHydrateDecryptionFields = (vaultData: UserVaultData) => {
 
   useEffectOnce(hydrateFields);
 };
+
 export default useHydrateDecryptionFields;

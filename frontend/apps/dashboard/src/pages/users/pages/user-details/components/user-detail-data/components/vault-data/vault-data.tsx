@@ -21,13 +21,14 @@ import type { FormData } from './vault-data.types';
 const VaultData = () => {
   const { t } = useTranslation('pages.user-details');
   const toast = useToast();
-  const decryptUser = useDecryptUser();
+
   const [state, send] = useDecryptMachine();
   const { fields, reason } = state.context;
   const isDecrypting =
     state.matches(State.selectingFields) ||
     state.matches(State.confirmingReason) ||
     state.matches(State.decrypting);
+
   const formMethods = useForm<FormData>({
     defaultValues: state.context.fields || {
       kycData: {},
@@ -35,8 +36,10 @@ const VaultData = () => {
     },
   });
   const { handleSubmit, reset } = formMethods;
+
   const userId = useUserId();
   const userQuery = useUser(userId);
+  const decryptUser = useDecryptUser();
   const userVaultDataQuery = useUserVault(userId, userQuery.data);
   const vaultData = userVaultDataQuery.data;
   const isLoading = userVaultDataQuery.isLoading || userQuery.isLoading;

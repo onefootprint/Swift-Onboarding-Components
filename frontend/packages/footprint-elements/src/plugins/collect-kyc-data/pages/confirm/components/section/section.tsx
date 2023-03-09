@@ -31,7 +31,7 @@ const Section = ({ title, IconComponent, onEdit, items }: SectionProps) => {
         </TitleContainer>
         <LinkButton onClick={onEdit}>{t('edit')}</LinkButton>
       </Header>
-      <SectionContent data-private>
+      <SectionContent>
         {items.map(({ text, subtext, textColor }) => (
           <SectionItem
             key={text}

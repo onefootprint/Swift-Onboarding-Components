@@ -1,7 +1,9 @@
 import '@onefootprint/design-tokens/src/output/theme.css';
 
 import themes from '@onefootprint/design-tokens';
-import FootprintDevTools from '@onefootprint/dev-tools';
+import FootprintDevTools, {
+  ObserveCollectorProvider,
+} from '@onefootprint/dev-tools';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -44,15 +46,17 @@ const App = ({ Component, pageProps }: AppProps) => {
           href="/favicon-16x16.png"
         />
       </Head>
-      <ReactQueryProvider>
-        <DesignSystemProvider theme={themes.light}>
-          <FootprintDevTools />
-          <GlobalStyle />
-          <Layout name={pageProps.layout}>
-            <Component />
-          </Layout>
-        </DesignSystemProvider>
-      </ReactQueryProvider>
+      <ObserveCollectorProvider appName="dashboard">
+        <ReactQueryProvider>
+          <DesignSystemProvider theme={themes.light}>
+            <FootprintDevTools />
+            <GlobalStyle />
+            <Layout name={pageProps.layout}>
+              <Component />
+            </Layout>
+          </DesignSystemProvider>
+        </ReactQueryProvider>
+      </ObserveCollectorProvider>
     </>
   );
 };

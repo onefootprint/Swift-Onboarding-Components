@@ -12,6 +12,7 @@ export type CodeInlineProps = {
   tooltipText?: string;
   tooltipTextConfirmation?: string;
   truncate?: boolean;
+  isPrivate?: boolean;
 };
 
 const HIDE_TIMEOUT = 600;
@@ -26,6 +27,7 @@ const CodeInline = ({
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
   truncate,
+  isPrivate,
 }: CodeInlineProps) => {
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
 
@@ -57,7 +59,9 @@ const CodeInline = ({
   };
 
   return disable ? (
-    <CodeContent data-truncate={truncate}>{children}</CodeContent>
+    <CodeContent data-truncate={truncate} data-private={isPrivate}>
+      {children}
+    </CodeContent>
   ) : (
     <Tooltip
       placement="right"
@@ -71,7 +75,9 @@ const CodeInline = ({
         onClick={disable ? undefined : handleClick}
         type="button"
       >
-        <CodeContent data-truncate={truncate}>{children}</CodeContent>
+        <CodeContent data-truncate={truncate} data-private={isPrivate}>
+          {children}
+        </CodeContent>
       </Button>
     </Tooltip>
   );

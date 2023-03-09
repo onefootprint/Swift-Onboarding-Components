@@ -22,7 +22,7 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
     issuers?.map(issuer => issuer.toUpperCase()).join(' & ') ?? '';
 
   return (
-    <div data-test-id="liveness-event-body">
+    <div data-test-id="liveness-event-body" data-private>
       {attestations && (
         <EventBodyEntry content={t('attested-by', { attestations })} />
       )}

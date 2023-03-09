@@ -102,10 +102,14 @@ const getElementTextsWithoutPrivateData = (el: HTMLElement): string[] => {
     texts.push(innerText);
   }
 
+  if (!el.children.length) {
+    texts.push(el.innerHTML);
+  }
+
   return texts;
 };
 
-export const getClickedElementInfo = (el: HTMLElement) => {
+export const getClickedElementInfo = (el: HTMLElement): IClickElementInfo => {
   const texts = [el.getAttribute('aria-label')];
   if (el.tagName.toLowerCase() === 'img') {
     texts.push(el.getAttribute('alt'));

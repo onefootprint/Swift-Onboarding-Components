@@ -79,7 +79,7 @@ const Insights = () => {
           </GoogleMapReact>
           <FloatingBox>
             {icoForUserAgent(userAgent)}
-            <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+            <Typography variant="label-2" sx={{ marginBottom: 5 }} isPrivate>
               {displayForUserAgent(userAgent)}
             </Typography>
             {insightEvent.ipAddress && (
@@ -87,7 +87,7 @@ const Insights = () => {
                 <Typography variant="label-3" color="tertiary">
                   IP Address
                 </Typography>
-                <Typography variant="body-3">
+                <Typography variant="body-3" isPrivate>
                   {insightEvent.ipAddress}
                 </Typography>
               </Row>
@@ -119,7 +119,7 @@ const Insights = () => {
                 <Typography variant="label-3" color="tertiary">
                   Region
                 </Typography>
-                <Typography variant="body-3">
+                <Typography variant="body-3" isPrivate>
                   {getRegionForInsightEvent(insightEvent)}
                 </Typography>
               </Row>
@@ -129,7 +129,9 @@ const Insights = () => {
                 <Typography variant="label-3" color="tertiary">
                   Country
                 </Typography>
-                <Typography variant="body-3">{insightEvent.country}</Typography>
+                <Typography variant="body-3" isPrivate>
+                  {insightEvent.country}
+                </Typography>
               </Row>
             )}
           </FloatingBox>
