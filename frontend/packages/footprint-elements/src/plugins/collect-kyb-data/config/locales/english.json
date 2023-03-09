@@ -1,3 +1,19 @@
 {
-  "pages": {}
+  "pages": {
+    "introduction": {
+      "title": "Hey there! 👋",
+      "subtitle": "Before we get started, there are a couple of things you should know.",
+      "guidelines": {
+        "beneficial-owner": {
+          "title": "You need to be a beneficial owner to verify your business.",
+          "description": "A beneficial owner is anyone who owns at least 25% of the business."
+        },
+        "bo-kyc": {
+          "title": "We need to verify your identity, as a beneficial owner.",
+          "description": "Otherwise we can't successfully verify your business."
+        }
+      },
+      "cta": "Continue"
+    }
+  }
 }
