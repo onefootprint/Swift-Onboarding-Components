@@ -21,6 +21,7 @@ pub mod risk_signal;
 pub mod scoped_user;
 pub mod session;
 pub mod socure_device_session;
+pub mod task;
 pub mod tenant;
 pub mod tenant_api_key;
 pub mod tenant_api_key_access_log;

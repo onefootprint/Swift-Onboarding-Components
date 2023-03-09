@@ -466,6 +466,22 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    task (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        scheduled_for -> Timestamptz,
+        task_data -> Jsonb,
+        status -> Text,
+        num_attempts -> Int4,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     tenant (id) {
         id -> Text,
         name -> Text,
@@ -758,6 +774,7 @@ allow_tables_to_appear_in_same_query!(
     scoped_user,
     session,
     socure_device_session,
+    task,
     tenant,
     tenant_api_key,
     tenant_api_key_access_log,

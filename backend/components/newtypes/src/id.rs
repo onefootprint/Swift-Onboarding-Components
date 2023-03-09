@@ -199,6 +199,7 @@ define_newtype_id!(
 );
 define_newtype_id!(ProxyRequestLogId, String, "Identifier for a log of proxy request");
 define_newtype_id!(WebhookServiceId, String, "Identifier for a webhook service");
+define_newtype_id!(TaskId, String, "Identifier for a task");
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(
