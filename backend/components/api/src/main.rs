@@ -23,6 +23,7 @@ mod enclave_client;
 mod errors;
 mod routes;
 mod serializers;
+mod task;
 use self::routes::*;
 mod proxy;
 mod s3;

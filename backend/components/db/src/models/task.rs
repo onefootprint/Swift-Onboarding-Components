@@ -4,7 +4,7 @@ use diesel::{
     sql_query,
     sql_types::{BigInt, Text, Timestamptz},
 };
-use newtypes::{TaskId, TaskStatus};
+use newtypes::{TaskData, TaskId, TaskStatus};
 use serde::{Deserialize, Serialize};
 
 use crate::{schema::task, DbError, DbResult, PgConn, TxnPgConn};
@@ -17,7 +17,7 @@ pub struct Task {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub scheduled_for: DateTime<Utc>,
-    pub task_data: serde_json::Value,
+    pub task_data: TaskData,
     pub status: TaskStatus,
     pub num_attempts: i32,
 }
@@ -27,7 +27,7 @@ pub struct Task {
 struct NewTask {
     pub created_at: DateTime<Utc>,
     pub scheduled_for: DateTime<Utc>,
-    pub task_data: serde_json::Value,
+    pub task_data: TaskData,
     pub status: TaskStatus,
     pub num_attempts: i32,
 }
@@ -43,7 +43,7 @@ impl Task {
     pub fn create(
         conn: &mut PgConn,
         scheduled_for: DateTime<Utc>,
-        task_data: serde_json::Value,
+        task_data: TaskData,
     ) -> Result<Task, DbError> {
         let new_task = NewTask {
             created_at: Utc::now(),
@@ -93,24 +93,35 @@ impl Task {
             .get_result(conn)?;
         Ok(result)
     }
+
+    // Currently only used for Tests! pretend there is #[cfg(test)] here!!
+    pub fn _bulk_delete_for_tests(conn: &mut PgConn, ids: Vec<&TaskId>) -> DbResult<usize> {
+        let cnt = diesel::delete(task::table.filter(task::id.eq_any(ids))).execute(conn)?;
+        Ok(cnt)
+    }
 }
 
 #[cfg(test)]
 #[allow(unused_must_use)]
 mod tests {
-    use macros::db_test;
-    use serde_json::json;
-
     use super::*;
     use crate::test_helpers::have_same_elements;
     use crate::tests::prelude::*;
+    use macros::db_test;
+    use newtypes::LogMessageTaskArgs;
+
+    fn task_data() -> TaskData {
+        TaskData::LogMessage(LogMessageTaskArgs {
+            message: "yo".to_owned(),
+        })
+    }
 
     #[db_test]
     fn create_and_poll(conn: &mut TestPgConn) {
-        let task1 = Task::create(conn, Utc::now(), json!({})).unwrap();
-        let task2 = Task::create(conn, Utc::now(), json!({})).unwrap();
-        let _task3 = Task::create(conn, Utc::now(), json!({})).unwrap();
-        let _task4 = Task::create(conn, Utc::now(), json!({})).unwrap();
+        let task1 = Task::create(conn, Utc::now(), task_data()).unwrap();
+        let task2 = Task::create(conn, Utc::now(), task_data()).unwrap();
+        let _task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
+        let _task4 = Task::create(conn, Utc::now(), task_data()).unwrap();
 
         let tasks = Task::poll(conn, 2).unwrap();
         // The oldest 2 scheduled tasks and returned + their status has changed to Running and their num_attempts is incremented
@@ -125,13 +136,13 @@ mod tests {
 
     #[db_test]
     fn only_pending_tasks_are_retrieved(conn: &mut TestPgConn) {
-        let task1 = Task::create(conn, Utc::now(), json!({})).unwrap();
+        let task1 = Task::create(conn, Utc::now(), task_data()).unwrap();
         Task::update(conn, &task1.id, TaskStatus::Running);
-        let task2 = Task::create(conn, Utc::now(), json!({})).unwrap();
+        let task2 = Task::create(conn, Utc::now(), task_data()).unwrap();
         Task::update(conn, &task2.id, TaskStatus::Completed);
-        let task3 = Task::create(conn, Utc::now(), json!({})).unwrap();
+        let task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
         Task::update(conn, &task3.id, TaskStatus::Failed);
-        let task4 = Task::create(conn, Utc::now(), json!({})).unwrap();
+        let task4 = Task::create(conn, Utc::now(), task_data()).unwrap();
 
         let tasks = Task::poll(conn, 4).unwrap();
         assert_eq!(1, tasks.len());
