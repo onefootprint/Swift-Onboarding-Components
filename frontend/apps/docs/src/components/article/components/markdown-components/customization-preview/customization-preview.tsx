@@ -57,7 +57,7 @@ const IframeContainer = styled.div`
 
     iframe {
       width: 500px;
-      min-height: 480px;
+      min-height: 420px;
     }
   `}
 `;
