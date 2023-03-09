@@ -1141,11 +1141,6 @@
           "content-type": "Content type",
           "target": "Target",
           "token": "Token"
-        },
-        "footer": {
-          "edit-name": "Edit name",
-          "disable": "Disable",
-          "remove": "Remove"
         }
       },
       "create": {

@@ -5,7 +5,6 @@ import React from 'react';
 import BasicConfiguration from './components/basic-configuration';
 import ClientCertificate from './components/client-certificate';
 import CustomHeaders from './components/custom-headers';
-import Footer from './components/footer';
 import IngressVaulting from './components/ingress-vaulting';
 import PinnedServerCertificates from './components/pinned-server-certificates';
 
@@ -20,7 +19,6 @@ const Content = ({ proxyConfig }: ContentProps) => (
     <ClientCertificate proxyConfig={proxyConfig} />
     <PinnedServerCertificates proxyConfig={proxyConfig} />
     <IngressVaulting proxyConfig={proxyConfig} />
-    <Footer />
   </Box>
 );
 
