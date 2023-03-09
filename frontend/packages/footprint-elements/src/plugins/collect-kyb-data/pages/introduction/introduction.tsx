@@ -4,12 +4,13 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, InfoBox, NavigationHeader } from '../../../../components';
+import { HeaderTitle, InfoBox } from '../../../../components';
+import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
 const Introduction = () => {
   const [, send] = useCollectKybDataMachine();
-  const { t } = useTranslation('pages.introduction');
+  const { allT, t } = useTranslation('pages.introduction');
 
   const handleClick = () => {
     send({
@@ -19,7 +20,7 @@ const Introduction = () => {
 
   return (
     <Container>
-      <NavigationHeader button={{ variant: 'close' }} />
+      <CollectKybDataNavigationHeader />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InfoBox
         items={[
@@ -36,7 +37,7 @@ const Introduction = () => {
         ]}
       />
       <Button fullWidth onClick={handleClick}>
-        {t('cta')}
+        {allT('pages.cta-continue')}
       </Button>
     </Container>
   );

@@ -14,6 +14,7 @@ import { MachineContext, MachineEvents } from './types';
   - Add confirm page transitions
   - Add edit flows for both desktop and mobile
   - Add unit tests for state machine
+  - Add pages for optional fields like doing-business-as, website, phone number
 */
 
 const createCollectKybDataMachine = () =>

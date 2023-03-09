@@ -1,21 +1,29 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  BeneficialOwner,
+  BusinessData,
   BusinessDataAttribute,
   OnboardingConfig,
 } from '@onefootprint/types';
 
-export type BusinessData = Partial<{
-  [BusinessDataAttribute.name]: string;
-  [BusinessDataAttribute.ein]: string;
-  [BusinessDataAttribute.beneficialOwners]: BeneficialOwner[];
-  [BusinessDataAttribute.addressLine1]: string;
-  [BusinessDataAttribute.addressLine2]: string;
-  [BusinessDataAttribute.city]: string;
-  [BusinessDataAttribute.state]: string;
-  [BusinessDataAttribute.country]: string;
-  [BusinessDataAttribute.zip]: number;
-}>;
+export type BasicData = Required<
+  Pick<BusinessData, BusinessDataAttribute.name | BusinessDataAttribute.ein>
+>;
+
+export type BusinessAddressData = Required<
+  Pick<
+    BusinessData,
+    | BusinessDataAttribute.addressLine1
+    | BusinessDataAttribute.addressLine2
+    | BusinessDataAttribute.city
+    | BusinessDataAttribute.state
+    | BusinessDataAttribute.country
+    | BusinessDataAttribute.zip
+  >
+>;
+
+export type BeneficialOwnersData = Required<
+  Pick<BusinessData, BusinessDataAttribute.beneficialOwners>
+>;
 
 export type MachineContext = {
   device?: DeviceInfo;
@@ -40,12 +48,21 @@ export type MachineEvents =
     }
   | {
       type: 'basicDataSubmitted';
+      payload: {
+        basicData: BasicData;
+      };
     }
   | {
       type: 'businessAddressSubmitted';
+      payload: {
+        businessAddress: BusinessAddressData;
+      };
     }
   | {
       type: 'beneficialOwnersSubmitted';
+      payload: {
+        beneficialOwners: BeneficialOwnersData;
+      };
     }
   | {
       type: 'navigatedToPrevPage';

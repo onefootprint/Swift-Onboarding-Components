@@ -1,12 +1,10 @@
-import { BusinessDataAttribute } from '@onefootprint/types';
-import { StateValue } from 'xstate';
-
-import { BusinessData } from '../state-machine/types';
+import { BusinessData, BusinessDataAttribute } from '@onefootprint/types';
 
 /*
   TODO:
   - consolidate these placeholder types with backend
   - add unit tests for these utils
+  - add utils for doing-business-as, website, phone number
 */
 
 const BASIC_DATA_ATTRIBUTES = [
@@ -52,32 +50,3 @@ export const hasMissingAttributes = (
   mustCollect: BusinessDataAttribute[],
   collectedData?: BusinessData,
 ) => mustCollect.some(option => !collectedData || !collectedData[option]);
-
-export const getCurrentStepFromMissingAttributes = (
-  attributes: BusinessDataAttribute[],
-  state: StateValue,
-) => {
-  if (!hasMissingAttributes(attributes)) {
-    return 0;
-  }
-  let currentStep = 0;
-  if (isMissingBasicDataAttribute(attributes)) {
-    currentStep += 1;
-    if (state === 'basicInformation') {
-      return currentStep;
-    }
-  }
-  if (isMissingBusinessAddressAttribute(attributes)) {
-    currentStep += 1;
-    if (state === 'residentialAddress') {
-      return currentStep;
-    }
-  }
-  if (isMissingBeneficialOwnerAttribute(attributes)) {
-    currentStep += 1;
-    if (state === 'ssn') {
-      return currentStep;
-    }
-  }
-  return currentStep;
-};
