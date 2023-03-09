@@ -40,3 +40,9 @@ export type NoButtons = {
   secondaryButton?: never;
   linkButton?: never;
 };
+
+export type AllButtons = {
+  primaryButton: DialogButton;
+  secondaryButton: DialogButton;
+  linkButton?: DialogButton;
+};

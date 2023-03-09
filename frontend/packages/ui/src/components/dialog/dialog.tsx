@@ -2,6 +2,7 @@ import { Icon } from '@onefootprint/icons';
 import React from 'react';
 
 import BaseDialog, {
+  AllButtons,
   NoButtons,
   OnlyButtons,
   OnlyPrimaryButton,
@@ -19,7 +20,13 @@ export type DialogProps = {
   testID?: string;
   title: string;
   isConfirmation?: boolean;
-} & (OnlyPrimaryButton | OnlyButtons | PrimaryAndLinkButtons | NoButtons);
+} & (
+  | OnlyPrimaryButton
+  | OnlyButtons
+  | PrimaryAndLinkButtons
+  | NoButtons
+  | AllButtons
+);
 
 // eslint-disable-next-line react/jsx-props-no-spreading
 const Dialog = (props: DialogProps) => <BaseDialog {...props} isResponsive />;

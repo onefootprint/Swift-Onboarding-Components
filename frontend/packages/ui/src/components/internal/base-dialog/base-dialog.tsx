@@ -13,6 +13,7 @@ import Overlay from '../../overlay';
 import Portal from '../../portal';
 import Typography from '../../typography';
 import {
+  AllButtons,
   NoButtons,
   OnlyButtons,
   OnlyPrimaryButton,
@@ -31,7 +32,13 @@ type BaseDialogProps = {
   title: string;
   isResponsive?: boolean;
   isConfirmation?: boolean;
-} & (OnlyPrimaryButton | OnlyButtons | PrimaryAndLinkButtons | NoButtons);
+} & (
+  | AllButtons
+  | OnlyPrimaryButton
+  | OnlyButtons
+  | PrimaryAndLinkButtons
+  | NoButtons
+);
 
 const BaseDialog = ({
   children,
@@ -55,10 +62,15 @@ const BaseDialog = ({
     }
   });
 
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    onClose();
+  };
+
   return open ? (
     <Portal selector="#footprint-portal">
       <FocusTrap>
-        <Overlay onClick={onClose} aria-modal>
+        <Overlay onClick={handleClick} aria-modal>
           <DialogContainer
             aria-label={title}
             data-testid={testID}

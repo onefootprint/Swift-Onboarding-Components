@@ -1,38 +1,75 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText224, IcoPlusSmall16 } from '@onefootprint/icons';
-import { Box, LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, TextArea, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 
+import type { FormData, StepProps } from '@/proxy-configs/proxy-configs.types';
+
+import FormGrid from '../form-grid';
 import UploadFile from '../upload-file';
 
-const PinnedServerCertificates = () => {
+const defaultValue = { certificate: '' };
+
+const PinnedServerCertificates = ({ id, onSubmit, values }: StepProps) => {
   const { t } = useTranslation(
     'pages.proxy-configs.create.form.pinned-server-certificates',
   );
+  const { control, handleSubmit, register, setValue } = useForm<FormData>({
+    defaultValues: {
+      pinnedServerCertificates: values.pinnedServerCertificates,
+    },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'pinnedServerCertificates',
+  });
+
+  const handleAdd = () => {
+    append(defaultValue);
+  };
+
+  const handleRemove = (index: number) => () => {
+    remove(index);
+  };
 
   return (
-    <Box>
+    <form id={id} onSubmit={handleSubmit(onSubmit)}>
       <Typography variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
       </Typography>
-      <Box sx={{ marginBottom: 5 }}>
-        <UploadFile
-          iconComponent={IcoFileText224}
-          label={t('certificate.label')}
-          cta={t('certificate.cta')}
-          placeholder={t('certificate.placeholder')}
-        />
-      </Box>
-      <Box>
-        <LinkButton
-          iconComponent={IcoPlusSmall16}
-          iconPosition="left"
-          size="compact"
-        >
-          {t('add-more')}
-        </LinkButton>
-      </Box>
-    </Box>
+      <FormGrid>
+        {fields.map((field, index) => (
+          <UploadFile
+            accept=".pem, .crt"
+            cta={t('certificate.cta')}
+            iconComponent={IcoFileText224}
+            id={`certificate.${index}`}
+            key={field.id}
+            label={t('certificate.label')}
+            onChange={value =>
+              setValue(`pinnedServerCertificates.${index}.certificate`, value)
+            }
+            onRemove={fields.length >= 2 ? handleRemove(index) : undefined}
+          >
+            <TextArea
+              autoFocus
+              id={`certificate.${index}`}
+              placeholder={t('certificate.placeholder')}
+              {...register(`pinnedServerCertificates.${index}.certificate`)}
+            />
+          </UploadFile>
+        ))}
+      </FormGrid>
+      <LinkButton
+        iconComponent={IcoPlusSmall16}
+        iconPosition="left"
+        onClick={handleAdd}
+        size="compact"
+      >
+        {t('add-more')}
+      </LinkButton>
+    </form>
   );
 };
 

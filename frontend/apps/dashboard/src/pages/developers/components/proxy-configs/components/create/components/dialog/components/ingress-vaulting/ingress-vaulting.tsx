@@ -2,55 +2,143 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import {
   Box,
+  FormControl,
+  FormLabel,
+  InputAddon,
+  InputGroup,
   LinkButton,
-  Select,
+  NativeSelect,
   TextInput,
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 
-const IngressVaulting = () => {
+import type { FormData, StepProps } from '@/proxy-configs/proxy-configs.types';
+
+import FormGrid from '../form-grid';
+
+const defaultRule = { token: '', target: '' };
+
+const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
   const { t } = useTranslation(
     'pages.proxy-configs.create.form.ingress-vaulting',
   );
+  const { handleSubmit, control, register } = useForm<FormData>({
+    defaultValues: {
+      ingressSettings: {
+        contentType: 'json',
+        rules: values.ingressSettings.rules,
+      },
+    },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'ingressSettings.rules',
+  });
+
+  const handleAdd = () => {
+    append(defaultRule);
+  };
+
+  const handleRemove = (index: number) => () => {
+    remove(index);
+  };
 
   return (
-    <Box>
+    <form id={id} onSubmit={handleSubmit(onSubmit)}>
       <Typography variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
       </Typography>
       <Box sx={{ marginBottom: 8 }}>
-        <Select
-          label={t('content-type.label')}
-          options={[{ label: 'application/json', value: 'JSON' }]}
-        />
+        <FormControl>
+          <FormLabel htmlFor="method">{t('content-type.label')}</FormLabel>
+          <NativeSelect
+            disabled
+            id="method"
+            placeholder={t('content-type.placeholder')}
+            {...register('ingressSettings.contentType')}
+          >
+            <option value="json">JSON</option>
+          </NativeSelect>
+        </FormControl>
       </Box>
-      <Box sx={{ marginBottom: 5 }}>
-        <Typography variant="label-2" sx={{ marginBottom: 5 }}>
-          {t('vaulting-rules.title')}
-        </Typography>
-        <Box sx={{ display: 'grid', gap: 5 }}>
-          <TextInput
-            label={t('vaulting-rules.token.label')}
-            placeholder={t('vaulting-rules.token.placeholder')}
-          />
-          <TextInput
-            label={t('vaulting-rules.target.label')}
-            placeholder={t('vaulting-rules.target.placeholder')}
-          />
-        </Box>
-      </Box>
-      <Box>
-        <LinkButton
-          iconComponent={IcoPlusSmall16}
-          iconPosition="left"
-          size="compact"
-        >
-          {t('add-more')}
-        </LinkButton>
-      </Box>
-    </Box>
+      <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+        {t('vaulting-rules.title')}
+      </Typography>
+      <FormGrid>
+        {fields.map((field, index) => (
+          <Box key={field.id}>
+            <Box sx={{ display: 'grid', gap: 5, marginBottom: 3 }}>
+              <FormControl>
+                <FormLabel htmlFor={`token-${index}`}>
+                  {t('vaulting-rules.token.label')}
+                </FormLabel>
+                <InputGroup>
+                  <InputAddon>custom.</InputAddon>
+                  <TextInput
+                    autoFocus
+                    id={`token-${index}`}
+                    placeholder={t('vaulting-rules.token.placeholder')}
+                    {...register(`ingressSettings.rules.${index}.token`, {
+                      ...createValidationOptions(
+                        index,
+                        t('vaulting-rules.token.errors.required'),
+                      ),
+                    })}
+                  />
+                </InputGroup>
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor={`target-${index}`}>
+                  {t('vaulting-rules.target.label')}
+                </FormLabel>
+                <TextInput
+                  id={`target-${index}`}
+                  placeholder={t('vaulting-rules.target.placeholder')}
+                  {...register(`ingressSettings.rules.${index}.target`, {
+                    ...createValidationOptions(
+                      index,
+                      t('vaulting-rules.target.errors.required'),
+                    ),
+                  })}
+                />
+              </FormControl>
+            </Box>
+            {fields.length >= 2 && (
+              <LinkButton
+                onClick={handleRemove(index)}
+                size="compact"
+                variant="destructive"
+              >
+                Remove
+              </LinkButton>
+            )}
+          </Box>
+        ))}
+      </FormGrid>
+      <LinkButton
+        iconComponent={IcoPlusSmall16}
+        iconPosition="left"
+        onClick={handleAdd}
+        size="compact"
+      >
+        {t('add-more')}
+      </LinkButton>
+    </form>
   );
+};
+
+const createValidationOptions = (index: number, message: string) => {
+  if (index === 0) {
+    return {
+      required: {
+        value: true,
+        message,
+      },
+    };
+  }
+  return undefined;
 };
 
 export default IngressVaulting;

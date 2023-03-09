@@ -1,11 +1,6 @@
 import styled, { css } from 'styled-components';
 
-export type OverlayProps = {
-  onClick?: () => void;
-  testID?: string;
-};
-
-const Overlay = styled.div<OverlayProps>`
+const Overlay = styled.div`
   ${({ theme }) => css`
     align-items: center;
     background: rgba(0, 0, 0, 0.3);

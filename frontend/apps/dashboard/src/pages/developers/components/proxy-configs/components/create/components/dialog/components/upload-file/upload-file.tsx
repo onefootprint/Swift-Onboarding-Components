@@ -1,35 +1,83 @@
-import { Icon } from '@onefootprint/icons';
+import { useTranslation } from '@onefootprint/hooks';
+import { Icon, IcoTrash16 } from '@onefootprint/icons';
 import {
   Box,
   Button,
   createFontStyles,
-  TextArea,
+  Divider,
+  IconButton,
+  LinkButton,
   Typography,
 } from '@onefootprint/ui';
-import React, { useId } from 'react';
-import styled, { css } from 'styled-components';
+import React, { useRef, useState } from 'react';
+import styled from 'styled-components';
 
 export type UploadFileProps = {
-  label: string;
+  accept: string;
+  children: React.ReactNode;
   cta: string;
-  placeholder: string;
   iconComponent: Icon;
+  id: string;
+  label: string;
+  onChange: (value: string) => void;
+  onRemove?: () => void;
 };
 
 const UploadFile = ({
-  iconComponent: IconComponent,
-  label,
+  accept,
+  children,
   cta,
-  placeholder,
+  iconComponent: IconComponent,
+  id,
+  label,
+  onChange,
+  onRemove,
 }: UploadFileProps) => {
-  const id = useId();
+  const { t } = useTranslation('pages.proxy-configs.create.form.upload-file');
+  const [fileName, setFileName] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleClick = () => {
+    inputRef.current?.click();
+  };
+
+  const readFile = async (file: File) => {
+    const newValue = await file.text();
+    onChange(newValue);
+    setFileName(file.name);
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.length) return;
+    const [file] = event.target.files;
+    readFile(file);
+  };
+
+  const handleRemove = () => {
+    if (inputRef.current) inputRef.current.value = '';
+    onChange('');
+    setFileName('');
+  };
 
   return (
     <Box>
-      <Label htmlFor={id}>
-        <IconComponent />
-        {label}
-      </Label>
+      <Box
+        sx={{
+          display: 'flex',
+          marginBottom: 4,
+          justifyContent: 'space-between',
+        }}
+      >
+        <Label htmlFor={id}>
+          <IconComponent />
+          {label}
+        </Label>
+        {onRemove && (
+          <LinkButton onClick={onRemove} variant="destructive" size="compact">
+            {t('remove')}
+          </LinkButton>
+        )}
+      </Box>
       <Box
         sx={{
           backgroundColor: 'secondary',
@@ -37,27 +85,75 @@ const UploadFile = ({
           borderRadius: 'default',
         }}
       >
-        <Button variant="secondary" size="compact" fullWidth>
-          {cta}
-        </Button>
-        <Box sx={{ marginY: 3, display: 'flex', justifyContent: 'center' }}>
-          <Typography color="quaternary" variant="body-4">
-            or
-          </Typography>
+        <Box>
+          <Button
+            fullWidth
+            onClick={handleClick}
+            size="compact"
+            variant="secondary"
+          >
+            {cta}
+          </Button>
         </Box>
-        <TextArea placeholder={placeholder} id={id} />
+        {fileName ? (
+          <>
+            <Box sx={{ marginY: 5 }}>
+              <Divider />
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Box>
+                <Typography variant="body-3">{fileName}</Typography>
+              </Box>
+              <IconButton aria-label={t('remove')} onClick={handleRemove}>
+                <IcoTrash16 color="error" />
+              </IconButton>
+            </Box>
+          </>
+        ) : (
+          <>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: 3,
+                marginY: 5,
+              }}
+            >
+              <Divider />
+              <Typography color="quaternary" variant="body-4">
+                {t('or')}
+              </Typography>
+              <Divider />
+            </Box>
+            {children}
+          </>
+        )}
       </Box>
+      <HiddenInput
+        accept={accept}
+        ref={inputRef}
+        type="file"
+        onChange={handleChange}
+      />
     </Box>
   );
 };
 
 const Label = styled.label`
-  ${({ theme }) => css`
-    ${createFontStyles('label-3')};
-    margin-bottom: ${theme.spacing[5]};
-    display: flex;
-    align-items: center;
-  `}
+  ${createFontStyles('label-3')};
+  display: flex;
+  align-items: center;
+`;
+
+const HiddenInput = styled.input`
+  display: none;
 `;
 
 export default UploadFile;

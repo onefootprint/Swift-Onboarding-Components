@@ -8,8 +8,6 @@ import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-import { PROXY_CONFIGS_LIST_QUERY_KEY } from '@/proxy-configs/constants';
-
 const createProxyConfig = async (
   authHeaders: AuthHeaders,
   payload: CreateProxyConfigRequest,
@@ -25,7 +23,7 @@ const createProxyConfig = async (
 };
 
 const useCreateProxyConfig = () => {
-  const { t } = useTranslation('pages.proxy-configs.notifications');
+  const { t } = useTranslation('pages.proxy-configs.notifications.create');
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();
@@ -40,12 +38,12 @@ const useCreateProxyConfig = () => {
         variant: 'error',
       });
     },
-    onSuccess: () => {
+    onSuccess: (response: CreateProxyConfigResponse) => {
       toast.show({
         title: t('success.title'),
-        description: t('success.description'),
+        description: t('success.description', { name: response.name }),
       });
-      queryClient.invalidateQueries(PROXY_CONFIGS_LIST_QUERY_KEY);
+      queryClient.invalidateQueries();
     },
   });
 };

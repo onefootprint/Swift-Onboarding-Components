@@ -78,7 +78,7 @@ describe('<Members />', () => {
       withMembersError();
     });
 
-    it('should render an error message', async () => {
+    it('should show an error message', async () => {
       renderMembers();
 
       await waitFor(() => {
@@ -206,7 +206,7 @@ describe('<Members />', () => {
           withRolesError();
         });
 
-        it('should render an error message', async () => {
+        it('should show an error message', async () => {
           await renderMembersAndWaitData();
 
           const inviteButton = screen.getByRole('button', {

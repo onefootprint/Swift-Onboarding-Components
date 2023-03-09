@@ -1155,25 +1155,29 @@
           "title": "Create vault proxy config",
           "name": {
             "label": "Vault proxy configuration name",
-            "placeholder": "My vault proxy config"
+            "placeholder": "My vault proxy config",
+            "errors": {
+              "required": "Please enter a name"
+            }
           },
           "basic-configuration": {
             "title": "Basic configuration",
             "url": {
               "label": "URL",
-              "placeholder": "www.website.com",
+              "placeholder": "https://acme.com",
               "errors": {
-                "required": "Please enter a URL"
+                "required": "Please enter a url"
               }
             },
             "method": {
-              "label": "Method",
+              "label": "HTTP Method",
+              "placeholder": "Select a method",
               "errors": {
-                "required": "Please enter a URL"
+                "required": "Please enter a method"
               }
             },
             "access-reason": {
-              "label": "Decryption reason",
+              "label": "Access reason",
               "placeholder": "Reason",
               "errors": {
                 "required": "Please enter a reason"
@@ -1191,9 +1195,10 @@
             "secret": {
               "label": "Secret"
             },
+            "remove": "Remove",
             "add-more": "Add another"
           },
-          "client-certificates": {
+          "client-identity": {
             "title": "Client certificate authentication (mTLS)",
             "certificate": {
               "label": "Certificate",
@@ -1232,6 +1237,10 @@
               }
             },
             "add-more": "Add another"
+          },
+          "upload-file": {
+            "or": "or",
+            "remove": "Remove file"
           }
         }
       },
@@ -1239,7 +1248,7 @@
         "create": {
           "success": {
             "title": "Vault proxy configuration created",
-            "description": "Vault proxy configuration {{name}} was created successfully."
+            "description": "Vault Proxy config {{name}} was created successfully"
           },
           "error": {
             "title": "Error creating vault proxy configuration"

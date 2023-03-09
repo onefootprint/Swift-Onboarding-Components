@@ -2,73 +2,81 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
 import { CreateProxyConfigRequest } from '@onefootprint/types';
 import { Dialog as FPDialog } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { PROXY_FORM_ID } from '@/proxy-configs/constants';
+import type { FormData } from '@/proxy-configs/proxy-configs.types';
 
-import * as stepComponents from './components';
+import FormWizard from './components/form-wizard';
+import steps from './constants';
 import useCreateProxyConfig from './hooks/use-create-proxy-config';
 
-const steps = [
-  { id: 'name', Step: stepComponents.Name },
-  { id: 'base-config', Step: stepComponents.BaseConfiguration },
-  { id: 'custom-header', Step: stepComponents.CustomHeaderValues },
-  { id: 'client-certificates', Step: stepComponents.ClientCertificates },
-  { id: 'server-certificates', Step: stepComponents.PinnedServerCertificates },
-  { id: 'ingress-vaulting', Step: stepComponents.IngressVaulting },
-];
-
 type DialogProps = {
+  defaultValues: FormData;
   onClose: () => void;
   open: boolean;
 };
 
-const Dialog = ({ onClose, open }: DialogProps) => {
+const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
   const { t, allT } = useTranslation('pages.proxy-configs.create.form');
   const mutation = useCreateProxyConfig();
-  const [step, setStep] = useState(0);
-  const isFirstStep = step === 0;
-  const isLastStep = step === steps.length - 1;
+  const [stepIndex, setStepIndex] = useState(0);
+  const isFirstStep = stepIndex === 0;
+  const isLastStep = stepIndex === steps.length - 1;
+  const maxStep = steps.length - 1;
+  const { Component, id, canSkip } = steps[stepIndex];
 
-  const handleSubmit = (proxyConfig: CreateProxyConfigRequest) => {
-    mutation.mutate(proxyConfig, { onSuccess: onClose });
+  useEffect(() => {
+    if (!open) {
+      setStepIndex(0);
+    }
+  }, [open]);
+
+  const goForward = () => {
+    if (stepIndex < maxStep) {
+      setStepIndex(prevStep => prevStep + 1);
+    }
   };
 
   const goBack = () => {
-    setStep(currentStep => currentStep - 1);
+    if (stepIndex > 0) {
+      setStepIndex(prevStep => prevStep - 1);
+    }
   };
 
-  const goNext = () => {
-    if (!isLastStep) {
-      setStep(currentStep => currentStep + 1);
-    }
+  const handleSubmit = (formData: CreateProxyConfigRequest) => {
+    mutation.mutate(formData, { onSuccess: onClose });
   };
 
   return (
     <FPDialog
+      closeIconComponent={isFirstStep ? IcoClose24 : IcoChevronLeftBig24}
+      onClose={isFirstStep ? onClose : goBack}
+      open={open}
       size="compact"
       title={t('title')}
-      onClose={isFirstStep ? onClose : goBack}
-      closeIconComponent={isFirstStep ? IcoClose24 : IcoChevronLeftBig24}
-      open={open}
+      linkButton={
+        canSkip ? { label: allT('skip'), onClick: goForward } : undefined
+      }
       primaryButton={{
-        form: PROXY_FORM_ID,
+        form: id,
         label: isLastStep ? allT('save') : allT('next'),
         loading: mutation.isLoading,
-        type: isLastStep ? 'submit' : 'button',
-        onClick: goNext,
+        type: 'submit',
       }}
       secondaryButton={{
-        label: allT('cancel'),
         disabled: mutation.isLoading,
+        label: allT('cancel'),
         onClick: onClose,
       }}
     >
-      <form onSubmit={handleSubmit}>
-        {steps.map(
-          ({ Step, id }, index) => step === index && <Step key={id} />,
-        )}
-      </form>
+      <FormWizard
+        Component={Component}
+        defaultValues={defaultValues}
+        id={id}
+        isLastStep={isLastStep}
+        onForward={goForward}
+        onSubmit={handleSubmit}
+      />
     </FPDialog>
   );
 };

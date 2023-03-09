@@ -4,6 +4,8 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
+import { CREATE_DEFAULT_VALUES } from '@/proxy-configs/constants';
+
 import Dialog from './components/dialog';
 
 const Create = () => {
@@ -22,7 +24,11 @@ const Create = () => {
           {t('create.cta')}
         </Button>
       </PermissionGate>
-      <Dialog onClose={close} open={isOpen} />
+      <Dialog
+        defaultValues={CREATE_DEFAULT_VALUES}
+        onClose={close}
+        open={isOpen}
+      />
     </>
   );
 };
