@@ -55,7 +55,7 @@ const Header = styled.header`
   `};
 `;
 
-const Title = styled.legend`
+const Title = styled.div`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
