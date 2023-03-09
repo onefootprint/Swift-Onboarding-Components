@@ -17,17 +17,17 @@ use newtypes::{
     PiiString, ScopedUserId, VaultId, VaultPublicKey, VdKind,
 };
 
-/// Helps to process updates for data in an IdentityDataUpdate request.
-pub struct VdBuilder<T> {
+/// Helps to process updates for data in a DataRequest<T>.
+pub struct VaultDataBuilder<T> {
     data: Vec<NewVaultData<T>>,
 }
 
-impl<T> VdBuilder<T>
+impl<T> VaultDataBuilder<T>
 where
     T: IsDataIdentifierDiscriminant + Into<VdKind>,
     DataLifetimeKind: From<T>,
 {
-    /// Construct the list of NewUserVaultData from an IdentityDataUpdate
+    /// Construct the list of NewVaultData from a DataRequest<T>
     pub fn build(update: DataRequest<T>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
         let mut data = vec![];
 

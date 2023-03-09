@@ -1,4 +1,4 @@
-use super::vd_builder::VdBuilder;
+use super::vault_data_builder::VaultDataBuilder;
 use super::WriteableVw;
 use crate::auth::AuthError;
 use crate::errors::user::UserError;
@@ -220,7 +220,7 @@ impl WriteableVw<Person> {
         {
             return Err(UserError::InvalidDataKind(*idk).into());
         }
-        let builder = VdBuilder::build(update, v.public_key.clone())?;
+        let builder = VaultDataBuilder::build(update, v.public_key.clone())?;
         builder.validate_and_save(
             conn,
             existing_fields,
@@ -242,7 +242,7 @@ impl WriteableVw<Business> {
         let existing_fields = self.get_populated_business_fields();
         let v = self.vault();
 
-        let builder = VdBuilder::build(update, v.public_key.clone())?;
+        let builder = VaultDataBuilder::build(update, v.public_key.clone())?;
         builder.validate_and_save(
             conn,
             existing_fields, // business logic doesn't currently use this
