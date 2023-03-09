@@ -211,7 +211,7 @@ impl WriteableVw<Person> {
         fingerprints: NewFingerprints<IDK>,
     ) -> Result<(), ApiError> {
         let existing_fields = self.get_populated_identity_fields();
-        let uv = self.vault();
+        let v = self.vault();
 
         // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
         if let Some(idk) = [IDK::PhoneNumber, IDK::Email]
@@ -220,11 +220,11 @@ impl WriteableVw<Person> {
         {
             return Err(UserError::InvalidDataKind(*idk).into());
         }
-        let builder = VdBuilder::build(update, uv.public_key.clone())?;
+        let builder = VdBuilder::build(update, v.public_key.clone())?;
         builder.validate_and_save(
             conn,
             existing_fields,
-            uv.id.clone(),
+            v.id.clone(),
             self.scoped_user_id.clone(),
             fingerprints,
         )?;
@@ -239,17 +239,16 @@ impl WriteableVw<Business> {
         conn: &mut TxnPgConn,
         update: DataRequest<BusinessDataKind>,
     ) -> Result<(), ApiError> {
-        // TODO existing fields
-        let existing_fields = vec![];
-        let uv = self.vault();
+        let existing_fields = self.get_populated_business_fields();
+        let v = self.vault();
 
-        let builder = VdBuilder::build(update, uv.public_key.clone())?;
+        let builder = VdBuilder::build(update, v.public_key.clone())?;
         builder.validate_and_save(
             conn,
-            existing_fields,
-            uv.id.clone(),
+            existing_fields, // business logic doesn't currently use this
+            v.id.clone(),
             self.scoped_user_id.clone(),
-            HashMap::new(),
+            HashMap::new(), // no fingerprints for business data yet
         )?;
 
         Ok(())

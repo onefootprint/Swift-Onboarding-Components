@@ -1,3 +1,4 @@
+use super::Business;
 use super::{Person, VaultWrapper};
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
@@ -5,6 +6,7 @@ use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
+use newtypes::BusinessDataKind as BDK;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
@@ -71,6 +73,20 @@ impl VaultWrapper<Person> {
 
     pub fn get_populated_custom_data(&self) -> Vec<KvDataKey> {
         self.kv_data().keys().cloned().collect()
+    }
+}
+
+impl VaultWrapper<Business> {
+    pub fn get_business_data_e_field(&self, kind: BDK) -> Option<&SealedVaultBytes> {
+        self.speculative
+            .get_business_data_e_field(kind)
+            .or_else(|| self.portable.get_business_data_e_field(kind))
+    }
+
+    pub fn get_populated_business_fields(&self) -> Vec<BDK> {
+        BDK::iter()
+            .filter(|k| self.get_business_data_e_field(*k).is_some())
+            .collect()
     }
 }
 
