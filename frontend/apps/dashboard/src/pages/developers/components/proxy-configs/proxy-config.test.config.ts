@@ -129,15 +129,15 @@ export const withEditProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
 
 export const withRemoveProxyConfig = (proxyConfig: ProxyConfigDetails) =>
   mockRequest({
-    method: 'delete',
-    path: `/org/proxy_configs/${proxyConfig.id}`,
+    method: 'post',
+    path: `/org/proxy_configs/${proxyConfig.id}/deactivate`,
     response: {},
   });
 
 export const withRemoveProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
   mockRequest({
-    method: 'delete',
-    path: `/org/proxy_configs/${proxyConfig.id}`,
+    method: 'post',
+    path: `/org/proxy_configs/${proxyConfig.id}/deactivate`,
     statusCode: 400,
     response: {
       error: {

@@ -7,8 +7,8 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const removeProxyConfig = async (authHeaders: AuthHeaders, id: string) => {
   const response = await request({
-    method: 'delete',
-    url: `/org/proxy_configs/${id}`,
+    method: 'POST',
+    url: `/org/proxy_configs/${id}/deactivate`,
     headers: authHeaders,
   });
 

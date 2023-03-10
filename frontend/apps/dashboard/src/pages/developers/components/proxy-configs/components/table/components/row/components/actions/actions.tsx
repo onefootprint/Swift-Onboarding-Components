@@ -51,6 +51,7 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
           <Dropdown.Item
             onSelect={handleRemove}
             onClick={event => event.stopPropagation()}
+            variant="destructive"
           >
             {t('remove.cta')}
           </Dropdown.Item>

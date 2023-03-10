@@ -44,11 +44,13 @@ const StyledDropdownContent = styled(RadixDropdown.Content)`
   `}
 `;
 
-const StyledDropdownItem = styled(RadixDropdown.Item)`
-  ${({ theme }) => css`
+const StyledDropdownItem = styled(RadixDropdown.Item)<{
+  variant?: 'default' | 'destructive';
+}>`
+  ${({ theme, variant }) => css`
     ${createFontStyles('body-3')};
     cursor: pointer;
-    color: ${theme.color.primary};
+    color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
     padding: ${theme.spacing[2]} ${theme.spacing[5]};
     outline: none;
 
