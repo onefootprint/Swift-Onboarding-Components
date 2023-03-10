@@ -77,15 +77,33 @@ impl VaultWrapper<Person> {
 }
 
 impl VaultWrapper<Business> {
-    pub fn get_business_data_e_field(&self, kind: BDK) -> Option<&SealedVaultBytes> {
+    pub fn get_business_e_field(&self, kind: BDK) -> Option<&SealedVaultBytes> {
         self.speculative
             .get_business_data_e_field(kind)
             .or_else(|| self.portable.get_business_data_e_field(kind))
     }
 
+    pub fn has_business_field(&self, kind: BDK) -> bool {
+        self.get_business_e_field(kind).is_some()
+    }
+
     pub fn get_populated_business_fields(&self) -> Vec<BDK> {
         BDK::iter()
-            .filter(|k| self.get_business_data_e_field(*k).is_some())
+            .filter(|k| self.get_business_e_field(*k).is_some())
+            .collect()
+    }
+
+    pub fn missing_business_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
+        // can we generify this to share with missing_id_fields?
+        ob_config
+            .must_collect_data
+            .iter()
+            .filter(|cdo| {
+                cdo.required_attributes::<BDK>()
+                    .iter()
+                    .any(|d| !self.has_business_field(*d))
+            })
+            .cloned()
             .collect()
     }
 }

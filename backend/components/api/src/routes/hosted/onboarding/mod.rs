@@ -1,7 +1,7 @@
 use crate::{
     auth::session::AuthSessionData,
     auth::user::{AuthedOnboardingInfo, ValidateUserToken},
-    errors::ApiResult,
+    errors::{user::UserError, ApiResult},
     utils::{
         self,
         session::AuthSession,
@@ -20,7 +20,7 @@ use db::{
     DbError, PgConn,
 };
 use itertools::Itertools;
-use newtypes::{OnboardingId, SessionAuthToken, VaultId};
+use newtypes::{OnboardingId, ScopedUserId, SessionAuthToken, VaultId};
 use paperclip::actix::web;
 
 pub mod authorize;
@@ -66,6 +66,7 @@ fn create_onboarding_validation_token(
 pub fn get_requirements(
     conn: &mut PgConn,
     ob_info: &AuthedOnboardingInfo,
+    scoped_business_id: Option<ScopedUserId>,
 ) -> ApiResult<(Vec<OnboardingRequirement>, Onboarding)> {
     let ob_config_id = &ob_info.ob_config.id;
     let scoped_user_id = &ob_info.scoped_user.id;
@@ -73,6 +74,16 @@ pub fn get_requirements(
     let uvw = VaultWrapper::build(conn, VwArgs::Tenant(scoped_user_id))?;
     let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.vault.id, ob_config_id))?;
     let missing_id_fields = uvw.missing_identity_fields(&ob_info.ob_config);
+
+    // Fetch missing business fields
+    let missing_business_fields = if ob_info.ob_config.must_collect_business() {
+        let scoped_business_id = scoped_business_id.ok_or(UserError::NotAllowedWithoutBusiness)?;
+        let bvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_business_id))?;
+        bvw.missing_business_fields(&ob_info.ob_config)
+    } else {
+        vec![]
+    };
+
     // Document requirements are determined by the presence of DocumentRequest database objects.
     // In various places in the codebase, we will determine if a DocumentRequest should be created
     //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
@@ -111,6 +122,9 @@ pub fn get_requirements(
     let requirements = vec![
         (!missing_id_fields.is_empty()).then_some(OnboardingRequirement::CollectData {
             missing_attributes: missing_id_fields,
+        }),
+        (!missing_business_fields.is_empty()).then_some(OnboardingRequirement::CollectBusinessData {
+            missing_attributes: missing_business_fields,
         }),
         // check if we have liveness events
         liveness_events

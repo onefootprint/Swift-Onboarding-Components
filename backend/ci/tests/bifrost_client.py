@@ -59,6 +59,7 @@ class BifrostClient:
         self.auth_token = user.auth_token
         self.phone_number = user.phone_number
         self.document_data = document_data
+        return self.auth_token
 
     def initialize_onboarding(self):
         """Initialize the onboarding"""
@@ -95,18 +96,20 @@ class BifrostClient:
         )
         post("hosted/user/biometric", data, self.auth_token)
 
+    def get_requirements(self):
+        return get(
+            "hosted/onboarding/status",
+            None,
+            self.auth_token,
+        )["requirements"]
+
     def add_identity_document_data(self):
         """Add identity documents to vault"""
         from .image_fixtures import test_image
 
-        body = get(
-            "hosted/onboarding/status",
-            None,
-            self.auth_token,
-        )
-
         # We have a requirement
-        get_requirement_from_requirements("collect_document", body["requirements"])
+        requirements = self.get_requirements()
+        get_requirement_from_requirements("collect_document", requirements)
 
         data = {
             "front_image": test_image,

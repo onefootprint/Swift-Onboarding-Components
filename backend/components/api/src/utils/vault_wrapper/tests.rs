@@ -131,7 +131,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(bvw.get_business_data_e_field(attribute), expected_value.as_ref());
+        assert_eq!(bvw.get_business_e_field(attribute), expected_value.as_ref());
     }
 }
 

@@ -23,7 +23,8 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let (requirements, _) = get_requirements(conn, &ob_info)?;
+            let scoped_business_id = user_auth.scoped_business_id();
+            let (requirements, _) = get_requirements(conn, &ob_info, scoped_business_id)?;
             let fields_to_authorize: AuthorizeFields =
                 get_fields_to_authorize(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
 

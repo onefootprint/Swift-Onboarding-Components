@@ -1,5 +1,10 @@
 import pytest
-from tests.utils import create_ob_config, put, post
+from tests.utils import (
+    create_ob_config,
+    put,
+    post,
+    get_requirement_from_requirements,
+)
 from tests.bifrost_client import BifrostClient
 from tests.constants import PHONE_NUMBER
 
@@ -18,9 +23,14 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 @pytest.fixture(scope="session")
 def sandbox_user_w_business(kyb_sandbox_ob_config, twilio):
     bifrost_client = BifrostClient(kyb_sandbox_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio)
+    auth_token = bifrost_client.init_user_for_onboarding(twilio)
     bifrost_client.initialize_onboarding()
-    return bifrost_client.auth_token
+    requirements = bifrost_client.get_requirements()
+    business_requirement = get_requirement_from_requirements(
+        "collect_business_data", requirements
+    )
+    assert business_requirement["missing_attributes"] == ["business_name"]
+    return auth_token
 
 
 @pytest.mark.parametrize(

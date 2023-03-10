@@ -9,8 +9,12 @@ use strum::EnumDiscriminants;
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]
 pub enum OnboardingRequirement {
-    /// There is missing data that must be collected
+    /// There is missing identity data that must be collected
     CollectData {
+        missing_attributes: Vec<CollectedDataOption>,
+    },
+    /// There is missing business data that must be collected
+    CollectBusinessData {
         missing_attributes: Vec<CollectedDataOption>,
     },
     /// Perform liveness checks
