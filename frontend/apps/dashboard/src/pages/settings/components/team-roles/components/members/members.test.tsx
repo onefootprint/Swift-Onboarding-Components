@@ -409,7 +409,7 @@ describe('<Members />', () => {
           });
           await userEvent.click(actionButton);
 
-          const removeButton = screen.getByText('Remove member');
+          const removeButton = screen.getByText('Remove');
           await userEvent.click(removeButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
@@ -447,7 +447,7 @@ describe('<Members />', () => {
           });
           await userEvent.click(actionButton);
 
-          const removeButton = screen.getByText('Remove member');
+          const removeButton = screen.getByText('Remove');
           await userEvent.click(removeButton);
           await waitFor(() => {
             screen.getByRole('dialog', {

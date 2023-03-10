@@ -89,7 +89,7 @@ describe('<Row />', () => {
       });
       await userEvent.click(actionButton);
 
-      const removeButton = screen.getByText('Remove role');
+      const removeButton = screen.getByText('Remove');
       await userEvent.click(removeButton);
 
       await waitFor(() => {

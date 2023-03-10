@@ -61,9 +61,8 @@ const Actions = ({ member }: ActionsProps) => {
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>
         </PermissionGate>
-
         <Dropdown.Content align="end">
-          <Dropdown.Item onSelect={handleRemove}>
+          <Dropdown.Item onSelect={handleRemove} variant="destructive">
             {t('remove.cta')}
           </Dropdown.Item>
         </Dropdown.Content>

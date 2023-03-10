@@ -856,7 +856,7 @@
             "aria-label": "Open actions for member {{email}}",
             "not-allowed": "You are not allowed to change teammates",
             "remove": {
-              "cta": "Remove member",
+              "cta": "Remove",
               "confirmation": {
                 "title": "Remove team member",
                 "description": "You’re about to remove <b>{{name}}</b> from your team. Are you sure?"
@@ -940,8 +940,8 @@
           "actions": {
             "aria-label": "Open actions for role {{name}}",
             "not-allowed": "You are not allowed to manage roles",
-            "remove": "Remove role",
-            "edit": "Edit role"
+            "remove": "Remove",
+            "edit": "Edit"
           }
         },
         "create": {

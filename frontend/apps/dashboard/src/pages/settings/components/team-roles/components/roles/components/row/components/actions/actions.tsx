@@ -39,7 +39,9 @@ const Actions = ({ role }: ActionsProps) => {
         </PermissionGate>
         <Dropdown.Content align="end">
           <Dropdown.Item onSelect={handleEdit}>{t('edit')}</Dropdown.Item>
-          <Dropdown.Item onSelect={handleRemove}>{t('remove')}</Dropdown.Item>
+          <Dropdown.Item onSelect={handleRemove} variant="destructive">
+            {t('remove')}
+          </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
       <Remove role={role} ref={removeRef} />

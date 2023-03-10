@@ -299,7 +299,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const editButton = screen.getByText('Edit role');
+          const editButton = screen.getByText('Edit');
           await userEvent.click(editButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
@@ -347,7 +347,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const editButton = screen.getByText('Edit role');
+          const editButton = screen.getByText('Edit');
           await userEvent.click(editButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
@@ -390,7 +390,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const removeButton = screen.getByText('Remove role');
+          const removeButton = screen.getByText('Remove');
           await userEvent.click(removeButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
@@ -431,7 +431,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const removeButton = screen.getByText('Remove role');
+          const removeButton = screen.getByText('Remove');
           await userEvent.click(removeButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
