@@ -5,10 +5,18 @@ import { useMutation } from '@tanstack/react-query';
 import { AUTH_HEADER } from '../../../../../config/constants';
 
 const businessDataRequest = async (payload: BusinessDataRequest) => {
-  // TODO: implement based on api routes
+  let method;
+  let url;
+  if (payload.speculative) {
+    method = 'POST';
+    url = '/hosted/business/vault/validate';
+  } else {
+    method = 'PUT';
+    url = '/hosted/business/vault';
+  }
   const response = await requestWithoutCaseConverter<BusinessDataResponse>({
-    method: 'POST',
-    url: '',
+    method,
+    url,
     data: payload,
     headers: {
       [AUTH_HEADER]: payload.authToken,
