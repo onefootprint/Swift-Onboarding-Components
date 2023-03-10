@@ -18,6 +18,7 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
   );
   const { handleSubmit, register, formState } = useForm<FormData>({
     defaultValues: {
+      name: values.name,
       accessReason: values.accessReason,
       method: values.method,
       url: values.url,
@@ -30,22 +31,32 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
         {t('title')}
       </Typography>
       <Box sx={{ display: 'grid', gap: 7 }}>
-        <FormControl>
-          <TextInput
-            autoFocus
-            hasError={!!formState.errors.url}
-            hint={formState.errors.url?.message}
-            label={t('url.label')}
-            placeholder={t('url.placeholder')}
-            type="url"
-            {...register('url', {
-              required: {
-                value: true,
-                message: t('url.errors.required'),
-              },
-            })}
-          />
-        </FormControl>
+        <TextInput
+          autoFocus
+          hasError={!!formState.errors.name}
+          hint={formState.errors.name?.message}
+          label={t('name.label')}
+          placeholder={t('name.placeholder')}
+          {...register('name', {
+            required: {
+              value: true,
+              message: t('name.errors.required'),
+            },
+          })}
+        />
+        <TextInput
+          hasError={!!formState.errors.url}
+          hint={formState.errors.url?.message}
+          label={t('url.label')}
+          placeholder={t('url.placeholder')}
+          type="url"
+          {...register('url', {
+            required: {
+              value: true,
+              message: t('url.errors.required'),
+            },
+          })}
+        />
         <FormControl>
           <FormLabel htmlFor="method">{t('method.label')}</FormLabel>
           <NativeSelect

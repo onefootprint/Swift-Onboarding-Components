@@ -2,11 +2,9 @@ import BasicConfiguration from './components/basic-configuration';
 import ClientCertificates from './components/client-identity';
 import CustomHeaderValues from './components/custom-header-values';
 import IngressVaulting from './components/ingress-vaulting';
-import Name from './components/name';
 import PinnedServerCertificates from './components/pinned-server-certificates';
 
 const steps = [
-  { id: 'name', Component: Name, canSkip: false },
   { id: 'base-config', Component: BasicConfiguration, canSkip: false },
   { id: 'custom-header', Component: CustomHeaderValues, canSkip: true },
   { id: 'client-identity', Component: ClientCertificates, canSkip: true },

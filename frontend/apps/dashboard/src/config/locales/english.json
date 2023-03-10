@@ -1150,15 +1150,15 @@
         "cta-not-allowed": "You're not allowed to create vault proxy configurations",
         "form": {
           "title": "Create vault proxy config",
-          "name": {
-            "label": "Vault proxy configuration name",
-            "placeholder": "My vault proxy config",
-            "errors": {
-              "required": "Please enter a name"
-            }
-          },
           "basic-configuration": {
             "title": "Basic configuration",
+            "name": {
+              "label": "Name",
+              "placeholder": "My vault proxy config",
+              "errors": {
+                "required": "Please enter a name"
+              }
+            },
             "url": {
               "label": "URL",
               "placeholder": "https://acme.com",

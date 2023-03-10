@@ -56,17 +56,9 @@ export const filloutForm = async () => {
     expect(dialog).toBeInTheDocument();
   });
 
-  // Step 1: name
-  const nameField = screen.getByLabelText('Vault proxy configuration name');
+  // Step 1: Basic config
+  const nameField = screen.getByLabelText('Name');
   await userEvent.type(nameField, 'My proxy config');
-
-  await next();
-
-  // Step 2: basic configuration
-  await waitFor(() => {
-    const title = screen.getByText('Basic configuration');
-    expect(title).toBeInTheDocument();
-  });
 
   const urlField = screen.getByLabelText('URL');
   await userEvent.type(urlField, 'https://ditto.footprint.dev:8443');
@@ -76,7 +68,7 @@ export const filloutForm = async () => {
 
   await next();
 
-  // Step 3: headers
+  // Step 2: headers
   await waitFor(() => {
     const title = screen.getByText('Custom header values');
     expect(title).toBeInTheDocument();
@@ -90,7 +82,7 @@ export const filloutForm = async () => {
 
   await next();
 
-  // Step 4:
+  // Step 3:
   await waitFor(() => {
     const title = screen.getByText('Client certificate authentication (mTLS)');
     expect(title).toBeInTheDocument();
@@ -104,7 +96,7 @@ export const filloutForm = async () => {
 
   await next();
 
-  // Step 5: Pinned server certificates
+  // Step 4: Pinned server certificates
   await waitFor(() => {
     const title = screen.getByText('Client certificate authentication (mTLS)');
     expect(title).toBeInTheDocument();
@@ -115,7 +107,7 @@ export const filloutForm = async () => {
 
   await next();
 
-  // Step 6: Ingress Vaulting
+  // Step 5: Ingress Vaulting
   await waitFor(() => {
     const title = screen.getByText('Ingress vaulting');
     expect(title).toBeInTheDocument();
