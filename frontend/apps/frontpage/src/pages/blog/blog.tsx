@@ -2,6 +2,7 @@ import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { Container, Divider, media } from '@onefootprint/ui';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
+import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';
 import { getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
 
@@ -78,6 +79,7 @@ const Blog = ({ posts }: BlogProps) => {
           </Posts>
           <StyledDivider />
         </BlogGrid>
+        <SubscribeToNewsletter />
       </Container>
     </>
   );
