@@ -49,25 +49,19 @@ export type MachineEvents =
     }
   | {
       type: 'basicDataSubmitted';
-      payload: {
-        basicData: BasicData;
-      };
+      payload: BasicData;
     }
   | {
       type: 'businessAddressSubmitted';
-      payload: {
-        businessAddress: BusinessAddressData;
-      };
+      payload: BusinessAddressData;
     }
   | {
       type: 'beneficialOwnersSubmitted';
-      payload: {
-        beneficialOwners: BeneficialOwnersData;
-      };
+      payload: BeneficialOwnersData;
     }
-  | {
-      type: 'navigatedToPrevPage';
-    }
-  | {
-      type: 'confirmed';
-    };
+  | { type: 'navigatedToPrevPage' }
+  | { type: 'confirmed' }
+  | { type: 'editBasicData' }
+  | { type: 'editBusinessAddress' }
+  | { type: 'editBeneficialOwners' }
+  | { type: 'returnToSummary' };

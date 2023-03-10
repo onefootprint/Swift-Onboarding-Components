@@ -3,15 +3,15 @@ import { IcoFileText24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
+import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import Section from '../section';
 
 type BasicInfoSectionProps = {
   onEdit: () => void;
 };
 
 const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
-  const { t } = useTranslation('pages.confirm');
+  const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
 
@@ -52,6 +52,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
   return (
     <Section
       title={t('basic-info.title')}
+      editLabel={allT('pages.confirm.summary.edit')}
       onEdit={handleEdit}
       IconComponent={IcoFileText24}
       items={basicInfo}

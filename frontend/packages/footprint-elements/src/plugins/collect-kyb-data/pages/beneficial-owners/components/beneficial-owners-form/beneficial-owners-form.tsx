@@ -2,6 +2,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   BeneficialOwnerDataAttribute,
+  BusinessData,
   BusinessDataAttribute,
 } from '@onefootprint/types';
 import { Button, Divider } from '@onefootprint/ui';
@@ -17,7 +18,7 @@ import FormInvalidError from './components/form-invalid-error';
 type FormData = BeneficialOwnersData;
 
 export type BeneficialOwnersFormProps = {
-  defaultValues?: FormData;
+  defaultValues?: Pick<BusinessData, BusinessDataAttribute.beneficialOwners>;
   isLoading: boolean;
   onSubmit: (data: BeneficialOwnersData) => void;
   ctaLabel?: string;
@@ -31,20 +32,23 @@ const BeneficialOwnersForm = ({
 }: BeneficialOwnersFormProps) => {
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const { allT } = useTranslation('pages.beneficial-owners.form');
+  const defaultBeneficialOwnersData = defaultValues?.[
+    BusinessDataAttribute.beneficialOwners
+  ] ?? [
+    {
+      [BeneficialOwnerDataAttribute.firstName]: '',
+      [BeneficialOwnerDataAttribute.lastName]: '',
+      [BeneficialOwnerDataAttribute.email]: undefined,
+      [BeneficialOwnerDataAttribute.ownershipStake]: 0,
+    },
+  ];
 
   const methods = useForm<FormData>({
-    defaultValues: defaultValues
-      ? { ...defaultValues }
-      : {
-          [BusinessDataAttribute.beneficialOwners]: [
-            {
-              [BeneficialOwnerDataAttribute.firstName]: '',
-              [BeneficialOwnerDataAttribute.lastName]: '',
-              [BeneficialOwnerDataAttribute.email]: undefined,
-              [BeneficialOwnerDataAttribute.ownershipStake]: 0,
-            },
-          ],
-        },
+    defaultValues: {
+      [BusinessDataAttribute.beneficialOwners]: [
+        ...defaultBeneficialOwnersData,
+      ],
+    },
   });
 
   const {

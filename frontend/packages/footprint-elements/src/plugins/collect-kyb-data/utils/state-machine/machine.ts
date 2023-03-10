@@ -11,9 +11,6 @@ import { MachineContext, MachineEvents } from './types';
 /*
   TODO: 
   - Add navigated to prev page transitions
-  - Add confirm page transitions
-  - Add edit flows for both desktop and mobile
-  - Add unit tests for state machine
   - Add pages for optional fields like doing-business-as, website, phone number
 */
 
@@ -78,16 +75,19 @@ const createCollectKybDataMachine = () =>
             basicDataSubmitted: [
               {
                 target: 'businessAddress',
+                actions: 'assignBasicData',
                 cond: context =>
                   isMissingBusinessAddressAttribute(context.missingAttributes),
               },
               {
                 target: 'beneficialOwners',
+                actions: 'assignBasicData',
                 cond: context =>
                   isMissingBeneficialOwnerAttribute(context.missingAttributes),
               },
               {
                 target: 'confirm',
+                actions: 'assignBasicData',
               },
             ],
           },
@@ -97,11 +97,13 @@ const createCollectKybDataMachine = () =>
             businessAddressSubmitted: [
               {
                 target: 'beneficialOwners',
+                actions: 'assignBusinessAddress',
                 cond: context =>
                   isMissingBeneficialOwnerAttribute(context.missingAttributes),
               },
               {
                 target: 'confirm',
+                actions: 'assignBusinessAddress',
               },
             ],
           },
@@ -111,6 +113,7 @@ const createCollectKybDataMachine = () =>
             beneficialOwnersSubmitted: [
               {
                 target: 'confirm',
+                actions: 'assignBeneficialOwners',
               },
             ],
           },
@@ -119,6 +122,86 @@ const createCollectKybDataMachine = () =>
           on: {
             confirmed: {
               target: 'completed',
+            },
+            // Desktop transitions
+            editBasicData: {
+              target: 'basicDataEditDesktop',
+              cond: context => context.device?.type !== 'mobile',
+            },
+            editBusinessAddress: {
+              target: 'businessAddressEditDesktop',
+              cond: context => context.device?.type !== 'mobile',
+            },
+            editBeneficialOwners: {
+              target: 'beneficialOwnersEditDesktop',
+              cond: context => context.device?.type !== 'mobile',
+            },
+            // Mobile transitions
+            basicDataSubmitted: {
+              actions: 'assignBasicData',
+              cond: context => context.device?.type === 'mobile',
+            },
+            businessAddressSubmitted: {
+              actions: 'assignBusinessAddress',
+              cond: context => context.device?.type === 'mobile',
+            },
+            beneficialOwnersSubmitted: {
+              actions: 'assignBeneficialOwners',
+              cond: context => context.device?.type === 'mobile',
+            },
+          },
+        },
+        basicDataEditDesktop: {
+          on: {
+            basicDataSubmitted: [
+              {
+                target: 'confirm',
+                cond: context => context.device?.type !== 'mobile',
+                actions: 'assignBasicData',
+              },
+              {
+                actions: 'assignBasicData',
+              },
+            ],
+            returnToSummary: {
+              target: 'confirm',
+              cond: context => context.device?.type !== 'mobile',
+            },
+          },
+        },
+        businessAddressEditDesktop: {
+          on: {
+            businessAddressSubmitted: [
+              {
+                target: 'confirm',
+                cond: context => context.device?.type !== 'mobile',
+                actions: 'assignBusinessAddress',
+              },
+              {
+                actions: 'assignBusinessAddress',
+              },
+            ],
+            returnToSummary: {
+              target: 'confirm',
+              cond: context => context.device?.type !== 'mobile',
+            },
+          },
+        },
+        beneficialOwnersEditDesktop: {
+          on: {
+            beneficialOwnersSubmitted: [
+              {
+                target: 'confirm',
+                cond: context => context.device?.type !== 'mobile',
+                actions: 'assignBeneficialOwners',
+              },
+              {
+                actions: 'assignBeneficialOwners',
+              },
+            ],
+            returnToSummary: {
+              target: 'confirm',
+              cond: context => context.device?.type !== 'mobile',
             },
           },
         },
@@ -130,10 +213,33 @@ const createCollectKybDataMachine = () =>
     {
       actions: {
         assignInitialContext: assign((context, event) => {
-          const { authToken, device, config } = event.payload;
+          const { authToken, device, config, missingAttributes } =
+            event.payload;
           context.device = device;
           context.authToken = authToken;
           context.config = config;
+          context.missingAttributes = [...missingAttributes];
+          return context;
+        }),
+        assignBasicData: assign((context, event) => {
+          context.data = {
+            ...context.data,
+            ...event.payload,
+          };
+          return context;
+        }),
+        assignBusinessAddress: assign((context, event) => {
+          context.data = {
+            ...context.data,
+            ...event.payload,
+          };
+          return context;
+        }),
+        assignBeneficialOwners: assign((context, event) => {
+          context.data = {
+            ...context.data,
+            ...event.payload,
+          };
           return context;
         }),
       },

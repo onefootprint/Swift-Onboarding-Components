@@ -3,15 +3,15 @@ import { IcoEmail24 } from '@onefootprint/icons';
 import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
+import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import Section from '../section';
 
 type EmailSectionProps = {
   onEdit: () => void;
 };
 
 const EmailSection = ({ onEdit }: EmailSectionProps) => {
-  const { t } = useTranslation('pages.confirm');
+  const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data, missingAttributes, receivedEmail } = state.context;
   const email = data[UserDataAttribute.email];
@@ -29,6 +29,7 @@ const EmailSection = ({ onEdit }: EmailSectionProps) => {
   return (
     <Section
       title={t('email.title')}
+      editLabel={allT('pages.confirm.summary.edit')}
       onEdit={handleEdit}
       IconComponent={IcoEmail24}
       items={[

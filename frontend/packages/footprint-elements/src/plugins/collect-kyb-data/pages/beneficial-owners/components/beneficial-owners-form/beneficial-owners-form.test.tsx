@@ -34,8 +34,6 @@ describe('<BeneficialOwnersForm />', () => {
   it('onsubmit gets called when submitting one beneficial owner info', async () => {
     const onSubmit = jest.fn();
     renderForm({ onSubmit });
-    const title = screen.getByText('Beneficial owner (You)');
-    expect(title).toBeInTheDocument();
 
     const firstName = screen.getByLabelText('First name');
     expect(firstName).toBeInTheDocument();

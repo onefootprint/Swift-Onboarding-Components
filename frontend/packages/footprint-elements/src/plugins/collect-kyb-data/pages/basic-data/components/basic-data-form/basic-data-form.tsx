@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessData, BusinessDataAttribute } from '@onefootprint/types';
 import { Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -10,7 +10,10 @@ import { BasicData } from '../../../../utils/state-machine/types';
 type FormData = BasicData;
 
 export type BasicDataFormProps = {
-  defaultValues?: BasicData;
+  defaultValues?: Pick<
+    BusinessData,
+    BusinessDataAttribute.name | BusinessDataAttribute.ein
+  >;
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
   ctaLabel?: string;

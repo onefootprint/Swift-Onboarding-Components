@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { BusinessDataAttribute } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -20,9 +21,9 @@ const BusinessAddress = ({
   onComplete,
   hideHeader,
 }: BusinessAddressProps) => {
-  const { t } = useTranslation('pages.business-address');
+  const { allT, t } = useTranslation('pages.business-address');
   const [state, send] = useCollectKybDataMachine();
-  const { authToken } = state.context;
+  const { authToken, data } = state.context;
   const toast = useToast();
   const { mutation, syncData } = useSyncData();
 
@@ -31,7 +32,7 @@ const BusinessAddress = ({
       send({
         type: 'businessAddressSubmitted',
         payload: {
-          businessAddress,
+          ...businessAddress,
         },
       });
       onComplete?.();
@@ -39,8 +40,8 @@ const BusinessAddress = ({
 
     const handleError = () => {
       toast.show({
-        title: t('sync-data-error.title'),
-        description: t('sync-data-error.description'),
+        title: allT('pages.sync-data-error.title'),
+        description: allT('pages.sync-data-error.description'),
         variant: 'error',
       });
     };
@@ -57,6 +58,17 @@ const BusinessAddress = ({
     });
   };
 
+  const defaultValues = {
+    [BusinessDataAttribute.addressLine1]:
+      data?.[BusinessDataAttribute.addressLine1],
+    [BusinessDataAttribute.addressLine2]:
+      data?.[BusinessDataAttribute.addressLine2],
+    [BusinessDataAttribute.city]: data?.[BusinessDataAttribute.city],
+    [BusinessDataAttribute.state]: data?.[BusinessDataAttribute.state],
+    [BusinessDataAttribute.zip]: data?.[BusinessDataAttribute.zip],
+    [BusinessDataAttribute.country]: data?.[BusinessDataAttribute.country],
+  };
+
   return (
     <>
       {!hideHeader && (
@@ -70,6 +82,7 @@ const BusinessAddress = ({
         </>
       )}
       <BusinessAddressForm
+        defaultValues={defaultValues}
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { BusinessDataAttribute } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -21,26 +22,24 @@ const BeneficialOwners = ({
   onComplete,
 }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken } = state.context;
+  const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
-  const { t } = useTranslation('pages.beneficial-owners');
+  const { t, allT } = useTranslation('pages.beneficial-owners');
 
   const handleSubmit = (beneficialOwners: BeneficialOwnersData) => {
     const handleSuccess = () => {
       send({
         type: 'beneficialOwnersSubmitted',
-        payload: {
-          beneficialOwners,
-        },
+        payload: beneficialOwners,
       });
       onComplete?.();
     };
 
     const handleError = () => {
       toast.show({
-        title: t('sync-data-error.title'),
-        description: t('sync-data-error.description'),
+        title: allT('pages.sync-data-error.title'),
+        description: allT('pages.sync-data-error.description'),
         variant: 'error',
       });
     };
@@ -57,6 +56,11 @@ const BeneficialOwners = ({
     });
   };
 
+  const defaultValues = {
+    [BusinessDataAttribute.beneficialOwners]:
+      data?.[BusinessDataAttribute.beneficialOwners],
+  };
+
   return (
     <>
       {!hideHeader && (
@@ -70,6 +74,7 @@ const BeneficialOwners = ({
         </>
       )}
       <BeneficialOwnersForm
+        defaultValues={defaultValues}
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}

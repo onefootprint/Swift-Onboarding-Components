@@ -2,12 +2,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import EditDataContainerDesktop from '../../../../components/edit-data-container-desktop';
-import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
-import ResidentialAddress from '../residential-address';
+import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
+import BasicData from '../basic-data';
 
-const EditAddressDesktop = () => {
+const EditBasicDataDesktop = () => {
   const { t } = useTranslation('pages.confirm');
-  const [, send] = useCollectKycDataMachine();
+  const [, send] = useCollectKybDataMachine();
 
   const handlePrev = () => {
     send({ type: 'returnToSummary' });
@@ -16,9 +16,11 @@ const EditAddressDesktop = () => {
   return (
     <EditDataContainerDesktop
       onClickPrev={handlePrev}
-      title={t('edit-sheet.title', { name: t('address.title').toLowerCase() })}
+      title={t('edit-sheet.title', {
+        name: t('basic-data.title').toLowerCase(),
+      })}
     >
-      <ResidentialAddress
+      <BasicData
         ctaLabel={t('edit-sheet.save')}
         onComplete={handlePrev}
         hideHeader
@@ -27,4 +29,4 @@ const EditAddressDesktop = () => {
   );
 };
 
-export default EditAddressDesktop;
+export default EditBasicDataDesktop;

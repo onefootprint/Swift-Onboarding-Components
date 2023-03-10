@@ -3,15 +3,15 @@ import { IcoUserCircle24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
+import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import Section from '../section';
 
 type IdentitySectionProps = {
   onEdit: () => void;
 };
 
 const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
-  const { t } = useTranslation('pages.confirm');
+  const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
 
@@ -40,6 +40,7 @@ const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
   return (
     <Section
       title={t('identity.title')}
+      editLabel={allT('pages.confirm.summary.edit')}
       onEdit={handleEdit}
       IconComponent={IcoUserCircle24}
       items={identity}

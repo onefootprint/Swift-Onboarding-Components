@@ -4,8 +4,8 @@ import { IcoBuilding24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
+import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import Section from '../section';
 import createAddressLine from './utils/create-address-line';
 
 type AddressSectionProps = {
@@ -13,7 +13,7 @@ type AddressSectionProps = {
 };
 
 const AddressSection = ({ onEdit }: AddressSectionProps) => {
-  const { t } = useTranslation('pages.confirm');
+  const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
 
@@ -48,6 +48,7 @@ const AddressSection = ({ onEdit }: AddressSectionProps) => {
   return (
     <Section
       title={t('address.title')}
+      editLabel={allT('pages.confirm.summary.edit')}
       onEdit={handleEdit}
       IconComponent={IcoBuilding24}
       items={address}

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { BusinessDataAttribute } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -17,17 +18,17 @@ type BasicDataProps = {
 
 const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken } = state.context;
+  const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
-  const { t } = useTranslation('pages.basic-data');
+  const { allT, t } = useTranslation('pages.basic-data');
 
   const handleSubmit = (basicData: BasicDataFields) => {
     const handleSuccess = () => {
       send({
         type: 'basicDataSubmitted',
         payload: {
-          basicData,
+          ...basicData,
         },
       });
       onComplete?.();
@@ -35,8 +36,8 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
 
     const handleError = () => {
       toast.show({
-        title: t('sync-data-error.title'),
-        description: t('sync-data-error.description'),
+        title: allT('pages.sync-data-error.title'),
+        description: allT('pages.sync-data-error.description'),
         variant: 'error',
       });
     };
@@ -53,6 +54,11 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
     });
   };
 
+  const defaultValues = {
+    [BusinessDataAttribute.name]: data?.[BusinessDataAttribute.name],
+    [BusinessDataAttribute.ein]: data?.[BusinessDataAttribute.ein],
+  };
+
   return (
     <>
       {!hideHeader && (
@@ -66,6 +72,7 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
         </>
       )}
       <BasicDataForm
+        defaultValues={defaultValues}
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}

@@ -1,11 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
-import { Button, useToast } from '@onefootprint/ui';
+import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
-import { HeaderTitle } from '../../../../components';
-import NavigationHeader from '../../../../components/navigation-header';
+import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncEmail from '../../hooks/use-sync-email';
@@ -111,22 +109,19 @@ const Confirm = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onClick: handlePrev }} />
-      <Container>
-        <HeaderTitle
-          title={t('summary.title')}
-          subtitle={t('summary.subtitle')}
-        />
-        <SectionsContainer>
-          <EmailSection onEdit={handleEmailEdit} />
-          <BasicInfoSection onEdit={handleBasicInfoEdit} />
-          <AddressSection onEdit={handleAddressEdit} />
-          <IdentitySection onEdit={handleIdentityEdit} />
-        </SectionsContainer>
-        <Button fullWidth onClick={handleConfirm} loading={isLoading}>
-          {t('summary.cta')}
-        </Button>
-      </Container>
+      <ConfirmCollectedData
+        title={t('summary.title')}
+        subtitle={t('summary.subtitle')}
+        cta={t('summary.cta')}
+        onClickPrev={handlePrev}
+        onClickConfirm={handleConfirm}
+        isLoading={isLoading}
+      >
+        <EmailSection onEdit={handleEmailEdit} />
+        <BasicInfoSection onEdit={handleBasicInfoEdit} />
+        <AddressSection onEdit={handleAddressEdit} />
+        <IdentitySection onEdit={handleIdentityEdit} />
+      </ConfirmCollectedData>
       <EditSheet
         open={!!editContent}
         onClose={handleCloseEdit}
@@ -135,27 +130,5 @@ const Confirm = () => {
     </>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    row-gap: ${theme.spacing[8]};
-  `}
-`;
-
-const SectionsContainer = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    row-gap: ${theme.spacing[5]};
-  `}
-`;
 
 export default Confirm;

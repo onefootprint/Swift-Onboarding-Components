@@ -110,6 +110,40 @@
         }
       }
     },
+    "confirm": {
+      "summary": {
+        "title": "Confirm your business data",
+        "subtitle": "Please make sure that your business data is accurate and there are no typos before continuing.",
+        "edit": "Edit",
+        "cta": "Confirm & Continue"
+      },
+      "basic-data": {
+        "title": "Basic data",
+        "business-name": "Business name",
+        "ein": "Employer Identification Number (EIN)"
+      },
+      "business-address": {
+        "title": "Registered business address"
+      },
+      "beneficial-owners": {
+        "title": "Beneficial owners",
+        "beneficial-owner-you": "Beneficial owner (You)",
+        "beneficial-owner-other": "Beneficial owner (Other)",
+        "first-name": "First name",
+        "last-name": "Last name",
+        "email": "Email",
+        "ownership-stake": "Ownership stake"
+      },
+      "edit-sheet": {
+        "title": "Edit {{name}}",
+        "save": "Save",
+        "name": {
+          "basic-data": "basic data",
+          "business-address": "business address",
+          "beneficial-owners": "beneficial owners"
+        }
+      }
+    },
     "sync-data-error": {
       "title": "An error occurred",
       "description": "An error occurred while saving data. Please fix the inputs and try again."

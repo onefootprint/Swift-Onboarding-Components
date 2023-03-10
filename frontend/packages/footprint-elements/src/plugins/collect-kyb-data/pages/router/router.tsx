@@ -6,6 +6,9 @@ import BasicData from '../basic-data';
 import BeneficialOwners from '../beneficial-owners';
 import BusinessAddress from '../business-address';
 import Confirm from '../confirm';
+import EditBasicDataDesktop from '../edit-basic-data-desktop';
+import EditBeneficialOwnersDesktop from '../edit-beneficial-owners-desktop';
+import EditBusinessAddressDesktop from '../edit-business-address-desktop';
 import Introduction from '../introduction';
 
 type RouterProps = {
@@ -37,6 +40,15 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('confirm')) {
     return <Confirm />;
+  }
+  if (state.matches('basicDataEditDesktop')) {
+    return <EditBasicDataDesktop />;
+  }
+  if (state.matches('businessAddressEditDesktop')) {
+    return <EditBusinessAddressDesktop />;
+  }
+  if (state.matches('beneficialOwnersEditDesktop')) {
+    return <EditBeneficialOwnersDesktop />;
   }
 
   return null;

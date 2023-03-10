@@ -13,6 +13,9 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignBasicData: 'basicDataSubmitted';
+    assignBeneficialOwners: 'beneficialOwnersSubmitted';
+    assignBusinessAddress: 'businessAddressSubmitted';
     assignInitialContext: 'receivedContext';
   };
   eventsCausingDelays: {};
@@ -20,8 +23,11 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'basicData'
+    | 'basicDataEditDesktop'
     | 'beneficialOwners'
+    | 'beneficialOwnersEditDesktop'
     | 'businessAddress'
+    | 'businessAddressEditDesktop'
     | 'completed'
     | 'confirm'
     | 'init'

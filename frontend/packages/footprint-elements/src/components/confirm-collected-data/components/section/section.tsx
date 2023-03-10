@@ -1,5 +1,4 @@
 import { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import { Icon } from '@onefootprint/icons';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -7,43 +6,49 @@ import styled, { css } from 'styled-components';
 
 import SectionItem from '../section-item';
 
-type SectionProps = {
+export type SectionProps = {
   title: string;
-  onEdit: () => void;
   items: {
     text: string;
     subtext?: string;
     textColor?: Color;
   }[];
-  IconComponent: Icon;
+  editLabel?: string;
+  onEdit?: () => void;
+  IconComponent?: Icon;
 };
 
-const Section = ({ title, IconComponent, onEdit, items }: SectionProps) => {
-  const { t } = useTranslation('pages.confirm.summary');
-  return (
-    <Container>
-      <Header>
-        <TitleContainer>
-          <IconComponent />
-          <Typography sx={{ marginLeft: 2 }} variant="label-2">
-            {title}
-          </Typography>
-        </TitleContainer>
-        <LinkButton onClick={onEdit}>{t('edit')}</LinkButton>
-      </Header>
-      <SectionContent>
-        {items.map(({ text, subtext, textColor }) => (
-          <SectionItem
-            key={text}
-            text={text}
-            subtext={subtext}
-            textColor={textColor}
-          />
-        ))}
-      </SectionContent>
-    </Container>
-  );
-};
+const Section = ({
+  title,
+  editLabel,
+  IconComponent,
+  onEdit,
+  items,
+}: SectionProps) => (
+  <Container>
+    <Header>
+      <TitleContainer>
+        {IconComponent && <IconComponent />}
+        <Typography sx={{ marginLeft: 2 }} variant="label-2">
+          {title}
+        </Typography>
+      </TitleContainer>
+      {onEdit && editLabel && (
+        <LinkButton onClick={onEdit}>{editLabel}</LinkButton>
+      )}
+    </Header>
+    <SectionContent>
+      {items.map(({ text, subtext, textColor }) => (
+        <SectionItem
+          key={text}
+          text={text}
+          subtext={subtext}
+          textColor={textColor}
+        />
+      ))}
+    </SectionContent>
+  </Container>
+);
 
 const SectionContent = styled.div`
   ${({ theme }) => css`

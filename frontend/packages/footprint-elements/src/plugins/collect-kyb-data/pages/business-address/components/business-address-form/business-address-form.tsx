@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessData, BusinessDataAttribute } from '@onefootprint/types';
 import {
   AddressInput,
   CountrySelectOption,
@@ -32,7 +32,15 @@ type FormData = {
 };
 
 export type BusinessAddressFormProps = {
-  defaultValues?: BusinessAddressData;
+  defaultValues?: Pick<
+    BusinessData,
+    | BusinessDataAttribute.addressLine1
+    | BusinessDataAttribute.addressLine2
+    | BusinessDataAttribute.city
+    | BusinessDataAttribute.state
+    | BusinessDataAttribute.country
+    | BusinessDataAttribute.zip
+  >;
   isLoading: boolean;
   onSubmit: (businessAddress: BusinessAddressData) => void;
   ctaLabel?: string;
