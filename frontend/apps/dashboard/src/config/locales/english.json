@@ -1051,7 +1051,8 @@
       "table": {
         "aria-label": "Proxy configurations",
         "header": {
-          "name": "Configuration name",
+          "name": "Name",
+          "id": "ID",
           "url": "URL",
           "method": "HTTP method",
           "status": "Status",

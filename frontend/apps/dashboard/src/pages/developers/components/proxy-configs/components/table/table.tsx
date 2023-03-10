@@ -16,11 +16,12 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
   const { t } = useTranslation('pages.proxy-configs');
   const filters = useFilters();
   const columns = [
-    { id: 'name', text: t('table.header.name'), width: '20%' },
-    { id: 'url', text: t('table.header.url'), width: '25%' },
-    { id: 'httpMethod', text: t('table.header.method'), width: '15%' },
+    { id: 'name', text: t('table.header.name'), width: '11.5%' },
+    { id: 'id', text: t('table.header.id'), width: '20%' },
+    { id: 'url', text: t('table.header.url'), width: '18.5%' },
+    { id: 'httpMethod', text: t('table.header.method'), width: '10%' },
     { id: 'created', text: t('table.header.created_at'), width: '15%' },
-    { id: 'status', text: t('table.header.status'), width: '20%' },
+    { id: 'status', text: t('table.header.status'), width: '12.5%' },
     { id: 'actions', text: '', width: '5%' },
   ];
 

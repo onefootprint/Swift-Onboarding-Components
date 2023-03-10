@@ -1,6 +1,6 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { ProxyConfig } from '@onefootprint/types';
-import { Badge } from '@onefootprint/ui';
+import { Badge, CodeInline } from '@onefootprint/ui';
 import React from 'react';
 
 import Actions from './components/actions';
@@ -17,6 +17,9 @@ const Row = ({ proxyConfig }: RowProps) => {
   return (
     <>
       <td>{name}</td>
+      <td>
+        <CodeInline truncate>{proxyConfig.id}</CodeInline>
+      </td>
       <td>{url}</td>
       <td>{method}</td>
       <td>{formatDateWithTime(new Date(createdAt))}</td>

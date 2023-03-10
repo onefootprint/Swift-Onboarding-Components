@@ -63,6 +63,9 @@ describe('<ProxyConfigs />', () => {
       await renderProxyConfigsAndWaitData();
 
       proxyConfigsFixture.forEach(proxyConfig => {
+        const id = screen.getByText(proxyConfig.id);
+        expect(id).toBeInTheDocument();
+
         const name = screen.getByText(proxyConfig.name);
         expect(name).toBeInTheDocument();
 
