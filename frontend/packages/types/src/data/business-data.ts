@@ -4,6 +4,8 @@ import { CountryCode } from './countries';
 
 export type BusinessData = Partial<{
   [BusinessDataAttribute.name]: string;
+  [BusinessDataAttribute.website]: string;
+  [BusinessDataAttribute.phoneNumber]: string;
   [BusinessDataAttribute.ein]: string;
   [BusinessDataAttribute.beneficialOwners]: BeneficialOwner[];
   [BusinessDataAttribute.addressLine1]: string;

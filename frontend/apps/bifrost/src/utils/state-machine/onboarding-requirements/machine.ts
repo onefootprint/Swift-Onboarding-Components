@@ -16,6 +16,7 @@ export type OnboardingRequirementsMachineArgs = {
 const defaultRequirements: Requirements = {
   idDoc: false,
   liveness: false,
+  kybData: [],
   kycData: [],
   identityCheck: false,
 };
@@ -46,7 +47,6 @@ const createOnboardingRequirementsMachine = ({
           email,
         },
         requirements: { ...defaultRequirements },
-        kycData: {},
         startedDataCollection: false,
       },
       states: {
@@ -79,6 +79,13 @@ const createOnboardingRequirementsMachine = ({
                 target: 'success',
               },
             ],
+          },
+        },
+        kybData: {
+          on: {
+            requirementCompleted: {
+              target: 'checkOnboardingRequirements',
+            },
           },
         },
         kycData: {

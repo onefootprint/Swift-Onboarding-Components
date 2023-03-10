@@ -1,8 +1,9 @@
-// TODO: this is a placeholder type for testing while developing the plugin
 enum BusinessDataAttribute {
   name = 'name',
+  website = 'website',
+  phoneNumber = 'phone_number',
   ein = 'ein',
-  beneficialOwners = 'beneficialOwners',
+  beneficialOwners = 'beneficial_owners',
   addressLine1 = 'address_line1',
   addressLine2 = 'address_line2',
   city = 'city',

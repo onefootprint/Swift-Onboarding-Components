@@ -1,13 +1,22 @@
 import { OnboardingConfig } from '../data';
-import { CollectedKycDataOption } from '../data/collected-kyc-data-option';
+import {
+  CollectedKybDataOption,
+  CollectedKycDataOption,
+} from '../data/collected-data-option';
 import IdDocType from '../data/id-doc-type';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',
   idDoc = 'collect_document',
   collectKycData = 'collect_data',
+  collectKybData = 'collect_business_data',
   identityCheck = 'identity_check',
 }
+
+export type CollectKybDataRequirement = {
+  kind: OnboardingRequirementKind.collectKybData;
+  missingAttributes: CollectedKybDataOption[];
+};
 
 export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
@@ -29,6 +38,7 @@ export type IdentityCheckRequirements = {
 };
 
 export type OnboardingRequirement =
+  | CollectKybDataRequirement
   | CollectKycDataRequirement
   | IdDocRequirement
   | LivenessRequirement

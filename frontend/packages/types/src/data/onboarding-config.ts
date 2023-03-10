@@ -1,4 +1,4 @@
-import { CollectedDataOption } from './collected-kyc-data-option';
+import { CollectedDataOption } from './collected-data-option';
 
 export type OnboardingConfig = {
   id: string;

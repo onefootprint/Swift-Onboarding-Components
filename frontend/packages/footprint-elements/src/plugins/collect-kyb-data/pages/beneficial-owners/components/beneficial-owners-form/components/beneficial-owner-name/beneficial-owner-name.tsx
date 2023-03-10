@@ -1,5 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
+import {
+  BeneficialOwnerDataAttribute,
+  BusinessDataAttribute,
+} from '@onefootprint/types';
 import { Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -18,11 +21,15 @@ const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
   } = useFormContext<BeneficialOwnersData>();
 
   const firstNameErrors =
-    errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.firstName];
+    errors[BusinessDataAttribute.beneficialOwners]?.[index]?.[
+      BeneficialOwnerDataAttribute.firstName
+    ];
   const hasFirstNameError = !!firstNameErrors;
 
   const lastNameErrors =
-    errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.lastName];
+    errors[BusinessDataAttribute.beneficialOwners]?.[index]?.[
+      BeneficialOwnerDataAttribute.lastName
+    ];
   const hasLastNameError = !!lastNameErrors;
 
   return (
@@ -35,7 +42,7 @@ const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
           label={t('first-name.label')}
           placeholder={t('first-name.placeholder')}
           {...register(
-            `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.firstName}`,
+            `${BusinessDataAttribute.beneficialOwners}.${index}.${BeneficialOwnerDataAttribute.firstName}`,
             { required: true },
           )}
         />
@@ -48,7 +55,7 @@ const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
           label={t('last-name.label')}
           placeholder={t('last-name.placeholder')}
           {...register(
-            `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.lastName}`,
+            `${BusinessDataAttribute.beneficialOwners}.${index}.${BeneficialOwnerDataAttribute.lastName}`,
             { required: true },
           )}
         />

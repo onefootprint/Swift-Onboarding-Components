@@ -1,4 +1,4 @@
-import { CollectedKycDataOption } from './collected-kyc-data-option';
+import { CollectedKycDataOption } from './collected-data-option';
 import { InsightEvent } from './insight-event';
 import { OnboardingDecision } from './onboarding-decision';
 import OnboardingStatus from './onboarding-status';

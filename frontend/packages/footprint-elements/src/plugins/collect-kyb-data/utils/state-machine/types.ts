@@ -2,6 +2,7 @@ import { DeviceInfo } from '@onefootprint/hooks';
 import {
   BusinessData,
   BusinessDataAttribute,
+  CollectedKybDataOption,
   OnboardingConfig,
 } from '@onefootprint/types';
 
@@ -29,7 +30,7 @@ export type MachineContext = {
   device?: DeviceInfo;
   authToken?: string;
   config?: OnboardingConfig;
-  missingAttributes: BusinessDataAttribute[];
+  missingAttributes: CollectedKybDataOption[];
   data: BusinessData;
 };
 
@@ -40,7 +41,7 @@ export type MachineEvents =
         authToken: string;
         device: DeviceInfo;
         config: OnboardingConfig;
-        missingAttributes: BusinessDataAttribute[];
+        missingAttributes: CollectedKybDataOption[];
       };
     }
   | {

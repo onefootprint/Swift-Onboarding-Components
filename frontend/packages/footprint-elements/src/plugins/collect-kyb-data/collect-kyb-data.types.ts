@@ -1,11 +1,10 @@
-import { BusinessDataAttribute, OnboardingConfig } from '@onefootprint/types';
+import { CollectedKybDataOption, OnboardingConfig } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
 export type CollectKybDataContext = {
-  // TODO: fill in the context
   config: OnboardingConfig;
-  missingAttributes: BusinessDataAttribute[];
+  missingAttributes: CollectedKybDataOption[];
 };
 
 export type CollectKybDataProps = BasePluginProps<CollectKybDataContext>;

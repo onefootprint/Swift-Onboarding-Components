@@ -1,52 +1,55 @@
-import { BusinessData, BusinessDataAttribute } from '@onefootprint/types';
+import {
+  BusinessData,
+  CollectedKybDataOption,
+  CollectedKybDataOptionToRequiredAttributes,
+} from '@onefootprint/types';
 
 /*
   TODO:
-  - consolidate these placeholder types with backend
   - add unit tests for these utils
   - add utils for doing-business-as, website, phone number
 */
 
 const BASIC_DATA_ATTRIBUTES = [
-  BusinessDataAttribute.name,
-  BusinessDataAttribute.ein,
+  CollectedKybDataOption.name,
+  CollectedKybDataOption.ein,
 ];
 
-const BUSINESS_ADDRESS_ATTRIBUTES = [
-  BusinessDataAttribute.addressLine1,
-  BusinessDataAttribute.city,
-  BusinessDataAttribute.state,
-  BusinessDataAttribute.country,
-  BusinessDataAttribute.zip,
-];
+const BUSINESS_ADDRESS_ATTRIBUTES = [CollectedKybDataOption.address];
 
-const BENEFICIAL_OWNER_ATTRIBUTES = [BusinessDataAttribute.beneficialOwners];
+const BENEFICIAL_OWNER_ATTRIBUTES = [CollectedKybDataOption.beneficialOwners];
 
 export const isMissing = (
-  attributes: BusinessDataAttribute[],
-  mustCollect: BusinessDataAttribute[],
+  attributes: CollectedKybDataOption[],
+  mustCollect: CollectedKybDataOption[],
   collectedData?: BusinessData,
 ) =>
   attributes
     .filter(option => mustCollect.includes(option))
+    .flatMap(option => CollectedKybDataOptionToRequiredAttributes[option])
     .some(attr => !collectedData || !collectedData[attr]);
 
 export const isMissingBasicDataAttribute = (
-  mustCollect: BusinessDataAttribute[],
+  mustCollect: CollectedKybDataOption[],
   collectedData?: BusinessData,
 ) => isMissing(BASIC_DATA_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingBusinessAddressAttribute = (
-  mustCollect: BusinessDataAttribute[],
+  mustCollect: CollectedKybDataOption[],
   collectedData?: BusinessData,
 ) => isMissing(BUSINESS_ADDRESS_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingBeneficialOwnerAttribute = (
-  mustCollect: BusinessDataAttribute[],
+  mustCollect: CollectedKybDataOption[],
   collectedData?: BusinessData,
 ) => isMissing(BENEFICIAL_OWNER_ATTRIBUTES, mustCollect, collectedData);
 
 export const hasMissingAttributes = (
-  mustCollect: BusinessDataAttribute[],
+  mustCollect: CollectedKybDataOption[],
   collectedData?: BusinessData,
-) => mustCollect.some(option => !collectedData || !collectedData[option]);
+) =>
+  mustCollect.some(option =>
+    CollectedKybDataOptionToRequiredAttributes[option].some(
+      attr => !collectedData || !collectedData[attr],
+    ),
+  );

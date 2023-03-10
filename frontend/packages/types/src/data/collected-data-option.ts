@@ -1,8 +1,19 @@
+import BusinessDataAttribute from './business-data-attribute';
 import UserDataAttribute from './user-data-attribute';
 
 export type CollectedDataOption =
+  | CollectedKybDataOption
   | CollectedKycDataOption
   | CollectedDocumentDataOption;
+
+export enum CollectedKybDataOption {
+  name = 'business_name',
+  ein = 'business_ein',
+  address = 'business_address',
+  phoneNumber = 'business_phone_number',
+  website = 'business_website',
+  beneficialOwners = 'business_beneficial_owners',
+}
 
 // TODO: the backend type for CDO has become more advanced and includes more than just KYC data
 export enum CollectedKycDataOption {
@@ -48,7 +59,27 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
 };
 
-export const OptionToRequiredAttributes: Record<
+export const CollectedKybDataOptionToRequiredAttributes: Record<
+  CollectedKybDataOption,
+  BusinessDataAttribute[]
+> = {
+  [CollectedKybDataOption.name]: [BusinessDataAttribute.name],
+  [CollectedKybDataOption.ein]: [BusinessDataAttribute.ein],
+  [CollectedKybDataOption.address]: [
+    BusinessDataAttribute.addressLine1,
+    BusinessDataAttribute.city,
+    BusinessDataAttribute.state,
+    BusinessDataAttribute.zip,
+    BusinessDataAttribute.country,
+  ],
+  [CollectedKybDataOption.phoneNumber]: [BusinessDataAttribute.phoneNumber],
+  [CollectedKybDataOption.website]: [BusinessDataAttribute.website],
+  [CollectedKybDataOption.beneficialOwners]: [
+    BusinessDataAttribute.beneficialOwners,
+  ],
+};
+
+export const CollectedKycDataOptionToRequiredAttributes: Record<
   CollectedKycDataOption,
   UserDataAttribute[]
 > = {

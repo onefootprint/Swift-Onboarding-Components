@@ -1,5 +1,6 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
 import {
+  CollectKybData,
   CollectKycData,
   DeviceSignals,
   IdDoc,
@@ -20,8 +21,7 @@ const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, userFound, email, config, device },
-
-    requirements: { liveness, idDoc, selfie, kycData },
+    requirements: { liveness, idDoc, selfie, kycData, kybData },
   } = state.context;
   const isDone = state.matches('success');
 
@@ -47,6 +47,23 @@ const Router = ({ onDone }: RouterProps) => {
     return (
       <DeviceSignals page="additional-info-required" fpAuthToken={authToken}>
         <AdditionalInfoRequired />
+      </DeviceSignals>
+    );
+  }
+  if (state.matches('kybData')) {
+    return (
+      <DeviceSignals page="kyb-data" fpAuthToken={authToken}>
+        <CollectKybData
+          context={{
+            authToken,
+            device,
+            customData: {
+              missingAttributes: kybData,
+              config,
+            },
+          }}
+          onDone={handleRequirementCompleted}
+        />
       </DeviceSignals>
     );
   }

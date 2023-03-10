@@ -79,12 +79,15 @@ const BusinessAddressForm = ({
       typeof stateData === 'object' ? stateData.value : stateData;
 
     onSubmit({
-      address_line1: formData[BusinessDataAttribute.addressLine1],
-      address_line2: formData[BusinessDataAttribute.addressLine2],
-      city: formData[BusinessDataAttribute.city],
-      zip: formData[BusinessDataAttribute.zip],
-      country: formData[BusinessDataAttribute.country].value,
-      state: stateStr,
+      [BusinessDataAttribute.addressLine1]:
+        formData[BusinessDataAttribute.addressLine1],
+      [BusinessDataAttribute.addressLine2]:
+        formData[BusinessDataAttribute.addressLine2],
+      [BusinessDataAttribute.city]: formData[BusinessDataAttribute.city],
+      [BusinessDataAttribute.zip]: formData[BusinessDataAttribute.zip],
+      [BusinessDataAttribute.country]:
+        formData[BusinessDataAttribute.country].value,
+      [BusinessDataAttribute.state]: stateStr,
     });
   };
 

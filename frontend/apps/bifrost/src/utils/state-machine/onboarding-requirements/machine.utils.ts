@@ -7,6 +7,10 @@ type MachineTarget = {
 
 export const RequirementTargets: MachineTarget[] = [
   {
+    target: 'kybData',
+    cond: context => shouldRunCollectKybData(context),
+  },
+  {
     target: 'kycData',
     cond: context => shouldRunCollectKycData(context),
   },
@@ -36,6 +40,9 @@ export const requiresAdditionalInfo = (context: MachineContext) => {
     (kycData.length > 0 || !!idDoc || !!liveness)
   );
 };
+
+const shouldRunCollectKybData = (context: MachineContext) =>
+  context.requirements.kybData.length > 0;
 
 const shouldRunCollectKycData = (context: MachineContext) =>
   context.requirements.kycData.length > 0;

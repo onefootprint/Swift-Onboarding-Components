@@ -1,4 +1,4 @@
-import { CollectedDataOption } from '../data/collected-kyc-data-option';
+import { CollectedDataOption } from '../data/collected-data-option';
 
 export type OrgOnboardingConfigCreateRequest = {
   name: string;

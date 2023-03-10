@@ -2,6 +2,7 @@ import { useGetOnboardingStatus } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import {
+  CollectedKybDataOption,
   CollectedKycDataOption,
   OnboardingRequirement,
   OnboardingRequirementKind,
@@ -28,9 +29,13 @@ const CheckOnboardingRequirements = () => {
     let selfie = false;
     let consent = false;
     let kycData: CollectedKycDataOption[] = [];
+    let kybData: CollectedKybDataOption[] = [];
     let identityCheck = false;
 
     requirements.forEach((req: OnboardingRequirement) => {
+      if (req.kind === OnboardingRequirementKind.collectKybData) {
+        kybData = req.missingAttributes;
+      }
       if (req.kind === OnboardingRequirementKind.collectKycData) {
         kycData = req.missingAttributes;
       }
@@ -54,6 +59,7 @@ const CheckOnboardingRequirements = () => {
         idDoc,
         selfie,
         consent,
+        kybData,
         kycData,
         identityCheck,
       },

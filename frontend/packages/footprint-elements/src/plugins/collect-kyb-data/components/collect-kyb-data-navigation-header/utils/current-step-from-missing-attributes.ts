@@ -1,4 +1,4 @@
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { CollectedKybDataOption } from '@onefootprint/types';
 import { StateValue } from 'xstate';
 
 import {
@@ -15,7 +15,7 @@ import {
 */
 
 const getCurrentStepFromMissingAttributes = (
-  mustCollect: BusinessDataAttribute[],
+  mustCollect: CollectedKybDataOption[],
   state: StateValue,
 ) => {
   if (!hasMissingAttributes(mustCollect)) {

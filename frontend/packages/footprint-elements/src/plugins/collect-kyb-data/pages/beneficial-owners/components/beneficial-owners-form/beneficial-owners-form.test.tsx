@@ -4,7 +4,10 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
+import {
+  BeneficialOwnerDataAttribute,
+  BusinessDataAttribute,
+} from '@onefootprint/types';
 import React from 'react';
 
 import BeneficialOwnersForm, {
@@ -54,7 +57,7 @@ describe('<BeneficialOwnersForm />', () => {
     await userEvent.click(continueButton);
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        beneficialOwners: [
+        [BusinessDataAttribute.beneficialOwners]: [
           {
             [BeneficialOwnerDataAttribute.firstName]: 'John',
             [BeneficialOwnerDataAttribute.lastName]: 'Doe',
@@ -106,7 +109,7 @@ describe('<BeneficialOwnersForm />', () => {
     await userEvent.click(continueButton);
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        beneficialOwners: [
+        [BusinessDataAttribute.beneficialOwners]: [
           {
             [BeneficialOwnerDataAttribute.firstName]: 'John',
             [BeneficialOwnerDataAttribute.lastName]: 'Doe',
@@ -141,7 +144,7 @@ describe('<BeneficialOwnersForm />', () => {
     await userEvent.click(continueButton);
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        beneficialOwners: [
+        [BusinessDataAttribute.beneficialOwners]: [
           {
             [BeneficialOwnerDataAttribute.firstName]: 'John',
             [BeneficialOwnerDataAttribute.lastName]: 'Doe',
@@ -164,7 +167,7 @@ describe('<BeneficialOwnersForm />', () => {
     renderForm({
       onSubmit,
       defaultValues: {
-        beneficialOwners: [
+        [BusinessDataAttribute.beneficialOwners]: [
           {
             [BeneficialOwnerDataAttribute.firstName]: 'John',
             [BeneficialOwnerDataAttribute.lastName]: 'Doe',

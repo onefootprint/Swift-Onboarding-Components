@@ -10,7 +10,7 @@ export * from './business-data';
 export { default as BusinessDataAttribute } from './business-data-attribute';
 export * from './challenge-data';
 export { default as ChallengeKind } from './challenge-kind';
-export * from './collected-kyc-data-option';
+export * from './collected-data-option';
 export { default as ComplianceStatus } from './compliance-status';
 export * from './countries';
 export { default as D2PStatus } from './d2p-status';

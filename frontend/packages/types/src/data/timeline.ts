@@ -1,5 +1,5 @@
 import { Annotation } from './annotation';
-import { CollectedKycDataOption } from './collected-kyc-data-option';
+import { CollectedKycDataOption } from './collected-data-option';
 import IdDocType from './id-doc-type';
 import { InsightEvent } from './insight-event';
 import { LivenessAttribute, LivenessSource } from './liveness';

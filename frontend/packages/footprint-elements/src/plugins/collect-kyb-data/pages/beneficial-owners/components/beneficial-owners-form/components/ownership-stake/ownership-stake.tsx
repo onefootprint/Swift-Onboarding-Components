@@ -1,5 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
+import {
+  BeneficialOwnerDataAttribute,
+  BusinessDataAttribute,
+} from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -20,7 +23,7 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
   } = useFormContext<BeneficialOwnersData>();
 
   const ownershipStakeErrors =
-    errors.beneficialOwners?.[index]?.[
+    errors[BusinessDataAttribute.beneficialOwners]?.[index]?.[
       BeneficialOwnerDataAttribute.ownershipStake
     ];
   const hasError = !!ownershipStakeErrors;
@@ -35,7 +38,7 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
       label={t('label')}
       placeholder={t('placeholder')}
       {...register(
-        `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.ownershipStake}`,
+        `${BusinessDataAttribute.beneficialOwners}.${index}.${BeneficialOwnerDataAttribute.ownershipStake}`,
         {
           required: {
             value: true,

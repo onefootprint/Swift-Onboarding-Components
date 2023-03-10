@@ -25,6 +25,7 @@ export interface Typegen0 {
     | 'checkOnboardingRequirements'
     | 'idDoc'
     | 'identityCheck'
+    | 'kybData'
     | 'kycData'
     | 'router'
     | 'success'

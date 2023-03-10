@@ -1,8 +1,8 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
+  CollectedKybDataOption,
   CollectedKycDataOption,
   OnboardingConfig,
-  UserData,
 } from '@onefootprint/types';
 
 export type Requirements = {
@@ -12,6 +12,7 @@ export type Requirements = {
   selfie?: boolean;
   consent?: boolean;
   kycData: readonly CollectedKycDataOption[];
+  kybData: CollectedKybDataOption[];
 };
 
 export type MachineContext = {
@@ -24,7 +25,6 @@ export type MachineContext = {
   };
   startedDataCollection: boolean;
   requirements: Requirements;
-  kycData: UserData; // Filled user data
 };
 
 export type MachineEvents =

@@ -1,4 +1,4 @@
-import { CollectedKycDataOption } from './collected-kyc-data-option';
+import { CollectedKycDataOption } from './collected-data-option';
 import DecisionStatus from './decision-status';
 import Vendor from './vendor';
 

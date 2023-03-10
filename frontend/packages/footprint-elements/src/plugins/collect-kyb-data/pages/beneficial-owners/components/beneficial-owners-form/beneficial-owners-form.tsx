@@ -1,6 +1,9 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
+import {
+  BeneficialOwnerDataAttribute,
+  BusinessDataAttribute,
+} from '@onefootprint/types';
 import { Button, Divider } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
@@ -33,7 +36,7 @@ const BeneficialOwnersForm = ({
     defaultValues: defaultValues
       ? { ...defaultValues }
       : {
-          beneficialOwners: [
+          [BusinessDataAttribute.beneficialOwners]: [
             {
               [BeneficialOwnerDataAttribute.firstName]: '',
               [BeneficialOwnerDataAttribute.lastName]: '',
@@ -51,11 +54,12 @@ const BeneficialOwnersForm = ({
   } = methods;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'beneficialOwners',
+    name: BusinessDataAttribute.beneficialOwners,
     rules: { minLength: 1 },
   });
   const shouldShowError =
-    !!errors.beneficialOwners && errors.beneficialOwners[0];
+    !!errors?.[BusinessDataAttribute.beneficialOwners] &&
+    errors?.[BusinessDataAttribute.beneficialOwners]?.[0];
 
   const handleAddMore = () => {
     append({
@@ -71,7 +75,7 @@ const BeneficialOwnersForm = ({
   };
 
   const onSubmitFormData = (formData: FormData) => {
-    const beneficialOwners = formData.beneficialOwners
+    const beneficialOwners = formData[BusinessDataAttribute.beneficialOwners]
       .filter(
         (bo, index) =>
           bo[BeneficialOwnerDataAttribute.firstName] &&
@@ -87,7 +91,7 @@ const BeneficialOwnersForm = ({
           bo[BeneficialOwnerDataAttribute.ownershipStake],
         ),
       }));
-    onSubmit({ beneficialOwners });
+    onSubmit({ [BusinessDataAttribute.beneficialOwners]: beneficialOwners });
   };
 
   return (
