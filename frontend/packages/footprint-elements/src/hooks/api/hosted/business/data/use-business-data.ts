@@ -1,5 +1,9 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { BusinessDataRequest, BusinessDataResponse } from '@onefootprint/types';
+import {
+  BusinessDataAttribute,
+  BusinessDataRequest,
+  BusinessDataResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../../config/constants';
@@ -14,10 +18,25 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
     method = 'PUT';
     url = '/hosted/business/vault';
   }
+  // Transform the data into the format expected by the API
+  const data = Object.fromEntries(
+    Object.entries(payload.data)
+      // Don't send null values
+      .filter(e => !!e[1])
+      .map(([k, v]) => [`business.${k}`, v]),
+  );
+
+  // Stringify all beneficial owners data and send as one field
+  const beneficialOwners = payload.data[BusinessDataAttribute.beneficialOwners];
+  if (beneficialOwners) {
+    data[`business.${BusinessDataAttribute.beneficialOwners}`] =
+      JSON.stringify(beneficialOwners);
+  }
+
   const response = await requestWithoutCaseConverter<BusinessDataResponse>({
     method,
     url,
-    data: payload,
+    data,
     headers: {
       [AUTH_HEADER]: payload.authToken,
     },

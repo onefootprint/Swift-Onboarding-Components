@@ -5,7 +5,7 @@ import {
   BusinessData,
   BusinessDataAttribute,
 } from '@onefootprint/types';
-import { Button, Divider } from '@onefootprint/ui';
+import { Button, Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -31,7 +31,8 @@ const BeneficialOwnersForm = ({
   ctaLabel,
 }: BeneficialOwnersFormProps) => {
   const [animate] = useAutoAnimate<HTMLFormElement>();
-  const { allT } = useTranslation('pages.beneficial-owners.form');
+  const { t, allT } = useTranslation('pages.beneficial-owners.form');
+  const toast = useToast();
   const defaultBeneficialOwnersData = defaultValues?.[
     BusinessDataAttribute.beneficialOwners
   ] ?? [
@@ -79,6 +80,20 @@ const BeneficialOwnersForm = ({
   };
 
   const onSubmitFormData = (formData: FormData) => {
+    const totalOwnershipStake = formData[BusinessDataAttribute.beneficialOwners]
+      .map(bo => Number(bo[BeneficialOwnerDataAttribute.ownershipStake]))
+      .reduce((acc, curr) => acc + curr, 0);
+
+    if (totalOwnershipStake > 100) {
+      toast.show({
+        title: t('errors.ownership-stake-total.title'),
+        description: t('errors.ownership-stake-total.description'),
+        variant: 'error',
+      });
+
+      return;
+    }
+
     const beneficialOwners = formData[BusinessDataAttribute.beneficialOwners]
       .filter(
         (bo, index) =>

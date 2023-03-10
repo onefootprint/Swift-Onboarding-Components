@@ -247,4 +247,48 @@ describe('<BeneficialOwnersForm />', () => {
       screen.getByText('Ownership stake cannot be larger than 100%'),
     ).toBeInTheDocument();
   });
+
+  it('shows error toast when sum of ownership stakes is over 100%', async () => {
+    const onSubmit = jest.fn();
+    renderForm({ onSubmit });
+
+    const addMoreButton = screen.getByRole('button', { name: 'Add more' });
+    expect(addMoreButton).toBeInTheDocument();
+    await userEvent.click(addMoreButton);
+
+    const firstNameFields = screen.getAllByLabelText('First name');
+    expect(firstNameFields).toHaveLength(2);
+    await userEvent.type(firstNameFields[0], 'John');
+    await userEvent.type(firstNameFields[1], 'Lily');
+
+    const lastNameFields = screen.getAllByLabelText('Last name');
+    expect(lastNameFields).toHaveLength(2);
+    await userEvent.type(lastNameFields[0], 'Doe');
+    await userEvent.type(lastNameFields[1], 'Smith');
+
+    const emailFields = screen.getAllByLabelText('Email');
+    expect(
+      screen.getByPlaceholderText('your.email@email.com'),
+    ).toBeInTheDocument();
+    expect(emailFields).toHaveLength(1);
+    await userEvent.type(emailFields[0], 'Lily@smith.com');
+
+    const ownershipStakeFields = screen.getAllByLabelText(
+      'Ownership stake (%)',
+    );
+    expect(ownershipStakeFields).toHaveLength(2);
+    await userEvent.type(ownershipStakeFields[0], '70');
+    await userEvent.type(ownershipStakeFields[1], '70');
+
+    const continueButton = screen.getByRole('button', { name: 'Continue' });
+    expect(continueButton).toBeInTheDocument();
+    await userEvent.click(continueButton);
+    expect(onSubmit).not.toBeCalled();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Ownership stake total exceeds 100%'),
+      ).toBeInTheDocument();
+    });
+  });
 });

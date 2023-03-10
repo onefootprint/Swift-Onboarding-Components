@@ -15,6 +15,11 @@ const masks = {
       numericOnly: true,
       blocks: [4],
     },
+    ein: {
+      numericOnly: true,
+      delimiters: ['-'],
+      blocks: [2, 7],
+    },
   },
 };
 

@@ -37,7 +37,7 @@ describe('<BasicDataForm />', () => {
     const ein = screen.getByLabelText('Employer Identification Number (EIN)');
     expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
     expect(ein).toBeInTheDocument();
-    await userEvent.type(ein, '123231231');
+    await userEvent.type(ein, '129876543');
 
     const continueButton = screen.getByRole('button', { name: 'Continue' });
     expect(continueButton).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe('<BasicDataForm />', () => {
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
         name: 'Acme Inc.',
-        ein: '123231231',
+        ein: '12-9876543',
       });
     });
   });
@@ -61,14 +61,14 @@ describe('<BasicDataForm />', () => {
     renderForm({
       defaultValues: {
         name: 'Acme Inc.',
-        ein: '99999999999',
+        ein: '98-7654321',
       },
       onSubmit,
     });
     const name = screen.getByLabelText('Business name');
     expect(name).toHaveValue('Acme Inc.');
     const ein = screen.getByLabelText('Employer Identification Number (EIN)');
-    expect(ein).toHaveValue(99999999999);
+    expect(ein).toHaveValue('98-7654321');
 
     const continueButton = screen.getByRole('button', { name: 'Continue' });
     expect(continueButton).toBeInTheDocument();
@@ -76,8 +76,30 @@ describe('<BasicDataForm />', () => {
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
         name: 'Acme Inc.',
-        ein: '99999999999',
+        ein: '98-7654321',
       });
+    });
+  });
+
+  it('renders error when submitting empty form', async () => {
+    const onSubmit = jest.fn();
+    renderForm({ onSubmit });
+
+    const continueButton = screen.getByRole('button', { name: 'Continue' });
+    expect(continueButton).toBeInTheDocument();
+    await userEvent.click(continueButton);
+    await waitFor(() => {
+      expect(onSubmit).not.toBeCalled();
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByText('Business name cannot be empty or is invalid'),
+      ).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByText('EIN cannot be empty or is invalid'),
+      ).toBeInTheDocument();
     });
   });
 });

@@ -26,7 +26,10 @@
         "ein": {
           "label": "Employer Identification Number (EIN)",
           "placeholder": "12-3456789",
-          "error": "EIN cannot be empty or is invalid"
+          "errors": {
+            "required": "EIN cannot be empty or is invalid",
+            "pattern": "EIN has to be in the format 12-3456789"
+          }
         }
       }
     },
@@ -106,7 +109,11 @@
         },
         "add-more": "Add more",
         "errors": {
-          "invalid": "Please complete the fields above."
+          "invalid": "Please complete the fields above.",
+          "ownership-stake-total": {
+            "title": "Ownership stake total exceeds 100%",
+            "description": "Please verify each beneficial owner's ownership stake. The sum can't exceed 100%."
+          }
         }
       }
     },

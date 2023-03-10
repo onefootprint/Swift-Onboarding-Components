@@ -1,4 +1,4 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { BusinessData, BusinessDataAttribute } from '@onefootprint/types';
 import { Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
@@ -26,14 +26,18 @@ const BasicDataForm = ({
   ctaLabel,
 }: BasicDataFormProps) => {
   const { allT, t } = useTranslation('pages.basic-data.form');
-
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues,
   });
+  const inputMasks = useInputMask('en-US');
+  const einErrors = errors[BusinessDataAttribute.ein];
+  const hasEinError = !!einErrors;
+  const einHint = hasEinError ? einErrors?.message : undefined;
 
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
@@ -58,13 +62,23 @@ const BasicDataForm = ({
         {...register(BusinessDataAttribute.name, { required: true })}
       />
       <TextInput
-        type="number"
         data-private
-        hasError={!!errors[BusinessDataAttribute.ein]}
-        hint={errors[BusinessDataAttribute.ein] ? t('ein.error') : undefined}
+        hasError={hasEinError}
+        hint={einHint}
+        mask={inputMasks.ein}
+        value={getValues(BusinessDataAttribute.ein)}
         label={t('ein.label')}
         placeholder={t('ein.placeholder')}
-        {...register(BusinessDataAttribute.ein, { required: true })}
+        {...register(BusinessDataAttribute.ein, {
+          required: {
+            value: true,
+            message: t('ein.errors.required'),
+          },
+          pattern: {
+            value: /^\d{2}-\d{7}$/,
+            message: t('ein.errors.pattern'),
+          },
+        })}
       />
       <Button type="submit" fullWidth loading={isLoading}>
         {ctaLabel ?? allT('pages.cta-continue')}
