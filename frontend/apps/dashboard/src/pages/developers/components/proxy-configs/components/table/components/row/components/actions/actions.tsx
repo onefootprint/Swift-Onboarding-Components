@@ -12,8 +12,6 @@ export type ActionsProps = {
   proxyConfig: ProxyConfig;
 };
 
-// TODO: use the correct permission
-// https://linear.app/footprint/issue/FP-2952/vault-proxy-use-the-correct-permission
 const Actions = ({ proxyConfig }: ActionsProps) => {
   const { name } = proxyConfig;
   const { t } = useTranslation('pages.proxy-configs.actions');
@@ -32,7 +30,7 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Dropdown.Root>
         <PermissionGate
-          scope={RoleScope.apiKeys}
+          scope={RoleScope.vaultProxy}
           fallbackText={t('not-allowed')}
         >
           <Dropdown.Trigger aria-label={t('aria-label', { name })}>

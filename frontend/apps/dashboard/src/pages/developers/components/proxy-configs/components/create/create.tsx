@@ -15,10 +15,8 @@ const Create = () => {
   return (
     <>
       <PermissionGate
-        // TODO: use the correct permission
-        // https://linear.app/footprint/issue/FP-2952/vault-proxy-use-the-correct-permission
         fallbackText={t('header.cta-not-allowed')}
-        scope={RoleScope.apiKeys}
+        scope={RoleScope.vaultProxy}
       >
         <Button size="small" variant="secondary" onClick={open}>
           {t('create.cta')}

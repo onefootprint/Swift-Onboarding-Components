@@ -3,6 +3,7 @@ export enum RoleScope {
   admin = 'admin',
   onboardingConfiguration = 'onboarding_configuration',
   apiKeys = 'api_keys',
+  vaultProxy = 'vault_proxy',
   orgSettings = 'org_settings',
   decryptCustom = 'decrypt_custom',
   decryptDocuments = 'decrypt.document_and_selfie',

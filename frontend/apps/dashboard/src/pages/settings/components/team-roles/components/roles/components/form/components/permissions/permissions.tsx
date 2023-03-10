@@ -50,6 +50,11 @@ const Permissions = () => {
           {...register('scopes')}
         />
         <Checkbox
+          label={t('scopes.vault-proxy')}
+          value="vault_proxy"
+          {...register('scopes')}
+        />
+        <Checkbox
           label={t('scopes.org-settings')}
           value="org_settings"
           {...register('scopes')}
