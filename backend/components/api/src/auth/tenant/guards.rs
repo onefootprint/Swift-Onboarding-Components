@@ -19,6 +19,7 @@ pub enum TenantGuard {
     ApiKeys,
     OrgSettings,
     ManualReview,
+    VaultProxy
 }
 
 impl TenantGuard {
@@ -31,6 +32,7 @@ impl TenantGuard {
             Self::ApiKeys => TenantScope::ApiKeys,
             Self::OrgSettings => TenantScope::OrgSettings,
             Self::ManualReview => TenantScope::ManualReview,
+            Self::VaultProxy => TenantScope::VaultProxy
         }
     }
 }

@@ -4,7 +4,7 @@ use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard
 use crate::auth::Either;
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiResult;
-use crate::types::{ResponseData};
+use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_wire_types::{CreateProxyConfigRequest, PatchProxyConfigRequest};
@@ -76,7 +76,7 @@ pub async fn post(
     request: Json<CreateProxyConfigRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
-    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let auth = auth.check_guard(TenantGuard::VaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
     let is_live = auth.is_live()?;
@@ -184,7 +184,7 @@ pub async fn patch(
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
-    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let auth = auth.check_guard(TenantGuard::VaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
     let is_live = auth.is_live()?;
