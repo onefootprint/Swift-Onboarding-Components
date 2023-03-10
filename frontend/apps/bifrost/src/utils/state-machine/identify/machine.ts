@@ -3,15 +3,9 @@ import { OnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { BootstrapData } from '../bifrost/types';
-import {
-  Actions,
-  Events,
-  MachineContext,
-  MachineEvents,
-  States,
-} from './types';
+import { MachineContext, MachineEvents } from './types';
 
-type IdentifyMachineArgs = {
+export type IdentifyMachineArgs = {
   device: DeviceInfo;
   bootstrapData?: BootstrapData;
   config?: OnboardingConfig;
@@ -24,13 +18,16 @@ const createIdentifyMachine = ({
   config,
   identifierSuffix,
 }: IdentifyMachineArgs) =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine(
     {
       predictableActionArguments: true,
       id: 'identify',
-      initial: bootstrapData
-        ? States.initBootstrap
-        : States.emailIdentification,
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: bootstrapData ? 'initBootstrap' : 'emailIdentification',
       context: {
         device,
         bootstrapData: bootstrapData ?? {},
@@ -42,53 +39,53 @@ const createIdentifyMachine = ({
       },
       states: {
         // New bootstrap transitions (not used in this machine for now)
-        [States.initBootstrap]: {
+        initBootstrap: {
           on: {
-            [Events.bootstrapDataInvalid]: {
-              target: States.emailIdentification,
-              actions: [Actions.reset],
+            bootstrapDataInvalid: {
+              target: 'emailIdentification',
+              actions: ['reset'],
             },
-            [Events.identifyFailed]: {
-              target: States.emailIdentification,
-              actions: [Actions.assignEmail, Actions.assignPhone],
+            identifyFailed: {
+              target: 'emailIdentification',
+              actions: ['assignEmail', 'assignPhone'],
             },
-            [Events.identified]: {
-              target: States.bootstrapChallenge,
+            identified: {
+              target: 'bootstrapChallenge',
               actions: [
-                Actions.assignEmail,
-                Actions.assignPhone,
-                Actions.assignUserFound,
-                Actions.assignSuccessfulIdentifier,
-                Actions.assignAvailableChallengeKinds,
-                Actions.assignHasSyncablePassKey,
+                'assignEmail',
+                'assignPhone',
+                'assignUserFound',
+                'assignSuccessfulIdentifier',
+                'assignAvailableChallengeKinds',
+                'assignHasSyncablePassKey',
               ],
             },
           },
         },
-        [States.bootstrapChallenge]: {
+        bootstrapChallenge: {
           on: {
-            [Events.identifyReset]: {
-              target: States.emailIdentification,
-              actions: [Actions.reset],
+            identifyReset: {
+              target: 'emailIdentification',
+              actions: ['reset'],
             },
-            [Events.challengeSucceeded]: {
-              target: States.success,
-              actions: [Actions.assignAuthToken],
+            challengeSucceeded: {
+              target: 'success',
+              actions: ['assignAuthToken'],
             },
           },
         },
         // Other transitions
-        [States.emailIdentification]: {
+        emailIdentification: {
           on: {
-            [Events.identified]: [
+            identified: [
               {
-                target: States.phoneIdentification,
+                target: 'phoneIdentification',
                 actions: [
-                  Actions.assignEmail,
-                  Actions.assignUserFound,
-                  Actions.assignSuccessfulIdentifier,
-                  Actions.assignAvailableChallengeKinds,
-                  Actions.assignHasSyncablePassKey,
+                  'assignEmail',
+                  'assignUserFound',
+                  'assignSuccessfulIdentifier',
+                  'assignAvailableChallengeKinds',
+                  'assignHasSyncablePassKey',
                 ],
                 description:
                   'Transition to phone registration only if could not find user or will not be able to initiate a challenge',
@@ -98,76 +95,65 @@ const createIdentifyMachine = ({
                   event.payload.availableChallengeKinds.length === 0,
               },
               {
-                target: States.challenge,
+                target: 'challenge',
                 actions: [
-                  Actions.assignEmail,
-                  Actions.assignUserFound,
-                  Actions.assignSuccessfulIdentifier,
-                  Actions.assignAvailableChallengeKinds,
-                  Actions.assignHasSyncablePassKey,
+                  'assignEmail',
+                  'assignUserFound',
+                  'assignSuccessfulIdentifier',
+                  'assignAvailableChallengeKinds',
+                  'assignHasSyncablePassKey',
                 ],
               },
             ],
           },
         },
-        [States.phoneIdentification]: {
+        phoneIdentification: {
           on: {
-            [Events.navigatedToPrevPage]: {
-              target: States.emailIdentification,
+            navigatedToPrevPage: {
+              target: 'emailIdentification',
             },
-            [Events.identifyReset]: {
-              target: States.emailIdentification,
-              actions: [Actions.reset],
+            identifyReset: {
+              target: 'emailIdentification',
+              actions: ['reset'],
             },
-            [Events.identified]: {
-              target: States.challenge,
+            identified: {
+              target: 'challenge',
               actions: [
-                Actions.assignPhone,
-                Actions.assignUserFound,
-                Actions.assignSuccessfulIdentifier,
-                Actions.assignAvailableChallengeKinds,
-                Actions.assignHasSyncablePassKey,
+                'assignPhone',
+                'assignUserFound',
+                'assignSuccessfulIdentifier',
+                'assignAvailableChallengeKinds',
+                'assignHasSyncablePassKey',
               ],
             },
           },
         },
-        [States.challenge]: {
+        challenge: {
           on: {
-            [Events.navigatedToPrevPage]: [
+            navigatedToPrevPage: [
               {
-                target: States.phoneIdentification,
+                target: 'phoneIdentification',
                 cond: context =>
                   !context.identify.userFound || !!context.identify.phoneNumber,
               },
               {
-                target: States.emailIdentification,
+                target: 'emailIdentification',
               },
             ],
-            [Events.challengeSucceeded]: {
-              target: States.success,
-              actions: [Actions.assignAuthToken],
+            challengeSucceeded: {
+              target: 'success',
+              actions: ['assignAuthToken'],
             },
           },
         },
-        [States.success]: {
+        success: {
           type: 'final',
-          data: {
-            authToken: (context: MachineContext) => context.challenge.authToken,
-            userFound: (context: MachineContext) => context.identify.userFound,
-            email: (context: MachineContext) => context.identify.email,
-          },
         },
       },
     },
     {
       actions: {
-        [Actions.assignEmail]: assign((context, event) => {
-          if (
-            event.type !== Events.identified &&
-            event.type !== Events.identifyFailed
-          ) {
-            return context;
-          }
+        assignEmail: assign((context, event) => {
           const { email } = event.payload;
           if (!email) {
             return context;
@@ -175,13 +161,7 @@ const createIdentifyMachine = ({
           context.identify.email = email;
           return context;
         }),
-        [Actions.assignPhone]: assign((context, event) => {
-          if (
-            event.type !== Events.identified &&
-            event.type !== Events.identifyFailed
-          ) {
-            return context;
-          }
+        assignPhone: assign((context, event) => {
           const { phoneNumber } = event.payload;
           if (!phoneNumber) {
             return context;
@@ -189,46 +169,34 @@ const createIdentifyMachine = ({
           context.identify.phoneNumber = phoneNumber;
           return context;
         }),
-        [Actions.assignAvailableChallengeKinds]: assign((context, event) => {
-          if (
-            event.type === Events.identified &&
-            event.payload.availableChallengeKinds
-          ) {
+        assignAvailableChallengeKinds: assign((context, event) => {
+          if (event.payload.availableChallengeKinds) {
             context.challenge.availableChallengeKinds =
               event.payload.availableChallengeKinds;
           }
           return context;
         }),
-        [Actions.assignSuccessfulIdentifier]: assign((context, event) => {
-          if (
-            event.type === Events.identified &&
-            event.payload.successfulIdentifier
-          ) {
+        assignSuccessfulIdentifier: assign((context, event) => {
+          if (event.payload.successfulIdentifier) {
             context.identify.successfulIdentifier =
               event.payload.successfulIdentifier;
           }
           return context;
         }),
-        [Actions.assignHasSyncablePassKey]: assign((context, event) => {
-          if (event.type === Events.identified) {
-            context.challenge.hasSyncablePassKey =
-              event.payload.hasSyncablePassKey;
-          }
+        assignHasSyncablePassKey: assign((context, event) => {
+          context.challenge.hasSyncablePassKey =
+            event.payload.hasSyncablePassKey;
           return context;
         }),
-        [Actions.assignUserFound]: assign((context, event) => {
-          if (event.type === Events.identified) {
-            context.identify.userFound = event.payload.userFound;
-          }
+        assignUserFound: assign((context, event) => {
+          context.identify.userFound = event.payload.userFound;
           return context;
         }),
-        [Actions.assignAuthToken]: assign((context, event) => {
-          if (event.type === Events.challengeSucceeded) {
-            context.challenge.authToken = event.payload.authToken;
-          }
+        assignAuthToken: assign((context, event) => {
+          context.challenge.authToken = event.payload.authToken;
           return context;
         }),
-        [Actions.reset]: assign(context => {
+        reset: assign(context => {
           // Don't allow resetting the identifier suffix
           context.identify = {
             identifierSuffix: context.identify.identifierSuffix,

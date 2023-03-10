@@ -5,7 +5,6 @@ import {
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import { Events, States } from 'src/utils/state-machine/bifrost';
 
 import AuthenticationSuccess from './authentication-success';
 import Complete from './complete';
@@ -18,6 +17,15 @@ import SandboxOutcome from './sandbox-outcome';
 
 const Root = () => {
   const [state, send] = useBifrostMachine();
+  const {
+    device,
+    bootstrapData,
+    config,
+    sandboxSuffix,
+    userFound,
+    authToken,
+    email,
+  } = state.context;
   const observeCollector = useObserveCollector();
   useLogStateMachine('bifrost', state);
 
@@ -28,16 +36,37 @@ const Root = () => {
         observeCollector.logError('error', error, { stack });
       }}
       onReset={() => {
-        send({ type: Events.reset });
+        send({ type: 'reset' });
       }}
     >
-      {state.matches(States.init) && <Init />}
-      {state.matches(States.configInvalid) && <ConfigInvalid />}
-      {state.matches(States.sandboxOutcome) && <SandboxOutcome />}
-      {state.matches(States.identify) && <Identify />}
-      {state.matches(States.onboarding) && <Onboarding />}
-      {state.matches(States.authenticationSuccess) && <AuthenticationSuccess />}
-      {state.matches(States.complete) && <Complete />}
+      {state.matches('init') && <Init />}
+      {state.matches('configInvalid') && <ConfigInvalid />}
+      {state.matches('sandboxOutcome') && <SandboxOutcome />}
+      {state.matches('identify') && (
+        <Identify
+          device={device}
+          bootstrapData={bootstrapData}
+          config={config}
+          identifierSuffix={sandboxSuffix}
+          onDone={payload => {
+            send({ type: 'identifyCompleted', payload });
+          }}
+        />
+      )}
+      {state.matches('onboarding') && (
+        <Onboarding
+          userFound={userFound}
+          device={device}
+          config={config}
+          authToken={authToken}
+          email={email}
+          onDone={payload => {
+            send({ type: 'onboardingCompleted', payload });
+          }}
+        />
+      )}
+      {state.matches('authenticationSuccess') && <AuthenticationSuccess />}
+      {state.matches('complete') && <Complete />}
     </ErrorBoundary>
   );
 };

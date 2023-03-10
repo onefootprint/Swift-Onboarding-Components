@@ -3,14 +3,7 @@ import { OnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
-import {
-  Actions,
-  Events,
-  MachineContext,
-  MachineEvents,
-  Requirements,
-  States,
-} from './types';
+import { MachineContext, MachineEvents, Requirements } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
   userFound: boolean;
@@ -34,11 +27,16 @@ const createOnboardingRequirementsMachine = ({
   config,
   email,
 }: OnboardingRequirementsMachineArgs) =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine(
     {
       predictableActionArguments: true,
       id: 'onboarding-requirements',
-      initial: States.checkOnboardingRequirements,
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'checkOnboardingRequirements',
       context: {
         onboardingContext: {
           userFound,
@@ -52,82 +50,80 @@ const createOnboardingRequirementsMachine = ({
         startedDataCollection: false,
       },
       states: {
-        [States.checkOnboardingRequirements]: {
+        checkOnboardingRequirements: {
           on: {
-            [Events.onboardingRequirementsReceived]: {
-              target: States.router,
-              actions: [Actions.assignRequirements],
+            onboardingRequirementsReceived: {
+              target: 'router',
+              actions: ['assignRequirements'],
             },
           },
         },
-        [States.router]: {
+        router: {
           always: [
             {
-              target: States.additionalInfoRequired,
+              target: 'additionalInfoRequired',
               cond: context => requiresAdditionalInfo(context),
             },
             ...RequirementTargets,
             {
-              target: States.success,
+              target: 'success',
             },
           ],
         },
-        [States.additionalInfoRequired]: {
-          entry: [Actions.startDataCollection],
+        additionalInfoRequired: {
+          entry: ['startDataCollection'],
           on: {
-            [Events.requirementCompleted]: [
+            requirementCompleted: [
               ...RequirementTargets,
               {
-                target: States.success,
+                target: 'success',
               },
             ],
           },
         },
-        [States.kycData]: {
+        kycData: {
           on: {
-            [Events.requirementCompleted]: {
-              target: States.checkOnboardingRequirements,
+            requirementCompleted: {
+              target: 'checkOnboardingRequirements',
             },
           },
         },
-        [States.transfer]: {
+        transfer: {
           on: {
-            [Events.requirementCompleted]: {
-              target: States.checkOnboardingRequirements,
+            requirementCompleted: {
+              target: 'checkOnboardingRequirements',
             },
           },
         },
-        [States.idDoc]: {
+        idDoc: {
           on: {
-            [Events.requirementCompleted]: {
-              target: States.checkOnboardingRequirements,
+            requirementCompleted: {
+              target: 'checkOnboardingRequirements',
             },
           },
         },
-        [States.identityCheck]: {
+        identityCheck: {
           on: {
-            [Events.requirementCompleted]: {
-              target: States.checkOnboardingRequirements,
+            requirementCompleted: {
+              target: 'checkOnboardingRequirements',
             },
           },
         },
-        [States.success]: {
+        success: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        [Actions.assignRequirements]: assign((context, event) => {
-          if (event.type === Events.onboardingRequirementsReceived) {
-            context.requirements = { ...event.payload };
-          }
-          return context;
-        }),
-        [Actions.startDataCollection]: assign(context => {
-          context.startedDataCollection = true;
-          return context;
-        }),
+        assignRequirements: assign((context, event) => ({
+          ...context,
+          requirements: { ...event.payload },
+        })),
+        startDataCollection: assign(context => ({
+          ...context,
+          startedDataCollection: true,
+        })),
       },
     },
   );

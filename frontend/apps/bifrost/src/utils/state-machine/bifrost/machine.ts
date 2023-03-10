@@ -1,167 +1,133 @@
 import { assign, createMachine } from 'xstate';
 
-import createIdentifyMachine from '../identify';
-import createOnboardingMachine from '../onboarding';
-import { Actions, BifrostContext, BifrostEvent, Events, States } from './types';
+import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldShowSandboxOutcome from './utils/should-show-sandbox-outcome';
 
-const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
-  {
-    predictableActionArguments: true,
-    id: 'bifrostMachine',
-    initial: States.init,
-    context: {},
-    on: {
-      [Events.reset]: {
-        target: States.init,
-        actions: [Actions.resetContext],
+export const createBifrostMachine = () =>
+  createMachine(
+    {
+      predictableActionArguments: true,
+      id: 'bifrost',
+      schema: {
+        context: {} as MachineContext,
+        events: {} as MachineEvents,
+      },
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'init',
+      context: {},
+      on: {
+        reset: {
+          target: 'init',
+          actions: ['resetContext'],
+        },
+      },
+      states: {
+        init: {
+          on: {
+            configRequestFailed: {
+              target: 'configInvalid',
+            },
+            initContextUpdated: [
+              {
+                target: 'sandboxOutcome',
+                actions: ['assignInitContext'],
+                cond: (context, event) =>
+                  shouldShowSandboxOutcome(context, event),
+              },
+              {
+                target: 'identify',
+                actions: ['assignInitContext'],
+                cond: (context, event) => isContextReady(context, event),
+              },
+              {
+                actions: ['assignInitContext'],
+              },
+            ],
+          },
+        },
+        sandboxOutcome: {
+          on: {
+            sandboxOutcomeSubmitted: {
+              target: 'identify',
+              actions: ['assignSandboxOutcome'],
+            },
+          },
+        },
+        identify: {
+          on: {
+            identifyCompleted: [
+              {
+                target: 'onboarding',
+                actions: ['assignAuthToken', 'assignUserFound', 'assignEmail'],
+                cond: context => !!context.config,
+              },
+              {
+                target: 'authenticationSuccess',
+                actions: ['assignAuthToken', 'assignUserFound', 'assignEmail'],
+              },
+            ],
+          },
+        },
+        onboarding: {
+          on: {
+            onboardingCompleted: {
+              target: 'complete',
+              actions: ['assignValidationToken', 'assignStatus'],
+            },
+          },
+        },
+        configInvalid: {
+          type: 'final',
+        },
+        authenticationSuccess: {
+          type: 'final',
+        },
+        complete: {
+          type: 'final',
+        },
       },
     },
-    states: {
-      [States.init]: {
-        on: {
-          [Events.configRequestFailed]: {
-            target: States.configInvalid,
-          },
-          [Events.initContextUpdated]: [
-            {
-              target: States.sandboxOutcome,
-              actions: [Actions.assignInitContext],
-              cond: (context, event) =>
-                shouldShowSandboxOutcome(context, event),
-            },
-            {
-              target: States.identify,
-              actions: [Actions.assignInitContext],
-              cond: (context, event) => isContextReady(context, event),
-            },
-            {
-              actions: [Actions.assignInitContext],
-            },
-          ],
-        },
-      },
-      [States.sandboxOutcome]: {
-        on: {
-          [Events.sandboxOutcomeSubmitted]: {
-            target: States.identify,
-            actions: [Actions.assignSandboxOutcome],
-          },
-        },
-      },
-      [States.identify]: {
-        invoke: {
-          id: 'identify',
-          src: context =>
-            createIdentifyMachine({
-              device: { ...context.device! },
-              bootstrapData: context.bootstrapData ?? {},
-              config: context.config,
-              identifierSuffix: context.sandboxSuffix,
-            }),
-          onDone: [
-            {
-              target: States.onboarding,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignUserFound,
-                Actions.assignEmail,
-              ],
-              cond: context => !!context.config,
-            },
-            {
-              target: States.authenticationSuccess,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignUserFound,
-                Actions.assignEmail,
-              ],
-            },
-          ],
-        },
-      },
-      [States.onboarding]: {
-        invoke: {
-          id: 'onboarding',
-          src: context =>
-            createOnboardingMachine({
-              userFound: context.userFound!,
-              device: context.device!,
-              authToken: context.authToken!,
-              config: context.config!,
-              email: context.email,
-            }),
-          onDone: {
-            target: States.complete,
-            actions: [Actions.assignValidationToken, Actions.assignStatus],
-          },
-        },
-      },
-      [States.configInvalid]: {
-        type: 'final',
-      },
-      [States.authenticationSuccess]: {
-        type: 'final',
-      },
-      [States.complete]: {
-        type: 'final',
-      },
-    },
-  },
-  {
-    actions: {
-      [Actions.assignInitContext]: assign((context, event) => {
-        if (event.type !== Events.initContextUpdated) {
+    {
+      actions: {
+        assignInitContext: assign((context, event) => {
+          const { device, config, bootstrapData } = event.payload;
+          context.device = device !== undefined ? device : context.device;
+          context.config = config !== undefined ? config : context.config;
+          context.bootstrapData =
+            bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
+
           return context;
-        }
-        const { device, config, bootstrapData } = event.payload;
-        context.device = device !== undefined ? device : context.device;
-        context.config = config !== undefined ? config : context.config;
-        context.bootstrapData =
-          bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
-
-        return context;
-      }),
-      [Actions.assignSandboxOutcome]: assign((context, event) => {
-        if (event.type === Events.sandboxOutcomeSubmitted) {
-          context.sandboxSuffix = event.payload.sandboxSuffix;
-        }
-        return context;
-      }),
-      [Actions.assignUserFound]: assign((context, event) => {
-        if (event.type === Events.identifyCompleted) {
-          context.userFound = event.data.userFound;
-        }
-        return context;
-      }),
-      [Actions.assignEmail]: assign((context, event) => {
-        if (event.type === Events.identifyCompleted) {
-          context.email = event.data.email;
-        }
-        return context;
-      }),
-      [Actions.assignAuthToken]: assign((context, event) => {
-        if (event.type === Events.identifyCompleted) {
-          context.authToken = event.data.authToken;
-        }
-        return context;
-      }),
-      [Actions.assignValidationToken]: assign((context, event) => {
-        if (event.type === Events.onboardingCompleted) {
-          context.validationToken = event.data.validationToken;
-        }
-        return context;
-      }),
-      [Actions.assignStatus]: assign((context, event) => {
-        if (event.type === Events.onboardingCompleted) {
-          context.status = event.data.status;
-        }
-        return context;
-      }),
-      [Actions.resetContext]: assign(() => ({})),
+        }),
+        assignSandboxOutcome: assign((context, event) => ({
+          ...context,
+          sandboxSuffix: event.payload.sandboxSuffix,
+        })),
+        assignUserFound: assign((context, event) => ({
+          ...context,
+          userFound: event.payload.userFound,
+        })),
+        assignEmail: assign((context, event) => ({
+          ...context,
+          email: event.payload.email,
+        })),
+        assignAuthToken: assign((context, event) => ({
+          ...context,
+          authToken: event.payload.authToken,
+        })),
+        assignValidationToken: assign((context, event) => ({
+          ...context,
+          validationToken: event.payload.validationToken,
+        })),
+        assignStatus: assign((context, event) => ({
+          ...context,
+          status: event.payload.status,
+        })),
+        resetContext: assign(() => ({})),
+      },
     },
-  },
-);
+  );
 
-export default bifrostMachine;
+const BifrostMachine = createBifrostMachine();
+
+export default BifrostMachine;

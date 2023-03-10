@@ -7,15 +7,6 @@ import {
 
 import { BootstrapData } from '../bifrost/types';
 
-export enum States {
-  initBootstrap = 'initBootstrap',
-  bootstrapChallenge = 'bootstrapChallenge',
-  emailIdentification = 'emailIdentification',
-  phoneIdentification = 'phoneIdentification',
-  challenge = 'challenge',
-  success = 'success',
-}
-
 export type MachineContext = {
   config?: OnboardingConfig;
   device: DeviceInfo;
@@ -38,42 +29,12 @@ export type MachineChallengeContext = {
   authToken?: string;
 };
 
-export enum Events {
-  bootstrapDataInvalid = 'bootstrapDataInvalid',
-  identified = 'identified',
-  identifyFailed = 'identifyFailed',
-  identifyReset = 'identifyReset',
-  navigatedToPrevPage = 'navigatedToPrevPage',
-  challengeSucceeded = 'challengeSucceeded',
-  challengeFailed = 'challengeFailed',
-}
-
-export enum Actions {
-  assignSandboxOutcome = 'assignSandboxOutcome',
-  assignEmail = 'assignEmail',
-  assignPhone = 'assignPhone',
-  assignAvailableChallengeKinds = 'assignAvailableChallengeKinds',
-  assignSuccessfulIdentifier = 'assignSuccessfulIdentifier',
-  assignHasSyncablePassKey = 'assignHasSyncablePassKey',
-  assignUserFound = 'assignUserFound',
-  assignChallengeData = 'assignChallengeData',
-  assignAuthToken = 'assignAuthToken',
-  reset = 'reset',
-}
-
 export type MachineEvents =
-  | BootstrapEvents
-  | IdentifyEvents
-  | ChallengeEvents
-  | OtherEvents;
-
-type BootstrapEvents = {
-  type: Events.bootstrapDataInvalid;
-};
-
-type IdentifyEvents =
   | {
-      type: Events.identified;
+      type: 'bootstrapDataInvalid';
+    }
+  | {
+      type: 'identified';
       payload: {
         email?: string;
         phoneNumber?: string;
@@ -84,21 +45,18 @@ type IdentifyEvents =
       };
     }
   | {
-      type: Events.identifyFailed;
+      type: 'identifyFailed';
       payload: {
         email?: string;
         phoneNumber?: string;
       };
     }
-  | { type: Events.identifyReset };
-
-type ChallengeEvents =
+  | { type: 'identifyReset' }
   | {
-      type: Events.challengeSucceeded;
+      type: 'challengeSucceeded';
       payload: {
         authToken: string;
       };
     }
-  | { type: Events.challengeFailed };
-
-type OtherEvents = { type: Events.navigatedToPrevPage };
+  | { type: 'challengeFailed' }
+  | { type: 'navigatedToPrevPage' };

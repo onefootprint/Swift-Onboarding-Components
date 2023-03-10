@@ -3,7 +3,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Events } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -24,7 +23,7 @@ const InitOnboarding = () => {
       {
         onSuccess: ({ validationToken }) => {
           send({
-            type: Events.onboardingInitialized,
+            type: 'onboardingInitialized',
             payload: {
               validationToken,
             },

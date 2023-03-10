@@ -1,10 +1,10 @@
-import { BifrostContext, BifrostEvent, Events } from '../../types';
+import { MachineContext, MachineEvents } from '../../types';
 
 const shouldShowSandboxOutcome = (
-  context: BifrostContext,
-  event: BifrostEvent,
+  context: MachineContext,
+  event: MachineEvents,
 ) => {
-  if (event.type !== Events.initContextUpdated) {
+  if (event.type !== 'initContextUpdated') {
     return false;
   }
   const device = context.device || event.payload.device;

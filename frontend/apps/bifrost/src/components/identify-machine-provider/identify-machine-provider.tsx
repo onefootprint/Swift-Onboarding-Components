@@ -1,19 +1,11 @@
-import { useActor } from '@xstate/react';
+import { useMachine } from '@xstate/react';
 import constate from 'constate';
-import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import {
-  MachineContext,
-  MachineEvents,
-} from 'src/utils/state-machine/identify/types';
-import { Sender, State } from 'xstate';
+import createIdentifyMachine, {
+  IdentifyMachineArgs,
+} from 'src/utils/state-machine/identify/machine';
 
-const useLocalIdentifyMachine = () => {
-  const [state] = useBifrostMachine();
-  const actor: [State<MachineContext>, Sender<MachineEvents>] = useActor(
-    state.children.identify,
-  );
-  return actor;
-};
+const useLocalIdentifyMachine = (args: IdentifyMachineArgs) =>
+  useMachine(() => createIdentifyMachine(args));
 
 export const [IdentifyMachineProvider, useIdentifyMachine] = constate(
   useLocalIdentifyMachine,

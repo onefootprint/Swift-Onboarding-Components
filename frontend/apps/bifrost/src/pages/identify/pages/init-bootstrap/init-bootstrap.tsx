@@ -5,7 +5,7 @@ import validateBootstrapData from 'src/pages/identify/utils/validate-bootstrap-d
 import { useEffectOnce } from 'usehooks-ts';
 
 import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
-import useIdentifyMachine, { Events } from '../../hooks/use-identify-machine';
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 
 const InitBootstrap = () => {
   const [state, send] = useIdentifyMachine();
@@ -68,7 +68,7 @@ const InitBootstrap = () => {
       // If we don't have a valid email or phone number, ignore the bootstrap
       // data and take the user through the normal identify flow
       send({
-        type: Events.bootstrapDataInvalid,
+        type: 'bootstrapDataInvalid',
       });
 
       return;
@@ -85,7 +85,7 @@ const InitBootstrap = () => {
       // If the user is not found, take them through the normal identify flow but
       // prefill the form fields
       send({
-        type: Events.identifyFailed,
+        type: 'identifyFailed',
         payload: {
           email,
           phoneNumber,
@@ -96,7 +96,7 @@ const InitBootstrap = () => {
     }
 
     send({
-      type: Events.identified,
+      type: 'identified',
       payload: {
         email,
         phoneNumber,

@@ -8,7 +8,6 @@ import {
 import React from 'react';
 import InitShimmer from 'src/components/init-shimmer';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import { Events } from 'src/utils/state-machine/bifrost';
 
 import useBootstrapData from './hooks/use-bootstrap-data';
 import useTenantPublicKey from './hooks/use-tenant-public-key';
@@ -23,7 +22,7 @@ const Init = () => {
       device,
     });
     send({
-      type: Events.initContextUpdated,
+      type: 'initContextUpdated',
       payload: {
         device,
       },
@@ -36,7 +35,7 @@ const Init = () => {
         config,
       });
       send({
-        type: Events.initContextUpdated,
+        type: 'initContextUpdated',
         payload: {
           config: {
             ...config,
@@ -52,7 +51,7 @@ const Init = () => {
     },
     onError: () => {
       send({
-        type: Events.configRequestFailed,
+        type: 'configRequestFailed',
       });
     },
   });
@@ -65,7 +64,7 @@ const Init = () => {
       },
     });
     send({
-      type: Events.initContextUpdated,
+      type: 'initContextUpdated',
       payload: {
         bootstrapData,
       },

@@ -8,7 +8,6 @@ import {
 import React from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import SandboxOutcomeFooter from 'src/components/sandbox-outcome-footer';
-import { Events } from 'src/hooks/use-identify-machine';
 import LegalFooter from 'src/pages/identify/components/legal-footer';
 
 import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
@@ -39,7 +38,7 @@ const EmailIdentification = () => {
           hasSyncablePassKey,
         }: IdentifyResponse) => {
           send({
-            type: Events.identified,
+            type: 'identified',
             payload: {
               userFound,
               email: emailFromForm,

@@ -1,25 +1,25 @@
-import { MachineContext, States } from './types';
+import { MachineContext } from './types';
 
 type MachineTarget = {
-  target: States;
+  target: string;
   cond: (context: MachineContext) => boolean;
 };
 
 export const RequirementTargets: MachineTarget[] = [
   {
-    target: States.kycData,
+    target: 'kycData',
     cond: context => shouldRunCollectKycData(context),
   },
   {
-    target: States.transfer,
+    target: 'transfer',
     cond: context => shouldRunTransfer(context),
   },
   {
-    target: States.idDoc,
+    target: 'idDoc',
     cond: context => shouldRunIdDoc(context),
   },
   {
-    target: States.identityCheck,
+    target: 'identityCheck',
     cond: context => shouldRunIdentityCheck(context),
   },
 ];

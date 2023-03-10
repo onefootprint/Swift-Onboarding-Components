@@ -1,33 +1,36 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { DeviceSignals, withProvider } from '@onefootprint/footprint-elements';
 import React from 'react';
-import { States } from 'src/utils/state-machine/onboarding';
 
-import useOnboardingMachine from '../../hooks/use-onboarding-machine';
-import OnboardingRequirements from '../onboarding-requirements';
-import MachineProvider from './components/machine-provider';
-import Authorize from './pages/authorize';
-import InitOnboarding from './pages/init-onboarding';
+import { OnboardingMachineArgs } from '../../utils/state-machine/onboarding/machine';
+import OnboardingMachineProvider from './components/machine-provider';
+import Router, { DonePayload } from './pages/router';
 
-const Onboarding = () => {
-  const [state] = useOnboardingMachine();
-  useLogStateMachine('onboarding', state);
-
-  if (state.matches(States.initOnboarding)) {
-    return <InitOnboarding />;
-  }
-
-  if (state.matches(States.onboardingRequirements)) {
-    return <OnboardingRequirements />;
-  }
-  if (state.matches(States.authorize)) {
-    return (
-      <DeviceSignals page="authorize" fpAuthToken={state.context.authToken}>
-        <Authorize />
-      </DeviceSignals>
-    );
-  }
-  return null;
+type OnboardingProps = Partial<OnboardingMachineArgs> & {
+  onDone: (payload: DonePayload) => void;
 };
 
-export default () => withProvider(MachineProvider, Onboarding);
+const Onboarding = ({
+  userFound,
+  device,
+  config,
+  authToken,
+  email,
+  onDone,
+}: OnboardingProps) => {
+  if (!device || !config || !authToken) {
+    throw new Error('Missing onboarding props');
+  }
+
+  return (
+    <OnboardingMachineProvider
+      userFound={!!userFound}
+      device={device}
+      config={config}
+      authToken={authToken}
+      email={email}
+    >
+      <Router onDone={onDone} />
+    </OnboardingMachineProvider>
+  );
+};
+
+export default Onboarding;

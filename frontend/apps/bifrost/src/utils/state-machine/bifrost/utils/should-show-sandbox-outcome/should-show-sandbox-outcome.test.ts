@@ -1,6 +1,6 @@
 import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
-import { BifrostContext, BifrostEvent, Events } from '../../types';
+import { MachineContext, MachineEvents } from '../../types';
 import shouldShowSandboxOutcome from './should-show-sandbox-outcome';
 
 describe('shouldShowSandboxOutcome', () => {
@@ -20,7 +20,7 @@ describe('shouldShowSandboxOutcome', () => {
 
   describe('when init context info is complete', () => {
     it('should return true if key is not live', () => {
-      const context: BifrostContext = {
+      const context: MachineContext = {
         device: {
           type: 'mobile',
           hasSupportForWebauthn: true,
@@ -28,20 +28,20 @@ describe('shouldShowSandboxOutcome', () => {
         config: { ...testOnboardingConfig, isLive: false },
         bootstrapData: {},
       };
-      const event: BifrostEvent = {
-        type: Events.initContextUpdated,
+      const event: MachineEvents = {
+        type: 'initContextUpdated',
         payload: {},
       };
       expect(shouldShowSandboxOutcome(context, event)).toEqual(true);
     });
 
     it('should return false if key is live', () => {
-      const context: BifrostContext = {
+      const context: MachineContext = {
         config: { ...testOnboardingConfig, isLive: true },
         bootstrapData: {},
       };
-      const event: BifrostEvent = {
-        type: Events.initContextUpdated,
+      const event: MachineEvents = {
+        type: 'initContextUpdated',
         payload: {
           device: {
             type: 'mobile',
@@ -55,11 +55,11 @@ describe('shouldShowSandboxOutcome', () => {
 
   describe('when init context is incomplete', () => {
     it('should return false', () => {
-      const context: BifrostContext = {
+      const context: MachineContext = {
         bootstrapData: {},
       };
-      const event: BifrostEvent = {
-        type: Events.initContextUpdated,
+      const event: MachineEvents = {
+        type: 'initContextUpdated',
         payload: {
           device: {
             type: 'mobile',

@@ -5,9 +5,7 @@ import {
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import LoginChallenge from 'src/pages/identify/components/login-challenge';
-import useIdentifyMachine, {
-  Events,
-} from 'src/pages/identify/hooks/use-identify-machine';
+import useIdentifyMachine from 'src/pages/identify/hooks/use-identify-machine';
 import styled, { css } from 'styled-components';
 
 import SignupChallenge from './components/signup-challenge';
@@ -21,7 +19,7 @@ const Challenge = () => {
   } = context;
 
   const onNavigateToPrev = () => {
-    send(Events.navigatedToPrevPage);
+    send('navigatedToPrevPage');
   };
 
   return (

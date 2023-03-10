@@ -6,9 +6,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import LegalFooter from 'src/pages/identify/components/legal-footer';
 import LoginChallenge from 'src/pages/identify/components/login-challenge';
-import useIdentifyMachine, {
-  Events,
-} from 'src/pages/identify/hooks/use-identify-machine';
+import useIdentifyMachine from 'src/pages/identify/hooks/use-identify-machine';
 import styled, { css } from 'styled-components';
 
 import LoginWithDifferentAccount from './components/login-with-different-account';
@@ -27,7 +25,7 @@ const BootstrapChallenge = () => {
 
   const handleLoginWithDifferent = () => {
     send({
-      type: Events.identifyReset,
+      type: 'identifyReset',
     });
   };
 

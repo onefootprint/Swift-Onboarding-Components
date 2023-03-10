@@ -5,7 +5,7 @@ import {
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { ChallengeKind, LoginChallengeResponse } from '@onefootprint/types';
 import React, { useState } from 'react';
-import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
+import useIdentifyMachine from 'src/hooks/use-identify-machine';
 import BiometricChallengeVerification from 'src/pages/identify/components/biometric-challenge-verification';
 import generateLoginDeviceResponse from 'src/pages/identify/utils/biometric/login-challenge-response';
 
@@ -89,7 +89,7 @@ const LoginBiometricChallenge = () => {
           setSuccess(true);
           setTimeout(() => {
             send({
-              type: Events.challengeSucceeded,
+              type: 'challengeSucceeded',
               payload: {
                 authToken,
               },

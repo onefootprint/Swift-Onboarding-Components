@@ -34,7 +34,6 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
-import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
 
 const IconByCollectedKycDataOption: Record<
@@ -88,7 +87,7 @@ const Authorize = () => {
       {
         onSuccess: ({ validationToken, status }) => {
           send({
-            type: Events.authorized,
+            type: 'authorized',
             payload: {
               validationToken,
               status,

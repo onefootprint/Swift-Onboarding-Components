@@ -1,8 +1,8 @@
 import { renderHook } from '@onefootprint/test-utils';
 import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+import { BifrostMachine } from 'src/utils/state-machine/bifrost';
 
 import { BifrostMachineProvider } from '../../components/bifrost-machine-provider';
-import bifrostMachine from '../../utils/state-machine/bifrost';
 import useSandboxMode from './use-sandbox-mode';
 
 describe('useSandboxMode', () => {
@@ -23,7 +23,7 @@ describe('useSandboxMode', () => {
   describe('when it is using a live key', () => {
     it('should return false', () => {
       const config = getOnboardingConfig(true);
-      bifrostMachine.context.config = config;
+      BifrostMachine.context.config = config;
       const { result } = renderHook(() => useSandboxMode(), {
         wrapper: BifrostMachineProvider,
       });
@@ -34,7 +34,7 @@ describe('useSandboxMode', () => {
   describe('when it is using a sandbox key', () => {
     it('should return false', () => {
       const config = getOnboardingConfig(false);
-      bifrostMachine.context.config = config;
+      BifrostMachine.context.config = config;
       const { result } = renderHook(() => useSandboxMode(), {
         wrapper: BifrostMachineProvider,
       });

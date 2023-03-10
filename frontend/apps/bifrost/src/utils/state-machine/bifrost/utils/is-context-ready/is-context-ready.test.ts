@@ -1,6 +1,6 @@
 import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
-import { BifrostContext, BifrostEvent, Events } from '../../types';
+import { MachineContext, MachineEvents } from '../../types';
 import isContextReady from './is-context-ready';
 
 describe('isContextReady', () => {
@@ -20,7 +20,7 @@ describe('isContextReady', () => {
 
   describe('when init context info is complete', () => {
     it('when all data is in the machine context', () => {
-      const context: BifrostContext = {
+      const context: MachineContext = {
         device: {
           type: 'mobile',
           hasSupportForWebauthn: true,
@@ -28,20 +28,20 @@ describe('isContextReady', () => {
         config: { ...testOnboardingConfig },
         bootstrapData: {},
       };
-      const event: BifrostEvent = {
-        type: Events.initContextUpdated,
+      const event: MachineEvents = {
+        type: 'initContextUpdated',
         payload: {},
       };
       expect(isContextReady(context, event)).toEqual(true);
     });
 
     it('when some data is in the machine context and some in the event payload', () => {
-      const context: BifrostContext = {
+      const context: MachineContext = {
         config: { ...testOnboardingConfig },
         bootstrapData: {},
       };
-      const event: BifrostEvent = {
-        type: Events.initContextUpdated,
+      const event: MachineEvents = {
+        type: 'initContextUpdated',
         payload: {
           device: {
             type: 'mobile',
@@ -55,11 +55,11 @@ describe('isContextReady', () => {
 
   describe('when init context is incomplete', () => {
     it('when context and payload have missing data', () => {
-      const context: BifrostContext = {
+      const context: MachineContext = {
         bootstrapData: {},
       };
-      const event: BifrostEvent = {
-        type: Events.initContextUpdated,
+      const event: MachineEvents = {
+        type: 'initContextUpdated',
         payload: {
           device: {
             type: 'mobile',

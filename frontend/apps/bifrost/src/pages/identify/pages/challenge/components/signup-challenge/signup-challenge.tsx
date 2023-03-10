@@ -7,7 +7,7 @@ import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { ChallengeData, IdentifyVerifyResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
+import useIdentifyMachine from 'src/hooks/use-identify-machine';
 import SmsChallengeVerification from 'src/pages/identify/components/sms-challenge-verification';
 import useIdentifierSuffix from 'src/pages/identify/hooks/use-identifier-suffix';
 import getScrubbedPhoneNumber from 'src/pages/identify/utils/get-scrubbed-phone-number';
@@ -62,7 +62,7 @@ const SignupChallenge = () => {
         onSettled: () => {
           setTimeout(() => {
             send({
-              type: Events.challengeSucceeded,
+              type: 'challengeSucceeded',
               payload: {
                 authToken,
               },

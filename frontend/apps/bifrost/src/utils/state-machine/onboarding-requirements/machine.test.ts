@@ -4,7 +4,6 @@ import { interpret } from 'xstate';
 import createOnboardingRequirementsMachine, {
   OnboardingRequirementsMachineArgs,
 } from './machine';
-import { Events, States } from './types';
 
 describe('Onboarding Requirements Machine Tests', () => {
   const createMachine = (args: OnboardingRequirementsMachineArgs) =>
@@ -40,7 +39,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       machine.start();
       let { state } = machine;
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
       const {
         requirements,
         kycData,
@@ -66,7 +65,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: false,
           liveness: false,
@@ -74,7 +73,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           kycData: [],
         },
       });
-      expect(state.value).toBe(States.success);
+      expect(state.value).toBe('success');
     });
 
     it('shows additional data required page for data collection requirements', () => {
@@ -95,7 +94,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       expect(state.context.startedDataCollection).toBe(false);
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: true,
           liveness: true,
@@ -111,21 +110,21 @@ describe('Onboarding Requirements Machine Tests', () => {
         kycData: [CollectedKycDataOption.name],
       });
       expect(state.context.startedDataCollection).toBe(true);
-      expect(state.value).toBe(States.additionalInfoRequired);
+      expect(state.value).toBe('additionalInfoRequired');
 
       // Skips the onboarding requirement checking after this
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.kycData);
+      expect(state.value).toBe('kycData');
 
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: true,
           liveness: true,
@@ -140,15 +139,15 @@ describe('Onboarding Requirements Machine Tests', () => {
         kycData: [],
       });
 
-      expect(state.value).toBe(States.transfer);
+      expect(state.value).toBe('transfer');
 
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: true,
           liveness: false,
@@ -163,15 +162,15 @@ describe('Onboarding Requirements Machine Tests', () => {
         kycData: [],
       });
 
-      expect(state.value).toBe(States.identityCheck);
+      expect(state.value).toBe('identityCheck');
 
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: false,
           liveness: false,
@@ -185,7 +184,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [],
       });
-      expect(state.value).toBe(States.success);
+      expect(state.value).toBe('success');
     });
 
     it('skips the additional data required page if only identity check is required', () => {
@@ -204,7 +203,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       machine.start();
       let { state } = machine;
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: true,
           liveness: false,
@@ -219,14 +218,14 @@ describe('Onboarding Requirements Machine Tests', () => {
         kycData: [],
       });
 
-      expect(state.value).toBe(States.identityCheck);
+      expect(state.value).toBe('identityCheck');
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: false,
           liveness: false,
@@ -240,7 +239,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [],
       });
-      expect(state.value).toBe(States.success);
+      expect(state.value).toBe('success');
     });
   });
 
@@ -261,7 +260,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       machine.start();
       let { state } = machine;
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: true,
           liveness: true,
@@ -276,15 +275,15 @@ describe('Onboarding Requirements Machine Tests', () => {
         kycData: [CollectedKycDataOption.name],
       });
 
-      expect(state.value).toBe(States.kycData);
+      expect(state.value).toBe('kycData');
 
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: true,
           liveness: true,
@@ -299,15 +298,15 @@ describe('Onboarding Requirements Machine Tests', () => {
         kycData: [],
       });
 
-      expect(state.value).toBe(States.transfer);
+      expect(state.value).toBe('transfer');
 
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: true,
           liveness: false,
@@ -322,15 +321,15 @@ describe('Onboarding Requirements Machine Tests', () => {
         kycData: [],
       });
 
-      expect(state.value).toBe(States.identityCheck);
+      expect(state.value).toBe('identityCheck');
 
       state = machine.send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
-      expect(state.value).toBe(States.checkOnboardingRequirements);
+      expect(state.value).toBe('checkOnboardingRequirements');
 
       state = machine.send({
-        type: Events.onboardingRequirementsReceived,
+        type: 'onboardingRequirementsReceived',
         payload: {
           identityCheck: false,
           liveness: false,
@@ -344,7 +343,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [],
       });
-      expect(state.value).toBe(States.success);
+      expect(state.value).toBe('success');
     });
   });
 });

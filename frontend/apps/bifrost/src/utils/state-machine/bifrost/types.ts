@@ -1,43 +1,12 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import { OnboardingConfig, OnboardingStatus } from '@onefootprint/types';
 
-export enum States {
-  init = 'Init',
-  sandboxOutcome = 'sandboxOutcome',
-  identify = 'identify',
-  configInvalid = 'configInvalid',
-  authenticationSuccess = 'authenticationSuccess',
-  onboarding = 'onboarding',
-  complete = 'complete',
-}
-
-export enum Events {
-  initContextUpdated = 'initContextUpdated',
-  configRequestFailed = 'configRequestFailed',
-  sandboxOutcomeSubmitted = 'sandboxOutcomeSubmitted',
-  authenticationSucceeded = 'authenticationSucceeded',
-  identifyCompleted = 'done.invoke.identify',
-  onboardingCompleted = 'done.invoke.onboarding',
-  reset = 'reset',
-}
-
-export enum Actions {
-  assignInitContext = 'assignInitContext',
-  assignSandboxOutcome = 'assignSandboxOutcome',
-  assignUserFound = 'assignUserFound',
-  assignAuthToken = 'assignAuthToken',
-  assignEmail = 'assignEmail',
-  assignValidationToken = 'assignValidationToken',
-  assignStatus = 'assignStatus',
-  resetContext = 'resetContext',
-}
-
 export type BootstrapData = {
   email?: string;
   phoneNumber?: string;
 };
 
-export type BifrostContext = {
+export type MachineContext = {
   authToken?: string;
   device?: DeviceInfo;
   config?: OnboardingConfig;
@@ -49,9 +18,9 @@ export type BifrostContext = {
   sandboxSuffix?: string;
 };
 
-export type BifrostEvent =
+export type MachineEvents =
   | {
-      type: Events.initContextUpdated;
+      type: 'initContextUpdated';
       payload: {
         config?: OnboardingConfig;
         device?: DeviceInfo;
@@ -59,29 +28,29 @@ export type BifrostEvent =
       };
     }
   | {
-      type: Events.configRequestFailed;
+      type: 'configRequestFailed';
     }
   | {
-      type: Events.sandboxOutcomeSubmitted;
+      type: 'sandboxOutcomeSubmitted';
       payload: {
         sandboxSuffix: string;
       };
     }
   | {
-      type: Events.identifyCompleted;
-      data: {
+      type: 'identifyCompleted';
+      payload: {
         authToken: string;
         userFound: boolean;
         email?: string;
       };
     }
   | {
-      type: Events.onboardingCompleted;
-      data: {
+      type: 'onboardingCompleted';
+      payload: {
         validationToken?: string;
         status?: OnboardingStatus;
       };
     }
   | {
-      type: Events.reset;
+      type: 'reset';
     };

@@ -4,14 +4,14 @@ import {
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
-import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
+import useIdentifyMachine from 'src/hooks/use-identify-machine';
 
 const PhoneIdentificationHeader = () => {
   const { t } = useTranslation('pages.phone-identification');
   const [, send] = useIdentifyMachine();
 
   const handleNavToPrevPage = () => {
-    send({ type: Events.navigatedToPrevPage });
+    send({ type: 'navigatedToPrevPage' });
   };
 
   return (

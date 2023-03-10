@@ -9,7 +9,6 @@ import {
 } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { Events } from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
@@ -49,7 +48,7 @@ const CheckOnboardingRequirements = () => {
     });
 
     send({
-      type: Events.onboardingRequirementsReceived,
+      type: 'onboardingRequirementsReceived',
       payload: {
         liveness,
         idDoc,

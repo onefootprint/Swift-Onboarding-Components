@@ -9,9 +9,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useOnboardingRequirementsMachine, {
-  Events,
-} from '../../hooks/use-onboarding-requirements-machine';
+import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 
 const IdentityCheck = () => {
   const { t } = useTranslation('pages.identity-check');
@@ -54,7 +52,7 @@ const IdentityCheck = () => {
 
     if (isDone) {
       send({
-        type: Events.requirementCompleted,
+        type: 'requirementCompleted',
       });
     }
   };

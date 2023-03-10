@@ -5,17 +5,6 @@ import {
   UserData,
 } from '@onefootprint/types';
 
-export enum States {
-  checkOnboardingRequirements = 'checkOnboardingRequirements',
-  router = 'router',
-  additionalInfoRequired = 'additionalInfoRequired',
-  kycData = 'kycData',
-  transfer = 'transfer',
-  idDoc = 'idDoc',
-  identityCheck = 'identityCheck',
-  success = 'success',
-}
-
 export type Requirements = {
   identityCheck: boolean;
   liveness: boolean;
@@ -38,21 +27,11 @@ export type MachineContext = {
   kycData: UserData; // Filled user data
 };
 
-export enum Events {
-  onboardingRequirementsReceived = 'onboardingRequirementsReceived',
-  requirementCompleted = 'requirementCompleted',
-}
-
-export enum Actions {
-  assignRequirements = 'assignRequirements',
-  startDataCollection = 'startDataCollection',
-}
-
 export type MachineEvents =
   | {
-      type: Events.requirementCompleted;
+      type: 'requirementCompleted';
     }
   | {
-      type: Events.onboardingRequirementsReceived;
+      type: 'onboardingRequirementsReceived';
       payload: Requirements;
     };

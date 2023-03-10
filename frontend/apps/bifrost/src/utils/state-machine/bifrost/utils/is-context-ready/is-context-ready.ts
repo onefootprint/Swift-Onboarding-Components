@@ -1,7 +1,7 @@
-import { BifrostContext, BifrostEvent, Events } from '../../types';
+import { MachineContext, MachineEvents } from '../../types';
 
-const isContextReady = (context: BifrostContext, event: BifrostEvent) => {
-  if (event.type !== Events.initContextUpdated) {
+const isContextReady = (context: MachineContext, event: MachineEvents) => {
+  if (event.type !== 'initContextUpdated') {
     return false;
   }
   const device = context.device || event.payload.device;

@@ -7,7 +7,7 @@ import { IcoCheck24, IcoUser24, IcoWarning24 } from '@onefootprint/icons';
 import { Box, Button, RadioSelect, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';
 
 import useSkipIfHasBootstrapData from './hooks/use-skip-if-has-bootstrap-data';
@@ -42,7 +42,7 @@ const SandboxOutcome = () => {
 
   const handleAfterSubmit = (formData: FormData) => {
     send({
-      type: Events.sandboxOutcomeSubmitted,
+      type: 'sandboxOutcomeSubmitted',
       payload: {
         sandboxSuffix: `#${formData.outcome}${formData.testID}`,
       },

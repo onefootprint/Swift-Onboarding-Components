@@ -7,7 +7,6 @@ import {
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';
-import { Events, States } from './types';
 
 describe('Identify Machine Tests', () => {
   const getOnboardingConfig = (isLive?: boolean): OnboardingConfig => ({
@@ -24,34 +23,37 @@ describe('Identify Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
   });
 
-  const createMachine = (deviceInfo: DeviceInfo, identifierSuffix?: string) =>
-    createIdentifyMachine({
-      device: deviceInfo,
-      config: getOnboardingConfig(),
-      identifierSuffix,
-    });
+  const createMachine = (deviceInfo: DeviceInfo, identifierSuffix?: string) => {
+    const machine = interpret(
+      createIdentifyMachine({
+        device: deviceInfo,
+        config: getOnboardingConfig(),
+        identifierSuffix,
+      }),
+    );
+    machine.start();
+    return machine;
+  };
 
   describe('with existing account', () => {
     it('successfully ids the user from email', () => {
-      const machine = interpret(
-        createMachine(
-          {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-          },
-          '#test1',
-        ),
+      const machine = createMachine(
+        {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+        '#test1',
       );
-      machine.start();
+
       let { state } = machine;
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
       });
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           successfulIdentifier: { email: 'belce@onefootprint.com' },
@@ -70,26 +72,24 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts sms challenge', () => {
-      const machine = interpret(
-        createMachine({
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        }),
-      );
-      machine.start();
+      const machine = createMachine({
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      });
+
       let { state } = machine;
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
       });
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
@@ -100,10 +100,10 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneIdentification);
+      expect(state.value).toEqual('phoneIdentification');
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           phoneNumber: '+16509878899',
           successfulIdentifier: { phoneNumber: '+16509878899' },
@@ -122,26 +122,24 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts biometric challenge', () => {
-      const machine = interpret(
-        createMachine({
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        }),
-      );
-      machine.start();
+      const machine = createMachine({
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      });
+
       let { state } = machine;
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
       });
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
@@ -152,10 +150,10 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneIdentification);
+      expect(state.value).toEqual('phoneIdentification');
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           phoneNumber: '+16509878899',
           successfulIdentifier: { phoneNumber: '+16509878899' },
@@ -174,10 +172,10 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
 
       state = machine.send({
-        type: Events.challengeSucceeded,
+        type: 'challengeSucceeded',
         payload: {
           authToken: 'token',
         },
@@ -187,28 +185,26 @@ describe('Identify Machine Tests', () => {
         hasSyncablePassKey: false,
         authToken: 'token',
       });
-      expect(state.value).toEqual(States.success);
+      expect(state.value).toEqual('success');
     });
   });
 
   describe('with new user', () => {
     it('registers new phone', () => {
-      const machine = interpret(
-        createMachine({
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        }),
-      );
-      machine.start();
+      const machine = createMachine({
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      });
+
       let { state } = machine;
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
       });
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
@@ -219,10 +215,10 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneIdentification);
+      expect(state.value).toEqual('phoneIdentification');
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           phoneNumber: '+16509878899',
           userFound: false,
@@ -234,44 +230,42 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
 
       // Go back and change the phone number
       state = machine.send({
-        type: Events.navigatedToPrevPage,
+        type: 'navigatedToPrevPage',
       });
-      expect(state.value).toEqual(States.phoneIdentification);
+      expect(state.value).toEqual('phoneIdentification');
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           phoneNumber: '+16509878899',
           userFound: false,
         },
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
     });
 
     it('editing email while registering phone', () => {
-      const machine = interpret(
-        createMachine(
-          {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-          },
-          '#test1',
-        ),
+      const machine = createMachine(
+        {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+        '#test1',
       );
-      machine.start();
+
       let { state } = machine;
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
       });
 
       state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
@@ -283,32 +277,29 @@ describe('Identify Machine Tests', () => {
         identifierSuffix: '#test1',
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.phoneIdentification);
+      expect(state.value).toEqual('phoneIdentification');
 
       // Edit the email address
       state = machine.send({
-        type: Events.identifyReset,
+        type: 'identifyReset',
       });
       expect(state.context.identify).toEqual({
         identifierSuffix: '#test1',
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual(States.emailIdentification);
+      expect(state.value).toEqual('emailIdentification');
     });
   });
 
   describe('biometric challenge', () => {
     it('successfully completes', () => {
-      const machine = interpret(
-        createMachine({
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        }),
-      );
-      machine.start();
+      const machine = createMachine({
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      });
 
       let state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           successfulIdentifier: { email: 'belce@onefootprint.com' },
@@ -326,10 +317,10 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
 
       state = machine.send({
-        type: Events.challengeSucceeded,
+        type: 'challengeSucceeded',
         payload: {
           authToken: 'authToken',
         },
@@ -339,20 +330,17 @@ describe('Identify Machine Tests', () => {
         hasSyncablePassKey: true,
         authToken: 'authToken',
       });
-      expect(state.value).toEqual(States.success);
+      expect(state.value).toEqual('success');
     });
 
     it('falls back to sms challenge', () => {
-      const machine = interpret(
-        createMachine({
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        }),
-      );
-      machine.start();
+      const machine = createMachine({
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      });
 
       let state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           userFound: true,
@@ -361,10 +349,10 @@ describe('Identify Machine Tests', () => {
           hasSyncablePassKey: false,
         },
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
 
       state = machine.send({
-        type: Events.challengeFailed,
+        type: 'challengeFailed',
       });
 
       expect(state.context.identify).toEqual({
@@ -376,10 +364,10 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
 
       state = machine.send({
-        type: Events.challengeSucceeded,
+        type: 'challengeSucceeded',
         payload: {
           authToken: 'authToken',
         },
@@ -389,22 +377,19 @@ describe('Identify Machine Tests', () => {
         hasSyncablePassKey: false,
         authToken: 'authToken',
       });
-      expect(state.value).toEqual(States.success);
+      expect(state.value).toEqual('success');
     });
   });
 
   describe('sms challenge', () => {
     it('successfully completes after resending the code', () => {
-      const machine = interpret(
-        createMachine({
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        }),
-      );
-      machine.start();
+      const machine = createMachine({
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+      });
 
       let state = machine.send({
-        type: Events.identified,
+        type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
           userFound: true,
@@ -422,10 +407,10 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual(States.challenge);
+      expect(state.value).toEqual('challenge');
 
       state = machine.send({
-        type: Events.challengeSucceeded,
+        type: 'challengeSucceeded',
         payload: {
           authToken: 'authToken',
         },
@@ -435,7 +420,7 @@ describe('Identify Machine Tests', () => {
         hasSyncablePassKey: true,
         authToken: 'authToken',
       });
-      expect(state.value).toEqual(States.success);
+      expect(state.value).toEqual('success');
     });
   });
 });

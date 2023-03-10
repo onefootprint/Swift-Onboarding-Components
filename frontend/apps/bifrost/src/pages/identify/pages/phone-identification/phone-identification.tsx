@@ -7,7 +7,7 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 import SandboxOutcomeFooter from 'src/components/sandbox-outcome-footer';
-import useIdentifyMachine, { Events } from 'src/hooks/use-identify-machine';
+import useIdentifyMachine from 'src/hooks/use-identify-machine';
 
 import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
 import PhoneIdentificationEmailPreview from './components/phone-identification-email-preview';
@@ -39,7 +39,7 @@ const PhoneIdentification = () => {
           hasSyncablePassKey,
         }: IdentifyResponse) => {
           send({
-            type: Events.identified,
+            type: 'identified',
             payload: {
               phoneNumber: phoneFromForm,
               userFound,
@@ -58,7 +58,7 @@ const PhoneIdentification = () => {
   };
 
   const handleChangeEmail = () => {
-    send({ type: Events.identifyReset });
+    send({ type: 'identifyReset' });
   };
 
   return (

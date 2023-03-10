@@ -1,19 +1,12 @@
-import { useActor } from '@xstate/react';
+import { useMachine } from '@xstate/react';
 import constate from 'constate';
-import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
-import {
-  MachineContext,
-  MachineEvents,
-} from 'src/utils/state-machine/onboarding-requirements/types';
-import { Sender, State } from 'xstate';
+import createOnboardingRequirementsMachine, {
+  OnboardingRequirementsMachineArgs,
+} from 'src/utils/state-machine/onboarding-requirements/machine';
 
-const useLocalOnboardingRequirementsMachine = () => {
-  const [state] = useOnboardingMachine();
-  const actor: [State<MachineContext>, Sender<MachineEvents>] = useActor(
-    state.children.onboardingRequirements,
-  );
-  return actor;
-};
+const useLocalOnboardingRequirementsMachine = (
+  args: OnboardingRequirementsMachineArgs,
+) => useMachine(() => createOnboardingRequirementsMachine(args));
 
 export const [
   OnboardingRequirementsMachineProvider,
