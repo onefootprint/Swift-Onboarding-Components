@@ -18,6 +18,7 @@ const PinnedServerCertificates = ({
   const { t } = useTranslation(
     'pages.proxy-configs.details.pinned-server-certificates',
   );
+  const shouldShow = proxyConfig.pinnedServerCertificates.length > 0;
 
   const handleClick = (contents: string[]) => () => {
     contents.forEach(content => {
@@ -29,7 +30,7 @@ const PinnedServerCertificates = ({
     });
   };
 
-  return (
+  return shouldShow ? (
     <Fieldset title={t('title')}>
       <Field label={t('certificate')}>
         <LinkButton
@@ -43,7 +44,7 @@ const PinnedServerCertificates = ({
         </LinkButton>
       </Field>
     </Fieldset>
-  );
+  ) : null;
 };
 
 export default PinnedServerCertificates;

@@ -11,8 +11,10 @@ type CustomHeadersProps = {
 
 const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
   const { t } = useTranslation('pages.proxy-configs.details.custom-headers');
+  const shouldShow =
+    proxyConfig.headers.length > 0 || proxyConfig.secretHeaders.length > 0;
 
-  return (
+  return shouldShow ? (
     <Fieldset title={t('title')}>
       {proxyConfig.secretHeaders.map(({ name }) => (
         <Fragment key={name}>
@@ -29,7 +31,7 @@ const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
         </Fragment>
       ))}
     </Fieldset>
-  );
+  ) : null;
 };
 
 export default CustomHeaders;
