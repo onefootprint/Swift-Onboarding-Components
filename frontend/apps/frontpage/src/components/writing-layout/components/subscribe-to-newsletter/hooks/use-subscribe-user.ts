@@ -8,11 +8,16 @@ type SubscribeUserRequest = {
 };
 
 const subscribeUser = async (payload: SubscribeUserRequest) => {
-  const response = await request<SubscribeUserResponse>({
-    method: 'POST',
-    url: '/api/subscribe-to-newsletter',
-    data: payload,
-  });
+  const response = await request<SubscribeUserResponse>(
+    {
+      method: 'POST',
+      url: '/api/subscribe-to-newsletter',
+      data: payload,
+      baseURL: undefined,
+      withCredentials: false,
+    },
+    true,
+  );
   return response.data;
 };
 
