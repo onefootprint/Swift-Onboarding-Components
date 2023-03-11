@@ -24,6 +24,7 @@ export interface Typegen0 {
   matchesStates:
     | 'basicData'
     | 'basicDataEditDesktop'
+    | 'beneficialOwnerKyc'
     | 'beneficialOwners'
     | 'beneficialOwnersEditDesktop'
     | 'businessAddress'

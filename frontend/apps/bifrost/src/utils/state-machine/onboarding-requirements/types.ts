@@ -11,7 +11,7 @@ export type Requirements = {
   idDoc?: boolean;
   selfie?: boolean;
   consent?: boolean;
-  kycData: readonly CollectedKycDataOption[];
+  kycData: CollectedKycDataOption[];
   kybData: CollectedKybDataOption[];
 };
 

@@ -1,10 +1,17 @@
-import { CollectedKybDataOption, OnboardingConfig } from '@onefootprint/types';
+import {
+  CollectedKybDataOption,
+  CollectedKycDataOption,
+  OnboardingConfig,
+} from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
 export type CollectKybDataContext = {
   config: OnboardingConfig;
-  missingAttributes: CollectedKybDataOption[];
+  missingKybAttributes: CollectedKybDataOption[];
+  missingKycAttributes: CollectedKycDataOption[];
+  userFound: boolean;
+  email?: string;
 };
 
 export type CollectKybDataProps = BasePluginProps<CollectKybDataContext>;

@@ -58,8 +58,11 @@ const Router = ({ onDone }: RouterProps) => {
             authToken,
             device,
             customData: {
-              missingAttributes: kybData,
+              missingKybAttributes: kybData,
+              missingKycAttributes: kycData,
               config,
+              userFound,
+              email,
             },
           }}
           onDone={handleRequirementCompleted}

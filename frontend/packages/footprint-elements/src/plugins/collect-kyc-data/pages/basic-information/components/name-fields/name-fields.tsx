@@ -4,7 +4,11 @@ import { Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-const NameFields = () => {
+type NameFieldsProps = {
+  isDisabled?: boolean;
+};
+
+const NameFields = ({ isDisabled }: NameFieldsProps) => {
   const {
     register,
     formState: { errors },
@@ -16,6 +20,7 @@ const NameFields = () => {
       <Grid.Column col={6}>
         <TextInput
           data-private
+          disabled={isDisabled}
           hasError={!!errors[UserDataAttribute.firstName]}
           hint={
             errors[UserDataAttribute.firstName]
@@ -30,6 +35,7 @@ const NameFields = () => {
       <Grid.Column col={6}>
         <TextInput
           data-private
+          disabled={isDisabled}
           hasError={!!errors[UserDataAttribute.lastName]}
           hint={
             errors[UserDataAttribute.firstName]

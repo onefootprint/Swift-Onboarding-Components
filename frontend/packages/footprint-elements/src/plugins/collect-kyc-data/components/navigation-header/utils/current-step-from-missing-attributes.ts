@@ -9,7 +9,7 @@ import {
 } from '../../../utils/missing-attributes';
 
 const getCurrentStepFromMissingAttributes = (
-  mustCollect: readonly CollectedKycDataOption[],
+  mustCollect: CollectedKycDataOption[],
   state: StateValue,
 ) => {
   if (!hasMissingAttributes(mustCollect)) {

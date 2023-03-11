@@ -24,6 +24,7 @@ export type MachineContext = {
   userFound?: boolean;
   config?: OnboardingConfig;
   receivedEmail?: boolean; // Whether received non-empty email from initial context
+  fixedData?: UserData;
   // Machine generated
   missingAttributes: CollectedKycDataOption[];
   data: UserData;
@@ -34,11 +35,12 @@ export type MachineEvents =
       type: 'receivedContext';
       payload: {
         authToken: string;
-        missingAttributes: readonly CollectedKycDataOption[];
+        missingAttributes: CollectedKycDataOption[];
         userFound: boolean;
         device: DeviceInfo;
         email?: string;
         config: OnboardingConfig;
+        fixedData?: UserData;
       };
     }
   | {

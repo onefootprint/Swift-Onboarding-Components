@@ -18,12 +18,19 @@ type NameFormProps = {
 
 const NameForm = ({ isLoading, ctaLabel, onSubmit }: NameFormProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data } = state.context;
+  const { data, fixedData } = state.context;
+  const hasFixedName =
+    fixedData?.[UserDataAttribute.firstName] !== undefined &&
+    fixedData?.[UserDataAttribute.lastName] !== undefined;
 
   const methods = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.firstName]: data[UserDataAttribute.firstName],
-      [UserDataAttribute.lastName]: data[UserDataAttribute.lastName],
+      [UserDataAttribute.firstName]: hasFixedName
+        ? fixedData?.[UserDataAttribute.firstName]
+        : data[UserDataAttribute.firstName],
+      [UserDataAttribute.lastName]: hasFixedName
+        ? fixedData?.[UserDataAttribute.lastName]
+        : data[UserDataAttribute.lastName],
     },
   });
 
@@ -38,7 +45,7 @@ const NameForm = ({ isLoading, ctaLabel, onSubmit }: NameFormProps) => {
   return (
     <FormProvider {...methods}>
       <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
-        <NameFields />
+        <NameFields isDisabled={hasFixedName} />
         <CtaButton isLoading={isLoading} label={ctaLabel} />
       </Form>
     </FormProvider>

@@ -27,8 +27,8 @@ const SSN_ATTRIBUTES = [
 // (1) it must be collected for this onboarding session AND
 // (2) it hasn't yet been collected
 export const isMissing = (
-  attributes: readonly CollectedKycDataOption[],
-  mustCollect: readonly CollectedKycDataOption[],
+  attributes: CollectedKycDataOption[],
+  mustCollect: CollectedKycDataOption[],
   collectedData?: UserData,
 ) =>
   attributes
@@ -37,29 +37,29 @@ export const isMissing = (
     .some(attr => !collectedData || !collectedData[attr]);
 
 export const isMissingEmailAttribute = (
-  mustCollect: readonly CollectedKycDataOption[],
+  mustCollect: CollectedKycDataOption[],
   collectedData?: UserData,
 ) =>
   mustCollect.includes(CollectedKycDataOption.email) &&
   !collectedData?.[UserDataAttribute.email];
 
 export const isMissingBasicAttribute = (
-  mustCollect: readonly CollectedKycDataOption[],
+  mustCollect: CollectedKycDataOption[],
   collectedData?: UserData,
 ) => isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingResidentialAttribute = (
-  mustCollect: readonly CollectedKycDataOption[],
+  mustCollect: CollectedKycDataOption[],
   collectedData?: UserData,
 ) => isMissing(RESIDENTIAL_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingSsnAttribute = (
-  mustCollect: readonly CollectedKycDataOption[],
+  mustCollect: CollectedKycDataOption[],
   collectedData?: UserData,
 ) => isMissing(SSN_ATTRIBUTES, mustCollect, collectedData);
 
 export const hasMissingAttributes = (
-  mustCollect: readonly CollectedKycDataOption[],
+  mustCollect: CollectedKycDataOption[],
   collectedData?: UserData,
 ) =>
   mustCollect.some(option =>

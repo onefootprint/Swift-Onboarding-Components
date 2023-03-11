@@ -6,7 +6,7 @@ import getCurrentStepFromMissingAttributes from './utils/current-step-from-missi
 
 const CollectKybDataNavigationHeader = () => {
   const [state, send] = useCollectKybDataMachine();
-  const { missingAttributes } = state.context;
+  const { missingKybAttributes: missingAttributes } = state.context;
   const value = getCurrentStepFromMissingAttributes(
     missingAttributes,
     state.value,

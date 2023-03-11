@@ -26,7 +26,8 @@ const createCollectKybDataMachine = () =>
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        missingAttributes: [],
+        missingKybAttributes: [],
+        missingKycAttributes: [],
         data: {},
       },
       states: {
@@ -37,7 +38,7 @@ const createCollectKybDataMachine = () =>
                 target: 'introduction',
                 actions: 'assignInitialContext',
                 cond: (context, event) =>
-                  hasMissingAttributes(event.payload.missingAttributes),
+                  hasMissingAttributes(event.payload.missingKybAttributes),
               },
               {
                 target: 'completed',
@@ -52,17 +53,21 @@ const createCollectKybDataMachine = () =>
               {
                 target: 'basicData',
                 cond: context =>
-                  isMissingBasicDataAttribute(context.missingAttributes),
+                  isMissingBasicDataAttribute(context.missingKybAttributes),
               },
               {
                 target: 'businessAddress',
                 cond: context =>
-                  isMissingBusinessAddressAttribute(context.missingAttributes),
+                  isMissingBusinessAddressAttribute(
+                    context.missingKybAttributes,
+                  ),
               },
               {
                 target: 'beneficialOwners',
                 cond: context =>
-                  isMissingBeneficialOwnerAttribute(context.missingAttributes),
+                  isMissingBeneficialOwnerAttribute(
+                    context.missingKybAttributes,
+                  ),
               },
               {
                 target: 'confirm',
@@ -77,13 +82,17 @@ const createCollectKybDataMachine = () =>
                 target: 'businessAddress',
                 actions: 'assignBasicData',
                 cond: context =>
-                  isMissingBusinessAddressAttribute(context.missingAttributes),
+                  isMissingBusinessAddressAttribute(
+                    context.missingKybAttributes,
+                  ),
               },
               {
                 target: 'beneficialOwners',
                 actions: 'assignBasicData',
                 cond: context =>
-                  isMissingBeneficialOwnerAttribute(context.missingAttributes),
+                  isMissingBeneficialOwnerAttribute(
+                    context.missingKybAttributes,
+                  ),
               },
               {
                 target: 'confirm',
@@ -99,7 +108,9 @@ const createCollectKybDataMachine = () =>
                 target: 'beneficialOwners',
                 actions: 'assignBusinessAddress',
                 cond: context =>
-                  isMissingBeneficialOwnerAttribute(context.missingAttributes),
+                  isMissingBeneficialOwnerAttribute(
+                    context.missingKybAttributes,
+                  ),
               },
               {
                 target: 'confirm',
@@ -120,9 +131,15 @@ const createCollectKybDataMachine = () =>
         },
         confirm: {
           on: {
-            confirmed: {
-              target: 'completed',
-            },
+            confirmed: [
+              {
+                cond: context => context.missingKycAttributes.length > 0,
+                target: 'beneficialOwnerKyc',
+              },
+              {
+                target: 'completed',
+              },
+            ],
             // Desktop transitions
             editBasicData: {
               target: 'basicDataEditDesktop',
@@ -205,6 +222,13 @@ const createCollectKybDataMachine = () =>
             },
           },
         },
+        beneficialOwnerKyc: {
+          on: {
+            beneficialOwnerKycSubmitted: {
+              target: 'completed',
+            },
+          },
+        },
         completed: {
           type: 'final',
         },
@@ -213,12 +237,22 @@ const createCollectKybDataMachine = () =>
     {
       actions: {
         assignInitialContext: assign((context, event) => {
-          const { authToken, device, config, missingAttributes } =
-            event.payload;
+          const {
+            authToken,
+            device,
+            config,
+            userFound,
+            email,
+            missingKybAttributes,
+            missingKycAttributes,
+          } = event.payload;
+          context.missingKybAttributes = [...missingKybAttributes];
+          context.missingKycAttributes = [...missingKycAttributes];
           context.device = device;
           context.authToken = authToken;
           context.config = config;
-          context.missingAttributes = [...missingAttributes];
+          context.userFound = userFound;
+          context.email = email;
           return context;
         }),
         assignBasicData: assign((context, event) => {

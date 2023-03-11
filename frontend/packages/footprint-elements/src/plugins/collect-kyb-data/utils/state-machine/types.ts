@@ -3,6 +3,7 @@ import {
   BusinessData,
   BusinessDataAttribute,
   CollectedKybDataOption,
+  CollectedKycDataOption,
   OnboardingConfig,
 } from '@onefootprint/types';
 
@@ -27,10 +28,15 @@ export type BeneficialOwnersData = Required<
 >;
 
 export type MachineContext = {
+  // Plugin context
+  missingKybAttributes: CollectedKybDataOption[];
+  missingKycAttributes: CollectedKycDataOption[];
   device?: DeviceInfo;
   authToken?: string;
   config?: OnboardingConfig;
-  missingAttributes: CollectedKybDataOption[];
+  userFound?: boolean;
+  email?: string;
+  // Machine generated
   data: BusinessData;
 };
 
@@ -38,10 +44,13 @@ export type MachineEvents =
   | {
       type: 'receivedContext';
       payload: {
+        missingKybAttributes: CollectedKybDataOption[];
+        missingKycAttributes: CollectedKycDataOption[];
         authToken: string;
         device: DeviceInfo;
         config: OnboardingConfig;
-        missingAttributes: CollectedKybDataOption[];
+        userFound: boolean;
+        email?: string;
       };
     }
   | {
@@ -64,4 +73,5 @@ export type MachineEvents =
   | { type: 'editBasicData' }
   | { type: 'editBusinessAddress' }
   | { type: 'editBeneficialOwners' }
-  | { type: 'returnToSummary' };
+  | { type: 'returnToSummary' }
+  | { type: 'beneficialOwnerKycSubmitted' };

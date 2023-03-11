@@ -26,7 +26,8 @@ describe('Collect KYB Data Machine Tests', () => {
   };
 
   const createMachine = (
-    missingAttributes: CollectedKybDataOption[],
+    missingKybAttributes: CollectedKybDataOption[],
+    missingKycAttributes: CollectedKycDataOption[],
     device: DeviceInfo = {
       type: 'mobile',
       hasSupportForWebauthn: false,
@@ -39,20 +40,25 @@ describe('Collect KYB Data Machine Tests', () => {
       payload: {
         authToken: 'authToken',
         device,
+        userFound: true,
         config: { ...TestOnboardingConfig },
-        missingAttributes,
+        missingKybAttributes,
+        missingKycAttributes,
       },
     });
     return machine;
   };
 
   it('visits all pages when all attributes are missing', () => {
-    const machine = createMachine([
-      CollectedKybDataOption.name,
-      CollectedKybDataOption.ein,
-      CollectedKybDataOption.address,
-      CollectedKybDataOption.beneficialOwners,
-    ]);
+    const machine = createMachine(
+      [
+        CollectedKybDataOption.name,
+        CollectedKybDataOption.ein,
+        CollectedKybDataOption.address,
+        CollectedKybDataOption.beneficialOwners,
+      ],
+      [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+    );
     let { state } = machine;
 
     expect(state.value).toEqual('introduction');
@@ -128,17 +134,21 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'confirmed' });
+
+    expect(state.value).toEqual('beneficialOwnerKyc');
+    state = machine.send({ type: 'beneficialOwnerKycSubmitted' });
+
     expect(state.value).toEqual('completed');
   });
 
   it('when there are no missing attributes', () => {
-    const machine = createMachine([]);
+    const machine = createMachine([], []);
     const { state } = machine;
     expect(state.value).toEqual('completed');
   });
 
   it('skips pages when attributes are not missing', () => {
-    const machine = createMachine([CollectedKybDataOption.address]);
+    const machine = createMachine([CollectedKybDataOption.address], []);
 
     let { state } = machine;
     expect(state.value).toEqual('introduction');
@@ -175,12 +185,15 @@ describe('Collect KYB Data Machine Tests', () => {
 
   describe('Confirm flow', () => {
     it('when on mobile', () => {
-      const machine = createMachine([
-        CollectedKybDataOption.name,
-        CollectedKybDataOption.ein,
-        CollectedKybDataOption.address,
-        CollectedKybDataOption.beneficialOwners,
-      ]);
+      const machine = createMachine(
+        [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.ein,
+          CollectedKybDataOption.address,
+          CollectedKybDataOption.beneficialOwners,
+        ],
+        [],
+      );
       let { state } = machine;
 
       // Collect all fields first
@@ -315,6 +328,7 @@ describe('Collect KYB Data Machine Tests', () => {
           CollectedKybDataOption.address,
           CollectedKybDataOption.beneficialOwners,
         ],
+        [],
         {
           type: 'desktop',
           hasSupportForWebauthn: true,

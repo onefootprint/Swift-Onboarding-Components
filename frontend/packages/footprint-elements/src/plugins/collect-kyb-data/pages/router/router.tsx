@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 
 import { useCollectKybDataMachine } from '../../components/machine-provider';
 import BasicData from '../basic-data';
+import BeneficialOwnerKyc from '../beneficial-owner-kyc';
 import BeneficialOwners from '../beneficial-owners';
 import BusinessAddress from '../business-address';
 import Confirm from '../confirm';
@@ -49,6 +50,9 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('beneficialOwnersEditDesktop')) {
     return <EditBeneficialOwnersDesktop />;
+  }
+  if (state.matches('beneficialOwnerKyc')) {
+    return <BeneficialOwnerKyc />;
   }
 
   return null;

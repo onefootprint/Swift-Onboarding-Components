@@ -349,6 +349,7 @@ const createCollectKycDataMachine = () =>
             missingAttributes,
             email,
             config,
+            fixedData,
           } = event.payload;
           context.device = device;
           context.authToken = authToken;
@@ -357,6 +358,7 @@ const createCollectKycDataMachine = () =>
           context.data[UserDataAttribute.email] = email;
           context.receivedEmail = !!email;
           context.config = config;
+          context.fixedData = fixedData;
           return context;
         }),
         assignEmail: assign((context, event) => {
