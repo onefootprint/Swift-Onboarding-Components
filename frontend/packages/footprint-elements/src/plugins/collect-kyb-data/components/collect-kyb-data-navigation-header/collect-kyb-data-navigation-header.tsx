@@ -2,16 +2,10 @@ import React from 'react';
 
 import FootprintNavigationHeader from '../../../../components/navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
-import getCurrentStepFromMissingAttributes from './utils/current-step-from-missing-attributes';
 
 const CollectKybDataNavigationHeader = () => {
   const [state, send] = useCollectKybDataMachine();
-  const { missingKybAttributes: missingAttributes } = state.context;
-  const value = getCurrentStepFromMissingAttributes(
-    missingAttributes,
-    state.value,
-  );
-  const shouldShowCloseButton = value === 1;
+  const shouldShowCloseButton = state.matches('introduction');
 
   const handleBackButtonClick = () => {
     send('navigatedToPrevPage');

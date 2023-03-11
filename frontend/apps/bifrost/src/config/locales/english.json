@@ -104,7 +104,7 @@
       }
     },
     "phone-identification": {
-      "title": "Let's verify your identity! 😊",
+      "title": "Hey there! 👋",
       "subtitle": "Enter your phone number to proceed.",
       "email-card": {
         "cta": "Change"
@@ -123,7 +123,7 @@
     },
     "challenge": {
       "title": {
-        "new-user": "Let's verify your identity!",
+        "new-user": "Verify your phone number",
         "existing-user": "Welcome back! 🎉"
       },
       "signup-challenge": {
