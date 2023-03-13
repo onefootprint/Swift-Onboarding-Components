@@ -22,6 +22,7 @@ use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::IdDocKind;
+use newtypes::VaultKind;
 use newtypes::{Fingerprint, Fingerprinter, IdentityDataKind};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -106,6 +107,7 @@ pub async fn get(
         footprint_user_id,
         timestamp_lte,
         timestamp_gte,
+        kind: Some(VaultKind::Person),
     };
     let (scoped_users, mut obs, uvws, count) = state
         .db_pool
@@ -181,6 +183,7 @@ pub async fn get_detail(
         footprint_user_id: Some(footprint_user_id.into_inner()),
         timestamp_lte: None,
         timestamp_gte: None,
+        kind: Some(VaultKind::Person),
     };
     let (su, ob, uvw) = state
         .db_pool

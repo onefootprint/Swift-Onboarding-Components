@@ -8,6 +8,7 @@ use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::OnboardingStatusFilter;
+use newtypes::VaultKind;
 use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, TenantId};
 
 #[derive(Clone, Default)]
@@ -22,6 +23,7 @@ pub struct ScopedVaultListQueryParams {
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub requires_manual_review: Option<bool>,
+    pub kind: Option<VaultKind>,
 }
 
 pub fn list_authorized_for_tenant_query<'a>(params: ScopedVaultListQueryParams) -> BoxedQuery<'a, Pg> {
@@ -131,6 +133,13 @@ pub fn list_authorized_for_tenant_query<'a>(params: ScopedVaultListQueryParams) 
 
     if let Some(timestamp_gte) = params.timestamp_gte {
         query = query.filter(scoped_user::start_timestamp.ge(timestamp_gte))
+    }
+
+    if let Some(kind) = params.kind {
+        let uv_ids = user_vault::table
+            .filter(user_vault::kind.eq(kind))
+            .select(user_vault::id);
+        query = query.filter(scoped_user::user_vault_id.eq_any(uv_ids))
     }
 
     if let Some(fingerprints) = params.fingerprints {
