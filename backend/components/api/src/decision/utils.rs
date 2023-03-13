@@ -205,12 +205,10 @@ async fn setup_test_fixtures(
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 
-            let ob = ob.into_inner().update(
+            ob.into_inner().update(
                 conn,
                 OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
             )?;
-            // also move to authorized
-            ob.update(conn, OnboardingUpdate::is_authorized(true))?;
 
             // Create some mock risk signals that are somewhat consistent with the mock decision
             let reason_codes = match (decision_status, create_manual_review) {

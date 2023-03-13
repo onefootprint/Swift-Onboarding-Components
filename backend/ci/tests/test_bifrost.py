@@ -129,8 +129,9 @@ class TestBifrost:
         authorize_fields = body["fields_to_authorize"]
         assert not authorize_fields
 
+        assert req("identity_check")
         assert req("liveness")
-       
+
         # Shouldn't be able to complete the onboarding until user data is provided
         post(
             "hosted/onboarding/authorize",
@@ -326,6 +327,30 @@ class TestBifrost:
         post("hosted/user/biometric/init", None, d2p_auth_token, status_code=400)
         post("hosted/user/biometric", data, d2p_auth_token, status_code=400)
 
+    def test_onboarding_kyc(self, tenant, non_sandbox_auth_token):
+        body = get(
+            "hosted/onboarding/kyc",
+            None,
+            tenant.default_ob_config.key,
+            non_sandbox_auth_token,
+        )
+        assert body["status"] == "pending"
+
+        post(
+            "hosted/onboarding/submit",
+            None,
+            tenant.default_ob_config.key,
+            non_sandbox_auth_token,
+        )
+
+        body = get(
+            "hosted/onboarding/kyc",
+            None,
+            tenant.default_ob_config.key,
+            non_sandbox_auth_token,
+        )
+        assert body["status"] == "complete"
+
     def test_onboarding_authorize(self, tenant, non_sandbox_auth_token):
         body = post(
             "hosted/onboarding/authorize",
@@ -334,14 +359,6 @@ class TestBifrost:
             non_sandbox_auth_token,
         )
         validation_token = body["validation_token"]
-        # temporary before we move this
-        body = get(
-            "hosted/onboarding/kyc",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
-        assert body["status"] == "complete"
 
         assert validation_token
 

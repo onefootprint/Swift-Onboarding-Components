@@ -136,6 +136,14 @@ class BifrostClient:
             self.auth_token,
         )
 
+    def run_kyc_check(self):
+        """Run the KYC check"""
+        post(
+            "hosted/onboarding/submit",
+            None,
+            self.auth_token,
+        )
+
     def authorize_user_to_tenant(self):
         """Authorize and complete the onboarding"""
         body = post(
@@ -174,6 +182,8 @@ class BifrostClient:
         # Identity Document data, if applicable
         if self.document_data is not None:
             self.add_identity_document_data()
+        # Submit the onboarding via /submit
+        self.run_kyc_check()
         # Retrieve validation token
         validation_token = self.authorize_user_to_tenant()
         # User validation token to get a persistent token the tenant's can use

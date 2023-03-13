@@ -52,6 +52,7 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
     foo_bifrost_client.auth_token = inherited_auth_token
 
     user = foo_bifrost_client.initialize_onboarding()
+    validation_token = foo_bifrost_client.run_kyc_check()
     validation_token = foo_bifrost_client.authorize_user_to_tenant()
     foo_fp_user_id = foo_bifrost_client.validate_user(
         validation_token, foo_sandbox_tenant.sk

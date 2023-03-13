@@ -39,6 +39,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(authorize::post)
         .service(status::get)
         .service(kyc::get)
+        .service(kyc::post)
         .service(skip_liveness::post)
         .service(fingerprint_visit::post)
         .service(pat::get)
@@ -110,6 +111,14 @@ pub fn get_requirements(
     // RELATED: FP-1802 and FP-1800
     let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
 
+    // See if we need to run identity checks and ultimately produce a decision. We do this in 2 scenarios:
+    //   1. we have not done it at all (!idv_reqs_initiated)
+    //   2. we need to re-run the decision engine to produce a decision after a step up (!has_final_decision)\
+    //
+    // TODO this is slightly overloaded and maybe we need another requirement?
+    let identity_check_required =
+        !(onboarding.idv_reqs_initiated_at.is_some() && onboarding.decision_made_at.is_some());
+
     let requirements = vec![
         (!missing_id_fields.is_empty()).then_some(OnboardingRequirement::CollectData {
             missing_attributes: missing_id_fields,
@@ -121,6 +130,7 @@ pub fn get_requirements(
         liveness_events
             .is_empty()
             .then_some(OnboardingRequirement::Liveness),
+        (identity_check_required).then_some(OnboardingRequirement::IdentityCheck),
     ]
     .into_iter()
     .flatten()

@@ -1,5 +1,5 @@
 use crate::{
-    errors::{onboarding::OnboardingError, ApiError, ApiResult},
+    errors::{ApiError, ApiResult},
     utils::vault_wrapper::{Person, VaultWrapper},
 };
 
@@ -27,14 +27,7 @@ pub fn build_verification_requests_and_checkpoint(
     uvw: &VaultWrapper<Person>,
     ob_id: &OnboardingId,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
-    // Once we set idv_reqs_initiated_at below, this lock will make sure we can't save multiple sets of VerificationRequests
-    // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
     let ob = Onboarding::lock(conn, ob_id)?;
-
-    if ob.idv_reqs_initiated_at.is_some() {
-        return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-    }
-
     // Always set the idv_reqs_initiated_at in order to checkpoint
     let ob = ob.into_inner();
     let su_id = ob.scoped_user_id.clone();

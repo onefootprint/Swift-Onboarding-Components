@@ -1,3 +1,4 @@
+use db::models::ob_configuration::ObConfiguration;
 use thiserror::Error;
 
 use self::rule::RuleSetName;
