@@ -10,7 +10,6 @@ import { MachineContext, MachineEvents } from './types';
 
 /*
   TODO: 
-  - Add navigated to prev page transitions
   - Add doing-business-as
 */
 
@@ -99,6 +98,9 @@ const createCollectKybDataMachine = () =>
                 actions: 'assignBasicData',
               },
             ],
+            navigatedToPrevPage: {
+              target: 'introduction',
+            },
           },
         },
         businessAddress: {
@@ -117,6 +119,16 @@ const createCollectKybDataMachine = () =>
                 actions: 'assignBusinessAddress',
               },
             ],
+            navigatedToPrevPage: [
+              {
+                target: 'basicData',
+                cond: context =>
+                  isMissingBasicDataAttribute(context.missingKybAttributes),
+              },
+              {
+                target: 'introduction',
+              },
+            ],
           },
         },
         beneficialOwners: {
@@ -125,6 +137,23 @@ const createCollectKybDataMachine = () =>
               {
                 target: 'confirm',
                 actions: 'assignBeneficialOwners',
+              },
+            ],
+            navigatedToPrevPage: [
+              {
+                target: 'businessAddress',
+                cond: context =>
+                  isMissingBusinessAddressAttribute(
+                    context.missingKybAttributes,
+                  ),
+              },
+              {
+                target: 'basicData',
+                cond: context =>
+                  isMissingBasicDataAttribute(context.missingKybAttributes),
+              },
+              {
+                target: 'introduction',
               },
             ],
           },
@@ -166,6 +195,30 @@ const createCollectKybDataMachine = () =>
               actions: 'assignBeneficialOwners',
               cond: context => context.device?.type === 'mobile',
             },
+            navigatedToPrevPage: [
+              {
+                target: 'beneficialOwners',
+                cond: context =>
+                  isMissingBeneficialOwnerAttribute(
+                    context.missingKybAttributes,
+                  ),
+              },
+              {
+                target: 'businessAddress',
+                cond: context =>
+                  isMissingBusinessAddressAttribute(
+                    context.missingKybAttributes,
+                  ),
+              },
+              {
+                target: 'basicData',
+                cond: context =>
+                  isMissingBasicDataAttribute(context.missingKybAttributes),
+              },
+              {
+                target: 'introduction',
+              },
+            ],
           },
         },
         basicDataEditDesktop: {

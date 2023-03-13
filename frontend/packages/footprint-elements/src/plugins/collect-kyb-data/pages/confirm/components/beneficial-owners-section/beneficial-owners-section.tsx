@@ -16,11 +16,6 @@ type BeneficialOwnersSectionProps = {
   onEdit: () => void;
 };
 
-/* 
-  TODO: 
-  Add functionality to add more rows
-*/
-
 const BeneficialOwnersSection = ({ onEdit }: BeneficialOwnersSectionProps) => {
   const { t, allT } = useTranslation('pages.confirm.beneficial-owners');
   const [state] = useCollectKybDataMachine();
