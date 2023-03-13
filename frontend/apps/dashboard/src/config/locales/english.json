@@ -4,11 +4,6 @@
     "error": "Uh-oh!",
     "success": "Yay!"
   },
-  "error": {
-    "title": "Oops! An error occurred.",
-    "description": "We're sorry. Please restart the page.",
-    "cta": "Restart"
-  },
   "save": "Save",
   "skip": "Skip",
   "close": "Close",
