@@ -30,11 +30,12 @@ pub fn build_verification_requests_and_checkpoint(
     let ob = Onboarding::lock(conn, ob_id)?;
     // Always set the idv_reqs_initiated_at in order to checkpoint
     let ob = ob.into_inner();
+    let su_id = ob.scoped_user_id.clone();
     ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
 
     let vendor_apis = desired_vendor_apis(uvw)?;
 
-    let requests_to_initiate = VerificationRequest::bulk_create(conn, ob_id.clone(), vendor_apis)?;
+    let requests_to_initiate = VerificationRequest::bulk_create(conn, ob_id.clone(), su_id, vendor_apis)?;
 
     Ok(requests_to_initiate)
 }

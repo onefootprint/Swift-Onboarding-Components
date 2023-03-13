@@ -95,6 +95,7 @@ pub fn create(
                 conn,
                 VendorAPI::IdologyScanOnboarding,
                 opts.onboarding_id,
+                opts.scoped_user_id.clone(),
                 id1.id,
             )
             .unwrap();

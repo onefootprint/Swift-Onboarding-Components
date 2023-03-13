@@ -7,6 +7,7 @@ use crate::tests::prelude::*;
 use macros::db_test_case;
 use newtypes::OnboardingId;
 use newtypes::PiiJsonValue;
+use newtypes::ScopedUserId;
 use newtypes::SealedVaultBytes;
 use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
@@ -29,6 +30,7 @@ use std::str::FromStr;
 ]; "a kyc request with an unexpected earlier seqno is filtered out")]
 fn test_get_requests_and_results_for_onboarding(conn: &mut TestPgConn, input_req_res: Vec<Vec<VendorAPI>>) {
     let ob_id = OnboardingId::from_str("abc123").unwrap();
+    let su_id = ScopedUserId::from_str("def456").unwrap();
 
     // Creates VerificationRequest / VerificationResult's for each of the input's. Every Vec<VendorAPI> will have a different (increasing) seqno
     let mut input_requests_and_results: Vec<Vec<RequestAndMaybeResult>> = input_req_res
@@ -37,7 +39,7 @@ fn test_get_requests_and_results_for_onboarding(conn: &mut TestPgConn, input_req
             // To advance the seqno for every set of requests
             DataLifetime::get_next_seqno(conn).unwrap();
             let verification_requests =
-                VerificationRequest::bulk_create(conn.conn(), ob_id.clone(), vendor_apis).unwrap();
+                VerificationRequest::bulk_create(conn.conn(), ob_id.clone(), su_id.clone(), vendor_apis).unwrap();
 
             verification_requests
                 .into_iter()

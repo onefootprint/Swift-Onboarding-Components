@@ -42,6 +42,7 @@ struct NewVerificationRequestRow {
     vendor_api: VendorAPI,
     uvw_snapshot_seqno: DataLifetimeSeqno,
     identity_document_id: Option<IdentityDocumentId>,
+    scoped_user_id: Option<ScopedUserId>,
 }
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 impl VerificationRequest {
@@ -49,6 +50,7 @@ impl VerificationRequest {
     pub fn bulk_create(
         conn: &mut PgConn,
         onboarding_id: OnboardingId,
+        scoped_user_id: ScopedUserId,
         vendor_apis: Vec<VendorAPI>,
     ) -> Result<Vec<Self>, crate::DbError> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -61,6 +63,7 @@ impl VerificationRequest {
                 timestamp: Utc::now(),
                 uvw_snapshot_seqno: seqno,
                 identity_document_id: None,
+                scoped_user_id: Some(scoped_user_id.clone()),
             })
             .collect();
         let result = diesel::insert_into(verification_request::table)
@@ -127,6 +130,7 @@ impl VerificationRequest {
         conn: &mut PgConn,
         vendor_api: VendorAPI,
         onboarding_id: OnboardingId,
+        scoped_user_id: ScopedUserId,
         identity_document_id: IdentityDocumentId,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -137,6 +141,7 @@ impl VerificationRequest {
             timestamp: Utc::now(),
             uvw_snapshot_seqno: seqno,
             identity_document_id: Some(identity_document_id),
+            scoped_user_id: Some(scoped_user_id),
         };
         let result = diesel::insert_into(verification_request::table)
             .values(new_row)

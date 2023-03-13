@@ -116,6 +116,7 @@ async fn create_user_and_onboarding(
             fixtures::verification_request::bulk_create(
                 conn,
                 &onboarding.id,
+                &onboarding.scoped_user_id,
                 vec![
                     VendorAPI::TwilioLookupV2,
                     VendorAPI::IdologyExpectID,
