@@ -9,7 +9,11 @@ import {
 
 export type BasicData = Required<
   Pick<BusinessData, BusinessDataAttribute.name | BusinessDataAttribute.ein>
->;
+> &
+  Pick<
+    BusinessData,
+    BusinessDataAttribute.phoneNumber | BusinessDataAttribute.website
+  >;
 
 export type BusinessAddressData = Required<
   Pick<

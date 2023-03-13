@@ -16,7 +16,7 @@
     },
     "basic-data": {
       "title": "Basic data",
-      "subtitle": "We need your business name and EIN.",
+      "subtitle": "We need some information about your business.",
       "form": {
         "business-name": {
           "label": "Business name",
@@ -29,6 +29,21 @@
           "errors": {
             "required": "EIN cannot be empty or is invalid",
             "pattern": "EIN has to be in the format 12-3456789"
+          }
+        },
+        "website": {
+          "label": "Website",
+          "placeholder": "https://www.acmebank.com",
+          "errors": {
+            "required": "Website cannot be empty or is invalid"
+          }
+        },
+        "phone-number": {
+          "label": "Phone number",
+          "placeholder": "(123) 456-7890",
+          "errors": {
+            "required": "Phone number cannot be empty",
+            "pattern": "Phone number is invalid"
           }
         }
       }
@@ -127,7 +142,9 @@
       "basic-data": {
         "title": "Basic data",
         "business-name": "Business name",
-        "ein": "Employer Identification Number (EIN)"
+        "ein": "Employer Identification Number (EIN)",
+        "website": "Website",
+        "phone-number": "Phone number"
       },
       "business-address": {
         "title": "Registered business address"

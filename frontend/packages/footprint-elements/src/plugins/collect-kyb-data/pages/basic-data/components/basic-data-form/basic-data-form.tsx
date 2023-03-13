@@ -1,19 +1,28 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { BusinessData, BusinessDataAttribute } from '@onefootprint/types';
-import { Button, TextInput } from '@onefootprint/ui';
+import { Button, PhoneInput, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import { BasicData } from '../../../../utils/state-machine/types';
+import PHONE_REGEX from './constants';
 
 type FormData = BasicData;
+
+type OptionalFields =
+  | BusinessDataAttribute.phoneNumber
+  | BusinessDataAttribute.website;
 
 export type BasicDataFormProps = {
   defaultValues?: Pick<
     BusinessData,
-    BusinessDataAttribute.name | BusinessDataAttribute.ein
+    | BusinessDataAttribute.name
+    | BusinessDataAttribute.ein
+    | BusinessDataAttribute.phoneNumber
+    | BusinessDataAttribute.website
   >;
+  optionalFields?: OptionalFields[];
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
   ctaLabel?: string;
@@ -21,6 +30,7 @@ export type BasicDataFormProps = {
 
 const BasicDataForm = ({
   defaultValues,
+  optionalFields,
   isLoading,
   onSubmit,
   ctaLabel,
@@ -30,19 +40,34 @@ const BasicDataForm = ({
     register,
     handleSubmit,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues,
   });
   const inputMasks = useInputMask('en-US');
+
   const einErrors = errors[BusinessDataAttribute.ein];
   const hasEinError = !!einErrors;
   const einHint = hasEinError ? einErrors?.message : undefined;
+
+  const phoneNumberErrors = errors[BusinessDataAttribute.phoneNumber];
+  const hasPhoneNumberError = !!phoneNumberErrors;
+  const phoneNumberHint = hasPhoneNumberError
+    ? phoneNumberErrors?.message
+    : undefined;
+
+  const websiteErrors = errors[BusinessDataAttribute.website];
+  const hasWebsiteError = !!websiteErrors;
+  const websiteHint = hasWebsiteError ? websiteErrors?.message : undefined;
 
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
       [BusinessDataAttribute.name]: formData[BusinessDataAttribute.name],
       [BusinessDataAttribute.ein]: formData[BusinessDataAttribute.ein],
+      [BusinessDataAttribute.phoneNumber]:
+        formData[BusinessDataAttribute.phoneNumber],
+      [BusinessDataAttribute.website]: formData[BusinessDataAttribute.website],
     };
     onSubmit(basicData);
   };
@@ -80,6 +105,46 @@ const BasicDataForm = ({
           },
         })}
       />
+      {optionalFields?.includes(BusinessDataAttribute.website) && (
+        <TextInput
+          data-private
+          hasError={hasWebsiteError}
+          hint={websiteHint}
+          label={t('website.label')}
+          placeholder={t('website.placeholder')}
+          type="url"
+          defaultValue={getValues(BusinessDataAttribute.website)}
+          {...register(BusinessDataAttribute.website, {
+            required: {
+              value: true,
+              message: t('website.errors.required'),
+            },
+          })}
+        />
+      )}
+      {optionalFields?.includes(BusinessDataAttribute.phoneNumber) && (
+        <PhoneInput
+          data-private
+          hasError={hasPhoneNumberError}
+          hint={phoneNumberHint}
+          label={t('phone-number.label')}
+          placeholder={t('phone-number.placeholder')}
+          onReset={() => {
+            setValue(BusinessDataAttribute.phoneNumber, undefined);
+          }}
+          value={getValues(BusinessDataAttribute.phoneNumber)}
+          {...register(BusinessDataAttribute.phoneNumber, {
+            required: {
+              value: true,
+              message: t('phone-number.errors.required'),
+            },
+            pattern: {
+              value: PHONE_REGEX,
+              message: t('phone-number.errors.pattern'),
+            },
+          })}
+        />
+      )}
       <Button type="submit" fullWidth loading={isLoading}>
         {ctaLabel ?? allT('pages.cta-continue')}
       </Button>

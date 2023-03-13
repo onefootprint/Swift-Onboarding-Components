@@ -13,13 +13,15 @@ import {
 const BASIC_DATA_ATTRIBUTES = [
   CollectedKybDataOption.name,
   CollectedKybDataOption.ein,
+  CollectedKybDataOption.phoneNumber,
+  CollectedKybDataOption.website,
 ];
 
 const BUSINESS_ADDRESS_ATTRIBUTES = [CollectedKybDataOption.address];
 
 const BENEFICIAL_OWNER_ATTRIBUTES = [CollectedKybDataOption.beneficialOwners];
 
-export const isMissing = (
+const isMissing = (
   attributes: CollectedKybDataOption[],
   mustCollect: CollectedKybDataOption[],
   collectedData?: BusinessData,

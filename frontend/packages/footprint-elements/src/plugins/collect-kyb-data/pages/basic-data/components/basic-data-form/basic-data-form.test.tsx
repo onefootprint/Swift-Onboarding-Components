@@ -4,6 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
+import { BusinessDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
 import BasicDataForm, { BasicDataFormProps } from './basic-data-form';
@@ -11,12 +12,14 @@ import BasicDataForm, { BasicDataFormProps } from './basic-data-form';
 describe('<BasicDataForm />', () => {
   const renderForm = ({
     defaultValues,
+    optionalFields,
     isLoading = false,
     onSubmit = () => {},
     ctaLabel,
   }: Partial<BasicDataFormProps>) => {
     customRender(
       <BasicDataForm
+        optionalFields={optionalFields}
         defaultValues={defaultValues}
         isLoading={isLoading}
         onSubmit={onSubmit}
@@ -25,9 +28,17 @@ describe('<BasicDataForm />', () => {
     );
   };
 
-  it('onsubmit gets called when submitting basic data', async () => {
+  // TODO: unskip test when bug resolved, and add tests for phone number error state below
+  // https://linear.app/footprint/issue/FP-2843/phoneinput-dynamic-import-causes-node-segfault
+  it.skip('onsubmit gets called when submitting basic data', async () => {
     const onSubmit = jest.fn();
-    renderForm({ onSubmit });
+    renderForm({
+      onSubmit,
+      optionalFields: [
+        BusinessDataAttribute.phoneNumber,
+        BusinessDataAttribute.website,
+      ],
+    });
 
     const name = screen.getByLabelText('Business name');
     expect(screen.getByPlaceholderText('Acme Bank Inc.')).toBeInTheDocument();
@@ -38,6 +49,51 @@ describe('<BasicDataForm />', () => {
     expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
     expect(ein).toBeInTheDocument();
     await userEvent.type(ein, '129876543');
+
+    const phoneNumber = screen.getByLabelText('Phone number');
+    expect(phoneNumber).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('123-456-7890')).toBeInTheDocument();
+    await userEvent.type(phoneNumber, '6594539494');
+
+    const website = screen.getByLabelText('Business website');
+    expect(website).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('www.acme.com')).toBeInTheDocument();
+    await userEvent.type(website, 'www.acme.com');
+
+    const continueButton = screen.getByRole('button', { name: 'Continue' });
+    expect(continueButton).toBeInTheDocument();
+    await userEvent.click(continueButton);
+    await waitFor(() => {
+      expect(onSubmit).toBeCalledWith({
+        name: 'Acme Inc.',
+        ein: '12-9876543',
+        phoneNumber: '6594539494',
+        website: 'www.acme.com',
+      });
+    });
+  });
+
+  it('hides some attributes', async () => {
+    const onSubmit = jest.fn();
+    renderForm({
+      onSubmit,
+    });
+
+    const name = screen.getByLabelText('Business name');
+    expect(screen.getByPlaceholderText('Acme Bank Inc.')).toBeInTheDocument();
+    expect(name).toBeInTheDocument();
+    await userEvent.type(name, 'Acme Inc.');
+
+    const ein = screen.getByLabelText('Employer Identification Number (EIN)');
+    expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
+    expect(ein).toBeInTheDocument();
+    await userEvent.type(ein, '129876543');
+
+    const phoneNumber = screen.queryByLabelText('Phone number');
+    expect(phoneNumber).not.toBeInTheDocument();
+
+    const website = screen.queryByLabelText('Website');
+    expect(website).not.toBeInTheDocument();
 
     const continueButton = screen.getByRole('button', { name: 'Continue' });
     expect(continueButton).toBeInTheDocument();

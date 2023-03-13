@@ -11,7 +11,7 @@ import { MachineContext, MachineEvents } from './types';
 /*
   TODO: 
   - Add navigated to prev page transitions
-  - Add pages for optional fields like doing-business-as, website, phone number
+  - Add doing-business-as
 */
 
 const createCollectKybDataMachine = () =>

@@ -57,6 +57,9 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
   const defaultValues = {
     [BusinessDataAttribute.name]: data?.[BusinessDataAttribute.name],
     [BusinessDataAttribute.ein]: data?.[BusinessDataAttribute.ein],
+    [BusinessDataAttribute.phoneNumber]:
+      data?.[BusinessDataAttribute.phoneNumber],
+    [BusinessDataAttribute.website]: data?.[BusinessDataAttribute.website],
   };
 
   return (
@@ -73,6 +76,10 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
       )}
       <BasicDataForm
         defaultValues={defaultValues}
+        optionalFields={[
+          BusinessDataAttribute.website,
+          BusinessDataAttribute.phoneNumber,
+        ]}
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
