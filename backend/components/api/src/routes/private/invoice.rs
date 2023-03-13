@@ -8,7 +8,7 @@ use billing::BillingInfo;
 use chrono::{NaiveDate, Utc};
 use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
-use db::scoped_user::{count_authorized_for_tenant, ScopedUserListQueryParams};
+use db::scoped_vault::{count_authorized_for_tenant, ScopedVaultListQueryParams};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{StripeCustomerId, TenantId};
 use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
@@ -110,7 +110,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     }
     let interval = billing::interval::get_billing_interval(billing_date)?;
 
-    let params = ScopedUserListQueryParams {
+    let params = ScopedVaultListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: true,
         only_billable: true,

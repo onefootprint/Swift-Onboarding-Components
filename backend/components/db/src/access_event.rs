@@ -3,7 +3,7 @@ use crate::actor::SaturatedActor;
 use crate::errors::DbError;
 use crate::models::access_event::AccessEvent;
 use crate::models::insight_event::InsightEvent;
-use crate::models::scoped_user::*;
+use crate::models::scoped_vault::*;
 use crate::models::tenant::Tenant;
 use crate::schema;
 use crate::DbPool;
@@ -33,7 +33,7 @@ pub type AccessEventInfo = (AccessEvent, SaturatedActor);
 #[derive(Debug)]
 pub struct AccessEventListItemForTenant {
     pub event: AccessEventInfo,
-    pub scoped_user: ScopedUser,
+    pub scoped_user: ScopedVault,
     pub insight: Option<InsightEvent>,
 }
 
@@ -93,7 +93,7 @@ impl AccessEventListItemForTenant {
                     results = results.filter(schema::access_event::ordering_id.le(cursor));
                 }
 
-                let results: Vec<(AccessEvent, ScopedUser, Option<InsightEvent>, Option<Tenant>)> =
+                let results: Vec<(AccessEvent, ScopedVault, Option<InsightEvent>, Option<Tenant>)> =
                     results.load(conn)?;
 
                 // Saturate the actors from the DB
@@ -121,7 +121,7 @@ impl AccessEventListItemForTenant {
 pub struct AccessEventListItemForUser {
     pub event: AccessEventInfo,
     pub tenant_name: String,
-    pub scoped_user: ScopedUser,
+    pub scoped_user: ScopedVault,
 }
 
 impl AccessEventListItemForUser {
@@ -129,7 +129,7 @@ impl AccessEventListItemForUser {
     pub async fn get(pool: &DbPool, user_vault_id: VaultId) -> Result<Vec<Self>, DbError> {
         let list_items = pool
             .db_query(move |conn| -> DbResult<_> {
-                let results: Vec<(AccessEvent, ScopedUser, Tenant)> = schema::access_event::table
+                let results: Vec<(AccessEvent, ScopedVault, Tenant)> = schema::access_event::table
                     .inner_join(schema::scoped_user::table)
                     .inner_join(
                         schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_user::tenant_id)),

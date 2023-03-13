@@ -37,7 +37,7 @@ pub mod schema;
 pub mod access_event;
 pub mod actor;
 mod has_lifetime;
-pub mod scoped_user;
+pub mod scoped_vault;
 pub mod tenant;
 pub use has_lifetime::*;
 

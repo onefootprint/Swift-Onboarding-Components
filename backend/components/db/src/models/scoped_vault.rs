@@ -4,7 +4,7 @@ use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, Locked, ObConfigurationId, OnboardingId, ScopedUserId, TenantId, VaultId};
+use newtypes::{FootprintUserId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::{IsLive, ObConfiguration};
@@ -16,8 +16,8 @@ use super::vault::Vault;
 /// while keeping information for each onboarding separate.
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = scoped_user)]
-pub struct ScopedUser {
-    pub id: ScopedUserId,
+pub struct ScopedVault {
+    pub id: ScopedVaultId,
     pub fp_user_id: FootprintUserId,
     pub user_vault_id: VaultId,
     pub tenant_id: TenantId,
@@ -33,7 +33,7 @@ pub struct ScopedUser {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = scoped_user)]
-struct NewScopedUser {
+struct NewScopedVault {
     user_vault_id: VaultId,
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
@@ -41,15 +41,15 @@ struct NewScopedUser {
     ob_configuration_id: Option<ObConfigurationId>,
 }
 
-pub enum ScopedUserIdentifier<'a> {
+pub enum ScopedVaultIdentifier<'a> {
     Id {
-        id: &'a ScopedUserId,
+        id: &'a ScopedVaultId,
     },
     OnboardingId {
         id: &'a OnboardingId,
     },
     User {
-        id: &'a ScopedUserId,
+        id: &'a ScopedVaultId,
         uv_id: &'a VaultId,
     },
     FpUserId {
@@ -59,25 +59,25 @@ pub enum ScopedUserIdentifier<'a> {
     },
 }
 
-impl<'a> From<&'a ScopedUserId> for ScopedUserIdentifier<'a> {
-    fn from(id: &'a ScopedUserId) -> Self {
+impl<'a> From<&'a ScopedVaultId> for ScopedVaultIdentifier<'a> {
+    fn from(id: &'a ScopedVaultId) -> Self {
         Self::Id { id }
     }
 }
 
-impl<'a> From<&'a OnboardingId> for ScopedUserIdentifier<'a> {
+impl<'a> From<&'a OnboardingId> for ScopedVaultIdentifier<'a> {
     fn from(id: &'a OnboardingId) -> Self {
         Self::OnboardingId { id }
     }
 }
 
-impl<'a> From<(&'a ScopedUserId, &'a VaultId)> for ScopedUserIdentifier<'a> {
-    fn from((id, uv_id): (&'a ScopedUserId, &'a VaultId)) -> Self {
+impl<'a> From<(&'a ScopedVaultId, &'a VaultId)> for ScopedVaultIdentifier<'a> {
+    fn from((id, uv_id): (&'a ScopedVaultId, &'a VaultId)) -> Self {
         Self::User { id, uv_id }
     }
 }
 
-impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for ScopedUserIdentifier<'a> {
+impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for ScopedVaultIdentifier<'a> {
     fn from((fp_user_id, t_id, is_live): (&'a FootprintUserId, &'a TenantId, IsLive)) -> Self {
         Self::FpUserId {
             fp_user_id,
@@ -87,7 +87,7 @@ impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for ScopedUserIdentif
     }
 }
 
-impl ScopedUser {
+impl ScopedVault {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
     #[tracing::instrument(skip_all)]
     pub fn get_or_create(
@@ -113,7 +113,7 @@ impl ScopedUser {
             return Ok(scoped_user);
         }
         // Row doesn't exist for user_vault_id, tenant_id - create a new one
-        let new = NewScopedUser {
+        let new = NewScopedVault {
             user_vault_id: uv.id.clone(),
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
@@ -122,7 +122,7 @@ impl ScopedUser {
         };
         let ob = diesel::insert_into(scoped_user::table)
             .values(new)
-            .get_result::<ScopedUser>(conn.conn())?;
+            .get_result::<ScopedVault>(conn.conn())?;
         Ok(ob)
     }
 
@@ -137,7 +137,7 @@ impl ScopedUser {
         if uv.is_portable {
             return Err(DbError::CannotCreatedScopedUser);
         }
-        let new = NewScopedUser {
+        let new = NewScopedVault {
             user_vault_id: uv.id,
             start_timestamp: Utc::now(),
             tenant_id,
@@ -146,7 +146,7 @@ impl ScopedUser {
         };
         let ob = diesel::insert_into(scoped_user::table)
             .values(new)
-            .get_result::<ScopedUser>(conn.conn())?;
+            .get_result::<ScopedVault>(conn.conn())?;
         Ok(ob)
     }
 
@@ -155,7 +155,7 @@ impl ScopedUser {
     pub fn list_for_user_vault(
         conn: &mut PgConn,
         user_vault_id: &VaultId,
-    ) -> DbResult<Vec<(ScopedUser, Tenant)>> {
+    ) -> DbResult<Vec<(ScopedVault, Tenant)>> {
         use crate::schema::tenant;
         let results = scoped_user::table
             .inner_join(tenant::table)
@@ -165,24 +165,24 @@ impl ScopedUser {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get<'a, T: Into<ScopedUserIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedUser> {
+    pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedVault> {
         let mut query = scoped_user::table.into_boxed();
 
         match id.into() {
-            ScopedUserIdentifier::Id { id } => query = query.filter(scoped_user::id.eq(id)),
-            ScopedUserIdentifier::OnboardingId { id } => {
+            ScopedVaultIdentifier::Id { id } => query = query.filter(scoped_user::id.eq(id)),
+            ScopedVaultIdentifier::OnboardingId { id } => {
                 use crate::schema::onboarding;
                 let scoped_user_ids = onboarding::table
                     .filter(onboarding::id.eq(id))
                     .select(onboarding::scoped_user_id);
                 query = query.filter(scoped_user::id.eq_any(scoped_user_ids))
             }
-            ScopedUserIdentifier::User { id, uv_id } => {
+            ScopedVaultIdentifier::User { id, uv_id } => {
                 query = query
                     .filter(scoped_user::id.eq(id))
                     .filter(scoped_user::user_vault_id.eq(uv_id))
             }
-            ScopedUserIdentifier::FpUserId {
+            ScopedVaultIdentifier::FpUserId {
                 fp_user_id,
                 t_id,
                 is_live,

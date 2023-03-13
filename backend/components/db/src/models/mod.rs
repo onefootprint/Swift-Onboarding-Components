@@ -18,7 +18,7 @@ pub mod phone_number;
 pub mod proxy_config;
 pub mod proxy_request_log;
 pub mod risk_signal;
-pub mod scoped_user;
+pub mod scoped_vault;
 pub mod session;
 pub mod socure_device_session;
 pub mod task;

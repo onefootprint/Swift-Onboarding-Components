@@ -8,16 +8,16 @@ use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::kv_data::KeyValueData;
 use db::models::onboarding::Onboarding;
 use db::models::phone_number::PhoneNumber;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
 use db::HasLifetime;
 use db::PgConn;
-use newtypes::{ScopedUserId, TenantId};
+use newtypes::{ScopedVaultId, TenantId};
 use std::collections::HashMap;
 
 impl VaultWrapper<Person> {
-    pub fn build_for_tenant(conn: &mut PgConn, su_id: &ScopedUserId) -> ApiResult<TenantUvw> {
+    pub fn build_for_tenant(conn: &mut PgConn, su_id: &ScopedVaultId) -> ApiResult<TenantUvw> {
         let uvw = Self::build(conn, VwArgs::Tenant(su_id))?;
         let onboarding = Onboarding::bulk_get_for_users(conn, vec![su_id])?.remove(su_id);
         Ok(TenantUvw {
@@ -33,9 +33,9 @@ impl VaultWrapper<Person> {
     #[tracing::instrument(skip_all)]
     pub fn multi_get_for_tenant(
         conn: &mut PgConn,
-        users: Vec<(ScopedUser, Vault)>,
+        users: Vec<(ScopedVault, Vault)>,
         tenant_id: &TenantId,
-    ) -> ApiResult<HashMap<ScopedUserId, TenantUvw>> {
+    ) -> ApiResult<HashMap<ScopedVaultId, TenantUvw>> {
         let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();
         let uv_id_to_active_lifetimes =
             DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
@@ -62,7 +62,7 @@ impl VaultWrapper<Person> {
                     None,
                     // Fetch data by UserVaultId. It is possible that multiple ScopedUsers have the
                     // same UserVaultId.
-                    // TODO: all of these should really be keyed on ScopedUserId, otherwise
+                    // TODO: all of these should really be keyed on ScopedVaultId, otherwise
                     // speculative data for ScopedUser A will show for ScopedUser B within the same
                     // tenant
                     vds.get(&uv_id).cloned().unwrap_or_default(),

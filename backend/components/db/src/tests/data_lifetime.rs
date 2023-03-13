@@ -3,7 +3,7 @@ use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::*;
 use macros::db_test;
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, IdDocKind, IdentityDataKind, ScopedUserId, TenantId, VaultId,
+    DataLifetimeId, DataLifetimeSeqno, IdDocKind, IdentityDataKind, ScopedVaultId, TenantId, VaultId,
 };
 use std::collections::HashSet;
 
@@ -22,7 +22,7 @@ struct TestData {
     uv_id: VaultId,
     uv2_id: VaultId,
     uvx_id: VaultId,
-    su_id: ScopedUserId,
+    su_id: ScopedVaultId,
     seqno0: DataLifetimeSeqno,
     seqno1: DataLifetimeSeqno,
     seqno2: DataLifetimeSeqno,
@@ -54,9 +54,9 @@ impl TestData {
         let uvx_id = fixtures::vault::create_person(conn, true).into_inner().id;
 
         // Create scoped users
-        let su_id = fixtures::scoped_user::create(conn, &uv_id, &ob_config_id).id;
-        let su2_id = fixtures::scoped_user::create(conn, &uv2_id, &ob_config_id).id;
-        let su3_id = fixtures::scoped_user::create(conn, &uv_id, &ob_config2_id).id;
+        let su_id = fixtures::scoped_vault::create(conn, &uv_id, &ob_config_id).id;
+        let su2_id = fixtures::scoped_vault::create(conn, &uv2_id, &ob_config_id).id;
+        let su3_id = fixtures::scoped_vault::create(conn, &uv_id, &ob_config2_id).id;
 
         // Timeline of seqnos
         let seqno0 = DataLifetime::get_next_seqno(conn).unwrap();

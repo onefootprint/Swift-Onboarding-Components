@@ -1,5 +1,5 @@
 use api_wire_types::IdentityDocumentKindForUser;
-use db::models::{onboarding::SerializableOnboardingInfo, scoped_user::ScopedUser};
+use db::models::{onboarding::SerializableOnboardingInfo, scoped_vault::ScopedVault};
 use newtypes::{DataIdentifier, IdentityDataKind};
 
 use crate::utils::db2api::DbToApi;
@@ -9,7 +9,7 @@ pub type UserDetail = (
     Vec<IdentityDocumentKindForUser>,
     Vec<DataIdentifier>,
     Option<SerializableOnboardingInfo>,
-    ScopedUser,
+    ScopedVault,
     bool,
 );
 
@@ -24,7 +24,7 @@ impl DbToApi<UserDetail> for api_wire_types::User {
             is_portable,
         ): UserDetail,
     ) -> Self {
-        let ScopedUser {
+        let ScopedVault {
             fp_user_id,
             start_timestamp,
             ordering_id,
@@ -44,10 +44,10 @@ impl DbToApi<UserDetail> for api_wire_types::User {
     }
 }
 
-impl DbToApi<ScopedUser> for api_wire_types::User {
-    fn from_db(target: ScopedUser) -> Self {
+impl DbToApi<ScopedVault> for api_wire_types::User {
+    fn from_db(target: ScopedVault) -> Self {
         // Used in POST /users when we create a new vault-only user
-        let ScopedUser {
+        let ScopedVault {
             id: _,
             fp_user_id,
             user_vault_id: _,

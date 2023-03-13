@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{
-    DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, KeyValueDataId, KvDataKey, ScopedUserId,
+    DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, KeyValueDataId, KvDataKey, ScopedVaultId,
     SealedVaultBytes, VaultId,
 };
 use serde::{Deserialize, Serialize};
@@ -42,7 +42,7 @@ impl KeyValueData {
     pub fn bulk_create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
         data: Vec<NewKeyValueDataArgs>,
         seqno: DataLifetimeSeqno,
     ) -> Result<(), DbError> {

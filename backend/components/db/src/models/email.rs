@@ -9,7 +9,7 @@ use diesel::Queryable;
 use newtypes::IdentityDataKind;
 use newtypes::{DataLifetimeId, DataLifetimeSeqno};
 use newtypes::{
-    DataPriority, EmailId, Fingerprint as FingerprintData, ScopedUserId, SealedVaultBytes, VaultId,
+    DataPriority, EmailId, Fingerprint as FingerprintData, ScopedVaultId, SealedVaultBytes, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -59,7 +59,7 @@ impl Email {
         e_data: SealedVaultBytes,
         fingerprint: FingerprintData,
         priority: DataPriority,
-        su_id: &ScopedUserId,
+        su_id: &ScopedVaultId,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Email> {
         let lifetime = DataLifetime::create(conn, uv_id, Some(su_id), IdentityDataKind::Email.into(), seqno)?;

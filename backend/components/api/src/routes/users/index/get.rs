@@ -18,7 +18,7 @@ use crate::State;
 use api_wire_types::IdentityDocumentKindForUser;
 use api_wire_types::ListUsersRequest;
 use db::models::onboarding::Onboarding;
-use db::scoped_user::ScopedUserListQueryParams;
+use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::IdDocKind;
@@ -96,7 +96,7 @@ pub async fn get(
     };
 
     let tenant_id = tenant.id.clone();
-    let query_params = ScopedUserListQueryParams {
+    let query_params = ScopedVaultListQueryParams {
         tenant_id: tenant_id.clone(),
         only_billable: false,
         is_live: auth.is_live()?,
@@ -110,13 +110,13 @@ pub async fn get(
     let (scoped_users, mut obs, uvws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_users = db::scoped_user::list_authorized_for_tenant(
+            let scoped_users = db::scoped_vault::list_authorized_for_tenant(
                 conn,
                 query_params.clone(),
                 cursor,
                 (page_size + 1) as i64,
             )?;
-            let count = db::scoped_user::count_authorized_for_tenant(conn, query_params).map(Some)?;
+            let count = db::scoped_vault::count_authorized_for_tenant(conn, query_params).map(Some)?;
             let uvws = VaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
             let scoped_user_ids: Vec<_> = scoped_users.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
@@ -171,7 +171,7 @@ pub async fn get_detail(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let query_params = ScopedUserListQueryParams {
+    let query_params = ScopedVaultListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
         only_billable: false,
@@ -185,7 +185,7 @@ pub async fn get_detail(
     let (su, ob, uvw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (su, _) = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
+            let (su, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
             let uvw = VaultWrapper::build_for_tenant(conn, &su.id)?;

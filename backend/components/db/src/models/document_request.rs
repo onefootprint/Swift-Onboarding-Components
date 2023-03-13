@@ -5,7 +5,7 @@ use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, Locked, ScopedUserId};
+use newtypes::{DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, Locked, ScopedVaultId};
 use serde::{Deserialize, Serialize};
 
 use super::verification_result::VerificationResult;
@@ -15,7 +15,7 @@ pub type DocRefId = String;
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub ref_id: Option<DocRefId>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
@@ -53,7 +53,7 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: ScopedVaultId,
         ref_id: Option<String>,
         should_collect_selfie: bool,
         previous_document_request_id: Option<DocumentRequestId>,
@@ -75,7 +75,7 @@ impl DocumentRequest {
 
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
     #[tracing::instrument(skip_all)]
-    pub fn lock_active(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Locked<Self>> {
+    pub fn lock_active(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
         let result = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
@@ -87,7 +87,7 @@ impl DocumentRequest {
 
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
     #[tracing::instrument(skip_all)]
-    pub fn get_active(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Self> {
+    pub fn get_active(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> DbResult<Self> {
         let result = document_request::table
             .filter(document_request::scoped_user_id.eq(scoped_user_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
@@ -99,7 +99,7 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn get(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
         request_id: &DocumentRequestId,
     ) -> DbResult<Self> {
         let result = document_request::table
@@ -133,7 +133,7 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn count_statuses(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
         statuses: Vec<DocumentRequestStatus>,
     ) -> DbResult<i64> {
         let num_status: i64 = document_request::table
@@ -147,7 +147,7 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn get_latest_with_previous_request_and_result(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
     ) -> DbResult<(
         DocumentRequest,
         Option<DocumentRequest>,
@@ -189,7 +189,7 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn lock(
         conn: &mut TxnPgConn,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
         id: &DocumentRequestId,
     ) -> DbResult<Locked<Self>> {
         let result = document_request::table
@@ -209,7 +209,7 @@ impl DocumentRequest {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct NewDocumentRequest {
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub ref_id: Option<String>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,

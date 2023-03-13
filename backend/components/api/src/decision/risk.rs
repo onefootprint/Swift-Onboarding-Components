@@ -6,7 +6,7 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         risk_signal::RiskSignal,
-        scoped_user::ScopedUser,
+        scoped_vault::ScopedVault,
     },
     DbPool, TxnPgConn,
 };
@@ -41,7 +41,7 @@ pub async fn save_final_decision(
 
     let obid = ob_id.clone();
     let tenant_id = db_pool
-        .db_query(move |conn| ScopedUser::get(conn, &ob_id))
+        .db_query(move |conn| ScopedVault::get(conn, &ob_id))
         .await??
         .tenant_id;
 
@@ -50,7 +50,7 @@ pub async fn save_final_decision(
     let obd = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &obid)?;
-            let scoped_user = ScopedUser::get(conn, &ob.scoped_user_id)?;
+            let scoped_user = ScopedVault::get(conn, &ob.scoped_user_id)?;
 
             // prevent race conditions from producing 2 decisions
             if assert_is_first_decision_for_onboarding && ob.decision_made_at.is_some() {

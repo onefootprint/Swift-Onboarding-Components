@@ -12,7 +12,7 @@ use db::DbPool;
 use db::{
     models::{
         onboarding::Onboarding, onboarding_decision::OnboardingDecision, phone_number::NewPhoneNumberArgs,
-        risk_signal::RiskSignal, scoped_user::ScopedUser, vault::NewVaultInfo,
+        risk_signal::RiskSignal, scoped_vault::ScopedVault, vault::NewVaultInfo,
     },
     test_helpers::test_db_pool,
     tests::fixtures,
@@ -62,7 +62,7 @@ fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     ob_config: ObConfiguration,
     keys_and_new_phone_args: KeysAndNewPhoneNumberArgs,
-) -> (Vault, ScopedUser) {
+) -> (Vault, ScopedVault) {
     let user_info = NewVaultInfo {
         e_private_key: keys_and_new_phone_args.1,
         public_key: keys_and_new_phone_args.0,
@@ -77,7 +77,7 @@ fn create_user_and_populate_vault(
     )
     .unwrap();
 
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let update = vec![
         (

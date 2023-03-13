@@ -2,7 +2,7 @@ use crate::errors::ApiResult;
 use crate::State;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use newtypes::{AccessEventKind, DataIdentifier, DbActor, ScopedUserId};
+use newtypes::{AccessEventKind, DataIdentifier, DbActor, ScopedVaultId};
 
 pub struct DecryptRequest {
     pub reason: String,
@@ -14,7 +14,7 @@ impl DecryptRequest {
     pub(super) async fn create_access_event(
         self,
         state: &State,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: ScopedVaultId,
         targets: Vec<DataIdentifier>,
     ) -> ApiResult<()> {
         let DecryptRequest {

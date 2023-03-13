@@ -7,7 +7,7 @@ use crate::models::user_timeline::UserTimeline;
 use crate::PgConn;
 use crate::TxnPgConn;
 
-use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedUserId, SealedVaultBytes, TenantId, VaultId};
+use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedVaultId, SealedVaultBytes, TenantId, VaultId};
 
 pub(crate) fn test_tenant_user(
     conn: &mut TxnPgConn,
@@ -28,7 +28,7 @@ pub(crate) fn test_annotation<T>(
     conn: &mut TxnPgConn,
     note: String,
     is_pinned: bool,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     user_vault_id: VaultId,
     actor: T,
 ) -> AnnotationInfo

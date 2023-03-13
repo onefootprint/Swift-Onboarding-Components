@@ -2,7 +2,7 @@ use super::SessionContext;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
 use db::{models::vault::Vault, DbPool};
-use newtypes::{ScopedUserId, VaultId};
+use newtypes::{ScopedVaultId, VaultId};
 use paperclip::actix::Apiv2Schema;
 
 mod session;
@@ -22,9 +22,9 @@ pub use validate_user::*;
 #[serde(rename = "snake_case")]
 pub enum UserAuthScope {
     SignUp,
-    OrgOnboardingInit { id: ScopedUserId },
+    OrgOnboardingInit { id: ScopedVaultId },
     OrgOnboarding,
-    Business(ScopedUserId),
+    Business(ScopedVaultId),
     BasicProfile,
     ExtendedProfile,
     SensitiveProfile,

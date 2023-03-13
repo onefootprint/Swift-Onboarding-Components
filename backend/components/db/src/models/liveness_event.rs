@@ -19,7 +19,7 @@ use newtypes::LivenessAttributes;
 
 use newtypes::TenantId;
 use newtypes::VaultId;
-use newtypes::{LivenessEventId, LivenessSource, ScopedUserId};
+use newtypes::{LivenessEventId, LivenessSource, ScopedVaultId};
 
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +29,7 @@ use super::insight_event::InsightEvent;
 #[diesel(table_name = liveness_event)]
 pub struct LivenessEvent {
     pub id: LivenessEventId,
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
     pub created_at: DateTime<Utc>,
@@ -93,7 +93,7 @@ impl LivenessEvent {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = liveness_event)]
 pub struct NewLivenessEvent {
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
     pub insight_event_id: InsightEventId,

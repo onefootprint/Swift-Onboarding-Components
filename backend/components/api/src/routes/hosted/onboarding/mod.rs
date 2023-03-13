@@ -20,7 +20,7 @@ use db::{
     DbError, PgConn,
 };
 use itertools::Itertools;
-use newtypes::{OnboardingId, ScopedUserId, SessionAuthToken, VaultId};
+use newtypes::{OnboardingId, ScopedVaultId, SessionAuthToken, VaultId};
 use paperclip::actix::web;
 
 pub mod authorize;
@@ -66,7 +66,7 @@ fn create_onboarding_validation_token(
 pub fn get_requirements(
     conn: &mut PgConn,
     ob_info: &AuthedOnboardingInfo,
-    scoped_business_id: Option<ScopedUserId>,
+    scoped_business_id: Option<ScopedVaultId>,
 ) -> ApiResult<(Vec<OnboardingRequirement>, Onboarding)> {
     let ob_config_id = &ob_info.ob_config.id;
     let scoped_user_id = &ob_info.scoped_user.id;

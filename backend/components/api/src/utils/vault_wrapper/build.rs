@@ -9,7 +9,7 @@ use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::vault::{NewVaultArgs, NewVaultInfo};
@@ -104,7 +104,7 @@ impl VaultWrapper<Person> {
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su_id = if let Some(ob_config) = ob_config {
-            let su = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
+            let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
             Some(su.id)
         } else {
             None

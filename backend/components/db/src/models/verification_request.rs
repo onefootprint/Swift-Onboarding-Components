@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::{
-    DataLifetimeSeqno, IdentityDocumentId, OnboardingId, ScopedUserId, Vendor, VendorAPI,
+    DataLifetimeSeqno, IdentityDocumentId, OnboardingId, ScopedVaultId, Vendor, VendorAPI,
     VerificationRequestId,
 };
 use serde::{Deserialize, Serialize};
@@ -30,7 +30,7 @@ pub struct VerificationRequest {
     // If we are verifying an identity document, we want to know exactly which one we were verifying since there
     // could be multiple in the vault, seqno doesn't help us
     pub identity_document_id: Option<IdentityDocumentId>,
-    pub scoped_user_id: Option<ScopedUserId>,
+    pub scoped_user_id: Option<ScopedVaultId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -42,7 +42,7 @@ struct NewVerificationRequestRow {
     vendor_api: VendorAPI,
     uvw_snapshot_seqno: DataLifetimeSeqno,
     identity_document_id: Option<IdentityDocumentId>,
-    scoped_user_id: Option<ScopedUserId>,
+    scoped_user_id: Option<ScopedVaultId>,
 }
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 impl VerificationRequest {
@@ -50,7 +50,7 @@ impl VerificationRequest {
     pub fn bulk_create(
         conn: &mut PgConn,
         onboarding_id: OnboardingId,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: ScopedVaultId,
         vendor_apis: Vec<VendorAPI>,
     ) -> Result<Vec<Self>, crate::DbError> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -130,7 +130,7 @@ impl VerificationRequest {
         conn: &mut PgConn,
         vendor_api: VendorAPI,
         onboarding_id: OnboardingId,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: ScopedVaultId,
         identity_document_id: IdentityDocumentId,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_current_seqno(conn)?;

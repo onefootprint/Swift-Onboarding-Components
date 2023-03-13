@@ -1,6 +1,6 @@
 use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
-use crate::models::scoped_user::ScopedUser;
+use crate::models::scoped_vault::ScopedVault;
 use crate::DbError;
 use crate::PgConn;
 use crate::{schema::user_timeline, DbResult};
@@ -10,7 +10,7 @@ use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::VendorAPI;
-use newtypes::{DbUserTimelineEvent, ScopedUserId, UserTimelineId, VaultId};
+use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
@@ -18,13 +18,13 @@ use super::document_request::DocumentRequest;
 use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
-use super::scoped_user::ScopedUserIdentifier;
+use super::scoped_vault::ScopedVaultIdentifier;
 use strum::IntoEnumIterator;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = user_timeline)]
 pub struct UserTimeline {
     pub id: UserTimelineId,
-    pub scoped_user_id: Option<ScopedUserId>,
+    pub scoped_user_id: Option<ScopedVaultId>,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -38,7 +38,7 @@ pub struct UserTimeline {
 #[diesel(table_name = user_timeline)]
 pub struct NewUserTimeline {
     pub user_vault_id: VaultId,
-    pub scoped_user_id: Option<ScopedUserId>,
+    pub scoped_user_id: Option<ScopedVaultId>,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub is_portable: bool,
@@ -69,7 +69,7 @@ impl UserTimeline {
         user_vault_id: VaultId,
         // Is only ever null during my1fp account creation in identify verify. Should we get rid of
         // that codepath?
-        scoped_user_id: Option<ScopedUserId>,
+        scoped_user_id: Option<ScopedVaultId>,
     ) -> DbResult<()>
     where
         T: Into<DbUserTimelineEvent>,
@@ -90,7 +90,7 @@ impl UserTimeline {
     #[tracing::instrument(skip_all)]
     pub fn bulk_portablize(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
         kind: DbUserTimelineEventKind,
     ) -> DbResult<()> {
         let events = user_timeline::table
@@ -118,9 +118,9 @@ impl UserTimeline {
         tenant_can_view_socure_risk_signal: bool,
     ) -> DbResult<Vec<UserTimelineInfo>>
     where
-        T: Into<ScopedUserIdentifier<'a>>,
+        T: Into<ScopedVaultIdentifier<'a>>,
     {
-        let su = ScopedUser::get(conn, scoped_user_id)?;
+        let su = ScopedVault::get(conn, scoped_user_id)?;
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
         let results: Vec<Self> = user_timeline::table
@@ -247,7 +247,7 @@ mod tests {
         let user_vault = fixtures::vault::create_person(conn, true).into_inner();
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-        let scoped_user = fixtures::scoped_user::create(conn, &user_vault.id, &ob_config.id);
+        let scoped_user = fixtures::scoped_vault::create(conn, &user_vault.id, &ob_config.id);
 
         let tenant_user1 = test_tenant_user(conn, String::from("tu1@acme.com"), None, None);
         let tenant_user2 = test_tenant_user(conn, String::from("tu2@acme.com"), None, None);

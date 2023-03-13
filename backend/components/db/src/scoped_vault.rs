@@ -1,4 +1,4 @@
-use crate::models::scoped_user::ScopedUser;
+use crate::models::scoped_vault::ScopedVault;
 use crate::models::vault::Vault;
 use crate::schema;
 use crate::PgConn;
@@ -11,7 +11,7 @@ use newtypes::OnboardingStatusFilter;
 use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, TenantId};
 
 #[derive(Clone, Default)]
-pub struct ScopedUserListQueryParams {
+pub struct ScopedVaultListQueryParams {
     pub tenant_id: TenantId,
     pub is_live: bool,
     /// When true, only returns the scoped users that are either (1) authorized or (2) non-portable
@@ -24,7 +24,7 @@ pub struct ScopedUserListQueryParams {
     pub requires_manual_review: Option<bool>,
 }
 
-pub fn list_authorized_for_tenant_query<'a>(params: ScopedUserListQueryParams) -> BoxedQuery<'a, Pg> {
+pub fn list_authorized_for_tenant_query<'a>(params: ScopedVaultListQueryParams) -> BoxedQuery<'a, Pg> {
     // Filter out onboardings that haven't been explicitly authorized by the user - these should
     // not be visible in the dashboard since the tenant doesn't have permissions to view anything
     // about the user
@@ -154,7 +154,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: ScopedUserListQueryParams) -
 
 pub fn count_authorized_for_tenant(
     conn: &mut PgConn,
-    params: ScopedUserListQueryParams,
+    params: ScopedVaultListQueryParams,
 ) -> Result<i64, DbError> {
     let count = list_authorized_for_tenant_query(params)
         .count()
@@ -165,10 +165,10 @@ pub fn count_authorized_for_tenant(
 /// lists all scoped_users across all configurations
 pub fn list_authorized_for_tenant(
     conn: &mut PgConn,
-    params: ScopedUserListQueryParams,
+    params: ScopedVaultListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<(ScopedUser, Vault)>, DbError> {
+) -> Result<Vec<(ScopedVault, Vault)>, DbError> {
     let mut scoped_users = list_authorized_for_tenant_query(params)
         .order_by(schema::scoped_user::ordering_id.desc())
         .limit(page_size);

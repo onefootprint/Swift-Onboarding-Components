@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
 use crate::{models::identity_document::IdentityDocument, TxnPgConn};
-use newtypes::{DocumentRequestId, IdDocKind, ScopedUserId, SealedVaultDataKey, VaultId};
+use newtypes::{DocumentRequestId, IdDocKind, ScopedVaultId, SealedVaultDataKey, VaultId};
 
-pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, su_id: Option<&ScopedUserId>) -> IdentityDocument {
+pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, su_id: Option<&ScopedVaultId>) -> IdentityDocument {
     IdentityDocument::create(
         conn,
         DocumentRequestId::from_str("test_derp").unwrap(),

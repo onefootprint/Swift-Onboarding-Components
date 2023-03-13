@@ -1,5 +1,5 @@
 use db::PgConn;
-use newtypes::ScopedUserId;
+use newtypes::ScopedVaultId;
 
 use crate::{
     auth::{user::UserSession, SessionContext},
@@ -10,7 +10,7 @@ use crate::{
 pub fn pre_add_data_checks(
     user_auth: &SessionContext<UserSession>,
     conn: &mut PgConn,
-) -> ApiResult<ScopedUserId> {
+) -> ApiResult<ScopedVaultId> {
     // TODO For now, we only allow adding an email during onboarding since we otherwise
     // don't know which scoped user to associate the data with.
     // We might one day want to support this outside of onboarding for my1fp. In that case,

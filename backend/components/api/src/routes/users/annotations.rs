@@ -18,7 +18,7 @@ use actix_web::web::Json;
 use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
 use db::models::annotation::Annotation;
 use db::models::annotation::AnnotationInfo;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::DbError;
 use newtypes::AnnotationId;
@@ -128,7 +128,7 @@ pub fn post(
     let annotation: AnnotationInfo = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
             let annotation: AnnotationInfo =
                 Annotation::create(conn, note, is_pinned, scoped_user.id.clone(), auth_actor)?;

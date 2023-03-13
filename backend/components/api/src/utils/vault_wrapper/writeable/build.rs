@@ -1,5 +1,5 @@
 use db::{models::vault::Vault, TxnPgConn};
-use newtypes::{Locked, ScopedUserId};
+use newtypes::{Locked, ScopedVaultId};
 
 use crate::{
     errors::ApiResult,
@@ -14,7 +14,7 @@ impl<Type> VaultWrapper<Type> {
     /// speculative data that has been added by previous operations
     pub fn lock_for_onboarding(
         conn: &mut TxnPgConn,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
     ) -> ApiResult<WriteableVw<Type>> {
         // Lock the UserVault in this transaction, then build the UVW
         Vault::lock_by_scoped_user(conn, scoped_user_id)?;

@@ -5,7 +5,7 @@ use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::{
     DataLifetimeId, DataLifetimeSeqno, DataPriority, Fingerprint as FingerprintData, IdentityDataKind,
-    PhoneNumberId, ScopedUserId, SealedVaultBytes, VaultId,
+    PhoneNumberId, ScopedVaultId, SealedVaultBytes, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -76,7 +76,7 @@ impl PhoneNumber {
         uv_id: &VaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
-        su_id: Option<&ScopedUserId>,
+        su_id: Option<&ScopedVaultId>,
         seqno: DataLifetimeSeqno,
         is_unique_fingerprint: bool,
     ) -> DbResult<PhoneNumber> {
@@ -112,7 +112,7 @@ impl PhoneNumber {
         uv_id: &VaultId,
         args: NewPhoneNumberArgs,
         priority: DataPriority,
-        su_id: Option<&ScopedUserId>,
+        su_id: Option<&ScopedVaultId>,
     ) -> DbResult<PhoneNumber> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let phone_number = Self::create(conn, uv_id, args, priority, su_id, seqno, true)?;

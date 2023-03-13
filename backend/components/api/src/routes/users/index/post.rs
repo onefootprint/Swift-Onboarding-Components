@@ -7,7 +7,7 @@ use crate::errors::ApiResult;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use newtypes::VaultKind;
@@ -37,7 +37,7 @@ pub async fn post(
         .db_pool
         .db_transaction(|conn| -> ApiResult<_> {
             let user_vault = Vault::create(conn, new_user)?;
-            let scoped_user = ScopedUser::create_non_portable(conn, user_vault, tenant_id)?;
+            let scoped_user = ScopedVault::create_non_portable(conn, user_vault, tenant_id)?;
             Ok(scoped_user)
         })
         .await?;

@@ -10,7 +10,7 @@ use db::models::onboarding::OnboardingAndConfig;
 pub use decrypt_request::DecryptRequest;
 
 use super::{Person, VaultWrapper};
-use newtypes::ScopedUserId;
+use newtypes::ScopedVaultId;
 
 use derive_more::Deref;
 
@@ -21,6 +21,6 @@ use derive_more::Deref;
 pub struct TenantUvw {
     #[deref]
     uvw: VaultWrapper<Person>,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     onboarding: Option<OnboardingAndConfig>,
 }

@@ -3,7 +3,7 @@ use crate::*;
 /// Describes an onboarding of a user vault to a tenant
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 pub struct HostedAuthorizedOrgs {
-    pub id: ScopedUserId,
+    pub id: ScopedVaultId,
     pub tenant_id: TenantId,
     pub name: String,
     pub logo_url: Option<String>,

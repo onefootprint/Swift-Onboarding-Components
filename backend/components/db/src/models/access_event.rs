@@ -2,7 +2,7 @@ use crate::schema::access_event;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable, RunQueryDsl};
-use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedUserId};
+use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId};
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::CreateInsightEvent;
@@ -11,7 +11,7 @@ use super::insight_event::CreateInsightEvent;
 #[diesel(table_name = access_event)]
 pub struct AccessEvent {
     pub id: AccessEventId,
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -25,7 +25,7 @@ pub struct AccessEvent {
 
 #[derive(Debug, Clone)]
 pub struct NewAccessEvent {
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub reason: Option<String>,
     pub principal: DbActor,
     pub insight: CreateInsightEvent,
@@ -36,7 +36,7 @@ pub struct NewAccessEvent {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
 struct NewAccessEventWithInsight {
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     insight_event_id: InsightEventId,
     reason: Option<String>,
     principal: DbActor,

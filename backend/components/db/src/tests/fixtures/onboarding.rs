@@ -1,16 +1,17 @@
-use newtypes::{ObConfigurationId, ScopedUserId};
+use newtypes::{ObConfigurationId, ScopedVaultId};
 
 use crate::{
     models::{
         insight_event::CreateInsightEvent,
         onboarding::{Onboarding, OnboardingCreateArgs},
     },
-    tests::prelude::*, TxnPgConn,
+    tests::prelude::*,
+    TxnPgConn,
 };
 
 pub fn create(
     conn: &mut TestPgConn,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     ob_configuration_id: ObConfigurationId,
 ) -> Onboarding {
     let ob_args = OnboardingCreateArgs {
@@ -26,7 +27,7 @@ pub fn create(
 
 pub fn create_with_txn(
     conn: &mut TxnPgConn,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     ob_configuration_id: ObConfigurationId,
 ) -> Onboarding {
     let ob_args = OnboardingCreateArgs {

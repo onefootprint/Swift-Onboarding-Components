@@ -8,7 +8,7 @@ use crate::State;
 use api_wire_types::hosted::{HostedAuthorizedOrgs, HostedUserOnboardingInfo};
 use api_wire_types::InsightEvent;
 use db::models::onboarding::Onboarding;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -28,7 +28,7 @@ pub async fn get(
     let (scoped_users, mut obs) = state
         .db_pool
         .db_query(move |conn| -> Result<_, db::DbError> {
-            let scoped_users = ScopedUser::list_for_user_vault(conn, user_auth.user_vault_id())?;
+            let scoped_users = ScopedVault::list_for_user_vault(conn, user_auth.user_vault_id())?;
             let scoped_user_ids = scoped_users.iter().map(|x| &x.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
             Ok((scoped_users, obs))

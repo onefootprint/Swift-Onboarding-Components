@@ -7,7 +7,7 @@ use diesel::sql_types::Int8;
 use itertools::Itertools;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
-use newtypes::ScopedUserId;
+use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::{DataLifetimeId, VaultId};
 use serde::{Deserialize, Serialize};
@@ -65,7 +65,7 @@ pub struct DataLifetime {
     pub _updated_at: DateTime<Utc>,
     // Ownership attributes
     pub user_vault_id: VaultId,
-    pub scoped_user_id: Option<ScopedUserId>,
+    pub scoped_user_id: Option<ScopedVaultId>,
     // Lifecycle attributes
     pub created_at: DateTime<Utc>,
     pub portablized_at: Option<DateTime<Utc>>,
@@ -83,7 +83,7 @@ struct NewDataLifetime {
     user_vault_id: VaultId,
     // We might want to not support creating data not linked to a tenant. Right now this is only
     // used for the my1fp login flow
-    scoped_user_id: Option<ScopedUserId>,
+    scoped_user_id: Option<ScopedVaultId>,
     created_at: DateTime<Utc>,
     created_seqno: DataLifetimeSeqno,
     kind: DataLifetimeKind,
@@ -135,7 +135,7 @@ impl DataLifetime {
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedUserId>,
+        scoped_user_id: Option<&ScopedVaultId>,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -160,7 +160,7 @@ impl DataLifetime {
     pub(crate) fn create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedUserId>,
+        scoped_user_id: Option<&ScopedVaultId>,
         kind: DataLifetimeKind,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {
@@ -192,7 +192,7 @@ impl DataLifetime {
     pub fn bulk_commit_for_tenant(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let update = DataLifetimeUpdate {
@@ -234,7 +234,7 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub fn bulk_deactivate_speculative(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedUserId,
+        scoped_user_id: &ScopedVaultId,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -263,7 +263,7 @@ impl DataLifetime {
     pub fn get_active(
         conn: &mut PgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedUserId>,
+        scoped_user_id: Option<&ScopedVaultId>,
     ) -> DbResult<Vec<Self>> {
         let mut query = data_lifetime::table
             .filter(data_lifetime::user_vault_id.eq(user_vault_id))
@@ -325,7 +325,7 @@ impl DataLifetime {
     pub fn get_active_at(
         conn: &mut PgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedUserId>,
+        scoped_user_id: Option<&ScopedVaultId>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         // This is kind of unnecessarily similar to `get_active`, but it's hard to combine

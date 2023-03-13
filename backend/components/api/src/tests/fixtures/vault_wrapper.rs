@@ -4,7 +4,7 @@ use db::{
     models::{
         data_lifetime::DataLifetime,
         ob_configuration::ObConfiguration,
-        scoped_user::ScopedUser,
+        scoped_vault::ScopedVault,
         tenant::Tenant,
         vault::Vault,
         vault_data::{NewVaultData, VaultData},
@@ -15,7 +15,7 @@ use db::{
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 
 pub type VwSetup = (
-    ScopedUser,
+    ScopedVault,
     ObConfiguration,
     VaultWrapper<Person>,
     Tenant,
@@ -26,7 +26,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     let uv = db::tests::fixtures::vault::create_person(conn, uv_is_live);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, uv_is_live);
-    let su = db::tests::fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     // Add identity data
     let data = vec![

@@ -3,7 +3,7 @@ use super::insight_event::CreateInsightEvent;
 use super::liveness_event::LivenessEvent;
 use super::manual_review::ManualReview;
 use super::onboarding_decision::OnboardingDecision;
-use super::scoped_user::ScopedUser;
+use super::scoped_vault::ScopedVault;
 use crate::actor::{self, SaturatedActor};
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
@@ -16,7 +16,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
     FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
-    ScopedUserId, TenantId, TenantScope, VaultId,
+    ScopedVaultId, TenantId, TenantScope, VaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -25,7 +25,7 @@ use std::collections::HashMap;
 #[diesel(table_name = onboarding)]
 pub struct Onboarding {
     pub id: OnboardingId,
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -39,7 +39,7 @@ pub struct Onboarding {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = onboarding)]
 struct NewOnboarding {
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
@@ -54,7 +54,7 @@ pub struct OnboardingUpdate {
 }
 
 pub struct OnboardingCreateArgs {
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: CreateInsightEvent,
     pub should_create_document_request: bool,
@@ -95,8 +95,8 @@ impl OnboardingUpdate {
 #[derive(Debug)]
 pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
-    ScopedUserId {
-        su_id: &'a ScopedUserId,
+    ScopedVaultId {
+        su_id: &'a ScopedVaultId,
         user_vault_id: &'a VaultId,
     },
     ConfigId {
@@ -112,9 +112,9 @@ impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
 }
 
 // TODO change this to su_id, user_vault_id?
-impl<'a> From<(&'a ScopedUserId, &'a VaultId)> for OnboardingIdentifier<'a> {
-    fn from((su_id, user_vault_id): (&'a ScopedUserId, &'a VaultId)) -> Self {
-        Self::ScopedUserId { su_id, user_vault_id }
+impl<'a> From<(&'a ScopedVaultId, &'a VaultId)> for OnboardingIdentifier<'a> {
+    fn from((su_id, user_vault_id): (&'a ScopedVaultId, &'a VaultId)) -> Self {
+        Self::ScopedVaultId { su_id, user_vault_id }
     }
 }
 
@@ -130,7 +130,7 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a>
 type OnboardingInfo<TDecision> = (
     Onboarding,
     ObConfiguration,
-    (ScopedUser, Option<LivenessEvent>),
+    (ScopedVault, Option<LivenessEvent>),
     InsightEvent,
     Option<ManualReview>,
     Option<TDecision>,
@@ -150,7 +150,7 @@ where
 pub type SerializableOnboardingInfo = OnboardingInfo<(OnboardingDecision, SaturatedActor)>;
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
-pub type BasicOnboardingInfo<ObT> = (ObT, ScopedUser, Option<ManualReview>, Option<OnboardingDecision>);
+pub type BasicOnboardingInfo<ObT> = (ObT, ScopedVault, Option<ManualReview>, Option<OnboardingDecision>);
 
 impl Onboarding {
     #[tracing::instrument(skip_all)]
@@ -175,7 +175,7 @@ impl Onboarding {
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::ScopedUserId { su_id, user_vault_id } => {
+            OnboardingIdentifier::ScopedVaultId { su_id, user_vault_id } => {
                 query = query
                     .filter(onboarding::scoped_user_id.eq(su_id))
                     .filter(scoped_user::user_vault_id.eq(user_vault_id))
@@ -251,8 +251,8 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn bulk_get_for_users(
         conn: &mut PgConn,
-        scoped_user_ids: Vec<&ScopedUserId>,
-    ) -> DbResult<HashMap<ScopedUserId, OnboardingAndConfig>> {
+        scoped_user_ids: Vec<&ScopedVaultId>,
+    ) -> DbResult<HashMap<ScopedVaultId, OnboardingAndConfig>> {
         // For now, this will be either 0 or 1 result per user
         use crate::schema::ob_configuration;
         let results = onboarding::table
@@ -269,8 +269,8 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn get_for_scoped_users(
         conn: &mut PgConn,
-        scoped_user_ids: Vec<&ScopedUserId>,
-    ) -> DbResult<HashMap<ScopedUserId, SerializableOnboardingInfo>> {
+        scoped_user_ids: Vec<&ScopedVaultId>,
+    ) -> DbResult<HashMap<ScopedVaultId, SerializableOnboardingInfo>> {
         use crate::schema::{
             insight_event, liveness_event, manual_review, ob_configuration, onboarding_decision,
         };

@@ -21,7 +21,7 @@ use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
 use newtypes::{
-    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, ScopedUserId, SealedVaultDataKey, VaultId,
+    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, ScopedVaultId, SealedVaultDataKey, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -323,7 +323,7 @@ pub async fn get_inner(
     user_auth: SessionContext<UserSession>,
 ) -> Result<DocumentResponse, ApiError> {
     let scoped_user_id = db_pool
-        .db_query(move |conn| -> Result<ScopedUserId, ApiError> {
+        .db_query(move |conn| -> Result<ScopedVaultId, ApiError> {
             let Some(auth_info) = user_auth.onboarding(conn)? else {
         return Err(ApiError::from(OnboardingError::NoOnboarding))
     };
@@ -347,7 +347,7 @@ pub async fn get_inner(
 /// Based on the current and previous requests, map to our API response
 pub fn construct_get_response(
     conn: &mut PgConn,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
 ) -> Result<(DocumentResponseStatus, Vec<DocumentImageError>), ApiError> {
     // Get the latest document request for the scoped user, and the previous result (for errors).
     // We don't just stash the errors on the document request because with multiple vendors, we'll need
@@ -410,7 +410,7 @@ async fn handle_scan_onboarding_request(
     state: &State,
     document_request: DbDocumentRequest,
     document_verification_request: VerificationRequest,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     user_vault_id: VaultId,
     identity_document_id: IdentityDocumentId,
 ) -> Result<(), ApiError> {
@@ -517,7 +517,7 @@ async fn handle_scan_onboarding_request(
 async fn handle_s3_upload_error(
     state: &State,
     document_request_id: DocumentRequestId,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
 ) -> DbResult<()> {
     // In the case of an s3 error, we move our status to UploadFailed
     state
@@ -544,7 +544,7 @@ async fn handle_s3_upload_error(
 }
 
 // We only allow users to have NUM_RETRIES tries. We'll handle Failed vs. UpploadFailed differently when creating a decision
-fn retry_limit_exceeded(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> Result<bool, DbError> {
+fn retry_limit_exceeded(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> Result<bool, DbError> {
     let num_failed = DbDocumentRequest::count_statuses(
         conn,
         scoped_user_id,

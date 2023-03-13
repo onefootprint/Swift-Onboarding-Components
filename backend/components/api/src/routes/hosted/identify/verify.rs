@@ -17,7 +17,7 @@ use chrono::Duration;
 use crypto::sha256;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::{NewVaultInfo, Vault};
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::{Fingerprinter, IdentityDataKind, PhoneNumber, PiiString, SessionAuthToken, VaultId};
@@ -80,7 +80,7 @@ pub async fn post(
             // user vault to onboard onto a new ob config, we need to make the ScopedUser
             .db_transaction(move |conn| -> ApiResult<_> {
                 let uv = Vault::lock(conn, &user_vault_id)?;
-                let result = ScopedUser::get_or_create(conn, &uv, ob_config.id)?;
+                let result = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
                 Ok(result)
             })
             .await?;

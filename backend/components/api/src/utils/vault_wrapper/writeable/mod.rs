@@ -1,4 +1,4 @@
-use newtypes::{Locked, ScopedUserId};
+use newtypes::{Locked, ScopedVaultId};
 
 use super::VaultWrapper;
 use derive_more::Deref;
@@ -9,7 +9,7 @@ mod commit_data;
 mod vault_data_builder;
 
 /// This specific subset variant of VaultWrapper contains all the logic to write new data into a user's vault.
-/// It can only be constructed via a ScopedUserId.
+/// It can only be constructed via a ScopedVaultId.
 ///
 /// Context:
 ///
@@ -28,5 +28,5 @@ mod vault_data_builder;
 pub struct WriteableVw<Type> {
     #[deref]
     uvw: Locked<VaultWrapper<Type>>,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
 }

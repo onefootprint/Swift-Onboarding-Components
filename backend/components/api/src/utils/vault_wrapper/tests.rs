@@ -22,7 +22,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     let uv = db::tests::fixtures::vault::create_person(conn, true);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = db::tests::fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     // Add identity data
     let data = vec![
@@ -97,7 +97,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     let uv = db::tests::fixtures::vault::create_person(conn, true);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = db::tests::fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let data = vec![
         NewVaultData {
@@ -140,7 +140,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     // Add an email
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
@@ -196,12 +196,12 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
-    let su2 = fixtures::scoped_user::create(conn, &uv.id, &ob_config2.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let su2 = fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 
     struct Test<'a> {
         update: Vec<(DataIdentifier, PiiString)>,
-        su_id: &'a newtypes::ScopedUserId,
+        su_id: &'a newtypes::ScopedVaultId,
         is_allowed: bool,
     }
 
@@ -323,8 +323,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
-    let su2 = fixtures::scoped_user::create(conn, &uv.id, &ob_config2.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let su2 = fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 
     // Add speculative ssn4 (and some other data) by tenant 1
     let update = vec![
@@ -371,7 +371,7 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let updates = vec![
         // Partial address
@@ -419,7 +419,7 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let k1 = KvDataKey::from_str("blerp").unwrap();
     let k2 = KvDataKey::from_str("flerp").unwrap();
@@ -465,7 +465,7 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     // Add some identity data
     let update = vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))];

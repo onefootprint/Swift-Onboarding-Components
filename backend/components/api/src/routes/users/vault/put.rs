@@ -8,7 +8,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::put_data_request::PutDataRequest;
 use newtypes::{AccessEventKind, FootprintUserId};
@@ -59,7 +59,7 @@ pub async fn put(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
 
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
             uvw.put_person_data(conn, request, fingerprints, false)?;

@@ -4,7 +4,7 @@ use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{errors::ApiError, State};
 use actix_web::web::Query;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use newtypes::flat_api_object_map_type;
 use newtypes::input::Csv;
 use newtypes::{DataIdentifier, FootprintUserId};
@@ -47,7 +47,7 @@ pub async fn get(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })

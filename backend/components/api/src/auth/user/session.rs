@@ -1,11 +1,11 @@
 use db::{
     models::{
-        ob_configuration::ObConfiguration, onboarding::Onboarding, scoped_user::ScopedUser, tenant::Tenant,
+        ob_configuration::ObConfiguration, onboarding::Onboarding, scoped_vault::ScopedVault, tenant::Tenant,
     },
     PgConn,
 };
 use itertools::Itertools;
-use newtypes::{ScopedUserId, VaultId};
+use newtypes::{ScopedVaultId, VaultId};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthScope, UserAuthScopeDiscriminant};
@@ -71,7 +71,7 @@ impl UserSession {
 pub struct AuthedOnboardingInfo {
     pub user_vault_id: VaultId,
     pub onboarding: Onboarding,
-    pub scoped_user: ScopedUser,
+    pub scoped_user: ScopedVault,
     pub ob_config: ObConfiguration,
     pub tenant: Tenant,
 }
@@ -79,7 +79,7 @@ pub struct AuthedOnboardingInfo {
 impl SessionContext<UserSession> {
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
     /// session, if exists
-    pub fn scoped_user_id(&self) -> Option<ScopedUserId> {
+    pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
         self.data
             .scopes
             .iter()
@@ -92,7 +92,7 @@ impl SessionContext<UserSession> {
 
     /// Extracts the business vault_id from the `UserAuthScope::Business` scope on this session, if
     /// exists
-    pub fn scoped_business_id(&self) -> Option<ScopedUserId> {
+    pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
         self.data
             .scopes
             .iter()
@@ -104,13 +104,13 @@ impl SessionContext<UserSession> {
     }
 
     /// Fetch the scoped_user info
-    pub fn scoped_user(&self, conn: &mut PgConn) -> ApiResult<Option<ScopedUser>> {
+    pub fn scoped_user(&self, conn: &mut PgConn) -> ApiResult<Option<ScopedVault>> {
         let Some(scoped_user_id) = self.scoped_user_id() else {
             return Ok(None);
         };
 
         // Confirm that the scoped_user in the auth token belongs to the user
-        let scoped_user = ScopedUser::get(conn, (&scoped_user_id, &self.data.user_vault_id))?;
+        let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &self.data.user_vault_id))?;
         Ok(Some(scoped_user))
     }
 

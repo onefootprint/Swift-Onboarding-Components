@@ -9,7 +9,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, Locked, OnboardingId, ScopedUserId, TenantId,
+    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, Locked, OnboardingId, ScopedVaultId, TenantId,
     VaultId, VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
@@ -31,7 +31,7 @@ pub struct Vault {
 
 pub enum VaultIdentifier<'a> {
     Id(&'a VaultId),
-    ScopedUserId(&'a ScopedUserId),
+    ScopedVaultId(&'a ScopedVaultId),
     FpUserId {
         fp_user_id: &'a FootprintUserId,
         tenant_id: &'a TenantId,
@@ -46,9 +46,9 @@ impl<'a> From<&'a VaultId> for VaultIdentifier<'a> {
     }
 }
 
-impl<'a> From<&'a ScopedUserId> for VaultIdentifier<'a> {
-    fn from(id: &'a ScopedUserId) -> Self {
-        Self::ScopedUserId(id)
+impl<'a> From<&'a ScopedVaultId> for VaultIdentifier<'a> {
+    fn from(id: &'a ScopedVaultId) -> Self {
+        Self::ScopedVaultId(id)
     }
 }
 
@@ -72,7 +72,7 @@ impl Vault {
     fn query(id: VaultIdentifier) -> BoxedQuery<Pg> {
         match id {
             VaultIdentifier::Id(id) => user_vault::table.filter(user_vault::id.eq(id)).into_boxed(),
-            VaultIdentifier::ScopedUserId(scoped_user_id) => {
+            VaultIdentifier::ScopedVaultId(scoped_user_id) => {
                 let uv_ids = scoped_user::table
                     .filter(scoped_user::id.eq(scoped_user_id))
                     .select(scoped_user::user_vault_id);
@@ -126,7 +126,7 @@ impl Vault {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedUserId) -> DbResult<Locked<Self>> {
+    pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq(su_id))
             .select(scoped_user::user_vault_id);
@@ -138,7 +138,7 @@ impl Vault {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn multi_get(conn: &mut PgConn, ids: Vec<&ScopedUserId>) -> DbResult<Vec<Self>> {
+    pub fn multi_get(conn: &mut PgConn, ids: Vec<&ScopedVaultId>) -> DbResult<Vec<Self>> {
         let uv_ids = scoped_user::table
             .filter(scoped_user::id.eq_any(ids))
             .select(scoped_user::user_vault_id);

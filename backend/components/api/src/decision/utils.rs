@@ -4,7 +4,7 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         risk_signal::RiskSignal,
-        scoped_user::ScopedUser,
+        scoped_vault::ScopedVault,
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
     },
@@ -12,7 +12,7 @@ use db::{
 };
 use newtypes::{
     DbActor, DecisionStatus, FootprintReasonCode, IdentityDocumentId, OnboardingId, PhoneNumber,
-    ScopedUserId, TenantId, Vendor, VendorAPI,
+    ScopedVaultId, TenantId, Vendor, VendorAPI,
 };
 
 use super::vendor;
@@ -43,8 +43,8 @@ pub async fn should_initiate_idv_or_else_setup_test_fixtures(
         let obid = ob_id.clone();
         let scoped_user = state
             .db_pool
-            .db_query(move |conn| -> Result<ScopedUser, ApiError> {
-                ScopedUser::get(conn, &obid).map_err(ApiError::from)
+            .db_query(move |conn| -> Result<ScopedVault, ApiError> {
+                ScopedVault::get(conn, &obid).map_err(ApiError::from)
             })
             .await??;
 
@@ -65,7 +65,7 @@ pub fn create_document_verification_request(
     conn: &mut PgConn,
     vendor_api: VendorAPI,
     onboarding_id: OnboardingId,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     identity_document_id: IdentityDocumentId,
 ) -> Result<VerificationRequest, ApiError> {
     // As of now, we only support 1 vendor for sending documents too

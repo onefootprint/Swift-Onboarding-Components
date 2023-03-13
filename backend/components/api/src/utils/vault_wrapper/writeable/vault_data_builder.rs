@@ -14,7 +14,7 @@ use db::{
 };
 use newtypes::{
     CollectedDataOption, DataIdentifier, DataLifetimeKind, DataRequest, IsDataIdentifierDiscriminant,
-    PiiString, ScopedUserId, VaultId, VaultPublicKey, VdKind,
+    PiiString, ScopedVaultId, VaultId, VaultPublicKey, VdKind,
 };
 
 /// Helps to process updates for data in a DataRequest<T>.
@@ -49,7 +49,7 @@ where
         conn: &mut TxnPgConn,
         existing_fields: Vec<T>, // portable or speculative on UVW
         user_vault_id: VaultId,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: ScopedVaultId,
         fingerprints: NewFingerprints<T>,
     ) -> ApiResult<()> {
         // First, validate that we're not overwriting any full data with partial data.

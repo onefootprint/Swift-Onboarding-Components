@@ -4,13 +4,13 @@ use crate::PgConn;
 use crate::{
     actor,
     actor::SaturatedActor,
-    models::scoped_user::ScopedUser,
+    models::scoped_vault::ScopedVault,
     schema::{annotation, scoped_user},
     DbError, DbResult,
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AnnotationId, DbActor, FootprintUserId, ScopedUserId, TenantId};
+use newtypes::{AnnotationId, DbActor, FootprintUserId, ScopedVaultId, TenantId};
 
 use serde::{Deserialize, Serialize};
 
@@ -21,7 +21,7 @@ pub struct Annotation {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub scoped_user_id: ScopedUserId,
+    pub scoped_user_id: ScopedVaultId,
     pub note: String,
     pub is_pinned: bool,
     pub actor: DbActor,
@@ -31,7 +31,7 @@ pub struct Annotation {
 #[diesel(table_name = annotation)]
 struct NewAnnotation {
     timestamp: DateTime<Utc>,
-    scoped_user_id: ScopedUserId,
+    scoped_user_id: ScopedVaultId,
     note: String,
     is_pinned: bool,
     actor: DbActor,
@@ -51,7 +51,7 @@ impl Annotation {
         conn: &mut PgConn,
         note: String,
         is_pinned: bool,
-        scoped_user_id: ScopedUserId,
+        scoped_user_id: ScopedVaultId,
         actor: T,
     ) -> DbResult<AnnotationInfo>
     where
@@ -139,7 +139,7 @@ impl Annotation {
             query = query.filter(annotation::is_pinned.eq(is_pinned));
         }
 
-        let results: Vec<(Annotation, ScopedUser)> = query.get_results::<(Self, ScopedUser)>(conn)?;
+        let results: Vec<(Annotation, ScopedVault)> = query.get_results::<(Self, ScopedVault)>(conn)?;
         let annotations = results.into_iter().map(|t| t.0).collect();
         let annotations_with_actors = actor::saturate_actors(conn, annotations)?;
         Ok(annotations_with_actors)

@@ -104,7 +104,7 @@ define_newtype_id!(EmailId, String, "Identifier for an email");
 define_newtype_id!(PhoneNumberId, String, "Identifier for a phone number");
 define_newtype_id!(UserProfileId, String, "Identifier for user basic info");
 define_newtype_id!(IdentityDataId, String, "Identifier for user identity data row");
-define_newtype_id!(ScopedUserId, String, "Identifier for an ScopedUser");
+define_newtype_id!(ScopedVaultId, String, "Identifier for an ScopedUser");
 define_newtype_id!(OnboardingId, String, "Identifier for an OnboardingLink");
 define_newtype_id!(FootprintUserId, String, "Identifier for a ScopedUser");
 impl_verified_prefix_for_nt_id!(FootprintUserId, "fp_id_");

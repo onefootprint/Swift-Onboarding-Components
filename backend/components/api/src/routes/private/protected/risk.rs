@@ -9,7 +9,7 @@ use crate::{decision, State};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::onboarding::Onboarding;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{
@@ -76,7 +76,7 @@ async fn make_vendor_calls(
     let (requests, ob) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
 
@@ -153,7 +153,7 @@ async fn make_decision(
     let ob = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
             Ok(ob)
@@ -231,7 +231,7 @@ async fn shadow_run(
     let requests = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedUser::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;

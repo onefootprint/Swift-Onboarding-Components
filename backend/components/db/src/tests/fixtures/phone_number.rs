@@ -2,7 +2,7 @@ use crate::{
     models::phone_number::{NewPhoneNumberArgs, PhoneNumber},
     TxnPgConn,
 };
-use newtypes::{DataPriority, ScopedUserId, VaultId};
+use newtypes::{DataPriority, ScopedVaultId, VaultId};
 use newtypes::{Fingerprint, SealedVaultBytes};
 use rand::Rng;
 
@@ -18,7 +18,7 @@ fn random_phone_number() -> String {
     )
 }
 
-pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, su_id: Option<&ScopedUserId>) -> PhoneNumber {
+pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, su_id: Option<&ScopedVaultId>) -> PhoneNumber {
     let phone_info = NewPhoneNumberArgs {
         e_phone_number: SealedVaultBytes(vec![]),
         sh_phone_number: Fingerprint(random_phone_number().as_bytes().to_vec()),

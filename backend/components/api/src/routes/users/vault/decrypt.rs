@@ -6,7 +6,7 @@ use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::{DecryptRequest, VaultWrapper};
 use crate::{errors::ApiError, State};
 use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_user::ScopedUser;
+use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::{flat_api_object_map_type, PiiString};
 use newtypes::{DataIdentifier, FootprintUserId};
@@ -61,7 +61,7 @@ pub async fn post(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedUser::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })

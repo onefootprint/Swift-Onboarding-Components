@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
-use newtypes::ScopedUserId;
+use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
 use newtypes::VaultId;
 use newtypes::VdKind;
@@ -46,7 +46,7 @@ impl VaultData {
     pub fn bulk_create<T>(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedUserId>,
+        scoped_user_id: Option<&ScopedVaultId>,
         data: Vec<NewVaultData<T>>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>>

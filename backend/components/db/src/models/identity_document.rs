@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 use newtypes::{
     Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdDocKind, IdentityDocumentId,
-    ScopedUserId, SealedVaultDataKey, VaultId,
+    ScopedVaultId, SealedVaultDataKey, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -89,7 +89,7 @@ impl IdentityDocument {
         selfie_image_s3_url: Option<String>,
         document_type: IdDocKind,
         country_code: String,
-        su_id: Option<&ScopedUserId>,
+        su_id: Option<&ScopedVaultId>,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -126,7 +126,7 @@ impl IdentityDocument {
 
     /// Get all the documents collected for a given onboarding
     #[tracing::instrument(skip_all)]
-    pub fn get_for_scoped_user_id(conn: &mut PgConn, scoped_user_id: &ScopedUserId) -> DbResult<Vec<Self>> {
+    pub fn get_for_scoped_user_id(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let results = identity_document::table
             .inner_join(data_lifetime::table)
             .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))

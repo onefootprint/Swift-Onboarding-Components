@@ -3,7 +3,7 @@ use db::{
     models::{onboarding::Onboarding, vault::Vault, verification_request::VerificationRequest},
     PgConn,
 };
-use newtypes::{DataLifetimeSeqno, ScopedUserId, VaultId};
+use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
 
 /// There are a lot of places we build UVWs, under varying circumstances. Things to consider:
 ///   - Portable and Speculative data:
@@ -24,10 +24,10 @@ pub enum VwArgs<'a> {
     /// Generally used during APIs on the bifrost onboarding path when WRITING data to the vault or
     /// in tenant-authed APIs when READING data from the vault.
     /// TODO should we have this include the list of fields to be decrypted so we can selectively choose what to load?
-    Tenant(&'a ScopedUserId),
+    Tenant(&'a ScopedVaultId),
 }
 
-type Args = (Vault, Option<ScopedUserId>, Option<DataLifetimeSeqno>);
+type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>);
 
 impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {

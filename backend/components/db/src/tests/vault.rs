@@ -12,7 +12,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let uv = fixtures::vault::create_person(conn, true).into_inner();
-    let su = fixtures::scoped_user::create(conn, &uv.id, &ob_config.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
 
