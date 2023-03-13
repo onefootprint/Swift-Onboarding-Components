@@ -23,6 +23,17 @@ export const proxyConfigsFixture: ProxyConfig[] = [
   },
 ];
 
+export const firstProxyConfigFixture: ProxyConfig = {
+  id: 'proxy_id_rBXHrA7oUgN8m7YfVVJKC4',
+  isLive: true,
+  name: 'Name of the proxy config',
+  createdAt: '2023-03-03T00:28:13.097885Z',
+  status: 'enabled',
+  url: 'https://my-test-url.com/',
+  method: 'GET',
+  deactivatedAt: null,
+};
+
 export const withProxyConfigs = (
   proxyConfigs: ProxyConfig[] = proxyConfigsFixture,
 ) =>

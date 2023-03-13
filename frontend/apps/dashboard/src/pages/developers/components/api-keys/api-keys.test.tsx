@@ -71,7 +71,9 @@ describe('<ApiKeys />', () => {
 
         const table = screen.getByRole('table');
         const [firstApiKey] = listApiKeysFixture;
-        const tr = within(table).getByTestId(firstApiKey.id);
+        const tr = within(table).getByRole('row', {
+          name: firstApiKey.name,
+        });
 
         const name = within(tr).getByText(firstApiKey.name);
         expect(name).toBeInTheDocument();

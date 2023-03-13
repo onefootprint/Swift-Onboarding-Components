@@ -18,6 +18,7 @@ export type TableProps<T> = {
   columns: { id?: string; text: string; width?: Property.Width }[];
   emptyStateText?: string;
   getKeyForRow: (item: T) => string;
+  getAriaLabelForRow?: (item: T) => string;
   hideThead?: boolean;
   initialSearch?: string;
   isLoading?: boolean;
@@ -34,6 +35,7 @@ const Table = <T,>({
   columns,
   emptyStateText = 'No results',
   getKeyForRow,
+  getAriaLabelForRow,
   hideThead,
   initialSearch,
   isLoading,
@@ -109,7 +111,11 @@ const Table = <T,>({
             {shouldShowData &&
               items.map((item: T, index: Number) => (
                 <Tr
-                  data-testid={getKeyForRow(item)}
+                  aria-label={
+                    getAriaLabelForRow
+                      ? getAriaLabelForRow(item)
+                      : getKeyForRow(item)
+                  }
                   data-clickable={!!onRowClick}
                   key={getKeyForRow(item)}
                   onClick={() => {

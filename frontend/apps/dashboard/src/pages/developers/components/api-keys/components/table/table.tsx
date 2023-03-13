@@ -26,6 +26,7 @@ const ApiKeysTable = () => {
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={error ? getErrorMessage(error) : t('table.empty-state')}
+      getAriaLabelForRow={(apiKey: ApiKey) => apiKey.name}
       getKeyForRow={(apiKey: ApiKey) => apiKey.id}
       isLoading={isLoading}
       items={data}

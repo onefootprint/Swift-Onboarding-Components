@@ -34,6 +34,7 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('table.empty-state')}
+      getAriaLabelForRow={proxyConfig => proxyConfig.name}
       getKeyForRow={proxyConfig => proxyConfig.id}
       isLoading={isLoading}
       items={data}

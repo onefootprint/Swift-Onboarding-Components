@@ -5,6 +5,7 @@ import Table, { TableProps } from './table';
 
 describe('<Table />', () => {
   const renderTable = ({
+    getAriaLabelForRow,
     hideThead,
     'aria-label': ariaLabel = 'Table',
     onRowClick,
@@ -26,6 +27,7 @@ describe('<Table />', () => {
         aria-label={ariaLabel}
         columns={columns}
         emptyStateText={emptyStateText}
+        getAriaLabelForRow={getAriaLabelForRow}
         getKeyForRow={(item: any) => item.id}
         hideThead={hideThead}
         isLoading={isLoading}
@@ -86,6 +88,21 @@ describe('<Table />', () => {
 
         const search = screen.getByPlaceholderText('Search by name');
         expect(search).toBeInTheDocument();
+      });
+    });
+
+    describe('when it has getAriaLabelForRow', () => {
+      it('should be able to get a specific row by name', () => {
+        renderTable({
+          items: [
+            { id: '1', name: 'John Doe', age: 32 },
+            { id: '2', name: 'Jane Doe', age: 31 },
+          ],
+          getAriaLabelForRow: (item: any) => item.name,
+        });
+
+        const row = screen.getByRole('row', { name: 'John Doe' });
+        expect(row).toBeInTheDocument();
       });
     });
   });

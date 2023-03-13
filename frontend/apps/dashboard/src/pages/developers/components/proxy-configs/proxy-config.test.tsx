@@ -11,6 +11,7 @@ import React from 'react';
 import { clickOnAction } from 'src/config/tests';
 
 import {
+  firstProxyConfigFixture,
   proxyConfigDetailsFixture,
   proxyConfigsFixture,
   withEditProxyConfig,
@@ -91,7 +92,7 @@ describe('<ProxyConfigs />', () => {
         await renderProxyConfigsAndWaitData();
 
         const firstRow = screen.getByRole('row', {
-          name: new RegExp(proxyConfigsFixture[0].name),
+          name: firstProxyConfigFixture.name,
         });
         firstRow.click();
 
@@ -99,7 +100,7 @@ describe('<ProxyConfigs />', () => {
           {
             query: {
               tab: 'proxy-configs',
-              proxy_config_id: proxyConfigsFixture[0].id,
+              proxy_config_id: firstProxyConfigFixture.id,
             },
           },
           undefined,

@@ -72,7 +72,7 @@ describe('<RiskSignals />', () => {
       it('should show a spinner and the data within the table', async () => {
         await renderRiskSignalsAndWaitData();
 
-        const tr = screen.getByTestId('sig_ryxauTlDX8hIm3wVRmm');
+        const tr = screen.getByRole('row', { name: 'sig_ryxauTlDX8hIm3wVRmm' });
         expect(tr).toBeInTheDocument();
 
         const severity = within(tr).getByText('Low');
@@ -103,7 +103,9 @@ describe('<RiskSignals />', () => {
           });
           await renderRiskSignalsAndWaitData();
 
-          const tr = screen.getByTestId('sig_ryxauTlDX8hIm3wVRmm');
+          const tr = screen.getByRole('row', {
+            name: 'sig_ryxauTlDX8hIm3wVRmm',
+          });
           await userEvent.click(tr);
           expect(pushMockFn).toHaveBeenCalledWith(
             {
