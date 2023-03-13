@@ -16,7 +16,7 @@ const removeProxyConfig = async (authHeaders: AuthHeaders, id: string) => {
 };
 
 const useRemoveProxyConfig = (proxyConfig: ProxyConfig) => {
-  const { t } = useTranslation('pages.proxy-configs.actions.remove');
+  const { t } = useTranslation('pages.proxy-configs.notifications.remove');
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();
@@ -26,16 +26,16 @@ const useRemoveProxyConfig = (proxyConfig: ProxyConfig) => {
     onError: (error: unknown) => {
       toast.show({
         description: getErrorMessage(error),
-        title: t('feedback.error.title'),
+        title: t('error.title'),
         variant: 'error',
       });
     },
     onSuccess: () => {
       toast.show({
-        description: t('feedback.success.description', {
+        description: t('success.description', {
           name: proxyConfig.name,
         }),
-        title: t('feedback.success.title'),
+        title: t('success.title'),
       });
       queryClient.invalidateQueries();
     },

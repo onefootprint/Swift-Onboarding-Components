@@ -2,7 +2,7 @@ import {
   ProxyConfigDetails,
   ProxyConfigHeader,
   ProxyConfigMethod,
-  ProxyIngressRule,
+  ProxyConfigIngressRule,
 } from '../data';
 
 export type CreateProxyConfigRequest = {
@@ -14,7 +14,7 @@ export type CreateProxyConfigRequest = {
   headers: ProxyConfigHeader[];
   ingressSettings: {
     contentType: 'json';
-    rules: ProxyIngressRule[];
+    rules: ProxyConfigIngressRule[];
   };
   method: ProxyConfigMethod;
   name: string;

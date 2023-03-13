@@ -1,10 +1,18 @@
-import type { ProxyConfigMethod, ProxyIngressRule } from '@onefootprint/types';
+import type {
+  ProxyConfigIngressRule,
+  ProxyConfigMethod,
+} from '@onefootprint/types';
 
 export type FormData = {
   accessReason: string;
   clientIdentity: { certificate: string; key: string };
-  headers: { name: string; value: string; secret: boolean }[];
-  ingressSettings: { contentType: 'json'; rules: ProxyIngressRule[] };
+  headers: {
+    name: string;
+    value: string;
+    secret: boolean;
+    disabled?: boolean;
+  }[];
+  ingressSettings: { contentType: 'json'; rules: ProxyConfigIngressRule[] };
   method: ProxyConfigMethod;
   name: string;
   pinnedServerCertificates: { certificate: string }[];

@@ -9,6 +9,7 @@
     "description": "We're sorry. Please restart the page.",
     "cta": "Restart"
   },
+  "edit": "Edit",
   "save": "Save",
   "skip": "Skip",
   "close": "Close",
@@ -1073,15 +1074,6 @@
           "confirmation": {
             "title": "Remove proxy config",
             "description": "You’re about to remove the proxy config <b>{{name}}</b>. Are you sure?"
-          },
-          "feedback": {
-            "error": {
-              "title": "Error removing proxy config"
-            },
-            "success": {
-              "title": "Success",
-              "description": "Proxy config removed successfully."
-            }
           }
         },
         "status": {
@@ -1090,11 +1082,6 @@
             "confirmation": {
               "title": "Enable proxy config",
               "description": "You’re about to enable the proxy config <b>{{name}}</b>. Are you sure?"
-            },
-            "feedback": {
-              "error": {
-                "title": "Error enabling proxy config"
-              }
             }
           },
           "disable": {
@@ -1122,7 +1109,8 @@
       },
       "details": {
         "basic-configuration": {
-          "title": "Basic Configuration",
+          "title": "Basic configuration",
+          "name": "Name",
           "url": "URL",
           "method": "HTTP Method",
           "access-reason": "Access reason"
@@ -1255,6 +1243,24 @@
           },
           "error": {
             "title": "Error creating vault proxy configuration"
+          }
+        },
+        "update": {
+          "success": {
+            "title": "Vault proxy configuration updated",
+            "description": "Vault proxy configuration was updated successfully"
+          },
+          "error": {
+            "title": "Error updating vault proxy configuration"
+          }
+        },
+        "remove": {
+          "success": {
+            "title": "Vault proxy configuration removed",
+            "description": "Vault Proxy config was removed successfully"
+          },
+          "error": {
+            "title": "Error removing vault proxy configuration"
           }
         }
       }

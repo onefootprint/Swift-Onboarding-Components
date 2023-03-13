@@ -12,7 +12,7 @@ export type FieldsetProps = {
 };
 
 const Fieldset = ({ children, cta, title }: FieldsetProps) => (
-  <FieldsetContainer>
+  <FieldsetContainer aria-label={title}>
     <Header>
       <Typography variant="label-2" as="div">
         {title}

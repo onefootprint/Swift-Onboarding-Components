@@ -6,7 +6,7 @@ import { Trans } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
 import styled from 'styled-components';
 
-import useDisableProxyConfig from './hooks/use-disable-proxy-config';
+import useUpdateProxyConfigs from '@/proxy-configs/hooks/use-update-proxy-configs';
 
 export type StatusHandler = {
   toggle: () => void;
@@ -20,7 +20,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(
   ({ proxyConfig }, ref) => {
     const { t } = useTranslation('pages.proxy-configs.actions.status');
     const [open, setOpen] = useState(false);
-    const mutation = useDisableProxyConfig(proxyConfig);
+    const mutation = useUpdateProxyConfigs();
 
     const showConfirmation = () => {
       setOpen(true);
@@ -33,6 +33,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(
     const disable = () => {
       mutation.mutate(
         {
+          id: proxyConfig.id,
           status: proxyConfig.status === 'enabled' ? 'disabled' : 'enabled',
         },
         {

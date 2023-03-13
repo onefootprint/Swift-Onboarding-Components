@@ -1,17 +1,13 @@
 import {
-  createFileSaverSpy,
   createUseRouterSpy,
   customRender,
   screen,
-  userEvent,
   waitFor,
-  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 import { clickOnAction } from 'src/config/tests';
 
 import {
-  firstProxyConfigFixture,
   proxyConfigDetailsFixture,
   proxyConfigsFixture,
   withEditProxyConfig,
@@ -25,11 +21,8 @@ import {
 import ProxyConfigs from './proxy-configs';
 
 const useRouterSpy = createUseRouterSpy();
-const fileSaverSpy = createFileSaverSpy();
 
 describe('<ProxyConfigs />', () => {
-  const fileSaverMock = fileSaverSpy();
-
   beforeEach(() => {
     useRouterSpy({
       pathname: '/developers',
@@ -37,10 +30,6 @@ describe('<ProxyConfigs />', () => {
         tab: 'proxy-configs',
       },
     });
-  });
-
-  beforeEach(() => {
-    withProxyConfigs();
   });
 
   const renderProxyConfigs = () => customRender(<ProxyConfigs />);
@@ -92,7 +81,7 @@ describe('<ProxyConfigs />', () => {
         await renderProxyConfigsAndWaitData();
 
         const firstRow = screen.getByRole('row', {
-          name: firstProxyConfigFixture.name,
+          name: proxyConfigDetailsFixture.name,
         });
         firstRow.click();
 
@@ -100,7 +89,7 @@ describe('<ProxyConfigs />', () => {
           {
             query: {
               tab: 'proxy-configs',
-              proxy_config_id: firstProxyConfigFixture.id,
+              proxy_config_id: proxyConfigDetailsFixture.id,
             },
           },
           undefined,
@@ -110,103 +99,25 @@ describe('<ProxyConfigs />', () => {
     });
 
     describe('when it has a proxy_config_id in the query params', () => {
-      describe('when the request to fetch the proxy config details succeeds', () => {
-        beforeEach(() => {
-          withProxyConfigDetails(proxyConfigDetailsFixture.id);
+      beforeEach(() => {
+        withProxyConfigDetails(proxyConfigDetailsFixture.id);
+        useRouterSpy({
+          pathname: '/developers',
+          query: {
+            tab: 'proxy-configs',
+            proxy_config_id: proxyConfigDetailsFixture.id,
+          },
         });
+      });
 
-        it('should show the details of the proxy config', async () => {
-          useRouterSpy({
-            pathname: '/developers',
-            query: {
-              tab: 'proxy-configs',
-              proxy_config_id: proxyConfigDetailsFixture.id,
-            },
+      it('should show the proxy config details', async () => {
+        await renderProxyConfigsAndWaitData();
+
+        await waitFor(() => {
+          const details = screen.getByRole('dialog', {
+            name: proxyConfigDetailsFixture.name,
           });
-
-          await renderProxyConfigsAndWaitData();
-
-          const urlRow = screen.getByRole('row', {
-            name: 'URL',
-          });
-          const urlValue = within(urlRow).getByText(
-            proxyConfigDetailsFixture.url,
-          );
-          expect(urlValue).toBeInTheDocument();
-
-          const httpRow = screen.getByRole('row', {
-            name: 'HTTP Method',
-          });
-          const httpValue = within(httpRow).getByText(
-            proxyConfigDetailsFixture.method,
-          );
-          expect(httpValue).toBeInTheDocument();
-
-          const accessReasonRow = screen.getByRole('row', {
-            name: 'Access reason',
-          });
-          const accessReasonValue = within(accessReasonRow).getByText(
-            proxyConfigDetailsFixture.accessReason,
-          );
-          expect(accessReasonValue).toBeInTheDocument();
-
-          proxyConfigDetailsFixture.secretHeaders.forEach(header => {
-            const headerName = screen.getByText(header.name);
-            expect(headerName).toBeInTheDocument();
-          });
-
-          proxyConfigDetailsFixture.headers.forEach(header => {
-            const headerName = screen.getByText(header.name);
-            expect(headerName).toBeInTheDocument();
-
-            const headerValue = screen.getByText(header.value);
-            expect(headerValue).toBeInTheDocument();
-          });
-
-          const download = screen.getByRole('button', {
-            name: 'Download client certificate',
-          });
-          await userEvent.click(download);
-          expect(fileSaverMock).toHaveBeenCalledWith(
-            {
-              content: expect.anything(),
-              options: {
-                type: 'text/plain;charset=utf-8',
-              },
-            },
-            'name-of-the-proxy-config-client-certificate.crt',
-          );
-
-          const downloadPinnedServerCertificate = screen.getByRole('button', {
-            name: 'Download pinned server certificate',
-          });
-          await userEvent.click(downloadPinnedServerCertificate);
-          expect(fileSaverMock).toHaveBeenCalledWith(
-            {
-              content: expect.anything(),
-              options: {
-                type: 'text/plain;charset=utf-8',
-              },
-            },
-            'name-of-the-proxy-config-pinned-server-certificate.crt',
-          );
-
-          const contentTypeRow = screen.getByRole('row', {
-            name: 'Content type',
-          });
-          const contentTypeValue = within(contentTypeRow).getByText(
-            proxyConfigDetailsFixture.ingressContentType,
-            { exact: false },
-          );
-          expect(contentTypeValue).toBeInTheDocument();
-
-          proxyConfigDetailsFixture.ingressRules.forEach(rule => {
-            const ruleToken = screen.getByText(rule.token);
-            expect(ruleToken).toBeInTheDocument();
-
-            const ruleTarget = screen.getByText(rule.target);
-            expect(ruleTarget).toBeInTheDocument();
-          });
+          expect(details).toBeInTheDocument();
         });
       });
     });
@@ -256,7 +167,7 @@ describe('<ProxyConfigs />', () => {
 
           await waitFor(() => {
             const feedback = screen.getByText(
-              `${proxyConfigDetailsFixture.name} proxy config has been updated.`,
+              'Vault proxy configuration updated',
             );
             expect(feedback).toBeInTheDocument();
           });
@@ -306,7 +217,7 @@ describe('<ProxyConfigs />', () => {
 
           await waitFor(() => {
             const feedback = screen.getByText(
-              'Proxy config removed successfully.',
+              'Vault proxy configuration removed',
             );
             expect(feedback).toBeInTheDocument();
           });

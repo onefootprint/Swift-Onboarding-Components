@@ -5,8 +5,7 @@ import { LinkButton } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
-import Field from 'src/components/field';
-import Fieldset from 'src/components/fieldset';
+import { Field } from 'src/components';
 
 type PinnedServerCertificatesProps = {
   proxyConfig: ProxyConfigDetails;
@@ -31,19 +30,17 @@ const PinnedServerCertificates = ({
   };
 
   return shouldShow ? (
-    <Fieldset title={t('title')}>
-      <Field label={t('certificate')}>
-        <LinkButton
-          iconComponent={IcoDownload16}
-          onClick={handleClick(proxyConfig.pinnedServerCertificates)}
-          size="compact"
-        >
-          {t('download', {
-            count: proxyConfig.pinnedServerCertificates.length,
-          })}
-        </LinkButton>
-      </Field>
-    </Fieldset>
+    <Field label={t('certificate')}>
+      <LinkButton
+        iconComponent={IcoDownload16}
+        onClick={handleClick(proxyConfig.pinnedServerCertificates)}
+        size="compact"
+      >
+        {t('download', {
+          count: proxyConfig.pinnedServerCertificates.length,
+        })}
+      </LinkButton>
+    </Field>
   ) : null;
 };
 

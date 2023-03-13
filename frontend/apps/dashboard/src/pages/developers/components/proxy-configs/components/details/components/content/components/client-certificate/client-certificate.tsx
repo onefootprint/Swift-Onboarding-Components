@@ -5,8 +5,7 @@ import { LinkButton } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
-import Field from 'src/components/field';
-import Fieldset from 'src/components/fieldset';
+import { Field } from 'src/components';
 
 type ClientCertificateProps = {
   proxyConfig: ProxyConfigDetails;
@@ -26,17 +25,15 @@ const ClientCertificate = ({ proxyConfig }: ClientCertificateProps) => {
   };
 
   return proxyConfig.clientCertificate ? (
-    <Fieldset title={t('title')}>
-      <Field label={t('certificate')}>
-        <LinkButton
-          iconComponent={IcoDownload16}
-          onClick={handleClick(proxyConfig.clientCertificate)}
-          size="compact"
-        >
-          {t('download')}
-        </LinkButton>
-      </Field>
-    </Fieldset>
+    <Field label={t('certificate')}>
+      <LinkButton
+        iconComponent={IcoDownload16}
+        onClick={handleClick(proxyConfig.clientCertificate)}
+        size="compact"
+      >
+        {t('download')}
+      </LinkButton>
+    </Field>
   ) : null;
 };
 

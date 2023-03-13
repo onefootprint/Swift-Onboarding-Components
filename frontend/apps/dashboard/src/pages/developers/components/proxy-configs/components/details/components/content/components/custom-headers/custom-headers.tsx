@@ -2,8 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
-import Field from 'src/components/field';
-import Fieldset from 'src/components/fieldset';
+import { Field } from 'src/components';
 
 type CustomHeadersProps = {
   proxyConfig: ProxyConfigDetails;
@@ -15,7 +14,7 @@ const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
     proxyConfig.headers.length > 0 || proxyConfig.secretHeaders.length > 0;
 
   return shouldShow ? (
-    <Fieldset title={t('title')}>
+    <>
       {proxyConfig.secretHeaders.map(({ name }) => (
         <Fragment key={name}>
           <Field label={t('name')}>{name}</Field>
@@ -30,7 +29,7 @@ const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
           <Field label={t('value')}>{value}</Field>
         </Fragment>
       ))}
-    </Fieldset>
+    </>
   ) : null;
 };
 

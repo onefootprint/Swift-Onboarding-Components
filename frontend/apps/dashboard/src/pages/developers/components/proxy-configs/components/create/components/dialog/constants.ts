@@ -1,8 +1,8 @@
-import BasicConfiguration from './components/basic-configuration';
-import ClientCertificates from './components/client-identity';
-import CustomHeaderValues from './components/custom-header-values';
-import IngressVaulting from './components/ingress-vaulting';
-import PinnedServerCertificates from './components/pinned-server-certificates';
+import BasicConfiguration from '../../../form/basic-configuration';
+import ClientCertificates from '../../../form/client-identity';
+import CustomHeaderValues from '../../../form/custom-header-values';
+import IngressVaulting from '../../../form/ingress-vaulting';
+import PinnedServerCertificates from '../../../form/pinned-server-certificates';
 
 const steps = [
   { id: 'base-config', Component: BasicConfiguration, canSkip: false },

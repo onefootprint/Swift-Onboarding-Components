@@ -10,17 +10,19 @@ export type ProxyConfigSecretHeader = {
   id: string;
 };
 
-export type ProxyIngressRule = {
+export type ProxyConfigIngressRule = {
   token: string;
   target: string;
 };
+
+export type ProxyConfigStatus = 'enabled' | 'disabled';
 
 export type ProxyConfig = {
   id: string;
   isLive: boolean;
   name: string;
   createdAt: string;
-  status: 'enabled' | 'disabled';
+  status: ProxyConfigStatus;
   url: string;
   method: ProxyConfigMethod;
   deactivatedAt: null | string;
@@ -30,8 +32,8 @@ export type ProxyConfigDetails = ProxyConfig & {
   clientCertificate: string | null;
   accessReason: string;
   headers: ProxyConfigHeader[];
-  ingressContentType: string;
-  ingressRules: ProxyIngressRule[];
+  ingressContentType: 'json';
+  ingressRules: ProxyConfigIngressRule[];
   pinnedServerCertificates: string[];
   secretHeaders: ProxyConfigSecretHeader[];
 };

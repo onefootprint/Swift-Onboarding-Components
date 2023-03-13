@@ -1,15 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
-import { ProxyConfig, UpdateProxyConfigRequest } from '@onefootprint/types';
+import { UpdateProxyConfigRequest } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-const disableProxyConfig = async (
+const updateProxyConfig = async (
   authHeaders: AuthHeaders,
-  id: string,
-  data: UpdateProxyConfigRequest,
+  payload: UpdateProxyConfigRequest,
 ) => {
+  const { id, ...data } = payload;
   const response = await request({
     method: 'PATCH',
     url: `/org/proxy_configs/${id}`,
@@ -20,32 +20,31 @@ const disableProxyConfig = async (
   return response.data;
 };
 
-const useDisableProxyConfig = (proxyConfig: ProxyConfig) => {
-  const { t } = useTranslation('pages.proxy-configs.actions.status');
+const useUpdateProxyConfig = () => {
+  const { t } = useTranslation('pages.proxy-configs.notifications.update');
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: UpdateProxyConfigRequest) =>
-      disableProxyConfig(session.authHeaders, proxyConfig.id, payload),
+      updateProxyConfig(session.authHeaders, payload),
+
     onError: (error: unknown) => {
       toast.show({
         description: getErrorMessage(error),
-        title: t('feedback.error.title'),
+        title: t('error.title'),
         variant: 'error',
       });
     },
     onSuccess: () => {
       toast.show({
-        description: t('feedback.success.description', {
-          name: proxyConfig.name,
-        }),
-        title: t('feedback.success.title'),
+        description: t('success.description'),
+        title: t('success.title'),
       });
       queryClient.invalidateQueries();
     },
   });
 };
 
-export default useDisableProxyConfig;
+export default useUpdateProxyConfig;
