@@ -26,6 +26,7 @@ use crate::DecisionStatus;
 pub enum OnboardingStatus {
     Pass,
     Fail,
+    Pending,
 }
 
 #[derive(
