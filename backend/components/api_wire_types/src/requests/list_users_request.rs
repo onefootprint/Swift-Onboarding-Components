@@ -16,3 +16,9 @@ pub struct ListUsersRequest {
 }
 
 export_schema!(ListUsersRequest);
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct ListEntitiesRequest {
+    pub kind: Option<VaultKind>,
+}

@@ -10,6 +10,9 @@ pub use self::risk_signal::*;
 pub mod access_event;
 pub use self::access_event::*;
 
+mod entity;
+pub use self::entity::*;
+
 pub mod liveness_event;
 pub use self::liveness_event::*;
 

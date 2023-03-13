@@ -19,7 +19,7 @@ pub struct ScopedVaultListQueryParams {
     pub only_billable: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
     pub fingerprints: Option<Vec<Fingerprint>>,
-    pub footprint_user_id: Option<FootprintUserId>,
+    pub fp_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub requires_manual_review: Option<bool>,
@@ -123,7 +123,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: ScopedVaultListQueryParams) 
         }
     }
 
-    if let Some(footprint_user_id) = params.footprint_user_id {
+    if let Some(footprint_user_id) = params.fp_id {
         query = query.filter(scoped_user::fp_user_id.eq(footprint_user_id))
     }
 

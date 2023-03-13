@@ -1,6 +1,7 @@
 mod access_event;
 mod actor;
 mod annotation;
+mod entity;
 mod identity_document;
 mod insight_event;
 mod liveness_event;

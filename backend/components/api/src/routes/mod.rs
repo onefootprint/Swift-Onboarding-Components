@@ -1,10 +1,11 @@
+mod entities;
 pub mod hosted;
-pub mod index;
-pub mod onboarding;
-pub mod org;
-pub mod private;
-pub mod proxy;
-pub mod users;
+mod index;
+mod onboarding;
+mod org;
+mod private;
+mod proxy;
+mod users;
 
 use paperclip::actix::web;
 
@@ -16,4 +17,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
     users::routes(config);
     hosted::routes(config);
     proxy::routes(config);
+    entities::routes(config);
 }
