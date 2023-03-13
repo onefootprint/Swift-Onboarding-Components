@@ -5,7 +5,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::{
-    DataLifetimeSeqno, IdentityDocumentId, OnboardingId, Vendor, VendorAPI, VerificationRequestId,
+    DataLifetimeSeqno, IdentityDocumentId, OnboardingId, ScopedUserId, Vendor, VendorAPI,
+    VerificationRequestId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -29,6 +30,7 @@ pub struct VerificationRequest {
     // If we are verifying an identity document, we want to know exactly which one we were verifying since there
     // could be multiple in the vault, seqno doesn't help us
     pub identity_document_id: Option<IdentityDocumentId>,
+    pub scoped_user_id: Option<ScopedUserId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

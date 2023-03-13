@@ -655,6 +655,7 @@ table! {
         vendor_api -> Text,
         uvw_snapshot_seqno -> Int8,
         identity_document_id -> Nullable<Text>,
+        scoped_user_id -> Nullable<Text>,
     }
 }
 
@@ -741,6 +742,7 @@ joinable!(user_timeline -> scoped_user (scoped_user_id));
 joinable!(user_timeline -> user_vault (user_vault_id));
 joinable!(verification_request -> identity_document (identity_document_id));
 joinable!(verification_request -> onboarding (onboarding_id));
+joinable!(verification_request -> scoped_user (scoped_user_id));
 joinable!(verification_result -> verification_request (request_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
 joinable!(webauthn_credential -> user_vault (user_vault_id));
