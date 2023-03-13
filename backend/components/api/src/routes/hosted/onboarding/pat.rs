@@ -3,8 +3,7 @@
 
 use actix_web::HttpResponseBuilder;
 use db::models::{
-    insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent, onboarding::Onboarding,
-    user_timeline::UserTimeline,
+    insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent, user_timeline::UserTimeline,
 };
 use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{
@@ -17,7 +16,7 @@ use web::HttpResponse;
 
 use crate::{
     auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant},
-    errors::{onboarding::OnboardingError, ApiError, ApiResult},
+    errors::{ApiError, ApiResult},
     types::EmptyResponse,
     utils::headers::InsightHeaders,
     State,
@@ -71,7 +70,10 @@ async fn authorize_privacy_pass(
     user_auth: UserAuthContext,
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_permissions::<UserAuthScopeDiscriminant>(vec![])?;
+    let scoped_user_id = user_auth.scoped_user_id().ok_or(ApiError::AssertionError(
+        "User not initialized for privacy pass".into(),
+    ))?;
     let nonce = user_auth.auth_token.hash_bytes();
 
     let challenge = privacy_pass::TokenChallenge::new(state.config.rp_id.clone(), nonce);
@@ -85,20 +87,10 @@ async fn authorize_privacy_pass(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let ob_info = user_auth.assert_onboarding(conn)?;
-            let ob_config = ob_info.ob_config;
-            let onboarding = Onboarding::lock_by_config(conn, &ob_info.user_vault_id, &ob_config.id)?
-                .ok_or(OnboardingError::NoOnboarding)?
-                .into_inner();
-
-            if onboarding.is_complete() {
-                return Err(OnboardingError::AlreadyCompleted.into());
-            }
-
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let liveness_event = NewLivenessEvent {
-                scoped_user_id: onboarding.scoped_user_id.clone(),
+                scoped_user_id: scoped_user_id.clone(),
                 attributes: Some(LivenessAttributes {
                     issuers: vec![LivenessIssuer::Cloudflare, LivenessIssuer::Footprint],
                     ..Default::default()
@@ -114,7 +106,7 @@ async fn authorize_privacy_pass(
                     id: liveness_event.id,
                 },
                 user_auth.user_vault_id().clone(),
-                Some(onboarding.scoped_user_id),
+                Some(scoped_user_id),
             )?;
 
             Ok(())

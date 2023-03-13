@@ -43,7 +43,6 @@ where
     };
     let ids = s
         .split(',')
-        .into_iter()
         .map(|x| I::deserialize(x.trim().into_deserializer()))
         .collect::<Result<Vec<I>, _>>()?;
     Ok(ids)

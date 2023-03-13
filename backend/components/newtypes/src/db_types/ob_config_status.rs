@@ -24,15 +24,13 @@ use strum_macros::{AsRefStr, EnumString};
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "PascalCase")]
 #[diesel(sql_type = Text)]
+#[derive(Default)]
 pub enum ApiKeyStatus {
+    #[default]
     Disabled,
     Enabled,
 }
 
-impl Default for ApiKeyStatus {
-    fn default() -> Self {
-        ApiKeyStatus::Disabled
-    }
-}
+
 
 impl_enum_str_diesel!(ApiKeyStatus);

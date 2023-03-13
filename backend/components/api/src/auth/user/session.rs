@@ -193,7 +193,7 @@ impl ExtractableAuthSession for ParsedUserSession {
 
 impl ParsedUserSession {
     fn are_permissions_met(&self, requested_permissions: &[UserAuthScopeDiscriminant]) -> bool {
-        requested_permissions.iter().any(|s| self.0.has_scope(s))
+        requested_permissions.is_empty() || requested_permissions.iter().any(|s| self.0.has_scope(s))
     }
 }
 
