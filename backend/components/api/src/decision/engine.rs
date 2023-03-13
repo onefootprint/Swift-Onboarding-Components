@@ -2,10 +2,8 @@ use std::collections::HashMap;
 
 use crate::{
     enclave_client::EnclaveClient,
-    errors::{onboarding::OnboardingError, ApiError, ApiResult},
+    errors::{ApiError, ApiResult},
     metrics,
-    utils::vault_wrapper::{VaultWrapper, VwArgs},
-    State,
 };
 
 use super::{
@@ -303,58 +301,4 @@ pub async fn make_onboarding_decision(
     }
 
     Ok(())
-}
-
-type ShouldRunDecisionEngine = bool;
-
-/// Determine if we are in a position to run IDV checks and produce a Decision. Otherwise, set up some testing data
-#[tracing::instrument(skip(state, ob_config))]
-pub async fn perform_pre_run_operations(
-    state: &State,
-    ob: Onboarding,
-    ob_config: ObConfiguration,
-) -> Result<ShouldRunDecisionEngine, ApiError> {
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&ob.scoped_user_id)))
-        .await??;
-
-    let should_initiate_verification_requests =
-        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob.id.clone(), true)
-            .await?;
-    if !should_initiate_verification_requests {
-        return Ok(false);
-    }
-
-    state
-        .db_pool
-        .db_transaction(move |conn| -> Result<_, ApiError> {
-            // Can only start KYC checks for onboarding that has all required fields
-            // Document Collection is handled synchronously in the frontend (to surface errors)
-            let missing_attributes = uvw.missing_identity_fields(&ob_config);
-            if !missing_attributes.is_empty() {
-                return Err(OnboardingError::MissingAttributes(missing_attributes.into()).into());
-            }
-
-            // Can only initiate IDV reqs one time for an onboarding
-            // Once we set idv_reqs_initiated_at below, this lock will make sure we can't save multiple sets of VerificationRequests
-            // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
-            if ob.idv_reqs_initiated_at.is_some() {
-                // In the case of a step up (for similar race condition related reasons) we notate on the OB whether we _do_ need
-                // to produce a new decision, despite not needing to initiate verification requests again.
-                if ob.decision_made_at.is_none() {
-                    return Ok(());
-                } else {
-                    return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-                }
-            }
-
-            // Checkpoint and create VerificationRequests
-            vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
-
-            Ok(())
-        })
-        .await?;
-
-    Ok(true)
 }
