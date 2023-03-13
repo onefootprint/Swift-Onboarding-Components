@@ -25,7 +25,8 @@ pub async fn post_validate(
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     tenant_auth.check_guard(TenantGuard::Admin)?;
-    request.into_inner().decompose(true)?;
+    let request = request.into_inner().decompose(true)?;
+    request.assert_no_business_data()?;
 
     EmptyResponse::ok().json()
 }

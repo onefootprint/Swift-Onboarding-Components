@@ -84,6 +84,8 @@ pub enum Error {
     Custom(String),
     #[error("{0}")]
     VdKindConversionError(#[from] VdKindConversionError),
+    #[error("Cannot add to this type of vault")]
+    IncompatibleDataIdentifier,
 }
 
 use std::collections::HashMap;

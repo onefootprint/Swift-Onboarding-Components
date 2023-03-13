@@ -44,10 +44,11 @@ impl WriteableVw<Person> {
         id_fingerprints: NewFingerprints<IDK>,
         for_bifrost: bool,
     ) -> ApiResult<Option<EmailId>> {
+        request.assert_no_business_data()?;
         let DecomposedPutRequest {
             id_update,
             custom_data,
-            business_data: _, // TODO error if business data provided
+            business_data: _,
         } = request;
         let new_cdos = CollectedDataOption::list_from(id_update.keys().cloned().collect());
 
@@ -110,10 +111,11 @@ impl WriteableVw<Business> {
         conn: &mut TxnPgConn,
         request: DecomposedPutRequest,
     ) -> ApiResult<()> {
+        // Error if trying to add person data to business vault
+        request.assert_no_id_data()?;
         let DecomposedPutRequest {
-            id_update: _, // TODO error if ID data
+            id_update: _,
             custom_data,
-            // TODO check that you don't add business data on a non-business vault
             business_data,
         } = request;
         let new_cdos = CollectedDataOption::list_from(business_data.keys().cloned().collect());

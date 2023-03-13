@@ -81,8 +81,7 @@ def sandbox_user_w_business(kyb_sandbox_ob_config, twilio):
             },
             400,
         ),
-        # TODO change this to fail
-        ({"id.ssn4": "1234"}, 200),
+        ({"id.ssn4": "1234"}, 400),
     ],
 )
 def test_put_business_vault(

@@ -18,7 +18,8 @@ pub async fn post_validate(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
-    request.into_inner().decompose(true)?;
+    let request = request.into_inner().decompose(true)?;
+    request.assert_no_id_data()?;
 
     EmptyResponse::ok().json()
 }

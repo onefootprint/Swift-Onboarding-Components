@@ -12,13 +12,6 @@ flat_api_object_map_type!(
     example=r#"{ "id.first_name": "Peter", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }"#
 );
 
-pub struct DecomposedPutRequest {
-    pub id_update: DataRequest<IDK>,
-    // TODO parse with DataRequest
-    pub custom_data: HashMap<KvDataKey, PiiString>,
-    pub business_data: DataRequest<BDK>,
-}
-
 impl PutDataRequest {
     /// Decomposes the hashmap of DataIdentifier -> PiiString into its parts that live in different
     /// underlying database tables.
@@ -52,5 +45,39 @@ impl PutDataRequest {
             business_data,
         };
         Ok(result)
+    }
+}
+
+pub struct DecomposedPutRequest {
+    pub id_update: DataRequest<IDK>,
+    // TODO parse with DataRequest
+    pub custom_data: HashMap<KvDataKey, PiiString>,
+    pub business_data: DataRequest<BDK>,
+}
+
+impl DecomposedPutRequest {
+    // TODO do validation at parse time
+    /// Returns an Err if this request contains identity data
+    pub fn assert_no_id_data(&self) -> NtResult<()> {
+        Self::assert_empty(self.id_update.keys().collect())
+    }
+
+    /// Returns an Err if this request contains business data
+    pub fn assert_no_business_data(&self) -> NtResult<()> {
+        Self::assert_empty(self.business_data.keys().collect())
+    }
+
+    fn assert_empty<T>(values: Vec<&T>) -> NtResult<()>
+    where
+        T: Into<DataIdentifier> + Copy,
+    {
+        if !values.is_empty() {
+            let field_errors = values
+                .into_iter()
+                .map(|di| ((*di).into(), Error::IncompatibleDataIdentifier))
+                .collect();
+            return Err(crate::DataValidationError::FieldValidationError(field_errors).into());
+        }
+        Ok(())
     }
 }

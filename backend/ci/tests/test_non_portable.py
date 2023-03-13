@@ -24,6 +24,11 @@ class TestNonPortableVaultApi:
                 "1 Footprint Way",
                 "Cannot vault without other Address data",
             ),
+            (
+                "business.ein",
+                "Flerp",
+                "Cannot add to this type of vault",
+            ),
         ],
     )
     def test_identity_validation(self, tenant, key, value, expected_error):
