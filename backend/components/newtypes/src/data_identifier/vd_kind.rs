@@ -4,7 +4,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
-use crate::{BusinessDataKind as BDK, DataIdentifier, EnumDotNotationError, IdentityDataKind as IDK};
+use crate::{BusinessDataKind as BDK, DataIdentifier, IdentityDataKind as IDK};
 
 #[derive(
     Debug,
@@ -29,6 +29,7 @@ use crate::{BusinessDataKind as BDK, DataIdentifier, EnumDotNotationError, Ident
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// A subset of DataIdentifier whose values are stored in the VaultData table
 pub enum VdKind {
     // We use IDK here, even though Email and PhoneNumber variants of IDK are never stored in the
     // VaultData table. We will likely migrate Email and PhoneNumber to go in VaultData in the future.
@@ -48,6 +49,18 @@ impl From<VdKind> for DataIdentifier {
     }
 }
 
+impl TryFrom<DataIdentifier> for VdKind {
+    type Error = ConversionError;
+
+    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+        match value {
+            DataIdentifier::Business(b) => Ok(Self::Business(b)),
+            DataIdentifier::Id(b) => Ok(Self::Id(b)),
+            _ => Err(ConversionError::Error(value)),
+        }
+    }
+}
+
 impl From<IDK> for VdKind {
     fn from(value: IDK) -> Self {
         Self::Id(value)
@@ -61,66 +74,32 @@ impl From<BDK> for VdKind {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum VdKindConversionError {
-    #[error("Cannot convert from UvdKind: {0} to IDK")]
-    ToIdentityDataKindError(VdKind),
+pub enum ConversionError {
+    #[error("Cannot convert from DataIdentifier: {0}")]
+    Error(DataIdentifier),
+    #[error("VdKind does not support {0}")]
+    Unsupported(String),
 }
 
 impl std::fmt::Display for VdKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let prefix = self.as_ref();
-        let suffix = match self {
-            VdKind::Id(s) => {
-                // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
-                if matches!(s, IDK::PhoneNumber | IDK::Email) {
-                    return Err(std::fmt::Error);
-                }
-                s.to_string()
-            }
-            VdKind::Business(s) => s.to_string(),
-        };
-        write!(f, "{}.{}", prefix, suffix)
+        // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
+        if matches!(self, Self::Id(IDK::PhoneNumber) | Self::Id(IDK::Email)) {
+            return Err(std::fmt::Error);
+        }
+        let di = DataIdentifier::from(*self);
+        di.fmt(f)
     }
 }
 
 impl FromStr for VdKind {
-    type Err = EnumDotNotationError;
+    type Err = crate::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let period_idx = s.find('.');
-
-        // We are bifurcating UvdKind from a flat enum into an enum with 2 struct-nested variants (IDK, BDK).
-        // We currently only have the person variants and these are being serialized into PG as non-prefixed strings (eg: first_name, dob) but these will now be written as
-        // prefixed strings (eg: person.first_name, person.dob). To maintain backwards compatability for a brief period before a database migration is run in a followup, we will
-        // handle here both parsing prefixed and non-prefixed person variants.
-        let result = match period_idx {
-            None => IDK::from_str(s)
-                .map(Self::Id)
-                .map_err(|_| EnumDotNotationError::CannotParse(s.to_owned()))?,
-            Some(period_idx) => {
-                let prefix = &s[..period_idx];
-                let suffix = &s[(period_idx + 1)..];
-                let prefix = VdKindDiscriminant::from_str(prefix)
-                    .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
-
-                let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
-                match prefix {
-                    VdKindDiscriminant::Id => {
-                        let idk = IDK::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?;
-                        // Temporarily make sure we don't parse a phone/email since they aren't stored in the VaultData table
-                        if matches!(idk, IDK::PhoneNumber | IDK::Email) {
-                            return Err(EnumDotNotationError::CannotParseSuffix(
-                                "Cannot use PhoneNumber or Email in VdKind".to_owned(),
-                            ));
-                        }
-                        Self::Id(idk)
-                    }
-                    VdKindDiscriminant::Business => {
-                        Self::Business(BDK::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
-                    }
-                }
-            }
-        };
-
+        let di = DataIdentifier::from_str(s)?;
+        let result = Self::try_from(di)?;
+        if matches!(result, Self::Id(IDK::PhoneNumber) | Self::Id(IDK::Email)) {
+            return Err(ConversionError::Unsupported(s.to_owned()).into());
+        }
         Ok(result)
     }
 }
@@ -138,9 +117,7 @@ mod tests {
     }
 
     #[test_case("id.first_name" => VdKind::Id(IDK::FirstName))]
-    #[test_case("first_name" => VdKind::Id(IDK::FirstName))]
     #[test_case("id.address_line1" => VdKind::Id(IDK::AddressLine1))]
-    #[test_case("address_line1" => VdKind::Id(IDK::AddressLine1))]
     fn test_deserialization(input: &str) -> VdKind {
         VdKind::from_str(input).unwrap()
     }

@@ -238,10 +238,10 @@ async fn shadow_run(
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let vendor_apis = vendor::desired_vendor_apis(&uvw)?;
+            #[allow(clippy::unwrap_used)]
             let memory_only_requests = vendor_apis
                 .into_iter()
                 .map(|v| VerificationRequest {
-                    #[allow(clippy::unwrap_used)]
                     id: VerificationRequestId::from_str("fake in-memory-only VerificationRequest").unwrap(),
                     vendor: Vendor::from(v),
                     timestamp: Utc::now(),
@@ -280,12 +280,12 @@ async fn shadow_run(
 
     // calculate_decision currently requires Vec<VendorResult> which we normally get from saving VerificationResult's to PG
     // since we want to keep things in-memory-only, we manually create VendorResult's here with dummy VerificationResultId's
+    #[allow(clippy::unwrap_used)]
     let vendor_results = vendor_results
         .successful
         .into_iter()
         .map(|(req, res)| VendorResult {
             response: res,
-            #[allow(clippy::unwrap_used)]
             verification_result_id: VerificationResultId::from_str("fake in-memory-only VerificationResult")
                 .unwrap(),
             verification_request_id: req.id,
