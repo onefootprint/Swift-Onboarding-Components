@@ -14,7 +14,13 @@ const BasicConfiguration = ({ proxyConfig }: BasicConfigurationProps) => {
   );
 
   return (
-    <Fieldset title={t('title')}>
+    <Fieldset
+      title={t('title')}
+      cta={{
+        label: 'Edit',
+        onClick: () => {},
+      }}
+    >
       <Field label={t('url')}>{proxyConfig.url}</Field>
       <Field label={t('method')}>{proxyConfig.method}</Field>
       <Field label={t('access-reason')}>{proxyConfig.accessReason}</Field>

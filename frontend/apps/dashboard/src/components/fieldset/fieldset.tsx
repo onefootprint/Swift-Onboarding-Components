@@ -1,17 +1,28 @@
-import { Grid, Typography } from '@onefootprint/ui';
+import { Grid, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-type FieldsetProps = {
+export type FieldsetProps = {
   children: React.ReactNode;
+  cta?: {
+    label: string;
+    onClick: () => void;
+  };
   title: string;
 };
 
-const Fieldset = ({ title, children }: FieldsetProps) => (
+const Fieldset = ({ children, cta, title }: FieldsetProps) => (
   <FieldsetContainer>
-    <Typography variant="label-2" sx={{ marginBottom: 6 }}>
-      {title}
-    </Typography>
+    <Header>
+      <Typography variant="label-2" as="div">
+        {title}
+      </Typography>
+      {cta && (
+        <LinkButton size="compact" onClick={cta.onClick}>
+          {cta.label}
+        </LinkButton>
+      )}
+    </Header>
     <Content>{children}</Content>
   </FieldsetContainer>
 );
@@ -23,6 +34,15 @@ const FieldsetContainer = styled.fieldset`
       margin-bottom: ${theme.spacing[7]};
       padding-bottom: ${theme.spacing[7]};
     }
+  `};
+`;
+
+const Header = styled.header`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[6]};
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   `};
 `;
 
