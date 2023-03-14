@@ -30,7 +30,7 @@ pub struct VerificationRequest {
     // If we are verifying an identity document, we want to know exactly which one we were verifying since there
     // could be multiple in the vault, seqno doesn't help us
     pub identity_document_id: Option<IdentityDocumentId>,
-    pub scoped_user_id: Option<ScopedVaultId>,
+    pub scoped_user_id: ScopedVaultId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -42,7 +42,7 @@ struct NewVerificationRequestRow {
     vendor_api: VendorAPI,
     uvw_snapshot_seqno: DataLifetimeSeqno,
     identity_document_id: Option<IdentityDocumentId>,
-    scoped_user_id: Option<ScopedVaultId>,
+    scoped_user_id: ScopedVaultId,
 }
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 impl VerificationRequest {
@@ -63,7 +63,7 @@ impl VerificationRequest {
                 timestamp: Utc::now(),
                 uvw_snapshot_seqno: seqno,
                 identity_document_id: None,
-                scoped_user_id: Some(scoped_user_id.clone()),
+                scoped_user_id: scoped_user_id.clone(),
             })
             .collect();
         let result = diesel::insert_into(verification_request::table)
@@ -141,7 +141,7 @@ impl VerificationRequest {
             timestamp: Utc::now(),
             uvw_snapshot_seqno: seqno,
             identity_document_id: Some(identity_document_id),
-            scoped_user_id: Some(scoped_user_id),
+            scoped_user_id,
         };
         let result = diesel::insert_into(verification_request::table)
             .values(new_row)

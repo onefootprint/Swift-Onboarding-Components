@@ -655,7 +655,7 @@ table! {
         vendor_api -> Text,
         uvw_snapshot_seqno -> Int8,
         identity_document_id -> Nullable<Text>,
-        scoped_user_id -> Nullable<Text>,
+        scoped_user_id -> Text,
     }
 }
 

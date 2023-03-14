@@ -1,0 +1,1 @@
+ALTER TABLE verification_request ALTER COLUMN scoped_user_id DROP NOT NULL;
