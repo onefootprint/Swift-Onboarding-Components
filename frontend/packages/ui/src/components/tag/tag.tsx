@@ -9,11 +9,12 @@ export type TagProps = {
 
 const Tag = styled.span<TagProps>`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')};
-    background-color: ${theme.backgroundColor.neutral};
-    border-radius: ${theme.borderRadius.compact};
+    ${createFontStyles('caption-2')};
     color: ${theme.color.neutral};
-    padding: ${theme.spacing[1]} ${theme.spacing[2]};
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
+    background-color: ${theme.backgroundColor.primary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+    border-radius: ${theme.borderRadius.full};
   `};
 `;
 
