@@ -22,6 +22,7 @@ export type MachineContext = {
     device: DeviceInfo;
     authToken: string;
     email?: string;
+    sandboxSuffix?: string; // only if in sandbox mode
   };
   startedDataCollection: boolean;
   requirements: Requirements;

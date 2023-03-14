@@ -11,6 +11,7 @@ export type OnboardingRequirementsMachineArgs = {
   config: OnboardingConfig;
   authToken: string;
   email?: string;
+  sandboxSuffix?: string; // only if in sandbox mode
 };
 
 const defaultRequirements: Requirements = {
@@ -27,6 +28,7 @@ const createOnboardingRequirementsMachine = ({
   authToken,
   config,
   email,
+  sandboxSuffix,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine(
     {
@@ -45,6 +47,7 @@ const createOnboardingRequirementsMachine = ({
           authToken,
           config,
           email,
+          sandboxSuffix,
         },
         requirements: { ...defaultRequirements },
         startedDataCollection: false,

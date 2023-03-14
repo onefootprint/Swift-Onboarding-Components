@@ -6,6 +6,7 @@ export type MachineContext = {
   config: OnboardingConfig;
   device: DeviceInfo;
   email?: string;
+  sandboxSuffix?: string; // only if in sandbox mode
   authToken: string;
   validationToken?: string;
   status?: OnboardingStatus;

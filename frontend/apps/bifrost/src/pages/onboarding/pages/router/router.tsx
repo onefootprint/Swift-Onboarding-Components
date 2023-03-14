@@ -28,6 +28,7 @@ const Router = ({ onDone }: RouterProps) => {
     config,
     authToken,
     email,
+    sandboxSuffix,
   } = state.context;
   useLogStateMachine('onboarding', state);
 
@@ -49,6 +50,7 @@ const Router = ({ onDone }: RouterProps) => {
         config={config}
         authToken={authToken}
         email={email}
+        sandboxSuffix={sandboxSuffix}
         onDone={() => {
           send({
             type: 'onboardingRequirementsCompleted',

@@ -60,6 +60,7 @@ const Root = () => {
           config={config}
           authToken={authToken}
           email={email}
+          sandboxSuffix={sandboxSuffix}
           onDone={payload => {
             send({ type: 'onboardingCompleted', payload });
           }}

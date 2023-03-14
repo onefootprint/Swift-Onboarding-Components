@@ -34,6 +34,8 @@ describe('Onboarding Requirements Machine Tests', () => {
           userFound: true,
           authToken: 'token',
           config: { ...TestOnboardingConfig },
+          email: 'piip@onefootprint.com',
+          sandboxSuffix: 'sandboxTest',
         }),
       );
 
@@ -58,6 +60,8 @@ describe('Onboarding Requirements Machine Tests', () => {
         userFound: true,
         authToken: 'token',
         config: { ...TestOnboardingConfig },
+        email: 'piip@onefootprint.com',
+        sandboxSuffix: 'sandboxTest',
       });
 
       state = machine.send({

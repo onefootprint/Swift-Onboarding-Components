@@ -5,6 +5,7 @@ import { useUserEmail } from '../../../hooks';
 type SyncEmailArgs = {
   authToken?: string;
   email?: string;
+  sandboxSuffix?: string;
   speculative?: boolean;
   onSuccess?: () => void;
   onError?: (error: unknown) => void;
@@ -17,6 +18,7 @@ const useSyncEmail = () => {
   const syncEmail = ({
     authToken,
     email,
+    sandboxSuffix,
     speculative,
     onSuccess,
     onError,
@@ -34,8 +36,10 @@ const useSyncEmail = () => {
       return;
     }
 
+    // If we are in sandbox mode, attach the sandbox suffix to the email
+    const emailWithSuffix = sandboxSuffix ? `${email}${sandboxSuffix}` : email;
     userEmailMutation.mutate(
-      { data: { email }, authToken, speculative },
+      { data: { email: emailWithSuffix }, authToken, speculative },
       {
         onSuccess,
         onError: (error: unknown) => {

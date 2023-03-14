@@ -11,6 +11,7 @@ export type CollectKycDataContext = {
   fixedData?: UserData;
   userFound: boolean;
   email?: string;
+  sandboxSuffix?: string; // only if in sandbox mode
   config: OnboardingConfig;
 };
 

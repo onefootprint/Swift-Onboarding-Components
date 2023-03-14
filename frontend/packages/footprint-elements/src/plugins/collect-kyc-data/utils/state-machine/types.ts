@@ -24,6 +24,7 @@ export type MachineContext = {
   userFound?: boolean;
   config?: OnboardingConfig;
   receivedEmail?: boolean; // Whether received non-empty email from initial context
+  sandboxSuffix?: string; // only if in sandbox mode
   fixedData?: UserData;
   // Machine generated
   missingAttributes: CollectedKycDataOption[];
@@ -39,6 +40,7 @@ export type MachineEvents =
         userFound: boolean;
         device: DeviceInfo;
         email?: string;
+        sandboxSuffix?: string;
         config: OnboardingConfig;
         fixedData?: UserData;
       };

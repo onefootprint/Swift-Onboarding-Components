@@ -22,8 +22,14 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
     if (!customData) {
       return;
     }
-    const { missingAttributes, userFound, email, config, fixedData } =
-      customData;
+    const {
+      missingAttributes,
+      userFound,
+      email,
+      sandboxSuffix,
+      config,
+      fixedData,
+    } = customData;
     send({
       type: 'receivedContext',
       payload: {
@@ -32,6 +38,7 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
         missingAttributes,
         userFound,
         email,
+        sandboxSuffix,
         config,
         fixedData,
       },

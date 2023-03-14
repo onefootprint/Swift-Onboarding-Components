@@ -348,6 +348,7 @@ const createCollectKycDataMachine = () =>
             userFound,
             missingAttributes,
             email,
+            sandboxSuffix,
             config,
             fixedData,
           } = event.payload;
@@ -357,6 +358,7 @@ const createCollectKycDataMachine = () =>
           context.missingAttributes = [...missingAttributes];
           context.data[UserDataAttribute.email] = email;
           context.receivedEmail = !!email;
+          context.sandboxSuffix = sandboxSuffix;
           context.config = config;
           context.fixedData = fixedData;
           return context;

@@ -31,6 +31,7 @@ describe('Collect KYC Data Machine Tests', () => {
       hasSupportForWebauthn: false,
     },
     email?: string,
+    sandboxSuffix?: string,
   ) => {
     const machine = interpret(createCollectKycDataMachine());
     machine.start();
@@ -43,6 +44,7 @@ describe('Collect KYC Data Machine Tests', () => {
         device,
         config: { ...TestOnboardingConfig },
         email,
+        sandboxSuffix,
       },
     });
     return machine;
@@ -62,6 +64,7 @@ describe('Collect KYC Data Machine Tests', () => {
           hasSupportForWebauthn: false,
         },
         'piip@onefootprint.com',
+        'sandboxTest',
       );
       let { state } = machine;
       let { context } = state;
@@ -74,6 +77,7 @@ describe('Collect KYC Data Machine Tests', () => {
         'piip@onefootprint.com',
       );
       expect(context.receivedEmail).toEqual(true);
+      expect(context.sandboxSuffix).toEqual('sandboxTest');
       expect(state.value).toEqual('basicInformation');
 
       state = machine.send({
@@ -358,6 +362,7 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.receivedEmail).toEqual(false);
+      expect(context.sandboxSuffix).toEqual(undefined);
       expect(state.value).toEqual('email');
 
       state = machine.send({
@@ -430,6 +435,7 @@ describe('Collect KYC Data Machine Tests', () => {
           hasSupportForWebauthn: false,
         },
         'piip@onefootprint.com',
+        'sandboxTest',
       );
       let { state } = machine;
       let { context } = state;
@@ -440,6 +446,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.data[UserDataAttribute.email]).toEqual(
         'piip@onefootprint.com',
       );
+      expect(context.receivedEmail).toBe(true);
       expect(state.value).toEqual('ssn');
 
       state = machine.send({

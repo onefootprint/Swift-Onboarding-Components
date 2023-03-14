@@ -20,7 +20,14 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken, userFound, email, config, device },
+    onboardingContext: {
+      authToken,
+      userFound,
+      email,
+      sandboxSuffix: identifierSuffix,
+      config,
+      device,
+    },
     requirements: { liveness, idDoc, selfie, kycData, kybData },
   } = state.context;
   const isDone = state.matches('success');
@@ -81,6 +88,7 @@ const Router = ({ onDone }: RouterProps) => {
               missingAttributes: kycData,
               userFound,
               email,
+              sandboxSuffix: identifierSuffix,
               config,
             },
           }}

@@ -10,6 +10,7 @@ export type OnboardingMachineArgs = {
   config: OnboardingConfig;
   authToken: string;
   email?: string;
+  sandboxSuffix?: string; // only if in sandbox mode
 };
 
 const createOnboardingMachine = ({
@@ -18,6 +19,7 @@ const createOnboardingMachine = ({
   authToken,
   config,
   email,
+  sandboxSuffix,
 }: OnboardingMachineArgs) =>
   createMachine(
     {
@@ -35,6 +37,7 @@ const createOnboardingMachine = ({
         authToken,
         config,
         email,
+        sandboxSuffix,
       },
       states: {
         initOnboarding: {

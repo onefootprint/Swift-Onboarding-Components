@@ -12,7 +12,6 @@ import HeaderTitle from '../../../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useSyncEmail from '../../../../hooks/use-sync-email';
-import EMAIL_SANDBOX_REGEX from './email-collect.constants';
 
 type EmailCollectProps = {
   authToken?: string;
@@ -28,11 +27,10 @@ const EmailCollect = ({
   hideHeader,
   authToken,
   onComplete,
-  config,
   ctaLabel,
 }: EmailCollectProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data } = state.context;
+  const { data, sandboxSuffix, config } = state.context;
   const { t, allT } = useTranslation('pages.email');
   const showRequestErrorToast = useRequestErrorToast();
   const { mutation, syncEmail } = useSyncEmail();
@@ -48,17 +46,17 @@ const EmailCollect = ({
     },
   });
 
-  const getHint = () => {
-    if (errors.email) {
-      return errors.email.message;
-    }
-    return isSandbox ? t('email.hint') : undefined;
-  };
-
   const onSubmitForm = (formData: FormData) => {
     const { email } = formData;
+    if (isSandbox && !sandboxSuffix) {
+      console.error(
+        'Found empty sandbox suffix in collect-kyc-data email-collect form while in sandbox mode.',
+      );
+    }
+
     syncEmail({
       email,
+      sandboxSuffix,
       authToken,
       speculative: true,
       onSuccess: () => {
@@ -87,8 +85,9 @@ const EmailCollect = ({
         <Box sx={{ marginBottom: 7 }}>
           <TextInput
             data-private
+            type="email"
             hasError={!!errors.email}
-            hint={getHint()}
+            hint={errors.email?.message}
             label={t('email.label')}
             placeholder={t('email.placeholder')}
             defaultValue={getValues(UserDataAttribute.email)}
@@ -97,12 +96,6 @@ const EmailCollect = ({
                 value: true,
                 message: t('email.errors.required'),
               },
-              pattern: isSandbox
-                ? {
-                    value: EMAIL_SANDBOX_REGEX,
-                    message: t('email.errors.pattern'),
-                  }
-                : undefined,
             })}
           />
         </Box>

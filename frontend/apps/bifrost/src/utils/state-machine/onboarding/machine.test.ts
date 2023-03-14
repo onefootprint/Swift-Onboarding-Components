@@ -34,16 +34,26 @@ describe('Onboarding Machine Tests', () => {
     config = testOnboardingConfig,
     authToken = 'token',
     email = 'belce@onefootprint.com',
+    sandboxSuffix,
   }: Partial<OnboardingMachineArgs>) => {
     const machine = interpret(
-      createOnboardingMachine({ userFound, device, config, authToken, email }),
+      createOnboardingMachine({
+        userFound,
+        device,
+        config,
+        authToken,
+        email,
+        sandboxSuffix,
+      }),
     );
     machine.start();
     return machine;
   };
 
   it('completes the onboarding flow if received validation token', () => {
-    const machine = createMachine({});
+    const machine = createMachine({
+      sandboxSuffix: 'sandboxTest',
+    });
     let { state } = machine;
     expect(state.value).toBe('initOnboarding');
 
@@ -61,6 +71,7 @@ describe('Onboarding Machine Tests', () => {
       config: testOnboardingConfig,
       authToken: 'token',
       email: 'belce@onefootprint.com',
+      sandboxSuffix: 'sandboxTest',
     });
 
     state = machine.send({
@@ -77,6 +88,7 @@ describe('Onboarding Machine Tests', () => {
       config: testOnboardingConfig,
       authToken: 'token',
       email: 'belce@onefootprint.com',
+      sandboxSuffix: 'sandboxTest',
       validationToken: 'token',
       status: OnboardingStatus.failed,
     });

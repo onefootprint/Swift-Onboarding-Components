@@ -15,6 +15,7 @@ const OnboardingRequirements = ({
   authToken,
   config,
   email,
+  sandboxSuffix,
   onDone,
 }: OnboardingRequirementsProps) => {
   if (!device || !authToken || !config) {
@@ -28,6 +29,7 @@ const OnboardingRequirements = ({
       authToken={authToken}
       config={config}
       email={email}
+      sandboxSuffix={sandboxSuffix}
     >
       <Router onDone={onDone} />
     </OnboardingRequirementsMachineProvider>

@@ -17,13 +17,14 @@ import IdentitySection from './components/identity-section';
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, device, missingAttributes } = state.context;
+  const { authToken, data, config, sandboxSuffix, device, missingAttributes } =
+    state.context;
   const isMobile = device?.type === 'mobile';
+  const isSandbox = !config?.isLive;
   const [editContent, setEditContent] = useState<EditSection | undefined>();
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
-
   const toast = useToast();
 
   const handleError = (error: unknown) => {
@@ -54,17 +55,25 @@ const Confirm = () => {
   const handleConfirm = () => {
     // If email is missing, we need to sync it successfully before we can
     // sync the rest of the kyc data.
-    if (isMissingEmailAttribute(missingAttributes)) {
-      syncEmail({
-        authToken,
-        email: data[UserDataAttribute.email],
-        speculative: false,
-        onSuccess: handleSyncData,
-        onError: handleError,
-      });
-    } else {
+    if (!isMissingEmailAttribute(missingAttributes)) {
       handleSyncData();
+      return;
     }
+
+    if (isSandbox && !sandboxSuffix) {
+      console.error(
+        'Found empty sandbox suffix in collect-kyc-data email-collect form while in sandbox mode.',
+      );
+    }
+
+    syncEmail({
+      authToken,
+      email: data[UserDataAttribute.email],
+      sandboxSuffix,
+      speculative: false,
+      onSuccess: handleSyncData,
+      onError: handleError,
+    });
   };
 
   const handlePrev = () => {
