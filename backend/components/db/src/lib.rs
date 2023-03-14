@@ -317,7 +317,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -
             // Verification requests
             {
                 let verification_request_ids = verification_request::table
-                    .filter(verification_request::onboarding_id.eq_any(ob_ids))
+                    .filter(verification_request::scoped_user_id.eq_any(su_ids))
                     .select(verification_request::id);
 
                 deleted_rows += diesel::delete(verification_result::table)
@@ -325,7 +325,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(verification_request::table)
-                    .filter(verification_request::onboarding_id.eq_any(ob_ids))
+                    .filter(verification_request::scoped_user_id.eq_any(su_ids))
                     .execute(conn.conn())?;
             }
 

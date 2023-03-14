@@ -1,4 +1,4 @@
-use crate::schema::{onboarding, scoped_user, user_vault, verification_request, verification_result};
+use crate::schema::{scoped_user, user_vault, verification_request, verification_result};
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
@@ -74,12 +74,12 @@ impl VerificationRequest {
 
     /// Based on VerificationRequests for the onboarding, get VerificationResults
     #[tracing::instrument(skip_all)]
-    pub fn get_latest_requests_and_results_for_onboarding(
+    pub fn get_latest_requests_and_results_for_scoped_user(
         conn: &mut PgConn,
-        onboarding_id: OnboardingId,
+        scoped_user_id: ScopedVaultId,
     ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
-            .filter(verification_request::onboarding_id.eq(onboarding_id))
+            .filter(verification_request::scoped_user_id.eq(scoped_user_id))
             .left_join(verification_result::table)
             .order((
                 verification_request::vendor_api,
@@ -153,7 +153,7 @@ impl VerificationRequest {
     pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Vault> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
-            .inner_join(onboarding::table.inner_join(scoped_user::table.inner_join(user_vault::table)))
+            .inner_join(scoped_user::table.inner_join(user_vault::table))
             .select(user_vault::all_columns)
             .get_result(conn)?;
 

@@ -162,6 +162,7 @@ async fn make_decision(
 
     let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
         &ob.id,
+        &ob.scoped_user_id,
         &state.db_pool,
         &state.enclave_client,
     )

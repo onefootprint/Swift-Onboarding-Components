@@ -33,7 +33,7 @@ use idv::{
 };
 
 use itertools::Itertools;
-use newtypes::{OnboardingId, VerificationRequestId};
+use newtypes::{OnboardingId, ScopedVaultId, VerificationRequestId};
 use prometheus::labels;
 ///
 /// Run loads saved VerificationRequests and (potentially) VerificationResults and produces a Decision
@@ -53,7 +53,8 @@ pub async fn run(
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
 ) -> ApiResult<()> {
     let vendor_requests =
-        get_latest_verification_requests_and_results(&ob.id, db_pool, enclave_client).await?;
+        get_latest_verification_requests_and_results(&ob.id, &ob.scoped_user_id, db_pool, enclave_client)
+            .await?;
 
     let vendor_results = make_vendor_requests(
         db_pool,
@@ -143,15 +144,16 @@ pub struct VendorRequests {
 
 pub async fn get_latest_verification_requests_and_results(
     onboarding_id: &OnboardingId,
+    scoped_user_id: &ScopedVaultId,
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
 ) -> ApiResult<VendorRequests> {
-    let obid = onboarding_id.clone();
+    let suid = scoped_user_id.clone();
     let requests_and_results = db_pool
         .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
             // Load our requests and results
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
-            VerificationRequest::get_latest_requests_and_results_for_onboarding(conn, obid)
+            VerificationRequest::get_latest_requests_and_results_for_scoped_user(conn, suid)
         })
         .await??;
 
