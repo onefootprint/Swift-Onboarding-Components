@@ -145,6 +145,7 @@ const Content = styled.div`
       color: ${theme.color.quaternary};
       text-align: center;
     }
+
     blockquote {
       ${createFontStyles('body-1')};
       color: ${theme.color.primary};

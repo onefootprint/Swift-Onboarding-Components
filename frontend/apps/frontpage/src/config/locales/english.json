@@ -106,6 +106,10 @@
         "media": {
           "text": "Media",
           "href": "/media"
+        },
+        "changelog": {
+          "text": "Changelog",
+          "href": "/changelog"
         }
       }
     },
@@ -858,6 +862,20 @@
           "description": "Our advanced PII vaults use strong cryptography and are built on top of secure Nitro Enclaves."
         }
       }
+    },
+    "changelog": {
+      "html-title": "Footprint - Changelog",
+      "title": "Changelog",
+      "microtitle": "Fresh from the vault",
+      "load-more": "Load more",
+      "copy": {
+        "title": "Copy",
+        "confirmation": "Copied!"
+      },
+      "empty": {
+        "title": "There are no updates yet."
+      },
+      "go-back": "Back to all posts"
     }
   }
 }

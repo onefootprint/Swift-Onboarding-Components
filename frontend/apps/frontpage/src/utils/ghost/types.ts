@@ -37,6 +37,9 @@ export type Tag = {
 };
 
 export type Post = {
+  id: string;
+  html: string | undefined;
+  featured: boolean | undefined;
   created_at: string;
   published_at: string;
   excerpt: string;

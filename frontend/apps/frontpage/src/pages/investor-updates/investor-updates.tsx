@@ -22,6 +22,7 @@ export type InvestorUpdatesProps = {
 const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
   const { t } = useTranslation('pages.investor-updates');
   const { formatDateWithLongMonth } = useIntl();
+
   return (
     <>
       <SEO title={t('html-title')} slug="/investor-updates" />

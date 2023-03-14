@@ -4,17 +4,20 @@ const ghost = configureGhost();
 
 const INVESTOR_UPDATES_TAG = 'Investor Update';
 const LIBRARY_TAG = 'Library';
+const CHANGELOG_TAG = 'Changelog';
 
 export enum PostType {
   blog = 'blog',
   investorUpdate = 'investorUpdate',
   library = 'library',
+  changelog = 'changelog',
 }
 
 export enum SlugByPostType {
   blog = '/blog',
   investorUpdate = '/investor-updates',
   library = '/library',
+  changelog = '/changelog',
 }
 
 export async function getInitialPosts(type?: PostType) {
@@ -37,6 +40,9 @@ export const getSlugPrefix = (tagName?: string) => {
   if (tagName === LIBRARY_TAG) {
     return SlugByPostType.library;
   }
+  if (tagName === CHANGELOG_TAG) {
+    return SlugByPostType.changelog;
+  }
   return SlugByPostType.blog;
 };
 
@@ -44,7 +50,11 @@ function filterPosts(posts: any[], type?: PostType) {
   if (type === PostType.blog) {
     return posts.filter(post => {
       const name = post.primary_tag?.name;
-      return name !== INVESTOR_UPDATES_TAG && name !== LIBRARY_TAG;
+      return (
+        name !== INVESTOR_UPDATES_TAG &&
+        name !== LIBRARY_TAG &&
+        name !== CHANGELOG_TAG
+      );
     });
   }
   if (type === PostType.investorUpdate) {
@@ -55,6 +65,10 @@ function filterPosts(posts: any[], type?: PostType) {
   if (type === PostType.library) {
     return posts.filter(post => post.primary_tag?.name === LIBRARY_TAG);
   }
+  if (type === PostType.changelog) {
+    return posts.filter(post => post.primary_tag?.name === CHANGELOG_TAG);
+  }
+
   return posts;
 }
 
