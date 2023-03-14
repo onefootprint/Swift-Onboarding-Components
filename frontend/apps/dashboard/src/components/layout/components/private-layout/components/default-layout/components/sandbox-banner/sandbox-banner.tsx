@@ -22,9 +22,7 @@ const SandboxBanner = () => {
             {t('toggle')}
           </button>
         ) : (
-          <ContactForm>
-            <button type="button">{t('activate')}</button>
-          </ContactForm>
+          <ContactForm>{t('activate')}</ContactForm>
         )}
       </Banner>
     </SandboxBannerContainer>
