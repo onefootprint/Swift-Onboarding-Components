@@ -64,7 +64,7 @@ const Navbar = () => {
       ],
     },
     { text: t('entries.media.text'), href: t('entries.media.href') },
-    // { text: t('entries.changelog.text'), href: t('entries.changelog.href') },
+    { text: t('entries.changelog.text'), href: t('entries.changelog.href') },
   ];
 
   return (

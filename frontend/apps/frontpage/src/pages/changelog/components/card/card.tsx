@@ -1,20 +1,10 @@
 import { useIntl } from '@onefootprint/hooks';
 import { media, Typography } from '@onefootprint/ui';
-import { rgba } from 'polished';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import PostContent from './components/post-content/post-content';
 import Progress from './components/progress';
-
-const BLUR_COLORS = [
-  rgba(154, 255, 141, 0.181),
-  rgba(156, 178, 255, 0.181),
-  rgba(253, 146, 255, 0.181),
-  rgba(255, 146, 146, 0.181),
-  rgba(255, 255, 146, 0.181),
-  rgba(73, 255, 215, 0.181),
-];
 
 type CardProps = {
   date: string;
@@ -27,6 +17,7 @@ type CardProps = {
   last?: boolean | false;
   active?: boolean | false;
   slug: string;
+  blurColor: string | 'rgba(171, 255, 163, .15)';
 };
 
 const Card = ({
@@ -40,12 +31,13 @@ const Card = ({
   featureImageAlt,
   active,
   slug,
+  blurColor,
 }: CardProps) => {
   const { formatDateWithLongMonth } = useIntl();
   const formattedDate = formatDateWithLongMonth(new Date(date));
 
   return (
-    <Container id={slug}>
+    <Container id={slug} blurColor={blurColor}>
       <DateDesktop>
         <Typography variant="label-3" color="tertiary">
           {formattedDate}
@@ -68,8 +60,10 @@ const Card = ({
   );
 };
 
-const Container = styled.div`
-  ${({ theme }) => css`
+const Container = styled.div<{
+  blurColor: string | 'rgba(171, 255, 163, .15)';
+}>`
+  ${({ theme, blurColor }) => css`
     display: flex;
     flex-direction: row;
     position: relative;
@@ -78,9 +72,9 @@ const Container = styled.div`
     width: fit-content;
     margin: auto;
     background: radial-gradient(
-      50% 50% at 20% 20%,
-      ${BLUR_COLORS}[Math.floor(Math.random() * ${BLUR_COLORS}.length)] 0%,
-      ${theme.backgroundColor.primary} 100%
+      50% 50% at 60% 30%,
+      ${blurColor} 0%,
+      ${theme.backgroundColor.primary} 75%
     );
   `}
 `;
@@ -93,6 +87,8 @@ const DateDesktop = styled.div`
       display: flex;
       margin-top: ${theme.spacing[1]};
       text-align: right;
+      min-width: 136px;
+      justify-content: flex-end;
     `}
   `}
 `;

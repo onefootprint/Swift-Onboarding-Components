@@ -20,6 +20,13 @@ export type ChangelogProps = {
 };
 
 const POSTS_NUMBER = 5;
+const BLUR_COLORS = [
+  'rgba(171, 255, 163, .15)',
+  'rgba(255, 127, 127, 0.15)',
+  'rgba(85, 139, 255, 0.15)',
+  'rgba(255, 255, 127, 0.15)',
+  'rgba(255, 127, 255, 0.15)',
+];
 
 const Changelog = ({ posts }: ChangelogProps) => {
   const { t } = useTranslation('pages.changelog');
@@ -47,7 +54,7 @@ const Changelog = ({ posts }: ChangelogProps) => {
               {posts.slice(0, postNumber).map((post, index) => (
                 <Card
                   key={post.uuid}
-                  date={post.created_at}
+                  date={post.published_at}
                   authorName={post.primary_author.name}
                   authorImg={post.primary_author.profile_image}
                   title={post.title}
@@ -57,6 +64,7 @@ const Changelog = ({ posts }: ChangelogProps) => {
                   active={post.featured}
                   last={posts.length === index + 1}
                   slug={post.slug}
+                  blurColor={BLUR_COLORS[index % BLUR_COLORS.length]}
                 />
               ))}
             </Timeline>

@@ -28,6 +28,10 @@ const Content = styled.div`
 
     a {
       color: ${theme.color.accent};
+
+      &:hover {
+        opacity: 0.8;
+      }
     }
 
     strong {

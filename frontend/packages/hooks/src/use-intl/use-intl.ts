@@ -47,6 +47,7 @@ const useIntl = (locale = 'en-US') => {
 
   return {
     formatDateWithLongMonth,
+
     formatDateWithTime,
     formatRelativeDate,
   };

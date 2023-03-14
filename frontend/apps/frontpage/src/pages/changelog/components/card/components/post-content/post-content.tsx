@@ -72,6 +72,11 @@ const PostContainer = styled.div`
     gap: ${theme.spacing[8]};
     margin: ${theme.spacing[2]} auto;
     width: 100%;
+    margin-bottom: ${theme.spacing[10]};
+
+    ${media.greaterThan('md')`
+      margin-bottom: none;
+    `}
   `}
 `;
 
@@ -100,6 +105,9 @@ const ImageContainer = styled.div`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    background-color: ${theme.backgroundColor.tertiary};
+    background-color: rgba(247, 247, 247, 0.4);
+    backdrop-filter: (8px);
     overflow: hidden;
     width: 100%;
     height: 430px;

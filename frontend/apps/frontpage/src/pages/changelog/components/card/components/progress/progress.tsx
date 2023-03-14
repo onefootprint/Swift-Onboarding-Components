@@ -28,7 +28,6 @@ const Container = styled.div`
 
     ${media.greaterThan('md')`
       display: flex;
-      margin-top: ${theme.spacing[1]};
       text-align: right;
     `}
   `}
