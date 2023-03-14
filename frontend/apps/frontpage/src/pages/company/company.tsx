@@ -100,13 +100,6 @@ const Company = () => {
       twitter: 'https://twitter.com/elliottvforde',
     },
     {
-      name: 'Karen Mok',
-      avatarSrc: '/team/member-karen.png',
-      role: 'Chief of Staff',
-      linkedin: 'https://www.linkedin.com/in/karenjmok/',
-      twitter: 'https://twitter.com/themokstories',
-    },
-    {
       name: 'Keagan Long',
       avatarSrc: '/team/member-keagan.png',
       role: 'Engineering',
