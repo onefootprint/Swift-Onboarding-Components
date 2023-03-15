@@ -19,7 +19,7 @@ use db::DbError;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
-    tags(Organization, PublicApi),
+    tags(Organization),
     description = " Uses tenant public key auth to return information about the tenant."
 )]
 #[get("/org/onboarding_config")]
@@ -35,7 +35,7 @@ pub fn get_detail(
 }
 
 #[api_v2_operation(
-    tags(Organization, PublicApi),
+    tags(Organization),
     description = "Returns a list of onboarding configurations owned by the tenant."
 )]
 #[get("/org/onboarding_configs")]

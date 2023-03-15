@@ -7,7 +7,7 @@ use crate::State;
 use chrono::Utc;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-#[api_v2_operation(description = "Checks that the api key is OK", tags(Organization, PublicApi))]
+#[api_v2_operation(description = "Checks that the api key is OK", tags(Organization))]
 #[get("/org/api_keys/check")]
 async fn get(
     _state: web::Data<State>,

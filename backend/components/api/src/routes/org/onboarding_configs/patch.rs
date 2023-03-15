@@ -27,7 +27,7 @@ struct UpdateObConfigRequest {
 
 #[api_v2_operation(
     description = "Updates an existing onboarding configuration.",
-    tags(Organization, PublicApi)
+    tags(Organization)
 )]
 #[patch("/org/onboarding_configs/{id}")]
 async fn patch(

@@ -34,7 +34,7 @@ type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 #[api_v2_operation(
     description = " Allows a tenant to view a list of AccessEvent logs for a specific user's data. \
     Optionally allows filtering on data_kind. Requires tenant secret key auth.",
-    tags(Organization, PublicApi)
+    tags(Organization)
 )]
 #[get("/org/access_events")]
 async fn get(

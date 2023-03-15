@@ -18,10 +18,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 
 type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 
-#[api_v2_operation(
-    description = "Gets the timeline for a user verification trail.",
-    tags(Users, PublicApi)
-)]
+#[api_v2_operation(description = "Gets the timeline for a user verification trail.", tags(Users))]
 #[get("/users/{footprint_user_id}/timeline")]
 pub async fn get(
     state: web::Data<State>,

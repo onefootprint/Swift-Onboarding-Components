@@ -22,7 +22,7 @@ pub type UserListResponse = Vec<UserDetailResponse>;
 
 #[api_v2_operation(
     description = "View list of users that have started onboarding to the tenant.",
-    tags(Users, PublicApi)
+    tags(Users)
 )]
 #[get("/users")]
 pub async fn get(
@@ -35,7 +35,7 @@ pub async fn get(
     Ok(results)
 }
 
-#[api_v2_operation(description = "View details of a specific user", tags(Users, PublicApi))]
+#[api_v2_operation(description = "View details of a specific user", tags(Users))]
 #[get("/users/{footprint_user_id}")]
 pub async fn get_detail(
     state: web::Data<State>,

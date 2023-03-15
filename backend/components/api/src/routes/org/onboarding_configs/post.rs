@@ -103,10 +103,7 @@ impl CreateOnboardingConfigurationRequest {
     }
 }
 
-#[api_v2_operation(
-    description = "Creates a new onboarding configuration.",
-    tags(Organization, PublicApi)
-)]
+#[api_v2_operation(description = "Creates a new onboarding configuration.", tags(Organization))]
 #[post("/org/onboarding_configs")]
 pub async fn post(
     state: web::Data<State>,

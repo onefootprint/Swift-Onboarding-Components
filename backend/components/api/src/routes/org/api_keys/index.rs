@@ -17,10 +17,7 @@ use paperclip::actix::{self, api_v2_operation, patch, web, web::Json};
 
 type ApiKeysResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::SecretApiKey>, DateTime<Utc>>>;
 
-#[api_v2_operation(
-    description = "Lists the tenant's secret API keys",
-    tags(Organization, PublicApi)
-)]
+#[api_v2_operation(description = "Lists the tenant's secret API keys", tags(Organization))]
 #[actix::get("/org/api_keys")]
 pub async fn get(
     state: web::Data<State>,
@@ -64,10 +61,7 @@ pub struct CreateApiKeyRequest {
     name: String,
 }
 
-#[api_v2_operation(
-    description = "Generates a new secret tenant api key.",
-    tags(Organization, PublicApi)
-)]
+#[api_v2_operation(description = "Generates a new secret tenant api key.", tags(Organization))]
 #[actix::post("/org/api_keys")]
 pub async fn post(
     state: web::Data<State>,
@@ -106,10 +100,7 @@ pub struct UpdateApiKeyRequest {
     status: Option<ApiKeyStatus>,
 }
 
-#[api_v2_operation(
-    description = "Generates a new secret tenant api key.",
-    tags(Organization, PublicApi)
-)]
+#[api_v2_operation(description = "Generates a new secret tenant api key.", tags(Organization))]
 #[patch("/org/api_keys/{id}")]
 pub async fn patch(
     state: web::Data<State>,
