@@ -10,6 +10,7 @@ import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
+import ErrorBoundary from '../components/error-boundary';
 import Layout from '../components/layout';
 import configureReactI18next from '../config/initializers/react-i18next';
 import ReactQueryProvider from '../config/initializers/react-query-provider';
@@ -51,9 +52,11 @@ const App = ({ Component, pageProps }: AppProps) => {
           <DesignSystemProvider theme={themes.light}>
             <FootprintDevTools />
             <GlobalStyle />
-            <Layout name={pageProps.layout}>
-              <Component />
-            </Layout>
+            <ErrorBoundary>
+              <Layout name={pageProps.layout}>
+                <Component />
+              </Layout>
+            </ErrorBoundary>
           </DesignSystemProvider>
         </ReactQueryProvider>
       </ObserveCollectorProvider>

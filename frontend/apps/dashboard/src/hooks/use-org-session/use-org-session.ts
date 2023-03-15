@@ -9,12 +9,12 @@ const useOrgSession = () => {
     setOrg,
   } = useSession();
   const data = sessionData?.org;
-  const dangerouslyCastedData = dangerouslySessionData.org;
-  const isSandbox = dangerouslyCastedData.isLive === false;
-  const canToggle = dangerouslyCastedData.isSandboxRestricted === false;
+  const dangerouslyCastedData = dangerouslySessionData?.org;
+  const isSandbox = data?.isLive === false;
+  const canToggle = data?.isSandboxRestricted === false;
 
   const toggle = () => {
-    setOrg({ isLive: !dangerouslyCastedData.isLive });
+    setOrg({ isLive: !data?.isLive });
   };
 
   const update = (newOrganization: Partial<Organization>) => {

@@ -1,0 +1,53 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { Container, EmptyState } from '@onefootprint/ui';
+import Head from 'next/head';
+import Image from 'next/image';
+import React from 'react';
+import styled from 'styled-components';
+
+type ErrorProps = {
+  resetErrorBoundary: () => void;
+};
+
+const Error = ({ resetErrorBoundary }: ErrorProps) => {
+  const { t } = useTranslation('error');
+
+  return (
+    <>
+      <Head>
+        <title>{t('title')}</title>
+      </Head>
+      <ErrorContainer>
+        <Container>
+          <EmptyState
+            title={t('title')}
+            description={t('description')}
+            cta={{
+              label: t('cta'),
+              onClick: resetErrorBoundary,
+            }}
+            renderHeader={() => (
+              <Image
+                alt={t('image.alt')}
+                height={212.62}
+                src="/404.png"
+                width={298}
+                priority
+              />
+            )}
+          />
+        </Container>
+      </ErrorContainer>
+    </>
+  );
+};
+
+const ErrorContainer = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+`;
+
+export default Error;

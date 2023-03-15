@@ -4,6 +4,11 @@
     "error": "Uh-oh!",
     "success": "Yay!"
   },
+  "error": {
+    "title": "Oops! An error occurred.",
+    "description": "Our penguins were notified and are working on it.",
+    "cta": "Restart"
+  },
   "edit": "Edit",
   "save": "Save",
   "skip": "Skip",
