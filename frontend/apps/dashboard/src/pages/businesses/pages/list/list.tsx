@@ -6,7 +6,7 @@ import React from 'react';
 import Table from './components/table';
 import useBusinesses from './hooks/use-businesses';
 
-const Businesses = () => {
+const List = () => {
   const { t } = useTranslation('pages.businesses');
   const {
     data: response,
@@ -43,4 +43,4 @@ const Businesses = () => {
   );
 };
 
-export default Businesses;
+export default List;

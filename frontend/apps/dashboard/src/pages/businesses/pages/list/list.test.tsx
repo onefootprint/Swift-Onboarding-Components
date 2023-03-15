@@ -9,17 +9,17 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import ProxyConfigs from './businesses';
+import ProxyConfigs from './list';
 import {
   businessesListFixture,
   businessListFormattedFixture,
   withBusinesses,
   withBusinessesError,
-} from './businesses.test.config';
+} from './list.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<Businesses />', () => {
+describe('<List />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/businesses',

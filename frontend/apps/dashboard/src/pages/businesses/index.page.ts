@@ -1,1 +1,1 @@
-export { default } from './businesses';
+export { default } from './pages/list';

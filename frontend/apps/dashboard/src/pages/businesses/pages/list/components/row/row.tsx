@@ -3,9 +3,9 @@ import { IcoWarning16 } from '@onefootprint/icons';
 import { Badge, Box, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
-import type { Business } from 'src/pages/businesses/businesses.types';
 
-import getBadgeVariantByStatus from '@/businesses/utils/get-badge-variant-by-status';
+import type { Business } from '@/businesses/types';
+import getBadgeVariantByStatus from '@/businesses/utils';
 
 type RowProps = {
   business: Business;

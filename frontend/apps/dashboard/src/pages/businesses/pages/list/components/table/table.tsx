@@ -3,10 +3,11 @@ import { Table as UITable } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import { Business } from '../../businesses.types';
+import { Business } from '@/businesses/types';
+
 import useFilters from '../../hooks/use-filters';
-import Filters from './components/filters';
-import Row from './components/row';
+import Filters from '../filters';
+import Row from '../row';
 
 type TableProps = {
   businesses?: Business[];
