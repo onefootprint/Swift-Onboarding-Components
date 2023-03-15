@@ -1,4 +1,3 @@
-use super::document_request::DocumentRequest;
 use super::insight_event::CreateInsightEvent;
 use super::liveness_event::LivenessEvent;
 use super::manual_review::ManualReview;
@@ -21,6 +20,8 @@ use newtypes::{
 use newtypes::OnboardingStatus;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+type IsNew = bool;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = onboarding)]
@@ -58,8 +59,6 @@ pub struct OnboardingCreateArgs {
     pub scoped_user_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: CreateInsightEvent,
-    pub should_create_document_request: bool,
-    pub should_collect_selfie: bool,
 }
 
 impl OnboardingUpdate {
@@ -325,14 +324,14 @@ impl Onboarding {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_or_create(conn: &mut TxnPgConn, args: OnboardingCreateArgs) -> DbResult<Onboarding> {
+    pub fn get_or_create(conn: &mut TxnPgConn, args: OnboardingCreateArgs) -> DbResult<(Onboarding, IsNew)> {
         let ob = onboarding::table
             .filter(onboarding::scoped_user_id.eq(&args.scoped_user_id))
             .filter(onboarding::ob_configuration_id.eq(&args.ob_configuration_id))
             .first(conn.conn())
             .optional()?;
         if let Some(ob) = ob {
-            return Ok(ob);
+            return Ok((ob, false));
         }
         // Row doesn't exist for scoped_user_id, ob_configuration_id - create a new one
         let insight_event = args.insight_event.insert_with_conn(conn)?;
@@ -346,18 +345,7 @@ impl Onboarding {
             .values(new_ob)
             .get_result::<Onboarding>(conn.conn())?;
 
-        // To prevent duplicate document requests, only create a doc request if the onboarding is new
-        if args.should_create_document_request {
-            DocumentRequest::create(
-                conn,
-                ob.scoped_user_id.clone(),
-                None,
-                args.should_collect_selfie,
-                None,
-            )?;
-        }
-
-        Ok(ob)
+        Ok((ob, true))
     }
 
     #[tracing::instrument(skip_all)]

@@ -111,7 +111,7 @@ async fn create_user_and_onboarding(
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config, keys_and_phone);
 
-            let onboarding = fixtures::onboarding::create_with_txn(conn, su.id, ob_config_id);
+            let onboarding = fixtures::onboarding::create(conn, su.id, ob_config_id);
 
             fixtures::verification_request::bulk_create(
                 conn,

@@ -10,6 +10,7 @@ use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use db::models::business_owner::BusinessOwner;
+use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
@@ -66,11 +67,33 @@ pub async fn post(
         None
     };
 
+    let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let user_vault = Vault::lock(conn, user_auth.user_vault_id())?;
+
+            // Create the onboarding for this scoped user
+            let ob_create_args = OnboardingCreateArgs {
+                scoped_user_id: scoped_user.id,
+                ob_configuration_id: ob_config.id.clone(),
+                insight_event: insight_event.clone(),
+            };
+            let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args)?;
+            if is_new_ob && ob_config.must_collect_document() {
+                // Create a `DocumentRequest` if specified in the ob config.
+                // To prevent duplicate document requests, only create a doc request if the onboarding is new
+                DocumentRequest::create(
+                    conn,
+                    ob.scoped_user_id.clone(),
+                    None,
+                    ob_config.must_collect_selfie(),
+                    None,
+                )?;
+            }
+
+            // If the ob config has business fields, create a business vault, scoped vault, and ob
             let business_scope = if let Some(new_business_keypair) = new_business_keypair {
                 let (public_key, e_private_key) = new_business_keypair;
                 let args = NewVaultArgs {
@@ -80,32 +103,27 @@ pub async fn post(
                     is_portable: true,
                     kind: VaultKind::Business,
                 };
+                // TODO don't create a business vault for this onboarding if already exists. Can
+                // also short circuit if ob config is authorized
                 let business_vault = Vault::create(conn, args)?;
                 BusinessOwner::create(conn, user_vault.id.clone(), business_vault.id.clone())?;
                 let ob_config_id = scoped_user.ob_configuration_id.ok_or_else(|| {
                     ApiError::AssertionError("Expected scoped user vault to have ob config id".to_owned())
                 })?;
-                let su = ScopedVault::get_or_create(conn, &business_vault, ob_config_id)?;
-                Some(UserAuthScope::Business(su.id))
+                let sb = ScopedVault::get_or_create(conn, &business_vault, ob_config_id)?;
+                let ob_create_args = OnboardingCreateArgs {
+                    scoped_user_id: sb.id.clone(),
+                    ob_configuration_id: ob_config.id.clone(),
+                    insight_event: insight_event.clone(),
+                };
+                Onboarding::get_or_create(conn, ob_create_args)?;
+                Some(UserAuthScope::Business(sb.id))
             } else {
                 None
             };
 
-            let insight_event = CreateInsightEvent::from(insights);
-
-            let ob_create_args = OnboardingCreateArgs {
-                scoped_user_id: scoped_user.id,
-                ob_configuration_id: ob_config.id.clone(),
-                insight_event,
-                // Create a `DocumentRequest` if specified in the ob config.
-                // We do this inside the OB creation to make this route more idempotent
-                should_create_document_request: ob_config.must_collect_document(),
-                should_collect_selfie: ob_config.must_collect_selfie(),
-            };
-
-            let ob = Onboarding::get_or_create(conn, ob_create_args)?;
-            // Update the auth session in the DB to have the OrgOnboarding scope, giving permission
-            // to perform other operations
+            // Update the auth session in the DB to have the OrgOnboarding scope and potentially
+            // business scope, giving permission to perform other operations in onboarding.
             let new_scopes = vec![UserAuthScope::OrgOnboarding]
                 .into_iter()
                 .chain(business_scope.into_iter())
