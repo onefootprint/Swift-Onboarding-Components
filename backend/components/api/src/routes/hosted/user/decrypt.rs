@@ -3,6 +3,7 @@ use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
+use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
@@ -40,7 +41,7 @@ fn post(
     let uv_id = user_vault.id.clone();
     let uvw = state
         .db_pool
-        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::User(&uv_id)))
+        .db_query(move |conn| VaultWrapper::<Person>::build(conn, VwArgs::User(&uv_id)))
         .await??;
 
     let ids: Vec<_> = attributes.iter().cloned().map(DataIdentifier::Id).collect();

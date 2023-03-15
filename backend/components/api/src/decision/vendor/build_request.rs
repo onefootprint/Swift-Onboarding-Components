@@ -1,13 +1,13 @@
 use crate::enclave_client::EnclaveClient;
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person};
 use crate::{errors::ApiError, State};
 use crypto::aead::AeadSealedBytes;
 use db::DbPool;
 use db::models::document_request::DocRefId;
 use db::models::identity_document::IdentityDocument;
 use db::models::verification_request::VerificationRequest;
-use newtypes::{email::Email, IdentityDataKind, IdvData, PhoneNumber};
-use newtypes::{DocVData, Base64Data, PiiString};
+use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber};
+use newtypes::{DocVData, Base64Data, PiiString, DataIdentifier};
 use std::{str::FromStr};
 use strum::IntoEnumIterator;
 
@@ -19,32 +19,32 @@ pub async fn build_idv_data_from_verification_request(
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
     let uvw = db_pool
-        .db_query(|conn| VaultWrapper::build(conn, VwArgs::Idv(request)))
+        .db_query(|conn| VaultWrapper::<Person>::build(conn, VwArgs::Idv(request)))
         .await??;
 
-    let all_identity_data_kinds: Vec<_> = IdentityDataKind::iter().collect();
-    let mut decrypted_values = uvw.decrypt_unsafe(enclave_client, &all_identity_data_kinds).await?;
+    let all_idks: Vec<_> = IDK::iter().map(DataIdentifier::from).collect();
+    let mut decrypted_values = uvw.decrypt_unsafe(enclave_client, &all_idks).await?;
     // Remove sandbox suffixes
     let email = decrypted_values
-        .remove(&IdentityDataKind::Email)
+        .remove(&IDK::Email.into())
         .map(|x| Email::from_str(x.leak()).map(|x| x.email))
         .transpose()?;
     let phone_number = decrypted_values
-        .remove(&IdentityDataKind::PhoneNumber)
+        .remove(&IDK::PhoneNumber.into())
         .map(|x| PhoneNumber::from_str(x.leak()).map(|x| x.e164()))
         .transpose()?;
     let request = IdvData {
-        first_name: decrypted_values.remove(&IdentityDataKind::FirstName),
-        last_name: decrypted_values.remove(&IdentityDataKind::LastName),
-        address_line1: decrypted_values.remove(&IdentityDataKind::AddressLine1),
-        address_line2: decrypted_values.remove(&IdentityDataKind::AddressLine2),
-        city: decrypted_values.remove(&IdentityDataKind::City),
-        state: decrypted_values.remove(&IdentityDataKind::State),
-        zip: decrypted_values.remove(&IdentityDataKind::Zip),
-        country: decrypted_values.remove(&IdentityDataKind::Country),
-        ssn4: decrypted_values.remove(&IdentityDataKind::Ssn4),
-        ssn9: decrypted_values.remove(&IdentityDataKind::Ssn9),
-        dob: decrypted_values.remove(&IdentityDataKind::Dob),
+        first_name: decrypted_values.remove(&IDK::FirstName.into()),
+        last_name: decrypted_values.remove(&IDK::LastName.into()),
+        address_line1: decrypted_values.remove(&IDK::AddressLine1.into()),
+        address_line2: decrypted_values.remove(&IDK::AddressLine2.into()),
+        city: decrypted_values.remove(&IDK::City.into()),
+        state: decrypted_values.remove(&IDK::State.into()),
+        zip: decrypted_values.remove(&IDK::Zip.into()),
+        country: decrypted_values.remove(&IDK::Country.into()),
+        ssn4: decrypted_values.remove(&IDK::Ssn4.into()),
+        ssn9: decrypted_values.remove(&IDK::Ssn9.into()),
+        dob: decrypted_values.remove(&IDK::Dob.into()),
         email,
         phone_number,
     };

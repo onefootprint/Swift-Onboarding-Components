@@ -1,6 +1,5 @@
 use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{tenant::TenantSessionAuth, Either};
-use crate::errors::tenant::TenantError;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::{DecryptRequest, VaultWrapper};
@@ -45,14 +44,7 @@ pub async fn post(
 
     let request = request.into_inner();
     let DecryptUnifiedFieldsRequest { fields, reason } = request;
-    let fields = fields.clone().into_iter().collect_vec();
-
-    if fields
-        .iter()
-        .any(|f| matches!(f, DataIdentifier::IdDocument(_) | DataIdentifier::Selfie(_)))
-    {
-        return Err(TenantError::CannotDecryptDocument.into());
-    }
+    let fields = fields.into_iter().collect_vec();
 
     let auth = auth.check_guard(CanDecrypt::new(fields.clone()))?;
     let is_live = auth.is_live()?;

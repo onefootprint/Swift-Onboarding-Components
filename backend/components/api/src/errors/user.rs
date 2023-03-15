@@ -15,4 +15,6 @@ pub enum UserError {
     NotAllowedWithoutBusiness,
     #[error("Unable to add {0} in this method")]
     InvalidDataKind(IdentityDataKind),
+    #[error("Cannot decrypt {0}")]
+    CannotDecrypt(DataIdentifier),
 }
