@@ -23,6 +23,8 @@ impl PutDataRequest {
             }
         }
 
+        // TODO more general logic to parse DataRequests for each type
+
         // Parse identity data
         let (id_update, other_data) = DataRequest::<IDK>::new(self.into(), for_bifrost)?;
 

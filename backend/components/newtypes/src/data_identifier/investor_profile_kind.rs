@@ -25,7 +25,7 @@ use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant};
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
-/// Represents data that is collected about a particular Business
+/// Represents data that is collected as part of a user's investor profile
 pub enum InvestorProfileKind {
     EmploymentStatus,
     Occupation,
@@ -59,7 +59,6 @@ impl IsDataIdentifierDiscriminant for InvestorProfileKind {
     }
 
     fn parent(&self) -> Option<CollectedData> {
-        // TODO
-        None
+        Some(CollectedData::InvestorProfile)
     }
 }

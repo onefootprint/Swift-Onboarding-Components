@@ -1,6 +1,6 @@
 use crate::{
     BusinessDataKind as BDK, DataIdentifier, DataIdentifierDiscriminant, IdentityDataKind as IDK,
-    IsDataIdentifierDiscriminant,
+    InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -32,6 +32,8 @@ pub enum CollectedData {
     BusinessWebsite,
     BusinessBeneficialOwners,
     BusinessCorporationType,
+
+    InvestorProfile,
 }
 
 impl CollectedData {
@@ -56,6 +58,7 @@ impl CollectedData {
             Self::BusinessWebsite => vec![BusinessWebsite],
             Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners],
             Self::BusinessCorporationType => vec![BusinessCorporationType],
+            Self::InvestorProfile => vec![InvestorProfile],
         }
     }
 
@@ -72,6 +75,7 @@ impl CollectedData {
                 DataIdentifierDiscriminant::Id
             }
             Self::Document => DataIdentifierDiscriminant::IdDocument,
+            Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,
         }
     }
 }
@@ -123,6 +127,8 @@ pub enum CollectedDataOption {
     BusinessWebsite,
     BusinessBeneficialOwners,
     BusinessCorporationType,
+
+    InvestorProfile,
 }
 
 crate::util::impl_enum_str_diesel!(CollectedDataOption);
@@ -145,6 +151,7 @@ impl CollectedDataOption {
             Self::BusinessWebsite => CollectedData::BusinessWebsite,
             Self::BusinessBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
+            Self::InvestorProfile => CollectedData::InvestorProfile,
         }
     }
 
@@ -180,7 +187,12 @@ impl CollectedDataOption {
             Self::BusinessWebsite => Some(vec![BDK::Website.into()]),
             Self::BusinessBeneficialOwners => Some(vec![BDK::BeneficialOwners.into()]),
             Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
-            _ => None,
+
+            // Can we stick the investor profile identifier in here? Even if it's a different DI variant... cool
+            Self::InvestorProfile => Some(IPK::iter().map(|x| x.into()).collect()),
+
+            Self::Document => None,
+            Self::DocumentAndSelfie => None,
         }
     }
 
@@ -259,7 +271,7 @@ impl CollectedDataOption {
 mod test {
     use crate::{
         BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, IdentityDataKind as IDK,
-        IsDataIdentifierDiscriminant,
+        InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
     };
     use itertools::Itertools;
     use std::collections::HashSet;
@@ -308,32 +320,30 @@ mod test {
         }
     }
 
-    #[test]
-    fn test_idk_parent() {
-        for idk in IDK::iter() {
-            // Parent's children should contain self
-            assert!(idk
-                .parent()
-                .unwrap()
-                .options()
-                .into_iter()
-                .flat_map(|cdo| cdo.attributes::<IDK>())
-                .contains(&idk));
+    #[test_case(IDK::iter().collect_vec())]
+    #[test_case(BDK::iter().collect_vec())]
+    #[test_case(IPK::iter().collect_vec())]
+    fn test_parent<T>(ids: Vec<T>)
+    where
+        T: IsDataIdentifierDiscriminant + std::fmt::Debug,
+    {
+        for id in ids {
+            println!("id {:?}", id);
+            test_discriminant(id);
         }
     }
 
-    #[test]
-    fn test_bdk_parent() {
-        for bdk in BDK::iter() {
-            // Parent's children should contain self
-            assert!(bdk
-                .parent()
-                .unwrap()
-                .options()
-                .into_iter()
-                .flat_map(|cdo| cdo.attributes::<BDK>())
-                .contains(&bdk));
-        }
+    fn test_discriminant<T>(id: T)
+    where
+        T: IsDataIdentifierDiscriminant,
+    {
+        assert!(id
+            .parent()
+            .unwrap()
+            .options()
+            .into_iter()
+            .flat_map(|cdo| cdo.attributes::<T>())
+            .contains(&id));
     }
 
     // Identity CDOs
