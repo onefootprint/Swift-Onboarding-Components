@@ -47,6 +47,7 @@ impl WriteableVw<Person> {
         // TODO combine the DB queries to add custom data and id data
         let DecomposedPutRequest {
             id_update,
+            ip_update,
             custom_data,
             business_data: _,
         } = request;
@@ -104,6 +105,12 @@ impl WriteableVw<Person> {
             self.update_data_unsafe(conn, id_update, id_fingerprints)?;
         }
 
+        // Update IP data
+        if !ip_update.is_empty() {
+            assert_non_portable()?;
+            self.update_data_unsafe(conn, ip_update, HashMap::new())?;
+        }
+
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, new_cdos)?;
 
@@ -122,6 +129,7 @@ impl WriteableVw<Business> {
         request.assert_no_id_data()?;
         let DecomposedPutRequest {
             id_update: _,
+            ip_update: _,
             custom_data,
             business_data,
         } = request;

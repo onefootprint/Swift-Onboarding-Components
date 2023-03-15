@@ -1,4 +1,7 @@
-use crate::{BusinessDataKind, ConversionError, DataIdentifier, IdDocKind, IdentityDataKind, KvDataKey};
+use crate::{
+    BusinessDataKind, ConversionError, DataIdentifier, IdDocKind, IdentityDataKind, InvestorProfileKind,
+    KvDataKey,
+};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
@@ -32,6 +35,7 @@ pub enum DataLifetimeKind {
     Custom(KvDataKey),
     IdDocument(IdDocKind),
     Business(BusinessDataKind),
+    InvestorProfile(InvestorProfileKind),
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeKind);
@@ -43,6 +47,7 @@ impl From<DataLifetimeKind> for DataIdentifier {
             DataLifetimeKind::Id(b) => Self::Id(b),
             DataLifetimeKind::Custom(k) => Self::Custom(k),
             DataLifetimeKind::IdDocument(k) => Self::IdDocument(k),
+            DataLifetimeKind::InvestorProfile(k) => Self::InvestorProfile(k),
         }
     }
 }
@@ -56,6 +61,7 @@ impl TryFrom<DataIdentifier> for DataLifetimeKind {
             DataIdentifier::Id(b) => Ok(Self::Id(b)),
             DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
             DataIdentifier::IdDocument(k) => Ok(Self::IdDocument(k)),
+            DataIdentifier::InvestorProfile(k) => Ok(Self::InvestorProfile(k)),
             _ => Err(ConversionError::Error(value)),
         }
     }
@@ -82,6 +88,12 @@ impl From<IdDocKind> for DataLifetimeKind {
 impl From<BusinessDataKind> for DataLifetimeKind {
     fn from(value: BusinessDataKind) -> Self {
         Self::Business(value)
+    }
+}
+
+impl From<InvestorProfileKind> for DataLifetimeKind {
+    fn from(value: InvestorProfileKind) -> Self {
+        Self::InvestorProfile(value)
     }
 }
 

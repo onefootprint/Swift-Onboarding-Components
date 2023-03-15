@@ -4,7 +4,9 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
-use crate::{BusinessDataKind as BDK, DataIdentifier, IdentityDataKind as IDK, KvDataKey};
+use crate::{
+    BusinessDataKind as BDK, DataIdentifier, IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey,
+};
 
 #[derive(
     Debug,
@@ -35,6 +37,7 @@ pub enum VdKind {
     Id(IDK),
     Business(BDK),
     Custom(KvDataKey),
+    InvestorProfile(IPK),
 }
 
 crate::util::impl_enum_string_diesel!(VdKind);
@@ -46,6 +49,7 @@ impl From<VdKind> for DataIdentifier {
             VdKind::Business(b) => Self::Business(b),
             VdKind::Id(b) => Self::Id(b),
             VdKind::Custom(k) => Self::Custom(k),
+            VdKind::InvestorProfile(k) => Self::InvestorProfile(k),
         }
     }
 }
@@ -58,6 +62,7 @@ impl TryFrom<DataIdentifier> for VdKind {
             DataIdentifier::Business(b) => Ok(Self::Business(b)),
             DataIdentifier::Id(b) => Ok(Self::Id(b)),
             DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
+            DataIdentifier::InvestorProfile(k) => Ok(Self::InvestorProfile(k)),
             _ => Err(ConversionError::Error(value)),
         }
     }
@@ -78,6 +83,12 @@ impl From<BDK> for VdKind {
 impl From<KvDataKey> for VdKind {
     fn from(value: KvDataKey) -> Self {
         Self::Custom(value)
+    }
+}
+
+impl From<IPK> for VdKind {
+    fn from(value: IPK) -> Self {
+        Self::InvestorProfile(value)
     }
 }
 

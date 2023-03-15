@@ -1,7 +1,6 @@
-use crate::IdentityDataKind as IDK;
 use crate::{
-    flat_api_object_map_type, BusinessDataKind as BDK, DataIdentifier, DataRequest, Error, KvDataKey,
-    NtResult, PiiString,
+    flat_api_object_map_type, BusinessDataKind as BDK, DataIdentifier, DataRequest, Error,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey, NtResult, PiiString,
 };
 
 flat_api_object_map_type!(
@@ -28,6 +27,9 @@ impl PutDataRequest {
         // Parse identity data
         let (id_update, other_data) = DataRequest::<IDK>::new(self.into(), for_bifrost)?;
 
+        // Parse investor profile data
+        let (ip_update, other_data) = DataRequest::<IPK>::new(other_data, for_bifrost)?;
+
         // Parse business data
         let (business_data, other_data) = DataRequest::<BDK>::new(other_data, for_bifrost)?;
 
@@ -38,6 +40,7 @@ impl PutDataRequest {
         }
         let result = DecomposedPutRequest {
             id_update,
+            ip_update,
             custom_data,
             business_data,
         };
@@ -47,6 +50,7 @@ impl PutDataRequest {
 
 pub struct DecomposedPutRequest {
     pub id_update: DataRequest<IDK>,
+    pub ip_update: DataRequest<IPK>,
     pub custom_data: DataRequest<KvDataKey>,
     pub business_data: DataRequest<BDK>,
 }
@@ -55,7 +59,9 @@ impl DecomposedPutRequest {
     // TODO do validation at parse time
     /// Returns an Err if this request contains identity data
     pub fn assert_no_id_data(&self) -> NtResult<()> {
-        Self::assert_empty(self.id_update.keys().collect())
+        Self::assert_empty(self.id_update.keys().collect())?;
+        Self::assert_empty(self.ip_update.keys().collect())?;
+        Ok(())
     }
 
     /// Returns an Err if this request contains business data
