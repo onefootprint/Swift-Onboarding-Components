@@ -1,8 +1,8 @@
 import {
   ProxyConfigDetails,
   ProxyConfigHeader,
-  ProxyConfigMethod,
   ProxyConfigIngressRule,
+  ProxyConfigMethod,
 } from '../data';
 
 export type CreateProxyConfigRequest = {

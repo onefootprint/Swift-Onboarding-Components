@@ -6,66 +6,43 @@ import {
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  IcoBuilding24,
-  IcoCake24,
-  IcoCar24,
-  IcoEmail24,
-  IcoFileText24,
-  IcoIdCard24,
-  IcoPassport24,
-  IcoPhone24,
-  IcoSelfie24,
-  IcoUserCircle24,
-} from '@onefootprint/icons';
-import {
-  CollectedDataOption,
-  CollectedDataOptionLabels,
   CollectedDocumentDataOption,
+  CollectedKybDataOption,
   CollectedKycDataOption,
   IdDocType,
 } from '@onefootprint/types';
-import {
-  FootprintButton,
-  LoadingIndicator,
-  Typography,
-  useToast,
-} from '@onefootprint/ui';
-import Link from 'next/link';
+import { Divider, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { Trans } from 'react-i18next';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import styled, { css } from 'styled-components';
 
-const IconByCollectedKycDataOption: Record<
-  CollectedKycDataOption,
-  JSX.Element
-> = {
-  [CollectedKycDataOption.name]: <IcoUserCircle24 />,
-  [CollectedKycDataOption.email]: <IcoEmail24 />,
-  [CollectedKycDataOption.phoneNumber]: <IcoPhone24 />,
-  [CollectedKycDataOption.ssn4]: <IcoFileText24 />,
-  [CollectedKycDataOption.ssn9]: <IcoFileText24 />,
-  [CollectedKycDataOption.dob]: <IcoCake24 />,
-  [CollectedKycDataOption.fullAddress]: <IcoBuilding24 />,
-  [CollectedKycDataOption.partialAddress]: <IcoBuilding24 />,
-};
-
-const IconByIdDocType: Record<IdDocType, JSX.Element> = {
-  [IdDocType.idCard]: <IcoIdCard24 />,
-  [IdDocType.driversLicense]: <IcoCar24 />,
-  [IdDocType.passport]: <IcoPassport24 />,
-};
+import Button from './components/button/button';
+import KybFields from './components/kyb-fields';
+import KycFields from './components/kyc-fields';
+import Loading from './components/loading';
+import isDocCdo from './utils/isDocCdo';
+import isKybCdo from './utils/isKybCdo';
+import isKycCdo from './utils/isKycCdo';
 
 const Authorize = () => {
-  const onboardingAuthorizeMutation = useOnboardingAuthorize();
-  const toast = useToast();
   const { t } = useTranslation('pages.authorize');
   const [state, send] = useOnboardingMachine();
-  const [collectedIdDocTypes, setCollectedIdDocTypes] = useState<IdDocType[]>();
   const {
     authToken,
-    config: { orgName: tenantName, privacyPolicyUrl, canAccessData },
+    config: { orgName: tenantName, canAccessData },
   } = state.context;
+  const onboardingAuthorizeMutation = useOnboardingAuthorize();
+  const toast = useToast();
+  const [collectedIdDocTypes, setCollectedIdDocTypes] = useState<IdDocType[]>(
+    [],
+  );
+  const kycData = canAccessData.filter(
+    data => isKycCdo(data) || isDocCdo(data),
+  ) as (CollectedKycDataOption | CollectedDocumentDataOption)[];
+  const kybData = canAccessData.filter(data =>
+    isKybCdo(data),
+  ) as CollectedKybDataOption[];
+  const hasBothSections = kycData.length > 0 && kybData.length > 0;
 
   const statusQuery = useGetOnboardingStatus(authToken, {
     onSuccess: ({ fieldsToAuthorize }) => {
@@ -74,11 +51,7 @@ const Authorize = () => {
   });
 
   if (statusQuery.isLoading) {
-    return (
-      <Container>
-        <LoadingIndicator />
-      </Container>
-    );
+    return <Loading />;
   }
 
   const handleClick = () => {
@@ -105,22 +78,6 @@ const Authorize = () => {
     );
   };
 
-  const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
-    [CollectedKycDataOption.name]: t('data-labels.name'),
-    [CollectedKycDataOption.email]: t('data-labels.email'),
-    [CollectedKycDataOption.phoneNumber]: t('data-labels.phone'),
-    [CollectedKycDataOption.ssn4]: t('data-labels.ssn4'),
-    [CollectedKycDataOption.ssn9]: t('data-labels.ssn9'),
-    [CollectedKycDataOption.dob]: t('data-labels.dob'),
-    [CollectedKycDataOption.fullAddress]: t('data-labels.address-full'),
-    [CollectedKycDataOption.partialAddress]: t('data-labels.address-partial'),
-  };
-  const docTypeLabels: Record<IdDocType, string> = {
-    [IdDocType.idCard]: t('data-labels.id-card'),
-    [IdDocType.passport]: t('data-labels.passport'),
-    [IdDocType.driversLicense]: t('data-labels.driversLicense'),
-  };
-
   return (
     <>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
@@ -129,72 +86,17 @@ const Authorize = () => {
           title={t('title')}
           subtitle={t('subtitle', { tenantName })}
         />
-        <CategoriesContainer>
-          {canAccessData
-            .filter(o => o in CollectedDataOptionLabels)
-            .map((dataOpt: CollectedDataOption) => {
-              const kycDataOpt = dataOpt as CollectedKycDataOption;
-              return (
-                <Category key={kycDataOpt}>
-                  <IconContainer>
-                    {IconByCollectedKycDataOption[kycDataOpt]}
-                  </IconContainer>
-                  <Typography variant="label-3">
-                    {collectedKycDataOptionLabels[kycDataOpt]}
-                  </Typography>
-                </Category>
-              );
-            })}
-          {collectedIdDocTypes?.map((collectedDoc: IdDocType) => (
-            <Category key={collectedDoc}>
-              <IconContainer>{IconByIdDocType[collectedDoc]}</IconContainer>
-              <Typography variant="label-3">
-                {docTypeLabels[collectedDoc]}
-              </Typography>
-            </Category>
-          ))}
-          {canAccessData.includes(
-            CollectedDocumentDataOption.documentAndSelfie,
-          ) && (
-            <Category key="selfie">
-              <IconContainer>
-                <IcoSelfie24 />
-              </IconContainer>
-              <Typography variant="label-3">
-                {t('data-labels.selfie')}
-              </Typography>
-            </Category>
-          )}
-        </CategoriesContainer>
-        <ButtonContainer>
-          <FootprintButton
-            fullWidth
-            loading={onboardingAuthorizeMutation.isLoading}
-            onClick={handleClick}
-            text={t('cta')}
-          />
-          {privacyPolicyUrl && (
-            <Typography
-              variant="label-4"
-              color="secondary"
-              sx={{ textAlign: 'center' }}
-            >
-              <Trans
-                i18nKey="pages.authorize.footer"
-                values={{ tenantName }}
-                components={{
-                  a: (
-                    <Link
-                      href={privacyPolicyUrl}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    />
-                  ),
-                }}
-              />
-            </Typography>
-          )}
-        </ButtonContainer>
+        <KycFields
+          showTitle={hasBothSections}
+          data={kycData}
+          documentTypes={collectedIdDocTypes}
+        />
+        {hasBothSections && <Divider />}
+        <KybFields showTitle={hasBothSections} data={kybData} />
+        <Button
+          isLoading={onboardingAuthorizeMutation.isLoading}
+          onClick={handleClick}
+        />
       </Container>
     </>
   );
@@ -208,38 +110,6 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     min-height: var(--loading-container-min-height);
-  `}
-`;
-
-const IconContainer = styled.span`
-  ${({ theme }) => css`
-    margin-right: ${theme.spacing[2]};
-  `}
-`;
-
-const Category = styled.div`
-  display: flex;
-  justify-content: left;
-  align-items: center;
-`;
-
-const CategoriesContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr auto;
-    width: 100%;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[3]};
-  `}
-`;
-
-const ButtonContainer = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[4]};
   `}
 `;
 

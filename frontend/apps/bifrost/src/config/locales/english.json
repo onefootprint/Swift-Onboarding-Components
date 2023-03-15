@@ -156,6 +156,12 @@
         "title": "An error occurred",
         "description": "An error occurred while completing onboarding. Please try again."
       },
+      "kyc": {
+        "title": "Your personal data"
+      },
+      "kyb": {
+        "title": "Your business data"
+      },
       "data-labels": {
         "name": "Name",
         "email": "Email",
@@ -168,7 +174,11 @@
         "id-card": "ID Card",
         "passport": "Passport",
         "driversLicense": "Driver's License",
-        "selfie": "Selfie"
+        "selfie": "Selfie",
+        "business-name": "Business name",
+        "business-ein": "EIN",
+        "business-address": "Registered address",
+        "business-beneficial-owners": "Beneficial owners"
       }
     },
     "config-invalid": {

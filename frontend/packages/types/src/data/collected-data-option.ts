@@ -57,6 +57,12 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   phone_number: CollectedKycDataOption.phoneNumber,
   document: CollectedDocumentDataOption.document,
   document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
+  business_name: CollectedKybDataOption.name,
+  business_ein: CollectedKybDataOption.ein,
+  business_address: CollectedKybDataOption.address,
+  business_phone_number: CollectedKybDataOption.phoneNumber,
+  business_website: CollectedKybDataOption.website,
+  business_beneficial_owners: CollectedKybDataOption.beneficialOwners,
 };
 
 export const CollectedKybDataOptionToRequiredAttributes: Record<
