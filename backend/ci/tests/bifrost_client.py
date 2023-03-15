@@ -89,7 +89,7 @@ class BifrostClient:
         """Add identity data via hosted/user/vault"""
         put(
             "hosted/business/vault",
-            self.business_data,
+            build_business_data(),
             self.auth_token,
         )
 
@@ -178,7 +178,6 @@ class BifrostClient:
         self.initialize_onboarding()
         self.add_identity_data()
         if add_business_data:
-            self.business_data = build_business_data()
             self.add_business_data()
         self.register_biometric_credentials()
         if self.document_data is not None:
@@ -203,5 +202,4 @@ class BifrostClient:
             email=sandbox_email,
             validation_token=validation_token,
             tenant=tenant,
-            business_data=self.business_data,
         )

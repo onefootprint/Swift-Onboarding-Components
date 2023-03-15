@@ -68,4 +68,3 @@ class User(NamedTuple):
     email: str
     validation_token: str
     tenant: Tenant
-    business_data: dict

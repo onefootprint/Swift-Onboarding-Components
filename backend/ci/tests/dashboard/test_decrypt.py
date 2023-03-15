@@ -1,4 +1,5 @@
 import pytest
+from tests.dashboard.utils import latest_access_event_for
 from tests.utils import create_ob_config
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
@@ -19,16 +20,6 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
         twilio, document_data=DocumentDataOptions.front_back_selfie
     )
     return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
-
-
-def latest_access_event_for(user):
-    body = get(
-        "org/access_events",
-        dict(footprint_user_id=user.fp_user_id),
-        user.tenant.sk.key,
-    )
-    access_events = body["data"]
-    return access_events[0]
 
 
 def test_tenant_decrypt(sandbox_user):
@@ -58,7 +49,7 @@ def test_tenant_decrypt(sandbox_user):
         for attribute, value in attributes.items():
             assert expected_data[attribute] == value
 
-        access_event = latest_access_event_for(sandbox_user)
+        access_event = latest_access_event_for(sandbox_user.fp_user_id, tenant.sk)
         assert set(access_event["targets"]) == set(attributes)
 
 
@@ -170,7 +161,7 @@ def test_tenant_document_decrypt(user_with_documents):
     assert resp["images"][0]["back"] == test_image
     assert not resp["images"][0]["selfie"]
 
-    access_event = latest_access_event_for(user_with_documents)
+    access_event = latest_access_event_for(user_with_documents.fp_user_id, tenant.sk)
     assert set(access_event["targets"]) == {"id_document.passport"}
 
 
@@ -213,7 +204,7 @@ def test_tenant_selfie_decrypt(
     assert resp["images"][0]["back"] == test_image
     assert resp["images"][0]["selfie"] == test_image
 
-    access_event = latest_access_event_for(user)
+    access_event = latest_access_event_for(user.fp_user_id, sandbox_tenant.sk)
     assert set(access_event["targets"]) == {
         "id_document.passport",
         "selfie.passport",
