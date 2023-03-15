@@ -30,7 +30,7 @@ flat_api_object_map_type!(
     description = "Given a list of fields, checks for their existence in the vault without decrypting them.",
     tags(Vault, PublicApi, Entities)
 )]
-#[actix::get("/entities/{footprint_user_id}/vault")]
+#[actix::get("/entities/{fp_id}/vault")]
 pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -47,7 +47,7 @@ pub async fn get_inner(
     request: Query<FieldsParams>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetVaultResponse> {
-    let footprint_user_id = path.into_inner();
+    let fp_id = path.into_inner();
     let FieldsParams { fields } = request.into_inner();
 
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -57,7 +57,7 @@ pub async fn get_inner(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })

@@ -36,14 +36,14 @@ pub type EntityListResponse = Vec<EntityDetailResponse>;
 /// and IdDocKind. This will be removed when `GET /users` is modernized to return a list of
 /// DataIdentifiers
 fn get_visible_populated_fields(
-    uvw: &TenantUvw,
+    vw: &TenantUvw,
 ) -> (
     Vec<DataIdentifier>,
     Vec<IdentityDataKind>,
     Vec<IdDocKind>,
     Vec<IdDocKind>,
 ) {
-    let attributes = uvw.get_visible_populated_fields();
+    let attributes = vw.get_visible_populated_fields();
     let mut idks = Vec::<IdentityDataKind>::new();
     let mut docs = Vec::<IdDocKind>::new();
     let mut selfies = Vec::<IdDocKind>::new();
@@ -58,11 +58,11 @@ fn get_visible_populated_fields(
 }
 
 fn create_identity_document_info_for_user(
-    uvw: &TenantUvw,
+    vw: &TenantUvw,
     document_types: Vec<IdDocKind>,
     selfie_document_types: Vec<IdDocKind>,
 ) -> Vec<IdentityDocumentKindForUser> {
-    uvw.identity_documents()
+    vw.identity_documents()
         .iter()
         .filter(|id_doc_and_req| document_types.contains(&id_doc_and_req.document_type))
         .filter_map(|id_doc_and_req| {
@@ -142,10 +142,10 @@ where
                 (page_size + 1) as i64,
             )?;
             let count = db::scoped_vault::count_authorized_for_tenant(conn, query_params).map(Some)?;
-            let uvws = VaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
+            let vws = VaultWrapper::multi_get_for_tenant(conn, scoped_users.clone(), &tenant_id)?;
             let scoped_user_ids: Vec<_> = scoped_users.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
-            Ok((scoped_users, obs, uvws, count))
+            Ok((scoped_users, obs, vws, count))
         })
         .await??;
 
@@ -165,9 +165,9 @@ where
             let ob = obs.remove(&sv.id);
             let (attributes, idks, document_types, selfie_document_types) = get_visible_populated_fields(vw);
             let is_portable = vw.vault.is_portable;
-            let document_types_for_user: Vec<IdentityDocumentKindForUser> =
+            let doc_types: Vec<IdentityDocumentKindForUser> =
                 create_identity_document_info_for_user(vw, document_types, selfie_document_types);
-            let result = T::from_db((idks, document_types_for_user, attributes, ob, sv, is_portable));
+            let result = T::from_db((idks, doc_types, attributes, ob, sv, is_portable, vw.vault().kind));
             Ok(result)
         })
         .collect::<ApiResult<_>>()?;
@@ -215,24 +215,24 @@ where
         timestamp_gte: None,
         kind: None,
     };
-    let (su, ob, uvw) = state
+    let (su, ob, vw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let (su, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let uvw = VaultWrapper::build_for_tenant(conn, &su.id)?;
+            let vw = VaultWrapper::build_for_tenant(conn, &su.id)?;
             let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?.remove(&su.id);
 
-            Ok((su, ob, uvw))
+            Ok((su, ob, vw))
         })
         .await??;
     // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
-    let (attributes, idks, document_types, selfie_document_types) = get_visible_populated_fields(&uvw);
-    let is_portable = uvw.vault.is_portable;
-    let document_types_for_user: Vec<IdentityDocumentKindForUser> =
-        create_identity_document_info_for_user(&uvw, document_types, selfie_document_types);
-    let result = T::from_db((idks, document_types_for_user, attributes, ob, su, is_portable));
+    let (attributes, idks, document_types, selfie_document_types) = get_visible_populated_fields(&vw);
+    let is_portable = vw.vault.is_portable;
+    let doc_types: Vec<IdentityDocumentKindForUser> =
+        create_identity_document_info_for_user(&vw, document_types, selfie_document_types);
+    let result = T::from_db((idks, doc_types, attributes, ob, su, is_portable, vw.vault().kind));
     ResponseData::ok(result).json()
 }
 

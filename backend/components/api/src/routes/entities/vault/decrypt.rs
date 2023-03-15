@@ -32,7 +32,7 @@ flat_api_object_map_type!(
     tags(Vault, PublicApi, Entities),
     description = "Decrypts the specified list of fields from the provided vault."
 )]
-#[actix::post("/entities/{footprint_user_id}/vault/decrypt")]
+#[actix::post("/entities/{fp_id}/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -51,7 +51,7 @@ pub async fn post_inner(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptResponse> {
-    let footprint_user_id = path.into_inner();
+    let fp_id = path.into_inner();
 
     let request = request.into_inner();
     let DecryptRequest { fields, reason } = request;
@@ -64,7 +64,7 @@ pub async fn post_inner(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })

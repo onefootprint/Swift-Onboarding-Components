@@ -1,6 +1,6 @@
 use api_wire_types::IdentityDocumentKindForUser;
 use db::models::{onboarding::SerializableOnboardingInfo, scoped_vault::ScopedVault};
-use newtypes::{DataIdentifier, IdentityDataKind};
+use newtypes::{DataIdentifier, IdentityDataKind, VaultKind};
 
 use crate::utils::db2api::DbToApi;
 
@@ -11,6 +11,7 @@ pub type UserDetail = (
     Option<SerializableOnboardingInfo>,
     ScopedVault,
     bool,
+    VaultKind,
 );
 
 impl DbToApi<UserDetail> for api_wire_types::User {
@@ -22,6 +23,7 @@ impl DbToApi<UserDetail> for api_wire_types::User {
             onboarding_info,
             scoped_user,
             is_portable,
+            _,
         ): UserDetail,
     ) -> Self {
         let ScopedVault {

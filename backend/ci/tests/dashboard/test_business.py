@@ -8,15 +8,14 @@ from tests.utils import get, post, build_business_data
 def sb_user_with_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     bifrost_client = BifrostClient(kyb_sandbox_ob_config)
     bifrost_client.init_user_for_onboarding(twilio)
-    user = bifrost_client.onboard_user_onto_tenant(
-        sandbox_tenant, add_business_data=True
-    )
+    bifrost_client.onboard_user_onto_tenant(sandbox_tenant, add_business_data=True)
     body = get("entities", dict(kind="business"), sandbox_tenant.sk.key)
-    user = body["data"][0]
-    assert set(user["attributes"]) == set(build_business_data())
+    entity = body["data"][0]
+    assert entity["kind"] == "business"
+    assert set(entity["attributes"]) == set(build_business_data())
 
     # TODO should get the fp_biz_id from validate
-    fp_id = user["id"]
+    fp_id = entity["id"]
     return fp_id
 
 

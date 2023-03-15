@@ -13,6 +13,7 @@ use strum_macros::EnumString;
     Deserialize,
     Debug,
     Clone,
+    Copy,
     Eq,
     PartialEq,
     Apiv2Schema,
