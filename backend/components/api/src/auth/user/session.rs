@@ -1,6 +1,9 @@
 use db::{
     models::{
-        ob_configuration::ObConfiguration, onboarding::Onboarding, scoped_vault::ScopedVault, tenant::Tenant,
+        ob_configuration::ObConfiguration,
+        onboarding::{Onboarding, OnboardingIdentifier},
+        scoped_vault::ScopedVault,
+        tenant::Tenant,
     },
     PgConn,
 };
@@ -101,6 +104,20 @@ impl SessionContext<UserSession> {
                 _ => None,
             })
             .next()
+    }
+
+    /// Extracts the business onboarding from the `UserAuthScope::Business` scope on this session,
+    /// if exists
+    pub fn business_onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<Onboarding>> {
+        let Some(sb_id) = self.scoped_business_id() else {
+            return Ok(None);
+        };
+        let identifier = OnboardingIdentifier::ScopedBusinessId {
+            sb_id: &sb_id,
+            user_vault_id: self.user_vault_id(),
+        };
+        let (ob, _, _, _) = Onboarding::get(conn, identifier)?;
+        Ok(Some(ob))
     }
 
     /// Fetch the scoped_user info

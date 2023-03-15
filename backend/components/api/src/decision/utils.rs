@@ -99,6 +99,7 @@ pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> Fixture
 pub async fn setup_test_fixtures(
     state: &State,
     ob_id: OnboardingId,
+    biz_ob: Option<Onboarding>,
     fixture_decision: FixtureDecision,
 ) -> ApiResult<()> {
     let (decision_status, create_manual_review) = fixture_decision;
@@ -164,8 +165,30 @@ pub async fn setup_test_fixtures(
                 conn,
                 OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
             )?;
-            // also move to authorized
             ob.update(conn, OnboardingUpdate::is_authorized(true))?;
+
+            if let Some(biz_ob) = biz_ob {
+                // TODO update the rest of the business ob
+                let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
+                let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
+                let new_decision = OnboardingDecisionCreateArgs {
+                    user_vault_id: sb.user_vault_id,
+                    onboarding: &biz_ob,
+                    logic_git_hash: crate::GIT_HASH.to_string(),
+                    status: decision_status,
+                    result_ids: vec![],
+                    annotation_id: None,
+                    actor: DbActor::Footprint,
+                    seqno,
+                };
+                OnboardingDecision::create(conn, new_decision)?;
+
+                let biz_ob = biz_ob.into_inner().update(
+                    conn,
+                    OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
+                )?;
+                biz_ob.update(conn, OnboardingUpdate::is_authorized(true))?;
+            }
 
             // Create some mock risk signals that are somewhat consistent with the mock decision
             let reason_codes = match (decision_status, create_manual_review) {

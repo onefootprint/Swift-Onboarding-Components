@@ -37,7 +37,7 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    let ob_info = state
+    let (ob_info, biz_ob) = state
         .db_pool
         .db_query(move |c| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(c)?;
@@ -49,8 +49,9 @@ pub async fn post(
                 let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect_vec();
                 return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
             }
+            let biz_ob = user_auth.business_onboarding(c)?;
 
-            Ok(ob_info)
+            Ok((ob_info, biz_ob))
         })
         .await??;
     // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
@@ -62,7 +63,7 @@ pub async fn post(
     // Run KYC checks
     let ob_id = ob_info.onboarding.id.clone();
     if should_run_kyc_checks {
-        let engine_result = run_kyc(&state, ob_info).await;
+        let engine_result = run_kyc(&state, ob_info, biz_ob).await;
         // We always want to return a validation to the client if the DE fails.
         // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
         match engine_result {
@@ -120,7 +121,11 @@ pub async fn post(
     }))
 }
 
-async fn run_kyc(state: &State, ob_info: AuthedOnboardingInfo) -> Result<(), ApiError> {
+async fn run_kyc(
+    state: &State,
+    ob_info: AuthedOnboardingInfo,
+    biz_ob: Option<Onboarding>,
+) -> Result<(), ApiError> {
     let scoped_user_id = ob_info.scoped_user.id.clone();
     let uvw = state
         .db_pool
@@ -133,7 +138,9 @@ async fn run_kyc(state: &State, ob_info: AuthedOnboardingInfo) -> Result<(), Api
 
     if let Some(fixture_decision) = fixture_decision {
         // Don't run prod IDV requests and instead just create fixture data for this user
-        decision::utils::setup_test_fixtures(state, ob_info.onboarding.id.clone(), fixture_decision).await?;
+        // TODO create more business fixture data
+        decision::utils::setup_test_fixtures(state, ob_info.onboarding.id.clone(), biz_ob, fixture_decision)
+            .await?;
     } else {
         // Run KYC + produce a decision
         // Save Verification Requests, set ob to authorized, and (TODO) set onboarding to pending
@@ -144,8 +151,11 @@ async fn run_kyc(state: &State, ob_info: AuthedOnboardingInfo) -> Result<(), Api
                 // This will error if we already have created verification requests for this onboarding
                 decision::vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
 
-                ob.update(conn, OnboardingUpdate::is_authorized(true))?;
                 // TODO: update OB to pending!
+                ob.update(conn, OnboardingUpdate::is_authorized(true))?;
+                if let Some(biz_ob) = biz_ob {
+                    biz_ob.update(conn, OnboardingUpdate::is_authorized(true))?;
+                }
                 Ok(())
             })
             .await?;

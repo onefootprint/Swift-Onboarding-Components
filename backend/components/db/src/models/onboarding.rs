@@ -99,6 +99,11 @@ pub enum OnboardingIdentifier<'a> {
         su_id: &'a ScopedVaultId,
         user_vault_id: &'a VaultId,
     },
+    ScopedBusinessId {
+        sb_id: &'a ScopedVaultId,
+        /// Note: the ID of the user vault that owns this business
+        user_vault_id: &'a VaultId,
+    },
     ConfigId {
         user_vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
@@ -158,7 +163,7 @@ impl Onboarding {
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
-        use crate::schema::{manual_review, onboarding_decision};
+        use crate::schema::{business_owner, manual_review, onboarding_decision};
         let mut query = onboarding::table
             .inner_join(scoped_user::table)
             // Only fetch active manual review for this onboarding
@@ -179,6 +184,14 @@ impl Onboarding {
                 query = query
                     .filter(onboarding::scoped_user_id.eq(su_id))
                     .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            }
+            OnboardingIdentifier::ScopedBusinessId { sb_id, user_vault_id } => {
+                let business_vault_ids = business_owner::table
+                    .filter(business_owner::user_vault_id.eq(user_vault_id))
+                    .select(business_owner::business_vault_id);
+                query = query
+                    .filter(onboarding::scoped_user_id.eq(sb_id))
+                    .filter(scoped_user::user_vault_id.eq_any(business_vault_ids))
             }
             OnboardingIdentifier::ConfigId {
                 user_vault_id,
