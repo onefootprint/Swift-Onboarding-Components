@@ -41,9 +41,11 @@ pub async fn post(
     if scoped_user.is_live != auth.is_live()? {
         return Err(OnboardingError::InvalidSandboxState.into());
     }
-    let terminal_status = latest_decision
-        .and_then(|d| d.visible_status())
-        .ok_or(OnboardingError::NonTerminalState)?;
+
+    let terminal_status = ob.derive_status(latest_decision.as_ref());
+    if !terminal_status.is_complete() {
+        return Err(OnboardingError::NonTerminalState.into());
+    }
 
     Ok(Json(ResponseData::ok(ValidateResponse {
         onboarding_configuration_id: ob.ob_configuration_id,

@@ -19,7 +19,7 @@ use newtypes::FootprintUserId;
 use newtypes::TenantId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, Locked, OnboardingDecisionId,
-    OnboardingDecisionInfo, OnboardingId, OnboardingStatus, VaultId, VerificationResultId,
+    OnboardingDecisionInfo, OnboardingId, VaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -81,10 +81,6 @@ pub type SaturatedOnboardingDecisionInfo = (
 );
 
 impl OnboardingDecision {
-    pub fn visible_status(&self) -> Option<OnboardingStatus> {
-        self.status.into()
-    }
-
     #[tracing::instrument(skip_all)]
     pub fn create(conn: &mut TxnPgConn, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
         // Deactivate the last decision

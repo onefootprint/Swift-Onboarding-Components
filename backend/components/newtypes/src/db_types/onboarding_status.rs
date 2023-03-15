@@ -26,7 +26,19 @@ use crate::DecisionStatus;
 pub enum OnboardingStatus {
     Pass,
     Fail,
+    Incomplete,
     Pending,
+}
+
+impl OnboardingStatus {
+    pub fn is_complete(&self) -> bool {
+        match self {
+            OnboardingStatus::Pass => true,
+            OnboardingStatus::Fail => true,
+            OnboardingStatus::Incomplete => false,
+            OnboardingStatus::Pending => true,
+        }
+    }
 }
 
 #[derive(
@@ -58,12 +70,11 @@ impl Default for OnboardingStatus {
     }
 }
 
-impl From<DecisionStatus> for Option<OnboardingStatus> {
+impl From<DecisionStatus> for OnboardingStatus {
     fn from(s: DecisionStatus) -> Self {
         match s {
-            // TODO https://github.com/onefootprint/monorepo/pull/2457 will cause a merge conflict, so not making non-optional in my pr
-            DecisionStatus::Fail => Some(OnboardingStatus::Fail),
-            DecisionStatus::Pass => Some(OnboardingStatus::Pass),
+            DecisionStatus::Fail => OnboardingStatus::Fail,
+            DecisionStatus::Pass => OnboardingStatus::Pass,
         }
     }
 }

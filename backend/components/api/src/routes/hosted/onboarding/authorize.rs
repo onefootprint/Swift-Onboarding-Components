@@ -79,9 +79,10 @@ pub async fn post(
             // Return status as well
             let (ob, scoped_user, manual_review, latest_decision) = Onboarding::get(conn, &ob_id)?;
 
-            let (status, timestamp) = latest_decision
-                .and_then(|ld| ld.visible_status().map(|vs| (vs, ld.created_at)))
-                .ok_or(OnboardingError::NonTerminalState)?;
+            let status: OnboardingStatus = ob.derive_status(latest_decision.as_ref());
+            let timestamp = ob
+                .authorized_at
+                .ok_or_else(|| ApiError::from(OnboardingError::NonTerminalState))?;
 
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
             Ok((

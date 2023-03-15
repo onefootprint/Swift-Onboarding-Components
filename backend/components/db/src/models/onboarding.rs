@@ -18,6 +18,7 @@ use newtypes::{
     FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
     ScopedVaultId, TenantId, TenantScope, VaultId,
 };
+use newtypes::OnboardingStatus;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -404,6 +405,15 @@ impl Onboarding {
         self.idv_reqs_initiated_at.is_some()
             && self.decision_made_at.is_some()
             && self.authorized_at.is_some()
+    }
+
+    pub fn derive_status(&self, latest_decision: Option<&OnboardingDecision>) -> OnboardingStatus {
+        match (self.authorized_at.is_some(), latest_decision) {
+            (false, _) => OnboardingStatus::Incomplete,
+            // Either vendor calls failed but we still let Bifrost complete, or we have async decisioning (KYB)
+            (true, None) => OnboardingStatus::Pending,
+            (true, Some(obd)) => obd.status.into(),
+        }
     }
 }
 

@@ -28,7 +28,8 @@
     "pass": "Verified",
     "fail": "Failed",
     "vault_only": "Vault",
-    "incomplete": "Incomplete"
+    "incomplete": "Incomplete",
+    "pending": "Pending"
   },
   "user-data-attributes": {
     "name": "Name",

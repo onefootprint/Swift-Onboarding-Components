@@ -5,6 +5,7 @@ enum UserStatus {
   failed = 'fail',
   vaultOnly = 'vault_only',
   incomplete = 'incomplete',
+  pending = 'pending',
 }
 
 export default UserStatus;
