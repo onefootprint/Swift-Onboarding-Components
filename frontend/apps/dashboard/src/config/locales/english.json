@@ -56,7 +56,13 @@
     "email": "Email",
     "phone_number": "Phone number",
     "document": "ID Document",
-    "document_and_selfie": "ID Document & Selfie"
+    "document_and_selfie": "ID Document & Selfie",
+    "business_name": "Business name",
+    "business_ein": "Employer Identification Number (EIN)",
+    "business_address": "Registered business address",
+    "business_phone_number": "Business phone number",
+    "business_website": "Business website",
+    "business_beneficial_owners": "Business beneficial owners"
   },
   "id-doc-type": {
     "id_card": "ID card",
