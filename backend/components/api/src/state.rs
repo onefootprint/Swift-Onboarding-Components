@@ -11,8 +11,12 @@ use crate::{
 };
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
-use idv::{idology::client::IdologyClient, socure::client::SocureClient};
 use feature_flag::LaunchDarklyFeatureFlagClient;
+use idv::{
+    experian::cross_core::client::ExperianClient, idology::client::IdologyClient,
+    socure::client::SocureClient,
+};
+use newtypes::PiiString;
 use workos::{ApiKey, WorkOs};
 
 #[derive(Clone)]
@@ -36,8 +40,9 @@ pub struct State {
     pub(crate) webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
     pub(crate) billing_client: billing::BillingClient,
+    #[allow(unused)]
+    pub(crate) experian_client: ExperianClient,
 }
-
 impl State {
     /// initialize global state in test context
     #[cfg(test)]
@@ -110,6 +115,23 @@ impl State {
 
         let billing_client = billing::BillingClient::new(config.stripe.api_key.clone());
 
+        let experian_client = ExperianClient::new(
+            PiiString::from("crosscore2.uat@onefootprint.com"),
+            PiiString::from(""),
+            PiiString::from(""),
+            PiiString::from(""),
+            PiiString::from(""),
+            PiiString::from(""),
+            // TODO: uncomment once we have production credentials, for now we'll just use fixtures
+            // config.experian.auth_username.clone(),
+            // config.experian.auth_password.clone(),
+            // config.experian.auth_client_id.clone(),
+            // config.experian.auth_client_secret.clone(),
+            // config.experian.cross_core_username.clone(),
+            // config.experian.cross_core_password.clone(),
+        )
+        .expect("failed to build experian client");
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -156,6 +178,7 @@ impl State {
             feature_flag_client,
             webhook_service_client,
             billing_client,
+            experian_client,
         }
     }
 }

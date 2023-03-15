@@ -104,6 +104,8 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub stripe: StripeConfig,
+    // #[envconfig(nested = true)]
+    // pub experian: ExperianConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -228,4 +230,21 @@ pub struct SocureConfig {
 pub struct StripeConfig {
     #[envconfig(from = "STRIPE_API_KEY")]
     pub api_key: PiiString,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+#[allow(dead_code)]
+pub struct ExperianConfig {
+    #[envconfig(from = "EXPERIAN_AUTH_USERNAME")]
+    pub auth_username: PiiString,
+    #[envconfig(from = "EXPERIAN_AUTH_PASSWORD")]
+    pub auth_password: PiiString,
+    #[envconfig(from = "EXPERIAN_AUTH_CLIENT_ID")]
+    pub auth_client_id: PiiString,
+    #[envconfig(from = "EXPERIAN_AUTH_CLIENT_SECRET")]
+    pub auth_client_secret: PiiString,
+    #[envconfig(from = "EXPERIAN_CROSS_CORE_USERNAME")]
+    pub cross_core_username: PiiString,
+    #[envconfig(from = "EXPERIAN_CROSS_CORE_PASSWORD")]
+    pub cross_core_password: PiiString,
 }

@@ -1,4 +1,4 @@
-use newtypes::{IdvData, PiiJsonValue, Vendor};
+use newtypes::{IdvData, PiiJsonValue};
 use twilio::response::{lookup::LookupV2Response, parse_response};
 
 use crate::{ParsedResponse, VendorResponse};
@@ -43,7 +43,6 @@ pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<Ven
     let parsed = parse_response(response.clone())?;
 
     Ok(VendorResponse {
-        vendor: Vendor::Twilio,
         response: ParsedResponse::TwilioLookupV2(parsed),
         raw_response: response.into(),
     })

@@ -7,7 +7,7 @@ use crate::{
 };
 
 use super::{
-    features::FeatureVector,
+    features::kyc_features::FeatureVector,
     risk::OnboardingRulesDecisionOutput,
     vendor::{
         make_request::VerificationRequestWithVendorResponse, vendor_result::VendorResult,
@@ -27,6 +27,7 @@ use db::{
 use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::{
+    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
     socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
@@ -51,6 +52,11 @@ pub async fn run(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: &impl VendorAPICall<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >,
 ) -> ApiResult<()> {
     let vendor_requests =
         get_latest_verification_requests_and_results(&ob.id, &ob.scoped_user_id, db_pool, enclave_client)
@@ -65,6 +71,7 @@ pub async fn run(
         idology_client,
         socure_client,
         twilio_client,
+        experian_client,
     )
     .await?;
 
@@ -245,6 +252,11 @@ pub async fn make_vendor_requests(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: &impl VendorAPICall<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >,
 ) -> ApiResult<VendorResults> {
     // Make requests
     let results = vendor::make_request::make_vendor_requests(
@@ -256,6 +268,7 @@ pub async fn make_vendor_requests(
         idology_client,
         socure_client,
         twilio_client,
+        experian_client,
     )
     .await?;
 
@@ -268,7 +281,7 @@ pub fn calculate_decision(
     ff_client: &impl FeatureFlagClient,
 ) -> ApiResult<(OnboardingRulesDecisionOutput, FeatureVector)> {
     // From our results, create a FeatureVector for the final decision output
-    let features = features::create_features(vendor_results);
+    let features = features::kyc_features::create_features(vendor_results);
 
     let decision = risk::evaluate_onboarding_rules(&features, ff_client)?;
 

@@ -4,13 +4,14 @@
 use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
+use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::pa::response::PaResponse;
 
 use idology::expectid::response::ExpectIDResponse;
 use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
 use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
 
-use newtypes::{PiiJsonValue, Vendor};
+use newtypes::PiiJsonValue;
 
 use socure::response::SocureIDPlusResponse;
 
@@ -36,6 +37,7 @@ pub enum ParsedResponse {
     IDologyPa(PaResponse),
     TwilioLookupV2(LookupV2Response),
     SocureIDPlus(SocureIDPlusResponse),
+    ExperianPreciseID(CrossCoreAPIResponse),
 }
 
 impl ParsedResponse {
@@ -85,12 +87,18 @@ impl ParsedResponse {
 
         Ok(Self::IDologyPa(parsed))
     }
+
+    pub fn from_experian_cross_core(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed =
+            crate::experian::cross_core::response::parse_response(raw_response).map_err(Error::from)?;
+
+        Ok(Self::ExperianPreciseID(parsed))
+    }
 }
 
 #[derive(Clone)]
 pub struct VendorResponse {
     // TODO: make a trait and remove the ParsedResponse enum
-    pub vendor: Vendor, // TODO: remove this, doesn't seem like its actually used at all
     pub response: ParsedResponse,
     pub raw_response: PiiJsonValue,
 }
@@ -111,4 +119,6 @@ pub enum Error {
     VendorCallsDisabledError,
     #[error("serde_json error: {0}")]
     SerderJsonError(#[from] serde_json::Error),
+    #[error("Experian error: {0}")]
+    ExperianError(#[from] experian::error::Error),
 }

@@ -20,6 +20,8 @@ pub enum BoolFlag<'a> {
     EnableSocureInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "EnableScanOnboardingCallsInNonProdEnvironment")]
     EnableScanOnboardingInNonProd(&'a ObConfigurationKey),
+    #[strum(to_string = "EnableExperianIdvCallsInNonProEnvironment")]
+    EnableExperianInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "DisableAllScanOnboardingCalls")]
     DisableAllScanOnboarding,
     #[strum(to_string = "DisableAllSocureIdvCalls")]
@@ -40,6 +42,7 @@ impl<'a> BoolFlag<'a> {
             Self::EnableRuleSetForDecision(k) => Some(k.to_string()),
             Self::EnableScanOnboardingInNonProd(k) => Some(k.to_string()),
             Self::EnableIdologyInNonProd(k) => Some(k.to_string()),
+            Self::EnableExperianInNonProd(k) => Some(k.to_string()),
             Self::EnableSocureInNonProd(k) => Some(k.to_string()),
             Self::DisableAllScanOnboarding => None,
             Self::DisableAllSocure => None,
@@ -56,6 +59,7 @@ impl<'a> BoolFlag<'a> {
             Self::EnableScanOnboardingInNonProd(_) => false,
             Self::EnableIdologyInNonProd(_) => false,
             Self::EnableSocureInNonProd(_) => false,
+            Self::EnableExperianInNonProd(_) => false,
             Self::DisableAllScanOnboarding => false,
             Self::DisableAllSocure => false,
         }

@@ -1,6 +1,6 @@
 use newtypes::DecisionStatus;
 
-use crate::decision::features::IDologyFeatures;
+use crate::decision::features::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
 
 use super::{
     rule_set::{Rule, RuleSet},
@@ -165,6 +165,19 @@ pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
     }
 }
 
+pub fn experian_rules() -> RuleSet<ExperianFeatures> {
+    let rule = Rule {
+        rule: |f: &ExperianFeatures| {
+            f.footprint_reason_codes
+                .contains(&FootprintReasonCode::IdNotLocated)
+        },
+        name: RuleName::IdNotLocated,
+    };
+    RuleSet {
+        rules: vec![rule],
+        name: RuleSetName::ExperianRules,
+    }
+}
 // will remove once we make sure the score based rule is working
 pub fn temp_watchlist() -> RuleSet<IDologyFeatures> {
     let rule = Rule {

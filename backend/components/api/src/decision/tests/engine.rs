@@ -20,6 +20,7 @@ use db::{
 };
 #[cfg(test)]
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
+use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
@@ -121,6 +122,7 @@ async fn create_user_and_onboarding(
                     VendorAPI::TwilioLookupV2,
                     VendorAPI::IdologyExpectID,
                     VendorAPI::SocureIDPlus,
+                    VendorAPI::ExperianPreciseID,
                 ],
             );
 
@@ -193,6 +195,11 @@ async fn test_run(
 
     let mut mock_twilio_api_call =
         MockVendorAPICall::<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>::new();
+    let mut mock_experian_api_call = MockVendorAPICall::<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >::new();
 
     mock_ff_client
         .expect_flag()
@@ -227,6 +234,11 @@ async fn test_run(
             ))
         });
 
+    mock_experian_api_call
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| Ok(idv::tests::fixtures::experian::create_response()));
+
     mock_ff_client
         .expect_flag()
         .times(1)
@@ -253,6 +265,7 @@ async fn test_run(
         &mock_idology_api_call,
         &mock_socure_api_call,
         &mock_twilio_api_call,
+        &mock_experian_api_call,
     )
     .await
     .unwrap();

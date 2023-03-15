@@ -67,10 +67,12 @@ impl VendorResult {
                         newtypes::VendorAPI::IdologyPa => {
                             ParsedResponse::from_idology_pa(decrypted_response.into_leak())?
                         }
+                        newtypes::VendorAPI::ExperianPreciseID => {
+                            ParsedResponse::from_experian_cross_core(decrypted_response.into_leak())?
+                        }
                     };
                     let res = VendorResult {
                         response: VendorResponse {
-                            vendor: request.vendor,
                             response: parsed_response,
                             // When we are loading the response from DB, the response has been scrubbed
                             raw_response: result.response.into(),

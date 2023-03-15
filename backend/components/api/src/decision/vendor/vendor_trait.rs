@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use idv::{
+    experian::{self, ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     idology::{
         client::IdologyClient,
         pa::{IdologyPaAPIResponse, IdologyPaRequest},
@@ -177,5 +178,40 @@ impl VendorAPIResponse for TwilioLookupV2APIResponse {
 
     fn parsed_response(self) -> ParsedResponse {
         ParsedResponse::TwilioLookupV2(self.parsed_response)
+    }
+}
+
+////////////////////
+/// Experian Impl
+/// /// ////////////////
+#[async_trait]
+impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>
+    for experian::cross_core::client::ExperianClient
+{
+    async fn make_request(
+        &self,
+        request: ExperianCrossCoreRequest,
+    ) -> Result<ExperianCrossCoreResponse, idv::experian::error::Error> {
+        let raw_response = self.send_precise_id_request(request.idv_data).await?;
+        let parsed_response = experian::cross_core::response::parse_response(raw_response.clone())?;
+
+        Ok(ExperianCrossCoreResponse {
+            raw_response: PiiJsonValue::new(raw_response),
+            parsed_response,
+        })
+    }
+}
+
+impl VendorAPIResponse for ExperianCrossCoreResponse {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::ExperianPreciseID
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response
+    }
+
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::ExperianPreciseID(self.parsed_response)
     }
 }

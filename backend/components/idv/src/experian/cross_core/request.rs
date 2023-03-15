@@ -9,14 +9,14 @@ use crate::experian::error::{ConversionError, Error};
 /// This is the top level request to CrossCore
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CrossCoreAPIRequest {
+pub(crate) struct CrossCoreAPIRequest {
     pub header: BodyHeader,
     pub payload: BodyPayload,
 }
 
 impl CrossCoreAPIRequest {
     // need to use our own method since we require more than IdvData to build the req
-    pub fn try_from(idv_data: IdvData, config: PreciseIDRequestConfig) -> Result<Self, Error> {
+    pub(crate) fn try_from(idv_data: IdvData, config: PreciseIDRequestConfig) -> Result<Self, Error> {
         let control_options = config.control_options.clone();
         let body_header = BodyHeader::from(config);
 
@@ -123,8 +123,8 @@ impl TryFrom<IdvData> for Contact {
             // TODO: was getting invalid errors when testing this when optional, so figure out if required
             ssn9,
             dob,
-            email,
-            phone_number,
+            email: _,
+            phone_number: _,
         } = d;
 
         let first_name = first_name.ok_or(ConversionError::MissingFirstName)?;
@@ -165,14 +165,14 @@ impl TryFrom<IdvData> for Contact {
             country_code: country,
         };
 
-        let email = Email {
-            id: Some(ExperianRequestDatumIdentifiers::Email1.to_string()),
-            email,
-        };
-        let phone = Telephone {
-            id: Some(ExperianRequestDatumIdentifiers::Phone1.to_string()),
-            number: phone_number,
-        };
+        // let email = Email {
+        //     id: Some(ExperianRequestDatumIdentifiers::Email1.to_string()),
+        //     email,
+        // };
+        // let phone = Telephone {
+        //     id: Some(ExperianRequestDatumIdentifiers::Phone1.to_string()),
+        //     number: phone_number,
+        // };
         let doc_type = ssn9.as_ref().map(|_| DocumentType::Ssn);
         let identity_document = IdentityDocument {
             // TODO: figure out ssn4
@@ -184,8 +184,10 @@ impl TryFrom<IdvData> for Contact {
             id: Some(ExperianRequestDatumIdentifiers::Contact1.to_string()),
             person,
             addresses: vec![address],
-            telephones: vec![phone],
-            emails: vec![email],
+            // TODO fill this in
+            telephones: vec![],
+            // TODO: these aren't available in the STAR test cases so let's not even send them for now
+            emails: vec![],
             identity_documents: vec![identity_document],
         })
     }

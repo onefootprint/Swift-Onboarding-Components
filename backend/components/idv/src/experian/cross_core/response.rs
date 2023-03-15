@@ -1,12 +1,16 @@
-use newtypes::experian::ResponseCode;
-
 use crate::experian::{
     error::{CrossCoreResponseError, Error},
     precise_id::response::PreciseIDAPIResponse,
 };
 
+pub fn parse_response(response: serde_json::Value) -> Result<CrossCoreAPIResponse, Error> {
+    let r: CrossCoreAPIResponse = serde_json::from_value(response)?;
+
+    Ok(r)
+}
+
 /// This is the top level response from CrossCore
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CrossCoreAPIResponse {
     pub response_header: ResponseHeader,
@@ -17,8 +21,8 @@ pub struct CrossCoreAPIResponse {
 impl CrossCoreAPIResponse {
     // Helper to dig down to the precise id response from cross core wrapper
     #[allow(dead_code)]
-    pub fn precise_id_response(&self) -> Result<Option<PreciseIDAPIResponse>, Error> {
-        let r = self
+    pub fn precise_id_response(&self) -> Result<PreciseIDAPIResponse, Error> {
+        let response = self
             .client_response_payload
             .decision_elements
             .iter()
@@ -37,10 +41,14 @@ impl CrossCoreAPIResponse {
             .and_then(|r| r.products)
             .and_then(|p| p.precise_id_server);
 
-        Ok(r)
+        if let Some(r) = response {
+            Ok(r)
+        } else {
+            Err(Error::MissingPreciseIDResponse)
+        }
     }
 }
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseHeader {
     #[serde(rename(deserialize = "tenantID"))]
@@ -50,13 +58,13 @@ pub struct ResponseHeader {
     pub exp_request_id: Option<String>,
     pub message_time: Option<String>,
     pub overall_response: OverallResponse,
-    pub response_code: Option<ResponseCode>,
+    pub response_code: Option<String>,
     pub response_type: Option<String>,
     pub response_message: Option<String>,
     pub category: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OverallResponse {
     pub decision: Option<String>,
@@ -71,14 +79,14 @@ pub struct OverallResponse {
     pub spare_objects: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientResponsePayload {
     pub orchestration_decisions: Vec<OrchestrationStepDecision>,
     pub decision_elements: Vec<DecisionElement>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OrchestrationStepDecision {
     // Sequence/point in workflow that decision point was generated.
@@ -100,7 +108,7 @@ pub struct OrchestrationStepDecision {
     pub decision_time: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DecisionElement {
     pub service_name: Option<String>,
@@ -112,7 +120,7 @@ pub struct DecisionElement {
     pub decisions: Option<Vec<DecisionElementDecision>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DecisionElementDecision {
     // This is unlikely to be an enum - no indication we can use that.
@@ -123,38 +131,38 @@ pub struct DecisionElementDecision {
     pub reason: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WarningError {
     pub response_type: Option<String>,
-    pub response_code: Option<ResponseCode>,
+    pub response_code: Option<String>,
     pub response_message: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OtherData {
     pub json: Option<JsonOtherData>,
 }
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct JsonOtherData {
     pub fraud_solutions: Option<FraudSolutions>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FraudSolutions {
     pub response: Option<FraudSolutionResponse>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FraudSolutionResponse {
     pub products: Option<FraudSolutionResponseProducts>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FraudSolutionResponseProducts {
     #[serde(rename(deserialize = "preciseIDServer"))]
@@ -180,12 +188,11 @@ mod tests {
         assert!(r
             .precise_id_response()
             .unwrap()
-            .unwrap()
             .summary
             .unwrap()
             .scores
             .unwrap()
             .precise_id_score
-            .is_some())
+            .is_some());
     }
 }

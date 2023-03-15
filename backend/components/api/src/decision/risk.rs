@@ -12,7 +12,7 @@ use db::{
 };
 
 use super::{
-    features::*,
+    features::kyc_features::*,
     rule::{self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules, RuleName},
 };
 use crate::{
@@ -119,9 +119,9 @@ pub fn evaluate_onboarding_rules(
         .ok_or_else(|| super::Error::MissingDataForRuleSet(onboarding_rules::idology_base_rule_set().name))?;
 
     // The set of rules that determine if a user passes onboarding
-    let prod_rules = vec![onboarding_rules::idology_base_rule_set()];
+    let prod_idology_rules = vec![onboarding_rules::idology_base_rule_set()];
     // Additional sets of rules that might be toggled on via a FF or by tenant
-    let additional_rules = vec![
+    let additional_idology_rules = vec![
         onboarding_rules::idology_conservative_rule_set(),
         onboarding_rules::temp_watchlist(),
     ]
@@ -129,15 +129,28 @@ pub fn evaluate_onboarding_rules(
     .map(|rs| ActionableRuleSetBuilder::new(rs).build(feature_flag_client))
     .collect();
 
+    //
+    // PROD
     // Evaluate our rules
-    let base = rule::rules_engine::evaluate_onboarding_rules(prod_rules, idology_features);
+    let base = rule::rules_engine::evaluate_onboarding_rules(prod_idology_rules, idology_features);
 
     // Evaluate conservative rules
-    let conservative = rule::rules_engine::evaluate_onboarding_rules(additional_rules, idology_features);
-    let onboarding_rule_evaluation_result = base.join(conservative);
+    let conservative =
+        rule::rules_engine::evaluate_onboarding_rules(additional_idology_rules, idology_features);
+    let idology_onboarding_rule_evaluation_result = base.join(conservative);
+
+    //
+    // TESTING
+    //
+    // TODO: might need a concept of prod/prod candidate/shadow style rules here.
+    let experian_rules = vec![onboarding_rules::experian_rules()];
+    features
+        .experian_features
+        .as_ref()
+        .map(|e| rule::rules_engine::evaluate_onboarding_rules(experian_rules, e));
 
     // If we no rules that triggered, we consider that a pass
-    let decision_status = if onboarding_rule_evaluation_result.triggered {
+    let decision_status = if idology_onboarding_rule_evaluation_result.triggered {
         DecisionStatus::Fail
     } else {
         DecisionStatus::Pass
@@ -150,8 +163,8 @@ pub fn evaluate_onboarding_rules(
     let output = OnboardingRulesDecisionOutput {
         decision_status,
         create_manual_review,
-        rules_triggered: onboarding_rule_evaluation_result.rules_triggered,
-        rules_not_triggered: onboarding_rule_evaluation_result.rules_not_triggered,
+        rules_triggered: idology_onboarding_rule_evaluation_result.rules_triggered,
+        rules_not_triggered: idology_onboarding_rule_evaluation_result.rules_not_triggered,
     };
     Ok(output)
 }

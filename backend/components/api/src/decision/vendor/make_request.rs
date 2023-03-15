@@ -13,16 +13,25 @@ use db::{
     DbError,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
+use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
 use newtypes::idology::IdologyScanOnboardingCaptureResult;
-use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, Vendor, VendorAPI};
+use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI};
 use prometheus::labels;
 
 /// Branch on vendor and send requests to vendors
-#[tracing::instrument(skip(data, db_pool, ff_client, idology_client, socure_client, twilio_client))]
+#[tracing::instrument(skip(
+    data,
+    db_pool,
+    ff_client,
+    idology_client,
+    socure_client,
+    twilio_client,
+    experian_client
+))]
 pub async fn send_idv_request(
     request: VerificationRequest,
     data: IdvData,
@@ -36,6 +45,11 @@ pub async fn send_idv_request(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: &impl VendorAPICall<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >,
 ) -> Result<VendorResponse, ApiError> {
     tracing::info!(
         msg = "Sending verification request",
@@ -70,6 +84,17 @@ pub async fn send_idv_request(
         VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(data, twilio_client).await?,
         VendorAPI::SocureIDPlus => {
             send_socure_idv_request(request, data, is_production, db_pool, socure_client, ff_client).await?
+        }
+        // TODO finish this
+        VendorAPI::ExperianPreciseID => {
+            send_experian_idv_request(
+                data,
+                is_production,
+                ob_configuration_key,
+                experian_client,
+                ff_client,
+            )
+            .await?
         }
         api => {
             let err = format!("send_idv_request not implemented for {}", api);
@@ -131,12 +156,10 @@ where
         .make_request(TwilioLookupV2Request { idv_data })
         .await
         .map(|r| {
-            let vendor = Vendor::from(r.clone().vendor_api()); // TOOD: clones :>
             let parsed_response = r.clone().parsed_response();
             let raw_response = r.raw_response();
             // TODO put this into a INto
             VendorResponse {
-                vendor,
                 response: parsed_response,
                 raw_response,
             }
@@ -194,12 +217,10 @@ pub async fn send_idology_idv_request(
         }
 
         res.map(|r| {
-            let vendor = Vendor::from(r.clone().vendor_api()); // TOOD: clones :>
             let parsed_response = r.clone().parsed_response();
             let raw_response = r.raw_response();
             VendorResponse {
                 // TODO: later delete VendorResponse and just replace with VendorAPIResponse
-                vendor,
                 response: parsed_response,
                 raw_response,
             }
@@ -213,7 +234,6 @@ pub async fn send_idology_idv_request(
                 .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
         Ok(VendorResponse {
-            vendor: Vendor::Idology,
             raw_response: response.into(),
             response: ParsedResponse::IDologyExpectID(parsed_response),
         })
@@ -267,11 +287,9 @@ pub async fn send_socure_idv_request(
 
         res.map(|r| {
             // TODO: later delete VendorResponse and just replace with VendorAPIResponse
-            let vendor = Vendor::from(r.clone().vendor_api()); // TOOD: clones :>
             let parsed_response = r.clone().parsed_response();
             let raw_response = r.raw_response();
             VendorResponse {
-                vendor,
                 response: parsed_response,
                 raw_response,
             }
@@ -284,8 +302,47 @@ pub async fn send_socure_idv_request(
             idv::socure::parse_response(response.clone()).map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
         Ok(VendorResponse {
-            vendor: Vendor::Socure,
             response: ParsedResponse::SocureIDPlus(parsed_response),
+            raw_response: response.into(),
+        })
+    }
+}
+
+// #[tracing::instrument(skip_all)]
+pub async fn send_experian_idv_request(
+    data: IdvData,
+    is_production: bool,
+    ob_configuration_key: ObConfigurationKey,
+    experian_api_call: &impl VendorAPICall<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >,
+    ff_client: &impl FeatureFlagClient,
+) -> Result<VendorResponse, ApiError> {
+    if is_production || ff_client.flag(BoolFlag::EnableExperianInNonProd(&ob_configuration_key)) {
+        let res = experian_api_call
+            .make_request(ExperianCrossCoreRequest { idv_data: data })
+            .await;
+
+        res.map(|r| {
+            let parsed_response = r.clone().parsed_response();
+            let raw_response = r.raw_response();
+
+            VendorResponse {
+                response: parsed_response,
+                raw_response,
+            }
+        })
+        .map_err(|e| ApiError::from(idv::Error::from(e)))
+    } else {
+        let response = idv::test_fixtures::experian_cross_core_response();
+
+        let parsed_response = idv::experian::cross_core::response::parse_response(response.clone())
+            .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+
+        Ok(VendorResponse {
+            response: ParsedResponse::ExperianPreciseID(parsed_response),
             raw_response: response.into(),
         })
     }
@@ -325,7 +382,6 @@ pub async fn send_scan_onboarding_docv_request(
             .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
         Ok(VendorResponse {
-            vendor: Vendor::Idology,
             response: ParsedResponse::IDologyScanOnboarding(parsed_response),
             raw_response: response.into(),
         })
@@ -346,6 +402,11 @@ pub async fn make_idv_request(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: &impl VendorAPICall<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >,
 ) -> Result<VendorResponse, ApiError> {
     let data =
         build_request::build_idv_data_from_verification_request(db_pool, enclave_client, request.clone())
@@ -360,6 +421,7 @@ pub async fn make_idv_request(
         idology_client,
         socure_client,
         twilio_client,
+        experian_client,
     )
     .await?;
     Ok(vendor_response)
@@ -421,6 +483,11 @@ pub async fn make_vendor_requests(
     >,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: &impl VendorAPICall<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >,
 ) -> Result<Vec<Result<VerificationRequestWithVendorResponse, ApiError>>, ApiError> {
     let raw_futures_with_vendors = requests.into_iter().map(|r| {
         (
@@ -434,6 +501,7 @@ pub async fn make_vendor_requests(
                 idology_client,
                 socure_client,
                 twilio_client,
+                experian_client,
             ),
         )
     });

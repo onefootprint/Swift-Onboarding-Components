@@ -45,6 +45,19 @@ fn vendor_api_requirements_are_satisfied(
         required: vec![IdentityDataKind::PhoneNumber],
     };
 
+    let experian_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
+        // minimum is full name and full address
+        required: vec![
+            IdentityDataKind::FirstName,
+            IdentityDataKind::LastName,
+            IdentityDataKind::AddressLine1,
+            IdentityDataKind::Zip,
+            IdentityDataKind::State,
+            IdentityDataKind::Country,
+            IdentityDataKind::City,
+        ],
+    };
+
     match vendor_api {
         VendorAPI::IdologyExpectID => expectid_requirements.are_satisfied(present_data_lifetime_kinds),
         // These document related vendors are a no op, since they are handled separately from KYC requests
@@ -54,6 +67,7 @@ fn vendor_api_requirements_are_satisfied(
         VendorAPI::TwilioLookupV2 => twilio_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::SocureIDPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
         VendorAPI::IdologyPa => false,
+        VendorAPI::ExperianPreciseID => experian_requirements.are_satisfied(present_data_lifetime_kinds),
     }
 }
 

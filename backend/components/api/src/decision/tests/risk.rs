@@ -36,7 +36,7 @@ fn test_final_decision(
     idology_status: DecisionStatus,
 ) -> (DecisionStatus, CreateManualReview) {
     use crate::decision::{
-        features::{FeatureVector, IDologyFeatures},
+        features::idology_expectid::IDologyFeatures, features::kyc_features::FeatureVector,
         rule::onboarding_rules,
     };
     use feature_flag::MockFeatureFlagClient;

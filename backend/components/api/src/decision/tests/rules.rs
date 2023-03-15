@@ -3,7 +3,7 @@ use std::str::FromStr;
 use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
 
 use crate::decision::{
-    features::IDologyFeatures,
+    features::idology_expectid::IDologyFeatures,
     rule::{onboarding_rules::idology_base_rule_set, rules_engine::evaluate_onboarding_rules},
 };
 use test_case::test_case;

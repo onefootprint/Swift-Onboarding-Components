@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("error building reqwest client: {0}")]
@@ -14,7 +16,27 @@ pub enum Error {
     ConversionError(#[from] ConversionError),
     #[error("Response Error {0}")]
     ResponseError(#[from] CrossCoreResponseError),
+    #[error("Error parsing response")]
+    StringParseError(#[from] std::num::ParseIntError),
+    #[error("Score not found when parsing precise id response")]
+    ScoreNotFound,
+    #[error("Missing precise ID Response")]
+    MissingPreciseIDResponse,
+    #[error("invalid PreciseID score received")]
+    InvalidScore,
+    #[error("Experian Validation error {0}")]
+    ValidationError(#[from] ValidationError),
 }
+
+#[derive(Debug, thiserror::Error, PartialEq, Eq)]
+pub enum ValidationError {
+    #[error("Data cannot be sent in this environment: {0}")]
+    EnvironmentMismatch(EnvironmentMismatchError),
+    #[error("Experian API credentials not registered")]
+    CredentialsNotRegistered,
+}
+
+pub enum ExperianAPIError {}
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConversionError {
@@ -125,4 +147,30 @@ pub enum ExperianErrorCode {
     #[serde(rename = "720")]
     E720,
     // TODO: Also get json not well formed R0102 in the response header, but not in the docs anywhere /shrug
+}
+
+#[derive(PartialEq, Eq)]
+pub struct EnvironmentMismatchError {
+    pub is_production: bool,
+    pub is_test_case: bool,
+}
+
+impl fmt::Debug for EnvironmentMismatchError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "is_production={}, is_test_case={}",
+            self.is_production, self.is_test_case
+        )
+    }
+}
+
+impl fmt::Display for EnvironmentMismatchError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "is_production={}, is_test_case={}",
+            self.is_production, self.is_test_case
+        )
+    }
 }

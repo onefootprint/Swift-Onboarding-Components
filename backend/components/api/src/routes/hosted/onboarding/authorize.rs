@@ -169,6 +169,7 @@ async fn run_kyc(
             &state.idology_client,
             &state.socure_production_client,
             &state.twilio_client.client,
+            &state.experian_client,
         )
         .await?;
     }

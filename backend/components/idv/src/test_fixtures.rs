@@ -340,501 +340,7 @@ pub fn experian_cross_core_response() -> serde_json::Value {
                             "fraudSolutions": {
                                 "response": {
                                     "products": {
-                                        "preciseIDServer": {
-                                            "sessionID": "YMWK2SXF855BNZGM01HDWMW2.pidd4v-2303060915341255630306",
-                                            "header": {
-                                                "reportDate": "03062023",
-                                                "reportTime": "091535",
-                                                "productOption": "01",
-                                                "subcode": "2956241",
-                                                "referenceNumber": "ExpInternal-TEST"
-                                            },
-                                            "summary": {
-                                                "transactionID": "2243698991",
-                                                "finalDecision": "ACC",
-                                                "scores": {
-                                                    "preciseIDScore": "656",
-                                                    "preciseIDScorecard": "IDS_V3.0",
-                                                    "validationScore": "000000",
-                                                    "verificationScore": "000000",
-                                                    "complianceDescription": "No Compliance Code",
-                                                    "fpdscore": "000000"
-                                                }
-                                            },
-                                            "preciseMatch": {
-                                                "version": "02.00",
-                                                "responseStatusCode": {
-                                                    "value": "",
-                                                    "code": "00"
-                                                },
-                                                "preciseMatchTransactionID": "3b636700-3a07-425d-9",
-                                                "preciseMatchScore": "000",
-                                                "preciseMatchDecision": {
-                                                    "value": "",
-                                                    "code": " "
-                                                },
-                                                "addresses": {
-                                                    "address": [
-                                                        {
-                                                            "summary": {
-                                                                "verificationResult": {
-                                                                    "value": "",
-                                                                    "code": "AC"
-                                                                },
-                                                                "type": {
-                                                                    "value": "",
-                                                                    "code": "P "
-                                                                },
-                                                                "unitMismatchResult": {
-                                                                    "value": "",
-                                                                    "code": "  "
-                                                                },
-                                                                "highRiskResult": {
-                                                                    "value": "",
-                                                                    "code": "N "
-                                                                },
-                                                                "counts": {
-                                                                    "standardizedAddressReturnCount": 0,
-                                                                    "residentialAddressMatchCount": 3,
-                                                                    "residentialAddressReturnCount": 2,
-                                                                    "highRiskAddressReturnCount": 0,
-                                                                    "businessAddressMatchCount": 0,
-                                                                    "businessAddressReturnCount": 0
-                                                                }
-                                                            },
-                                                            "detail": {
-                                                                "standardizedAddressRcd": {
-                                                                    "surname": "BREEN",
-                                                                    "firstName": "JOHN",
-                                                                    "middle": "W",
-                                                                    "address": "PO BOX 445",
-                                                                    "city": "APO",
-                                                                    "state": "AE",
-                                                                    "zipCode": "09061"
-                                                                },
-                                                                "residentialAddressRcd": [
-                                                                    {
-                                                                        "surname": "BREEN",
-                                                                        "firstName": "JOHN",
-                                                                        "middle": "W",
-                                                                        "aliasName": [],
-                                                                        "address": "445",
-                                                                        "city": "APO",
-                                                                        "state": "AE",
-                                                                        "zipCode": "09061",
-                                                                        "areaCode": "781",
-                                                                        "phone": "8945369",
-                                                                        "monthsAtResidence": "0048",
-                                                                        "lastUpdatedDate": "20080222"
-                                                                    },
-                                                                    {
-                                                                        "surname": "BREEN",
-                                                                        "firstName": "JOHN",
-                                                                        "aliasName": [],
-                                                                        "address": "PO BOX",
-                                                                        "city": "APO",
-                                                                        "state": "AE",
-                                                                        "zipCode": "09061",
-                                                                        "lastUpdatedDate": "20120820"
-                                                                    }
-                                                                ],
-                                                                "highRiskAddressRcd": [],
-                                                                "highRiskAddressDescription": [
-                                                                    {
-                                                                        "highRiskDescription": "No high risk business at address/phone"
-                                                                    }
-                                                                ],
-                                                                "businessAddressRcd": []
-                                                            }
-                                                        }
-                                                    ]
-                                                },
-                                                "phones": {
-                                                    "phone": [
-                                                        {
-                                                            "summary": {
-                                                                "verificationResult": {
-                                                                    "value": "",
-                                                                    "code": "EB"
-                                                                },
-                                                                "classification": {
-                                                                    "value": "",
-                                                                    "code": "LM"
-                                                                },
-                                                                "highRiskResult": {
-                                                                    "value": "",
-                                                                    "code": "N"
-                                                                },
-                                                                "counts": {
-                                                                    "residentialPhoneMatchCount": 2,
-                                                                    "residentialPhoneReturnCount": 2,
-                                                                    "highRiskPhoneReturnCount": 0,
-                                                                    "businessPhoneMatchCount": 1,
-                                                                    "businessPhoneReturnCount": 1
-                                                                }
-                                                            },
-                                                            "detail": {
-                                                                "residentialPhoneRcd": [
-                                                                    {
-                                                                        "surname": "BREEN",
-                                                                        "firstName": "JOHN",
-                                                                        "middle": "W",
-                                                                        "aliasName": [],
-                                                                        "address": "445",
-                                                                        "city": "APO",
-                                                                        "state": "AE",
-                                                                        "zipCode": "09061",
-                                                                        "areaCode": "781",
-                                                                        "phone": "8945369",
-                                                                        "monthsAtResidence": "0048",
-                                                                        "lastUpdatedDate": "20080222"
-                                                                    },
-                                                                    {
-                                                                        "surname": "BREEN KAREN",
-                                                                        "firstName": "JOHN",
-                                                                        "middle": "W",
-                                                                        "aliasName": [],
-                                                                        "address": "PO BOX",
-                                                                        "city": "APO",
-                                                                        "state": "AE",
-                                                                        "zipCode": "09061",
-                                                                        "zipPlus4": "0000",
-                                                                        "areaCode": "781",
-                                                                        "phone": "8945369",
-                                                                        "lastUpdatedDate": "20131220"
-                                                                    }
-                                                                ],
-                                                                "phoneHighRiskRcd": [],
-                                                                "highRiskPhoneDescription": [
-                                                                    {
-                                                                        "highRiskDescription": "No high risk business at address/phone"
-                                                                    }
-                                                                ],
-                                                                "businessPhoneRcd": [
-                                                                    {
-                                                                        "address": "PO BOX 445",
-                                                                        "city": "APO",
-                                                                        "state": "AE",
-                                                                        "zipCode": "09061",
-                                                                        "areaCode": "781",
-                                                                        "phone": "8945369"
-                                                                    }
-                                                                ]
-                                                            }
-                                                        }
-                                                    ]
-                                                },
-                                                "consumerID": {
-                                                    "summary": {
-                                                        "verificationResult": {
-                                                            "value": "",
-                                                            "code": "Y "
-                                                        },
-                                                        "deceasedResult": {
-                                                            "value": "",
-                                                            "code": "N"
-                                                        },
-                                                        "formatResult": {
-                                                            "value": "",
-                                                            "code": "V"
-                                                        },
-                                                        "issueResult": {
-                                                            "value": "",
-                                                            "code": "C"
-                                                        },
-                                                        "counts": {
-                                                            "consumerIDReturnCount": 2
-                                                        }
-                                                    },
-                                                    "detail": {
-                                                        "consumerIDRcd": [
-                                                            {
-                                                                "surname": "BREEN",
-                                                                "firstName": "JOHN",
-                                                                "aliasName": [],
-                                                                "address": "4528 W VALLEY CT",
-                                                                "city": "ARCATA",
-                                                                "state": "CA",
-                                                                "areaCode": "781",
-                                                                "phone": "8945369",
-                                                                "reportedDate": "20060524",
-                                                                "lastUpdatedDate": "20060524"
-                                                            },
-                                                            {
-                                                                "surname": "SWARTZ",
-                                                                "firstName": "SEAN",
-                                                                "middle": "C",
-                                                                "aliasName": [],
-                                                                "address": "340 COPENHAFFER RD",
-                                                                "city": "YORK",
-                                                                "state": "PA",
-                                                                "zipCode": "17404",
-                                                                "zipPlus4": "8402",
-                                                                "reportedDate": "19890901",
-                                                                "lastUpdatedDate": "20051113"
-                                                            }
-                                                        ]
-                                                    }
-                                                },
-                                                "dateOfBirth": {
-                                                    "summary": {
-                                                        "matchResult": {
-                                                            "value": "",
-                                                            "code": "9"
-                                                        },
-                                                        "monthOfBirth": "02",
-                                                        "dayOfBirth": "19",
-                                                        "yearOfBirth": "1957"
-                                                    }
-                                                },
-                                                "driverLicense": {
-                                                    "summary": {
-                                                        "verificationResult": {
-                                                            "value": "",
-                                                            "code": "M"
-                                                        },
-                                                        "formatValidation": {
-                                                            "value": "",
-                                                            "code": " "
-                                                        }
-                                                    }
-                                                },
-                                                "changeOfAddresses": {
-                                                    "changeOfAddress": [
-                                                        {
-                                                            "summary": {
-                                                                "verificationResult": {
-                                                                    "value": "",
-                                                                    "code": "N "
-                                                                },
-                                                                "counts": {
-                                                                    "changeOfAddressReturnCount": 0
-                                                                }
-                                                            }
-                                                        }
-                                                    ]
-                                                },
-                                                "ofac": {
-                                                    "summary": {
-                                                        "verificationResult": {
-                                                            "value": "",
-                                                            "code": "1 "
-                                                        },
-                                                        "counts": {
-                                                            "ofacReturnCount": 0
-                                                        }
-                                                    }
-                                                },
-                                                "previousAddresses": {
-                                                    "previousAddress": [
-                                                        {
-                                                            "summary": {
-                                                                "counts": {
-                                                                    "previousAddressReturnCount": 1
-                                                                }
-                                                            },
-                                                            "detail": {
-                                                                "previousAddressRcd": [
-                                                                    {
-                                                                        "address": "1335 N CLAYTON ST",
-                                                                        "city": "WILMINGTON",
-                                                                        "state": "DE",
-                                                                        "zipCode": "19806",
-                                                                        "zipPlus4": "4003",
-                                                                        "reportedDate": "20051214",
-                                                                        "lastUpdatedDate": "20051214"
-                                                                    }
-                                                                ]
-                                                            }
-                                                        }
-                                                    ]
-                                                },
-                                                "ssnfinder": {
-                                                    "summary": {
-                                                        "counts": {
-                                                            "ssnfinderReturnCount": 0
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "ipAddress": {
-                                                "ipAddressMatchZipCode": {
-                                                    "value": "",
-                                                    "code": " "
-                                                },
-                                                "ipAddressMatchState": {
-                                                    "value": "",
-                                                    "code": " "
-                                                },
-                                                "ipAddressMatchCity": {
-                                                    "value": "",
-                                                    "code": " "
-                                                },
-                                                "ipAddressMatchCountry": {
-                                                    "value": "",
-                                                    "code": " "
-                                                }
-                                            },
-                                            "pidxmlversion": "06.00",
-                                            "glbDetail": {
-                                                "fraudShield": {
-                                                    "indicator": [
-                                                        {
-                                                            "value": "N",
-                                                            "code": "01"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "02"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "03"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "04"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "05"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "06"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "10"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "11"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "13"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "14"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "15"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "16"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "17"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "18"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "21"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "25"
-                                                        },
-                                                        {
-                                                            "value": "N",
-                                                            "code": "26"
-                                                        }
-                                                    ]
-                                                },
-                                                "glbRules": {
-                                                    "glbRule": [
-                                                        {
-                                                            "value": "",
-                                                            "code": "3401"
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        },
-                                                        {
-                                                            "value": "",
-                                                            "code": "    "
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        },
+                                        "preciseIDServer": experian_precise_id_response(false, "656"),
                                         "customerManagement": {
                                             "version": "1.00",
                                             "reportDate": "03062023",
@@ -1130,6 +636,505 @@ pub fn experian_cross_core_response() -> serde_json::Value {
                     {
                         "contactId": "APPLICANT_CONTACT_ID_1",
                         "applicantType": "APPLICANT"
+                    }
+                ]
+            }
+        }
+    })
+}
+
+pub fn experian_precise_id_response(consumer_not_found: bool, score: &str) -> serde_json::Value {
+    let glb_rule_val = if consumer_not_found { "3001" } else { "1234" };
+    serde_json::json!({
+        "sessionID": "YMWK2SXF855BNZGM01HDWMW2.pidd4v-2303060915341255630306",
+        "header": {
+            "reportDate": "03062023",
+            "reportTime": "091535",
+            "productOption": "01",
+            "subcode": "2956241",
+            "referenceNumber": "ExpInternal-TEST"
+        },
+        "summary": {
+            "transactionID": "2243698991",
+            "finalDecision": "ACC",
+            "scores": {
+                "preciseIDScore": score,
+                "preciseIDScorecard": "IDS_V3.0",
+                "validationScore": "000000",
+                "verificationScore": "000000",
+                "complianceDescription": "No Compliance Code",
+                "fpdscore": "000000"
+            }
+        },
+        "preciseMatch": {
+            "version": "02.00",
+            "responseStatusCode": {
+                "value": "",
+                "code": "00"
+            },
+            "preciseMatchTransactionID": "3b636700-3a07-425d-9",
+            "preciseMatchScore": "000",
+            "preciseMatchDecision": {
+                "value": "",
+                "code": " "
+            },
+            "addresses": {
+                "address": [
+                    {
+                        "summary": {
+                            "verificationResult": {
+                                "value": "",
+                                "code": "AC"
+                            },
+                            "type": {
+                                "value": "",
+                                "code": "P "
+                            },
+                            "unitMismatchResult": {
+                                "value": "",
+                                "code": "  "
+                            },
+                            "highRiskResult": {
+                                "value": "",
+                                "code": "N "
+                            },
+                            "counts": {
+                                "standardizedAddressReturnCount": 0,
+                                "residentialAddressMatchCount": 3,
+                                "residentialAddressReturnCount": 2,
+                                "highRiskAddressReturnCount": 0,
+                                "businessAddressMatchCount": 0,
+                                "businessAddressReturnCount": 0
+                            }
+                        },
+                        "detail": {
+                            "standardizedAddressRcd": {
+                                "surname": "BREEN",
+                                "firstName": "JOHN",
+                                "middle": "W",
+                                "address": "PO BOX 445",
+                                "city": "APO",
+                                "state": "AE",
+                                "zipCode": "09061"
+                            },
+                            "residentialAddressRcd": [
+                                {
+                                    "surname": "BREEN",
+                                    "firstName": "JOHN",
+                                    "middle": "W",
+                                    "aliasName": [],
+                                    "address": "445",
+                                    "city": "APO",
+                                    "state": "AE",
+                                    "zipCode": "09061",
+                                    "areaCode": "781",
+                                    "phone": "8945369",
+                                    "monthsAtResidence": "0048",
+                                    "lastUpdatedDate": "20080222"
+                                },
+                                {
+                                    "surname": "BREEN",
+                                    "firstName": "JOHN",
+                                    "aliasName": [],
+                                    "address": "PO BOX",
+                                    "city": "APO",
+                                    "state": "AE",
+                                    "zipCode": "09061",
+                                    "lastUpdatedDate": "20120820"
+                                }
+                            ],
+                            "highRiskAddressRcd": [],
+                            "highRiskAddressDescription": [
+                                {
+                                    "highRiskDescription": "No high risk business at address/phone"
+                                }
+                            ],
+                            "businessAddressRcd": []
+                        }
+                    }
+                ]
+            },
+            "phones": {
+                "phone": [
+                    {
+                        "summary": {
+                            "verificationResult": {
+                                "value": "",
+                                "code": "EB"
+                            },
+                            "classification": {
+                                "value": "",
+                                "code": "LM"
+                            },
+                            "highRiskResult": {
+                                "value": "",
+                                "code": "N"
+                            },
+                            "counts": {
+                                "residentialPhoneMatchCount": 2,
+                                "residentialPhoneReturnCount": 2,
+                                "highRiskPhoneReturnCount": 0,
+                                "businessPhoneMatchCount": 1,
+                                "businessPhoneReturnCount": 1
+                            }
+                        },
+                        "detail": {
+                            "residentialPhoneRcd": [
+                                {
+                                    "surname": "BREEN",
+                                    "firstName": "JOHN",
+                                    "middle": "W",
+                                    "aliasName": [],
+                                    "address": "445",
+                                    "city": "APO",
+                                    "state": "AE",
+                                    "zipCode": "09061",
+                                    "areaCode": "781",
+                                    "phone": "8945369",
+                                    "monthsAtResidence": "0048",
+                                    "lastUpdatedDate": "20080222"
+                                },
+                                {
+                                    "surname": "BREEN KAREN",
+                                    "firstName": "JOHN",
+                                    "middle": "W",
+                                    "aliasName": [],
+                                    "address": "PO BOX",
+                                    "city": "APO",
+                                    "state": "AE",
+                                    "zipCode": "09061",
+                                    "zipPlus4": "0000",
+                                    "areaCode": "781",
+                                    "phone": "8945369",
+                                    "lastUpdatedDate": "20131220"
+                                }
+                            ],
+                            "phoneHighRiskRcd": [],
+                            "highRiskPhoneDescription": [
+                                {
+                                    "highRiskDescription": "No high risk business at address/phone"
+                                }
+                            ],
+                            "businessPhoneRcd": [
+                                {
+                                    "address": "PO BOX 445",
+                                    "city": "APO",
+                                    "state": "AE",
+                                    "zipCode": "09061",
+                                    "areaCode": "781",
+                                    "phone": "8945369"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "consumerID": {
+                "summary": {
+                    "verificationResult": {
+                        "value": "",
+                        "code": "Y "
+                    },
+                    "deceasedResult": {
+                        "value": "",
+                        "code": "N"
+                    },
+                    "formatResult": {
+                        "value": "",
+                        "code": "V"
+                    },
+                    "issueResult": {
+                        "value": "",
+                        "code": "C"
+                    },
+                    "counts": {
+                        "consumerIDReturnCount": 2
+                    }
+                },
+                "detail": {
+                    "consumerIDRcd": [
+                        {
+                            "surname": "BREEN",
+                            "firstName": "JOHN",
+                            "aliasName": [],
+                            "address": "4528 W VALLEY CT",
+                            "city": "ARCATA",
+                            "state": "CA",
+                            "areaCode": "781",
+                            "phone": "8945369",
+                            "reportedDate": "20060524",
+                            "lastUpdatedDate": "20060524"
+                        },
+                        {
+                            "surname": "SWARTZ",
+                            "firstName": "SEAN",
+                            "middle": "C",
+                            "aliasName": [],
+                            "address": "340 COPENHAFFER RD",
+                            "city": "YORK",
+                            "state": "PA",
+                            "zipCode": "17404",
+                            "zipPlus4": "8402",
+                            "reportedDate": "19890901",
+                            "lastUpdatedDate": "20051113"
+                        }
+                    ]
+                }
+            },
+            "dateOfBirth": {
+                "summary": {
+                    "matchResult": {
+                        "value": "",
+                        "code": "9"
+                    },
+                    "monthOfBirth": "02",
+                    "dayOfBirth": "19",
+                    "yearOfBirth": "1957"
+                }
+            },
+            "driverLicense": {
+                "summary": {
+                    "verificationResult": {
+                        "value": "",
+                        "code": "M"
+                    },
+                    "formatValidation": {
+                        "value": "",
+                        "code": " "
+                    }
+                }
+            },
+            "changeOfAddresses": {
+                "changeOfAddress": [
+                    {
+                        "summary": {
+                            "verificationResult": {
+                                "value": "",
+                                "code": "N "
+                            },
+                            "counts": {
+                                "changeOfAddressReturnCount": 0
+                            }
+                        }
+                    }
+                ]
+            },
+            "ofac": {
+                "summary": {
+                    "verificationResult": {
+                        "value": "",
+                        "code": "1 "
+                    },
+                    "counts": {
+                        "ofacReturnCount": 0
+                    }
+                }
+            },
+            "previousAddresses": {
+                "previousAddress": [
+                    {
+                        "summary": {
+                            "counts": {
+                                "previousAddressReturnCount": 1
+                            }
+                        },
+                        "detail": {
+                            "previousAddressRcd": [
+                                {
+                                    "address": "1335 N CLAYTON ST",
+                                    "city": "WILMINGTON",
+                                    "state": "DE",
+                                    "zipCode": "19806",
+                                    "zipPlus4": "4003",
+                                    "reportedDate": "20051214",
+                                    "lastUpdatedDate": "20051214"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "ssnfinder": {
+                "summary": {
+                    "counts": {
+                        "ssnfinderReturnCount": 0
+                    }
+                }
+            }
+        },
+        "ipAddress": {
+            "ipAddressMatchZipCode": {
+                "value": "",
+                "code": " "
+            },
+            "ipAddressMatchState": {
+                "value": "",
+                "code": " "
+            },
+            "ipAddressMatchCity": {
+                "value": "",
+                "code": " "
+            },
+            "ipAddressMatchCountry": {
+                "value": "",
+                "code": " "
+            }
+        },
+        "pidxmlversion": "06.00",
+        "glbDetail": {
+            "fraudShield": {
+                "indicator": [
+                    {
+                        "value": "N",
+                        "code": "01"
+                    },
+                    {
+                        "value": "N",
+                        "code": "02"
+                    },
+                    {
+                        "value": "N",
+                        "code": "03"
+                    },
+                    {
+                        "value": "N",
+                        "code": "04"
+                    },
+                    {
+                        "value": "N",
+                        "code": "05"
+                    },
+                    {
+                        "value": "N",
+                        "code": "06"
+                    },
+                    {
+                        "value": "N",
+                        "code": "10"
+                    },
+                    {
+                        "value": "N",
+                        "code": "11"
+                    },
+                    {
+                        "value": "N",
+                        "code": "13"
+                    },
+                    {
+                        "value": "N",
+                        "code": "14"
+                    },
+                    {
+                        "value": "N",
+                        "code": "15"
+                    },
+                    {
+                        "value": "N",
+                        "code": "16"
+                    },
+                    {
+                        "value": "N",
+                        "code": "17"
+                    },
+                    {
+                        "value": "N",
+                        "code": "18"
+                    },
+                    {
+                        "value": "N",
+                        "code": "21"
+                    },
+                    {
+                        "value": "N",
+                        "code": "25"
+                    },
+                    {
+                        "value": "N",
+                        "code": "26"
+                    }
+                ]
+            },
+            "glbRules": {
+                "glbRule": [
+                    {
+                        "value": "",
+                        "code": glb_rule_val
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
+                    },
+                    {
+                        "value": "",
+                        "code": "    "
                     }
                 ]
             }

@@ -97,6 +97,7 @@ async fn make_vendor_calls(
         &state.idology_client,
         &state.socure_production_client,
         &state.twilio_client.client,
+        &state.experian_client,
     )
     .await?;
 
@@ -269,6 +270,7 @@ async fn shadow_run(
         &state.idology_client,
         &state.socure_production_client,
         &state.twilio_client.client,
+        &state.experian_client,
     )
     .await?;
 

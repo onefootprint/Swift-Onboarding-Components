@@ -14,7 +14,6 @@ use crate::{ParsedResponse, VendorResponse};
 use crate::idology::client::IdologyClient;
 use crate::idology::error as IdologyError;
 use expectid::response::ExpectIDResponse;
-use newtypes::Vendor;
 use scan_onboarding::response::ScanOnboardingAPIResponse;
 
 use tokio_retry::{
@@ -50,7 +49,6 @@ pub async fn send_scan_verify_request(
     parsed_response.validate()?;
 
     Ok(VendorResponse {
-        vendor: Vendor::Idology,
         raw_response: response.into(),
         response: ParsedResponse::IDologyScanVerifySubmission(parsed_response),
     })
@@ -83,7 +81,6 @@ pub async fn poll_scan_verify_results_request(
     parsed.response.validate()?;
 
     Ok(VendorResponse {
-        vendor: Vendor::Idology,
         raw_response: response.into(),
         response: ParsedResponse::IDologyScanVerifyResult(parsed),
     })
@@ -109,7 +106,6 @@ pub async fn send_scan_onboarding_request(
     parsed_response.response.validate()?;
 
     Ok(VendorResponse {
-        vendor: Vendor::Idology,
         raw_response: response.into(),
         response: ParsedResponse::IDologyScanOnboarding(parsed_response),
     })

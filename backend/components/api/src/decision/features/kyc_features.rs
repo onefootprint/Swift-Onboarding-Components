@@ -3,30 +3,14 @@
 use idv::ParsedResponse;
 
 use itertools::Itertools;
-use newtypes::{
-    idology::IdologyScanOnboardingCaptureResult, DecisionStatus, FootprintReasonCode, Vendor, VendorAPI,
-    VerificationResultId,
+use newtypes::{FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
+
+use crate::decision::vendor::vendor_result::VendorResult;
+
+use super::{
+    experian::ExperianFeatures, idology_expectid::IDologyFeatures,
+    idology_scan_onboarding::IDologyScanOnboardingFeatures, socure_idplus::SocureFeatures,
 };
-
-use super::vendor::{socure::SocureFeatures, vendor_result::VendorResult};
-
-/// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IDologyFeatures {
-    pub status: DecisionStatus,
-    pub footprint_reason_codes: Vec<FootprintReasonCode>,
-    pub id_located: bool,
-    pub id_number_for_scan_required: Option<u64>,
-    pub is_id_scan_required: bool,
-    pub verification_result: VerificationResultId,
-    pub create_manual_review: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IDologyScanOnboardingFeatures {
-    pub status: DecisionStatus,
-    pub verification_result: VerificationResultId,
-}
 
 // TODO!
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -40,6 +24,7 @@ pub struct FeatureVector {
     pub idology_scan_onboarding_features: Option<IDologyScanOnboardingFeatures>,
     pub twilio_features: Option<TwilioFeatures>,
     pub socure_features: Option<SocureFeatures>,
+    pub experian_features: Option<ExperianFeatures>,
 }
 
 impl FeatureVector {
@@ -55,6 +40,7 @@ impl FeatureVector {
                 .or(other.idology_scan_onboarding_features),
             twilio_features: self.twilio_features.or(other.twilio_features),
             socure_features: self.socure_features.or(other.socure_features),
+            experian_features: self.experian_features.or(other.experian_features),
         }
     }
 }
@@ -78,12 +64,17 @@ impl FeatureVector {
             .socure_features
             .as_ref()
             .map(|i| i.verification_result.clone());
+        let experian_verification_result = self
+            .experian_features
+            .as_ref()
+            .map(|i| i.verification_result_id.clone());
 
         vec![
             idology_verification_result,
             idology_scan_onboarding_verification_result,
             twilio_verification_result,
             socure_verification_result,
+            experian_verification_result,
         ]
         .into_iter()
         .flatten()
@@ -100,6 +91,10 @@ impl FeatureVector {
             VendorAPI::IdologyScanVerifyResults => None,
             VendorAPI::IdologyScanOnboarding => None,
             VendorAPI::TwilioLookupV2 => None,
+            VendorAPI::ExperianPreciseID => self
+                .experian_features
+                .as_ref()
+                .map(|f| f.footprint_reason_codes.clone()),
             VendorAPI::SocureIDPlus => self
                 .socure_features
                 .as_ref()
@@ -147,45 +142,13 @@ impl From<VendorResult> for FeatureVector {
         let response = result.response;
         let verification_result_id = result.verification_result_id;
         match response.response {
-            ParsedResponse::IDologyExpectID(resp) => {
-                let r = resp.response;
-
-                // TODO: fix this to just be id_located. Shouldn't have idv crate doing anything w.r.t. our DecisionStatus
-                let (status, create_manual_review) = r.status();
-                let mut footprint_reason_codes: Vec<FootprintReasonCode> = r.footprint_reason_codes();
-
-                if r.max_watchlist_score().map(|s| s > 93).unwrap_or(false)
-                    && !footprint_reason_codes.contains(&FootprintReasonCode::WatchlistHit)
-                {
-                    footprint_reason_codes.push(FootprintReasonCode::WatchlistHit)
-                } else if r.has_potential_watchlist_hit()
-                    && !footprint_reason_codes.contains(&FootprintReasonCode::PotentialWatchlistHit)
-                {
-                    footprint_reason_codes.push(FootprintReasonCode::PotentialWatchlistHit)
-                }
-
-                // Add reason code for not locating
-                let id_located = r.id_located();
-                if !id_located {
-                    footprint_reason_codes.push(FootprintReasonCode::IdNotLocated)
-                }
-
-                let idology_features = IDologyFeatures {
-                    status,
-                    create_manual_review,
-                    id_located,
-                    is_id_scan_required: r.is_id_scan_required(),
-                    id_number_for_scan_required: r.id_number,
-                    verification_result: verification_result_id,
-                    footprint_reason_codes,
-                };
-                Self {
-                    idology_features: Some(idology_features),
-                    idology_scan_onboarding_features: None,
-                    twilio_features: None,
-                    socure_features: None,
-                }
-            }
+            ParsedResponse::IDologyExpectID(resp) => Self {
+                idology_features: Some(IDologyFeatures::from(resp, verification_result_id)),
+                idology_scan_onboarding_features: None,
+                twilio_features: None,
+                socure_features: None,
+                experian_features: None,
+            },
             // TODO!
             ParsedResponse::TwilioLookupV2(_) => Self {
                 idology_features: None,
@@ -194,12 +157,14 @@ impl From<VendorResult> for FeatureVector {
                     verification_result: verification_result_id,
                 }),
                 socure_features: None,
+                experian_features: None,
             },
             ParsedResponse::SocureIDPlus(ref idplus_response) => Self {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
+                experian_features: None,
             },
             // TODO
             ParsedResponse::IDologyScanVerifySubmission(_) => Self {
@@ -207,6 +172,7 @@ impl From<VendorResult> for FeatureVector {
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
+                experian_features: None,
             },
 
             // Writing down some context for future us:
@@ -225,30 +191,23 @@ impl From<VendorResult> for FeatureVector {
             // TLDR;
             // For now, let's just punt on incorporating scan OB status into our footprint decision, and can revisit when we have tenants. We'll defer to expectID response since we'll send along the scan OB
             // results to that. I'll keep this around since it's useful to save to PG (when we do that)
-            ParsedResponse::IDologyScanOnboarding(ref scan_ob_resp) => {
-                let status = scan_ob_resp
-                    .response
-                    .capture_result()
-                    .map(|r| {
-                        if r == IdologyScanOnboardingCaptureResult::Completed {
-                            DecisionStatus::Pass
-                        } else {
-                            DecisionStatus::Fail
-                        }
-                    })
-                    .unwrap_or(DecisionStatus::Fail);
-
-                let features = IDologyScanOnboardingFeatures {
-                    status,
-                    verification_result: verification_result_id,
-                };
-                Self {
-                    idology_features: None,
-                    idology_scan_onboarding_features: Some(features),
-                    twilio_features: None,
-                    socure_features: None,
-                }
-            }
+            ParsedResponse::IDologyScanOnboarding(ref scan_ob_resp) => Self {
+                idology_features: None,
+                idology_scan_onboarding_features: Some(IDologyScanOnboardingFeatures::from(
+                    scan_ob_resp,
+                    verification_result_id,
+                )),
+                twilio_features: None,
+                socure_features: None,
+                experian_features: None,
+            },
+            ParsedResponse::ExperianPreciseID(resp) => Self {
+                idology_features: None,
+                idology_scan_onboarding_features: None,
+                twilio_features: None,
+                socure_features: None,
+                experian_features: Some(ExperianFeatures::from(resp, verification_result_id)),
+            },
             _ => unimplemented!(),
         }
     }
@@ -267,52 +226,13 @@ pub fn create_features(results: Vec<VendorResult>) -> FeatureVector {
         .fold(base_features, |acc, v| acc.merge(FeatureVector::from(v)))
 }
 
-mod helpers {
-    use itertools::Itertools;
-    use levenshtein::levenshtein;
-
-    #[allow(dead_code)] // temp
-    pub(super) fn smart_name_distance(name1: &str, name2: &str) -> Option<usize> {
-        let clean_and_split = |s: &str| -> Vec<String> {
-            let s = s.trim().to_uppercase();
-            s.split(' ')
-                .map(|x| x.chars().filter(|c| c.is_alphanumeric()).collect::<String>())
-                .collect()
-        };
-        let name1_parts = clean_and_split(name1);
-        let name2_parts = clean_and_split(name2);
-
-        if name1_parts.len() < 2 || name2_parts.len() < 2 {
-            return None;
-        }
-
-        // Where N is the number of words in name1, select all length-N permutations of name2_parts.
-        // Choose the permutation that yields the smallest levenshtein difference.
-        // This has a few benefits:
-        // - We ignore differences in the ordering of names
-        // - We remove extra names from name2, like a middle name
-        name2_parts
-            .into_iter()
-            .permutations(name1_parts.len())
-            .map(|name2_parts| {
-                // Calculate the sum of levenshtein difference between parts of name1 and name2 zipped
-                name2_parts
-                    .iter()
-                    .zip(name1_parts.iter())
-                    .map(|(x, y)| levenshtein(x, y))
-                    .sum()
-            })
-            .min()
-    }
-}
-
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
 
-    use crate::decision::vendor::socure::SocureBaselineIdPlusLogicV6Result;
+    use crate::decision::features::socure_idplus::SocureBaselineIdPlusLogicV6Result;
 
     use super::*;
     use idv::{
@@ -321,9 +241,8 @@ mod tests {
         socure::response::SocureIDPlusResponse,
         ParsedResponse, VendorResponse,
     };
-    use newtypes::{Vendor, VerificationRequestId};
+    use newtypes::{DecisionStatus, Vendor, VerificationRequestId};
     use serde_json::json;
-    use test_case::test_case;
     // Feature tests
     // TODO: add in twilio
     // My concern is that these test asserts require `Debug` trait to be derived. Will this work
@@ -352,6 +271,7 @@ mod tests {
             idology_scan_onboarding_features: None,
             twilio_features: None,
             socure_features: None,
+            experian_features: None,
         };
         assert_eq!(
             expected_feature_vector.idology_features,
@@ -359,22 +279,9 @@ mod tests {
         );
         assert!(feature_vector.twilio_features.is_none());
         assert!(feature_vector.socure_features.is_none());
+        assert!(feature_vector.experian_features.is_none());
 
         Ok(())
-    }
-
-    // Helpers tests
-    #[test_case("elliott forde", "ElLioTt ForDe" => Some(0))]
-    #[test_case("elliott forde", "FORDE, ELLIOTT" => Some(0))]
-    #[test_case("elliott forde", "FORDE ELLIOT" => Some(1))]
-    #[test_case("elliott forde", "FORDE ELLIOTT VETLE" => Some(0))]
-    #[test_case("forde elliott", "ELLIOTT FORDE VETLE" => Some(0))]
-    #[test_case("elliott forde", "CONRAD FORDE" => Some(7))]
-    #[test_case("elliott", "elliott forde" => None)]
-    #[test_case("elliott forde", "elliott" => None)]
-    #[test_case("elliott forde", "" => None)]
-    fn test_good_emails(name1: &str, name2: &str) -> Option<usize> {
-        helpers::smart_name_distance(name1, name2)
     }
 
     fn create_idology_vendor_result(summary_result_key: &str) -> Result<VendorResult, IdologyError> {
@@ -421,7 +328,6 @@ mod tests {
         let parsed_response: ExpectIDResponse = idology_verification::parse_response(raw.clone())?;
 
         let res = VendorResponse {
-            vendor: Vendor::Idology,
             response: ParsedResponse::IDologyExpectID(parsed_response),
             raw_response: raw.into(),
         };
@@ -471,6 +377,7 @@ mod tests {
                     FootprintReasonCode::SsnIssuedPriorToDob,
                 ],
             }),
+            experian_features: None,
         };
         // no output when no input VendorAPI's are specified
         assert_eq!(0, feature_vector.consolidated_reason_codes(vec![]).len());

@@ -1,5 +1,5 @@
 use idv::socure::response::SocureIDPlusResponse;
-use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId, SocureReasonCode};
+use newtypes::{DecisionStatus, FootprintReasonCode, SocureReasonCode, VerificationResultId};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 

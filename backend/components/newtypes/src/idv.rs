@@ -1,7 +1,7 @@
 use crate::{IdentityDataKind, PiiString};
 use strum::IntoEnumIterator;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct IdvData {
     pub first_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
