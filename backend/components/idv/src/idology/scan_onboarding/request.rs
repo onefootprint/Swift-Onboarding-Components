@@ -3,16 +3,6 @@ use newtypes::{DocVData, PiiString};
 
 use crate::idology::scan_verify::request::ScanDocumentType;
 
-/// Idology request to ScanVerify
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct SubmissionRequest {
-    pub(crate) username: PiiString,
-    pub(crate) password: PiiString,
-    #[serde(flatten)]
-    pub(crate) data: SubmissionRequestData,
-}
-
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SubmissionRequestData {
@@ -28,7 +18,6 @@ pub(crate) struct SubmissionRequestData {
     face_image: Option<PiiString>,
     /// ipAddress parameter is not required unless you are utilizing ExpectID GeoTrace for your enterprise configuration.
     ip_address: Option<PiiString>,
-    output: String,
 }
 
 impl TryFrom<DocVData> for SubmissionRequestData {
@@ -60,7 +49,48 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             face_image: selfie_image,
             // TODO
             ip_address: None,
-            output: String::from("json"),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::idology::common::request::{IdologyRequestData, Request};
+
+    use super::*;
+
+    #[test]
+    fn test_serialization() {
+        let req = Request::new(
+            PiiString::from("u".to_owned()),
+            PiiString::from("p".to_owned()),
+            IdologyRequestData::ScanOnboarding(SubmissionRequestData {
+                image: PiiString::from("front123".to_owned()),
+                back_image: PiiString::from("back456".to_owned()),
+                country_code: PiiString::from("CA".to_owned()),
+                scan_document_type: ScanDocumentType::IdCard,
+                face_image: Some(PiiString::from("myface".to_owned())),
+                ip_address: None,
+            }),
+        );
+
+        let json_val = serde_json::to_value(&req).unwrap();
+
+        assert_eq!(
+            json!({
+              "username": "u",
+              "password": "p",
+              "image": "front123",
+              "backImage": "back456",
+              "countryCode": "CA",
+              "scanDocumentType": "idCard",
+              "faceImage": "myface",
+              "ipAddress": null,
+              "output": "json"
+            }),
+            json_val
+        );
     }
 }

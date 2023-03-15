@@ -29,12 +29,11 @@ impl IdologyClient {
     pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<serde_json::Value, IdologyError::Error> {
         let url = "https://web.idologylive.com/api/idiq.svc";
         let req_data = expectid::request::RequestData::try_from(idv_data)?;
-        let req_list = Request {
-            username: self.username.clone(),
-            password: self.password.clone(),
-            data: IdologyRequestData::ExpectId(req_data),
-            output: "json".to_owned(),
-        };
+        let req_list = Request::new(
+            self.username.clone(),
+            self.password.clone(),
+            IdologyRequestData::ExpectId(req_data),
+        );
         let response = self
             .client
             .post(url)
@@ -60,11 +59,11 @@ impl IdologyClient {
         // TODO load these as env or something else
         let url = "https://web.idologylive.com/api/idscanperform.svc";
         let req_data = scan_verify::request::SubmissionRequestData::try_from(docv_data)?;
-        let req = scan_verify::request::SubmissionRequest {
-            username: self.username.clone(),
-            password: self.password.clone(),
-            data: req_data,
-        };
+        let req = Request::new(
+            self.username.clone(),
+            self.password.clone(),
+            IdologyRequestData::ScanVerify(req_data),
+        );
 
         let response = self
             .client
@@ -89,11 +88,11 @@ impl IdologyClient {
         // TODO load these as env or something else
         let url = "https://web.idologylive.com/api/idscan.svc";
         let req_data = scan_verify::request::ResultsRequestData::from(query_id);
-        let req = scan_verify::request::ResultsRequest {
-            username: self.username.clone(),
-            password: self.password.clone(),
-            data: req_data,
-        };
+        let req = Request::new(
+            self.username.clone(),
+            self.password.clone(),
+            IdologyRequestData::ScanVerifyResults(req_data),
+        );
 
         let response = self
             .client
@@ -136,11 +135,11 @@ impl IdologyClient {
         // TODO load these as env or something else
         let url = "https://web.idologylive.com/api/scan-capture.svc";
         let req_data = scan_onboarding::request::SubmissionRequestData::try_from(docv_data)?;
-        let req = scan_onboarding::request::SubmissionRequest {
-            username: self.username.clone(),
-            password: self.password.clone(),
-            data: req_data,
-        };
+        let req = Request::new(
+            self.username.clone(),
+            self.password.clone(),
+            IdologyRequestData::ScanOnboarding(req_data),
+        );
 
         let response = self
             .client

@@ -1,14 +1,6 @@
 use crate::idology::error as IdologyError;
 use newtypes::{DocVData, IdDocKind, PiiString};
 
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct ResultsRequest {
-    pub(crate) username: PiiString,
-    pub(crate) password: PiiString,
-    #[serde(flatten)]
-    pub(crate) data: ResultsRequestData,
-}
 type QueryId = u64;
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -52,7 +44,6 @@ pub(crate) struct SubmissionRequestData {
     face_image: Option<PiiString>,
     /// ipAddress parameter is not required unless you are utilizing ExpectID GeoTrace for your enterprise configuration.
     ip_address: Option<PiiString>,
-    output: String,
 }
 
 // TODO put this into wire types so front end can use same
@@ -109,7 +100,6 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             face_image: None, // For now, we can only have Selfie enabled for Scan Onboard but not Scan Verify
             // TODO
             ip_address: None,
-            output: String::from("json"),
         })
     }
 }
