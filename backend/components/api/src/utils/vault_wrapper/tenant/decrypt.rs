@@ -46,7 +46,7 @@ impl TenantUvw {
         req: Option<DecryptRequest>,
     ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
         self.check_ob_config_access(ids)?;
-        let results = self.uvw.decrypt_unsafe(&state.enclave_client, ids).await?;
+        let results = self.uvw.decrypt_unchecked(&state.enclave_client, ids).await?;
         if let Some(req) = req {
             req.create_access_event(state, self.scoped_user_id.clone(), ids.to_vec())
                 .await?;

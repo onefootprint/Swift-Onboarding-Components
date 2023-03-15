@@ -15,7 +15,7 @@ impl<Type> VaultWrapper<Type> {
     /// Returns a hashmap of identifiers to their decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
     /// doesn't exist in the UVW.
-    pub async fn decrypt_unsafe(
+    pub async fn decrypt_unchecked(
         &self,
         enclave_client: &EnclaveClient,
         ids: &[DataIdentifier],
@@ -57,7 +57,7 @@ impl VaultWrapper<Person> {
 
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<PhoneNumber, ApiError> {
         let e164 = self
-            .decrypt_unsafe(&state.enclave_client, &[IDK::PhoneNumber.into()])
+            .decrypt_unchecked(&state.enclave_client, &[IDK::PhoneNumber.into()])
             .await?
             .remove(&IDK::PhoneNumber.into())
             .ok_or(ApiError::NoPhoneNumberForVault)?;

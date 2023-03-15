@@ -23,7 +23,7 @@ pub async fn build_idv_data_from_verification_request(
         .await??;
 
     let all_idks: Vec<_> = IDK::iter().map(DataIdentifier::from).collect();
-    let mut decrypted_values = uvw.decrypt_unsafe(enclave_client, &all_idks).await?;
+    let mut decrypted_values = uvw.decrypt_unchecked(enclave_client, &all_idks).await?;
     // Remove sandbox suffixes
     let email = decrypted_values
         .remove(&IDK::Email.into())
