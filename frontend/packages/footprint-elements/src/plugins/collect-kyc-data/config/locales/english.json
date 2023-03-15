@@ -58,7 +58,7 @@
           "address-line-1": {
             "label": "Address line 1",
             "placeholder": "Street and house number",
-            "error": "Address cannot be empty"
+            "error": "Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)"
           },
           "address-line-2": {
             "label": "Address line 2 (optional)",

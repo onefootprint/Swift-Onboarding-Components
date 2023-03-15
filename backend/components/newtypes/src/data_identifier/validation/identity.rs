@@ -46,6 +46,11 @@ fn validate_address(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
         return Err(Error::InvalidLength);
     }
 
+    // eventually should maybe use a address verification/resolution service for this
+    if for_bifrost && input.leak().to_lowercase().starts_with("po box") {
+        return Err(Error::AddressIsPOBox);
+    }
+
     Ok(input)
 }
 

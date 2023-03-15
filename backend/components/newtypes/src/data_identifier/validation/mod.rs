@@ -26,6 +26,8 @@ pub enum Error {
     InvalidDate,
     #[error("The entered date of birth results in an improbable age")]
     ImprobableDob,
+    #[error("The entered address is a PO Box")]
+    AddressIsPOBox,
 }
 
 pub(super) type VResult<T> = Result<T, Error>;

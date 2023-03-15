@@ -150,7 +150,10 @@ const AddressFull = ({
             label={t('form.address-line-1.label')}
             onSelect={handleAddressSelect}
             placeholder={t('form.address-line-1.placeholder')}
-            {...register(UserDataAttribute.addressLine1, { required: true })}
+            {...register(UserDataAttribute.addressLine1, {
+              required: true,
+              pattern: /^(?!p\.?o\.?\s?box).*$/i,
+            })}
           />
           <TextInput
             data-private
