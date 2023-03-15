@@ -19,6 +19,8 @@ type TimelineProps = {
   isLoading?: boolean;
 };
 
+const HEADER_HEIGHT = '40px';
+
 export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
   if (!time) {
     return 'empty';
@@ -42,27 +44,27 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
           const key = `${getKeyForItemTime(item.time)}-${i}`;
           const { iconComponent, headerComponent, bodyComponent } = item;
           const hasDashedBorder = !iconComponent;
-          const { length } = items;
+          const last = i === items.length - 1;
 
           return (
             <Fragment key={key}>
-              <TimeContainer hasDashedBorder={hasDashedBorder} index={i}>
-                {item.time && <TimelineItemTime time={item.time} />}
-              </TimeContainer>
-              <TextContainer
-                hasDashedBorder={hasDashedBorder}
-                index={i}
-                length={length}
-              >
-                <HeaderContainer>
+              <Row>
+                <TimeContainer>
+                  {item.time && <TimelineItemTime time={item.time} />}
+                </TimeContainer>
+                <IconAndLine>
+                  <Line data-last={last} data-dashed={hasDashedBorder} />
                   {iconComponent && (
-                    <IconContainer index={i}>{iconComponent}</IconContainer>
+                    <IconContainer>{iconComponent}</IconContainer>
                   )}
-                  {headerComponent}
-                </HeaderContainer>
-                <BodyContainer>{bodyComponent}</BodyContainer>
-                <Mask index={i} length={length} />
-              </TextContainer>
+                </IconAndLine>
+                <Content>
+                  <Header>{headerComponent}</Header>
+                  {bodyComponent && (
+                    <BodyContainer>{bodyComponent}</BodyContainer>
+                  )}
+                </Content>
+              </Row>
             </Fragment>
           );
         })}
@@ -77,118 +79,55 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
 };
 
 const TimelineContainer = styled.div`
-  display: grid;
-  grid-template-columns: auto auto auto auto;
-  align-content: left;
-  justify-content: left;
+  display: flex;
+  flex-direction: column;
 `;
 
-const TimeContainer = styled.div<{ hasDashedBorder: boolean; index: number }>`
-  ${({ theme }) => css`
-    grid-column-start: 1;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    margin-right: ${theme.spacing[7]};
-  `};
-
-  // If the first item has the dashed connector, the first row is shifted down
-  ${({ theme, hasDashedBorder, index }) =>
-    hasDashedBorder &&
-    index === 0 &&
-    css`
-      padding-top: ${theme.spacing[5]};
-    `};
+const TimeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 156px;
+  height: ${HEADER_HEIGHT};
+  flex-shrink: 0;
+  justify-self: flex-end;
 `;
 
-const IconContainer = styled.div<{ index: number }>`
+const Content = styled.div`
   ${({ theme }) => css`
-    display: flex;
-    align-items: flex-start;
-    padding: ${theme.spacing[3]};
-    background: ${theme.backgroundColor.primary};
-    position: absolute;
-    z-index: 3;
-    left: calc(-1 * ${theme.spacing[5]});
-    top: ${theme.spacing[7]};
-  `};
-
-  // Align the icon with the text
-  ${({ index, theme }) =>
-    index === 0 &&
-    css`
-      top: calc(-1 * ${theme.spacing[2]});
-    `};
-`;
-
-const TextContainer = styled.div<{
-  hasDashedBorder: boolean;
-  index: number;
-  length: number;
-}>`
-  ${({ theme }) => css`
-    grid-column-start: 2;
-    background: ${theme.backgroundColor.primary};
-    position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: ${theme.spacing[8]} 0 ${theme.spacing[8]} ${theme.spacing[7]};
-    margin-top: calc(-1 * ${theme.spacing[8]});
-    border-left: 2px solid ${theme.borderColor.primary};
+    padding-bottom: ${theme.spacing[8]};
+    gap: ${theme.spacing[2]};
+    width: 100%;
+  `}
+`;
+
+const Header = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: ${HEADER_HEIGHT};
+    margin-left: ${theme.spacing[1]};
+
+    & > * {
+      max-width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      line-height: ${HEADER_HEIGHT};
+    }
   `};
-
-  ${({ hasDashedBorder }) =>
-    hasDashedBorder &&
-    css`
-      z-index: 2;
-      border-left-style: dashed;
-    `};
-
-  ${({ index, length }) =>
-    index === length - 1 &&
-    css`
-      padding-bottom: 0;
-    `};
-
-  ${({ index }) =>
-    index === 0 &&
-    css`
-      padding-top: 0;
-      margin-top: 0;
-    `};
-
-  // If the first item has the dashed connector, the first row is shifted down
-  ${({ hasDashedBorder, index, theme }) =>
-    hasDashedBorder &&
-    index === 0 &&
-    css`
-      padding-top: ${theme.spacing[5]};
-    `};
-`;
-
-// Hides the tail end of the border if the last item has a body
-const Mask = styled.div<{ index: number; length: number }>`
-  ${({ theme, index, length }) =>
-    index === length - 1 &&
-    css`
-      position: absolute;
-      background: ${theme.backgroundColor.primary};
-      top: ${theme.spacing[8]};
-      width: 2px;
-      height: calc(100% - ${theme.spacing[8]});
-      left: -2px;
-    `};
-`;
-
-const HeaderContainer = styled.div`
-  display: flex;
 `;
 
 const BodyContainer = styled.div`
   ${({ theme }) => css`
-    margin: ${theme.spacing[2]} 0 0 ${theme.spacing[6]};
+    padding-left: ${theme.spacing[5]};
   `};
 `;
 
@@ -196,6 +135,56 @@ const LoadingContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[4]};
   `};
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: auto;
+  align-items: stretch;
+  position: relative;
+`;
+
+const IconAndLine = styled.div`
+  position: relative;
+  align-items: stretch;
+  min-width: 40px;
+  flex-shrink: 0;
+`;
+
+const IconContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    padding: ${theme.spacing[4]};
+    background: ${theme.backgroundColor.primary};
+    z-index: 3;
+  `};
+`;
+
+const Line = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    left: 50%;
+    width: 0px;
+    height: 100%;
+    transform: translateX(-50%);
+    border-left: ${theme.borderWidth[2]} solid ${theme.borderColor.primary};
+
+    &[data-last='true'] {
+      border-left: ${theme.borderWidth[2]} solid
+        ${theme.backgroundColor.transparent};
+    }
+
+    &[data-dashed='true'] {
+      border-left: ${theme.borderWidth[2]} dashed ${theme.borderColor.primary};
+    }
+  `}
 `;
 
 export default Timeline;

@@ -63,6 +63,7 @@ const AnnotationDetails = ({ data, source }: AnnotationDetailsProps) => {
         onClick={() => {
           setDrawerOpen(true);
         }}
+        size="compact"
       >
         {t('org-overwrite.see-details')}
       </LinkButton>

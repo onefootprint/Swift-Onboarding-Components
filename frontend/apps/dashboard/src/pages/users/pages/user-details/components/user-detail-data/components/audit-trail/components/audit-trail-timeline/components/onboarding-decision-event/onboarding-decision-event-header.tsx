@@ -6,7 +6,7 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import AnnotationDetails from './components/annotation-details';
 
@@ -53,7 +53,7 @@ const OnboardingDecisionEventHeader = ({
             : t('not-verified-by-firm-employee')}
         </Typography>
         <Typography variant="label-3" sx={{ marginLeft: 2, marginRight: 2 }}>
-          •
+          ·
         </Typography>
         <AnnotationDetails data={data} source={source} />
       </OrgDecisionContainer>
@@ -69,7 +69,7 @@ const OnboardingDecisionEventHeader = ({
           {t('org-overwrite.title', { decision, user: source.member })}
         </Typography>
         <Typography variant="label-3" sx={{ marginLeft: 2, marginRight: 2 }}>
-          •
+          ·
         </Typography>
         <AnnotationDetails data={data} source={source} />
       </OrgDecisionContainer>
@@ -80,7 +80,11 @@ const OnboardingDecisionEventHeader = ({
 };
 
 const OrgDecisionContainer = styled.span`
-  display: flex;
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[2]};
+  `}
 `;
 
 export default OnboardingDecisionEventHeader;

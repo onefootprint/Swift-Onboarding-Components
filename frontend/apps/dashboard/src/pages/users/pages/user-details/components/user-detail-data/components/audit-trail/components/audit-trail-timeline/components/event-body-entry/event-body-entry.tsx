@@ -1,7 +1,9 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+const LINE_HEIGHT = '26px';
 
 type EventBodyEntryProps = {
   content: string | JSX.Element;
@@ -10,24 +12,42 @@ type EventBodyEntryProps = {
 
 const EventBodyEntry = ({ content, testID }: EventBodyEntryProps) => (
   <Container data-testid={testID}>
-    <IcoCheck16 />
-    <Typography variant="body-3" color="secondary" sx={{ marginLeft: 2 }}>
-      {content}
-    </Typography>
+    <IconBounds>
+      <IcoCheck16 />
+    </IconBounds>
+    <Content>{content}</Content>
   </Container>
 );
 
 const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: flex-start;
+  ${createFontStyles('body-3')};
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+`;
 
-    // Centers the svg on the first line (if it wraps around)
-    align-items: baseline;
-    svg {
-      padding-top: ${theme.spacing[1]};
-    }
+const IconBounds = styled.div`
+  ${({ theme }) => css`
+    margin-right: ${theme.spacing[2]};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: ${LINE_HEIGHT};
+    width: ${LINE_HEIGHT};
   `}
+`;
+
+const Content = styled.div`
+  min-height: ${LINE_HEIGHT};
+
+  & > * {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
 `;
 
 export default EventBodyEntry;

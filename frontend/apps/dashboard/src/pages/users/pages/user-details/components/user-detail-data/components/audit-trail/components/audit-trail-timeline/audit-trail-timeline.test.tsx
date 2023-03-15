@@ -52,7 +52,6 @@ describe('<AuditTrailTimeline />', () => {
       renderAuditTrailTimeline({ timeline: TimelineFixture });
       const header = screen.getByTestId('kyc-data-collected-event-header');
       expect(header).toBeInTheDocument();
-
       expect(within(header).getByText('Full name')).toBeInTheDocument();
       expect(within(header).getByText('Date of Birth')).toBeInTheDocument();
       expect(within(header).getByText('SSN')).toBeInTheDocument();

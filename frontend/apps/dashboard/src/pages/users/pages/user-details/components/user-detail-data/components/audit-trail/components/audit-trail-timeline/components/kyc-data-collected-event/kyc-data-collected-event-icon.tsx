@@ -1,5 +1,6 @@
 import {
   IcoBuilding16,
+  IcoEmail16,
   Icon,
   IcoPhone16,
   IcoUserCircle16,
@@ -16,7 +17,7 @@ type KycDataCollectedEventIconProps = {
 
 const iconForAttribute: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.name]: IcoUserCircle16,
-  [CollectedKycDataOption.email]: IcoUserCircle16,
+  [CollectedKycDataOption.email]: IcoEmail16,
   [CollectedKycDataOption.phoneNumber]: IcoPhone16,
   [CollectedKycDataOption.ssn4]: IcoUserCircle16,
   [CollectedKycDataOption.ssn9]: IcoUserCircle16,

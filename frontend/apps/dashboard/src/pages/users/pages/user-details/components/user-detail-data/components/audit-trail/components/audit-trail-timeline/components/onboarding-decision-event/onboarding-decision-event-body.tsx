@@ -8,6 +8,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import createStringList from 'src/utils/create-string-list';
 import createTagList from 'src/utils/create-tag-list';
+import styled, { css } from 'styled-components';
 
 import EventBodyEntry from '../event-body-entry';
 
@@ -55,16 +56,18 @@ const OnboardingDecisionEventBody = ({
     return (
       <EventBodyEntry
         content={
-          <>
-            <Typography variant="body-3" as="span">
-              {statusStr}{' '}
+          <Container>
+            <Typography variant="body-3" as="span" sx={{ marginRight: 1 }}>
+              {statusStr}
             </Typography>
-            <Typography variant="body-3" as="span">
-              {createTagList(collectedDataLabels)}
-            </Typography>
+            {createTagList(collectedDataLabels)}
             {vendors && (
               <>
-                <Typography variant="body-3" as="span">
+                <Typography
+                  variant="body-3"
+                  as="span"
+                  sx={{ marginRight: 2, marginLeft: 1 }}
+                >
                   {t('with')}
                 </Typography>
                 <Typography variant="body-3" as="span">
@@ -72,7 +75,7 @@ const OnboardingDecisionEventBody = ({
                 </Typography>
               </>
             )}
-          </>
+          </Container>
         }
         testID="onboarding-decision-event-body"
       />
@@ -90,5 +93,15 @@ const OnboardingDecisionEventBody = ({
 
   return null;
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: ${theme.spacing[2]};
+  `}
+`;
 
 export default OnboardingDecisionEventBody;

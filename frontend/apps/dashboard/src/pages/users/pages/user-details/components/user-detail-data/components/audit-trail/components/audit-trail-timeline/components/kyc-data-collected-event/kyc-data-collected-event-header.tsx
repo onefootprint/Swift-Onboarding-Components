@@ -6,6 +6,7 @@ import {
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import createTagList from 'src/utils/create-tag-list';
+import styled, { css } from 'styled-components';
 
 type KycDataCollectedEventHeaderProps = {
   data: CollectedKycDataEventData;
@@ -25,15 +26,28 @@ const KycDataCollectedEventHeader = ({
   );
 
   return (
-    <Typography
-      variant="label-3"
-      testID="kyc-data-collected-event-header"
-      color={isFromOtherOrg ? 'tertiary' : 'primary'}
-    >
-      {isFromOtherOrg ? t('title-from-other-org') : t('title')}
+    <Container data-testid="kyc-data-collected-event-header">
+      <Typography
+        variant="label-3"
+        color={isFromOtherOrg ? 'tertiary' : 'primary'}
+        sx={{ marginRight: 1 }}
+      >
+        {isFromOtherOrg ? t('title-from-other-org') : t('title')}
+      </Typography>
       {createTagList(attributeLabels)}
-    </Typography>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: ${theme.spacing[2]};
+  `}
+`;
 
 export default KycDataCollectedEventHeader;

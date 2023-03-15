@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Tag } from '@onefootprint/ui';
+import { Box, Tag } from '@onefootprint/ui';
 import React from 'react';
 
 type FieldTagListProps = {
@@ -7,7 +7,7 @@ type FieldTagListProps = {
 };
 
 const FieldTagList = ({ targets }: FieldTagListProps) => {
-  const { allT } = useTranslation('');
+  const { t } = useTranslation('');
 
   const tags = targets
     .map((target: string) => {
@@ -15,17 +15,17 @@ const FieldTagList = ({ targets }: FieldTagListProps) => {
       if (parts.length === 2) {
         const [prefix, label] = parts;
         if (prefix === 'id') {
-          return allT(`user-data-attributes.${label}`);
+          return t(`user-data-attributes.${label}`);
         }
         if (prefix === 'custom') {
           // TODO better formatting for custom data tags
           return target;
         }
         if (prefix === 'id_document') {
-          return allT(`id-doc-type.${label}`);
+          return t(`id-doc-type.${label}`);
         }
         if (prefix === 'selfie') {
-          return allT('id-doc-type.selfie');
+          return t('id-doc-type.selfie');
         }
       }
       return '';
@@ -34,10 +34,13 @@ const FieldTagList = ({ targets }: FieldTagListProps) => {
 
   return (
     <>
-      {tags.map((tag: string, i: number) => (
-        <span key={`${tag}`}>
+      {tags.map((tag: string, index: number) => (
+        <span key={tag}>
+          <Box sx={{ display: 'inline-block', marginLeft: 1 }} />
           <Tag>{tag}</Tag>
-          {i !== targets.length - 1 && <span>, </span>}
+          {index < tags.length - 1 && (
+            <Box sx={{ display: 'inline-block', marginRight: 1 }} />
+          )}
         </span>
       ))}
     </>
