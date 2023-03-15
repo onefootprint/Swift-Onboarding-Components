@@ -43,7 +43,7 @@
     "prettier": "^2.8.4",
     "start-server-and-test": "^1.15.2",
     "turbo": "^1.8.3",
-    "webpack": "^5.72.0"
+    "webpack": "^5.76.0"
   },
   "lint-staged": {
     "*.{jsx,js,ts,tsx}": [
