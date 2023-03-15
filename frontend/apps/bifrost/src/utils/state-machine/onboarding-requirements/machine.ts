@@ -19,7 +19,6 @@ const defaultRequirements: Requirements = {
   liveness: false,
   kybData: [],
   kycData: [],
-  identityCheck: false,
 };
 
 const createOnboardingRequirementsMachine = ({
@@ -106,13 +105,6 @@ const createOnboardingRequirementsMachine = ({
           },
         },
         idDoc: {
-          on: {
-            requirementCompleted: {
-              target: 'checkOnboardingRequirements',
-            },
-          },
-        },
-        identityCheck: {
           on: {
             requirementCompleted: {
               target: 'checkOnboardingRequirements',

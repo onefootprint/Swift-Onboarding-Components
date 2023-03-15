@@ -10,7 +10,6 @@ export enum OnboardingRequirementKind {
   idDoc = 'collect_document',
   collectKycData = 'collect_data',
   collectKybData = 'collect_business_data',
-  identityCheck = 'identity_check',
 }
 
 export type CollectKybDataRequirement = {
@@ -33,16 +32,11 @@ export type LivenessRequirement = {
   kind: OnboardingRequirementKind.liveness;
 };
 
-export type IdentityCheckRequirements = {
-  kind: OnboardingRequirementKind.identityCheck;
-};
-
 export type OnboardingRequirement =
   | CollectKybDataRequirement
   | CollectKycDataRequirement
   | IdDocRequirement
-  | LivenessRequirement
-  | IdentityCheckRequirements;
+  | LivenessRequirement;
 
 export type OnboardingStatusRequest = {
   authToken: string;

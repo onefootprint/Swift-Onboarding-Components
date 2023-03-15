@@ -30,7 +30,6 @@ const CheckOnboardingRequirements = () => {
     let consent = false;
     let kycData: CollectedKycDataOption[] = [];
     let kybData: CollectedKybDataOption[] = [];
-    let identityCheck = false;
 
     requirements.forEach((req: OnboardingRequirement) => {
       if (req.kind === OnboardingRequirementKind.collectKybData) {
@@ -47,9 +46,6 @@ const CheckOnboardingRequirements = () => {
         selfie = req.shouldCollectSelfie;
         consent = req.shouldCollectConsent;
       }
-      if (req.kind === OnboardingRequirementKind.identityCheck) {
-        identityCheck = true;
-      }
     });
 
     send({
@@ -61,7 +57,6 @@ const CheckOnboardingRequirements = () => {
         consent,
         kybData,
         kycData,
-        identityCheck,
       },
     });
   };

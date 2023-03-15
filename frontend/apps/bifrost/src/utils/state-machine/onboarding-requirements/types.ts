@@ -6,7 +6,6 @@ import {
 } from '@onefootprint/types';
 
 export type Requirements = {
-  identityCheck: boolean;
   liveness: boolean;
   idDoc?: boolean;
   selfie?: boolean;

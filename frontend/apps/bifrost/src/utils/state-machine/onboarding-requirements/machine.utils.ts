@@ -22,10 +22,6 @@ export const RequirementTargets: MachineTarget[] = [
     target: 'idDoc',
     cond: context => shouldRunIdDoc(context),
   },
-  {
-    target: 'identityCheck',
-    cond: context => shouldRunIdentityCheck(context),
-  },
 ];
 
 export const requiresAdditionalInfo = (context: MachineContext) => {
@@ -69,6 +65,3 @@ const shouldRunTransfer = (context: MachineContext) => {
   }
   return !!idDoc || !!liveness;
 };
-
-const shouldRunIdentityCheck = (context: MachineContext) =>
-  !!context.requirements.identityCheck;

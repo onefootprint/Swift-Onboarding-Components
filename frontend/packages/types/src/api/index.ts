@@ -13,7 +13,6 @@ export * from './get-access-events';
 export * from './get-auth-roles';
 export * from './get-d2p-status';
 export * from './get-doc-status';
-export * from './get-kyc-status';
 export * from './get-liveness';
 export * from './get-members';
 export * from './get-onboarding-config';

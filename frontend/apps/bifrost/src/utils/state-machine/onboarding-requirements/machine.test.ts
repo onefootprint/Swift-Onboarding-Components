@@ -45,7 +45,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       const { requirements, startedDataCollection, onboardingContext } =
         state.context;
       expect(requirements).toEqual({
-        identityCheck: false,
         liveness: false,
         idDoc: false,
         kycData: [],
@@ -67,7 +66,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          identityCheck: false,
           liveness: false,
           idDoc: false,
           kycData: [],
@@ -97,7 +95,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          identityCheck: true,
           liveness: true,
           idDoc: false,
           kycData: [CollectedKycDataOption.name],
@@ -106,7 +103,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       });
 
       expect(state.context.requirements).toEqual({
-        identityCheck: true,
         liveness: true,
         idDoc: false,
         kycData: [CollectedKycDataOption.name],
@@ -129,7 +125,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          identityCheck: true,
           liveness: true,
           idDoc: false,
           kycData: [],
@@ -137,7 +132,6 @@ describe('Onboarding Requirements Machine Tests', () => {
         },
       });
       expect(state.context.requirements).toEqual({
-        identityCheck: true,
         liveness: true,
         idDoc: false,
         kycData: [],
@@ -154,7 +148,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          identityCheck: true,
           liveness: false,
           idDoc: false,
           kycData: [],
@@ -162,96 +155,12 @@ describe('Onboarding Requirements Machine Tests', () => {
         },
       });
       expect(state.context.requirements).toEqual({
-        identityCheck: true,
-        liveness: false,
         idDoc: false,
         kycData: [],
         kybData: [],
-      });
-
-      expect(state.value).toBe('identityCheck');
-
-      state = machine.send({
-        type: 'requirementCompleted',
-      });
-      expect(state.value).toBe('checkOnboardingRequirements');
-
-      state = machine.send({
-        type: 'onboardingRequirementsReceived',
-        payload: {
-          identityCheck: false,
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-        },
-      });
-      expect(state.context.requirements).toEqual({
-        identityCheck: false,
         liveness: false,
-        idDoc: false,
-        kycData: [],
-        kybData: [],
-      });
-      expect(state.value).toBe('success');
-    });
-
-    it('skips the additional data required page if only identity check is required', () => {
-      const machine = interpret(
-        createMachine({
-          device: {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-          },
-          userFound: true,
-          authToken: 'token',
-          config: { ...TestOnboardingConfig },
-        }),
-      );
-
-      machine.start();
-      let { state } = machine;
-      state = machine.send({
-        type: 'onboardingRequirementsReceived',
-        payload: {
-          identityCheck: true,
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-        },
-      });
-      expect(state.context.requirements).toEqual({
-        identityCheck: true,
-        liveness: false,
-        idDoc: false,
-        kycData: [],
-        kybData: [],
       });
 
-      expect(state.value).toBe('identityCheck');
-      state = machine.send({
-        type: 'requirementCompleted',
-      });
-      expect(state.value).toBe('checkOnboardingRequirements');
-
-      state = machine.send({
-        type: 'onboardingRequirementsReceived',
-        payload: {
-          identityCheck: false,
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-        },
-      });
-      expect(state.context.requirements).toEqual({
-        identityCheck: false,
-        liveness: false,
-        idDoc: false,
-        kycData: [],
-        kybData: [],
-      });
       expect(state.value).toBe('success');
     });
   });
@@ -275,7 +184,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          identityCheck: true,
           liveness: true,
           idDoc: false,
           kycData: [CollectedKycDataOption.name],
@@ -283,7 +191,6 @@ describe('Onboarding Requirements Machine Tests', () => {
         },
       });
       expect(state.context.requirements).toEqual({
-        identityCheck: true,
         liveness: true,
         idDoc: false,
         kycData: [CollectedKycDataOption.name],
@@ -300,7 +207,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          identityCheck: true,
           liveness: true,
           idDoc: true,
           kycData: [],
@@ -308,7 +214,6 @@ describe('Onboarding Requirements Machine Tests', () => {
         },
       });
       expect(state.context.requirements).toEqual({
-        identityCheck: true,
         liveness: true,
         idDoc: true,
         kycData: [],
@@ -325,7 +230,6 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          identityCheck: true,
           liveness: false,
           idDoc: false,
           kycData: [],
@@ -333,37 +237,12 @@ describe('Onboarding Requirements Machine Tests', () => {
         },
       });
       expect(state.context.requirements).toEqual({
-        identityCheck: true,
         liveness: false,
         idDoc: false,
         kycData: [],
         kybData: [],
       });
 
-      expect(state.value).toBe('identityCheck');
-
-      state = machine.send({
-        type: 'requirementCompleted',
-      });
-      expect(state.value).toBe('checkOnboardingRequirements');
-
-      state = machine.send({
-        type: 'onboardingRequirementsReceived',
-        payload: {
-          identityCheck: false,
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-        },
-      });
-      expect(state.context.requirements).toEqual({
-        identityCheck: false,
-        liveness: false,
-        idDoc: false,
-        kycData: [],
-        kybData: [],
-      });
       expect(state.value).toBe('success');
     });
   });

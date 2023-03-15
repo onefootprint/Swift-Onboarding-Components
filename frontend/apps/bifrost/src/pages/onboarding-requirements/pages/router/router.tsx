@@ -11,7 +11,6 @@ import React, { useEffect } from 'react';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import AdditionalInfoRequired from '../additional-info-required';
 import CheckOnboardingRequirements from '../check-onboarding-requirements';
-import IdentityCheck from '../identity-check';
 
 type RouterProps = {
   onDone: () => void;
@@ -133,9 +132,7 @@ const Router = ({ onDone }: RouterProps) => {
       </DeviceSignals>
     );
   }
-  if (state.matches('identityCheck')) {
-    return <IdentityCheck />;
-  }
+
   return null;
 };
 
