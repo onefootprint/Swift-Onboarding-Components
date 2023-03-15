@@ -123,12 +123,12 @@ const Company = () => {
 
   const companyPhotos = [
     {
-      alt: 'Fall 2022 Offsite Destination',
-      src: '/company/offsite.png',
+      alt: 'Spring 2023 Team Retreat',
+      src: '/company/san-diego.jpg',
     },
     {
-      alt: 'Team Dinner',
-      src: '/company/dinner.png',
+      alt: 'Team Activity',
+      src: '/company/escapology.jpg',
     },
   ];
 
