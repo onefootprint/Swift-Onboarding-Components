@@ -1,33 +1,15 @@
-use super::Business;
 use super::{Person, VaultWrapper};
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
-use db::models::vault_data::VaultData;
 use itertools::Itertools;
-use newtypes::IdentityDataKind as IDK;
-use newtypes::{BusinessDataKind as BDK, VdKind};
+use newtypes::DataIdentifier;
+use newtypes::IsDataIdentifierDiscriminant;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
-use newtypes::{DataIdentifier, KvDataKey};
-use std::collections::HashMap;
-use strum::IntoEnumIterator;
 
 impl VaultWrapper<Person> {
-    pub fn missing_identity_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
-        ob_config
-            .must_collect_data
-            .iter()
-            .filter(|cdo| {
-                cdo.required_attributes::<IDK>()
-                    .iter()
-                    .any(|d| !self.has_identity_field(*d))
-            })
-            .cloned()
-            .collect()
-    }
-
     /// Return speculative phone numbers if exist, otherwise portable. There should only be one
     pub fn phone_numbers(&self) -> &[PhoneNumber] {
         if !self.speculative.phone_numbers.is_empty() {
@@ -57,79 +39,63 @@ impl VaultWrapper<Person> {
     }
 }
 
-impl VaultWrapper<Person> {
-    pub fn get_identity_e_field(&self, kind: IDK) -> Option<&SealedVaultBytes> {
-        self.speculative
-            .get_identity_e_field(kind)
-            .or_else(|| self.portable.get_identity_e_field(kind))
-    }
-
-    pub fn has_identity_field(&self, kind: IDK) -> bool {
-        self.get_identity_e_field(kind).is_some()
-    }
-
-    pub fn get_populated_identity_fields(&self) -> Vec<IDK> {
-        IDK::iter().filter(|k| self.has_identity_field(*k)).collect()
-    }
-}
-
-impl VaultWrapper<Business> {
-    pub fn get_business_e_field(&self, kind: BDK) -> Option<&SealedVaultBytes> {
-        self.speculative
-            .get_business_data_e_field(kind)
-            .or_else(|| self.portable.get_business_data_e_field(kind))
-    }
-
-    pub fn has_business_field(&self, kind: BDK) -> bool {
-        self.get_business_e_field(kind).is_some()
-    }
-
-    pub fn get_populated_business_fields(&self) -> Vec<BDK> {
-        BDK::iter()
-            .filter(|k| self.get_business_e_field(*k).is_some())
-            .collect()
-    }
-
-    pub fn missing_business_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
-        // can we generify this to share with missing_id_fields?
-        ob_config
-            .must_collect_data
-            .iter()
-            .filter(|cdo| {
-                cdo.required_attributes::<BDK>()
-                    .iter()
-                    .any(|d| !self.has_business_field(*d))
-            })
-            .cloned()
-            .collect()
-    }
-}
-
 impl<Type> VaultWrapper<Type> {
     /// helper to expose a reference/deref coercion to the underlying vault (normally from a LockedVaultWrapper)
     pub fn vault(&self) -> &Vault {
         &self.vault
     }
 
-    // Can i rm get_populated_id_fields, custom_data, etc?
-    pub fn populated(&self) -> Vec<DataIdentifier> {
+    pub(super) fn populated_dis(&self) -> Vec<DataIdentifier> {
         self.speculative
-            .populated()
+            .populated_dis()
             .into_iter()
-            .chain(self.portable.populated())
+            .chain(self.portable.populated_dis())
             .unique()
             .collect()
     }
 
-    pub fn kv_data(&self) -> HashMap<KvDataKey, &VaultData> {
-        // We don't currently support portable kv data
+    pub fn populated<T>(&self) -> Vec<T>
+    where
+        T: IsDataIdentifierDiscriminant,
+    {
+        self.populated_dis()
+            .into_iter()
+            .filter_map(|di| di.try_into().ok())
+            .collect()
+    }
+
+    pub fn has_field<T>(&self, id: T) -> bool
+    where
+        T: Into<DataIdentifier>,
+    {
+        self.populated_dis().contains(&id.into())
+    }
+
+    pub fn get_e_data<T>(&self, id: T) -> Option<&SealedVaultBytes>
+    where
+        T: Into<DataIdentifier> + Clone,
+    {
+        // Show portable data if visible
         self.speculative
-            .vd
+            .get_e_data(id.clone())
+            .or_else(|| self.portable.get_e_data(id))
+    }
+
+    pub fn missing_fields<T>(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption>
+    where
+        T: IsDataIdentifierDiscriminant,
+    {
+        // can we generify this to share with missing_id_fields?
+        // can we instead use populated_dis?
+        ob_config
+            .must_collect_data
             .iter()
-            .filter_map(|vd| match vd.kind {
-                VdKind::Custom(ref kv_key) => Some((kv_key.clone(), vd)),
-                _ => None,
+            .filter(|cdo| {
+                cdo.required_attributes::<T>()
+                    .iter()
+                    .any(|d| !self.populated::<T>().contains(d))
             })
+            .cloned()
             .collect()
     }
 }

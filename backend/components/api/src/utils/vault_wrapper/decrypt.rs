@@ -17,11 +17,12 @@ impl VaultWrapper<Person> {
     where
         T: Into<DataIdentifier> + Clone + Hash + Eq,
     {
+        // TODO revamp this when we start implementing business decrypt
         HashMap::from_iter(ids.iter().filter_map(|di| {
             match Into::<DataIdentifier>::into(di.clone()) {
                 // TODO simplify to share Custom + Id
-                DataIdentifier::Custom(k) => self.kv_data().get(&k).map(|kvd| &kvd.e_data),
-                DataIdentifier::Id(idk) => self.get_identity_e_field(idk),
+                DataIdentifier::Custom(k) => self.get_e_data(k),
+                DataIdentifier::Id(idk) => self.get_e_data(idk),
                 // Decrypt key here
                 DataIdentifier::IdDocument(_) => todo!(),
                 DataIdentifier::Selfie(_) => todo!(),

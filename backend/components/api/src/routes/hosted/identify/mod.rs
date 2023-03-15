@@ -137,7 +137,7 @@ async fn get_user_challenge_context(
         .await??;
 
     let mut kinds: Vec<ChallengeKind> = Vec::new();
-    if uvw.has_identity_field(IdentityDataKind::PhoneNumber) {
+    if uvw.has_field(IdentityDataKind::PhoneNumber) {
         kinds.push(ChallengeKind::Sms);
     }
     if !creds.is_empty() {

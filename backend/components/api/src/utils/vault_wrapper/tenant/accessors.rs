@@ -31,7 +31,7 @@ impl TenantUvw {
     pub fn get_visible_populated_fields(&self) -> Vec<DataIdentifier> {
         let can_see_scopes = self.can_see_scopes();
 
-        self.populated()
+        self.populated_dis()
         .into_iter()
         // Reuse the tenant auth codepaths to filter out DataIdentifiers on this VaultWrapper
         // that are visible given the approved onboarding configurations

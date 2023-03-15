@@ -212,7 +212,7 @@ impl WriteableVw<Person> {
         update: DataRequest<IDK>,
         fingerprints: NewFingerprints<IDK>,
     ) -> Result<(), ApiError> {
-        let existing_fields = self.get_populated_identity_fields();
+        let existing_fields = self.populated();
         let v = self.vault();
 
         // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
@@ -241,7 +241,7 @@ impl WriteableVw<Business> {
         conn: &mut TxnPgConn,
         update: DataRequest<BusinessDataKind>,
     ) -> Result<(), ApiError> {
-        let existing_fields = self.get_populated_business_fields();
+        let existing_fields = self.populated();
         let v = self.vault();
 
         let builder = VaultDataBuilder::build(update, v.public_key.clone())?;

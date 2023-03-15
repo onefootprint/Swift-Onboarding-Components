@@ -49,8 +49,7 @@ pub fn build_verification_requests_and_checkpoint(
 
 pub fn desired_vendor_apis(uvw: &VaultWrapper<Person>) -> ApiResult<Vec<VendorAPI>> {
     // From the data in the vault, figure out which vendors we need to send to
-    let vendor_apis =
-        idv::requirements::available_vendor_apis(uvw.get_populated_identity_fields().as_slice());
+    let vendor_apis = idv::requirements::available_vendor_apis(uvw.populated().as_slice());
     if vendor_apis.is_empty() {
         return Err(ApiError::AssertionError(
             "Not enough information to send to any vendors".into(),

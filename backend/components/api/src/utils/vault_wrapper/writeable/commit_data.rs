@@ -78,8 +78,8 @@ impl WriteableVw<Person> {
         // NOTE: this does nothing to Custom data or Identity documents since they don't fit into
         // the CollectedDataOption model
         let d = decide_data_to_commit(CurrentData {
-            speculative: CollectedDataOption::list_from(uvw.speculative.get_populated_identity_fields()),
-            portable: CollectedDataOption::list_from(uvw.portable.get_populated_identity_fields()),
+            speculative: CollectedDataOption::list_from(uvw.speculative.populated::<IDK>()),
+            portable: CollectedDataOption::list_from(uvw.portable.populated::<IDK>()),
         });
         let speculative_kinds_to_commit: Vec<_> = d
             .to_portablize
@@ -99,7 +99,7 @@ impl WriteableVw<Person> {
         let lifetime_ids_to_deactivate = {
             // For everything that we're about to commit, deactivate the old data if exists
             let portable_lifetimes_to_deactivate =
-                uvw.portable.get_id_lifetimes(&speculative_kinds_to_commit);
+                uvw.portable.get_lifetimes(speculative_kinds_to_commit.clone());
             let is_all_data_portable = portable_lifetimes_to_deactivate
                 .iter()
                 .all(|l| l.portablized_seqno.is_some());
@@ -111,7 +111,7 @@ impl WriteableVw<Person> {
             }
             // And, grab the IDs of speculative data that we're deactivating.
             let speculative_lifetimes_to_deactivate =
-                uvw.speculative.get_id_lifetimes(&speculative_kinds_to_deactivate);
+                uvw.speculative.get_lifetimes(speculative_kinds_to_deactivate);
             if !speculative_lifetimes_to_deactivate.is_empty() {
                 // For now, we only deactivate speculative data if committing it would otherwise
                 // replace more full data on the user vault.
@@ -136,8 +136,7 @@ impl WriteableVw<Person> {
         // NOTE: this isn't committing identity documents since we never return IdentityDocument
         // from get_populated_fields
         let lifetime_ids_to_commit = {
-            let speculative_lifetimes_to_commit =
-                uvw.speculative.get_id_lifetimes(&speculative_kinds_to_commit);
+            let speculative_lifetimes_to_commit = uvw.speculative.get_lifetimes(speculative_kinds_to_commit);
             let all_data_is_speculative_and_belongs_to_scoped_user = speculative_lifetimes_to_commit
                 .iter()
                 .all(|l| l.portablized_seqno.is_none() && l.scoped_user_id == Some(scoped_user_id.clone()));

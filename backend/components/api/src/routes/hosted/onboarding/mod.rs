@@ -5,7 +5,7 @@ use crate::{
     utils::{
         self,
         session::AuthSession,
-        vault_wrapper::{VaultWrapper, VwArgs},
+        vault_wrapper::{Business, Person, VaultWrapper, VwArgs},
     },
 };
 use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
@@ -20,7 +20,9 @@ use db::{
     DbError, PgConn,
 };
 use itertools::Itertools;
-use newtypes::{OnboardingId, ScopedVaultId, SessionAuthToken, VaultId};
+use newtypes::{
+    BusinessDataKind as BDK, IdentityDataKind as IDK, OnboardingId, ScopedVaultId, SessionAuthToken, VaultId,
+};
 use paperclip::actix::web;
 
 pub mod authorize;
@@ -70,15 +72,15 @@ pub fn get_requirements(
     let ob_config_id = &ob_info.ob_config.id;
     let scoped_user_id = &ob_info.scoped_user.id;
 
-    let uvw = VaultWrapper::build(conn, VwArgs::Tenant(scoped_user_id))?;
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(scoped_user_id))?;
     let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.vault.id, ob_config_id))?;
-    let missing_id_fields = uvw.missing_identity_fields(&ob_info.ob_config);
+    let missing_id_fields = uvw.missing_fields::<IDK>(&ob_info.ob_config);
 
     // Fetch missing business fields
     let missing_business_fields = if ob_info.ob_config.must_collect_business() {
         let scoped_business_id = scoped_business_id.ok_or(UserError::NotAllowedWithoutBusiness)?;
-        let bvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_business_id))?;
-        bvw.missing_business_fields(&ob_info.ob_config)
+        let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
+        bvw.missing_fields::<BDK>(&ob_info.ob_config)
     } else {
         vec![]
     };
