@@ -3,6 +3,7 @@ pub mod common;
 pub mod error;
 pub mod expectid;
 pub(crate) mod fixtures;
+pub mod pa;
 pub mod scan_onboarding;
 pub mod scan_verify;
 

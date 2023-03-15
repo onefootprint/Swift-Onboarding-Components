@@ -12,7 +12,7 @@ pub struct KeyResponse {
     pub key: String,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Eq, PartialEq)]
 pub struct IDologyQualifiers {
     pub qualifier: serde_json::Value,
 }

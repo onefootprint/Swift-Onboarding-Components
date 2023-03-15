@@ -1,6 +1,6 @@
 use newtypes::PiiString;
 
-use crate::idology::{expectid, scan_onboarding, scan_verify};
+use crate::idology::{expectid, pa, scan_onboarding, scan_verify};
 
 /// Request to Idology ExpectID
 #[derive(Debug, Clone, serde::Serialize)]
@@ -32,4 +32,5 @@ pub(crate) enum IdologyRequestData {
     ScanOnboarding(scan_onboarding::request::SubmissionRequestData),
     ScanVerify(scan_verify::request::SubmissionRequestData),
     ScanVerifyResults(scan_verify::request::ResultsRequestData),
+    Pa(pa::request::RequestData),
 }

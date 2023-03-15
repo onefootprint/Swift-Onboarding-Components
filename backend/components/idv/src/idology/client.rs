@@ -2,7 +2,7 @@ use super::{
     common::request::{IdologyRequestData, Request},
     error as IdologyError,
     expectid::{self},
-    scan_onboarding, scan_verify,
+    pa, scan_onboarding, scan_verify,
 };
 use newtypes::{DocVData, IdvData, PiiString};
 
@@ -145,6 +145,30 @@ impl IdologyClient {
             .client
             .post(url)
             .form(&req)
+            .send()
+            .await
+            .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;
+
+        let idology_response = response
+            .json::<serde_json::Value>()
+            .await
+            .map_err(IdologyError::ReqwestError::InternalError)?;
+        Ok(idology_response)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn standalone_pa(&self, idv_data: IdvData) -> Result<serde_json::Value, IdologyError::Error> {
+        let url = "https://web.idologylive.com/api/pa-standalone.svc";
+        let req_data = pa::request::RequestData::try_from(idv_data)?;
+        let req_list = Request::new(
+            self.username.clone(),
+            self.password.clone(),
+            IdologyRequestData::Pa(req_data),
+        );
+        let response = self
+            .client
+            .post(url)
+            .query(&req_list)
             .send()
             .await
             .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;

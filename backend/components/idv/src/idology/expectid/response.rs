@@ -34,7 +34,7 @@ pub struct Response {
     pub restriction: Option<Restriction>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Restriction {
     pub key: Option<String>,
