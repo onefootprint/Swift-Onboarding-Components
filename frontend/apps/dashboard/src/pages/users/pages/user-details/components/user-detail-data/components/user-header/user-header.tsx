@@ -15,7 +15,7 @@ import ManualReview from './components/manual-review';
 const UserHeader = () => {
   const userId = useUserId();
   const { data } = useUser(userId);
-  const { t } = useTranslation('pages.user-details.user-header.status');
+  const { t } = useTranslation('entity-statuses');
   const [state] = useDecryptMachine();
   if (!data) {
     return null;
