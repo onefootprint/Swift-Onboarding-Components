@@ -1,4 +1,4 @@
-import { Box } from '@onefootprint/ui';
+import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
 
 import {
@@ -17,7 +17,12 @@ const Content = () => (
     <Box sx={{ marginBottom: 7 }}>
       <Breadcrumb />
     </Box>
-    <Header />
+    <Box sx={{ marginBottom: 5 }}>
+      <Header />
+    </Box>
+    <Box sx={{ marginBottom: 5 }}>
+      <Divider />
+    </Box>
     <Vault />
     <AuditTrail />
     <RiskSignals />

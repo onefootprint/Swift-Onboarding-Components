@@ -9,6 +9,7 @@
       "src/*": ["./src/*"],
       "@/proxy-configs/*": ["./src/pages/developers/components/proxy-configs/*"],
       "@/businesses/*": ["./src/pages/businesses/*"],
+      "@/business/*": ["./src/pages/businesses/pages/details/*"],
     }
   },
   "include": ["src", "next-env.d.ts"]

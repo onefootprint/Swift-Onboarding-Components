@@ -646,6 +646,9 @@
         "title": "Business details breadcrumb",
         "list": "Businesses",
         "details": "Details"
+      },
+      "header": {
+        "title": "Business info"
       }
     },
     "security-logs": {

@@ -28,4 +28,20 @@ describe('<Details />', () => {
     expect(listLink).toBeInTheDocument();
     expect(listLink.getAttribute('href')).toEqual('/businesses');
   });
+
+  it('should show a header with the business status, start and id', () => {
+    renderDetails();
+
+    const header = screen.getByRole('banner', { name: 'Business info' });
+    expect(header).toBeInTheDocument();
+
+    const status = screen.getByText('Verified');
+    expect(status).toBeInTheDocument();
+
+    const start = screen.getByText('1/13/23, 6:31 PM');
+    expect(start).toBeInTheDocument();
+
+    const id = screen.getByText('fp_id_XPutoYibmM2dEggjbSRNZR');
+    expect(id).toBeInTheDocument();
+  });
 });
