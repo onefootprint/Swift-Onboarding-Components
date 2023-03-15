@@ -190,7 +190,7 @@ impl CollectedDataOption {
     }
 
     /// Maps each CDO to the list of DataIdentifiers to be collected for the option
-    fn data_identifiers(&self) -> Option<Vec<DataIdentifier>> {
+    pub fn data_identifiers(&self) -> Option<Vec<DataIdentifier>> {
         // Maybe this could migrate to DataIdentifiers
         match self {
             Self::Name => Some(vec![IDK::FirstName.into(), IDK::LastName.into()]),
