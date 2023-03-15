@@ -159,6 +159,13 @@
     }
   },
   "pages": {
+    "404": {
+      "title": "Oops! Page couldn't be found.",
+      "description": "We're sorry, but the requested page doesn't exist or was removed.",
+      "image": {
+        "alt": "An image of a penguin using a smartphone"
+      }
+    },
     "sign-up": {
       "page-title": "Footprint | Sign up to the Footprint",
       "title": "Create your account",
