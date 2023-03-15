@@ -1,8 +1,8 @@
 pub mod client;
+pub mod common;
 pub mod error;
 pub mod expectid;
 pub(crate) mod fixtures;
-pub mod response_common;
 pub mod scan_onboarding;
 pub mod scan_verify;
 

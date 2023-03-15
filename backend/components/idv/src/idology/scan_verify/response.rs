@@ -2,10 +2,10 @@ use newtypes::idology::{
     IDologyScanVerifyResultCode, IDologyScanVerifySummaryResultCode, IDologyScanVerifyVerificationResultCode,
 };
 
-use crate::idology::error::{self as IdologyError, RequestError};
-use crate::idology::response_common::{
+use crate::idology::common::response::{
     IDologyQualifiers, IdologyResponseHelpers, KeyResponse, SubmissionResponseError,
 };
+use crate::idology::error::{self as IdologyError, RequestError};
 
 // Given a raw response, deserialize
 pub fn parse_response(value: serde_json::Value) -> Result<ScanVerifyAPIResponse, IdologyError::Error> {

@@ -1,6 +1,6 @@
 use crate::idology::{
     error as IdologyError,
-    response_common::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType, from_string_or_int},
+    common::response::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType, from_string_or_int},
     IdologyError::RequestError,
 };
 use itertools::Itertools;

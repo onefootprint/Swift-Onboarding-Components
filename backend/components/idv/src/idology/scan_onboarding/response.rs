@@ -1,6 +1,6 @@
 use crate::idology::{
+    common::response::{from_string_or_int, IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
     error as IdologyError,
-    response_common::{from_string_or_int, IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
     IdologyError::RequestError,
 };
 use newtypes::{

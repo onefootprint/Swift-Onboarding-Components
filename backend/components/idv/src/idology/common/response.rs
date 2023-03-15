@@ -4,7 +4,7 @@ use newtypes::{FootprintReasonCode, IDologyReasonCode, PiiString, ScrubbedPiiStr
 use serde::{Deserialize, Deserializer};
 use strum::EnumString;
 
-use super::error::RequestError;
+use crate::idology::IdologyError::RequestError;
 
 /// This file holds common structures used to work with Idology APIs
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

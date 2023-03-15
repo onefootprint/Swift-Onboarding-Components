@@ -2,17 +2,6 @@ use crate::idology::error as IdologyError;
 use chrono::{Datelike, NaiveDate};
 use newtypes::{IdvData, PiiString};
 
-/// Request to Idology ExpectID
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct Request {
-    pub(crate) username: PiiString,
-    pub(crate) password: PiiString,
-    pub(crate) age_to_check: u32,
-    #[serde(flatten)]
-    pub(crate) data: RequestData,
-}
-
 /// Idology request, we'll only use this for U.S. citizens for now
 /// as KYC requests differ for UK + other countries
 #[derive(Debug, Clone, serde::Serialize)]
@@ -34,7 +23,6 @@ pub(crate) struct RequestData {
     email: Option<PiiString>,
     /// this must be 10 digits
     telephone: Option<PiiString>,
-    output: String,
 }
 
 impl TryFrom<IdvData> for RequestData {
@@ -87,8 +75,64 @@ impl TryFrom<IdvData> for RequestData {
             email,
             // TODO remove country code
             telephone: phone_number,
-            output: "json".to_owned(),
         };
         Ok(request)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::idology::common::request::{IdologyRequestData, Request};
+
+    use super::*;
+
+    #[test]
+    fn test_serialization_expect_id() {
+        let req = Request {
+            username: PiiString::from("u".to_owned()),
+            password: PiiString::from("p".to_owned()),
+            output: "json".to_owned(),
+            data: IdologyRequestData::ExpectId(RequestData {
+                first_name: PiiString::from("bob".to_owned()),
+                last_name: PiiString::from("boberto".to_owned()),
+                address: PiiString::from("123 Main St".to_owned()),
+                city: None,
+                state: None,
+                zip: None,
+                ssn_last4: None,
+                ssn: None,
+                dob_month: None,
+                dob_year: None,
+                dob_day: None,
+                email: None,
+                telephone: None,
+            }),
+        };
+
+        let json_val = serde_json::to_value(&req).unwrap();
+
+        assert_eq!(
+            json!({
+              "username": "u",
+              "password": "p",
+              "firstName": "bob",
+              "lastName": "boberto",
+              "address": "123 Main St",
+              "city": null,
+              "state": null,
+              "zip": null,
+              "ssnLast4": null,
+              "ssn": null,
+              "dobMonth": null,
+              "dobYear": null,
+              "dobDay": null,
+              "email": null,
+              "telephone": null,
+              "output": "json"
+            }),
+            json_val
+        );
     }
 }

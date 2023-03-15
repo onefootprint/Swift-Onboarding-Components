@@ -1,4 +1,5 @@
 use super::{
+    common::request::{IdologyRequestData, Request},
     error as IdologyError,
     expectid::{self},
     scan_onboarding, scan_verify,
@@ -28,11 +29,11 @@ impl IdologyClient {
     pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<serde_json::Value, IdologyError::Error> {
         let url = "https://web.idologylive.com/api/idiq.svc";
         let req_data = expectid::request::RequestData::try_from(idv_data)?;
-        let req_list = expectid::request::Request {
+        let req_list = Request {
             username: self.username.clone(),
             password: self.password.clone(),
-            age_to_check: 0, // Don't have IDology reject based on age
-            data: req_data,
+            data: IdologyRequestData::ExpectId(req_data),
+            output: "json".to_owned(),
         };
         let response = self
             .client
