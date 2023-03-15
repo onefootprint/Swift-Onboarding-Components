@@ -34,13 +34,14 @@ mod collected_data;
 mod data_lifetime_kind;
 mod id_doc_kind;
 mod identity_data_kind;
+mod investor_profile_kind;
 mod kv_data_key;
 mod validation;
 mod vd_kind;
 
 pub use self::{
     business_data_kind::*, collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*,
-    validation::Error as ValidationError, validation::*, vd_kind::*,
+    investor_profile_kind::*, validation::Error as ValidationError, validation::*, vd_kind::*,
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
@@ -87,6 +88,7 @@ pub enum DataIdentifier {
     IdDocument(IdDocKind),
     Selfie(IdDocKind),
     Business(BusinessDataKind),
+    InvestorProfile(InvestorProfileKind),
 }
 
 string_api_data_type_alias!(DataIdentifier);
@@ -113,6 +115,7 @@ impl std::fmt::Display for DataIdentifier {
             Self::IdDocument(s) => s.to_string(),
             Self::Selfie(s) => s.to_string(),
             Self::Business(s) => s.to_string(),
+            Self::InvestorProfile(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -148,6 +151,9 @@ impl FromStr for DataIdentifier {
             DataIdentifierDiscriminant::Business => {
                 Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
+            DataIdentifierDiscriminant::InvestorProfile => Self::InvestorProfile(
+                InvestorProfileKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?,
+            ),
         };
         Ok(result)
     }

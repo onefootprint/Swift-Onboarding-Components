@@ -109,7 +109,9 @@ impl IsGuardMet for CanDecrypt {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         let (identifiers, other): (Vec<_>, Vec<_>) = self.0.into_iter().partition_map(|di| match di {
             // Id and Business data permissions are handled with CDOs
-            DataIdentifier::Id(_) | DataIdentifier::Business(_) => Left(di),
+            DataIdentifier::Id(_) | DataIdentifier::Business(_) | DataIdentifier::InvestorProfile(_) => {
+                Left(di)
+            }
             // While Custom + Document permissions are very easy to determine
             DataIdentifier::Custom(_) => Right(token_scopes.contains(&TenantScope::DecryptCustom)),
 

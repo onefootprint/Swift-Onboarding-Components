@@ -3,6 +3,7 @@ use regex::Regex;
 
 mod business;
 mod identity;
+mod investor_profile;
 
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.

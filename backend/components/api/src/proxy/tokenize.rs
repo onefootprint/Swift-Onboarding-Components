@@ -55,6 +55,7 @@ pub async fn vault_pii(
                         DataIdentifier::Selfie(_)
                         | DataIdentifier::Id(_)
                         | DataIdentifier::IdDocument(_)
+                        | DataIdentifier::InvestorProfile(_)
                         | DataIdentifier::Business(_) => None,
                         DataIdentifier::Custom(k) => Some((k.clone().into(), value.clone())),
                     })
