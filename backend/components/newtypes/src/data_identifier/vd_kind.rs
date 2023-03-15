@@ -104,7 +104,6 @@ impl FromStr for VdKind {
     type Err = crate::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let di = DataIdentifier::from_str(s)?;
-        println!("DI: {:?}", di);
         let result = Self::try_from(di)?;
         if matches!(result, Self::Id(IDK::PhoneNumber) | Self::Id(IDK::Email)) {
             return Err(ConversionError::Unsupported(s.to_owned()).into());

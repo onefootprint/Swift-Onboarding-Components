@@ -1,17 +1,16 @@
 use super::TenantUvw;
-use crate::{
-    auth::tenant::{CanDecrypt, IsGuardMet, TenantGuardDsl},
-    utils,
-};
+use crate::auth::tenant::{CanDecrypt, IsGuardMet, TenantGuardDsl};
 use itertools::Itertools;
-use newtypes::{DataIdentifier, TenantScope};
+use newtypes::{DataIdentifier, TenantScope, VaultKind};
 
 impl TenantUvw {
     /// Returns the list of TenantScopes representing permissions to see data on this user vault.
     /// For portable vaults, the visible data is granted by approved onboarding configurations.
     /// For non-portable vaults, all data is visible
     fn can_see_scopes(&self) -> Vec<TenantScope> {
-        if !self.vault.is_portable {
+        // TODO treat scoped businesses the same as scoped users. Just showing everything now
+        // for testing
+        if self.vault.kind == VaultKind::Business || !self.vault.is_portable {
             // All fields are visible in non-portable vaults
             return vec![TenantScope::Admin];
         }
@@ -32,27 +31,8 @@ impl TenantUvw {
     pub fn get_visible_populated_fields(&self) -> Vec<DataIdentifier> {
         let can_see_scopes = self.can_see_scopes();
 
-        let id_data = self.get_populated_identity_fields().into_iter().map(|k| k.into());
-        let kv_data = self.get_populated_custom_data().into_iter().map(|k| k.into());
-        // TODO add business data
-        let id_docs = self
-            .identity_documents()
-            .iter()
-            .flat_map(|i| {
-                if utils::identity_document::id_doc_collected_selfie(i) {
-                    vec![
-                        DataIdentifier::IdDocument(i.document_type),
-                        DataIdentifier::Selfie(i.document_type),
-                    ]
-                } else {
-                    vec![DataIdentifier::IdDocument(i.document_type)]
-                }
-            })
-            .unique();
-
-        id_docs
-        .chain(id_data)
-        .chain(kv_data)
+        self.populated()
+        .into_iter()
         // Reuse the tenant auth codepaths to filter out DataIdentifiers on this VaultWrapper
         // that are visible given the approved onboarding configurations
         .filter(|x| {

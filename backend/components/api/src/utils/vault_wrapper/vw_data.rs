@@ -4,8 +4,9 @@ use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault_data::VaultData;
 use db::{HasLifetime, HasSealedIdentityData};
-use newtypes::IdentityDataKind;
+use itertools::Itertools;
 use newtypes::{BusinessDataKind, DataLifetimeId, SealedVaultBytes, VdKind};
+use newtypes::{DataIdentifier, IdentityDataKind as IDK};
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 use strum::IntoEnumIterator;
@@ -113,10 +114,43 @@ impl<Type> VwData<Type> {
             phantom: PhantomData,
         }
     }
+
+    pub fn populated(&self) -> Vec<DataIdentifier> {
+        let emails = self
+            .emails
+            .iter()
+            .map(|_| DataIdentifier::from(IDK::Email))
+            .collect_vec();
+        let phone_numbers = self
+            .phone_numbers
+            .iter()
+            .map(|_| DataIdentifier::from(IDK::PhoneNumber))
+            .collect_vec();
+        let vds = self.vd.iter().map(|vd| vd.kind.clone().into()).collect_vec();
+        let id_docs = self
+            .identity_documents
+            .iter()
+            .flat_map(|i| {
+                if i.selfie_image_s3_url.is_some() {
+                    vec![
+                        DataIdentifier::IdDocument(i.document_type),
+                        DataIdentifier::Selfie(i.document_type),
+                    ]
+                } else {
+                    vec![DataIdentifier::IdDocument(i.document_type)]
+                }
+            })
+            .collect_vec();
+        [emails, phone_numbers, vds, id_docs]
+            .into_iter()
+            .flatten()
+            .unique()
+            .collect()
+    }
 }
 
 impl VwData<Person> {
-    fn vd(&self, kind: IdentityDataKind) -> Option<&VaultData> {
+    fn vd(&self, kind: IDK) -> Option<&VaultData> {
         self.vd.iter().find(|d| match d.kind {
             VdKind::Id(p) => p == kind,
             VdKind::Business(_) => false,
@@ -127,30 +161,30 @@ impl VwData<Person> {
     /// Dispatch queries for a piece of data with a given DataAttribute kind to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub(super) fn get(&self, kind: &IdentityDataKind) -> Option<&dyn HasSealedIdentityData> {
+    pub(super) fn get(&self, kind: &IDK) -> Option<&dyn HasSealedIdentityData> {
         let email = self.emails.first();
         let phone = self.phone_numbers.first();
         match kind {
             // vd
-            IdentityDataKind::FirstName
-            | IdentityDataKind::LastName
-            | IdentityDataKind::Dob
-            | IdentityDataKind::Ssn4
-            | IdentityDataKind::Ssn9
-            | IdentityDataKind::AddressLine1
-            | IdentityDataKind::AddressLine2
-            | IdentityDataKind::City
-            | IdentityDataKind::State
-            | IdentityDataKind::Zip
-            | IdentityDataKind::Country => self.vd(*kind).map(|vd| vd as &dyn HasSealedIdentityData),
+            IDK::FirstName
+            | IDK::LastName
+            | IDK::Dob
+            | IDK::Ssn4
+            | IDK::Ssn9
+            | IDK::AddressLine1
+            | IDK::AddressLine2
+            | IDK::City
+            | IDK::State
+            | IDK::Zip
+            | IDK::Country => self.vd(*kind).map(|vd| vd as &dyn HasSealedIdentityData),
             // email
-            IdentityDataKind::Email => email.map(|email| email as &dyn HasSealedIdentityData),
+            IDK::Email => email.map(|email| email as &dyn HasSealedIdentityData),
             // phone
-            IdentityDataKind::PhoneNumber => phone.map(|phone| phone as &dyn HasSealedIdentityData),
+            IDK::PhoneNumber => phone.map(|phone| phone as &dyn HasSealedIdentityData),
         }
     }
 
-    fn get_id_lifetime(&self, kind: &IdentityDataKind) -> Option<&DataLifetime> {
+    fn get_id_lifetime(&self, kind: &IDK) -> Option<&DataLifetime> {
         self.get(kind).and_then(|d| {
             let lifetime_id = d.lifetime_id();
             self.lifetimes.get(lifetime_id)
@@ -159,18 +193,18 @@ impl VwData<Person> {
 
     pub(super) fn get_id_lifetimes<'a, T>(&self, kinds: T) -> Vec<&DataLifetime>
     where
-        T: IntoIterator<Item = &'a IdentityDataKind>,
+        T: IntoIterator<Item = &'a IDK>,
     {
         kinds.into_iter().flat_map(|k| self.get_id_lifetime(k)).collect()
     }
 
-    pub fn get_identity_e_field(&self, kind: IdentityDataKind) -> Option<&SealedVaultBytes> {
+    pub fn get_identity_e_field(&self, kind: IDK) -> Option<&SealedVaultBytes> {
         let value = self.get(&kind);
         value.map(|v| v.e_data())
     }
 
-    pub fn get_populated_identity_fields(&self) -> Vec<IdentityDataKind> {
-        IdentityDataKind::iter()
+    pub fn get_populated_identity_fields(&self) -> Vec<IDK> {
+        IDK::iter()
             .filter(|k| self.get_identity_e_field(*k).is_some())
             .collect()
     }

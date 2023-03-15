@@ -6,10 +6,11 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
+use itertools::Itertools;
 use newtypes::IdentityDataKind as IDK;
-use newtypes::KvDataKey;
 use newtypes::{BusinessDataKind as BDK, VdKind};
 use newtypes::{CollectedDataOption, SealedVaultBytes};
+use newtypes::{DataIdentifier, KvDataKey};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
@@ -70,10 +71,6 @@ impl VaultWrapper<Person> {
     pub fn get_populated_identity_fields(&self) -> Vec<IDK> {
         IDK::iter().filter(|k| self.has_identity_field(*k)).collect()
     }
-
-    pub fn get_populated_custom_data(&self) -> Vec<KvDataKey> {
-        self.kv_data().keys().cloned().collect()
-    }
 }
 
 impl VaultWrapper<Business> {
@@ -112,6 +109,16 @@ impl<Type> VaultWrapper<Type> {
     /// helper to expose a reference/deref coercion to the underlying vault (normally from a LockedVaultWrapper)
     pub fn vault(&self) -> &Vault {
         &self.vault
+    }
+
+    // Can i rm get_populated_id_fields, custom_data, etc?
+    pub fn populated(&self) -> Vec<DataIdentifier> {
+        self.speculative
+            .populated()
+            .into_iter()
+            .chain(self.portable.populated())
+            .unique()
+            .collect()
     }
 
     pub fn kv_data(&self) -> HashMap<KvDataKey, &VaultData> {
