@@ -14,7 +14,6 @@ use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
-use newtypes::ScopedVaultId;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use webhooks::events::WebhookEvent;
@@ -40,7 +39,7 @@ pub async fn post(
 
     let ob_info = state
         .db_pool
-        .db_query(move |c| -> ApiResult<AuthedOnboardingInfo> {
+        .db_query(move |c| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(c)?;
             // Verify there are no unmet requirements
             let scoped_business_id = user_auth.scoped_business_id();
@@ -61,9 +60,9 @@ pub async fn post(
     let should_run_kyc_checks = ob_info.onboarding.authorized_at.is_none();
 
     // Run KYC checks
-    let su_id = ob_info.scoped_user.id.clone();
+    let ob_id = ob_info.onboarding.id.clone();
     if should_run_kyc_checks {
-        let engine_result = run_kyc(&state, ob_info.onboarding.clone(), su_id).await;
+        let engine_result = run_kyc(&state, ob_info).await;
         // We always want to return a validation to the client if the DE fails.
         // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
         match engine_result {
@@ -77,7 +76,6 @@ pub async fn post(
     let (validation_token, status, su, decision_timestamp, manual_review, ob_configuration_id) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let ob_id = ob_info.onboarding.id.clone();
             // Return status as well
             let (ob, scoped_user, manual_review, latest_decision) = Onboarding::get(conn, &ob_id)?;
 
@@ -121,28 +119,24 @@ pub async fn post(
     }))
 }
 
-async fn run_kyc(
-    state: &State,
-    onboarding: Onboarding,
-    scoped_user_id: ScopedVaultId,
-) -> Result<(), ApiError> {
+async fn run_kyc(state: &State, ob_info: AuthedOnboardingInfo) -> Result<(), ApiError> {
+    let scoped_user_id = ob_info.scoped_user.id.clone();
     let uvw = state
         .db_pool
         .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user_id)))
         .await??;
-    let should_make_idv_requests_and_decision =
-        decision::utils::should_initiate_idv_or_else_setup_test_fixtures(
-            state,
-            uvw.clone(),
-            onboarding.id.clone(),
-            true,
-        )
-        .await?;
+    let ff_client = &state.feature_flag_client;
+    let fixture_decision =
+        decision::utils::get_fixture_data_decision(state, ff_client, &uvw, &ob_info.scoped_user.tenant_id)
+            .await?;
 
-    // Run KYC + produce a decision
-    if should_make_idv_requests_and_decision {
+    if let Some(fixture_decision) = fixture_decision {
+        // Don't run prod IDV requests and instead just create fixture data for this user
+        decision::utils::setup_test_fixtures(state, ob_info.onboarding.id.clone(), fixture_decision).await?;
+    } else {
+        // Run KYC + produce a decision
         // Save Verification Requests, set ob to authorized, and (TODO) set onboarding to pending
-        let ob = onboarding.clone();
+        let ob = ob_info.onboarding.clone();
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<()> {
@@ -151,13 +145,12 @@ async fn run_kyc(
 
                 ob.update(conn, OnboardingUpdate::is_authorized(true))?;
                 // TODO: update OB to pending!
-
                 Ok(())
             })
             .await?;
 
         decision::engine::run(
-            onboarding,
+            ob_info.onboarding,
             &state.db_pool,
             &state.enclave_client,
             state.config.service_config.is_production(),

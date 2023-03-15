@@ -9,13 +9,11 @@ use rand::Rng;
 fn random_phone_number() -> String {
     let mut rng = rand::thread_rng();
 
-    format!(
-        "+1{}",
-        (0..10)
-            .map(|_| rng.gen_range(0..10).to_string())
-            .collect::<Vec<String>>()
-            .join("")
-    )
+    let number = (0..10)
+        .map(|_| rng.gen_range(0..10).to_string())
+        .collect::<Vec<String>>()
+        .join("");
+    format!("+1{}", number)
 }
 
 pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, su_id: Option<&ScopedVaultId>) -> PhoneNumber {

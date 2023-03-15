@@ -210,16 +210,12 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&suid)))
         .await??;
-    let uv_id = uvw.vault.id.clone();
-    let should_initiate_verification_requests =
-        decision::utils::should_initiate_idv_or_else_setup_test_fixtures(
-            &state,
-            uvw,
-            auth_info.onboarding.id.clone(),
-            // TODO: generate fixture data for identity documents
-            false,
-        )
-        .await?;
+    // TODO: generate fixture data for identity documents
+    let ff_client = &state.feature_flag_client;
+    let should_initiate_reqs =
+        decision::utils::get_fixture_data_decision(&state, ff_client, &uvw, &auth_info.scoped_user.tenant_id)
+            .await?
+            .is_none();
     // TODO: more vendors!
     let api = newtypes::VendorAPI::IdologyScanOnboarding;
     if db_document_request.ref_id.is_some() {
@@ -229,7 +225,7 @@ pub async fn post(
     }
 
     // Save Verification Requests and run our vendor requests
-    if should_initiate_verification_requests {
+    if should_initiate_reqs {
         // Save our verification request
         let ob_id = auth_info.onboarding.id.clone();
         let su_id = auth_info.scoped_user.id.clone();
@@ -290,7 +286,7 @@ pub async fn post(
                     newtypes::DocumentUploadedInfo {
                         id: identity_document.id.clone(),
                     },
-                    uv_id,
+                    uvw.vault.id,
                     Some(su_id),
                 )?;
 

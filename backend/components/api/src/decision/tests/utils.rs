@@ -3,40 +3,20 @@ use crate::tests::fixtures;
 use db::tests::prelude::*;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::db_test;
-use newtypes::{DecisionStatus, OnboardingId, PhoneNumber};
-use std::str::FromStr;
+use newtypes::{DecisionStatus, PhoneNumber};
 use test_case::test_case;
 
 #[db_test]
 fn test_handle_setup(conn: &mut TestPgConn) {
-    //
-    // SANDBOX
-    //
     let state =
         &tokio_test::block_on(async { crate::utils::mock_enclave::StateWithMockEnclave::init().await }).state;
-
-    let onboarding_id = OnboardingId::from_str("ob_123").unwrap();
-    let (_, _, uvw, _, _) = fixtures::vault_wrapper::create(conn, false);
-    assert!(!uvw.vault.is_live);
-    // it doesn't matter what we pass here, just don't want it to be true
-    let phone_number = PhoneNumber::parse("+1 123 456 7890#idv".into()).unwrap();
-
-    let res = tokio_test::block_on(async {
-        utils::should_initiate_sandbox_and_setup(state, onboarding_id, uvw, phone_number, false).await
-    })
-    .unwrap();
-
-    assert!(!res);
-
     //
     // PROD
     //
 
     // create a live UV and ob_config
-    let (su, ob_config, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
+    let (_, _, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
     assert!(uvw.vault.is_live);
-    // from the things we set up with UVW, create an onboarding
-    let ob = db::tests::fixtures::onboarding::create(conn, su.id, ob_config.id);
 
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
@@ -48,22 +28,18 @@ fn test_handle_setup(conn: &mut TestPgConn) {
         .return_once(|_| false);
 
     let res = tokio_test::block_on(async {
-        utils::should_initiate_prod_and_setup(state, ob.id, uvw, tenant.id, &mock_ff_client, false).await
+        utils::get_fixture_data_decision(state, &mock_ff_client, &uvw, &tenant.id).await
     })
     .unwrap();
-
-    assert!(res);
+    assert!(res.is_none()); // No fixture decision
 
     //
     // PROD DEMO TENANT
     //
 
     // create a live UV and ob_config
-    let (su, ob_config, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
+    let (_, _, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
     assert!(uvw.vault.is_live);
-    // from the things we set up with UVW, create an onboarding
-    let ob = db::tests::fixtures::onboarding::create(conn, su.id, ob_config.id);
-
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
     let tenant_id = tenant.id.clone();
@@ -74,11 +50,10 @@ fn test_handle_setup(conn: &mut TestPgConn) {
         .return_once(|_| true);
 
     let res = tokio_test::block_on(async {
-        utils::should_initiate_prod_and_setup(state, ob.id, uvw, tenant.id, &mock_ff_client, false).await
+        utils::get_fixture_data_decision(state, &mock_ff_client, &uvw, &tenant.id).await
     })
     .unwrap();
-    // should not be true
-    assert!(!res)
+    assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant
 }
 
 #[test_case("fail" => (DecisionStatus::Fail, false))]
