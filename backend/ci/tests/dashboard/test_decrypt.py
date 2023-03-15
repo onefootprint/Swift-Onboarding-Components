@@ -4,7 +4,6 @@ from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
     post,
-    build_user_data,
 )
 from tests.bifrost_client import BifrostClient, DocumentDataOptions
 

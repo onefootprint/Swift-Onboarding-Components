@@ -123,7 +123,7 @@ def sandbox_tenant(sandbox_tenant_data):
     return create_tenant(*sandbox_tenant_data)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def doc_request_ob_config(tenant, must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Doc request config",
@@ -133,7 +133,7 @@ def doc_request_ob_config(tenant, must_collect_data, can_access_data):
     return create_ob_config(tenant.sk, ob_conf_data)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def doc_request_ob_config2(tenant, must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Doc request config",
@@ -149,6 +149,27 @@ def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_
         "name": "Doc request config",
         "must_collect_data": must_collect_data + ["document_and_selfie"],
         "can_access_data": can_access_data + ["document_and_selfie"],
+    }
+    return create_ob_config(sandbox_tenant.sk, ob_conf_data)
+
+
+@pytest.fixture(scope="session")
+def kyb_cdos():
+    return [
+        "business_name",
+        "business_ein",
+        "business_address",
+        "business_phone_number",
+        "business_website",
+    ]
+
+
+@pytest.fixture(scope="session")
+def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data, kyb_cdos):
+    ob_conf_data = {
+        "name": "Doc request config",
+        "must_collect_data": must_collect_data + kyb_cdos,
+        "can_access_data": can_access_data + kyb_cdos,
     }
     return create_ob_config(sandbox_tenant.sk, ob_conf_data)
 

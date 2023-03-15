@@ -258,6 +258,22 @@ def build_user_data():
     return user_data
 
 
+def build_business_data():
+    return {
+        "business.name": "Foobar Inc",
+        "business.website": "foobar.com",
+        "business.phone_number": PHONE_NUMBER,
+        "business.address_line1": "1 Footprint Way",
+        "business.city": "Enclave",
+        "business.state": "NY",
+        "business.zip": "10009",
+        "business.country": "US",
+        "business.ein": "12-1231234",
+        # TODO
+        # "business.beneficial_owners": "",
+    }
+
+
 def clean_up_user(phone_number, email):
     # cleanup live user
     post("private/cleanup", dict(phone_number=phone_number), CUSTODIAN_AUTH)

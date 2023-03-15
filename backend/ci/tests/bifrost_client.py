@@ -15,6 +15,7 @@ from tests.utils import (
     override_webauthn_attestation,
     get_requirement_from_requirements,
     build_user_data,
+    build_business_data,
 )
 
 
@@ -45,6 +46,7 @@ class BifrostClient:
 
     def __init__(self, ob_config):
         self.ob_config = ob_config
+        self.business_data = None
         self.user_data = build_user_data()
 
     def init_user_for_onboarding(self, twilio, sandbox_suffix=None, document_data=None):
@@ -80,6 +82,14 @@ class BifrostClient:
         put(
             "hosted/user/vault",
             self.user_data,
+            self.auth_token,
+        )
+
+    def add_business_data(self):
+        """Add identity data via hosted/user/vault"""
+        put(
+            "hosted/business/vault",
+            self.business_data,
             self.auth_token,
         )
 
@@ -154,7 +164,7 @@ class BifrostClient:
         )
         return body["footprint_user_id"]
 
-    def onboard_user_onto_tenant(self, tenant):
+    def onboard_user_onto_tenant(self, tenant, add_business_data=False):
         """
         Onboards a user onto a tenant. See individual methods for more information
         """
@@ -165,18 +175,15 @@ class BifrostClient:
         sandbox_email = _sandbox_email(self.phone_number)
         self.add_email(sandbox_email)
 
-        # Start an onboarding
         self.initialize_onboarding()
-        # Add identity data
         self.add_identity_data()
-        # Liveness
+        if add_business_data:
+            self.business_data = build_business_data()
+            self.add_business_data()
         self.register_biometric_credentials()
-        # Identity Document data, if applicable
         if self.document_data is not None:
             self.add_identity_document_data()
-        # Retrieve validation token
         validation_token = self.authorize_user_to_tenant()
-        # User validation token to get a persistent token the tenant's can use
         fp_user_id = self.validate_user(validation_token, tenant.sk)
 
         return User(
@@ -196,4 +203,5 @@ class BifrostClient:
             email=sandbox_email,
             validation_token=validation_token,
             tenant=tenant,
+            business_data=self.business_data,
         )

@@ -1,6 +1,5 @@
 import pytest
 from tests.utils import (
-    create_ob_config,
     put,
     post,
     get_requirement_from_requirements,
@@ -10,18 +9,7 @@ from tests.constants import PHONE_NUMBER
 
 
 @pytest.fixture(scope="session")
-def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
-    ob_conf_data = {
-        "name": "Doc request config",
-        # Just need one business attribute in the ob config
-        "must_collect_data": must_collect_data + ["business_name"],
-        "can_access_data": can_access_data + ["business_name"],
-    }
-    return create_ob_config(sandbox_tenant.sk, ob_conf_data)
-
-
-@pytest.fixture(scope="session")
-def sandbox_user_w_business(kyb_sandbox_ob_config, twilio):
+def sandbox_user_w_business(kyb_sandbox_ob_config, twilio, kyb_cdos):
     bifrost_client = BifrostClient(kyb_sandbox_ob_config)
     auth_token = bifrost_client.init_user_for_onboarding(twilio)
     bifrost_client.initialize_onboarding()
@@ -29,7 +17,7 @@ def sandbox_user_w_business(kyb_sandbox_ob_config, twilio):
     business_requirement = get_requirement_from_requirements(
         "collect_business_data", requirements
     )
-    assert business_requirement["missing_attributes"] == ["business_name"]
+    assert set(business_requirement["missing_attributes"]) == set(kyb_cdos)
     return auth_token
 
 
