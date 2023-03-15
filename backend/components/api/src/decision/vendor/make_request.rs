@@ -41,11 +41,15 @@ pub async fn send_idv_request(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
         vendor_api = request.vendor_api.clone().to_string(),
-        onboarding_id = request.onboarding_id.to_string(),
+        onboarding_id = request
+            .onboarding_id
+            .clone()
+            .map(|o| o.to_string())
+            .unwrap_or_default(),
     );
     // Make the request to the IDV vendor
 
-    let onboarding_id = request.onboarding_id.clone();
+    let onboarding_id = request.onboarding_id.clone().ok_or(DbError::ObjectNotFound)?;
     let ob_configuration_key = db_pool
         .db_query(move |conn| ObConfiguration::get_by_onboarding_id(conn, &onboarding_id))
         .await??
@@ -87,7 +91,11 @@ pub async fn send_docv_request(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
         vendor_api = request.vendor_api.clone().to_string(),
-        onboarding_id = request.onboarding_id.to_string(),
+        onboarding_id = request
+            .onboarding_id
+            .clone()
+            .map(|o| o.to_string())
+            .unwrap_or_default(),
     );
     // Make the request to the DocV vendor
     // TODO implement mocking for these once we use scan verify
@@ -221,7 +229,7 @@ pub async fn send_socure_idv_request(
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     ff_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
-    let onboarding_id = request.onboarding_id.clone();
+    let onboarding_id = request.onboarding_id.clone().ok_or(DbError::ObjectNotFound)?;
     let (socure_device_session_id, ip_address, ob_configuration_key) = db_pool
         .db_query(
             move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
@@ -291,7 +299,7 @@ pub async fn send_scan_onboarding_docv_request(
 ) -> Result<VendorResponse, ApiError> {
     let ff_client = &state.feature_flag_client;
 
-    let onboarding_id = request.onboarding_id.clone();
+    let onboarding_id = request.onboarding_id.clone().ok_or(DbError::ObjectNotFound)?;
     let ob_configuration_key = state
         .db_pool
         .db_query(move |conn| -> Result<ObConfigurationKey, DbError> {

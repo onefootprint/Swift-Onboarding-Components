@@ -248,7 +248,7 @@ async fn shadow_run(
                     timestamp: Utc::now(),
                     _created_at: Utc::now(),
                     _updated_at: Utc::now(),
-                    onboarding_id: ob.id.clone(),
+                    onboarding_id: Some(ob.id.clone()),
                     vendor_api: v,
                     uvw_snapshot_seqno: seqno,
                     identity_document_id: None,

@@ -1,7 +1,7 @@
 use crate::errors::ApiResult;
 use db::{
     models::{onboarding::Onboarding, vault::Vault, verification_request::VerificationRequest},
-    PgConn,
+    DbError, PgConn,
 };
 use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
 
@@ -33,7 +33,8 @@ impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
         let args = match self {
             Self::Idv(req) => {
-                let (_, su, _, _) = Onboarding::get(conn, &req.onboarding_id)?;
+                let onboarding_id = req.onboarding_id.ok_or(DbError::ObjectNotFound)?;
+                let (_, su, _, _) = Onboarding::get(conn, &onboarding_id)?;
                 let uv = Vault::get(conn, &su.user_vault_id)?;
                 (uv, Some(su.id), Some(req.uvw_snapshot_seqno))
             }

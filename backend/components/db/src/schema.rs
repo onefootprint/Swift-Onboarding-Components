@@ -651,7 +651,7 @@ table! {
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        onboarding_id -> Text,
+        onboarding_id -> Nullable<Text>,
         vendor_api -> Text,
         uvw_snapshot_seqno -> Int8,
         identity_document_id -> Nullable<Text>,

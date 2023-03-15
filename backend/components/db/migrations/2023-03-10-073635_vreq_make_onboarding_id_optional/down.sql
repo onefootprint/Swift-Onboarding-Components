@@ -1,0 +1,1 @@
+ALTER TABLE verification_request ALTER COLUMN onboarding_id SET NOT NULL;

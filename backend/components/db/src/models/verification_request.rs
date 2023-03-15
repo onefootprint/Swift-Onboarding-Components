@@ -22,7 +22,7 @@ pub struct VerificationRequest {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub onboarding_id: OnboardingId,
+    pub onboarding_id: Option<OnboardingId>,
     pub vendor_api: VendorAPI,
     // The current seqno when this VerificationRequest was created.
     // This is used to reconstruct the VaultWrapper at the time the request was sent.
@@ -36,7 +36,7 @@ pub struct VerificationRequest {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = verification_request)]
 struct NewVerificationRequestRow {
-    onboarding_id: OnboardingId,
+    onboarding_id: Option<OnboardingId>,
     vendor: Vendor,
     timestamp: DateTime<Utc>,
     vendor_api: VendorAPI,
@@ -57,7 +57,7 @@ impl VerificationRequest {
         let requests: Vec<_> = vendor_apis
             .into_iter()
             .map(|vendor_api| NewVerificationRequestRow {
-                onboarding_id: onboarding_id.clone(),
+                onboarding_id: Some(onboarding_id.clone()),
                 vendor_api,
                 vendor: Vendor::from(vendor_api),
                 timestamp: Utc::now(),
@@ -135,7 +135,7 @@ impl VerificationRequest {
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_row = NewVerificationRequestRow {
-            onboarding_id,
+            onboarding_id: Some(onboarding_id),
             vendor_api,
             vendor: Vendor::from(vendor_api),
             timestamp: Utc::now(),
