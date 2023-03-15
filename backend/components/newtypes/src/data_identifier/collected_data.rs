@@ -76,54 +76,6 @@ impl CollectedData {
     }
 }
 
-pub trait HasParentCdo {
-    fn parent(&self) -> Option<CollectedData>;
-}
-
-impl HasParentCdo for IDK {
-    /// Maps an IDK to the CollectedData variant that contains this IDK
-    fn parent(&self) -> Option<CollectedData> {
-        let result = match self {
-            Self::FirstName => CollectedData::Name,
-            Self::LastName => CollectedData::Name,
-            Self::Dob => CollectedData::Dob,
-            Self::Ssn4 => CollectedData::Ssn,
-            Self::Ssn9 => CollectedData::Ssn,
-            Self::AddressLine1 => CollectedData::Address,
-            Self::AddressLine2 => CollectedData::Address,
-            Self::City => CollectedData::Address,
-            Self::State => CollectedData::Address,
-            Self::Zip => CollectedData::Address,
-            Self::Country => CollectedData::Address,
-            Self::Email => CollectedData::Email,
-            Self::PhoneNumber => CollectedData::PhoneNumber,
-        };
-        Some(result)
-    }
-}
-
-impl HasParentCdo for BDK {
-    /// Maps an BDK to the CollectedData variant that contains this BDK
-    fn parent(&self) -> Option<CollectedData> {
-        let result = match self {
-            Self::Name => CollectedData::BusinessName,
-            Self::Dba => CollectedData::BusinessName,
-            Self::Website => CollectedData::BusinessWebsite,
-            Self::PhoneNumber => CollectedData::BusinessPhoneNumber,
-            Self::Ein => CollectedData::BusinessEin,
-            Self::AddressLine1 => CollectedData::BusinessAddress,
-            Self::AddressLine2 => CollectedData::BusinessAddress,
-            Self::City => CollectedData::BusinessAddress,
-            Self::State => CollectedData::BusinessAddress,
-            Self::Zip => CollectedData::BusinessAddress,
-            Self::Country => CollectedData::BusinessAddress,
-            Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
-            Self::CorporationType => CollectedData::BusinessCorporationType,
-        };
-        Some(result)
-    }
-}
-
 #[derive(
     Debug,
     Eq,
@@ -306,8 +258,8 @@ impl CollectedDataOption {
 #[cfg(test)]
 mod test {
     use crate::{
-        BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, HasParentCdo,
-        IdentityDataKind as IDK, IsDataIdentifierDiscriminant,
+        BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, IdentityDataKind as IDK,
+        IsDataIdentifierDiscriminant,
     };
     use itertools::Itertools;
     use std::collections::HashSet;

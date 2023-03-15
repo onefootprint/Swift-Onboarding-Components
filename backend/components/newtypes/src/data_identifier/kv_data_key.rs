@@ -1,10 +1,4 @@
-use crate::{CollectedData, DataIdentifier, HasParentCdo, IsDataIdentifierDiscriminant, KvDataKey, Validate};
-
-impl HasParentCdo for KvDataKey {
-    fn parent(&self) -> Option<CollectedData> {
-        None
-    }
-}
+use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, Validate};
 
 impl Validate for KvDataKey {
     fn validate(&self, value: crate::PiiString, _for_bifrost: bool) -> crate::NtResult<crate::PiiString> {
@@ -26,6 +20,10 @@ impl IsDataIdentifierDiscriminant for KvDataKey {
     fn is_optional(&self) -> bool {
         // Doesn't really apply to custom data
         false
+    }
+
+    fn parent(&self) -> Option<CollectedData> {
+        None
     }
 }
 

@@ -93,41 +93,13 @@ string_api_data_type_alias!(DataIdentifier);
 
 /// Contains all of the functionality that each nested type of DataIdentifier must provide
 pub trait IsDataIdentifierDiscriminant:
-    Hash + Eq + Clone + TryFrom<DataIdentifier> + Into<DataIdentifier> + Validate + HasParentCdo
+    Hash + Eq + Clone + TryFrom<DataIdentifier> + Into<DataIdentifier> + Validate
 {
+    /// When true, will not be required in order to satisfy the parent CD/CDO
     fn is_optional(&self) -> bool;
-}
 
-impl From<IdentityDataKind> for DataIdentifier {
-    fn from(value: IdentityDataKind) -> Self {
-        Self::Id(value)
-    }
-}
-
-impl TryFrom<DataIdentifier> for IdentityDataKind {
-    type Error = crate::Error;
-    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
-        match value {
-            DataIdentifier::Id(idk) => Ok(idk),
-            _ => Err(crate::Error::Custom("Can't convert into IDK".to_owned())),
-        }
-    }
-}
-
-impl From<BusinessDataKind> for DataIdentifier {
-    fn from(value: BusinessDataKind) -> Self {
-        Self::Business(value)
-    }
-}
-
-impl TryFrom<DataIdentifier> for BusinessDataKind {
-    type Error = crate::Error;
-    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
-        match value {
-            DataIdentifier::Business(bdk) => Ok(bdk),
-            _ => Err(crate::Error::Custom("Can't convert into BDK".to_owned())),
-        }
-    }
+    /// Maps the DI variant to the CollectedData variant that contains this DI
+    fn parent(&self) -> Option<CollectedData>;
 }
 
 /// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.

@@ -1,4 +1,4 @@
-use crate::{IsDataIdentifierDiscriminant, PiiString, SaltedFingerprint};
+use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, PiiString, SaltedFingerprint};
 use crypto::sha256;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -51,7 +51,42 @@ pub enum IdentityDataKind {
 
 crate::util::impl_enum_str_diesel!(IdentityDataKind);
 
+impl From<IdentityDataKind> for DataIdentifier {
+    fn from(value: IdentityDataKind) -> Self {
+        Self::Id(value)
+    }
+}
+
+impl TryFrom<DataIdentifier> for IdentityDataKind {
+    type Error = crate::Error;
+    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+        match value {
+            DataIdentifier::Id(idk) => Ok(idk),
+            _ => Err(crate::Error::Custom("Can't convert into IDK".to_owned())),
+        }
+    }
+}
+
 impl IsDataIdentifierDiscriminant for IdentityDataKind {
+    fn parent(&self) -> Option<CollectedData> {
+        let result = match self {
+            Self::FirstName => CollectedData::Name,
+            Self::LastName => CollectedData::Name,
+            Self::Dob => CollectedData::Dob,
+            Self::Ssn4 => CollectedData::Ssn,
+            Self::Ssn9 => CollectedData::Ssn,
+            Self::AddressLine1 => CollectedData::Address,
+            Self::AddressLine2 => CollectedData::Address,
+            Self::City => CollectedData::Address,
+            Self::State => CollectedData::Address,
+            Self::Zip => CollectedData::Address,
+            Self::Country => CollectedData::Address,
+            Self::Email => CollectedData::Email,
+            Self::PhoneNumber => CollectedData::PhoneNumber,
+        };
+        Some(result)
+    }
+
     fn is_optional(&self) -> bool {
         matches!(self, Self::AddressLine2)
     }
