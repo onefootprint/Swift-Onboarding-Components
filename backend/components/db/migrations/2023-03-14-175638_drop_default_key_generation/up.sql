@@ -1,0 +1,7 @@
+ALTER TABLE scoped_user
+    ALTER COLUMN fp_user_id DROP DEFAULT;
+ALTER TABLE scoped_user
+    ALTER COLUMN id DROP DEFAULT;
+
+ALTER TABLE user_vault
+    ALTER COLUMN id DROP DEFAULT;

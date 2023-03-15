@@ -2,6 +2,8 @@ pub use derive_more::{Add, Display, From, FromStr, Into};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::VaultKind;
+
 /// This macro generates an Id type that wraps a string
 macro_rules! define_newtype_id {
     ($name: ident, $type: ty, $doc: literal) => {
@@ -224,6 +226,14 @@ define_newtype_id!(TaskId, String, "Identifier for a task");
 #[serde(transparent)]
 pub struct DataLifetimeSeqno(i64);
 
+fn generate_random_id(prefix: &str, length: usize) -> String {
+    format!(
+        "{}_{}",
+        prefix,
+        crypto::random::gen_random_alphanumeric_code(length)
+    )
+}
+
 impl ObConfigurationKey {
     /// prefixed on LIVE keys
     pub const LIVE_PREFIX: &'static str = "ob_live";
@@ -241,19 +251,49 @@ impl ObConfigurationKey {
             Self::SANDBOX_PREFIX
         };
 
-        let key = format!(
-            "{}_{}",
-            prefix,
-            crypto::random::gen_random_alphanumeric_code(Self::LENGTH)
-        );
-
-        Self(key)
+        Self(generate_random_id(prefix, Self::LENGTH))
     }
 }
 
 impl TenantId {
     pub fn is_integration_test_tenant(&self) -> bool {
         self.0.starts_with("_private_it_org_")
+    }
+}
+
+impl ScopedVaultId {
+    const LENGTH: usize = 22;
+
+    pub fn generate(kind: VaultKind) -> Self {
+        let prefix = match kind {
+            VaultKind::Person => "su",
+            VaultKind::Business => "sb",
+        };
+        Self(generate_random_id(prefix, Self::LENGTH))
+    }
+}
+
+impl VaultId {
+    const LENGTH: usize = 22;
+
+    pub fn generate(kind: VaultKind) -> Self {
+        let prefix = match kind {
+            VaultKind::Person => "uv",
+            VaultKind::Business => "bv",
+        };
+        Self(generate_random_id(prefix, Self::LENGTH))
+    }
+}
+
+impl FootprintUserId {
+    const LENGTH: usize = 22;
+
+    pub fn generate(kind: VaultKind) -> Self {
+        let prefix = match kind {
+            VaultKind::Person => "fp_id",
+            VaultKind::Business => "fp_bid",
+        };
+        Self(generate_random_id(prefix, Self::LENGTH))
     }
 }
 

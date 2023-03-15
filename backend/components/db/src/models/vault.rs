@@ -150,6 +150,21 @@ impl Vault {
 
     #[tracing::instrument(skip_all)]
     pub fn create(conn: &mut PgConn, new_user: NewVaultArgs) -> DbResult<Locked<Vault>> {
+        let NewVaultArgs {
+            e_private_key,
+            public_key,
+            is_live,
+            is_portable,
+            kind,
+        } = new_user;
+        let new_user = NewVaultRow {
+            id: VaultId::generate(kind),
+            e_private_key,
+            public_key,
+            is_live,
+            is_portable,
+            kind,
+        };
         let user_vault = diesel::insert_into(user_vault::table)
             .values(new_user)
             .get_result::<Vault>(conn)?;
@@ -189,8 +204,17 @@ impl Vault {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = user_vault)]
+struct NewVaultRow {
+    id: VaultId,
+    e_private_key: EncryptedVaultPrivateKey,
+    public_key: VaultPublicKey,
+    is_live: IsLive,
+    is_portable: bool,
+    kind: VaultKind,
+}
+
 pub struct NewVaultArgs {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,

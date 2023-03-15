@@ -34,6 +34,8 @@ pub struct ScopedVault {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = scoped_user)]
 struct NewScopedVault {
+    id: ScopedVaultId,
+    fp_user_id: FootprintUserId,
     user_vault_id: VaultId,
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
@@ -114,6 +116,8 @@ impl ScopedVault {
         }
         // Row doesn't exist for user_vault_id, tenant_id - create a new one
         let new = NewScopedVault {
+            id: ScopedVaultId::generate(uv.kind),
+            fp_user_id: FootprintUserId::generate(uv.kind),
             user_vault_id: uv.id.clone(),
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
@@ -138,6 +142,8 @@ impl ScopedVault {
             return Err(DbError::CannotCreatedScopedUser);
         }
         let new = NewScopedVault {
+            id: ScopedVaultId::generate(uv.kind),
+            fp_user_id: FootprintUserId::generate(uv.kind),
             user_vault_id: uv.id,
             start_timestamp: Utc::now(),
             tenant_id,
