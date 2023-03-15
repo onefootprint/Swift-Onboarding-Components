@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
+import { FieldOrPlaceholder } from 'src/components';
 import styled from 'styled-components';
 
 export type DataRowProps = {

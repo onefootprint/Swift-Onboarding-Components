@@ -11,6 +11,7 @@ export * from './decrypt-id-doc';
 export * from './ger-roles';
 export * from './get-access-events';
 export * from './get-auth-roles';
+export * from './get-businesses';
 export * from './get-d2p-status';
 export * from './get-doc-status';
 export * from './get-liveness';

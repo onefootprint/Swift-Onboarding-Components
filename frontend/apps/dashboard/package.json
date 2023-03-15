@@ -72,7 +72,8 @@
       "<rootDir>/src/config/initializers/react-i18next-test.ts"
     ],
     "moduleNameMapper": {
-      "@/proxy-configs/(.*)": "<rootDir>/src/pages/developers/components/proxy-configs/$1"
+      "@/proxy-configs/(.*)": "<rootDir>/src/pages/developers/components/proxy-configs/$1",
+      "@/businesses/(.*)": "<rootDir>/src/pages/businesses/$1"
     }
   }
 }

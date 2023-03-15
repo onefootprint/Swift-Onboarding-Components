@@ -37,22 +37,22 @@ export type ScopedUser = {
   identityDocumentInfo: IdDocInfo[];
 };
 
-export const statusForScopedUser = (su: ScopedUser) => {
-  if (!su.isPortable) {
+export const statusForScopedUser = (scopedUser: ScopedUser) => {
+  if (!scopedUser.isPortable) {
     return UserStatus.vaultOnly;
   }
   return (
-    (su.onboarding &&
-      su.onboarding.isAuthorized &&
-      (su.onboarding.status as unknown as UserStatus)) ||
+    (scopedUser.onboarding &&
+      scopedUser.onboarding.isAuthorized &&
+      (scopedUser.onboarding.status as unknown as UserStatus)) ||
     UserStatus.incomplete
   );
 };
 
-export const requiresManualReview = (su: ScopedUser) => {
-  const userStatus = statusForScopedUser(su);
+export const requiresManualReview = (scopedUser: ScopedUser) => {
+  const userStatus = statusForScopedUser(scopedUser);
   return (
-    (su.onboarding?.requiresManualReview &&
+    (scopedUser.onboarding?.requiresManualReview &&
       // Cannot manually review if the user is incomplete or vault only
       userStatus !== UserStatus.incomplete &&
       userStatus !== UserStatus.vaultOnly) ||

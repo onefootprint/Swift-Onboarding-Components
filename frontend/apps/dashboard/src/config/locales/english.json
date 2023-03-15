@@ -24,6 +24,12 @@
     "cta": "Yes",
     "cancel": "No"
   },
+  "entity-statuses": {
+    "pass": "Verified",
+    "fail": "Failed",
+    "vault_only": "Vault",
+    "incomplete": "Incomplete"
+  },
   "user-data-attributes": {
     "name": "Name",
     "phone_number": "Phone number",
@@ -373,14 +379,6 @@
         "title": "Pinned note",
         "title-by-author": " from {{author}}"
       },
-      "user-header": {
-        "status": {
-          "pass": "Verified",
-          "fail": "Failed",
-          "vault_only": "Vault",
-          "incomplete": "Incomplete"
-        }
-      },
       "user-info": {
         "cta": {
           "select-all": "Select all",
@@ -606,6 +604,39 @@
           "abandoned-event": {
             "title": "User dropped off before providing all information"
           }
+        }
+      }
+    },
+    "businesses": {
+      "page-title": "Footprint | Businesses",
+      "header": {
+        "title": "Businesses"
+      },
+      "filters": {
+        "status": {
+          "label": "Status",
+          "options": {
+            "verified": "Verified",
+            "failed": "Failed",
+            "incomplete": "Incomplete"
+          }
+        },
+        "date-range": {
+          "label": "Date range"
+        }
+      },
+      "table": {
+        "aria-label": "Businesses table",
+        "search": {
+          "placeholder": "Search (exact match)..."
+        },
+        "empty-state": "No businesses found",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "Status",
+          "submitted-by": "Submitted by (beneficial owner)",
+          "start": "Date"
         }
       }
     },

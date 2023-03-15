@@ -3,7 +3,7 @@ import { IcoWarning16 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import { Badge, Box, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
-import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
+import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 import useUserVault from 'src/pages/users/pages/user-details/hooks/use-user-vault';
 import { User } from 'src/pages/users/users.types';
 import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
@@ -14,7 +14,7 @@ type RowProps = {
 };
 
 const Row = ({ user }: RowProps) => {
-  const { allT } = useTranslation('pages.users');
+  const { t } = useTranslation();
   const { data: vaultData } = useUserVault(user.id, user);
   const badgeVariant = getUserStatusBadgeVariant(
     user.status,
@@ -38,7 +38,7 @@ const Row = ({ user }: RowProps) => {
       </td>
       <td>
         <Badge variant={badgeVariant}>
-          {allT(`pages.user-details.user-header.status.${user.status}`)}
+          {t(`entity-statuses.${user.status}`)}
           {user.requiresManualReview && (
             <Box sx={{ marginLeft: 2 }}>
               <IcoWarning16 color={badgeVariant} />
