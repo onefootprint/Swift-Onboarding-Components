@@ -1,16 +1,14 @@
 use super::TenantUvw;
 use crate::auth::tenant::{CanDecrypt, IsGuardMet, TenantGuardDsl};
 use itertools::Itertools;
-use newtypes::{DataIdentifier, TenantScope, VaultKind};
+use newtypes::{DataIdentifier, TenantScope};
 
 impl TenantUvw {
     /// Returns the list of TenantScopes representing permissions to see data on this user vault.
     /// For portable vaults, the visible data is granted by approved onboarding configurations.
     /// For non-portable vaults, all data is visible
     fn can_see_scopes(&self) -> Vec<TenantScope> {
-        // TODO treat scoped businesses the same as scoped users. Just showing everything now
-        // for testing
-        if self.vault.kind == VaultKind::Business || !self.vault.is_portable {
+        if !self.vault.is_portable {
             // All fields are visible in non-portable vaults
             return vec![TenantScope::Admin];
         }

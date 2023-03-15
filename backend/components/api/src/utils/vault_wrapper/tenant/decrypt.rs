@@ -3,16 +3,14 @@ use crate::auth::tenant::{CanDecrypt, IsGuardMet};
 use crate::auth::AuthError;
 use crate::{errors::ApiResult, State};
 use itertools::Itertools;
-use newtypes::{DataIdentifier, PiiString, TenantScope, VaultKind};
+use newtypes::{DataIdentifier, PiiString, TenantScope};
 use std::collections::HashMap;
 
 impl TenantUvw {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
     pub fn check_ob_config_access(&self, ids: &[DataIdentifier]) -> ApiResult<()> {
-        // TODO treat scoped businesses the same as scoped users. Just showing everything now
-        // for testing
-        if self.vault.kind == VaultKind::Business || !self.vault.is_portable {
+        if !self.vault.is_portable {
             // tenants can do what they wish with NON-portable vaults they own
             return Ok(());
         }
