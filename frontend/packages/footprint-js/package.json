@@ -44,7 +44,7 @@
     "postmate": "^1.5.2",
     "tsconfig": "*",
     "tsup": "^6.5.0",
-    "typescript": "4.8.4"
+    "typescript": "4.9.5"
   },
   "publishConfig": {
     "access": "public"

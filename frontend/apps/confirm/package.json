@@ -41,7 +41,7 @@
     "eslint-config-footprint": "*",
     "@onefootprint/jest-presets": "*",
     "tsconfig": "*",
-    "typescript": "4.8.4"
+    "typescript": "4.9.5"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"
