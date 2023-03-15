@@ -53,6 +53,7 @@ fn vendor_api_requirements_are_satisfied(
         VendorAPI::IdologyScanOnboarding => false,
         VendorAPI::TwilioLookupV2 => twilio_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::SocureIDPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
+        VendorAPI::IdologyPa => false,
     }
 }
 

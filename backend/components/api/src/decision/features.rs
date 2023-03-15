@@ -104,6 +104,7 @@ impl FeatureVector {
                 .socure_features
                 .as_ref()
                 .map(|f| f.footprint_reason_codes.clone()),
+            VendorAPI::IdologyPa => None,
         }
     }
 

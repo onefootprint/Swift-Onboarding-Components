@@ -18,6 +18,7 @@ pub struct Response {
     pub id_number: Option<IdNumber>, // TODO: move IdNumber and Restriction to `common`
     pub restriction: Option<Restriction>,
     pub qualifiers: Option<IDologyQualifiers>,
+    // TODO: add error and validate() method
 }
 
 #[cfg(test)]

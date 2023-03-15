@@ -1,5 +1,19 @@
+use newtypes::{IdvData, PiiJsonValue};
+
+use self::response::PaResponse;
+
 pub(super) mod request;
 pub mod response;
+
+pub struct IdologyPaRequest {
+    pub idv_data: IdvData,
+}
+
+#[derive(Clone)]
+pub struct IdologyPaAPIResponse {
+    pub raw_response: PiiJsonValue,
+    pub parsed_response: PaResponse,
+}
 
 #[cfg(test)]
 mod test {
@@ -7,9 +21,7 @@ mod test {
 
     use crate::idology::{client::IdologyClient, expectid::response::Restriction, fixtures};
 
-    use super::{
-        *,
-    };
+    use super::*;
 
     #[ignore]
     #[tokio::test]

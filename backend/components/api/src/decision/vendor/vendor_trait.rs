@@ -1,6 +1,10 @@
 use async_trait::async_trait;
 use idv::{
-    idology::{client::IdologyClient, IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
+    idology::{
+        client::IdologyClient,
+        pa::{IdologyPaAPIResponse, IdologyPaRequest},
+        IdologyExpectIDAPIResponse, IdologyExpectIDRequest,
+    },
     socure::{client::SocureClient, SocureIDPlusAPIResponse, SocureIDPlusRequest},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
     ParsedResponse,
@@ -29,7 +33,7 @@ where
 }
 
 /////////////////////
-/// Idology Impl
+/// Idology Impl - ExpectID
 /// ////////////////
 #[async_trait]
 impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>
@@ -64,6 +68,42 @@ impl VendorAPIResponse for IdologyExpectIDAPIResponse {
         ParsedResponse::IDologyExpectID(self.parsed_response)
     }
 }
+
+/////////////////////
+/// Idology Impl - PA
+/// ////////////////
+#[async_trait]
+impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error> for IdologyClient {
+    async fn make_request(
+        &self,
+        request: IdologyPaRequest,
+    ) -> Result<IdologyPaAPIResponse, idv::idology::error::Error> {
+        let raw_response = self.standalone_pa(request.idv_data).await?; // TODO: this should return PiiJsonValue itself
+        let parsed_response = idv::idology::pa::response::parse_response(raw_response.clone())?;
+
+        // TODO: call validate
+
+        Ok(IdologyPaAPIResponse {
+            raw_response: PiiJsonValue::new(raw_response),
+            parsed_response,
+        })
+    }
+}
+
+impl VendorAPIResponse for IdologyPaAPIResponse {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::IdologyPa
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response
+    }
+
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IDologyPa(self.parsed_response)
+    }
+}
+
 ////////////////////
 /// Socure Impl
 /// /// ////////////////

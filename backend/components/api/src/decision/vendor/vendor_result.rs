@@ -64,6 +64,9 @@ impl VendorResult {
                         newtypes::VendorAPI::IdologyScanOnboarding => {
                             ParsedResponse::from_idology_scan_onboarding(decrypted_response.into_leak())?
                         }
+                        newtypes::VendorAPI::IdologyPa => {
+                            ParsedResponse::from_idology_pa(decrypted_response.into_leak())?
+                        }
                     };
                     let res = VendorResult {
                         response: VendorResponse {

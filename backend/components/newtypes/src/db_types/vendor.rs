@@ -67,6 +67,7 @@ pub enum VendorAPI {
     IdologyScanVerifySubmission,
     IdologyScanVerifyResults,
     IdologyScanOnboarding,
+    IdologyPa,
     TwilioLookupV2,
     SocureIDPlus,
 }
@@ -81,6 +82,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IdologyScanOnboarding => Self::Idology,
             VendorAPI::TwilioLookupV2 => Self::Twilio,
             VendorAPI::SocureIDPlus => Self::Socure,
+            VendorAPI::IdologyPa => Self::Idology,
         }
     }
 }
@@ -94,6 +96,7 @@ impl VendorAPI {
             VendorAPI::IdologyScanOnboarding => true,
             VendorAPI::TwilioLookupV2 => false,
             VendorAPI::SocureIDPlus => false,
+            VendorAPI::IdologyPa => false,
         }
     }
 }

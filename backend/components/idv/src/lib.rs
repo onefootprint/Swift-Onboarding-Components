@@ -4,6 +4,7 @@
 use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
+use idology::pa::response::PaResponse;
 
 use idology::expectid::response::ExpectIDResponse;
 use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
@@ -32,6 +33,7 @@ pub enum ParsedResponse {
     IDologyScanVerifyResult(ScanVerifyAPIResponse),
     IDologyScanVerifySubmission(ScanVerifySubmissionAPIResponse),
     IDologyScanOnboarding(ScanOnboardingAPIResponse),
+    IDologyPa(PaResponse),
     TwilioLookupV2(LookupV2Response),
     SocureIDPlus(SocureIDPlusResponse),
 }
@@ -76,6 +78,12 @@ impl ParsedResponse {
             crate::idology::scan_onboarding::response::parse_response(raw_response).map_err(Error::from)?;
 
         Ok(Self::IDologyScanOnboarding(parsed))
+    }
+
+    pub fn from_idology_pa(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed = crate::idology::pa::response::parse_response(raw_response).map_err(Error::from)?;
+
+        Ok(Self::IDologyPa(parsed))
     }
 }
 
