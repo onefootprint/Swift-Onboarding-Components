@@ -1,4 +1,4 @@
-use crate::{BusinessDataKind, EnumDotNotationError, IdDocKind, IdentityDataKind, KvDataKey};
+use crate::{BusinessDataKind, ConversionError, DataIdentifier, IdDocKind, IdentityDataKind, KvDataKey};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
@@ -36,6 +36,31 @@ pub enum DataLifetimeKind {
 
 crate::util::impl_enum_string_diesel!(DataLifetimeKind);
 
+impl From<DataLifetimeKind> for DataIdentifier {
+    fn from(value: DataLifetimeKind) -> Self {
+        match value {
+            DataLifetimeKind::Business(b) => Self::Business(b),
+            DataLifetimeKind::Id(b) => Self::Id(b),
+            DataLifetimeKind::Custom(k) => Self::Custom(k),
+            DataLifetimeKind::IdDocument(k) => Self::IdDocument(k),
+        }
+    }
+}
+
+impl TryFrom<DataIdentifier> for DataLifetimeKind {
+    type Error = ConversionError;
+
+    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+        match value {
+            DataIdentifier::Business(b) => Ok(Self::Business(b)),
+            DataIdentifier::Id(b) => Ok(Self::Id(b)),
+            DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
+            DataIdentifier::IdDocument(k) => Ok(Self::IdDocument(k)),
+            _ => Err(ConversionError::Error(value)),
+        }
+    }
+}
+
 impl From<IdentityDataKind> for DataLifetimeKind {
     fn from(value: IdentityDataKind) -> Self {
         Self::Id(value)
@@ -64,45 +89,18 @@ impl From<BusinessDataKind> for DataLifetimeKind {
 /// We serialize DLKs as `prefix.suffix`
 impl std::fmt::Display for DataLifetimeKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let prefix = self.as_ref();
-        let suffix = match self {
-            Self::Id(s) => s.to_string(),
-            Self::Custom(s) => s.to_string(),
-            Self::IdDocument(s) => s.to_string(),
-            Self::Business(s) => s.to_string(),
-        };
-        write!(f, "{}.{}", prefix, suffix)
+        let di = DataIdentifier::from(self.clone());
+        di.fmt(f)
     }
 }
 
 /// A custom implementation to make the appearance of serialized DataLifetimeKind much more reasonable.
 /// We serialize DLKs as `prefix.suffix`
 impl FromStr for DataLifetimeKind {
-    type Err = EnumDotNotationError;
+    type Err = crate::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let period_idx = s
-            .find('.')
-            .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
-        let prefix = &s[..period_idx];
-        let suffix = &s[(period_idx + 1)..];
-        let prefix = DataLifetimeKindDiscriminants::from_str(prefix)
-            .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
-        // Parse the suffix differently depending on the prefix
-        let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
-        let result = match prefix {
-            DataLifetimeKindDiscriminants::Id => {
-                Self::Id(IdentityDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
-            }
-            DataLifetimeKindDiscriminants::Custom => {
-                Self::Custom(KvDataKey::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
-            }
-            DataLifetimeKindDiscriminants::IdDocument => {
-                Self::IdDocument(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
-            }
-            DataLifetimeKindDiscriminants::Business => {
-                Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
-            }
-        };
+        let di = DataIdentifier::from_str(s)?;
+        let result = Self::try_from(di)?;
         Ok(result)
     }
 }
