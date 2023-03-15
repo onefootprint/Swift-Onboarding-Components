@@ -5,7 +5,6 @@ use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
-use db::models::kv_data::KeyValueData;
 use db::models::onboarding::Onboarding;
 use db::models::phone_number::PhoneNumber;
 use db::models::scoped_vault::ScopedVault;
@@ -48,7 +47,6 @@ impl VaultWrapper<Person> {
         let phone_numbers = PhoneNumber::bulk_get(conn, &active_lifetime_list)?;
         let emails = Email::bulk_get(conn, &active_lifetime_list)?;
         let identity_document_map = IdentityDocumentAndRequest::bulk_get(conn, &active_lifetime_list)?;
-        let kv_data_map = KeyValueData::bulk_get(conn, &active_lifetime_list)?;
         let scoped_user_ids = users.iter().map(|(su, _)| &su.id).collect();
         let onboarding_map = Onboarding::bulk_get_for_users(conn, scoped_user_ids)?;
 
@@ -69,7 +67,6 @@ impl VaultWrapper<Person> {
                     phone_numbers.get(&uv_id).cloned().unwrap_or_default(),
                     emails.get(&uv_id).cloned().unwrap_or_default(),
                     identity_document_map.get(&uv_id).cloned().unwrap_or_default(),
-                    kv_data_map.get(&uv_id).cloned().unwrap_or_default(),
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
                 )?;
                 let uvw = TenantUvw {

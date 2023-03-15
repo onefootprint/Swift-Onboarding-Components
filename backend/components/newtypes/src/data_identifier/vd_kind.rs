@@ -4,12 +4,11 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
-use crate::{BusinessDataKind as BDK, DataIdentifier, IdentityDataKind as IDK};
+use crate::{BusinessDataKind as BDK, DataIdentifier, IdentityDataKind as IDK, KvDataKey};
 
 #[derive(
     Debug,
     Clone,
-    Copy,
     Ord,
     PartialOrd,
     Eq,
@@ -35,6 +34,7 @@ pub enum VdKind {
     // VaultData table. We will likely migrate Email and PhoneNumber to go in VaultData in the future.
     Id(IDK),
     Business(BDK),
+    Custom(KvDataKey),
 }
 
 crate::util::impl_enum_string_diesel!(VdKind);
@@ -45,6 +45,7 @@ impl From<VdKind> for DataIdentifier {
         match value {
             VdKind::Business(b) => Self::Business(b),
             VdKind::Id(b) => Self::Id(b),
+            VdKind::Custom(k) => Self::Custom(k),
         }
     }
 }
@@ -56,6 +57,7 @@ impl TryFrom<DataIdentifier> for VdKind {
         match value {
             DataIdentifier::Business(b) => Ok(Self::Business(b)),
             DataIdentifier::Id(b) => Ok(Self::Id(b)),
+            DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
             _ => Err(ConversionError::Error(value)),
         }
     }
@@ -73,6 +75,12 @@ impl From<BDK> for VdKind {
     }
 }
 
+impl From<KvDataKey> for VdKind {
+    fn from(value: KvDataKey) -> Self {
+        Self::Custom(value)
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum ConversionError {
     #[error("Cannot convert from DataIdentifier: {0}")]
@@ -87,7 +95,7 @@ impl std::fmt::Display for VdKind {
         if matches!(self, Self::Id(IDK::PhoneNumber) | Self::Id(IDK::Email)) {
             return Err(std::fmt::Error);
         }
-        let di = DataIdentifier::from(*self);
+        let di = DataIdentifier::from(self.clone());
         di.fmt(f)
     }
 }
@@ -96,6 +104,7 @@ impl FromStr for VdKind {
     type Err = crate::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let di = DataIdentifier::from_str(s)?;
+        println!("DI: {:?}", di);
         let result = Self::try_from(di)?;
         if matches!(result, Self::Id(IDK::PhoneNumber) | Self::Id(IDK::Email)) {
             return Err(ConversionError::Unsupported(s.to_owned()).into());

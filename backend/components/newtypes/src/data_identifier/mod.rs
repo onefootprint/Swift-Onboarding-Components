@@ -34,6 +34,7 @@ mod collected_data;
 mod data_lifetime_kind;
 mod id_doc_kind;
 mod identity_data_kind;
+mod kv_data_key;
 mod validation;
 mod vd_kind;
 
@@ -110,12 +111,6 @@ impl TryFrom<DataIdentifier> for IdentityDataKind {
             DataIdentifier::Id(idk) => Ok(idk),
             _ => Err(crate::Error::Custom("Can't convert into IDK".to_owned())),
         }
-    }
-}
-
-impl From<KvDataKey> for DataIdentifier {
-    fn from(value: KvDataKey) -> Self {
-        Self::Custom(value)
     }
 }
 

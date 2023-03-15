@@ -1,0 +1,1 @@
+DELETE FROM user_vault_data WHERE kind LIKE 'custom.%';

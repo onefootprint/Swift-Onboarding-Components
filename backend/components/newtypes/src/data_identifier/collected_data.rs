@@ -74,13 +74,13 @@ impl CollectedData {
 }
 
 pub trait HasParentCdo {
-    fn parent(&self) -> CollectedData;
+    fn parent(&self) -> Option<CollectedData>;
 }
 
 impl HasParentCdo for IDK {
     /// Maps an IDK to the CollectedData variant that contains this IDK
-    fn parent(&self) -> CollectedData {
-        match self {
+    fn parent(&self) -> Option<CollectedData> {
+        let result = match self {
             Self::FirstName => CollectedData::Name,
             Self::LastName => CollectedData::Name,
             Self::Dob => CollectedData::Dob,
@@ -94,14 +94,15 @@ impl HasParentCdo for IDK {
             Self::Country => CollectedData::Address,
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
-        }
+        };
+        Some(result)
     }
 }
 
 impl HasParentCdo for BDK {
     /// Maps an IDK to the CollectedData variant that contains this IDK
-    fn parent(&self) -> CollectedData {
-        match self {
+    fn parent(&self) -> Option<CollectedData> {
+        let result = match self {
             Self::Name => CollectedData::BusinessName,
             Self::Website => CollectedData::BusinessWebsite,
             Self::PhoneNumber => CollectedData::BusinessPhoneNumber,
@@ -113,7 +114,8 @@ impl HasParentCdo for BDK {
             Self::Zip => CollectedData::BusinessAddress,
             Self::Country => CollectedData::BusinessAddress,
             Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
-        }
+        };
+        Some(result)
     }
 }
 
@@ -353,6 +355,7 @@ mod test {
             // Parent's children should contain self
             assert!(idk
                 .parent()
+                .unwrap()
                 .options()
                 .into_iter()
                 .flat_map(|cdo| cdo.attributes::<IDK>())
@@ -366,6 +369,7 @@ mod test {
             // Parent's children should contain self
             assert!(bdk
                 .parent()
+                .unwrap()
                 .options()
                 .into_iter()
                 .flat_map(|cdo| cdo.attributes::<BDK>())

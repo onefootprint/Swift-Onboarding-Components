@@ -42,9 +42,11 @@ where
         // Make sure all keys provided are parts of coherent CollectedDataOptions.
         // For ex, can't specify FirstName without LastName
         let keys = data.keys().cloned().collect_vec();
-        let extra_keys = Self::extra_keys(keys);
-        if !extra_keys.is_empty() {
-            let extra_dis = extra_keys.into_iter().map(|x| (x.parent(), x.into())).collect();
+        let extra_dis = Self::extra_keys(keys)
+            .into_iter()
+            .filter_map(|x| x.parent().map(|p| (p, x.into())))
+            .collect_vec();
+        if !extra_dis.is_empty() {
             return Err(DataValidationError::ExtraFieldError(extra_dis).into());
         }
 

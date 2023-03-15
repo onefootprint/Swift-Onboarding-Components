@@ -14,7 +14,7 @@ use super::data_lifetime::DataLifetime;
 
 #[derive(Debug, Hash, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = kv_data)]
-pub struct KeyValueData {
+struct KeyValueData {
     pub id: KeyValueDataId,
     pub data_key: KvDataKey,
     pub e_data: SealedVaultBytes,
@@ -32,7 +32,7 @@ struct NewKeyValueData {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewKeyValueDataArgs {
+struct NewKeyValueDataArgs {
     pub data_key: KvDataKey,
     pub e_data: SealedVaultBytes,
 }

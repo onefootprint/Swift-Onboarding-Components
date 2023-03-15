@@ -7,7 +7,6 @@ use crate::utils::fingerprint::NewFingerprints;
 use crate::utils::vault_wrapper::{Business, Person};
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
-use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::phone_number::{NewPhoneNumberArgs, PhoneNumber};
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
@@ -29,7 +28,7 @@ impl<Type> WriteableVw<Type> {
     pub fn update_custom_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        update: HashMap<KvDataKey, PiiString>,
+        update: DataRequest<KvDataKey>,
     ) -> ApiResult<()> {
         self.update_custom_data_unsafe(conn, update)
     }
@@ -45,6 +44,7 @@ impl WriteableVw<Person> {
         for_bifrost: bool,
     ) -> ApiResult<Option<EmailId>> {
         request.assert_no_business_data()?;
+        // TODO combine the DB queries to add custom data and id data
         let DecomposedPutRequest {
             id_update,
             custom_data,
@@ -261,25 +261,18 @@ impl<Type> WriteableVw<Type> {
     fn update_custom_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        update: HashMap<KvDataKey, PiiString>,
+        update: DataRequest<KvDataKey>,
     ) -> ApiResult<()> {
-        let existing_lifetime_ids = update
-            .keys()
-            .flat_map(|k| self.kv_data().get(k))
-            .map(|k| k.lifetime_id.clone())
-            .collect();
-        let updates = update
-            .into_iter()
-            .map(|(data_key, pii)| {
-                let e_data = self.vault().public_key.seal_pii(&pii)?;
-                Ok(NewKeyValueDataArgs { data_key, e_data })
-            })
-            .collect::<Result<Vec<_>, ApiError>>()?;
+        let v = self.vault();
 
-        let seqno = DataLifetime::get_next_seqno(conn)?;
-        // TODO: Should we use bulk_deactivate_speculative here? When we denormalize `key` onto DataLifetimeKind
-        DataLifetime::bulk_deactivate(conn, existing_lifetime_ids, seqno)?;
-        KeyValueData::bulk_create(conn, &self.vault().id, &self.scoped_user_id, updates, seqno)?;
+        let builder = VaultDataBuilder::build(update, v.public_key.clone())?;
+        builder.validate_and_save(
+            conn,
+            vec![], // No CDOs for custom data, yet. This logic isn't used
+            v.id.clone(),
+            self.scoped_user_id.clone(),
+            HashMap::new(), // no fingerprints for kv_data data yet
+        )?;
         Ok(())
     }
 

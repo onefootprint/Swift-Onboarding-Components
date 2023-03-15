@@ -2,13 +2,13 @@ use super::Business;
 use super::{Person, VaultWrapper};
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
-use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
-use newtypes::BusinessDataKind as BDK;
+use db::models::vault_data::VaultData;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
+use newtypes::{BusinessDataKind as BDK, VdKind};
 use newtypes::{CollectedDataOption, SealedVaultBytes};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -114,8 +114,15 @@ impl<Type> VaultWrapper<Type> {
         &self.vault
     }
 
-    pub fn kv_data(&self) -> &HashMap<KvDataKey, KeyValueData> {
+    pub fn kv_data(&self) -> HashMap<KvDataKey, &VaultData> {
         // We don't currently support portable kv data
-        &self.speculative.kv_data
+        self.speculative
+            .vd
+            .iter()
+            .filter_map(|vd| match vd.kind {
+                VdKind::Custom(ref kv_key) => Some((kv_key.clone(), vd)),
+                _ => None,
+            })
+            .collect()
     }
 }

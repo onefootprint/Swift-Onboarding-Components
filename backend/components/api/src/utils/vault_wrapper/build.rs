@@ -5,7 +5,6 @@ use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
-use db::models::kv_data::KeyValueData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::NewPhoneNumberArgs;
 use db::models::phone_number::PhoneNumber;
@@ -33,11 +32,10 @@ impl<Type> VaultWrapper<Type> {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
-        kv_data: Vec<KeyValueData>,
         lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<Self> {
         let (portable, speculative) =
-            VwData::partition(vd, phone_numbers, emails, identity_documents, kv_data, lifetimes)?;
+            VwData::partition(vd, phone_numbers, emails, identity_documents, lifetimes)?;
         let result = Self {
             vault: user_vault,
             portable,
@@ -66,11 +64,6 @@ impl<Type> VaultWrapper<Type> {
         let phone_numbers = PhoneNumber::get_for(conn, &active_lifetime_ids)?;
         let emails = Email::get_for(conn, &active_lifetime_ids)?;
         let identity_documents = IdentityDocumentAndRequest::get_for(conn, &active_lifetime_ids)?;
-        let kv_data = if su_id.is_some() {
-            KeyValueData::get_for(conn, &active_lifetime_ids)?
-        } else {
-            vec![]
-        };
 
         let result = Self::build_internal(
             uv,
@@ -79,7 +72,6 @@ impl<Type> VaultWrapper<Type> {
             phone_numbers,
             emails,
             identity_documents,
-            kv_data,
             active_lifetimes,
         )?;
         Ok(result)

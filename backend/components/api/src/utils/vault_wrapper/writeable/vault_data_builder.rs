@@ -12,6 +12,7 @@ use db::{
     },
     TxnPgConn,
 };
+use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataIdentifier, DataLifetimeKind, DataRequest, IsDataIdentifierDiscriminant,
     PiiString, ScopedVaultId, VaultId, VaultPublicKey, VdKind,
@@ -54,9 +55,9 @@ where
     ) -> ApiResult<()> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
-        let new_fields = self.data.iter().map(|d| d.kind.clone()).collect();
+        let new_fields = self.data.iter().map(|d| d.kind.clone()).collect_vec();
         let existing = CollectedDataOption::list_from(existing_fields);
-        let new = CollectedDataOption::list_from(new_fields);
+        let new = CollectedDataOption::list_from(new_fields.clone());
         let offending_partial_cdo =
             new.iter()
                 .cloned()
@@ -70,9 +71,12 @@ where
 
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
-        let kinds_to_deactivate = new
-            .iter()
-            .flat_map(|cdo| cdo.attributes::<T>())
+        let kinds_to_deactivate = new_fields
+            .into_iter()
+            // Even if we're not providing all fields for a CDO, deactivate old versions of all
+            // fields in the CDO. For example, address line 2
+            .chain(new.iter().flat_map(|cdo| cdo.attributes::<T>()))
+            .unique()
             .map(DataLifetimeKind::from)
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;

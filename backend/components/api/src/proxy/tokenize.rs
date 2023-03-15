@@ -11,6 +11,7 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
+use newtypes::DataRequest;
 use newtypes::KvDataKey;
 use newtypes::PiiString;
 use std::collections::HashMap;
@@ -48,14 +49,14 @@ pub async fn vault_pii(
                 let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_user.id)?;
 
                 // vault the custom data
-                let custom: HashMap<KvDataKey, _> = values
+                let custom: HashMap<_, _> = values
                     .iter()
                     .filter_map(|(di, value)| match di {
                         DataIdentifier::Selfie(_)
                         | DataIdentifier::Id(_)
                         | DataIdentifier::IdDocument(_)
                         | DataIdentifier::Business(_) => None,
-                        DataIdentifier::Custom(k) => Some((k.clone(), value.clone())),
+                        DataIdentifier::Custom(k) => Some((k.clone().into(), value.clone())),
                     })
                     .collect();
 
@@ -66,10 +67,12 @@ pub async fn vault_pii(
                         principal,
                         insight,
                         kind: AccessEventKind::Update,
-                        targets: custom.keys().cloned().map(DataIdentifier::Custom).collect(),
+                        targets: custom.keys().cloned().collect(),
                     }
                     .create(conn)?;
-                    uvw.update_custom_data(conn, custom)?;
+                    // TODO could technically now support vaulting any kind of data instead of just custom
+                    let (data, _) = DataRequest::<KvDataKey>::new(custom, false)?;
+                    uvw.update_custom_data(conn, data)?
                 }
 
                 Ok(())

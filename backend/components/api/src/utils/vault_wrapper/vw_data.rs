@@ -1,12 +1,11 @@
 use db::models::data_lifetime::DataLifetime;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
-use db::models::kv_data::KeyValueData;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault_data::VaultData;
 use db::{HasLifetime, HasSealedIdentityData};
+use newtypes::IdentityDataKind;
 use newtypes::{BusinessDataKind, DataLifetimeId, SealedVaultBytes, VdKind};
-use newtypes::{IdentityDataKind, KvDataKey};
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 use strum::IntoEnumIterator;
@@ -23,7 +22,6 @@ pub(super) struct VwData<Type> {
     pub(super) emails: Vec<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
     pub(super) identity_documents: Vec<IdentityDocumentAndRequest>,
-    pub(super) kv_data: HashMap<KvDataKey, KeyValueData>,
 
     // A map of all of the DataLifetimes for this data.
     lifetimes: HashMap<DataLifetimeId, DataLifetime>,
@@ -36,7 +34,6 @@ impl<Type> VwData<Type> {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
-        kv_data: Vec<KeyValueData>,
         all_lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<(Self, Self)> {
         let speculative_lifetime_ids: HashSet<_> = all_lifetimes
@@ -59,12 +56,12 @@ impl<Type> VwData<Type> {
         let (portable_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
         let (portable_identity_documents, speculative_identity_documents) =
             partition(identity_documents, &speculative_lifetime_ids);
-        let (portable_kv_data, speculative_kv_data) = partition(kv_data, &speculative_lifetime_ids);
 
-        if !portable_kv_data.is_empty() {
-            // We don't commit kv_data yet because we don't want it to be portable. Error if we find
-            // any
-            return Err(ApiError::AssertionError("Found portable kv_data".to_owned()));
+        // TODO some runtime checks that business vaults don't have id data and vice versa
+        if portable_vd.iter().any(|vd| matches!(vd.kind, VdKind::Custom(_))) {
+            // We don't commit custom data yet because we don't want it to be portable. Error if we
+            // find any
+            return Err(ApiError::AssertionError("Found portable custom data".to_owned()));
         }
 
         let portable = Self::build(
@@ -72,7 +69,6 @@ impl<Type> VwData<Type> {
             portable_phone_numbers,
             portable_emails,
             portable_identity_documents,
-            portable_kv_data,
             &all_lifetimes,
         );
         let speculative = Self::build(
@@ -80,7 +76,6 @@ impl<Type> VwData<Type> {
             speculative_phone_numbers,
             speculative_emails,
             speculative_identity_documents,
-            speculative_kv_data,
             &all_lifetimes,
         );
         Ok((portable, speculative))
@@ -91,7 +86,6 @@ impl<Type> VwData<Type> {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
-        kv_data: Vec<KeyValueData>,
         all_lifetimes: &[DataLifetime],
     ) -> Self {
         let lifetime_ids: Vec<Vec<_>> = vec![
@@ -99,7 +93,6 @@ impl<Type> VwData<Type> {
             phone_numbers.iter().map(|d| d.lifetime_id()).collect(),
             emails.iter().map(|d| d.lifetime_id()).collect(),
             identity_documents.iter().map(|d| d.lifetime_id()).collect(),
-            kv_data.iter().map(|d| d.lifetime_id()).collect(),
         ];
         let lifetime_ids: HashSet<_> = lifetime_ids.into_iter().flatten().collect();
         // Since all_lifetimes contains a superset of lifetimes represented by the data in this
@@ -116,7 +109,6 @@ impl<Type> VwData<Type> {
             phone_numbers,
             emails,
             identity_documents,
-            kv_data: kv_data.into_iter().map(|d| (d.data_key.clone(), d)).collect(),
             lifetimes,
             phantom: PhantomData,
         }
@@ -128,6 +120,7 @@ impl VwData<Person> {
         self.vd.iter().find(|d| match d.kind {
             VdKind::Id(p) => p == kind,
             VdKind::Business(_) => false,
+            VdKind::Custom(_) => false,
         })
     }
 
@@ -188,6 +181,7 @@ impl VwData<Business> {
         self.vd.iter().find(|d| match d.kind {
             VdKind::Business(b) => b == kind,
             VdKind::Id(_) => false,
+            VdKind::Custom(_) => false,
         })
     }
 

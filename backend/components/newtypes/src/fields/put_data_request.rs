@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::IdentityDataKind as IDK;
 use crate::{
     flat_api_object_map_type, BusinessDataKind as BDK, DataIdentifier, DataRequest, Error, KvDataKey,
@@ -31,14 +29,11 @@ impl PutDataRequest {
         // Parse business data
         let (business_data, other_data) = DataRequest::<BDK>::new(other_data, for_bifrost)?;
 
-        // Parse custom data
-        let custom_data = other_data
-            .into_iter()
-            .map(|(k, v)| match k {
-                DataIdentifier::Custom(k) => Ok((k, v)),
-                k => Err(Error::Custom(format!("Cannot put key {}", k))),
-            })
-            .collect::<NtResult<HashMap<_, _>>>()?;
+        // Parse custom data - this is mostly a no-op since we do no validation on custom data
+        let (custom_data, other_data) = DataRequest::<KvDataKey>::new(other_data, for_bifrost)?;
+        if let Some(k) = other_data.into_iter().next() {
+            return Err(Error::Custom(format!("Cannot put key {}", k.0)));
+        }
         let result = DecomposedPutRequest {
             id_update,
             custom_data,
@@ -50,8 +45,7 @@ impl PutDataRequest {
 
 pub struct DecomposedPutRequest {
     pub id_update: DataRequest<IDK>,
-    // TODO parse with DataRequest
-    pub custom_data: HashMap<KvDataKey, PiiString>,
+    pub custom_data: DataRequest<KvDataKey>,
     pub business_data: DataRequest<BDK>,
 }
 

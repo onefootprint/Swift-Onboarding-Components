@@ -14,7 +14,6 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
 use newtypes::PiiString;
 use newtypes::{BusinessDataKind as BDK, SealedVaultBytes};
-use std::collections::HashMap;
 use std::str::FromStr;
 
 #[db_test]
@@ -426,18 +425,18 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
 
     // Add some custom data
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    let custom_data = HashMap::from_iter([
-        (k1.clone(), PiiString::from("BLERP")),
-        (k2.clone(), PiiString::from("FLERP")),
-    ]);
-    uvw.update_custom_data(conn, custom_data).unwrap();
+    let custom_data = vec![
+        (k1.clone().into(), PiiString::from("BLERP")),
+        (k2.clone().into(), PiiString::from("FLERP")),
+    ];
+    uvw.add_data_test(conn, custom_data).unwrap();
 
     // Update k1 and make sure only it changed
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
     let v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
-    let custom_data = HashMap::from_iter([(k1.clone(), PiiString::from("MERP"))]);
-    uvw.update_custom_data(conn, custom_data).unwrap();
+    let custom_data = vec![(k1.clone().into(), PiiString::from("MERP"))];
+    uvw.add_data_test(conn, custom_data).unwrap();
 
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let new_v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
@@ -446,11 +445,11 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
     assert_eq!(new_v2, v2);
 
     // Update k1 and k2 again and make sure they both changed
-    let custom_data = HashMap::from_iter([
-        (k1.clone(), PiiString::from("hi")),
-        (k2.clone(), PiiString::from("bye")),
-    ]);
-    uvw.update_custom_data(conn, custom_data).unwrap();
+    let custom_data = vec![
+        (k1.clone().into(), PiiString::from("hi")),
+        (k2.clone().into(), PiiString::from("bye")),
+    ];
+    uvw.add_data_test(conn, custom_data).unwrap();
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let newest_v1 = uvw.kv_data().get(&k1).unwrap().e_data.clone();
     let newest_v2 = uvw.kv_data().get(&k2).unwrap().e_data.clone();
@@ -478,12 +477,12 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
     // Also add some custom data
     let custom_key1 = KvDataKey::from_str("blerp").unwrap();
     let custom_key2 = KvDataKey::from_str("flerp").unwrap();
-    let custom_data = HashMap::from_iter([
-        (custom_key1.clone(), PiiString::from("BLERP")),
-        (custom_key2.clone(), PiiString::from("FLERP")),
-    ]);
+    let custom_data = vec![
+        (custom_key1.clone().into(), PiiString::from("BLERP")),
+        (custom_key2.clone().into(), PiiString::from("FLERP")),
+    ];
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.update_custom_data(conn, custom_data).unwrap();
+    uvw.add_data_test(conn, custom_data).unwrap();
 
     // Commit the identity data
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
