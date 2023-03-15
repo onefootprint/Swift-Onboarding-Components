@@ -13,8 +13,8 @@ use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
-    BusinessDataKind, CollectedDataOption, DataCollectedInfo, DataPriority, DataRequest, EmailId,
-    Fingerprint, IdentityDataKind as IDK, KvDataKey, PiiString,
+    CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, DataRequest, EmailId,
+    Fingerprint, IdentityDataKind as IDK, IsDataIdentifierDiscriminant, KvDataKey, PiiString, VdKind,
 };
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
@@ -30,7 +30,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         update: DataRequest<KvDataKey>,
     ) -> ApiResult<()> {
-        self.update_custom_data_unsafe(conn, update)
+        self.update_data_unsafe(conn, update, HashMap::new())
     }
 }
 
@@ -70,7 +70,7 @@ impl WriteableVw<Person> {
         };
         // Update custom data
         if !custom_data.is_empty() {
-            self.update_custom_data_unsafe(conn, custom_data)?;
+            self.update_data_unsafe(conn, custom_data, HashMap::new())?;
         }
         // Update PhoneNumber
         if let Some(phone_number) = phone_number {
@@ -94,7 +94,14 @@ impl WriteableVw<Person> {
         // Update VaultData
         if !id_update.is_empty() {
             assert_non_portable()?;
-            self.update_identity_data_unsafe(conn, id_update, id_fingerprints)?;
+            // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
+            if let Some(idk) = [IDK::PhoneNumber, IDK::Email]
+                .iter()
+                .find(|k| id_update.contains_key(k))
+            {
+                return Err(UserError::InvalidDataKind(*idk).into());
+            }
+            self.update_data_unsafe(conn, id_update, id_fingerprints)?;
         }
 
         // Add timeline event for all the newly added data
@@ -122,11 +129,11 @@ impl WriteableVw<Business> {
 
         // Update business data
         if !business_data.is_empty() {
-            self.update_business_data_unsafe(conn, business_data)?;
+            self.update_data_unsafe(conn, business_data, HashMap::new())?; // TODO fingerprints
         }
         // Update custom data
         if !custom_data.is_empty() {
-            self.update_custom_data_unsafe(conn, custom_data)?;
+            self.update_data_unsafe(conn, custom_data, HashMap::new())?;
         }
 
         // Add timeline event for all the newly added data
@@ -205,73 +212,29 @@ impl WriteableVw<Person> {
 
         Ok(email.id)
     }
-
-    fn update_identity_data_unsafe(
-        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
-        conn: &mut TxnPgConn,
-        update: DataRequest<IDK>,
-        fingerprints: NewFingerprints<IDK>,
-    ) -> Result<(), ApiError> {
-        let existing_fields = self.populated();
-        let v = self.vault();
-
-        // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
-        if let Some(idk) = [IDK::PhoneNumber, IDK::Email]
-            .iter()
-            .find(|k| update.contains_key(k))
-        {
-            return Err(UserError::InvalidDataKind(*idk).into());
-        }
-        let builder = VaultDataBuilder::build(update, v.public_key.clone())?;
-        builder.validate_and_save(
-            conn,
-            existing_fields,
-            v.id.clone(),
-            self.scoped_user_id.clone(),
-            fingerprints,
-        )?;
-
-        Ok(())
-    }
-}
-
-impl WriteableVw<Business> {
-    fn update_business_data_unsafe(
-        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
-        conn: &mut TxnPgConn,
-        update: DataRequest<BusinessDataKind>,
-    ) -> Result<(), ApiError> {
-        let existing_fields = self.populated();
-        let v = self.vault();
-
-        let builder = VaultDataBuilder::build(update, v.public_key.clone())?;
-        builder.validate_and_save(
-            conn,
-            existing_fields, // business logic doesn't currently use this
-            v.id.clone(),
-            self.scoped_user_id.clone(),
-            HashMap::new(), // no fingerprints for business data yet
-        )?;
-
-        Ok(())
-    }
 }
 
 impl<Type> WriteableVw<Type> {
-    fn update_custom_data_unsafe(
+    fn update_data_unsafe<T>(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        update: DataRequest<KvDataKey>,
-    ) -> ApiResult<()> {
+        update: DataRequest<T>,
+        fingerprints: NewFingerprints<T>,
+    ) -> ApiResult<()>
+    where
+        T: IsDataIdentifierDiscriminant + Into<VdKind>,
+        DataLifetimeKind: From<T>,
+    {
+        let existing_fields = self.populated();
         let v = self.vault();
 
         let builder = VaultDataBuilder::build(update, v.public_key.clone())?;
         builder.validate_and_save(
             conn,
-            vec![], // No CDOs for custom data, yet. This logic isn't used
+            existing_fields, // not all logic uses this
             v.id.clone(),
             self.scoped_user_id.clone(),
-            HashMap::new(), // no fingerprints for kv_data data yet
+            fingerprints,
         )?;
         Ok(())
     }
