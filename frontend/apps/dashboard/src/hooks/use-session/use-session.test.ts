@@ -1,5 +1,6 @@
 import { act, renderHook } from '@onefootprint/test-utils';
 import { RoleScope } from '@onefootprint/types';
+import { resetUser } from 'src/config/tests';
 
 import useSession from './use-session';
 
@@ -39,6 +40,10 @@ const loginPayload = {
 };
 
 describe('useSession', () => {
+  beforeEach(() => {
+    resetUser();
+  });
+
   describe('when the state is empty', () => {
     it('should indicate that the user is not logged in', () => {
       const { result } = renderHook(() => useSession());

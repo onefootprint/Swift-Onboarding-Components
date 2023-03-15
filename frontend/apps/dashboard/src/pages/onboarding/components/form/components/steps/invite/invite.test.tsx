@@ -77,59 +77,59 @@ describe('<Invite />', () => {
       const roleField = screen.getByRole('button', { name: 'Admin' });
       expect(roleField).toBeInTheDocument();
     });
-  });
 
-  describe('when clicking on the add more button', () => {
-    it('should add a new invite field', async () => {
-      await renderInviteAndWaitData({});
+    describe('when clicking on the add more button', () => {
+      it('should add a new invite field', async () => {
+        await renderInviteAndWaitData({});
 
-      const addMoreButton = screen.getByRole('button', { name: 'Add more' });
-      await userEvent.click(addMoreButton);
+        const addMoreButton = screen.getByRole('button', { name: 'Add more' });
+        await userEvent.click(addMoreButton);
 
-      const emailFields = screen.getAllByPlaceholderText('jane.doe@acme.com');
-      await waitFor(() => {
-        expect(emailFields).toHaveLength(2);
-      });
-    });
-  });
-
-  describe('when submitting the form', () => {
-    describe('when the request to invite a member succeeds', () => {
-      beforeEach(() => {
-        withInviteMember();
-      });
-
-      it('should invite the member and trigger onComplete', async () => {
-        const onComplete = jest.fn();
-        await renderInviteAndWaitData({ onComplete });
-
-        const emailField = screen.getByLabelText('Email address');
-        await userEvent.type(emailField, 'jane.doe@acme.com');
-
-        const submitButton = screen.getByRole('button', { name: 'Complete' });
-        await userEvent.click(submitButton);
+        const emailFields = screen.getAllByPlaceholderText('jane.doe@acme.com');
         await waitFor(() => {
-          expect(onComplete).toHaveBeenCalled();
+          expect(emailFields).toHaveLength(2);
         });
       });
     });
 
-    describe('when the request to invite a member fails', () => {
-      beforeEach(() => {
-        withInviteMemberError();
+    describe('when submitting the form', () => {
+      describe('when the request to invite a member succeeds', () => {
+        beforeEach(() => {
+          withInviteMember();
+        });
+
+        it('should invite the member and trigger onComplete', async () => {
+          const onComplete = jest.fn();
+          await renderInviteAndWaitData({ onComplete });
+
+          const emailField = screen.getByLabelText('Email address');
+          await userEvent.type(emailField, 'jane.doe@acme.com');
+
+          const submitButton = screen.getByRole('button', { name: 'Complete' });
+          await userEvent.click(submitButton);
+          await waitFor(() => {
+            expect(onComplete).toHaveBeenCalled();
+          });
+        });
       });
 
-      it('should invite the member and trigger onComplete', async () => {
-        await renderInviteAndWaitData({});
+      describe('when the request to invite a member fails', () => {
+        beforeEach(() => {
+          withInviteMemberError();
+        });
 
-        const emailField = screen.getByLabelText('Email address');
-        await userEvent.type(emailField, 'jane.doe@acme.com');
+        it('should invite the member and trigger onComplete', async () => {
+          await renderInviteAndWaitData({});
 
-        const submitButton = screen.getByRole('button', { name: 'Complete' });
-        await userEvent.click(submitButton);
+          const emailField = screen.getByLabelText('Email address');
+          await userEvent.type(emailField, 'jane.doe@acme.com');
 
-        const error = await screen.findByText('Something went wrong');
-        expect(error).toBeInTheDocument();
+          const submitButton = screen.getByRole('button', { name: 'Complete' });
+          await userEvent.click(submitButton);
+
+          const error = await screen.findByText('Something went wrong');
+          expect(error).toBeInTheDocument();
+        });
       });
     });
   });
