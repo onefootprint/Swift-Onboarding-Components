@@ -6,16 +6,18 @@ impl Validate for BDK {
     fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
         let result = match self {
             BDK::Name => value,
-            BDK::Website => value,
+            BDK::Dba => value,
+            BDK::Website => value, // TODO
             BDK::PhoneNumber => PhoneNumber::parse(value)?.e164_with_suffix(),
-            BDK::Ein => value,
+            BDK::Ein => value, // TODO
             BDK::AddressLine1 => value,
             BDK::AddressLine2 => value,
             BDK::City => value,
             BDK::State => value,
             BDK::Zip => super::clean_and_validate_zip(value)?,
             BDK::Country => super::clean_and_validate_country(value)?,
-            BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
+            BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?, // TODO
+            BDK::CorporationType => value,                                         // TODO
         };
         Ok(result)
     }

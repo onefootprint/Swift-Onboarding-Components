@@ -261,6 +261,7 @@ def build_user_data():
 def build_business_data():
     return {
         "business.name": "Foobar Inc",
+        "business.dba": "Barfoo Inc",
         "business.website": "foobar.com",
         "business.phone_number": PHONE_NUMBER,
         "business.address_line1": "1 Footprint Way",

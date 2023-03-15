@@ -27,7 +27,8 @@ use crate::IsDataIdentifierDiscriminant;
 #[serde(rename_all = "snake_case")]
 /// Represents data that is collected about a particular Business
 pub enum BusinessDataKind {
-    Name, // TODO DBA
+    Name,
+    Dba,
     Website,
     PhoneNumber,
     Ein,
@@ -38,10 +39,11 @@ pub enum BusinessDataKind {
     Zip,
     Country,
     BeneficialOwners,
+    CorporationType,
 }
 
 impl IsDataIdentifierDiscriminant for BusinessDataKind {
     fn is_optional(&self) -> bool {
-        matches!(self, Self::AddressLine2)
+        matches!(self, Self::Dba | Self::AddressLine2)
     }
 }

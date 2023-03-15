@@ -31,6 +31,7 @@ pub enum CollectedData {
     BusinessPhoneNumber,
     BusinessWebsite,
     BusinessBeneficialOwners,
+    BusinessCorporationType,
 }
 
 impl CollectedData {
@@ -54,6 +55,7 @@ impl CollectedData {
             Self::BusinessPhoneNumber => vec![BusinessPhoneNumber],
             Self::BusinessWebsite => vec![BusinessWebsite],
             Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners],
+            Self::BusinessCorporationType => vec![BusinessCorporationType],
         }
     }
 
@@ -64,7 +66,8 @@ impl CollectedData {
             | Self::BusinessAddress
             | Self::BusinessPhoneNumber
             | Self::BusinessWebsite
-            | Self::BusinessBeneficialOwners => DataIdentifierDiscriminant::Business,
+            | Self::BusinessBeneficialOwners
+            | Self::BusinessCorporationType => DataIdentifierDiscriminant::Business,
             Self::Name | Self::Dob | Self::Ssn | Self::Address | Self::Email | Self::PhoneNumber => {
                 DataIdentifierDiscriminant::Id
             }
@@ -100,10 +103,11 @@ impl HasParentCdo for IDK {
 }
 
 impl HasParentCdo for BDK {
-    /// Maps an IDK to the CollectedData variant that contains this IDK
+    /// Maps an BDK to the CollectedData variant that contains this BDK
     fn parent(&self) -> Option<CollectedData> {
         let result = match self {
             Self::Name => CollectedData::BusinessName,
+            Self::Dba => CollectedData::BusinessName,
             Self::Website => CollectedData::BusinessWebsite,
             Self::PhoneNumber => CollectedData::BusinessPhoneNumber,
             Self::Ein => CollectedData::BusinessEin,
@@ -114,6 +118,7 @@ impl HasParentCdo for BDK {
             Self::Zip => CollectedData::BusinessAddress,
             Self::Country => CollectedData::BusinessAddress,
             Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
+            Self::CorporationType => CollectedData::BusinessCorporationType,
         };
         Some(result)
     }
@@ -165,6 +170,7 @@ pub enum CollectedDataOption {
     BusinessPhoneNumber,
     BusinessWebsite,
     BusinessBeneficialOwners,
+    BusinessCorporationType,
 }
 
 crate::util::impl_enum_str_diesel!(CollectedDataOption);
@@ -186,12 +192,12 @@ impl CollectedDataOption {
             Self::BusinessPhoneNumber => CollectedData::BusinessPhoneNumber,
             Self::BusinessWebsite => CollectedData::BusinessWebsite,
             Self::BusinessBeneficialOwners => CollectedData::BusinessBeneficialOwners,
+            Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
         }
     }
 
     /// Maps each CDO to the list of DataIdentifiers to be collected for the option
     pub fn data_identifiers(&self) -> Option<Vec<DataIdentifier>> {
-        // Maybe this could migrate to DataIdentifiers
         match self {
             Self::Name => Some(vec![IDK::FirstName.into(), IDK::LastName.into()]),
             Self::Dob => Some(vec![IDK::Dob.into()]),
@@ -208,7 +214,7 @@ impl CollectedDataOption {
             Self::PartialAddress => Some(vec![IDK::Zip.into(), IDK::Country.into()]),
             Self::Email => Some(vec![IDK::Email.into()]),
             Self::PhoneNumber => Some(vec![IDK::PhoneNumber.into()]),
-            Self::BusinessName => Some(vec![BDK::Name.into()]),
+            Self::BusinessName => Some(vec![BDK::Name.into(), BDK::Dba.into()]),
             Self::BusinessEin => Some(vec![BDK::Ein.into()]),
             Self::BusinessAddress => Some(vec![
                 BDK::AddressLine1.into(),
@@ -221,6 +227,7 @@ impl CollectedDataOption {
             Self::BusinessPhoneNumber => Some(vec![BDK::PhoneNumber.into()]),
             Self::BusinessWebsite => Some(vec![BDK::Website.into()]),
             Self::BusinessBeneficialOwners => Some(vec![BDK::BeneficialOwners.into()]),
+            Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
             _ => None,
         }
     }
@@ -394,6 +401,7 @@ mod test {
     #[test_case(vec![IDK::City, IDK::State, IDK::Zip, IDK::Ssn4, IDK::LastName, IDK::Country, IDK::FirstName, IDK::Dob, IDK::Email, IDK::PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
     // Business CDOs
     #[test_case(vec![BDK::Name] => HashSet::from_iter([CDO::BusinessName]))]
+    #[test_case(vec![BDK::Name, BDK::Dba] => HashSet::from_iter([CDO::BusinessName]))]
     #[test_case(vec![BDK::Ein] => HashSet::from_iter([CDO::BusinessEin]))]
     #[test_case(vec![BDK::AddressLine1] => HashSet::from_iter([]))]
     #[test_case(vec![BDK::AddressLine2] => HashSet::from_iter([]))]
