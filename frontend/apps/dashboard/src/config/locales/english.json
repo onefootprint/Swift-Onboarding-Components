@@ -640,6 +640,14 @@
         }
       }
     },
+    "business": {
+      "page-title": "Footprint | Business details",
+      "breadcrumb": {
+        "title": "Business details breadcrumb",
+        "list": "Businesses",
+        "details": "Details"
+      }
+    },
     "security-logs": {
       "page-title": "Footprint | Security logs",
       "header": {

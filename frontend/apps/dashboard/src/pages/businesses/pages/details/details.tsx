@@ -14,7 +14,7 @@ const Details = () => {
 
   return (
     <>
-      <Head>{t('title')}</Head>
+      <Head>{t('page-title')}</Head>
       <Box>
         {isLoading && <Loading />}
         {errorMessage && <Error />}

@@ -14,7 +14,9 @@ import {
 const Content = () => (
   <Box as="section" testID="business-content">
     <Notes />
-    <Breadcrumb />
+    <Box sx={{ marginBottom: 7 }}>
+      <Breadcrumb />
+    </Box>
     <Header />
     <Vault />
     <AuditTrail />
