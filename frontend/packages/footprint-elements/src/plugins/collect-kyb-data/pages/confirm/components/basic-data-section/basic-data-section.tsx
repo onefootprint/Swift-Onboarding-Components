@@ -17,19 +17,35 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
 
   const basicInfo = [];
 
-  const firstName = data[BusinessDataAttribute.name];
-  if (firstName) {
+  const name = data[BusinessDataAttribute.name];
+  if (name) {
     basicInfo.push({
       text: t('business-name'),
-      subtext: firstName,
+      subtext: name,
     });
   }
 
-  const lastName = data[BusinessDataAttribute.ein];
-  if (lastName) {
+  const ein = data[BusinessDataAttribute.ein];
+  if (ein) {
     basicInfo.push({
       text: t('ein'),
-      subtext: lastName,
+      subtext: ein,
+    });
+  }
+
+  const website = data[BusinessDataAttribute.website];
+  if (website) {
+    basicInfo.push({
+      text: t('website'),
+      subtext: website,
+    });
+  }
+
+  const phone = data[BusinessDataAttribute.phoneNumber];
+  if (phone) {
+    basicInfo.push({
+      text: t('phone-number'),
+      subtext: phone,
     });
   }
 
