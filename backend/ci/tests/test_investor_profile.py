@@ -20,20 +20,6 @@ def sandbox_user(investor_profile_ob_config, twilio):
     return auth_token
 
 
-@pytest.fixture(scope="session")
-def ip_data():
-    return {
-        "investor_profile.employment_status": "employed",
-        "investor_profile.occupation": "Neurosurgeon",
-        "investor_profile.employed_by_brokerage": "no",
-        "investor_profile.annual_income": "lt50k",
-        "investor_profile.net_worth": "gt1m",
-        "investor_profile.investment_goals": '["grow_long_term_wealth", "buy_a_home"]',
-        "investor_profile.risk_tolerance": "conservative",
-        "investor_profile.declarations": '["affiliated_with_us_broker", "family_of_political_figure"]',
-    }
-
-
 def test_put_ip_info_valid(sandbox_user, ip_data):
     post("hosted/user/vault/validate", ip_data, sandbox_user)
     put("hosted/user/vault", ip_data, sandbox_user)

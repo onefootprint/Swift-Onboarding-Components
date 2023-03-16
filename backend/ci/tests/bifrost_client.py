@@ -85,6 +85,13 @@ class BifrostClient:
             self.auth_token,
         )
 
+    def add_investor_profile(self, data):
+        put(
+            "hosted/user/vault",
+            data,
+            self.auth_token,
+        )
+
     def add_business_data(self):
         """Add identity data via hosted/user/vault"""
         put(
@@ -164,7 +171,9 @@ class BifrostClient:
         )
         return body["footprint_user_id"]
 
-    def onboard_user_onto_tenant(self, tenant, add_business_data=False):
+    def onboard_user_onto_tenant(
+        self, tenant, add_business_data=False, investor_profile=None
+    ):
         """
         Onboards a user onto a tenant. See individual methods for more information
         """
@@ -177,6 +186,8 @@ class BifrostClient:
 
         self.initialize_onboarding()
         self.add_identity_data()
+        if investor_profile:
+            self.add_investor_profile(investor_profile)
         if add_business_data:
             self.add_business_data()
         self.register_biometric_credentials()
