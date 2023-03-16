@@ -5,6 +5,7 @@ import React from 'react';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import KybAccessForm from '../kyb-access-form';
+import KybBoCollectForm from '../kyb-bo-collect-form';
 import KybCollectForm from '../kyb-collect-form';
 import KycAccessForm from '../kyc-access-form';
 import KycCollectForm from '../kyc-collect-form';
@@ -83,6 +84,7 @@ const Dialog = ({ open, onClose, onCreate }: DialogProps) => {
       {state.matches('kycCollect') && <KycCollectForm />}
       {state.matches('kycAccess') && <KycAccessForm />}
       {state.matches('kybCollect') && <KybCollectForm />}
+      {state.matches('kybBoCollect') && <KybBoCollectForm />}
       {state.matches('kybAccess') && <KybAccessForm />}
     </FpDialog>
   );

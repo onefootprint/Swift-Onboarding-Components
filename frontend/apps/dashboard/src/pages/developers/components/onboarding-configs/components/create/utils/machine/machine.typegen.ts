@@ -13,6 +13,8 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignKybAccess: 'kybAccessSubmitted';
+    assignKybCollect: 'kybCollectSubmitted';
     assignKycAccess: 'kycAccessSubmitted';
     assignKycCollect: 'kycCollectSubmitted';
     assignName: 'nameSubmitted';
@@ -23,6 +25,7 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'kybAccess'
+    | 'kybBoCollect'
     | 'kybCollect'
     | 'kycAccess'
     | 'kycCollect'

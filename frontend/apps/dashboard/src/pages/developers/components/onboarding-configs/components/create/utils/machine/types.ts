@@ -1,5 +1,7 @@
 import {
+  CollectedDataOption,
   CollectedDocumentDataOption,
+  CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
@@ -15,6 +17,8 @@ export type MachineContext = {
     CollectedKycDataOption | CollectedDocumentDataOption,
     boolean
   >;
+  kybCollect?: Record<CollectedKybDataOption, boolean>;
+  kybAccess?: Record<CollectedDataOption, boolean>;
 };
 
 export type MachineEvents =
@@ -47,4 +51,12 @@ export type MachineEvents =
         CollectedKycDataOption | CollectedDocumentDataOption,
         boolean
       >;
+    }
+  | {
+      type: 'kybCollectSubmitted';
+      payload: Record<CollectedKybDataOption, boolean>;
+    }
+  | {
+      type: 'kybAccessSubmitted';
+      payload: Record<CollectedDataOption, boolean>;
     };
