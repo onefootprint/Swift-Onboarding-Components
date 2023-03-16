@@ -75,7 +75,7 @@ const Header = styled.header`
     align-items: center;
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
-    height: 36px;
+    height: 40px;
     justify-content: center;
     position: relative;
   `}
