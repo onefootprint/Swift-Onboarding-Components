@@ -5,6 +5,11 @@ import createOnboardingRequirementsMachine, {
   OnboardingRequirementsMachineArgs,
 } from './machine';
 
+/*
+  TODO:
+  - add tests for kyb and investorProfile
+*/
+
 describe('Onboarding Requirements Machine Tests', () => {
   const createMachine = (args: OnboardingRequirementsMachineArgs) =>
     createOnboardingRequirementsMachine(args);
@@ -49,6 +54,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [],
         kybData: [],
+        investorProfile: [],
       });
       expect(startedDataCollection).toBe(false);
       expect(onboardingContext).toEqual({
@@ -70,6 +76,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           idDoc: false,
           kycData: [],
           kybData: [],
+          investorProfile: [],
         },
       });
       expect(state.value).toBe('success');
@@ -99,6 +106,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           idDoc: false,
           kycData: [CollectedKycDataOption.name],
           kybData: [],
+          investorProfile: [],
         },
       });
 
@@ -107,6 +115,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [CollectedKycDataOption.name],
         kybData: [],
+        investorProfile: [],
       });
       expect(state.context.startedDataCollection).toBe(true);
       expect(state.value).toBe('additionalInfoRequired');
@@ -129,6 +138,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           idDoc: false,
           kycData: [],
           kybData: [],
+          investorProfile: [],
         },
       });
       expect(state.context.requirements).toEqual({
@@ -136,6 +146,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [],
         kybData: [],
+        investorProfile: [],
       });
 
       expect(state.value).toBe('transfer');
@@ -152,12 +163,14 @@ describe('Onboarding Requirements Machine Tests', () => {
           idDoc: false,
           kycData: [],
           kybData: [],
+          investorProfile: [],
         },
       });
       expect(state.context.requirements).toEqual({
         idDoc: false,
         kycData: [],
         kybData: [],
+        investorProfile: [],
         liveness: false,
       });
 
@@ -188,6 +201,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           idDoc: false,
           kycData: [CollectedKycDataOption.name],
           kybData: [],
+          investorProfile: [],
         },
       });
       expect(state.context.requirements).toEqual({
@@ -195,6 +209,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [CollectedKycDataOption.name],
         kybData: [],
+        investorProfile: [],
       });
 
       expect(state.value).toBe('kycData');
@@ -211,6 +226,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           idDoc: true,
           kycData: [],
           kybData: [],
+          investorProfile: [],
         },
       });
       expect(state.context.requirements).toEqual({
@@ -218,6 +234,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: true,
         kycData: [],
         kybData: [],
+        investorProfile: [],
       });
 
       expect(state.value).toBe('transfer');
@@ -234,6 +251,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           idDoc: false,
           kycData: [],
           kybData: [],
+          investorProfile: [],
         },
       });
       expect(state.context.requirements).toEqual({
@@ -241,6 +259,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         idDoc: false,
         kycData: [],
         kybData: [],
+        investorProfile: [],
       });
 
       expect(state.value).toBe('success');

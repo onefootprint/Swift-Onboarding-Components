@@ -3,6 +3,7 @@ export type Page =
   | 'transfer'
   | 'kyc-data'
   | 'kyb-data'
+  | 'investor-profile'
   | 'id-doc'
   | 'liveness'
   | 'authorize';

@@ -4,6 +4,7 @@ import {
   CollectKycData,
   DeviceSignals,
   IdDoc,
+  InvestorProfile,
   Transfer,
 } from '@onefootprint/footprint-elements';
 import React, { useEffect } from 'react';
@@ -90,6 +91,19 @@ const Router = ({ onDone }: RouterProps) => {
               sandboxSuffix: identifierSuffix,
               config,
             },
+          }}
+          onDone={handleRequirementCompleted}
+        />
+      </DeviceSignals>
+    );
+  }
+  if (state.matches('investorProfile')) {
+    return (
+      <DeviceSignals page="investor-profile" fpAuthToken={authToken}>
+        <InvestorProfile
+          context={{
+            authToken,
+            device,
           }}
           onDone={handleRequirementCompleted}
         />

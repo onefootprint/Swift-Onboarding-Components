@@ -15,6 +15,10 @@ export const RequirementTargets: MachineTarget[] = [
     cond: context => shouldRunCollectKycData(context),
   },
   {
+    target: 'investorProfile',
+    cond: context => shouldRunCollectInvestorProfile(context),
+  },
+  {
     target: 'transfer',
     cond: context => shouldRunTransfer(context),
   },
@@ -42,6 +46,9 @@ const shouldRunCollectKybData = (context: MachineContext) =>
 
 const shouldRunCollectKycData = (context: MachineContext) =>
   context.requirements.kycData.length > 0;
+
+const shouldRunCollectInvestorProfile = (context: MachineContext) =>
+  context.requirements.investorProfile.length > 0;
 
 const shouldRunIdDoc = (context: MachineContext) => {
   const {

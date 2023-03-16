@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 
-import { CollectKycData } from '../../..';
+import CollectKycData from '../../../collect-kyc-data';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
 const BeneficialOwnerKyc = () => {

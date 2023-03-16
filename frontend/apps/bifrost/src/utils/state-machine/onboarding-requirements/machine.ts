@@ -19,6 +19,7 @@ const defaultRequirements: Requirements = {
   liveness: false,
   kybData: [],
   kycData: [],
+  investorProfile: [],
 };
 
 const createOnboardingRequirementsMachine = ({
@@ -84,6 +85,13 @@ const createOnboardingRequirementsMachine = ({
           },
         },
         kybData: {
+          on: {
+            requirementCompleted: {
+              target: 'checkOnboardingRequirements',
+            },
+          },
+        },
+        investorProfile: {
           on: {
             requirementCompleted: {
               target: 'checkOnboardingRequirements',
