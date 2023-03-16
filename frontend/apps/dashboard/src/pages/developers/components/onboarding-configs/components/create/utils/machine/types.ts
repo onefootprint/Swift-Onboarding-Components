@@ -17,7 +17,10 @@ export type MachineContext = {
     CollectedKycDataOption | CollectedDocumentDataOption,
     boolean
   >;
-  kybCollect?: Record<CollectedKybDataOption, boolean>;
+  kybCollect?: {
+    [CollectedKybDataOption.website]: boolean;
+    [CollectedKybDataOption.phoneNumber]: boolean;
+  };
   kybAccess?: Record<CollectedDataOption, boolean>;
 };
 
@@ -54,7 +57,10 @@ export type MachineEvents =
     }
   | {
       type: 'kybCollectSubmitted';
-      payload: Record<CollectedKybDataOption, boolean>;
+      payload: {
+        [CollectedKybDataOption.website]: boolean;
+        [CollectedKybDataOption.phoneNumber]: boolean;
+      };
     }
   | {
       type: 'kybAccessSubmitted';

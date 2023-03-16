@@ -121,6 +121,27 @@ describe('<CreateConfig />', () => {
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
     });
+
+    it('clicking next should take user to the kyb form', async () => {
+      renderCreate();
+
+      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+      const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
+      await userEvent.click(kyb);
+
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      expect(nextButton).toBeInTheDocument();
+      await userEvent.click(nextButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
+      const nameInput = screen.getByLabelText('Onboarding configuration name');
+      await userEvent.type(nameInput, 'Test name');
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kybCollect')),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('KycCollectForm', () => {
@@ -407,6 +428,84 @@ describe('<CreateConfig />', () => {
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('KybCollectForm', () => {
+    it('should show collected data options', async () => {
+      renderCreate();
+
+      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+      const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
+      await userEvent.click(kyb);
+
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
+      const nameInput = screen.getByLabelText('Onboarding configuration name');
+      await userEvent.type(nameInput, 'Test name');
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kybCollect')),
+      ).toBeInTheDocument();
+
+      const collectedData = screen.getByTestId('collected-data');
+      expect(
+        within(collectedData).getByText('Legal business name'),
+      ).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText('Registered business address'),
+      ).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText('Beneficial owner'),
+      ).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText('Employer Identification Number (EIN)'),
+      ).toBeInTheDocument();
+
+      const options = screen.getByTestId('kyb-collect-form-options');
+      const website = within(options).getByLabelText(
+        'Website',
+      ) as HTMLInputElement;
+      expect(website).toBeInTheDocument();
+      expect(website.checked).toBeFalsy();
+      await userEvent.click(website);
+      expect(website.checked).toBeTruthy();
+
+      const phoneNumber = within(options).getByLabelText(
+        'Phone number',
+      ) as HTMLInputElement;
+      expect(phoneNumber).toBeInTheDocument();
+      expect(phoneNumber.checked).toBeFalsy();
+      await userEvent.click(phoneNumber);
+      expect(phoneNumber.checked).toBeTruthy();
+    });
+
+    it('clicking back should go back to name form', async () => {
+      renderCreate();
+
+      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+      const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
+      await userEvent.click(kyb);
+
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
+      const nameInput = screen.getByLabelText('Onboarding configuration name');
+      await userEvent.type(nameInput, 'Test name');
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kybCollect')),
+      ).toBeInTheDocument();
+
+      const backButton = screen.getByRole('button', { name: 'Go back' });
+      await userEvent.click(backButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
     });
   });
 });
