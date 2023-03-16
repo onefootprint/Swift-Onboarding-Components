@@ -83,7 +83,8 @@ impl TryFrom<&str> for IngressRule {
             | DataIdentifier::Id(_)
             | DataIdentifier::IdDocument(_)
             | DataIdentifier::InvestorProfile(_)
-            | DataIdentifier::Business(_) => return Err(VaultProxyError::CannotProxyVaultNonCustomData)?,
+            | DataIdentifier::Business(_)
+            | DataIdentifier::Document(_) => return Err(VaultProxyError::CannotProxyVaultNonCustomData)?,
         }
 
         Ok(Self { proxy_token, target })

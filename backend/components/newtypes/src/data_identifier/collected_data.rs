@@ -22,7 +22,7 @@ pub enum CollectedData {
     Address,
     Email,
     PhoneNumber,
-    Document,
+    Document, // Represents IdDocKind's
 
     // TODO: maybe nest these
     BusinessName,
@@ -116,8 +116,8 @@ pub enum CollectedDataOption {
     PartialAddress,
     Email,
     PhoneNumber,
-    Document,
-    DocumentAndSelfie,
+    Document,          // Represents IdDocKind's
+    DocumentAndSelfie, // Represents IdDocKind's
 
     // TODO: maybe nest these
     BusinessName,

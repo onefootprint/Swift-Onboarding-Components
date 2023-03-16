@@ -32,6 +32,7 @@
 mod business_data_kind;
 mod collected_data;
 mod data_lifetime_kind;
+mod document_kind;
 mod id_doc_kind;
 mod identity_data_kind;
 mod investor_profile_kind;
@@ -40,8 +41,9 @@ mod validation;
 mod vd_kind;
 
 pub use self::{
-    business_data_kind::*, collected_data::*, data_lifetime_kind::*, id_doc_kind::*, identity_data_kind::*,
-    investor_profile_kind::*, validation::Error as ValidationError, validation::*, vd_kind::*,
+    business_data_kind::*, collected_data::*, data_lifetime_kind::*, document_kind::*, id_doc_kind::*,
+    identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
+    vd_kind::*,
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
@@ -89,6 +91,7 @@ pub enum DataIdentifier {
     Selfie(IdDocKind),
     Business(BusinessDataKind),
     InvestorProfile(InvestorProfileKind),
+    Document(DocumentKind),
 }
 
 string_api_data_type_alias!(DataIdentifier);
@@ -116,6 +119,7 @@ impl std::fmt::Display for DataIdentifier {
             Self::Selfie(s) => s.to_string(),
             Self::Business(s) => s.to_string(),
             Self::InvestorProfile(s) => s.to_string(),
+            Self::Document(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -154,6 +158,9 @@ impl FromStr for DataIdentifier {
             DataIdentifierDiscriminant::InvestorProfile => Self::InvestorProfile(
                 InvestorProfileKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?,
             ),
+            DataIdentifierDiscriminant::Document => {
+                Self::Document(DocumentKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
         };
         Ok(result)
     }
@@ -174,6 +181,7 @@ mod tests {
     #[test_case(DataIdentifier::Selfie(IdDocKind::IdCard) => "selfie.id_card")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::Ein) => "business.ein")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
+    #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -187,6 +195,7 @@ mod tests {
     #[test_case("selfie.passport" => DataIdentifier::Selfie(IdDocKind::Passport))]
     #[test_case("business.ein" => DataIdentifier::Business(BusinessDataKind::Ein))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
+    #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

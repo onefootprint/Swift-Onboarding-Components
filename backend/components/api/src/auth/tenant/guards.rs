@@ -124,6 +124,11 @@ impl IsGuardMet for CanDecrypt {
                     || token_scopes.contains(&TenantScope::Decrypt(CDO::DocumentAndSelfie));
                 Right(can_decrypt)
             }
+            DataIdentifier::Document(k) => match k {
+                newtypes::DocumentKind::FinraComplianceLetter => {
+                    Right(token_scopes.contains(&TenantScope::Decrypt(CDO::InvestorProfile)))
+                }
+            },
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different
