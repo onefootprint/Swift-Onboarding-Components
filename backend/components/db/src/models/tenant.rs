@@ -1,4 +1,7 @@
-use crate::schema::{scoped_user, tenant};
+use crate::schema::{
+    scoped_user,
+    tenant::{self, BoxedQuery},
+};
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -8,7 +11,9 @@ use diesel::prelude::*;
 use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
-use newtypes::{CompanySize, EncryptedVaultPrivateKey, StripeCustomerId, TenantId, VaultId, VaultPublicKey};
+use newtypes::{
+    CompanySize, EncryptedVaultPrivateKey, ScopedVaultId, StripeCustomerId, TenantId, VaultId, VaultPublicKey,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -27,6 +32,24 @@ pub struct Tenant {
     pub company_size: Option<CompanySize>,
     pub privacy_policy_url: Option<String>,
     pub stripe_customer_id: Option<StripeCustomerId>,
+    pub is_experian_enabled: bool,
+}
+
+pub enum TenantIdentifier<'a> {
+    Id(&'a TenantId),
+    ScopedVaultId(&'a ScopedVaultId),
+}
+
+impl<'a> From<&'a TenantId> for TenantIdentifier<'a> {
+    fn from(id: &'a TenantId) -> Self {
+        Self::Id(id)
+    }
+}
+
+impl<'a> From<&'a ScopedVaultId> for TenantIdentifier<'a> {
+    fn from(id: &'a ScopedVaultId) -> Self {
+        Self::ScopedVaultId(id)
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -52,6 +75,17 @@ pub struct NewIntegrationTestTenant {
 }
 
 impl Tenant {
+    fn query(id: TenantIdentifier) -> BoxedQuery<Pg> {
+        match id {
+            TenantIdentifier::Id(id) => tenant::table.filter(tenant::id.eq(id)).into_boxed(),
+            TenantIdentifier::ScopedVaultId(scoped_vault_id) => {
+                let tenant_id = scoped_user::table
+                    .filter(scoped_user::id.eq(scoped_vault_id))
+                    .select(scoped_user::tenant_id);
+                tenant::table.filter(tenant::id.eq_any(tenant_id)).into_boxed()
+            }
+        }
+    }
     #[tracing::instrument(skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table
@@ -62,8 +96,11 @@ impl Tenant {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get(conn: &mut PgConn, id: &TenantId) -> DbResult<Self> {
-        let tenant = tenant::table.filter(tenant::id.eq(id)).first(conn)?;
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
+    where
+        T: Into<TenantIdentifier<'a>>,
+    {
+        let tenant = Self::query(id.into()).first(conn)?;
         Ok(tenant)
     }
 

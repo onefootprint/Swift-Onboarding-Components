@@ -496,6 +496,7 @@ table! {
         company_size -> Nullable<Text>,
         privacy_policy_url -> Nullable<Text>,
         stripe_customer_id -> Nullable<Text>,
+        is_experian_enabled -> Bool,
     }
 }
 

@@ -35,3 +35,8 @@ mod vault;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod verification_request;
+
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod tenant;
