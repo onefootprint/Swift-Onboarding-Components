@@ -1,6 +1,6 @@
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export type TimelineItemTimeData =
   | {
@@ -20,7 +20,7 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
   if (isTimestamp) {
     return (
       <TimeContainer>
-        <Typography variant="label-3" color="tertiary" sx={{ marginRight: 4 }}>
+        <Typography variant="label-3" color="tertiary">
           {new Date(time.timestamp).toLocaleString('en-us', {
             month: '2-digit',
             day: '2-digit',
@@ -52,7 +52,7 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
   if (shouldCollapseRange) {
     return (
       <TimeContainer>
-        <Typography variant="label-3" color="tertiary" sx={{ marginRight: 4 }}>
+        <Typography variant="label-3" color="tertiary">
           {start}
         </Typography>
         <Typography variant="label-3" color="tertiary">
@@ -82,7 +82,18 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
 };
 
 const TimeContainer = styled.div`
-  display: flex;
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: ${theme.spacing[1]};
+    margin-right: ${theme.spacing[1]};
+
+    p {
+      min-width: 72px;
+    }
+  `}
 `;
 
 export default TimelineItemTime;

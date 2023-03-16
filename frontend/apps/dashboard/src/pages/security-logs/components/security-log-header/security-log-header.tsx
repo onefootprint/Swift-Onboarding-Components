@@ -1,6 +1,7 @@
 import { AccessEvent } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 
 import FieldTagList from '../field-tag-list';
 
@@ -9,11 +10,22 @@ type SecurityLogHeaderProps = {
 };
 
 const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => (
-  <Typography variant="body-3">
+  <Container>
     <FieldTagList targets={accessEvent.targets} />{' '}
-    {accessEvent.targets.length > 1 ? 'were' : 'was'} accessed by{' '}
-    {accessEvent.principal || 'an automated process'}
-  </Typography>
+    <Typography variant="body-3" sx={{ marginLeft: 3 }}>
+      {accessEvent.targets.length > 1 ? 'were' : 'was'} accessed by
+    </Typography>
+    <Typography variant="body-3" sx={{ marginLeft: 2 }}>
+      {accessEvent.principal || 'an automated process'}{' '}
+    </Typography>
+  </Container>
 );
+
+const Container = styled.span`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+`;
 
 export default SecurityLogHeader;

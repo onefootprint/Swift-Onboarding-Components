@@ -87,10 +87,9 @@ const TimeContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 156px;
   height: ${HEADER_HEIGHT};
   flex-shrink: 0;
-  justify-self: flex-end;
+  min-width: 146px;
 `;
 
 const Content = styled.div`
@@ -102,6 +101,7 @@ const Content = styled.div`
     padding-bottom: ${theme.spacing[8]};
     gap: ${theme.spacing[2]};
     width: 100%;
+    margin-left: ${theme.spacing[5]};
   `}
 `;
 
@@ -150,7 +150,7 @@ const Row = styled.div`
 const IconAndLine = styled.div`
   position: relative;
   align-items: stretch;
-  min-width: 40px;
+  min-width: 16px;
   flex-shrink: 0;
 `;
 
@@ -159,7 +159,8 @@ const IconContainer = styled.div`
     display: flex;
     position: relative;
     align-items: flex-start;
-    padding: ${theme.spacing[4]};
+    justify-content: center;
+    padding: ${theme.spacing[4]} 0;
     background: ${theme.backgroundColor.primary};
     z-index: 3;
   `};

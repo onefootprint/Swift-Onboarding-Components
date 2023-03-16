@@ -63,11 +63,7 @@ const OnboardingDecisionEventBody = ({
             {createTagList(collectedDataLabels)}
             {vendors && (
               <>
-                <Typography
-                  variant="body-3"
-                  as="span"
-                  sx={{ marginRight: 2, marginLeft: 1 }}
-                >
+                <Typography variant="body-3" as="span" sx={{ marginLeft: 1 }}>
                   {t('with')}
                 </Typography>
                 <Typography variant="body-3" as="span">

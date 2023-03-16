@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { AccessEvent } from '@onefootprint/types';
-import { Box, SearchInput, Typography } from '@onefootprint/ui';
+import { SearchInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
@@ -66,7 +66,6 @@ const SecurityLogs = () => {
         />
         <SecurityLogsFilters />
       </FiltersContainer>
-      <Box sx={{ marginTop: 9, marginBottom: 9 }} />
       <Timeline
         items={items}
         isLoading={
@@ -81,6 +80,9 @@ const FiltersContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[5]};
+    padding-bottom: ${theme.spacing[5]};
+    margin-bottom: ${theme.spacing[7]};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 `;
 

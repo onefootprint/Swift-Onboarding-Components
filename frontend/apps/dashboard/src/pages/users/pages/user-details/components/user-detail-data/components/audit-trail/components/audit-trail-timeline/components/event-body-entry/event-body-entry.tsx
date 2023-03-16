@@ -40,6 +40,10 @@ const IconBounds = styled.div`
 
 const Content = styled.div`
   min-height: ${LINE_HEIGHT};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 
   & > * {
     display: flex;
