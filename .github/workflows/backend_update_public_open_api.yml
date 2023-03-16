@@ -33,11 +33,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Generate public open api spec
-        working-directory: ./backend
-        run: python scripts/update-open-api.py
+        working-directory: ./backend/ci
+        run: python scripts/update_open_api.py
         shell: bash
 
       - name: Push files to Stoplight
-        working-directory: ./backend/out
+        working-directory: ./backend/ci/out
         run: |
           npx @stoplight/cli@5 push --ci-token ${{secrets.STOPLIGHT_TOKEN}}
