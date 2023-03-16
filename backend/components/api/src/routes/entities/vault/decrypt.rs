@@ -29,7 +29,7 @@ flat_api_object_map_type!(
 );
 
 #[api_v2_operation(
-    tags(Vault, Entities),
+    tags(Vault, Entities, Private),
     description = "Decrypts the specified list of fields from the provided vault."
 )]
 #[actix::post("/entities/{fp_id}/vault/decrypt")]

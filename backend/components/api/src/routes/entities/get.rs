@@ -177,7 +177,7 @@ where
 
 #[api_v2_operation(
     description = "View list of entities (business or user) that have started onboarding to the tenant.",
-    tags(Entities)
+    tags(Entities, Private)
 )]
 #[get("/entities")]
 pub async fn get(
@@ -238,7 +238,7 @@ where
 
 #[api_v2_operation(
     description = "View details of a specific entity (business or user)",
-    tags(Entities)
+    tags(Entities, Private)
 )]
 #[get("/entities/{fp_id}")]
 pub async fn get_detail(
