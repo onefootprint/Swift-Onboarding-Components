@@ -12,7 +12,7 @@ type FormData = {
   type: 'kyb' | 'kyc';
 };
 
-const TypeForm = () => {
+const Type = () => {
   const { t } = useTranslation(
     'pages.developers.onboarding-configs.create-dialog.type-form',
   );
@@ -67,4 +67,4 @@ const TypeForm = () => {
   );
 };
 
-export default TypeForm;
+export default Type;

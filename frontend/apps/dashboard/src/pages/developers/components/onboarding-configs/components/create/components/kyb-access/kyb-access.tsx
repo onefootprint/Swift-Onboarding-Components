@@ -1,8 +1,8 @@
 import React from 'react';
 
-const KybAccessForm = () => (
+const KybAccess = () => (
   // TODO:
   <div>KybAccess</div>
 );
 
-export default KybAccessForm;
+export default KybAccess;

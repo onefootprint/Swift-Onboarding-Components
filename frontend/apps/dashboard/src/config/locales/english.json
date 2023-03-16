@@ -74,6 +74,14 @@
     "website": "Website",
     "phone_number": "Phone number"
   },
+  "collected-kyb-data-options": {
+    "name": "Legal business name",
+    "ein": "Employer Identification Number (EIN)",
+    "address": "Registered business address",
+    "beneficial_owner": "Beneficial owner",
+    "website": "Website",
+    "phone_number": "Phone number"
+  },
   "id-doc-type": {
     "id_card": "ID card",
     "driver_license": "Driver's License",
@@ -843,6 +851,10 @@
             "collected-data": "Collected data",
             "optional": "Optionally required",
             "beneficial-owner-warning": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
+          },
+          "kyb-bo-collect-form": {
+            "title": "KYC of a Beneficial owner",
+            "description": "To successfully verify a business we also need to verify its beneficial owner's identity."
           },
           "kyb-access-form": {}
         },

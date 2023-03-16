@@ -4,14 +4,14 @@ import { Dialog as FpDialog, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
-import KybAccessForm from '../kyb-access-form';
-import KybBoCollectForm from '../kyb-bo-collect-form';
-import KybCollectForm from '../kyb-collect-form';
-import KycAccessForm from '../kyc-access-form';
-import KycCollectForm from '../kyc-collect-form';
+import KybAccess from '../kyb-access';
+import KybBoCollect from '../kyb-bo-collect';
+import KybCollect from '../kyb-collect';
+import KycAccess from '../kyc-access';
+import KycCollect from '../kyc-collect';
 import { useOnboardingConfigMachine } from '../machine-provider';
-import NameForm from '../name-form';
-import TypeForm from '../type-form';
+import Name from '../name';
+import Type from '../type';
 
 type DialogProps = {
   open: boolean;
@@ -79,13 +79,13 @@ const Dialog = ({ open, onClose, onCreate }: DialogProps) => {
         onClick: handleClose,
       }}
     >
-      {state.matches('type') && <TypeForm />}
-      {state.matches('name') && <NameForm />}
-      {state.matches('kycCollect') && <KycCollectForm />}
-      {state.matches('kycAccess') && <KycAccessForm />}
-      {state.matches('kybCollect') && <KybCollectForm />}
-      {state.matches('kybBoCollect') && <KybBoCollectForm />}
-      {state.matches('kybAccess') && <KybAccessForm />}
+      {state.matches('type') && <Type />}
+      {state.matches('name') && <Name />}
+      {state.matches('kycCollect') && <KycCollect />}
+      {state.matches('kycAccess') && <KycAccess />}
+      {state.matches('kybCollect') && <KybCollect />}
+      {state.matches('kybBoCollect') && <KybBoCollect />}
+      {state.matches('kybAccess') && <KybAccess />}
     </FpDialog>
   );
 };

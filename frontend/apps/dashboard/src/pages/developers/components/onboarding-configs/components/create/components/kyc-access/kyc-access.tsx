@@ -18,7 +18,7 @@ type FormData = Record<
   boolean
 >;
 
-const KycAccessForm = () => {
+const KycAccess = () => {
   const [state, send] = useOnboardingConfigMachine();
   const { kycCollect } = state.context;
   const { t, allT } = useTranslation(
@@ -142,4 +142,4 @@ const OptionsContainer = styled.div`
   `}
 `;
 
-export default KycAccessForm;
+export default KycAccess;

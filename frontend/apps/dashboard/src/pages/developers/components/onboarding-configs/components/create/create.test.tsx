@@ -507,5 +507,31 @@ describe('<CreateConfig />', () => {
 
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
     });
+
+    it('clicking next should go to kyb bo collect form', async () => {
+      renderCreate();
+
+      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+      const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
+      await userEvent.click(kyb);
+
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
+      const nameInput = screen.getByLabelText('Onboarding configuration name');
+      await userEvent.type(nameInput, 'Test name');
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kybCollect')),
+      ).toBeInTheDocument();
+
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kycCollect')),
+      ).toBeInTheDocument();
+    });
   });
 });

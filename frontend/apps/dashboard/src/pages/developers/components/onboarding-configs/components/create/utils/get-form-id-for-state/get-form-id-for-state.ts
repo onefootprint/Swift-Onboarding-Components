@@ -7,7 +7,7 @@ const getFormIdForState = (value: StateValue) => {
   if (value === 'type') {
     return 'type-form';
   }
-  if (value === 'kycCollect') {
+  if (value === 'kycCollect' || value === 'kybBoCollect') {
     return 'kyc-collect-form';
   }
   if (value === 'kycAccess') {

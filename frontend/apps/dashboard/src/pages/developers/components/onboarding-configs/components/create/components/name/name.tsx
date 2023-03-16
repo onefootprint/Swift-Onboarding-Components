@@ -10,7 +10,7 @@ type FormData = {
   name: string;
 };
 
-const NameForm = () => {
+const Name = () => {
   const { t } = useTranslation(
     'pages.developers.onboarding-configs.create-dialog.name-form',
   );
@@ -55,4 +55,4 @@ const NameForm = () => {
   );
 };
 
-export default NameForm;
+export default Name;

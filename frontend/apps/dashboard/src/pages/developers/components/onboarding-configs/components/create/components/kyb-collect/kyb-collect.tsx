@@ -15,7 +15,7 @@ type FormData = {
   [CollectedKybDataOption.phoneNumber]: boolean;
 };
 
-const KybCollectForm = () => {
+const KybCollect = () => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create-dialog.kyb-collect-form',
   );
@@ -106,4 +106,4 @@ const OptionsContainer = styled.div`
   `}
 `;
 
-export default KybCollectForm;
+export default KybCollect;
