@@ -1,5 +1,4 @@
 import {
-  CollectedDataOption,
   CollectedDocumentDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -21,7 +20,13 @@ export type MachineContext = {
     [CollectedKybDataOption.website]: boolean;
     [CollectedKybDataOption.phoneNumber]: boolean;
   };
-  kybAccess?: Record<CollectedDataOption, boolean>;
+  kybAccess?: {
+    allKybData: boolean;
+    kycData: Record<
+      CollectedKycDataOption | CollectedDocumentDataOption,
+      boolean
+    >;
+  };
 };
 
 export type MachineEvents =
@@ -64,5 +69,11 @@ export type MachineEvents =
     }
   | {
       type: 'kybAccessSubmitted';
-      payload: Record<CollectedDataOption, boolean>;
+      payload: {
+        allKybData: boolean;
+        kycData: Record<
+          CollectedKycDataOption | CollectedDocumentDataOption,
+          boolean
+        >;
+      };
     };
