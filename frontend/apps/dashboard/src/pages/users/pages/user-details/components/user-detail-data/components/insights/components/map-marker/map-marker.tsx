@@ -17,11 +17,11 @@ const MapMarker = (props: MapMarkerProps) => (
 );
 
 const MapMarkerContainer = styled.div`
-  transform: translateX(-50%) translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   ${({ theme }) => css`
+    transform: translateX(-50%) translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     backdrop-filter: brightness(0.9);
     width: 324px;
     height: 324px;
