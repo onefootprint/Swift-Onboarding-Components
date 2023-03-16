@@ -11,7 +11,7 @@ import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
-import IdAnimation from '../../../../components/id-animation';
+import IdAnimation from '../../../../components/animations/id-animation';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useHandleCameraError from '../../hooks/use-handle-camera-error';
