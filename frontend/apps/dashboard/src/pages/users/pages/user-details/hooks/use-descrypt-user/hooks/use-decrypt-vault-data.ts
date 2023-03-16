@@ -12,6 +12,8 @@ import useDecryptIdDoc from './hooks/use-decrypt-id-doc';
 // decrypted images in the dashboard UI, convert it back to valid base64 first
 const addBase64Prefix = (imageData: string) => `data:png;base64,${imageData}`;
 
+// TODO: Support decrypting investorProfile
+// https://linear.app/footprint/issue/FP-3140/dashboard-broken-decrypt
 const useDecryptVaultData = (userId: string) => {
   const decryptData = useDecryptData();
   const decryptIdDoc = useDecryptIdDoc();
@@ -31,6 +33,7 @@ const useDecryptVaultData = (userId: string) => {
     const decryptedVaultData: UserVaultData = {
       idDoc: {},
       kycData: {},
+      investorProfile: {},
     };
     const promises = [];
 

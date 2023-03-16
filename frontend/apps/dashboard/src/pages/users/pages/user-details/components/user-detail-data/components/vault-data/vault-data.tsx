@@ -85,6 +85,8 @@ const VaultData = () => {
     });
   };
 
+  // TODO: Allow to decrypt investor profile data
+  // https://linear.app/footprint/issue/FP-3135/allow-to-decrypt-investor-profile
   const handleBeforeSubmit = (formData: FormData) => {
     const { kycData, idDoc } = formData;
     const attrLists = getAttrListFromFields(kycData, idDoc);

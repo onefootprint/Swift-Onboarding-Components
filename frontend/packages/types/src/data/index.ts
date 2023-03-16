@@ -27,6 +27,7 @@ export { default as IdDocType } from './id-doc-type';
 export * from './identifier';
 export { default as IdentifyUserKind } from './identify-user-kind';
 export * from './insight-event';
+export * from './investor-data-attribute';
 export * from './liveness';
 export * from './liveness-check-info';
 export * from './onboarding';

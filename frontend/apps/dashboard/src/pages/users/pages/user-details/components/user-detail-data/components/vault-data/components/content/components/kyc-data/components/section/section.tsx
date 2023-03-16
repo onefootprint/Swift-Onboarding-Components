@@ -4,7 +4,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import DataSection from '../../../data-section';
-import DataRow from './components/data-row';
+import Field from '../../../field';
 
 type SectionProps = {
   fields: any[];
@@ -58,7 +58,7 @@ const Section = ({
       title={title}
     >
       {fields.map(field => (
-        <DataRow
+        <Field
           canAccess={field.canAccess}
           canSelect={field.canSelect}
           hasDataInVault={field.hasDataInVault}

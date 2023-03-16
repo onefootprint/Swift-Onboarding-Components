@@ -440,6 +440,9 @@
             "back-alt": "Back image of the ID Doc"
           }
         },
+        "investor-profile": {
+          "title": "Investor profile"
+        },
         "risks": {
           "cta": "See details",
           "empty-state": "No risk signals",

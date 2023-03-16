@@ -15,10 +15,12 @@ describe('syncVaultWithDecryptedData', () => {
           [UserDataAttribute.city]: 'Boston',
         },
         idDoc: {},
+        investorProfile: {},
       },
       {
         kycData: {},
         idDoc: {},
+        investorProfile: {},
       },
     );
 
@@ -28,6 +30,7 @@ describe('syncVaultWithDecryptedData', () => {
         [UserDataAttribute.city]: 'Boston',
       },
       idDoc: {},
+      investorProfile: {},
     });
   });
 
@@ -47,6 +50,7 @@ describe('syncVaultWithDecryptedData', () => {
             },
           ],
         },
+        investorProfile: {},
       },
       {
         kycData: {
@@ -62,6 +66,7 @@ describe('syncVaultWithDecryptedData', () => {
             },
           ],
         },
+        investorProfile: {},
       },
     );
 
@@ -88,6 +93,7 @@ describe('syncVaultWithDecryptedData', () => {
           },
         ],
       },
+      investorProfile: {},
     });
   });
 
@@ -96,6 +102,7 @@ describe('syncVaultWithDecryptedData', () => {
       {
         kycData: {},
         idDoc: {},
+        investorProfile: {},
       },
       {
         kycData: {
@@ -103,6 +110,7 @@ describe('syncVaultWithDecryptedData', () => {
           [UserDataAttribute.lastName]: 'Footprint',
         },
         idDoc: {},
+        investorProfile: {},
       },
     );
 
@@ -112,6 +120,7 @@ describe('syncVaultWithDecryptedData', () => {
         [UserDataAttribute.lastName]: 'Footprint',
       },
       idDoc: {},
+      investorProfile: {},
     });
   });
 
@@ -123,6 +132,7 @@ describe('syncVaultWithDecryptedData', () => {
           [UserDataAttribute.lastName]: 'Footprint',
         },
         idDoc: {},
+        investorProfile: {},
       },
       undefined,
     );
@@ -133,6 +143,7 @@ describe('syncVaultWithDecryptedData', () => {
         [UserDataAttribute.lastName]: 'Footprint',
       },
       idDoc: {},
+      investorProfile: {},
     });
   });
 });

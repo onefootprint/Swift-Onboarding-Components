@@ -5,17 +5,21 @@ const getVaultDataOrCreate = async (queryClient: QueryClient, user: User) => {
   const getFromCache = () =>
     queryClient.getQueryData<UserVaultData>(['user', user.id, 'vaultData']);
 
+  // TODO:
+  // https://linear.app/footprint/issue/FP-2909/add-new-format-for-attributes-in-onboarding
   const createInitialData = () => {
     const idDoc: UserVaultData['idDoc'] = {};
+    const kycData: UserVaultData['kycData'] = {};
+    const investorProfile: UserVaultData['investorProfile'] = {};
+
     const docTypes = user.identityDocumentInfo.map(info => info.type);
     Object.values(docTypes).forEach(attribute => {
       idDoc[attribute] = null;
     });
-    const kycData: UserVaultData['kycData'] = {};
     Object.values(user.identityDataAttributes).forEach(attribute => {
       kycData[attribute] = null;
     });
-    return { kycData, idDoc };
+    return { kycData, idDoc, investorProfile };
   };
 
   const possibleData = await getFromCache();

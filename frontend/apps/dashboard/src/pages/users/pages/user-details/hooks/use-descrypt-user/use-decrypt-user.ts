@@ -13,6 +13,8 @@ const useDecryptUser = () => {
   const userVaultDataQuery = useUserVaultData(userId);
   const decryptVaultData = useDecryptVaultData(userId);
 
+  // TODO: Allow to decrypt investor profile data
+  // https://linear.app/footprint/issue/FP-3135/allow-to-decrypt-investor-profile
   const decrypt = (
     data: {
       kycData: UserDataAttribute[];

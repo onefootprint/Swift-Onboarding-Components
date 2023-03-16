@@ -50,6 +50,7 @@ export const riskSignalsFixture: RiskSignal[] = [
 export const userFixture: ScopedUser = {
   id: 'fp_id_rybIhIjSPky1yEZ7u77cok',
   isPortable: true,
+  attributes: [],
   identityDataAttributes: [
     UserDataAttribute.firstName,
     UserDataAttribute.lastName,

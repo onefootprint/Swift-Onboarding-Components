@@ -1,6 +1,7 @@
 import {
   DecryptedIdDoc,
   IdDocType,
+  InvestorProfileDataAttribute,
   ScopedUser,
   UserDataAttribute,
   UserStatus,
@@ -14,9 +15,14 @@ export type User = ScopedUser & {
 export type UserVaultData = {
   kycData: Partial<Record<UserDataAttribute, KycDataValue>>;
   idDoc: Partial<Record<IdDocType, IdDocDataValue>>;
+  investorProfile: Partial<
+    Record<InvestorProfileDataAttribute, InvestorProfileDataValue>
+  >;
 };
 
 export type UserWithVaultData = User & { vaultData: UserVaultData };
 
-export type KycDataValue = string | null; // Null value means encrypted
+// Null value means encrypted
+export type KycDataValue = string | null;
+export type InvestorProfileDataValue = string | null;
 export type IdDocDataValue = DecryptedIdDoc[] | null;

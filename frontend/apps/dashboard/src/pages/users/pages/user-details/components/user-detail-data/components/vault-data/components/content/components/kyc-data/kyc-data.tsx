@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, UserVaultData } from 'src/pages/users/users.types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import RiskSignalsOverview from '../risk-signals-overview';
 import Section from './components/section';
@@ -17,7 +17,7 @@ const KycData = ({ user, vaultData, isDecrypting }: KycDataProps) => {
   const showRiskSignals = user.isPortable;
 
   return (
-    <>
+    <Grid>
       <Section
         fields={basic.fields}
         footer={showRiskSignals && <RiskSignalsOverview type="basic" />}
@@ -43,9 +43,17 @@ const KycData = ({ user, vaultData, isDecrypting }: KycDataProps) => {
           title={address.title}
         />
       </AddressContainer>
-    </>
+    </Grid>
   );
 };
+
+const Grid = styled.div`
+  ${({ theme }) => css`
+    display: grid;
+    gap: ${theme.spacing[5]};
+    grid-template-columns: repeat(2, 1fr);
+  `};
+`;
 
 const AddressContainer = styled.div`
   grid-row: 1 / span 2;

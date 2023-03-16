@@ -1,34 +1,14 @@
 import { IdDocInfo } from './id-doc-info';
+import { InvestorProfileDataAttribute } from './investor-data-attribute';
 import { Onboarding } from './onboarding';
 import UserDataAttribute from './user-data-attribute';
 import UserStatus from './user-status';
 
-// TODO: Deprecate UserDataAttribute
+// TODO:
 // https://linear.app/footprint/issue/FP-2909/add-new-format-for-attributes-in-onboarding
-// enum UserAttribute {
-//   firstName = 'id.first_name',
-//   lastName = 'id.last_name',
-//   email = 'id.email',
-//   phoneNumber = 'id.phone_number',
-//   dob = 'id.dob',
-//   ssn9 = 'id.ssn9',
-//   ssn4 = 'id.ssn4',
-//   addressLine1 = 'id.address_line1',
-//   addressLine2 = 'id.address_line2',
-//   city = 'id.city',
-//   state = 'id.state',
-//   country = 'id.country',
-//   zip = 'id.zip',
-//   passport = 'id_document.passport',
-//   selfiePassport = 'selfie.passport',
-//   idCard = 'id_document.id_card',
-//   selfieIdCard = 'selfie.id_card',
-//   driversLicense = 'id_document.driver_license',
-//   selfieDriversLicense = 'selfie.driver_license',
-// }
-
 export type ScopedUser = {
   id: string;
+  attributes: InvestorProfileDataAttribute[];
   isPortable: boolean;
   startTimestamp: string;
   onboarding?: Onboarding;

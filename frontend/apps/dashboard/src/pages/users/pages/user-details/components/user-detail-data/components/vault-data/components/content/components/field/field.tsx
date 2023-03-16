@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { FieldOrPlaceholder } from 'src/components';
 import styled from 'styled-components';
 
-export type DataRowProps = {
+export type FieldProps = {
   canAccess: boolean;
   canSelect: boolean;
   hasDataInVault: boolean;
@@ -17,7 +17,7 @@ export type DataRowProps = {
   value?: string | null;
 };
 
-const DataRow = ({
+const Field = ({
   canAccess,
   canSelect,
   hasDataInVault,
@@ -27,7 +27,7 @@ const DataRow = ({
   name,
   showCheckbox,
   value,
-}: DataRowProps) => {
+}: FieldProps) => {
   const { t } = useTranslation('pages.user-details.user-info.decrypt');
   const { register } = useFormContext();
   const disabled = !canSelect;
@@ -72,4 +72,4 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
-export default DataRow;
+export default Field;

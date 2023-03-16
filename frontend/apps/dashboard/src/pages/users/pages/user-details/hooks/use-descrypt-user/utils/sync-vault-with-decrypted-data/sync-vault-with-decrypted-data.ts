@@ -1,4 +1,8 @@
-import { IdDocType, UserDataAttribute } from '@onefootprint/types';
+import {
+  IdDocType,
+  InvestorProfileDataAttribute,
+  UserDataAttribute,
+} from '@onefootprint/types';
 import { UserVaultData } from 'src/pages/users/users.types';
 
 const syncVaultWithDecryptedData = (
@@ -8,22 +12,27 @@ const syncVaultWithDecryptedData = (
   const syncedVaultData = vaultData || {
     kycData: {},
     idDoc: {},
+    investorProfile: {},
   };
-  const { kycData, idDoc } = decryptedVaultData;
+  const { kycData, idDoc, investorProfile } = decryptedVaultData;
 
-  Object.entries(kycData).forEach(([userDataAttr, kycDataValue]) => {
-    if (kycDataValue !== undefined && kycDataValue !== null) {
+  Object.entries(kycData).forEach(([attr, value]) => {
+    if (value !== undefined && value !== null) {
       // Even if it is an empty string, save it to the vault data
-      syncedVaultData.kycData[userDataAttr as UserDataAttribute] = kycDataValue;
+      syncedVaultData.kycData[attr as UserDataAttribute] = value;
     }
   });
-
-  Object.entries(idDoc).forEach(([idDocType, idDocDataValue]) => {
-    if (idDocDataValue) {
-      syncedVaultData.idDoc[idDocType as IdDocType] = idDocDataValue;
+  Object.entries(idDoc).forEach(([attr, value]) => {
+    if (value) {
+      syncedVaultData.idDoc[attr as IdDocType] = value;
     }
   });
-
+  Object.entries(investorProfile).forEach(([attr, value]) => {
+    if (value !== undefined && value !== null) {
+      syncedVaultData.investorProfile[attr as InvestorProfileDataAttribute] =
+        value;
+    }
+  });
   return syncedVaultData;
 };
 
