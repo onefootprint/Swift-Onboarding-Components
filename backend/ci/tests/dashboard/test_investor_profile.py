@@ -33,14 +33,13 @@ def test_get_vault(sandbox_tenant, sb_user_with_investor_profile, ip_data):
     "fields_to_decrypt",
     [
         [
-            "investor_profile.employment_status",
             "investor_profile.occupation",
-            "investor_profile.employed_by_brokerage",
+            "investor_profile.brokerage_firm_employer",
             "investor_profile.annual_income",
             "investor_profile.net_worth",
         ],
         ["investor_profile.risk_tolerance", "investor_profile.declarations"],
-        ["investor_profile.employment_status"],
+        ["investor_profile.net_worth"],
     ],
 )
 def test_decrypt(

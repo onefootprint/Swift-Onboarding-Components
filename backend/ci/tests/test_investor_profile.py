@@ -28,9 +28,8 @@ def test_put_ip_info_valid(sandbox_user, ip_data):
 @pytest.mark.parametrize(
     "patch_data",
     [
-        {"investor_profile.employment_status": "flerp"},
         {"investor_profile.occuptation": ""},
-        {"investor_profile.employed_by_brokerage": "maybe"},
+        {"investor_profile.brokerage_firm_employer": ""},
         {"investor_profile.annual_income": "10000000000"},
         {"investor_profile.net_worth": "0"},
         {"investor_profile.investment_goals": '["hi", "grow_long_term_wealth"]'},

@@ -10,9 +10,8 @@ use strum_macros::EnumString;
 impl Validate for IPK {
     fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
         let value = match self {
-            Self::EmploymentStatus => parse_enum::<EmploymentStatus>(value)?,
             Self::Occupation => validate_length(value)?,
-            Self::EmployedByBrokerage => parse_enum::<EmployedByBrokerage>(value)?,
+            Self::BrokerageFirmEmployer => validate_length(value)?,
             Self::AnnualIncome => parse_enum::<AnnualIncome>(value)?,
             Self::NetWorth => parse_enum::<NetWorth>(value)?,
             Self::InvestmentGoals => parse_json::<Vec<InvestmentGoal>>(value)?,
@@ -44,20 +43,6 @@ where
 {
     serde_json::de::from_str::<T>(value.leak())?;
     Ok(value)
-}
-
-#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
-#[strum(serialize_all = "snake_case")]
-enum EmploymentStatus {
-    Employed,
-    Unemployed,
-}
-
-#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
-#[strum(serialize_all = "snake_case")]
-enum EmployedByBrokerage {
-    Yes,
-    No,
 }
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]

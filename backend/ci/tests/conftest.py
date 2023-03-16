@@ -178,9 +178,7 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data, ky
 @pytest.fixture(scope="session")
 def ip_data():
     return {
-        "investor_profile.employment_status": "employed",
         "investor_profile.occupation": "Neurosurgeon",
-        "investor_profile.employed_by_brokerage": "no",
         "investor_profile.annual_income": "lt50k",
         "investor_profile.net_worth": "gt1m",
         "investor_profile.investment_goals": '["grow_long_term_wealth", "buy_a_home"]',

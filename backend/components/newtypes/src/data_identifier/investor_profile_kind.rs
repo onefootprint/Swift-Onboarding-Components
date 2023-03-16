@@ -27,9 +27,8 @@ use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant};
 #[serde(rename_all = "snake_case")]
 /// Represents data that is collected as part of a user's investor profile
 pub enum InvestorProfileKind {
-    EmploymentStatus,
     Occupation,
-    EmployedByBrokerage,
+    BrokerageFirmEmployer,
     AnnualIncome,
     NetWorth,
     InvestmentGoals,
@@ -55,7 +54,7 @@ impl TryFrom<DataIdentifier> for InvestorProfileKind {
 
 impl IsDataIdentifierDiscriminant for InvestorProfileKind {
     fn is_optional(&self) -> bool {
-        false
+        matches!(self, Self::Occupation | Self::BrokerageFirmEmployer)
     }
 
     fn parent(&self) -> Option<CollectedData> {
