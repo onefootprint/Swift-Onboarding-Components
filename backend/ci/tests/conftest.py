@@ -168,9 +168,19 @@ def kyb_cdos():
 @pytest.fixture(scope="session")
 def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data, kyb_cdos):
     ob_conf_data = {
-        "name": "Doc request config",
+        "name": "Business config",
         "must_collect_data": must_collect_data + kyb_cdos,
         "can_access_data": can_access_data + kyb_cdos,
+    }
+    return create_ob_config(sandbox_tenant.sk, ob_conf_data)
+
+
+@pytest.fixture(scope="session")
+def investor_profile_ob_config(sandbox_tenant, must_collect_data, can_access_data):
+    ob_conf_data = {
+        "name": "Investor profile config",
+        "must_collect_data": must_collect_data + ["investor_profile"],
+        "can_access_data": can_access_data + ["investor_profile"],
     }
     return create_ob_config(sandbox_tenant.sk, ob_conf_data)
 
