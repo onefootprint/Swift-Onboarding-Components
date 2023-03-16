@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 type TagListProps = {
   items: string[];
-  testID: string;
+  testID?: string;
 };
 
 const TagList = ({ testID, items }: TagListProps) => (

@@ -42,7 +42,15 @@ export const createOnboardingConfigMachine = () =>
           },
         },
         kycCollect: {
-          // TODO:
+          on: {
+            kycCollectSubmitted: {
+              target: 'kycAccess',
+              actions: ['assignKycCollect'],
+            },
+            prevClicked: {
+              target: 'name',
+            },
+          },
         },
         kycAccess: {
           // TODO:
@@ -64,6 +72,10 @@ export const createOnboardingConfigMachine = () =>
         assignType: assign((context, event) => ({
           ...context,
           type: event.payload.type,
+        })),
+        assignKycCollect: assign((context, event) => ({
+          ...context,
+          kycCollect: event.payload,
         })),
       },
     },

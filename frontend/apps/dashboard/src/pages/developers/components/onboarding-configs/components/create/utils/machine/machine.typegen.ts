@@ -13,6 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignKycCollect: 'kycCollectSubmitted';
     assignName: 'nameSubmitted';
     assignType: 'typeSubmitted';
   };

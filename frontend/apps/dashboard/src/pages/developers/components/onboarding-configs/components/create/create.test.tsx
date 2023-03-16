@@ -3,6 +3,7 @@ import {
   screen,
   userEvent,
   waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -101,6 +102,121 @@ describe('<CreateConfig />', () => {
       await userEvent.click(backButton);
 
       expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+    });
+
+    it('clicking next should take user to the kyc form', async () => {
+      renderCreate();
+
+      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      expect(nextButton).toBeInTheDocument();
+      await userEvent.click(nextButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
+      const nameInput = screen.getByLabelText('Onboarding configuration name');
+      await userEvent.type(nameInput, 'Test name');
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kycCollect')),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('KycCollectForm', () => {
+    it('should show collected data options', async () => {
+      renderCreate();
+
+      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      await userEvent.click(nextButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
+      const nameInput = screen.getByLabelText('Onboarding configuration name');
+      await userEvent.type(nameInput, 'Test name');
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kycCollect')),
+      ).toBeInTheDocument();
+
+      const collectedData = screen.getByTestId('collected-data');
+      expect(within(collectedData).getByText('Email')).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText('Phone number'),
+      ).toBeInTheDocument();
+      expect(within(collectedData).getByText('Full name')).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText('Date of Birth'),
+      ).toBeInTheDocument();
+      expect(within(collectedData).getByText('Address')).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText('SSN (Last 4)'),
+      ).toBeInTheDocument();
+
+      // Select SSN (Full) option
+      const ssnFullOption = screen.getByLabelText('SSN (Full)');
+      await userEvent.click(ssnFullOption);
+      expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
+
+      // Select SSN (Last 4) option
+      const ssnLast4Option = screen.getByLabelText('SSN (Last 4)');
+      await userEvent.click(ssnLast4Option);
+      expect(
+        within(collectedData).getByText('SSN (Last 4)'),
+      ).toBeInTheDocument();
+
+      // Select ID Document
+      const idDocumentOption = screen.getByLabelText('ID Document');
+      await userEvent.click(idDocumentOption);
+      expect(
+        within(collectedData).getByText('ID Document'),
+      ).toBeInTheDocument();
+
+      // Select Selfie
+      const selfieOption = screen.getByLabelText('Selfie');
+      await userEvent.click(selfieOption);
+      expect(
+        within(collectedData).getByText('ID Document & Selfie'),
+      ).toBeInTheDocument();
+
+      // Unselect Selfie
+      await userEvent.click(selfieOption);
+      expect(
+        within(collectedData).getByText('ID Document'),
+      ).toBeInTheDocument();
+
+      // Select Selfie & Unselect ID Document
+      await userEvent.click(selfieOption);
+      await userEvent.click(idDocumentOption);
+      expect(
+        within(collectedData).queryByText('ID Document & Selfie'),
+      ).not.toBeInTheDocument();
+      expect(
+        within(collectedData).queryByText('ID Document'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('clicking back should take user to the name form', async () => {
+      renderCreate();
+
+      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+      expect(nextButton).toBeInTheDocument();
+      await userEvent.click(nextButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
+      const nameInput = screen.getByLabelText('Onboarding configuration name');
+      await userEvent.type(nameInput, 'Test name');
+      await userEvent.click(nextButton);
+
+      expect(
+        screen.getByTestId(getFormIdForState('kycCollect')),
+      ).toBeInTheDocument();
+      const backButton = screen.getByRole('button', { name: 'Go back' });
+      await userEvent.click(backButton);
+
+      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
     });
   });
 });

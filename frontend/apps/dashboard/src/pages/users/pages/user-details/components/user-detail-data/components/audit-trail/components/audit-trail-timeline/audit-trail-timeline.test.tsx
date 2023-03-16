@@ -54,7 +54,7 @@ describe('<AuditTrailTimeline />', () => {
       expect(header).toBeInTheDocument();
       expect(within(header).getByText('Full name')).toBeInTheDocument();
       expect(within(header).getByText('Date of Birth')).toBeInTheDocument();
-      expect(within(header).getByText('SSN')).toBeInTheDocument();
+      expect(within(header).getByText('SSN (Full)')).toBeInTheDocument();
       expect(within(header).getByText('Address')).toBeInTheDocument();
     });
 
@@ -91,7 +91,7 @@ describe('<AuditTrailTimeline />', () => {
       const body = bodies[0];
       expect(within(body).getByText('Full name')).toBeInTheDocument();
       expect(within(body).getByText('Date of Birth')).toBeInTheDocument();
-      expect(within(body).getByText('SSN')).toBeInTheDocument();
+      expect(within(body).getByText('SSN (Full)')).toBeInTheDocument();
       expect(within(body).getByText('Address')).toBeInTheDocument();
     });
 

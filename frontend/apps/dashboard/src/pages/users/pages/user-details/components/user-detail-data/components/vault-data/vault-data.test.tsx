@@ -142,11 +142,11 @@ describe('<VaultDataContent />', () => {
       it('should display the encrypted data', async () => {
         await renderVaultDataAndWaitData();
 
-        const ssnRow = screen.getByRole('row', { name: 'SSN' });
+        const ssnRow = screen.getByRole('row', { name: 'SSN (Full)' });
         const ssnValue = within(ssnRow).getByText('•••••••••');
         expect(ssnValue).toBeInTheDocument();
 
-        const ssn4Row = screen.getByRole('row', { name: 'SSN (last 4)' });
+        const ssn4Row = screen.getByRole('row', { name: 'SSN (Last 4)' });
         const ssn4Value = within(ssn4Row).getByText('•••••••••');
         expect(ssn4Value).toBeInTheDocument();
 
@@ -170,12 +170,12 @@ describe('<VaultDataContent />', () => {
           await userEvent.click(decryptButton);
 
           const ssnField = screen.getByRole('checkbox', {
-            name: 'SSN',
+            name: 'SSN (Full)',
           });
           await userEvent.click(ssnField);
 
           const ssn4Field = screen.getByRole('checkbox', {
-            name: 'SSN (last 4)',
+            name: 'SSN (Last 4)',
           });
           await userEvent.click(ssn4Field);
 
@@ -192,13 +192,13 @@ describe('<VaultDataContent />', () => {
           await selectDecryptReasonAndContinue();
 
           await waitFor(() => {
-            const ssnRow = screen.getByRole('row', { name: 'SSN' });
+            const ssnRow = screen.getByRole('row', { name: 'SSN (Full)' });
             const ssnValue = within(ssnRow).getByText('234324324');
             expect(ssnValue).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const ssn4Row = screen.getByRole('row', { name: 'SSN (last 4)' });
+            const ssn4Row = screen.getByRole('row', { name: 'SSN (Last 4)' });
             const ssn4Value = within(ssn4Row).getByText('4324');
             expect(ssn4Value).toBeInTheDocument();
           });

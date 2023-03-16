@@ -341,7 +341,7 @@ describe('<CreateDialog />', () => {
             expect(screen.getByTestId('access-form')).toBeVisible();
           });
 
-          const fullSsn = screen.getByLabelText('SSN');
+          const fullSsn = screen.getByLabelText('SSN (Full)');
           expect(fullSsn).toBeInTheDocument();
         });
       });
@@ -365,7 +365,7 @@ describe('<CreateDialog />', () => {
             expect(screen.getByTestId('access-form')).toBeVisible();
           });
 
-          const last4Ssn = screen.getByLabelText('SSN (last 4)');
+          const last4Ssn = screen.getByLabelText('SSN (Last 4)');
           expect(last4Ssn).toBeInTheDocument();
         });
       });
