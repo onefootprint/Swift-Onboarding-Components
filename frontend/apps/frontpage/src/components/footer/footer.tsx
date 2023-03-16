@@ -30,6 +30,9 @@ const Footer = () => {
               <Typography variant="body-3" color="tertiary">
                 © {currentYear} {t('copyright')}
               </Typography>
+              <Typography variant="body-3" color="tertiary">
+                {t('phone-number')}
+              </Typography>
               <Image
                 src="/footer/soc-2-badge.png"
                 height={32}
