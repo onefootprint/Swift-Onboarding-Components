@@ -19,8 +19,8 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import isKycCdo from 'src/utils/cdo-utils/isKycCdo';
 
-import isKycCdo from '../../utils/isKycCdo';
 import { FieldProps } from '../field';
 import FieldsList from '../fields-list';
 

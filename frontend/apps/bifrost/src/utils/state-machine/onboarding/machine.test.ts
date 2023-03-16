@@ -1,9 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedKycDataOption,
-  OnboardingConfig,
-  OnboardingStatus,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createOnboardingMachine, { OnboardingMachineArgs } from './machine';
@@ -78,7 +74,6 @@ describe('Onboarding Machine Tests', () => {
       type: 'authorized',
       payload: {
         validationToken: 'token',
-        status: OnboardingStatus.failed,
       },
     });
     expect(state.value).toEqual('success');
@@ -90,7 +85,6 @@ describe('Onboarding Machine Tests', () => {
       email: 'belce@onefootprint.com',
       sandboxSuffix: 'sandboxTest',
       validationToken: 'token',
-      status: OnboardingStatus.failed,
     });
   });
 
@@ -128,7 +122,6 @@ describe('Onboarding Machine Tests', () => {
       type: 'authorized',
       payload: {
         validationToken: 'token',
-        status: OnboardingStatus.failed,
       },
     });
     expect(state.value).toEqual('success');
@@ -139,7 +132,6 @@ describe('Onboarding Machine Tests', () => {
       authToken: 'token',
       email: 'belce@onefootprint.com',
       validationToken: 'token',
-      status: OnboardingStatus.failed,
     });
   });
 });

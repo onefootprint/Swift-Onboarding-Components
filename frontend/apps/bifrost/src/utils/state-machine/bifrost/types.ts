@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig, OnboardingStatus } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 
 export type BootstrapData = {
   email?: string;
@@ -14,7 +14,6 @@ export type MachineContext = {
   email?: string;
   validationToken?: string;
   bootstrapData?: BootstrapData;
-  status?: OnboardingStatus;
   sandboxSuffix?: string;
 };
 
@@ -48,7 +47,6 @@ export type MachineEvents =
       type: 'onboardingCompleted';
       payload: {
         validationToken?: string;
-        status?: OnboardingStatus;
       };
     }
   | {

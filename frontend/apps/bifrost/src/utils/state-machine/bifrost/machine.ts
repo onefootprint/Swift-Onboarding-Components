@@ -73,7 +73,7 @@ export const createBifrostMachine = () =>
           on: {
             onboardingCompleted: {
               target: 'complete',
-              actions: ['assignValidationToken', 'assignStatus'],
+              actions: ['assignValidationToken'],
             },
           },
         },
@@ -118,10 +118,6 @@ export const createBifrostMachine = () =>
         assignValidationToken: assign((context, event) => ({
           ...context,
           validationToken: event.payload.validationToken,
-        })),
-        assignStatus: assign((context, event) => ({
-          ...context,
-          status: event.payload.status,
         })),
         resetContext: assign(() => ({})),
       },

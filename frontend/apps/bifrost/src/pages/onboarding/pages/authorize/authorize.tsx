@@ -14,15 +14,15 @@ import {
 import { Divider, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
+import isDocCdo from 'src/utils/cdo-utils/isDocCdo';
+import isKybCdo from 'src/utils/cdo-utils/isKybCdo';
+import isKycCdo from 'src/utils/cdo-utils/isKycCdo';
 import styled, { css } from 'styled-components';
 
 import Button from './components/button/button';
 import KybFields from './components/kyb-fields';
 import KycFields from './components/kyc-fields';
 import Loading from './components/loading';
-import isDocCdo from './utils/isDocCdo';
-import isKybCdo from './utils/isKybCdo';
-import isKycCdo from './utils/isKycCdo';
 
 const Authorize = () => {
   const { t } = useTranslation('pages.authorize');
@@ -58,12 +58,11 @@ const Authorize = () => {
     onboardingAuthorizeMutation.mutate(
       { authToken },
       {
-        onSuccess: ({ validationToken, status }) => {
+        onSuccess: ({ validationToken }) => {
           send({
             type: 'authorized',
             payload: {
               validationToken,
-              status,
             },
           });
         },

@@ -13,7 +13,6 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignStatus: 'authorized';
     assignValidationToken: 'authorized' | 'onboardingInitialized';
   };
   eventsCausingDelays: {};

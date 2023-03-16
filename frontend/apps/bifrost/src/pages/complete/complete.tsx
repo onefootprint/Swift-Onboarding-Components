@@ -5,9 +5,9 @@ import {
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { OnboardingStatus } from '@onefootprint/types';
 import { Box, LinkButton } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
+import isKybCdo from 'src/utils/cdo-utils/isKybCdo';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -20,9 +20,9 @@ const Complete = () => {
   const { t } = useTranslation('pages.complete');
   const footprint = useFootprintProvider();
   const [state] = useBifrostMachine();
-  const { validationToken, status } = state.context;
-  const isVerified = status === OnboardingStatus.verified;
-  const [showConfetti, setShowConfetti] = React.useState(isVerified);
+  const { validationToken, config } = state.context;
+  const [showConfetti, setShowConfetti] = useState(true);
+  const hasKyb = config?.canAccessData?.some(cdo => isKybCdo(cdo));
 
   useEffectOnce(() => {
     handleComplete(CLOSE_DELAY);
@@ -56,11 +56,11 @@ const Complete = () => {
         <Box sx={{ marginBottom: 4 }} />
         <HeaderTitle
           sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
-          title={isVerified ? t('success.title') : t('failure.title')}
-          subtitle={isVerified ? t('success.subtitle') : t('failure.subtitle')}
+          title={t('title')}
+          subtitle={hasKyb ? t('subtitle-with-kyb') : t('subtitle')}
         />
         <Box sx={{ marginBottom: 7 }} />
-        <LinkButton onClick={handleClose}>{t('success.cta')}</LinkButton>
+        <LinkButton onClick={handleClose}>{t('cta')}</LinkButton>
       </Container>
     </>
   );

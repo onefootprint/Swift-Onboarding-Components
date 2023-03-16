@@ -17,7 +17,6 @@ export interface Typegen0 {
     assignEmail: 'identifyCompleted';
     assignInitContext: 'initContextUpdated';
     assignSandboxOutcome: 'sandboxOutcomeSubmitted';
-    assignStatus: 'onboardingCompleted';
     assignUserFound: 'identifyCompleted';
     assignValidationToken: 'onboardingCompleted';
     resetContext: 'reset';

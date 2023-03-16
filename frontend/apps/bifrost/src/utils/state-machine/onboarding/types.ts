@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig, OnboardingStatus } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   userFound: boolean;
@@ -9,7 +9,6 @@ export type MachineContext = {
   sandboxSuffix?: string; // only if in sandbox mode
   authToken: string;
   validationToken?: string;
-  status?: OnboardingStatus;
 };
 
 export type MachineEvents =
@@ -26,6 +25,5 @@ export type MachineEvents =
       type: 'authorized';
       payload: {
         validationToken: string;
-        status: OnboardingStatus;
       };
     };

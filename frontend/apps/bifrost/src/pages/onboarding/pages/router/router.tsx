@@ -1,6 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
 import { DeviceSignals } from '@onefootprint/footprint-elements';
-import { OnboardingStatus } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import OnboardingRequirements from 'src/pages/onboarding-requirements';
@@ -10,7 +9,6 @@ import InitOnboarding from '../init-onboarding';
 
 export type DonePayload = {
   validationToken?: string;
-  status?: OnboardingStatus;
 };
 
 type RouterProps = {
@@ -22,7 +20,6 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('success');
   const {
     validationToken,
-    status,
     userFound,
     device,
     config,
@@ -34,7 +31,7 @@ const Router = ({ onDone }: RouterProps) => {
 
   useEffect(() => {
     if (isDone) {
-      onDone({ validationToken, status });
+      onDone({ validationToken });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);

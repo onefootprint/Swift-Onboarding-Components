@@ -1,9 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedKycDataOption,
-  OnboardingConfig,
-  OnboardingStatus,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 import { BootstrapData } from 'src/hooks/use-bifrost-machine';
 import { interpret } from 'xstate';
 
@@ -82,7 +78,6 @@ describe('Bifrost Machine Tests', () => {
       type: 'onboardingCompleted',
       payload: {
         validationToken: 'token',
-        status: OnboardingStatus.failed,
       },
     });
     expect(state.value).toEqual('complete');
@@ -94,7 +89,6 @@ describe('Bifrost Machine Tests', () => {
       userFound: true,
       email: 'belce@onefootprint.com',
       validationToken: 'token',
-      status: OnboardingStatus.failed,
     });
   });
 
@@ -149,7 +143,6 @@ describe('Bifrost Machine Tests', () => {
       type: 'onboardingCompleted',
       payload: {
         validationToken: 'token',
-        status: OnboardingStatus.failed,
       },
     });
     expect(state.value).toEqual('complete');
@@ -161,7 +154,6 @@ describe('Bifrost Machine Tests', () => {
       userFound: true,
       email: 'belce@onefootprint.com',
       validationToken: 'token',
-      status: OnboardingStatus.failed,
       sandboxSuffix: 'suffix',
     });
   });
