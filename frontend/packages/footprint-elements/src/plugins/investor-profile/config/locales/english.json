@@ -1,0 +1,9 @@
+{
+  "pages": {
+    "sync-data-error": {
+      "title": "An error occurred",
+      "description": "An error occurred while saving data. Please fix the inputs and try again."
+    },
+    "cta-continue": "Continue"
+  }
+}
