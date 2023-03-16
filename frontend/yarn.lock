@@ -15202,6 +15202,11 @@ raw-loader@^4.0.2:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
+react-calendly@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/react-calendly/-/react-calendly-4.1.1.tgz#25ac2ff3e062e4c6a0aefb83b851bebf66a94a1c"
+  integrity sha512-NEVYY3BXvDb11jmEh7ttMzXRKHSZA2POxNI64wh9sqXgcwvWzy/pfDGOxfM3UCgCvH1iXyPmdy+qntHDEprh4w==
+
 react-day-picker@^8.3.0:
   version "8.3.6"
   resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-8.3.6.tgz#21c0d625ff18d807d7b9f428c70b980c4869936d"

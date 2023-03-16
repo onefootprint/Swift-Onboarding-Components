@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
+import { PopupModal } from 'react-calendly';
+import useSession from 'src/hooks/use-session';
 import styled from 'styled-components';
-
-import ContactDialog from './dialog/dialog';
-
-const GET_FORM_URL =
-  'https://getform.io/f/dcda4ab1-bf30-4aeb-bf3c-af013bbc2b30';
 
 type ContactFormProps = {
   children: React.ReactNode;
@@ -12,6 +9,15 @@ type ContactFormProps = {
 
 const ContactForm = ({ children }: ContactFormProps) => {
   const [showDialog, setShowDialog] = useState(false);
+
+  const { data } = useSession();
+
+  const prefill = {
+    email: data?.user.email || '',
+    firstName: data?.user.firstName || '',
+    lastName: data?.user.lastName || '',
+    name: `${data?.user.firstName} ${data?.user.lastName}` || '',
+  };
 
   const handleClickTrigger = () => {
     setShowDialog(true);
@@ -26,10 +32,12 @@ const ContactForm = ({ children }: ContactFormProps) => {
       <Trigger type="button" onClick={handleClickTrigger}>
         {children}
       </Trigger>
-      <ContactDialog
-        url={GET_FORM_URL}
+      <PopupModal
+        url="https://calendly.com/footprinteli"
+        onModalClose={handleClose}
         open={showDialog}
-        onClose={handleClose}
+        rootElement={document.body}
+        prefill={prefill}
       />
     </>
   );
