@@ -1,5 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedKycDataOption } from '@onefootprint/types';
+import {
+  CollectedDocumentDataOption,
+  CollectedKycDataOption,
+} from '@onefootprint/types';
 import { Checkbox, Divider, Radio, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
@@ -15,8 +18,8 @@ import { useOnboardingConfigMachine } from '../machine-provider';
 
 type FormData = {
   ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-  idDoc: boolean;
-  selfie: boolean;
+  [CollectedDocumentDataOption.document]: boolean;
+  [CollectedDocumentDataOption.documentAndSelfie]: boolean;
 };
 
 const KycCollectForm = () => {
@@ -31,8 +34,8 @@ const KycCollectForm = () => {
   });
 
   const ssnKind = watch('ssnKind');
-  const idDoc = watch('idDoc');
-  const selfie = watch('selfie');
+  const idDoc = watch(CollectedDocumentDataOption.document);
+  const selfie = watch(CollectedDocumentDataOption.documentAndSelfie);
   const collectedDataTags = [
     allT('collected-data-options.email'),
     allT('collected-data-options.phone_number'),
@@ -56,15 +59,17 @@ const KycCollectForm = () => {
       type: 'kycCollectSubmitted',
       payload: {
         ssnKind: formData.ssnKind,
-        idDoc: formData.idDoc,
-        selfie: formData.selfie,
+        [CollectedDocumentDataOption.document]:
+          formData[CollectedDocumentDataOption.document],
+        [CollectedDocumentDataOption.documentAndSelfie]:
+          formData[CollectedDocumentDataOption.documentAndSelfie],
       },
     });
   };
 
   const handleIdDocChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.checked) {
-      setValue('selfie', false);
+      setValue(CollectedDocumentDataOption.documentAndSelfie, false);
     }
   };
 
@@ -98,10 +103,10 @@ const KycCollectForm = () => {
         <Divider />
         <Section>
           <Typography variant="label-3">{t('add-ons.title')}</Typography>
-          <OptionsContainer>
+          <OptionsContainer data-testid="kyc-collect-form-options">
             <Checkbox
               label={allT('collected-data-options.document')}
-              {...register('idDoc', {
+              {...register(CollectedDocumentDataOption.document, {
                 onChange: handleIdDocChange,
               })}
             />
@@ -126,7 +131,7 @@ const KycCollectForm = () => {
             <AnimatedContainer isExpanded={idDoc}>
               <Checkbox
                 label={allT('collected-data-options.selfie')}
-                {...register(`selfie`)}
+                {...register(CollectedDocumentDataOption.documentAndSelfie)}
               />
             </AnimatedContainer>
           </OptionsContainer>
