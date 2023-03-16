@@ -19,7 +19,7 @@ use webhooks::events::WebhookEvent;
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
-    tags(Users)
+    tags(Users, Preview)
 )]
 #[post("/users/{fp_user_id}/decisions")]
 pub async fn post(

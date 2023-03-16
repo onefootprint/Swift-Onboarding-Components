@@ -29,7 +29,7 @@ use strum::IntoEnumIterator;
 
 #[api_v2_operation(
     description = "Checks existence if items in the document vault.",
-    tags(Vault, PublicApi, Users)
+    tags(Vault, Preview, Users)
 )]
 #[actix::get("/users/{footprint_user_id}/vault/identity/document")]
 pub async fn get(
@@ -63,7 +63,7 @@ pub async fn get(
 
 #[api_v2_operation(
     description = "Decrypts images in the document vault.",
-    tags(Vault, PublicApi, Users)
+    tags(Vault, Preview, Users)
 )]
 #[actix::post("/users/{footprint_user_id}/vault/identity/document/decrypt")]
 pub async fn post_decrypt(

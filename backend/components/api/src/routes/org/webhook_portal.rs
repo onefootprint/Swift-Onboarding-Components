@@ -13,7 +13,7 @@ use crate::State;
 use paperclip::actix::{api_v2_operation, get, web};
 use webhooks::PortalResponse;
 
-#[api_v2_operation(tags(OrgSettings), description = "Returns the webhook portal url.")]
+#[api_v2_operation(tags(OrgSettings, Private), description = "Returns the webhook portal url.")]
 #[get("/org/webhook_portal")]
 async fn get(
     state: web::Data<State>,

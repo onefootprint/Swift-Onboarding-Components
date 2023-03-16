@@ -23,7 +23,10 @@ use paperclip::actix::{api_v2_operation, get, web};
 type RiskSignalsDetailResponse = api_wire_types::RiskSignal;
 type RiskSignalsListResponse = Vec<RiskSignalsDetailResponse>;
 
-#[api_v2_operation(description = "Lists the risk signals for a footprint user.", tags(Users))]
+#[api_v2_operation(
+    description = "Lists the risk signals for a footprint user.",
+    tags(Users, Preview)
+)]
 #[get("/users/{footprint_user_id}/risk_signals")]
 pub async fn get(
     state: web::Data<State>,
@@ -94,7 +97,10 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
         .collect()
 }
 
-#[api_v2_operation(description = "Lists the risk signals for a footprint user.", tags(Users))]
+#[api_v2_operation(
+    description = "Lists the risk signals for a footprint user.",
+    tags(Users, Preview)
+)]
 #[get("/users/{footprint_user_id}/risk_signals/{signal_id}")]
 pub async fn get_detail(
     state: web::Data<State>,

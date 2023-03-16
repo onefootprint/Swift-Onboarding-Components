@@ -12,7 +12,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
     description = "Allows a tenant to view a customer's registered webauthn credentials.",
-    tags(Users)
+    tags(Users, Preview)
 )]
 #[get("/users/{footprint_user_id}/liveness")]
 pub async fn get(

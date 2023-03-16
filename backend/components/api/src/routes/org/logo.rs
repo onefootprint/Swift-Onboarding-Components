@@ -17,7 +17,10 @@ use futures_util::StreamExt as _;
 
 const MAX_IMAGE_SIZE_BYTES: usize = 1_048_576;
 
-#[api_v2_operation(description = "Upload a new logo for the organization.", tags(Organization))]
+#[api_v2_operation(
+    description = "Upload a new logo for the organization.",
+    tags(Organization, Preview)
+)]
 #[actix::put("/org/logo")]
 pub async fn put(
     state: web::Data<State>,
