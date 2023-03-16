@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 
@@ -49,6 +50,7 @@ if __name__ == "__main__":
     # If running this script, actually output the new open api spec
     open_api_spec = requests.get("https://api.onefootprint.com/docs-spec-v3").json()
     get_public_apis(open_api_spec)
+    os.makedirs("out", exist_ok=True)
     with open("out/public-api.json", "w") as f:
         f.write(json.dumps(open_api_spec))
         f.close()
