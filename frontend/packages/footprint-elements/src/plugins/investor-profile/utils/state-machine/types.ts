@@ -6,10 +6,38 @@ export type MachineContext = {
   authToken?: string;
 };
 
-export type MachineEvents = {
-  type: 'receivedContext';
-  payload: {
-    authToken: string;
-    device: DeviceInfo;
-  };
-};
+export type MachineEvents =
+  | {
+      type: 'receivedContext';
+      payload: {
+        authToken: string;
+        device: DeviceInfo;
+      };
+    }
+  | {
+      type: 'employmentSubmitted';
+      payload: {};
+    }
+  | {
+      type: 'brokerageEmploymentSubmitted';
+      payload: {};
+    }
+  | {
+      type: 'incomeSubmitted';
+      payload: {};
+    }
+  | {
+      type: 'netWorthSubmitted';
+      payload: {};
+    }
+  | {
+      type: 'riskToleranceSubmitted';
+      payload: {};
+    }
+  | {
+      type: 'conflictOfInterestSubmitted';
+      payload: {};
+    }
+  | {
+      type: 'navigatedToPrevPage';
+    };

@@ -12,10 +12,25 @@ export interface Typegen0 {
     guards: never;
     services: never;
   };
-  eventsCausingActions: {};
+  eventsCausingActions: {
+    assignBrokerageEmployment: 'brokerageEmploymentSubmitted';
+    assignConflictOfInterest: 'conflictOfInterestSubmitted';
+    assignEmployment: 'employmentSubmitted';
+    assignIncome: 'incomeSubmitted';
+    assignNetWorth: 'netWorthSubmitted';
+    assignRiskTolerance: 'riskToleranceSubmitted';
+  };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'completed' | 'init';
+  matchesStates:
+    | 'brokerageEmployment'
+    | 'completed'
+    | 'conflictOfInterest'
+    | 'employment'
+    | 'income'
+    | 'init'
+    | 'netWorth'
+    | 'riskTolerance';
   tags: never;
 }
