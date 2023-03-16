@@ -36,6 +36,7 @@ pub struct Onboarding {
     pub authorized_at: Option<DateTime<Utc>>,
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
+    pub status: OnboardingStatus,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -45,6 +46,7 @@ struct NewOnboarding {
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
+    status: OnboardingStatus,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -353,6 +355,7 @@ impl Onboarding {
             ob_configuration_id: args.ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
+            status: OnboardingStatus::Incomplete,
         };
         let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)

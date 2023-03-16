@@ -264,6 +264,7 @@ table! {
         authorized_at -> Nullable<Timestamptz>,
         idv_reqs_initiated_at -> Nullable<Timestamptz>,
         decision_made_at -> Nullable<Timestamptz>,
+        status -> Text,
     }
 }
 

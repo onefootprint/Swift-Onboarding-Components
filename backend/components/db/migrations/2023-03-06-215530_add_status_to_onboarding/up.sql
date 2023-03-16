@@ -1,0 +1,2 @@
+ALTER TABLE onboarding ADD COLUMN status TEXT NOT NULL DEFAULT 'incomplete';
+ALTER TABLE onboarding ALTER COLUMN status DROP DEFAULT;
