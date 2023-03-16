@@ -46,9 +46,7 @@ describe('<RadioSelect />', () => {
       renderRadioSelect({
         value: 'Item 2',
       });
-      const option = screen.getByLabelText(
-        'Description 2',
-      ) as HTMLButtonElement;
+      const option = screen.getByLabelText('Item 2') as HTMLButtonElement;
       expect((option as any).selected).toBeTruthy();
     });
 
@@ -58,9 +56,7 @@ describe('<RadioSelect />', () => {
         renderRadioSelect({
           onChange: onChangeMockFn,
         });
-        const option = screen.getByLabelText(
-          'Description 2',
-        ) as HTMLButtonElement;
+        const option = screen.getByLabelText('Item 2') as HTMLButtonElement;
         await userEvent.click(option);
         expect(onChangeMockFn).toHaveBeenCalled();
       });

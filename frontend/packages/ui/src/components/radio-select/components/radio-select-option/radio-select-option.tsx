@@ -31,7 +31,7 @@ const RadioSelectOption = ({
 
   return (
     <Option
-      aria-label={description}
+      aria-label={title}
       aria-selected={selected}
       key={value}
       onClick={handleClick}

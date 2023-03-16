@@ -1,4 +1,4 @@
-import { createMachine } from 'xstate';
+import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
 
@@ -16,10 +16,30 @@ export const createOnboardingConfigMachine = () =>
       context: {},
       states: {
         type: {
-          // TODO:
+          on: {
+            typeSubmitted: {
+              target: 'name',
+              actions: ['assignType'],
+            },
+          },
         },
         name: {
-          // TODO:
+          on: {
+            nameSubmitted: [
+              {
+                target: 'kybCollect',
+                cond: context => context.type === 'kyb',
+                actions: ['assignName'],
+              },
+              {
+                target: 'kycCollect',
+                actions: ['assignName'],
+              },
+            ],
+            prevClicked: {
+              target: 'type',
+            },
+          },
         },
         kycCollect: {
           // TODO:
@@ -37,7 +57,14 @@ export const createOnboardingConfigMachine = () =>
     },
     {
       actions: {
-        // TODO:
+        assignName: assign((context, event) => ({
+          ...context,
+          name: event.payload.name,
+        })),
+        assignType: assign((context, event) => ({
+          ...context,
+          type: event.payload.type,
+        })),
       },
     },
   );

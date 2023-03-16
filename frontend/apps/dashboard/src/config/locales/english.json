@@ -791,6 +791,34 @@
             "label": "Status"
           }
         },
+        "create-dialog": {
+          "title": "Create onboarding config",
+          "type-form": {
+            "title": "Types of onboarding configuration",
+            "description": "Select the type of verification flow you want to create:",
+            "kyc": {
+              "title": "KYC",
+              "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them."
+            },
+            "kyb": {
+              "title": "KYB",
+              "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with."
+            }
+          },
+          "name-form": {
+            "name": {
+              "label": "Onboarding configuration name",
+              "placeholder": "User ID verification",
+              "errors": {
+                "required": "Please enter a name for your onboarding configuration."
+              }
+            }
+          },
+          "kyc-collect-form": {},
+          "kyc-access-form": {},
+          "kyb-collect-form": {},
+          "kyb-access-form": {}
+        },
         "create": {
           "title": "Create onboarding config",
           "sections": {

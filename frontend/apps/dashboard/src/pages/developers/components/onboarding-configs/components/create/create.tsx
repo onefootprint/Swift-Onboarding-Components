@@ -1,7 +1,7 @@
 import React from 'react';
 
 import CreateDialog from './components/dialog';
-import { OnboardingConfigMachineProvider } from './components/machine-provider';
+import OnboardingConfigMachineProvider from './components/machine-provider';
 
 export type CreateProps = {
   open: boolean;

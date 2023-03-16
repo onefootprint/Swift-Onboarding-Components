@@ -5,6 +5,9 @@ export type MachineContext = {
 
 export type MachineEvents =
   | {
+      type: 'prevClicked';
+    }
+  | {
       type: 'typeSubmitted';
       payload: {
         type: 'kyb' | 'kyc';

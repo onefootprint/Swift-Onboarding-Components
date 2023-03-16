@@ -1,2 +1,2 @@
 export { default } from './machine-provider';
-export * from './machine-provider';
+export { useOnboardingConfigMachine } from './machine-provider';

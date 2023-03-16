@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
-import { Dialog as FpDialog } from '@onefootprint/ui';
+import { Dialog as FpDialog, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 
+import getFormIdForState from '../../utils/get-form-id-for-state';
 import KybAccessForm from '../kyb-access-form';
 import KybCollectForm from '../kyb-collect-form';
 import KycAccessForm from '../kyc-access-form';
@@ -17,21 +18,45 @@ type DialogProps = {
   onCreate: () => void;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Dialog = ({ open, onClose, onCreate }: DialogProps) => {
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs.create',
+    'pages.developers.onboarding-configs.create-dialog',
   );
-  const [state] = useOnboardingConfigMachine();
+  const [state, send] = useOnboardingConfigMachine();
+  const { type } = state.context;
   const isFirstStep = state.matches('type');
+  const isFinalStep =
+    (type === 'kyb' && state.matches('kybAccess')) ||
+    (type === 'kyc' && state.matches('kycAccess'));
+  const confirmationDialog = useConfirmationDialog();
+
+  const confirmBeforeClosing = () => {
+    confirmationDialog.open({
+      title: allT('confirm.title'),
+      description: allT('confirm.description'),
+      primaryButton: {
+        label: allT('confirm.cta'),
+        onClick: onClose,
+      },
+      secondaryButton: {
+        label: allT('confirm.cancel'),
+      },
+    });
+  };
 
   const handleClose = () => {
-    // TODO:
-    onClose();
-    onCreate();
+    if (isFirstStep) {
+      onClose();
+    } else {
+      confirmBeforeClosing();
+    }
   };
 
   const handleBack = () => {
-    // TODO:
+    send({
+      type: 'prevClicked',
+    });
   };
 
   return (
@@ -43,7 +68,10 @@ const Dialog = ({ open, onClose, onCreate }: DialogProps) => {
       onClose={isFirstStep ? onClose : handleBack}
       open={open}
       primaryButton={{
-        label: 'todo',
+        form: getFormIdForState(state.value),
+        label: isFinalStep ? allT('save') : allT('next'),
+        type: 'submit',
+        // TODO: loading state & aria label
       }}
       secondaryButton={{
         label: allT('cancel'),
@@ -58,8 +86,6 @@ const Dialog = ({ open, onClose, onCreate }: DialogProps) => {
       {state.matches('kybAccess') && <KybAccessForm />}
     </FpDialog>
   );
-
-  return null;
 };
 
 export default Dialog;
