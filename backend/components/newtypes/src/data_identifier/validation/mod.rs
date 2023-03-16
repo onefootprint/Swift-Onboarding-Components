@@ -29,6 +29,10 @@ pub enum Error {
     ImprobableDob,
     #[error("The entered address is a PO Box")]
     AddressIsPOBox,
+    #[error("Cannot parse: {0}")]
+    CannotParseEnum(#[from] strum::ParseError),
+    #[error("Cannot parse: {0}")]
+    CannotParseJson(#[from] serde_json::Error),
 }
 
 pub(super) type VResult<T> = Result<T, Error>;

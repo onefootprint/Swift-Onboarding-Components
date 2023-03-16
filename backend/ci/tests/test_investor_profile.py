@@ -20,35 +20,42 @@ def sandbox_user(investor_profile_ob_config, twilio):
     return auth_token
 
 
+@pytest.fixture(scope="session")
+def ip_data():
+    return {
+        "investor_profile.employment_status": "employed",
+        "investor_profile.occupation": "Neurosurgeon",
+        "investor_profile.employed_by_brokerage": "no",
+        "investor_profile.annual_income": "lt50k",
+        "investor_profile.net_worth": "gt1m",
+        "investor_profile.investment_goals": '["grow_long_term_wealth", "buy_a_home"]',
+        "investor_profile.risk_tolerance": "conservative",
+        "investor_profile.declarations": '["affiliated_with_us_broker", "family_of_political_figure"]',
+    }
+
+
+def test_put_ip_info_valid(sandbox_user, ip_data):
+    post("hosted/user/vault/validate", ip_data, sandbox_user)
+    put("hosted/user/vault", ip_data, sandbox_user)
+
+
 @pytest.mark.parametrize(
-    "ip_data,expected_status_code",
+    "patch_data",
     [
-        (
-            {
-                "investor_profile.employment_status": "employed",
-                "investor_profile.occupation": "Neurosurgeon",
-                "investor_profile.employed_by_brokerage": "no",
-                "investor_profile.annual_income": "u50000",
-                "investor_profile.net_worth": "a1m",
-                "investor_profile.investment_goals": '["grow_long_term_wealth", "buy_a_home"]',
-                "investor_profile.risk_tolerance": "conservative",
-                "investor_profile.declarations": "[]",
-            },
-            200,
-        ),
-        # TODO test validation
+        {"investor_profile.employment_status": "flerp"},
+        {"investor_profile.occuptation": ""},
+        {"investor_profile.employed_by_brokerage": "maybe"},
+        {"investor_profile.annual_income": "10000000000"},
+        {"investor_profile.net_worth": "0"},
+        {"investor_profile.investment_goals": '["hi", "grow_long_term_wealth"]'},
+        {"investor_profile.risk_tolerance": "really high"},
+        {"investor_profile.declarations": '["hi", "grow_long_term_wealth"]'},
     ],
 )
-def test_put_ip_info(sandbox_user, ip_data, expected_status_code):
-    post(
-        "hosted/user/vault/validate",
-        ip_data,
-        sandbox_user,
-        status_code=expected_status_code,
-    )
-    put(
-        "hosted/user/vault",
-        ip_data,
-        sandbox_user,
-        status_code=expected_status_code,
-    )
+def test_put_ip_info_invalid(sandbox_user, ip_data, patch_data):
+    ip_data = {
+        **ip_data,
+        **patch_data,
+    }
+    post("hosted/user/vault/validate", ip_data, sandbox_user, status_code=400)
+    put("hosted/user/vault", ip_data, sandbox_user, status_code=400)
