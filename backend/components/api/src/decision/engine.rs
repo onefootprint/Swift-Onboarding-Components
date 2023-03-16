@@ -64,6 +64,7 @@ pub async fn run(
 
     let vendor_results = make_vendor_requests(
         db_pool,
+        &ob.id,
         enclave_client,
         is_production,
         vendor_requests.outstanding_requests,
@@ -241,6 +242,7 @@ fn partition_vendor_errors(
 #[allow(clippy::too_many_arguments)]
 pub async fn make_vendor_requests(
     db_pool: &DbPool,
+    onboarding_id: &OnboardingId,
     enclave_client: &EnclaveClient,
     is_production: bool,
     requests: Vec<VerificationRequest>,
@@ -261,6 +263,7 @@ pub async fn make_vendor_requests(
     // Make requests
     let results = vendor::make_request::make_vendor_requests(
         requests,
+        onboarding_id,
         db_pool,
         enclave_client,
         is_production,

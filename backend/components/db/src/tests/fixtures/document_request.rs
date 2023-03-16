@@ -94,7 +94,6 @@ pub fn create(
             let vreq = VerificationRequest::create_document_verification_request(
                 conn,
                 VendorAPI::IdologyScanOnboarding,
-                opts.onboarding_id,
                 opts.scoped_user_id.clone(),
                 id1.id,
             )

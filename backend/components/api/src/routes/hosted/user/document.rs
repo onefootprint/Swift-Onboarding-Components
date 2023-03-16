@@ -21,7 +21,8 @@ use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
 use newtypes::{
-    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, ScopedVaultId, SealedVaultDataKey, VaultId,
+    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, OnboardingId, ScopedVaultId,
+    SealedVaultDataKey, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -227,7 +228,6 @@ pub async fn post(
     // Save Verification Requests and run our vendor requests
     if should_initiate_reqs {
         // Save our verification request
-        let ob_id = auth_info.onboarding.id.clone();
         let su_id = auth_info.scoped_user.id.clone();
         let id_doc_id = identity_document.id.clone();
         let (document_verification_request, doc_request) = state
@@ -245,7 +245,6 @@ pub async fn post(
                     let res = decision::utils::create_document_verification_request(
                         conn.conn(),
                         api,
-                        ob_id,
                         su_id,
                         id_doc_id,
                     )?;
@@ -262,6 +261,7 @@ pub async fn post(
         // Make our request!
         handle_scan_onboarding_request(
             &state,
+            &auth_info.onboarding.id,
             doc_request,
             document_verification_request,
             auth_info.scoped_user.id.clone(),
@@ -404,6 +404,7 @@ pub fn construct_get_response(
 #[tracing::instrument(skip(state, document_request, document_verification_request))]
 async fn handle_scan_onboarding_request(
     state: &State,
+    onboarding_id: &OnboardingId,
     document_request: DbDocumentRequest,
     document_verification_request: VerificationRequest,
     scoped_user_id: ScopedVaultId,
@@ -413,8 +414,12 @@ async fn handle_scan_onboarding_request(
     // Make document verification request
     // TODO: spawn a thread to make this request, but scan onboarding returns immediately (allegedly) so it's fine for now
     let verification_request_id = document_verification_request.id.clone();
-    let vendor_result =
-        decision::vendor::make_request::make_docv_request(state, document_verification_request).await;
+    let vendor_result = decision::vendor::make_request::make_docv_request(
+        state,
+        document_verification_request,
+        onboarding_id,
+    )
+    .await;
 
     // Our vendor request could fail for some reason. We handle most errors in the vendor request code, but if
     // some anticipated error arises, if we don't catch the error here, we introduce a potential loophole for someone to get through

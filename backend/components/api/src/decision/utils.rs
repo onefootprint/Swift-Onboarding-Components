@@ -59,7 +59,6 @@ pub async fn get_fixture_data_decision(
 pub fn create_document_verification_request(
     conn: &mut PgConn,
     vendor_api: VendorAPI,
-    onboarding_id: OnboardingId,
     scoped_user_id: ScopedVaultId,
     identity_document_id: IdentityDocumentId,
 ) -> Result<VerificationRequest, ApiError> {
@@ -72,7 +71,6 @@ pub fn create_document_verification_request(
     VerificationRequest::create_document_verification_request(
         conn,
         vendor_api,
-        onboarding_id,
         scoped_user_id,
         identity_document_id,
     )
@@ -120,7 +118,6 @@ pub async fn setup_test_fixtures(
             // Create some mock verification request and results
             let request = VerificationRequest::bulk_create(
                 conn,
-                ob.id.clone(),
                 ob.scoped_user_id.clone(),
                 vec![VendorAPI::IdologyExpectID],
             )?

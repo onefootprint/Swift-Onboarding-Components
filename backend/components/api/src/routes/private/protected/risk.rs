@@ -90,6 +90,7 @@ async fn make_vendor_calls(
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
+        &ob.id,
         &state.enclave_client,
         state.config.service_config.is_production(),
         requests,
@@ -230,7 +231,7 @@ async fn shadow_run(
         fp_user_id,
     } = request.into_inner();
 
-    let requests = state
+    let (ob, requests) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
@@ -249,7 +250,7 @@ async fn shadow_run(
                     timestamp: Utc::now(),
                     _created_at: Utc::now(),
                     _updated_at: Utc::now(),
-                    onboarding_id: Some(ob.id.clone()),
+                    onboarding_id: None,
                     vendor_api: v,
                     uvw_snapshot_seqno: seqno,
                     identity_document_id: None,
@@ -257,12 +258,13 @@ async fn shadow_run(
                 })
                 .collect();
 
-            Ok(memory_only_requests)
+            Ok((ob, memory_only_requests))
         })
         .await?;
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
+        &ob.id,
         &state.enclave_client,
         state.config.service_config.is_production(),
         requests,

@@ -49,7 +49,6 @@ impl VerificationRequest {
     #[tracing::instrument(skip_all)]
     pub fn bulk_create(
         conn: &mut PgConn,
-        onboarding_id: OnboardingId,
         scoped_user_id: ScopedVaultId,
         vendor_apis: Vec<VendorAPI>,
     ) -> Result<Vec<Self>, crate::DbError> {
@@ -57,7 +56,7 @@ impl VerificationRequest {
         let requests: Vec<_> = vendor_apis
             .into_iter()
             .map(|vendor_api| NewVerificationRequestRow {
-                onboarding_id: Some(onboarding_id.clone()),
+                onboarding_id: None,
                 vendor_api,
                 vendor: Vendor::from(vendor_api),
                 timestamp: Utc::now(),
@@ -129,13 +128,12 @@ impl VerificationRequest {
     pub fn create_document_verification_request(
         conn: &mut PgConn,
         vendor_api: VendorAPI,
-        onboarding_id: OnboardingId,
         scoped_user_id: ScopedVaultId,
         identity_document_id: IdentityDocumentId,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_row = NewVerificationRequestRow {
-            onboarding_id: Some(onboarding_id),
+            onboarding_id: None,
             vendor_api,
             vendor: Vendor::from(vendor_api),
             timestamp: Utc::now(),

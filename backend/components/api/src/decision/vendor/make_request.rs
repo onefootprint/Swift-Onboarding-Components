@@ -35,6 +35,7 @@ use prometheus::labels;
 pub async fn send_idv_request(
     request: VerificationRequest,
     data: IdvData,
+    onboarding_id: &OnboardingId,
     db_pool: &DbPool,
     is_production: bool,
     ff_client: &impl FeatureFlagClient,
@@ -55,17 +56,14 @@ pub async fn send_idv_request(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
         vendor_api = request.vendor_api.clone().to_string(),
-        onboarding_id = request
-            .onboarding_id
-            .clone()
-            .map(|o| o.to_string())
-            .unwrap_or_default(),
+        scoped_user_id = %request.scoped_user_id,
+        onboarding_id = %onboarding_id,
     );
     // Make the request to the IDV vendor
 
-    let onboarding_id = request.onboarding_id.clone().ok_or(DbError::ObjectNotFound)?;
+    let obid = onboarding_id.clone();
     let ob_configuration_key = db_pool
-        .db_query(move |conn| ObConfiguration::get_by_onboarding_id(conn, &onboarding_id))
+        .db_query(move |conn| ObConfiguration::get_by_onboarding_id(conn, &obid))
         .await??
         .key;
 
@@ -83,7 +81,15 @@ pub async fn send_idv_request(
         }
         VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(data, twilio_client).await?,
         VendorAPI::SocureIDPlus => {
-            send_socure_idv_request(request, data, is_production, db_pool, socure_client, ff_client).await?
+            send_socure_idv_request(
+                onboarding_id,
+                data,
+                is_production,
+                db_pool,
+                socure_client,
+                ff_client,
+            )
+            .await?
         }
         // TODO finish this
         VendorAPI::ExperianPreciseID => {
@@ -110,17 +116,15 @@ pub async fn send_idv_request(
 pub async fn send_docv_request(
     state: &State,
     request: VerificationRequest,
+    onboarding_id: &OnboardingId,
     data: DocVData,
 ) -> Result<VendorResponse, ApiError> {
     tracing::info!(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
         vendor_api = request.vendor_api.clone().to_string(),
-        onboarding_id = request
-            .onboarding_id
-            .clone()
-            .map(|o| o.to_string())
-            .unwrap_or_default(),
+        scoped_user_id = %request.scoped_user_id,
+        onboarding_id = %onboarding_id,
     );
     // Make the request to the DocV vendor
     // TODO implement mocking for these once we use scan verify
@@ -134,7 +138,9 @@ pub async fn send_docv_request(
             };
             idv::idology::poll_scan_verify_results_request(&state.idology_client, ref_id).await?
         }
-        VendorAPI::IdologyScanOnboarding => send_scan_onboarding_docv_request(state, request, data).await?,
+        VendorAPI::IdologyScanOnboarding => {
+            send_scan_onboarding_docv_request(state, onboarding_id, data).await?
+        }
         api => {
             let err = format!("send_docv_request not implemented for {}", api);
             return Err(ApiError::AssertionError(err));
@@ -242,26 +248,25 @@ pub async fn send_idology_idv_request(
 
 #[tracing::instrument(skip_all)]
 pub async fn send_socure_idv_request(
-    request: VerificationRequest,
+    onboarding_id: &OnboardingId,
     data: IdvData,
     is_production: bool,
     db_pool: &DbPool,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     ff_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
-    let onboarding_id = request.onboarding_id.clone().ok_or(DbError::ObjectNotFound)?;
+    let obid = onboarding_id.clone();
     let (socure_device_session_id, ip_address, ob_configuration_key) = db_pool
         .db_query(
             move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
                 let socure_device_session_id =
-                    SocureDeviceSession::latest_for_onboarding(conn, &onboarding_id)?
-                        .map(|d| d.device_session_id);
+                    SocureDeviceSession::latest_for_onboarding(conn, &obid)?.map(|d| d.device_session_id);
 
-                let ip_address = InsightEvent::get_by_onboarding_id(conn, &onboarding_id)?
+                let ip_address = InsightEvent::get_by_onboarding_id(conn, &obid)?
                     .ip_address
                     .map(PiiString::from);
 
-                let ob_configuration_key = ObConfiguration::get_by_onboarding_id(conn, &onboarding_id)?.key;
+                let ob_configuration_key = ObConfiguration::get_by_onboarding_id(conn, &obid)?.key;
 
                 Ok((socure_device_session_id, ip_address, ob_configuration_key))
             },
@@ -351,16 +356,16 @@ pub async fn send_experian_idv_request(
 #[tracing::instrument(skip_all)]
 pub async fn send_scan_onboarding_docv_request(
     state: &State,
-    request: VerificationRequest,
+    onboarding_id: &OnboardingId,
     data: DocVData,
 ) -> Result<VendorResponse, ApiError> {
     let ff_client = &state.feature_flag_client;
 
-    let onboarding_id = request.onboarding_id.clone().ok_or(DbError::ObjectNotFound)?;
+    let obid = onboarding_id.clone();
     let ob_configuration_key = state
         .db_pool
         .db_query(move |conn| -> Result<ObConfigurationKey, DbError> {
-            Ok(ObConfiguration::get_by_onboarding_id(conn, &onboarding_id)?.key)
+            Ok(ObConfiguration::get_by_onboarding_id(conn, &obid)?.key)
         })
         .await??;
 
@@ -391,6 +396,7 @@ pub async fn send_scan_onboarding_docv_request(
 /// Make our requests to a vendor, building data from the cached VerificationRequest
 pub async fn make_idv_request(
     request: VerificationRequest,
+    onboarding_id: &OnboardingId,
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     is_production: bool,
@@ -415,6 +421,7 @@ pub async fn make_idv_request(
     let vendor_response = send_idv_request(
         request,
         data,
+        onboarding_id,
         db_pool,
         is_production,
         ff_client,
@@ -436,6 +443,7 @@ pub async fn make_idv_request(
 pub async fn make_docv_request(
     state: &State,
     request: VerificationRequest,
+    onboarding_id: &OnboardingId,
 ) -> Result<vendor_result::VendorResult, ApiError> {
     let request_id = request.id.clone();
     let requestid = request.id.clone();
@@ -444,7 +452,7 @@ pub async fn make_docv_request(
         build_request::build_docv_data_for_submission_from_verification_request(state, request.clone())
             .await?;
 
-    let vendor_response = send_docv_request(state, request.clone(), data).await?;
+    let vendor_response = send_docv_request(state, request.clone(), onboarding_id, data).await?;
     let uv = state
         .db_pool
         .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
@@ -472,6 +480,7 @@ pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorRes
 #[tracing::instrument(skip_all)]
 pub async fn make_vendor_requests(
     requests: Vec<VerificationRequest>,
+    onboarding_id: &OnboardingId,
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     is_production: bool,
@@ -494,6 +503,7 @@ pub async fn make_vendor_requests(
             r.clone(),
             make_idv_request(
                 r,
+                onboarding_id,
                 db_pool,
                 enclave_client,
                 is_production,
