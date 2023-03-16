@@ -21,7 +21,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    BusinessDataKind as BDK, IdentityDataKind as IDK, OnboardingId, ScopedVaultId, SessionAuthToken, VaultId,
+    BusinessDataKind as BDK, IdentityDataKind as IDK, InvestorProfileKind as IPK, OnboardingId,
+    ScopedVaultId, SessionAuthToken, VaultId,
 };
 use paperclip::actix::web;
 
@@ -75,6 +76,7 @@ pub fn get_requirements(
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(scoped_user_id))?;
     let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.vault.id, ob_config_id))?;
     let missing_id_fields = uvw.missing_fields::<IDK>(&ob_info.ob_config);
+    let missing_ip_fields = uvw.missing_fields::<IPK>(&ob_info.ob_config);
 
     // Fetch missing business fields
     let missing_business_fields = if ob_info.ob_config.must_collect_business() {
@@ -115,6 +117,9 @@ pub fn get_requirements(
     let requirements = vec![
         (!missing_id_fields.is_empty()).then_some(OnboardingRequirement::CollectData {
             missing_attributes: missing_id_fields,
+        }),
+        (!missing_ip_fields.is_empty()).then_some(OnboardingRequirement::CollectInvestorProfile {
+            missing_attributes: missing_ip_fields,
         }),
         (!missing_business_fields.is_empty()).then_some(OnboardingRequirement::CollectBusinessData {
             missing_attributes: missing_business_fields,
