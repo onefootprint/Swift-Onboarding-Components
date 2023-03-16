@@ -2,10 +2,10 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
-import BrokerageEmploymentForm from './components/brokerage-employment-form';
+import InvestmentGoalsForm from './components/investment-goals-form';
 
-const BrokerageEmployment = () => {
-  const { t } = useTranslation('pages.brokerage-employment');
+const InvestmentGoals = () => {
+  const { t } = useTranslation('pages.investment-goals');
 
   return (
     <>
@@ -14,9 +14,9 @@ const BrokerageEmployment = () => {
         subtitle={t('subtitle')}
         sx={{ marginBottom: 7 }}
       />
-      <BrokerageEmploymentForm />
+      <InvestmentGoalsForm />
     </>
   );
 };
 
-export default BrokerageEmployment;
+export default InvestmentGoals;

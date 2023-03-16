@@ -2,7 +2,7 @@ import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
 
-const createCollectKybDataMachine = () =>
+const createCollectInvestorProfileDataMachine = () =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -49,11 +49,22 @@ const createCollectKybDataMachine = () =>
         netWorth: {
           on: {
             netWorthSubmitted: {
-              target: 'riskTolerance',
+              target: 'investmentGoals',
               actions: 'assignNetWorth',
             },
             navigatedToPrevPage: {
               target: 'income',
+            },
+          },
+        },
+        investmentGoals: {
+          on: {
+            investmentGoalsSubmitted: {
+              target: 'riskTolerance',
+              actions: 'assignInvestmentGoals',
+            },
+            navigatedToPrevPage: {
+              target: 'netWorth',
             },
           },
         },
@@ -64,7 +75,7 @@ const createCollectKybDataMachine = () =>
               actions: 'assignRiskTolerance',
             },
             navigatedToPrevPage: {
-              target: 'netWorth',
+              target: 'riskTolerance',
             },
           },
         },
@@ -95,6 +106,8 @@ const createCollectKybDataMachine = () =>
         // TODO:
         assignNetWorth: assign(context => context),
         // TODO:
+        assignInvestmentGoals: assign(context => context),
+        // TODO:
         assignRiskTolerance: assign(context => context),
         // TODO:
         assignConflictOfInterest: assign(context => context),
@@ -102,4 +115,4 @@ const createCollectKybDataMachine = () =>
     },
   );
 
-export default createCollectKybDataMachine;
+export default createCollectInvestorProfileDataMachine;

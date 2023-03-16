@@ -1,5 +1,40 @@
 {
   "pages": {
+    "employment": {
+      "title": "What's your employment status and occupation?",
+      "subtitle": "We're legally required to collect this information.",
+      "form": {}
+    },
+    "brokerage-employment": {
+      "title": "Are you employed by a brokerage firm?",
+      "subtitle": "We're legally required to collect this information.",
+      "form": {}
+    },
+    "income": {
+      "title": "What's your annual income?",
+      "subtitle": "We're legally required to collect this information.",
+      "form": {}
+    },
+    "net-worth": {
+      "title": "What's your net worth?",
+      "subtitle": "We're legally required to collect this information.",
+      "form": {}
+    },
+    "investment-goals": {
+      "title": "What are your investment goals?",
+      "subtitle": "We're legally required to collect this information.",
+      "form": {}
+    },
+    "risk-tolerance": {
+      "title": "How would you describe your risk tolerance?",
+      "subtitle": "We're legally required to collect this information.",
+      "form": {}
+    },
+    "conflict-of-interest": {
+      "title": "Do any of the following apply to you or a member of your immediate family?",
+      "subtitle": "These declarations will not apply to most users.",
+      "form": {}
+    },
     "sync-data-error": {
       "title": "An error occurred",
       "description": "An error occurred while saving data. Please fix the inputs and try again."

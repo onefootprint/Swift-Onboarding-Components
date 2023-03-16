@@ -31,6 +31,10 @@ export type MachineEvents =
       payload: {};
     }
   | {
+      type: 'investmentGoalsSubmitted';
+      payload: {};
+    }
+  | {
       type: 'riskToleranceSubmitted';
       payload: {};
     }

@@ -1,5 +1,6 @@
 import { OnboardingConfig } from '../data';
 import {
+  CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
@@ -10,6 +11,7 @@ export enum OnboardingRequirementKind {
   idDoc = 'collect_document',
   collectKycData = 'collect_data',
   collectKybData = 'collect_business_data',
+  investorProfile = 'collect_investor_profile',
 }
 
 export type CollectKybDataRequirement = {
@@ -20,6 +22,11 @@ export type CollectKybDataRequirement = {
 export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
   missingAttributes: CollectedKycDataOption[];
+};
+
+export type CollectInvestorProfileRequirement = {
+  kind: OnboardingRequirementKind.investorProfile;
+  missingAttributes: CollectedInvestorProfileDataOption[];
 };
 
 export type IdDocRequirement = {
@@ -35,6 +42,7 @@ export type LivenessRequirement = {
 export type OnboardingRequirement =
   | CollectKybDataRequirement
   | CollectKycDataRequirement
+  | CollectInvestorProfileRequirement
   | IdDocRequirement
   | LivenessRequirement;
 

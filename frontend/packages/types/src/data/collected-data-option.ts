@@ -4,7 +4,12 @@ import UserDataAttribute from './user-data-attribute';
 export type CollectedDataOption =
   | CollectedKybDataOption
   | CollectedKycDataOption
-  | CollectedDocumentDataOption;
+  | CollectedDocumentDataOption
+  | CollectedInvestorProfileDataOption;
+
+export enum CollectedInvestorProfileDataOption {
+  investorProfile = 'investor_profile',
+}
 
 export enum CollectedKybDataOption {
   name = 'business_name',
@@ -63,6 +68,7 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   business_phone_number: CollectedKybDataOption.phoneNumber,
   business_website: CollectedKybDataOption.website,
   business_beneficial_owners: CollectedKybDataOption.beneficialOwners,
+  investor_profile: CollectedInvestorProfileDataOption.investorProfile,
 };
 
 export const CollectedKybDataOptionToRequiredAttributes: Record<

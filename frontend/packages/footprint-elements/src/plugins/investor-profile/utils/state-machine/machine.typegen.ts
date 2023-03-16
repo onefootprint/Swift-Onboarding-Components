@@ -17,6 +17,7 @@ export interface Typegen0 {
     assignConflictOfInterest: 'conflictOfInterestSubmitted';
     assignEmployment: 'employmentSubmitted';
     assignIncome: 'incomeSubmitted';
+    assignInvestmentGoals: 'investmentGoalsSubmitted';
     assignNetWorth: 'netWorthSubmitted';
     assignRiskTolerance: 'riskToleranceSubmitted';
   };
@@ -30,6 +31,7 @@ export interface Typegen0 {
     | 'employment'
     | 'income'
     | 'init'
+    | 'investmentGoals'
     | 'netWorth'
     | 'riskTolerance';
   tags: never;
