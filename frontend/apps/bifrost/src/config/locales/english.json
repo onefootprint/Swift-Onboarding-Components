@@ -178,7 +178,9 @@
         "business-name": "Business name",
         "business-ein": "EIN",
         "business-address": "Registered address",
-        "business-beneficial-owners": "Beneficial owners"
+        "business-beneficial-owners": "Beneficial owners",
+        "business-website": "Website",
+        "business-phone-number": "Phone number"
       }
     },
     "config-invalid": {
