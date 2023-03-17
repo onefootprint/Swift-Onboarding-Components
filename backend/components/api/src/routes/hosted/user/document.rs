@@ -32,7 +32,8 @@ const SELFIE: &str = "selfie";
 const NUM_RETRIES: i64 = 3;
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
-#[api_v2_operation(description = "POSTs a document to footprint servers", tags(Hosted))]
+/// TODO: rename to /hosted/user/identity_document or find a way to merge in with new generic doc upload endpoint
+#[api_v2_operation(description = "POSTs an Identity document to footprint servers", tags(Hosted))]
 #[actix::post("/hosted/user/document")]
 pub async fn post(
     state: web::Data<State>,

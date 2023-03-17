@@ -6,6 +6,7 @@ use schemars::JsonSchema;
 /// POST request body for sending Footprint identity document images
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct DocumentRequest {
+    //TODO: rename to IdentityDocumentRequest
     /// base64 standard encoded image bytes
     pub front_image: PiiString,
     /// base64 standard encoded image bytes!)

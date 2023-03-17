@@ -62,7 +62,7 @@ impl S3Client {
     {
         let body: ByteStream = ByteStream::from(object);
 
-        tracing::info!("s3: begin put object");
+        tracing::info!(bucket=%bucket, key=%key, "s3: begin put object");
 
         let mut put = self
             .client
@@ -77,9 +77,9 @@ impl S3Client {
 
         put.send().await?;
 
-        tracing::info!("s3: put object complete");
-
-        Ok(format!("{}{}/{}", S3_PATH_PREFIX, bucket, key))
+        let s3_path = format!("{}{}/{}", S3_PATH_PREFIX, bucket, key);
+        tracing::info!(s3_path=%s3_path, "s3: put object complete");
+        Ok(s3_path)
     }
 
     /// For use when > 5MB

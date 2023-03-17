@@ -10,6 +10,7 @@ mod email;
 mod index;
 mod liveness;
 mod token;
+mod upload;
 mod vault;
 
 #[cfg(test)]
@@ -31,5 +32,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(token::get)
         .service(email::verify::post)
         .service(email::challenge::post)
-        .service(consent::post);
+        .service(consent::post)
+        .service(upload::post);
 }

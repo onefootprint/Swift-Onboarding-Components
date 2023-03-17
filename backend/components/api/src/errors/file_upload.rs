@@ -1,17 +1,19 @@
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum ImageUploadError {
+pub enum FileUploadError {
     #[error("invalid file upload body missing")]
     InvalidFileUploadMissing,
     #[error("missing content type (mime)")]
     MissingMimeType,
-    #[error("invalid file not supported or missing")]
-    InvalidImageMimeType,
+    #[error("invalid file type")]
+    InvalidMimeType,
     #[error("invalid file upload body missing: {0}")]
-    MultipartFileUploadError(#[from] actix_multipart::MultipartError),
+    MultipartError(#[from] actix_multipart::MultipartError),
     #[error("image too large: max size is 1MB")]
-    ImageTooLarge,
+    FileTooLarge,
     #[error("invalid content length")]
     InvalidContentLength,
+    #[error("missing filename")]
+    MissingFilename,
 }

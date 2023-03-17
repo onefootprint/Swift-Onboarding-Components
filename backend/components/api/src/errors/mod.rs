@@ -10,8 +10,8 @@ use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
 pub mod challenge;
 pub mod enclave;
+pub mod file_upload;
 pub mod handoff;
-pub mod image_upload;
 pub mod kms;
 pub mod onboarding;
 pub mod proxy;
@@ -111,7 +111,7 @@ pub enum ApiError {
     #[error("Decision error: {0}")]
     DecisionError(#[from] crate::decision::Error),
     #[error("image upload error: {0}")]
-    ImageUploadError(#[from] image_upload::ImageUploadError),
+    FileUploadError(#[from] file_upload::FileUploadError),
     #[error("internal webhook error")]
     WebhooksError(#[from] webhooks::Error),
     #[error("Task error: {0}")]
@@ -219,7 +219,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidProxyBody => StatusCode::BAD_REQUEST,
             ApiError::VaultProxyError(_) => StatusCode::BAD_REQUEST,
-            ApiError::ImageUploadError(_) => StatusCode::BAD_REQUEST,
+            ApiError::FileUploadError(_) => StatusCode::BAD_REQUEST,
             ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
             ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::TaskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
