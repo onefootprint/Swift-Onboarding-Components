@@ -2,6 +2,7 @@ export enum InvestorProfileDataAttribute {
   employmentStatus = 'investor_profile.employment_status',
   occupation = 'investor_profile.occupation',
   employedByBrokerage = 'investor_profile.employed_by_brokerage',
+  employedByBrokerageFirm = 'investor_profile.brokerage_firm_employer',
   annualIncome = 'investor_profile.annual_income',
   netWorth = 'investor_profile.net_worth',
   investmentGoals = 'investor_profile.investment_goals',
@@ -10,11 +11,8 @@ export enum InvestorProfileDataAttribute {
 }
 
 export enum InvestorProfileEmploymentStatus {
-  s1_to10 = `s1_to10`,
-  s11_to50 = `s11_to50`,
-  s51_to100 = `s51_to100`,
-  s101_to1000 = `s101_to1000`,
-  s1001_plus = `s1001_plus`,
+  employed = 'employed',
+  unemployed = 'unemployed',
 }
 
 export enum InvestorProfileEmployedByBrokerage {

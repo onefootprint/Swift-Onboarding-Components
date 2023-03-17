@@ -13,13 +13,14 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignBrokerageEmployment: 'brokerageEmploymentSubmitted';
-    assignConflictOfInterest: 'conflictOfInterestSubmitted';
-    assignEmployment: 'employmentSubmitted';
-    assignIncome: 'incomeSubmitted';
-    assignInvestmentGoals: 'investmentGoalsSubmitted';
-    assignNetWorth: 'netWorthSubmitted';
-    assignRiskTolerance: 'riskToleranceSubmitted';
+    assignData:
+      | 'brokerageEmploymentSubmitted'
+      | 'conflictOfInterestSubmitted'
+      | 'employmentSubmitted'
+      | 'incomeSubmitted'
+      | 'investmentGoalsSubmitted'
+      | 'netWorthSubmitted'
+      | 'riskToleranceSubmitted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

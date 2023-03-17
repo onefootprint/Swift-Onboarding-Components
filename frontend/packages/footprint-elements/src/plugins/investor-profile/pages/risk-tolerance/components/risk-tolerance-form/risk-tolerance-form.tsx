@@ -1,21 +1,36 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { Button } from '@onefootprint/ui';
+import {
+  InvestorProfileData,
+  InvestorProfileDataAttribute,
+} from '@onefootprint/types';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-type RiskToleranceFormProps = {
+import ContinueButton from '../../../../components/continue-button/continue-button';
+import { RiskToleranceData } from '../../../../utils/state-machine/types';
+
+export type RiskToleranceFormProps = {
+  defaultValues?: Pick<
+    InvestorProfileData,
+    InvestorProfileDataAttribute.riskTolerance
+  >;
   isLoading?: boolean;
-  ctaLabel?: string;
+  onSubmit: (data: RiskToleranceData) => void;
 };
 
-const RiskToleranceForm = ({ isLoading, ctaLabel }: RiskToleranceFormProps) => {
-  const { allT } = useTranslation('pages.risk-tolerance.form');
+const RiskToleranceForm = ({
+  isLoading,
+  defaultValues,
+  onSubmit,
+}: RiskToleranceFormProps) => {
+  const { handleSubmit } = useForm<RiskToleranceData>({
+    defaultValues,
+  });
+
   return (
-    <Form>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       {/* TODO: */}
-      <Button type="submit" fullWidth loading={isLoading}>
-        {ctaLabel ?? allT('pages.cta-continue')}
-      </Button>
+      <ContinueButton isLoading={isLoading} />
     </Form>
   );
 };

@@ -1,21 +1,36 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { Button } from '@onefootprint/ui';
+import {
+  InvestorProfileData,
+  InvestorProfileDataAttribute,
+} from '@onefootprint/types';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-type NetWorthFormProps = {
+import ContinueButton from '../../../../components/continue-button/continue-button';
+import { NetWorthData } from '../../../../utils/state-machine/types';
+
+export type NetWorthFormProps = {
   isLoading?: boolean;
-  ctaLabel?: string;
+  defaultValues?: Pick<
+    InvestorProfileData,
+    InvestorProfileDataAttribute.netWorth
+  >;
+  onSubmit: (data: NetWorthData) => void;
 };
 
-const NetWorthForm = ({ isLoading, ctaLabel }: NetWorthFormProps) => {
-  const { allT } = useTranslation('pages.net-worth.form');
+const NetWorthForm = ({
+  isLoading,
+  defaultValues,
+  onSubmit,
+}: NetWorthFormProps) => {
+  const { handleSubmit } = useForm<NetWorthData>({
+    defaultValues,
+  });
+
   return (
-    <Form>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       {/* TODO: */}
-      <Button type="submit" fullWidth loading={isLoading}>
-        {ctaLabel ?? allT('pages.cta-continue')}
-      </Button>
+      <ContinueButton isLoading={isLoading} />
     </Form>
   );
 };

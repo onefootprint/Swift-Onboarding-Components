@@ -13,14 +13,16 @@ const createCollectInvestorProfileDataMachine = () =>
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: {},
+      context: {
+        data: {},
+      },
       states: {
         init: {},
         employment: {
           on: {
             employmentSubmitted: {
               target: 'brokerageEmployment',
-              actions: 'assignEmployment',
+              actions: 'assignData',
             },
           },
         },
@@ -28,7 +30,7 @@ const createCollectInvestorProfileDataMachine = () =>
           on: {
             brokerageEmploymentSubmitted: {
               target: 'income',
-              actions: 'assignBrokerageEmployment',
+              actions: 'assignData',
             },
             navigatedToPrevPage: {
               target: 'employment',
@@ -39,7 +41,7 @@ const createCollectInvestorProfileDataMachine = () =>
           on: {
             incomeSubmitted: {
               target: 'netWorth',
-              actions: 'assignIncome',
+              actions: 'assignData',
             },
             navigatedToPrevPage: {
               target: 'brokerageEmployment',
@@ -50,7 +52,7 @@ const createCollectInvestorProfileDataMachine = () =>
           on: {
             netWorthSubmitted: {
               target: 'investmentGoals',
-              actions: 'assignNetWorth',
+              actions: 'assignData',
             },
             navigatedToPrevPage: {
               target: 'income',
@@ -61,7 +63,7 @@ const createCollectInvestorProfileDataMachine = () =>
           on: {
             investmentGoalsSubmitted: {
               target: 'riskTolerance',
-              actions: 'assignInvestmentGoals',
+              actions: 'assignData',
             },
             navigatedToPrevPage: {
               target: 'netWorth',
@@ -72,7 +74,7 @@ const createCollectInvestorProfileDataMachine = () =>
           on: {
             riskToleranceSubmitted: {
               target: 'conflictOfInterest',
-              actions: 'assignRiskTolerance',
+              actions: 'assignData',
             },
             navigatedToPrevPage: {
               target: 'riskTolerance',
@@ -83,7 +85,7 @@ const createCollectInvestorProfileDataMachine = () =>
           on: {
             conflictOfInterestSubmitted: {
               target: 'completed',
-              actions: 'assignConflictOfInterest',
+              actions: 'assignData',
             },
             navigatedToPrevPage: {
               target: 'riskTolerance',
@@ -97,20 +99,13 @@ const createCollectInvestorProfileDataMachine = () =>
     },
     {
       actions: {
-        // TODO:
-        assignEmployment: assign(context => context),
-        // TODO:
-        assignBrokerageEmployment: assign(context => context),
-        // TODO:
-        assignIncome: assign(context => context),
-        // TODO:
-        assignNetWorth: assign(context => context),
-        // TODO:
-        assignInvestmentGoals: assign(context => context),
-        // TODO:
-        assignRiskTolerance: assign(context => context),
-        // TODO:
-        assignConflictOfInterest: assign(context => context),
+        assignData: assign((context, event) => ({
+          ...context,
+          data: {
+            ...context.data,
+            ...event.payload,
+          },
+        })),
       },
     },
   );

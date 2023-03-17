@@ -1,7 +1,7 @@
-import { UserData } from '../data';
+import { InvestorProfileData, UserData } from '../data';
 
 export type UserDataRequest = {
-  data: UserData;
+  data: UserData | InvestorProfileData;
   authToken: string;
   speculative?: boolean;
 };

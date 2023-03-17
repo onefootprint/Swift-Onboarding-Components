@@ -1,21 +1,37 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { Button } from '@onefootprint/ui';
+import {
+  InvestorProfileData,
+  InvestorProfileDataAttribute,
+} from '@onefootprint/types';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-type EmploymentFormProps = {
+import ContinueButton from '../../../../components/continue-button/continue-button';
+import { EmploymentData } from '../../../../utils/state-machine/types';
+
+export type EmploymentFormProps = {
+  defaultValues?: Pick<
+    InvestorProfileData,
+    | InvestorProfileDataAttribute.employmentStatus
+    | InvestorProfileDataAttribute.occupation
+  >;
   isLoading?: boolean;
-  ctaLabel?: string;
+  onSubmit: (data: EmploymentData) => void;
 };
 
-const EmploymentForm = ({ isLoading, ctaLabel }: EmploymentFormProps) => {
-  const { allT } = useTranslation('pages.employment.form');
+const EmploymentForm = ({
+  defaultValues,
+  isLoading,
+  onSubmit,
+}: EmploymentFormProps) => {
+  const { handleSubmit } = useForm<EmploymentData>({
+    defaultValues,
+  });
+
   return (
-    <Form>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       {/* TODO: */}
-      <Button type="submit" fullWidth loading={isLoading}>
-        {ctaLabel ?? allT('pages.cta-continue')}
-      </Button>
+      <ContinueButton isLoading={isLoading} />
     </Form>
   );
 };

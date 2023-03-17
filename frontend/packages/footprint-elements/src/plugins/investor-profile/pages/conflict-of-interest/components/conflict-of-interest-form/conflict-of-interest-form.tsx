@@ -1,24 +1,36 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { Button } from '@onefootprint/ui';
+import {
+  InvestorProfileData,
+  InvestorProfileDataAttribute,
+} from '@onefootprint/types';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-type ConflictOfInterestFormProps = {
+import ContinueButton from '../../../../components/continue-button/continue-button';
+import { DeclarationData } from '../../../../utils/state-machine/types';
+
+export type ConflictOfInterestFormProps = {
+  defaultValues?: Pick<
+    InvestorProfileData,
+    InvestorProfileDataAttribute.declarations
+  >;
   isLoading?: boolean;
-  ctaLabel?: string;
+  onSubmit: (data: DeclarationData) => void;
 };
 
 const ConflictOfInterestForm = ({
+  defaultValues,
   isLoading,
-  ctaLabel,
+  onSubmit,
 }: ConflictOfInterestFormProps) => {
-  const { allT } = useTranslation('pages.conflict-of-interest.form');
+  const { handleSubmit } = useForm<DeclarationData>({
+    defaultValues,
+  });
+
   return (
-    <Form>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       {/* TODO: */}
-      <Button type="submit" fullWidth loading={isLoading}>
-        {ctaLabel ?? allT('pages.cta-continue')}
-      </Button>
+      <ContinueButton isLoading={isLoading} />
     </Form>
   );
 };

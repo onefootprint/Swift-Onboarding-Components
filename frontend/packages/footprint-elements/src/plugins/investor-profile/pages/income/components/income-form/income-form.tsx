@@ -1,21 +1,36 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { Button } from '@onefootprint/ui';
+import {
+  InvestorProfileData,
+  InvestorProfileDataAttribute,
+} from '@onefootprint/types';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-type IncomeFormProps = {
+import ContinueButton from '../../../../components/continue-button/continue-button';
+import { IncomeData } from '../../../../utils/state-machine/types';
+
+export type IncomeFormProps = {
+  defaultValues?: Pick<
+    InvestorProfileData,
+    InvestorProfileDataAttribute.annualIncome
+  >;
   isLoading?: boolean;
-  ctaLabel?: string;
+  onSubmit: (data: IncomeData) => void;
 };
 
-const IncomeForm = ({ isLoading, ctaLabel }: IncomeFormProps) => {
-  const { allT } = useTranslation('pages.income.form');
+const IncomeForm = ({
+  defaultValues,
+  isLoading,
+  onSubmit,
+}: IncomeFormProps) => {
+  const { handleSubmit } = useForm<IncomeData>({
+    defaultValues,
+  });
+
   return (
-    <Form>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       {/* TODO: */}
-      <Button type="submit" fullWidth loading={isLoading}>
-        {ctaLabel ?? allT('pages.cta-continue')}
-      </Button>
+      <ContinueButton isLoading={isLoading} />
     </Form>
   );
 };
