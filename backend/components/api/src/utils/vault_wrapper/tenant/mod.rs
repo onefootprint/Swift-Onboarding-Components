@@ -1,9 +1,9 @@
 mod accessors;
 mod build;
+pub mod checks;
 mod decrypt;
 mod decrypt_request;
-
-pub mod checks;
+pub mod document;
 pub mod identity_document;
 
 use db::models::onboarding::OnboardingAndConfig;

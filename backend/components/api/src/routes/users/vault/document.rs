@@ -114,7 +114,7 @@ pub async fn post_decrypt(
     };
     // As of 2022-11-28: It's possible a user has more than 1 document of a given document_type
     let decrypted_docs = uvw
-        .decrypt_document(&state, document_type, include_selfie, req)
+        .decrypt_identity_document(&state, document_type, include_selfie, req)
         .await?;
 
     let images = state

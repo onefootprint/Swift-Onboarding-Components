@@ -33,5 +33,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(email::verify::post)
         .service(email::challenge::post)
         .service(consent::post)
-        .service(upload::post);
+        .service(upload::post)
+        .service(upload::document_decrypt);
 }

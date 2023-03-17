@@ -3,6 +3,7 @@ use super::VwArgs;
 use super::{Person, VaultWrapper};
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::ob_configuration::ObConfiguration;
@@ -32,10 +33,17 @@ impl<Type> VaultWrapper<Type> {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
+        documents: Vec<DocumentData>,
         lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<Self> {
-        let (portable, speculative) =
-            VwData::partition(vd, phone_numbers, emails, identity_documents, lifetimes)?;
+        let (portable, speculative) = VwData::partition(
+            vd,
+            phone_numbers,
+            emails,
+            identity_documents,
+            documents,
+            lifetimes,
+        )?;
         let result = Self {
             vault: user_vault,
             portable,
@@ -64,6 +72,7 @@ impl<Type> VaultWrapper<Type> {
         let phone_numbers = PhoneNumber::get_for(conn, &active_lifetime_ids)?;
         let emails = Email::get_for(conn, &active_lifetime_ids)?;
         let identity_documents = IdentityDocumentAndRequest::get_for(conn, &active_lifetime_ids)?;
+        let documents = DocumentData::get_for(conn, &active_lifetime_ids)?;
 
         let result = Self::build_internal(
             uv,
@@ -72,6 +81,7 @@ impl<Type> VaultWrapper<Type> {
             phone_numbers,
             emails,
             identity_documents,
+            documents,
             active_lifetimes,
         )?;
         Ok(result)

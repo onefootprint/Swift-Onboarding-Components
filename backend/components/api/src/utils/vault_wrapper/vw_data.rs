@@ -1,12 +1,14 @@
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::phone_number::PhoneNumber;
 use db::models::vault_data::VaultData;
 use db::{HasLifetime, HasSealedIdentityData};
 use itertools::Itertools;
+use newtypes::DocumentKind;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, IsDataIdentifierDiscriminant};
 use newtypes::{DataLifetimeId, SealedVaultBytes, VdKind};
 use std::collections::{HashMap, HashSet};
@@ -19,7 +21,7 @@ pub(super) struct VwData<Type> {
     pub(super) emails: Vec<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
     pub(super) identity_documents: Vec<IdentityDocumentAndRequest>,
-
+    pub(super) documents: Vec<DocumentData>,
     // A map of all of the DataLifetimes for this data.
     lifetimes: HashMap<DataLifetimeId, DataLifetime>,
     phantom: PhantomData<Type>,
@@ -31,6 +33,7 @@ impl<Type> VwData<Type> {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
+        documents: Vec<DocumentData>,
         all_lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<(Self, Self)> {
         let speculative_lifetime_ids: HashSet<_> = all_lifetimes
@@ -53,6 +56,7 @@ impl<Type> VwData<Type> {
         let (portable_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
         let (portable_identity_documents, speculative_identity_documents) =
             partition(identity_documents, &speculative_lifetime_ids);
+        let (portable_documents, speculative_documents) = partition(documents, &speculative_lifetime_ids);
 
         // TODO some runtime checks that business vaults don't have id data and vice versa
         if portable_vd.iter().any(|vd| matches!(vd.kind, VdKind::Custom(_))) {
@@ -66,6 +70,7 @@ impl<Type> VwData<Type> {
             portable_phone_numbers,
             portable_emails,
             portable_identity_documents,
+            portable_documents,
             &all_lifetimes,
         );
         let speculative = Self::build(
@@ -73,6 +78,7 @@ impl<Type> VwData<Type> {
             speculative_phone_numbers,
             speculative_emails,
             speculative_identity_documents,
+            speculative_documents,
             &all_lifetimes,
         );
         Ok((portable, speculative))
@@ -83,6 +89,7 @@ impl<Type> VwData<Type> {
         phone_numbers: Vec<PhoneNumber>,
         emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
+        documents: Vec<DocumentData>,
         all_lifetimes: &[DataLifetime],
     ) -> Self {
         let lifetime_ids: Vec<Vec<_>> = vec![
@@ -106,6 +113,7 @@ impl<Type> VwData<Type> {
             phone_numbers,
             emails,
             identity_documents,
+            documents,
             lifetimes,
             phantom: PhantomData,
         }
@@ -137,7 +145,8 @@ impl<Type> VwData<Type> {
                 }
             })
             .collect_vec();
-        [emails, phone_numbers, vds, id_docs]
+        let docs = self.documents.iter().map(|d| d.kind.into()).collect_vec();
+        [emails, phone_numbers, vds, id_docs, docs]
             .into_iter()
             .flatten()
             .unique()
@@ -203,5 +212,9 @@ impl<Type> VwData<Type> {
     {
         let value = self.get(id);
         value.map(|v| v.e_data())
+    }
+
+    pub fn get_document(&self, kind: DocumentKind) -> Option<&DocumentData> {
+        self.documents.iter().find(|d| d.kind == kind)
     }
 }

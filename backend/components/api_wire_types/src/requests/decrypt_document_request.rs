@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use newtypes::{flat_api_object_map_type, IdDocKind};
+use newtypes::{flat_api_object_map_type, DocumentKind, IdDocKind};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
@@ -42,4 +42,10 @@ pub struct DecryptIdentityDocumentResponse {
     pub document_type: IdDocKind,
     // image data
     pub images: Vec<ImageData>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct DecryptDocumentRequest {
+    pub kind: DocumentKind,
+    pub reason: String,
 }

@@ -89,7 +89,7 @@ impl TenantUvw {
         Ok(result)
     }
 
-    pub async fn decrypt_document(
+    pub async fn decrypt_identity_document(
         &self,
         state: &State,
         document_type: IdDocKind,

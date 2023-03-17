@@ -1,4 +1,5 @@
 use super::{Person, VaultWrapper};
+use db::models::document_data::DocumentData;
 use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::ob_configuration::ObConfiguration;
@@ -6,6 +7,7 @@ use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::DocumentKind;
 use newtypes::IsDataIdentifierDiscriminant;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
 
@@ -97,5 +99,11 @@ impl<Type> VaultWrapper<Type> {
             })
             .cloned()
             .collect()
+    }
+
+    pub fn get_document(&self, kind: DocumentKind) -> Option<&DocumentData> {
+        self.speculative
+            .get_document(kind)
+            .or_else(|| self.portable.get_document(kind))
     }
 }

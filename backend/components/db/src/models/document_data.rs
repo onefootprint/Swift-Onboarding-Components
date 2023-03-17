@@ -1,5 +1,8 @@
+use crate::schema::data_lifetime;
 use crate::schema::document_data;
 use crate::DbResult;
+use crate::HasLifetime;
+use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -68,5 +71,38 @@ impl DocumentData {
             .values(new_doc)
             .get_result::<DocumentData>(conn.conn())?;
         Ok(res)
+    }
+
+    // TODO: query by DLId's and call from vdbuilder
+    #[tracing::instrument(skip_all)]
+    pub fn latest_for_scoped_vault(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Option<Self>> {
+        let res = document_data::table
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::scoped_user_id.eq(scoped_vault_id))
+            .order_by(document_data::_created_at.desc())
+            .select(document_data::all_columns)
+            .first(conn)
+            .optional()?;
+
+        Ok(res)
+    }
+}
+
+impl HasLifetime for DocumentData {
+    fn lifetime_id(&self) -> &DataLifetimeId {
+        &self.lifetime_id
+    }
+
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
+        let results = document_data::table
+            .filter(document_data::lifetime_id.eq_any(lifetime_ids))
+            .get_results(conn)?;
+        Ok(results)
     }
 }

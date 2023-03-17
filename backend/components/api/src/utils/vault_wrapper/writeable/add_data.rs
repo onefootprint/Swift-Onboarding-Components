@@ -3,9 +3,13 @@ use super::WriteableVw;
 use crate::auth::AuthError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
+use crate::utils::file_upload::FileUpload;
 use crate::utils::fingerprint::NewFingerprints;
 use crate::utils::vault_wrapper::{Business, Person};
+use crate::State;
+use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
 use db::models::email::Email;
 use db::models::phone_number::{NewPhoneNumberArgs, PhoneNumber};
 use db::models::user_timeline::UserTimeline;
@@ -13,8 +17,9 @@ use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, DataRequest, EmailId,
-    Fingerprint, IdentityDataKind as IDK, IsDataIdentifierDiscriminant, KvDataKey, PiiString, VdKind,
+    CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, DataRequest, DocumentKind,
+    EmailId, Fingerprint, IdentityDataKind as IDK, IsDataIdentifierDiscriminant, KvDataKey, PiiString,
+    ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
 };
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
@@ -292,4 +297,80 @@ mod test {
             Ok(())
         }
     }
+}
+
+impl WriteableVw<Person> {
+    // TODO: could later figure out how to merge this into VaultDataBuilder or make a complimentary struct for docs
+    // Docs are fun in that it sounds like we need to support having multiple docs of the same kind in general (eg: right now you can upload 2 FINRA docs)
+    //  so the logic around deactivating/portabalizing DL's is a little divergent here
+    pub fn put_document(
+        self,
+        conn: &mut TxnPgConn,
+        kind: DocumentKind,
+        mime_type: String,
+        filename: String,
+        e_data_key: SealedVaultDataKey,
+        s3_url: String,
+    ) -> ApiResult<DocumentData> {
+        let vault_id = self.vault.id.clone();
+        let scoped_user_id = self.scoped_user_id;
+
+        // TODO: remove Dataliftime constraint on document.* so we can suppport multiple docs at once
+        Ok(DocumentData::create(
+            conn,
+            &vault_id,
+            Some(&scoped_user_id),
+            kind,
+            mime_type,
+            filename,
+            s3_url,
+            e_data_key,
+        )?)
+        // TODO: whoopsie timeline events are CDO-specific so gunna be a little non-trivial to make for doc uploads
+    }
+}
+
+pub async fn encrypt_to_s3(
+    state: &State,
+    file: &FileUpload,
+    kind: DocumentKind,
+    public_key: &VaultPublicKey,
+    vault_id: &VaultId,
+    scoped_vault_id: &ScopedVaultId,
+) -> ApiResult<(SealedVaultDataKey, String)> {
+    let (e_data_key, data_key) =
+        SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
+            public_key.as_ref(),
+        )?;
+    let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
+    let sealed_bytes = data_key.seal_bytes(&file.bytes)?;
+
+    let bucket = &state.config.document_s3_bucket.clone();
+    let key = document_s3_key(vault_id, scoped_vault_id, kind);
+
+    let s3_path = state
+        .s3_client
+        .put_object(bucket, key, sealed_bytes.0, Some(&file.mime_type))
+        .await?;
+
+    tracing::info!(s3_path = s3_path, scoped_vault_id=%scoped_vault_id, vault_id=%vault_id, filename=%file.filename, mime_type=%file.mime_type, "Uploaded Document to S3");
+
+    Ok((e_data_key, s3_path))
+}
+
+fn hash_id<T: ToString>(id: &T) -> String {
+    crypto::base64::encode_config(
+        crypto::sha256(id.to_string().as_str().as_bytes()),
+        crypto::base64::URL_SAFE_NO_PAD,
+    )
+}
+
+fn document_s3_key(vault_id: &VaultId, scoped_vault_id: &ScopedVaultId, kind: DocumentKind) -> String {
+    format!(
+        "docs/encrypted/{}/{}/{}/{}",
+        hash_id(vault_id),
+        hash_id(scoped_vault_id),
+        kind,
+        crypto::random::gen_random_alphanumeric_code(32),
+    )
 }

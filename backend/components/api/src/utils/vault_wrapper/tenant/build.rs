@@ -67,6 +67,7 @@ impl VaultWrapper<Person> {
                     phone_numbers.get(&uv_id).cloned().unwrap_or_default(),
                     emails.get(&uv_id).cloned().unwrap_or_default(),
                     identity_document_map.get(&uv_id).cloned().unwrap_or_default(),
+                    vec![], // Don't currently support multi-get for Documents
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
                 )?;
                 let uvw = TenantUvw {

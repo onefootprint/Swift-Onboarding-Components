@@ -4,6 +4,8 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
+use crate::DataIdentifier;
+
 #[derive(
     Debug,
     Display,
@@ -32,5 +34,11 @@ pub enum DocumentKind {
     FinraComplianceLetter,
 }
 // TODO: one day merge IdDocKind into here
+
+impl From<DocumentKind> for DataIdentifier {
+    fn from(value: DocumentKind) -> Self {
+        Self::Document(value)
+    }
+}
 
 crate::util::impl_enum_str_diesel!(DocumentKind);
