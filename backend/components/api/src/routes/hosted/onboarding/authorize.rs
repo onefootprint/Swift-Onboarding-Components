@@ -24,7 +24,6 @@ use webhooks::events::WebhookEvent;
 pub struct CommitResponse {
     /// Footprint validation token
     validation_token: SessionAuthToken,
-    status: OnboardingStatus,
 }
 
 #[instrument(
@@ -137,10 +136,7 @@ pub async fn post(
     }
 
     Ok(Json(ResponseData {
-        data: CommitResponse {
-            validation_token,
-            status,
-        },
+        data: CommitResponse { validation_token },
     }))
 }
 
