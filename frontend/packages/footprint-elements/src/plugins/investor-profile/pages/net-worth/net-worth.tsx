@@ -1,5 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { InvestorProfileDataAttribute } from '@onefootprint/types';
+import {
+  InvestorProfileDataAttribute,
+  InvestorProfileNetWorth,
+} from '@onefootprint/types';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
@@ -47,7 +50,8 @@ const NetWorth = () => {
         onSubmit={handleSubmit}
         defaultValues={{
           [InvestorProfileDataAttribute.netWorth]:
-            data?.[InvestorProfileDataAttribute.netWorth],
+            data?.[InvestorProfileDataAttribute.netWorth] ||
+            InvestorProfileNetWorth.tt50k,
         }}
       />
     </>
