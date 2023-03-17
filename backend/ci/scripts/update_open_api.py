@@ -80,11 +80,11 @@ if __name__ == "__main__":
     open_api_spec = requests.get("https://api.onefootprint.com/docs-spec-v3").json()
     os.makedirs("out", exist_ok=True)
     public_open_api_spec = get_apis(open_api_spec, "PublicApi")
-    with open("out/API", "w") as f:
+    with open("out/API.json", "w") as f:
         f.write(json.dumps(public_open_api_spec))
         f.close()
     preview_open_api_spec = get_apis(open_api_spec, "Preview")
     os.makedirs("out", exist_ok=True)
-    with open("out/API Preview", "w") as f:
+    with open("out/API Preview.json", "w") as f:
         f.write(json.dumps(preview_open_api_spec))
         f.close()
