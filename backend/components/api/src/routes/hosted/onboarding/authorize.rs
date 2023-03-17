@@ -12,10 +12,12 @@ use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
+use db::models::tenant::Tenant;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use tracing::{field, instrument};
 use webhooks::events::WebhookEvent;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -25,6 +27,15 @@ pub struct CommitResponse {
     status: OnboardingStatus,
 }
 
+#[instrument(
+        fields(
+            tenant_id=field::Empty,
+            tenant_name=field::Empty,
+            onboarding=field::Empty,
+            ob_configuration_id=field::Empty,
+        ),
+        skip_all
+)]
 #[api_v2_operation(
     tags(Hosted, Bifrost),
     description = "Finish onboarding the user. Processes the collected data and returns the validation token that can be exchanged for a permanent Footprint user token."
@@ -37,7 +48,7 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    let (ob_info, biz_ob) = state
+    let (ob_info, biz_ob, tenant) = state
         .db_pool
         .db_query(move |c| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(c)?;
@@ -50,10 +61,22 @@ pub async fn post(
                 return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
             }
             let biz_ob = user_auth.business_onboarding(c)?;
+            let tenant = Tenant::get(c, &ob_info.scoped_user.id)?;
 
-            Ok((ob_info, biz_ob))
+            Ok((ob_info, biz_ob, tenant))
         })
         .await??;
+
+    let span = tracing::Span::current();
+    span.record("tenant_id", &format!("{}", tenant.id));
+    span.record("tenant_name", &tenant.name);
+    span.record("onboarding_id", &format!("{}", ob_info.onboarding.id));
+    span.record("scoped_use_id", &format!("{}", ob_info.scoped_user.id));
+    span.record(
+        "ob_configuration_id",
+        &format!("{}", ob_info.onboarding.ob_configuration_id),
+    );
+
     // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
     // but if we do, we should no-op and succeed
     //

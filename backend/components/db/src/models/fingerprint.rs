@@ -49,12 +49,12 @@ impl Fingerprint {
                     *count > 1 && 
                     // not all DLKs we 1) fingerprint and 2) we expect to be unique
                         match kind {
-                            DataLifetimeKind::Id(k) => k.potentially_should_have_unique_fingerprint(),
+                            DataLifetimeKind::Id(k) => k.should_have_unique_fingerprint(),
                             _ => false
                         }
                     }
                 ).for_each(|(kind, count)| {
-                    tracing::warn!(kind=%kind, count=%count, "same fingerprints used across distinct UserVaults")
+                    tracing::error!(kind=%kind, count=%count, "same fingerprints used across distinct UserVaults")
                 });
             }
             Err(e) => {
