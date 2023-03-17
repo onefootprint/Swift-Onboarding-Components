@@ -20,7 +20,17 @@ const KybCollect = () => {
     'pages.developers.onboarding-configs.create-dialog.kyb-collect-form',
   );
   const [state, send] = useOnboardingConfigMachine();
-  const { register, handleSubmit, watch } = useForm<FormData>();
+  const { kybCollect } = state.context;
+  const { register, handleSubmit, watch } = useForm<FormData>({
+    defaultValues: {
+      [CollectedKybDataOption.website]: kybCollect
+        ? kybCollect[CollectedKybDataOption.website]
+        : false,
+      [CollectedKybDataOption.phoneNumber]: kybCollect
+        ? kybCollect[CollectedKybDataOption.phoneNumber]
+        : false,
+    },
+  });
 
   const handleBeforeSubmit = (formData: FormData) => {
     send({
