@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use crate::schema::data_lifetime;
 use crate::schema::fingerprint;
+use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::dsl::count_distinct;
 use diesel::prelude::*;
-use crate::PgConn;
 use diesel::Queryable;
 use newtypes::{DataLifetimeId, DataLifetimeKind, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};
@@ -36,36 +38,28 @@ pub struct NewFingerprint {
 }
 
 pub type IsUnique = bool;
-
+pub type DuplicateExistingFingerprintsByDLK = HashMap<DataLifetimeKind, i64>;
 impl Fingerprint {
     #[tracing::instrument(skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprint>) -> DbResult<()> {
+    pub fn bulk_create(
+        conn: &mut TxnPgConn,
+        fingerprints: Vec<NewFingerprint>,
+    ) -> DbResult<DuplicateExistingFingerprintsByDLK> {
         // Alert if we see multiple user vaults with the same information
         let new_sh_data = fingerprints.iter().map(|f| f.sh_data.clone()).collect();
         let existing_fingerprints_result = Self::bulk_check_if_exists(conn.conn(), new_sh_data);
-        match existing_fingerprints_result {
-            Ok(existing_fingerprints) => {
-                existing_fingerprints.into_iter().filter(|(kind, count)| {
-                    *count > 1 && 
-                    // not all DLKs we 1) fingerprint and 2) we expect to be unique
-                        match kind {
-                            DataLifetimeKind::Id(k) => k.should_have_unique_fingerprint(),
-                            _ => false
-                        }
-                    }
-                ).for_each(|(kind, count)| {
-                    tracing::error!(kind=%kind, count=%count, "same fingerprints used across distinct UserVaults")
-                });
-            }
+        let duplicates = match existing_fingerprints_result {
+            Ok(existing_fingerprints) => HashMap::from_iter(existing_fingerprints.into_iter()),
             Err(e) => {
-                tracing::warn!(e=%e, "query for duplicate fingerprints failed")
+                tracing::warn!(e=%e, "query for duplicate fingerprints failed");
+                HashMap::new()
             }
-        } 
+        };
 
         diesel::insert_into(fingerprint::table)
             .values(fingerprints)
             .execute(conn.conn())?;
-        Ok(())
+        Ok(duplicates)
     }
 
     #[tracing::instrument(skip_all)]

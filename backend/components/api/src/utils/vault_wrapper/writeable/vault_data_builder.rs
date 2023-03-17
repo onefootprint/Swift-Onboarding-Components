@@ -8,7 +8,7 @@ use db::{
     models::{
         data_lifetime::DataLifetime,
         fingerprint::{Fingerprint, NewFingerprint},
-        vault_data::{NewVaultData, VaultData},
+        vault_data::{NewVaultData, VaultData}, tenant::Tenant, vault::Vault
     },
     TxnPgConn,
 };
@@ -108,7 +108,29 @@ where
                 })
             })
             .collect::<ApiResult<_>>()?;
-        Fingerprint::bulk_create(conn, fingerprints)?;
+        let duplicates = Fingerprint::bulk_create(conn, fingerprints)?;
+        
+        // we don't ? here since if there's errors, we don't need to fail the txn, this is just for logs
+        let tenant = Tenant::get(conn, &scoped_user_id);
+        let user_vault = Vault::get(conn, &user_vault_id);
+
+        if let (Ok(t), Ok(uv)) = (tenant, user_vault) {
+            duplicates.into_iter().filter(|(kind, count)| {
+                *count > 1 && 
+                // not all DLKs we 1) fingerprint and 2) we expect to be unique
+                    match kind {
+                        DataLifetimeKind::Id(k) => k.should_have_unique_fingerprint(),
+                        _ => false
+                    }
+                }
+            ).for_each(|(kind, count)| {
+                // don't error if this is a demo tenant or sandbox user
+                if !t.is_demo_tenant || uv.is_live {
+                    tracing::error!(kind=%kind, count=%count, "same fingerprints used across distinct UserVaults")
+                }
+            });
+        }         
+
         Ok(())
     }
 }
