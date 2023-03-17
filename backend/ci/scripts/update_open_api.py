@@ -4,7 +4,6 @@ import requests
 
 # Every API endpoint must have only one of these tag values
 IDENTIFYING_TAG_VALUES = ["Private", "PublicApi", "Hosted", "Preview"]
-PUBLICLY_VISIBLE_TAG_VALUES = ["PublicApi", "Preview"]
 
 
 class Endpoint:
@@ -17,7 +16,8 @@ class Endpoint:
         self.method = method
         self.path_info = path_info
 
-    def matches(self, tag):
+    @property
+    def identifying_tag(self):
         tags = self.path_info["tags"]
         identifying_tags = set(tags) & set(IDENTIFYING_TAG_VALUES)
         # Enforce that every API has one and only one "identifying tag"
@@ -28,15 +28,16 @@ class Endpoint:
             len(identifying_tags) == 1
         ), f"{self.method.upper()} {self.url} has more than one identifying tags: {tags}"
         identifying_tag = next(iter(identifying_tags))
-        return identifying_tag == tag
+        return identifying_tag
 
     def serialize(self):
         """
         Serializes the Endpoint back into open-api JSON path info
         """
-        existing_description = self.path_info["description"]
-        new_description = f"This is a preview API. By using this, you consent to potentially breaking API changes.\n{existing_description}"
-        return {**self.path_info, "description": new_description}
+        description = self.path_info["description"]
+        if self.identifying_tag == "Preview":
+            description = f"This is a preview API. By using this, you consent to potentially breaking API changes.\n{description}"
+        return {**self.path_info, "description": description}
 
 
 def get_apis(open_api_spec, tag):
@@ -57,7 +58,7 @@ def get_apis(open_api_spec, tag):
         url: {
             method: endpoint.serialize()
             for (method, endpoint) in methods_for_url.items()
-            if endpoint.matches(tag)
+            if endpoint.identifying_tag == tag
         }
         for (url, methods_for_url) in paths.items()
     }
