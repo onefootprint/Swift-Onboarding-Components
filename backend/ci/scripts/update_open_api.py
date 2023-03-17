@@ -1,6 +1,9 @@
 import os
 import json
 import requests
+from collections import defaultdict
+from urllib.parse import unquote
+
 
 # Every API endpoint must have only one of these tag values
 IDENTIFYING_TAG_VALUES = ["Private", "PublicApi", "Hosted", "Preview"]
@@ -30,12 +33,33 @@ class Endpoint:
         identifying_tag = next(iter(identifying_tags))
         return identifying_tag
 
+    @property
+    def schemas(self):
+        """Computes the schemas that are used for the endpoint"""
+        request_type = (
+            self.path_info.get("requestBody", {})
+            .get("content", {})
+            .get("application/json", {})
+            .get("schema", {})
+            .get("$ref")
+        )
+        response_types = [
+            resp.get("content", {})
+            .get("application/json", {})
+            .get("schema", {})
+            .get("$ref")
+            for (_, resp) in self.path_info.get("responses", {}).items()
+        ]
+        all_types = response_types + [request_type]
+        return [unquote(t) for t in all_types if t]
+
     def serialize(self):
         """
         Serializes the Endpoint back into open-api JSON path info
         """
         description = self.path_info["description"]
         if self.identifying_tag == "Preview":
+            # Add a disclaimer tag to all Preview APIs
             description = f"This is a preview API. By using this, you consent to potentially breaking API changes.\n{description}"
         return {**self.path_info, "description": description}
 
@@ -45,33 +69,32 @@ def get_apis(open_api_spec, tag):
     Replace the paths in the open API spec with only the public paths, and validate the tags for
     each endpoint.
     """
-    # Parse paths
-    paths = {
-        url: {
-            method: Endpoint(url, method, path_info)
-            for method, path_info in methods_for_url.items()
-        }
+    # Parse endpoints
+    endpoints = [
+        Endpoint(url, method, path_info)
         for (url, methods_for_url) in open_api_spec["paths"].items()
-    }
-    # Filter out the endpoints that do not have a public tag
-    public_paths = {
-        url: {
-            method: endpoint.serialize()
-            for (method, endpoint) in methods_for_url.items()
-            if endpoint.identifying_tag == tag
-        }
-        for (url, methods_for_url) in paths.items()
-    }
-    # Filter out empty URLs
-    public_paths = {
-        url: methods_for_url
-        for (url, methods_for_url) in public_paths.items()
-        if methods_for_url
-    }
-    # TODO filter out entities not used in public APIs?
+        for method, path_info in methods_for_url.items()
+    ]
+    # Filter out the endpoints that don't have a matching tag.
+    # Track the paths and entity refs that have a matching tag
+    paths_dict = defaultdict(lambda: defaultdict(list))
+    used_entity_refs = set()
+    for endpoint in endpoints:
+        if endpoint.identifying_tag == tag:
+            paths_dict[endpoint.url][endpoint.method].append(endpoint.serialize())
+            used_entity_refs |= set(endpoint.schemas)
+    # Create the final list of all schemas used by the matching endpoints
+    used_schemas = [
+        open_api_spec["components"]["schemas"][schema_ref.split("/")[-1]]
+        for schema_ref in used_entity_refs
+    ]
     return {
         **open_api_spec,
-        "paths": public_paths,
+        "components": {
+            **open_api_spec["components"],
+            "schemas": used_schemas,
+        },
+        "paths": paths_dict,
     }
 
 
