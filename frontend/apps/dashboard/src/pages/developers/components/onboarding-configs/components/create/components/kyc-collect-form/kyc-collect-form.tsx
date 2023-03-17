@@ -1,27 +1,33 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
-import { Checkbox, Divider, Radio, Typography } from '@onefootprint/ui';
-import Link from 'next/link';
+import { Box, Checkbox, Divider, Radio, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import TagList from '../../../onboarding-configs-data/components/onboarding-config-item/components/tag-list';
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import AnimatedContainer from '../animated-container';
 import { useOnboardingConfigMachine } from '../machine-provider';
+import IdDocDescription from './components/id-doc-description';
+import InvestorProfileQuestions from './components/investor-profile-questions';
 
 type FormData = {
   ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
   [CollectedDocumentDataOption.document]: boolean;
   [CollectedDocumentDataOption.documentAndSelfie]: boolean;
+  [CollectedInvestorProfileDataOption.investorProfile]: boolean;
 };
 
-const KycCollectForm = () => {
+type KycCollectFormProps = {
+  showInvestorProfile?: boolean;
+};
+
+const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create-dialog.kyc-collect-form',
   );
@@ -42,6 +48,9 @@ const KycCollectForm = () => {
   const ssnKind = watch('ssnKind');
   const idDoc = watch(CollectedDocumentDataOption.document);
   const selfie = watch(CollectedDocumentDataOption.documentAndSelfie);
+  const investorProfile = watch(
+    CollectedInvestorProfileDataOption.investorProfile,
+  );
   const collectedDataTags = [
     allT('collected-data-options.email'),
     allT('collected-data-options.phone_number'),
@@ -59,6 +68,9 @@ const KycCollectForm = () => {
   } else if (idDoc) {
     collectedDataTags.push(allT('collected-data-options.document'));
   }
+  if (investorProfile) {
+    collectedDataTags.push(allT('collected-data-options.investor_profile'));
+  }
 
   const handleBeforeSubmit = (formData: FormData) => {
     send({
@@ -69,6 +81,8 @@ const KycCollectForm = () => {
           formData[CollectedDocumentDataOption.document],
         [CollectedDocumentDataOption.documentAndSelfie]:
           formData[CollectedDocumentDataOption.documentAndSelfie],
+        [CollectedInvestorProfileDataOption.investorProfile]:
+          formData[CollectedInvestorProfileDataOption.investorProfile],
       },
     });
   };
@@ -108,36 +122,42 @@ const KycCollectForm = () => {
       <Section>
         <Typography variant="label-3">{t('add-ons.title')}</Typography>
         <OptionsContainer data-testid="kyc-collect-form-options">
-          <Checkbox
-            label={allT('collected-data-options.document')}
-            {...register(CollectedDocumentDataOption.document, {
-              onChange: handleIdDocChange,
-            })}
-          />
-          {!idDoc && (
-            <IdDocDescription>
-              <Typography variant="body-3" color="tertiary">
-                <Trans
-                  i18nKey="pages.developers.onboarding-configs.create-dialog.kyc-collect-form.add-ons.document-description"
-                  components={{
-                    a: (
-                      <Link
-                        href="http://www.onefootprint.com/supported-id-documents"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                      />
-                    ),
-                  }}
-                />
-              </Typography>
-            </IdDocDescription>
-          )}
-          <AnimatedContainer isExpanded={idDoc}>
+          <Box>
             <Checkbox
-              label={allT('collected-data-options.selfie')}
-              {...register(CollectedDocumentDataOption.documentAndSelfie)}
+              label={allT('collected-data-options.document')}
+              {...register(CollectedDocumentDataOption.document, {
+                onChange: handleIdDocChange,
+              })}
             />
-          </AnimatedContainer>
+
+            <AnimatedContainer isExpanded={idDoc}>
+              <Checkbox
+                label={allT('collected-data-options.selfie')}
+                {...register(CollectedDocumentDataOption.documentAndSelfie)}
+              />
+            </AnimatedContainer>
+          </Box>
+          {!idDoc && (
+            <DescriptionContainer>
+              <IdDocDescription />
+            </DescriptionContainer>
+          )}
+          {showInvestorProfile && (
+            <>
+              <Checkbox
+                label={t('add-ons.investor-profile.label')}
+                {...register(
+                  CollectedInvestorProfileDataOption.investorProfile,
+                )}
+              />
+              <DescriptionContainer>
+                <Typography variant="body-3" color="tertiary">
+                  {t('add-ons.investor-profile.description')}
+                </Typography>
+                {investorProfile && <InvestorProfileQuestions />}
+              </DescriptionContainer>
+            </>
+          )}
         </OptionsContainer>
       </Section>
     </Form>
@@ -160,9 +180,8 @@ const Section = styled.div`
   `}
 `;
 
-const IdDocDescription = styled.div`
+const DescriptionContainer = styled.div`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[2]};
     margin-left: calc(${theme.spacing[2]} + ${theme.spacing[7]});
   `}
 `;
@@ -170,7 +189,7 @@ const IdDocDescription = styled.div`
 const OptionsContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[2]};
+    gap: ${theme.spacing[3]};
   `}
 `;
 

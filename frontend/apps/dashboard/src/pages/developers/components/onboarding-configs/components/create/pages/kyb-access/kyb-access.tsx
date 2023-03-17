@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 import { Box, Checkbox, Divider, Typography } from '@onefootprint/ui';
@@ -16,7 +17,12 @@ import getFormIdForState from '../../utils/get-form-id-for-state';
 
 type FormData = {
   allKybData: boolean;
-} & Record<CollectedKycDataOption | CollectedDocumentDataOption, boolean>;
+} & Record<
+  | CollectedKycDataOption
+  | CollectedDocumentDataOption
+  | CollectedInvestorProfileDataOption,
+  boolean
+>;
 
 const KybAccess = () => {
   const [state, send] = useOnboardingConfigMachine();
@@ -102,27 +108,28 @@ const KybAccess = () => {
               {...register(CollectedKycDataOption.ssn9)}
             />
           )}
-          <Box>
-            {kycCollect?.[CollectedDocumentDataOption.document] && (
+          {kycCollect?.[CollectedDocumentDataOption.document] && (
+            <Box>
               <Checkbox
                 label={allT('collected-data-options.document')}
                 {...register(CollectedDocumentDataOption.document, {
                   onChange: handleDocumentChange,
                 })}
               />
-            )}
-            <AnimatedContainer
-              isExpanded={
-                !!kycCollect?.[CollectedDocumentDataOption.documentAndSelfie] &&
-                !!idDocAccess
-              }
-            >
-              <Checkbox
-                label={allT('id-doc-type.selfie')}
-                {...register(CollectedDocumentDataOption.documentAndSelfie)}
-              />
-            </AnimatedContainer>
-          </Box>
+              <AnimatedContainer
+                isExpanded={
+                  !!kycCollect?.[
+                    CollectedDocumentDataOption.documentAndSelfie
+                  ] && !!idDocAccess
+                }
+              >
+                <Checkbox
+                  label={allT('id-doc-type.selfie')}
+                  {...register(CollectedDocumentDataOption.documentAndSelfie)}
+                />
+              </AnimatedContainer>
+            </Box>
+          )}
         </OptionsContainer>
       </Form>
     </>

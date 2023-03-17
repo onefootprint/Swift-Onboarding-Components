@@ -1,6 +1,7 @@
 import {
   CollectedDataOption,
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
@@ -95,7 +96,11 @@ const getKycOnboardingConfigFromContext = (
 } => {
   const { kycCollect, kycAccess } = context;
 
-  const mustCollectData: CollectedDataOption[] = [
+  const mustCollectData: (
+    | CollectedKycDataOption
+    | CollectedDocumentDataOption
+    | CollectedInvestorProfileDataOption
+  )[] = [
     CollectedKycDataOption.email,
     CollectedKycDataOption.name,
     CollectedKycDataOption.fullAddress,
@@ -108,11 +113,13 @@ const getKycOnboardingConfigFromContext = (
   } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
     mustCollectData.push(CollectedKycDataOption.ssn9);
   }
-
   if (kycCollect?.[CollectedDocumentDataOption.documentAndSelfie]) {
     mustCollectData.push(CollectedDocumentDataOption.documentAndSelfie);
   } else if (kycCollect?.[CollectedDocumentDataOption.document]) {
     mustCollectData.push(CollectedDocumentDataOption.document);
+  }
+  if (kycCollect?.[CollectedInvestorProfileDataOption.investorProfile]) {
+    mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
   const canAccessData: CollectedDataOption[] = [];
@@ -141,6 +148,9 @@ const getKycOnboardingConfigFromContext = (
     canAccessData.push(CollectedDocumentDataOption.documentAndSelfie);
   } else if (kycAccess?.[CollectedDocumentDataOption.document]) {
     canAccessData.push(CollectedDocumentDataOption.document);
+  }
+  if (kycAccess?.[CollectedInvestorProfileDataOption.investorProfile]) {
+    canAccessData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
   return { mustCollectData, canAccessData };

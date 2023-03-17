@@ -1,5 +1,6 @@
 import {
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
@@ -11,9 +12,12 @@ export type MachineContext = {
     ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
     [CollectedDocumentDataOption.document]: boolean;
     [CollectedDocumentDataOption.documentAndSelfie]: boolean;
+    [CollectedInvestorProfileDataOption.investorProfile]: boolean;
   };
   kycAccess?: Record<
-    CollectedKycDataOption | CollectedDocumentDataOption,
+    | CollectedKycDataOption
+    | CollectedDocumentDataOption
+    | CollectedInvestorProfileDataOption,
     boolean
   >;
   kybCollect?: {
@@ -47,12 +51,15 @@ export type MachineEvents =
         ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
         [CollectedDocumentDataOption.document]: boolean;
         [CollectedDocumentDataOption.documentAndSelfie]: boolean;
+        [CollectedInvestorProfileDataOption.investorProfile]: boolean;
       };
     }
   | {
       type: 'kycAccessSubmitted';
       payload: Record<
-        CollectedKycDataOption | CollectedDocumentDataOption,
+        | CollectedKycDataOption
+        | CollectedDocumentDataOption
+        | CollectedInvestorProfileDataOption,
         boolean
       >;
     }
@@ -68,7 +75,9 @@ export type MachineEvents =
       payload: {
         allKybData: boolean;
         kycAccess: Record<
-          CollectedKycDataOption | CollectedDocumentDataOption,
+          | CollectedKycDataOption
+          | CollectedDocumentDataOption
+          | CollectedInvestorProfileDataOption,
           boolean
         >;
       };

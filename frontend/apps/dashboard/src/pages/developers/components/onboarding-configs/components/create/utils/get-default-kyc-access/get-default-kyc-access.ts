@@ -1,5 +1,6 @@
 import {
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
@@ -10,7 +11,12 @@ const getDefaultKycAccess = (
   kycAccess: MachineContext['kycAccess'],
 ) => {
   const defaultValues: Partial<
-    Record<CollectedKycDataOption | CollectedDocumentDataOption, boolean>
+    Record<
+      | CollectedKycDataOption
+      | CollectedDocumentDataOption
+      | CollectedInvestorProfileDataOption,
+      boolean
+    >
   > = {
     [CollectedKycDataOption.email]: true,
     [CollectedKycDataOption.phoneNumber]: true,
@@ -25,6 +31,8 @@ const getDefaultKycAccess = (
       !!kycCollect?.[CollectedDocumentDataOption.document],
     [CollectedDocumentDataOption.documentAndSelfie]:
       !!kycCollect?.[CollectedDocumentDataOption.documentAndSelfie],
+    [CollectedInvestorProfileDataOption.investorProfile]:
+      !!kycCollect?.[CollectedInvestorProfileDataOption.investorProfile],
   };
 
   if (kycAccess) {

@@ -76,7 +76,7 @@
     "business_phone_number": "Business phone number",
     "business_website": "Business website",
     "business_beneficial_owners": "Business beneficial owners",
-    "investor_profile": "Investor Profile"
+    "investor_profile": "Investor profile"
   },
   "collected-kyb-data-options": {
     "name": "Legal business name",
@@ -852,7 +852,20 @@
             "ssn": "SSN",
             "add-ons": {
               "title": "Add-ons",
-              "document-description": "We might still need to ask some users to capture their ID Document as part of our step-up verification flow. For the full list of countries and document types we support, please go <a>here.</a>"
+              "document-description": "We might still need to ask some users to capture their ID Document as part of our step-up verification flow. For the full list of countries and document types we support, please go <a>here.</a>",
+              "investor-profile": {
+                "label": "Broker questions (Investor profile)",
+                "description": "Required for all brokerage and investment apps.",
+                "questions": {
+                  "employment": "What's your employment status and occupation?",
+                  "brokerage-employment": "Are you employed by a brokerage firm?",
+                  "income": "What's your annual income?",
+                  "net-worth": "What's your net worth?",
+                  "investment-goals": "What are your investment goals?",
+                  "risk-tolerance": "How would you describe your risk tolerance?",
+                  "conflict-of-interest": "Do any of the following apply to you or a member of your immediate family?"
+                }
+              }
             }
           },
           "kyc-access-form": {

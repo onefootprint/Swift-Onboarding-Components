@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 import { Box, Checkbox } from '@onefootprint/ui';
@@ -15,7 +16,9 @@ import getDefaultKycAccess from '../../utils/get-default-kyc-access/get-default-
 import getFormIdForState from '../../utils/get-form-id-for-state';
 
 type FormData = Record<
-  CollectedKycDataOption | CollectedDocumentDataOption,
+  | CollectedKycDataOption
+  | CollectedDocumentDataOption
+  | CollectedInvestorProfileDataOption,
   boolean
 >;
 
@@ -87,27 +90,34 @@ const KycAccess = () => {
               {...register(CollectedKycDataOption.ssn9)}
             />
           )}
-          <Box>
-            {kycCollect?.[CollectedDocumentDataOption.document] && (
+          {kycCollect?.[CollectedDocumentDataOption.document] && (
+            <Box>
               <Checkbox
                 label={allT('collected-data-options.document')}
                 {...register(CollectedDocumentDataOption.document, {
                   onChange: handleDocumentChange,
                 })}
               />
-            )}
-            <AnimatedContainer
-              isExpanded={
-                !!kycCollect?.[CollectedDocumentDataOption.documentAndSelfie] &&
-                !!idDocAccess
-              }
-            >
-              <Checkbox
-                label={allT('id-doc-type.selfie')}
-                {...register(CollectedDocumentDataOption.documentAndSelfie)}
-              />
-            </AnimatedContainer>
-          </Box>
+              <AnimatedContainer
+                isExpanded={
+                  !!kycCollect?.[
+                    CollectedDocumentDataOption.documentAndSelfie
+                  ] && !!idDocAccess
+                }
+              >
+                <Checkbox
+                  label={allT('id-doc-type.selfie')}
+                  {...register(CollectedDocumentDataOption.documentAndSelfie)}
+                />
+              </AnimatedContainer>
+            </Box>
+          )}
+          {kycCollect?.[CollectedInvestorProfileDataOption.investorProfile] && (
+            <Checkbox
+              label={allT('collected-data-options.investor_profile')}
+              {...register(CollectedInvestorProfileDataOption.investorProfile)}
+            />
+          )}
         </OptionsContainer>
       </Form>
     </>

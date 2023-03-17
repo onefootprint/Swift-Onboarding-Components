@@ -14,11 +14,7 @@ const AnimatedContainer = ({
   const [animate] = useAutoAnimate<HTMLDivElement>();
   return (
     <Box ref={animate}>
-      {isExpanded && (
-        <Box sx={{ marginLeft: 5, marginTop: 3, marginBottom: 3 }}>
-          {children}
-        </Box>
-      )}
+      {isExpanded && <Box sx={{ marginLeft: 5, marginTop: 3 }}>{children}</Box>}
     </Box>
   );
 };
