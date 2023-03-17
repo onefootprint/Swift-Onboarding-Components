@@ -14,7 +14,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
     <div>
       <Typography variant="label-3">User</Typography>
       <DataGrid>
-        <Typography variant="label-3" color="tertiary">
+        <Typography variant="body-3" color="tertiary">
           Footprint token
         </Typography>
         <CodeContainer>
@@ -26,25 +26,25 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
       <div>
         <Typography variant="label-3">Metadata</Typography>
         <DataGrid>
-          <Typography variant="label-3" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             Region
           </Typography>
           <Typography variant="body-3" isPrivate>
             {getRegionForInsightEvent(accessEvent.insightEvent) || '-'}
           </Typography>
-          <Typography variant="label-3" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             IP Address
           </Typography>
           <Typography variant="body-3" isPrivate>
             {accessEvent.insightEvent.ipAddress || '-'}
           </Typography>
-          <Typography variant="label-3" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             Country
           </Typography>
           <Typography variant="body-3" isPrivate>
             {accessEvent.insightEvent.country || '-'}
           </Typography>
-          <Typography variant="label-3" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             Device/OS
           </Typography>
           <Box
@@ -57,7 +57,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
               {displayForUserAgent(accessEvent.insightEvent.userAgent || '')}
             </Typography>
           </Box>
-          <Typography variant="label-3" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             Zip code
           </Typography>
           <Typography variant="body-3" isPrivate>
@@ -68,7 +68,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
     )}
     <div>
       <Box sx={{ marginBottom: 5 }}>
-        <Typography variant="label-3">Reason</Typography>
+        <Typography variant="body-3">Reason</Typography>
       </Box>
       <Typography variant="body-3">{accessEvent.reason || '-'}</Typography>
     </div>

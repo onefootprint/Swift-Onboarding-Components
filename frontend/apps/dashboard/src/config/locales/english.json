@@ -75,15 +75,8 @@
     "business_address": "Registered business address",
     "business_phone_number": "Business phone number",
     "business_website": "Business website",
-    "business_beneficial_owners": "Business beneficial owners"
-  },
-  "collected-kyb-data-options": {
-    "name": "Legal business name",
-    "ein": "Employer Identification Number (EIN)",
-    "address": "Registered business address",
-    "beneficial_owner": "Beneficial owner",
-    "website": "Website",
-    "phone_number": "Phone number"
+    "business_beneficial_owners": "Business beneficial owners",
+    "investor_profile": "Investor Profile"
   },
   "collected-kyb-data-options": {
     "name": "Legal business name",
@@ -1164,17 +1157,13 @@
             }
           },
           "permissions": {
-            "label": "Permissions",
-            "scopes": {
-              "read": "Read only",
-              "onboarding-configuration": "Manage onboarding configuration",
-              "api-keys": "Manage API keys",
-              "vault-proxy": "Manage vault proxy",
-              "org-settings": "Modify organization settings",
-              "manual-review": "Perform manual review",
-              "decrypt-attributes": "Permissible attributes",
-              "decrypt": "Decrypt data"
-            }
+            "title": "Permissions"
+          },
+          "decrypt": {
+            "label": "Decrypt data"
+          },
+          "decrypt-attributes": {
+            "label": "Permissible attributes"
           }
         },
         "scopes": {
@@ -1199,7 +1188,8 @@
             "email": "Email",
             "phone_number": "Phone number",
             "documents": "Documents",
-            "custom": "Custom attributes"
+            "custom": "Custom attributes",
+            "investor_profile": "Broker questions (Investor profile)"
           }
         }
       }

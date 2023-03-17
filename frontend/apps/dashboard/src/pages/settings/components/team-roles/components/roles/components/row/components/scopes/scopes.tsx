@@ -50,7 +50,7 @@ const Tags = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-wrap: wrap;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[2]};
     padding: ${theme.spacing[3]} 0;
   `}
 `;

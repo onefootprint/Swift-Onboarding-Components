@@ -16,7 +16,7 @@ import useDecryptOptions from './hooks/use-decrypt-options';
 
 const Permissions = () => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
-  const { t } = useTranslation('pages.settings.roles.form.permissions');
+  const { t } = useTranslation('pages.settings.roles');
   const { register, watch, control, setValue, getValues } = useFormContext();
   const decryptOptions = useDecryptOptions();
   const showDecryptSelect = watch('showDecrypt');
@@ -35,36 +35,39 @@ const Permissions = () => {
   return (
     <>
       <Box sx={{ marginBottom: 5 }}>
-        <Typography variant="label-2">{t('label')}</Typography>
+        <Typography variant="label-2">{t('form.permissions.title')}</Typography>
       </Box>
       <ToggleContainer>
         <Checkbox disabled label={t('scopes.read')} checked />
         <Checkbox
-          label={t('scopes.onboarding-configuration')}
+          label={t('scopes.onboarding_configuration')}
           value="onboarding_configuration"
           {...register('scopes')}
         />
         <Checkbox
-          label={t('scopes.api-keys')}
+          label={t('scopes.api_keys')}
           value="api_keys"
           {...register('scopes')}
         />
         <Checkbox
-          label={t('scopes.vault-proxy')}
+          label={t('scopes.vault_proxy')}
           value="vault_proxy"
           {...register('scopes')}
         />
         <Checkbox
-          label={t('scopes.org-settings')}
+          label={t('scopes.org_settings')}
           value="org_settings"
           {...register('scopes')}
         />
         <Checkbox
-          label={t('scopes.manual-review')}
+          label={t('scopes.manual_review')}
           value="manual_review"
           {...register('scopes')}
         />
-        <Checkbox label={t('scopes.decrypt')} {...register('showDecrypt')} />
+        <Checkbox
+          label={t('form.decrypt.label')}
+          {...register('showDecrypt')}
+        />
         <div ref={animateDecryptSelect}>
           {showDecryptSelect && (
             <DecryptContainer>
@@ -74,7 +77,7 @@ const Permissions = () => {
                 rules={{ required: true }}
                 render={({ field }) => (
                   <MultiSelect
-                    label={t('scopes.decrypt-attributes')}
+                    label={t('form.decrypt-attributes.label')}
                     options={decryptOptions}
                     size="compact"
                     onBlur={field.onBlur}

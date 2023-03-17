@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { RoleScope } from '@onefootprint/types';
 
 export type Option = {
@@ -11,15 +12,17 @@ export type Group = {
 };
 
 const useDecryptOptions = () => {
+  const { t } = useTranslation('pages.settings.roles.scopes');
+
   const defaultOptions: Group[] = [
     {
       label: 'Basic Data',
       options: [
-        { value: RoleScope.decryptName, label: 'Full name' },
-        { value: RoleScope.decryptEmail, label: 'Email' },
+        { value: RoleScope.decryptName, label: t('decrypt.name') },
+        { value: RoleScope.decryptEmail, label: t('decrypt.email') },
         {
           value: RoleScope.decryptPhoneNumber,
-          label: 'Phone number',
+          label: t('decrypt.phone_number'),
         },
       ],
     },
@@ -28,17 +31,17 @@ const useDecryptOptions = () => {
       options: [
         {
           value: RoleScope.decryptSsn9,
-          label: 'SSN',
+          label: t('decrypt.ssn9'),
         },
         {
           value: RoleScope.decryptSsn4,
-          label: 'SSN (last 4)',
+          label: t('decrypt.ssn4'),
         },
         {
           value: RoleScope.decryptDob,
-          label: 'Date of Birth',
+          label: t('decrypt.dob'),
         },
-        { value: RoleScope.decryptDocuments, label: 'ID documents' },
+        { value: RoleScope.decryptDocuments, label: t('decrypt.documents') },
       ],
     },
     {
@@ -46,11 +49,11 @@ const useDecryptOptions = () => {
       options: [
         {
           value: RoleScope.decryptFullAddress,
-          label: 'Full address',
+          label: t('decrypt.full_address'),
         },
         {
           value: RoleScope.decryptPartialAddress,
-          label: 'Partial address',
+          label: t('decrypt.partial_address'),
         },
       ],
     },
@@ -59,7 +62,11 @@ const useDecryptOptions = () => {
       options: [
         {
           value: RoleScope.decryptCustom,
-          label: 'Custom data',
+          label: t('decrypt.custom'),
+        },
+        {
+          value: RoleScope.decryptInvestorProfile,
+          label: t('decrypt.investor_profile'),
         },
       ],
     },

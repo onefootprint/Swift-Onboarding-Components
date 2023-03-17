@@ -84,7 +84,7 @@ const Insights = () => {
             </Typography>
             {insightEvent.ipAddress && (
               <Row>
-                <Typography variant="label-3" color="tertiary">
+                <Typography variant="body-3" color="tertiary">
                   IP Address
                 </Typography>
                 <Typography variant="body-3" isPrivate>
@@ -93,7 +93,7 @@ const Insights = () => {
               </Row>
             )}
             <Row>
-              <Typography variant="label-3" color="tertiary">
+              <Typography variant="body-3" color="tertiary">
                 Biometric
               </Typography>
               <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
@@ -116,7 +116,7 @@ const Insights = () => {
             </Row>
             {getRegionForInsightEvent(insightEvent) && (
               <Row>
-                <Typography variant="label-3" color="tertiary">
+                <Typography variant="body-3" color="tertiary">
                   Region
                 </Typography>
                 <Typography variant="body-3" isPrivate>
@@ -126,7 +126,7 @@ const Insights = () => {
             )}
             {insightEvent.country && (
               <Row>
-                <Typography variant="label-3" color="tertiary">
+                <Typography variant="body-3" color="tertiary">
                   Country
                 </Typography>
                 <Typography variant="body-3" isPrivate>
