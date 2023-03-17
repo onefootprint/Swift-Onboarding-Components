@@ -68,6 +68,23 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    document_data (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        lifetime_id -> Text,
+        kind -> Text,
+        mime_type -> Text,
+        filename -> Text,
+        s3_url -> Text,
+        e_data_key -> Bytea,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     document_request (id) {
         id -> Text,
         scoped_user_id -> Text,
@@ -701,6 +718,7 @@ joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(annotation -> scoped_user (scoped_user_id));
 joinable!(data_lifetime -> scoped_user (scoped_user_id));
 joinable!(data_lifetime -> user_vault (user_vault_id));
+joinable!(document_data -> data_lifetime (lifetime_id));
 joinable!(document_request -> scoped_user (scoped_user_id));
 joinable!(email -> data_lifetime (lifetime_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
@@ -754,6 +772,7 @@ allow_tables_to_appear_in_same_query!(
     annotation,
     business_owner,
     data_lifetime,
+    document_data,
     document_request,
     email,
     fingerprint,
