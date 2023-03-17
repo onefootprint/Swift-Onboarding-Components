@@ -55,7 +55,7 @@ export const createOnboardingConfigMachine = () =>
         kycAccess: {
           on: {
             kycAccessSubmitted: {
-              target: 'kybCollect',
+              target: 'complete',
               actions: ['assignKycAccess'],
             },
             prevClicked: {
@@ -88,13 +88,16 @@ export const createOnboardingConfigMachine = () =>
         kybAccess: {
           on: {
             kybAccessSubmitted: {
-              target: 'kybBoCollect',
+              target: 'complete',
               actions: ['assignKybAccess'],
             },
             prevClicked: {
               target: 'kybBoCollect',
             },
           },
+        },
+        complete: {
+          type: 'final',
         },
       },
     },
@@ -122,7 +125,10 @@ export const createOnboardingConfigMachine = () =>
         })),
         assignKybAccess: assign((context, event) => ({
           ...context,
-          kybAccess: event.payload,
+          kycAccess: event.payload.kycAccess,
+          kybAccess: {
+            allKybData: event.payload.allKybData,
+          },
         })),
       },
     },

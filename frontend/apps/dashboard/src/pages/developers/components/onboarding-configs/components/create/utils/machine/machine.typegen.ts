@@ -24,6 +24,7 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'complete'
     | 'kybAccess'
     | 'kybBoCollect'
     | 'kybCollect'

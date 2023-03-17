@@ -22,10 +22,6 @@ export type MachineContext = {
   };
   kybAccess?: {
     allKybData: boolean;
-    kycData: Record<
-      CollectedKycDataOption | CollectedDocumentDataOption,
-      boolean
-    >;
   };
 };
 
@@ -71,7 +67,7 @@ export type MachineEvents =
       type: 'kybAccessSubmitted';
       payload: {
         allKybData: boolean;
-        kycData: Record<
+        kycAccess: Record<
           CollectedKycDataOption | CollectedDocumentDataOption,
           boolean
         >;

@@ -859,7 +859,21 @@
             "title": "KYC of a Beneficial owner",
             "description": "To successfully verify a business we also need to verify its beneficial owner's identity."
           },
-          "kyb-access-form": {}
+          "kyb-access-form": {
+            "title": "Authorized scopes",
+            "description": "Select the data attributes you need read access to after an onboarding. During onboarding, the user will \"authorize\" access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected.",
+            "all-business-info": "All business information",
+            "beneficial-owner": "Beneficial owner"
+          },
+          "cta": {
+            "aria-label": "Creating a new onboarding config..."
+          },
+          "feedback": {
+            "success": {
+              "title": "Success",
+              "description": "Onboarding config created successfully."
+            }
+          }
         },
         "create": {
           "title": "Create onboarding config",

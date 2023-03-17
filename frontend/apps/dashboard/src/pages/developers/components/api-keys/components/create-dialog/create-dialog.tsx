@@ -43,6 +43,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   return (
     <Dialog
       size="compact"
+      testID="create-dialog"
       title={t('title')}
       primaryButton={{
         form: 'create-secret-key-form',
