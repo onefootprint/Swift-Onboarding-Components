@@ -91,11 +91,6 @@ fn test_evaluate_onboarding_rules(
         })
         .times(1)
         .return_once(move |_| should_use_conservative_rules);
-    mock_ff_client
-        .expect_flag()
-        .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&onboarding_rules::temp_watchlist().name))
-        .times(1)
-        .return_once(move |_| false);
 
     // function under test
     evaluate_onboarding_rules(&feature_vector, &mock_ff_client).unwrap()

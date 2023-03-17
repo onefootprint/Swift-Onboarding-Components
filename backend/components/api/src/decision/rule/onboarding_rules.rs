@@ -181,20 +181,6 @@ pub fn experian_rules() -> RuleSet<ExperianFeatures> {
         name: RuleSetName::ExperianRules,
     }
 }
-// will remove once we make sure the score based rule is working
-pub fn temp_watchlist() -> RuleSet<IDologyFeatures> {
-    let rule = Rule {
-        rule: |f: &IDologyFeatures| {
-            f.footprint_reason_codes
-                .contains(&FootprintReasonCode::PotentialWatchlistHit)
-        },
-        name: RuleName::WatchlistHit,
-    };
-    RuleSet {
-        rules: vec![rule],
-        name: RuleSetName::TempWatchlist,
-    }
-}
 
 #[cfg(test)]
 mod tests {

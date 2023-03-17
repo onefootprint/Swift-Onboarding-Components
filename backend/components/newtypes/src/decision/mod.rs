@@ -6,6 +6,5 @@ pub enum RuleSetName {
     IdologyBaseRules,
     IdologyConservativeFailingRules,
     ExperianRules,
-    TempWatchlist,
     Test(String),
 }

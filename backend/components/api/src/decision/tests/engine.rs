@@ -212,12 +212,6 @@ async fn test_run(
         .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&RuleSetName::IdologyConservativeFailingRules))
         .returning(|_| true);
 
-    mock_ff_client
-        .expect_flag()
-        .times(1)
-        .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&RuleSetName::TempWatchlist))
-        .returning(|_| true);
-
     mock_twilio_api_call
         .expect_make_request()
         .times(1)

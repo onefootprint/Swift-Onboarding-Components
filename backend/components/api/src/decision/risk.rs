@@ -125,13 +125,10 @@ pub fn evaluate_onboarding_rules(
     // The set of rules that determine if a user passes onboarding
     let prod_idology_rules = vec![onboarding_rules::idology_base_rule_set()];
     // Additional sets of rules that might be toggled on via a FF or by tenant
-    let additional_idology_rules = vec![
-        onboarding_rules::idology_conservative_rule_set(),
-        onboarding_rules::temp_watchlist(),
-    ]
-    .into_iter()
-    .map(|rs| ActionableRuleSetBuilder::new(rs).build(feature_flag_client))
-    .collect();
+    let additional_idology_rules = vec![onboarding_rules::idology_conservative_rule_set()]
+        .into_iter()
+        .map(|rs| ActionableRuleSetBuilder::new(rs).build(feature_flag_client))
+        .collect();
 
     //
     // PROD
