@@ -19,6 +19,7 @@ import { USER_HEADER_ACTIONS_ID } from 'src/pages/users/pages/user-details/const
 import DecryptMachineProvider from '../../../decrypt-machine-provider';
 import VaultData from './vault-data';
 import {
+  getTextByRow,
   selectDecryptReasonAndContinue,
   withRiskSignals,
   withUser,
@@ -118,21 +119,18 @@ describe('<VaultDataContent />', () => {
           await selectDecryptReasonAndContinue();
 
           await waitFor(() => {
-            const nameRow = screen.getByRole('row', { name: 'Full name' });
-            const nameValue = within(nameRow).getByText('Jane Doe');
-            expect(nameValue).toBeInTheDocument();
+            const name = getTextByRow('Full name', 'Jane Doe');
+            expect(name).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const emailRow = screen.getByRole('row', { name: 'Email' });
-            const emailValue = within(emailRow).getByText('jane.doe@acme.com');
-            expect(emailValue).toBeInTheDocument();
+            const email = getTextByRow('Email', 'jane.doe@acme.com');
+            expect(email).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const phoneRow = screen.getByRole('row', { name: 'Phone number' });
-            const phoneValue = within(phoneRow).getByText('+14259334138');
-            expect(phoneValue).toBeInTheDocument();
+            const phone = getTextByRow('Phone number', '+14259334138');
+            expect(phone).toBeInTheDocument();
           });
         });
       });
@@ -142,17 +140,14 @@ describe('<VaultDataContent />', () => {
       it('should display the encrypted data', async () => {
         await renderVaultDataAndWaitData();
 
-        const ssnRow = screen.getByRole('row', { name: 'SSN (Full)' });
-        const ssnValue = within(ssnRow).getByText('•••••••••');
-        expect(ssnValue).toBeInTheDocument();
+        const ssn = getTextByRow('SSN (Full)', '•••••••••');
+        expect(ssn).toBeInTheDocument();
 
-        const ssn4Row = screen.getByRole('row', { name: 'SSN (Last 4)' });
-        const ssn4Value = within(ssn4Row).getByText('•••••••••');
-        expect(ssn4Value).toBeInTheDocument();
+        const ssn4 = getTextByRow('SSN (Last 4)', '•••••••••');
+        expect(ssn4).toBeInTheDocument();
 
-        const dobRow = screen.getByRole('row', { name: 'Date of Birth' });
-        const dobValue = within(dobRow).getByText('•••••••••');
-        expect(dobValue).toBeInTheDocument();
+        const dob = getTextByRow('Date of Birth', '•••••••••');
+        expect(dob).toBeInTheDocument();
       });
 
       describe('when clicking on the decrypt button', () => {
@@ -192,21 +187,18 @@ describe('<VaultDataContent />', () => {
           await selectDecryptReasonAndContinue();
 
           await waitFor(() => {
-            const ssnRow = screen.getByRole('row', { name: 'SSN (Full)' });
-            const ssnValue = within(ssnRow).getByText('234324324');
-            expect(ssnValue).toBeInTheDocument();
+            const ssn = getTextByRow('SSN (Full)', '234324324');
+            expect(ssn).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const ssn4Row = screen.getByRole('row', { name: 'SSN (Last 4)' });
-            const ssn4Value = within(ssn4Row).getByText('4324');
-            expect(ssn4Value).toBeInTheDocument();
+            const ssn4 = getTextByRow('SSN (Last 4)', '4324');
+            expect(ssn4).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const dobRow = screen.getByRole('row', { name: 'Date of Birth' });
-            const dobValue = within(dobRow).getByText('1990-01-04');
-            expect(dobValue).toBeInTheDocument();
+            const dob = getTextByRow('Date of Birth', '1990-01-04');
+            expect(dob).toBeInTheDocument();
           });
         });
       });
@@ -216,34 +208,23 @@ describe('<VaultDataContent />', () => {
       it('should display the encrypted data', async () => {
         await renderVaultDataAndWaitData();
 
-        const addressLine1Row = screen.getByRole('row', {
-          name: 'Address line 1',
-        });
-        const addressLine1Value =
-          within(addressLine1Row).getByText('•••••••••');
-        expect(addressLine1Value).toBeInTheDocument();
+        const addressLine1 = getTextByRow('Address line 1', '•••••••••');
+        expect(addressLine1).toBeInTheDocument();
 
-        const addressLine2Row = screen.getByRole('row', {
-          name: 'Address line 2',
-        });
-        const addressLine2Value = within(addressLine2Row).getByText('-');
-        expect(addressLine2Value).toBeInTheDocument();
+        const addressLine2 = getTextByRow('Address line 2', '-');
+        expect(addressLine2).toBeInTheDocument();
 
-        const cityRow = screen.getByRole('row', { name: 'City' });
-        const cityValue = within(cityRow).getByText('•••••••••');
-        expect(cityValue).toBeInTheDocument();
+        const city = getTextByRow('City', '•••••••••');
+        expect(city).toBeInTheDocument();
 
-        const stateRow = screen.getByRole('row', { name: 'State' });
-        const stateValue = within(stateRow).getByText('•••••••••');
-        expect(stateValue).toBeInTheDocument();
+        const state = getTextByRow('State', '•••••••••');
+        expect(state).toBeInTheDocument();
 
-        const zipRow = screen.getByRole('row', { name: 'Zip code' });
-        const zipValue = within(zipRow).getByText('•••••••••');
-        expect(within(zipValue).getByText('•••••••••')).toBeInTheDocument();
+        const zip = getTextByRow('Zip code', '•••••••••');
+        expect(zip).toBeInTheDocument();
 
-        const countryRow = screen.getByRole('row', { name: 'Country' });
-        const countryValue = within(countryRow).getByText('•••••••••');
-        expect(countryValue).toBeInTheDocument();
+        const country = getTextByRow('Country', '•••••••••');
+        expect(country).toBeInTheDocument();
       });
 
       describe('when clicking on the decrypt button', () => {
@@ -295,32 +276,64 @@ describe('<VaultDataContent />', () => {
           await selectDecryptReasonAndContinue();
 
           await waitFor(() => {
-            const addressLineRow = screen.getByRole('row', {
-              name: 'Address line 1',
-            });
-            const addressLineValue =
-              within(addressLineRow).getByText('14 Linda Street');
-            expect(addressLineValue).toBeInTheDocument();
+            const addressLine1 = getTextByRow(
+              'Address line 1',
+              '14 Linda Street',
+            );
+            expect(addressLine1).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const cityRow = screen.getByRole('row', { name: 'City' });
-            const cityValue = within(cityRow).getByText('San Francisco');
-            expect(cityValue).toBeInTheDocument();
+            const city = getTextByRow('City', 'San Francisco');
+            expect(city).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const stateRow = screen.getByRole('row', { name: 'State' });
-            const stateValue = within(stateRow).getByText('CA');
-            expect(stateValue).toBeInTheDocument();
+            const state = getTextByRow('State', 'CA');
+            expect(state).toBeInTheDocument();
           });
 
           await waitFor(() => {
-            const countryRow = screen.getByRole('row', { name: 'Country' });
-            const contryValue = within(countryRow).getByText('US');
-            expect(contryValue).toBeInTheDocument();
+            const country = getTextByRow('Country', 'US');
+            expect(country).toBeInTheDocument();
           });
         });
+      });
+    });
+
+    describe('investor profile data', () => {
+      it('should display the encrypted data', async () => {
+        await renderVaultDataAndWaitData();
+
+        const employment = getTextByRow('Employment status', '•••••••••');
+        expect(employment).toBeInTheDocument();
+
+        const occupation = getTextByRow('Occupation', '•••••••••');
+        expect(occupation).toBeInTheDocument();
+
+        const brokerageFirm = getTextByRow(
+          'Employed by brokerage firm?',
+          '•••••••••',
+        );
+        expect(brokerageFirm).toBeInTheDocument();
+
+        const annualIncome = getTextByRow('Annual income', '•••••••••');
+        expect(annualIncome).toBeInTheDocument();
+
+        const netWorth = getTextByRow('Net worth', '•••••••••');
+        expect(netWorth).toBeInTheDocument();
+
+        const investmentGoals = getTextByRow('Investment goals', '•••••••••');
+        expect(investmentGoals).toBeInTheDocument();
+
+        const riskTolerance = getTextByRow('Risk tolerance', '•••••••••');
+        expect(riskTolerance).toBeInTheDocument();
+
+        const declarations = getTextByRow('Declaration(s)', '•••••••••');
+        expect(declarations).toBeInTheDocument();
+
+        const complianceLetter = getTextByRow('Compliance letter', '•••••••••');
+        expect(complianceLetter).toBeInTheDocument();
       });
     });
   });

@@ -7,9 +7,11 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
+  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
   DecisionSourceKind,
   DecisionStatus,
+  InvestorProfileDataAttribute,
   OnboardingStatus,
   RiskSignal,
   RiskSignalSeverity,
@@ -50,7 +52,17 @@ export const riskSignalsFixture: RiskSignal[] = [
 export const userFixture: ScopedUser = {
   id: 'fp_id_rybIhIjSPky1yEZ7u77cok',
   isPortable: true,
-  attributes: [],
+  attributes: [
+    InvestorProfileDataAttribute.employmentStatus,
+    InvestorProfileDataAttribute.occupation,
+    InvestorProfileDataAttribute.employedByBrokerage,
+    InvestorProfileDataAttribute.annualIncome,
+    InvestorProfileDataAttribute.netWorth,
+    InvestorProfileDataAttribute.investmentGoals,
+    InvestorProfileDataAttribute.riskTolerance,
+    InvestorProfileDataAttribute.declarations,
+    InvestorProfileDataAttribute.complianceLetter,
+  ],
   identityDataAttributes: [
     UserDataAttribute.firstName,
     UserDataAttribute.lastName,
@@ -99,6 +111,7 @@ export const userFixture: ScopedUser = {
       CollectedKycDataOption.fullAddress,
       CollectedKycDataOption.email,
       CollectedKycDataOption.phoneNumber,
+      CollectedInvestorProfileDataOption.investorProfile,
     ],
     canAccessDataAttributes: [
       UserDataAttribute.firstName,
@@ -159,6 +172,13 @@ export const withUserDecrypt = (
     path: `/users/${userId}/vault/decrypt`,
     response,
   });
+
+export const getTextByRow = (name: string, value: string) => {
+  const row = screen.getByRole('row', {
+    name,
+  });
+  return within(row).getByText(value);
+};
 
 export const selectDecryptReasonAndContinue = async () => {
   await waitFor(() => {

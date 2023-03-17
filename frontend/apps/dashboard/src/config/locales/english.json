@@ -47,6 +47,17 @@
     "zip": "Zip code",
     "country": "Country"
   },
+  "investor-profile-attributes": {
+    "investor_profile.employment_status": "Employment status",
+    "investor_profile.occupation": "Occupation",
+    "investor_profile.employed_by_brokerage": "Employed by brokerage firm?",
+    "investor_profile.annual_income": "Annual income",
+    "investor_profile.net_worth": "Net worth",
+    "investor_profile.investment_goals": "Investment goals",
+    "investor_profile.risk_tolerance": "Risk tolerance",
+    "investor_profile.declarations": "Declaration(s)",
+    "investor_profile.compliance_letter": "Compliance letter"
+  },
   "collected-data-options": {
     "name": "Full name",
     "dob": "Date of Birth",
@@ -441,7 +452,14 @@
           }
         },
         "investor-profile": {
-          "title": "Investor profile"
+          "title": "Investor profile",
+          "employment-status-and-occupation": "What's your employment status and occupation?",
+          "brokerage-firm": "Are you employed by a brokerage firm?",
+          "annual-income": "What's your annual income?",
+          "net-worth": "What's your net worth?",
+          "investment-goals": "What are your investment goals?",
+          "risk-tolerance": "How would you describe your risk tolerance?",
+          "immediate-family": "Do any of the following apply to you or a member of your immediate family?"
         },
         "risks": {
           "cta": "See details",

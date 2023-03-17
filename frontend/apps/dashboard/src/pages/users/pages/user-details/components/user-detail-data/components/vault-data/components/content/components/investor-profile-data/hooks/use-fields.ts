@@ -1,142 +1,86 @@
-// TODO: https://linear.app/footprint/issue/FP-3139/dashboard-broker-use-real-fields
+import { useTranslation } from '@onefootprint/hooks';
+import {
+  CollectedInvestorProfileDataOption,
+  InvestorProfileDataAttribute,
+  RoleScope,
+} from '@onefootprint/types';
+import usePermissions from 'src/hooks/use-permissions';
+import { User, UserVaultData } from 'src/pages/users/users.types';
 
-const useRows = () => {
+import useFormValues from '../../../hooks/use-form-values';
+
+// TODO: https://linear.app/footprint/issue/FP-3139/dashboard-broker-use-real-fields
+const useFields = (
+  user: User,
+  vaultData: UserVaultData,
+  isDecrypting: boolean,
+) => {
+  const { t, allT } = useTranslation(
+    'pages.user-details.user-info.investor-profile',
+  );
+  const { hasPermission } = usePermissions();
+  const { investorProfile } = vaultData;
+  const values = useFormValues();
+
+  const getData = (attribute: InvestorProfileDataAttribute) => {
+    const canDecrypt = hasPermission(RoleScope.decryptInvestorProfile);
+    const canAccessData = user.onboarding?.canAccessData.includes(
+      CollectedInvestorProfileDataOption.investorProfile,
+    );
+    const value = investorProfile[attribute];
+    const hasValue = user.attributes.includes(attribute);
+    const canAccess = !user.isPortable || !!canAccessData;
+    const isDataDecrypted = !!vaultData.investorProfile[attribute];
+
+    return {
+      canAccess,
+      canSelect: hasValue && !isDataDecrypted && canDecrypt && canAccess,
+      checked: !!values.investorProfile[attribute],
+      hasPermission: canDecrypt,
+      isDataDecrypted,
+      hasValue,
+      label: allT(`investor-profile-attributes.${attribute}`),
+      name: `investorProfile.${attribute}`,
+      showCheckbox: isDecrypting,
+      value,
+    };
+  };
+
   const left = [
     {
-      title: "What's your employment status and occupation?",
+      title: t('employment-status-and-occupation'),
       fields: [
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Employment status',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Occupation',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
+        getData(InvestorProfileDataAttribute.employmentStatus),
+        getData(InvestorProfileDataAttribute.occupation),
       ],
     },
     {
-      title: 'Are you employed by a brokerage firm?',
-      fields: [
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Employed by brokerage firm?',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
-      ],
+      title: t('brokerage-firm'),
+      fields: [getData(InvestorProfileDataAttribute.employedByBrokerage)],
     },
     {
-      title: "What's your annual income?",
-      fields: [
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Annual income',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
-      ],
+      title: t('annual-income'),
+      fields: [getData(InvestorProfileDataAttribute.annualIncome)],
     },
     {
-      title: "What's your net worth?",
-      fields: [
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Net worth',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
-      ],
+      title: t('net-worth'),
+      fields: [getData(InvestorProfileDataAttribute.netWorth)],
     },
   ];
   const right = [
     {
-      title: 'What are your investment goals?',
-      fields: [
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Investment goals',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
-      ],
+      title: t('investment-goals'),
+      fields: [getData(InvestorProfileDataAttribute.investmentGoals)],
     },
     {
-      title: 'How would you describe your risk tolerance?',
-      fields: [
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Risk tolerance',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
-      ],
+      title: t('risk-tolerance'),
+      fields: [getData(InvestorProfileDataAttribute.riskTolerance)],
     },
     {
-      title:
-        'Do any of the following apply to you or a member of your immediate family?',
+      title: t('immediate-family'),
       fields: [
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Declaration(s)',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
-        {
-          canAccess: false,
-          canSelect: false,
-          hasDataInVault: false,
-          hasPermission: false,
-          isFilled: false,
-          label: 'Compliance letter',
-          name: 'employmentStatus',
-          showCheckbox: false,
-          value: null,
-        },
+        getData(InvestorProfileDataAttribute.declarations),
+        getData(InvestorProfileDataAttribute.complianceLetter),
       ],
     },
   ];
@@ -144,4 +88,4 @@ const useRows = () => {
   return [left, right];
 };
 
-export default useRows;
+export default useFields;

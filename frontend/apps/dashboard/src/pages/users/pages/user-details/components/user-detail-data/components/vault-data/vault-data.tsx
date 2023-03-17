@@ -33,6 +33,7 @@ const VaultData = () => {
     defaultValues: state.context.fields || {
       kycData: {},
       idDoc: {},
+      investorProfile: {},
     },
   });
   const { handleSubmit, reset } = formMethods;

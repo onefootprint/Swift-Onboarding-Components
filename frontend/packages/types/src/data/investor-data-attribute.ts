@@ -7,7 +7,8 @@ export enum InvestorProfileDataAttribute {
   netWorth = 'investor_profile.net_worth',
   investmentGoals = 'investor_profile.investment_goals',
   riskTolerance = 'investor_profile.risk_tolerance',
-  declarations = 'investor_profile.declaration',
+  declarations = 'investor_profile.declarations',
+  complianceLetter = 'investor_profile.compliance_letter',
 }
 
 export enum InvestorProfileEmploymentStatus {

@@ -24,19 +24,19 @@ const useRows = (
   const getData = (attribute: UserDataAttribute, roleScopes: RoleScope[]) => {
     const canDecrypt = roleScopes.some(roleScope => hasPermission(roleScope));
     const value = kycData[attribute];
-    const isFilled = user.identityDataAttributes.includes(attribute);
+    const hasValue = user.identityDataAttributes.includes(attribute);
     const canAccess =
       !user.isPortable ||
       user.onboarding?.canAccessDataAttributes.includes(attribute);
-    const isDataDecrypted = !!vaultData.kycData[attribute];
+    const isDataDecrypted = !!kycData[attribute];
 
     return {
       canAccess,
-      canSelect: isFilled && !isDataDecrypted && canDecrypt && canAccess,
+      canSelect: hasValue && !isDataDecrypted && canDecrypt && canAccess,
       checked: !!values.kycData[attribute],
       hasPermission: canDecrypt,
       isDataDecrypted,
-      isFilled,
+      hasValue,
       label: allT(`user-data-attributes.${attribute}`),
       name: `kycData.${attribute}`,
       showCheckbox: isDecrypting,

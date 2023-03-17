@@ -1,4 +1,4 @@
-import { CollectedKycDataOption } from './collected-data-option';
+import { CollectedDataOption } from './collected-data-option';
 import { InsightEvent } from './insight-event';
 import { OnboardingDecision } from './onboarding-decision';
 import OnboardingStatus from './onboarding-status';
@@ -14,7 +14,9 @@ export type Onboarding = {
   timestamp: string;
   isLivenessSkipped: boolean;
   insightEvent: InsightEvent;
-  canAccessData: CollectedKycDataOption[];
+  canAccessData: CollectedDataOption[];
+  // TODO: Deprecate canAccessDataAttributes and canAccessIdentityDocumentImages
+  // https://linear.app/footprint/issue/FP-3146/deprecate-canaccessdataattributes
   canAccessDataAttributes: UserDataAttribute[];
   canAccessIdentityDocumentImages: boolean;
   latestDecision?: OnboardingDecision;

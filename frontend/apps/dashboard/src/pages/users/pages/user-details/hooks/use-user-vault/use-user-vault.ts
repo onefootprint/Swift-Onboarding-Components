@@ -1,3 +1,4 @@
+import { InvestorProfileDataAttribute } from '@onefootprint/types';
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, UserVaultData } from 'src/pages/users/users.types';
 
@@ -19,6 +20,11 @@ const getVaultDataOrCreate = async (queryClient: QueryClient, user: User) => {
     Object.values(user.identityDataAttributes).forEach(attribute => {
       kycData[attribute] = null;
     });
+    Object.values(InvestorProfileDataAttribute).forEach(attribute => {
+      const hasAttribute = user.attributes.find(attr => attr === attribute);
+      if (hasAttribute) investorProfile[attribute] = null;
+    });
+
     return { kycData, idDoc, investorProfile };
   };
 

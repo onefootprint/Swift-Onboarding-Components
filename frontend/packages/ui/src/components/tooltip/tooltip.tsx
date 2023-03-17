@@ -17,7 +17,7 @@ export type TooltipProps = {
   placement?: Placement;
   size?: Size;
   testID?: string;
-  text: string;
+  text?: string;
 };
 
 const Tooltip = ({
@@ -50,7 +50,7 @@ const Tooltip = ({
     ],
   });
   const isVisible = useVisibility(refElement);
-  const shouldShowTooltip = isVisible && !disabled;
+  const shouldShowTooltip = isVisible && !disabled && !!text;
   const clonedChildren = useGetElementRef(children, id, setRefElement);
 
   const recalculateStylesAfterTextChange = useCallback(() => {

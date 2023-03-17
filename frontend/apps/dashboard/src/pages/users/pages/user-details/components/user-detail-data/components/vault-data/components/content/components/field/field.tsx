@@ -8,9 +8,9 @@ import styled from 'styled-components';
 export type FieldProps = {
   canAccess: boolean;
   canSelect: boolean;
-  hasDataInVault: boolean;
+  isDataDecrypted: boolean;
   hasPermission: boolean;
-  isFilled: boolean;
+  hasValue: boolean;
   label: string;
   name: string;
   showCheckbox: boolean;
@@ -20,9 +20,9 @@ export type FieldProps = {
 const Field = ({
   canAccess,
   canSelect,
-  hasDataInVault,
+  isDataDecrypted,
   hasPermission,
-  isFilled,
+  hasValue,
   label,
   name,
   showCheckbox,
@@ -37,10 +37,10 @@ const Field = ({
     if (!hasPermission || !canAccess) {
       return t('not-allowed');
     }
-    if (!isFilled) {
+    if (!hasValue) {
       return t('empty');
     }
-    return '';
+    return undefined;
   };
 
   return (
@@ -49,15 +49,15 @@ const Field = ({
         <Tooltip disabled={!showTooltip} text={getTooltip()}>
           <Box>
             <Checkbox
-              checked={hasDataInVault || undefined}
-              {...(hasDataInVault ? {} : register(name))}
+              checked={isDataDecrypted || undefined}
+              {...register(name)}
               disabled={disabled}
               label={label}
             />
           </Box>
         </Tooltip>
       ) : (
-        <Typography variant="label-3" color="tertiary">
+        <Typography variant="body-3" color="tertiary">
           {label}
         </Typography>
       )}

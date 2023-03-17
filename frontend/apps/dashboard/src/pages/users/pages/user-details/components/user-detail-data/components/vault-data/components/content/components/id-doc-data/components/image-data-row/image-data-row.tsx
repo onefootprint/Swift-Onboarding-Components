@@ -62,7 +62,7 @@ const ImageDataRow = ({
     <Container role="row" aria-label={label}>
       <RowContainer>
         <TitleContainer>
-          <Typography variant="label-3" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             {label}
           </Typography>
           {isSuccessful && <SuccessFlag />}

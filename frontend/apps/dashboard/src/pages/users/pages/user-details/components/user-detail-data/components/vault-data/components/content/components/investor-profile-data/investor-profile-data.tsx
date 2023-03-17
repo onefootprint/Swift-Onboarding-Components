@@ -18,15 +18,12 @@ export type InvestorProfileDataProps = {
 // TODO:
 // https://linear.app/footprint/issue/FP-3136/dashboard-broker-risk-signal-for-investor-profile
 const InvestorProfileData = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   user,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   vaultData,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isDecrypting,
 }: InvestorProfileDataProps) => {
   const { t } = useTranslation('pages.user-details.user-info.investor-profile');
-  const [left, right] = useFields();
+  const [left, right] = useFields(user, vaultData, isDecrypting);
 
   return (
     <DataSection iconComponent={IcoDollar24} title={t('title')}>
@@ -34,7 +31,7 @@ const InvestorProfileData = ({
         <Column>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
             {left.map(column => (
-              <Box>
+              <Box key={column.title}>
                 <Typography variant="label-2" sx={{ marginBottom: 5 }}>
                   {column.title}
                 </Typography>
@@ -43,9 +40,9 @@ const InvestorProfileData = ({
                     <Field
                       canAccess={field.canAccess}
                       canSelect={field.canSelect}
-                      hasDataInVault={field.hasDataInVault}
                       hasPermission={field.hasPermission}
-                      isFilled={field.isFilled}
+                      hasValue={field.hasValue}
+                      isDataDecrypted={field.isDataDecrypted}
                       key={field.name}
                       label={field.label}
                       name={field.name}
@@ -62,7 +59,7 @@ const InvestorProfileData = ({
         <Column>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
             {right.map(column => (
-              <Box>
+              <Box key={column.title}>
                 <Typography variant="label-2" sx={{ marginBottom: 5 }}>
                   {column.title}
                 </Typography>
@@ -71,9 +68,9 @@ const InvestorProfileData = ({
                     <Field
                       canAccess={field.canAccess}
                       canSelect={field.canSelect}
-                      hasDataInVault={field.hasDataInVault}
                       hasPermission={field.hasPermission}
-                      isFilled={field.isFilled}
+                      hasValue={field.hasValue}
+                      isDataDecrypted={field.isDataDecrypted}
                       key={field.name}
                       label={field.label}
                       name={field.name}

@@ -5,8 +5,7 @@ export enum RoleScope {
   apiKeys = 'api_keys',
   vaultProxy = 'vault_proxy',
   orgSettings = 'org_settings',
-  decryptCustom = 'decrypt_custom',
-  decryptDocuments = 'decrypt.document_and_selfie',
+  manualReview = 'manual_review',
   decryptName = 'decrypt.name',
   decryptDob = 'decrypt.dob',
   decryptSsn4 = 'decrypt.ssn4',
@@ -15,7 +14,9 @@ export enum RoleScope {
   decryptPartialAddress = 'decrypt.partial_address',
   decryptEmail = 'decrypt.email',
   decryptPhoneNumber = 'decrypt.phone_number',
-  manualReview = 'manual_review',
+  decryptDocuments = 'decrypt.document_and_selfie',
+  decryptInvestorProfile = 'decrypt.investor_profile',
+  decryptCustom = 'decrypt_custom',
 }
 
 export type Role = {

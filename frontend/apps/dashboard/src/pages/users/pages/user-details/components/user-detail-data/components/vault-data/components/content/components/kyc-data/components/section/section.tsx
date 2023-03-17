@@ -61,9 +61,9 @@ const Section = ({
         <Field
           canAccess={field.canAccess}
           canSelect={field.canSelect}
-          hasDataInVault={field.hasDataInVault}
+          hasValue={field.hasValue}
           hasPermission={field.hasPermission}
-          isFilled={field.isFilled}
+          isDataDecrypted={field.isDataDecrypted}
           key={field.name}
           label={field.label}
           name={field.name}
