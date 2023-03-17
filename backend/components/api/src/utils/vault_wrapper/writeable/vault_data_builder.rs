@@ -125,7 +125,7 @@ where
                 }
             ).for_each(|(kind, count)| {
                 // don't error if this is a demo tenant or sandbox user
-                if !t.is_demo_tenant || uv.is_live {
+                if uv.is_live && !t.is_demo_tenant {
                     tracing::error!(kind=%kind, count=%count, "same fingerprints used across distinct UserVaults")
                 }
             });
