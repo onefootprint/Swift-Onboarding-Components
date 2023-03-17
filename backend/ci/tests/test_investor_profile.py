@@ -33,6 +33,7 @@ def test_put_ip_info_valid(sandbox_user, ip_data):
         {"investor_profile.annual_income": "10000000000"},
         {"investor_profile.net_worth": "0"},
         {"investor_profile.investment_goals": '["hi", "grow_long_term_wealth"]'},
+        {"investor_profile.investment_goals": "[]"},
         {"investor_profile.risk_tolerance": "really high"},
         {"investor_profile.declarations": '["hi", "grow_long_term_wealth"]'},
     ],

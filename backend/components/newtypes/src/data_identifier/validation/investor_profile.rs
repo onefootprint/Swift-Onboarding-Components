@@ -14,7 +14,13 @@ impl Validate for IPK {
             Self::BrokerageFirmEmployer => validate_length(value)?,
             Self::AnnualIncome => parse_enum::<AnnualIncome>(value)?,
             Self::NetWorth => parse_enum::<NetWorth>(value)?,
-            Self::InvestmentGoals => parse_json::<Vec<InvestmentGoal>>(value)?,
+            Self::InvestmentGoals => parse_json_and_validate::<Vec<InvestmentGoal>, _>(value, |l| {
+                if l.is_empty() {
+                    Err(Error::InvalidLength)
+                } else {
+                    Ok(())
+                }
+            })?,
             Self::RiskTolerance => parse_enum::<RiskTolerance>(value)?,
             Self::Declarations => parse_json::<Vec<Declaration>>(value)?,
         };
@@ -41,7 +47,16 @@ fn parse_json<T>(value: PiiString) -> VResult<PiiString>
 where
     T: DeserializeOwned,
 {
-    serde_json::de::from_str::<T>(value.leak())?;
+    parse_json_and_validate::<T, _>(value, |_| Ok(()))
+}
+
+fn parse_json_and_validate<T, F>(value: PiiString, f: F) -> VResult<PiiString>
+where
+    T: DeserializeOwned,
+    F: FnOnce(T) -> VResult<()>,
+{
+    let parsed_value = serde_json::de::from_str(value.leak())?;
+    f(parsed_value)?;
     Ok(value)
 }
 
