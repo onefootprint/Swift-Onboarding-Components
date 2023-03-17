@@ -254,9 +254,6 @@ mod tests {
 
         let feature_vector = create_features(vendor_results);
         let expected_idology_features = IDologyFeatures {
-            status: DecisionStatus::Pass,
-            create_manual_review: false,
-            id_located: true,
             is_id_scan_required: false,
             id_number_for_scan_required: Some(3010453),
             footprint_reason_codes: vec![
@@ -346,18 +343,15 @@ mod tests {
     fn test_consolidated_reason_codes() {
         let feature_vector = FeatureVector {
             idology_features: Some(IDologyFeatures {
-                status: DecisionStatus::Pass,
                 footprint_reason_codes: vec![
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::NameLastDoesNotMatch,
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SubjectDeceased,
                 ],
-                id_located: false,
                 id_number_for_scan_required: None,
                 is_id_scan_required: false,
                 verification_result: VerificationResultId::from("123".to_owned()),
-                create_manual_review: false,
             }),
             idology_scan_onboarding_features: None,
             twilio_features: None,

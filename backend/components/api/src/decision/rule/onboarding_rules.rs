@@ -1,5 +1,3 @@
-use newtypes::DecisionStatus;
-
 use crate::decision::features::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
 
 use super::{
@@ -12,7 +10,12 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
     let rules = vec![
         // If we don't have a located identity, we should fail
         Rule {
-            rule: { |f: &IDologyFeatures| f.status != DecisionStatus::Pass },
+            rule: {
+                |f: &IDologyFeatures| {
+                    f.footprint_reason_codes
+                        .contains(&FootprintReasonCode::IdNotLocated)
+                }
+            },
             name: RuleName::IdNotLocated,
         },
         //

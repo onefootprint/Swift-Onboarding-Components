@@ -1,55 +1,74 @@
-use crate::decision::risk::evaluate_onboarding_rules;
-use feature_flag::BoolFlag;
-use newtypes::{DecisionStatus, FootprintReasonCode};
+use crate::decision::{
+    features::idology_expectid::IDologyFeatures,
+    features::kyc_features::FeatureVector,
+    risk::{evaluate_onboarding_rules, OnboardingRulesDecisionOutput},
+    rule::onboarding_rules,
+    rule::RuleName,
+};
+use feature_flag::{BoolFlag, MockFeatureFlagClient};
+use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
 use std::str::FromStr;
 use test_case::test_case;
 
-// these tests kinda stink, need to refactor
-fn idology_reason_codes(should_fail: bool, should_fail_conservative: bool) -> Vec<FootprintReasonCode> {
-    let mut codes = vec![];
-    if should_fail {
-        codes.push(FootprintReasonCode::SubjectDeceased);
-    }
-    if should_fail_conservative {
-        codes.push(FootprintReasonCode::AddressLocatedIsHighRiskAddress);
-    }
-
-    codes
-}
-type CreateManualReview = bool;
-// passing status but hit a conservative rule -> fail
-#[test_case(true, true, false, DecisionStatus::Pass => (DecisionStatus::Fail, true))]
-// passing status but hit a base rule -> fail
-#[test_case(true, false, true, DecisionStatus::Pass => (DecisionStatus::Fail, true))]
-// failing status and hit no rules -> fail (needs a pass)
-#[test_case(true, false, false, DecisionStatus::Fail => (DecisionStatus::Fail, true))]
-// // passing status and hit no rules -> pass
-#[test_case(true, false, false, DecisionStatus::Pass => (DecisionStatus::Pass, false))]
-// don't use rule flags, but we still pass because the passing rules are permanent
-#[test_case(false, false, true, DecisionStatus::Pass => (DecisionStatus::Pass, false))]
-// don't use rule flags, and we still fail bc idology failed
-#[test_case(false, true, true, DecisionStatus::Fail => (DecisionStatus::Fail, true))]
-fn test_final_decision(
+fn create_onboarding_rules_decision_output(
+    expected_decision_status: DecisionStatus,
+    expected_create_manual_review: bool,
+    expected_should_commit: bool,
+    expected_triggered_rules: Vec<RuleName>,
     should_use_conservative_rules: bool,
-    base_rules_should_fail: bool,
-    conservative_rules_should_fail: bool,
-    idology_status: DecisionStatus,
-) -> (DecisionStatus, CreateManualReview) {
-    use crate::decision::{
-        features::idology_expectid::IDologyFeatures, features::kyc_features::FeatureVector,
-        rule::onboarding_rules,
-    };
-    use feature_flag::MockFeatureFlagClient;
-    use newtypes::VerificationResultId;
+) -> OnboardingRulesDecisionOutput {
+    let conservative = onboarding_rules::idology_conservative_rule_set()
+        .rules
+        .into_iter()
+        .map(|r| r.name);
 
+    let base = onboarding_rules::idology_base_rule_set()
+        .rules
+        .into_iter()
+        .map(|r| r.name);
+
+    let all_non_triggering_rules = if should_use_conservative_rules {
+        base.chain(conservative)
+            .filter(|r| !expected_triggered_rules.contains(r))
+            .collect()
+    } else {
+        base.filter(|r| !expected_triggered_rules.contains(r)).collect()
+    };
+
+    OnboardingRulesDecisionOutput {
+        decision_status: expected_decision_status,
+        should_commit: expected_should_commit,
+        create_manual_review: expected_create_manual_review,
+        rules_triggered: expected_triggered_rules,
+        rules_not_triggered: all_non_triggering_rules,
+    }
+}
+
+// id located
+#[test_case(true, vec![] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![], true); "id located -> pass")]
+#[test_case(false, vec![] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![], false); "id located, conservative rules are off -> pass")]
+#[test_case(false, vec![FootprintReasonCode::IdNotLocated] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::IdNotLocated], false); "id not located -> fail")]
+// id located, but was a watchlist hit so we commit, but fail onboarding
+#[test_case(false, vec![FootprintReasonCode::WatchlistHit] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, true, vec![RuleName::WatchlistHit], false); "id located, watchlist hit -> fail but commit")]
+// id located, but was a watchlist hit + other failure, so we don't commit and fail onboarding
+#[test_case(false, vec![FootprintReasonCode::WatchlistHit, FootprintReasonCode::SubjectDeceased] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased, RuleName::WatchlistHit], false); "id located, watchlist hit + other reason -> fail and don't commit")]
+#[test_case(false, vec![FootprintReasonCode::PotentialWatchlistHit] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![], false); "id located, but potential watchlist -> pass")]
+// id located but hit a conservative rule -> fail
+#[test_case(true, vec![FootprintReasonCode::AddressLocatedIsHighRiskAddress] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::AddressLocatedIsHighRiskAddress], true); "id located but hit a conservative rule -> fail")]
+// id located but hit a base rule -> fail
+#[test_case(false, vec![FootprintReasonCode::SubjectDeceased]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased], false); "id located but hit a base rule -> fail")]
+// conservative rules feature flagged on
+#[test_case(true, vec![FootprintReasonCode::SubjectDeceased, FootprintReasonCode::AddressLocatedIsHighRiskAddress]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased, RuleName::AddressLocatedIsHighRiskAddress], true); "id located, but hit a base rule and conservative rule -> fail")]
+
+fn test_evaluate_onboarding_rules(
+    should_use_conservative_rules: bool,
+    fp_reason_codes: Vec<FootprintReasonCode>,
+) -> OnboardingRulesDecisionOutput {
     // Set up a feature vector
     let idology_features = IDologyFeatures {
-        status: idology_status,
-        create_manual_review: false,
-        id_located: true,
         is_id_scan_required: false,
         id_number_for_scan_required: Some(3010453),
-        footprint_reason_codes: idology_reason_codes(base_rules_should_fail, conservative_rules_should_fail),
+        footprint_reason_codes: fp_reason_codes,
         verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
     };
 
@@ -76,15 +95,8 @@ fn test_final_decision(
         .expect_flag()
         .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&onboarding_rules::temp_watchlist().name))
         .times(1)
-        .return_once(move |_| should_use_conservative_rules);
+        .return_once(move |_| false);
 
     // function under test
-    let d = evaluate_onboarding_rules(&feature_vector, &mock_ff_client).unwrap();
-
-    assert!(!d.rules_not_triggered.is_empty());
-    if d.decision_status == DecisionStatus::Fail {
-        assert!(!d.rules_triggered.is_empty())
-    }
-
-    (d.decision_status, d.create_manual_review)
+    evaluate_onboarding_rules(&feature_vector, &mock_ff_client).unwrap()
 }

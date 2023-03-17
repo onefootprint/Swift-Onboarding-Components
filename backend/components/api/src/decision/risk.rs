@@ -57,8 +57,8 @@ pub async fn save_final_decision(
                 return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
             }
 
-            // If the decision is a pass, mark all data as verified for the onboarding
-            let seqno = if decision.decision_status == DecisionStatus::Pass {
+            // If we should commit, mark all data as verified for the onboarding
+            let seqno = if decision.should_commit {
                 let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
                 let seqno = uvw.commit_identity_data(conn)?;
                 Some(seqno)
@@ -107,6 +107,7 @@ pub async fn save_final_decision(
 #[derive(PartialEq, Eq, Debug)]
 pub struct OnboardingRulesDecisionOutput {
     pub decision_status: DecisionStatus,
+    pub should_commit: bool,
     pub create_manual_review: bool,
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
@@ -164,6 +165,7 @@ pub fn evaluate_onboarding_rules(
     let create_manual_review = decision_status == DecisionStatus::Fail;
 
     let output = OnboardingRulesDecisionOutput {
+        should_commit: should_commit(&idology_onboarding_rule_evaluation_result.rules_triggered),
         decision_status,
         create_manual_review,
         rules_triggered: idology_onboarding_rule_evaluation_result.rules_triggered,
@@ -189,4 +191,12 @@ fn write_risk_signals(
     let reason_codes = feature_vector.consolidated_reason_codes(vendor_apis);
     RiskSignal::bulk_create(conn, onboarding_decision_id, reason_codes)?;
     Ok(())
+}
+
+/// For now, we have very simple logic to decide when to commit which is just "if the only thing that failed this user is a watchlist hit, commit"
+///
+/// More thoughts: https://www.notion.so/onefootprint/Design-Doc-Portabilization-Decision-71f1cfb945234c58b74e97f005211917?pvs=4
+fn should_commit(rules_triggered: &Vec<RuleName>) -> bool {
+    rules_triggered.is_empty()
+        || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
 }

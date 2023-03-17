@@ -47,6 +47,7 @@ impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
             create_manual_review,
             rules_triggered,
             rules_not_triggered,
+            should_commit: _,
         } = d;
 
         Self {

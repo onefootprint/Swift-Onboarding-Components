@@ -109,13 +109,6 @@ impl Response {
         }
     }
 
-    pub fn status(&self) -> (DecisionStatus, CreateManualReview) {
-        match self.id_located() {
-            true => (DecisionStatus::Pass, false),
-            false => (DecisionStatus::Fail, false),
-        }
-    }
-
     /// Whether the ID was located on IDology
     pub fn id_located(&self) -> bool {
         if let Some(ref results) = self.results {
