@@ -130,7 +130,7 @@ class TestBifrost:
         assert not authorize_fields
 
         assert req("liveness")
-       
+
         # Shouldn't be able to complete the onboarding until user data is provided
         post(
             "hosted/onboarding/authorize",

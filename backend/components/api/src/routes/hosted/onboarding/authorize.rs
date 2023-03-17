@@ -174,10 +174,9 @@ async fn run_kyc(
                 // This will error if we already have created verification requests for this onboarding
                 decision::vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
 
-                // TODO: update OB to pending!
-                ob.update(conn, OnboardingUpdate::is_authorized(true))?;
+                ob.update(conn, OnboardingUpdate::is_authorized())?;
                 if let Some(biz_ob) = biz_ob {
-                    biz_ob.update(conn, OnboardingUpdate::is_authorized(true))?;
+                    biz_ob.update(conn, OnboardingUpdate::is_authorized())?;
                 }
                 Ok(())
             })

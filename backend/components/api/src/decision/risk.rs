@@ -81,7 +81,10 @@ pub async fn save_final_decision(
 
             let ob = ob.into_inner();
             // Make a billable event here
-            ob.update(conn, OnboardingUpdate::has_final_decision(true))?;
+            ob.update(
+                conn,
+                OnboardingUpdate::set_has_final_decision(decision.decision_status),
+            )?;
 
             // Create ManualReview row if requested
             if decision.create_manual_review {

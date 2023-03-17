@@ -13,11 +13,11 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{
-    FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
-    ScopedVaultId, TenantId, TenantScope, VaultId,
-};
 use newtypes::OnboardingStatus;
+use newtypes::{
+    DecisionStatus, FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId,
+    OnboardingId, ScopedVaultId, TenantId, TenantScope, VaultId,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -55,6 +55,7 @@ pub struct OnboardingUpdate {
     authorized_at: Option<Option<DateTime<Utc>>>,
     idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
     decision_made_at: Option<Option<DateTime<Utc>>>,
+    status: Option<OnboardingStatus>,
 }
 
 pub struct OnboardingCreateArgs {
@@ -64,9 +65,10 @@ pub struct OnboardingCreateArgs {
 }
 
 impl OnboardingUpdate {
-    pub fn is_authorized(is_authorized: bool) -> Self {
+    pub fn is_authorized() -> Self {
         Self {
-            authorized_at: Some(is_authorized.then_some(Utc::now())),
+            authorized_at: Some(Some(Utc::now())),
+            status: Some(OnboardingStatus::Pending),
             ..Self::default()
         }
     }
@@ -78,18 +80,20 @@ impl OnboardingUpdate {
         }
     }
 
-    pub fn has_final_decision(has_final_decision: bool) -> Self {
+    pub fn set_has_final_decision(decision_status: DecisionStatus) -> Self {
         Self {
-            decision_made_at: Some(has_final_decision.then_some(Utc::now())),
+            decision_made_at: Some(Some(Utc::now())),
+            status: Some(decision_status.into()),
             ..Self::default()
         }
     }
 
-    pub fn idv_reqs_and_has_final_decision(has_final_decision: bool, idv_reqs_initiated: bool) -> Self {
+    pub fn idv_reqs_and_has_final_decision_and_is_authorized(decision_status: DecisionStatus) -> Self {
         Self {
-            idv_reqs_initiated_at: Some(idv_reqs_initiated.then_some(Utc::now())),
-            decision_made_at: Some(has_final_decision.then_some(Utc::now())),
-            ..Self::default()
+            authorized_at: Some(Some(Utc::now())),
+            idv_reqs_initiated_at: Some(Some(Utc::now())),
+            decision_made_at: Some(Some(Utc::now())),
+            status: Some(decision_status.into()),
         }
     }
 }

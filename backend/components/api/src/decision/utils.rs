@@ -158,11 +158,10 @@ pub async fn setup_test_fixtures(
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 
-            let ob = ob.into_inner().update(
+            ob.into_inner().update(
                 conn,
-                OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
+                OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
             )?;
-            ob.update(conn, OnboardingUpdate::is_authorized(true))?;
 
             if let Some(biz_ob) = biz_ob {
                 // TODO update the rest of the business ob
@@ -180,11 +179,10 @@ pub async fn setup_test_fixtures(
                 };
                 OnboardingDecision::create(conn, new_decision)?;
 
-                let biz_ob = biz_ob.into_inner().update(
+                biz_ob.into_inner().update(
                     conn,
-                    OnboardingUpdate::idv_reqs_and_has_final_decision(true, true),
+                    OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
                 )?;
-                biz_ob.update(conn, OnboardingUpdate::is_authorized(true))?;
             }
 
             // Create some mock risk signals that are somewhat consistent with the mock decision
