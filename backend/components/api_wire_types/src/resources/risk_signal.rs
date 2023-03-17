@@ -12,8 +12,6 @@ pub struct RiskSignal {
     pub severity: SignalSeverity,
     pub scopes: Vec<SignalScope>,
     pub timestamp: chrono::DateTime<Utc>,
-    pub deactivated_at: Option<chrono::DateTime<Utc>>,
-    pub vendors: Vec<Vendor>,
 }
 
 export_schema!(RiskSignal);

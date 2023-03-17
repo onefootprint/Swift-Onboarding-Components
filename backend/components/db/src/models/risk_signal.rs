@@ -17,7 +17,7 @@ pub struct RiskSignal {
     pub onboarding_decision_id: OnboardingDecisionId,
     pub reason_code: FootprintReasonCode,
     pub created_at: DateTime<Utc>,
-    pub deactivated_at: Option<DateTime<Utc>>,
+    pub deactivated_at: Option<DateTime<Utc>>, // Currently unused!
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub vendors: Vec<Vendor>,

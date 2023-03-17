@@ -20,8 +20,6 @@ impl DbToApi<(RiskSignal, Option<Vec<(VerificationRequest, VerificationResult)>>
             onboarding_decision_id,
             reason_code,
             created_at,
-            deactivated_at,
-            vendors,
             ..
         } = target.0;
 
@@ -34,8 +32,6 @@ impl DbToApi<(RiskSignal, Option<Vec<(VerificationRequest, VerificationResult)>>
             severity: reason_code.severity(),
             scopes: reason_code.scopes(),
             timestamp: created_at,
-            deactivated_at,
-            vendors,
         }
     }
 }
