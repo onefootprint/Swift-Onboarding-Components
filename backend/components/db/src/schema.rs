@@ -515,6 +515,7 @@ table! {
         privacy_policy_url -> Nullable<Text>,
         stripe_customer_id -> Nullable<Text>,
         is_experian_enabled -> Bool,
+        is_demo_tenant -> Bool,
     }
 }
 

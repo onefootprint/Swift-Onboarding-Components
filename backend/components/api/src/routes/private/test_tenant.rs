@@ -82,6 +82,7 @@ async fn post(
                         e_private_key: e_priv_key,
                         public_key: ec_pk_uncompressed,
                         sandbox_restricted: false,
+                        is_demo_tenant: true,
                     };
                     Tenant::save(conn, new_tenant)?
                 }

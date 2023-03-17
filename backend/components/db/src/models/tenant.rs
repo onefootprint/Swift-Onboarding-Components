@@ -33,6 +33,7 @@ pub struct Tenant {
     pub privacy_policy_url: Option<String>,
     pub stripe_customer_id: Option<StripeCustomerId>,
     pub is_experian_enabled: bool,
+    pub is_demo_tenant: bool,
 }
 
 pub enum TenantIdentifier<'a> {
@@ -72,6 +73,7 @@ pub struct NewIntegrationTestTenant {
     pub public_key: VaultPublicKey,
     pub e_private_key: EncryptedVaultPrivateKey,
     pub sandbox_restricted: bool,
+    pub is_demo_tenant: bool,
 }
 
 impl Tenant {
