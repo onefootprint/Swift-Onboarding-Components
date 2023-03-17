@@ -17,11 +17,11 @@ use db::TxnPgConn;
 use newtypes::email::Email as NewtypeEmail;
 use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataLifetimeKind, DataPriority, DataRequest, DocumentKind,
-    EmailId, Fingerprint, IdentityDataKind as IDK, IsDataIdentifierDiscriminant, KvDataKey, PiiString,
-    ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
+    CollectedDataOption, DataCollectedInfo, DataIdentifier, DataLifetimeKind, DataPriority, DataRequest,
+    DocumentKind, EmailId, Fingerprint, IdentityDataKind as IDK, IsDataIdentifierDiscriminant, KvDataKey,
+    PiiString, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
 };
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::str::FromStr;
 
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
@@ -49,14 +49,15 @@ impl WriteableVw<Person> {
         for_bifrost: bool,
     ) -> ApiResult<Option<EmailId>> {
         request.assert_no_business_data()?;
+
         // TODO combine the DB queries to add custom data and id data
         let DecomposedPutRequest {
+            keys,
             id_update,
             ip_update,
             custom_data,
             business_data: _,
         } = request;
-        let new_cdos = CollectedDataOption::list_from(id_update.keys().cloned().collect());
 
         // Extract phone and email from identity data since they are handled separately (for now)
         let mut id_update = id_update;
@@ -117,7 +118,7 @@ impl WriteableVw<Person> {
         }
 
         // Add timeline event for all the newly added data
-        self.add_timeline_event(conn, new_cdos)?;
+        self.add_timeline_event(conn, keys)?;
 
         Ok(new_email_id)
     }
@@ -133,12 +134,12 @@ impl WriteableVw<Business> {
         // Error if trying to add person data to business vault
         request.assert_no_id_data()?;
         let DecomposedPutRequest {
+            keys,
             id_update: _,
             ip_update: _,
             custom_data,
             business_data,
         } = request;
-        let new_cdos = CollectedDataOption::list_from(business_data.keys().cloned().collect());
 
         // Update business data
         if !business_data.is_empty() {
@@ -150,7 +151,7 @@ impl WriteableVw<Business> {
         }
 
         // Add timeline event for all the newly added data
-        self.add_timeline_event(conn, new_cdos)?;
+        self.add_timeline_event(conn, keys)?;
 
         Ok(())
     }
@@ -252,7 +253,8 @@ impl<Type> WriteableVw<Type> {
         Ok(())
     }
 
-    fn add_timeline_event(&self, conn: &mut TxnPgConn, cdos: HashSet<CollectedDataOption>) -> ApiResult<()> {
+    fn add_timeline_event(&self, conn: &mut TxnPgConn, keys: Vec<DataIdentifier>) -> ApiResult<()> {
+        let cdos = CollectedDataOption::list_from(keys);
         // Add UserTimeline for all the newly added data
         if !cdos.is_empty() {
             // Create a timeline event that shows all the new data that was added

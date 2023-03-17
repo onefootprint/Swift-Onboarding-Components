@@ -22,6 +22,8 @@ impl PutDataRequest {
             }
         }
 
+        let keys = self.keys().cloned().collect();
+
         // TODO more general logic to parse DataRequests for each type
 
         // Parse identity data
@@ -39,6 +41,7 @@ impl PutDataRequest {
             return Err(Error::Custom(format!("Cannot put key {}", k.0)));
         }
         let result = DecomposedPutRequest {
+            keys,
             id_update,
             ip_update,
             custom_data,
@@ -49,6 +52,7 @@ impl PutDataRequest {
 }
 
 pub struct DecomposedPutRequest {
+    pub keys: Vec<DataIdentifier>,
     pub id_update: DataRequest<IDK>,
     pub ip_update: DataRequest<IPK>,
     pub custom_data: DataRequest<KvDataKey>,
