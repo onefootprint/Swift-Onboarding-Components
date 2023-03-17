@@ -32,12 +32,15 @@ class TestNonPortableVaultApi:
         ],
     )
     def test_identity_validation(self, tenant, key, value, expected_error):
+        # Can't create the user inline with invalid data
+        data = {key: value}
+        post("users/", data, tenant.sk.key, status_code=400)
+
         body = post("users/", None, tenant.sk.key)
         user = body
         fp_id = user["id"]
         assert fp_id
 
-        data = {key: value}
         body = put(f"users/{fp_id}/vault", data, tenant.sk.key, status_code=400)
         # Should have a JSON error message with the invalid field identifier as the key
         assert body["error"]["message"][key] == expected_error
@@ -45,20 +48,18 @@ class TestNonPortableVaultApi:
         post(f"users/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
     def test_vault_create_write_decrypt(self, tenant):
-        # create the vault
-        body = post("users/", None, tenant.sk.key)
-        user = body
-        fp_id = user["id"]
-        assert fp_id
-
-        # post data to it
+        # create the vault with data
         data = {
             "id.phone_number": PHONE_NUMBER,
             "id.email": EMAIL,
             "custom.hi": "bye",
             **build_user_data(),
         }
-        put(f"users/{fp_id}/vault", data, tenant.sk.key)
+        body = post("users/", data, tenant.sk.key)
+        user = body
+        fp_id = user["id"]
+        assert fp_id
+
         # check that the data is there now
         response = get(f"users/{fp_id}/vault", None, tenant.sk.key)
         assert response["id.first_name"]
