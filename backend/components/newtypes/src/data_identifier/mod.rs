@@ -107,6 +107,21 @@ pub trait IsDataIdentifierDiscriminant:
     fn parent(&self) -> Option<CollectedData>;
 }
 
+impl DataIdentifier {
+    /// When true, will not be required in order to satisfy the parent CD/CDO
+    fn is_optional(&self) -> bool {
+        match self {
+            Self::Id(s) => s.is_optional(),
+            Self::Custom(s) => s.is_optional(),
+            Self::Business(s) => s.is_optional(),
+            Self::InvestorProfile(s) => s.is_optional(),
+            Self::Document(s) => s.is_optional(),
+            // TODO
+            Self::IdDocument(_) | Self::Selfie(_) => false,
+        }
+    }
+}
+
 /// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
 /// We serialize DIs as `prefix.suffix`
 impl std::fmt::Display for DataIdentifier {

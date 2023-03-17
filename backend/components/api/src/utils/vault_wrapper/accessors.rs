@@ -7,6 +7,7 @@ use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::DataIdentifierDiscriminant;
 use newtypes::DocumentKind;
 use newtypes::IsDataIdentifierDiscriminant;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
@@ -83,19 +84,19 @@ impl<Type> VaultWrapper<Type> {
             .or_else(|| self.portable.get_e_data(id))
     }
 
-    pub fn missing_fields<T>(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption>
-    where
-        T: IsDataIdentifierDiscriminant,
-    {
-        // can we generify this to share with missing_id_fields?
-        // can we instead use populated_dis?
+    pub fn missing_fields(
+        &self,
+        ob_config: &ObConfiguration,
+        di_kind: DataIdentifierDiscriminant,
+    ) -> Vec<CollectedDataOption> {
         ob_config
             .must_collect_data
             .iter()
+            .filter(|cdo| cdo.parent().data_identifier_kind() == di_kind)
             .filter(|cdo| {
-                cdo.required_attributes::<T>()
-                    .iter()
-                    .any(|d| !self.populated::<T>().contains(d))
+                cdo.required_data_identifiers()
+                    .into_iter()
+                    .any(|d| !self.populated_dis().contains(&d))
             })
             .cloned()
             .collect()

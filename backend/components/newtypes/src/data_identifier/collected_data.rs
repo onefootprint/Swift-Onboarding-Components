@@ -196,6 +196,14 @@ impl CollectedDataOption {
         }
     }
 
+    /// Maps the CDO to the list of DIs that are required and are represented by the CDO, if self
+    /// represents T. Otherwise, returns an empty list.
+    pub fn required_data_identifiers(&self) -> Vec<DataIdentifier> {
+        self.data_identifiers()
+            .map(|dis| dis.into_iter().filter(|k| !k.is_optional()).collect())
+            .unwrap_or_default()
+    }
+
     /// Maps the CDO to the list of Ts represented by the CDO, if self represents T. Otherwise,
     /// returns an empty list.
     pub fn attributes<T>(&self) -> Vec<T>
@@ -212,43 +220,31 @@ impl CollectedDataOption {
             .unwrap_or_default()
     }
 
-    /// Maps the CDO to the list of Ts that are required and are represented by the CDO, if self
-    /// represents T. Otherwise, returns an empty list.
-    pub fn required_attributes<T>(&self) -> Vec<T>
+    /// Given a list of DataIdentifiers (maybe collected via API), computes the set of
+    /// CollectedDataOptions represented by this list of DataIdentifiers
+    pub fn list_from<T>(ids: Vec<T>) -> HashSet<Self>
     where
-        T: IsDataIdentifierDiscriminant,
+        T: Into<DataIdentifier>,
     {
-        self.attributes::<T>()
-            .into_iter()
-            .filter(|k| !k.is_optional())
-            .collect()
-    }
-
-    /// Given a list of IdentityDataKinds (maybe collected via API), computes the set of
-    /// CollectedDataOptions represented by this list of IdentityDataKinds
-    pub fn list_from<T>(kinds: Vec<T>) -> HashSet<Self>
-    where
-        T: IsDataIdentifierDiscriminant,
-    {
-        let kinds: HashSet<_> = kinds.into_iter().collect();
+        let dis: HashSet<_> = ids.into_iter().map(|k| k.into()).collect();
         // For each CollectedData variant, figure out which of the options (if any) is represented
-        // in the list of kinds
+        // in the list of dis
         CollectedData::iter()
             .flat_map(|cd| {
                 let possible_options = cd.options();
-                // Get the maximal option whose attributes are entirely contained in this list of kinds
-                // in the list of kinds
+                // Get the maximal option whose attributes are entirely contained in this list of dis
+                // in the list of dis
                 possible_options
                     .into_iter()
                     .rev()
                     .filter_map(|cdo| {
-                        let attributes = cdo.required_attributes::<T>();
-                        // Skip CDOs that aren't related to T
-                        (!attributes.is_empty()).then_some((cdo, attributes))
+                        let dis = cdo.required_data_identifiers();
+                        // Filter out CDOs with no required DIs
+                        (!dis.is_empty()).then_some((cdo, dis))
                     })
                     .find(|(_, attrs)| {
                         let required_attrs = HashSet::from_iter(attrs.iter().cloned());
-                        kinds.is_superset(&required_attrs)
+                        dis.is_superset(&required_attrs)
                     })
                     .map(|(cdo, _)| cdo)
             })
@@ -270,8 +266,8 @@ impl CollectedDataOption {
 #[cfg(test)]
 mod test {
     use crate::{
-        BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, IdentityDataKind as IDK,
-        InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
+        BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, DataIdentifier as DI,
+        IdentityDataKind as IDK, InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
     };
     use itertools::Itertools;
     use std::collections::HashSet;
@@ -290,18 +286,7 @@ mod test {
 
             let attrs_for_options: Vec<_> = options
                 .iter()
-                .map(|dlk| dlk.required_attributes::<IDK>())
-                .collect();
-            let is_sorted = attrs_for_options.windows(2).all(|w| w[0].len() <= w[1].len());
-            assert!(
-                is_sorted,
-                "Options for CollectedData {} are not in ascending order",
-                cd
-            );
-
-            let attrs_for_options: Vec<_> = options
-                .iter()
-                .map(|dlk| dlk.required_attributes::<BDK>())
+                .map(|dlk| dlk.required_data_identifiers())
                 .collect();
             let is_sorted = attrs_for_options.windows(2).all(|w| w[0].len() <= w[1].len());
             assert!(
@@ -328,7 +313,6 @@ mod test {
         T: IsDataIdentifierDiscriminant + std::fmt::Debug,
     {
         for id in ids {
-            println!("id {:?}", id);
             test_discriminant(id);
         }
     }
@@ -372,9 +356,14 @@ mod test {
     #[test_case(vec![BDK::PhoneNumber] => HashSet::from_iter([CDO::BusinessPhoneNumber]))]
     #[test_case(vec![BDK::Website] => HashSet::from_iter([CDO::BusinessWebsite]))]
     #[test_case(vec![BDK::BeneficialOwners] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
+    #[test_case(vec![IPK::Occupation, IPK::BrokerageFirmEmployer, IPK::AnnualIncome, IPK::NetWorth, IPK::InvestmentGoals, IPK::RiskTolerance, IPK::Declarations] => HashSet::from_iter([CDO::InvestorProfile]))]
+    #[test_case(vec![IPK::AnnualIncome, IPK::NetWorth, IPK::InvestmentGoals, IPK::RiskTolerance, IPK::Declarations] => HashSet::from_iter([CDO::InvestorProfile]))]
+    // Mixed
+    #[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Ssn4)] => HashSet::from_iter([CDO::BusinessBeneficialOwners, CDO::Ssn4]))]
+    #[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Zip), DI::from(IDK::Country)] => HashSet::from_iter([CDO::BusinessBeneficialOwners, CDO::PartialAddress]))]
     fn test_parse_list_of_kinds<T>(kinds: Vec<T>) -> HashSet<CDO>
     where
-        T: IsDataIdentifierDiscriminant,
+        T: Into<DI>,
     {
         CDO::list_from(kinds)
     }

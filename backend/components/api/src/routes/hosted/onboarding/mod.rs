@@ -20,10 +20,7 @@ use db::{
     DbError, PgConn,
 };
 use itertools::Itertools;
-use newtypes::{
-    BusinessDataKind as BDK, IdentityDataKind as IDK, InvestorProfileKind as IPK, OnboardingId,
-    ScopedVaultId, SessionAuthToken, VaultId,
-};
+use newtypes::{DataIdentifierDiscriminant, OnboardingId, ScopedVaultId, SessionAuthToken, VaultId};
 use paperclip::actix::web;
 
 pub mod authorize;
@@ -75,14 +72,15 @@ pub fn get_requirements(
 
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(scoped_user_id))?;
     let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.vault.id, ob_config_id))?;
-    let missing_id_fields = uvw.missing_fields::<IDK>(&ob_info.ob_config);
-    let missing_ip_fields = uvw.missing_fields::<IPK>(&ob_info.ob_config);
+    let missing_id_fields = uvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::Id);
+    let missing_ip_fields =
+        uvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::InvestorProfile);
 
     // Fetch missing business fields
     let missing_business_fields = if ob_info.ob_config.must_collect_business() {
         let scoped_business_id = scoped_business_id.ok_or(UserError::NotAllowedWithoutBusiness)?;
         let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
-        bvw.missing_fields::<BDK>(&ob_info.ob_config)
+        bvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::Business)
     } else {
         vec![]
     };
