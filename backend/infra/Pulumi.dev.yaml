@@ -25,6 +25,9 @@ config:
       heartbeatCloudId: dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ0MDZmYjczZWNlZjk0MDViODY5NzI3MmMwMDE1N2ExZCRjNGExNTAzOTBiMmU0M2UzODVlNWQ5OWY0YWRlYTc3OA==
       id: omacKoQBB6pi8-b5UVPY
     enclaveCertPCR8: 48cb393ec504192fb147ffb2818c2a00c8e2d74659b509cc449a48ffe1c257a266b6a9f9ac356c4cd38a6c11825dd600
+    fingerprint:
+      fingerprintSdkKey:
+        secure: v1:ShqC3sYp5bwUGSIi:1Wcf0WjDOj6NSh2ZBOWffhqskNZVxExTOGkaDd/JDH5WdIvR
     grafana:
       prometheusPushAuth:
         secure: v1:VdwOY1dTgkXEMk4W:i3PexS68jj8BwxdeHPPugmMQdl6ygvRTfBXb3K60uQwpJnuMy3N1HEERTa3t0tM2PBSJZbhCobPfOq2LtQG7ALfSKn32zpU75nujiT5KViRm7ZJWNHmaJ0kl15WZj/gRr/tvLsupnW8U/E3hAfkQoqN/IknVqW3qjeQdlL3oP88QHce1PBbAQM+oepcJlLFNrrVgaHdEqwsZJn/4

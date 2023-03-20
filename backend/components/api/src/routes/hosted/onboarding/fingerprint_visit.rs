@@ -27,35 +27,54 @@ pub async fn post(
         request_id,
     } = request.into_inner();
 
-    // TODO: hit server API for request info, save inside the FPVE
+    tokio::spawn(async move {
+        let response = state
+            .fingerprintjs_client
+            .get_event(request_id.clone().into())
+            .await;
 
-    state
-        .db_pool
-        .db_transaction(move |conn| -> Result<_, ApiError> {
-            let user_vault_id = user_auth.user_vault_id().clone();
-            let scoped_user_id = user_auth.scoped_user_id();
+        let resp = match response {
+            Ok(r) => Some(r),
+            Err(e) => {
+                tracing::warn!(e = ?e, "error fetching fingerprint result from API");
+                None
+            }
+        };
 
-            FingerprintVisitEvent::create(
-                conn,
-                visitor_id.clone().into(),
-                request_id.into(),
-                Some(user_vault_id.clone()),
-                scoped_user_id.clone(),
-                path,
-                telemetry_headers.session_id.clone(),
-            )?;
+        let db_res = state
+            .db_pool
+            .db_transaction(move |conn| -> Result<_, ApiError> {
+                let user_vault_id = user_auth.user_vault_id().clone();
+                let scoped_user_id = user_auth.scoped_user_id();
 
-            // associate session_id with visitor_id and other identifiers in logs so we can see things in observe
-            tracing::info!(
-                session_id=%format!("{:?}", telemetry_headers.session_id), 
-                visitor_id=%visitor_id, 
-                user_vault_id=%user_vault_id,
-                scoped_user_id=%format!("{:?}", scoped_user_id), 
-                "fingerprint visit");
+                FingerprintVisitEvent::create(
+                    conn,
+                    visitor_id.clone().into(),
+                    request_id.into(),
+                    Some(user_vault_id.clone()),
+                    scoped_user_id.clone(),
+                    path,
+                    telemetry_headers.session_id.clone(),
+                    resp,
+                )?;
 
-            Ok(())
-        })
-        .await?;
+                // associate session_id with visitor_id and other identifiers in logs so we can see things in observe
+                tracing::info!(
+                    session_id=%format!("{:?}", telemetry_headers.session_id),
+                    visitor_id=%visitor_id,
+                    user_vault_id=%user_vault_id,
+                    scoped_user_id=%format!("{:?}", scoped_user_id),
+                    "fingerprint visit"
+                );
+
+                Ok(())
+            })
+            .await;
+
+        if let Err(e) = db_res {
+            tracing::error!(e = ?e, "error saving fingerprint result")
+        }
+    });
 
     EmptyResponse::ok().json()
 }

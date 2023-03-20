@@ -138,6 +138,7 @@ export abstract class ServiceContainers {
         secretsStore.svixAuthToken.arn,
         secretsStore.stripeApiKey.arn,
         secretsStore.fpcProtectedCustodianKeyParameter.arn,
+        secretsStore.fingerprintSdkKey.arn,
       ])
       .apply(
         ([
@@ -161,6 +162,7 @@ export abstract class ServiceContainers {
           svixAuthToken,
           stripeApiKeyArn,
           fpcProtectedArn,
+          fingerprintSdkKey,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -234,6 +236,10 @@ export abstract class ServiceContainers {
               {
                 name: 'PROTECTED_CUSTODIAN_KEY',
                 valueFrom: fpcProtectedArn,
+              },
+              {
+                name: 'FINGERPRINTJS_SDK_KEY',
+                valueFrom: fingerprintSdkKey,
               },
             ],
             environment: [

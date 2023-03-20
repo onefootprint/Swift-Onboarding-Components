@@ -106,6 +106,8 @@ pub struct Config {
     pub stripe: StripeConfig,
     // #[envconfig(nested = true)]
     // pub experian: ExperianConfig,
+    #[envconfig(from = "FINGERPRINTJS_SDK_KEY")]
+    pub fingerprintjs_sdk_key: String,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {

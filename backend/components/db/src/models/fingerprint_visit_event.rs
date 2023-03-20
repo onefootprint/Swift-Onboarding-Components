@@ -35,6 +35,7 @@ pub struct NewFingerprintVisit {
     pub response: Option<serde_json::Value>,
 }
 impl FingerprintVisitEvent {
+    #[allow(clippy::too_many_arguments)]
     #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
@@ -44,6 +45,7 @@ impl FingerprintVisitEvent {
         scoped_user_id: Option<ScopedVaultId>,
         path: String,
         session_id: Option<String>,
+        response: Option<serde_json::Value>,
     ) -> DbResult<Self> {
         let new_row = NewFingerprintVisit {
             visitor_id,
@@ -53,7 +55,7 @@ impl FingerprintVisitEvent {
             session_id,
             created_at: Utc::now(),
             request_id,
-            response: None,
+            response,
         };
 
         let visit = diesel::insert_into(fingerprint_visit_event::table)

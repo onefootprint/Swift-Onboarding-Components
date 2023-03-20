@@ -35,6 +35,7 @@ export interface StaticSecrets {
   stripeApiKey: aws.ssm.Parameter;
   fpcProtectedCustodianKey: pulumi.Output<string>;
   fpcProtectedCustodianKeyParameter: aws.ssm.Parameter;
+  fingerprintSdkKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -49,6 +50,7 @@ interface SecretConstants {
   launchDarkly: LaunchDarkly;
   svix: Svix;
   stripe: Stripe;
+  fingerprint: Fingerprint
 }
 
 interface ElasticSecrets {
@@ -97,6 +99,10 @@ interface Svix {
 
 interface Stripe {
   apiKey: string;
+}
+
+interface Fingerprint {
+  fingerprintSdkKey: string;
 }
 
 export async function LoadSecrets(
@@ -244,6 +250,10 @@ export async function LoadSecrets(
     fpcProtectedCustodianKeyParameter: createSecretParameter(
       `fpcPrivateProectedToken-${stack}`,
       fpcProtectedCustodianKey.result,
+    ),
+    fingerprintSdkKey: createSecretParameter(
+      `fingerprintSdkKey-${stack}`,
+      secretConstants.fingerprint.fingerprintSdkKey,
     ),
   };
 }
