@@ -30,7 +30,6 @@ const Ending = () => {
     <>
       <SEO title={t('title')} description={t('description')} />
       <Navigation />
-
       <StyledContainer>
         <HeadingContainer>
           <Chip>{t('chip')}</Chip>

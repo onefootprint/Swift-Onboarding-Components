@@ -75,7 +75,7 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
             exit="exit"
           >
             <IconContainer>
-              <Rive src="/animations/face-id-2.riv" />
+              <Rive src="/animations/face-id.riv" />
             </IconContainer>
             <Typography
               as="p"
