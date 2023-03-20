@@ -840,7 +840,8 @@
       }
     },
     "tenant": {
-      "html-title": "{{tenantName}} ♥ Footprint",
+      "html-title-custom": "{{tenantName}} ♥ Footprint",
+      "html-title": "Your PII data is safe.",
       "html-description": "We care about your PII data and privacy. That's why {{tenantName}} has partnered with Footprint to achieve the highest security standards, so that your personal information is always safe and secure.",
       "title": "We care about your PII data and privacy.",
       "subtitle": "That's why {{tenantName}} has partnered with Footprint to achieve the highest security standards, so your personal information is always safe and secure.",

@@ -16,6 +16,7 @@ const BoostConversions = () => (
 );
 
 const ImageContainer = styled.div`
+  user-select: none;
   position: relative;
   display: flex;
   align-items: center;
@@ -83,7 +84,7 @@ const StyledImage = styled(Image)`
   ${media.greaterThan('lg')`
     mask: radial-gradient(50% 70% at 50% 60%, #fff 0%, transparent 40%);
     left: 50%;
-    top: 34%;
+    top: 36%;
   `}
 `;
 

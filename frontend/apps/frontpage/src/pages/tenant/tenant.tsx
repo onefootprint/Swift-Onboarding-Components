@@ -28,14 +28,25 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
   return (
     <>
       <Head>
-        <meta
-          property="og:title"
-          content={t('html-title', { tenantName: tenant.name })}
-        />
-        <meta
-          property="og:description"
-          content={t('html-description', { tenantName: tenant.name })}
-        />
+        {tenant.name ? (
+          <>
+            <title>{t('html-title-custom', { tenantName: tenant.name })}</title>
+            <meta
+              property="og:title"
+              content={t('html-title-custom', { tenantName: tenant.name })}
+            />
+            <meta
+              property="og:description"
+              content={t('html-description', { tenantName: tenant.name })}
+            />
+          </>
+        ) : (
+          <>
+            <title>{t('html-title')}</title>
+            <meta property="og:title" content={t('html-title')} />
+            <meta property="og:description" content={t('html-description')} />
+          </>
+        )}
         {tenant.logoUrl ? (
           <meta
             property="og:image"

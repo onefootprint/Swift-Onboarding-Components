@@ -45,6 +45,7 @@ const Shield = () => (
 );
 
 const Container = styled.div`
+  user-select: none;
   position: relative;
   display: flex;
   justify-content: center;

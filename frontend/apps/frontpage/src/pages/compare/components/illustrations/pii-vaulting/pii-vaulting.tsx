@@ -14,6 +14,7 @@ const PiiVaulting = () => (
 );
 
 const ImageContainer = styled.div`
+  user-select: none;
   position: relative;
   display: flex;
   align-items: center;

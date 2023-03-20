@@ -109,6 +109,7 @@ const Container = styled.div`
 
 const IconsContainer = styled.div`
   ${({ theme }) => css`
+    user-select: none;
     z-index: 1;
     display: flex;
     justify-content: center;

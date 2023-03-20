@@ -19,6 +19,7 @@ const CodeSnippet = () => (
 );
 
 const Code = styled(SyntaxHighlighter)`
+  user-select: none;
   background: transparent !important;
   font-family: monospace;
   color: #fff;
