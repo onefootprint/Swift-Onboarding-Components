@@ -83,7 +83,7 @@ async fn make_vendor_calls(
 
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
 
-            let requests = vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
+            let requests = vendor::build_verification_requests_and_checkpoint(conn, &uvw, &scoped_user.id)?;
 
             Ok((requests, ob))
         })

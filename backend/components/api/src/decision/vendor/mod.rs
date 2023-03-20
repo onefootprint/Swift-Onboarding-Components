@@ -1,16 +1,10 @@
 use crate::{
-    errors::{onboarding::OnboardingError, ApiError, ApiResult},
+    errors::{ApiError, ApiResult},
     utils::vault_wrapper::{Person, VaultWrapper},
 };
 
-use db::{
-    models::{
-        onboarding::{Onboarding, OnboardingUpdate},
-        verification_request::VerificationRequest,
-    },
-    TxnPgConn,
-};
-use newtypes::{OnboardingId, VendorAPI};
+use db::{models::verification_request::VerificationRequest, TxnPgConn};
+use newtypes::{OnboardingId, ScopedVaultId, VendorAPI};
 
 pub(super) mod build_request;
 pub mod make_request;
@@ -24,24 +18,11 @@ pub mod verification_result;
 pub fn build_verification_requests_and_checkpoint(
     conn: &mut TxnPgConn,
     uvw: &VaultWrapper<Person>,
-    ob_id: &OnboardingId,
+    su_id: &ScopedVaultId,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
-    // Once we set idv_reqs_initiated_at below, this lock will make sure we can't save multiple sets of VerificationRequests
-    // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
-    let ob = Onboarding::lock(conn, ob_id)?;
-
-    if ob.idv_reqs_initiated_at.is_some() {
-        return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-    }
-
-    // Always set the idv_reqs_initiated_at in order to checkpoint
-    let ob = ob.into_inner();
-    let su_id = ob.scoped_user_id.clone();
-    ob.update(conn, OnboardingUpdate::idv_reqs_initiated(true))?;
-
     let vendor_apis = desired_vendor_apis(uvw)?;
 
-    let requests_to_initiate = VerificationRequest::bulk_create(conn, su_id, vendor_apis)?;
+    let requests_to_initiate = VerificationRequest::bulk_create(conn, su_id.clone(), vendor_apis)?;
 
     Ok(requests_to_initiate)
 }

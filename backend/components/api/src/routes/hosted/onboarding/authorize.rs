@@ -164,13 +164,22 @@ async fn run_kyc(
         // Run KYC + produce a decision
         // Save Verification Requests, set ob to authorized, and (TODO) set onboarding to pending
         let ob = ob_info.onboarding.clone();
+        let scoped_user_id = ob_info.scoped_user.id.clone();
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<()> {
-                // This will error if we already have created verification requests for this onboarding
-                decision::vendor::build_verification_requests_and_checkpoint(conn, &uvw, &ob.id)?;
+                // Once we set idv_reqs_initiated_at below, this lock will make sure we can't save multiple sets of VerificationRequests
+                // and multiple decisions for an onboarding in a race condition (suppose we call /submit twice by accident)
+                let ob = Onboarding::lock(conn, &ob.id)?;
 
-                ob.update(conn, OnboardingUpdate::is_authorized())?;
+                if ob.idv_reqs_initiated_at.is_some() {
+                    return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+                }
+
+                decision::vendor::build_verification_requests_and_checkpoint(conn, &uvw, &scoped_user_id)?;
+                ob.into_inner()
+                    .update(conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
+
                 if let Some(biz_ob) = biz_ob {
                     biz_ob.update(conn, OnboardingUpdate::is_authorized())?;
                 }
