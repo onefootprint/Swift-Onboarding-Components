@@ -21,6 +21,9 @@ const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
       {severity === RiskSignalSeverity.Low && (
         <Badge variant="info">{t('low')}</Badge>
       )}
+      {severity === RiskSignalSeverity.Info && (
+        <Badge variant="neutral">{t('info')}</Badge>
+      )}
     </>
   );
 };

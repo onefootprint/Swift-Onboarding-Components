@@ -556,7 +556,8 @@
         "severity": {
           "low": "Low",
           "medium": "Medium",
-          "high": "High"
+          "high": "High",
+          "info": "Info"
         },
         "table": {
           "aria-label": "Risk signals",

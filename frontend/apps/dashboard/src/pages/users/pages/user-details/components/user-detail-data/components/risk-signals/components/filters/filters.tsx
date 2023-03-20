@@ -29,6 +29,10 @@ const RiskSignalsFilters = () => {
               label: t('severity.low'),
               value: 'low',
             },
+            {
+              label: t('severity.info'),
+              value: 'info',
+            },
           ],
           selectedOptions: filters.values.severity,
         },

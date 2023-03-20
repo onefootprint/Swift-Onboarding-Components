@@ -290,7 +290,7 @@ footprint_reason_code_enum! {
         #[note = "Private email domain", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Email], description = "The domain of the email address has been identified as belonging to a private individual."]
         EmailDomainPrivate,
 
-        #[note = "Corporate email domain", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Email], description = "The domain of the email address has been identified as belonging to a corporate entity."]
+        #[note = "Corporate email domain", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Email], description = "The domain of the email address has been identified as belonging to a corporate entity."]
         EmailDomainCorporate,
 
         #[note = "Email recently verified", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Email], description = "The email address is high risk because it was only recently verified in our databases."]
@@ -413,6 +413,7 @@ crate::util::impl_enum_str_diesel!(FootprintReasonCode);
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SignalSeverity {
+    Info,
     Low,
     Medium,
     High,
@@ -433,6 +434,7 @@ mod tests {
     use strum::IntoEnumIterator;
 
     #[test_case(SignalSeverity::Low, SignalSeverity::High => Ordering::Less)]
+    #[test_case(SignalSeverity::Info, SignalSeverity::Low => Ordering::Less)]
     #[test_case(SignalSeverity::Low, SignalSeverity::Medium => Ordering::Less)]
     #[test_case(SignalSeverity::Medium, SignalSeverity::High => Ordering::Less)]
     fn test_cmp_signal_severity(s1: SignalSeverity, s2: SignalSeverity) -> Ordering {

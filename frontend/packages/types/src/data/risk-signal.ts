@@ -4,6 +4,7 @@ export enum RiskSignalSeverity {
   Low = 'low',
   Medium = 'medium',
   High = 'high',
+  Info = 'info',
 }
 
 export type RiskSignal = {
