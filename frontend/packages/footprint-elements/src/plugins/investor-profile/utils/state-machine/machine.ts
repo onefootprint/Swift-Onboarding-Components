@@ -1,3 +1,4 @@
+import { InvestorProfileDataAttribute } from '@onefootprint/types/src/data/investor-data-attribute';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
@@ -17,13 +18,28 @@ const createCollectInvestorProfileDataMachine = () =>
         data: {},
       },
       states: {
-        init: {},
+        init: {
+          on: {
+            receivedContext: {
+              target: 'employment',
+              actions: 'assignInitialContext',
+            },
+          },
+        },
         employment: {
           on: {
-            employmentSubmitted: {
-              target: 'brokerageEmployment',
-              actions: 'assignData',
-            },
+            employmentSubmitted: [
+              {
+                target: 'brokerageEmployment',
+                actions: 'assignData',
+                cond: (context, event) =>
+                  !!event.payload[InvestorProfileDataAttribute.occupation],
+              },
+              {
+                target: 'income',
+                actions: 'assignData',
+              },
+            ],
           },
         },
         brokerageEmployment: {
@@ -73,7 +89,7 @@ const createCollectInvestorProfileDataMachine = () =>
         riskTolerance: {
           on: {
             riskToleranceSubmitted: {
-              target: 'conflictOfInterest',
+              target: 'declarations',
               actions: 'assignData',
             },
             navigatedToPrevPage: {
@@ -81,9 +97,9 @@ const createCollectInvestorProfileDataMachine = () =>
             },
           },
         },
-        conflictOfInterest: {
+        declarations: {
           on: {
-            conflictOfInterestSubmitted: {
+            declarationsSubmitted: {
               target: 'completed',
               actions: 'assignData',
             },
@@ -99,6 +115,10 @@ const createCollectInvestorProfileDataMachine = () =>
     },
     {
       actions: {
+        assignInitialContext: assign((context, event) => ({
+          ...context,
+          ...event.payload,
+        })),
         assignData: assign((context, event) => ({
           ...context,
           data: {

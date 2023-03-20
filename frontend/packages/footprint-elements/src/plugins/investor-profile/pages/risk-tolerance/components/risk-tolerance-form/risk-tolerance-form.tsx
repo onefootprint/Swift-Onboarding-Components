@@ -21,24 +21,39 @@ export type RiskToleranceFormProps = {
   onSubmit: (data: RiskToleranceData) => void;
 };
 
+type FormData = {
+  riskTolerance: InvestorProfileRiskTolerance;
+};
+
 const RiskToleranceForm = ({
   isLoading,
   defaultValues,
   onSubmit,
 }: RiskToleranceFormProps) => {
   const { t } = useTranslation('pages.risk-tolerance.form');
-  const { handleSubmit, register } = useForm<RiskToleranceData>({
-    defaultValues,
+  const { handleSubmit, register } = useForm<FormData>({
+    defaultValues: {
+      riskTolerance:
+        defaultValues?.[InvestorProfileDataAttribute.riskTolerance] ??
+        InvestorProfileRiskTolerance.conservative,
+    },
   });
 
+  const handleBeforeSubmit = (data: FormData) => {
+    const { riskTolerance } = data;
+    onSubmit({
+      [InvestorProfileDataAttribute.riskTolerance]: riskTolerance,
+    });
+  };
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
       <OptionsContainer data-private>
         <RadioContainer>
           <Radio
             value={InvestorProfileRiskTolerance.conservative}
             label={t(`${InvestorProfileRiskTolerance.conservative}.label`)}
-            {...register(InvestorProfileDataAttribute.riskTolerance)}
+            {...register('riskTolerance')}
           />
           <Typography variant="body-3" color="tertiary">
             {t(`${InvestorProfileRiskTolerance.conservative}.description`)}
@@ -48,7 +63,7 @@ const RiskToleranceForm = ({
           <Radio
             value={InvestorProfileRiskTolerance.moderate}
             label={t(`${InvestorProfileRiskTolerance.moderate}.label`)}
-            {...register(InvestorProfileDataAttribute.riskTolerance)}
+            {...register('riskTolerance')}
           />
           <Typography variant="body-3" color="tertiary">
             {t(`${InvestorProfileRiskTolerance.moderate}.description`)}
@@ -58,7 +73,7 @@ const RiskToleranceForm = ({
           <Radio
             value={InvestorProfileRiskTolerance.aggressive}
             label={t(`${InvestorProfileRiskTolerance.aggressive}.label`)}
-            {...register(InvestorProfileDataAttribute.riskTolerance)}
+            {...register('riskTolerance')}
           />
           <Typography variant="body-3" color="tertiary">
             {t(`${InvestorProfileRiskTolerance.aggressive}.description`)}

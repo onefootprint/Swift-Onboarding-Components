@@ -1,7 +1,5 @@
 export enum InvestorProfileDataAttribute {
-  employmentStatus = 'investor_profile.employment_status',
   occupation = 'investor_profile.occupation',
-  employedByBrokerage = 'investor_profile.employed_by_brokerage',
   employedByBrokerageFirm = 'investor_profile.brokerage_firm_employer',
   annualIncome = 'investor_profile.annual_income',
   netWorth = 'investor_profile.net_worth',
@@ -11,18 +9,8 @@ export enum InvestorProfileDataAttribute {
   complianceLetter = 'investor_profile.compliance_letter',
 }
 
-export enum InvestorProfileEmploymentStatus {
-  employed = 'employed',
-  unemployed = 'unemployed',
-}
-
-export enum InvestorProfileEmployedByBrokerage {
-  yes = 'yes',
-  no = 'no',
-}
-
 export enum InvestorProfileAnnualIncome {
-  tt50k = 'lt_50k',
+  lt50k = 'lt_50k',
   s50kTo100k = 's50k_to_100k',
   s100kTo250k = 's100k_to_250k',
   s250kTo500k = 's250k_to_500k',
@@ -30,7 +18,7 @@ export enum InvestorProfileAnnualIncome {
 }
 
 export enum InvestorProfileNetWorth {
-  tt50k = 'lt_50k',
+  lt50k = 'lt_50k',
   s50kTo100k = 's50k_to_100k',
   s100kTo250k = 's100k_to_250k',
   s250kTo500k = 's250k_to_500k',

@@ -2,9 +2,8 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileData,
   InvestorProfileDataAttribute,
-  InvestorProfileEmploymentStatus,
 } from '@onefootprint/types';
-import { Select, TextInput } from '@onefootprint/ui';
+import { Select, SelectOption, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -15,11 +14,15 @@ import { EmploymentData } from '../../../../utils/state-machine/types';
 export type EmploymentFormProps = {
   defaultValues?: Pick<
     InvestorProfileData,
-    | InvestorProfileDataAttribute.employmentStatus
-    | InvestorProfileDataAttribute.occupation
+    InvestorProfileDataAttribute.occupation
   >;
   isLoading?: boolean;
   onSubmit: (data: EmploymentData) => void;
+};
+
+type FormData = {
+  status: SelectOption;
+  occupation?: string;
 };
 
 const EmploymentForm = ({
@@ -28,66 +31,81 @@ const EmploymentForm = ({
   onSubmit,
 }: EmploymentFormProps) => {
   const { t } = useTranslation('pages.employment.form');
+  const options: SelectOption[] = [
+    {
+      label: t('employment-status.employed'),
+      value: 'employed',
+    },
+    {
+      label: t('employment-status.unemployed'),
+      value: 'unemployed',
+    },
+  ];
+
+  const defaultOccupation =
+    defaultValues?.[InvestorProfileDataAttribute.occupation];
+  const hasDefaultOccupation =
+    typeof defaultOccupation === 'string' && defaultOccupation.length > 0;
+  const defaultEmploymentStatus = hasDefaultOccupation
+    ? 'employed'
+    : 'unemployed';
+  const defaultOption = options.find(
+    option => option.value === defaultEmploymentStatus,
+  );
+
   const {
     register,
     control,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<EmploymentData>({
-    defaultValues,
+  } = useForm<FormData>({
+    defaultValues: {
+      status: defaultOption ?? options[0],
+      occupation: defaultOccupation,
+    },
   });
-  const employmentStatus = watch(InvestorProfileDataAttribute.employmentStatus);
 
-  const options = [
-    {
-      label: t('employment-status.employed'),
-      value: InvestorProfileEmploymentStatus.employed,
-    },
-    {
-      label: t('employment-status.unemployed'),
-      value: InvestorProfileEmploymentStatus.unemployed,
-    },
-  ];
+  const employmentStatus = watch('status') as SelectOption;
+  const handleBeforeSubmit = (formData: FormData) => {
+    const {
+      status: { value },
+      occupation = '',
+    } = formData;
+    onSubmit({
+      [InvestorProfileDataAttribute.occupation]:
+        value === 'employed' ? occupation : '',
+    });
+  };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
       <Controller
         control={control}
-        name={InvestorProfileDataAttribute.employmentStatus}
+        name="status"
         rules={{ required: true }}
-        render={({ field, fieldState: { error } }) => {
-          const value =
-            typeof field.value === 'object' ? field.value : undefined;
-          return (
-            <Select
-              isPrivate
-              label={t('employment-status.label')}
-              onBlur={field.onBlur}
-              options={options}
-              onChange={nextOption => {
-                field.onChange(nextOption);
-              }}
-              hint={error && t('employment-status.error')}
-              hasError={!!error}
-              placeholder={t('employment-status.placeholder')}
-              value={value}
-            />
-          );
-        }}
+        render={({ field, fieldState: { error } }) => (
+          <Select
+            isPrivate
+            label={t('employment-status.label')}
+            onBlur={field.onBlur}
+            options={options}
+            onChange={field.onChange}
+            hint={error && t('employment-status.error')}
+            hasError={!!error}
+            placeholder={t('employment-status.placeholder')}
+            value={field.value}
+          />
+        )}
       />
-      {employmentStatus === InvestorProfileEmploymentStatus.employed && (
+      {employmentStatus.value === 'employed' && (
         <TextInput
           data-private
-          hasError={!!errors[InvestorProfileDataAttribute.occupation]}
-          hint={
-            errors[InvestorProfileDataAttribute.occupation]
-              ? t('occupation.error')
-              : undefined
-          }
+          hasError={!!errors.occupation}
+          hint={errors.occupation ? t('occupation.error') : undefined}
           label={t('occupation.label')}
           placeholder={t('occupation.placeholder')}
-          {...register(InvestorProfileDataAttribute.occupation, {
+          {...register('occupation', {
             required: true,
           })}
         />

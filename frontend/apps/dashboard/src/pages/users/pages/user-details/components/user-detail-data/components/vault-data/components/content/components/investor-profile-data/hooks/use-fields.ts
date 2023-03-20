@@ -49,14 +49,11 @@ const useFields = (
   const left = [
     {
       title: t('employment-status-and-occupation'),
-      fields: [
-        getData(InvestorProfileDataAttribute.employmentStatus),
-        getData(InvestorProfileDataAttribute.occupation),
-      ],
+      fields: [getData(InvestorProfileDataAttribute.occupation)],
     },
     {
       title: t('brokerage-firm'),
-      fields: [getData(InvestorProfileDataAttribute.employedByBrokerage)],
+      fields: [getData(InvestorProfileDataAttribute.employedByBrokerageFirm)],
     },
     {
       title: t('annual-income'),

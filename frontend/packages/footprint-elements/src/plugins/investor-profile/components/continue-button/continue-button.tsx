@@ -7,11 +7,16 @@ type ContinueButtonProps = {
 };
 
 const ContinueButton = ({ isLoading }: ContinueButtonProps) => {
-  const { allT } = useTranslation('pages.investment-goals.form');
+  const { t } = useTranslation('components.continue-button');
 
   return (
-    <Button type="submit" fullWidth loading={isLoading}>
-      {allT('pages.cta-continue')}
+    <Button
+      type="submit"
+      fullWidth
+      loading={isLoading}
+      loadingAriaLabel={t('loading-aria-label')}
+    >
+      {t('label')}
     </Button>
   );
 };

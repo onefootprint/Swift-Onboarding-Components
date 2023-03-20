@@ -106,6 +106,7 @@ const Input = styled.input<Pick<CheckboxProps, 'hasError'>>`
     outline-offset: ${theme.spacing[2]};
     place-content: center;
     width: 16px;
+    min-width: 16px;
 
     &::before {
       content: '';

@@ -8,10 +8,10 @@ import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine'
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncErrorToast from '../../hooks/use-sync-error-toast';
 import { DeclarationData } from '../../utils/state-machine/types';
-import ConflictOfInterestForm from './components/conflict-of-interest-form';
+import DeclarationsForm from './components/declarations-form';
 
-const ConflictOfInterest = () => {
-  const { t } = useTranslation('pages.conflict-of-interest-form');
+const Declarations = () => {
+  const { t } = useTranslation('pages.declarations');
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -24,7 +24,7 @@ const ConflictOfInterest = () => {
       speculative: true,
       onSuccess: () => {
         send({
-          type: 'conflictOfInterestSubmitted',
+          type: 'declarationsSubmitted',
           payload: {
             ...declarationData,
           },
@@ -42,7 +42,7 @@ const ConflictOfInterest = () => {
         subtitle={t('subtitle')}
         sx={{ marginBottom: 7 }}
       />
-      <ConflictOfInterestForm
+      <DeclarationsForm
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
@@ -54,4 +54,4 @@ const ConflictOfInterest = () => {
   );
 };
 
-export default ConflictOfInterest;
+export default Declarations;

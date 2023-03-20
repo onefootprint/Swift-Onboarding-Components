@@ -305,17 +305,8 @@ describe('<VaultDataContent />', () => {
       it('should display the encrypted data', async () => {
         await renderVaultDataAndWaitData();
 
-        const employment = getTextByRow('Employment status', '•••••••••');
-        expect(employment).toBeInTheDocument();
-
         const occupation = getTextByRow('Occupation', '•••••••••');
         expect(occupation).toBeInTheDocument();
-
-        const brokerageFirm = getTextByRow(
-          'Employed by brokerage firm?',
-          '•••••••••',
-        );
-        expect(brokerageFirm).toBeInTheDocument();
 
         const annualIncome = getTextByRow('Annual income', '•••••••••');
         expect(annualIncome).toBeInTheDocument();

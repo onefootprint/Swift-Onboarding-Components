@@ -1,15 +1,23 @@
-import { customRender } from '@onefootprint/test-utils';
+import { InvestorProfileDataAttribute } from '@onefootprint/types';
 import React from 'react';
+
+import {
+  renderInvestorProfile,
+  screen,
+  selectEvents,
+  userEvent,
+  waitFor,
+} from '@/investor-profile/config/tests';
 
 import EmploymentForm, { EmploymentFormProps } from './employment-form';
 
-describe.skip('<EmploymentForm />', () => {
+describe('<EmploymentForm />', () => {
   const renderForm = ({
     defaultValues,
     isLoading,
     onSubmit = () => {},
   }: Partial<EmploymentFormProps>) => {
-    customRender(
+    renderInvestorProfile(
       <EmploymentForm
         defaultValues={defaultValues}
         isLoading={isLoading}
@@ -18,24 +26,74 @@ describe.skip('<EmploymentForm />', () => {
     );
   };
 
-  it('onSubmit is called when form is submitted', async () => {
+  it('should trigger onSubmit when form is submitted', async () => {
     const onSubmit = jest.fn();
     renderForm({ onSubmit });
-    // TODO:
+
+    const button = screen.getByRole('button', { name: 'Continue' });
+
+    await userEvent.click(button);
+    expect(onSubmit).toHaveBeenCalledWith({
+      [InvestorProfileDataAttribute.occupation]: '',
+    });
+
+    const trigger = screen.getByRole('button', { name: 'Unemployed' });
+    await selectEvents.select(trigger, 'Employed');
+    expect(screen.getByText('Employed')).toBeInTheDocument();
+
+    const occupation = screen.getByLabelText('Occupation');
+    await userEvent.type(occupation, 'Doctor');
+
+    await userEvent.click(button);
+    expect(onSubmit).toHaveBeenCalledWith({
+      [InvestorProfileDataAttribute.occupation]: 'Doctor',
+    });
   });
 
-  it('renders default values correctly', async () => {
-    renderForm({});
-    // TODO:
+  describe('renders default values correctly', () => {
+    it('when there is an occupation', async () => {
+      renderForm({
+        defaultValues: {
+          [InvestorProfileDataAttribute.occupation]: 'Doctor',
+        },
+      });
+
+      const occupation = screen.getByLabelText('Occupation');
+      expect(occupation).toHaveValue('Doctor');
+      expect(screen.getByText('Employed')).toBeInTheDocument();
+    });
+
+    it('when there are no default values', async () => {
+      renderForm({
+        defaultValues: {},
+      });
+
+      const occupation = screen.queryByLabelText('Occupation');
+      expect(occupation).not.toBeInTheDocument();
+      expect(screen.getByText('Unemployed')).toBeInTheDocument();
+    });
   });
 
   it('renders loading state correctly', async () => {
     renderForm({ isLoading: true });
-    // TODO:
+    const button = screen.getByLabelText('Loading...');
+    expect(button).toBeInTheDocument();
   });
 
   it('renders error state correctly', async () => {
-    renderForm({});
-    // TODO:
+    renderForm({
+      defaultValues: {
+        [InvestorProfileDataAttribute.occupation]: 'test',
+      },
+    });
+
+    const occupation = screen.getByLabelText('Occupation');
+    await userEvent.clear(occupation);
+
+    const button = screen.getByRole('button', { name: 'Continue' });
+    await userEvent.click(button);
+    await waitFor(() => {
+      expect(screen.getByText('Occupation is required')).toBeInTheDocument();
+    });
   });
 });

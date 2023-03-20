@@ -4,18 +4,16 @@ import {
   InvestorProfileDataAttribute,
   InvestorProfileDeclaration,
 } from '@onefootprint/types';
-import { Checkbox, Divider, Typography } from '@onefootprint/ui';
+import { Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import ContinueButton from '../../../../components/continue-button';
 import { DeclarationData } from '../../../../utils/state-machine/types';
-import UploadDoc from '../upload-doc/upload-doc';
+import UploadDoc from '../upload-doc';
 
-type FormData = Record<InvestorProfileDeclaration, boolean>;
-
-export type ConflictOfInterestFormProps = {
+export type DeclarationsFormProps = {
   defaultValues?: Pick<
     InvestorProfileData,
     InvestorProfileDataAttribute.declarations
@@ -24,12 +22,14 @@ export type ConflictOfInterestFormProps = {
   onSubmit: (data: DeclarationData) => void;
 };
 
-const ConflictOfInterestForm = ({
+type FormData = Record<InvestorProfileDeclaration, boolean>;
+
+const DeclarationsForm = ({
   defaultValues,
   isLoading,
   onSubmit,
-}: ConflictOfInterestFormProps) => {
-  const { t } = useTranslation('pages.conflict-of-interest.form');
+}: DeclarationsFormProps) => {
+  const { t } = useTranslation('pages.declarations.form');
   const defaultEntries = (
     defaultValues?.[InvestorProfileDataAttribute.declarations] ?? []
   ).map(goal => [goal, true]);
@@ -77,16 +77,7 @@ const ConflictOfInterestForm = ({
           {...register(InvestorProfileDeclaration.familyOfPoliticalFigure)}
         />
       </CheckboxContainer>
-      {shouldShowUpload && (
-        <>
-          <Divider />
-          <UploadDoc />
-          <Typography variant="caption-4" color="tertiary">
-            {t('doc-upload.disclaimer')}
-          </Typography>
-          <Divider />
-        </>
-      )}
+      {shouldShowUpload && <UploadDoc />}
       <ContinueButton isLoading={isLoading} />
     </Form>
   );
@@ -102,8 +93,13 @@ const Form = styled.form`
 const CheckboxContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[6]};
+
+    // For checkbox labels that wrap around, we want to align the text baseline
+    label {
+      align-items: baseline;
+    }
   `}
 `;
 
-export default ConflictOfInterestForm;
+export default DeclarationsForm;

@@ -51,7 +51,7 @@ const Income = () => {
         defaultValues={{
           [InvestorProfileDataAttribute.annualIncome]:
             data?.[InvestorProfileDataAttribute.annualIncome] ||
-            InvestorProfileAnnualIncome.tt50k,
+            InvestorProfileAnnualIncome.lt50k,
         }}
       />
     </>

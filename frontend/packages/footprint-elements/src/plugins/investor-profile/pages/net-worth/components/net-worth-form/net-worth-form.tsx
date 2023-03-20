@@ -21,48 +21,63 @@ export type NetWorthFormProps = {
   onSubmit: (data: NetWorthData) => void;
 };
 
+type FormData = {
+  netWorth: InvestorProfileNetWorth;
+};
+
 const NetWorthForm = ({
   isLoading,
   defaultValues,
   onSubmit,
 }: NetWorthFormProps) => {
   const { t } = useTranslation('pages.net-worth.form');
-  const { handleSubmit, register } = useForm<NetWorthData>({
-    defaultValues,
+  const { handleSubmit, register } = useForm<FormData>({
+    defaultValues: {
+      netWorth:
+        defaultValues?.[InvestorProfileDataAttribute.netWorth] ??
+        InvestorProfileNetWorth.lt50k,
+    },
   });
 
+  const handleBeforeSubmit = (data: FormData) => {
+    const { netWorth } = data;
+    onSubmit({
+      [InvestorProfileDataAttribute.netWorth]: netWorth,
+    });
+  };
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
       <OptionsContainer data-private>
         <Radio
-          value={InvestorProfileNetWorth.tt50k}
-          label={t(`${InvestorProfileNetWorth.tt50k}`)}
-          {...register(InvestorProfileDataAttribute.netWorth)}
+          value={InvestorProfileNetWorth.lt50k}
+          label={t(`${InvestorProfileNetWorth.lt50k}`)}
+          {...register('netWorth')}
         />
         <Radio
           value={InvestorProfileNetWorth.s50kTo100k}
           label={t(`${InvestorProfileNetWorth.s50kTo100k}`)}
-          {...register(InvestorProfileDataAttribute.netWorth)}
+          {...register('netWorth')}
         />
         <Radio
           value={InvestorProfileNetWorth.s100kTo250k}
           label={t(`${InvestorProfileNetWorth.s100kTo250k}`)}
-          {...register(InvestorProfileDataAttribute.netWorth)}
+          {...register('netWorth')}
         />
         <Radio
           value={InvestorProfileNetWorth.s250kTo500k}
           label={t(`${InvestorProfileNetWorth.s250kTo500k}`)}
-          {...register(InvestorProfileDataAttribute.netWorth)}
+          {...register('netWorth')}
         />
         <Radio
           value={InvestorProfileNetWorth.S500kTo1m}
           label={t(`${InvestorProfileNetWorth.S500kTo1m}`)}
-          {...register(InvestorProfileDataAttribute.netWorth)}
+          {...register('netWorth')}
         />
         <Radio
           value={InvestorProfileNetWorth.Gt1m}
           label={t(`${InvestorProfileNetWorth.Gt1m}`)}
-          {...register(InvestorProfileDataAttribute.netWorth)}
+          {...register('netWorth')}
         />
       </OptionsContainer>
       <ContinueButton isLoading={isLoading} />

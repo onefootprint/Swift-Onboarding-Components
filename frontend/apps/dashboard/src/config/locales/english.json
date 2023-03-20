@@ -852,7 +852,7 @@
                   "net-worth": "What's your net worth?",
                   "investment-goals": "What are your investment goals?",
                   "risk-tolerance": "How would you describe your risk tolerance?",
-                  "conflict-of-interest": "Do any of the following apply to you or a member of your immediate family?"
+                  "declarations": "Do any of the following apply to you or a member of your immediate family?"
                 }
               }
             }

@@ -1,17 +1,27 @@
-import { customRender } from '@onefootprint/test-utils';
+import {
+  InvestorProfileDataAttribute,
+  InvestorProfileRiskTolerance,
+} from '@onefootprint/types';
 import React from 'react';
+
+import {
+  renderInvestorProfile,
+  screen,
+  userEvent,
+  waitFor,
+} from '@/investor-profile/config/tests';
 
 import RiskToleranceForm, {
   RiskToleranceFormProps,
 } from './risk-tolerance-form';
 
-describe.skip('<RiskToleranceForm />', () => {
+describe('<RiskToleranceForm />', () => {
   const renderForm = ({
     defaultValues,
     isLoading,
     onSubmit = () => {},
   }: Partial<RiskToleranceFormProps>) => {
-    customRender(
+    renderInvestorProfile(
       <RiskToleranceForm
         defaultValues={defaultValues}
         isLoading={isLoading}
@@ -20,24 +30,74 @@ describe.skip('<RiskToleranceForm />', () => {
     );
   };
 
-  it('onSubmit is called when form is submitted', async () => {
+  it('should trigger onSubmit when form is submitted', async () => {
     const onSubmit = jest.fn();
     renderForm({ onSubmit });
-    // TODO:
+
+    const aggressive = screen.getByRole('radio', {
+      name: 'Aggressive',
+    }) as HTMLInputElement;
+    await userEvent.click(aggressive);
+    await waitFor(() => {
+      expect(aggressive.checked).toBe(true);
+    });
+
+    const button = screen.getByRole('button', { name: 'Continue' });
+    await userEvent.click(button);
+    expect(onSubmit).toHaveBeenCalledWith({
+      [InvestorProfileDataAttribute.riskTolerance]:
+        InvestorProfileRiskTolerance.aggressive,
+    });
   });
 
-  it('renders default values correctly', async () => {
-    renderForm({});
-    // TODO:
+  describe('renders default values correctly', () => {
+    it('when there are no defaults', async () => {
+      renderForm({});
+
+      const conservative = screen.getByRole('radio', {
+        name: 'Conservative',
+      }) as HTMLInputElement;
+      expect(conservative.checked).toBe(true);
+
+      const moderate = screen.getByRole('radio', {
+        name: 'Moderate',
+      }) as HTMLInputElement;
+      expect(moderate.checked).toBe(false);
+
+      const aggressive = screen.getByRole('radio', {
+        name: 'Aggressive',
+      }) as HTMLInputElement;
+      expect(aggressive.checked).toBe(false);
+    });
+
+    it('when there are defaults', async () => {
+      renderForm({
+        defaultValues: {
+          [InvestorProfileDataAttribute.riskTolerance]:
+            InvestorProfileRiskTolerance.moderate,
+        },
+      });
+
+      const conservative = screen.getByRole('radio', {
+        name: 'Conservative',
+      }) as HTMLInputElement;
+      expect(conservative.checked).toBe(false);
+
+      const moderate = screen.getByRole('radio', {
+        name: 'Moderate',
+      }) as HTMLInputElement;
+      expect(moderate.checked).toBe(true);
+
+      const aggressive = screen.getByRole('radio', {
+        name: 'Aggressive',
+      }) as HTMLInputElement;
+      expect(aggressive.checked).toBe(false);
+    });
   });
 
   it('renders loading state correctly', async () => {
     renderForm({ isLoading: true });
-    // TODO:
-  });
-
-  it('renders error state correctly', async () => {
-    renderForm({});
-    // TODO:
+    const button = screen.getByLabelText('Loading...');
+    expect(button).toBeInTheDocument();
   });
 });

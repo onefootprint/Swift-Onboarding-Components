@@ -1,4 +1,14 @@
 {
+  "components": {
+    "sync-data-error": {
+      "title": "An error occurred",
+      "description": "An error occurred while saving data. Please fix the inputs and try again."
+    },
+    "continue-button": {
+      "label": "Continue",
+      "loading-aria-label": "Loading..."
+    }
+  },
   "pages": {
     "employment": {
       "title": "What's your employment status and occupation?",
@@ -38,10 +48,10 @@
       "subtitle": "We're legally required to collect this information.",
       "form": {
         "lt_50k": "Under $50,000",
-        "s50k_to_100k": "$51,000 - $100,000",
-        "s100k_to_250k": "$101,000 - $250,000",
-        "s250k_to_500k": "$251,000 - $500,000",
-        "Gt_500k": "$501,000+"
+        "s50k_to_100k": "$50,000 - $100,000",
+        "s100k_to_250k": "$100,000 - $250,000",
+        "s250k_to_500k": "$250,000 - $500,000",
+        "Gt_500k": "$500,000+"
       }
     },
     "net-worth": {
@@ -49,11 +59,11 @@
       "subtitle": "We're legally required to collect this information.",
       "form": {
         "lt_50k": "Under $50,000",
-        "s50k_to_100k": "$51,000 - $100,000",
-        "s100k_to_250k": "$101,000 - $250,000",
-        "s250k_to_500k": "$251,000 - $500,000",
-        "s500k_to_1m": "$501,000 - $1,000,000",
-        "gt_1m": "$1,001,000+"
+        "s50k_to_100k": "$50,000 - $100,000",
+        "s100k_to_250k": "$100,000 - $250,000",
+        "s250k_to_500k": "$250,000 - $500,000",
+        "s500k_to_1m": "$500,000 - $1,000,000",
+        "gt_1m": "$1,000,000+"
       }
     },
     "investment-goals": {
@@ -65,7 +75,8 @@
         "support_loved_ones": "Support my loved ones",
         "buy_a_home": "Buy a home",
         "pay_off_debt": "Pay off debt",
-        "start_my_own_business": "Start my own business"
+        "start_my_own_business": "Start my own business",
+        "empty-selection": "Please select at least one goal"
       }
     },
     "risk-tolerance": {
@@ -86,7 +97,7 @@
         }
       }
     },
-    "conflict-of-interest": {
+    "declarations": {
       "title": "Do any of the following apply to you or a member of your immediate family?",
       "subtitle": "These declarations will not apply to most users.",
       "form": {
@@ -94,8 +105,7 @@
           "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
           "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
           "senior_political_figure": "I'm a senior political figure",
-          "family_of_political_figure": "I'm a family member or relative of a senior political figure",
-          "none": "None of the above apply to me or my family"
+          "family_of_political_figure": "I'm a family member or relative of a senior political figure"
         },
         "doc-upload": {
           "label": "Upload a compliance letter (PDF)",
@@ -104,11 +114,6 @@
           "required": "A compliance letter is required"
         }
       }
-    },
-    "sync-data-error": {
-      "title": "An error occurred",
-      "description": "An error occurred while saving data. Please fix the inputs and try again."
-    },
-    "cta-continue": "Continue"
+    }
   }
 }

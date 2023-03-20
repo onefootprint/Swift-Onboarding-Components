@@ -46,6 +46,7 @@
     "xstate": "^4.35.1"
   },
   "devDependencies": {
+    "@onefootprint/test-utils": "*",
     "@onefootprint/jest-presets": "*",
     "@rive-app/react-canvas": "^3.0.35",
     "@storybook/addon-actions": "^6.5.15",
@@ -76,6 +77,9 @@
     "preset": "@onefootprint/jest-presets/jest/web",
     "setupFiles": [
       "<rootDir>/src/plugins/collect-kyb-data/config/initializers/react-i18next-test.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "@/investor-profile/(.*)": "<rootDir>/src/plugins/investor-profile/$1"
+    }
   }
 }

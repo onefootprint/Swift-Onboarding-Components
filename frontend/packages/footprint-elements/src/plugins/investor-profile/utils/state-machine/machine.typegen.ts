@@ -15,12 +15,13 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignData:
       | 'brokerageEmploymentSubmitted'
-      | 'conflictOfInterestSubmitted'
+      | 'declarationsSubmitted'
       | 'employmentSubmitted'
       | 'incomeSubmitted'
       | 'investmentGoalsSubmitted'
       | 'netWorthSubmitted'
       | 'riskToleranceSubmitted';
+    assignInitialContext: 'receivedContext';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -28,7 +29,7 @@ export interface Typegen0 {
   matchesStates:
     | 'brokerageEmployment'
     | 'completed'
-    | 'conflictOfInterest'
+    | 'declarations'
     | 'employment'
     | 'income'
     | 'init'

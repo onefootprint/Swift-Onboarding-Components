@@ -5,14 +5,13 @@ import {
   InvestorProfileInvestmentGoal,
 } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import ContinueButton from '../../../../components/continue-button';
 import { InvestmentGoalsData } from '../../../../utils/state-machine/types';
-
-type FormData = Record<InvestorProfileInvestmentGoal, boolean>;
+import Error from '../error';
 
 export type InvestmentGoalsFormProps = {
   defaultValues?: Pick<
@@ -23,6 +22,8 @@ export type InvestmentGoalsFormProps = {
   onSubmit: (data: InvestmentGoalsData) => void;
 };
 
+type FormData = Record<InvestorProfileInvestmentGoal, boolean>;
+
 const InvestmentGoalsForm = ({
   defaultValues,
   isLoading,
@@ -32,14 +33,38 @@ const InvestmentGoalsForm = ({
   const defaultEntries = (
     defaultValues?.[InvestorProfileDataAttribute.investmentGoals] ?? []
   ).map(goal => [goal, true]);
-  const { handleSubmit, register } = useForm<FormData>({
+  const { handleSubmit, register, watch } = useForm<FormData>({
     defaultValues: Object.fromEntries(defaultEntries),
   });
+  const [showError, setShowError] = useState(false);
+  const growLongTermWealth = watch(
+    InvestorProfileInvestmentGoal.growLongTermWealth,
+  );
+  const saveForRetirement = watch(
+    InvestorProfileInvestmentGoal.saveForRetirement,
+  );
+  const buyAHome = watch(InvestorProfileInvestmentGoal.buyAHome);
+  const payOffDebt = watch(InvestorProfileInvestmentGoal.payOffDebt);
+  const startMyOwnBusiness = watch(
+    InvestorProfileInvestmentGoal.startMyOwnBusiness,
+  );
+  const hasEmptySelection =
+    !growLongTermWealth &&
+    !saveForRetirement &&
+    !buyAHome &&
+    !payOffDebt &&
+    !startMyOwnBusiness;
 
   const handleBeforeSubmit = (data: FormData) => {
+    if (hasEmptySelection) {
+      setShowError(true);
+      return;
+    }
+
     const goals = Object.entries(data)
       .filter(([, value]) => !!value)
       .map(([key]) => key as InvestorProfileInvestmentGoal);
+
     onSubmit({
       [InvestorProfileDataAttribute.investmentGoals]: goals,
     });
@@ -61,6 +86,10 @@ const InvestmentGoalsForm = ({
           {...register(InvestorProfileInvestmentGoal.buyAHome)}
         />
         <Checkbox
+          label={t(InvestorProfileInvestmentGoal.supportLovedOnes)}
+          {...register(InvestorProfileInvestmentGoal.supportLovedOnes)}
+        />
+        <Checkbox
           label={t(InvestorProfileInvestmentGoal.payOffDebt)}
           {...register(InvestorProfileInvestmentGoal.payOffDebt)}
         />
@@ -69,6 +98,7 @@ const InvestmentGoalsForm = ({
           {...register(InvestorProfileInvestmentGoal.startMyOwnBusiness)}
         />
       </CheckboxContainer>
+      {hasEmptySelection && showError && <Error />}
       <ContinueButton isLoading={isLoading} />
     </Form>
   );
@@ -84,7 +114,12 @@ const Form = styled.form`
 const CheckboxContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[6]};
+
+    // For checkbox labels that wrap around, we want to align the text baseline
+    label {
+      align-items: baseline;
+    }
   `}
 `;
 

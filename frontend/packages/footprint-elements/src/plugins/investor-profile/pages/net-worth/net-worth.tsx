@@ -51,7 +51,7 @@ const NetWorth = () => {
         defaultValues={{
           [InvestorProfileDataAttribute.netWorth]:
             data?.[InvestorProfileDataAttribute.netWorth] ||
-            InvestorProfileNetWorth.tt50k,
+            InvestorProfileNetWorth.lt50k,
         }}
       />
     </>

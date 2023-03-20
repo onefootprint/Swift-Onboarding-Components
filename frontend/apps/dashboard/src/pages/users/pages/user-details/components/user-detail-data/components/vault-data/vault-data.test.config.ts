@@ -49,9 +49,8 @@ export const userFixture: ScopedUser = {
   id: 'fp_id_rybIhIjSPky1yEZ7u77cok',
   isPortable: true,
   attributes: [
-    InvestorProfileDataAttribute.employmentStatus,
     InvestorProfileDataAttribute.occupation,
-    InvestorProfileDataAttribute.employedByBrokerage,
+    InvestorProfileDataAttribute.employedByBrokerageFirm,
     InvestorProfileDataAttribute.annualIncome,
     InvestorProfileDataAttribute.netWorth,
     InvestorProfileDataAttribute.investmentGoals,

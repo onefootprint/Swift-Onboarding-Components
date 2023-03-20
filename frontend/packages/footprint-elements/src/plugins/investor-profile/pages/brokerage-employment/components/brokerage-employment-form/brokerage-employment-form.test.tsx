@@ -1,17 +1,24 @@
-import { customRender } from '@onefootprint/test-utils';
+import { InvestorProfileDataAttribute } from '@onefootprint/types';
 import React from 'react';
+
+import {
+  renderInvestorProfile,
+  screen,
+  userEvent,
+  waitFor,
+} from '@/investor-profile/config/tests';
 
 import BrokerageEmploymentForm, {
   BrokerageEmploymentFormProps,
 } from './brokerage-employment-form';
 
-describe.skip('<BrokerageEmploymentForm />', () => {
+describe('<BrokerageEmploymentForm />', () => {
   const renderForm = ({
     defaultValues,
     isLoading,
     onSubmit = () => {},
   }: Partial<BrokerageEmploymentFormProps>) => {
-    customRender(
+    renderInvestorProfile(
       <BrokerageEmploymentForm
         defaultValues={defaultValues}
         isLoading={isLoading}
@@ -20,24 +27,76 @@ describe.skip('<BrokerageEmploymentForm />', () => {
     );
   };
 
-  it('onSubmit is called when form is submitted', async () => {
+  it('should trigger onSubmit when form is submitted', async () => {
     const onSubmit = jest.fn();
     renderForm({ onSubmit });
-    // TODO:
+
+    const button = screen.getByRole('button', { name: 'Continue' });
+
+    await userEvent.click(button);
+    expect(onSubmit).toHaveBeenCalledWith({
+      [InvestorProfileDataAttribute.employedByBrokerageFirm]: '',
+    });
+
+    const option = screen.getByLabelText('Yes, I am');
+    await userEvent.click(option);
+
+    const input = screen.getByLabelText('Firm');
+    await waitFor(() => {
+      expect(input).toBeInTheDocument();
+    });
+
+    await userEvent.type(input, 'Test');
+    await userEvent.click(button);
+    expect(onSubmit).toHaveBeenCalledWith({
+      [InvestorProfileDataAttribute.employedByBrokerageFirm]: 'Test',
+    });
   });
 
-  it('renders default values correctly', async () => {
-    renderForm({});
-    // TODO:
+  describe('renders default values correctly', () => {
+    it('when there is a firm name', () => {
+      renderForm({
+        defaultValues: {
+          [InvestorProfileDataAttribute.employedByBrokerageFirm]: 'Test',
+        },
+      });
+
+      const option = screen.getByLabelText('Yes, I am');
+      expect(option).toBeChecked();
+      const input = screen.getByLabelText('Firm');
+      expect(input).toHaveValue('Test');
+    });
+
+    it('when there are no default values', () => {
+      renderForm({ defaultValues: {} });
+
+      const option = screen.getByLabelText('No, I am not');
+      expect(option).toBeChecked();
+      const firm = screen.queryByLabelText('Firm');
+      expect(firm).not.toBeInTheDocument();
+    });
   });
 
   it('renders loading state correctly', async () => {
     renderForm({ isLoading: true });
-    // TODO:
+    const button = screen.getByLabelText('Loading...');
+    expect(button).toBeInTheDocument();
   });
 
   it('renders error state correctly', async () => {
-    renderForm({});
-    // TODO:
+    renderForm({
+      defaultValues: {
+        [InvestorProfileDataAttribute.employedByBrokerageFirm]: 'test',
+      },
+    });
+
+    const firm = screen.getByLabelText('Firm');
+    await userEvent.clear(firm);
+
+    const button = screen.getByRole('button', { name: 'Continue' });
+    await userEvent.click(button);
+    await waitFor(() => {
+      expect(screen.getByText('Firm is required')).toBeInTheDocument();
+    });
   });
 });

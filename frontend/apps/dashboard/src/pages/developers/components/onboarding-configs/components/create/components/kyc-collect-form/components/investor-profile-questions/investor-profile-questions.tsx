@@ -16,7 +16,7 @@ const InvestorProfileQuestions = () => {
       <Question>{t('net-worth')}</Question>
       <Question>{t('investment-goals')}</Question>
       <Question>{t('risk-tolerance')}</Question>
-      <Question>{t('conflict-of-interest')}</Question>
+      <Question>{t('declarations')}</Question>
     </QuestionsContainer>
   );
 };

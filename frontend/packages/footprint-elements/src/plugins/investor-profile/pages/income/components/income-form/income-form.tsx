@@ -21,43 +21,58 @@ export type IncomeFormProps = {
   onSubmit: (data: IncomeData) => void;
 };
 
+type FormData = {
+  income: InvestorProfileAnnualIncome;
+};
+
 const IncomeForm = ({
   defaultValues,
   isLoading,
   onSubmit,
 }: IncomeFormProps) => {
   const { t } = useTranslation('pages.income.form');
-  const { handleSubmit, register } = useForm<IncomeData>({
-    defaultValues,
+  const { handleSubmit, register } = useForm<FormData>({
+    defaultValues: {
+      income:
+        defaultValues?.[InvestorProfileDataAttribute.annualIncome] ??
+        InvestorProfileAnnualIncome.lt50k,
+    },
   });
 
+  const handleBeforeSubmit = (data: FormData) => {
+    const { income } = data;
+    onSubmit({
+      [InvestorProfileDataAttribute.annualIncome]: income,
+    });
+  };
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
       <OptionsContainer data-private>
         <Radio
-          value={InvestorProfileAnnualIncome.tt50k}
-          label={t(`${InvestorProfileAnnualIncome.tt50k}`)}
-          {...register(InvestorProfileDataAttribute.annualIncome)}
+          value={InvestorProfileAnnualIncome.lt50k}
+          label={t(`${InvestorProfileAnnualIncome.lt50k}`)}
+          {...register('income')}
         />
         <Radio
           value={InvestorProfileAnnualIncome.s50kTo100k}
           label={t(`${InvestorProfileAnnualIncome.s50kTo100k}`)}
-          {...register(InvestorProfileDataAttribute.annualIncome)}
+          {...register('income')}
         />
         <Radio
           value={InvestorProfileAnnualIncome.s100kTo250k}
           label={t(`${InvestorProfileAnnualIncome.s100kTo250k}`)}
-          {...register(InvestorProfileDataAttribute.annualIncome)}
+          {...register('income')}
         />
         <Radio
           value={InvestorProfileAnnualIncome.s250kTo500k}
           label={t(`${InvestorProfileAnnualIncome.s250kTo500k}`)}
-          {...register(InvestorProfileDataAttribute.annualIncome)}
+          {...register('income')}
         />
         <Radio
           value={InvestorProfileAnnualIncome.gt500k}
           label={t(`${InvestorProfileAnnualIncome.gt500k}`)}
-          {...register(InvestorProfileDataAttribute.annualIncome)}
+          {...register('income')}
         />
       </OptionsContainer>
       <ContinueButton isLoading={isLoading} />

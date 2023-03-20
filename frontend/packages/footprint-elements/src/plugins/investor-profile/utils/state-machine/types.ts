@@ -4,17 +4,14 @@ import {
   InvestorProfileDataAttribute,
 } from '@onefootprint/types';
 
-export type EmploymentData = Required<
-  Pick<InvestorProfileData, InvestorProfileDataAttribute.employmentStatus> &
-    Pick<InvestorProfileData, InvestorProfileDataAttribute.occupation>
+export type EmploymentData = Pick<
+  InvestorProfileData,
+  InvestorProfileDataAttribute.occupation
 >;
 
-export type EmployedByBrokerageData = Required<
-  Pick<InvestorProfileData, InvestorProfileDataAttribute.employedByBrokerage> &
-    Pick<
-      InvestorProfileData,
-      InvestorProfileDataAttribute.employedByBrokerageFirm
-    >
+export type EmployedByBrokerageData = Pick<
+  InvestorProfileData,
+  InvestorProfileDataAttribute.employedByBrokerageFirm
 >;
 
 export type IncomeData = Required<
@@ -77,7 +74,7 @@ export type MachineEvents =
       payload: RiskToleranceData;
     }
   | {
-      type: 'conflictOfInterestSubmitted';
+      type: 'declarationsSubmitted';
       payload: DeclarationData;
     }
   | {

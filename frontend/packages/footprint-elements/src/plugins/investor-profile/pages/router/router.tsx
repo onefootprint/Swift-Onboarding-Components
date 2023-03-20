@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import BrokerageEmployment from '../brokerage-employment';
-import ConflictOfInterest from '../conflict-of-interest';
+import Declarations from '../declarations';
 import Employment from '../employment';
 import Income from '../income';
+import InvestmentGoals from '../investment-goals';
 import NetWorth from '../net-worth';
 import RiskTolerance from '../risk-tolerance';
 
@@ -39,11 +40,14 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('riskTolerance')) {
     return <RiskTolerance />;
   }
-  if (state.matches('conflictOfInterest')) {
-    return <ConflictOfInterest />;
+  if (state.matches('investmentGoals')) {
+    return <InvestmentGoals />;
+  }
+  if (state.matches('declarations')) {
+    return <Declarations />;
   }
 
-  return <div>Router</div>;
+  return null;
 };
 
 export default Router;

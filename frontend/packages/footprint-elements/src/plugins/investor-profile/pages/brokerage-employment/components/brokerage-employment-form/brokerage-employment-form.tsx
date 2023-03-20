@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileData,
   InvestorProfileDataAttribute,
-  InvestorProfileEmployedByBrokerage,
 } from '@onefootprint/types';
 import { Radio, TextInput } from '@onefootprint/ui';
 import React from 'react';
@@ -15,11 +14,15 @@ import { EmployedByBrokerageData } from '../../../../utils/state-machine/types';
 export type BrokerageEmploymentFormProps = {
   defaultValues?: Pick<
     InvestorProfileData,
-    | InvestorProfileDataAttribute.employedByBrokerage
-    | InvestorProfileDataAttribute.employedByBrokerageFirm
+    InvestorProfileDataAttribute.employedByBrokerageFirm
   >;
   isLoading?: boolean;
   onSubmit: (data: EmployedByBrokerageData) => void;
+};
+
+type FormData = {
+  employed: 'true' | 'false';
+  firm?: string;
 };
 
 const BrokerageEmploymentForm = ({
@@ -28,44 +31,46 @@ const BrokerageEmploymentForm = ({
   onSubmit,
 }: BrokerageEmploymentFormProps) => {
   const { t } = useTranslation('pages.brokerage-employment.form');
+  const defaultFirm =
+    defaultValues?.[InvestorProfileDataAttribute.employedByBrokerageFirm];
+  const hasDefaultFirm =
+    typeof defaultFirm === 'string' && defaultFirm.length > 0;
+
   const {
     handleSubmit,
     register,
     watch,
     formState: { errors },
-  } = useForm<EmployedByBrokerageData>({
-    defaultValues,
+  } = useForm<FormData>({
+    defaultValues: {
+      employed: hasDefaultFirm ? 'true' : 'false',
+      firm: defaultFirm,
+    },
   });
-  const status = watch(InvestorProfileDataAttribute.employedByBrokerage);
+
+  const isEmployed = watch('employed');
+  const handleBeforeSubmit = (data: FormData) => {
+    const { employed, firm = '' } = data;
+    onSubmit({
+      [InvestorProfileDataAttribute.employedByBrokerageFirm]:
+        employed === 'true' ? firm : '',
+    });
+  };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
       <OptionsContainer data-private>
-        <Radio
-          value={InvestorProfileEmployedByBrokerage.no}
-          label={t('status.no')}
-          {...register(InvestorProfileDataAttribute.employedByBrokerage)}
-        />
-        <Radio
-          value={InvestorProfileEmployedByBrokerage.yes}
-          label={t('status.yes')}
-          {...register(InvestorProfileDataAttribute.employedByBrokerage)}
-        />
+        <Radio value="false" label={t('status.no')} {...register('employed')} />
+        <Radio value="true" label={t('status.yes')} {...register('employed')} />
       </OptionsContainer>
-      {status === InvestorProfileEmployedByBrokerage.yes && (
+      {isEmployed === 'true' && (
         <TextInput
           data-private
-          hasError={
-            !!errors[InvestorProfileDataAttribute.employedByBrokerageFirm]
-          }
-          hint={
-            errors[InvestorProfileDataAttribute.employedByBrokerageFirm]
-              ? t('firm.error')
-              : undefined
-          }
+          hasError={!!errors.firm}
+          hint={errors.firm ? t('firm.error') : undefined}
           placeholder={t('firm.placeholder')}
           label={t('firm.label')}
-          {...register(InvestorProfileDataAttribute.employedByBrokerageFirm, {
+          {...register('firm', {
             required: true,
           })}
         />
