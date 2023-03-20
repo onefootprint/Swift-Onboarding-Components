@@ -3,8 +3,11 @@ from tests.utils import (
     put,
     post,
     get_requirement_from_requirements,
+    file_contents,
+    multipart_file,
 )
 from tests.bifrost_client import BifrostClient
+from tests.dashboard.test_investor_profile import sb_user_with_investor_profile
 
 
 @pytest.fixture(scope="session")
@@ -17,12 +20,12 @@ def sandbox_user(investor_profile_ob_config, twilio):
         "collect_investor_profile", requirements
     )
     assert "investor_profile" in ip_requirement["missing_attributes"]
-    return auth_token
+    return bifrost_client
 
 
 def test_put_ip_info_valid(sandbox_user, ip_data):
-    post("hosted/user/vault/validate", ip_data, sandbox_user)
-    put("hosted/user/vault", ip_data, sandbox_user)
+    post("hosted/user/vault/validate", ip_data, sandbox_user.auth_token)
+    put("hosted/user/vault", ip_data, sandbox_user.auth_token)
 
 
 @pytest.mark.parametrize(
@@ -55,8 +58,41 @@ def test_put_ip_info_invalid(sandbox_user, ip_data, key, value, expected_error):
         **ip_data,
         key: value,
     }
-    body = post("hosted/user/vault/validate", ip_data, sandbox_user, status_code=400)
+    body = post(
+        "hosted/user/vault/validate", ip_data, sandbox_user.auth_token, status_code=400
+    )
     assert expected_error in body["error"]["message"][key]
 
-    body = put("hosted/user/vault", ip_data, sandbox_user, status_code=400)
+    body = put("hosted/user/vault", ip_data, sandbox_user.auth_token, status_code=400)
     assert expected_error in body["error"]["message"][key]
+
+
+class TestDocuments:
+    def test_invalid_upload(self, sandbox_user):
+        res = post(
+            "/hosted/user/upload",
+            None,
+            sandbox_user.auth_token,
+            files=multipart_file("example_txt.txt", "text/plain"),
+            status_code=400,
+        )
+        assert "image upload error: invalid file type" == res["error"]["message"]
+
+    def test_valid_upload(self, sandbox_user, ip_data, sandbox_tenant):
+        user = sandbox_user.onboard_user_onto_tenant(
+            sandbox_tenant,
+            investor_profile=ip_data,
+            document_file=multipart_file("example_pdf.pdf", "application/pdf"),
+        )
+
+        res = post(
+            f"/users/{user.fp_user_id}/vault/document/decrypt",
+            {
+                "kind": "finra_compliance_letter",
+                "reason": "show me",
+            },
+            sandbox_tenant.sk.key,
+            raw_response=True,
+        )
+        assert "application/pdf" == res.headers["content-type"]
+        assert (file_contents("example_pdf.pdf"), res.content)

@@ -68,16 +68,20 @@ def put(path, data=None, *auths, status_code=200, files=None):
     ).json()
 
 
-def post(path, data=None, *auths, status_code=200):
-    return _make_request(
+def post(path, data=None, *auths, status_code=200, files=None, raw_response=False):
+    res = _make_request(
         method=requests.post,
         path=path,
         data=data,
         params=None,
         status_code=status_code,
         auths=auths,
-        files=None,
-    ).json()
+        files=files,
+    )
+    if raw_response:
+        return res
+    else:
+        return res.json()
 
 
 def patch(path, data=None, *auths, status_code=200):
@@ -345,3 +349,16 @@ def override_webauthn_attestation(attestation):
         attestation["response"]["attestationObject"]
     )
     return attestation
+
+
+def file_path(filename):
+    return os.path.join(os.path.dirname(__file__), "resources/", filename)
+
+
+def multipart_file(filename, mime_type):
+    return {"upload_file": (filename, open(file_path(filename), "rb"), mime_type)}
+
+
+def file_contents(filename):
+    with open(file_path(filename), "rb") as f:
+        return f.read()

@@ -49,7 +49,9 @@ class BifrostClient:
         self.business_data = None
         self.user_data = build_user_data()
 
-    def init_user_for_onboarding(self, twilio, sandbox_suffix=None, document_data=None):
+    def init_user_for_onboarding(
+        self, twilio, sandbox_suffix=None, identity_document_data=None
+    ):
         """
         Associate a specific instance with a challenged user and data we'd like to simulate submitting
         """
@@ -60,7 +62,7 @@ class BifrostClient:
         )
         self.auth_token = user.auth_token
         self.phone_number = user.phone_number
-        self.document_data = document_data
+        self.identity_document_data = identity_document_data
         return self.auth_token
 
     def initialize_onboarding(self):
@@ -136,10 +138,10 @@ class BifrostClient:
             "country_code": "USA",
         }
 
-        if self.document_data.has_back():
+        if self.identity_document_data.has_back():
             data["back_image"] = test_image
 
-        if self.document_data.has_selfie():
+        if self.identity_document_data.has_selfie():
             data["selfie_image"] = test_image
             post(
                 f"hosted/user/consent",
@@ -171,8 +173,11 @@ class BifrostClient:
         )
         return body["footprint_user_id"]
 
+    def upload_document(self, document_file):
+        post("/hosted/user/upload", None, self.auth_token, files=document_file)
+
     def onboard_user_onto_tenant(
-        self, tenant, add_business_data=False, investor_profile=None
+        self, tenant, add_business_data=False, investor_profile=None, document_file=None
     ):
         """
         Onboards a user onto a tenant. See individual methods for more information
@@ -188,10 +193,12 @@ class BifrostClient:
         self.add_identity_data()
         if investor_profile:
             self.add_investor_profile(investor_profile)
+        if document_file:
+            self.upload_document(document_file)
         if add_business_data:
             self.add_business_data()
         self.register_biometric_credentials()
-        if self.document_data is not None:
+        if self.identity_document_data is not None:
             self.add_identity_document_data()
         validation_token = self.authorize_user_to_tenant()
         fp_user_id = self.validate_user(validation_token, tenant.sk)

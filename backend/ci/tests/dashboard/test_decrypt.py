@@ -17,7 +17,7 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
     """
     bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
     bifrost_client.init_user_for_onboarding(
-        twilio, document_data=DocumentDataOptions.front_back_selfie
+        twilio, identity_document_data=DocumentDataOptions.front_back_selfie
     )
     return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 
@@ -183,7 +183,7 @@ def test_tenant_selfie_decrypt(
     bifrost_client = BifrostClient(ob_config)
     bifrost_client.init_user_for_onboarding(
         twilio,
-        document_data=DocumentDataOptions.front_back_selfie,
+        identity_document_data=DocumentDataOptions.front_back_selfie,
     )
     user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
 

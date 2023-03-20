@@ -152,7 +152,9 @@ def test_get_users_detail_doc_and_selfie(
 ):
     tenant = sandbox_user.tenant
     bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio, document_data=document_data)
+    bifrost_client.init_user_for_onboarding(
+        twilio, identity_document_data=document_data
+    )
     user = bifrost_client.onboard_user_onto_tenant(tenant)
 
     res = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
