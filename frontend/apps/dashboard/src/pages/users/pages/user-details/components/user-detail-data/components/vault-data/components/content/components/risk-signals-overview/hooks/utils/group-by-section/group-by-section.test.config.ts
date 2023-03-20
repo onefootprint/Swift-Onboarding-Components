@@ -13,9 +13,7 @@ const createRiskSignal = (scopes: SignalAttribute[]): RiskSignal => ({
   note: 'VOIP phone number',
   description:
     "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-  deactivatedAt: null,
   onboardingDecisionId: faker.datatype.uuid(),
-  vendors: ['idology'],
   timestamp: '2022-10-24T21:56:12.682238Z',
 });
 

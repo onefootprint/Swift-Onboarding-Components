@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
+import createStringList from 'src/utils/create-string-list';
 import styled, { css } from 'styled-components';
 
 import SeverityBadge from '../../../../../severity-badge';
@@ -11,17 +12,15 @@ type OverviewProps = {
   description: RiskSignal['description'];
   scopes: RiskSignal['scopes'];
   severity: RiskSignal['severity'];
-  vendors: RiskSignal['vendors'];
 };
 
-const Overview = ({
-  vendors,
-  description,
-  scopes,
-  severity,
-}: OverviewProps) => {
+const Overview = ({ description, scopes, severity }: OverviewProps) => {
   const { t, allT } = useTranslation(
     'pages.user-details.risk-signals.details.overview',
+  );
+  const uniqueScopes = Array.from(new Set(scopes));
+  const scopesList = uniqueScopes.map(scope =>
+    allT(`signal-attributes.${scope}`),
   );
 
   return (
@@ -30,7 +29,6 @@ const Overview = ({
         <Typography variant="label-2">{t('title')}</Typography>
       </Header>
       <Fieldset>
-        <Field label={t('vendors')}>{vendors.toString()}</Field>
         <Grid.Row>
           <Grid.Column col={6}>
             <Field label={t('severity')}>
@@ -38,13 +36,7 @@ const Overview = ({
             </Field>
           </Grid.Column>
           <Grid.Column col={6}>
-            <Field label={t('scopes')}>
-              {scopes
-                .map(signalAttribute =>
-                  allT(`signal-attributes.${signalAttribute}`),
-                )
-                .toString()}
-            </Field>
+            <Field label={t('scopes')}>{createStringList(scopesList)}</Field>
           </Grid.Column>
         </Grid.Row>
         <Field label={t('description')}>{description}</Field>

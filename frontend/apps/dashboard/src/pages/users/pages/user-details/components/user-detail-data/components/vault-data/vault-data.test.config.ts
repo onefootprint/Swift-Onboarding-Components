@@ -29,9 +29,7 @@ export const riskSignalsFixture: RiskSignal[] = [
     note: 'VOIP phone number',
     description:
       "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-    deactivatedAt: null,
     onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-    vendors: ['idology'],
     timestamp: '2022-10-24T21:56:12.682238Z',
   },
   {
@@ -44,8 +42,6 @@ export const riskSignalsFixture: RiskSignal[] = [
     severity: RiskSignalSeverity.Low,
     scopes: [SignalAttribute.email],
     timestamp: '2022-10-24T21:56:12.682238Z',
-    deactivatedAt: null,
-    vendors: ['idology'],
   },
 ];
 

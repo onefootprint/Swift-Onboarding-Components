@@ -76,11 +76,8 @@ describe('<Details />', () => {
       );
       expect(description).toBeInTheDocument();
 
-      const vendors = screen.getByText('idology');
-      expect(vendors).toBeInTheDocument();
-
-      const scope = screen.getByText('Phone number');
-      expect(scope).toBeInTheDocument();
+      const scopes = screen.getByText('Phone number and Date of Birth');
+      expect(scopes).toBeInTheDocument();
     });
   });
 });

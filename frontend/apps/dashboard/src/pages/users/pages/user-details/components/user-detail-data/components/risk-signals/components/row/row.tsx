@@ -3,7 +3,7 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import { RiskSignal } from '@onefootprint/types';
 import { Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
-import createStringList from 'src/utils/create-string-list/create-string-list';
+import createStringList from 'src/utils/create-string-list';
 
 import SeverityBadge from '../severity-badge';
 

@@ -4,18 +4,17 @@ import React from 'react';
 
 import Overview from './components/overview';
 
-type DataProps = {
+type ContentProps = {
   riskSignal: RiskSignal;
 };
 
-const Data = ({ riskSignal }: DataProps) => (
+const Content = ({ riskSignal }: ContentProps) => (
   <>
     <Box sx={{ marginBottom: 9 }}>
       <Overview
         description={riskSignal.description}
         scopes={riskSignal.scopes}
         severity={riskSignal.severity}
-        vendors={riskSignal.vendors}
       />
     </Box>
     {/* 
@@ -31,4 +30,4 @@ const Data = ({ riskSignal }: DataProps) => (
   </>
 );
 
-export default Data;
+export default Content;

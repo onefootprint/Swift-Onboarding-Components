@@ -4,7 +4,7 @@ import { Drawer } from '@onefootprint/ui';
 import React from 'react';
 
 import useRiskSignalsFilters from '../../hooks/use-risk-signals-filters';
-import Data from './components/data';
+import Content from './components/content';
 import Error from './components/error';
 import Loading from './components/loading';
 import useRiskSignalDetails from './hooks/use-risk-signal-details';
@@ -25,7 +25,7 @@ const Details = () => {
   return (
     <Drawer open={isOpen} title={getDrawerTitle()} onClose={clear}>
       <>
-        {data && <Data riskSignal={data} />}
+        {data && <Content riskSignal={data} />}
         {isLoading && <Loading />}
         {error && <Error message={getErrorMessage(error)} />}
       </>

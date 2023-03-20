@@ -8,7 +8,6 @@ export enum RiskSignalSeverity {
 }
 
 export type RiskSignal = {
-  deactivatedAt: Date | null;
   description: string;
   id: string;
   note: string;
@@ -17,5 +16,4 @@ export type RiskSignal = {
   scopes: SignalAttribute[];
   severity: RiskSignalSeverity;
   timestamp: string;
-  vendors: string[];
 };

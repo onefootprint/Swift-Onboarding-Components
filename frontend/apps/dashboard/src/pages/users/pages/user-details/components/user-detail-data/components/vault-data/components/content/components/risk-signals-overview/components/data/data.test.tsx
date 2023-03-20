@@ -48,9 +48,7 @@ describe('<Data />', () => {
             note: 'VOIP phone number',
             description:
               "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-            deactivatedAt: null,
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-            vendors: ['idology'],
             timestamp: '2022-10-24T21:56:12.682238Z',
           },
         ],
@@ -71,9 +69,7 @@ describe('<Data />', () => {
             note: 'VOIP phone number',
             description:
               "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-            deactivatedAt: null,
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-            vendors: ['idology'],
             timestamp: '2022-10-24T21:56:12.682238Z',
           },
         ],
@@ -88,8 +84,6 @@ describe('<Data />', () => {
             severity: RiskSignalSeverity.Low,
             scopes: [SignalAttribute.email],
             timestamp: '2022-10-24T21:56:12.682238Z',
-            deactivatedAt: null,
-            vendors: ['idology'],
           },
         ],
       });
@@ -127,9 +121,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -172,9 +164,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -197,9 +187,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
             {
@@ -212,8 +200,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
         });
@@ -236,9 +222,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -261,9 +245,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
             {
@@ -276,8 +258,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
           low: [],
@@ -300,9 +280,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -325,9 +303,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
             {
@@ -340,8 +316,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.High,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
           medium: [],
@@ -366,9 +340,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -383,8 +355,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
         });
@@ -406,9 +376,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -424,8 +392,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
         });
@@ -447,9 +413,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -464,8 +428,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
           low: [],
@@ -488,9 +450,7 @@ describe('<Data />', () => {
               note: 'VOIP phone number',
               description:
                 "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-              deactivatedAt: null,
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-              vendors: ['idology'],
               timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
@@ -505,8 +465,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.Medium,
               scopes: [SignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
           low: [
@@ -520,8 +478,6 @@ describe('<Data />', () => {
               severity: RiskSignalSeverity.Low,
               scopes: [SignalAttribute.name],
               timestamp: '2022-10-24T21:56:12.682238Z',
-              deactivatedAt: null,
-              vendors: ['idology'],
             },
           ],
         });
