@@ -1,4 +1,5 @@
 export { default as BrokerTransition } from './animations/broker-transition';
+export { default as GenericTransition } from './animations/generic-transition';
 export { default as DeviceSignals } from './device-signals';
 export { default as FootprintFooter } from './footprint-footer';
 export { default as FootprintProvider } from './footprint-provider';
