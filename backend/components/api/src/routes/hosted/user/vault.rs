@@ -11,7 +11,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use newtypes::email::Email;
 use newtypes::put_data_request::PutDataRequest;
-use newtypes::IdentityDataKind;
+use newtypes::{IdentityDataKind, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -24,7 +24,11 @@ pub async fn post_validate(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
-    let request = request.into_inner().decompose(true)?;
+    let opts = ParseOptions {
+        for_bifrost: true,
+        allow_extra_field_errors: false,
+    };
+    let request = request.into_inner().decompose(opts)?;
     request.assert_no_business_data()?;
 
     EmptyResponse::ok().json()
@@ -41,7 +45,11 @@ pub async fn put(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
-    let request = request.into_inner().decompose(true)?;
+    let opts = ParseOptions {
+        for_bifrost: true,
+        allow_extra_field_errors: false,
+    };
+    let request = request.into_inner().decompose(opts)?;
     let fingerprints = build_fingerprints(&state, request.id_update.clone()).await?;
     let email = request
         .id_update

@@ -13,6 +13,7 @@ use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::KvDataKey;
+use newtypes::ParseOptions;
 use newtypes::PiiString;
 use std::collections::HashMap;
 
@@ -73,7 +74,11 @@ pub async fn vault_pii(
                     }
                     .create(conn)?;
                     // TODO could technically now support vaulting any kind of data instead of just custom
-                    let (data, _) = DataRequest::<KvDataKey>::new(custom, false)?;
+                    let opts = ParseOptions {
+                        for_bifrost: false,
+                        allow_extra_field_errors: false,
+                    };
+                    let (data, _) = DataRequest::<KvDataKey>::new(custom, opts)?;
                     uvw.update_custom_data(conn, data)?
                 }
 

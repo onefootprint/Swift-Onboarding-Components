@@ -11,7 +11,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::put_data_request::PutDataRequest;
-use newtypes::{AccessEventKind, FootprintUserId};
+use newtypes::{AccessEventKind, FootprintUserId, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[api_v2_operation(
@@ -25,7 +25,11 @@ pub async fn post_validate(
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     tenant_auth.check_guard(TenantGuard::Admin)?;
-    let request = request.into_inner().decompose(true)?;
+    let opts = ParseOptions {
+        for_bifrost: false,
+        allow_extra_field_errors: false,
+    };
+    let request = request.into_inner().decompose(opts)?;
     request.assert_no_business_data()?;
 
     EmptyResponse::ok().json()
@@ -53,7 +57,11 @@ pub async fn put(
     let principal = tenant_auth.actor().into();
 
     let targets = request.keys().cloned().collect_vec();
-    let request = request.into_inner().decompose(true)?;
+    let opts = ParseOptions {
+        for_bifrost: false,
+        allow_extra_field_errors: false,
+    };
+    let request = request.into_inner().decompose(opts)?;
     let fingerprints = build_fingerprints(&state, request.id_update.clone()).await?;
 
     state

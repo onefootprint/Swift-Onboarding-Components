@@ -19,13 +19,23 @@ impl<T> DataRequest<T> {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct ParseOptions {
+    /// When true, performs some front-loaded validation that vendors normally perform in order to
+    /// try to prevent vendors rejecting our request with a 400.
+    pub for_bifrost: bool,
+    /// Don't raise errors for trying to add superfluous fields to the vault.
+    /// Useful to allow speculatively validating data that is only a part of a CDO
+    pub allow_extra_field_errors: bool,
+}
+
 impl<T> DataRequest<T>
 where
     T: IsDataIdentifierDiscriminant,
 {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
-    pub fn new(map: DataIdentifierRequest, for_bifrost: bool) -> NtResult<(Self, DataIdentifierRequest)> {
+    pub fn new(map: DataIdentifierRequest, opts: ParseOptions) -> NtResult<(Self, DataIdentifierRequest)> {
         let (data, other_data): (HashMap<_, _>, HashMap<_, _>) =
             map.into_iter()
                 .partition_map(|(k, v)| match T::try_from(k.clone()) {
@@ -33,27 +43,29 @@ where
                     Err(_) => Right((k, v)),
                 });
 
-        let clean_id_data = Self::clean_and_validate_data(data, for_bifrost)?;
+        let clean_id_data = Self::clean_and_validate_data(data, opts)?;
         let id_update = Self(clean_id_data);
         Ok((id_update, other_data))
     }
 
-    fn clean_and_validate_data(data: RawDataRequest<T>, for_bifrost: bool) -> NtResult<RawDataRequest<T>> {
+    fn clean_and_validate_data(data: RawDataRequest<T>, opts: ParseOptions) -> NtResult<RawDataRequest<T>> {
         // Make sure all keys provided are parts of coherent CollectedDataOptions.
         // For ex, can't specify FirstName without LastName
-        let keys = data.keys().cloned().collect_vec();
-        let extra_dis = Self::extra_keys(keys)
-            .into_iter()
-            .filter_map(|x| x.parent().map(|p| (p, x.into())))
-            .collect_vec();
-        if !extra_dis.is_empty() {
-            return Err(DataValidationError::ExtraFieldError(extra_dis).into());
+        if !opts.allow_extra_field_errors {
+            let keys = data.keys().cloned().collect_vec();
+            let extra_dis = Self::extra_keys(keys)
+                .into_iter()
+                .filter_map(|x| x.parent().map(|p| (p, x.into())))
+                .collect_vec();
+            if !extra_dis.is_empty() {
+                return Err(DataValidationError::ExtraFieldError(extra_dis).into());
+            }
         }
 
         // Iterate through keys, use validation function per key and keep track of errors
         let (cleaned_id_data, errors): (HashMap<_, _>, HashMap<_, _>) =
             data.into_iter()
-                .partition_map(|(k, v)| match k.validate(v, for_bifrost) {
+                .partition_map(|(k, v)| match k.validate(v, opts.for_bifrost) {
                     Ok(v) => Left((k, v)),
                     Err(v) => Right((k.into(), v)),
                 });

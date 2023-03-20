@@ -18,6 +18,7 @@ use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::put_data_request::PutDataRequest;
 use newtypes::AccessEventKind;
+use newtypes::ParseOptions;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -50,7 +51,11 @@ pub async fn post(
         let request = request.into_inner();
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
-            let request = request.decompose(true)?;
+            let opts = ParseOptions {
+                for_bifrost: false,
+                allow_extra_field_errors: false,
+            };
+            let request = request.decompose(opts)?;
             let fingerprints = build_fingerprints(&state, request.id_update.clone()).await?;
             Some((targets, request, fingerprints))
         } else {

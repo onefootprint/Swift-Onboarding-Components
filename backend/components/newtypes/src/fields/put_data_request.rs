@@ -1,6 +1,6 @@
 use crate::{
     flat_api_object_map_type, BusinessDataKind as BDK, DataIdentifier, DataRequest, Error,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey, NtResult, PiiString,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey, NtResult, ParseOptions, PiiString,
 };
 
 flat_api_object_map_type!(
@@ -12,7 +12,7 @@ flat_api_object_map_type!(
 impl PutDataRequest {
     /// Decomposes the hashmap of DataIdentifier -> PiiString into its parts that live in different
     /// underlying database tables.
-    pub fn decompose(mut self, for_bifrost: bool) -> NtResult<DecomposedPutRequest> {
+    pub fn decompose(mut self, opts: ParseOptions) -> NtResult<DecomposedPutRequest> {
         // Custom logic to always populate ssn4 if ssn9 is provided
         if let Some(ssn9) = self.get(&IDK::Ssn9.into()) {
             #[allow(clippy::map_entry)]
@@ -27,16 +27,16 @@ impl PutDataRequest {
         // TODO more general logic to parse DataRequests for each type
 
         // Parse identity data
-        let (id_update, other_data) = DataRequest::<IDK>::new(self.into(), for_bifrost)?;
+        let (id_update, other_data) = DataRequest::<IDK>::new(self.into(), opts)?;
 
         // Parse investor profile data
-        let (ip_update, other_data) = DataRequest::<IPK>::new(other_data, for_bifrost)?;
+        let (ip_update, other_data) = DataRequest::<IPK>::new(other_data, opts)?;
 
         // Parse business data
-        let (business_data, other_data) = DataRequest::<BDK>::new(other_data, for_bifrost)?;
+        let (business_data, other_data) = DataRequest::<BDK>::new(other_data, opts)?;
 
         // Parse custom data - this is mostly a no-op since we do no validation on custom data
-        let (custom_data, other_data) = DataRequest::<KvDataKey>::new(other_data, for_bifrost)?;
+        let (custom_data, other_data) = DataRequest::<KvDataKey>::new(other_data, opts)?;
         if let Some(k) = other_data.into_iter().next() {
             return Err(Error::Custom(format!("Cannot put key {}", k.0)));
         }

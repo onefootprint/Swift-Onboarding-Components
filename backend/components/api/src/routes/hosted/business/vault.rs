@@ -6,6 +6,7 @@ use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
 use newtypes::put_data_request::PutDataRequest;
+use newtypes::ParseOptions;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -18,7 +19,11 @@ pub async fn post_validate(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
-    let request = request.into_inner().decompose(true)?;
+    let opts = ParseOptions {
+        for_bifrost: true,
+        allow_extra_field_errors: false,
+    };
+    let request = request.into_inner().decompose(opts)?;
     request.assert_no_id_data()?;
 
     EmptyResponse::ok().json()
@@ -35,7 +40,11 @@ pub async fn put(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
-    let request = request.into_inner().decompose(true)?;
+    let opts = ParseOptions {
+        for_bifrost: true,
+        allow_extra_field_errors: false,
+    };
+    let request = request.into_inner().decompose(opts)?;
 
     state
         .db_pool

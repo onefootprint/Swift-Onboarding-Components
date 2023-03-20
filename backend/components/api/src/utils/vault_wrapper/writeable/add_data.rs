@@ -278,7 +278,7 @@ mod test {
         utils::vault_wrapper::{Person, WriteableVw},
     };
     use db::TxnPgConn;
-    use newtypes::{put_data_request::PutDataRequest, DataIdentifier, Fingerprint, PiiString};
+    use newtypes::{put_data_request::PutDataRequest, DataIdentifier, Fingerprint, ParseOptions, PiiString};
     use std::collections::HashMap;
 
     impl WriteableVw<Person> {
@@ -289,7 +289,11 @@ mod test {
             data: Vec<(DataIdentifier, PiiString)>,
         ) -> ApiResult<()> {
             let request = PutDataRequest::from(HashMap::from_iter(data.into_iter()));
-            let request = request.decompose(true)?;
+            let opts = ParseOptions {
+                for_bifrost: true,
+                allow_extra_field_errors: false,
+            };
+            let request = request.decompose(opts)?;
             let fingerprints = request
                 .id_update
                 .keys()
