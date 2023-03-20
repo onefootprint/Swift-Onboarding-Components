@@ -1,4 +1,4 @@
-import Postmate from 'postmate';
+import Postmate from '@onefootprint/postmate';
 
 import {
   FootprintInternalEvent,
@@ -34,12 +34,9 @@ class FootprintIframe {
       container,
       name: 'footprint-iframe',
       url,
+      allow: 'otp-credentials; publickey-credentials-get *; camera *;',
     });
     this.handleIframeLoaded();
-    this.child.frame.setAttribute(
-      'allow',
-      'otp-credentials; publickey-credentials-get *; camera *;',
-    );
 
     this.child.on(FootprintPublicEvent.closed, () => this.close());
     this.child.on(FootprintInternalEvent.started, () => {

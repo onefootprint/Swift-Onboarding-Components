@@ -34,7 +34,7 @@
     "heic2any": "^0.0.3",
     "i18next": "^22.0.4",
     "lodash": "^4.17.21",
-    "postmate": "^1.5.2",
+    "@onefootprint/postmate": "2.1.0",
     "qrcode.react": "^3.1.0",
     "react-hook-form": "^7.43.5",
     "react-i18next": "^12.0.0",
