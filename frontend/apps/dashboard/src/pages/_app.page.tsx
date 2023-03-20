@@ -5,6 +5,7 @@ import FootprintDevTools, {
   ObserveCollectorProvider,
 } from '@onefootprint/dev-tools';
 import { DesignSystemProvider } from '@onefootprint/ui';
+import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
@@ -60,6 +61,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           </DesignSystemProvider>
         </ReactQueryProvider>
       </ObserveCollectorProvider>
+      <Analytics />
     </>
   );
 };
