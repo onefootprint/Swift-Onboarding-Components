@@ -1,0 +1,1 @@
+ALTER TABLE fingerprint_visit_event DROP COLUMN response;

@@ -27,6 +27,8 @@ pub async fn post(
         request_id,
     } = request.into_inner();
 
+    // TODO: hit server API for request info, save inside the FPVE
+
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {

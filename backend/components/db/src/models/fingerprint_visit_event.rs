@@ -20,6 +20,7 @@ pub struct FingerprintVisitEvent {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub fingerprint_request_id: FingerprintRequestId,
+    pub response: Option<serde_json::Value>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = fingerprint_visit_event)]
@@ -31,6 +32,7 @@ pub struct NewFingerprintVisit {
     pub session_id: Option<String>,
     pub created_at: DateTime<Utc>,
     pub request_id: FingerprintRequestId,
+    pub response: Option<serde_json::Value>,
 }
 impl FingerprintVisitEvent {
     #[tracing::instrument(skip_all)]
@@ -51,6 +53,7 @@ impl FingerprintVisitEvent {
             session_id,
             created_at: Utc::now(),
             request_id,
+            response: None,
         };
 
         let visit = diesel::insert_into(fingerprint_visit_event::table)

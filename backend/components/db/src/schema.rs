@@ -144,6 +144,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         request_id -> Text,
+        response -> Nullable<Jsonb>,
     }
 }
 
