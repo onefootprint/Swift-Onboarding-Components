@@ -6,6 +6,9 @@ pub use insight::*;
 mod telemetry;
 pub use telemetry::*;
 
+mod allow_extra_fields;
+pub use allow_extra_fields::*;
+
 use crate::errors::{ApiError, ApiResult};
 
 pub fn get_header(name: &str, req: &HeaderMap) -> Option<String> {

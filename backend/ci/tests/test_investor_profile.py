@@ -67,6 +67,37 @@ def test_put_ip_info_invalid(sandbox_user, ip_data, key, value, expected_error):
     assert expected_error in body["error"]["message"][key]
 
 
+def test_put_ip_info_incomplete_data(sandbox_user):
+    data = {"investor_profile.occupation": "Penguin veterinarian"}
+    # Should not be able to provide single pieces of data without addl_headers
+    post(
+        "hosted/user/vault/validate",
+        data,
+        sandbox_user.auth_token,
+        status_code=400,
+    )
+
+    # But, when we provide this special header, should silence that error
+    addl_headers = {
+        "x-fp-allow-extra-fields": "true",
+    }
+    post(
+        "hosted/user/vault/validate",
+        data,
+        sandbox_user.auth_token,
+        addl_headers=addl_headers,
+    )
+
+    # The non-speculative endpoint should never accept this header
+    put(
+        "hosted/user/vault",
+        data,
+        sandbox_user.auth_token,
+        status_code=400,
+        addl_headers=addl_headers,
+    )
+
+
 class TestDocuments:
     def test_invalid_upload(self, sandbox_user):
         res = post(

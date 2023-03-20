@@ -29,8 +29,14 @@ class IncorrectServerVersion(Exception):
         super().__init__(message)
 
 
-def _make_request(method, path, data, params, status_code, auths, files):
+def _make_request(
+    method, path, data, params, status_code, auths, files, addl_headers=None
+):
     headers = {auth.HEADER_NAME: auth.value for auth in auths}
+    headers = {
+        **headers,
+        **(addl_headers or {}),
+    }
     response = method(url(path), headers=headers, json=data, params=params, files=files)
     if response.status_code != status_code:
         raise HttpError(
@@ -56,7 +62,7 @@ def get(path, params=None, *auths, status_code=200):
     ).json()
 
 
-def put(path, data=None, *auths, status_code=200, files=None):
+def put(path, data=None, *auths, status_code=200, files=None, addl_headers=None):
     return _make_request(
         method=requests.put,
         path=path,
@@ -65,10 +71,19 @@ def put(path, data=None, *auths, status_code=200, files=None):
         status_code=status_code,
         auths=auths,
         files=files,
+        addl_headers=addl_headers,
     ).json()
 
 
-def post(path, data=None, *auths, status_code=200, files=None, raw_response=False):
+def post(
+    path,
+    data=None,
+    *auths,
+    status_code=200,
+    files=None,
+    raw_response=False,
+    addl_headers=None,
+):
     res = _make_request(
         method=requests.post,
         path=path,
@@ -77,6 +92,7 @@ def post(path, data=None, *auths, status_code=200, files=None, raw_response=Fals
         status_code=status_code,
         auths=auths,
         files=files,
+        addl_headers=addl_headers,
     )
     if raw_response:
         return res
