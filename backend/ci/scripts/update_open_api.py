@@ -84,10 +84,11 @@ def get_apis(open_api_spec, tag):
             paths_dict[endpoint.url][endpoint.method].append(endpoint.serialize())
             used_entity_refs |= set(endpoint.schemas)
     # Create the final list of all schemas used by the matching endpoints
-    used_schemas = [
-        open_api_spec["components"]["schemas"][schema_ref.split("/")[-1]]
-        for schema_ref in used_entity_refs
-    ]
+    used_entity_names = [schema_ref.split("/")[-1] for schema_ref in used_entity_refs]
+    used_schemas = {
+        name: open_api_spec["components"]["schemas"][name]
+        for name in used_entity_names
+    }
     return {
         **open_api_spec,
         "components": {
