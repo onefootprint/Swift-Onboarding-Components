@@ -1,6 +1,7 @@
 use crate::models::scoped_vault::ScopedVault;
 use crate::models::vault::Vault;
 use crate::schema;
+use crate::DbResult;
 use crate::PgConn;
 use crate::{errors::DbError, schema::scoped_user::BoxedQuery};
 use chrono::{DateTime, Utc};
@@ -8,6 +9,7 @@ use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::OnboardingStatusFilter;
+use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::{DecisionStatus, Fingerprint, FootprintUserId, TenantId};
 
@@ -26,7 +28,13 @@ pub struct ScopedVaultListQueryParams {
     pub kind: Option<VaultKind>,
 }
 
-pub fn list_authorized_for_tenant_query<'a>(params: ScopedVaultListQueryParams) -> BoxedQuery<'a, Pg> {
+/// Composes the query to fetch authorized users matching the provided filter params.
+/// Requires the `conn` only to execute one subquery because diesel doesn't like it. Returns a box
+/// query that must still be executed
+pub fn list_authorized_for_tenant_query<'a>(
+    conn: &mut PgConn,
+    params: ScopedVaultListQueryParams,
+) -> DbResult<BoxedQuery<'a, Pg>> {
     // Filter out onboardings that haven't been explicitly authorized by the user - these should
     // not be visible in the dashboard since the tenant doesn't have permissions to view anything
     // about the user
@@ -34,7 +42,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: ScopedVaultListQueryParams) 
         data_lifetime, fingerprint, manual_review, onboarding, onboarding_decision, scoped_user, user_vault,
     };
     let mut query = scoped_user::table
-        .filter(scoped_user::tenant_id.eq(params.tenant_id))
+        .filter(scoped_user::tenant_id.eq(params.tenant_id.clone()))
         .filter(scoped_user::is_live.eq(params.is_live))
         .into_boxed();
 
@@ -143,29 +151,53 @@ pub fn list_authorized_for_tenant_query<'a>(params: ScopedVaultListQueryParams) 
     }
 
     if let Some(fingerprints) = params.fingerprints {
-        let matching_uv_ids = fingerprint::table
+        // We have to basically replicate the DataLifetime::get_active inside a SQL query -
+        // fingerprints for a piece of data for a given tenant A should be visible if either:
+        // - the data is not portablized but was added by tenant A
+        // - the data is portablized (could be added by any tenant)
+        // These two subqueries handle each case respectively
+
+        let owned_scoped_vault_ids = scoped_user::table
+            .filter(scoped_user::tenant_id.eq(params.tenant_id))
+            .select(scoped_user::id);
+        let matching_speculative_v_ids: Vec<VaultId> = fingerprint::table
             .inner_join(data_lifetime::table)
-            // Active lifetimes - all active rows that are portable
-            // TODO should also be able to search speculative fingerprints made by this tenant.
-            // But diesel doesn't let you join on scoped_user and use it in a subquery
-            // Might be able to execute this subquery and then use it - I don't think results
-            // would be large
+            // Active, non-portablized lifetimes that were added by this tenant
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .filter(data_lifetime::portablized_seqno.is_null())
+            .filter(data_lifetime::scoped_user_id.eq_any(owned_scoped_vault_ids))
+            // Matching fingerprint
+            .filter(fingerprint::sh_data.eq_any(&fingerprints))
+            // Specifically get the matching user_vault_id (the scoped_user_id might belong to another tenant)
+            .select(data_lifetime::user_vault_id)
+            // Sadly, diesel doesn't let you join on scoped_user and use it in a subquery on the
+            // scoped_user table... So, we have to actually execute the subquery
+            .get_results(conn)?;
+
+        let matching_portable_v_ids = fingerprint::table
+            .inner_join(data_lifetime::table)
+            // Active, PORTABLE lifetimes
             .filter(data_lifetime::deactivated_seqno.is_null())
             .filter(not(data_lifetime::portablized_seqno.is_null()))
             // Matching fingerprint
             .filter(fingerprint::sh_data.eq_any(fingerprints))
+            // Specifically get the matching user_vault_id (the scoped_user_id might belong to another tenant)
             .select(data_lifetime::user_vault_id);
-        query = query.filter(scoped_user::user_vault_id.eq_any(matching_uv_ids))
+        query = query.filter(
+            scoped_user::user_vault_id
+                .eq_any(matching_portable_v_ids)
+                .or(scoped_user::user_vault_id.eq_any(matching_speculative_v_ids)),
+        )
     }
 
-    query
+    Ok(query)
 }
 
 pub fn count_authorized_for_tenant(
     conn: &mut PgConn,
     params: ScopedVaultListQueryParams,
 ) -> Result<i64, DbError> {
-    let count = list_authorized_for_tenant_query(params)
+    let count = list_authorized_for_tenant_query(conn, params)?
         .count()
         .get_result(conn)?;
     Ok(count)
@@ -178,7 +210,7 @@ pub fn list_authorized_for_tenant(
     cursor: Option<i64>,
     page_size: i64,
 ) -> Result<Vec<(ScopedVault, Vault)>, DbError> {
-    let mut scoped_users = list_authorized_for_tenant_query(params)
+    let mut scoped_users = list_authorized_for_tenant_query(conn, params)?
         .order_by(schema::scoped_user::ordering_id.desc())
         .limit(page_size);
 
