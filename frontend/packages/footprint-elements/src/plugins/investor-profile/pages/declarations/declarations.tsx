@@ -3,6 +3,7 @@ import { InvestorProfileDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
+import useUploadFile from '../../../../hooks/api/hosted/user/use-upload-file';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -14,10 +15,51 @@ const Declarations = () => {
   const { t } = useTranslation('pages.declarations');
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
-  const { mutation, syncData } = useSyncData();
+  const { mutation: syncDataMutation, syncData } = useSyncData();
+  const uploadFileMutation = useUploadFile();
   const showToast = useSyncErrorToast();
 
-  const handleSubmit = (declarationData: DeclarationData) => {
+  const sendDeclarationData = (declarationData: DeclarationData) => {
+    send({
+      type: 'declarationsSubmitted',
+      payload: {
+        ...declarationData,
+      },
+    });
+  };
+
+  const commitData = (declarationData: DeclarationData, files?: File[]) => {
+    syncData({
+      authToken,
+      data: {
+        ...data,
+        ...declarationData,
+      },
+      onSuccess: async () => {
+        // Next, submit any docs data to backend
+        if (!files?.length) {
+          sendDeclarationData(declarationData);
+          return;
+        }
+
+        uploadFileMutation.mutate(
+          {
+            file: files[0],
+            authToken: authToken ?? '',
+          },
+          {
+            onSuccess: () => {
+              sendDeclarationData(declarationData);
+            },
+            onError: showToast,
+          },
+        );
+      },
+      onError: showToast,
+    });
+  };
+
+  const handleSubmit = (declarationData: DeclarationData, files?: File[]) => {
     // First send the declarations data speculatively to check for any errors
     syncData({
       authToken,
@@ -25,22 +67,7 @@ const Declarations = () => {
       speculative: true,
       onSuccess: () => {
         // Since this is the last data collection step, go ahead and submit all of this data to backend non-speculatively
-        syncData({
-          authToken,
-          data: {
-            ...data,
-            ...declarationData,
-          },
-          onSuccess: () => {
-            send({
-              type: 'declarationsSubmitted',
-              payload: {
-                ...declarationData,
-              },
-            });
-          },
-          onError: showToast,
-        });
+        commitData(declarationData, files);
       },
       onError: showToast,
     });
@@ -55,7 +82,7 @@ const Declarations = () => {
         sx={{ marginBottom: 7 }}
       />
       <DeclarationsForm
-        isLoading={mutation.isLoading}
+        isLoading={syncDataMutation.isLoading || uploadFileMutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
           [InvestorProfileDataAttribute.declarations]:

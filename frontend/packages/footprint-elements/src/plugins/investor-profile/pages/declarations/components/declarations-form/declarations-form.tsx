@@ -5,13 +5,13 @@ import {
   InvestorProfileDeclaration,
 } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import ContinueButton from '../../../../components/continue-button';
 import { DeclarationData } from '../../../../utils/state-machine/types';
-import UploadDoc from '../upload-doc';
+import UploadComplianceLetter from '../upload-compliance-letter';
 
 export type DeclarationsFormProps = {
   defaultValues?: Pick<
@@ -19,7 +19,7 @@ export type DeclarationsFormProps = {
     InvestorProfileDataAttribute.declarations
   >;
   isLoading?: boolean;
-  onSubmit: (data: DeclarationData) => void;
+  onSubmit: (data: DeclarationData, files?: File[]) => void;
 };
 
 type FormData = Record<InvestorProfileDeclaration, boolean>;
@@ -40,19 +40,42 @@ const DeclarationsForm = ({
     InvestorProfileDeclaration.affiliatedWithUsBroker,
   );
   const seniorExecutive = watch(InvestorProfileDeclaration.seniorExecutive);
-  const shouldShowUpload = affiliatedWithUsBroker || seniorExecutive;
+  const shouldRequireUpload = affiliatedWithUsBroker || seniorExecutive;
+  const [shouldShowUploadError, setShouldShowUploadError] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+
+  const handleUploadChange = (newFiles: File[]) => {
+    if (newFiles.length > 0) {
+      setShouldShowUploadError(false);
+    }
+    setFiles(newFiles);
+  };
 
   const handleBeforeSubmit = (data: FormData) => {
-    const goals = Object.entries(data)
+    if (shouldRequireUpload && files.length === 0) {
+      setShouldShowUploadError(true);
+      return;
+    }
+
+    const filteredData = Object.entries(data)
       .filter(([, value]) => !!value)
       .map(([key]) => key as InvestorProfileDeclaration);
-    onSubmit({
-      [InvestorProfileDataAttribute.declarations]: goals,
-    });
+    const declarations = {
+      [InvestorProfileDataAttribute.declarations]: filteredData,
+    };
+
+    if (files.length) {
+      onSubmit(declarations, files);
+    } else {
+      onSubmit(declarations);
+    }
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
+    <Form
+      onSubmit={handleSubmit(handleBeforeSubmit)}
+      encType="multipart/form-data"
+    >
       <CheckboxContainer>
         <Checkbox
           label={t(
@@ -77,7 +100,12 @@ const DeclarationsForm = ({
           {...register(InvestorProfileDeclaration.familyOfPoliticalFigure)}
         />
       </CheckboxContainer>
-      {shouldShowUpload && <UploadDoc />}
+      {shouldRequireUpload && (
+        <UploadComplianceLetter
+          hasError={shouldShowUploadError}
+          onChange={handleUploadChange}
+        />
+      )}
       <ContinueButton isLoading={isLoading} />
     </Form>
   );
