@@ -72,7 +72,10 @@ fn create_identity_document_info_for_user(
                     let selfie_collected = utils::identity_document::id_doc_collected_selfie(id_doc_and_req)
                         && selfie_document_types.contains(&id_doc_and_req.document_type);
                     IdentityDocumentKindForUser {
+                        // Supporting this for backwards compatibility
                         kind: id_doc_and_req.document_type,
+                        // Provide fully-fledged identifier to the frontend
+                        data_identifier: DataIdentifier::IdDocument(id_doc_and_req.document_type),
                         status,
                         selfie_collected,
                     }

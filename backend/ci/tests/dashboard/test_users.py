@@ -143,11 +143,19 @@ def test_get_users_detail(sandbox_user):
     [
         (
             DocumentDataOptions.front_back,
-            [{"type": "passport", "status": "success", "selfie_collected": False}],
+            {
+                "data_identifier": "id_document.passport",
+                "status": "success",
+                "selfie_collected": False,
+            },
         ),
         (
             DocumentDataOptions.front_back_selfie,
-            [{"type": "passport", "status": "success", "selfie_collected": True}],
+            {
+                "data_identifier": "id_document.passport",
+                "status": "success",
+                "selfie_collected": True,
+            },
         ),
     ],
 )
@@ -166,7 +174,9 @@ def test_get_users_detail_doc_and_selfie(
     user = bifrost_client.onboard_user_onto_tenant(tenant)
 
     res = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
-    assert res["identity_document_info"] == expected_identity_document_info
+    assert len(res["identity_document_info"]) == 1
+    for (k, v) in expected_identity_document_info.items():
+        assert res["identity_document_info"][0][k] == v
 
 
 def test_liveness_list(sandbox_user):

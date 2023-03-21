@@ -23,7 +23,10 @@ export_schema!(User);
 
 pub struct IdentityDocumentKindForUser {
     #[serde(rename = "type")]
+    /// Deprecated
     pub kind: IdDocKind,
+    /// The data identifier for this document
+    pub data_identifier: DataIdentifier,
     pub status: UserFacingCollectedDocumentStatus,
     pub selfie_collected: bool,
 }
