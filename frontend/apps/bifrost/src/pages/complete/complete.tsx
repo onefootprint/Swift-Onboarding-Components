@@ -7,7 +7,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { Box, LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import isKybCdo from 'src/utils/cdo-utils/isKybCdo';
+import { isKybCdo } from 'src/utils/cdo-utils';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 

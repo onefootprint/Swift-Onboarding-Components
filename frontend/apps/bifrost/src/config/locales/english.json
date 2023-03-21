@@ -180,7 +180,8 @@
         "business-address": "Registered address",
         "business-beneficial-owners": "Beneficial owners",
         "business-website": "Website",
-        "business-phone-number": "Phone number"
+        "business-phone-number": "Phone number",
+        "investor-profile": "Investor profile"
       }
     },
     "config-invalid": {

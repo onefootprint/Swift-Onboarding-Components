@@ -18,16 +18,28 @@ const Declarations = () => {
   const showToast = useSyncErrorToast();
 
   const handleSubmit = (declarationData: DeclarationData) => {
+    // First send the declarations data speculatively to check for any errors
     syncData({
       authToken,
       data: declarationData,
       speculative: true,
       onSuccess: () => {
-        send({
-          type: 'declarationsSubmitted',
-          payload: {
+        // Since this is the last data collection step, go ahead and submit all of this data to backend non-speculatively
+        syncData({
+          authToken,
+          data: {
+            ...data,
             ...declarationData,
           },
+          onSuccess: () => {
+            send({
+              type: 'declarationsSubmitted',
+              payload: {
+                ...declarationData,
+              },
+            });
+          },
+          onError: showToast,
         });
       },
       onError: showToast,

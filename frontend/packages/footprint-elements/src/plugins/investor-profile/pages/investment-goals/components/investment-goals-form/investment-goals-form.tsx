@@ -45,12 +45,16 @@ const InvestmentGoalsForm = ({
   );
   const buyAHome = watch(InvestorProfileInvestmentGoal.buyAHome);
   const payOffDebt = watch(InvestorProfileInvestmentGoal.payOffDebt);
+  const supportLovedOnes = watch(
+    InvestorProfileInvestmentGoal.supportLovedOnes,
+  );
   const startMyOwnBusiness = watch(
     InvestorProfileInvestmentGoal.startMyOwnBusiness,
   );
   const hasEmptySelection =
     !growLongTermWealth &&
     !saveForRetirement &&
+    !supportLovedOnes &&
     !buyAHome &&
     !payOffDebt &&
     !startMyOwnBusiness;

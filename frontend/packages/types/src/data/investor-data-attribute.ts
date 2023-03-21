@@ -10,20 +10,20 @@ export enum InvestorProfileDataAttribute {
 }
 
 export enum InvestorProfileAnnualIncome {
-  lt50k = 'lt_50k',
-  s50kTo100k = 's50k_to_100k',
-  s100kTo250k = 's100k_to_250k',
-  s250kTo500k = 's250k_to_500k',
-  gt500k = 'Gt_500k',
+  lt50k = 'lt50k',
+  s50kTo100k = 's50k_to100k',
+  s100kTo250k = 's100k_to250k',
+  s250kTo500k = 's250k_to500k',
+  gt500k = 'gt500k',
 }
 
 export enum InvestorProfileNetWorth {
-  lt50k = 'lt_50k',
-  s50kTo100k = 's50k_to_100k',
-  s100kTo250k = 's100k_to_250k',
-  s250kTo500k = 's250k_to_500k',
-  S500kTo1m = 's500k_to_1m',
-  Gt1m = 'gt_1m',
+  lt50k = 'lt50k',
+  s50kTo100k = 's50k_to100k',
+  s100kTo250k = 's100k_to250k',
+  s250kTo500k = 's250k_to500k',
+  S500kTo1m = 's500k_to1m',
+  gt1m = 'gt1m',
 }
 
 export enum InvestorProfileInvestmentGoal {

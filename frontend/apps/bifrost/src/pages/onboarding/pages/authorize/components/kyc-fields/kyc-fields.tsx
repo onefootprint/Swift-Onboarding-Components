@@ -3,6 +3,7 @@ import {
   IcoBuilding24,
   IcoCake24,
   IcoCar24,
+  IcoDollar24,
   IcoEmail24,
   IcoFileText24,
   IcoIdCard24,
@@ -14,12 +15,13 @@ import {
 } from '@onefootprint/icons';
 import {
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
   IdDocType,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import isKycCdo from 'src/utils/cdo-utils/isKycCdo';
+import { isKycCdo } from 'src/utils/cdo-utils';
 
 import { FieldProps } from '../field';
 import FieldsList from '../fields-list';
@@ -42,7 +44,11 @@ const IconByIdDocType: Record<IdDocType, Icon> = {
 };
 
 type KycFieldsProps = {
-  data: (CollectedKycDataOption | CollectedDocumentDataOption)[];
+  data: (
+    | CollectedKycDataOption
+    | CollectedDocumentDataOption
+    | CollectedInvestorProfileDataOption
+  )[];
   documentTypes: IdDocType[];
   showTitle?: boolean;
 };
@@ -67,21 +73,34 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
   };
 
   const fields: FieldProps[] = [];
-  data.forEach((cdo: CollectedKycDataOption | CollectedDocumentDataOption) => {
-    if (isKycCdo(cdo)) {
-      fields.push({
-        IconComponent:
-          IconByCollectedKycDataOption[cdo as CollectedKycDataOption],
-        label: collectedKycDataOptionLabels[cdo as CollectedKycDataOption],
-      });
-    }
-    if (cdo === CollectedDocumentDataOption.documentAndSelfie) {
-      fields.push({
-        IconComponent: IcoSelfie24,
-        label: t('data-labels.selfie'),
-      });
-    }
-  });
+  data.forEach(
+    (
+      cdo:
+        | CollectedKycDataOption
+        | CollectedDocumentDataOption
+        | CollectedInvestorProfileDataOption,
+    ) => {
+      if (isKycCdo(cdo)) {
+        fields.push({
+          IconComponent:
+            IconByCollectedKycDataOption[cdo as CollectedKycDataOption],
+          label: collectedKycDataOptionLabels[cdo as CollectedKycDataOption],
+        });
+      }
+      if (cdo === CollectedDocumentDataOption.documentAndSelfie) {
+        fields.push({
+          IconComponent: IcoSelfie24,
+          label: t('data-labels.selfie'),
+        });
+      }
+      if (cdo === CollectedInvestorProfileDataOption.investorProfile) {
+        fields.push({
+          IconComponent: IcoDollar24,
+          label: t('data-labels.investor-profile'),
+        });
+      }
+    },
+  );
 
   documentTypes.forEach(docType => {
     fields.push({

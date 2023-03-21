@@ -75,8 +75,8 @@ const NetWorthForm = ({
           {...register('netWorth')}
         />
         <Radio
-          value={InvestorProfileNetWorth.Gt1m}
-          label={t(`${InvestorProfileNetWorth.Gt1m}`)}
+          value={InvestorProfileNetWorth.gt1m}
+          label={t(`${InvestorProfileNetWorth.gt1m}`)}
           {...register('netWorth')}
         />
       </OptionsContainer>

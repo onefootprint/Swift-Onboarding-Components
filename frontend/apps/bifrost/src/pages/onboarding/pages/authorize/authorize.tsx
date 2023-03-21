@@ -7,6 +7,7 @@ import {
 import { useTranslation } from '@onefootprint/hooks';
 import {
   CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
   IdDocType,
@@ -14,9 +15,12 @@ import {
 import { Divider, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
-import isDocCdo from 'src/utils/cdo-utils/isDocCdo';
-import isKybCdo from 'src/utils/cdo-utils/isKybCdo';
-import isKycCdo from 'src/utils/cdo-utils/isKycCdo';
+import {
+  isDocCdo,
+  isInvestorProfileCdo,
+  isKybCdo,
+  isKycCdo,
+} from 'src/utils/cdo-utils';
 import styled, { css } from 'styled-components';
 
 import Button from './components/button/button';
@@ -37,8 +41,12 @@ const Authorize = () => {
     [],
   );
   const kycData = canAccessData.filter(
-    data => isKycCdo(data) || isDocCdo(data),
-  ) as (CollectedKycDataOption | CollectedDocumentDataOption)[];
+    data => isKycCdo(data) || isDocCdo(data) || isInvestorProfileCdo(data),
+  ) as (
+    | CollectedKycDataOption
+    | CollectedDocumentDataOption
+    | CollectedInvestorProfileDataOption
+  )[];
   const kybData = canAccessData.filter(data =>
     isKybCdo(data),
   ) as CollectedKybDataOption[];

@@ -47,23 +47,23 @@
       "title": "What's your annual income?",
       "subtitle": "We're legally required to collect this information.",
       "form": {
-        "lt_50k": "Under $50,000",
-        "s50k_to_100k": "$50,000 - $100,000",
-        "s100k_to_250k": "$100,000 - $250,000",
-        "s250k_to_500k": "$250,000 - $500,000",
-        "Gt_500k": "$500,000+"
+        "lt50k": "Under $50,000",
+        "s50k_to100k": "$50,000 - $100,000",
+        "s100k_to250k": "$100,000 - $250,000",
+        "s250k_to500k": "$250,000 - $500,000",
+        "gt500k": "$500,000+"
       }
     },
     "net-worth": {
       "title": "What's your net worth?",
       "subtitle": "We're legally required to collect this information.",
       "form": {
-        "lt_50k": "Under $50,000",
-        "s50k_to_100k": "$50,000 - $100,000",
-        "s100k_to_250k": "$100,000 - $250,000",
-        "s250k_to_500k": "$250,000 - $500,000",
-        "s500k_to_1m": "$500,000 - $1,000,000",
-        "gt_1m": "$1,000,000+"
+        "lt50k": "Under $50,000",
+        "s50k_to100k": "$50,000 - $100,000",
+        "s100k_to250k": "$100,000 - $250,000",
+        "s250k_to500k": "$250,000 - $500,000",
+        "s500k_to1m": "$500,000 - $1,000,000",
+        "gt1m": "$1,000,000+"
       }
     },
     "investment-goals": {
