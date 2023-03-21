@@ -1,9 +1,7 @@
 use super::{Person, VaultWrapper};
 use db::models::document_data::DocumentData;
-use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::phone_number::PhoneNumber;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
@@ -13,24 +11,6 @@ use newtypes::IsDataIdentifierDiscriminant;
 use newtypes::{CollectedDataOption, SealedVaultBytes};
 
 impl VaultWrapper<Person> {
-    /// Return speculative phone numbers if exist, otherwise portable. There should only be one
-    pub fn phone_numbers(&self) -> &[PhoneNumber] {
-        if !self.speculative.phone_numbers.is_empty() {
-            &self.speculative.phone_numbers
-        } else {
-            &self.portable.phone_numbers
-        }
-    }
-
-    /// Return speculative emails if exist, otherwise portable. There should only be one
-    pub fn emails(&self) -> &[Email] {
-        if !self.speculative.emails.is_empty() {
-            &self.speculative.emails
-        } else {
-            &self.portable.emails
-        }
-    }
-
     /// Return speculative identity_documents if exist, otherwise portable. There should only be one
     pub fn identity_documents(&self) -> &[IdentityDocumentAndRequest] {
         // TODO but do we support portable ID docs?

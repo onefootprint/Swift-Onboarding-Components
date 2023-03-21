@@ -7,7 +7,6 @@ mod consent;
 mod decrypt;
 mod document;
 mod email;
-mod index;
 mod liveness;
 mod token;
 mod upload;
@@ -18,7 +17,6 @@ mod tests;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
-        .service(index::get)
         .service(authorized_orgs::get)
         .service(vault::put)
         .service(vault::post_validate)
@@ -31,7 +29,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(liveness::get)
         .service(token::get)
         .service(email::verify::post)
-        .service(email::challenge::post)
         .service(consent::post)
         .service(upload::post)
         .service(upload::document_decrypt);
