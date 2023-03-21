@@ -405,10 +405,78 @@ footprint_reason_code_enum! {
         DocumentPossibleImageTampering,
 
         #[note = "Document low match with selfie", severity = SignalSeverity::High, scopes =  vec![SignalScope::Document, SignalScope::Selfie], description = "The match score between the customer's captured selfie image and captured document was low."]
-        DocumentLowMatchScoreWithSelfie
+        DocumentLowMatchScoreWithSelfie,
+
+
+        // ~~~~~ Info ~~~~~~~~
+        // These are present if:
+        //   !IdNotLocated && specific other reason codes are not present
+        #[note = "Address matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Address], description = "Address located matches address input."]
+        AddressMatches,
+
+        #[note = "ZIP code matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Address], description = "ZIP code located matches the ZIP code input."]
+        AddressZipCodeMatches,
+
+        #[note = "Street name matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::StreetAddress], description = "Street name located matches input street name."]
+        AddressStreetNameMatches,
+
+        #[note = "Street number matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::StreetAddress], description = "Street number located matches input street number."]
+        AddressStreetNumberMatches,
+
+        #[note = "State matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Address], description = "State located matches state input."]
+        AddressStateMatches,
+
+        #[note = "DOB year match", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Dob], description = "The year of birth located matches the input."]
+        DobYobMatches,
+
+        #[note = "DOB month match", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Dob], description = "Month of birth input matches the month of birth located."]
+        DobMobMatches,
+
+        #[note = "SSN matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Ssn], description = "SSN located matches SSN input."]
+        SsnMatches,
+
+        #[note = "Last name matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Name], description = "The located last name matches the input last name."]
+        NameLastMatches,
+
+        #[note = "IP state matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::IpAddress, SignalScope::Address], description = "The located IP State matches the input IP State."]
+        IpStateMatches,
+
+        #[note = "Phone number matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::PhoneNumber], description = "The phone number input matches the located phone number."]
+        PhoneNumberMatches,
+
+        #[note = "Area code matches state", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Address, SignalScope::PhoneNumber], description = "The area code for the phone number input matches the state input."]
+        InputPhoneNumberMatchesInputState,
+
+        #[note = "Area code matches located state", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Address, SignalScope::PhoneNumber], description = "The area code for the phone number input matches any address in the located address history for the identity."]
+        InputPhoneNumberMatchesLocatedStateHistory
     }
 }
 crate::util::impl_enum_str_diesel!(FootprintReasonCode);
+
+impl FootprintReasonCode {
+    pub fn to_info_code(&self) -> Option<Self> {
+        match self {
+            FootprintReasonCode::AddressDoesNotMatch => Some(Self::AddressMatches),
+            FootprintReasonCode::AddressZipCodeDoesNotMatch => Some(Self::AddressZipCodeMatches),
+            FootprintReasonCode::AddressStreetNameDoesNotMatch => Some(Self::AddressStreetNameMatches),
+            FootprintReasonCode::AddressStreetNumberDoesNotMatch => Some(Self::AddressStreetNumberMatches),
+            FootprintReasonCode::AddressStateDoesNotMatch => Some(Self::AddressStateMatches),
+            FootprintReasonCode::DobYobDoesNotMatch => Some(Self::DobYobMatches),
+            FootprintReasonCode::DobMobDoesNotMatch => Some(Self::DobMobMatches),
+            FootprintReasonCode::SsnDoesNotMatch => Some(Self::SsnMatches),
+            FootprintReasonCode::NameLastDoesNotMatch => Some(Self::NameLastMatches),
+            FootprintReasonCode::IpStateDoesNotMatch => Some(Self::IpStateMatches),
+            FootprintReasonCode::PhoneNumberDoesNotMatch => Some(Self::PhoneNumberMatches),
+            FootprintReasonCode::InputPhoneNumberDoesNotMatchInputState => {
+                Some(Self::InputPhoneNumberMatchesInputState)
+            }
+            FootprintReasonCode::InputPhoneNumberDoesNotMatchLocatedStateHistory => {
+                Some(Self::InputPhoneNumberMatchesLocatedStateHistory)
+            }
+            _ => None,
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]

@@ -4,6 +4,7 @@ use idv::ParsedResponse;
 
 use itertools::Itertools;
 use newtypes::{FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
+use strum::IntoEnumIterator;
 
 use crate::decision::vendor::vendor_result::VendorResult;
 
@@ -86,7 +87,7 @@ impl FeatureVector {
             VendorAPI::IdologyExpectID => self
                 .idology_features
                 .as_ref()
-                .map(|i| i.footprint_reason_codes.clone()),
+                .map(|i| Self::enrich_idology_reason_codes_with_info_codes(i.footprint_reason_codes.clone())),
             VendorAPI::IdologyScanVerifySubmission => None,
             VendorAPI::IdologyScanVerifyResults => None,
             VendorAPI::IdologyScanOnboarding => None,
@@ -134,6 +135,25 @@ impl FeatureVector {
                 )
             })
             .collect()
+    }
+
+    /// Based on the set of computed reason codes, add in `Info` codes for idology.
+    /// Other vendors might require different logic
+    pub fn enrich_idology_reason_codes_with_info_codes(
+        mut reason_codes: Vec<FootprintReasonCode>,
+    ) -> Vec<FootprintReasonCode> {
+        // Add in info codes ONLY if we've located the identity
+        if !reason_codes.contains(&FootprintReasonCode::IdNotLocated) {
+            FootprintReasonCode::iter().for_each(|r| {
+                if let Some(info_code) = r.to_info_code() {
+                    if !reason_codes.contains(&r) {
+                        reason_codes.push(info_code)
+                    }
+                }
+            });
+        }
+
+        reason_codes
     }
 }
 
@@ -230,7 +250,7 @@ pub fn create_features(results: Vec<VendorResult>) -> FeatureVector {
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use std::{fmt::Debug, panic, str::FromStr};
 
     use crate::decision::features::socure_idplus::SocureBaselineIdPlusLogicV6Result;
 
@@ -348,6 +368,7 @@ mod tests {
                     FootprintReasonCode::NameLastDoesNotMatch,
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SubjectDeceased,
+                    FootprintReasonCode::IdNotLocated,
                 ],
                 id_number_for_scan_required: None,
                 is_id_scan_required: false,
@@ -376,34 +397,91 @@ mod tests {
         // no output when no input VendorAPI's are specified
         assert_eq!(0, feature_vector.consolidated_reason_codes(vec![]).len());
         // only reason codes from specified VendorAPI's are included in output
-        assert!(have_same_elements(
+        assert_have_same_elements(
             vec![
                 (FootprintReasonCode::SubjectDeceased, vec![Vendor::Idology]),
                 (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
+                (FootprintReasonCode::IdNotLocated, vec![Vendor::Idology]),
             ],
-            feature_vector.consolidated_reason_codes(vec![VendorAPI::IdologyExpectID])
-        ));
+            feature_vector.consolidated_reason_codes(vec![VendorAPI::IdologyExpectID]),
+        );
 
         let yo = feature_vector
             .consolidated_reason_codes(vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus]);
         // correctly consolidates by vendor
-        assert!(have_same_elements(
+        assert_have_same_elements(
             vec![
                 (
                     FootprintReasonCode::SubjectDeceased,
-                    vec![Vendor::Idology, Vendor::Socure]
+                    vec![Vendor::Idology, Vendor::Socure],
                 ),
                 (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
                 (FootprintReasonCode::SsnIssuedPriorToDob, vec![Vendor::Socure]),
+                (FootprintReasonCode::IdNotLocated, vec![Vendor::Idology]),
             ],
-            yo
-        ));
+            yo,
+        );
+
+        // Info codes
+        let feature_vector_id_located = FeatureVector {
+            idology_features: Some(IDologyFeatures {
+                footprint_reason_codes: vec![
+                    FootprintReasonCode::SubjectDeceased,
+                    FootprintReasonCode::NameLastDoesNotMatch,
+                    FootprintReasonCode::SubjectDeceased,
+                    FootprintReasonCode::IpStateDoesNotMatch,
+                ],
+                id_number_for_scan_required: None,
+                is_id_scan_required: false,
+                verification_result: VerificationResultId::from("123".to_owned()),
+            }),
+            ..Default::default()
+        };
+
+        let idology_reason_codes_with_info =
+            feature_vector_id_located.consolidated_reason_codes(vec![VendorAPI::IdologyExpectID]);
+        let expected_codes = vec![
+            (FootprintReasonCode::SubjectDeceased, vec![Vendor::Idology]),
+            // Note: the last name and IpState do not match, so they do NOT appear as info reason codes
+            (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
+            (FootprintReasonCode::IpStateDoesNotMatch, vec![Vendor::Idology]),
+            // All other info codes present, though
+            (FootprintReasonCode::AddressMatches, vec![Vendor::Idology]),
+            (FootprintReasonCode::AddressZipCodeMatches, vec![Vendor::Idology]),
+            (
+                FootprintReasonCode::AddressStreetNameMatches,
+                vec![Vendor::Idology],
+            ),
+            (
+                FootprintReasonCode::AddressStreetNumberMatches,
+                vec![Vendor::Idology],
+            ),
+            (FootprintReasonCode::AddressStateMatches, vec![Vendor::Idology]),
+            (FootprintReasonCode::DobYobMatches, vec![Vendor::Idology]),
+            (FootprintReasonCode::DobMobMatches, vec![Vendor::Idology]),
+            (FootprintReasonCode::SsnMatches, vec![Vendor::Idology]),
+            (FootprintReasonCode::PhoneNumberMatches, vec![Vendor::Idology]),
+            (
+                FootprintReasonCode::InputPhoneNumberMatchesInputState,
+                vec![Vendor::Idology],
+            ),
+            (
+                FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
+                vec![Vendor::Idology],
+            ),
+        ];
+        assert_have_same_elements(expected_codes, idology_reason_codes_with_info);
     }
 
-    fn have_same_elements<T>(l: Vec<T>, r: Vec<T>) -> bool
+    fn assert_have_same_elements<T>(l: Vec<T>, r: Vec<T>)
     where
-        T: Eq,
+        T: Eq + Debug + Clone,
     {
-        l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()
+        if !(l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()) {
+            panic!(
+                "{}",
+                format!("\nleft={:?} does not equal\nright={:?}\n", l.to_vec(), r.to_vec())
+            )
+        }
     }
 }

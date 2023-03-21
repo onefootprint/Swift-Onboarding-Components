@@ -271,14 +271,13 @@ async fn test_run(
 
             let risk_signals = RiskSignal::list_by_onboarding_decision_id(conn, &onboarding_decisions[0].id)
                 .expect("RiskSignal should be created");
-            assert_eq!(expected_footprint_reason_codes.len(), risk_signals.len());
-            assert_eq!(
-                expected_footprint_reason_codes,
-                risk_signals
-                    .iter()
-                    .map(|rs| rs.reason_code.clone())
-                    .collect::<Vec<_>>()
-            );
+            let rs_reason_codes = risk_signals
+                .iter()
+                .map(|rs| rs.reason_code.clone())
+                .collect::<Vec<_>>();
+            assert!(expected_footprint_reason_codes
+                .iter()
+                .all(|r| rs_reason_codes.contains(r)));
             assert_eq!(vec![Vendor::Idology], risk_signals[0].vendors);
 
             db::private_cleanup_integration_tests(conn, &uvid).unwrap();

@@ -130,7 +130,7 @@ mod tests {
                 (&task1.id, TaskStatus::Running, 1),
                 (&task2.id, TaskStatus::Running, 1),
             ],
-            tasks.iter().map(|t| (&t.id, t.status, t.num_attempts)).collect()
+            tasks.iter().map(|t| (&t.id, t.status, t.num_attempts)).collect(),
         ));
     }
 
