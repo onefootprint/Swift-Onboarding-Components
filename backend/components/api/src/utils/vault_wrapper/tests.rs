@@ -45,7 +45,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     let email = fixtures::email::create(conn, &uv.id, &su.id, seqno);
 
     // Create phone number
-    let phone_number = fixtures::phone_number::create(conn, &uv.id, Some(&su.id));
+    let phone_number = fixtures::phone_number::create(conn, &uv.id, &su.id);
 
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![

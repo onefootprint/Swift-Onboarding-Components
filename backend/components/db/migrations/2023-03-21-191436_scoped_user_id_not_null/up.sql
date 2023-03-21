@@ -1,0 +1,1 @@
+ALTER TABLE data_lifetime ALTER scoped_user_id SET NOT NULL;

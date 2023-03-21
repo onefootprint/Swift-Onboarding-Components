@@ -174,7 +174,7 @@ impl WriteableVw<Person> {
             &self.vault.id,
             phone_info,
             DataPriority::Primary,
-            Some(&self.scoped_user_id),
+            &self.scoped_user_id,
             seqno,
             false,
         )?;

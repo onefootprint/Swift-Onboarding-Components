@@ -54,13 +54,13 @@ pub struct VerifyResponse {
 pub async fn post(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
-    ob_pk_auth: Option<ObPkAuth>,
+    ob_pk_auth: ObPkAuth,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?.data;
 
-    let ob_config = ob_pk_auth.map(|ob| (ob.ob_config().clone()));
+    let ob_config = ob_pk_auth.ob_config().clone();
     let (user_vault_id, user_kind) = match challenge_state.data {
         ChallengeData::Sms(c_state) => {
             validate_sms_challenge(&state, c_state, &request.challenge_response, ob_config.clone()).await?
@@ -70,30 +70,23 @@ pub async fn post(
         }
     };
 
-    // If a tenant PK is provided, create the ScopedUser if it doesn't yet exist
-    let (token_scopes, duration) = if let Some(ob_config) = ob_config {
-        // Tenant ob config public key is provided - we are in the identify flow for bifrost.
-        let user_vault_id = user_vault_id.clone();
-        let su = state
-            .db_pool
-            // This already happens if we make a UserVault. But if we are logging into an existing
-            // user vault to onboard onto a new ob config, we need to make the ScopedUser
-            .db_transaction(move |conn| -> ApiResult<_> {
-                let uv = Vault::lock(conn, &user_vault_id)?;
-                let result = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
-                Ok(result)
-            })
-            .await?;
-        let token_scopes = vec![
-            UserAuthScope::SignUp,
-            UserAuthScope::OrgOnboardingInit { id: su.id },
-        ];
-        (token_scopes, Duration::minutes(20))
-    } else {
-        // No tenant public key is provided - we are in the my1fp identify flow
-        let token_scopes = vec![UserAuthScope::SignUp, UserAuthScope::BasicProfile];
-        (token_scopes, Duration::hours(24))
-    };
+    // Tenant ob config public key is provided - we are in the identify flow for bifrost.
+    let user_vault_id2 = user_vault_id.clone();
+    let su = state
+        .db_pool
+        // This already happens if we make a UserVault. But if we are logging into an existing
+        // user vault to onboard onto a new ob config, we need to make the ScopedUser
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let uv = Vault::lock(conn, &user_vault_id2)?;
+            let result = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
+            Ok(result)
+        })
+        .await?;
+    let token_scopes = vec![
+        UserAuthScope::SignUp,
+        UserAuthScope::OrgOnboardingInit { id: su.id },
+    ];
+    let duration = Duration::minutes(30);
 
     // Create the auth session and save it in the database
     let data = UserSession::make(user_vault_id, token_scopes);
@@ -138,7 +131,7 @@ async fn validate_sms_challenge(
     state: &web::Data<State>,
     challenge_state: PhoneChallengeState,
     challenge_response: &str,
-    ob_config: Option<ObConfiguration>,
+    ob_config: ObConfiguration,
 ) -> Result<(VaultId, VerifyKind), ApiError> {
     if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
@@ -166,16 +159,14 @@ async fn validate_sms_challenge(
 async fn create_new_user_vault(
     state: &web::Data<State>,
     phone_number: PiiString,
-    ob_config: Option<ObConfiguration>,
+    ob_config: ObConfiguration,
 ) -> ApiResult<Vault> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let phone_number = PhoneNumber::parse(phone_number)?;
-    if let Some(ob_config) = ob_config.as_ref() {
-        // If we are making a ScopedUser here, verify that the ob config is_live matches the user vault
-        if ob_config.is_live != phone_number.is_live() {
-            return Err(UserError::SandboxMismatch.into());
-        }
+    // Verify that the ob config is_live matches the user vault
+    if ob_config.is_live != phone_number.is_live() {
+        return Err(UserError::SandboxMismatch.into());
     }
 
     let phone_info = NewPhoneNumberArgs {

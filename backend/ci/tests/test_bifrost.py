@@ -380,7 +380,9 @@ class TestBifrost:
         body = get(f"users/{footprint_user_id}/timeline", None, tenant.sk.key)
         assert len(body) > 0
 
-    def test_identify_login_repeat_customer_biometric(self, non_sandbox_auth_token):
+    def test_identify_login_repeat_customer_biometric(
+        self, non_sandbox_auth_token, tenant
+    ):
         # Not used in test, but want to make sure the user has been created before running this test
         non_sandbox_auth_token
         # Identify the user by email
@@ -431,7 +433,7 @@ class TestBifrost:
             "challenge_kind": "biometric",
             "challenge_token": body["challenge_data"]["challenge_token"],
         }
-        body = post("hosted/identify/verify", data)
+        body = post("hosted/identify/verify", data, tenant.default_ob_config.key)
         assert body["kind"] == "user_inherited"
 
     def test_identify_login_repeat_customer_no_challenge(self, non_sandbox_auth_token):

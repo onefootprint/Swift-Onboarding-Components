@@ -94,7 +94,7 @@ impl VaultWrapper<Person> {
     pub fn create_user_vault(
         conn: &mut TxnPgConn,
         user_info: NewVaultInfo,
-        ob_config: Option<ObConfiguration>,
+        ob_config: ObConfiguration,
         phone_args: NewPhoneNumberArgs,
     ) -> ApiResult<Locked<Vault>> {
         let new_user_vault = NewVaultArgs {
@@ -105,19 +105,14 @@ impl VaultWrapper<Person> {
             kind: VaultKind::Person,
         };
         let uv = Vault::create(conn, new_user_vault)?;
-        let su_id = if let Some(ob_config) = ob_config {
-            let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
-            Some(su.id)
-        } else {
-            None
-        };
+        let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
         // Primary since we just made the UVW and there can't already be another phone
-        PhoneNumber::create_verified(conn, &uv.id, phone_args, DataPriority::Primary, su_id.as_ref())?;
+        PhoneNumber::create_verified(conn, &uv.id, phone_args, DataPriority::Primary, &su.id)?;
         let data_collected_info = DataCollectedInfo {
             attributes: vec![CollectedDataOption::PhoneNumber],
         };
         // Create a log of the piece of data being added
-        UserTimeline::create(conn, data_collected_info, uv.id.clone(), su_id)?;
+        UserTimeline::create(conn, data_collected_info, uv.id.clone(), Some(su.id))?;
 
         Ok(uv)
     }

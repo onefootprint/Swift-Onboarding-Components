@@ -50,7 +50,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     db::tests::fixtures::email::create(conn, &uv.id, &su.id, seqno);
 
     // Create phone number
-    db::tests::fixtures::phone_number::create(conn, &uv.id, Some(&su.id));
+    db::tests::fixtures::phone_number::create(conn, &uv.id, &su.id);
 
     (
         su.clone(),

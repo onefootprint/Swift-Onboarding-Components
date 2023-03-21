@@ -70,13 +70,8 @@ fn create_user_and_populate_vault(
         is_live: true,
     };
 
-    let uv = VaultWrapper::create_user_vault(
-        conn,
-        user_info,
-        Some(ob_config.clone()),
-        keys_and_new_phone_args.2,
-    )
-    .unwrap();
+    let uv = VaultWrapper::create_user_vault(conn, user_info, ob_config.clone(), keys_and_new_phone_args.2)
+        .unwrap();
 
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
