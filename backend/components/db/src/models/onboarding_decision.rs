@@ -117,15 +117,12 @@ impl OnboardingDecision {
             .execute(conn.conn())?;
 
         // Create UserTimeline event for the decision
-        UserTimeline::create(
-            conn,
-            OnboardingDecisionInfo {
-                id: result.id.clone(),
-                annotation_id: args.annotation_id,
-            },
-            args.user_vault_id,
-            Some(args.onboarding.scoped_user_id.clone()),
-        )?;
+        let decision_info = OnboardingDecisionInfo {
+            id: result.id.clone(),
+            annotation_id: args.annotation_id,
+        };
+        let su_id = args.onboarding.scoped_user_id.clone();
+        UserTimeline::create(conn, decision_info, args.user_vault_id, su_id)?;
         Ok(result)
     }
 

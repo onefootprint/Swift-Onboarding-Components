@@ -245,14 +245,10 @@ impl<Type> WriteableVw<Type> {
         // Add UserTimeline for all the newly added data
         if !cdos.is_empty() {
             // Create a timeline event that shows all the new data that was added
-            UserTimeline::create(
-                conn,
-                DataCollectedInfo {
-                    attributes: cdos.into_iter().collect(),
-                },
-                self.vault.id.clone(),
-                Some(self.scoped_user_id.clone()),
-            )?;
+            let info = DataCollectedInfo {
+                attributes: cdos.into_iter().collect(),
+            };
+            UserTimeline::create(conn, info, self.vault.id.clone(), self.scoped_user_id.clone())?;
         }
         Ok(())
     }

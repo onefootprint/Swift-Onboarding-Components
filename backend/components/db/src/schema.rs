@@ -622,7 +622,7 @@ table! {
 
     user_timeline (id) {
         id -> Text,
-        scoped_user_id -> Nullable<Text>,
+        scoped_user_id -> Text,
         event -> Jsonb,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,

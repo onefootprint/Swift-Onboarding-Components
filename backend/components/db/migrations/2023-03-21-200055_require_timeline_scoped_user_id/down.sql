@@ -1,0 +1,1 @@
+ALTER TABLE user_timeline ALTER COLUMN scoped_user_id DROP NOT NULL;

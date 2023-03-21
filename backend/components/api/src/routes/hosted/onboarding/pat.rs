@@ -100,14 +100,10 @@ async fn authorize_privacy_pass(
             }
             .insert(conn)?;
 
-            UserTimeline::create(
-                conn,
-                LivenessInfo {
-                    id: liveness_event.id,
-                },
-                user_auth.user_vault_id().clone(),
-                Some(scoped_user_id),
-            )?;
+            let info = LivenessInfo {
+                id: liveness_event.id,
+            };
+            UserTimeline::create(conn, info, user_auth.user_vault_id().clone(), scoped_user_id)?;
 
             Ok(())
         })

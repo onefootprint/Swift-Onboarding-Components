@@ -112,7 +112,7 @@ impl VaultWrapper<Person> {
             attributes: vec![CollectedDataOption::PhoneNumber],
         };
         // Create a log of the piece of data being added
-        UserTimeline::create(conn, data_collected_info, uv.id.clone(), Some(su.id))?;
+        UserTimeline::create(conn, data_collected_info, uv.id.clone(), su.id)?;
 
         Ok(uv)
     }

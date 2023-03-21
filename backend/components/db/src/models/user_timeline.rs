@@ -24,7 +24,7 @@ use strum::IntoEnumIterator;
 #[diesel(table_name = user_timeline)]
 pub struct UserTimeline {
     pub id: UserTimelineId,
-    pub scoped_user_id: Option<ScopedVaultId>,
+    pub scoped_user_id: ScopedVaultId,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -38,7 +38,7 @@ pub struct UserTimeline {
 #[diesel(table_name = user_timeline)]
 pub struct NewUserTimeline {
     pub user_vault_id: VaultId,
-    pub scoped_user_id: Option<ScopedVaultId>,
+    pub scoped_user_id: ScopedVaultId,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub is_portable: bool,
@@ -67,9 +67,7 @@ impl UserTimeline {
         conn: &mut PgConn,
         event: T,
         user_vault_id: VaultId,
-        // Is only ever null during my1fp account creation in identify verify. Should we get rid of
-        // that codepath?
-        scoped_user_id: Option<ScopedVaultId>,
+        scoped_user_id: ScopedVaultId,
     ) -> DbResult<()>
     where
         T: Into<DbUserTimelineEvent>,
@@ -211,15 +209,9 @@ impl UserTimeline {
                         SaturatedTimelineEvent::Annotation(annotation)
                     }
                 };
-                let is_from_other_tenant = if let Some(su_id) = ut.scoped_user_id.as_ref() {
-                    // This will actually display that events from different ob configs at the same
-                    // tenant belong to a different tenant. Probably okay.
-                    su_id != &su.id
-                } else {
-                    // Timeline events not associated with a tenant technically don't belong to
-                    // another tenant. But we also might want to treat them differently in the UI
-                    false
-                };
+                // This will actually display that events from different ob configs at the same
+                // tenant belong to a different tenant. Probably okay.
+                let is_from_other_tenant = ut.scoped_user_id != su.id;
                 Ok(UserTimelineInfo(ut, is_from_other_tenant, saturated_event))
             })
             .collect::<DbResult<Vec<_>>>()?;

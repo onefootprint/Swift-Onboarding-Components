@@ -282,14 +282,10 @@ pub async fn post(
                 };
                 db_document_request.update(conn, update)?;
 
-                UserTimeline::create(
-                    conn,
-                    newtypes::DocumentUploadedInfo {
-                        id: identity_document.id.clone(),
-                    },
-                    uvw.vault.id,
-                    Some(su_id),
-                )?;
+                let info = newtypes::DocumentUploadedInfo {
+                    id: identity_document.id.clone(),
+                };
+                UserTimeline::create(conn, info, uvw.vault.id, su_id)?;
 
                 Ok(())
             })
@@ -460,14 +456,10 @@ async fn handle_scan_onboarding_request(
                     ..Default::default()
                 };
                 // Create a timeline event
-                UserTimeline::create(
-                    conn,
-                    newtypes::DocumentUploadedInfo {
-                        id: identity_document_id.clone(),
-                    },
-                    user_vault_id,
-                    Some(scoped_user_id.clone()),
-                )?;
+                let info = newtypes::DocumentUploadedInfo {
+                    id: identity_document_id.clone(),
+                };
+                UserTimeline::create(conn, info, user_vault_id, scoped_user_id.clone())?;
 
                 let current_doc_request = document_request.update(conn.conn(), failed_update)?;
                 let current_doc_request_id = current_doc_request.id.clone();
@@ -499,14 +491,10 @@ async fn handle_scan_onboarding_request(
                 document_request.update(conn.conn(), completed_update)?;
 
                 // Create a timeline event
-                UserTimeline::create(
-                    conn,
-                    newtypes::DocumentUploadedInfo {
-                        id: identity_document_id,
-                    },
-                    user_vault_id,
-                    Some(scoped_user_id),
-                )?;
+                let info = newtypes::DocumentUploadedInfo {
+                    id: identity_document_id,
+                };
+                UserTimeline::create(conn, info, user_vault_id, scoped_user_id)?;
             }
 
             Ok(())

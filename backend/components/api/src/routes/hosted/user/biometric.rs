@@ -250,14 +250,10 @@ pub async fn complete_post(
                 };
 
                 // create the timeline event for a liveness
-                UserTimeline::create(
-                    conn,
-                    LivenessInfo {
-                        id: liveness_event.id,
-                    },
-                    user_auth.user_vault_id().clone(),
-                    Some(su.id.clone()),
-                )?;
+                let info = LivenessInfo {
+                    id: liveness_event.id,
+                };
+                UserTimeline::create(conn, info, user_auth.user_vault_id().clone(), su.id.clone())?;
             }
 
             let _ = NewWebauthnCredential {

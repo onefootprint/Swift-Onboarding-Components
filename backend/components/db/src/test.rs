@@ -38,14 +38,14 @@ where
     // TODO: as noted in #[post("/users/{footprint_user_id}/annotations")], the Annotation + UserTimeline creations here should be thrown into a helper (or db) func so that tests
     //      (and other future users) don't need to recreate the logic that route is doing
 
-    let annotation = Annotation::create(conn, note, is_pinned, scoped_user_id, actor).unwrap();
+    let annotation = Annotation::create(conn, note, is_pinned, scoped_user_id.clone(), actor).unwrap();
     UserTimeline::create(
         conn,
         newtypes::AnnotationInfo {
             annotation_id: annotation.0.id.clone(),
         },
         user_vault_id,
-        None,
+        scoped_user_id,
     )
     .unwrap();
     annotation

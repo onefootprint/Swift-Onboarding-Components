@@ -133,14 +133,10 @@ pub fn post(
             let annotation: AnnotationInfo =
                 Annotation::create(conn, note, is_pinned, scoped_user.id.clone(), auth_actor)?;
 
-            UserTimeline::create(
-                conn,
-                newtypes::AnnotationInfo {
-                    annotation_id: annotation.0.id.clone(),
-                },
-                scoped_user.user_vault_id,
-                Some(scoped_user.id),
-            )?;
+            let info = newtypes::AnnotationInfo {
+                annotation_id: annotation.0.id.clone(),
+            };
+            UserTimeline::create(conn, info, scoped_user.user_vault_id, scoped_user.id)?;
 
             Ok(annotation)
         })
