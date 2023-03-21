@@ -62,7 +62,7 @@ impl Email {
         su_id: &ScopedVaultId,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Email> {
-        let lifetime = DataLifetime::create(conn, uv_id, Some(su_id), IdentityDataKind::Email.into(), seqno)?;
+        let lifetime = DataLifetime::create(conn, uv_id, su_id, IdentityDataKind::Email.into(), seqno)?;
         let new_row = NewEmail {
             e_data,
             is_verified: false,

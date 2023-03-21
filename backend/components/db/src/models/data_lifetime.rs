@@ -65,7 +65,7 @@ pub struct DataLifetime {
     pub _updated_at: DateTime<Utc>,
     // Ownership attributes
     pub user_vault_id: VaultId,
-    pub scoped_user_id: Option<ScopedVaultId>,
+    pub scoped_user_id: ScopedVaultId,
     // Lifecycle attributes
     pub created_at: DateTime<Utc>,
     pub portablized_at: Option<DateTime<Utc>>,
@@ -83,7 +83,7 @@ struct NewDataLifetime {
     user_vault_id: VaultId,
     // We might want to not support creating data not linked to a tenant. Right now this is only
     // used for the my1fp login flow
-    scoped_user_id: Option<ScopedVaultId>,
+    scoped_user_id: ScopedVaultId,
     created_at: DateTime<Utc>,
     created_seqno: DataLifetimeSeqno,
     kind: DataLifetimeKind,
@@ -135,7 +135,7 @@ impl DataLifetime {
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedVaultId>,
+        scoped_user_id: &ScopedVaultId,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -143,7 +143,7 @@ impl DataLifetime {
             .into_iter()
             .map(|k| NewDataLifetime {
                 user_vault_id: user_vault_id.clone(),
-                scoped_user_id: scoped_user_id.cloned(),
+                scoped_user_id: scoped_user_id.clone(),
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 kind: k,
@@ -160,7 +160,7 @@ impl DataLifetime {
     pub(crate) fn create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedVaultId>,
+        scoped_user_id: &ScopedVaultId,
         kind: DataLifetimeKind,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {

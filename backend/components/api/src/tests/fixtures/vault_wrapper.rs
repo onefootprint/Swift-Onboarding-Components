@@ -44,7 +44,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
+    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
 
     // Create email
     db::tests::fixtures::email::create(conn, &uv.id, &su.id, seqno);

@@ -89,7 +89,7 @@ impl IdentityDocument {
         selfie_image_s3_url: Option<String>,
         document_type: IdDocKind,
         country_code: String,
-        su_id: Option<&ScopedVaultId>,
+        su_id: &ScopedVaultId,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -209,7 +209,7 @@ mod tests {
                     Some("s3_678".to_string()),
                     IdDocKind::IdCard,
                     "usa".to_string(),
-                    None,
+                    &ScopedVaultId::from("su_123".to_string()),
                     SealedVaultDataKey::default(),
                 )?;
 

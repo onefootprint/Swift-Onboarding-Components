@@ -83,7 +83,7 @@ where
         DataLifetime::bulk_deactivate_speculative(conn, &scoped_user_id, kinds_to_deactivate, seqno)?;
 
         // Create the new VDs
-        let vds = VaultData::bulk_create(conn, &user_vault_id, Some(&scoped_user_id), self.data, seqno)?;
+        let vds = VaultData::bulk_create(conn, &user_vault_id, &scoped_user_id, self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let kind_to_lifetime = vds

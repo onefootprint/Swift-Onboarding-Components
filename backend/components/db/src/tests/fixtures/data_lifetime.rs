@@ -12,7 +12,7 @@ pub fn build<T: Into<DataLifetimeKind>>(
     deactivated_seqno: Option<DataLifetimeSeqno>,
     kind: T,
 ) -> DataLifetime {
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, Some(su_id), vec![kind.into()], created_seqno)
+    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![kind.into()], created_seqno)
         .unwrap()
         .pop()
         .unwrap();

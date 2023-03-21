@@ -82,13 +82,7 @@ impl PhoneNumber {
     ) -> DbResult<PhoneNumber> {
         // Create a portable lifetime - once the phone number is verified and bound to a vault
         // it should be immediately portable, even though it isn't verified by vendors.
-        let lifetime = DataLifetime::create(
-            conn,
-            uv_id,
-            Some(su_id),
-            IdentityDataKind::PhoneNumber.into(),
-            seqno,
-        )?;
+        let lifetime = DataLifetime::create(conn, uv_id, su_id, IdentityDataKind::PhoneNumber.into(), seqno)?;
         let new_row = NewPhoneNumberRow {
             e_e164: args.e_phone_number,
             is_verified: true,

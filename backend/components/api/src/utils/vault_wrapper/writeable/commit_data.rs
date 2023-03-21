@@ -140,7 +140,7 @@ impl WriteableVw<Person> {
             let speculative_lifetimes_to_commit = uvw.speculative.get_lifetimes(speculative_kinds_to_commit);
             let all_data_is_speculative_and_belongs_to_scoped_user = speculative_lifetimes_to_commit
                 .iter()
-                .all(|l| l.portablized_seqno.is_none() && l.scoped_user_id == Some(scoped_user_id.clone()));
+                .all(|l| l.portablized_seqno.is_none() && l.scoped_user_id == scoped_user_id);
             if !all_data_is_speculative_and_belongs_to_scoped_user {
                 // Just a sanity check filter that we don't commit other data - all results should match
                 // this filter

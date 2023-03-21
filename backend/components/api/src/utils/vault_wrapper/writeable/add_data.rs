@@ -306,18 +306,11 @@ impl WriteableVw<Person> {
         s3_url: String,
     ) -> ApiResult<DocumentData> {
         let vault_id = self.vault.id.clone();
-        let scoped_user_id = self.scoped_user_id;
+        let su_id = self.scoped_user_id;
 
         // TODO: remove Dataliftime constraint on document.* so we can suppport multiple docs at once
         Ok(DocumentData::create(
-            conn,
-            &vault_id,
-            Some(&scoped_user_id),
-            kind,
-            mime_type,
-            filename,
-            s3_url,
-            e_data_key,
+            conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key,
         )?)
         // TODO: whoopsie timeline events are CDO-specific so gunna be a little non-trivial to make for doc uploads
     }

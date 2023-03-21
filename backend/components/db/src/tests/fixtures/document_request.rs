@@ -84,7 +84,7 @@ pub fn create(
             None,
             newtypes::IdDocKind::DriverLicense,
             "USA".into(),
-            Some(&opts.scoped_user_id),
+            &opts.scoped_user_id,
             SealedVaultDataKey(vec![]),
         )
         .unwrap();

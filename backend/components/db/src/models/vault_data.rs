@@ -46,7 +46,7 @@ impl VaultData {
     pub fn bulk_create<T>(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedVaultId>,
+        scoped_user_id: &ScopedVaultId,
         data: Vec<NewVaultData<T>>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>>

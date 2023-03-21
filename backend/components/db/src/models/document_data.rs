@@ -47,7 +47,7 @@ impl DocumentData {
     pub fn create(
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
-        scoped_vault_id: Option<&ScopedVaultId>,
+        scoped_vault_id: &ScopedVaultId,
         kind: DocumentKind,
         mime_type: String,
         filename: String,

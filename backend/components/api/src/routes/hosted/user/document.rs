@@ -200,7 +200,7 @@ pub async fn post(
                 // TODO: should be from vendor response
                 request.document_type,
                 request.country_code.clone(),
-                Some(&su_id),
+                &su_id,
                 e_data_key,
             )
             .map_err(ApiError::from)

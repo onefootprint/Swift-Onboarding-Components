@@ -39,7 +39,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
+    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
 
     // Create email
     let email = fixtures::email::create(conn, &uv.id, &su.id, seqno);
@@ -113,7 +113,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &uv.id, Some(&su.id), data, seqno).unwrap();
+    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![
@@ -472,7 +472,7 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
     uvw.add_data_test(conn, update).unwrap();
 
     // Also add an identity document
-    let id_doc = fixtures::identity_document::create(conn, &uv.id, Some(&su.id));
+    let id_doc = fixtures::identity_document::create(conn, &uv.id, &su.id);
 
     // Also add some custom data
     let custom_key1 = KvDataKey::from_str("blerp").unwrap();

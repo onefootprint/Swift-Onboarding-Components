@@ -1,16 +1,11 @@
+use crate::schema::kv_data;
 use crate::PgConn;
-use crate::{schema::kv_data, DbError};
-use crate::{DbResult, HasLifetime, TxnPgConn};
+use crate::{DbResult, HasLifetime};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
-use newtypes::{
-    DataLifetimeId, DataLifetimeKind, DataLifetimeSeqno, KeyValueDataId, KvDataKey, ScopedVaultId,
-    SealedVaultBytes, VaultId,
-};
+use newtypes::{DataLifetimeId, KeyValueDataId, KvDataKey, SealedVaultBytes};
 use serde::{Deserialize, Serialize};
-
-use super::data_lifetime::DataLifetime;
 
 #[derive(Debug, Hash, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = kv_data)]
@@ -35,42 +30,6 @@ struct NewKeyValueData {
 struct NewKeyValueDataArgs {
     pub data_key: KvDataKey,
     pub e_data: SealedVaultBytes,
-}
-
-impl KeyValueData {
-    #[tracing::instrument(skip_all)]
-    #[allow(unused)]
-    pub fn bulk_create(
-        conn: &mut TxnPgConn,
-        user_vault_id: &VaultId,
-        scoped_user_id: &ScopedVaultId,
-        data: Vec<NewKeyValueDataArgs>,
-        seqno: DataLifetimeSeqno,
-    ) -> Result<(), DbError> {
-        // Make a DataLifetime row for each of the new pieces of data being inserted
-        let dlks = data
-            .iter()
-            .map(|a| a.data_key.clone())
-            .map(DataLifetimeKind::from)
-            .collect();
-        let lifetimes = DataLifetime::bulk_create(conn, user_vault_id, Some(scoped_user_id), dlks, seqno)?;
-        let new_rows = data
-            .into_iter()
-            .zip(lifetimes)
-            .map(|(arg, lifetime)| {
-                let NewKeyValueDataArgs { data_key, e_data } = arg;
-                NewKeyValueData {
-                    lifetime_id: lifetime.id,
-                    data_key,
-                    e_data,
-                }
-            })
-            .collect::<Vec<NewKeyValueData>>();
-        diesel::insert_into(kv_data::table)
-            .values(&new_rows)
-            .execute(conn.conn())?;
-        Ok(())
-    }
 }
 
 impl HasLifetime for KeyValueData {

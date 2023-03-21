@@ -53,7 +53,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         user_vault_id -> Text,
-        scoped_user_id -> Nullable<Text>,
+        scoped_user_id -> Text,
         created_at -> Timestamptz,
         portablized_at -> Nullable<Timestamptz>,
         deactivated_at -> Nullable<Timestamptz>,
