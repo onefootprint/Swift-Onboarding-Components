@@ -4,12 +4,13 @@ use crate::decision::vendor;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
+use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{
@@ -236,12 +237,14 @@ async fn shadow_run(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let tenant = Tenant::get(conn, &scoped_user.id)?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
-            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
+            let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
-            let vendor_apis = vendor::desired_vendor_apis(&uvw)?;
+            let vendor_apis =
+                vendor::get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tenant)?;
             #[allow(clippy::unwrap_used)]
             let memory_only_requests = vendor_apis
                 .into_iter()

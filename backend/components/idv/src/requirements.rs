@@ -45,7 +45,7 @@ fn vendor_api_requirements_are_satisfied(
         required: vec![IdentityDataKind::PhoneNumber],
     };
 
-    let _experian_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
+    let experian_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
         // minimum is full name and full address
         required: vec![
             IdentityDataKind::FirstName,
@@ -67,8 +67,7 @@ fn vendor_api_requirements_are_satisfied(
         VendorAPI::TwilioLookupV2 => twilio_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::SocureIDPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
         VendorAPI::IdologyPa => false,
-        VendorAPI::ExperianPreciseID => false, //experian_requirements.are_satisfied(present_data_lifetime_kinds),
-                                               // TODO: Experian requirements are more difficult because we need to check that Experian is enabled for the Tenant
+        VendorAPI::ExperianPreciseID => experian_requirements.are_satisfied(present_data_lifetime_kinds),
     }
 }
 
@@ -89,6 +88,15 @@ mod tests {
     #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName] => vec![VendorAPI::SocureIDPlus])]
     #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1] => vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus])]
     #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1, IdentityDataKind::PhoneNumber] => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2, VendorAPI::SocureIDPlus])]
+    #[test_case(&[
+        IdentityDataKind::FirstName,
+        IdentityDataKind::LastName,
+        IdentityDataKind::AddressLine1,
+        IdentityDataKind::Zip,
+        IdentityDataKind::State,
+        IdentityDataKind::Country,
+        IdentityDataKind::City,
+    ] => vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus, VendorAPI::ExperianPreciseID])]
     fn test_available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -> Vec<VendorAPI> {
         available_vendor_apis(present_data_lifetime_kinds)
     }
