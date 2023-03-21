@@ -71,9 +71,9 @@ async fn authorize_privacy_pass(
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
     let user_auth = user_auth.check_permissions::<UserAuthScopeDiscriminant>(vec![])?;
-    let scoped_user_id = user_auth.scoped_user_id().ok_or(ApiError::AssertionError(
-        "User not initialized for privacy pass".into(),
-    ))?;
+    let scoped_user_id = user_auth
+        .scoped_user_id()
+        .ok_or_else(|| ApiError::AssertionError("User not initialized for privacy pass".into()))?;
     let nonce = user_auth.auth_token.hash_bytes();
 
     let challenge = privacy_pass::TokenChallenge::new(state.config.rp_id.clone(), nonce);
