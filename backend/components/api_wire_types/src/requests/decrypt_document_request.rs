@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use newtypes::{flat_api_object_map_type, DocumentKind, IdDocKind};
+use newtypes::{flat_api_object_map_type, DataIdentifier, DocumentKind, IdDocKind};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
@@ -15,8 +15,10 @@ flat_api_object_map_type!(
 /// POST
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct DecryptIdentityDocumentRequest {
-    // type of document for decryption
-    pub document_type: IdDocKind,
+    /// Deprecated. type of document for decryption
+    pub document_type: Option<IdDocKind>,
+    /// type of document for decryption, represented by the fully-qualified DataIdentifier
+    pub document_identifier: Option<DataIdentifier>,
     // Reason for the decryption
     pub reason: String,
     #[serde(default)]

@@ -75,9 +75,27 @@ pub async fn post_decrypt(
 ) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
     let DecryptIdentityDocumentRequest {
         document_type,
+        document_identifier,
         reason,
         include_selfie,
     } = request.into_inner();
+
+    // To maintain backwards compatibility while the frontend migrates to use only DataIdentifiers,
+    // have some magic parsing of the identifier
+    let document_type = match (document_type, document_identifier) {
+        (Some(doc_type), None) => doc_type,
+        (None, Some(DataIdentifier::IdDocument(doc_kind))) => doc_kind,
+        (None, Some(_)) => {
+            return Err(ApiError::AssertionError(
+                "Can only provide id_document identifiers".to_owned(),
+            ))
+        }
+        (Some(_), Some(_)) | (None, None) => {
+            return Err(ApiError::AssertionError(
+                "Must provide either doucment_type or document_identifier".to_owned(),
+            ))
+        }
+    };
 
     let targets = [
         Some(DataIdentifier::IdDocument(document_type)),
