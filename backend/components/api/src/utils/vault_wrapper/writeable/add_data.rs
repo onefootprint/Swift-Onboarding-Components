@@ -1,6 +1,5 @@
 use super::vault_data_builder::VaultDataBuilder;
 use super::WriteableVw;
-use crate::auth::AuthError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::utils::file_upload::FileUpload;
@@ -46,7 +45,6 @@ impl WriteableVw<Person> {
         conn: &mut TxnPgConn,
         request: DecomposedPutRequest,
         id_fingerprints: NewFingerprints<IDK>,
-        for_bifrost: bool,
     ) -> ApiResult<Option<EmailId>> {
         request.assert_no_business_data()?;
 
@@ -68,20 +66,12 @@ impl WriteableVw<Person> {
             .map(|p| newtypes::email::Email::from_str(p.leak()))
             .transpose()?;
 
-        let assert_non_portable = || -> Result<_, _> {
-            // Cannot add identity data to a portable vault unless we are in bifrost
-            if !for_bifrost && self.vault().is_portable {
-                return Err(AuthError::CannotModifyPortableUser);
-            }
-            Ok(())
-        };
         // Update custom data
         if !custom_data.is_empty() {
             self.update_data_unsafe(conn, custom_data, HashMap::new())?;
         }
         // Update PhoneNumber
         if let Some(phone_number) = phone_number {
-            assert_non_portable()?;
             let Some(fp) = id_fingerprints.remove(&IDK::PhoneNumber) else {
                 return Err(ApiError::AssertionError("No fingerprint found for phone number".to_owned()));
             };
@@ -89,7 +79,6 @@ impl WriteableVw<Person> {
         }
         // Update Email
         let new_email_id = if let Some(email) = email {
-            assert_non_portable()?;
             let Some(fp) = id_fingerprints.remove(&IDK::Email) else {
                 return Err(ApiError::AssertionError("No fingerprint found for email".to_owned()));
             };
@@ -100,7 +89,6 @@ impl WriteableVw<Person> {
         };
         // Update VaultData
         if !id_update.is_empty() {
-            assert_non_portable()?;
             // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
             if let Some(idk) = [IDK::PhoneNumber, IDK::Email]
                 .iter()
@@ -113,7 +101,6 @@ impl WriteableVw<Person> {
 
         // Update IP data
         if !ip_update.is_empty() {
-            assert_non_portable()?;
             self.update_data_unsafe(conn, ip_update, HashMap::new())?;
         }
 
@@ -299,7 +286,7 @@ mod test {
                 .keys()
                 .map(|idk| (*idk, Fingerprint(vec![])))
                 .collect();
-            self.put_person_data(conn, request, fingerprints, true)?;
+            self.put_person_data(conn, request, fingerprints)?;
             Ok(())
         }
     }

@@ -210,6 +210,8 @@ impl DataLifetime {
     }
 
     /// Given a list of DataLifetimeIds, marks the active DataLifetime rows as deactivated.
+    /// NOTE: this may deactivate portablized data. When deactivating portablized data, should
+    /// generally only do when replacing with other portablized data
     #[tracing::instrument(skip_all)]
     pub fn bulk_deactivate(
         conn: &mut PgConn,

@@ -51,6 +51,7 @@ where
     fn clean_and_validate_data(data: RawDataRequest<T>, opts: ParseOptions) -> NtResult<RawDataRequest<T>> {
         // Make sure all keys provided are parts of coherent CollectedDataOptions.
         // For ex, can't specify FirstName without LastName
+        // TODO this validation should happen at write time - you should be able to add only a last name if the full name already exists in the vault
         if !opts.allow_extra_field_errors {
             let keys = data.keys().cloned().collect_vec();
             let extra_dis = Self::extra_keys(keys)

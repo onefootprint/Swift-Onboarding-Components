@@ -215,27 +215,23 @@ def test_access_events_list(sandbox_user):
     assert not body["data"]
 
 
-def test_portable_failed_data_write(sandbox_user):
-    data = dict(reason="test", fields=["id.first_name", "id.ssn9"])
-    body = post(
-        f"users/{sandbox_user.fp_user_id}/vault/decrypt",
-        data,
-        sandbox_user.tenant.sk.key,
-    )
-    assert body["id.first_name"]
+def test_update_data_for_portable_user(sandbox_user):
+    # Should be allowed to overwrite data for users that onboarded via bifrost
+    fp_id = sandbox_user.fp_user_id
+    decrypt_req = dict(reason="test", fields=["id.ssn9"])
+    body = post(f"users/{fp_id}/vault/decrypt", decrypt_req, sandbox_user.tenant.sk.key)
+    assert body["id.ssn9"]
 
-    data = {
-        "id.dob": "1970-01-01",
-        "id.ssn9": _gen_random_ssn(),
-    }
+    # Even though the vault is portable, we should be able to update the data
+    for new_ssn in ["120981234", "098765432"]:
+        new_data = {"id.ssn9": new_ssn}
+        put(f"users/{fp_id}/vault", new_data, sandbox_user.tenant.sk.key)
 
-    # ensure we cannot change data in a portable vault
-    put(
-        f"users/{sandbox_user.fp_user_id}/vault",
-        data,
-        sandbox_user.tenant.sk.key,
-        status_code=401,
-    )
+        # Make sure we see the new ssn
+        body = post(
+            f"users/{fp_id}/vault/decrypt", decrypt_req, sandbox_user.tenant.sk.key
+        )
+        assert body["id.ssn9"] == new_ssn
 
 
 def test_override_onboarding_decision(sandbox_user):

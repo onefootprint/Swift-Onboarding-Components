@@ -74,7 +74,7 @@ pub async fn post(
             if let Some((targets, request, fingerprints)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                uvw.put_person_data(conn, request, fingerprints, false)?;
+                uvw.put_person_data(conn, request, fingerprints)?;
                 // Create an access event to show data was added
                 NewAccessEvent {
                     scoped_user_id: scoped_user.id.clone(),

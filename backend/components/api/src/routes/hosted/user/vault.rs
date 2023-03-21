@@ -74,7 +74,7 @@ pub async fn put(
 
             // Even though this accepts id.phone_number, it will always error at runtime since we
             // only allow a vault to have one phone number
-            let email_id = uvw.put_person_data(conn, request, fingerprints, true)?;
+            let email_id = uvw.put_person_data(conn, request, fingerprints)?;
             Ok(email_id)
         })
         .await?;

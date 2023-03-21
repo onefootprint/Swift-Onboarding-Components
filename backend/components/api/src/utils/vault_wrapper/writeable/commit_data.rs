@@ -70,6 +70,7 @@ impl WriteableVw<Person> {
     /// NOTE: this DOES NOT commit custom data or identity documents since we haven't figured out
     /// the portability story for those types of data
     pub fn commit_identity_data(self, conn: &mut TxnPgConn) -> ApiResult<DataLifetimeSeqno> {
+        // TODO only commit data collected by the ob config rather than all data
         let Self { uvw, scoped_user_id } = self;
 
         // Use the same seqno to deactivate old data and commit new data
