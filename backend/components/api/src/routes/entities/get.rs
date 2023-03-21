@@ -100,23 +100,28 @@ where
     let ListUsersRequest {
         statuses,
         requires_manual_review,
-        fingerprint,
-        footprint_user_id: fp_id,
+        search,
+        footprint_user_id: mut fp_id,
         timestamp_lte,
         timestamp_gte,
     } = filters.into_inner();
 
     // TODO clean phone number or email
-    let fingerprints = match fingerprint {
-        Some(fingerprint) => {
-            let cleaned_data = fingerprint.clean_for_fingerprint();
+    let fingerprints = if let Some(search) = search {
+        let cleaned_data = search.clean_for_fingerprint();
 
+        // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier instead
+        if cleaned_data.leak().starts_with("fp_id_") && fp_id.is_none() {
+            fp_id = Some(FootprintUserId::from(search.leak_to_string()));
+            None
+        } else {
             let fut_fingerprints = IdentityDataKind::fingerprintable()
                 .map(|kind| state.compute_fingerprint(kind, cleaned_data.clone()));
             let fingerprints: Vec<Fingerprint> = futures::future::try_join_all(fut_fingerprints).await?;
             Some(fingerprints)
         }
-        None => None,
+    } else {
+        None
     };
 
     let tenant_id = tenant.id.clone();

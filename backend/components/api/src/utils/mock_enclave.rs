@@ -15,6 +15,7 @@ pub struct StateWithMockEnclave {
 
 impl Drop for StateWithMockEnclave {
     fn drop(&mut self) {
+        #[allow(clippy::let_underscore_future)]
         let _ = self.server.stop(false);
         self.h1.abort();
         self.h2.abort();

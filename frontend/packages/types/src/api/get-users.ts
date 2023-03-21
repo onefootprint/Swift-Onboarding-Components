@@ -1,7 +1,7 @@
 import { ScopedUser } from '../data';
 
 export type UsersRequest = {
-  fingerprint?: string;
+  search?: string;
 };
 
 export type UsersResponse = ScopedUser[];

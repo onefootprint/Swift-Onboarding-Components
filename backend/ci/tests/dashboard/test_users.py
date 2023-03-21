@@ -32,7 +32,7 @@ def incomplete_user(sandbox_tenant, twilio):
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_user_id otherwise
     body = get(
         "users",
-        dict(fingerprint=bifrost_client.phone_number.replace(" ", "")),
+        dict(search=bifrost_client.phone_number.replace(" ", "")),
         sandbox_tenant.sk.key,
     )
     return body["data"][0]["id"]
@@ -71,6 +71,14 @@ def test_get_users_list(sandbox_user, sandbox_user2, vault_user, incomplete_user
             scoped_user["identity_data_attributes"]
         )
         assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
+
+
+def test_get_users_by_fp_id_query(sandbox_user):
+    tenant = sandbox_user.tenant
+    body = get("users", {"search": sandbox_user.fp_user_id}, tenant.sk.key)
+    scoped_users = body["data"]
+    assert len(scoped_users) == 1
+    assert scoped_users[0]["id"] == sandbox_user.fp_user_id
 
 
 @pytest.mark.parametrize(

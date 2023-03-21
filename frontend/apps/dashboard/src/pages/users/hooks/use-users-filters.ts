@@ -31,7 +31,7 @@ const useRiskSignalsFilters = () => {
   const { from, to } = getDateRange(values.dateRange);
   const requestParams = {
     cursor: last(values.cursor),
-    fingerprint: values.search,
+    search: values.search,
     pageSize: values.pageSize,
     statuses: queryToString(values.status),
     timestamp_gte: from,
