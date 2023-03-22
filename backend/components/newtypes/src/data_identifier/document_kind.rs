@@ -63,7 +63,9 @@ impl Validate for DocumentKind {
 
 impl IsDataIdentifierDiscriminant for DocumentKind {
     fn is_optional(&self) -> bool {
-        false
+        match self {
+            DocumentKind::FinraComplianceLetter => true,
+        }
     }
 
     fn parent(&self) -> Option<CollectedData> {

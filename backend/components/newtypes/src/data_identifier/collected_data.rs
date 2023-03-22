@@ -1,6 +1,6 @@
 use crate::{
-    BusinessDataKind as BDK, DataIdentifier, DataIdentifierDiscriminant, IdentityDataKind as IDK,
-    InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
+    BusinessDataKind as BDK, DataIdentifier, DataIdentifierDiscriminant, DocumentKind as DK,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -189,7 +189,12 @@ impl CollectedDataOption {
             Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
 
             // Can we stick the investor profile identifier in here? Even if it's a different DI variant... cool
-            Self::InvestorProfile => Some(IPK::iter().map(|x| x.into()).collect()),
+            Self::InvestorProfile => Some(
+                IPK::iter()
+                    .map(|x| x.into())
+                    .chain(vec![DK::FinraComplianceLetter.into()])
+                    .collect(),
+            ),
 
             Self::Document => None,
             Self::DocumentAndSelfie => None,
@@ -211,12 +216,7 @@ impl CollectedDataOption {
         T: IsDataIdentifierDiscriminant,
     {
         self.data_identifiers()
-            .and_then(|dis| {
-                dis.into_iter()
-                    .map(|di| di.try_into())
-                    .collect::<Result<_, _>>()
-                    .ok()
-            })
+            .map(|dis| dis.into_iter().filter_map(|di| di.try_into().ok()).collect())
             .unwrap_or_default()
     }
 
