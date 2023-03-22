@@ -1,7 +1,7 @@
 import constate from 'constate';
 import React from 'react';
 
-import BaseDialog from '../../components/internal/base-dialog';
+import BaseDialog from '../../components/dialog/components/base-dialog';
 import Typography from '../../components/typography';
 import useConfirmationDialog from './hooks/use-confirmation-dialog';
 

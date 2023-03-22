@@ -8,7 +8,7 @@ import BaseDialog, {
   OnlyPrimaryButton,
   PrimaryAndLinkButtons,
   Size,
-} from '../internal/base-dialog';
+} from './components/base-dialog';
 
 export type DialogProps = {
   children?: React.ReactNode;

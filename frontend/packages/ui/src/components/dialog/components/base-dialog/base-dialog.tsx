@@ -4,14 +4,15 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEventListener, useLockedBody } from 'usehooks-ts';
 
-import media from '../../../utils/media';
-import Box from '../../box';
-import Button from '../../button';
-import IconButton from '../../icon-button';
-import LinkButton from '../../link-button';
-import Overlay from '../../overlay';
-import Portal from '../../portal';
-import Typography from '../../typography';
+import media from '../../../../utils/media';
+import Box from '../../../box';
+import Button from '../../../button';
+import IconButton from '../../../icon-button';
+import LinkButton from '../../../link-button';
+import Overlay from '../../../overlay';
+import Portal from '../../../portal';
+import Typography from '../../../typography';
+import ScrollArea from '../scroll-area';
 import {
   AllButtons,
   NoButtons,
@@ -90,7 +91,7 @@ const BaseDialog = ({
               </CloseContainer>
               <Typography variant="label-2">{title}</Typography>
             </Header>
-            <Body>{children}</Body>
+            <ScrollArea>{children}</ScrollArea>
             {linkButton || primaryButton || secondaryButton ? (
               <Footer>
                 <Box>
@@ -150,12 +151,18 @@ const DialogContainer = styled.div<{
   isConfirmation: boolean;
 }>`
   ${({ theme, isResponsive, isConfirmation }) => css`
+    position: absolute;
+    display: flex;
+    flex-direction: column;
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
-    position: absolute;
+    overflow: hidden;
+    justify-content: stretch;
     top: ${theme.spacing[9]};
+    max-height: calc(100vh - ${theme.spacing[9]} * 2);
+    isolation: isolate;
 
     ${isConfirmation &&
     `
@@ -164,9 +171,10 @@ const DialogContainer = styled.div<{
       left: 50%;
       max-width: 90%;
     `}
-
     ${isResponsive &&
     media.lessThan('sm')`
+      top: 0;
+      max-height: none;
       width: 100vw;
       height: 100vh;
       border-radius: 0;
@@ -204,6 +212,8 @@ const Header = styled.header`
     padding: 0 ${theme.spacing[5]};
     height: 52px;
     position: relative;
+    flex-shrink: 0;
+    z-index: 1;
   `}
 `;
 
@@ -214,18 +224,16 @@ const CloseContainer = styled.div`
   `}
 `;
 
-const Body = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[7]};
-  `}
-`;
-
 const Footer = styled.footer`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: ${theme.spacing[5]} ${theme.spacing[7]};
+    flex-shrink: 0;
+    background-color: ${theme.backgroundColor.primary};
+    width: 100%;
+    z-index: 1;
   `}
 `;
 
