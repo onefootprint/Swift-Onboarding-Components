@@ -37,9 +37,6 @@ const VaultData = () => {
     decrypt.submitFields(formData);
   };
 
-  console.log('user', userQuery.data);
-  console.log('vaultData', vaultData);
-
   return shouldShow ? (
     <>
       <Portal selector={USER_HEADER_ACTIONS_SELECTOR}>
