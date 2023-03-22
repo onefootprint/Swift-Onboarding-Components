@@ -1,5 +1,6 @@
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
+use crate::State;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
     utils::{mock_enclave::StateWithMockEnclave, vault_wrapper::VaultWrapper},
@@ -10,8 +11,8 @@ use db::models::vault::Vault;
 use db::DbPool;
 use db::{
     models::{
-        onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
+        onboarding::Onboarding, onboarding_decision::OnboardingDecision, phone_number::NewPhoneNumberArgs,
+        risk_signal::RiskSignal, scoped_vault::ScopedVault, vault::NewVaultInfo,
     },
     test_helpers::test_db_pool,
     tests::fixtures,
@@ -23,11 +24,28 @@ use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
+use newtypes::Fingerprinter;
 use newtypes::{
-    DecisionStatus, FootprintReasonCode, IdentityDataKind, PiiString, VaultId, Vendor, VendorAPI,
+    DecisionStatus, EncryptedVaultPrivateKey, FootprintReasonCode, IdentityDataKind, PiiString, VaultId,
+    VaultPublicKey, Vendor, VendorAPI,
 };
 use rand::Rng;
 use test_case::test_case;
+
+type KeysAndNewPhoneNumberArgs = (VaultPublicKey, EncryptedVaultPrivateKey, NewPhoneNumberArgs);
+async fn get_keys_and_new_phone_args(state: &State, phone_number: &String) -> KeysAndNewPhoneNumberArgs {
+    let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
+    let sh_data = state
+        .compute_fingerprint(IdentityDataKind::PhoneNumber, PiiString::from(phone_number))
+        .await
+        .unwrap();
+    let phone_info = NewPhoneNumberArgs {
+        e_phone_number: public_key.seal_pii(&PiiString::from(phone_number)).unwrap(),
+        sh_phone_number: sh_data,
+    };
+
+    (public_key, e_private_key, phone_info)
+}
 
 fn random_phone_number() -> String {
     let mut rng = rand::thread_rng();
@@ -41,15 +59,23 @@ fn random_phone_number() -> String {
     )
 }
 
-fn create_user_and_populate_vault(conn: &mut TxnPgConn, ob_config: ObConfiguration) -> (Vault, ScopedVault) {
-    let uv = fixtures::vault::create_person(conn, ob_config.is_live);
+fn create_user_and_populate_vault(
+    conn: &mut TxnPgConn,
+    ob_config: ObConfiguration,
+    keys_and_new_phone_args: KeysAndNewPhoneNumberArgs,
+) -> (Vault, ScopedVault) {
+    let user_info = NewVaultInfo {
+        e_private_key: keys_and_new_phone_args.1,
+        public_key: keys_and_new_phone_args.0,
+        is_live: true,
+    };
+
+    let uv = VaultWrapper::create_user_vault(conn, user_info, ob_config.clone(), keys_and_new_phone_args.2)
+        .unwrap();
+
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let update = vec![
-        (
-            IdentityDataKind::PhoneNumber.into(),
-            PiiString::new(random_phone_number()),
-        ),
         (
             IdentityDataKind::FirstName.into(),
             PiiString::new("Bob".to_owned()),
@@ -66,14 +92,20 @@ fn create_user_and_populate_vault(conn: &mut TxnPgConn, ob_config: ObConfigurati
     (uv.into_inner(), su)
 }
 
-async fn create_user_and_onboarding(db_pool: &DbPool) -> (Tenant, Onboarding, VaultId) {
+async fn create_user_and_onboarding(
+    state: &State,
+    db_pool: &DbPool,
+    phone_number: &String,
+) -> (Tenant, Onboarding, VaultId) {
+    let keys_and_phone = get_keys_and_new_phone_args(state, phone_number).await;
+
     db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let tenant = fixtures::tenant::create(conn);
             let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
             let ob_config_id = ob_config.id.clone();
 
-            let (uv, su) = create_user_and_populate_vault(conn, ob_config);
+            let (uv, su) = create_user_and_populate_vault(conn, ob_config, keys_and_phone);
 
             let onboarding = fixtures::onboarding::create(conn, su.id, ob_config_id);
 
@@ -138,8 +170,9 @@ async fn test_run(
     //
     let db_pool = test_db_pool();
     let state = &StateWithMockEnclave::init().await.state;
+    let phone_number = random_phone_number();
 
-    let (tenant, onboarding, uvid) = create_user_and_onboarding(&db_pool).await;
+    let (tenant, onboarding, uvid) = create_user_and_onboarding(state, &db_pool, &phone_number).await;
 
     //
     // Mocking
