@@ -4,7 +4,7 @@ import UserDataAttribute from './user-data-attribute';
 export type CollectedDataOption =
   | CollectedKybDataOption
   | CollectedKycDataOption
-  | CollectedDocumentDataOption
+  | CollectedIdDocumentDataOption
   | CollectedInvestorProfileDataOption;
 
 export enum CollectedInvestorProfileDataOption {
@@ -34,6 +34,10 @@ export enum CollectedKycDataOption {
 
 export enum CollectedDocumentDataOption {
   document = 'document',
+}
+
+export enum CollectedIdDocumentDataOption {
+  document = 'document',
   documentAndSelfie = 'document_and_selfie',
 }
 
@@ -42,10 +46,10 @@ export const documentCdoFor = (
   collectSelfie: boolean,
 ) => {
   if (collectDocument && collectSelfie) {
-    return CollectedDocumentDataOption.documentAndSelfie;
+    return CollectedIdDocumentDataOption.documentAndSelfie;
   }
   if (collectDocument) {
-    return CollectedDocumentDataOption.document;
+    return CollectedIdDocumentDataOption.document;
   }
   return null;
 };
@@ -60,8 +64,8 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   full_address: CollectedKycDataOption.fullAddress,
   partial_address: CollectedKycDataOption.partialAddress,
   phone_number: CollectedKycDataOption.phoneNumber,
-  document: CollectedDocumentDataOption.document,
-  document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
+  document: CollectedIdDocumentDataOption.document,
+  document_and_selfie: CollectedIdDocumentDataOption.documentAndSelfie,
   business_name: CollectedKybDataOption.name,
   business_ein: CollectedKybDataOption.ein,
   business_address: CollectedKybDataOption.address,

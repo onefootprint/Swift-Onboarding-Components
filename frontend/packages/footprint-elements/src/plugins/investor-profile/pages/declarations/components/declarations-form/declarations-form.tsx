@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileData,
-  InvestorProfileDataAttribute,
   InvestorProfileDeclaration,
+  InvestorProfileDI,
 } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -14,10 +14,7 @@ import { DeclarationData } from '../../../../utils/state-machine/types';
 import UploadComplianceLetter from '../upload-compliance-letter';
 
 export type DeclarationsFormProps = {
-  defaultValues?: Pick<
-    InvestorProfileData,
-    InvestorProfileDataAttribute.declarations
-  >;
+  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.declarations>;
   isLoading?: boolean;
   onSubmit: (data: DeclarationData, files?: File[]) => void;
 };
@@ -31,7 +28,7 @@ const DeclarationsForm = ({
 }: DeclarationsFormProps) => {
   const { t } = useTranslation('pages.declarations.form');
   const defaultEntries = (
-    defaultValues?.[InvestorProfileDataAttribute.declarations] ?? []
+    defaultValues?.[InvestorProfileDI.declarations] ?? []
   ).map(goal => [goal, true]);
   const { handleSubmit, register, watch } = useForm<FormData>({
     defaultValues: Object.fromEntries(defaultEntries),
@@ -61,7 +58,7 @@ const DeclarationsForm = ({
       .filter(([, value]) => !!value)
       .map(([key]) => key as InvestorProfileDeclaration);
     const declarations = {
-      [InvestorProfileDataAttribute.declarations]: filteredData,
+      [InvestorProfileDI.declarations]: filteredData,
     };
 
     if (files.length) {

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileData,
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileInvestmentGoal,
 } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
@@ -14,10 +14,7 @@ import { InvestmentGoalsData } from '../../../../utils/state-machine/types';
 import Error from '../error';
 
 export type InvestmentGoalsFormProps = {
-  defaultValues?: Pick<
-    InvestorProfileData,
-    InvestorProfileDataAttribute.investmentGoals
-  >;
+  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>;
   isLoading?: boolean;
   onSubmit: (data: InvestmentGoalsData) => void;
 };
@@ -31,7 +28,7 @@ const InvestmentGoalsForm = ({
 }: InvestmentGoalsFormProps) => {
   const { t } = useTranslation('pages.investment-goals.form');
   const defaultEntries = (
-    defaultValues?.[InvestorProfileDataAttribute.investmentGoals] ?? []
+    defaultValues?.[InvestorProfileDI.investmentGoals] ?? []
   ).map(goal => [goal, true]);
   const { handleSubmit, register, watch } = useForm<FormData>({
     defaultValues: Object.fromEntries(defaultEntries),
@@ -70,7 +67,7 @@ const InvestmentGoalsForm = ({
       .map(([key]) => key as InvestorProfileInvestmentGoal);
 
     onSubmit({
-      [InvestorProfileDataAttribute.investmentGoals]: goals,
+      [InvestorProfileDI.investmentGoals]: goals,
     });
   };
 

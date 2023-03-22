@@ -1,10 +1,10 @@
-import { OnboardingConfig } from '../data';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
 import IdDocType from '../data/id-doc-type';
+import { OnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',

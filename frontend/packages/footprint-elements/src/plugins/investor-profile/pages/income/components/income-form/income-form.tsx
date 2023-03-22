@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileAnnualIncome,
   InvestorProfileData,
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
 } from '@onefootprint/types';
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
@@ -13,10 +13,7 @@ import ContinueButton from '../../../../components/continue-button';
 import { IncomeData } from '../../../../utils/state-machine/types';
 
 export type IncomeFormProps = {
-  defaultValues?: Pick<
-    InvestorProfileData,
-    InvestorProfileDataAttribute.annualIncome
-  >;
+  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.annualIncome>;
   isLoading?: boolean;
   onSubmit: (data: IncomeData) => void;
 };
@@ -34,7 +31,7 @@ const IncomeForm = ({
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       income:
-        defaultValues?.[InvestorProfileDataAttribute.annualIncome] ??
+        defaultValues?.[InvestorProfileDI.annualIncome] ??
         InvestorProfileAnnualIncome.lt50k,
     },
   });
@@ -42,7 +39,7 @@ const IncomeForm = ({
   const handleBeforeSubmit = (data: FormData) => {
     const { income } = data;
     onSubmit({
-      [InvestorProfileDataAttribute.annualIncome]: income,
+      [InvestorProfileDI.annualIncome]: income,
     });
   };
 

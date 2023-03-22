@@ -1,6 +1,6 @@
 import {
   CollectedDataOption,
-  CollectedDocumentDataOption,
+  CollectedIdDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -24,7 +24,7 @@ const getKybOnboardingConfigFromContext = (
   ];
   const mustCollectKycData: (
     | CollectedKycDataOption
-    | CollectedDocumentDataOption
+    | CollectedIdDocumentDataOption
   )[] = [
     CollectedKycDataOption.email,
     CollectedKycDataOption.name,
@@ -47,10 +47,10 @@ const getKybOnboardingConfigFromContext = (
   } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
     mustCollectKycData.push(CollectedKycDataOption.ssn9);
   }
-  if (kycCollect?.[CollectedDocumentDataOption.documentAndSelfie]) {
-    mustCollectKycData.push(CollectedDocumentDataOption.documentAndSelfie);
-  } else if (kycCollect?.[CollectedDocumentDataOption.document]) {
-    mustCollectKycData.push(CollectedDocumentDataOption.document);
+  if (kycCollect?.[CollectedIdDocumentDataOption.documentAndSelfie]) {
+    mustCollectKycData.push(CollectedIdDocumentDataOption.documentAndSelfie);
+  } else if (kycCollect?.[CollectedIdDocumentDataOption.document]) {
+    mustCollectKycData.push(CollectedIdDocumentDataOption.document);
   }
 
   const mustCollectData = [...mustCollectKybData, ...mustCollectKycData];
@@ -79,10 +79,10 @@ const getKybOnboardingConfigFromContext = (
   } else if (kycAccess?.[CollectedKycDataOption.ssn9]) {
     canAccessData.push(CollectedKycDataOption.ssn9);
   }
-  if (kycAccess?.[CollectedDocumentDataOption.documentAndSelfie]) {
-    canAccessData.push(CollectedDocumentDataOption.documentAndSelfie);
-  } else if (kycAccess?.[CollectedDocumentDataOption.document]) {
-    canAccessData.push(CollectedDocumentDataOption.document);
+  if (kycAccess?.[CollectedIdDocumentDataOption.documentAndSelfie]) {
+    canAccessData.push(CollectedIdDocumentDataOption.documentAndSelfie);
+  } else if (kycAccess?.[CollectedIdDocumentDataOption.document]) {
+    canAccessData.push(CollectedIdDocumentDataOption.document);
   }
 
   return { mustCollectData, canAccessData };
@@ -98,7 +98,7 @@ const getKycOnboardingConfigFromContext = (
 
   const mustCollectData: (
     | CollectedKycDataOption
-    | CollectedDocumentDataOption
+    | CollectedIdDocumentDataOption
     | CollectedInvestorProfileDataOption
   )[] = [
     CollectedKycDataOption.email,
@@ -113,10 +113,10 @@ const getKycOnboardingConfigFromContext = (
   } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
     mustCollectData.push(CollectedKycDataOption.ssn9);
   }
-  if (kycCollect?.[CollectedDocumentDataOption.documentAndSelfie]) {
-    mustCollectData.push(CollectedDocumentDataOption.documentAndSelfie);
-  } else if (kycCollect?.[CollectedDocumentDataOption.document]) {
-    mustCollectData.push(CollectedDocumentDataOption.document);
+  if (kycCollect?.[CollectedIdDocumentDataOption.documentAndSelfie]) {
+    mustCollectData.push(CollectedIdDocumentDataOption.documentAndSelfie);
+  } else if (kycCollect?.[CollectedIdDocumentDataOption.document]) {
+    mustCollectData.push(CollectedIdDocumentDataOption.document);
   }
   if (kycCollect?.[CollectedInvestorProfileDataOption.investorProfile]) {
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
@@ -144,10 +144,10 @@ const getKycOnboardingConfigFromContext = (
   } else if (kycAccess?.[CollectedKycDataOption.ssn9]) {
     canAccessData.push(CollectedKycDataOption.ssn9);
   }
-  if (kycAccess?.[CollectedDocumentDataOption.documentAndSelfie]) {
-    canAccessData.push(CollectedDocumentDataOption.documentAndSelfie);
-  } else if (kycAccess?.[CollectedDocumentDataOption.document]) {
-    canAccessData.push(CollectedDocumentDataOption.document);
+  if (kycAccess?.[CollectedIdDocumentDataOption.documentAndSelfie]) {
+    canAccessData.push(CollectedIdDocumentDataOption.documentAndSelfie);
+  } else if (kycAccess?.[CollectedIdDocumentDataOption.document]) {
+    canAccessData.push(CollectedIdDocumentDataOption.document);
   }
   if (kycAccess?.[CollectedInvestorProfileDataOption.investorProfile]) {
     canAccessData.push(CollectedInvestorProfileDataOption.investorProfile);

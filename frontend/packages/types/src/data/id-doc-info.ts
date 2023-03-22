@@ -1,8 +1,11 @@
 import { DecryptedIdDocStatus } from './decrypted-id-doc';
-import IdDocType from './id-doc-type';
+import IdDocDI from './id-doc-data-attribute';
 
 export type IdDocInfo = {
-  type: IdDocType;
+  // TODO: Remove from backend
+  // https://linear.app/footprint/issue/FP-3235/remove-unused-fields-for-user
+  // type: IdDocDI;
+  dataIdentifier: IdDocDI;
   status: DecryptedIdDocStatus;
   selfieCollected: boolean;
 };

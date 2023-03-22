@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  CollectedDocumentDataOption,
+  CollectedIdDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
@@ -17,7 +17,7 @@ import getFormIdForState from '../../utils/get-form-id-for-state';
 
 type FormData = Record<
   | CollectedKycDataOption
-  | CollectedDocumentDataOption
+  | CollectedIdDocumentDataOption
   | CollectedInvestorProfileDataOption,
   boolean
 >;
@@ -32,11 +32,11 @@ const KycAccess = () => {
   const { register, handleSubmit, watch, setValue } = useForm<FormData>({
     defaultValues: getDefaultKycAccess(kycCollect, kycAccess),
   });
-  const idDocAccess = watch(CollectedDocumentDataOption.document);
+  const idDocAccess = watch(CollectedIdDocumentDataOption.document);
 
   const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.checked) {
-      setValue(CollectedDocumentDataOption.documentAndSelfie, false);
+      setValue(CollectedIdDocumentDataOption.documentAndSelfie, false);
     }
   };
 
@@ -59,62 +59,62 @@ const KycAccess = () => {
       >
         <OptionsContainer>
           <Checkbox
-            label={allT('collected-data-options.email')}
+            label={allT('cdo.email')}
             {...register(CollectedKycDataOption.email)}
           />
           <Checkbox
-            label={allT('collected-data-options.phone_number')}
+            label={allT('cdo.phone_number')}
             {...register(CollectedKycDataOption.phoneNumber)}
           />
           <Checkbox
-            label={allT('collected-data-options.name')}
+            label={allT('cdo.name')}
             {...register(CollectedKycDataOption.name)}
           />
           <Checkbox
-            label={allT('collected-data-options.dob')}
+            label={allT('cdo.dob')}
             {...register(CollectedKycDataOption.dob)}
           />
           <Checkbox
-            label={allT('collected-data-options.full_address')}
+            label={allT('cdo.full_address')}
             {...register(CollectedKycDataOption.fullAddress)}
           />
           {kycCollect?.ssnKind === CollectedKycDataOption.ssn4 && (
             <Checkbox
-              label={allT('collected-data-options.ssn4')}
+              label={allT('cdo.ssn4')}
               {...register(CollectedKycDataOption.ssn4)}
             />
           )}
           {kycCollect?.ssnKind === CollectedKycDataOption.ssn9 && (
             <Checkbox
-              label={allT('collected-data-options.ssn9')}
+              label={allT('cdo.ssn9')}
               {...register(CollectedKycDataOption.ssn9)}
             />
           )}
-          {kycCollect?.[CollectedDocumentDataOption.document] && (
+          {kycCollect?.[CollectedIdDocumentDataOption.document] && (
             <Box>
               <Checkbox
-                label={allT('collected-data-options.document')}
-                {...register(CollectedDocumentDataOption.document, {
+                label={allT('cdo.document')}
+                {...register(CollectedIdDocumentDataOption.document, {
                   onChange: handleDocumentChange,
                 })}
               />
               <AnimatedContainer
                 isExpanded={
                   !!kycCollect?.[
-                    CollectedDocumentDataOption.documentAndSelfie
+                    CollectedIdDocumentDataOption.documentAndSelfie
                   ] && !!idDocAccess
                 }
               >
                 <Checkbox
-                  label={allT('id-doc-type.selfie')}
-                  {...register(CollectedDocumentDataOption.documentAndSelfie)}
+                  label={allT('cdo.selfie')}
+                  {...register(CollectedIdDocumentDataOption.documentAndSelfie)}
                 />
               </AnimatedContainer>
             </Box>
           )}
           {kycCollect?.[CollectedInvestorProfileDataOption.investorProfile] && (
             <Checkbox
-              label={allT('collected-data-options.investor_profile')}
+              label={allT('cdo.investor_profile')}
               {...register(CollectedInvestorProfileDataOption.investorProfile)}
             />
           )}

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileAnnualIncome,
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -49,8 +49,8 @@ const Income = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDataAttribute.annualIncome]:
-            data?.[InvestorProfileDataAttribute.annualIncome] ||
+          [InvestorProfileDI.annualIncome]:
+            data?.[InvestorProfileDI.annualIncome] ||
             InvestorProfileAnnualIncome.lt50k,
         }}
       />

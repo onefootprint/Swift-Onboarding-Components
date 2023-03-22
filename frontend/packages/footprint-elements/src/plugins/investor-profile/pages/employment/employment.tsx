@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { InvestorProfileDataAttribute } from '@onefootprint/types';
+import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
@@ -46,8 +46,7 @@ const Employment = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDataAttribute.occupation]:
-            data?.[InvestorProfileDataAttribute.occupation],
+          [InvestorProfileDI.occupation]: data?.[InvestorProfileDI.occupation],
         }}
       />
     </>

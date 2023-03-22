@@ -1,5 +1,7 @@
 import request, { PaginatedRequestResponse } from '@onefootprint/request';
 import {
+  getOnboardingCanAccessAttributes,
+  Onboarding,
   requiresManualReview,
   ScopedUser,
   statusForScopedUser,
@@ -37,14 +39,26 @@ const useUsers = () => {
     () => getUsersRequest(authHeaders, requestParams),
     {
       enabled: filters.isReady,
-      select: (response: PaginatedRequestResponse<UsersResponse>) => ({
-        meta: response.meta,
-        data: response.data.map((metadata: ScopedUser) => ({
-          ...metadata,
-          requiresManualReview: requiresManualReview(metadata),
-          status: statusForScopedUser(metadata),
-        })),
-      }),
+      select: (response: PaginatedRequestResponse<UsersResponse>) => {
+        const getOnboarding = (onboarding?: Onboarding) => {
+          if (!onboarding) {
+            return undefined;
+          }
+          return {
+            ...onboarding,
+            canAccessAttributes: getOnboardingCanAccessAttributes(onboarding),
+          };
+        };
+        return {
+          meta: response.meta,
+          data: response.data.map((scopedUser: ScopedUser) => ({
+            ...scopedUser,
+            requiresManualReview: requiresManualReview(scopedUser),
+            status: statusForScopedUser(scopedUser),
+            onboarding: getOnboarding(scopedUser.onboarding),
+          })),
+        };
+      },
     },
   );
   const pagination = useCursorPagination({

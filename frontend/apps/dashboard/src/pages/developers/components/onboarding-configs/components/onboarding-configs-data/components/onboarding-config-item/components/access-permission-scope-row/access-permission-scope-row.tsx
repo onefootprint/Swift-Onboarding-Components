@@ -15,9 +15,7 @@ const AccessPermissionScopeRow = ({ data }: AccessPermissionScopeRowProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.list-item.access-data',
   );
-  const items = canAccessData.map(dataAttr =>
-    allT(`collected-data-options.${dataAttr}`),
-  );
+  const items = canAccessData.map(dataAttr => allT(`cdo.${dataAttr}`));
 
   return (
     <tr>

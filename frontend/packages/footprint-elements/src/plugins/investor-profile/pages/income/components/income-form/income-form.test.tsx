@@ -1,6 +1,6 @@
 import {
   InvestorProfileAnnualIncome,
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -43,8 +43,7 @@ describe('<IncomeForm />', () => {
     const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.annualIncome]:
-        InvestorProfileAnnualIncome.s50kTo100k,
+      [InvestorProfileDI.annualIncome]: InvestorProfileAnnualIncome.s50kTo100k,
     });
   });
 
@@ -81,7 +80,7 @@ describe('<IncomeForm />', () => {
     it('when there is a default value prop', async () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDataAttribute.annualIncome]:
+          [InvestorProfileDI.annualIncome]:
             InvestorProfileAnnualIncome.s250kTo500k,
         },
       });

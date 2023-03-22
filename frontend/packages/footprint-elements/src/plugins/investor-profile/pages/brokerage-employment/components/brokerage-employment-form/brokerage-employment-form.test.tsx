@@ -1,4 +1,4 @@
-import { InvestorProfileDataAttribute } from '@onefootprint/types';
+import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import {
@@ -35,7 +35,7 @@ describe('<BrokerageEmploymentForm />', () => {
 
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.employedByBrokerageFirm]: '',
+      [InvestorProfileDI.employedByBrokerageFirm]: '',
     });
 
     const option = screen.getByLabelText('Yes, I am');
@@ -49,7 +49,7 @@ describe('<BrokerageEmploymentForm />', () => {
     await userEvent.type(input, 'Test');
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.employedByBrokerageFirm]: 'Test',
+      [InvestorProfileDI.employedByBrokerageFirm]: 'Test',
     });
   });
 
@@ -57,7 +57,7 @@ describe('<BrokerageEmploymentForm />', () => {
     it('when there is a firm name', () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDataAttribute.employedByBrokerageFirm]: 'Test',
+          [InvestorProfileDI.employedByBrokerageFirm]: 'Test',
         },
       });
 
@@ -86,7 +86,7 @@ describe('<BrokerageEmploymentForm />', () => {
   it('renders error state correctly', async () => {
     renderForm({
       defaultValues: {
-        [InvestorProfileDataAttribute.employedByBrokerageFirm]: 'test',
+        [InvestorProfileDI.employedByBrokerageFirm]: 'test',
       },
     });
 

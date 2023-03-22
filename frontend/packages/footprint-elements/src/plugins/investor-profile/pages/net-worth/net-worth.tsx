@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileNetWorth,
 } from '@onefootprint/types';
 import React from 'react';
@@ -49,9 +49,8 @@ const NetWorth = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDataAttribute.netWorth]:
-            data?.[InvestorProfileDataAttribute.netWorth] ||
-            InvestorProfileNetWorth.lt50k,
+          [InvestorProfileDI.netWorth]:
+            data?.[InvestorProfileDI.netWorth] || InvestorProfileNetWorth.lt50k,
         }}
       />
     </>

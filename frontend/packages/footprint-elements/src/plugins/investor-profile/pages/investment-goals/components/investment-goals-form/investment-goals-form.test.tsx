@@ -1,5 +1,5 @@
 import {
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileInvestmentGoal,
 } from '@onefootprint/types';
 import React from 'react';
@@ -73,7 +73,7 @@ describe('<InvestmentGoalsForm />', () => {
     }) as HTMLButtonElement;
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.investmentGoals]: [
+      [InvestorProfileDI.investmentGoals]: [
         InvestorProfileInvestmentGoal.growLongTermWealth,
         InvestorProfileInvestmentGoal.supportLovedOnes,
       ],
@@ -85,7 +85,7 @@ describe('<InvestmentGoalsForm />', () => {
     renderForm({
       onSubmit,
       defaultValues: {
-        [InvestorProfileDataAttribute.investmentGoals]: [
+        [InvestorProfileDI.investmentGoals]: [
           InvestorProfileInvestmentGoal.buyAHome,
           InvestorProfileInvestmentGoal.payOffDebt,
         ],
@@ -125,7 +125,7 @@ describe('<InvestmentGoalsForm />', () => {
     }) as HTMLButtonElement;
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.investmentGoals]: [
+      [InvestorProfileDI.investmentGoals]: [
         InvestorProfileInvestmentGoal.buyAHome,
         InvestorProfileInvestmentGoal.payOffDebt,
       ],

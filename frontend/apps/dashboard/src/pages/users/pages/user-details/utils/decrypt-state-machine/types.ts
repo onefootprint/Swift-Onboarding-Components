@@ -1,4 +1,4 @@
-import { IdDocType, UserDataAttribute } from '@onefootprint/types';
+import { IdDI, InvestorProfileDI } from '@onefootprint/types';
 
 export enum State {
   idle = 'idle',
@@ -31,10 +31,7 @@ export enum Action {
   assignReason = 'assignReason',
 }
 
-export type Fields = {
-  kycData: Partial<Record<UserDataAttribute, boolean>>;
-  idDoc: Partial<Record<IdDocType, boolean>>;
-};
+export type Fields = InvestorProfileDI[] & IdDI[];
 
 export type Context = {
   reason?: string;

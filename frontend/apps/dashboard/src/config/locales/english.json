@@ -31,34 +31,38 @@
     "incomplete": "Incomplete",
     "pending": "Pending"
   },
-  "user-data-attributes": {
-    "name": "Name",
-    "phone_number": "Phone number",
-    "email": "Email",
-    "first_name": "First name",
-    "last_name": "Last name",
-    "ssn9": "SSN (Full)",
-    "ssn4": "SSN (Last 4)",
-    "dob": "Date of Birth",
-    "address_line1": "Address line 1",
-    "address_line2": "Address line 2",
-    "city": "City",
-    "state": "State",
-    "zip": "Zip code",
-    "country": "Country"
-  },
-  "investor-profile-attributes": {
+  "di": {
+    "id.name": "Name",
+    "id.phone_number": "Phone number",
+    "id.email": "Email",
+    "id.first_name": "First name",
+    "id.last_name": "Last name",
+    "id.ssn9": "SSN (Full)",
+    "id.ssn4": "SSN (Last 4)",
+    "id.dob": "Date of Birth",
+    "id.address_line1": "Address line 1",
+    "id.address_line2": "Address line 2",
+    "id.city": "City",
+    "id.state": "State",
+    "id.zip": "Zip code",
+    "id.country": "Country",
     "investor_profile.employment_status": "Employment status",
     "investor_profile.occupation": "Occupation",
-    "investor_profile.employed_by_brokerage": "Employed by brokerage firm?",
+    "investor_profile.brokerage_firm_employer": "Employed by brokerage firm?",
     "investor_profile.annual_income": "Annual income",
     "investor_profile.net_worth": "Net worth",
     "investor_profile.investment_goals": "Investment goals",
     "investor_profile.risk_tolerance": "Risk tolerance",
     "investor_profile.declarations": "Declaration(s)",
-    "investor_profile.compliance_letter": "Compliance letter"
+    "investor_profile.compliance_letter": "Compliance letter",
+    "id_document.passport": "Passport",
+    "id_document.id_card": "ID card",
+    "id_document.driver_license": "Driver's License",
+    "selfie.passport": "Selfie",
+    "selfie.id_card": "Selfie",
+    "selfie.driver_license": "Selfie"
   },
-  "collected-data-options": {
+  "cdo": {
     "name": "Full name",
     "dob": "Date of Birth",
     "ssn9": "SSN (Full)",
@@ -86,13 +90,7 @@
     "website": "Website",
     "phone_number": "Phone number"
   },
-  "id-doc-type": {
-    "id_card": "ID card",
-    "driver_license": "Driver's License",
-    "passport": "Passport",
-    "selfie": "Selfie"
-  },
-  "vendors": {
+  "vendor": {
     "idology": "Idology",
     "socure": "Socure",
     "lexis_nexis": "LexisNexis",
@@ -446,13 +444,61 @@
         },
         "investor-profile": {
           "title": "Investor profile",
-          "employment-status-and-occupation": "What's your employment status and occupation?",
-          "brokerage-firm": "Are you employed by a brokerage firm?",
-          "annual-income": "What's your annual income?",
-          "net-worth": "What's your net worth?",
-          "investment-goals": "What are your investment goals?",
-          "risk-tolerance": "How would you describe your risk tolerance?",
-          "immediate-family": "Do any of the following apply to you or a member of your immediate family?"
+          "occupation": {
+            "title": "What's your occupation?"
+          },
+          "brokerage-firm": {
+            "title": "Are you employed by a brokerage firm?"
+          },
+          "annual-income": {
+            "title": "What's your annual income?",
+            "options": {
+              "lt50k": "Under $50,000",
+              "s50k_to100k": "$50,000 - $100,000",
+              "s100k_to250k": "$100,000 - $250,000",
+              "s250k_to500k": "$250,000 - $500,000",
+              "gt500k": "$500,000+"
+            }
+          },
+          "net-worth": {
+            "title": "What's your net worth?",
+            "options": {
+              "lt50k": "Under $50,000",
+              "s50k_to100k": "$50,000 - $100,000",
+              "s100k_to250k": "$100,000 - $250,000",
+              "s250k_to500k": "$250,000 - $500,000",
+              "s500k_to1m": "$500,000 - $1,000,000",
+              "gt1m": "$1,000,000+"
+            }
+          },
+          "investment-goals": {
+            "title": "What are your investment goals?",
+            "options": {
+              "grow_long_term_wealth": "Grow long-term wealth",
+              "save_for_retirement": "Save for retirement",
+              "support_loved_ones": "Support my loved ones",
+              "buy_a_home": "Buy a home",
+              "pay_off_debt": "Pay off debt",
+              "start_my_own_business": "Start my own business"
+            }
+          },
+          "risk-tolerance": {
+            "title": "How would you describe your risk tolerance?",
+            "options": {
+              "conservative": "Conservative",
+              "moderate": "Moderate",
+              "aggressive": "Aggressive"
+            }
+          },
+          "declarations": {
+            "title": "Do any of the following apply to you or a member of your immediate family?",
+            "options": {
+              "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
+              "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
+              "senior_political_figure": "I'm a senior political figure",
+              "family_of_political_figure": "I'm a family member or relative of a senior political figure"
+            }
+          }
         },
         "risks": {
           "cta": "See details",

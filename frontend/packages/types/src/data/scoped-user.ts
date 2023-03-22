@@ -1,21 +1,36 @@
+import CdoToDiMap from './cdo-to-di-map';
+import { DataIdentifier } from './di';
+import IdDocDI from './id-doc-data-attribute';
 import { IdDocInfo } from './id-doc-info';
-import { InvestorProfileDataAttribute } from './investor-data-attribute';
 import { Onboarding } from './onboarding';
-import UserDataAttribute from './user-data-attribute';
 import UserStatus from './user-status';
 
-// TODO:
-// https://linear.app/footprint/issue/FP-2909/add-new-format-for-attributes-in-onboarding
 export type ScopedUser = {
   id: string;
-  attributes: InvestorProfileDataAttribute[];
+  attributes: DataIdentifier[];
   isPortable: boolean;
   startTimestamp: string;
   onboarding?: Onboarding;
   orderingId: number;
-  identityDataAttributes: UserDataAttribute[];
   identityDocumentInfo: IdDocInfo[];
 };
+
+export const getUserIdDocumentAttributes = (scopedUser: ScopedUser) => {
+  const idDocAttributes: IdDocDI[] = [];
+  Object.entries(IdDocDI).forEach(([, attribute]) => {
+    if (scopedUser.attributes.includes(attribute)) {
+      idDocAttributes.push(attribute);
+    }
+  });
+  return idDocAttributes;
+};
+
+export const getOnboardingCanAccessAttributes = (
+  onboarding: Onboarding,
+): DataIdentifier[] =>
+  onboarding.canAccessData
+    .map(collectDataOption => CdoToDiMap[collectDataOption])
+    .flat();
 
 export const statusForScopedUser = (scopedUser: ScopedUser) => {
   if (!scopedUser.isPortable) {

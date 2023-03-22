@@ -1,5 +1,5 @@
 import {
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileNetWorth,
 } from '@onefootprint/types';
 import React from 'react';
@@ -43,8 +43,7 @@ describe('<NetWorthForm />', () => {
     const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.netWorth]:
-        InvestorProfileNetWorth.s50kTo100k,
+      [InvestorProfileDI.netWorth]: InvestorProfileNetWorth.s50kTo100k,
     });
   });
 
@@ -86,8 +85,7 @@ describe('<NetWorthForm />', () => {
     it('when there is a default value prop', async () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDataAttribute.netWorth]:
-            InvestorProfileNetWorth.s250kTo500k,
+          [InvestorProfileDI.netWorth]: InvestorProfileNetWorth.s250kTo500k,
         },
       });
 

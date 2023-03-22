@@ -1,3 +1,5 @@
+import capitalize from 'lodash/capitalize';
+
 const createStringList = (
   items: string[],
   connector?: string,
@@ -25,7 +27,7 @@ const createStringList = (
       }
     });
 
-  return list.join('');
+  return capitalize(list.join(''));
 };
 
 export default createStringList;

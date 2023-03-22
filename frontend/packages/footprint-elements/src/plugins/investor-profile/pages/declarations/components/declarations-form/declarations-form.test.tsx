@@ -1,6 +1,6 @@
 import {
-  InvestorProfileDataAttribute,
   InvestorProfileDeclaration,
+  InvestorProfileDI,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -48,7 +48,7 @@ describe('<DeclarationsForm />', () => {
     const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.declarations]: [
+      [InvestorProfileDI.declarations]: [
         InvestorProfileDeclaration.seniorPoliticalFigure,
         InvestorProfileDeclaration.familyOfPoliticalFigure,
       ],
@@ -58,7 +58,7 @@ describe('<DeclarationsForm />', () => {
   it('renders default values correctly', async () => {
     renderForm({
       defaultValues: {
-        [InvestorProfileDataAttribute.declarations]: [
+        [InvestorProfileDI.declarations]: [
           InvestorProfileDeclaration.familyOfPoliticalFigure,
         ],
       },

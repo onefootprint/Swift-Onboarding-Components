@@ -1,12 +1,18 @@
-import { DecryptedIdDoc, IdDocType } from '../data';
+import { DecryptedIdDoc, IdDocDI } from '../data';
 
-export type DecryptIdDocRequest = {
+export type DecryptIdDocumentRequest = {
   userId: string;
-  documentType: IdDocType;
+  // TODO: REMOVE
+  // https://linear.app/footprint/issue/FP-3235/remove-unused-fields-for-user
+  // documentType: IdDocType;
+  documentIdentifier: IdDocDI;
   reason: string;
 };
 
-export type DecryptIdDocResponse = {
-  documentType: IdDocType;
+export type DecryptIdDocumentResponse = {
+  // TODO: REMOVE
+  // https://linear.app/footprint/issue/FP-3235/remove-unused-fields-for-user
+  // documentType: IdDocType;
+  documentIdentifier: IdDocDI;
   images: DecryptedIdDoc[];
 };

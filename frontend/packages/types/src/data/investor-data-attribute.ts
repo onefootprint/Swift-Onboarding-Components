@@ -1,14 +1,3 @@
-export enum InvestorProfileDataAttribute {
-  occupation = 'investor_profile.occupation',
-  employedByBrokerageFirm = 'investor_profile.brokerage_firm_employer',
-  annualIncome = 'investor_profile.annual_income',
-  netWorth = 'investor_profile.net_worth',
-  investmentGoals = 'investor_profile.investment_goals',
-  riskTolerance = 'investor_profile.risk_tolerance',
-  declarations = 'investor_profile.declarations',
-  complianceLetter = 'investor_profile.compliance_letter',
-}
-
 export enum InvestorProfileAnnualIncome {
   lt50k = 'lt50k',
   s50kTo100k = 's50k_to100k',

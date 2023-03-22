@@ -39,11 +39,11 @@ const OnboardingDecisionEventBody = ({
   if (status === DecisionStatus.pass) {
     const uniqueVendors = Array.from(new Set(vendors));
     const vendorsList = createStringList(
-      uniqueVendors.map(vendor => allT(`vendors.${vendor}`)) ?? [],
+      uniqueVendors.map(vendor => allT(`vendor.${vendor}`)) ?? [],
     );
 
     const collectedDataLabels = [
-      ...mustCollectData.map(attr => allT(`collected-data-options.${attr}`)),
+      ...mustCollectData.map(attr => allT(`cdo.${attr}`)),
       // TODO: Add collected id document types here
       // https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to
       // ...collectedIdDocuments.map(idDoc => allT(`id-doc-type.${idDoc}`)),

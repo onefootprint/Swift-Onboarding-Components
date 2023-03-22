@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileData,
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileNetWorth,
 } from '@onefootprint/types';
 import { Radio } from '@onefootprint/ui';
@@ -14,10 +14,7 @@ import { NetWorthData } from '../../../../utils/state-machine/types';
 
 export type NetWorthFormProps = {
   isLoading?: boolean;
-  defaultValues?: Pick<
-    InvestorProfileData,
-    InvestorProfileDataAttribute.netWorth
-  >;
+  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.netWorth>;
   onSubmit: (data: NetWorthData) => void;
 };
 
@@ -34,7 +31,7 @@ const NetWorthForm = ({
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       netWorth:
-        defaultValues?.[InvestorProfileDataAttribute.netWorth] ??
+        defaultValues?.[InvestorProfileDI.netWorth] ??
         InvestorProfileNetWorth.lt50k,
     },
   });
@@ -42,7 +39,7 @@ const NetWorthForm = ({
   const handleBeforeSubmit = (data: FormData) => {
     const { netWorth } = data;
     onSubmit({
-      [InvestorProfileDataAttribute.netWorth]: netWorth,
+      [InvestorProfileDI.netWorth]: netWorth,
     });
   };
 

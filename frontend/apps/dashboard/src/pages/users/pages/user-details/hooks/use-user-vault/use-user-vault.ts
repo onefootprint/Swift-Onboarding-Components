@@ -1,31 +1,33 @@
-import { InvestorProfileDataAttribute } from '@onefootprint/types';
+import { IdDI, IdDocDI, InvestorProfileDI, Vault } from '@onefootprint/types';
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
-import { User, UserVaultData } from 'src/pages/users/users.types';
+import { User } from 'src/pages/users/users.types';
 
-const getVaultDataOrCreate = async (queryClient: QueryClient, user: User) => {
+const getVaultOrCreate = async (queryClient: QueryClient, user: User) => {
   const getFromCache = () =>
-    queryClient.getQueryData<UserVaultData>(['user', user.id, 'vaultData']);
+    queryClient.getQueryData<Vault>(['user', user.id, 'vault']);
 
-  // TODO:
-  // https://linear.app/footprint/issue/FP-2909/add-new-format-for-attributes-in-onboarding
   const createInitialData = () => {
-    const idDoc: UserVaultData['idDoc'] = {};
-    const kycData: UserVaultData['kycData'] = {};
-    const investorProfile: UserVaultData['investorProfile'] = {};
-
-    const docTypes = user.identityDocumentInfo.map(info => info.type);
-    Object.values(docTypes).forEach(attribute => {
-      idDoc[attribute] = null;
+    const vault: Vault = {
+      id: {},
+      idDoc: {},
+      investorProfile: {},
+    };
+    Object.entries(IdDocDI).forEach(([, attribute]) => {
+      if (user.attributes.includes(attribute)) {
+        vault.idDoc[attribute] = null;
+      }
     });
-    Object.values(user.identityDataAttributes).forEach(attribute => {
-      kycData[attribute] = null;
+    Object.entries(IdDI).forEach(([, attribute]) => {
+      if (user.attributes.includes(attribute)) {
+        vault.id[attribute] = null;
+      }
     });
-    Object.values(InvestorProfileDataAttribute).forEach(attribute => {
-      const hasAttribute = user.attributes.find(attr => attr === attribute);
-      if (hasAttribute) investorProfile[attribute] = null;
+    Object.entries(InvestorProfileDI).forEach(([, attribute]) => {
+      if (user.attributes.includes(attribute)) {
+        vault.investorProfile[attribute] = null;
+      }
     });
-
-    return { kycData, idDoc, investorProfile };
+    return vault;
   };
 
   const possibleData = await getFromCache();
@@ -35,13 +37,27 @@ const getVaultDataOrCreate = async (queryClient: QueryClient, user: User) => {
 const useUserVault = (userId: string, user?: User) => {
   const queryClient = useQueryClient();
 
-  const update = (newVaultData: UserVaultData) => {
-    queryClient.setQueryData(['user', userId, 'vaultData'], newVaultData);
+  const update = (newData: Vault) => {
+    const prevData = queryClient.getQueryData<Vault>(['user', userId, 'vault']);
+    queryClient.setQueryData(['user', userId, 'vault'], {
+      id: {
+        ...prevData?.id,
+        ...newData.id,
+      },
+      idDoc: {
+        ...prevData?.idDoc,
+        ...newData.idDoc,
+      },
+      investorProfile: {
+        ...prevData?.investorProfile,
+        ...newData.investorProfile,
+      },
+    });
   };
 
-  const userVaultQuery = useQuery<UserVaultData>(
-    ['user', userId, 'vaultData'],
-    () => getVaultDataOrCreate(queryClient, user as User),
+  const userVaultQuery = useQuery<Vault>(
+    ['user', userId, 'vault'],
+    () => getVaultOrCreate(queryClient, user as User),
     { enabled: !!user },
   );
 

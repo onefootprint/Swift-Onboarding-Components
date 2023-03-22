@@ -1,11 +1,11 @@
 import {
   CollectedDataOption,
-  CollectedDocumentDataOption,
+  CollectedIdDocumentDataOption,
 } from '@onefootprint/types';
 
 const isDocCdo = (data: CollectedDataOption) =>
-  Object.values(CollectedDocumentDataOption).includes(
-    data as CollectedDocumentDataOption,
+  Object.values(CollectedIdDocumentDataOption).includes(
+    data as CollectedIdDocumentDataOption,
   );
 
 export default isDocCdo;

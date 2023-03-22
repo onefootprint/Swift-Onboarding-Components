@@ -14,7 +14,7 @@ const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) =>
       isPrivate
       variant="body-3"
       color="primary"
-      sx={{ whiteSpace: 'nowrap' }}
+      sx={{ maxWidth: '50%' }}
     >
       {data || '-'}
     </Typography>

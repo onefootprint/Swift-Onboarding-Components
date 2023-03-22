@@ -1,32 +1,67 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar24 } from '@onefootprint/icons';
-import { Box, Typography } from '@onefootprint/ui';
+import { Vault } from '@onefootprint/types';
+import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { User, UserVaultData } from 'src/pages/users/users.types';
+import { useFormContext } from 'react-hook-form';
+import { User } from 'src/pages/users/users.types';
 import styled, { css } from 'styled-components';
 
 import DataSection from '../data-section';
-import Field from '../field';
+import Field from '../id-data/components/field';
 import useFields from './hooks/use-fields';
 
 export type InvestorProfileDataProps = {
   user: User;
-  vaultData: UserVaultData;
+  vault: Vault;
   isDecrypting: boolean;
 };
 
-// TODO:
-// https://linear.app/footprint/issue/FP-3136/dashboard-broker-risk-signal-for-investor-profile
 const InvestorProfileData = ({
   user,
-  vaultData,
+  vault,
   isDecrypting,
 }: InvestorProfileDataProps) => {
   const { t } = useTranslation('pages.user-details.user-info.investor-profile');
-  const [left, right] = useFields(user, vaultData, isDecrypting);
+  const { setValue } = useFormContext();
+  const [fields, meta] = useFields(user, vault, isDecrypting);
+  const [left, right] = fields;
+
+  const selectValue = (value: boolean) => {
+    fields
+      .flatMap(column => column)
+      .flatMap(section => section.fields)
+      .forEach(field => {
+        setValue(field.name, value);
+      });
+  };
+
+  const handleDeselectAll = () => {
+    selectValue(false);
+  };
+
+  const handleSelectAll = () => {
+    selectValue(true);
+  };
+
+  const renderCta = () => {
+    const showData = isDecrypting && meta.canSelectAtLeastOne;
+    return showData ? (
+      <LinkButton
+        onClick={meta.allChecked ? handleDeselectAll : handleSelectAll}
+        size="compact"
+      >
+        {meta.allChecked ? 'Deselect all' : 'Select all'}
+      </LinkButton>
+    ) : null;
+  };
 
   return (
-    <DataSection iconComponent={IcoDollar24} title={t('title')}>
+    <DataSection
+      iconComponent={IcoDollar24}
+      renderCta={renderCta}
+      title={t('title')}
+    >
       <Grid>
         <Column>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 9 }}>

@@ -7,7 +7,6 @@ import React from 'react';
 import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import useUserVault from 'src/pages/users/pages/user-details/hooks/use-user-vault';
 
-import DecryptMachineProvider from './components/decrypt-machine-provider';
 import IncompleteBanner from './components/incomplete-banner';
 import ManualReviewBanner from './components/manual-review-banner';
 import UserDetailsData from './components/user-detail-data';
@@ -61,15 +60,13 @@ const UserDetails = () => {
           <BreadcrumbItem>{t('breadcrumb.details')}</BreadcrumbItem>
         </Breadcrumb>
       </Box>
-      <DecryptMachineProvider>
-        {shouldShowLoading && <UserDetailsLoading />}
-        {shouldShowData && (
-          <UserDetailsData
-            user={{ ...userQuery.data, vaultData: userVaultDataQuery.data }}
-          />
-        )}
-        {shouldShowEmptyState && <UserDetailEmptyState />}
-      </DecryptMachineProvider>
+      {shouldShowLoading && <UserDetailsLoading />}
+      {shouldShowData && (
+        <UserDetailsData
+          user={{ ...userQuery.data, vault: userVaultDataQuery.data }}
+        />
+      )}
+      {shouldShowEmptyState && <UserDetailEmptyState />}
     </>
   );
 };

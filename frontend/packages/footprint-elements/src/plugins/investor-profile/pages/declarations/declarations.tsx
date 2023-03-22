@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { InvestorProfileDataAttribute } from '@onefootprint/types';
+import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
@@ -85,8 +85,8 @@ const Declarations = () => {
         isLoading={syncDataMutation.isLoading || uploadFileMutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDataAttribute.declarations]:
-            data?.[InvestorProfileDataAttribute.declarations],
+          [InvestorProfileDI.declarations]:
+            data?.[InvestorProfileDI.declarations],
         }}
       />
     </>

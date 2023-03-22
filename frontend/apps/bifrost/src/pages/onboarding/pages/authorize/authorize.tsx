@@ -6,7 +6,7 @@ import {
 } from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  CollectedDocumentDataOption,
+  CollectedIdDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -44,7 +44,7 @@ const Authorize = () => {
     data => isKycCdo(data) || isDocCdo(data) || isInvestorProfileCdo(data),
   ) as (
     | CollectedKycDataOption
-    | CollectedDocumentDataOption
+    | CollectedIdDocumentDataOption
     | CollectedInvestorProfileDataOption
   )[];
   const kybData = canAccessData.filter(data =>

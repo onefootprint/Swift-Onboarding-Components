@@ -1,4 +1,4 @@
-import { InvestorProfileDataAttribute } from '@onefootprint/types';
+import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import {
@@ -34,7 +34,7 @@ describe('<EmploymentForm />', () => {
 
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.occupation]: '',
+      [InvestorProfileDI.occupation]: '',
     });
 
     const trigger = screen.getByRole('button', { name: 'Unemployed' });
@@ -46,7 +46,7 @@ describe('<EmploymentForm />', () => {
 
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.occupation]: 'Doctor',
+      [InvestorProfileDI.occupation]: 'Doctor',
     });
   });
 
@@ -54,7 +54,7 @@ describe('<EmploymentForm />', () => {
     it('when there is an occupation', async () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDataAttribute.occupation]: 'Doctor',
+          [InvestorProfileDI.occupation]: 'Doctor',
         },
       });
 
@@ -83,7 +83,7 @@ describe('<EmploymentForm />', () => {
   it('renders error state correctly', async () => {
     renderForm({
       defaultValues: {
-        [InvestorProfileDataAttribute.occupation]: 'test',
+        [InvestorProfileDI.occupation]: 'test',
       },
     });
 

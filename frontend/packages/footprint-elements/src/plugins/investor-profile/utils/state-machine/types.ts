@@ -1,37 +1,34 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  InvestorProfileData,
-  InvestorProfileDataAttribute,
-} from '@onefootprint/types';
+import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
 
 export type EmploymentData = Pick<
   InvestorProfileData,
-  InvestorProfileDataAttribute.occupation
+  InvestorProfileDI.occupation
 >;
 
 export type EmployedByBrokerageData = Pick<
   InvestorProfileData,
-  InvestorProfileDataAttribute.employedByBrokerageFirm
+  InvestorProfileDI.employedByBrokerageFirm
 >;
 
 export type IncomeData = Required<
-  Pick<InvestorProfileData, InvestorProfileDataAttribute.annualIncome>
+  Pick<InvestorProfileData, InvestorProfileDI.annualIncome>
 >;
 
 export type NetWorthData = Required<
-  Pick<InvestorProfileData, InvestorProfileDataAttribute.netWorth>
+  Pick<InvestorProfileData, InvestorProfileDI.netWorth>
 >;
 
 export type InvestmentGoalsData = Required<
-  Pick<InvestorProfileData, InvestorProfileDataAttribute.investmentGoals>
+  Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>
 >;
 
 export type RiskToleranceData = Required<
-  Pick<InvestorProfileData, InvestorProfileDataAttribute.riskTolerance>
+  Pick<InvestorProfileData, InvestorProfileDI.riskTolerance>
 >;
 
 export type DeclarationData = Required<
-  Pick<InvestorProfileData, InvestorProfileDataAttribute.declarations>
+  Pick<InvestorProfileData, InvestorProfileDI.declarations>
 >;
 
 export type MachineContext = {

@@ -76,7 +76,7 @@ describe('<Details />', () => {
       );
       expect(description).toBeInTheDocument();
 
-      const scopes = screen.getByText('Phone number and Date of Birth');
+      const scopes = screen.getByText('Phone number and date of birth');
       expect(scopes).toBeInTheDocument();
     });
   });

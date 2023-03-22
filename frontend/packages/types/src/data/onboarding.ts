@@ -1,23 +1,22 @@
 import { CollectedDataOption } from './collected-data-option';
+import { DataIdentifier } from './di';
 import { InsightEvent } from './insight-event';
 import { OnboardingDecision } from './onboarding-decision';
 import OnboardingStatus from './onboarding-status';
-import UserDataAttribute from './user-data-attribute';
+import { RoleScope } from './role';
 
 export type Onboarding = {
-  id: string;
-  isAuthorized: boolean;
-  name: string;
+  canAccessAttributes: DataIdentifier[];
+  canAccessData: CollectedDataOption[];
+  canAccessPermissions: RoleScope[];
   configId: string;
+  id: string;
+  insightEvent: InsightEvent;
+  isAuthorized: boolean;
+  isLivenessSkipped: boolean;
+  latestDecision?: OnboardingDecision;
+  name: string;
   requiresManualReview: boolean;
   status: OnboardingStatus;
   timestamp: string;
-  isLivenessSkipped: boolean;
-  insightEvent: InsightEvent;
-  canAccessData: CollectedDataOption[];
-  // TODO: Deprecate canAccessDataAttributes and canAccessIdentityDocumentImages
-  // https://linear.app/footprint/issue/FP-3146/deprecate-canaccessdataattributes
-  canAccessDataAttributes: UserDataAttribute[];
-  canAccessIdentityDocumentImages: boolean;
-  latestDecision?: OnboardingDecision;
 };

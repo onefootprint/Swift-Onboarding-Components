@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  CollectedDocumentDataOption,
+  CollectedIdDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
@@ -18,8 +18,8 @@ import InvestorProfileQuestions from './components/investor-profile-questions';
 
 type FormData = {
   ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-  [CollectedDocumentDataOption.document]: boolean;
-  [CollectedDocumentDataOption.documentAndSelfie]: boolean;
+  [CollectedIdDocumentDataOption.document]: boolean;
+  [CollectedIdDocumentDataOption.documentAndSelfie]: boolean;
   [CollectedInvestorProfileDataOption.investorProfile]: boolean;
 };
 
@@ -36,40 +36,40 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
   const { register, handleSubmit, watch, setValue } = useForm<FormData>({
     defaultValues: {
       ssnKind: kycCollect ? kycCollect.ssnKind : CollectedKycDataOption.ssn4,
-      [CollectedDocumentDataOption.document]: kycCollect
-        ? kycCollect[CollectedDocumentDataOption.document]
+      [CollectedIdDocumentDataOption.document]: kycCollect
+        ? kycCollect[CollectedIdDocumentDataOption.document]
         : false,
-      [CollectedDocumentDataOption.documentAndSelfie]: kycCollect
-        ? kycCollect[CollectedDocumentDataOption.documentAndSelfie]
+      [CollectedIdDocumentDataOption.documentAndSelfie]: kycCollect
+        ? kycCollect[CollectedIdDocumentDataOption.documentAndSelfie]
         : false,
     },
   });
 
   const ssnKind = watch('ssnKind');
-  const idDoc = watch(CollectedDocumentDataOption.document);
-  const selfie = watch(CollectedDocumentDataOption.documentAndSelfie);
+  const idDoc = watch(CollectedIdDocumentDataOption.document);
+  const selfie = watch(CollectedIdDocumentDataOption.documentAndSelfie);
   const investorProfile = watch(
     CollectedInvestorProfileDataOption.investorProfile,
   );
   const collectedDataTags = [
-    allT('collected-data-options.email'),
-    allT('collected-data-options.phone_number'),
-    allT('collected-data-options.name'),
-    allT('collected-data-options.dob'),
-    allT('collected-data-options.full_address'),
+    allT('cdo.email'),
+    allT('cdo.phone_number'),
+    allT('cdo.name'),
+    allT('cdo.dob'),
+    allT('cdo.full_address'),
   ];
   collectedDataTags.push(
     ssnKind === CollectedKycDataOption.ssn4
-      ? allT('collected-data-options.ssn4')
-      : allT('collected-data-options.ssn9'),
+      ? allT('cdo.ssn4')
+      : allT('cdo.ssn9'),
   );
   if (idDoc && selfie) {
-    collectedDataTags.push(allT('collected-data-options.document_and_selfie'));
+    collectedDataTags.push(allT('cdo.document_and_selfie'));
   } else if (idDoc) {
-    collectedDataTags.push(allT('collected-data-options.document'));
+    collectedDataTags.push(allT('cdo.document'));
   }
   if (investorProfile) {
-    collectedDataTags.push(allT('collected-data-options.investor_profile'));
+    collectedDataTags.push(allT('cdo.investor_profile'));
   }
 
   const handleBeforeSubmit = (formData: FormData) => {
@@ -77,10 +77,10 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
       type: 'kycCollectSubmitted',
       payload: {
         ssnKind: formData.ssnKind,
-        [CollectedDocumentDataOption.document]:
-          formData[CollectedDocumentDataOption.document],
-        [CollectedDocumentDataOption.documentAndSelfie]:
-          formData[CollectedDocumentDataOption.documentAndSelfie],
+        [CollectedIdDocumentDataOption.document]:
+          formData[CollectedIdDocumentDataOption.document],
+        [CollectedIdDocumentDataOption.documentAndSelfie]:
+          formData[CollectedIdDocumentDataOption.documentAndSelfie],
         [CollectedInvestorProfileDataOption.investorProfile]:
           formData[CollectedInvestorProfileDataOption.investorProfile],
       },
@@ -89,7 +89,7 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
 
   const handleIdDocChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.checked) {
-      setValue(CollectedDocumentDataOption.documentAndSelfie, false);
+      setValue(CollectedIdDocumentDataOption.documentAndSelfie, false);
     }
   };
 
@@ -108,12 +108,12 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
         <OptionsContainer>
           <Radio
             value={CollectedKycDataOption.ssn4}
-            label={allT('collected-data-options.ssn4')}
+            label={allT('cdo.ssn4')}
             {...register('ssnKind')}
           />
           <Radio
             value={CollectedKycDataOption.ssn9}
-            label={allT('collected-data-options.ssn9')}
+            label={allT('cdo.ssn9')}
             {...register('ssnKind')}
           />
         </OptionsContainer>
@@ -124,16 +124,16 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
         <OptionsContainer data-testid="kyc-collect-form-options">
           <Box>
             <Checkbox
-              label={allT('collected-data-options.document')}
-              {...register(CollectedDocumentDataOption.document, {
+              label={allT('cdo.document')}
+              {...register(CollectedIdDocumentDataOption.document, {
                 onChange: handleIdDocChange,
               })}
             />
 
             <AnimatedContainer isExpanded={idDoc}>
               <Checkbox
-                label={allT('collected-data-options.selfie')}
-                {...register(CollectedDocumentDataOption.documentAndSelfie)}
+                label={allT('cdo.selfie')}
+                {...register(CollectedIdDocumentDataOption.documentAndSelfie)}
               />
             </AnimatedContainer>
           </Box>

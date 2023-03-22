@@ -1,5 +1,5 @@
 import {
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileRiskTolerance,
 } from '@onefootprint/types';
 import React from 'react';
@@ -45,7 +45,7 @@ describe('<RiskToleranceForm />', () => {
     const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDataAttribute.riskTolerance]:
+      [InvestorProfileDI.riskTolerance]:
         InvestorProfileRiskTolerance.aggressive,
     });
   });
@@ -73,7 +73,7 @@ describe('<RiskToleranceForm />', () => {
     it('when there are defaults', async () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDataAttribute.riskTolerance]:
+          [InvestorProfileDI.riskTolerance]:
             InvestorProfileRiskTolerance.moderate,
         },
       });

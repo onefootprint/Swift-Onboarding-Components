@@ -17,9 +17,7 @@ const RequiredDataToBeCollectedRow = ({
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.list-item.required-data',
   );
-  const items = mustCollectData.map(dataAttr =>
-    allT(`collected-data-options.${dataAttr}`),
-  );
+  const items = mustCollectData.map(dataAttr => allT(`cdo.${dataAttr}`));
 
   return (
     <tr>

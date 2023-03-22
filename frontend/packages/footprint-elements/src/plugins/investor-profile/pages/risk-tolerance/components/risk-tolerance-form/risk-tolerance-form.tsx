@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileData,
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileRiskTolerance,
 } from '@onefootprint/types';
 import { Radio, Typography } from '@onefootprint/ui';
@@ -13,10 +13,7 @@ import ContinueButton from '../../../../components/continue-button';
 import { RiskToleranceData } from '../../../../utils/state-machine/types';
 
 export type RiskToleranceFormProps = {
-  defaultValues?: Pick<
-    InvestorProfileData,
-    InvestorProfileDataAttribute.riskTolerance
-  >;
+  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.riskTolerance>;
   isLoading?: boolean;
   onSubmit: (data: RiskToleranceData) => void;
 };
@@ -34,7 +31,7 @@ const RiskToleranceForm = ({
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       riskTolerance:
-        defaultValues?.[InvestorProfileDataAttribute.riskTolerance] ??
+        defaultValues?.[InvestorProfileDI.riskTolerance] ??
         InvestorProfileRiskTolerance.conservative,
     },
   });
@@ -42,7 +39,7 @@ const RiskToleranceForm = ({
   const handleBeforeSubmit = (data: FormData) => {
     const { riskTolerance } = data;
     onSubmit({
-      [InvestorProfileDataAttribute.riskTolerance]: riskTolerance,
+      [InvestorProfileDI.riskTolerance]: riskTolerance,
     });
   };
 

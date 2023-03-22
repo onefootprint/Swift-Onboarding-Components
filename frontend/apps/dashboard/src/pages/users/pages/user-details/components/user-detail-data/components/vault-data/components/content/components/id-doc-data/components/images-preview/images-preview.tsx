@@ -18,11 +18,11 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
   const [index, setIndex] = useState(0);
   const options = [
     {
-      label: allT('collected-data-options.document'),
+      label: allT('cdo.document'),
       value: 'id-doc',
     },
     {
-      label: allT('id-doc-type.selfie'),
+      label: allT('cdo.selfie'),
       value: 'selfie',
     },
   ];
@@ -32,11 +32,7 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
     setIndex(selectedIndex);
   };
 
-  if (!images.length) {
-    return null;
-  }
-
-  return (
+  return images.length ? (
     <Container>
       {selectedImage.selfie && (
         <SegmentedControl
@@ -50,14 +46,14 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
         {segment === options[0].value && (
           <>
             <StyledImage
-              src={selectedImage.front}
+              src={addBase64Prefix(selectedImage.front)}
               width={350}
               height={350}
               alt={t('front-alt')}
             />
             {selectedImage.back && (
               <StyledImage
-                src={selectedImage.back}
+                src={addBase64Prefix(selectedImage.back)}
                 width={350}
                 height={350}
                 alt={t('back-alt')}
@@ -67,7 +63,7 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
         )}
         {segment === options[1].value && selectedImage.selfie && (
           <StyledImage
-            src={selectedImage.selfie}
+            src={addBase64Prefix(selectedImage.selfie)}
             width={350}
             height={350}
             alt={t('front-alt')}
@@ -78,8 +74,10 @@ const ImagesPreview = ({ images }: ImagesPreviewProps) => {
         <Pager max={images.length} onClick={showImageIndex} value={index} />
       )}
     </Container>
-  );
+  ) : null;
 };
+
+const addBase64Prefix = (imageData: string) => `data:png;base64,${imageData}`;
 
 const Container = styled.div`
   ${({ theme }) => css`

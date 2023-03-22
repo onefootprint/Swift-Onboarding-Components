@@ -1,4 +1,4 @@
-import { InvestorProfileDataAttribute } from '@onefootprint/types/src/data/investor-data-attribute';
+import { InvestorProfileDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
@@ -33,7 +33,7 @@ const createCollectInvestorProfileDataMachine = () =>
                 target: 'brokerageEmployment',
                 actions: 'assignData',
                 cond: (context, event) =>
-                  !!event.payload[InvestorProfileDataAttribute.occupation],
+                  !!event.payload[InvestorProfileDI.occupation],
               },
               {
                 target: 'income',

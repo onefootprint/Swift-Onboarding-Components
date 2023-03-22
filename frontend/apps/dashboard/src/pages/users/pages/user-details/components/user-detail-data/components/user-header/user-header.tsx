@@ -8,19 +8,15 @@ import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 import getUserStatusBadgeVariant from 'src/pages/users/utils/get-user-status-badge-variant';
 import styled, { css } from 'styled-components';
 
-import { State } from '../../../../utils/decrypt-state-machine';
-import { useDecryptMachine } from '../../../decrypt-machine-provider';
 import ManualReview from './components/manual-review';
 
 const UserHeader = () => {
   const userId = useUserId();
   const { data } = useUser(userId);
   const { t } = useTranslation('entity-statuses');
-  const [state] = useDecryptMachine();
   if (!data) {
     return null;
   }
-  const shouldShowManualReview = state.matches(State.idle);
 
   const badgeVariant = getUserStatusBadgeVariant(
     data.status,
@@ -59,7 +55,7 @@ const UserHeader = () => {
         </RowContainer>
         <RowContainer>
           <div id={USER_HEADER_ACTIONS_ID} />
-          {shouldShowManualReview && <ManualReview />}
+          <ManualReview />
         </RowContainer>
       </SplitRow>
     </HeaderContainer>

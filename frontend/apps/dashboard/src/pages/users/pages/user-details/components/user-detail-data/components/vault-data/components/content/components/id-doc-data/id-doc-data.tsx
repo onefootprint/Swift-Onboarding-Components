@@ -1,54 +1,40 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24 } from '@onefootprint/icons';
-import { DecryptedIdDocStatus, IdDocType } from '@onefootprint/types';
+import { Vault } from '@onefootprint/types';
 import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { User, UserVaultData } from 'src/pages/users/users.types';
+import { User } from 'src/pages/users/users.types';
 
 import DataSection from '../data-section';
 import RiskSignalsOverview from '../risk-signals-overview';
-import ImageDataRow from './components/image-data-row';
-import useFormState from './hooks/use-form-state';
+import Field from './components/image-data-row';
+import useFields from './hooks/use-fields';
 
 type IdDocDataProps = {
   user: User;
-  vaultData: UserVaultData;
+  vault: Vault;
   isDecrypting: boolean;
 };
 
-const IdDocData = ({ user, vaultData, isDecrypting }: IdDocDataProps) => {
-  const { t, allT } = useTranslation('pages.user-details.user-info');
-  const { idDoc } = vaultData;
-  const idDocTypes = Object.keys(idDoc ?? {}) as IdDocType[];
-  const successByIdDocType = Object.fromEntries(
-    user.identityDocumentInfo.map(info => [info.type, info.status]),
-  );
+const IdDocData = ({ user, vault, isDecrypting }: IdDocDataProps) => {
+  const { t } = useTranslation('pages.user-details.user-info');
+  const { setValue } = useFormContext();
+  const fields = useFields(user, vault, isDecrypting);
   const hasSelfie = user.identityDocumentInfo.some(
     info => !!info.selfieCollected,
   );
-  const { register, setValue, control } = useFormContext();
-  const { areAllFieldsSelected, areAllFieldsDisabled, fieldsState } =
-    useFormState({
-      control,
-      user,
-      vaultData,
-    });
-
-  if (!idDoc || !idDocTypes.length) {
-    return null;
-  }
+  const footer = user.isPortable && <RiskSignalsOverview type="document" />;
+  const allChecked = fields
+    .filter(field => field.canSelect)
+    .every(field => field.checked);
 
   const selectValue = (value: boolean) => {
-    if (!fieldsState[IdDocType.passport].disabled) {
-      setValue(`idDoc.${IdDocType.passport}`, value);
-    }
-    if (!fieldsState[IdDocType.idCard].disabled) {
-      setValue(`idDoc.${IdDocType.idCard}`, value);
-    }
-    if (!fieldsState[IdDocType.driversLicense].disabled) {
-      setValue(`idDoc.${IdDocType.driversLicense}`, value);
-    }
+    fields
+      .filter(field => field.canSelect)
+      .forEach(field => {
+        setValue(field.name, value);
+      });
   };
 
   const handleDeselectAll = () => {
@@ -60,20 +46,17 @@ const IdDocData = ({ user, vaultData, isDecrypting }: IdDocDataProps) => {
   };
 
   const renderCta = () => {
-    const hideCta = !isDecrypting || areAllFieldsDisabled;
+    const showData = isDecrypting && fields.some(field => field.canSelect);
 
-    return hideCta ? null : (
+    return showData ? (
       <LinkButton
-        disabled={areAllFieldsDisabled}
-        onClick={areAllFieldsSelected ? handleDeselectAll : handleSelectAll}
+        onClick={allChecked ? handleDeselectAll : handleSelectAll}
         size="compact"
       >
-        {areAllFieldsSelected ? t('cta.deselect-all') : t('cta.select-all')}
+        {allChecked ? 'Deselect all' : 'Select all'}
       </LinkButton>
-    );
+    ) : null;
   };
-  const footer = user.isPortable && <RiskSignalsOverview type="document" />;
-
   return (
     <DataSection
       iconComponent={IcoIdCard24}
@@ -81,19 +64,19 @@ const IdDocData = ({ user, vaultData, isDecrypting }: IdDocDataProps) => {
       footer={footer}
       renderCta={renderCta}
     >
-      {idDocTypes.map(type => (
-        <ImageDataRow
-          key={type}
-          label={allT(`id-doc-type.${type}`)}
-          data={idDoc[type]}
-          isSuccessful={
-            successByIdDocType[type] === DecryptedIdDocStatus.success
-          }
-          checkbox={{
-            register: register(`idDoc.${type}`),
-            ...fieldsState[type],
-            visible: isDecrypting,
-          }}
+      {fields.map(field => (
+        <Field
+          canAccess={field.canAccess}
+          canSelect={field.canSelect}
+          hasPermission={field.hasPermission}
+          hasValue={field.hasValue}
+          isDataDecrypted={field.isDataDecrypted}
+          isSuccessful={field.isSuccessful}
+          key={field.name}
+          label={field.label}
+          name={field.name}
+          showCheckbox={field.showCheckbox}
+          value={field.value}
         />
       ))}
     </DataSection>

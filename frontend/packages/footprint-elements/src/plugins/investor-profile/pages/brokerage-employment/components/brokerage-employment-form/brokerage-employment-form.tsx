@@ -1,8 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  InvestorProfileData,
-  InvestorProfileDataAttribute,
-} from '@onefootprint/types';
+import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
 import { Radio, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -14,7 +11,7 @@ import { EmployedByBrokerageData } from '../../../../utils/state-machine/types';
 export type BrokerageEmploymentFormProps = {
   defaultValues?: Pick<
     InvestorProfileData,
-    InvestorProfileDataAttribute.employedByBrokerageFirm
+    InvestorProfileDI.employedByBrokerageFirm
   >;
   isLoading?: boolean;
   onSubmit: (data: EmployedByBrokerageData) => void;
@@ -32,7 +29,7 @@ const BrokerageEmploymentForm = ({
 }: BrokerageEmploymentFormProps) => {
   const { t } = useTranslation('pages.brokerage-employment.form');
   const defaultFirm =
-    defaultValues?.[InvestorProfileDataAttribute.employedByBrokerageFirm];
+    defaultValues?.[InvestorProfileDI.employedByBrokerageFirm];
   const hasDefaultFirm =
     typeof defaultFirm === 'string' && defaultFirm.length > 0;
 
@@ -52,7 +49,7 @@ const BrokerageEmploymentForm = ({
   const handleBeforeSubmit = (data: FormData) => {
     const { employed, firm = '' } = data;
     onSubmit({
-      [InvestorProfileDataAttribute.employedByBrokerageFirm]:
+      [InvestorProfileDI.employedByBrokerageFirm]:
         employed === 'true' ? firm : '',
     });
   };

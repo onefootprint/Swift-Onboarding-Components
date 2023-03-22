@@ -1,6 +1,6 @@
+import { InvestorProfileDI } from './di';
 import {
   InvestorProfileAnnualIncome,
-  InvestorProfileDataAttribute,
   InvestorProfileDeclaration,
   InvestorProfileInvestmentGoal,
   InvestorProfileNetWorth,
@@ -8,11 +8,11 @@ import {
 } from './investor-data-attribute';
 
 export type InvestorProfileData = Partial<{
-  [InvestorProfileDataAttribute.occupation]: string;
-  [InvestorProfileDataAttribute.employedByBrokerageFirm]: string;
-  [InvestorProfileDataAttribute.annualIncome]: InvestorProfileAnnualIncome;
-  [InvestorProfileDataAttribute.netWorth]: InvestorProfileNetWorth;
-  [InvestorProfileDataAttribute.investmentGoals]: InvestorProfileInvestmentGoal[];
-  [InvestorProfileDataAttribute.riskTolerance]: InvestorProfileRiskTolerance;
-  [InvestorProfileDataAttribute.declarations]: InvestorProfileDeclaration[];
+  [InvestorProfileDI.occupation]: string;
+  [InvestorProfileDI.employedByBrokerageFirm]: string;
+  [InvestorProfileDI.annualIncome]: InvestorProfileAnnualIncome;
+  [InvestorProfileDI.netWorth]: InvestorProfileNetWorth;
+  [InvestorProfileDI.investmentGoals]: InvestorProfileInvestmentGoal[];
+  [InvestorProfileDI.riskTolerance]: InvestorProfileRiskTolerance;
+  [InvestorProfileDI.declarations]: InvestorProfileDeclaration[];
 }>;

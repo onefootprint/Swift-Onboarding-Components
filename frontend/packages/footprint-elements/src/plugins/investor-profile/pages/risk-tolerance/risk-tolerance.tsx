@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  InvestorProfileDataAttribute,
+  InvestorProfileDI,
   InvestorProfileRiskTolerance,
 } from '@onefootprint/types';
 import React from 'react';
@@ -49,8 +49,8 @@ const RiskTolerance = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDataAttribute.riskTolerance]:
-            data?.[InvestorProfileDataAttribute.riskTolerance] ||
+          [InvestorProfileDI.riskTolerance]:
+            data?.[InvestorProfileDI.riskTolerance] ||
             InvestorProfileRiskTolerance.conservative,
         }}
       />

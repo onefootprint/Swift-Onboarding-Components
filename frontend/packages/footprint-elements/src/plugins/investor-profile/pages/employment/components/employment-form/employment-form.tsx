@@ -1,8 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  InvestorProfileData,
-  InvestorProfileDataAttribute,
-} from '@onefootprint/types';
+import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
 import { Select, SelectOption, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -12,10 +9,7 @@ import ContinueButton from '../../../../components/continue-button';
 import { EmploymentData } from '../../../../utils/state-machine/types';
 
 export type EmploymentFormProps = {
-  defaultValues?: Pick<
-    InvestorProfileData,
-    InvestorProfileDataAttribute.occupation
-  >;
+  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.occupation>;
   isLoading?: boolean;
   onSubmit: (data: EmploymentData) => void;
 };
@@ -42,8 +36,7 @@ const EmploymentForm = ({
     },
   ];
 
-  const defaultOccupation =
-    defaultValues?.[InvestorProfileDataAttribute.occupation];
+  const defaultOccupation = defaultValues?.[InvestorProfileDI.occupation];
   const hasDefaultOccupation =
     typeof defaultOccupation === 'string' && defaultOccupation.length > 0;
   const defaultEmploymentStatus = hasDefaultOccupation
@@ -73,8 +66,7 @@ const EmploymentForm = ({
       occupation = '',
     } = formData;
     onSubmit({
-      [InvestorProfileDataAttribute.occupation]:
-        value === 'employed' ? occupation : '',
+      [InvestorProfileDI.occupation]: value === 'employed' ? occupation : '',
     });
   };
 

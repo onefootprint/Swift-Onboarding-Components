@@ -1,59 +1,84 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { RoleScope } from '@onefootprint/types';
-import { Checkbox, LinkButton, Typography } from '@onefootprint/ui';
+import { VaultIdDoc } from '@onefootprint/types';
+import {
+  Box,
+  Checkbox,
+  LinkButton,
+  Tooltip,
+  Typography,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { UseFormRegisterReturn } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import EncryptedCell from 'src/components/encrypted-cell';
-import PermissionGate from 'src/components/permission-gate';
-import { IdDocDataValue } from 'src/pages/users/users.types';
 import styled, { css } from 'styled-components';
 
 import DecryptedDataPreview from '../decrypted-data-preview';
 import SuccessFlag from '../success-flag';
 
 export type ImageDataRowProps = {
-  label: string;
-  data?: IdDocDataValue;
+  hasPermission: boolean;
+  canAccess: boolean;
+  canSelect: boolean;
+  hasValue: boolean;
+  isDataDecrypted: boolean;
   isSuccessful?: boolean;
-  checkbox: {
-    disabled: boolean;
-    checked: boolean;
-    visible: boolean;
-    register: UseFormRegisterReturn;
-  };
+  label: string;
+  name: string;
+  showCheckbox: boolean;
+  value?: VaultIdDoc;
 };
 
 const ImageDataRow = ({
-  label,
-  data,
-  checkbox,
+  hasPermission,
+  canAccess,
+  canSelect,
+  hasValue,
+  isDataDecrypted,
   isSuccessful,
+  label,
+  name,
+  showCheckbox,
+  value,
 }: ImageDataRowProps) => {
   const { t } = useTranslation('pages.user-details.user-info.id-doc');
-  const { disabled, checked, visible, register } = checkbox;
+  const { register } = useFormContext();
   const [imagesVisible, setImagesVisible] = useState(false);
-  const hasImageData = !!data;
+  const disabled = !canSelect;
+  const showTooltip = disabled;
+
   const handleToggleIdDocVisibility = () => {
     setImagesVisible(!imagesVisible);
   };
 
-  if (visible) {
+  const getTooltip = () => {
+    if (!hasPermission || !canAccess) {
+      return t('not-allowed');
+    }
+    if (!hasValue) {
+      return t('empty');
+    }
+    return undefined;
+  };
+
+  if (showCheckbox) {
     return (
       <Container role="row" aria-label={label}>
-        <TitleContainer>
-          <PermissionGate
-            scope={RoleScope.decryptDocuments}
-            fallbackText={t('not-allowed')}
-          >
-            <Checkbox
-              checked={disabled || checked}
-              {...register}
-              disabled={disabled}
-              label={label}
-            />
-          </PermissionGate>
-          {isSuccessful && <SuccessFlag />}
-        </TitleContainer>
+        <RowContainer>
+          <TitleContainer>
+            <Tooltip disabled={!showTooltip} text={getTooltip()}>
+              <Box>
+                <Checkbox
+                  checked={isDataDecrypted || undefined}
+                  {...register(name)}
+                  disabled={disabled}
+                  label={label}
+                />
+              </Box>
+            </Tooltip>
+            {isSuccessful && <SuccessFlag />}
+          </TitleContainer>
+          <Box>{isDataDecrypted ? null : <EncryptedCell />}</Box>
+        </RowContainer>
       </Container>
     );
   }
@@ -67,23 +92,17 @@ const ImageDataRow = ({
           </Typography>
           {isSuccessful && <SuccessFlag />}
         </TitleContainer>
-        {data === null && <EncryptedCell />}
-        {data === undefined && (
-          <Typography
-            variant="body-3"
-            color="primary"
-            sx={{ whiteSpace: 'nowrap' }}
-          >
-            -
-          </Typography>
-        )}
-        {hasImageData && (
+        {isDataDecrypted ? (
           <LinkButton onClick={handleToggleIdDocVisibility} size="compact">
             {imagesVisible ? t('id-doc-images.hide') : t('id-doc-images.show')}
           </LinkButton>
+        ) : (
+          <EncryptedCell />
         )}
       </RowContainer>
-      {hasImageData && imagesVisible && <DecryptedDataPreview images={data} />}
+      {isDataDecrypted && imagesVisible && value && (
+        <DecryptedDataPreview images={value} />
+      )}
     </Container>
   );
 };

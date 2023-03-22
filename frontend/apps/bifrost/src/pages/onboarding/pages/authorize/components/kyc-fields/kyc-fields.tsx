@@ -14,7 +14,7 @@ import {
   IcoUserCircle24,
 } from '@onefootprint/icons';
 import {
-  CollectedDocumentDataOption,
+  CollectedIdDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
   IdDocType,
@@ -46,7 +46,7 @@ const IconByIdDocType: Record<IdDocType, Icon> = {
 type KycFieldsProps = {
   data: (
     | CollectedKycDataOption
-    | CollectedDocumentDataOption
+    | CollectedIdDocumentDataOption
     | CollectedInvestorProfileDataOption
   )[];
   documentTypes: IdDocType[];
@@ -77,7 +77,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     (
       cdo:
         | CollectedKycDataOption
-        | CollectedDocumentDataOption
+        | CollectedIdDocumentDataOption
         | CollectedInvestorProfileDataOption,
     ) => {
       if (isKycCdo(cdo)) {
@@ -87,7 +87,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
           label: collectedKycDataOptionLabels[cdo as CollectedKycDataOption],
         });
       }
-      if (cdo === CollectedDocumentDataOption.documentAndSelfie) {
+      if (cdo === CollectedIdDocumentDataOption.documentAndSelfie) {
         fields.push({
           IconComponent: IcoSelfie24,
           label: t('data-labels.selfie'),

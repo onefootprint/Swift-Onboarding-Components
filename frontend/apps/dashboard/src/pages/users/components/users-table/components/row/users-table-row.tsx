@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Badge, Box, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
@@ -15,7 +15,7 @@ type RowProps = {
 
 const Row = ({ user }: RowProps) => {
   const { t } = useTranslation();
-  const { data: vaultData } = useUserVault(user.id, user);
+  const { data: vault } = useUserVault(user.id, user);
   const badgeVariant = getUserStatusBadgeVariant(
     user.status,
     user.requiresManualReview,
@@ -26,8 +26,8 @@ const Row = ({ user }: RowProps) => {
       <td>
         <FieldOrPlaceholder
           data={getFullNameDataValue(
-            vaultData?.kycData[UserDataAttribute.firstName],
-            vaultData?.kycData[UserDataAttribute.lastName],
+            vault?.id[IdDI.firstName],
+            vault?.id[IdDI.lastName],
           )}
         />
       </td>
@@ -47,22 +47,15 @@ const Row = ({ user }: RowProps) => {
         </Badge>
       </td>
       <td>
-        <FieldOrPlaceholder
-          data={vaultData?.kycData[UserDataAttribute.email]}
-        />
+        <FieldOrPlaceholder data={vault?.id[IdDI.email]} />
       </td>
       <td>
         <FieldOrPlaceholder
-          data={
-            vaultData?.kycData[UserDataAttribute.ssn9] ||
-            vaultData?.kycData[UserDataAttribute.ssn4]
-          }
+          data={vault?.id[IdDI.ssn9] || vault?.id[IdDI.ssn4]}
         />
       </td>
       <td>
-        <FieldOrPlaceholder
-          data={vaultData?.kycData[UserDataAttribute.phoneNumber]}
-        />
+        <FieldOrPlaceholder data={vault?.id[IdDI.phoneNumber]} />
       </td>
       <td>
         <Typography variant="body-3" color="primary">
