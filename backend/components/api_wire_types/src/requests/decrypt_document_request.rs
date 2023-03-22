@@ -40,10 +40,8 @@ pub struct ImageData {
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]
 pub struct DecryptIdentityDocumentResponse {
-    /// Deprecated
+    // type of document
     pub document_type: IdDocKind,
-    /// type of document, represented by the fully-qualified DataIdentifier
-    pub document_identifier: DataIdentifier,
     // image data
     pub images: Vec<ImageData>,
 }

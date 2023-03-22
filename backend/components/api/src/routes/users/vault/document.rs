@@ -142,7 +142,6 @@ pub async fn post_decrypt(
 
     let res = DecryptIdentityDocumentResponse {
         document_type,
-        document_identifier: DataIdentifier::IdDocument(document_type),
         images,
     };
 
