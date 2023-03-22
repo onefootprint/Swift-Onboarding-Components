@@ -258,6 +258,7 @@ async fn shadow_run(
                     uvw_snapshot_seqno: seqno,
                     identity_document_id: None,
                     scoped_user_id: scoped_user.id.clone(),
+                    decision_intent_id: None,
                 })
                 .collect();
 

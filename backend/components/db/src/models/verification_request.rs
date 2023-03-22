@@ -5,7 +5,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::{
-    DataLifetimeSeqno, IdentityDocumentId, ScopedVaultId, Vendor, VendorAPI, VerificationRequestId,
+    DataLifetimeSeqno, DecisionIntentId, IdentityDocumentId, ScopedVaultId, Vendor, VendorAPI,
+    VerificationRequestId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -29,6 +30,7 @@ pub struct VerificationRequest {
     // could be multiple in the vault, seqno doesn't help us
     pub identity_document_id: Option<IdentityDocumentId>,
     pub scoped_user_id: ScopedVaultId,
+    pub decision_intent_id: Option<DecisionIntentId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -40,6 +42,7 @@ struct NewVerificationRequestRow {
     uvw_snapshot_seqno: DataLifetimeSeqno,
     identity_document_id: Option<IdentityDocumentId>,
     scoped_user_id: ScopedVaultId,
+    decision_intent_id: Option<DecisionIntentId>,
 }
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 impl VerificationRequest {
@@ -59,6 +62,7 @@ impl VerificationRequest {
                 uvw_snapshot_seqno: seqno,
                 identity_document_id: None,
                 scoped_user_id: scoped_user_id.clone(),
+                decision_intent_id: None,
             })
             .collect();
         let result = diesel::insert_into(verification_request::table)
@@ -135,6 +139,7 @@ impl VerificationRequest {
             uvw_snapshot_seqno: seqno,
             identity_document_id: Some(identity_document_id),
             scoped_user_id,
+            decision_intent_id: None,
         };
         let result = diesel::insert_into(verification_request::table)
             .values(new_row)
