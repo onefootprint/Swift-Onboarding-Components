@@ -48,6 +48,20 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    contact_info (id) {
+        id -> Text,
+        is_verified -> Bool,
+        priority -> Text,
+        lifetime_id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     data_lifetime (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -731,6 +745,7 @@ table! {
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(annotation -> scoped_user (scoped_user_id));
+joinable!(contact_info -> data_lifetime (lifetime_id));
 joinable!(data_lifetime -> scoped_user (scoped_user_id));
 joinable!(data_lifetime -> user_vault (user_vault_id));
 joinable!(decision_intent -> scoped_user (scoped_vault_id));
@@ -786,6 +801,7 @@ allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
     business_owner,
+    contact_info,
     data_lifetime,
     decision_intent,
     document_data,

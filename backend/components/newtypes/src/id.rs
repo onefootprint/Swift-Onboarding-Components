@@ -104,6 +104,7 @@ define_newtype_id!(FingerprintId, String, "Identifier for a fingerprint");
 define_newtype_id!(AddressId, String, "Identifier for an address");
 define_newtype_id!(EmailId, String, "Identifier for an email");
 define_newtype_id!(PhoneNumberId, String, "Identifier for a phone number");
+define_newtype_id!(ContactInfoId, String, "Identifier for contact info");
 define_newtype_id!(UserProfileId, String, "Identifier for user basic info");
 define_newtype_id!(IdentityDataId, String, "Identifier for user identity data row");
 define_newtype_id!(ScopedVaultId, String, "Identifier for an ScopedUser");
