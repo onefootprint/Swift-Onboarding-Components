@@ -12,8 +12,7 @@ const KycCollect = () => {
   return (
     <>
       <FormTitle title={t('title')} description={t('description')} />
-      {/* TODO: to test the investor profile, add `showInvestorProfile` prop to KycCollectForm */}
-      <KycCollectForm />
+      <KycCollectForm showInvestorProfile />
     </>
   );
 };
