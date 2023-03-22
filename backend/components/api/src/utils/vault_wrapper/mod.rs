@@ -9,6 +9,7 @@ use self::vw_data::VwData;
 mod accessors;
 mod args;
 mod build;
+mod create;
 #[allow(dead_code)]
 mod decrypt;
 mod tenant;
@@ -16,6 +17,7 @@ mod vw_data;
 mod writeable;
 
 pub use args::VwArgs;
+pub use create::*;
 pub use tenant::*;
 pub use writeable::*;
 

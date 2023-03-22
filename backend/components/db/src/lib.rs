@@ -192,7 +192,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -
     // we clean up afterwards.
 
     use schema::{
-        access_event, annotation, data_lifetime, document_request, email, fingerprint,
+        access_event, annotation, contact_info, data_lifetime, document_request, email, fingerprint,
         fingerprint_visit_event, identity_document, liveness_event, manual_review, onboarding,
         onboarding_decision, onboarding_decision_verification_result_junction, phone_number, risk_signal,
         scoped_user, socure_device_session, user_timeline, user_vault, user_vault_data, verification_request,
@@ -241,6 +241,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -
 
         deleted_rows += diesel::delete(kv_data::table)
             .filter(kv_data::lifetime_id.eq_any(dl_ids))
+            .execute(conn.conn())?;
+
+        deleted_rows += diesel::delete(contact_info::table)
+            .filter(contact_info::lifetime_id.eq_any(dl_ids))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(data_lifetime::table)

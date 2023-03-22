@@ -18,9 +18,11 @@ use std::str::FromStr;
 
 #[db_test]
 fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
-    let uv = db::tests::fixtures::vault::create_person(conn, true);
+    // Just create this for the keypair
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
+
+    let uv = db::tests::fixtures::vault::create_person(conn, true);
     let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     // Add identity data
@@ -37,23 +39,32 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             kind: IDK::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },
+        NewVaultData {
+            kind: IDK::Email,
+            e_data: SealedVaultBytes(vec![4]),
+        },
+        NewVaultData {
+            kind: IDK::PhoneNumber,
+            e_data: SealedVaultBytes(vec![5]),
+        },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
+    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
 
-    // Create email
-    let email = fixtures::email::create(conn, &uv.id, &su.id, seqno);
-
-    // Create phone number
-    let phone_number = fixtures::phone_number::create(conn, &uv.id, &su.id);
+    // Portablize the phone as happens in prod
+    let phone_data = vds
+        .into_iter()
+        .find(|vd| vd.kind == IDK::PhoneNumber.into())
+        .unwrap();
+    DataLifetime::portablize(conn, &phone_data.lifetime_id, seqno).unwrap();
 
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![
         (IDK::FirstName, Some(SealedVaultBytes(vec![1]))),
         (IDK::LastName, Some(SealedVaultBytes(vec![2]))),
         (IDK::Ssn4, Some(SealedVaultBytes(vec![3]))),
-        (IDK::Email, Some(email.e_data)),
-        (IDK::PhoneNumber, Some(phone_number.e_e164.clone())),
+        (IDK::Email, Some(SealedVaultBytes(vec![4]))),
+        (IDK::PhoneNumber, Some(SealedVaultBytes(vec![5]))),
         (IDK::Dob, None),
         (IDK::AddressLine1, None),
         (IDK::AddressLine2, None),
@@ -75,7 +86,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         (IDK::LastName, None),
         (IDK::Ssn4, None),
         (IDK::Email, None),
-        (IDK::PhoneNumber, Some(phone_number.e_e164)),
+        (IDK::PhoneNumber, Some(SealedVaultBytes(vec![5]))),
         (IDK::Dob, None),
         (IDK::AddressLine1, None),
         (IDK::AddressLine2, None),

@@ -42,15 +42,17 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             kind: IdentityDataKind::Ssn4,
             e_data: SealedVaultBytes(vec![3]),
         },
+        NewVaultData {
+            kind: IdentityDataKind::Email,
+            e_data: SealedVaultBytes(vec![4]),
+        },
+        NewVaultData {
+            kind: IdentityDataKind::PhoneNumber,
+            e_data: SealedVaultBytes(vec![5]),
+        },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
     VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
-
-    // Create email
-    db::tests::fixtures::email::create(conn, &uv.id, &su.id, seqno);
-
-    // Create phone number
-    db::tests::fixtures::phone_number::create(conn, &uv.id, &su.id);
 
     (
         su.clone(),

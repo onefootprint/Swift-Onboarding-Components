@@ -52,7 +52,7 @@ where
         user_vault_id: VaultId,
         scoped_user_id: ScopedVaultId,
         fingerprints: NewFingerprints<T>,
-    ) -> ApiResult<()> {
+    ) -> ApiResult<Vec<VaultData>> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
         let new_fields = self.data.iter().map(|d| d.kind.clone()).collect_vec();
@@ -87,7 +87,8 @@ where
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let kind_to_lifetime = vds
-            .into_iter()
+            .iter()
+            .cloned()
             .map(|vd| {
                 T::try_from(DataIdentifier::from(vd.kind))
                     .map(|idk| (idk, vd.lifetime_id))
@@ -131,6 +132,6 @@ where
             });
         }         
 
-        Ok(())
+        Ok(vds)
     }
 }

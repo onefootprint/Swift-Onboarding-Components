@@ -32,8 +32,6 @@ use crate::{
 #[diesel(sql_type = Text)]
 /// A subset of DataIdentifier whose values are stored in the VaultData table
 pub enum VdKind {
-    // We use IDK here, even though Email and PhoneNumber variants of IDK are never stored in the
-    // VaultData table. We will likely migrate Email and PhoneNumber to go in VaultData in the future.
     Id(IDK),
     Business(BDK),
     Custom(KvDataKey),
@@ -103,9 +101,6 @@ pub enum ConversionError {
 impl std::fmt::Display for VdKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
-        if matches!(self, Self::Id(IDK::PhoneNumber) | Self::Id(IDK::Email)) {
-            return Err(std::fmt::Error);
-        }
         let di = DataIdentifier::from(self.clone());
         di.fmt(f)
     }
@@ -116,9 +111,6 @@ impl FromStr for VdKind {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let di = DataIdentifier::from_str(s)?;
         let result = Self::try_from(di)?;
-        if matches!(result, Self::Id(IDK::PhoneNumber) | Self::Id(IDK::Email)) {
-            return Err(ConversionError::Unsupported(s.to_owned()).into());
-        }
         Ok(result)
     }
 }
@@ -139,11 +131,5 @@ mod tests {
     #[test_case("id.address_line1" => VdKind::Id(IDK::AddressLine1))]
     fn test_deserialization(input: &str) -> VdKind {
         VdKind::from_str(input).unwrap()
-    }
-
-    #[test]
-    fn test_no_phone_or_email() {
-        assert!(VdKind::from_str("id.phone_number").is_err());
-        assert!(VdKind::from_str("id.email").is_err());
     }
 }

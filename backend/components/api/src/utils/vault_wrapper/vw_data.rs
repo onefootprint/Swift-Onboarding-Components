@@ -2,23 +2,19 @@ use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
-use db::models::email::Email;
 use db::models::identity_document::IdentityDocumentAndRequest;
-use db::models::phone_number::PhoneNumber;
 use db::models::vault_data::VaultData;
 use db::{HasLifetime, HasSealedIdentityData};
 use itertools::Itertools;
 use newtypes::DocumentKind;
-use newtypes::{DataIdentifier, IdentityDataKind as IDK, IsDataIdentifierDiscriminant};
-use newtypes::{DataLifetimeId, SealedVaultBytes, VdKind};
+use newtypes::{DataIdentifier, IsDataIdentifierDiscriminant};
+use newtypes::{DataLifetimeId, VdKind};
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 
 #[derive(Clone, Debug)]
 pub(super) struct VwData<Type> {
     pub(super) vd: Vec<VaultData>,
-    pub(super) phone_numbers: Vec<PhoneNumber>,
-    pub(super) emails: Vec<Email>,
     // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
     pub(super) identity_documents: Vec<IdentityDocumentAndRequest>,
     pub(super) documents: Vec<DocumentData>,
@@ -30,8 +26,6 @@ pub(super) struct VwData<Type> {
 impl<Type> VwData<Type> {
     pub(super) fn partition(
         vd: Vec<VaultData>,
-        phone_numbers: Vec<PhoneNumber>,
-        emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
         documents: Vec<DocumentData>,
         all_lifetimes: Vec<DataLifetime>,
@@ -51,9 +45,6 @@ impl<Type> VwData<Type> {
                 .partition(|d| speculative_lifetime_ids.contains(d.lifetime_id()))
         }
         let (portable_vd, speculative_vd) = partition(vd, &speculative_lifetime_ids);
-        let (portable_phone_numbers, speculative_phone_numbers) =
-            partition(phone_numbers, &speculative_lifetime_ids);
-        let (portable_emails, speculative_emails) = partition(emails, &speculative_lifetime_ids);
         let (portable_identity_documents, speculative_identity_documents) =
             partition(identity_documents, &speculative_lifetime_ids);
         let (portable_documents, speculative_documents) = partition(documents, &speculative_lifetime_ids);
@@ -67,16 +58,12 @@ impl<Type> VwData<Type> {
 
         let portable = Self::build(
             portable_vd,
-            portable_phone_numbers,
-            portable_emails,
             portable_identity_documents,
             portable_documents,
             &all_lifetimes,
         );
         let speculative = Self::build(
             speculative_vd,
-            speculative_phone_numbers,
-            speculative_emails,
             speculative_identity_documents,
             speculative_documents,
             &all_lifetimes,
@@ -86,17 +73,14 @@ impl<Type> VwData<Type> {
 
     fn build(
         vd: Vec<VaultData>,
-        phone_numbers: Vec<PhoneNumber>,
-        emails: Vec<Email>,
         identity_documents: Vec<IdentityDocumentAndRequest>,
         documents: Vec<DocumentData>,
         all_lifetimes: &[DataLifetime],
     ) -> Self {
         let lifetime_ids: Vec<Vec<_>> = vec![
             vd.iter().map(|d| d.lifetime_id()).collect(),
-            phone_numbers.iter().map(|d| d.lifetime_id()).collect(),
-            emails.iter().map(|d| d.lifetime_id()).collect(),
             identity_documents.iter().map(|d| d.lifetime_id()).collect(),
+            documents.iter().map(|d| d.lifetime_id()).collect(),
         ];
         let lifetime_ids: HashSet<_> = lifetime_ids.into_iter().flatten().collect();
         // Since all_lifetimes contains a superset of lifetimes represented by the data in this
@@ -110,8 +94,6 @@ impl<Type> VwData<Type> {
 
         Self {
             vd,
-            phone_numbers,
-            emails,
             identity_documents,
             documents,
             lifetimes,
@@ -120,16 +102,6 @@ impl<Type> VwData<Type> {
     }
 
     pub fn populated_dis(&self) -> Vec<DataIdentifier> {
-        let emails = self
-            .emails
-            .iter()
-            .map(|_| DataIdentifier::from(IDK::Email))
-            .collect_vec();
-        let phone_numbers = self
-            .phone_numbers
-            .iter()
-            .map(|_| DataIdentifier::from(IDK::PhoneNumber))
-            .collect_vec();
         let vds = self.vd.iter().map(|vd| vd.kind.clone().into()).collect_vec();
         let id_docs = self
             .identity_documents
@@ -146,11 +118,7 @@ impl<Type> VwData<Type> {
             })
             .collect_vec();
         let docs = self.documents.iter().map(|d| d.kind.into()).collect_vec();
-        [emails, phone_numbers, vds, id_docs, docs]
-            .into_iter()
-            .flatten()
-            .unique()
-            .collect()
+        [vds, id_docs, docs].into_iter().flatten().unique().collect()
     }
 
     pub fn populated<T>(&self) -> Vec<T>
@@ -171,21 +139,11 @@ impl<Type> VwData<Type> {
         T: Into<DataIdentifier>,
     {
         let di = id.into();
-        if matches!(di, DataIdentifier::Id(IDK::PhoneNumber)) {
-            let phone = self.phone_numbers.first();
-            return phone.map(|p| p as &dyn HasSealedIdentityData);
-        }
-        if matches!(di, DataIdentifier::Id(IDK::Email)) {
-            return self.emails.first().map(|e| e as &dyn HasSealedIdentityData);
-        }
-        if let Ok(vdk) = di.try_into() {
-            self.vd
-                .iter()
-                .find(|d| d.kind == vdk)
-                .map(|vd| vd as &dyn HasSealedIdentityData)
-        } else {
-            None
-        }
+        let vdk = di.try_into().ok()?;
+        self.vd
+            .iter()
+            .find(|d| d.kind == vdk)
+            .map(|vd| vd as &dyn HasSealedIdentityData)
     }
 
     fn get_lifetime<T>(&self, id: T) -> Option<&DataLifetime>
@@ -204,14 +162,6 @@ impl<Type> VwData<Type> {
         T: Into<DataIdentifier>,
     {
         kinds.into_iter().flat_map(|k| self.get_lifetime(k)).collect()
-    }
-
-    pub fn get_e_data<T>(&self, id: T) -> Option<&SealedVaultBytes>
-    where
-        T: Into<DataIdentifier>,
-    {
-        let value = self.get(id);
-        value.map(|v| v.e_data())
     }
 
     pub fn get_document(&self, kind: DocumentKind) -> Option<&DocumentData> {

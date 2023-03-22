@@ -16,6 +16,7 @@ pub trait Fingerprinter {
     async fn compute_fingerprint<S: SaltedFingerprint + Send>(
         &self,
         salt: S,
+        // TODO this should be able to take in &PiiString
         data: PiiString,
     ) -> Result<Fingerprint, Self::Error> {
         let data_to_sign = salt.salt_pii_to_sign(&data);

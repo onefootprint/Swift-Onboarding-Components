@@ -12,7 +12,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use newtypes::email::Email;
 use newtypes::put_data_request::PutDataRequest;
-use newtypes::{IdentityDataKind, ParseOptions};
+use newtypes::{DataIdentifier, IdentityDataKind as IDK, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -55,12 +55,12 @@ pub async fn put(
     let fingerprints = build_fingerprints(&state, request.id_update.clone()).await?;
     let email = request
         .id_update
-        .get(&IdentityDataKind::Email)
+        .get(&IDK::Email)
         .map(|p| Email::from_str(p.leak()))
         .transpose()?;
     let email_is_live = email.as_ref().map(|e| e.is_live());
 
-    let email_id = state
+    let new_contact_info = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user_id = pre_add_data_checks(&user_auth, conn)?;
@@ -74,14 +74,19 @@ pub async fn put(
 
             // Even though this accepts id.phone_number, it will always error at runtime since we
             // only allow a vault to have one phone number
-            let email_id = uvw.put_person_data(conn, request, fingerprints)?;
-            Ok(email_id)
+            let new_contact_info = uvw.put_person_data(conn, request, fingerprints)?;
+            Ok(new_contact_info)
         })
         .await?;
 
     // If we just added a new email address to the vault, send a verification email
-    if let Some((email, id)) = email.and_then(|e| email_id.map(|id| (e, id))) {
-        send_email_challenge(&state, id, &email.email).await?;
+    if let Some(email) = email {
+        if let Some((_, ci)) = new_contact_info
+            .into_iter()
+            .find(|(di, _)| di == &DataIdentifier::from(IDK::Email))
+        {
+            send_email_challenge(&state, ci.id, &email.email).await?;
+        }
     }
 
     EmptyResponse::ok().json()

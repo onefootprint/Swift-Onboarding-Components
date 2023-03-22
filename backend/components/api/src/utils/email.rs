@@ -3,7 +3,7 @@ use crate::auth::user::EmailVerifySession;
 use crate::errors::ApiError;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
-use newtypes::{EmailId, PiiString};
+use newtypes::{ContactInfoId, PiiString};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
@@ -137,7 +137,7 @@ impl SendgridClient {
 
 pub(crate) async fn send_email_challenge(
     state: &web::Data<State>,
-    email_id: EmailId,
+    email_id: ContactInfoId,
     email_address: &PiiString,
 ) -> Result<(), ApiError> {
     let session_data = AuthSessionData::EmailVerify(EmailVerifySession { email_id });

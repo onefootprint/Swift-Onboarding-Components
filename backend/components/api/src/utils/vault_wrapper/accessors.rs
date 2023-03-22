@@ -3,6 +3,7 @@ use db::models::document_data::DocumentData;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
+use db::HasSealedIdentityData;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant;
@@ -54,14 +55,18 @@ impl<Type> VaultWrapper<Type> {
         self.populated_dis().contains(&id.into())
     }
 
+    pub fn get<T>(&self, id: T) -> Option<&dyn HasSealedIdentityData>
+    where
+        T: Into<DataIdentifier> + Clone,
+    {
+        self.speculative.get(id.clone()).or_else(|| self.portable.get(id))
+    }
+
     pub fn get_e_data<T>(&self, id: T) -> Option<&SealedVaultBytes>
     where
         T: Into<DataIdentifier> + Clone,
     {
-        // Show portable data if visible
-        self.speculative
-            .get_e_data(id.clone())
-            .or_else(|| self.portable.get_e_data(id))
+        self.get(id).map(|v| v.e_data())
     }
 
     pub fn missing_fields(

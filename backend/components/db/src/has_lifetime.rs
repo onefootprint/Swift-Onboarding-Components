@@ -51,6 +51,7 @@ pub trait HasLifetime {
 }
 
 /// Implemented by all models that hold identity data: PhoneNumber, Email, and UserVaultData
+/// // TODO rename this
 pub trait HasSealedIdentityData: HasLifetime {
     fn e_data(&self) -> &SealedVaultBytes;
 }

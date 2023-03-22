@@ -33,6 +33,12 @@ from tests.webauthn_simulator import SoftWebauthnDevice
 WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
 
+@pytest.fixture(scope="module", autouse="true")
+def cleanup():
+    # Cleanup the non-sandbox user that is used across all integration test runs
+    clean_up_user(PHONE_NUMBER, EMAIL)
+
+
 @pytest.fixture(scope="module")
 def non_sandbox_auth_token(twilio, tenant):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
@@ -65,12 +71,6 @@ def ob_session_token(tenant):
     data = {"onboarding_config_id": tenant.default_ob_config.id}
     body = post("onboarding/session", data, tenant.sk.key)
     return OnboardingSessionToken(body["session_token"])
-
-
-@pytest.fixture(scope="module", autouse="true")
-def cleanup():
-    # Cleanup the non-sandbox user that is used across all integration test runs
-    clean_up_user(PHONE_NUMBER, EMAIL)
 
 
 class TestBifrost:

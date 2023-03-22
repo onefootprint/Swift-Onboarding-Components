@@ -19,9 +19,10 @@ use super::{
     fingerprint::{Fingerprint, NewFingerprint},
 };
 
+// Made private to show not used anymore
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = email)]
-pub struct Email {
+pub(crate) struct Email {
     pub id: EmailId,
     pub e_data: SealedVaultBytes,
     pub is_verified: bool,
@@ -31,9 +32,10 @@ pub struct Email {
     pub lifetime_id: DataLifetimeId,
 }
 
+// Made private to show not used anymore
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = email)]
-pub struct NewEmail {
+pub(crate) struct NewEmail {
     pub e_data: SealedVaultBytes,
     pub is_verified: bool,
     pub priority: DataPriority,
