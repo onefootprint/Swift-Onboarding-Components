@@ -16,21 +16,21 @@ use api_wire_types::DecryptDocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use newtypes::{DocumentKind, FootprintUserId, VaultPublicKey};
+use newtypes::{DataIdentifier, DocumentKind, FootprintUserId, VaultPublicKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
 
 #[api_v2_operation(description = "POSTs a document to the vault", tags(Hosted))]
-#[actix::post("/hosted/user/upload")]
+#[actix::post("/hosted/user/upload/{document_identifier}")]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
+    document_identifier: web::Path<DataIdentifier>,
     mut payload: Multipart,
     request: HttpRequest,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    // TODO: qualify path with doc type /hosted/user/upload/{doc_type}
-    let kind = DocumentKind::FinraComplianceLetter;
+    let kind = DocumentKind::try_from(document_identifier.into_inner())?;
 
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
     let ua = user_auth.clone();
@@ -49,7 +49,7 @@ pub async fn post(
     let file = file_upload::handle_file_upload(
         &mut payload,
         &request,
-        vec![mime::APPLICATION_PDF],
+        kind.accepted_mime_types(),
         MAX_DOC_SIZE_BYTES,
     )
     .await?;

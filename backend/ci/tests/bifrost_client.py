@@ -174,7 +174,12 @@ class BifrostClient:
         return body["footprint_user_id"]
 
     def upload_document(self, document_file):
-        post("/hosted/user/upload", None, self.auth_token, files=document_file)
+        post(
+            "/hosted/user/upload/document.finra_compliance_letter",
+            None,
+            self.auth_token,
+            files=document_file,
+        )
 
     def onboard_user_onto_tenant(
         self, tenant, add_business_data=False, investor_profile=None, document_file=None

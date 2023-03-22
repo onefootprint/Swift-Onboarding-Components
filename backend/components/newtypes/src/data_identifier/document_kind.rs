@@ -1,5 +1,6 @@
 use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, Validate};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use mime::Mime;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -67,5 +68,13 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
 
     fn parent(&self) -> Option<CollectedData> {
         Some(CollectedData::InvestorProfile)
+    }
+}
+
+impl DocumentKind {
+    pub fn accepted_mime_types(&self) -> Vec<Mime> {
+        match self {
+            DocumentKind::FinraComplianceLetter => vec![mime::APPLICATION_PDF],
+        }
     }
 }

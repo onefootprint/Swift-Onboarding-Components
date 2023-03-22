@@ -3698,6 +3698,7 @@ dependencies = [
  "either",
  "itertools 0.10.3",
  "lazy_static",
+ "mime",
  "paperclip",
  "phonenumber",
  "regex",

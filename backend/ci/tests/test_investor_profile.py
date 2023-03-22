@@ -101,7 +101,7 @@ def test_put_ip_info_incomplete_data(sandbox_user):
 class TestDocuments:
     def test_invalid_upload(self, sandbox_user):
         res = post(
-            "/hosted/user/upload",
+            "/hosted/user/upload/document.finra_compliance_letter",
             None,
             sandbox_user.auth_token,
             files=multipart_file("example_txt.txt", "text/plain"),
