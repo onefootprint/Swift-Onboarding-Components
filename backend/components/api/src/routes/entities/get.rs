@@ -23,6 +23,7 @@ use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::IdDocKind;
+use newtypes::PiiString;
 use newtypes::VaultKind;
 use newtypes::{Fingerprint, Fingerprinter, IdentityDataKind};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
@@ -111,16 +112,23 @@ where
 
     // TODO clean phone number or email
     let fingerprints = if let Some(search) = search {
-        let cleaned_data = search.clean_for_fingerprint();
+        // Tokenize the search string by splitting on `\s`. This handles cases like a user typing in a full name
+        let cleaned_data = tokenize_search_query(search.clean_for_fingerprint());
 
         // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier instead
-        if cleaned_data.leak().starts_with("fp_id_") && fp_id.is_none() {
+        if cleaned_data.iter().any(|p| p.leak().starts_with("fp_id_")) && fp_id.is_none() {
             fp_id = Some(FootprintUserId::from(search.leak_to_string()));
             None
         } else {
-            let fut_fingerprints = IdentityDataKind::fingerprintable()
-                .map(|kind| state.compute_fingerprint(kind, cleaned_data.clone()));
-            let fingerprints: Vec<Fingerprint> = futures::future::try_join_all(fut_fingerprints).await?;
+            let fut_fingerprints = cleaned_data
+                .into_iter()
+                .map(|s| compute_fingerprint_for_search(&state, s));
+            let fingerprints = futures::future::try_join_all(fut_fingerprints)
+                .await?
+                .into_iter()
+                .flatten()
+                .collect();
+
             Some(fingerprints)
         }
     } else {
@@ -256,4 +264,23 @@ pub async fn get_detail(
 ) -> JsonApiResponse<EntityDetailResponse> {
     let result = get_entity(state, fp_id, auth).await?;
     Ok(result)
+}
+
+async fn compute_fingerprint_for_search(
+    state: &State,
+    search: PiiString,
+) -> Result<Vec<Fingerprint>, ApiError> {
+    let fut_fingerprints =
+        IdentityDataKind::fingerprintable().map(|kind| state.compute_fingerprint(kind, search.clone()));
+    let fingerprints = futures::future::try_join_all(fut_fingerprints).await?;
+
+    Ok(fingerprints)
+}
+
+fn tokenize_search_query(input: PiiString) -> Vec<PiiString> {
+    let mut tokenized: Vec<PiiString> = input.leak().split(' ').into_iter().map(PiiString::from).collect();
+    // Add back in the original term, since addresses were probably fingerprinted with spaces in them to begin withs
+    tokenized.push(input);
+
+    tokenized
 }
