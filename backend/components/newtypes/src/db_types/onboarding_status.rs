@@ -56,15 +56,17 @@ pub enum OnboardingStatusFilter {
     Pass,
     Fail,
     Incomplete,
+    Pending,
     VaultOnly,
 }
 
-impl DecisionStatus {
+impl OnboardingStatus {
     pub fn try_from(value: &OnboardingStatusFilter) -> Option<Self> {
         match value {
             OnboardingStatusFilter::Pass => Some(Self::Pass),
             OnboardingStatusFilter::Fail => Some(Self::Fail),
-            OnboardingStatusFilter::Incomplete => None,
+            OnboardingStatusFilter::Incomplete => Some(Self::Incomplete),
+            OnboardingStatusFilter::Pending => Some(Self::Pending),
             OnboardingStatusFilter::VaultOnly => None,
         }
     }
