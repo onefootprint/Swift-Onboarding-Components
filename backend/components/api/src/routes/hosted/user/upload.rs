@@ -87,6 +87,7 @@ pub async fn document_decrypt(
     insights: InsightHeaders,
 ) -> actix_web::Result<HttpResponse, ApiError> {
     let DecryptDocumentRequest { kind, reason } = request.into_inner();
+    let kind = DocumentKind::try_from(kind)?;
 
     let auth = auth.check_guard(CanDecrypt::single(kind))?;
     let tenant_id = auth.tenant().id.clone();

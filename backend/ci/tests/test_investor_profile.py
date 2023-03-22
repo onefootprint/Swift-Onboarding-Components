@@ -119,7 +119,7 @@ class TestDocuments:
         res = post(
             f"/users/{user.fp_user_id}/vault/document/decrypt",
             {
-                "kind": "finra_compliance_letter",
+                "kind": "document.finra_compliance_letter",
                 "reason": "show me",
             },
             sandbox_tenant.sk.key,
