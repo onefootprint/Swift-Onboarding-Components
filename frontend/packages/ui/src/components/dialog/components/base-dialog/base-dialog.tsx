@@ -211,7 +211,8 @@ const Header = styled.header`
     justify-content: center;
     padding: 0 ${theme.spacing[5]};
     height: 52px;
-    position: relative;
+    position: sticky;
+    top: 0;
     flex-shrink: 0;
     z-index: 1;
   `}
@@ -234,6 +235,8 @@ const Footer = styled.footer`
     background-color: ${theme.backgroundColor.primary};
     width: 100%;
     z-index: 1;
+    position: sticky;
+    bottom: 0;
   `}
 `;
 

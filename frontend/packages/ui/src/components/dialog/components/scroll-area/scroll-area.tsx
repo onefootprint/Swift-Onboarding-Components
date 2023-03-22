@@ -1,12 +1,11 @@
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useEventListener } from 'usehooks-ts';
 
 type ScrollAreaProps = {
   children: React.ReactNode;
 };
-
-const SCROLL_ERROR_MARGIN = 16;
 
 const ScrollArea = ({ children }: ScrollAreaProps) => {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -16,59 +15,33 @@ const ScrollArea = ({ children }: ScrollAreaProps) => {
   const [scrollTop, setScrollTop] = useState(0);
   const [showLine, setShowLine] = useState(true);
 
-  useEffect(() => {
-    if (viewportRef.current && scrollAreaRef.current) {
-      setViewportHeight(viewportRef.current.clientHeight);
-      setScrollAreaHeight(scrollAreaRef.current.clientHeight);
-    }
-  }, [viewportRef, scrollAreaRef]);
+  const noOverflow = viewportHeight <= scrollAreaHeight;
+  const scrolledToBottom =
+    scrollTop > 0 && scrollTop + scrollAreaHeight >= viewportHeight;
 
-  useEffect(() => {
-    function handleResize() {
-      if (viewportRef.current && scrollAreaRef.current) {
-        setViewportHeight(viewportRef.current.clientHeight);
-        setScrollAreaHeight(scrollAreaRef.current.clientHeight);
-      }
-    }
-    window.addEventListener('resize', handleResize);
-  });
-
-  useEffect(() => {
-    if (!viewportRef.current || !scrollAreaRef.current) return;
-    const resizeObserver = new ResizeObserver(() => {
-      setViewportHeight(viewportRef.current!.clientHeight);
-      setScrollAreaHeight(scrollAreaRef.current!.clientHeight);
-    });
-    resizeObserver.observe(viewportRef.current);
-    resizeObserver.observe(scrollAreaRef.current);
-    resizeObserver.disconnect();
-  }, [viewportRef, scrollAreaRef]);
-
-  useEffect(() => {
-    if (!viewportRef.current || !scrollAreaRef.current) return;
-    const observer = new MutationObserver(() => {
-      setViewportHeight(viewportRef.current!.clientHeight);
-      setScrollAreaHeight(scrollAreaRef.current!.clientHeight);
-    });
-    observer.observe(viewportRef.current, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-    observer.disconnect();
-  }, [viewportRef, scrollAreaRef]);
+  const updateDimensions = () => {
+    setScrollAreaHeight(scrollAreaRef.current?.clientHeight ?? 0);
+    setViewportHeight(viewportRef.current?.clientHeight ?? 0);
+  };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
-    setShowLine(
-      viewportHeight - scrollAreaHeight >= scrollTop + SCROLL_ERROR_MARGIN,
-    );
   };
+
+  useEffect(() => {
+    if (noOverflow) {
+      setShowLine(false);
+    } else {
+      setShowLine(!scrolledToBottom);
+    }
+  }, [noOverflow, scrolledToBottom]);
+
+  useEventListener('resize', updateDimensions);
 
   return (
     <StyledRoot
       ref={scrollAreaRef}
-      data-line={viewportHeight !== scrollAreaHeight && showLine}
+      data-line={showLine}
       onScroll={handleScroll}
     >
       <StyledViewport asChild ref={viewportRef}>
