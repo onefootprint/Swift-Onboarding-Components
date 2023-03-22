@@ -2,6 +2,7 @@ pub mod access_event;
 pub mod annotation;
 pub mod business_owner;
 pub mod data_lifetime;
+pub mod decision_intent;
 pub mod document_data;
 pub mod document_request;
 pub mod email;

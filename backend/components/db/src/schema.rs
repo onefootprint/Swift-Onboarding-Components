@@ -68,6 +68,20 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    decision_intent (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        kind -> Text,
+        scoped_vault_id -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     document_data (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -719,6 +733,7 @@ joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(annotation -> scoped_user (scoped_user_id));
 joinable!(data_lifetime -> scoped_user (scoped_user_id));
 joinable!(data_lifetime -> user_vault (user_vault_id));
+joinable!(decision_intent -> scoped_user (scoped_vault_id));
 joinable!(document_data -> data_lifetime (lifetime_id));
 joinable!(document_request -> scoped_user (scoped_user_id));
 joinable!(email -> data_lifetime (lifetime_id));
@@ -772,6 +787,7 @@ allow_tables_to_appear_in_same_query!(
     annotation,
     business_owner,
     data_lifetime,
+    decision_intent,
     document_data,
     document_request,
     email,

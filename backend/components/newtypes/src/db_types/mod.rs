@@ -5,6 +5,7 @@ mod company_size;
 mod compliance_status;
 mod d2p_session_status;
 mod data_priority;
+mod decision_intent_kind;
 mod decision_status;
 mod document_request_status;
 mod fingerprint;
@@ -26,9 +27,9 @@ mod verification_status;
 
 pub use self::{
     access_event_kind::*, actor::*, attestation_type::*, company_size::*, compliance_status::*,
-    d2p_session_status::*, data_priority::*, decision_status::*, document_request_status::*, fingerprint::*,
-    footprint_reason_code::*, liveness_source::*, ob_config_status::*, onboarding_status::*,
-    org_member_email::*, proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, task_status::*,
-    tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
-    verification_status::*,
+    d2p_session_status::*, data_priority::*, decision_intent_kind::*, decision_status::*,
+    document_request_status::*, fingerprint::*, footprint_reason_code::*, liveness_source::*,
+    ob_config_status::*, onboarding_status::*, org_member_email::*, proxy_ingress_kind::*,
+    requirement_status::*, sealed_bytes::*, task_status::*, tenant_scope::*, user_timeline_event::*,
+    vault_key_pair::*, vault_kind::*, vendor::*, verification_status::*,
 };
