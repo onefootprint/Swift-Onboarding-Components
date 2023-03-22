@@ -10,6 +10,7 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
+use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
@@ -49,7 +50,7 @@ pub async fn post(
 
     let (ob_info, biz_ob, tenant) = state
         .db_pool
-        .db_query(move |c| -> ApiResult<_> {
+        .db_transaction(move |c| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(c)?;
             // Verify there are no unmet requirements
             let scoped_business_id = user_auth.scoped_business_id();
@@ -60,15 +61,25 @@ pub async fn post(
                 return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
             }
             let biz_ob = user_auth.business_onboarding(c)?;
-            let tenant = Tenant::get(c, &ob_info.scoped_user.id)?;
+            let tenant = Tenant::get(c, &ob_info.scoped_user.id).ok();
 
-            Ok((ob_info, biz_ob, tenant))
+            // Mark as authorized
+            let ob = Onboarding::lock(c, &ob_info.onboarding.id)?;
+
+            if ob.authorized_at.is_none() {
+                ob.into_inner().update(c, OnboardingUpdate::is_authorized())?;
+            }
+            let bizob = biz_ob
+                .map(|b| b.update(c, OnboardingUpdate::is_authorized()))
+                .transpose()?;
+
+            Ok((ob_info, bizob, tenant))
         })
-        .await??;
+        .await?;
 
     let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{}", tenant.id));
-    span.record("tenant_name", &tenant.name);
+    span.record("tenant_id", &format!("{:?}", tenant.as_ref().map(|t| &t.id)));
+    span.record("tenant_name", &format!("{:?}", tenant.as_ref().map(|t| &t.name)));
     span.record("onboarding_id", &format!("{}", ob_info.onboarding.id));
     span.record("scoped_use_id", &format!("{}", ob_info.scoped_user.id));
     span.record(
@@ -78,9 +89,7 @@ pub async fn post(
 
     // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
     // but if we do, we should no-op and succeed
-    //
-    // TODO: short circuit above once we can directly read status from Onboarding
-    let should_run_kyc_checks = ob_info.onboarding.authorized_at.is_none();
+    let should_run_kyc_checks = ob_info.onboarding.idv_reqs_initiated_at.is_none();
 
     // Run KYC checks
     let ob_id = ob_info.onboarding.id.clone();
@@ -103,9 +112,8 @@ pub async fn post(
             let (ob, scoped_user, manual_review, latest_decision) = Onboarding::get(conn, &ob_id)?;
 
             let status: OnboardingStatus = ob.derive_status(latest_decision.as_ref());
-            let timestamp = ob
-                .authorized_at
-                .ok_or_else(|| ApiError::from(OnboardingError::NonTerminalState))?;
+            // we shouldn't have many cases that need to fall back to Utc::now
+            let timestamp = ob.authorized_at.unwrap_or_else(Utc::now);
 
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
             Ok((
@@ -178,11 +186,8 @@ async fn run_kyc(
 
                 decision::vendor::build_verification_requests_and_checkpoint(conn, &uvw, &scoped_user_id)?;
                 ob.into_inner()
-                    .update(conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
+                    .update(conn, OnboardingUpdate::idv_reqs_initiated())?;
 
-                if let Some(biz_ob) = biz_ob {
-                    biz_ob.update(conn, OnboardingUpdate::is_authorized())?;
-                }
                 Ok(())
             })
             .await?;

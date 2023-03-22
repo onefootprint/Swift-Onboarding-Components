@@ -25,10 +25,7 @@ pub fn build_verification_requests_and_checkpoint(
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     let tenant = Tenant::get(conn, su_id)?;
 
-    let vendor_apis = get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tenant)?
-        .into_iter()
-        .filter(|va| is_vendor_api_enabled_for_tenant(va, &tenant))
-        .collect();
+    let vendor_apis = get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tenant)?;
 
     let requests_to_initiate = VerificationRequest::bulk_create(conn, su_id.clone(), vendor_apis)?;
 

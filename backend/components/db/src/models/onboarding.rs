@@ -73,6 +73,13 @@ impl OnboardingUpdate {
         }
     }
 
+    pub fn idv_reqs_initiated() -> Self {
+        Self {
+            idv_reqs_initiated_at: Some(Some(Utc::now())),
+            ..Self::default()
+        }
+    }
+
     pub fn idv_reqs_initiated_and_is_authorized() -> Self {
         Self {
             idv_reqs_initiated_at: Some(Some(Utc::now())),
