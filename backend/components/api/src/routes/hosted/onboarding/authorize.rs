@@ -109,9 +109,9 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             // Return status as well
-            let (ob, scoped_user, manual_review, latest_decision) = Onboarding::get(conn, &ob_id)?;
+            let (ob, scoped_user, manual_review, _) = Onboarding::get(conn, &ob_id)?;
 
-            let status: OnboardingStatus = ob.derive_status(latest_decision.as_ref());
+            let status: OnboardingStatus = ob.status;
             // we shouldn't have many cases that need to fall back to Utc::now
             let timestamp = ob.authorized_at.unwrap_or_else(Utc::now);
 

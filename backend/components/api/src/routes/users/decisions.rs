@@ -10,6 +10,7 @@ use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
 use db::models::annotation::Annotation;
 use db::models::onboarding::Onboarding;
+use db::models::onboarding::OnboardingUpdate;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use newtypes::DbActor;
@@ -76,6 +77,8 @@ pub async fn post(
                     seqno: None,
                 };
                 let decision = OnboardingDecision::create(conn, new_decision)?;
+                ob.into_inner()
+                    .update(conn, OnboardingUpdate::set_decision(status.into()))?;
                 Some(decision)
             } else {
                 // TODO should create some kind of UserTimeline event here since we are clearing a manual review

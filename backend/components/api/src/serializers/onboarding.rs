@@ -22,7 +22,7 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
             ..
         } = config.clone();
 
-        let status = onboarding.derive_status(latest_decision.as_ref().map(|d| &d.0));
+        let status = onboarding.status;
         let can_decrypt_scopes = OnboardingAndConfig(onboarding, config).can_decrypt_scopes();
 
         let can_access_data_attributes = can_access_data

@@ -97,6 +97,13 @@ impl OnboardingUpdate {
         }
     }
 
+    pub fn set_decision(decision_status: DecisionStatus) -> Self {
+        Self {
+            status: Some(decision_status.into()),
+            ..Self::default()
+        }
+    }
+
     pub fn idv_reqs_and_has_final_decision_and_is_authorized(decision_status: DecisionStatus) -> Self {
         Self {
             authorized_at: Some(Some(Utc::now())),
@@ -422,15 +429,6 @@ impl Onboarding {
         self.idv_reqs_initiated_at.is_some()
             && self.decision_made_at.is_some()
             && self.authorized_at.is_some()
-    }
-
-    pub fn derive_status(&self, latest_decision: Option<&OnboardingDecision>) -> OnboardingStatus {
-        match (self.authorized_at.is_some(), latest_decision) {
-            (false, _) => OnboardingStatus::Incomplete,
-            // Either vendor calls failed but we still let Bifrost complete, or we have async decisioning (KYB)
-            (true, None) => OnboardingStatus::Pending,
-            (true, Some(obd)) => obd.status.into(),
-        }
     }
 }
 
