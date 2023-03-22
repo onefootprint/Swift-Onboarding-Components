@@ -5,7 +5,7 @@ use derive_more::Deref;
 
 mod add_data;
 mod build;
-mod commit_data;
+mod portablize_data;
 mod vault_data_builder;
 pub use add_data::encrypt_to_s3;
 /// This specific subset variant of VaultWrapper contains all the logic to write new data into a user's vault.

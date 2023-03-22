@@ -137,7 +137,7 @@ pub async fn setup_test_fixtures(
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision_status == DecisionStatus::Pass {
                 let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
-                let seqno = uvw.commit_identity_data(conn)?;
+                let seqno = uvw.portablize_identity_data(conn)?;
                 Some(seqno)
             } else {
                 None

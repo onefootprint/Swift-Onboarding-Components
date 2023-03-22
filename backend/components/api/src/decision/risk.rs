@@ -60,7 +60,7 @@ pub async fn save_final_decision(
             // If we should commit, mark all data as verified for the onboarding
             let seqno = if decision.should_commit {
                 let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
-                let seqno = uvw.commit_identity_data(conn)?;
+                let seqno = uvw.portablize_identity_data(conn)?;
                 Some(seqno)
             } else {
                 None

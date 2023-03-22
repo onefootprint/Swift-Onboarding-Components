@@ -17,7 +17,7 @@ pub fn build<T: Into<DataLifetimeKind>>(
         .pop()
         .unwrap();
     if let Some(portablized_seqno) = portablized_seqno {
-        lifetime = DataLifetime::commit(conn, &lifetime.id, portablized_seqno).unwrap();
+        lifetime = DataLifetime::portablize(conn, &lifetime.id, portablized_seqno).unwrap();
     }
     if let Some(deactivated_seqno) = deactivated_seqno {
         lifetime = DataLifetime::bulk_deactivate(conn, vec![lifetime.id], deactivated_seqno)

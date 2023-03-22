@@ -175,7 +175,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(uvw.has_field(IDK::FirstName));
     assert!(uvw.has_field(IDK::LastName));
     assert!(uvw.has_field(IDK::Email));
-    uvw.commit_identity_data(conn).unwrap();
+    uvw.portablize_identity_data(conn).unwrap();
 
     // Now we should see the portable name and email
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::User(&uv.id)).unwrap();
@@ -350,11 +350,11 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
 
     // Commit data for tenant2
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su2.id).unwrap();
-    uvw.commit_identity_data(conn).unwrap();
+    uvw.portablize_identity_data(conn).unwrap();
 
     // Commit data for tenant1 - the new ssn4 should _not_ be portable
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.commit_identity_data(conn).unwrap();
+    uvw.portablize_identity_data(conn).unwrap();
 
     // Now, when getting portable data, we should still see the ssn9 added for tenant 2
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::User(&uv.id)).unwrap();
@@ -486,7 +486,7 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
 
     // Commit the identity data
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.commit_identity_data(conn).unwrap();
+    uvw.portablize_identity_data(conn).unwrap();
 
     let (portable, speculative): (Vec<_>, Vec<_>) = DataLifetime::get_active(conn, &uv.id, Some(&su.id))
         .unwrap()

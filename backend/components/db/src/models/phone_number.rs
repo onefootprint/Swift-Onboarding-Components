@@ -118,7 +118,7 @@ impl PhoneNumber {
         let phone_number = Self::create(conn, uv_id, args, priority, su_id, seqno, true)?;
         // Create a portable lifetime - once the phone number is verified and bound to a vault
         // it should be immediately portable, even though it isn't verified by vendors.
-        DataLifetime::commit(conn, &phone_number.lifetime_id, seqno)?;
+        DataLifetime::portablize(conn, &phone_number.lifetime_id, seqno)?;
 
         Ok(phone_number)
     }

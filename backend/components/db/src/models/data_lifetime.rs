@@ -171,9 +171,8 @@ impl DataLifetime {
         Ok(lifetime)
     }
 
-    // TODO rename to portablize
     #[tracing::instrument(skip_all)]
-    pub fn commit(conn: &mut PgConn, id: &DataLifetimeId, seqno: DataLifetimeSeqno) -> DbResult<Self> {
+    pub fn portablize(conn: &mut PgConn, id: &DataLifetimeId, seqno: DataLifetimeSeqno) -> DbResult<Self> {
         let update = DataLifetimeUpdate {
             portablized_at: Some(Some(Utc::now())),
             portablized_seqno: Some(Some(seqno)),
@@ -189,7 +188,7 @@ impl DataLifetime {
     /// Marks a list of DataLifetimes as portable for a specific (user, tenant). Used to commit
     /// speculative data and make it portable after it is verified by an approved onboarding
     #[tracing::instrument(skip_all)]
-    pub fn bulk_commit_for_tenant(
+    pub fn bulk_portablize_for_tenant(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
         scoped_user_id: &ScopedVaultId,
