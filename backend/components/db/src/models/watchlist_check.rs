@@ -37,19 +37,28 @@ impl WatchlistCheck {
         scoped_vault_id: ScopedVaultId,
         task_id: TaskId,
         decision_intent_id: DecisionIntentId,
-        status: WatchlistCheckStatus,
     ) -> DbResult<Self> {
         let new_watchlist_check = NewWatchlistCheck {
             created_at: Utc::now(),
             scoped_vault_id,
             task_id,
             decision_intent_id,
-            status,
+            status: WatchlistCheckStatus::Pending,
         };
 
         let res = diesel::insert_into(watchlist_check::table)
             .values(new_watchlist_check)
             .get_result(conn)?;
+        Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_by_task_id(conn: &mut PgConn, task_id: &TaskId) -> DbResult<Option<Self>> {
+        let res = watchlist_check::table
+            .filter(watchlist_check::task_id.eq(task_id))
+            .get_result(conn)
+            .optional()?;
+
         Ok(res)
     }
 }

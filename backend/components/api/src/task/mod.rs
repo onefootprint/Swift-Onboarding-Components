@@ -3,13 +3,16 @@ use db::{models::task::Task, DbError, DbPool};
 use newtypes::{TaskId, TaskStatus};
 use thiserror::Error;
 
-use self::tasks::{log_message_task::LogMessageTask, log_num_tenant_api_keys_task::LogNumTenantApiKeysTask};
+use self::tasks::{
+    log_message_task::LogMessageTask, log_num_tenant_api_keys_task::LogNumTenantApiKeysTask,
+    watchlist_check_task::WatchlistCheckTask,
+};
 
 mod tasks;
 
 // constant for now, but can make this a property of task type too
 #[allow(unused)]
-const MAX_NUM_ATTEMPTS: i32 = 3;
+const MAX_NUM_ATTEMPTS: i32 = 1; // since Task and our first use case (WatchlistCheck) are brand new, we want to manually react to every error so we aren't allowing automated retries yet
 
 #[derive(Debug, Error)]
 pub enum TaskError {
@@ -54,6 +57,11 @@ async fn execute_task(task: &Task, db_pool: &DbPool) -> Result<(), TaskError> {
         newtypes::TaskData::LogMessage(args) => LogMessageTask {}.execute(args).await,
         newtypes::TaskData::LogNumTenantApiKeys(args) => {
             LogNumTenantApiKeysTask::new(db_pool.clone()).execute(args).await
+        }
+        newtypes::TaskData::WatchlistCheck(args) => {
+            WatchlistCheckTask::new(db_pool.clone(), task.id.clone())
+                .execute(args)
+                .await
         }
     }
 }

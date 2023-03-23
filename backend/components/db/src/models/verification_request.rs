@@ -1,4 +1,4 @@
-use crate::schema::{scoped_user, user_vault, verification_request, verification_result};
+use crate::schema::{decision_intent, scoped_user, user_vault, verification_request, verification_result};
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
@@ -11,6 +11,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
+use super::decision_intent::DecisionIntent;
 use super::vault::Vault;
 use super::verification_result::VerificationResult;
 
@@ -70,6 +71,23 @@ impl VerificationRequest {
             .values(requests)
             .get_results(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn create(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+        decision_intent_id: &DecisionIntentId,
+        vendor_api: VendorAPI,
+    ) -> DbResult<Self> {
+        Self::bulk_create(
+            conn,
+            scoped_vault_id.clone(),
+            vec![vendor_api],
+            decision_intent_id,
+        )?
+        .pop()
+        .ok_or(crate::DbError::ObjectNotFound)
     }
 
     /// Based on VerificationRequests for the onboarding, get VerificationResults
@@ -156,6 +174,21 @@ impl VerificationRequest {
             .inner_join(scoped_user::table.inner_join(user_vault::table))
             .select(user_vault::all_columns)
             .get_result(conn)?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn list_by_decision_intent_id(
+        conn: &mut PgConn,
+        decision_intent_id: &DecisionIntentId,
+    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>, DecisionIntent)>> {
+        let res: Vec<(VerificationRequest, Option<VerificationResult>, DecisionIntent)> =
+            verification_request::table
+                .left_join(verification_result::table)
+                .inner_join(decision_intent::table)
+                .filter(decision_intent::id.eq(decision_intent_id))
+                .get_results(conn)?;
 
         Ok(res)
     }

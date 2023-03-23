@@ -6,7 +6,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
-use crate::TenantId;
+use crate::{ScopedVaultId, TenantId};
 
 // TODO: can probs rename this to task.rs now
 
@@ -45,6 +45,7 @@ crate::util::impl_enum_str_diesel!(TaskStatus);
 pub enum TaskData {
     LogMessage(LogMessageTaskArgs),
     LogNumTenantApiKeys(LogNumTenantApiKeysArgs), // proof of concept non-trivial task that does DB stuffs, can remove in future
+    WatchlistCheck(WatchlistCheckArgs),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -56,4 +57,9 @@ pub struct LogMessageTaskArgs {
 pub struct LogNumTenantApiKeysArgs {
     pub tenant_id: TenantId,
     pub is_live: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WatchlistCheckArgs {
+    pub scoped_vault_id: ScopedVaultId,
 }

@@ -4,7 +4,7 @@ use diesel::{
     sql_query,
     sql_types::{BigInt, Text, Timestamptz},
 };
-use newtypes::{TaskData, TaskId, TaskStatus};
+use newtypes::{Locked, TaskData, TaskId, TaskStatus};
 use serde::{Deserialize, Serialize};
 
 use crate::{schema::task, DbError, DbResult, PgConn, TxnPgConn};
@@ -92,6 +92,15 @@ impl Task {
             .set(task_update)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, task_id: &TaskId) -> DbResult<Locked<Self>> {
+        let result = task::table
+            .filter(task::id.eq(task_id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
     }
 
     // Currently only used for Tests! pretend there is #[cfg(test)] here!!

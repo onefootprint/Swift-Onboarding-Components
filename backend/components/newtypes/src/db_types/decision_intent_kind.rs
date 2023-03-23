@@ -29,6 +29,7 @@ use strum_macros::{AsRefStr, EnumString};
 pub enum DecisionIntentKind {
     OnboardingKyc,
     ManualRunKyc,
+    WatchlistCheck,
 }
 
 crate::util::impl_enum_str_diesel!(DecisionIntentKind);
