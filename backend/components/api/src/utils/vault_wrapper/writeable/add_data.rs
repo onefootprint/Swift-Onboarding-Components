@@ -1,19 +1,21 @@
 use super::vault_data_builder::VaultDataBuilder;
-use super::{create_contact_info_if_needed, WriteableVw};
+use super::WriteableVw;
 use crate::errors::user::UserError;
-use crate::errors::ApiResult;
+use crate::errors::{ApiError, ApiResult};
 use crate::utils::file_upload::FileUpload;
 use crate::utils::fingerprint::NewFingerprints;
 use crate::utils::vault_wrapper::{Business, Person};
 use crate::State;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
-use db::models::contact_info::ContactInfo;
+use db::models::contact_info::{ContactInfo, NewContactInfoArgs};
 use db::models::document_data::DocumentData;
 use db::models::user_timeline::UserTimeline;
+use db::models::vault_data::VaultData;
 use db::TxnPgConn;
+use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataIdentifier, DataRequest, DocumentKind,
-    IdentityDataKind as IDK, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
+    CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentKind,
+    IdentityDataKind as IDK, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
 };
 use std::collections::HashMap;
 
@@ -36,7 +38,8 @@ impl WriteableVw<Person> {
         // Update VaultData
         let keys = request.keys().cloned().collect();
         let new_contact_info = if !request.is_empty() {
-            self.update_data_unsafe(conn, request, id_fingerprints)?
+            let vds = self.update_data_unsafe(conn, request, id_fingerprints)?;
+            Self::create_contact_info_if_needed(conn, vds)?
         } else {
             vec![]
         };
@@ -72,7 +75,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         update: DataRequest,
         fingerprints: NewFingerprints<IDK>,
-    ) -> ApiResult<Vec<NewContactInfo>> {
+    ) -> ApiResult<Vec<VaultData>> {
         let existing_fields = self.populated_dis();
         let v = self.vault();
 
@@ -97,8 +100,36 @@ impl<Type> WriteableVw<Type> {
             fingerprints,
         )?;
 
-        let cis = create_contact_info_if_needed(conn, vds)?;
+        Ok(vds)
+    }
 
+    fn create_contact_info_if_needed(
+        conn: &mut TxnPgConn,
+        new_vds: Vec<VaultData>,
+    ) -> ApiResult<Vec<NewContactInfo>> {
+        // Create ContactInfo rows for new phone numbers/emails
+        let new_contact_info = new_vds
+            .iter()
+            .filter(|vd| matches!(vd.kind, VdKind::Id(IDK::PhoneNumber) | VdKind::Id(IDK::Email)))
+            .map(|vd| NewContactInfoArgs {
+                is_verified: false,
+                priority: ContactInfoPriority::Primary,
+                lifetime_id: vd.lifetime_id.clone(),
+            })
+            .collect_vec();
+        let cis = ContactInfo::bulk_create(conn, new_contact_info)?;
+        // Zip CI with corresponding DI
+        let cis = cis
+            .into_iter()
+            .map(|ci| -> ApiResult<_> {
+                let di = new_vds
+                    .iter()
+                    .find(|vd| vd.lifetime_id == ci.lifetime_id)
+                    .map(|vd| DataIdentifier::from(vd.kind.clone()))
+                    .ok_or_else(|| ApiError::AssertionError("No lifetime ID".to_owned()))?;
+                Ok((di, ci))
+            })
+            .collect::<ApiResult<Vec<_>>>()?;
         Ok(cis)
     }
 

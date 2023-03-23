@@ -5,12 +5,10 @@ use derive_more::Deref;
 
 mod add_data;
 mod build;
-mod contact_info;
 mod portablize_data;
 mod vault_data_builder;
 
 pub use add_data::encrypt_to_s3;
-pub(super) use contact_info::*;
 /// This specific subset variant of VaultWrapper contains all the logic to write new data into a user's vault.
 /// It can only be constructed via a ScopedVaultId.
 ///
