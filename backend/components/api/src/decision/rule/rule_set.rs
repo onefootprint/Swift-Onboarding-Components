@@ -14,23 +14,11 @@ pub struct RuleSet<T: Clone> {
 
 /// Trait representing the evaluation of a RuleSet
 pub trait EvaluateRuleSet<T> {
-    type RuleResult: EvaluatedRuleSet + Clone;
-    fn evaluate(&self, rule_input: &T) -> Self::RuleResult;
-}
-
-/// Trait representing if a ruleset is triggered
-pub trait EvaluatedRuleSet {
-    fn triggered(&self) -> bool;
-    fn ruleset_name(&self) -> &RuleSetName;
-    fn can_action(&self) -> bool;
-    fn rules_triggered(&self) -> &Vec<RuleName>;
-    fn rules_not_triggered(&self) -> &Vec<RuleName>;
+    fn evaluate(&self, rule_input: &T) -> RuleSetResult;
 }
 
 impl<T: Clone> EvaluateRuleSet<T> for RuleSet<T> {
-    type RuleResult = RuleSetResult;
-
-    fn evaluate(&self, rule_input: &T) -> Self::RuleResult {
+    fn evaluate(&self, rule_input: &T) -> RuleSetResult {
         // for the rules in the rule set, evaluate each rule
         let evaluated = self
             .rules
@@ -56,6 +44,7 @@ impl<T: Clone> EvaluateRuleSet<T> for RuleSet<T> {
                 .cloned()
                 .collect(),
             triggered: !triggered.is_empty(),
+            can_action: true,
         }
     }
 }
@@ -66,24 +55,7 @@ pub struct RuleSetResult {
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
     pub triggered: bool,
-}
-
-impl EvaluatedRuleSet for RuleSetResult {
-    fn triggered(&self) -> bool {
-        self.triggered
-    }
-    fn ruleset_name(&self) -> &RuleSetName {
-        &self.ruleset_name
-    }
-    fn can_action(&self) -> bool {
-        true
-    }
-    fn rules_triggered(&self) -> &Vec<RuleName> {
-        &self.rules_triggered
-    }
-    fn rules_not_triggered(&self) -> &Vec<RuleName> {
-        &self.rules_not_triggered
-    }
+    pub can_action: bool,
 }
 
 #[cfg(test)]
@@ -96,19 +68,22 @@ mod tests {
             ruleset_name: test_ruleset_name(),
             rules_triggered: vec![RuleName::Test("test.hello".into()), RuleName::Test("test.length_gt_3".into())],
             rules_not_triggered: vec![],
-            triggered: true
+            triggered: true,
+            can_action: true,
         })]
     #[test_case(test_ruleset_a(), TestFeatures::new("world") =>  RuleSetResult {
             ruleset_name: test_ruleset_name(),
             rules_triggered: vec![RuleName::Test("test.length_gt_3".into())],
             rules_not_triggered: vec![RuleName::Test("test.hello".into())],
-            triggered: true
+            triggered: true,
+            can_action: true,
         })]
     #[test_case(test_ruleset_b(), TestFeatures::new("goodbye") =>  RuleSetResult {
             ruleset_name: test_ruleset_other_name(),
             rules_triggered: vec![],
             rules_not_triggered: vec![RuleName::Test("test.world".into())],
-            triggered: false
+            triggered: false,
+            can_action: true,
         })]
     fn test_rule_set(rule_set: RuleSet<TestFeatures>, input_data: TestFeatures) -> RuleSetResult {
         rule_set.evaluate(&input_data)

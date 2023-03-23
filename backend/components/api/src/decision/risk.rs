@@ -12,8 +12,11 @@ use db::{
 };
 
 use super::{
-    features::kyc_features::*,
-    rule::{self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules, RuleName},
+    features::{experian::ExperianFeatures, idology_expectid::IDologyFeatures, kyc_features::*},
+    rule::{
+        self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules, rule_set::EvaluateRuleSet,
+        RuleName,
+    },
 };
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
@@ -123,28 +126,25 @@ pub fn evaluate_onboarding_rules(
         .ok_or_else(|| super::Error::MissingDataForRuleSet(onboarding_rules::idology_base_rule_set().name))?;
 
     // The set of rules that determine if a user passes onboarding
-    let prod_idology_rules = vec![onboarding_rules::idology_base_rule_set()];
-    // Additional sets of rules that might be toggled on via a FF or by tenant
-    let additional_idology_rules = vec![onboarding_rules::idology_conservative_rule_set()]
-        .into_iter()
-        .map(|rs| ActionableRuleSetBuilder::new(rs).build(feature_flag_client))
-        .collect();
+    let idology_rules: Vec<Box<dyn EvaluateRuleSet<IDologyFeatures>>> = vec![
+        Box::new(onboarding_rules::idology_base_rule_set()),
+        // Additional sets of rules that might be toggled on via a FF or by tenant
+        Box::new(
+            ActionableRuleSetBuilder::new(onboarding_rules::idology_conservative_rule_set())
+                .build(feature_flag_client),
+        ),
+    ];
 
     //
     // PROD
     // Evaluate our rules
-    let base = rule::rules_engine::evaluate_onboarding_rules(prod_idology_rules, idology_features);
-
-    // Evaluate conservative rules
-    let conservative =
-        rule::rules_engine::evaluate_onboarding_rules(additional_idology_rules, idology_features);
-    let idology_onboarding_rule_evaluation_result = base.join(conservative);
+    let idology_onboarding_rule_evaluation_result =
+        rule::rules_engine::evaluate_onboarding_rules(idology_rules, idology_features);
 
     //
     // TESTING
-    //
-    // TODO: might need a concept of prod/prod candidate/shadow style rules here.
-    let experian_rules = vec![onboarding_rules::experian_rules()];
+    let experian_rules: Vec<Box<dyn EvaluateRuleSet<ExperianFeatures>>> =
+        vec![Box::new(onboarding_rules::experian_rules())];
     features
         .experian_features
         .as_ref()

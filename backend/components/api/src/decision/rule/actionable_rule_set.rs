@@ -1,8 +1,8 @@
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 use super::{
-    rule_set::{EvaluateRuleSet, EvaluatedRuleSet, RuleSet, RuleSetResult},
-    RuleName, RuleSetName,
+    rule_set::{EvaluateRuleSet, RuleSet, RuleSetResult},
+    RuleSetName,
 };
 
 /// An actionable rule set is a ruleset that we need to check if we can action on
@@ -21,33 +21,15 @@ pub struct ActionableRuleSetResult {
     pub can_action: bool,
 }
 
-impl EvaluatedRuleSet for ActionableRuleSetResult {
-    fn triggered(&self) -> bool {
-        self.ruleset_result.triggered && self.can_action
-    }
-    fn ruleset_name(&self) -> &RuleSetName {
-        &self.ruleset_result.ruleset_name
-    }
-    fn can_action(&self) -> bool {
-        self.can_action
-    }
-    fn rules_triggered(&self) -> &Vec<RuleName> {
-        &self.ruleset_result.rules_triggered
-    }
-    fn rules_not_triggered(&self) -> &Vec<RuleName> {
-        &self.ruleset_result.rules_not_triggered
-    }
-}
-
 impl<T: Clone> EvaluateRuleSet<T> for ActionableRuleSet<T> {
-    type RuleResult = ActionableRuleSetResult;
+    fn evaluate(&self, rule_input: &T) -> RuleSetResult {
+        let base = self.ruleset.evaluate(rule_input);
 
-    fn evaluate(&self, rule_input: &T) -> Self::RuleResult {
-        let evaluated = self.ruleset.evaluate(rule_input);
-
-        ActionableRuleSetResult {
-            ruleset_name: self.ruleset.name.clone(),
-            ruleset_result: evaluated,
+        RuleSetResult {
+            ruleset_name: base.ruleset_name,
+            rules_triggered: base.rules_triggered,
+            rules_not_triggered: base.rules_not_triggered,
+            triggered: base.triggered,
             can_action: self.can_action,
         }
     }
