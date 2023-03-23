@@ -19,6 +19,7 @@ export interface StaticSecrets {
   enclaveUserSecretKey: aws.ssm.Parameter;
   enclaveSealedIkek: aws.ssm.Parameter;
   dbPassword: pulumi.Output<string>;
+  jbDbPassword: pulumi.Output<string>;
   cookieSessionKey: aws.ssm.Parameter;
   workosSecretKey: aws.ssm.Parameter;
   twilioApiKey: aws.ssm.Parameter;
@@ -50,7 +51,7 @@ interface SecretConstants {
   launchDarkly: LaunchDarkly;
   svix: Svix;
   stripe: Stripe;
-  fingerprint: Fingerprint
+  fingerprint: Fingerprint;
 }
 
 interface ElasticSecrets {
@@ -143,6 +144,11 @@ export async function LoadSecrets(
     special: false,
   });
 
+  const jumpboxAuroraDbPassword = new random.RandomPassword('db__jb_password', {
+    length: 44,
+    special: false,
+  });
+
   const fpcProtectedCustodianKey = new random.RandomPassword(
     'fpc_protected_custodian_key_021723',
     {
@@ -185,6 +191,7 @@ export async function LoadSecrets(
       name: `/static_secrets/trace-otelconfig-${stack}`,
     }),
     dbPassword: pulumi.secret(auroraDbPassword.result),
+    jbDbPassword: pulumi.secret(jumpboxAuroraDbPassword.result),
     cookieSessionKey: new aws.ssm.Parameter(
       `ssm-param-api-cookie-session-key`,
       {

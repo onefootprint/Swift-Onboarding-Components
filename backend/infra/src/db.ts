@@ -1,3 +1,4 @@
+import { StackEnvironment, StackMetadata } from './stack_metadata';
 import { CoreSecurityGroups } from './sg';
 import * as aws from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
@@ -8,7 +9,6 @@ import { FootprintVpc, Vpc } from './vpc';
 import { EngineType } from '@pulumi/aws/rds';
 import * as inputs from '@pulumi/aws/types';
 
-// TODO maybe enable idle_session_timeout for certain users in interactive sessions via /connect_db.sh
 const DEFAULT_PG_PARAMETERS = [
   // Kill queries that have a deadlock detected after 1s
   {
@@ -50,12 +50,16 @@ export async function CreateDB(
   vpc: FootprintVpc,
   provider: aws.Provider,
   clusterIdentifier: string,
-  constants: Config,
   secretsStore: StaticSecrets,
   dbConfig: DbConfig,
   coreSecurityGroups: CoreSecurityGroups,
+  stackMetadata: StackMetadata,
 ): Promise<DatabaseOutput> {
   const user = 'footprint';
+  // We'll use a different user to log into interactive sessions from the jumpbox - this lets us
+  // set more reasonable defaults for interactive sessions and allows us to track which queries
+  // came from an interactive session
+  const jbUser = 'footprint_jb';
   const databaseName = 'footprint';
 
   const databaseSecurityGroup = new awsx.ec2.SecurityGroup(
@@ -150,12 +154,22 @@ export async function CreateDB(
     performanceInsightsEnabled: true,
   });
 
-  const { rw: databaseUrl, ro: readOnlyDatabaseUrl } = pulumi
-    .all([db.endpoint, db.readerEndpoint, secretsStore.dbPassword])
-    .apply(([host, roHost, password]) => {
+  const {
+    rw: databaseUrl,
+    jb: jbDatabaseUrl,
+    ro: readOnlyDatabaseUrl,
+  } = pulumi
+    .all([
+      db.endpoint,
+      db.readerEndpoint,
+      secretsStore.dbPassword,
+      secretsStore.jbDbPassword,
+    ])
+    .apply(([host, roHost, password, jbPassword]) => {
       const rw = `postgresql://${user}:${password}@${host}`;
+      const jb = `postgresql://${jbUser}:${jbPassword}@${host}`;
       const ro = `postgresql://${user}:${password}@${roHost}`;
-      return { rw, ro };
+      return { rw, jb, ro };
     });
 
   const dbSecretName = `/db/url-${clusterIdentifier}`;
@@ -168,9 +182,28 @@ export async function CreateDB(
     },
   );
 
+  const dbJbSecretName = `/db/url-jb-${clusterIdentifier}`;
+  new aws.ssm.Parameter(
+    `ssm-param-database-conn-jumpbox-${clusterIdentifier}`,
+    {
+      type: 'SecureString',
+      value: jbDatabaseUrl,
+      name: dbJbSecretName,
+    },
+  );
+
+  // Since the jumpbox DB user requires manual setup that we've only done in dev and prod, just use
+  // the normal DB user in ephemeral environments
+  let jumpboxSecretName;
+  if (stackMetadata.environment === StackEnvironment.DevEphemeral) {
+    jumpboxSecretName = dbSecretName;
+  } else {
+    jumpboxSecretName = dbJbSecretName;
+  }
+
   const jump = await createDbJumpBox(
     clusterIdentifier,
-    dbSecretName,
+    jumpboxSecretName,
     coreSecurityGroups.jumpbox,
     vpc,
     provider,

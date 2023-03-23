@@ -88,12 +88,12 @@ export default async function main() {
     vpc,
     provider,
     `db-${stackMetadata.shortStackName}`,
-    constants,
     secretsStore,
     {
       protectDeletion: constants.deletionProtection,
     },
     coreSecurityGroups,
+    stackMetadata,
   );
 
   // Create our s3 buckets
