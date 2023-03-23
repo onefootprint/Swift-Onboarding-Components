@@ -253,7 +253,8 @@ impl CollectedDataOption {
 mod test {
     use crate::{
         BusinessDataKind as BDK, CollectedData, CollectedDataOption as CDO, DataIdentifier as DI,
-        IdentityDataKind as IDK, InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
+        DocumentKind as DK, IdentityDataKind as IDK, InvestorProfileKind as IPK,
+        IsDataIdentifierDiscriminant,
     };
     use itertools::Itertools;
     use std::collections::HashSet;
@@ -340,6 +341,7 @@ mod test {
     #[test_case(vec![BDK::Website.into()] => HashSet::from_iter([CDO::BusinessWebsite]))]
     #[test_case(vec![BDK::BeneficialOwners.into()] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
     #[test_case(vec![IPK::Occupation.into(), IPK::BrokerageFirmEmployer.into(), IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
+    #[test_case(vec![IPK::Occupation.into(), IPK::BrokerageFirmEmployer.into(), IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into(), DK::FinraComplianceLetter.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
     #[test_case(vec![IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
     // Mixed
     #[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Ssn4)] => HashSet::from_iter([CDO::BusinessBeneficialOwners, CDO::Ssn4]))]
