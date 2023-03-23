@@ -1,5 +1,5 @@
 use crate::{export_schema, Apiv2Schema, DateTime, Deserialize, JsonSchema, Serialize, Utc};
-use newtypes::{DocumentRequestStatus, IdDocKind, IdentityDocumentId};
+use newtypes::{DataIdentifier, DocumentRequestStatus, IdDocKind, IdentityDocumentId};
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Apiv2Schema)]
 pub struct IdentityDocumentTimelineEvent {
@@ -7,6 +7,7 @@ pub struct IdentityDocumentTimelineEvent {
     pub timestamp: DateTime<Utc>,
     pub status: DocumentRequestStatus,
     pub document_type: IdDocKind,
+    pub document_identifier: DataIdentifier,
     pub selfie_collected: bool,
 }
 
