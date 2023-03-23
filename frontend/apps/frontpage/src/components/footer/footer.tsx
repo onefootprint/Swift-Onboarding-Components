@@ -80,10 +80,6 @@ const Footer = () => {
                 href={t('links.company.about.href')}
               />
               <FooterLink
-                text={t('links.company.join-us.text')}
-                href={t('links.company.join-us.href')}
-              />
-              <FooterLink
                 text={t('links.company.blog.text')}
                 href={t('links.company.blog.href')}
               />

@@ -1,11 +1,5 @@
 import { useHasScroll, useToggle, useTranslation } from '@onefootprint/hooks';
-import {
-  IcoBook24,
-  IcoFootprint24,
-  IcoMegaphone24,
-  IcoUsers24,
-  IcoWriting24,
-} from '@onefootprint/icons';
+import { IcoBook24, IcoMegaphone24, IcoWriting24 } from '@onefootprint/icons';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -25,20 +19,7 @@ const Navbar = () => {
     { text: t('entries.docs.text'), href: t('entries.docs.href') },
     {
       text: t('entries.company.text'),
-      items: [
-        {
-          text: t('entries.company.links.about.text'),
-          href: t('entries.company.links.about.href'),
-          subtext: t('entries.company.links.about.subtext'),
-          iconComponent: IcoFootprint24,
-        },
-        {
-          text: t('entries.company.links.join-us.text'),
-          href: t('entries.company.links.join-us.href'),
-          subtext: t('entries.company.links.join-us.subtext'),
-          iconComponent: IcoUsers24,
-        },
-      ],
+      href: t('entries.company.links.about.href'),
     },
     {
       text: t('entries.writing.text'),

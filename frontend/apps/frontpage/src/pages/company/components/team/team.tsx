@@ -1,9 +1,5 @@
-import {
-  IcoArrowRightSmall24,
-  IcoLinkedin24,
-  IcoTwitter24,
-} from '@onefootprint/icons';
-import { LinkButton, media, Typography } from '@onefootprint/ui';
+import { IcoLinkedin24, IcoTwitter24 } from '@onefootprint/icons';
+import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -12,7 +8,6 @@ import styled, { css } from 'styled-components';
 type TeamProps = {
   title: string;
   description: string;
-  cta: string;
   items: {
     avatarSrc: string;
     linkedin?: string;
@@ -22,7 +17,7 @@ type TeamProps = {
   }[];
 };
 
-const Team = ({ title, cta, description, items }: TeamProps) => (
+const Team = ({ title, description, items }: TeamProps) => (
   <>
     <Typography variant="display-3" as="h3" sx={{ marginBottom: 5 }}>
       {title}
@@ -30,13 +25,7 @@ const Team = ({ title, cta, description, items }: TeamProps) => (
     <Typography variant="body-1" sx={{ marginBottom: 7 }}>
       {description}
     </Typography>
-    <LinkButton
-      href="https://onefootprint.notion.site/Join-us-at-Footprint-29e1b0de675840c39e79e9ffd587ca3c"
-      iconComponent={IcoArrowRightSmall24}
-      target="_blank"
-    >
-      {cta}
-    </LinkButton>
+
     <ItemsContainer>
       {items.map(item => (
         <Item key={item.name}>

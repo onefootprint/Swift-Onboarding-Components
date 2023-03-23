@@ -157,10 +157,6 @@
             "text": "About us",
             "href": "/company"
           },
-          "join-us": {
-            "text": "Join us",
-            "href": "https://jobs.ashbyhq.com/footprint"
-          },
           "blog": {
             "text": "Blog",
             "href": "/blog"
@@ -397,6 +393,14 @@
         "title": "Our team",
         "description": "We value diverse ideas and backgrounds. We hail from multiple countries and include some of the earliest employees from companies such as Stripe, Robinhood, Fast, and Observe. We support remote work, provide generous benefits, and have tasteful yet enjoyable quarterly offsites!",
         "cta": "Join the team"
+      },
+      "join-us": {
+        "title": "Join us!",
+        "description": "We are bringing interoperability and real security to the internet, by giving companies the tools to verify, authenticate, and secure identity with no friction, low cost, and unparalleled accuracy, and consumers the ability to live in a secure world that trusts and rewards them for being digital citizens. Footprint is a unified identity and privacy platform bringing one-click KYC powered by a strong cryptographic data vault. ",
+        "investors": "We’ve raised a large seed round led by Index Ventures along with the best founders & operators from Ramp, KAYAK, Plaid, Lattice, and JumpCloud.",
+        "pre-cta": "Interested in joining us?",
+        "cta": "Let us know",
+        "email-address": "join@onefootprint.com"
       }
     },
     "media": {

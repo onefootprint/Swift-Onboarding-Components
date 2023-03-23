@@ -7,12 +7,13 @@ import {
   IcoLeaf40,
   IcoShield40,
 } from '@onefootprint/icons';
-import { media, Typography } from '@onefootprint/ui';
+import { Divider, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import CompanyPhotos from './components/company-photos';
+import JoinUs from './components/join-us/join-us';
 import Team from './components/team';
 import Values from './components/values';
 
@@ -156,12 +157,13 @@ const Company = () => {
         </ValuesContainer>
         <TeamContainer>
           <Team
-            cta={t('team.cta')}
             description={t('team.description')}
             items={team}
             title={t('team.title')}
           />
         </TeamContainer>
+        <Divider />
+        <JoinUs />
       </Container>
     </>
   );
