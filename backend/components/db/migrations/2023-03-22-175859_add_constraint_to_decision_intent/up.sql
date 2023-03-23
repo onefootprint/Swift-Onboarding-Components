@@ -1,0 +1,2 @@
+-- There should only be one onboarding_kyc decision_intent per scoped_vault 
+CREATE UNIQUE INDEX unique_onboarding_decision_intent_per_scoped_vault ON decision_intent(scoped_vault_id) WHERE kind = 'onboarding_kyc'

@@ -8,6 +8,7 @@ use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
+use db::models::decision_intent::DecisionIntent;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
@@ -84,7 +85,14 @@ async fn make_vendor_calls(
 
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
 
-            let requests = vendor::build_verification_requests_and_checkpoint(conn, &uvw, &scoped_user.id)?;
+            let decision_intent =
+                DecisionIntent::create(conn, newtypes::DecisionIntentKind::ManualRunKyc, &scoped_user.id)?;
+            let requests = vendor::build_verification_requests_and_checkpoint(
+                conn,
+                &uvw,
+                &scoped_user.id,
+                &decision_intent.id,
+            )?;
 
             Ok((requests, ob))
         })

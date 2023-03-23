@@ -7,7 +7,7 @@ use db::{
     models::{tenant::Tenant, verification_request::VerificationRequest},
     TxnPgConn,
 };
-use newtypes::{IdentityDataKind, OnboardingId, ScopedVaultId, VendorAPI};
+use newtypes::{DecisionIntentId, IdentityDataKind, OnboardingId, ScopedVaultId, VendorAPI};
 
 pub(super) mod build_request;
 pub mod make_request;
@@ -22,12 +22,14 @@ pub fn build_verification_requests_and_checkpoint(
     conn: &mut TxnPgConn,
     uvw: &VaultWrapper<Person>,
     su_id: &ScopedVaultId,
+    decision_intent_id: &DecisionIntentId,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     let tenant = Tenant::get(conn, su_id)?;
 
     let vendor_apis = get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tenant)?;
 
-    let requests_to_initiate = VerificationRequest::bulk_create(conn, su_id.clone(), vendor_apis)?;
+    let requests_to_initiate =
+        VerificationRequest::bulk_create(conn, su_id.clone(), vendor_apis, decision_intent_id)?;
 
     Ok(requests_to_initiate)
 }

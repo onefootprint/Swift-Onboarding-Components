@@ -11,6 +11,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use chrono::Utc;
+use db::models::decision_intent::DecisionIntent;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
@@ -184,7 +185,13 @@ async fn run_kyc(
                     return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
                 }
 
-                decision::vendor::build_verification_requests_and_checkpoint(conn, &uvw, &scoped_user_id)?;
+                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &scoped_user_id)?;
+                decision::vendor::build_verification_requests_and_checkpoint(
+                    conn,
+                    &uvw,
+                    &scoped_user_id,
+                    &decision_intent.id,
+                )?;
                 ob.into_inner()
                     .update(conn, OnboardingUpdate::idv_reqs_initiated())?;
 

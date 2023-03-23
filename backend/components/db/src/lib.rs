@@ -22,7 +22,7 @@ mod instrumented_connection;
 use std::time::Duration;
 
 pub use crate::errors::DbError;
-use crate::schema::{kv_data, user_consent};
+use crate::schema::{decision_intent, kv_data, user_consent};
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::Runtime;
 use diesel::pg::PgConnection as DieselPgConnection;
@@ -276,6 +276,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -
 
         deleted_rows += diesel::delete(fingerprint_visit_event::table)
             .filter(fingerprint_visit_event::scoped_user_id.eq_any(su_ids.select(scoped_user::id.nullable())))
+            .execute(conn.conn())?;
+
+        deleted_rows += diesel::delete(decision_intent::table)
+            .filter(decision_intent::scoped_vault_id.eq_any(su_ids))
             .execute(conn.conn())?;
 
         // Onboardings

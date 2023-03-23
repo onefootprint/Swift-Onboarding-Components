@@ -1,5 +1,6 @@
 use db::{
     models::{
+        decision_intent::DecisionIntent,
         manual_review::ManualReview,
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
@@ -10,8 +11,8 @@ use db::{
     PgConn,
 };
 use newtypes::{
-    DbActor, DecisionStatus, FootprintReasonCode, IdentityDocumentId, OnboardingId, PhoneNumber,
-    ScopedVaultId, TenantId, Vendor, VendorAPI,
+    DbActor, DecisionIntentId, DecisionStatus, FootprintReasonCode, IdentityDocumentId, OnboardingId,
+    PhoneNumber, ScopedVaultId, TenantId, Vendor, VendorAPI,
 };
 
 use super::vendor;
@@ -61,6 +62,7 @@ pub fn create_document_verification_request(
     vendor_api: VendorAPI,
     scoped_user_id: ScopedVaultId,
     identity_document_id: IdentityDocumentId,
+    decision_intent_id: &DecisionIntentId,
 ) -> Result<VerificationRequest, ApiError> {
     // As of now, we only support 1 vendor for sending documents too
     if vendor_api != VendorAPI::IdologyScanOnboarding {
@@ -73,6 +75,7 @@ pub fn create_document_verification_request(
         vendor_api,
         scoped_user_id,
         identity_document_id,
+        decision_intent_id,
     )
     .map_err(ApiError::from)
 }
@@ -115,11 +118,13 @@ pub async fn setup_test_fixtures(
                 ManualReview::create(conn, ob.id.clone())?;
             }
 
+            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &ob.scoped_user_id)?;
             // Create some mock verification request and results
             let request = VerificationRequest::bulk_create(
                 conn,
                 ob.scoped_user_id.clone(),
                 vec![VendorAPI::IdologyExpectID],
+                &decision_intent.id,
             )?
             .pop()
             .ok_or(ApiError::ResourceNotFound)?;

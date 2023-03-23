@@ -51,6 +51,7 @@ impl VerificationRequest {
         conn: &mut PgConn,
         scoped_user_id: ScopedVaultId,
         vendor_apis: Vec<VendorAPI>,
+        decision_intent_id: &DecisionIntentId,
     ) -> Result<Vec<Self>, crate::DbError> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let requests: Vec<_> = vendor_apis
@@ -62,7 +63,7 @@ impl VerificationRequest {
                 uvw_snapshot_seqno: seqno,
                 identity_document_id: None,
                 scoped_user_id: scoped_user_id.clone(),
-                decision_intent_id: None,
+                decision_intent_id: Some(decision_intent_id.clone()),
             })
             .collect();
         let result = diesel::insert_into(verification_request::table)
@@ -130,6 +131,7 @@ impl VerificationRequest {
         vendor_api: VendorAPI,
         scoped_user_id: ScopedVaultId,
         identity_document_id: IdentityDocumentId,
+        decision_intent_id: &DecisionIntentId,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_row = NewVerificationRequestRow {
@@ -139,7 +141,7 @@ impl VerificationRequest {
             uvw_snapshot_seqno: seqno,
             identity_document_id: Some(identity_document_id),
             scoped_user_id,
-            decision_intent_id: None,
+            decision_intent_id: Some(decision_intent_id.clone()),
         };
         let result = diesel::insert_into(verification_request::table)
             .values(new_row)

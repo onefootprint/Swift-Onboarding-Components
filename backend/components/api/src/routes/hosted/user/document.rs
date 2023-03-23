@@ -10,8 +10,10 @@ use crate::{decision, State};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
 use crypto::seal::SealedChaCha20Poly1305DataKey;
+use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
+use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
@@ -231,23 +233,28 @@ pub async fn post(
         // Save our verification request
         let su_id = auth_info.scoped_user.id.clone();
         let id_doc_id = identity_document.id.clone();
+        let ob_id = auth_info.onboarding.id.clone();
         let (document_verification_request, doc_request) = state
             .db_pool
             .db_transaction(
                 move |conn| -> Result<(VerificationRequest, DbDocumentRequest), ApiError> {
                     // Protect against race conditions
                     let doc_request = DbDocumentRequest::lock(conn, &su_id, &db_document_request.id)?;
+                    let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
                     if doc_request.idv_reqs_initiated {
                         return Err(ApiError::AssertionError(
                             "Document request already initiated".into(),
                         ));
                     }
 
+                    let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
+
                     let res = decision::utils::create_document_verification_request(
                         conn.conn(),
                         api,
                         su_id,
                         id_doc_id,
+                        &decision_intent.id,
                     )?;
 
                     // Move our status to uploaded since we have generated a doc verification request

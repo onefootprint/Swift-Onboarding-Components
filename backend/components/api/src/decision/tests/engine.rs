@@ -4,6 +4,7 @@ use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
     utils::{mock_enclave::StateWithMockEnclave, vault_wrapper::VaultWrapper},
 };
+use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
@@ -17,7 +18,6 @@ use db::{
     tests::fixtures,
     DbError, TxnPgConn,
 };
-#[cfg(test)]
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
@@ -27,6 +27,7 @@ use newtypes::{
     DecisionStatus, FootprintReasonCode, IdentityDataKind, PiiString, VaultId, Vendor, VendorAPI,
 };
 use rand::Rng;
+#[cfg(test)]
 use test_case::test_case;
 
 fn random_phone_number() -> String {
@@ -77,6 +78,9 @@ async fn create_user_and_onboarding(db_pool: &DbPool) -> (Tenant, Onboarding, Va
 
             let onboarding = fixtures::onboarding::create(conn, su.id, ob_config_id);
 
+            let decision_intent =
+                DecisionIntent::get_or_create_onboarding_kyc(conn, &onboarding.scoped_user_id).unwrap();
+
             fixtures::verification_request::bulk_create(
                 conn,
                 &onboarding.scoped_user_id,
@@ -86,6 +90,7 @@ async fn create_user_and_onboarding(db_pool: &DbPool) -> (Tenant, Onboarding, Va
                     VendorAPI::SocureIDPlus,
                     VendorAPI::ExperianPreciseID,
                 ],
+                &decision_intent.id,
             );
 
             Ok((tenant, onboarding, uv.id))

@@ -1,8 +1,3 @@
-use newtypes::{
-    DocumentRequestId, DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedVaultId, SealedVaultDataKey,
-    VaultId, VendorAPI, VerificationRequestId, VerificationResultId,
-};
-
 use crate::{
     models::{
         document_request::{DocumentRequest, DocumentRequestUpdate},
@@ -12,6 +7,11 @@ use crate::{
     },
     tests::prelude::TestPgConn,
 };
+use newtypes::{
+    DecisionIntentId, DocumentRequestId, DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedVaultId,
+    SealedVaultDataKey, VaultId, VendorAPI, VerificationRequestId, VerificationResultId,
+};
+use std::str::FromStr;
 
 #[derive(Clone)]
 pub struct DocumentRequestFixtureCreateOpts {
@@ -96,6 +96,7 @@ pub fn create(
                 VendorAPI::IdologyScanOnboarding,
                 opts.scoped_user_id.clone(),
                 id1.id,
+                &DecisionIntentId::from_str("di_abc123").unwrap(),
             )
             .unwrap();
 
