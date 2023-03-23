@@ -1,5 +1,5 @@
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
-import Postmate from '@onefootprint/postmate';
+import Postmate from 'postmate';
 
 import {
   CompletePayload,
