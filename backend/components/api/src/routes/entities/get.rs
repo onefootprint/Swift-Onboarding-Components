@@ -278,7 +278,7 @@ async fn compute_fingerprint_for_search(
 }
 
 fn tokenize_search_query(input: PiiString) -> Vec<PiiString> {
-    let mut tokenized: Vec<PiiString> = input.leak().split(' ').into_iter().map(PiiString::from).collect();
+    let mut tokenized: Vec<PiiString> = input.leak().split(' ').map(PiiString::from).collect();
     // Add back in the original term, since addresses were probably fingerprinted with spaces in them to begin withs
     tokenized.push(input);
 
