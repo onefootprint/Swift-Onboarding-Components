@@ -222,11 +222,8 @@ impl CollectedDataOption {
 
     /// Given a list of DataIdentifiers (maybe collected via API), computes the set of
     /// CollectedDataOptions represented by this list of DataIdentifiers
-    pub fn list_from<T>(ids: Vec<T>) -> HashSet<Self>
-    where
-        T: Into<DataIdentifier>,
-    {
-        let dis: HashSet<_> = ids.into_iter().map(|k| k.into()).collect();
+    pub fn list_from(dis: Vec<DataIdentifier>) -> HashSet<Self> {
+        let dis: HashSet<_> = dis.into_iter().collect();
         // For each CollectedData variant, figure out which of the options (if any) is represented
         // in the list of dis
         CollectedData::iter()
@@ -243,7 +240,7 @@ impl CollectedDataOption {
                         (!dis.is_empty()).then_some((cdo, dis))
                     })
                     .find(|(_, attrs)| {
-                        let required_attrs = HashSet::from_iter(attrs.iter().cloned());
+                        let required_attrs: HashSet<_> = attrs.iter().cloned().collect();
                         dis.is_superset(&required_attrs)
                     })
                     .map(|(cdo, _)| cdo)
@@ -331,40 +328,37 @@ mod test {
     }
 
     // Identity CDOs
-    #[test_case(vec![IDK::FirstName] => HashSet::from_iter([]))]
-    #[test_case(vec![IDK::FirstName, IDK::LastName] => HashSet::from_iter([CDO::Name]))]
-    #[test_case(vec![IDK::FirstName, IDK::LastName, IDK::Dob, IDK::Email] => HashSet::from_iter([CDO::Name, CDO::Dob, CDO::Email]))]
-    #[test_case(vec![IDK::Ssn4, IDK::Dob] => HashSet::from_iter([CDO::Ssn4, CDO::Dob]))]
-    #[test_case(vec![IDK::Ssn4, IDK::Ssn9, IDK::Dob] => HashSet::from_iter([CDO::Ssn9, CDO::Dob]))]
-    #[test_case(vec![IDK::Ssn9] => HashSet::from_iter([]))]
-    #[test_case(vec![IDK::Zip, IDK::Country] => HashSet::from_iter([CDO::PartialAddress]))]
-    #[test_case(vec![IDK::AddressLine1, IDK::City, IDK::State, IDK::Zip, IDK::Country] => HashSet::from_iter([CDO::FullAddress]))]
-    #[test_case(vec![IDK::AddressLine1, IDK::AddressLine2, IDK::City, IDK::State, IDK::Zip, IDK::Country] => HashSet::from_iter([CDO::FullAddress]))]
-    #[test_case(vec![IDK::AddressLine1, IDK::AddressLine2, IDK::City, IDK::State, IDK::Zip, IDK::Country, IDK::FirstName] => HashSet::from_iter([CDO::FullAddress]))]
-    #[test_case(vec![IDK::AddressLine1, IDK::AddressLine2, IDK::City, IDK::State, IDK::Zip, IDK::Country, IDK::FirstName, IDK::LastName] => HashSet::from_iter([CDO::FullAddress, CDO::Name]))]
-    #[test_case(vec![IDK::Zip, IDK::Ssn4, IDK::LastName, IDK::Country, IDK::FirstName] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name]))]
-    #[test_case(vec![IDK::Zip, IDK::Ssn4, IDK::LastName, IDK::Country, IDK::FirstName, IDK::Dob, IDK::Email, IDK::PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
-    #[test_case(vec![IDK::City, IDK::State, IDK::Zip, IDK::Ssn4, IDK::LastName, IDK::Country, IDK::FirstName, IDK::Dob, IDK::Email, IDK::PhoneNumber] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
+    #[test_case(vec![IDK::FirstName.into()] => HashSet::from_iter([]))]
+    #[test_case(vec![IDK::FirstName.into(), IDK::LastName.into()] => HashSet::from_iter([CDO::Name]))]
+    #[test_case(vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Dob.into(), IDK::Email.into()] => HashSet::from_iter([CDO::Name, CDO::Dob, CDO::Email]))]
+    #[test_case(vec![IDK::Ssn4.into(), IDK::Dob.into()] => HashSet::from_iter([CDO::Ssn4, CDO::Dob]))]
+    #[test_case(vec![IDK::Ssn4.into(), IDK::Ssn9.into(), IDK::Dob.into()] => HashSet::from_iter([CDO::Ssn9, CDO::Dob]))]
+    #[test_case(vec![IDK::Ssn9.into()] => HashSet::from_iter([]))]
+    #[test_case(vec![IDK::Zip.into(), IDK::Country.into()] => HashSet::from_iter([CDO::PartialAddress]))]
+    #[test_case(vec![IDK::AddressLine1.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into()] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![IDK::AddressLine1.into(), IDK::AddressLine2.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into()] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![IDK::AddressLine1.into(), IDK::AddressLine2.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into(), IDK::FirstName.into()] => HashSet::from_iter([CDO::FullAddress]))]
+    #[test_case(vec![IDK::AddressLine1.into(), IDK::AddressLine2.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into(), IDK::FirstName.into(), IDK::LastName.into()] => HashSet::from_iter([CDO::FullAddress, CDO::Name]))]
+    #[test_case(vec![IDK::Zip.into(), IDK::Ssn4.into(), IDK::LastName.into(), IDK::Country.into(), IDK::FirstName.into()] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name]))]
+    #[test_case(vec![IDK::Zip.into(), IDK::Ssn4.into(), IDK::LastName.into(), IDK::Country.into(), IDK::FirstName.into(), IDK::Dob.into(), IDK::Email.into(), IDK::PhoneNumber.into()] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
+    #[test_case(vec![IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Ssn4.into(), IDK::LastName.into(), IDK::Country.into(), IDK::FirstName.into(), IDK::Dob.into(), IDK::Email.into(), IDK::PhoneNumber.into()] => HashSet::from_iter([CDO::PartialAddress, CDO::Ssn4, CDO::Name, CDO::Dob, CDO::Email, CDO::PhoneNumber]))]
     // Business CDOs
-    #[test_case(vec![BDK::Name] => HashSet::from_iter([CDO::BusinessName]))]
-    #[test_case(vec![BDK::Name, BDK::Dba] => HashSet::from_iter([CDO::BusinessName]))]
-    #[test_case(vec![BDK::Ein] => HashSet::from_iter([CDO::BusinessEin]))]
-    #[test_case(vec![BDK::AddressLine1] => HashSet::from_iter([]))]
-    #[test_case(vec![BDK::AddressLine2] => HashSet::from_iter([]))]
-    #[test_case(vec![BDK::AddressLine1, BDK::City, BDK::State, BDK::Zip, BDK::Country] => HashSet::from_iter([CDO::BusinessAddress]))]
-    #[test_case(vec![BDK::AddressLine1, BDK::AddressLine2, BDK::City, BDK::State, BDK::Zip, BDK::Country] => HashSet::from_iter([CDO::BusinessAddress]))]
-    #[test_case(vec![BDK::PhoneNumber] => HashSet::from_iter([CDO::BusinessPhoneNumber]))]
-    #[test_case(vec![BDK::Website] => HashSet::from_iter([CDO::BusinessWebsite]))]
-    #[test_case(vec![BDK::BeneficialOwners] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
-    #[test_case(vec![IPK::Occupation, IPK::BrokerageFirmEmployer, IPK::AnnualIncome, IPK::NetWorth, IPK::InvestmentGoals, IPK::RiskTolerance, IPK::Declarations] => HashSet::from_iter([CDO::InvestorProfile]))]
-    #[test_case(vec![IPK::AnnualIncome, IPK::NetWorth, IPK::InvestmentGoals, IPK::RiskTolerance, IPK::Declarations] => HashSet::from_iter([CDO::InvestorProfile]))]
+    #[test_case(vec![BDK::Name.into()] => HashSet::from_iter([CDO::BusinessName]))]
+    #[test_case(vec![BDK::Name.into(), BDK::Dba.into()] => HashSet::from_iter([CDO::BusinessName]))]
+    #[test_case(vec![BDK::Ein.into()] => HashSet::from_iter([CDO::BusinessEin]))]
+    #[test_case(vec![BDK::AddressLine1.into()] => HashSet::from_iter([]))]
+    #[test_case(vec![BDK::AddressLine2.into()] => HashSet::from_iter([]))]
+    #[test_case(vec![BDK::AddressLine1.into(), BDK::City.into(), BDK::State.into(), BDK::Zip.into(), BDK::Country.into()] => HashSet::from_iter([CDO::BusinessAddress]))]
+    #[test_case(vec![BDK::AddressLine1.into(), BDK::AddressLine2.into(), BDK::City.into(), BDK::State.into(), BDK::Zip.into(), BDK::Country.into()] => HashSet::from_iter([CDO::BusinessAddress]))]
+    #[test_case(vec![BDK::PhoneNumber.into()] => HashSet::from_iter([CDO::BusinessPhoneNumber]))]
+    #[test_case(vec![BDK::Website.into()] => HashSet::from_iter([CDO::BusinessWebsite]))]
+    #[test_case(vec![BDK::BeneficialOwners.into()] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
+    #[test_case(vec![IPK::Occupation.into(), IPK::BrokerageFirmEmployer.into(), IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
+    #[test_case(vec![IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
     // Mixed
     #[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Ssn4)] => HashSet::from_iter([CDO::BusinessBeneficialOwners, CDO::Ssn4]))]
     #[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Zip), DI::from(IDK::Country)] => HashSet::from_iter([CDO::BusinessBeneficialOwners, CDO::PartialAddress]))]
-    fn test_parse_list_of_kinds<T>(kinds: Vec<T>) -> HashSet<CDO>
-    where
-        T: Into<DI>,
-    {
+    fn test_parse_list_of_kinds(kinds: Vec<DI>) -> HashSet<CDO> {
         CDO::list_from(kinds)
     }
 }

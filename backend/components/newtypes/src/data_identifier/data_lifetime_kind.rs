@@ -1,6 +1,6 @@
 use crate::{
     BusinessDataKind, ConversionError, DataIdentifier, DocumentKind, IdDocKind, IdentityDataKind,
-    InvestorProfileKind, KvDataKey,
+    InvestorProfileKind, KvDataKey, VdKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -70,6 +70,18 @@ impl TryFrom<DataIdentifier> for DataLifetimeKind {
     }
 }
 
+impl From<VdKind> for DataLifetimeKind {
+    fn from(value: VdKind) -> Self {
+        match value {
+            VdKind::Business(x) => Self::Business(x),
+            VdKind::Id(x) => Self::Id(x),
+            VdKind::Custom(x) => Self::Custom(x),
+            VdKind::InvestorProfile(x) => Self::InvestorProfile(x),
+        }
+    }
+}
+
+// TODO can I rm these?
 impl From<IdentityDataKind> for DataLifetimeKind {
     fn from(value: IdentityDataKind) -> Self {
         Self::Id(value)

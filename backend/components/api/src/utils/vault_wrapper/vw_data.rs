@@ -6,8 +6,8 @@ use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::vault_data::VaultData;
 use db::{HasLifetime, HasSealedIdentityData};
 use itertools::Itertools;
+use newtypes::DataIdentifier;
 use newtypes::DocumentKind;
-use newtypes::{DataIdentifier, IsDataIdentifierDiscriminant};
 use newtypes::{DataLifetimeId, VdKind};
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
@@ -119,16 +119,6 @@ impl<Type> VwData<Type> {
             .collect_vec();
         let docs = self.documents.iter().map(|d| d.kind.into()).collect_vec();
         [vds, id_docs, docs].into_iter().flatten().unique().collect()
-    }
-
-    pub fn populated<T>(&self) -> Vec<T>
-    where
-        T: IsDataIdentifierDiscriminant,
-    {
-        self.populated_dis()
-            .into_iter()
-            .filter_map(|di| di.try_into().ok())
-            .collect()
     }
 
     /// Dispatch queries for a piece of data with a given identifier to the underlying data

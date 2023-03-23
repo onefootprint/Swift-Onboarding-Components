@@ -81,17 +81,19 @@ impl WriteableVw<Person> {
         // NOTE: this does nothing to Custom data or Identity documents since they don't fit into
         // the CollectedDataOption model
         let d = decide_data_to_portablize(CurrentData {
-            speculative: CollectedDataOption::list_from(uvw.speculative.populated::<IDK>()),
-            portable: CollectedDataOption::list_from(uvw.portable.populated::<IDK>()),
+            speculative: CollectedDataOption::list_from(uvw.speculative.populated_dis()),
+            portable: CollectedDataOption::list_from(uvw.portable.populated_dis()),
         });
         let speculative_kinds_to_portablize: Vec<_> = d
             .to_portablize
             .into_iter()
+            // Purposefully only take IDKs because we only want to portablize identity fields
             .flat_map(|o| o.attributes::<IDK>())
             .collect();
         let speculative_kinds_to_deactivate: Vec<_> = d
             .to_deactivate
             .into_iter()
+            // Purposefully only take IDKs because we only want to portablize identity fields
             .flat_map(|o| o.attributes::<IDK>())
             .collect();
 

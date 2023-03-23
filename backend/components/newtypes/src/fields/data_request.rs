@@ -81,7 +81,8 @@ where
     /// For example, if you provide FirstName without LastName, we can't save only your FirstName
     fn extra_keys(keys: Vec<T>) -> Vec<T> {
         // Get all the CDOs represented in here
-        let cdos = CollectedDataOption::list_from(keys.clone());
+        let dis = keys.clone().into_iter().map(|x| x.into()).collect();
+        let cdos = CollectedDataOption::list_from(dis);
         let represented_identifiers: HashSet<T> = cdos.into_iter().flat_map(|cdo| cdo.attributes()).collect();
         // Keys given minus represented keys
         let keys: HashSet<T> = keys.into_iter().collect();

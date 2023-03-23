@@ -13,7 +13,8 @@ use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
 use newtypes::PiiString;
-use newtypes::{BusinessDataKind as BDK, SealedVaultBytes};
+use newtypes::{BusinessDataKind as BDK, InvestorProfileKind as IPK, SealedVaultBytes};
+use std::collections::HashSet;
 use std::str::FromStr;
 
 #[db_test]
@@ -28,23 +29,23 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     // Add identity data
     let data = vec![
         NewVaultData {
-            kind: IDK::FirstName,
+            kind: IDK::FirstName.into(),
             e_data: SealedVaultBytes(vec![1]),
         },
         NewVaultData {
-            kind: IDK::LastName,
+            kind: IDK::LastName.into(),
             e_data: SealedVaultBytes(vec![2]),
         },
         NewVaultData {
-            kind: IDK::Ssn4,
+            kind: IDK::Ssn4.into(),
             e_data: SealedVaultBytes(vec![3]),
         },
         NewVaultData {
-            kind: IDK::Email,
+            kind: IDK::Email.into(),
             e_data: SealedVaultBytes(vec![4]),
         },
         NewVaultData {
-            kind: IDK::PhoneNumber,
+            kind: IDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![5]),
         },
     ];
@@ -111,15 +112,15 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
 
     let data = vec![
         NewVaultData {
-            kind: BDK::Name,
+            kind: BDK::Name.into(),
             e_data: SealedVaultBytes(vec![1]),
         },
         NewVaultData {
-            kind: BDK::Website,
+            kind: BDK::Website.into(),
             e_data: SealedVaultBytes(vec![2]),
         },
         NewVaultData {
-            kind: BDK::PhoneNumber,
+            kind: BDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![3]),
         },
     ];
@@ -469,7 +470,7 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
 }
 
 #[db_test]
-fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
+fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     // We haven't figured out the portability story for custom data or identity documents yet, so
     // for now, let's make sure we never commit them through the UVW
     let uv = fixtures::vault::create_person(conn, true);
@@ -477,49 +478,59 @@ fn test_dont_commit_custom_data_or_id_docs(conn: &mut TestPgConn) {
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
-    // Add some identity data
-    let update = vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))];
+    // Add some data,
+    let custom_key1 = KvDataKey::from_str("blerp").unwrap();
+    let custom_key2 = KvDataKey::from_str("flerp").unwrap();
+    let update = vec![
+        (IDK::Ssn4.into(), PiiString::new("1234".to_owned())),
+        (IPK::AnnualIncome.into(), PiiString::from("lt50k")),
+        (IPK::NetWorth.into(), PiiString::from("lt50k")),
+        (
+            IPK::InvestmentGoals.into(),
+            PiiString::from("[\"grow_long_term_wealth\"]"),
+        ),
+        (IPK::RiskTolerance.into(), PiiString::from("moderate")),
+        (IPK::Declarations.into(), PiiString::from("[]")),
+        (custom_key1.clone().into(), PiiString::from("BLERP")),
+        (custom_key2.clone().into(), PiiString::from("FLERP")),
+    ];
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.add_data_test(conn, update).unwrap();
 
     // Also add an identity document
     let id_doc = fixtures::identity_document::create(conn, &uv.id, &su.id);
 
-    // Also add some custom data
-    let custom_key1 = KvDataKey::from_str("blerp").unwrap();
-    let custom_key2 = KvDataKey::from_str("flerp").unwrap();
-    let custom_data = vec![
-        (custom_key1.clone().into(), PiiString::from("BLERP")),
-        (custom_key2.clone().into(), PiiString::from("FLERP")),
-    ];
-    let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.add_data_test(conn, custom_data).unwrap();
-
     // Commit the identity data
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.portablize_identity_data(conn).unwrap();
 
-    let (portable, speculative): (Vec<_>, Vec<_>) = DataLifetime::get_active(conn, &uv.id, Some(&su.id))
-        .unwrap()
-        .into_iter()
-        .partition_map(|dl| {
-            if dl.portablized_at.is_some() {
-                either::Either::Left(dl.kind)
-            } else {
-                either::Either::Right(dl.kind)
-            }
-        });
+    let (portable, speculative): (HashSet<_>, HashSet<_>) =
+        DataLifetime::get_active(conn, &uv.id, Some(&su.id))
+            .unwrap()
+            .into_iter()
+            .partition_map(|dl| {
+                if dl.portablized_at.is_some() {
+                    either::Either::Left(dl.kind)
+                } else {
+                    either::Either::Right(dl.kind)
+                }
+            });
 
-    let expected_speculative_kinds = [
+    let expected_speculative_kinds = HashSet::from_iter([
         // Assert all custom DLs are not portable
         custom_key1.into(),
         custom_key2.into(),
         // Assert identity doc DL is not portable
         id_doc.document_type.into(),
-    ];
-    assert!(expected_speculative_kinds.iter().all(|k| speculative.contains(k)));
+        IPK::AnnualIncome.into(),
+        IPK::NetWorth.into(),
+        IPK::InvestmentGoals.into(),
+        IPK::RiskTolerance.into(),
+        IPK::Declarations.into(),
+    ]);
+    assert_eq!(expected_speculative_kinds, speculative);
 
     // But identity data should be portable
-    let expected_portable_kinds = [IDK::Ssn4.into()];
-    assert!(expected_portable_kinds.iter().all(|k| portable.contains(k)));
+    let expected_portable_kinds = HashSet::from_iter([IDK::Ssn4.into()]);
+    assert_eq!(expected_portable_kinds, portable);
 }

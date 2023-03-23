@@ -124,7 +124,7 @@ impl<Type> WriteableVw<Type> {
         T: IsDataIdentifierDiscriminant + Into<VdKind>,
         DataLifetimeKind: From<T>,
     {
-        let existing_fields = self.populated();
+        let existing_fields = self.populated_dis();
         let v = self.vault();
 
         // Don't allow replacing a committed phone/email yet

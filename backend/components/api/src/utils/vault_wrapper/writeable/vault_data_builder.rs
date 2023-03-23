@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::{
     errors::{user::UserError, ApiError, ApiResult},
     utils::fingerprint::NewFingerprints,
@@ -19,22 +17,22 @@ use newtypes::{
 };
 
 /// Helps to process updates for data in a DataRequest<T>.
-pub struct VaultDataBuilder<T> {
-    data: Vec<NewVaultData<T>>,
+pub struct VaultDataBuilder {
+    data: Vec<NewVaultData>,
 }
 
-impl<T> VaultDataBuilder<T>
-where
-    T: IsDataIdentifierDiscriminant + Into<VdKind>,
-    DataLifetimeKind: From<T>,
+impl VaultDataBuilder
 {
     /// Construct the list of NewVaultData from a DataRequest<T>
-    pub fn build(update: DataRequest<T>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
+    pub fn build<T>(update: DataRequest<T>, vault_public_key: VaultPublicKey) -> ApiResult<Self> 
+    where
+        T: IsDataIdentifierDiscriminant + Into<VdKind>,
+        DataLifetimeKind: From<T> {
         let mut data = vec![];
 
         let mut add_sealed = |pii: PiiString, kind: T| -> ApiResult<()> {
             let sealed = vault_public_key.seal_pii(&pii)?;
-            data.push(NewVaultData::<T> { kind, e_data: sealed });
+            data.push(NewVaultData { kind: kind.into(), e_data: sealed });
             Ok(())
         };
         for (kind, pii) in update.into_inner() {
@@ -45,24 +43,26 @@ where
     }
 
     /// Validates that the pending updates are valid and then saves them to the DB as speculative data
-    pub fn validate_and_save(
+    pub fn validate_and_save<T>(
         self,
         conn: &mut TxnPgConn,
-        existing_fields: Vec<T>, // portable or speculative on UVW
+        existing_fields: Vec<DataIdentifier>, // portable or speculative on UVW
         user_vault_id: VaultId,
         scoped_user_id: ScopedVaultId,
         fingerprints: NewFingerprints<T>,
-    ) -> ApiResult<Vec<VaultData>> {
+    ) -> ApiResult<Vec<VaultData>> 
+    where T: Into<VdKind> + Clone {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
         let new_fields = self.data.iter().map(|d| d.kind.clone()).collect_vec();
-        let existing = CollectedDataOption::list_from(existing_fields);
-        let new = CollectedDataOption::list_from(new_fields.clone());
+        let new_dis = new_fields.clone().into_iter().map(DataIdentifier::from).collect_vec();
+        let existing_cdos = CollectedDataOption::list_from(existing_fields);
+        let new_cdos = CollectedDataOption::list_from(new_dis);
         let offending_partial_cdo =
-            new.iter()
+            new_cdos.iter()
                 .cloned()
                 .find(|speculative_cdo| match speculative_cdo.full_variant() {
-                    Some(full_cdo) => existing.contains(&full_cdo),
+                    Some(full_cdo) => existing_cdos.contains(&full_cdo),
                     None => false,
                 });
         if let Some(offending_partial_cdo) = offending_partial_cdo {
@@ -71,13 +71,15 @@ where
 
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
-        let kinds_to_deactivate = new_fields
+        let overwrite_kinds = new_cdos.iter().flat_map(|cdo| cdo.data_identifiers().unwrap_or_default().into_iter().filter_map(|di| DataLifetimeKind::try_from(di).ok()));
+        let added_kinds = new_fields
             .into_iter()
+            .map(DataLifetimeKind::from);
+        let kinds_to_deactivate = added_kinds
             // Even if we're not providing all fields for a CDO, deactivate old versions of all
             // fields in the CDO. For example, address line 2
-            .chain(new.iter().flat_map(|cdo| cdo.attributes::<T>()))
+            .chain(overwrite_kinds)
             .unique()
-            .map(DataLifetimeKind::from)
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::bulk_deactivate_speculative(conn, &scoped_user_id, kinds_to_deactivate, seqno)?;
@@ -86,25 +88,18 @@ where
         let vds = VaultData::bulk_create(conn, &user_vault_id, &scoped_user_id, self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
-        let kind_to_lifetime = vds
-            .iter()
-            .cloned()
-            .map(|vd| {
-                T::try_from(DataIdentifier::from(vd.kind))
-                    .map(|idk| (idk, vd.lifetime_id))
-                    .map_err(|_| ApiError::AssertionError("Cannot convert from vd.kind to T".to_owned()))
-            })
-            .collect::<Result<HashMap<_, _>, ApiError>>()?;
         let fingerprints: Vec<_> = fingerprints
             .into_iter()
             .map(|(kind, sh_data)| -> ApiResult<_> {
+                let vd_kind = kind.into();
                 Ok(NewFingerprint {
-                    kind: DataLifetimeKind::from(kind.clone()),
+                    kind: DataLifetimeKind::from(vd_kind.clone()),
                     sh_data,
-                    lifetime_id: kind_to_lifetime
-                        .get(&kind)
-                        .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?
-                        .clone(),
+                    lifetime_id: vds
+                        .iter()
+                        .find(|vd| vd.kind == vd_kind)
+                        .map(|vd| vd.lifetime_id.clone())
+                        .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?,
                     is_unique: false,
                 })
             })

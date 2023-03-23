@@ -31,23 +31,23 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     // Add identity data
     let data = vec![
         NewVaultData {
-            kind: IdentityDataKind::FirstName,
+            kind: IdentityDataKind::FirstName.into(),
             e_data: SealedVaultBytes(vec![1]),
         },
         NewVaultData {
-            kind: IdentityDataKind::LastName,
+            kind: IdentityDataKind::LastName.into(),
             e_data: SealedVaultBytes(vec![2]),
         },
         NewVaultData {
-            kind: IdentityDataKind::Ssn4,
+            kind: IdentityDataKind::Ssn4.into(),
             e_data: SealedVaultBytes(vec![3]),
         },
         NewVaultData {
-            kind: IdentityDataKind::Email,
+            kind: IdentityDataKind::Email.into(),
             e_data: SealedVaultBytes(vec![4]),
         },
         NewVaultData {
-            kind: IdentityDataKind::PhoneNumber,
+            kind: IdentityDataKind::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![5]),
         },
     ];

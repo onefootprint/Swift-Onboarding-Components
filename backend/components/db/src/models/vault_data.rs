@@ -28,8 +28,8 @@ pub struct VaultData {
     pub e_data: SealedVaultBytes,
 }
 
-pub struct NewVaultData<T> {
-    pub kind: T,
+pub struct NewVaultData {
+    pub kind: VdKind,
     pub e_data: SealedVaultBytes,
 }
 
@@ -43,17 +43,13 @@ pub struct NewUserVaultDataRow {
 
 impl VaultData {
     #[tracing::instrument(skip_all)]
-    pub fn bulk_create<T>(
+    pub fn bulk_create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
         scoped_user_id: &ScopedVaultId,
-        data: Vec<NewVaultData<T>>,
+        data: Vec<NewVaultData>,
         seqno: DataLifetimeSeqno,
-    ) -> DbResult<Vec<Self>>
-    where
-        T: Into<VdKind> + Clone,
-        DataLifetimeKind: From<T>,
-    {
+    ) -> DbResult<Vec<Self>> {
         // Make a DataLifetime row for each of the new pieces of data being inserted
         let lifetimes = DataLifetime::bulk_create(
             conn,
@@ -69,7 +65,7 @@ impl VaultData {
             .zip(lifetimes.into_iter())
             .map(|(new_vd, lifetime)| NewUserVaultDataRow {
                 lifetime_id: lifetime.id,
-                kind: new_vd.kind.into(),
+                kind: new_vd.kind,
                 e_data: new_vd.e_data,
             })
             .collect();

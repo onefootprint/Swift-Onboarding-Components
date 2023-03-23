@@ -11,8 +11,6 @@ use newtypes::{ContactInfoId, DataLifetimeId};
 #[diesel(table_name = contact_info)]
 /// Contains supplemental information for contact information stored inside the vault_data table
 pub struct ContactInfo {
-    // TODO backfill this with existing EmailId in order to maintain backwards compatibility with existing email validation tokens that were sent out
-    // TODO test this with an email link before + after
     pub id: ContactInfoId,
     pub is_verified: bool,
     pub priority: ContactInfoPriority,
