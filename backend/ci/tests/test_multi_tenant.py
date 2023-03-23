@@ -2,6 +2,7 @@ from typing import NamedTuple
 import pytest
 from tests.utils import (
     get,
+    put,
     create_tenant,
     inherit_user,
 )
@@ -108,3 +109,27 @@ def test_cant_see_fp_user_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_
         foo_sandbox_tenant.sk.key,
         status_code=404,
     )
+
+
+def test_cant_see_speculative_fingerprints(
+    sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user
+):
+    fp_user_id = dual_onboarded_user.fp_user_id
+
+    # Overwrite the name only from sandbox_tenant
+    data = {
+        "id.first_name": "New",
+        "id.last_name": "Name",
+    }
+    put(f"/users/{fp_user_id}/vault", data, sandbox_tenant.sk.key)
+
+    for search_query in ["new", "name"]:
+        data = dict(search=search_query)
+
+        # sandbox_tenant should be able to search for the user from its new name
+        body = get(f"/users", data, sandbox_tenant.sk.key)
+        assert [i for i in body["data"] if i["id"] == fp_user_id]
+
+        # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
+        body = get(f"/users", data, foo_sandbox_tenant.sk.key)
+        assert not len(body["data"])
