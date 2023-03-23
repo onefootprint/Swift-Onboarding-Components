@@ -20,7 +20,7 @@ EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", Non
 class HttpError(Exception):
     def __init__(self, code, message):
         self.code = code
-        super().__init__(message)
+        super().__init__(f"HttpError {code}: {message}")
 
 
 class IncorrectServerVersion(Exception):
