@@ -167,7 +167,7 @@ export async function CreateDB(
     ])
     .apply(([host, roHost, password, jbPassword]) => {
       const rw = `postgresql://${user}:${password}@${host}`;
-      const jb = `postgresql://${jbUser}:${jbPassword}@${host}`;
+      const jb = `postgresql://${jbUser}:${jbPassword}@${host}/${databaseName}`;
       const ro = `postgresql://${user}:${password}@${roHost}`;
       return { rw, jb, ro };
     });
