@@ -6,9 +6,9 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
 use newtypes::CollectedDataOption;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbUserTimelineEventKind;
-use newtypes::IdentityDataKind as IDK;
 use std::collections::HashSet;
 
 struct CurrentData {
@@ -88,13 +88,15 @@ impl WriteableVw<Person> {
             .to_portablize
             .into_iter()
             // Purposefully only take IDKs because we only want to portablize identity fields
-            .flat_map(|o| o.attributes::<IDK>())
+            .flat_map(|o| o.data_identifiers().unwrap_or_default())
+            .filter_map(|di| if let DataIdentifier::Id(idk) = di { Some(idk) } else { None})
             .collect();
         let speculative_kinds_to_deactivate: Vec<_> = d
             .to_deactivate
             .into_iter()
             // Purposefully only take IDKs because we only want to portablize identity fields
-            .flat_map(|o| o.attributes::<IDK>())
+            .flat_map(|o| o.data_identifiers().unwrap_or_default())
+            .filter_map(|di| if let DataIdentifier::Id(idk) = di { Some(idk) } else { None})
             .collect();
 
         //

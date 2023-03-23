@@ -1,5 +1,5 @@
 use db::models::onboarding::{Onboarding, OnboardingAndConfig, SerializableOnboardingInfo};
-use newtypes::IdentityDataKind as IDK;
+use newtypes::DataIdentifier;
 use newtypes::LivenessSource;
 
 use crate::utils::db2api::DbToApi;
@@ -25,9 +25,17 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
         let status = onboarding.status;
         let can_decrypt_scopes = OnboardingAndConfig(onboarding, config).can_decrypt_scopes();
 
+        // This is legacy - only shows IDKs. We will deprecate soon
         let can_access_data_attributes = can_access_data
             .iter()
-            .flat_map(|x| x.attributes::<IDK>())
+            .flat_map(|x| x.data_identifiers().unwrap_or_default())
+            .filter_map(|di| {
+                if let DataIdentifier::Id(idk) = di {
+                    Some(idk)
+                } else {
+                    None
+                }
+            })
             .collect();
         api_wire_types::Onboarding {
             id,

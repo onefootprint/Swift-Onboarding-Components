@@ -1,6 +1,6 @@
 use crate::{
     BusinessDataKind as BDK, DataIdentifier, DataIdentifierDiscriminant, DocumentKind as DK,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -209,18 +209,6 @@ impl CollectedDataOption {
             .unwrap_or_default()
     }
 
-    /// Maps the CDO to the list of Ts represented by the CDO, if self represents T. Otherwise,
-    /// returns an empty list.
-    /// TODO can I rm?
-    pub fn attributes<T>(&self) -> Vec<T>
-    where
-        T: IsDataIdentifierDiscriminant,
-    {
-        self.data_identifiers()
-            .map(|dis| dis.into_iter().filter_map(|di| di.try_into().ok()).collect())
-            .unwrap_or_default()
-    }
-
     /// Given a list of DataIdentifiers (maybe collected via API), computes the set of
     /// CollectedDataOptions represented by this list of DataIdentifiers
     pub fn list_from(dis: Vec<DataIdentifier>) -> HashSet<Self> {
@@ -311,21 +299,18 @@ mod test {
         T: IsDataIdentifierDiscriminant + std::fmt::Debug,
     {
         for id in ids {
-            test_discriminant(id);
+            test_discriminant(id.into());
         }
     }
 
-    fn test_discriminant<T>(id: T)
-    where
-        T: IsDataIdentifierDiscriminant,
-    {
-        assert!(id
+    fn test_discriminant(di: DI) {
+        assert!(di
             .parent()
             .unwrap()
             .options()
             .into_iter()
-            .flat_map(|cdo| cdo.attributes::<T>())
-            .contains(&id));
+            .flat_map(|cdo| cdo.data_identifiers().unwrap_or_default())
+            .contains(&di));
     }
 
     // Identity CDOs
