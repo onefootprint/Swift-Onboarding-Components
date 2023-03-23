@@ -289,7 +289,7 @@ pub async fn post(
                 };
                 db_document_request.update(conn, update)?;
 
-                let info = newtypes::DocumentUploadedInfo {
+                let info = newtypes::IdentityDocumentUploadedInfo {
                     id: identity_document.id.clone(),
                 };
                 UserTimeline::create(conn, info, uvw.vault.id, su_id)?;
@@ -463,7 +463,7 @@ async fn handle_scan_onboarding_request(
                     ..Default::default()
                 };
                 // Create a timeline event
-                let info = newtypes::DocumentUploadedInfo {
+                let info = newtypes::IdentityDocumentUploadedInfo {
                     id: identity_document_id.clone(),
                 };
                 UserTimeline::create(conn, info, user_vault_id, scoped_user_id.clone())?;
@@ -498,7 +498,7 @@ async fn handle_scan_onboarding_request(
                 document_request.update(conn.conn(), completed_update)?;
 
                 // Create a timeline event
-                let info = newtypes::DocumentUploadedInfo {
+                let info = newtypes::IdentityDocumentUploadedInfo {
                     id: identity_document_id,
                 };
                 UserTimeline::create(conn, info, user_vault_id, scoped_user_id)?;

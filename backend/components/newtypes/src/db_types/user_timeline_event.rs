@@ -14,7 +14,7 @@ use strum::EnumDiscriminants;
 #[serde(tag = "kind", content = "data")]
 pub enum DbUserTimelineEvent {
     DataCollected(DataCollectedInfo),
-    DocumentUploaded(DocumentUploadedInfo),
+    IdentityDocumentUploaded(IdentityDocumentUploadedInfo),
     OnboardingDecision(OnboardingDecisionInfo),
     Liveness(LivenessInfo),
     Annotation(AnnotationInfo),
@@ -26,9 +26,9 @@ impl From<DataCollectedInfo> for DbUserTimelineEvent {
     }
 }
 
-impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
-    fn from(s: DocumentUploadedInfo) -> Self {
-        Self::DocumentUploaded(s)
+impl From<IdentityDocumentUploadedInfo> for DbUserTimelineEvent {
+    fn from(s: IdentityDocumentUploadedInfo) -> Self {
+        Self::IdentityDocumentUploaded(s)
     }
 }
 
@@ -61,7 +61,7 @@ pub struct BiometricRegisteredInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DocumentUploadedInfo {
+pub struct IdentityDocumentUploadedInfo {
     pub id: IdentityDocumentId,
 }
 

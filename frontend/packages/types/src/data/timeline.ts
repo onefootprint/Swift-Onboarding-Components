@@ -10,7 +10,7 @@ export enum TimelineEventKind {
   kycDataCollected = 'data_collected',
   onboardingDecision = 'onboarding_decision',
   liveness = 'liveness',
-  idDocUploaded = 'document_uploaded',
+  idDocUploaded = 'identity_document_uploaded',
 }
 
 export type CollectedKycDataEvent = {

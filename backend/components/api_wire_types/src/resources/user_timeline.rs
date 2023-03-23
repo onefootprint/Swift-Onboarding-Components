@@ -24,7 +24,7 @@ export_schema!(UserTimeline);
 pub enum UserTimelineEvent {
     DataCollected(DataCollectedInfo),
     Liveness(LivenessEvent),
-    DocumentUploaded(IdentityDocumentTimelineEvent),
+    IdentityDocumentUploaded(IdentityDocumentTimelineEvent),
     OnboardingDecision {
         decision: OnboardingDecision,
         annotation: Option<Annotation>,

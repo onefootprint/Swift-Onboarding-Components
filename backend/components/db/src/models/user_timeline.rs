@@ -49,7 +49,7 @@ pub struct NewUserTimeline {
 pub enum SaturatedTimelineEvent {
     DataCollected(newtypes::DataCollectedInfo),
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
-    DocumentUploaded((IdentityDocument, DocumentRequest)),
+    IdentityDocumentUploaded((IdentityDocument, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
     Annotation(AnnotationInfo),
 }
@@ -148,7 +148,7 @@ impl UserTimeline {
         });
 
         let identity_document_ids = results.iter().flat_map(|ut| match ut.event {
-            DbUserTimelineEvent::DocumentUploaded(ref e) => Some(&e.id),
+            DbUserTimelineEvent::IdentityDocumentUploaded(ref e) => Some(&e.id),
             _ => None,
         });
 
@@ -190,11 +190,13 @@ impl UserTimeline {
                                 .transpose()?,
                         )
                     }
-                    DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
-                        identity_documents_and_requests
-                            .remove(&e.id)
-                            .ok_or(DbError::RelatedObjectNotFound)?,
-                    ),
+                    DbUserTimelineEvent::IdentityDocumentUploaded(ref e) => {
+                        SaturatedTimelineEvent::IdentityDocumentUploaded(
+                            identity_documents_and_requests
+                                .remove(&e.id)
+                                .ok_or(DbError::RelatedObjectNotFound)?,
+                        )
+                    }
                     DbUserTimelineEvent::Liveness(ref e) => {
                         let (liveness, insight) = liveness_events
                             .remove(&e.id)

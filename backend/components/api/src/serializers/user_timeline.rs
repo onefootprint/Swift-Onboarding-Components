@@ -26,9 +26,11 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::Liveness(l, i) => {
                 Self::Liveness(api_wire_types::LivenessEvent::from_db((l, i)))
             }
-            SaturatedTimelineEvent::DocumentUploaded((id_doc, doc_req)) => Self::DocumentUploaded(
-                api_wire_types::IdentityDocumentTimelineEvent::from_db((id_doc, doc_req)),
-            ), // TODO
+            SaturatedTimelineEvent::IdentityDocumentUploaded((id_doc, doc_req)) => {
+                Self::IdentityDocumentUploaded(api_wire_types::IdentityDocumentTimelineEvent::from_db((
+                    id_doc, doc_req,
+                )))
+            } // TODO
             SaturatedTimelineEvent::OnboardingDecision(
                 (decision, ob_config, vrs, tenant_user),
                 annotation,
