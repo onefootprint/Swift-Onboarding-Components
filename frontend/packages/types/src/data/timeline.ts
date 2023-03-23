@@ -1,5 +1,6 @@
 import { Annotation } from './annotation';
 import { CollectedKycDataOption } from './collected-data-option';
+import { DecryptedIdDocStatus } from './decrypted-id-doc';
 import IdDocType from './id-doc-type';
 import { InsightEvent } from './insight-event';
 import { LivenessAttribute, LivenessSource } from './liveness';
@@ -38,8 +39,11 @@ export type IdDocUploadedEvent = {
 };
 
 export type IdDocUploadedEventData = {
-  // TODO: https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to
-  idDocKind: IdDocType;
+  documentType: IdDocType;
+  id: string;
+  selfieCollected: boolean;
+  status: DecryptedIdDocStatus;
+  timestamp: string;
 };
 
 export type OnboardingDecisionEvent = {

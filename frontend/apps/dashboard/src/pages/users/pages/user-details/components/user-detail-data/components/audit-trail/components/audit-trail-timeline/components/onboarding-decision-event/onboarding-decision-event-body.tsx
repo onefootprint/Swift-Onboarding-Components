@@ -50,7 +50,9 @@ const OnboardingDecisionEventBody = ({
     ];
 
     if (mustCollectIdentityDocument) {
-      collectedDataLabels.push(allT('id-doc-type.id_card'));
+      // TODO: Once we receive the dataIdentifier from the backend, we can use and we won't need to append the prefix anymore`
+      // https://linear.app/footprint/issue/FP-3246/return-dataidentifier-for-timeline-iddoc-document-uploaded?noRedirect=1
+      collectedDataLabels.push(allT('di.id_document.id_card'));
     }
 
     return (

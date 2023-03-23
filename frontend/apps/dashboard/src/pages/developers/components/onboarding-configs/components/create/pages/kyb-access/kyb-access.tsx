@@ -124,7 +124,7 @@ const KybAccess = () => {
                 }
               >
                 <Checkbox
-                  label={allT('id-doc-type.selfie')}
+                  label={allT('cdo.selfie')}
                   {...register(CollectedIdDocumentDataOption.documentAndSelfie)}
                 />
               </AnimatedContainer>

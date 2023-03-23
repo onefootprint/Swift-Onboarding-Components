@@ -13,6 +13,6 @@ type IdDocUploadedEventIconProps = {
 };
 
 const IdDocUploadedEventIcon = ({ data }: IdDocUploadedEventIconProps) =>
-  IconByIdDocType[data.idDocKind] ?? <IcoIdCard16 />;
+  IconByIdDocType[data.documentType] ?? <IcoIdCard16 />;
 
 export default IdDocUploadedEventIcon;
