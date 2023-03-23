@@ -50,7 +50,7 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
     // sentry layer 
     let sentry_layer = sentry_tracing::layer().event_filter(|md| match *md.level() {
         tracing::Level::ERROR => sentry_tracing::EventFilter::Exception,
-        tracing::Level::DEBUG => sentry_tracing::EventFilter::Breadcrumb
+        tracing::Level::DEBUG => sentry_tracing::EventFilter::Breadcrumb,
         tracing::Level::INFO => sentry_tracing::EventFilter::Event,
         _ => sentry_tracing::EventFilter::Ignore,
     });
