@@ -8,6 +8,7 @@ use crate::utils::vault_wrapper::{Business, Person};
 use crate::State;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::contact_info::{ContactInfo, NewContactInfoArgs};
+use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault_data::VaultData;
@@ -198,7 +199,9 @@ impl WriteableVw<Person> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_user_id.clone();
 
-        // TODO: remove Dataliftime constraint on document.* so we can suppport multiple docs at once
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        DataLifetime::bulk_deactivate_speculative(conn, &su_id, vec![kind.into()], seqno)?;
+
         let doc = DocumentData::create(
             conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key,
         )?;

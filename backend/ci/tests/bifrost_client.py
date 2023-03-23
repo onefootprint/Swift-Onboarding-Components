@@ -182,7 +182,11 @@ class BifrostClient:
         )
 
     def onboard_user_onto_tenant(
-        self, tenant, add_business_data=False, investor_profile=None, document_file=None
+        self,
+        tenant,
+        add_business_data=False,
+        investor_profile=None,
+        document_files=None,
     ):
         """
         Onboards a user onto a tenant. See individual methods for more information
@@ -198,8 +202,8 @@ class BifrostClient:
         self.add_identity_data()
         if investor_profile:
             self.add_investor_profile(investor_profile)
-        if document_file:
-            self.upload_document(document_file)
+        if document_files:
+            [self.upload_document(d) for d in document_files]
         if add_business_data:
             self.add_business_data()
         self.register_biometric_credentials()

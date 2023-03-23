@@ -11,7 +11,7 @@ from tests.bifrost_client import BifrostClient
 from tests.dashboard.test_investor_profile import sb_user_with_investor_profile
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def sandbox_user(investor_profile_ob_config, twilio):
     bifrost_client = BifrostClient(investor_profile_ob_config)
     auth_token = bifrost_client.init_user_for_onboarding(twilio)
@@ -114,7 +114,7 @@ class TestDocuments:
         user = sandbox_user.onboard_user_onto_tenant(
             sandbox_tenant,
             investor_profile=ip_data,
-            document_file=multipart_file("example_pdf.pdf", "application/pdf"),
+            document_files=[multipart_file("example_pdf.pdf", "application/pdf")],
         )
 
         res = post(
@@ -127,7 +127,7 @@ class TestDocuments:
             raw_response=True,
         )
         assert "application/pdf" == res.headers["content-type"]
-        assert (file_contents("example_pdf.pdf"), res.content)
+        assert file_contents("example_pdf.pdf") == res.content
 
         timeline = get(
             f"/users/{user.fp_user_id}/timeline", None, sandbox_tenant.sk.key
@@ -137,5 +137,30 @@ class TestDocuments:
         ]
         assert len(doc_upload_events) == 1
         assert (
-            "finra_compliance_letter" == doc_upload_events[0]["event"]["data"]["kind"]
+            "document.finra_compliance_letter"
+            == doc_upload_events[0]["event"]["data"]["identifier"]
         )
+
+    # Case where user re-uploads the same doc (ie uploaded the wrong doc and uploads a new corrected version)
+    def test_reupload(self, sandbox_user, ip_data, sandbox_tenant):
+        user = sandbox_user.onboard_user_onto_tenant(
+            sandbox_tenant,
+            investor_profile=ip_data,
+            document_files=[
+                multipart_file("example_pdf.pdf", "application/pdf"),
+                multipart_file("example_pdf2.pdf", "application/pdf"),
+            ],
+        )
+
+        res = post(
+            f"/users/{user.fp_user_id}/vault/document/decrypt",
+            {
+                "kind": "document.finra_compliance_letter",
+                "reason": "show me",
+            },
+            sandbox_tenant.sk.key,
+            raw_response=True,
+        )
+
+        assert file_contents("example_pdf2.pdf") == res.content
+        assert file_contents("example_pdf.pdf") != res.content
