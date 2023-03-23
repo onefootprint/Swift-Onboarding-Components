@@ -13,9 +13,8 @@ use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
 use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataIdentifier, DataLifetimeKind, DataRequest, DocumentKind,
-    IdentityDataKind as IDK, IsDataIdentifierDiscriminant, KvDataKey, ScopedVaultId, SealedVaultDataKey,
-    VaultId, VaultPublicKey, VdKind,
+    CollectedDataOption, DataCollectedInfo, DataIdentifier, DataRequest, DocumentKind,
+    IdentityDataKind as IDK, KvDataKey, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
 };
 use std::collections::HashMap;
 
@@ -32,6 +31,12 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         update: DataRequest<KvDataKey>,
     ) -> ApiResult<()> {
+        let update = update
+            .into_inner()
+            .into_iter()
+            .map(|(k, v)| (k.into(), v))
+            .collect();
+        let update = DataRequest(update);
         self.update_data_unsafe(conn, update, HashMap::new())?;
         Ok(())
     }
@@ -46,8 +51,6 @@ impl WriteableVw<Person> {
         id_fingerprints: NewFingerprints<IDK>,
     ) -> ApiResult<Vec<NewContactInfo>> {
         request.assert_no_business_data()?;
-
-        // TODO combine the DB queries to add custom data and id data
         let DecomposedPutRequest {
             keys,
             id_update,
@@ -55,24 +58,22 @@ impl WriteableVw<Person> {
             custom_data,
             business_data: _,
         } = request;
-
-        // Update custom data
-        if !custom_data.is_empty() {
-            self.update_data_unsafe(conn, custom_data, HashMap::new())?;
-        }
+        // TODO get rid of this ugly re-merging after we already split the data apart
+        let all_data = id_update
+            .into_inner()
+            .into_iter()
+            .map(|(k, v)| (k.into(), v))
+            .chain(ip_update.into_inner().into_iter().map(|(k, v)| (k.into(), v)))
+            .chain(custom_data.into_inner().into_iter().map(|(k, v)| (k.into(), v)))
+            .collect();
+        let all_data: DataRequest<DataIdentifier> = DataRequest(all_data);
 
         // Update VaultData
-        let new_contact_info = if !id_update.is_empty() {
-            self.update_data_unsafe(conn, id_update, id_fingerprints)?
+        let new_contact_info = if !all_data.is_empty() {
+            self.update_data_unsafe(conn, all_data, id_fingerprints)?
         } else {
             vec![]
         };
-
-        // Update IP data
-        if !ip_update.is_empty() {
-            self.update_data_unsafe(conn, ip_update, HashMap::new())?;
-        }
-
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys)?;
 
@@ -96,15 +97,16 @@ impl WriteableVw<Business> {
             custom_data,
             business_data,
         } = request;
+        // TODO get rid of this ugly re-merging after we already split the data apart
+        let all_data = business_data
+            .into_inner()
+            .into_iter()
+            .map(|(k, v)| (k.into(), v))
+            .chain(custom_data.into_inner().into_iter().map(|(k, v)| (k.into(), v)))
+            .collect();
+        let all_data: DataRequest<DataIdentifier> = DataRequest(all_data);
 
-        // Update business data
-        if !business_data.is_empty() {
-            self.update_data_unsafe(conn, business_data, HashMap::new())?; // TODO fingerprints
-        }
-        // Update custom data
-        if !custom_data.is_empty() {
-            self.update_data_unsafe(conn, custom_data, HashMap::new())?;
-        }
+        self.update_data_unsafe(conn, all_data, HashMap::new())?; // TODO fingerprints
 
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys)?;
@@ -114,25 +116,19 @@ impl WriteableVw<Business> {
 }
 
 impl<Type> WriteableVw<Type> {
-    fn update_data_unsafe<T>(
+    fn update_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        update: DataRequest<T>,
-        fingerprints: NewFingerprints<T>,
-    ) -> ApiResult<Vec<NewContactInfo>>
-    where
-        T: IsDataIdentifierDiscriminant + Into<VdKind>,
-        DataLifetimeKind: From<T>,
-    {
+        update: DataRequest<DataIdentifier>,
+        fingerprints: NewFingerprints<IDK>,
+    ) -> ApiResult<Vec<NewContactInfo>> {
         let existing_fields = self.populated_dis();
         let v = self.vault();
 
         // Don't allow replacing a committed phone/email yet
         let irreplaceable_idks = vec![IDK::PhoneNumber, IDK::Email];
         for idk in irreplaceable_idks {
-            let update_has_idk = update
-                .keys()
-                .any(|id| Into::<VdKind>::into(id.clone()) == idk.into());
+            let update_has_idk = update.keys().any(|id| id == &DataIdentifier::from(idk));
             let vault_already_has_idk = self.portable.get(idk).is_some();
             if update_has_idk && vault_already_has_idk {
                 // We don't currently support adding a phone/email

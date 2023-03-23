@@ -11,7 +11,8 @@ type RawDataRequest<T> = HashMap<T, PiiString>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// Validated DataRequest of T -> PiiString where T is a subet of DataIdentifier
-pub struct DataRequest<T>(RawDataRequest<T>);
+// TODO don't make this `pub` - should require validation to create this
+pub struct DataRequest<T>(pub RawDataRequest<T>);
 
 impl<T> DataRequest<T> {
     pub fn into_inner(self) -> RawDataRequest<T> {

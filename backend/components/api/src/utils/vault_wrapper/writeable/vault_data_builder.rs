@@ -12,8 +12,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataIdentifier, DataLifetimeKind, DataRequest, IsDataIdentifierDiscriminant,
-    PiiString, ScopedVaultId, VaultId, VaultPublicKey, VdKind,
+    CollectedDataOption, DataIdentifier, DataLifetimeKind, DataRequest,
+    ScopedVaultId, VaultId, VaultPublicKey, IdentityDataKind as IDK,
 };
 
 /// Helps to process updates for data in a DataRequest<T>.
@@ -21,37 +21,28 @@ pub struct VaultDataBuilder {
     data: Vec<NewVaultData>,
 }
 
-impl VaultDataBuilder
-{
-    /// Construct the list of NewVaultData from a DataRequest<T>
-    pub fn build<T>(update: DataRequest<T>, vault_public_key: VaultPublicKey) -> ApiResult<Self> 
-    where
-        T: IsDataIdentifierDiscriminant + Into<VdKind>,
-        DataLifetimeKind: From<T> {
-        let mut data = vec![];
 
-        let mut add_sealed = |pii: PiiString, kind: T| -> ApiResult<()> {
-            let sealed = vault_public_key.seal_pii(&pii)?;
-            data.push(NewVaultData { kind: kind.into(), e_data: sealed });
-            Ok(())
-        };
+impl VaultDataBuilder {
+    /// Construct the list of NewVaultData from a DataRequest<T>
+    pub fn build(update: DataRequest<DataIdentifier>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
+        let mut data = vec![];
         for (kind, pii) in update.into_inner() {
-            add_sealed(pii, kind)?;
+            let sealed = vault_public_key.seal_pii(&pii)?;
+            data.push(NewVaultData { kind: kind.try_into().map_err(newtypes::Error::from)?, e_data: sealed });
         }
 
         Ok(Self { data })
     }
 
     /// Validates that the pending updates are valid and then saves them to the DB as speculative data
-    pub fn validate_and_save<T>(
+    pub fn validate_and_save(
         self,
         conn: &mut TxnPgConn,
         existing_fields: Vec<DataIdentifier>, // portable or speculative on UVW
         user_vault_id: VaultId,
         scoped_user_id: ScopedVaultId,
-        fingerprints: NewFingerprints<T>,
-    ) -> ApiResult<Vec<VaultData>> 
-    where T: Into<VdKind> + Clone {
+        fingerprints: NewFingerprints<IDK>, // should eventually support more than just IDK fingerprints
+    ) -> ApiResult<Vec<VaultData>> {
         // First, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
         let new_fields = self.data.iter().map(|d| d.kind.clone()).collect_vec();
@@ -90,14 +81,13 @@ impl VaultDataBuilder
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let fingerprints: Vec<_> = fingerprints
             .into_iter()
-            .map(|(kind, sh_data)| -> ApiResult<_> {
-                let vd_kind = kind.into();
+            .map(|(idk, sh_data)| -> ApiResult<_> {
                 Ok(NewFingerprint {
-                    kind: DataLifetimeKind::from(vd_kind.clone()),
+                    kind: DataLifetimeKind::from(idk),
                     sh_data,
                     lifetime_id: vds
                         .iter()
-                        .find(|vd| vd.kind == vd_kind)
+                        .find(|vd| vd.kind == idk.into())
                         .map(|vd| vd.lifetime_id.clone())
                         .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?,
                     is_unique: false,
