@@ -1,14 +1,37 @@
 import { CoreSecurityGroups } from './sg';
 import * as aws from '@pulumi/aws';
-import { Region } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
 import * as pulumi from '@pulumi/pulumi';
 import { Config } from './config';
-import * as random from '@pulumi/random';
 import { StaticSecrets } from './secrets';
 import { FootprintVpc, Vpc } from './vpc';
 import { EngineType } from '@pulumi/aws/rds';
 import * as inputs from '@pulumi/aws/types';
+
+// TODO maybe enable idle_session_timeout for certain users in interactive sessions via /connect_db.sh
+const DEFAULT_PG_PARAMETERS = [
+  // Kill queries that have a deadlock detected after 1s
+  {
+    name: 'deadlock_timeout',
+    value: '1000', // 1s
+  },
+  // Kill connections that have a transaction open for 60m
+  {
+    name: 'idle_in_transaction_session_timeout',
+    value: '3600000', // 60m
+  },
+  // Set an unreasonably high cap on the number of connections (the default is more unreasonably high)
+  {
+    name: 'max_connections',
+    value: '500',
+    applyMethod: 'pending-reboot',
+  },
+  // Don't allow any singular query to run for more than 1m. Long-running query workloads will need to override this.
+  {
+    name: 'statement_timeout',
+    value: '300000', // 5m
+  },
+];
 
 export type DbConfig = {
   protectDeletion: boolean;
@@ -68,6 +91,24 @@ export async function CreateDB(
   const subnet = new aws.rds.SubnetGroup(`${clusterIdentifier}-subnet-group`, {
     subnetIds: vpc.privateSubnetIds,
   });
+
+  // TODO use this in the db cluster
+  const clusterParameterGroup = new aws.rds.ClusterParameterGroup(
+    'fpc-pg-cluster',
+    {
+      family: 'aurora-postgresql14',
+      parameters: DEFAULT_PG_PARAMETERS,
+    },
+  );
+
+  // TODO use this in the db instances
+  const instanceParameterGroup = new aws.rds.ClusterParameterGroup(
+    'fpc-pg-instance',
+    {
+      family: 'aurora-postgresql14',
+      parameters: DEFAULT_PG_PARAMETERS,
+    },
+  );
 
   const db = new aws.rds.Cluster(`aurora-v2-${clusterIdentifier}`, {
     clusterIdentifier: `${clusterIdentifier}`,
