@@ -96,7 +96,7 @@ use strum::Display;
 #[derive(Debug, Display)]
 pub enum DataValidationError {
     /// There are additional data identifiers provided that aren't part of any CDO
-    ExtraFieldError(Vec<(CollectedData, DataIdentifier)>),
+    ExtraFieldError(Vec<DataIdentifier>),
     /// One or more data identifiers weren't able to be verified
     FieldValidationError(HashMap<DataIdentifier, Error>),
 }
@@ -130,10 +130,8 @@ impl DataValidationError {
         let err = match self {
             Self::ExtraFieldError(x) => x
                 .iter()
-                .map(|(cd, di): &(_, DataIdentifier)| {
-                    let err_str = format!("Cannot vault without other {} data", cd);
-                    (di.to_string(), err_str)
-                })
+                .filter_map(|di| di.parent().map(|cd| (di, cd)))
+                .map(|(di, cd)| (di.to_string(), format!("Cannot vault without other {} data", cd)))
                 .collect(),
             Self::FieldValidationError(x) => x.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
         };

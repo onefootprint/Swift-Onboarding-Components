@@ -13,7 +13,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataIdentifier, DataLifetimeKind, DataRequest,
-    ScopedVaultId, VaultId, VaultPublicKey, IdentityDataKind as IDK,
+    ScopedVaultId, VaultId, VaultPublicKey, IdentityDataKind as IDK, DataValidationError,
 };
 
 /// Helps to process updates for data in a DataRequest<T>.
@@ -43,10 +43,19 @@ impl VaultDataBuilder {
         scoped_user_id: ScopedVaultId,
         fingerprints: NewFingerprints<IDK>, // should eventually support more than just IDK fingerprints
     ) -> ApiResult<Vec<VaultData>> {
-        // First, validate that we're not overwriting any full data with partial data.
+        let new_dis = self.data.iter().map(|d| DataIdentifier::from(d.kind.clone())).collect_vec();
+
+        // First, validate that there are no "dangling" extra keys after we apply the write to the
+        // user vault.
+        // This allows us to only update, say, id.first_name as long as the vault already has id.last_name
+        let full_dis = existing_fields.iter().chain(new_dis.iter()).cloned().collect();
+        let dangling_keys_after_write = CollectedDataOption::dangling_identifiers(full_dis);
+        if !dangling_keys_after_write.is_empty() {
+            return Err(newtypes::Error::from(DataValidationError::ExtraFieldError(dangling_keys_after_write)).into());
+        }
+
+        // Next, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
-        let new_fields = self.data.iter().map(|d| d.kind.clone()).collect_vec();
-        let new_dis = new_fields.clone().into_iter().map(DataIdentifier::from).collect_vec();
         let existing_cdos = CollectedDataOption::list_from(existing_fields);
         let new_cdos = CollectedDataOption::list_from(new_dis);
         let offending_partial_cdo =
@@ -63,9 +72,7 @@ impl VaultDataBuilder {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
         let overwrite_kinds = new_cdos.iter().flat_map(|cdo| cdo.data_identifiers().unwrap_or_default().into_iter().filter_map(|di| DataLifetimeKind::try_from(di).ok()));
-        let added_kinds = new_fields
-            .into_iter()
-            .map(DataLifetimeKind::from);
+        let added_kinds = self.data.iter().map(|nvd| DataLifetimeKind::from(nvd.kind.clone()));
         let kinds_to_deactivate = added_kinds
             // Even if we're not providing all fields for a CDO, deactivate old versions of all
             // fields in the CDO. For example, address line 2

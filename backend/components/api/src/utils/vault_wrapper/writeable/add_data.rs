@@ -76,9 +76,6 @@ impl<Type> WriteableVw<Type> {
         update: DataRequest,
         fingerprints: NewFingerprints<IDK>,
     ) -> ApiResult<Vec<VaultData>> {
-        let existing_fields = self.populated_dis();
-        let v = self.vault();
-
         // Don't allow replacing a committed phone/email yet
         let irreplaceable_idks = vec![IDK::PhoneNumber, IDK::Email];
         for idk in irreplaceable_idks {
@@ -91,11 +88,11 @@ impl<Type> WriteableVw<Type> {
         }
 
         // Add the data
-        let builder = VaultDataBuilder::build(update, v.public_key.clone())?;
+        let builder = VaultDataBuilder::build(update, self.vault().public_key.clone())?;
         let vds = builder.validate_and_save(
             conn,
-            existing_fields, // not all logic uses this
-            v.id.clone(),
+            self.populated_dis(),
+            self.vault().id.clone(),
             self.scoped_user_id.clone(),
             fingerprints,
         )?;
