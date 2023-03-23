@@ -196,6 +196,7 @@ pub async fn setup_test_fixtures(
                 (DecisionStatus::Fail, false) => vec![
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SsnIssuedPriorToDob,
+                    FootprintReasonCode::IdNotLocated,
                 ],
                 // Manual review
                 (DecisionStatus::Fail, true) => vec![
@@ -204,8 +205,12 @@ pub async fn setup_test_fixtures(
                 ],
                 // Approved
                 (DecisionStatus::Pass, _) => vec![
-                    FootprintReasonCode::PhoneNumberLocatedIsVoip,
                     FootprintReasonCode::EmailDomainCorporate,
+                    FootprintReasonCode::AddressMatches,
+                    FootprintReasonCode::SsnMatches,
+                    FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
+                    FootprintReasonCode::NameLastMatches,
+                    FootprintReasonCode::PhoneNumberMatches,
                 ],
             };
             let signals = reason_codes

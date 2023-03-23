@@ -290,7 +290,7 @@ footprint_reason_code_enum! {
         #[note = "Private email domain", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Email], description = "The domain of the email address has been identified as belonging to a private individual."]
         EmailDomainPrivate,
 
-        #[note = "Corporate email domain", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Email], description = "The domain of the email address has been identified as belonging to a corporate entity."]
+        #[note = "Corporate email domain", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Email], description = "The domain of the email address has been identified as belonging to a corporate entity."]
         EmailDomainCorporate,
 
         #[note = "Email recently verified", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Email], description = "The email address is high risk because it was only recently verified in our databases."]
