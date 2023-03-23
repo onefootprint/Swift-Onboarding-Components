@@ -24,23 +24,24 @@ class FootprintIframe {
 
   private handleIframeLoaded = () => {
     removeLoader();
+    this.child?.frame.classList.remove('footprint-modal-loading');
+    this.child?.frame.classList.add('footprint-modal-loaded');
   };
 
   async open(url: string, userData?: UserData) {
     const container = createContainer();
     showOverlay(container);
     this.child = await new Postmate({
-      classListArray: ['footprint-modal'],
+      classListArray: ['footprint-modal', 'footprint-modal-loading'],
       container,
       name: 'footprint-iframe',
       url,
     });
-    this.handleIframeLoaded();
     this.child.frame.setAttribute(
       'allow',
       'otp-credentials; publickey-credentials-get *; camera *;',
     );
-
+    this.handleIframeLoaded();
     this.child.on(FootprintPublicEvent.closed, () => this.close());
     this.child.on(FootprintInternalEvent.started, () => {
       this.bootstrap(userData);

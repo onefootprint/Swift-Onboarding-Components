@@ -1,4 +1,5 @@
 const footprintClassNamesMap = {
+  container: '#layout-container',
   button: '.fp-button',
   input: '.fp-input',
   label: '.fp-label',

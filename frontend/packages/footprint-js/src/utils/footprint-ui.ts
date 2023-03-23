@@ -1,44 +1,6 @@
-import type { FootprintAppearance } from '../footprint-js.types';
-
 const CONTAINER_ID = 'footprint-container';
 const OVERLAY_ID = 'footprint-overlay';
 const LOADING_INDICATOR_ID = 'footprint-loading-indicator';
-const CUSTOM_STYLES_ID = 'footprint-custom-styles';
-
-const injectStylesToCurrentPage = (styles: string) => {
-  if (typeof window === 'undefined') return;
-  const prevStyle = document.getElementById(CUSTOM_STYLES_ID);
-  if (prevStyle) {
-    prevStyle.remove();
-  }
-  const style = document.createElement('style');
-  style.setAttribute('id', 'footprint-custom-styles');
-  style.textContent = styles;
-  document.head.append(style);
-};
-
-const addStyleRule = (selector: string, value?: any) =>
-  value ? `${selector}: ${value}` : '';
-
-export const injectStyles = ({ variables = {} }: FootprintAppearance) => {
-  injectStylesToCurrentPage(`
-    :root {
-      ${addStyleRule('--fp-fp-button-height', variables.fpButtonHeight)}
-      ${addStyleRule(
-        '--fp-fp-button-border-radius',
-        variables.fpButtonBorderRadius,
-      )}
-      ${addStyleRule('--fp-loading-bg', variables.loadingBg)}
-      ${addStyleRule('--fp-loading-color', variables.loadingColor)}
-      ${addStyleRule(
-        '--fp-loading-border-radius',
-        variables.loadingBorderRadius,
-      )}
-      ${addStyleRule('--fp-loading-padding', variables.loadingPadding)}
-      ${addStyleRule('--fp-overlay-bg', variables.overlayBg)}
-    }
-  `);
-};
 
 export const createButton = (container?: HTMLElement): HTMLButtonElement => {
   if (!container) {

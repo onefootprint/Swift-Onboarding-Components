@@ -13,28 +13,7 @@ export type FootprintAppearanceParams = {
   variables?: FootprintAppearanceVariables;
 };
 
-export type FootprintAppearanceVariables = FootprintMainStyles &
-  FootprintExternalStyles;
-
-export type FootprintAppearanceTheme = 'light' | 'dark';
-
-export type FootprintAppearanceRules = Partial<{
-  button: CSS.Properties;
-  'button:hover': CSS.Properties;
-  'button:focus': CSS.Properties;
-  'button:active': CSS.Properties;
-  input: CSS.Properties;
-  'input:hover': CSS.Properties;
-  'input:focus': CSS.Properties;
-  'input:active': CSS.Properties;
-  label: CSS.Properties;
-  hint: CSS.Properties;
-  link: CSS.Properties;
-  'link:hover': CSS.Properties;
-  'link:active': CSS.Properties;
-}>;
-
-export type FootprintMainStyles = Partial<{
+export type FootprintAppearanceVariables = Partial<{
   // globals
   borderRadius: CSS.Property.BorderRadius;
   colorError: CSS.Property.Color;
@@ -141,14 +120,23 @@ export type FootprintMainStyles = Partial<{
   dropdownFooterBg: CSS.Property.Background;
 }>;
 
-export type FootprintExternalStyles = Partial<{
-  fpButtonHeight: CSS.Property.Height;
-  fpButtonBorderRadius: CSS.Property.Height;
-  loadingBg: CSS.Property.Background;
-  loadingColor: CSS.Property.Color;
-  loadingBorderRadius: CSS.Property.BorderRadius;
-  loadingPadding: CSS.Property.Padding;
-  overlayBg: CSS.Property.Background;
+export type FootprintAppearanceTheme = 'light' | 'dark';
+
+export type FootprintAppearanceRules = Partial<{
+  container: CSS.Properties;
+  button: CSS.Properties;
+  'button:hover': CSS.Properties;
+  'button:focus': CSS.Properties;
+  'button:active': CSS.Properties;
+  input: CSS.Properties;
+  'input:hover': CSS.Properties;
+  'input:focus': CSS.Properties;
+  'input:active': CSS.Properties;
+  label: CSS.Properties;
+  hint: CSS.Properties;
+  link: CSS.Properties;
+  'link:hover': CSS.Properties;
+  'link:active': CSS.Properties;
 }>;
 
 export type FootprintAppearance = {

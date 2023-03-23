@@ -29,19 +29,9 @@ export const getAppearanceStyles = ({
   variables = {},
   rules = {},
 }: FootprintAppearanceParams = {}) => {
-  const {
-    fpButtonBorderRadius,
-    fpButtonHeight,
-    loadingBg,
-    loadingBorderRadius,
-    loadingColor,
-    loadingPadding,
-    overlayBg,
-    ...remainingStyles
-  } = variables;
   const getVariables = () =>
-    Object.keys(remainingStyles).length
-      ? encodeURIComponent(JSON.stringify(remainingStyles))
+    Object.keys(variables).length
+      ? encodeURIComponent(JSON.stringify(variables))
       : undefined;
 
   const getRules = () =>

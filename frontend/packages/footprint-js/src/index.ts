@@ -11,8 +11,6 @@ export type {
   FootprintAppearanceRules,
   FootprintAppearanceTheme,
   FootprintAppearanceVariables,
-  FootprintExternalStyles,
-  FootprintMainStyles,
   FootprintShowParams,
   OpenFootprint,
   UserData,

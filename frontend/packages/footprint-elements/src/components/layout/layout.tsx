@@ -80,6 +80,7 @@ const Body = styled.div`
     padding: ${theme.spacing[5]};
     display: flex;
     flex-direction: column;
+    position: relative;
 
     ${media.greaterThan('md')`
       padding: 0 ${theme.spacing[7]} ${theme.spacing[7]};
