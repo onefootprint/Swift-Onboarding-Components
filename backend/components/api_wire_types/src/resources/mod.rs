@@ -69,3 +69,6 @@ pub use self::proxy_config::*;
 
 pub mod webhook_portal;
 pub use self::webhook_portal::*;
+
+pub mod document_upload_timeline_event;
+pub use self::document_upload_timeline_event::*;

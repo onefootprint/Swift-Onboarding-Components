@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_vault::ScopedVault;
@@ -9,11 +11,13 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::DbUserTimelineEventKind;
+use newtypes::DocumentDataId;
 use newtypes::VendorAPI;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
+use super::document_data::DocumentData;
 use super::document_request::DocumentRequest;
 use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
@@ -52,6 +56,7 @@ pub enum SaturatedTimelineEvent {
     IdentityDocumentUploaded((IdentityDocument, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
     Annotation(AnnotationInfo),
+    DocumentUploaded(DocumentData),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -152,6 +157,11 @@ impl UserTimeline {
             _ => None,
         });
 
+        let document_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::DocumentUploaded(ref e) => Some(&e.id),
+            _ => None,
+        });
+
         let mut decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let mut annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
         let mut liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
@@ -160,6 +170,9 @@ impl UserTimeline {
         let mut vendor_apis_to_include: Vec<VendorAPI> = VendorAPI::iter()
             .filter(|v| !matches!(v, &VendorAPI::SocureIDPlus))
             .collect();
+
+        let mut documents: HashMap<DocumentDataId, DocumentData> =
+            DocumentData::get_bulk(conn, document_ids.collect())?;
 
         if tenant_can_view_socure_risk_signal {
             vendor_apis_to_include.push(VendorAPI::SocureIDPlus)
@@ -210,6 +223,9 @@ impl UserTimeline {
                             .ok_or(DbError::RelatedObjectNotFound)?;
                         SaturatedTimelineEvent::Annotation(annotation)
                     }
+                    DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
+                        documents.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
+                    ),
                 };
                 // This will actually display that events from different ob configs at the same
                 // tenant belong to a different tenant. Probably okay.

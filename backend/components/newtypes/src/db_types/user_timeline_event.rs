@@ -1,6 +1,6 @@
 use crate::{
-    AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId, OnboardingDecisionId,
-    WebauthnCredentialId,
+    AnnotationId, CollectedDataOption, DocumentDataId, IdentityDocumentId, LivenessEventId,
+    OnboardingDecisionId, WebauthnCredentialId,
 };
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -18,6 +18,7 @@ pub enum DbUserTimelineEvent {
     OnboardingDecision(OnboardingDecisionInfo),
     Liveness(LivenessInfo),
     Annotation(AnnotationInfo),
+    DocumentUploaded(DocumentUploadedInfo),
 }
 
 impl From<DataCollectedInfo> for DbUserTimelineEvent {
@@ -50,6 +51,12 @@ impl From<AnnotationInfo> for DbUserTimelineEvent {
     }
 }
 
+impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
+    fn from(s: DocumentUploadedInfo) -> Self {
+        Self::DocumentUploaded(s)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataCollectedInfo {
     pub attributes: Vec<CollectedDataOption>,
@@ -79,4 +86,9 @@ pub struct LivenessInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnnotationInfo {
     pub annotation_id: AnnotationId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DocumentUploadedInfo {
+    pub id: DocumentDataId,
 }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::schema::data_lifetime;
 use crate::schema::document_data;
 use crate::DbResult;
@@ -88,6 +90,21 @@ impl DocumentData {
             .optional()?;
 
         Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_bulk(
+        conn: &mut PgConn,
+        ids: Vec<&DocumentDataId>,
+    ) -> DbResult<HashMap<DocumentDataId, DocumentData>> {
+        let results = document_data::table
+            .filter(document_data::id.eq_any(ids))
+            .get_results::<DocumentData>(conn)?
+            .into_iter()
+            .map(|d| (d.id.clone(), d))
+            .collect();
+
+        Ok(results)
     }
 }
 

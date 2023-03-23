@@ -46,6 +46,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::Annotation(annotation_info) => {
                 Self::Annotation(api_wire_types::Annotation::from_db(annotation_info))
             }
+            SaturatedTimelineEvent::DocumentUploaded(d) => {
+                Self::DocumentUploaded(api_wire_types::DocumentUploadedTimelineEvent::from_db(d))
+            }
         }
     }
 }

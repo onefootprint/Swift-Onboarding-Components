@@ -5,6 +5,7 @@ from tests.utils import (
     get_requirement_from_requirements,
     file_contents,
     multipart_file,
+    get,
 )
 from tests.bifrost_client import BifrostClient
 from tests.dashboard.test_investor_profile import sb_user_with_investor_profile
@@ -127,3 +128,14 @@ class TestDocuments:
         )
         assert "application/pdf" == res.headers["content-type"]
         assert (file_contents("example_pdf.pdf"), res.content)
+
+        timeline = get(
+            f"/users/{user.fp_user_id}/timeline", None, sandbox_tenant.sk.key
+        )
+        doc_upload_events = [
+            e for e in timeline if e["event"]["kind"] == "document_uploaded"
+        ]
+        assert len(doc_upload_events) == 1
+        assert (
+            "finra_compliance_letter" == doc_upload_events[0]["event"]["data"]["kind"]
+        )

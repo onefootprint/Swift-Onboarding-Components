@@ -11,11 +11,12 @@ use db::models::contact_info::{ContactInfo, NewContactInfoArgs};
 use db::models::document_data::DocumentData;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault_data::VaultData;
-use db::TxnPgConn;
+use db::{DbError, PgConn, TxnPgConn};
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentKind,
-    IdentityDataKind as IDK, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
+    CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
+    DocumentKind, DocumentUploadedInfo, IdentityDataKind as IDK, ScopedVaultId, SealedVaultDataKey, VaultId,
+    VaultPublicKey, VdKind,
 };
 use std::collections::HashMap;
 
@@ -195,13 +196,25 @@ impl WriteableVw<Person> {
         s3_url: String,
     ) -> ApiResult<DocumentData> {
         let vault_id = self.vault.id.clone();
-        let su_id = self.scoped_user_id;
+        let su_id = self.scoped_user_id.clone();
 
         // TODO: remove Dataliftime constraint on document.* so we can suppport multiple docs at once
-        Ok(DocumentData::create(
+        let doc = DocumentData::create(
             conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key,
-        )?)
-        // TODO: whoopsie timeline events are CDO-specific so gunna be a little non-trivial to make for doc uploads
+        )?;
+
+        self.add_document_uploaded_timeline_event(conn, doc.id.clone())?;
+
+        Ok(doc)
+    }
+
+    fn add_document_uploaded_timeline_event(
+        &self,
+        conn: &mut PgConn,
+        doc_id: DocumentDataId,
+    ) -> Result<(), DbError> {
+        let info = DocumentUploadedInfo { id: doc_id };
+        UserTimeline::create(conn, info, self.vault().id.clone(), self.scoped_user_id.clone())
     }
 }
 
