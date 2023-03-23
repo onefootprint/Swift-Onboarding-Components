@@ -205,6 +205,7 @@ define_newtype_id!(WebhookServiceId, String, "Identifier for a webhook service")
 define_newtype_id!(TaskId, String, "Identifier for a task");
 define_newtype_id!(DocumentDataId, String, "Identifier for a DocumentData");
 define_newtype_id!(DecisionIntentId, String, "Identifier for a decision_intent");
+define_newtype_id!(WatchlistCheckId, String, "Identifier for a watchlist_check");
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

@@ -727,6 +727,23 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    watchlist_check (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        scoped_vault_id -> Text,
+        task_id -> Text,
+        decision_intent_id -> Text,
+        status -> Text,
+        logic_git_hash -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     webauthn_credential (id) {
         id -> Text,
         user_vault_id -> Text,
@@ -796,6 +813,9 @@ joinable!(verification_request -> decision_intent (decision_intent_id));
 joinable!(verification_request -> identity_document (identity_document_id));
 joinable!(verification_request -> scoped_user (scoped_user_id));
 joinable!(verification_result -> verification_request (request_id));
+joinable!(watchlist_check -> decision_intent (decision_intent_id));
+joinable!(watchlist_check -> scoped_user (scoped_vault_id));
+joinable!(watchlist_check -> task (task_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
 joinable!(webauthn_credential -> user_vault (user_vault_id));
 
@@ -844,5 +864,6 @@ allow_tables_to_appear_in_same_query!(
     user_vault_data,
     verification_request,
     verification_result,
+    watchlist_check,
     webauthn_credential,
 );

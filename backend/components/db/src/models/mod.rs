@@ -37,4 +37,5 @@ pub mod vault;
 pub mod vault_data;
 pub mod verification_request;
 pub mod verification_result;
+pub mod watchlist_check;
 pub mod webauthn_credential;
