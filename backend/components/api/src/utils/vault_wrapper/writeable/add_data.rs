@@ -11,10 +11,9 @@ use db::models::contact_info::ContactInfo;
 use db::models::document_data::DocumentData;
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
-use newtypes::put_data_request::DecomposedPutRequest;
 use newtypes::{
     CollectedDataOption, DataCollectedInfo, DataIdentifier, DataRequest, DocumentKind,
-    IdentityDataKind as IDK, KvDataKey, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
+    IdentityDataKind as IDK, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
 };
 use std::collections::HashMap;
 
@@ -23,54 +22,21 @@ type NewContactInfo = (DataIdentifier, ContactInfo);
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
 /// we have built the VaultWrapper for a specific tenant.
 /// These are the publically accessible utils to update data on a VaultWrapper.
-/// They use the private, xxx_unsafe methods, which cannot be exposed publically because they don't
+/// They use the private, update_data_unsafe method, which cannot be exposed publically because they don't
 /// take ownership over the VaultWrapper that is potentially stale after an update
-impl<Type> WriteableVw<Type> {
-    pub fn update_custom_data(
-        self, // consume self, since we don't want stale data getting used
-        conn: &mut TxnPgConn,
-        update: DataRequest<KvDataKey>,
-    ) -> ApiResult<()> {
-        let update = update
-            .into_inner()
-            .into_iter()
-            .map(|(k, v)| (k.into(), v))
-            .collect();
-        let update = DataRequest(update);
-        self.update_data_unsafe(conn, update, HashMap::new())?;
-        Ok(())
-    }
-}
-
 impl WriteableVw<Person> {
     /// Util function to make updates to multiple pieces of the Vault in one transaction
     pub fn put_person_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        request: DecomposedPutRequest,
+        request: DataRequest,
         id_fingerprints: NewFingerprints<IDK>,
     ) -> ApiResult<Vec<NewContactInfo>> {
         request.assert_no_business_data()?;
-        let DecomposedPutRequest {
-            keys,
-            id_update,
-            ip_update,
-            custom_data,
-            business_data: _,
-        } = request;
-        // TODO get rid of this ugly re-merging after we already split the data apart
-        let all_data = id_update
-            .into_inner()
-            .into_iter()
-            .map(|(k, v)| (k.into(), v))
-            .chain(ip_update.into_inner().into_iter().map(|(k, v)| (k.into(), v)))
-            .chain(custom_data.into_inner().into_iter().map(|(k, v)| (k.into(), v)))
-            .collect();
-        let all_data: DataRequest<DataIdentifier> = DataRequest(all_data);
-
         // Update VaultData
-        let new_contact_info = if !all_data.is_empty() {
-            self.update_data_unsafe(conn, all_data, id_fingerprints)?
+        let keys = request.keys().cloned().collect();
+        let new_contact_info = if !request.is_empty() {
+            self.update_data_unsafe(conn, request, id_fingerprints)?
         } else {
             vec![]
         };
@@ -86,28 +52,13 @@ impl WriteableVw<Business> {
     pub fn put_business_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        request: DecomposedPutRequest,
+        request: DataRequest,
     ) -> ApiResult<()> {
         // Error if trying to add person data to business vault
         request.assert_no_id_data()?;
-        let DecomposedPutRequest {
-            keys,
-            id_update: _,
-            ip_update: _,
-            custom_data,
-            business_data,
-        } = request;
-        // TODO get rid of this ugly re-merging after we already split the data apart
-        let all_data = business_data
-            .into_inner()
-            .into_iter()
-            .map(|(k, v)| (k.into(), v))
-            .chain(custom_data.into_inner().into_iter().map(|(k, v)| (k.into(), v)))
-            .collect();
-        let all_data: DataRequest<DataIdentifier> = DataRequest(all_data);
-
-        self.update_data_unsafe(conn, all_data, HashMap::new())?; // TODO fingerprints
-
+        let keys = request.keys().cloned().collect();
+        // TODO fingerprints
+        self.update_data_unsafe(conn, request, HashMap::new())?;
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys)?;
 
@@ -119,7 +70,7 @@ impl<Type> WriteableVw<Type> {
     fn update_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        update: DataRequest<DataIdentifier>,
+        update: DataRequest,
         fingerprints: NewFingerprints<IDK>,
     ) -> ApiResult<Vec<NewContactInfo>> {
         let existing_fields = self.populated_dis();
@@ -172,7 +123,7 @@ mod test {
         utils::vault_wrapper::{Person, WriteableVw},
     };
     use db::TxnPgConn;
-    use newtypes::{put_data_request::PutDataRequest, DataIdentifier, Fingerprint, ParseOptions, PiiString};
+    use newtypes::{DataIdentifier, DataRequest, Fingerprint, ParseOptions, PiiString};
     use std::collections::HashMap;
 
     impl WriteableVw<Person> {
@@ -182,15 +133,18 @@ mod test {
             conn: &mut TxnPgConn,
             data: Vec<(DataIdentifier, PiiString)>,
         ) -> ApiResult<()> {
-            let request = PutDataRequest::from(HashMap::from_iter(data.into_iter()));
             let opts = ParseOptions {
                 for_bifrost: true,
                 allow_extra_field_errors: false,
             };
-            let request = request.decompose(opts)?;
+            let data = HashMap::from_iter(data.into_iter());
+            let request = DataRequest::clean_and_validate(data, opts)?;
             let fingerprints = request
-                .id_update
                 .keys()
+                .filter_map(|di| match di {
+                    DataIdentifier::Id(idk) => Some(idk),
+                    _ => None,
+                })
                 .map(|idk| (*idk, Fingerprint(vec![])))
                 .collect();
             self.put_person_data(conn, request, fingerprints)?;

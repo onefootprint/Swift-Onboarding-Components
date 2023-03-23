@@ -1,4 +1,6 @@
-use crate::{CollectedDataOption, DataIdentifier, IsDataIdentifierDiscriminant, PiiString};
+use crate::{
+    CollectedDataOption, DataIdentifier, Error, IdentityDataKind as IDK, PiiString, Validate, VdKind,
+};
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
 use itertools::Itertools;
@@ -6,16 +8,13 @@ use std::clone::Clone;
 use std::collections::{HashMap, HashSet};
 
 type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
-/// Unvalidated data request, a HashMap of T -> PiiString where T is a subset of DataIdentifier
-type RawDataRequest<T> = HashMap<T, PiiString>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
-/// Validated DataRequest of T -> PiiString where T is a subet of DataIdentifier
-// TODO don't make this `pub` - should require validation to create this
-pub struct DataRequest<T>(pub RawDataRequest<T>);
+/// A parsed and validated DataRequest of DataIdentifier -> PiiString
+pub struct DataRequest(DataIdentifierRequest);
 
-impl<T> DataRequest<T> {
-    pub fn into_inner(self) -> RawDataRequest<T> {
+impl DataRequest {
+    pub fn into_inner(self) -> DataIdentifierRequest {
         self.0
     }
 }
@@ -30,26 +29,41 @@ pub struct ParseOptions {
     pub allow_extra_field_errors: bool,
 }
 
-impl<T> DataRequest<T>
-where
-    T: IsDataIdentifierDiscriminant,
-{
+impl DataRequest {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
-    pub fn new(map: DataIdentifierRequest, opts: ParseOptions) -> NtResult<(Self, DataIdentifierRequest)> {
-        let (data, other_data): (HashMap<_, _>, HashMap<_, _>) =
+    pub fn clean_and_validate(map: DataIdentifierRequest, opts: ParseOptions) -> NtResult<Self> {
+        let mut map = map;
+        // Custom logic to always populate ssn4 if ssn9 is provided
+        if let Some(ssn9) = map.get(&IDK::Ssn9.into()) {
+            #[allow(clippy::map_entry)]
+            if !map.contains_key(&IDK::Ssn4.into()) {
+                let ssn4 = PiiString::new(ssn9.leak().chars().skip(ssn9.leak().len() - 4).collect());
+                map.insert(IDK::Ssn4.into(), ssn4);
+            }
+        }
+
+        let (data, err_data): (HashMap<_, _>, HashMap<_, _>) =
             map.into_iter()
-                .partition_map(|(k, v)| match T::try_from(k.clone()) {
-                    Ok(identifier) => Left((identifier, v)),
+                .partition_map(|(k, v)| match VdKind::try_from(k.clone()) {
+                    // Only take the data that fits in the Vd table
+                    // TODO should we make the DataRequest a VdKind -> PiiString
+                    Ok(_) => Left((k, v)),
                     Err(_) => Right((k, v)),
                 });
+        if let Some(k) = err_data.into_iter().next() {
+            return Err(Error::Custom(format!("Cannot put key {}", k.0)));
+        }
 
-        let clean_id_data = Self::clean_and_validate_data(data, opts)?;
-        let id_update = Self(clean_id_data);
-        Ok((id_update, other_data))
+        let clean_data = Self::clean_and_validate_data(data, opts)?;
+        let update = Self(clean_data);
+        Ok(update)
     }
 
-    fn clean_and_validate_data(data: RawDataRequest<T>, opts: ParseOptions) -> NtResult<RawDataRequest<T>> {
+    fn clean_and_validate_data(
+        data: DataIdentifierRequest,
+        opts: ParseOptions,
+    ) -> NtResult<DataIdentifierRequest> {
         // Make sure all keys provided are parts of coherent CollectedDataOptions.
         // For ex, can't specify FirstName without LastName
         // TODO this validation should happen at write time - you should be able to add only a last name if the full name already exists in the vault
@@ -57,7 +71,7 @@ where
             let keys = data.keys().cloned().collect_vec();
             let extra_dis = Self::extra_keys(keys)
                 .into_iter()
-                .filter_map(|x| x.parent().map(|p| (p, x.into())))
+                .filter_map(|x| x.parent().map(|p| (p, x)))
                 .collect_vec();
             if !extra_dis.is_empty() {
                 return Err(DataValidationError::ExtraFieldError(extra_dis).into());
@@ -69,7 +83,7 @@ where
             data.into_iter()
                 .partition_map(|(k, v)| match k.validate(v, opts.for_bifrost) {
                     Ok(v) => Left((k, v)),
-                    Err(v) => Right((k.into(), v)),
+                    Err(v) => Right((k, v)),
                 });
         if !errors.is_empty() {
             return Err(DataValidationError::FieldValidationError(errors).into());
@@ -80,21 +94,52 @@ where
 
     /// Calculates the unnecessary keys that aren't part of any coherent CDO.
     /// For example, if you provide FirstName without LastName, we can't save only your FirstName
-    fn extra_keys(keys: Vec<T>) -> Vec<T> {
+    fn extra_keys(keys: Vec<DataIdentifier>) -> Vec<DataIdentifier> {
         // Get all the CDOs represented in here
-        let dis = keys.clone().into_iter().map(|x| x.into()).collect();
-        let cdos = CollectedDataOption::list_from(dis);
-        let represented_identifiers: HashSet<T> = cdos.into_iter().flat_map(|cdo| cdo.attributes()).collect();
+        let cdos = CollectedDataOption::list_from(keys.clone());
+        let represented_identifiers: HashSet<_> = cdos
+            .into_iter()
+            .flat_map(|cdo| cdo.data_identifiers().unwrap_or_default())
+            .collect();
         // Keys given minus represented keys
-        let keys: HashSet<T> = keys.into_iter().collect();
+        let keys: HashSet<_> = keys.into_iter().collect();
         keys.difference(&represented_identifiers).cloned().collect_vec()
+    }
+
+    pub fn assert_no_id_data(&self) -> NtResult<()> {
+        let id_keys = self
+            .keys()
+            .filter(|di| matches!(di, DataIdentifier::Id(_) | DataIdentifier::InvestorProfile(_)))
+            .collect();
+        Self::assert_empty(id_keys)?;
+        Ok(())
+    }
+
+    /// Returns an Err if this request contains business data
+    pub fn assert_no_business_data(&self) -> NtResult<()> {
+        let business_keys = self
+            .keys()
+            .filter(|di| matches!(di, DataIdentifier::Business(_)))
+            .collect();
+        Self::assert_empty(business_keys)
+    }
+
+    fn assert_empty(values: Vec<&DataIdentifier>) -> NtResult<()> {
+        if !values.is_empty() {
+            let field_errors = values
+                .into_iter()
+                .map(|di| (di.clone(), Error::IncompatibleDataIdentifier))
+                .collect();
+            return Err(crate::DataValidationError::FieldValidationError(field_errors).into());
+        }
+        Ok(())
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::DataRequest;
-    use crate::IdentityDataKind as IDK;
+    use crate::{DataIdentifier, IdentityDataKind as IDK};
     use itertools::Itertools;
     use std::collections::HashSet;
     use test_case::test_case;
@@ -112,10 +157,12 @@ mod test {
     // Complex with lots of missing fields
     #[test_case(&[AddressLine1, AddressLine2, City, State, FirstName, PhoneNumber, Email, Dob], &[AddressLine1, AddressLine2, City, State, FirstName,])]
     fn test_extra_idks(idks: &[IDK], expected_extra: &[IDK]) {
-        let extra: HashSet<_> = DataRequest::<IDK>::extra_keys(idks.to_vec())
-            .into_iter()
+        let dis = idks.iter().map(|idk| DataIdentifier::from(*idk)).collect();
+        let expected = expected_extra
+            .iter()
+            .map(|idk| DataIdentifier::from(*idk))
             .collect();
-        let expected: HashSet<_> = expected_extra.iter().cloned().collect();
+        let extra: HashSet<_> = DataRequest::extra_keys(dis).into_iter().collect();
         assert!(extra.symmetric_difference(&expected).collect_vec().is_empty())
     }
 }

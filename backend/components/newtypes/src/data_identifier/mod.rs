@@ -120,6 +120,34 @@ impl DataIdentifier {
             Self::IdDocument(_) | Self::Selfie(_) => false,
         }
     }
+
+    pub fn parent(&self) -> Option<CollectedData> {
+        match self {
+            Self::Id(s) => s.parent(),
+            Self::Custom(s) => s.parent(),
+            Self::Business(s) => s.parent(),
+            Self::InvestorProfile(s) => s.parent(),
+            Self::Document(s) => s.parent(),
+            // TODO
+            Self::IdDocument(_) | Self::Selfie(_) => None,
+        }
+    }
+}
+
+impl Validate for DataIdentifier {
+    fn validate(&self, value: crate::PiiString, for_bifrost: bool) -> crate::NtResult<crate::PiiString> {
+        match self {
+            Self::Id(s) => s.validate(value, for_bifrost),
+            Self::Custom(s) => s.validate(value, for_bifrost),
+            Self::Business(s) => s.validate(value, for_bifrost),
+            Self::InvestorProfile(s) => s.validate(value, for_bifrost),
+            Self::Document(s) => s.validate(value, for_bifrost),
+            // TODO
+            Self::IdDocument(_) | Self::Selfie(_) => Err(crate::Error::Custom(
+                "Cannot use to validate id doc or selfie".to_owned(),
+            )),
+        }
+    }
 }
 
 /// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.

@@ -5,7 +5,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
-use newtypes::put_data_request::PutDataRequest;
+use newtypes::put_data_request::RawDataRequest;
 use newtypes::ParseOptions;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -15,7 +15,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 )]
 #[actix::post("/hosted/business/vault/validate")]
 pub async fn post_validate(
-    request: Json<PutDataRequest>,
+    request: Json<RawDataRequest>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
@@ -23,7 +23,7 @@ pub async fn post_validate(
         for_bifrost: true,
         allow_extra_field_errors: false,
     };
-    let request = request.into_inner().decompose(opts)?;
+    let request = request.into_inner().clean_and_validate(opts)?;
     request.assert_no_id_data()?;
 
     EmptyResponse::ok().json()
@@ -36,7 +36,7 @@ pub async fn post_validate(
 #[actix::put("/hosted/business/vault")]
 pub async fn put(
     state: web::Data<State>,
-    request: Json<PutDataRequest>,
+    request: Json<RawDataRequest>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
@@ -44,7 +44,7 @@ pub async fn put(
         for_bifrost: true,
         allow_extra_field_errors: false,
     };
-    let request = request.into_inner().decompose(opts)?;
+    let request = request.into_inner().clean_and_validate(opts)?;
 
     state
         .db_pool

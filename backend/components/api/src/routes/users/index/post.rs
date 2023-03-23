@@ -16,7 +16,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use itertools::Itertools;
-use newtypes::put_data_request::PutDataRequest;
+use newtypes::put_data_request::RawDataRequest;
 use newtypes::AccessEventKind;
 use newtypes::ParseOptions;
 use newtypes::VaultKind;
@@ -29,7 +29,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 #[post("/users")]
 pub async fn post(
     state: web::Data<State>,
-    request: Option<Json<PutDataRequest>>,
+    request: Option<Json<RawDataRequest>>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::User>>, ApiError> {
@@ -55,8 +55,8 @@ pub async fn post(
                 for_bifrost: false,
                 allow_extra_field_errors: false,
             };
-            let request = request.decompose(opts)?;
-            let fingerprints = build_fingerprints(&state, request.id_update.clone()).await?;
+            let request = request.clean_and_validate(opts)?;
+            let fingerprints = build_fingerprints(&state, request.clone()).await?;
             Some((targets, request, fingerprints))
         } else {
             None

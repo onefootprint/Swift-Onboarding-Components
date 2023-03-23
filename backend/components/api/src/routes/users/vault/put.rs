@@ -10,7 +10,7 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use newtypes::put_data_request::PutDataRequest;
+use newtypes::put_data_request::RawDataRequest;
 use newtypes::{AccessEventKind, FootprintUserId, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
@@ -21,7 +21,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 #[actix::post("/users/{footprint_user_id}/vault/validate")]
 pub async fn post_validate(
     _path: Path<FootprintUserId>,
-    request: Json<PutDataRequest>,
+    request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     tenant_auth.check_guard(TenantGuard::Admin)?;
@@ -29,7 +29,7 @@ pub async fn post_validate(
         for_bifrost: false,
         allow_extra_field_errors: false,
     };
-    let request = request.into_inner().decompose(opts)?;
+    let request = request.into_inner().clean_and_validate(opts)?;
     request.assert_no_business_data()?;
 
     EmptyResponse::ok().json()
@@ -43,7 +43,7 @@ pub async fn post_validate(
 pub async fn put(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
-    request: Json<PutDataRequest>,
+    request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -61,8 +61,8 @@ pub async fn put(
         for_bifrost: false,
         allow_extra_field_errors: false,
     };
-    let request = request.into_inner().decompose(opts)?;
-    let fingerprints = build_fingerprints(&state, request.id_update.clone()).await?;
+    let request = request.into_inner().clean_and_validate(opts)?;
+    let fingerprints = build_fingerprints(&state, request.clone()).await?;
 
     state
         .db_pool

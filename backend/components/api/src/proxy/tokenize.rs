@@ -12,7 +12,6 @@ use itertools::Itertools;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
-use newtypes::KvDataKey;
 use newtypes::ParseOptions;
 use newtypes::PiiString;
 use std::collections::HashMap;
@@ -73,13 +72,13 @@ pub async fn vault_pii(
                         targets: custom.keys().cloned().collect(),
                     }
                     .create(conn)?;
-                    // TODO could technically now support vaulting any kind of data instead of just custom
+                    // TODO could technically now support vaulting any kind of data instead of just custom. Just need to fingerprint data too
                     let opts = ParseOptions {
                         for_bifrost: false,
                         allow_extra_field_errors: false,
                     };
-                    let (data, _) = DataRequest::<KvDataKey>::new(custom, opts)?;
-                    uvw.update_custom_data(conn, data)?
+                    let data = DataRequest::clean_and_validate(custom, opts)?;
+                    uvw.put_person_data(conn, data, HashMap::new())?;
                 }
 
                 Ok(())

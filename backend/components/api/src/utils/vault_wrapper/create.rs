@@ -7,8 +7,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::vault::{NewVaultArgs, NewVaultInfo};
 use db::TxnPgConn;
-use newtypes::put_data_request::PutDataRequest;
-use newtypes::{DataIdentifier, Fingerprint, SealedVaultBytes};
+use newtypes::{DataIdentifier, DataRequest, Fingerprint, SealedVaultBytes};
 use newtypes::{IdentityDataKind as IDK, PiiString, VaultKind};
 use newtypes::{Locked, ParseOptions};
 use std::collections::HashMap;
@@ -44,14 +43,12 @@ impl VaultWrapper<Person> {
         let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
 
         // Add the phone number to the vault since it was used to create it
-        let request = PutDataRequest::from(HashMap::from_iter(
-            [(IDK::PhoneNumber.into(), phone_number)].into_iter(),
-        ));
+        let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
         let opts = ParseOptions {
             for_bifrost: true,
             allow_extra_field_errors: false,
         };
-        let request = request.decompose(opts)?;
+        let request = DataRequest::clean_and_validate(data, opts)?;
         let fingerprint = HashMap::from_iter([(IDK::PhoneNumber, sh_phone_number)]);
         let new_ci = uvw.put_person_data(conn, request, fingerprint)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned

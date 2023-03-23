@@ -24,7 +24,7 @@ pub struct VaultDataBuilder {
 
 impl VaultDataBuilder {
     /// Construct the list of NewVaultData from a DataRequest<T>
-    pub fn build(update: DataRequest<DataIdentifier>, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
+    pub fn build(update: DataRequest, vault_public_key: VaultPublicKey) -> ApiResult<Self> {
         let mut data = vec![];
         for (kind, pii) in update.into_inner() {
             let sealed = vault_public_key.seal_pii(&pii)?;

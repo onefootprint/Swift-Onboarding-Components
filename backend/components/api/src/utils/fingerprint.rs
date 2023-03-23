@@ -1,24 +1,30 @@
 use std::collections::HashMap;
 
 use futures::TryFutureExt;
-use newtypes::{DataRequest, Fingerprint, Fingerprinter, SaltedFingerprint};
+use newtypes::{DataIdentifier, DataRequest, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 
 use crate::{errors::ApiResult, State};
 
 pub type NewFingerprints<T> = HashMap<T, Fingerprint>;
 
-/// Computes the fingerprints for a provided DataRequest<T>
+/// Computes the fingerprints for a provided DataRequest
+/// TODO: move this closer to parsing of DataRequest
 #[tracing::instrument(skip_all)]
-pub async fn build_fingerprints<T>(state: &State, update: DataRequest<T>) -> ApiResult<NewFingerprints<T>>
-where
-    T: SaltedFingerprint + Send + std::hash::Hash + std::cmp::Eq + Copy,
-{
-    let fut_fingerprints = update.into_inner().into_iter().map(|(kind, pii)| {
-        let pii = pii.clean_for_fingerprint();
-        state
-            .compute_fingerprint(kind, pii)
-            .map_ok(move |sh_data| (kind, sh_data))
-    });
+pub async fn build_fingerprints(state: &State, update: DataRequest) -> ApiResult<NewFingerprints<IDK>> {
+    let fut_fingerprints = update
+        .into_inner()
+        .into_iter()
+        .filter_map(|(di, pii)| match di {
+            // Only fingerprint ID data for now
+            DataIdentifier::Id(idk) => Some((idk, pii)),
+            _ => None,
+        })
+        .map(|(idk, pii)| {
+            let pii = pii.clean_for_fingerprint();
+            state
+                .compute_fingerprint(idk, pii)
+                .map_ok(move |sh_data| (idk, sh_data))
+        });
     let fingerprints = futures::future::try_join_all(fut_fingerprints)
         .await?
         .into_iter()

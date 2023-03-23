@@ -211,6 +211,7 @@ impl CollectedDataOption {
 
     /// Maps the CDO to the list of Ts represented by the CDO, if self represents T. Otherwise,
     /// returns an empty list.
+    /// TODO can I rm?
     pub fn attributes<T>(&self) -> Vec<T>
     where
         T: IsDataIdentifierDiscriminant,
