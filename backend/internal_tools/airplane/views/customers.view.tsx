@@ -1,22 +1,13 @@
 import {
   Stack,
   Table,
-  Title,
   useComponentState,
-  CodeInput,
+  Checkbox,
   Card,
-  Text,
-  TextInput,
-  Code,
   Button,
-  useTaskQuery,
-  useTaskMutation,
-  Loader,
-  Chart,
   Label,
 } from '@airplane/views';
 
-import { useState } from 'react';
 import airplane from 'airplane';
 
 const Customers = () => {
@@ -32,7 +23,7 @@ const Customers = () => {
       ) : (
         <></>
       )}
-      <Signups></Signups>
+      <Logins></Logins>
     </Stack>
   );
 };
@@ -43,7 +34,9 @@ const OrgList = () => {
       id="customers"
       title="Customers"
       defaultPageSize={25}
-      columns={[{ accessor: '_created_at', label: 'created', type: 'date' }]}
+      columns={[
+        { accessor: '_created_at', label: 'created', type: 'datetime' },
+      ]}
       task={{
         slug: 'dbquery',
         params: {
@@ -113,20 +106,49 @@ const OrgUsers = ({ tenantId }: OrgUserProps) => {
   );
 };
 
-const Signups = () => {
+//
+const Logins = () => {
+  const { id: checkboxId, value: checkboxState } = useComponentState();
+  const extraFilters = checkboxState
+    ? `
+          AND tenant_user.email NOT LIKE '%@gmail.com'
+          AND tenant_user.email NOT LIKE '%@yahoo.com'
+          AND tenant_user.email NOT LIKE '%@live.com'
+          AND tenant_user.email NOT LIKE '%@msn.com'
+          AND tenant_user.email NOT LIKE '%@hotmail.com'
+          AND tenant_user.email NOT LIKE '%@aol.com'
+          AND tenant_user.email NOT LIKE '%@outlook.com'
+          `
+    : '';
   return (
-    <Table
-      id="signups"
-      title="Dashboard Sign-ups"
-      defaultPageSize={25}
-      columns={[
-        { accessor: 'created_at', label: 'joined', type: 'date' },
-        { accessor: 'last_login_at', label: 'last active', type: 'date' },
-      ]}
-      task={{
-        slug: 'dbquery',
-        params: {
-          query: `
+    <Stack>
+      <h1>Recent activity</h1>
+      <Label>
+        Below is a list of users who have signed up for the dashboard - order by
+        "last active" to see who has been active most recently.
+      </Label>
+      <Checkbox id={checkboxId} label="Only corporate email domains"></Checkbox>
+      <Table
+        id="signups"
+        title="Dashboard Logins (corporate emails only)"
+        defaultPageSize={25}
+        columns={[
+          { accessor: 'email', label: 'Email', type: 'string' },
+          { accessor: 'created_at', label: 'Joined on', type: 'datetime' },
+          {
+            accessor: 'last_login_at',
+            label: 'Last dashboard login at',
+            type: 'datetime',
+          },
+          { accessor: 'org', label: 'Tenant name', type: 'string' },
+          { accessor: 'first_name', label: 'First name', type: 'string' },
+          { accessor: 'last_name', label: 'Last name', type: 'string' },
+          { accessor: 'org_id', label: 'tenant_id', type: 'string' },
+        ]}
+        task={{
+          slug: 'dbquery',
+          params: {
+            query: `
           SELECT
             tenant_user.email,
             trb.created_at,
@@ -138,12 +160,14 @@ const Signups = () => {
           FROM tenant_user
             INNER JOIN tenant_rolebinding as trb ON trb.tenant_user_id=tenant_user.id
             INNER JOIN tenant on tenant.id=trb.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it%' AND tenant_user.email NOT LIKE '%@onefootprint.com'
+          WHERE tenant.id NOT LIKE '_private_it%'
+          AND tenant_user.email NOT LIKE '%@onefootprint.com' ${extraFilters}
           ORDER BY trb.created_at DESC;
           `,
-        },
-      }}
-    ></Table>
+          },
+        }}
+      ></Table>
+    </Stack>
   );
 };
 
