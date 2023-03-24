@@ -111,7 +111,7 @@ class TestVaultProxy:
             "custom.cc4": "4242",
             **user_data,
         }
-        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev"
@@ -166,7 +166,7 @@ class TestVaultProxy:
             "custom.test_field": "hello world",
             **user_data,
         }
-        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev:8443"
@@ -231,7 +231,7 @@ class TestVaultProxy:
             "custom.test_field": "hello world",
             **user_data,
         }
-        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev"
@@ -262,7 +262,7 @@ class TestVaultProxy:
         assert result["data"]["card_number"] == f"{fp_id}.custom.card_number"
 
         data = dict(reason="test", fields=["custom.card_number"])
-        response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+        response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["custom.card_number"] == "12345678910"
 
     def test_proxy_config(self, sandbox_tenant):
@@ -284,7 +284,7 @@ class TestVaultProxy:
             "custom.message": "hello world",
             **user_data,
         }
-        put(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # fire the proxy request
         data = {
@@ -322,7 +322,7 @@ class TestVaultProxy:
         assert result["msg"] == "hello world"
 
         data = dict(reason="test", fields=["custom.card_number"])
-        response = post(f"users/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+        response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["custom.card_number"] == "4242424242424242424"
 
     def test_get_patch_deactivate_proxy_config(self, sandbox_tenant):

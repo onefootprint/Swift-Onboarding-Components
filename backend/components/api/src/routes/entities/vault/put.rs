@@ -16,10 +16,20 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[api_v2_operation(
     description = "Checks if provided data is valid before adding it to the vault",
-    tags(Vault, PublicApi, Users)
+    tags(Vault, PublicApi, Entities)
 )]
-#[actix::post("/users/{footprint_user_id}/vault/validate")]
+#[actix::post("/entities/{fp_id}/vault/validate")]
 pub async fn post_validate(
+    state: web::Data<State>,
+    path: Path<FootprintUserId>,
+    request: Json<RawDataRequest>,
+    tenant_auth: SecretTenantAuthContext,
+) -> JsonApiResponse<EmptyResponse> {
+    let result = post_validate_inner(state, path, request, tenant_auth).await?;
+    Ok(result)
+}
+
+pub async fn post_validate_inner(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<RawDataRequest>,
@@ -51,9 +61,9 @@ pub async fn post_validate(
 
 #[api_v2_operation(
     description = "Updates data in a user vault. Can be used to update `id.` data or `custom.` data, but `id.` data can only be specified for user vaults created via API.",
-    tags(Vault, PublicApi, Users)
+    tags(Vault, PublicApi, Entities)
 )]
-#[actix::put("/users/{footprint_user_id}/vault")]
+#[actix::put("/entities/{fp_id}/vault")]
 pub async fn put(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -61,7 +71,18 @@ pub async fn put(
     tenant_auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let footprint_user_id = path.into_inner();
+    let result = put_inner(state, path, request, tenant_auth, insight).await?;
+    Ok(result)
+}
+
+pub async fn put_inner(
+    state: web::Data<State>,
+    path: Path<FootprintUserId>,
+    request: Json<RawDataRequest>,
+    tenant_auth: SecretTenantAuthContext,
+    insight: InsightHeaders,
+) -> JsonApiResponse<EmptyResponse> {
+    let fp_id = path.into_inner();
     let insight = CreateInsightEvent::from(insight);
 
     // TODO what permissions do we need to add data to vault? Any API key will be able to right now
@@ -79,7 +100,7 @@ pub async fn put(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
             uvw.put_person_data(conn, request, fingerprints)?;

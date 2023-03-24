@@ -41,11 +41,11 @@ class TestNonPortableVaultApi:
         fp_id = user["id"]
         assert fp_id
 
-        body = put(f"users/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+        body = put(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
         # Should have a JSON error message with the invalid field identifier as the key
         assert body["error"]["message"][key] == expected_error
         # Validate endpoint should also fail
-        post(f"users/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
+        post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
 
 def test_vault_create_write_decrypt(tenant):
@@ -66,7 +66,7 @@ def test_vault_create_write_decrypt(tenant):
         "custom.ach_account_number": "123467890",
         "custom.cc4": "4242",
     }
-    put(f"users/{fp_id}/vault", update_data, tenant.sk.key)
+    put(f"entities/{fp_id}/vault", update_data, tenant.sk.key)
 
     # check that the data is there now
     all_data = {
@@ -76,7 +76,7 @@ def test_vault_create_write_decrypt(tenant):
     fields_to_check = [i for i in all_data] + ["custom.insurance_id"]
     params = {"fields": ", ".join(fields_to_check)}
 
-    response = get(f"users/{fp_id}/vault", params, tenant.sk.key)
+    response = get(f"entities/{fp_id}/vault", params, tenant.sk.key)
     for k in all_data:
         assert response[k]
     assert response["custom.insurance_id"] == False
@@ -91,7 +91,7 @@ def test_vault_create_write_decrypt(tenant):
             "custom.cc4",
         ],
     )
-    body = post(f"users/{fp_id}/vault/decrypt", data, tenant.sk.key)
+    body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
     data = body
     assert data["id.first_name"] == "Sandbox"
     assert data["id.zip"] == "10009"

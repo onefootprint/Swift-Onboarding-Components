@@ -41,7 +41,7 @@ def test_tenant_decrypt(sandbox_user):
             "reason": "Doing a hecking decrypt",
         }
         body = post(
-            f"users/{sandbox_user.fp_user_id}/vault/decrypt",
+            f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
             data,
             tenant.sk.key,
         )
@@ -63,7 +63,7 @@ def test_tenant_decrypt_no_permissions(sandbox_user):
         "reason": "Not doing a hecking decrypt",
     }
     post(
-        f"users/{sandbox_user.fp_user_id}/vault/decrypt",
+        f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
         data,
         tenant.sk.key,
         # Uh oh - we should be checking ensure_scope_allows_access
@@ -80,7 +80,7 @@ def test_tenant_decrypt_identity_doc_with_identity_endpoint(sandbox_user):
         "reason": "Let me see the face of the man or woman who wronged me",
     }
     post(
-        f"users/{sandbox_user.fp_user_id}/vault/decrypt",
+        f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
         data,
         tenant.sk.key,
         status_code=400,

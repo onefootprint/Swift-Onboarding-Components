@@ -191,7 +191,7 @@ def test_access_events_list(sandbox_user):
             "reason": "Doing a hecking decrypt",
         }
         body = post(
-            f"users/{sandbox_user.fp_user_id}/vault/decrypt",
+            f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
             data,
             tenant.sk.key,
         )
@@ -232,17 +232,19 @@ def test_update_data_for_portable_user(sandbox_user):
     # Should be allowed to overwrite data for users that onboarded via bifrost
     fp_id = sandbox_user.fp_user_id
     decrypt_req = dict(reason="test", fields=["id.ssn9"])
-    body = post(f"users/{fp_id}/vault/decrypt", decrypt_req, sandbox_user.tenant.sk.key)
+    body = post(
+        f"entities/{fp_id}/vault/decrypt", decrypt_req, sandbox_user.tenant.sk.key
+    )
     assert body["id.ssn9"]
 
     # Even though the vault is portable, we should be able to update the data
     for new_ssn in ["120981234", "098765432"]:
         new_data = {"id.ssn9": new_ssn}
-        put(f"users/{fp_id}/vault", new_data, sandbox_user.tenant.sk.key)
+        put(f"entities/{fp_id}/vault", new_data, sandbox_user.tenant.sk.key)
 
         # Make sure we see the new ssn
         body = post(
-            f"users/{fp_id}/vault/decrypt", decrypt_req, sandbox_user.tenant.sk.key
+            f"entities/{fp_id}/vault/decrypt", decrypt_req, sandbox_user.tenant.sk.key
         )
         assert body["id.ssn9"] == new_ssn
 

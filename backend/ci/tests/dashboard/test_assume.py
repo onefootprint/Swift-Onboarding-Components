@@ -83,11 +83,11 @@ def test_cannot_patch(assumed_token, path):
     [
         # TODO: reinstate this when we require a header
         # (
-        #     "users/some_fp_user_id/vault/decrypt",
+        #     "entities/some_fp_user_id/vault/decrypt",
         #     dict(fields=["id.first_name"], reason="Blah"),
         # ),
         # (
-        #     "users/some_fp_user_id/vault/identity/document/decrypt",
+        #     "entities/some_fp_user_id/vault/identity/document/decrypt",
         #     dict(document_type="passport", reason="blah"),
         # ),
         # (

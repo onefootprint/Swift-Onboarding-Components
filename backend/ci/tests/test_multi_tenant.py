@@ -121,7 +121,7 @@ def test_cant_see_speculative_fingerprints(
         "id.first_name": "New",
         "id.last_name": "Name",
     }
-    put(f"/users/{fp_user_id}/vault", data, sandbox_tenant.sk.key)
+    put(f"/entities/{fp_user_id}/vault", data, sandbox_tenant.sk.key)
 
     for search_query in ["new", "name"]:
         data = dict(search=search_query)
