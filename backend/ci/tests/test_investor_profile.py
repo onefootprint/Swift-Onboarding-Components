@@ -130,7 +130,7 @@ class TestDocuments:
         assert file_contents("example_pdf.pdf") == res.content
 
         timeline = get(
-            f"/users/{user.fp_user_id}/timeline", None, sandbox_tenant.sk.key
+            f"/entities/{user.fp_user_id}/timeline", None, sandbox_tenant.sk.key
         )
         doc_upload_events = [
             e for e in timeline if e["event"]["kind"] == "document_uploaded"

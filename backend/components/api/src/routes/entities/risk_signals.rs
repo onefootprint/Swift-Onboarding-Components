@@ -25,9 +25,9 @@ type RiskSignalsListResponse = Vec<RiskSignalsDetailResponse>;
 
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
-    tags(Users, Preview)
+    tags(Entities, Preview)
 )]
-#[get("/users/{footprint_user_id}/risk_signals")]
+#[get("/entities/{fp_id}/risk_signals")]
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FootprintUserId>,
@@ -37,17 +37,13 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let footprint_user_id = request.into_inner();
+    let fp_id = request.into_inner();
 
     let signals = state
         .db_pool
         .db_query(move |conn| -> ApiResult<Vec<RiskSignal>> {
-            let latest_onboarding_decision = OnboardingDecision::latest_footprint_actor_decision(
-                conn,
-                &footprint_user_id,
-                &tenant_id,
-                is_live,
-            )?;
+            let latest_onboarding_decision =
+                OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
 
             match latest_onboarding_decision {
                 Some(obd) => Ok(RiskSignal::list_by_onboarding_decision_id(conn, &obd.id)?),
@@ -99,9 +95,9 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
 
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
-    tags(Users, Preview)
+    tags(Entities, Preview)
 )]
-#[get("/users/{footprint_user_id}/risk_signals/{signal_id}")]
+#[get("/entities/{fp_id}/risk_signals/{signal_id}")]
 pub async fn get_detail(
     state: web::Data<State>,
     request: web::Path<(FootprintUserId, RiskSignalId)>,
@@ -110,11 +106,11 @@ pub async fn get_detail(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let (footprint_user_id, risk_signal_id) = request.into_inner();
+    let (fp_id, risk_signal_id) = request.into_inner();
 
     let (signal, verification_results) = state
         .db_pool
-        .db_query(move |conn| RiskSignal::get(conn, &risk_signal_id, &footprint_user_id, &tenant_id, is_live))
+        .db_query(move |conn| RiskSignal::get(conn, &risk_signal_id, &fp_id, &tenant_id, is_live))
         .await??;
     let signal = api_wire_types::RiskSignal::from_db((signal, Some(verification_results)));
 

@@ -55,7 +55,7 @@ def assumed_token(tenant, sandbox_tenant_data):
         "org/members",
         "org/roles",
         "org/onboarding_configs",
-        "users",
+        "entities",
         "org/access_events",
     ],
 )
@@ -91,10 +91,10 @@ def test_cannot_patch(assumed_token, path):
         #     dict(document_type="passport", reason="blah"),
         # ),
         # (
-        #     "users/some_fp_user_id/decisions",
+        #     "entities/some_fp_user_id/decisions",
         #     dict(status="pass", annotation=dict(note="", is_pinned=False)),
         # ),
-        # ("users/some_fp_user_id/annotations", dict(note="", is_pinned=False)),
+        # ("entities/some_fp_user_id/annotations", dict(note="", is_pinned=False)),
         (
             "org/onboarding_configs",
             dict(name="", must_collect_data=[], can_access_data=[]),

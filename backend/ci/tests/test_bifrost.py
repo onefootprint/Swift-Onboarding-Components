@@ -377,7 +377,7 @@ class TestBifrost:
         footprint_user_id = body["footprint_user_id"]
         assert footprint_user_id
 
-        body = get(f"users/{footprint_user_id}/timeline", None, tenant.sk.key)
+        body = get(f"entities/{footprint_user_id}/timeline", None, tenant.sk.key)
         assert len(body) > 0
 
     def test_identify_login_repeat_customer_biometric(

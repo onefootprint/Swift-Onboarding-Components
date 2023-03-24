@@ -12,9 +12,9 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
     description = "Allows a tenant to view a customer's registered webauthn credentials.",
-    tags(Users, Preview)
+    tags(Entities, Preview)
 )]
-#[get("/users/{footprint_user_id}/liveness")]
+#[get("/entities/{fp_id}/liveness")]
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FootprintUserId>,
@@ -23,17 +23,12 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let footprint_user_id = request.into_inner();
+    let fp_id = request.into_inner();
 
     let liveness_events = state
         .db_pool
         .db_query(move |conn| {
-            db::models::liveness_event::LivenessEvent::get_for_scoped_user(
-                conn,
-                &footprint_user_id,
-                &tenant_id,
-                is_live,
-            )
+            db::models::liveness_event::LivenessEvent::get_for_scoped_user(conn, &fp_id, &tenant_id, is_live)
         })
         .await??;
 

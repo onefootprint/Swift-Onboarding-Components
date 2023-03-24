@@ -20,9 +20,9 @@ type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 
 #[api_v2_operation(
     description = "Gets the timeline for a user verification trail.",
-    tags(Users, Preview)
+    tags(Entities, Preview)
 )]
-#[get("/users/{footprint_user_id}/timeline")]
+#[get("/entities/{fp_id}/timeline")]
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FootprintUserId>,
@@ -31,7 +31,7 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let footprint_user_id = request.into_inner();
+    let fp_id = request.into_inner();
     // Not all tenants should see socure related risk signals
     let tenant_can_view_socure_risk_signal = state
         .feature_flag_client
@@ -42,7 +42,7 @@ pub async fn get(
         .db_query(move |conn| {
             UserTimeline::list(
                 conn,
-                (&footprint_user_id, &tenant_id, is_live),
+                (&fp_id, &tenant_id, is_live),
                 tenant_can_view_socure_risk_signal,
             )
         })

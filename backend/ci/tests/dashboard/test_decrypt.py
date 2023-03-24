@@ -98,7 +98,7 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
         "reason": "Not doing a hecking decrypt",
     }
     # confirm they didn't auth identity_document
-    get_user_resp = get(f"users/{sandbox_user.fp_user_id}", None, tenant.sk.key)
+    get_user_resp = get(f"entities/{sandbox_user.fp_user_id}", None, tenant.sk.key)
     assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
 
     post(
@@ -114,7 +114,7 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
 def test_tenant_document_get_decrypt_no_permissions(sandbox_user):
     tenant = sandbox_user.tenant
     # confirm they didn't auth identity_document
-    get_user_resp = get(f"users/{sandbox_user.fp_user_id}", None, tenant.sk.key)
+    get_user_resp = get(f"entities/{sandbox_user.fp_user_id}", None, tenant.sk.key)
     assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
 
     get(

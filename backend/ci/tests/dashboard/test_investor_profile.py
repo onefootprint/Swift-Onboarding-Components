@@ -21,7 +21,7 @@ def sb_user_with_investor_profile(
 
 def test_get_vault(sandbox_tenant, sb_user_with_investor_profile, ip_data):
     body = get(
-        f"entities/{sb_user_with_investor_profile.fp_user_id}/vault",
+        f"users/{sb_user_with_investor_profile.fp_user_id}/vault",
         None,
         sandbox_tenant.sk.key,
     )
@@ -50,7 +50,7 @@ def test_decrypt(
         reason="Doing a business hecking decrypt",
     )
     body = post(
-        f"entities/{sb_user_with_investor_profile.fp_user_id}/vault/decrypt",
+        f"users/{sb_user_with_investor_profile.fp_user_id}/vault/decrypt",
         data,
         sandbox_tenant.sk.key,
     )

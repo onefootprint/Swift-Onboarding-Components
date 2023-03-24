@@ -20,12 +20,12 @@ use webhooks::events::WebhookEvent;
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
-    tags(Users, Preview)
+    tags(Entities, Preview)
 )]
-#[post("/users/{fp_user_id}/decisions")]
+#[post("/entities/{fp_id}/decisions")]
 pub async fn post(
     state: web::Data<State>,
-    fp_user_id: web::Path<FootprintUserId>,
+    fp_id: web::Path<FootprintUserId>,
     request: web::Json<DecisionRequest>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -33,8 +33,8 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor();
-    let fp_user_id = fp_user_id.into_inner();
-    let fp_user_id_clone = fp_user_id.clone();
+    let fp_id = fp_id.into_inner();
+    let fp_id_clone = fp_id.clone();
 
     let DecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },
@@ -45,7 +45,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<Option<_>> {
             let (ob, su, manual_review, decision) =
-                Onboarding::lock_for_tenant(conn, &fp_user_id, &tenant_id, is_live)?;
+                Onboarding::lock_for_tenant(conn, &fp_id, &tenant_id, is_live)?;
 
             if !ob.is_complete() {
                 // Can't make a decision on an onboarding that doesn't already have one
@@ -99,7 +99,7 @@ pub async fn post(
         state.webhook_service_client.send_event_to_tenant_non_blocking(
             auth.tenant().id.clone(),
             WebhookEvent::OnboardingStatusChanged(webhooks::events::OnboardingStatusChangedPayload {
-                footprint_user_id: fp_user_id_clone,
+                footprint_user_id: fp_id_clone,
                 timestamp: decision.created_at,
                 new_status: status.into(),
             }),
