@@ -1,9 +1,17 @@
-import { IcoCheck16, Icon } from '@onefootprint/icons';
+import { Icon } from '@onefootprint/icons';
 import { Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
+
+import CustomCheckIcon from './custom-check-icon/custom-check-icon';
+import {
+  firstIconContainerVariants,
+  firstTextContainerVariants,
+  secondIconContainerVariants,
+  secondTextContainerVariants,
+} from './transitions';
 
 type GenericTransitionProps = {
   firstText: string;
@@ -13,9 +21,6 @@ type GenericTransitionProps = {
   timeout: number;
   onAnimationEnd: () => void;
 };
-
-const STEP_DURATION = 3;
-const TRANSITION_DURATION = 0.2;
 
 const GenericTransition = ({
   firstText,
@@ -33,101 +38,37 @@ const GenericTransition = ({
   return (
     <AnimationWrapper>
       <Icons>
-        <FirstIconContainer
-          initial={{
-            opacity: 1,
-            x: '21%',
-            y: '22.5%',
-          }}
-          animate={{
-            opacity: 0,
-            x: '21%',
-            y: 0,
-            display: 'none',
-            transition: {
-              delay: STEP_DURATION,
-              duration: TRANSITION_DURATION,
-              ease: 'easeInOut',
-            },
-          }}
+        <IconContainer
+          variants={firstIconContainerVariants}
+          initial="initial"
+          animate="animate"
         >
-          <CheckContainer
-            initial={{
-              opacity: 0,
-              scale: 1,
-              x: 10,
-              y: -10,
-            }}
-            animate={{
-              opacity: 1,
-              scale: [1.2, 1],
-              x: 10,
-              y: -10,
-              transition: {
-                delay: 1,
-                duration: TRANSITION_DURATION,
-                ease: 'easeInOut',
-              },
-            }}
-          >
-            <IcoCheck16 color="quinary" />
-          </CheckContainer>
           {renderedFirstIcon}
-        </FirstIconContainer>
-        <SecondIconContainer
-          initial={{
-            opacity: 0,
-            x: '21%',
-            y: 0,
-          }}
-          animate={{
-            opacity: 1,
-            x: '21%',
-            y: '22.5%',
-            transition: {
-              delay: STEP_DURATION,
-              duration: TRANSITION_DURATION,
-              ease: 'easeInOut',
-            },
-          }}
+        </IconContainer>
+        <CustomCheckIcon />
+        <IconContainer
+          variants={secondIconContainerVariants}
+          initial="initial"
+          animate="animate"
         >
           {renderedSecondIcon}
-        </SecondIconContainer>
+        </IconContainer>
       </Icons>
       <Text>
-        <FirstTextContainer
-          initial={{
-            opacity: 1,
-            y: 0,
-          }}
-          animate={{
-            opacity: 0,
-            y: -10,
-            transition: {
-              delay: STEP_DURATION,
-              duration: TRANSITION_DURATION,
-              ease: 'easeInOut',
-            },
-          }}
+        <TextContainer
+          variants={firstTextContainerVariants}
+          initial="initial"
+          animate="animate"
         >
           <Typography variant="label-2">{firstText}</Typography>
-        </FirstTextContainer>
-        <SecondTextContainer
-          initial={{
-            opacity: 0,
-            y: 10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: {
-              delay: STEP_DURATION + 0.2,
-              duration: 0.2,
-            },
-          }}
+        </TextContainer>
+        <TextContainer
+          variants={secondTextContainerVariants}
+          initial="initial"
+          animate="animate"
         >
           <Typography variant="label-2">{secondText}</Typography>
-        </SecondTextContainer>
+        </TextContainer>
       </Text>
     </AnimationWrapper>
   );
@@ -149,31 +90,26 @@ const AnimationWrapper = styled(motion.div)`
 
 const Icons = styled.div`
   position: relative;
-  width: 80px;
-  height: 80px;
-`;
-
-const FirstIconContainer = styled(motion.div)`
-  position: absolute;
-  height: 60px;
   width: 60px;
-`;
-
-const SecondIconContainer = styled(motion.div)`
-  position: absolute;
   height: 60px;
-  width: 60px;
 `;
 
-const Text = styled.div`
+const IconContainer = styled(motion.div)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  height: 24px;
-  position: relative;
-  display: absolute;
-  text-align: center;
+  height: 100%;
+
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 `;
 
-const FirstTextContainer = styled(motion.div)`
+const TextContainer = styled(motion.div)`
   height: fit-content;
   position: absolute;
   top: 0;
@@ -181,28 +117,11 @@ const FirstTextContainer = styled(motion.div)`
   width: 100%;
 `;
 
-const SecondTextContainer = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
+const Text = styled.div`
   width: 100%;
-`;
-
-const CheckContainer = styled(motion.div)`
-  ${({ theme }) => css`
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transform: translate(50%, -50%);
-    top: 0;
-    right: 0;
-    background-color: ${theme.color.success};
-    border-radius: ${theme.borderRadius.full};
-    border: ${theme.borderWidth[2]} solid ${theme.backgroundColor.primary};
-    width: 24px;
-    height: 24px;
-  `}
+  height: 24px;
+  position: relative;
+  text-align: center;
 `;
 
 export default GenericTransition;
