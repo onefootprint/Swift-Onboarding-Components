@@ -3,9 +3,8 @@ import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
 import { Radio, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
-import ContinueButton from '../../../../components/continue-button';
+import CustomForm from '../../../../components/custom-form/custom-form';
 import { EmployedByBrokerageData } from '../../../../utils/state-machine/types';
 
 export type BrokerageEmploymentFormProps = {
@@ -27,7 +26,7 @@ const BrokerageEmploymentForm = ({
   isLoading,
   onSubmit,
 }: BrokerageEmploymentFormProps) => {
-  const { t } = useTranslation('pages.brokerage-employment.form');
+  const { t } = useTranslation('pages.brokerage-employment');
   const defaultFirm =
     defaultValues?.[InvestorProfileDI.employedByBrokerageFirm];
   const hasDefaultFirm =
@@ -55,11 +54,16 @@ const BrokerageEmploymentForm = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
-      <OptionsContainer data-private>
-        <Radio value="false" label={t('status.no')} {...register('employed')} />
-        <Radio value="true" label={t('status.yes')} {...register('employed')} />
-      </OptionsContainer>
+    <CustomForm
+      title={t('title')}
+      subtitle={t('subtitle')}
+      isLoading={isLoading}
+      formAttributes={{
+        onSubmit: handleSubmit(handleBeforeSubmit),
+      }}
+    >
+      <Radio value="false" label={t('status.no')} {...register('employed')} />
+      <Radio value="true" label={t('status.yes')} {...register('employed')} />
       {isEmployed === 'true' && (
         <TextInput
           data-private
@@ -72,23 +76,8 @@ const BrokerageEmploymentForm = ({
           })}
         />
       )}
-      <ContinueButton isLoading={isLoading} />
-    </Form>
+    </CustomForm>
   );
 };
-
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[6]};
-  `}
-`;
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default BrokerageEmploymentForm;

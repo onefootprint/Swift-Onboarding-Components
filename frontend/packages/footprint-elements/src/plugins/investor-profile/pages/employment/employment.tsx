@@ -4,7 +4,7 @@ import { InvestorProfileDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { GenericTransition, HeaderTitle } from '../../../../components';
+import { GenericTransition } from '../../../../components';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -16,9 +16,14 @@ const Employment = () => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, showTransition, data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { t, allT } = useTranslation('pages.employment');
+  const { allT } = useTranslation('pages.employment');
   const showToast = useSyncErrorToast();
-  const [showForm, setShowForm] = useState(!showTransition);
+  // Only show the animation if this is the first time we are rendering this page
+  // If user saved data, and navigated prev to this page, don't animate again
+  const hasCollectedData = Object.keys(data).length > 0;
+  const [showAnimation, setShowAnimation] = useState(
+    showTransition && !hasCollectedData,
+  );
 
   const handleSubmit = (employmentData: EmploymentData) => {
     syncData({
@@ -37,14 +42,20 @@ const Employment = () => {
     });
   };
 
-  return showForm ? (
+  return showAnimation ? (
+    <AnimationContainer>
+      <GenericTransition
+        firstIcon={IcoUser40}
+        secondIcon={IcoDollar40}
+        firstText={allT('components.transition-animation.source')}
+        secondText={allT('components.transition-animation.destination')}
+        timeout={5500}
+        onAnimationEnd={() => setShowAnimation(false)}
+      />
+    </AnimationContainer>
+  ) : (
     <>
       <InvestorProfileNavigationHeader />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        sx={{ marginBottom: 7 }}
-      />
       <EmploymentForm
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
@@ -53,17 +64,6 @@ const Employment = () => {
         }}
       />
     </>
-  ) : (
-    <AnimationContainer>
-      <GenericTransition
-        firstIcon={IcoUser40}
-        secondIcon={IcoDollar40}
-        firstText={allT('components.transition-animation.source')}
-        secondText={allT('components.transition-animation.destination')}
-        timeout={5500}
-        onAnimationEnd={() => setShowForm(true)}
-      />
-    </AnimationContainer>
   );
 };
 

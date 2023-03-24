@@ -1,8 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
-import { HeaderTitle } from '../../../../components';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -11,7 +9,6 @@ import { InvestmentGoalsData } from '../../utils/state-machine/types';
 import InvestmentGoalsForm from './components/investment-goals-form';
 
 const InvestmentGoals = () => {
-  const { t } = useTranslation('pages.investment-goals');
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -37,11 +34,6 @@ const InvestmentGoals = () => {
   return (
     <>
       <InvestorProfileNavigationHeader />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        sx={{ marginBottom: 7 }}
-      />
       <InvestmentGoalsForm
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}

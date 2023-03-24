@@ -93,7 +93,7 @@ const createCollectInvestorProfileDataMachine = () =>
               actions: 'assignData',
             },
             navigatedToPrevPage: {
-              target: 'riskTolerance',
+              target: 'investmentGoals',
             },
           },
         },

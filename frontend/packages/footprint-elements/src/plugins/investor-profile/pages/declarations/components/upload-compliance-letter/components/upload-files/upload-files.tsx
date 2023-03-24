@@ -12,7 +12,7 @@ type UploadFilesProps = {
 // TODO: For now, we are restricted by API to upload only one file even though
 // this component supports multiple files
 const UploadFiles = ({ onChange }: UploadFilesProps) => {
-  const { t } = useTranslation('pages.declarations.form.doc-upload');
+  const { t } = useTranslation('pages.declarations.doc-upload');
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -59,6 +59,8 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
         backgroundColor: 'secondary',
         padding: 5,
         borderRadius: 'default',
+        display: 'grid',
+        gap: 5,
       }}
     >
       <Box>
@@ -84,9 +86,7 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
       />
       {files.length > 0 && (
         <>
-          <Box sx={{ marginY: 5 }}>
-            <Divider />
-          </Box>
+          <Divider />
           <FilesContainer>
             {files.map(file => (
               <FileEntry

@@ -1,8 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { DocumentsDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
-import { HeaderTitle } from '../../../../components';
 import useUploadFile from '../../../../hooks/api/hosted/user/use-upload-file';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
@@ -12,7 +10,6 @@ import { DeclarationData } from '../../utils/state-machine/types';
 import DeclarationsForm from './components/declarations-form';
 
 const Declarations = () => {
-  const { t } = useTranslation('pages.declarations');
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
@@ -77,11 +74,6 @@ const Declarations = () => {
   return (
     <>
       <InvestorProfileNavigationHeader />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        sx={{ marginBottom: 7 }}
-      />
       <DeclarationsForm
         isLoading={syncDataMutation.isLoading || uploadFileMutation.isLoading}
         onSubmit={handleSubmit}

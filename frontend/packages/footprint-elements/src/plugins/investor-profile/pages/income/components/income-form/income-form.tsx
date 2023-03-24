@@ -7,9 +7,8 @@ import {
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
-import ContinueButton from '../../../../components/continue-button';
+import FormWithOptions from '../../../../components/custom-form';
 import { IncomeData } from '../../../../utils/state-machine/types';
 
 export type IncomeFormProps = {
@@ -27,7 +26,7 @@ const IncomeForm = ({
   isLoading,
   onSubmit,
 }: IncomeFormProps) => {
-  const { t } = useTranslation('pages.income.form');
+  const { t } = useTranslation('pages.income');
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       income:
@@ -44,51 +43,41 @@ const IncomeForm = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
-      <OptionsContainer data-private>
-        <Radio
-          value={InvestorProfileAnnualIncome.lt50k}
-          label={t(`${InvestorProfileAnnualIncome.lt50k}`)}
-          {...register('income')}
-        />
-        <Radio
-          value={InvestorProfileAnnualIncome.s50kTo100k}
-          label={t(`${InvestorProfileAnnualIncome.s50kTo100k}`)}
-          {...register('income')}
-        />
-        <Radio
-          value={InvestorProfileAnnualIncome.s100kTo250k}
-          label={t(`${InvestorProfileAnnualIncome.s100kTo250k}`)}
-          {...register('income')}
-        />
-        <Radio
-          value={InvestorProfileAnnualIncome.s250kTo500k}
-          label={t(`${InvestorProfileAnnualIncome.s250kTo500k}`)}
-          {...register('income')}
-        />
-        <Radio
-          value={InvestorProfileAnnualIncome.gt500k}
-          label={t(`${InvestorProfileAnnualIncome.gt500k}`)}
-          {...register('income')}
-        />
-      </OptionsContainer>
-      <ContinueButton isLoading={isLoading} />
-    </Form>
+    <FormWithOptions
+      title={t('title')}
+      subtitle={t('subtitle')}
+      isLoading={isLoading}
+      formAttributes={{
+        onSubmit: handleSubmit(handleBeforeSubmit),
+      }}
+    >
+      <Radio
+        value={InvestorProfileAnnualIncome.lt50k}
+        label={t(`${InvestorProfileAnnualIncome.lt50k}`)}
+        {...register('income')}
+      />
+      <Radio
+        value={InvestorProfileAnnualIncome.s50kTo100k}
+        label={t(`${InvestorProfileAnnualIncome.s50kTo100k}`)}
+        {...register('income')}
+      />
+      <Radio
+        value={InvestorProfileAnnualIncome.s100kTo250k}
+        label={t(`${InvestorProfileAnnualIncome.s100kTo250k}`)}
+        {...register('income')}
+      />
+      <Radio
+        value={InvestorProfileAnnualIncome.s250kTo500k}
+        label={t(`${InvestorProfileAnnualIncome.s250kTo500k}`)}
+        {...register('income')}
+      />
+      <Radio
+        value={InvestorProfileAnnualIncome.gt500k}
+        label={t(`${InvestorProfileAnnualIncome.gt500k}`)}
+        {...register('income')}
+      />
+    </FormWithOptions>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
-
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[6]};
-  `}
-`;
 
 export default IncomeForm;

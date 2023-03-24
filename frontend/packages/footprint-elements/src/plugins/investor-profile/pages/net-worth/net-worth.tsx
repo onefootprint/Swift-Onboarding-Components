@@ -1,11 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileDI,
   InvestorProfileNetWorth,
 } from '@onefootprint/types';
 import React from 'react';
 
-import { HeaderTitle } from '../../../../components';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -14,7 +12,6 @@ import { NetWorthData } from '../../utils/state-machine/types';
 import NetWorthForm from './components/net-worth-form';
 
 const NetWorth = () => {
-  const { t } = useTranslation('pages.net-worth');
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -40,11 +37,6 @@ const NetWorth = () => {
   return (
     <>
       <InvestorProfileNavigationHeader />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        sx={{ marginBottom: 7 }}
-      />
       <NetWorthForm
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}

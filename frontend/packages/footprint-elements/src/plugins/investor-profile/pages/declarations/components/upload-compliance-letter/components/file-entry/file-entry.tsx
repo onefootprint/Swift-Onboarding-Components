@@ -9,7 +9,7 @@ type FileEntryProps = {
 };
 
 const FileEntry = ({ file, onRemove }: FileEntryProps) => {
-  const { t } = useTranslation('pages.declarations.form.doc-upload');
+  const { t } = useTranslation('pages.declarations.doc-upload');
 
   return (
     <Box

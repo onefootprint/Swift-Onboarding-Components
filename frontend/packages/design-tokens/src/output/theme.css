@@ -483,10 +483,10 @@
   --fp-base-inputs-spacing-paddings-vertical-compact: 6px;
   --fp-base-inputs-typography-default-label: 500 14px/20px 'DM Sans';
   --fp-base-inputs-typography-default-input-content: 400 15px/20px 'DM Sans';
-  --fp-base-inputs-typography-default-hint: 500 13px/16px 'DM Sans';
+  --fp-base-inputs-typography-default-hint: 400 13px/16px 'DM Sans';
   --fp-base-inputs-typography-compact-label: 500 13px/16px 'DM Sans';
   --fp-base-inputs-typography-compact-input-content: 400 14px/20px 'DM Sans';
-  --fp-base-inputs-typography-compact-hint: 500 13px/16px 'DM Sans';
+  --fp-base-inputs-typography-compact-hint: 400 13px/16px 'DM Sans';
   --fp-base-inputs-elevation-focus: 0px 0px 0px 4px
     rgba(74, 36, 219, 0.12156862745098039);
   --fp-base-inputs-elevation-focus-error: 0px 0px 0px 4px

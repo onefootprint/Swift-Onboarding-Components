@@ -7,11 +7,9 @@ import {
 import { Checkbox } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
-import ContinueButton from '../../../../components/continue-button';
+import CustomForm from '../../../../components/custom-form';
 import { InvestmentGoalsData } from '../../../../utils/state-machine/types';
-import Error from '../error';
 
 export type InvestmentGoalsFormProps = {
   defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>;
@@ -26,7 +24,7 @@ const InvestmentGoalsForm = ({
   isLoading,
   onSubmit,
 }: InvestmentGoalsFormProps) => {
-  const { t } = useTranslation('pages.investment-goals.form');
+  const { t } = useTranslation('pages.investment-goals');
   const defaultEntries = (
     defaultValues?.[InvestorProfileDI.investmentGoals] ?? []
   ).map(goal => [goal, true]);
@@ -72,56 +70,39 @@ const InvestmentGoalsForm = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
-      <CheckboxContainer>
-        <Checkbox
-          label={t(InvestorProfileInvestmentGoal.growLongTermWealth)}
-          {...register(InvestorProfileInvestmentGoal.growLongTermWealth)}
-        />
-        <Checkbox
-          label={t(InvestorProfileInvestmentGoal.saveForRetirement)}
-          {...register(InvestorProfileInvestmentGoal.saveForRetirement)}
-        />
-        <Checkbox
-          label={t(InvestorProfileInvestmentGoal.buyAHome)}
-          {...register(InvestorProfileInvestmentGoal.buyAHome)}
-        />
-        <Checkbox
-          label={t(InvestorProfileInvestmentGoal.supportLovedOnes)}
-          {...register(InvestorProfileInvestmentGoal.supportLovedOnes)}
-        />
-        <Checkbox
-          label={t(InvestorProfileInvestmentGoal.payOffDebt)}
-          {...register(InvestorProfileInvestmentGoal.payOffDebt)}
-        />
-        <Checkbox
-          label={t(InvestorProfileInvestmentGoal.startMyOwnBusiness)}
-          {...register(InvestorProfileInvestmentGoal.startMyOwnBusiness)}
-        />
-      </CheckboxContainer>
-      {hasEmptySelection && showError && <Error />}
-      <ContinueButton isLoading={isLoading} />
-    </Form>
+    <CustomForm
+      title={t('title')}
+      subtitle={t('subtitle')}
+      isLoading={isLoading}
+      formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}
+      error={hasEmptySelection && showError ? t('empty-selection') : undefined}
+    >
+      <Checkbox
+        label={t(InvestorProfileInvestmentGoal.growLongTermWealth)}
+        {...register(InvestorProfileInvestmentGoal.growLongTermWealth)}
+      />
+      <Checkbox
+        label={t(InvestorProfileInvestmentGoal.saveForRetirement)}
+        {...register(InvestorProfileInvestmentGoal.saveForRetirement)}
+      />
+      <Checkbox
+        label={t(InvestorProfileInvestmentGoal.buyAHome)}
+        {...register(InvestorProfileInvestmentGoal.buyAHome)}
+      />
+      <Checkbox
+        label={t(InvestorProfileInvestmentGoal.supportLovedOnes)}
+        {...register(InvestorProfileInvestmentGoal.supportLovedOnes)}
+      />
+      <Checkbox
+        label={t(InvestorProfileInvestmentGoal.payOffDebt)}
+        {...register(InvestorProfileInvestmentGoal.payOffDebt)}
+      />
+      <Checkbox
+        label={t(InvestorProfileInvestmentGoal.startMyOwnBusiness)}
+        {...register(InvestorProfileInvestmentGoal.startMyOwnBusiness)}
+      />
+    </CustomForm>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
-
-const CheckboxContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[6]};
-
-    // For checkbox labels that wrap around, we want to align the text baseline
-    label {
-      align-items: baseline;
-    }
-  `}
-`;
 
 export default InvestmentGoalsForm;

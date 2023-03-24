@@ -3,9 +3,8 @@ import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
 import { Select, SelectOption, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
-import ContinueButton from '../../../../components/continue-button';
+import CustomForm from '../../../../components/custom-form';
 import { EmploymentData } from '../../../../utils/state-machine/types';
 
 export type EmploymentFormProps = {
@@ -24,7 +23,7 @@ const EmploymentForm = ({
   isLoading,
   onSubmit,
 }: EmploymentFormProps) => {
-  const { t } = useTranslation('pages.employment.form');
+  const { t } = useTranslation('pages.employment');
   const options: SelectOption[] = [
     {
       label: t('employment-status.employed'),
@@ -71,7 +70,14 @@ const EmploymentForm = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
+    <CustomForm
+      title={t('title')}
+      subtitle={t('subtitle')}
+      isLoading={isLoading}
+      formAttributes={{
+        onSubmit: handleSubmit(handleBeforeSubmit),
+      }}
+    >
       <Controller
         control={control}
         name="status"
@@ -102,16 +108,8 @@ const EmploymentForm = ({
           })}
         />
       )}
-      <ContinueButton isLoading={isLoading} />
-    </Form>
+    </CustomForm>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default EmploymentForm;

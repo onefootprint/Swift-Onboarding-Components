@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24, IcoWarning16 } from '@onefootprint/icons';
-import { Box, Divider, Typography } from '@onefootprint/ui';
+import { Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,35 +15,33 @@ const UploadComplianceLetter = ({
   hasError,
   onChange,
 }: UploadComplianceLetterProps) => {
-  const { t } = useTranslation('pages.declarations.form.doc-upload');
+  const { t } = useTranslation('pages.declarations.doc-upload');
 
   return (
-    <Container>
-      <Box sx={{ marginBottom: 3 }}>
-        <Divider />
-      </Box>
-      <UploadFilesLabel>
-        <IcoFileText24 />
-        <Typography variant="label-3" color="secondary">
-          {t('label')}
-        </Typography>
-      </UploadFilesLabel>
-      <UploadFiles onChange={onChange} />
-      {hasError && (
-        <ErrorContainer>
-          <IcoWarning16 color="error" />
-          <Typography variant="body-3" color="error">
-            {t('required')}
+    <>
+      <Divider />
+      <Container>
+        <UploadFilesLabel>
+          <IcoFileText24 />
+          <Typography variant="label-3" color="secondary">
+            {t('label')}
           </Typography>
-        </ErrorContainer>
-      )}
-      <Typography variant="caption-4" color="tertiary">
-        {t('disclaimer')}
-      </Typography>
-      <Box sx={{ marginTop: 3 }}>
-        <Divider />
-      </Box>
-    </Container>
+        </UploadFilesLabel>
+        <UploadFiles onChange={onChange} />
+        {hasError && (
+          <ErrorContainer>
+            <IcoWarning16 color="error" />
+            <Typography variant="body-3" color="error">
+              {t('required')}
+            </Typography>
+          </ErrorContainer>
+        )}
+        <Typography variant="caption-4" color="tertiary">
+          {t('disclaimer')}
+        </Typography>
+      </Container>
+      <Divider />
+    </>
   );
 };
 

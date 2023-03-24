@@ -7,9 +7,8 @@ import {
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
-import ContinueButton from '../../../../components/continue-button';
+import CustomForm from '../../../../components/custom-form/custom-form';
 import { NetWorthData } from '../../../../utils/state-machine/types';
 
 export type NetWorthFormProps = {
@@ -27,7 +26,7 @@ const NetWorthForm = ({
   defaultValues,
   onSubmit,
 }: NetWorthFormProps) => {
-  const { t } = useTranslation('pages.net-worth.form');
+  const { t } = useTranslation('pages.net-worth');
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       netWorth:
@@ -44,56 +43,46 @@ const NetWorthForm = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
-      <OptionsContainer data-private>
-        <Radio
-          value={InvestorProfileNetWorth.lt50k}
-          label={t(`${InvestorProfileNetWorth.lt50k}`)}
-          {...register('netWorth')}
-        />
-        <Radio
-          value={InvestorProfileNetWorth.s50kTo100k}
-          label={t(`${InvestorProfileNetWorth.s50kTo100k}`)}
-          {...register('netWorth')}
-        />
-        <Radio
-          value={InvestorProfileNetWorth.s100kTo250k}
-          label={t(`${InvestorProfileNetWorth.s100kTo250k}`)}
-          {...register('netWorth')}
-        />
-        <Radio
-          value={InvestorProfileNetWorth.s250kTo500k}
-          label={t(`${InvestorProfileNetWorth.s250kTo500k}`)}
-          {...register('netWorth')}
-        />
-        <Radio
-          value={InvestorProfileNetWorth.S500kTo1m}
-          label={t(`${InvestorProfileNetWorth.S500kTo1m}`)}
-          {...register('netWorth')}
-        />
-        <Radio
-          value={InvestorProfileNetWorth.gt1m}
-          label={t(`${InvestorProfileNetWorth.gt1m}`)}
-          {...register('netWorth')}
-        />
-      </OptionsContainer>
-      <ContinueButton isLoading={isLoading} />
-    </Form>
+    <CustomForm
+      title={t('title')}
+      subtitle={t('subtitle')}
+      formAttributes={{
+        onSubmit: handleSubmit(handleBeforeSubmit),
+      }}
+      isLoading={isLoading}
+    >
+      <Radio
+        value={InvestorProfileNetWorth.lt50k}
+        label={t(`${InvestorProfileNetWorth.lt50k}`)}
+        {...register('netWorth')}
+      />
+      <Radio
+        value={InvestorProfileNetWorth.s50kTo100k}
+        label={t(`${InvestorProfileNetWorth.s50kTo100k}`)}
+        {...register('netWorth')}
+      />
+      <Radio
+        value={InvestorProfileNetWorth.s100kTo250k}
+        label={t(`${InvestorProfileNetWorth.s100kTo250k}`)}
+        {...register('netWorth')}
+      />
+      <Radio
+        value={InvestorProfileNetWorth.s250kTo500k}
+        label={t(`${InvestorProfileNetWorth.s250kTo500k}`)}
+        {...register('netWorth')}
+      />
+      <Radio
+        value={InvestorProfileNetWorth.S500kTo1m}
+        label={t(`${InvestorProfileNetWorth.S500kTo1m}`)}
+        {...register('netWorth')}
+      />
+      <Radio
+        value={InvestorProfileNetWorth.gt1m}
+        label={t(`${InvestorProfileNetWorth.gt1m}`)}
+        {...register('netWorth')}
+      />
+    </CustomForm>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
-
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[6]};
-  `}
-`;
 
 export default NetWorthForm;

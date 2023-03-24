@@ -7,9 +7,8 @@ import {
 import { Checkbox } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
-import ContinueButton from '../../../../components/continue-button';
+import CustomForm from '../../../../components/custom-form';
 import { DeclarationData } from '../../../../utils/state-machine/types';
 import UploadComplianceLetter from '../upload-compliance-letter';
 
@@ -26,7 +25,7 @@ const DeclarationsForm = ({
   isLoading,
   onSubmit,
 }: DeclarationsFormProps) => {
-  const { t } = useTranslation('pages.declarations.form');
+  const { t } = useTranslation('pages.declarations');
   const defaultEntries = (
     defaultValues?.[InvestorProfileDI.declarations] ?? []
   ).map(goal => [goal, true]);
@@ -69,62 +68,43 @@ const DeclarationsForm = ({
   };
 
   return (
-    <Form
-      onSubmit={handleSubmit(handleBeforeSubmit)}
-      encType="multipart/form-data"
+    <CustomForm
+      title={t('title')}
+      subtitle={t('subtitle')}
+      isLoading={isLoading}
+      formAttributes={{
+        encType: 'multipart/form-data',
+        onSubmit: handleSubmit(handleBeforeSubmit),
+      }}
     >
-      <CheckboxContainer>
-        <Checkbox
-          label={t(
-            `options.${InvestorProfileDeclaration.affiliatedWithUsBroker}`,
-          )}
-          {...register(InvestorProfileDeclaration.affiliatedWithUsBroker)}
-        />
-        <Checkbox
-          label={t(`options.${InvestorProfileDeclaration.seniorExecutive}`)}
-          {...register(InvestorProfileDeclaration.seniorExecutive)}
-        />
-        <Checkbox
-          label={t(
-            `options.${InvestorProfileDeclaration.seniorPoliticalFigure}`,
-          )}
-          {...register(InvestorProfileDeclaration.seniorPoliticalFigure)}
-        />
-        <Checkbox
-          label={t(
-            `options.${InvestorProfileDeclaration.familyOfPoliticalFigure}`,
-          )}
-          {...register(InvestorProfileDeclaration.familyOfPoliticalFigure)}
-        />
-      </CheckboxContainer>
+      <Checkbox
+        label={t(
+          `options.${InvestorProfileDeclaration.affiliatedWithUsBroker}`,
+        )}
+        {...register(InvestorProfileDeclaration.affiliatedWithUsBroker)}
+      />
+      <Checkbox
+        label={t(`options.${InvestorProfileDeclaration.seniorExecutive}`)}
+        {...register(InvestorProfileDeclaration.seniorExecutive)}
+      />
+      <Checkbox
+        label={t(`options.${InvestorProfileDeclaration.seniorPoliticalFigure}`)}
+        {...register(InvestorProfileDeclaration.seniorPoliticalFigure)}
+      />
+      <Checkbox
+        label={t(
+          `options.${InvestorProfileDeclaration.familyOfPoliticalFigure}`,
+        )}
+        {...register(InvestorProfileDeclaration.familyOfPoliticalFigure)}
+      />
       {shouldRequireUpload && (
         <UploadComplianceLetter
           hasError={shouldShowUploadError}
           onChange={handleUploadChange}
         />
       )}
-      <ContinueButton isLoading={isLoading} />
-    </Form>
+    </CustomForm>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
-
-const CheckboxContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[6]};
-
-    // For checkbox labels that wrap around, we want to align the text baseline
-    label {
-      align-items: baseline;
-    }
-  `}
-`;
 
 export default DeclarationsForm;
