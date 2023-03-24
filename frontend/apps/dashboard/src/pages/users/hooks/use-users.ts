@@ -18,13 +18,17 @@ const getUsersRequest = async (
   authHeaders: AuthHeaders,
   params: UsersRequest,
 ) => {
+  const reqParams = {
+    kind: 'person',
+    ...params,
+  };
   const { data: response } = await request<
     PaginatedRequestResponse<UsersResponse>
   >({
     method: 'GET',
     url: '/users',
     headers: authHeaders,
-    params,
+    params: reqParams,
   });
 
   return response;

@@ -16,7 +16,7 @@ const getPinnedAnnotations = async (
   const response = await request<GetPinnedAnnotationsResponse>({
     headers: authHeaders,
     method: 'GET',
-    url: `/users/${userId}/annotations`,
+    url: `/entities/${userId}/annotations`,
     params: {
       isPinned: true,
     },

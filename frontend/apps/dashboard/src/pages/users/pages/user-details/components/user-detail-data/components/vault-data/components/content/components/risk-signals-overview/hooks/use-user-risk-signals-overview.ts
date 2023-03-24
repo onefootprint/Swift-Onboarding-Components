@@ -15,7 +15,7 @@ const getRiskSignalsRequest = async (
   const { data: response } = await request<GetRiskSignalsResponse>({
     headers: authHeaders,
     method: 'GET',
-    url: `/users/${userId}/risk_signals`,
+    url: `/entities/${userId}/risk_signals`,
   });
   return groupBySectionAndSeverity(response);
 };

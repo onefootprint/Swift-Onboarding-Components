@@ -10,7 +10,7 @@ const getLivenessRequest = async ({
 }: GetLivenessRequest) => {
   const response = await request<GetLivenessResponse>({
     method: 'GET',
-    url: `/users/${userId}/liveness`,
+    url: `/entities/${userId}/liveness`,
     headers: authHeaders,
   });
 

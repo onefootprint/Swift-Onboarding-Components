@@ -16,19 +16,21 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import useFilters from './use-filters';
 
-// TODO: Use correct endpoint
-// https://linear.app/footprint/issue/FP-3090/business-list-use-correct-endpoint
 const getBusinesses = async (
   authHeaders: AuthHeaders,
   payload: BusinessesRequest,
 ) => {
+  const params = {
+    kind: 'business',
+    ...payload,
+  };
   const { data: response } = await request<
     PaginatedRequestResponse<BusinessesResponse>
   >({
     method: 'GET',
-    url: '/users',
+    url: '/entities',
     headers: authHeaders,
-    params: payload,
+    params,
   });
 
   return response;

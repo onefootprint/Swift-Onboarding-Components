@@ -6,7 +6,7 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 const getTimelineRequest = async (userId: string, authHeaders: AuthHeaders) => {
   const response = await request<GetTimelineResponse>({
     method: 'GET',
-    url: `/users/${userId}/timeline`,
+    url: `/entities/${userId}/timeline`,
     headers: authHeaders,
   });
   return response.data;

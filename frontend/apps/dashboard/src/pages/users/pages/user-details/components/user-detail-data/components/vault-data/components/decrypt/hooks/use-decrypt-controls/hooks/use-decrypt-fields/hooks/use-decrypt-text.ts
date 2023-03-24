@@ -9,7 +9,7 @@ const decryptTextFields = async (
 ) => {
   const response = await requestWithoutCaseConverter<DecryptTextResponse>({
     method: 'POST',
-    url: `/users/${userId}/vault/decrypt`,
+    url: `/entities/${userId}/vault/decrypt`,
     data: {
       fields,
       reason,

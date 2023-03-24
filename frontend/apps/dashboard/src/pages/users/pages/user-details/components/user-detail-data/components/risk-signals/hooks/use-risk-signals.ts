@@ -18,7 +18,7 @@ const getRiskSignalsRequest = async (
     headers: authHeaders,
     method: 'GET',
     params,
-    url: `/users/${userId}/risk_signals`,
+    url: `/entities/${userId}/risk_signals`,
   });
   return response;
 };

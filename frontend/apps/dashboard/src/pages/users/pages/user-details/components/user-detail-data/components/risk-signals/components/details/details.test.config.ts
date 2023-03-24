@@ -20,14 +20,14 @@ export const riskSignalDetailsFixture: RiskSignal = {
 export const withRiskSignalDetails = () =>
   mockRequest({
     method: 'get',
-    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
     response: riskSignalDetailsFixture,
   });
 
 export const withRiskSignalDetailsError = () =>
   mockRequest({
     method: 'get',
-    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
     statusCode: 400,
     response: {
       error: {

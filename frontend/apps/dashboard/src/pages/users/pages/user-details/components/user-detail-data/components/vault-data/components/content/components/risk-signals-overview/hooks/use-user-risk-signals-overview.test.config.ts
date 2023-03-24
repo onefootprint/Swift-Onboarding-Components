@@ -27,14 +27,14 @@ export const createRiskSignal = ({
 export const withRiskSignals = (response: RiskSignal[]) =>
   mockRequest({
     method: 'get',
-    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
     response,
   });
 
 export const withRiskSignalsError = () =>
   mockRequest({
     method: 'get',
-    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
     statusCode: 400,
     response: {
       error: {

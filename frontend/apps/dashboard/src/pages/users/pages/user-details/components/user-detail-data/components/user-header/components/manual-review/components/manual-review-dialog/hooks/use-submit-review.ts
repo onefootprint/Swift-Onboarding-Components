@@ -10,7 +10,7 @@ const submitReview = async (
   const { footprintUserId, annotation, status } = data;
   const response = await request<SubmitReviewResponse>({
     method: 'POST',
-    url: `/users/${footprintUserId}/decisions`,
+    url: `/entities/${footprintUserId}/decisions`,
     data: {
       annotation,
       status,

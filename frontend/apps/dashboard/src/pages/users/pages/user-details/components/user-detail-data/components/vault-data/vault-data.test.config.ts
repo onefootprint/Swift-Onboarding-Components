@@ -162,7 +162,7 @@ export const withRiskSignals = (
 ) =>
   mockRequest({
     method: 'get',
-    path: `/users/${userId}/risk_signals`,
+    path: `/entities/${userId}/risk_signals`,
     response,
   });
 
@@ -179,7 +179,7 @@ export const withUserDecrypt = (
 ) =>
   mockRequest({
     method: 'post',
-    path: `/users/${userId}/vault/decrypt`,
+    path: `/entities/${userId}/vault/decrypt`,
     response,
   });
 

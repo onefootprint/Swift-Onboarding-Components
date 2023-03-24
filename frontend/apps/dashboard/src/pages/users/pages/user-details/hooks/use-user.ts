@@ -13,6 +13,7 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 const getUserRequest = async (authHeaders: AuthHeaders, userId: string) => {
   const response = await request<GetUserResponse>({
     method: 'GET',
+    // TODO migrate to `GET /entities/<fp_id>` after we stop reading deprecated fields
     url: `/users/${userId}`,
     headers: authHeaders,
   });

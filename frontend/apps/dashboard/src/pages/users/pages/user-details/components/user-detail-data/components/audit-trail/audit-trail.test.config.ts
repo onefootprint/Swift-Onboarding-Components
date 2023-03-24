@@ -117,6 +117,6 @@ export const timelineFixture: Timeline = [
 export const withTimeline = (userId: string, data = timelineFixture) =>
   mockRequest({
     method: 'get',
-    path: `/users/${userId}/timeline`,
+    path: `/entities/${userId}/timeline`,
     response: { data },
   });

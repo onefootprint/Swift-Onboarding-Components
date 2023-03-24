@@ -17,7 +17,7 @@ const updateOnboardingConfig = async (
   const response = await request<UpdateAnnotationResponse>({
     headers: authHeaders,
     method: 'PATCH',
-    url: `/users/${userId}/annotations/${annotationId}`,
+    url: `/entities/${userId}/annotations/${annotationId}`,
     data: {
       isPinned,
     },
