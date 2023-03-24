@@ -1,6 +1,4 @@
-use super::vault_data_builder::VaultDataBuilder;
 use super::WriteableVw;
-use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::utils::file_upload::FileUpload;
 use crate::utils::fingerprint::NewFingerprints;
@@ -78,26 +76,9 @@ impl<Type> WriteableVw<Type> {
         update: DataRequest,
         fingerprints: NewFingerprints<IDK>,
     ) -> ApiResult<Vec<VaultData>> {
-        // Don't allow replacing a committed phone/email yet
-        let irreplaceable_idks = vec![IDK::PhoneNumber, IDK::Email];
-        for idk in irreplaceable_idks {
-            let update_has_idk = update.keys().any(|id| id == &DataIdentifier::from(idk));
-            let vault_already_has_idk = self.portable.get(idk).is_some();
-            if update_has_idk && vault_already_has_idk {
-                // We don't currently support adding a phone/email
-                return Err(UserError::CannotReplaceData(idk.into()).into());
-            }
-        }
-
-        // Add the data
-        let builder = VaultDataBuilder::build(update, self.vault().public_key.clone())?;
-        let vds = builder.validate_and_save(
-            conn,
-            self.populated_dis(),
-            self.vault().id.clone(),
-            self.scoped_user_id.clone(),
-            fingerprints,
-        )?;
+        // Must do this validation here inside the locked, WriteableUvw
+        let request = self.validate_request(update)?;
+        let vds = request.save(conn, self.vault(), self.scoped_user_id.clone(), fingerprints)?;
 
         Ok(vds)
     }
