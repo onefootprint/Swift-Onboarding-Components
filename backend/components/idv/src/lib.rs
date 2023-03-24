@@ -121,4 +121,6 @@ pub enum Error {
     SerderJsonError(#[from] serde_json::Error),
     #[error("Experian error: {0}")]
     ExperianError(#[from] experian::error::Error),
+    #[error("{0}")]
+    ConversionError(String),
 }

@@ -14,6 +14,7 @@ use db::{
     },
     DbError, DbPool, DbResult, PgConn,
 };
+use idv::idology::pa::response::PaResponse;
 use idv::{
     idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
     VendorResponse,
@@ -75,7 +76,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             .await?;
 
         let scoped_vault_id = args.scoped_vault_id.clone();
-        let _vendor_response = if let Some(vres) = vres {
+        let vendor_response = if let Some(vres) = vres {
             Self::get_existing_vendor_response(
                 &self.db_pool,
                 &self.enclave_client,
@@ -95,8 +96,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             .await
         }?;
 
-        // TODO: calculate decision and update WatchlistCheck
-
+        // TODO: for now, assuming we have a non-error response. In future, need to validate the response and handle errors
+        let pa_res = PaResponse::try_from(vendor_response.response)?;
+        log::info!("WatchlistCheckTask PaResponse: {:?}", pa_res);
         Ok(())
     }
 }

@@ -24,6 +24,8 @@ pub enum TaskError {
     ApiError(#[from] ApiError),
     #[error("{0}")]
     IdologyError(#[from] idv::idology::error::Error),
+    #[error("{0}")]
+    IdvError(#[from] idv::Error),
 }
 
 #[allow(unused)]

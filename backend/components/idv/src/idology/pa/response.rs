@@ -1,6 +1,7 @@
 use crate::idology::common::response::IDologyQualifiers;
 use crate::idology::error as IdologyError;
 use crate::idology::expectid::response::{IdNumber, Restriction};
+use crate::ParsedResponse;
 
 pub fn parse_response(value: serde_json::Value) -> Result<PaResponse, IdologyError::Error> {
     let response: PaResponse = serde_json::value::from_value(value)?;
@@ -10,6 +11,18 @@ pub fn parse_response(value: serde_json::Value) -> Result<PaResponse, IdologyErr
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Eq, PartialEq)]
 pub struct PaResponse {
     pub response: Response,
+}
+
+impl TryFrom<ParsedResponse> for PaResponse {
+    type Error = crate::Error;
+    fn try_from(value: ParsedResponse) -> Result<Self, Self::Error> {
+        match value {
+            ParsedResponse::IDologyPa(res) => Ok(res),
+            _ => Err(crate::Error::ConversionError(
+                "Can't convert into PaResponse".to_owned(),
+            )),
+        }
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default, Eq, PartialEq)]
