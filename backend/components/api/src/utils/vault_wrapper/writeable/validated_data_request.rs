@@ -15,7 +15,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataLifetimeKind,
-    ScopedVaultId, IdentityDataKind as IDK, DataRequest, DataValidationError, DataIdentifier,
+    ScopedVaultId, IdentityDataKind as IDK, DataRequest, DataIdentifier,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -39,22 +39,10 @@ impl<Type> VaultWrapper<Type> {
             }
         }
 
-        // Then, validate that there are no "dangling" extra keys after we apply the write to the
-        // user vault.
-        // This allows us to only update, say, id.first_name as long as the vault already has id.last_name
-        let existing_fields = self.populated_dis();
-        let new_dis = request.keys().cloned().collect_vec();
-        let full_dis = existing_fields.iter().chain(new_dis.iter()).cloned().collect();
-        let dangling_keys_after_write = CollectedDataOption::dangling_identifiers(full_dis);
-        if !dangling_keys_after_write.is_empty() {
-            let err = newtypes::Error::from(DataValidationError::ExtraFieldError(dangling_keys_after_write));
-            return Err(err.into());
-        }
-
-        // Next, validate that we're not overwriting any full data with partial data.
+        // Then, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
-        let existing_cdos = CollectedDataOption::list_from(existing_fields);
-        let new_cdos = CollectedDataOption::list_from(new_dis);
+        let existing_cdos = CollectedDataOption::list_from(self.populated_dis());
+        let new_cdos = CollectedDataOption::list_from(request.keys().cloned().collect());
         let offending_partial_cdo =
             new_cdos
                 .iter()

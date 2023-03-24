@@ -21,17 +21,27 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 )]
 #[actix::post("/hosted/user/vault/validate")]
 pub async fn post_validate(
+    state: web::Data<State>,
     request: Json<RawDataRequest>,
     user_auth: UserAuthContext,
     allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
     let opts = ParseOptions {
         for_bifrost: true,
-        allow_extra_field_errors: allow_extra_fields.0,
+        allow_dangling_keys: *allow_extra_fields,
     };
     let request = request.into_inner().clean_and_validate(opts)?;
     request.assert_no_business_data()?;
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let su_id = pre_add_data_checks(&user_auth, conn)?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &su_id)?;
+            Ok(uvw)
+        })
+        .await??;
+    uvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
 }
@@ -47,11 +57,9 @@ pub async fn put(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
-    let opts = ParseOptions {
-        for_bifrost: true,
-        allow_extra_field_errors: false,
-    };
-    let request = request.into_inner().clean_and_validate(opts)?;
+    let request = request
+        .into_inner()
+        .clean_and_validate(ParseOptions::for_bifrost())?;
     let fingerprints = build_fingerprints(&state, request.clone()).await?;
     let email = request
         .get(&IDK::Email.into())

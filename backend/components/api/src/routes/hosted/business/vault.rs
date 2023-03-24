@@ -15,16 +15,27 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 )]
 #[actix::post("/hosted/business/vault/validate")]
 pub async fn post_validate(
-    request: Json<RawDataRequest>,
+    state: web::Data<State>,
     user_auth: UserAuthContext,
+    request: Json<RawDataRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
-    let opts = ParseOptions {
-        for_bifrost: true,
-        allow_extra_field_errors: false,
-    };
-    let request = request.into_inner().clean_and_validate(opts)?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
+    let request = request
+        .into_inner()
+        .clean_and_validate(ParseOptions::for_bifrost())?;
     request.assert_no_id_data()?;
+    let bvw = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            pre_add_data_checks(&user_auth, conn)?;
+            let sb_id = user_auth
+                .scoped_business_id()
+                .ok_or(UserError::NotAllowedWithoutBusiness)?;
+            let bvw = VaultWrapper::build_for_tenant(conn, &sb_id)?;
+            Ok(bvw)
+        })
+        .await??;
+    bvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
 }
@@ -40,11 +51,9 @@ pub async fn put(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
-    let opts = ParseOptions {
-        for_bifrost: true,
-        allow_extra_field_errors: false,
-    };
-    let request = request.into_inner().clean_and_validate(opts)?;
+    let request = request
+        .into_inner()
+        .clean_and_validate(ParseOptions::for_bifrost())?;
 
     state
         .db_pool
@@ -53,11 +62,11 @@ pub async fn put(
             let scoped_business_id = user_auth
                 .scoped_business_id()
                 .ok_or(UserError::NotAllowedWithoutBusiness)?;
-            let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &scoped_business_id)?;
+            let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &scoped_business_id)?;
 
             // TODO fingerprints
             // TODO make this do something with business data
-            uvw.put_business_data(conn, request)?;
+            bvw.put_business_data(conn, request)?;
             Ok(())
         })
         .await?;

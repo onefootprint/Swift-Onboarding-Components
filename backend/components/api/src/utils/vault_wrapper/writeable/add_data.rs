@@ -144,12 +144,8 @@ mod test {
             conn: &mut TxnPgConn,
             data: Vec<(DataIdentifier, PiiString)>,
         ) -> ApiResult<()> {
-            let opts = ParseOptions {
-                for_bifrost: true,
-                allow_extra_field_errors: false,
-            };
             let data = HashMap::from_iter(data.into_iter());
-            let request = DataRequest::clean_and_validate(data, opts)?;
+            let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
             let fingerprints = request
                 .keys()
                 .filter_map(|di| match di {

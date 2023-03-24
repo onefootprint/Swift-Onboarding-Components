@@ -51,11 +51,7 @@ pub async fn post(
         let request = request.into_inner();
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
-            let opts = ParseOptions {
-                for_bifrost: false,
-                allow_extra_field_errors: false,
-            };
-            let request = request.clean_and_validate(opts)?;
+            let request = request.clean_and_validate(ParseOptions::for_non_portable())?;
             let fingerprints = build_fingerprints(&state, request.clone()).await?;
             Some((targets, request, fingerprints))
         } else {

@@ -1,11 +1,12 @@
 use super::get_header;
 use actix_web::{http::header::HeaderMap, FromRequest};
+use derive_more::Deref;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use std::pin::Pin;
 
-#[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]
+#[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize, Deref)]
 /// Optional header to relax some request validation constraints when adding data to a vault
 pub struct AllowExtraFieldsHeaders(pub bool);
 

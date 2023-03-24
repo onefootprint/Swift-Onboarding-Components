@@ -20,17 +20,31 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 )]
 #[actix::post("/users/{footprint_user_id}/vault/validate")]
 pub async fn post_validate(
-    _path: Path<FootprintUserId>,
+    state: web::Data<State>,
+    path: Path<FootprintUserId>,
     request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    tenant_auth.check_guard(TenantGuard::Admin)?;
-    let opts = ParseOptions {
-        for_bifrost: false,
-        allow_extra_field_errors: false,
-    };
-    let request = request.into_inner().clean_and_validate(opts)?;
+    let fp_id = path.into_inner();
+
+    let tenant_auth = tenant_auth.check_guard(TenantGuard::Admin)?;
+    let tenant_id = tenant_auth.tenant().id.clone();
+    let is_live = tenant_auth.is_live()?;
+
+    let request = request
+        .into_inner()
+        .clean_and_validate(ParseOptions::for_non_portable())?;
     request.assert_no_business_data()?;
+
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            Ok(uvw)
+        })
+        .await??;
+    uvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
 }
@@ -57,11 +71,9 @@ pub async fn put(
     let principal = tenant_auth.actor().into();
 
     let targets = request.keys().cloned().collect_vec();
-    let opts = ParseOptions {
-        for_bifrost: false,
-        allow_extra_field_errors: false,
-    };
-    let request = request.into_inner().clean_and_validate(opts)?;
+    let request = request
+        .into_inner()
+        .clean_and_validate(ParseOptions::for_non_portable())?;
     let fingerprints = build_fingerprints(&state, request.clone()).await?;
 
     state

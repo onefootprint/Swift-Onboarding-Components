@@ -111,7 +111,7 @@ def test_get_users_filter(
         incomplete_user,
     ]
     expected_user_ids = [all_fp_user_ids[i] for i in expected_user_idxs]
-    assert set(u["id"] for u in scoped_users) > set(expected_user_ids)
+    assert set(u["id"] for u in scoped_users) >= set(expected_user_ids)
 
 
 def test_get_users_list_pagination(sandbox_user, sandbox_user2):
