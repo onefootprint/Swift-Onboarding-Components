@@ -13,7 +13,7 @@ use super::make_request::VerificationRequestWithVendorResponse;
 
 /// Save a verification result, encrypting the response payload in the process
 pub async fn save_verification_result(
-    db_pool: &DbPool,
+    db_pool: &DbPool, // TODO: migrate to PgConn
     vendor_responses: &[VerificationRequestWithVendorResponse],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
 ) -> Result<Vec<VerificationResult>, ApiError> {

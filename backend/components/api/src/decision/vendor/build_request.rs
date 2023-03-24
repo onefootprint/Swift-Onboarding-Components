@@ -12,7 +12,7 @@ use std::{str::FromStr};
 use strum::IntoEnumIterator;
 
 pub async fn build_idv_data_from_verification_request(
-    db_pool: &DbPool,
+    db_pool: &DbPool, // TODO: migrate to PgConn
     enclave_client: &EnclaveClient,
     request: VerificationRequest,
 ) -> Result<IdvData, ApiError> {

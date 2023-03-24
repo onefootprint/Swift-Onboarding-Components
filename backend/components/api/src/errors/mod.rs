@@ -114,8 +114,6 @@ pub enum ApiError {
     FileUploadError(#[from] file_upload::FileUploadError),
     #[error("internal webhook error")]
     WebhooksError(#[from] webhooks::Error),
-    #[error("Task error: {0}")]
-    TaskError(#[from] crate::task::TaskError),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -222,7 +220,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::FileUploadError(_) => StatusCode::BAD_REQUEST,
             ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
             ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::TaskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

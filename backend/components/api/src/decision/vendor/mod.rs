@@ -9,7 +9,7 @@ use db::{
 };
 use newtypes::{DecisionIntentId, IdentityDataKind, OnboardingId, ScopedVaultId, VendorAPI};
 
-pub(super) mod build_request;
+pub mod build_request;
 pub mod make_request;
 pub mod vendor_result;
 pub mod vendor_trait;

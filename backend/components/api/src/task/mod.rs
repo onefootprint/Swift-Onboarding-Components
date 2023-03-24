@@ -3,6 +3,8 @@ use db::{models::task::Task, DbError, DbPool};
 use newtypes::{TaskId, TaskStatus};
 use thiserror::Error;
 
+use crate::{errors::ApiError, State};
+
 use self::tasks::{
     log_message_task::LogMessageTask, log_num_tenant_api_keys_task::LogNumTenantApiKeysTask,
     watchlist_check_task::WatchlistCheckTask,
@@ -18,11 +20,16 @@ const MAX_NUM_ATTEMPTS: i32 = 1; // since Task and our first use case (Watchlist
 pub enum TaskError {
     #[error("{0}")]
     Database(#[from] DbError),
+    #[error("{0}")]
+    ApiError(#[from] ApiError),
+    #[error("{0}")]
+    IdologyError(#[from] idv::idology::error::Error),
 }
 
 #[allow(unused)]
-pub async fn poll_and_execute_tasks(db_pool: &DbPool, limit: i64) -> Result<Vec<Task>, DbError> {
-    let tasks = db_pool
+pub async fn poll_and_execute_tasks(state: &State, limit: i64) -> Result<Vec<Task>, DbError> {
+    let tasks = state
+        .db_pool
         .db_transaction(move |conn| -> Result<Vec<Task>, DbError> {
             let tasks = Task::poll(conn, limit)?;
             Ok(tasks)
@@ -32,7 +39,7 @@ pub async fn poll_and_execute_tasks(db_pool: &DbPool, limit: i64) -> Result<Vec<
     tracing::info!(tasks = format!("{:?}", tasks), "Executing polled tasks");
     let futs = tasks.iter().map(|t| async {
         tracing::info!(task_id=%t.id, "Executing task");
-        let task_result = execute_task(t, db_pool).await;
+        let task_result = execute_task(t, state).await;
         match &task_result {
             Ok(_) => {
                 tracing::info!(task_id=%t.id, "Task completed successfully");
@@ -42,7 +49,7 @@ pub async fn poll_and_execute_tasks(db_pool: &DbPool, limit: i64) -> Result<Vec<
             }
         };
         let task_new_status = task_result_to_status(t, task_result);
-        update_task(db_pool, t.id.clone(), task_new_status).await
+        update_task(&state.db_pool, t.id.clone(), task_new_status).await
     });
 
     futures::future::join_all(futs)
@@ -52,16 +59,23 @@ pub async fn poll_and_execute_tasks(db_pool: &DbPool, limit: i64) -> Result<Vec<
 }
 
 #[allow(unused)]
-async fn execute_task(task: &Task, db_pool: &DbPool) -> Result<(), TaskError> {
+async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
     match &task.task_data {
         newtypes::TaskData::LogMessage(args) => LogMessageTask {}.execute(args).await,
         newtypes::TaskData::LogNumTenantApiKeys(args) => {
-            LogNumTenantApiKeysTask::new(db_pool.clone()).execute(args).await
-        }
-        newtypes::TaskData::WatchlistCheck(args) => {
-            WatchlistCheckTask::new(db_pool.clone(), task.id.clone())
+            LogNumTenantApiKeysTask::new(state.db_pool.clone())
                 .execute(args)
                 .await
+        }
+        newtypes::TaskData::WatchlistCheck(args) => {
+            WatchlistCheckTask::new(
+                state.db_pool.clone(),
+                task.id.clone(),
+                state.enclave_client.clone(),
+                Box::new(state.idology_client.clone()),
+            )
+            .execute(args)
+            .await
         }
     }
 }
@@ -117,6 +131,8 @@ trait ExecuteTask<T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::mock_enclave::StateWithMockEnclave;
+
     use super::*;
     use chrono::Utc;
     use db::test_helpers::have_same_elements;
@@ -132,6 +148,8 @@ mod tests {
     #[tokio::test]
     async fn basic_end_to_end() {
         let db_pool = test_db_pool();
+        let state = &StateWithMockEnclave::init().await.state;
+        // TODO: need to create a test State so can pass to poll_and_execute_tasks
 
         // Setup
         let tasks = db_pool
@@ -147,7 +165,7 @@ mod tests {
             .unwrap();
 
         // Test
-        let executed_tasks = poll_and_execute_tasks(&db_pool, 2).await.unwrap();
+        let executed_tasks = poll_and_execute_tasks(state, 2).await.unwrap();
         // TODO: would be nice to actually assert the tasks did what they were supposed to do. Some dumb ideas: have a task which writes a Task to PG with a
         // particular nonce as an arg and then confirm that was written. Or a task that writes to a tmp file and then we read and confirm
         assert!(have_same_elements(
