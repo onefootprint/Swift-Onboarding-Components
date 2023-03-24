@@ -600,12 +600,6 @@
       "faq": {
         "title": "Frequently asked questions",
         "questions": {
-          "credits": {
-            "title": "What are credits and how do they work?",
-            "content": [
-              "Footprint charges in credits for our combined KYC + PII Security product. Each credit costs 25 cents. We charge in credits because we think it is an easier way for companies to keep track of pricing, and because it is a way for us to reward our early users (see below)."
-            ]
-          },
           "one-click-kyc-difference": {
             "title": "What is the difference between standard KYC and one-click KYC?",
             "content": [
@@ -615,13 +609,13 @@
           "one-click-charge": {
             "title": "Why do you charge more for one-click?",
             "content": [
-              "We charge eight credits ($2.00) for the one-click. This is because companies report drop-off of north of 50% when users have to fill in a KYC flow. Due to the lift in conversion and extra LTV of the net new customers we bring in through replacing the form with one-click, we charge a premium."
+              "We charge $2.00 for the one-click. This is because companies report drop-off of north of 50% when users have to fill in a KYC flow. Due to the lift in conversion and extra LTV of the net new customers we bring in through replacing the form with one-click, we charge a premium."
             ]
           },
           "how-to-recoup": {
             "title": "How do I recoup the cost of KYC?",
             "content": [
-              "To be even more aligned with our early users, we will give you a rebate back of the two credits it costs to do standard KYC  the next time that same person does a one-click KYC on another platform. If you onboard 100,000 people who are new to Footprint, you’ll spend $50,000, and you’ll get all of that back in credits to apply to future KYC when those people one-click for the first time elsewhere. "
+              "To be even more aligned with our early users, we will give you a rebate back of the cost to do standard KYC the next time that same person does a one-click KYC on another platform. If you onboard 100,000 people who are new to Footprint, you’ll spend $50,000, and you’ll get all of that back to apply to future KYC when those people one-click for the first time elsewhere. "
             ]
           },
           "competitor-pricing": {
@@ -639,19 +633,19 @@
           "failure-charge": {
             "title": "Do you charge if the KYC fails?",
             "content": [
-              "Nope. Our goal is to get results and get good actors on your platform. We don’t want to make money from fails in the flow or a bevy of fraudulent actors we reject. "
+              "Nope. Our goal will always be to get good actors on your platform. We are aligned with our customers' goals, so we don't make money from fails in the flow or a bevy of fraudulent actors we reject."
             ]
           },
           "business-model": {
             "title": "What is Footprint’s business model?",
             "content": [
-              "We operate a bit differently. We don’t want to make money by making verifications unnecessarily expensive. It’s why we give away biometric checks (e.g. FaceID, TouchID, etc) for free, and actually don’t recommend doing a driver’s license scan in many instances. While we’d be happy to make more money by doing a fairly simple task such as that scan, it really isn’t worth the money in most cases and adds unfortunate friction. Our business model has two core tenets to work: 1) democratize access to a best-in-class comprehensive security suite (with encryption, vaulting, access control, and audit logs), and 2) work toward a one-click future of identity. We charge accordingly."
+              "We operate a bit differently. We don’t want to make money by making verifications unnecessarily expensive. It’s why we give away biometric checks (e.g. FaceID, TouchID, etc) for free, and actually don’t recommend doing a driver’s license scan in many instances. While we’d be happy to make more money by doing a fairly simple task such as that scan, it really isn’t worth the money in most cases and adds unfortunate friction. Our business model has two core tenets to work: \n 1. Democratize access to a best-in-class comprehensive security suite (with encryption, vaulting, access control, and audit logs), and \n 2. Work toward a one-click future of identity. We charge accordingly."
             ]
           },
           "disclose-pricing": {
             "title": "Why do you disclose pricing?",
             "content": [
-              "Given our mission of bringing back trust and transparency to the Internet, we proudly display our pricing below, and genuine business model above. The pricing may change a bit over time, but we’ll update it here. As you’ll see below, we charge in credits for the KYC and Security product. For each user that does a standard KYC through you, we will give you a credit back each of the next three times they do a one-click KYC. That means you’ll recoup the cost of everyone you “onboard” to our network. Talk about aligned incentives :)."
+              "Given our mission of bringing back trust and transparency to the Internet, we proudly display our pricing below, and genuine business model above. The pricing may change a bit over time, but we’ll update it here. For each user that does a standard KYC through you, we will give you the cost back each of the next three times they do a one-click KYC. That means you’ll recoup the cost of everyone you “onboard” to our network. Talk about aligned incentives :)."
             ]
           },
           "drivers-license-scans": {
