@@ -275,7 +275,7 @@ class TestBifrost:
         post("hosted/onboarding/d2p/generate", None, non_sandbox_auth_token)
         post("hosted/onboarding/d2p/generate", dict(), non_sandbox_auth_token)
         # Get new auth token in d2p/generate endpoint
-        meta = dict(opener="mobile")
+        meta = dict(opener="mobile", style_params="lots of CSS things")
         body = post(
             "hosted/onboarding/d2p/generate", dict(meta=meta), non_sandbox_auth_token
         )
