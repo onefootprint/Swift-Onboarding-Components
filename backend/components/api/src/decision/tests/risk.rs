@@ -49,10 +49,9 @@ fn create_onboarding_rules_decision_output(
 #[test_case(false, vec![] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![], false); "id located, conservative rules are off -> pass")]
 #[test_case(false, vec![FootprintReasonCode::IdNotLocated] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::IdNotLocated], false); "id not located -> fail")]
 // id located, but was a watchlist hit so we commit, but fail onboarding
-#[test_case(false, vec![FootprintReasonCode::WatchlistHit] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, true, vec![RuleName::WatchlistHit], false); "id located, watchlist hit -> fail but commit")]
+#[test_case(false, vec![FootprintReasonCode::WatchlistHitOfac] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, true, vec![RuleName::WatchlistHit], false); "id located, watchlist hit -> fail but commit")]
 // id located, but was a watchlist hit + other failure, so we don't commit and fail onboarding
-#[test_case(false, vec![FootprintReasonCode::WatchlistHit, FootprintReasonCode::SubjectDeceased] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased, RuleName::WatchlistHit], false); "id located, watchlist hit + other reason -> fail and don't commit")]
-#[test_case(false, vec![FootprintReasonCode::PotentialWatchlistHit] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![], false); "id located, but potential watchlist -> pass")]
+#[test_case(false, vec![FootprintReasonCode::WatchlistHitNonSdn, FootprintReasonCode::SubjectDeceased] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased, RuleName::WatchlistHit], false); "id located, watchlist hit + other reason -> fail and don't commit")]
 // id located but hit a conservative rule -> fail
 #[test_case(true, vec![FootprintReasonCode::AddressLocatedIsHighRiskAddress] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::AddressLocatedIsHighRiskAddress], true); "id located but hit a conservative rule -> fail")]
 // id located but hit a base rule -> fail

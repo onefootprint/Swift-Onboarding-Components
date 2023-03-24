@@ -16,16 +16,6 @@ impl IDologyFeatures {
 
         let mut footprint_reason_codes: Vec<FootprintReasonCode> = r.footprint_reason_codes();
 
-        if r.max_watchlist_score().map(|s| s > 93).unwrap_or(false)
-            && !footprint_reason_codes.contains(&FootprintReasonCode::WatchlistHit)
-        {
-            footprint_reason_codes.push(FootprintReasonCode::WatchlistHit)
-        } else if r.has_potential_watchlist_hit()
-            && !footprint_reason_codes.contains(&FootprintReasonCode::PotentialWatchlistHit)
-        {
-            footprint_reason_codes.push(FootprintReasonCode::PotentialWatchlistHit)
-        }
-
         // Add reason code for not locating
         let id_located = r.id_located();
         if !id_located {

@@ -20,8 +20,7 @@ fn idology_features(fp_reason_codes: Vec<FootprintReasonCode>) -> IDologyFeature
 // if no id located, we fail.
 #[test_case(idology_features(vec![FootprintReasonCode::IdNotLocated]) => true)]
 // High watchlist score
-#[test_case(idology_features(vec![FootprintReasonCode::WatchlistHit]) => true)]
-#[test_case(idology_features(vec![FootprintReasonCode::PotentialWatchlistHit]) => false)]
+#[test_case(idology_features(vec![FootprintReasonCode::WatchlistHitOfac]) => true)]
 #[test_case(idology_features(vec![FootprintReasonCode::SubjectDeceased]) => true)]
 // SSN rules
 #[test_case(idology_features(vec![FootprintReasonCode::SsnDoesNotMatch]) => true)]

@@ -101,8 +101,14 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
         Rule {
             rule: {
                 |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::WatchlistHit)
+                    f.footprint_reason_codes.iter().any(|rc| {
+                        vec![
+                            FootprintReasonCode::WatchlistHitOfac,
+                            FootprintReasonCode::WatchlistHitNonSdn,
+                            FootprintReasonCode::WatchlistHitPep,
+                        ]
+                        .contains(rc)
+                    })
                 }
             },
             name: RuleName::WatchlistHit,

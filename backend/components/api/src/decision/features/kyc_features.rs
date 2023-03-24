@@ -279,7 +279,7 @@ mod tests {
             footprint_reason_codes: vec![
                 FootprintReasonCode::IpNotLocated,
                 FootprintReasonCode::AddressStreetNameDoesNotMatch,
-                FootprintReasonCode::WatchlistHit,
+                FootprintReasonCode::WatchlistHitOfac,
             ],
             verification_result: idology_result.verification_result_id,
         };

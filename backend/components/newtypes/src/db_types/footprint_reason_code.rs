@@ -83,11 +83,14 @@ footprint_reason_code_enum! {
     pub enum FootprintReasonCode {
 
         // ~~~~~~~~~ Identity ~~~~~~~~~~~~~~~
-        #[note = "Potential watchlist hit", severity = SignalSeverity::Low, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A weak potential match on a governmental watchlist (OFAC, PEP or NonSDN Consolidated Sanctions (PLC, FSE, ISA, SSI)) was found"]
-        PotentialWatchlistHit,
+        #[note = "OFAC watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A strong potential match on a governmental OFAC watchlist"]
+        WatchlistHitOfac,
 
-        #[note = "Watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A strong potential match on a governmental watchlist (OFAC, PEP or NonSDN Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
-        WatchlistHit,
+        #[note = "Non-SDN watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A strong potential match on a governmental NonSDN watchlist (Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
+        WatchlistHitNonSdn,
+
+        #[note = "PEP hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob], description = "A strong potential match as a Politically Exposed Person"]
+        WatchlistHitPep,
 
         #[note = "Identity not located", severity = SignalSeverity::High, scopes =  vec![SignalScope::Name, SignalScope::Dob, SignalScope::Ssn, SignalScope::Address], description = "Identity could not be located with the information provided"]
         IdNotLocated,

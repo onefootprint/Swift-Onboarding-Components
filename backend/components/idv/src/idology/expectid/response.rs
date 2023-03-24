@@ -1,11 +1,12 @@
 use crate::idology::{
+    common::response::{
+        from_string_or_int, IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType,
+    },
     error as IdologyError,
-    common::response::{IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType, from_string_or_int},
     IdologyError::RequestError,
 };
-use itertools::Itertools;
 use newtypes::{DecisionStatus, FootprintReasonCode, IDologyReasonCode};
-use std::str::FromStr;
+use std::{collections::HashSet, str::FromStr};
 
 // Given a raw response, deserialize
 pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDResponse, IdologyError::Error> {
@@ -43,7 +44,7 @@ pub struct Restriction {
 }
 
 impl Restriction {
-    pub fn parse_pa(&self) -> Option<Vec<Pa>> {
+    fn parse_pa(&self) -> Option<Vec<Pa>> {
         self.pa.as_ref().map(|pa| match pa {
             serde_json::Value::Object(_) => {
                 let parsed_pa: Option<Pa> = serde_json::value::from_value(pa.to_owned()).ok();
@@ -60,12 +61,42 @@ impl Restriction {
             _ => vec![],
         })
     }
+
+    pub fn watchlists(&self) -> Vec<PaWatchlistHit> {
+        let is_watchlist_hit = self
+            .key
+            .as_ref()
+            .map(|k| k == "global.watch.list")
+            .unwrap_or(false);
+
+        let hits = if let Some(l) = self.parse_pa() {
+            l.into_iter()
+                .map(PaWatchlistHit::try_from)
+                .filter_map(|r| match r {
+                    Ok(h) => Some(h),
+                    Err(e) => {
+                        tracing::error!(err=%e, "Error parsing Idology watchlist hit");
+                        None
+                    }
+                })
+                .collect()
+        } else {
+            vec![]
+        };
+
+        if (is_watchlist_hit && hits.is_empty()) || (!is_watchlist_hit && !hits.is_empty()) {
+            tracing::error!(is_watchlist_hit=%is_watchlist_hit, hits=format!("{:?}", hits), "Unexpected Idology watchlist response");
+        }
+
+        hits
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PaList {
     OFAC,
-    OtherWatchlist,
+    PEP,
+    NonSDNList,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, PartialEq, Eq, serde::Serialize)]
@@ -82,17 +113,72 @@ pub struct Pa {
     pub dob: Option<String>,
 }
 
+// Parsed Pa
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PaWatchlistHit {
+    list: PaList,
+    score: i32,
+    dob: Option<String>,
+    record_type: Option<String>,
+}
+
+impl From<PaWatchlistHit> for FootprintReasonCode {
+    fn from(h: PaWatchlistHit) -> Self {
+        match h.list {
+            PaList::OFAC => FootprintReasonCode::WatchlistHitOfac,
+            PaList::PEP => FootprintReasonCode::WatchlistHitPep,
+            PaList::NonSDNList => FootprintReasonCode::WatchlistHitNonSdn,
+        }
+    }
+}
+
+impl PaWatchlistHit {
+    pub fn to_footprint_reason_codes(hits: Vec<PaWatchlistHit>) -> Vec<FootprintReasonCode> {
+        let codes: HashSet<FootprintReasonCode> = hits
+            .into_iter()
+            .filter(|h| h.score > 93)
+            .map(|h| h.into())
+            .collect();
+        codes.into_iter().collect()
+    }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum PaWatchlistHitParseError {
+    #[error("score missing or malformed")]
+    ScoreParseError,
+}
+
+impl TryFrom<Pa> for PaWatchlistHit {
+    type Error = PaWatchlistHitParseError;
+
+    fn try_from(v: Pa) -> Result<Self, Self::Error> {
+        let score = v
+            .get_score()
+            .map_err(|_| PaWatchlistHitParseError::ScoreParseError)?
+            .ok_or(PaWatchlistHitParseError::ScoreParseError)?;
+
+        Ok(Self {
+            list: v.to_watchlist_enum(),
+            score,
+            dob: v.dob.clone(),
+            record_type: v.record_type,
+        })
+    }
+}
+
 // TODO: unsure the enum here
 impl Pa {
     fn to_watchlist_enum(&self) -> PaList {
         match self.list.as_str() {
             "Office of Foreign Asset Control" => PaList::OFAC,
             "OFAC SDN" => PaList::OFAC,
-            _ => PaList::OtherWatchlist,
+            "Politically Exposed Persons" => PaList::PEP,
+            _ => PaList::NonSDNList,
         }
     }
 
-    pub fn get_score(&self) -> Result<Option<i32>, std::num::ParseIntError> {
+    fn get_score(&self) -> Result<Option<i32>, std::num::ParseIntError> {
         self.score.as_ref().map(|s| s.parse::<i32>()).transpose()
     }
 }
@@ -127,7 +213,7 @@ impl Response {
     }
 
     pub fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
-        if let Some(ref qualifiers) = self.qualifiers {
+        let qualifier_reason_codes = if let Some(ref qualifiers) = self.qualifiers {
             qualifiers
                 .parse_qualifiers()
                 .into_iter()
@@ -147,52 +233,18 @@ impl Response {
                 .collect()
         } else {
             vec![]
-        }
-    }
+        };
 
-    // TODO: specialized review perhaps?
-    pub fn watchlists(&self) -> Option<Vec<PaList>> {
-        self.restriction.as_ref().map(|r| {
-            let mut lists: Vec<PaList> = vec![];
-            let key = r.key.as_ref();
-            let is_global_wl = key.map(|k| k.starts_with("global")).unwrap_or(false);
+        let restriction_reason_codes = self
+            .restriction
+            .as_ref()
+            .map(|r| PaWatchlistHit::to_footprint_reason_codes(r.watchlists()))
+            .unwrap_or_default();
 
-            if let Some(response_lists) = r.parse_pa() {
-                response_lists
-                    .iter()
-                    .map(|l| l.to_watchlist_enum())
-                    .for_each(|l| lists.push(l))
-            };
-
-            if lists.is_empty() && is_global_wl {
-                lists.push(PaList::OtherWatchlist);
-            }
-
-            lists.into_iter().unique().collect()
-        })
-    }
-
-    pub fn has_potential_watchlist_hit(&self) -> bool {
-        self.watchlists().map(|w| !w.is_empty()).unwrap_or(false)
-    }
-
-    pub fn max_watchlist_score(&self) -> Option<i32> {
-        self.restriction.as_ref().and_then(|r| r.parse_pa().and_then(|response_lists| 
-                response_lists
-                    .iter()
-                    .flat_map(|p| {
-                        let score_res = p.get_score();
-                        match score_res {
-                            Ok(s) => s,
-                            Err(_) => {
-                                tracing::warn!(score=%format!("{:?}", p.score), "error parsing watchlist score");
-                                None
-                            }
-                        }
-                    })
-                    .max()
-            
-        ))
+        qualifier_reason_codes
+            .into_iter()
+            .chain(restriction_reason_codes.into_iter())
+            .collect()
     }
 
     fn error(&self) -> Option<RequestError> {
@@ -210,7 +262,6 @@ impl Response {
         Ok(())
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -299,7 +350,7 @@ mod tests {
         assert!(response.response.qualifiers.is_none());
         assert!(response.response.results.is_none());
         assert!(response.response.summary_result.is_none());
-        assert!(response.response.watchlists().is_none())
+        assert!(response.response.restriction.is_none());
     }
 
     #[test]
@@ -335,6 +386,10 @@ mod tests {
                     "score": "97",
                     "dob": "11301960"
                 },
+                {
+                    "list": "Politically Exposed Persons",
+                    "score": 67
+                  },
                 ]
             },
         }});
@@ -373,46 +428,71 @@ mod tests {
 
         let response_single = parse_response(raw_single)
             .expect("Could not parse response")
-            .response;
+            .response
+            .restriction
+            .unwrap();
         let response_multiple = parse_response(raw_multiple)
             .expect("Could not parse response")
-            .response;
+            .response
+            .restriction
+            .unwrap();
         let response_missing_pa = parse_response(raw_missing_pa)
             .expect("Could not parse response")
-            .response;
+            .response
+            .restriction
+            .unwrap();
         let response_malformed = parse_response(raw_malformed_pa)
             .expect("Could not parse response")
-            .response;
+            .response
+            .restriction
+            .unwrap();
         let response_malformed_score = parse_response(raw_malformed_score)
             .expect("Could not parse response")
-            .response;
+            .response
+            .restriction
+            .unwrap();
         // PA has 1 record
-        assert_eq!(vec![PaList::OFAC], response_single.watchlists().unwrap());
-        assert_eq!(Some(97), response_single.max_watchlist_score());
-
-        // PA has 2 records
         assert_eq!(
-            vec![PaList::OFAC, PaList::OtherWatchlist],
-            response_multiple.watchlists().unwrap()
+            vec![PaWatchlistHit {
+                list: PaList::OFAC,
+                score: 97,
+                dob: Some("02121978".to_owned()),
+                record_type: None
+            }],
+            response_single.watchlists()
         );
-        assert_eq!(Some(98), response_multiple.max_watchlist_score());
+
+        assert_eq!(
+            vec![
+                PaWatchlistHit {
+                    list: PaList::OFAC,
+                    score: 98,
+                    dob: Some("11301960".to_owned()),
+                    record_type: None
+                },
+                PaWatchlistHit {
+                    list: PaList::NonSDNList,
+                    score: 97,
+                    dob: Some("11301960".to_owned()),
+                    record_type: None
+                },
+                PaWatchlistHit {
+                    list: PaList::PEP,
+                    score: 67,
+                    dob: None,
+                    record_type: None
+                }
+            ],
+            response_multiple.watchlists()
+        );
 
         // Response missing PA
-        assert_eq!(
-            vec![PaList::OtherWatchlist],
-            response_missing_pa.watchlists().unwrap()
-        );
-        assert_eq!(None, response_missing_pa.max_watchlist_score());
+        assert!(response_missing_pa.watchlists().is_empty());
 
         // Malformed PA
-        assert_eq!(
-            vec![PaList::OtherWatchlist],
-            response_malformed.watchlists().unwrap()
-        );
-        assert_eq!(None, response_malformed.max_watchlist_score());
+        assert!(response_malformed.watchlists().is_empty());
 
-        // Malformed score
-        assert_eq!(None, response_malformed_score.max_watchlist_score())
+        assert!(response_malformed_score.watchlists().is_empty());
     }
 
     #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardMailDrop])]
@@ -457,14 +537,14 @@ mod tests {
         Response {
             qualifiers: None,
             results: Some(KeyResponse {
-                key: results_key.to_owned()
+                key: results_key.to_owned(),
             }),
             summary_result: None,
             id_number: None,
             id_scan: None,
             error: None,
             restriction: None,
-        }.id_located()
+        }
+        .id_located()
     }
-
 }
