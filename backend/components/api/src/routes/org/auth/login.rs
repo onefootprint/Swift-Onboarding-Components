@@ -52,7 +52,7 @@ async fn handler(
         })
         .await
         .map_err(WorkOsError::from)?;
-    tracing::info!(profile =?profile, "workos login");
+    tracing::info!(org_id =?profile.organization_id, id = ?profile.id, "workos login");
 
     let profile2 = profile.clone();
     // First, get all matching tenant rolebindings.
