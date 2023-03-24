@@ -2,6 +2,8 @@ mod context;
 pub use context::*;
 mod data;
 pub use data::*;
+mod update;
+pub use update::*;
 
 use db::PgConn;
 

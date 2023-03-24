@@ -1,4 +1,4 @@
-use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
+use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
         session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
@@ -149,10 +149,8 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
     }
 }
 
-impl TenantRbAuthContext {
-    /// Escape hatch to get the `TenantUser` for a `TenantRbAuthContext`, if and only if the
-    /// authed user is a firm employee.
-    pub fn firm_employee_user(&self) -> ApiResult<TenantUser> {
+impl GetFirmEmployee for TenantRbAuthContext {
+    fn firm_employee_user(&self) -> ApiResult<TenantUser> {
         let tenant_user = self.data.0.tenant_user.clone();
         if !tenant_user.is_firm_employee {
             // TODO should we hide these errors with 404s?
@@ -162,6 +160,6 @@ impl TenantRbAuthContext {
     }
 }
 
-// Allow calling SessionContext<T>::update for T=TenantRbAuth, only for mutating a token to be used
+// Allow calling SessionContext<T>::update for T=ParsedTenantRbAuth, only for mutating a token to be used
 // for impersonation
 impl AllowSessionUpdate for ParsedTenantRbAuth {}

@@ -8,6 +8,7 @@ pub use self::workos::*;
 use db::models::tenant::Tenant;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_user::TenantUser;
 pub use ob_public_key::*;
 mod secret_key;
 pub use secret_key::*;
@@ -21,6 +22,7 @@ pub use self::firm_employee::*;
 use super::AuthError;
 use super::Either;
 use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAuthContext>;
@@ -34,6 +36,12 @@ pub trait TenantAuth {
     /// The rolebinding that ties the authed principal to the role. Will be None for firm employee
     /// auth and API key auth
     fn rolebinding(&self) -> Option<&TenantRolebinding>;
+}
+
+pub trait GetFirmEmployee {
+    /// Escape hatch to get the `TenantUser` for an auth session, if and only if the authed user
+    /// is a firm employee.
+    fn firm_employee_user(&self) -> ApiResult<TenantUser>;
 }
 
 #[derive(Clone)]

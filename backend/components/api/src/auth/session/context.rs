@@ -1,21 +1,12 @@
-use std::{marker::PhantomData, pin::Pin};
-
+use super::{AllowSessionUpdate, ExtractableAuthSession, GetSessionForUpdate};
+use crate::auth::AuthError;
+use crate::{errors::ApiError, utils::session::AuthSession, State};
 use actix_web::{http::header::HeaderMap, web, FromRequest};
 use chrono::{DateTime, Utc};
-use crypto::aead::ScopedSealingKey;
-use db::PgConn;
 use futures_util::Future;
 use newtypes::{PiiString, SessionAuthToken};
 use paperclip::actix::Apiv2Security;
-
-use crate::{
-    errors::{ApiError, ApiResult},
-    utils::session::AuthSession,
-    State,
-};
-
-use super::{AuthSessionData, ExtractableAuthSession};
-use crate::auth::AuthError;
+use std::{marker::PhantomData, pin::Pin};
 
 /// Abstract Session Context Type
 #[derive(Debug, Clone, Apiv2Security)]
@@ -35,22 +26,12 @@ impl<T> SessionContext<T> {
     }
 }
 
-pub trait AllowSessionUpdate {}
-
-impl<T> SessionContext<T>
+impl<T> GetSessionForUpdate for SessionContext<T>
 where
     T: AllowSessionUpdate,
 {
-    /// Replace the session data for the session used to authenticate this SessionContext with the
-    /// new provided data
-    pub fn update_session(
-        self, // Intentionally consume to prevent reading stale value
-        conn: &mut PgConn,
-        session_sealing_key: &ScopedSealingKey,
-        data: AuthSessionData,
-    ) -> ApiResult<()> {
-        self.session.update(conn, session_sealing_key, data)?;
-        Ok(())
+    fn session(self) -> AuthSession {
+        self.session
     }
 }
 

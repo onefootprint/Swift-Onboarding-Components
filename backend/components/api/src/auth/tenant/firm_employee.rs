@@ -1,7 +1,7 @@
-use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
+use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
-        session::{AuthSessionData, ExtractableAuthSession},
+        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -110,6 +110,21 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         }))
     }
 }
+
+impl GetFirmEmployee for FirmEmployeeAuthContext {
+    fn firm_employee_user(&self) -> ApiResult<TenantUser> {
+        let tu = &self.data.0.tenant_user;
+        if !tu.is_firm_employee {
+            // TODO should we hide these errors with 404s?
+            return Err(AuthError::NotFirmEmployee.into());
+        }
+        Ok(tu.clone())
+    }
+}
+
+// Allow calling SessionContext<T>::update for T=ParsedFirmEmployeeAuth, only for mutating a token to be used
+// for impersonation
+impl AllowSessionUpdate for ParsedFirmEmployeeAuth {}
 
 impl CanCheckTenantGuard for FirmEmployeeAuthContext {
     fn role(&self) -> &TenantRole {

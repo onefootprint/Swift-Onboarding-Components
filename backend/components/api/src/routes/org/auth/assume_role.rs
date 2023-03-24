@@ -1,4 +1,4 @@
-use crate::auth::session::AuthSessionData;
+use crate::auth::session::{AuthSessionData, UpdateSession};
 use crate::auth::tenant::WorkOsSession;
 use crate::auth::SessionContext;
 use crate::errors::ApiError;

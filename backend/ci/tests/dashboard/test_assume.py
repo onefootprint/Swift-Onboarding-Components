@@ -33,8 +33,8 @@ def assumed_token(tenant, sandbox_tenant_data):
     # Correct use
     post("private/assume", data, auth_token)
 
-    # Should not be able to assume with the same token that was used to assume
-    post("private/assume", data, auth_token, status_code=401)
+    # Can re-assume with the same token
+    post("private/assume", data, auth_token)
 
     # Now, the auth token sees different data!
     body = get("org", None, auth_token)

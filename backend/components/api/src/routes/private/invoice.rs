@@ -1,5 +1,5 @@
 use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
-use crate::auth::tenant::TenantRbAuthContext;
+use crate::auth::tenant::{GetFirmEmployee, TenantRbAuthContext};
 use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};

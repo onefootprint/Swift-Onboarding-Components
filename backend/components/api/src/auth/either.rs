@@ -6,7 +6,10 @@ use futures_util::Future;
 
 use crate::errors::ApiError;
 
-use super::{tenant::TenantAuth, AuthError};
+use super::{
+    tenant::{GetFirmEmployee, TenantAuth},
+    AuthError,
+};
 
 #[derive(Debug, Clone)]
 /// Abstract Session Context Type
@@ -128,6 +131,19 @@ where
         match self {
             Either::Left(l) => l.actor(),
             Either::Right(r) => r.actor(),
+        }
+    }
+}
+
+impl<A, B> GetFirmEmployee for Either<A, B>
+where
+    A: GetFirmEmployee,
+    B: GetFirmEmployee,
+{
+    fn firm_employee_user(&self) -> crate::errors::ApiResult<db::models::tenant_user::TenantUser> {
+        match self {
+            Either::Left(l) => l.firm_employee_user(),
+            Either::Right(r) => r.firm_employee_user(),
         }
     }
 }

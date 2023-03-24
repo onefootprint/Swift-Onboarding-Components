@@ -1,4 +1,5 @@
 use super::create_onboarding_validation_token;
+use crate::auth::session::UpdateSession;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;

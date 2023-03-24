@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::{FirmEmployeeSession, TenantRbAuthContext};
+use crate::auth::session::{AuthSessionData, UpdateSession};
+use crate::auth::tenant::{FirmEmployeeSession, GetFirmEmployee, TenantSessionAuth};
 use crate::auth::AuthError;
 use crate::errors::ApiResult;
 use crate::types::{JsonApiResponse, ResponseData};
@@ -24,7 +24,7 @@ struct AssumeRequest {
 #[post("/private/assume")]
 async fn post(
     state: web::Data<State>,
-    auth: TenantRbAuthContext,
+    auth: TenantSessionAuth,
     request: Json<AssumeRequest>,
 ) -> JsonApiResponse<api_wire_types::Organization> {
     let firm_employee = auth.firm_employee_user()?;
