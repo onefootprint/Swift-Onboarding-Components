@@ -49,7 +49,7 @@ export enum IdDI {
 }
 
 export enum DocumentsDI {
-  finraComplianceLetter = 'documents.finra_compliance_letter',
+  finraComplianceLetter = 'document.finra_compliance_letter',
 }
 
 export type DataIdentifier =

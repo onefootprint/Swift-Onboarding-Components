@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { InvestorProfileDI } from '@onefootprint/types';
+import { DocumentsDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
@@ -45,6 +45,7 @@ const Declarations = () => {
         uploadFileMutation.mutate(
           {
             file: files[0],
+            documentKind: DocumentsDI.finraComplianceLetter,
             authToken: authToken ?? '',
           },
           {
