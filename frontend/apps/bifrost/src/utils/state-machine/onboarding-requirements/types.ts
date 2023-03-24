@@ -26,6 +26,7 @@ export type MachineContext = {
     sandboxSuffix?: string; // only if in sandbox mode
   };
   startedDataCollection: boolean;
+  collectedKycData?: boolean; // Used to determine if we should show a transition animation between kyc data and investor profile plugins
   requirements: Requirements;
 };
 

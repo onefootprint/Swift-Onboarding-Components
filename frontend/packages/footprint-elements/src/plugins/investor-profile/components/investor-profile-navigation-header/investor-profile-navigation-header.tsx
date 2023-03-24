@@ -5,7 +5,7 @@ import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine'
 
 const InvestorProfileNavigationHeader = () => {
   const [state, send] = useInvestorProfileMachine();
-  const shouldShowCloseButton = state.matches('init');
+  const shouldShowCloseButton = state.matches('employment');
 
   const handleBackButtonClick = () => {
     send('navigatedToPrevPage');

@@ -99,6 +99,7 @@ const createOnboardingRequirementsMachine = ({
           },
         },
         kycData: {
+          exit: ['markCollectedKycData'],
           on: {
             requirementCompleted: {
               target: 'checkOnboardingRequirements',
@@ -133,6 +134,10 @@ const createOnboardingRequirementsMachine = ({
         startDataCollection: assign(context => ({
           ...context,
           startedDataCollection: true,
+        })),
+        markCollectedKycData: assign(context => ({
+          ...context,
+          collectedKycData: true,
         })),
       },
     },

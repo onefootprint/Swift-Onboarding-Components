@@ -35,6 +35,9 @@ export type MachineContext = {
   // Plugin context
   device?: DeviceInfo;
   authToken?: string;
+  // Whether to show the animation at the start, if transitioning from collect-kyc-data
+  // In the future, we can generalize to use different icons to indicate prev plugin type
+  showTransition?: boolean;
   data: InvestorProfileData;
 };
 
@@ -44,6 +47,7 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
+        showTransition?: boolean;
       };
     }
   | {

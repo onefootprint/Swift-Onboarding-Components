@@ -3,15 +3,18 @@ import { Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTimeout } from 'usehooks-ts';
 
 type GenericTransitionProps = {
   firstText: string;
   secondText: string;
   firstIcon: Icon;
   secondIcon: Icon;
+  timeout: number;
+  onAnimationEnd: () => void;
 };
 
-const FIRST_STEP_DURATION = 3;
+const STEP_DURATION = 3;
 const TRANSITION_DURATION = 0.2;
 
 const GenericTransition = ({
@@ -19,9 +22,13 @@ const GenericTransition = ({
   secondText,
   firstIcon: IconFirst,
   secondIcon: IconSecond,
+  timeout,
+  onAnimationEnd,
 }: GenericTransitionProps) => {
   const renderedFirstIcon = <IconFirst />;
   const renderedSecondIcon = <IconSecond />;
+
+  useTimeout(onAnimationEnd, timeout);
 
   return (
     <AnimationWrapper>
@@ -29,16 +36,16 @@ const GenericTransition = ({
         <FirstIconContainer
           initial={{
             opacity: 1,
-            y: '50%',
-            x: '50%',
+            x: '21%',
+            y: '22.5%',
           }}
           animate={{
             opacity: 0,
+            x: '21%',
             y: 0,
-            x: '50%',
             display: 'none',
             transition: {
-              delay: FIRST_STEP_DURATION,
+              delay: STEP_DURATION,
               duration: TRANSITION_DURATION,
               ease: 'easeInOut',
             },
@@ -70,15 +77,15 @@ const GenericTransition = ({
         <SecondIconContainer
           initial={{
             opacity: 0,
+            x: '21%',
             y: 0,
-            x: '50%',
           }}
           animate={{
             opacity: 1,
-            y: '50%',
-            x: '50%',
+            x: '21%',
+            y: '22.5%',
             transition: {
-              delay: FIRST_STEP_DURATION,
+              delay: STEP_DURATION,
               duration: TRANSITION_DURATION,
               ease: 'easeInOut',
             },
@@ -97,7 +104,7 @@ const GenericTransition = ({
             opacity: 0,
             y: -10,
             transition: {
-              delay: FIRST_STEP_DURATION,
+              delay: STEP_DURATION,
               duration: TRANSITION_DURATION,
               ease: 'easeInOut',
             },
@@ -114,7 +121,7 @@ const GenericTransition = ({
             opacity: 1,
             y: 0,
             transition: {
-              delay: FIRST_STEP_DURATION,
+              delay: STEP_DURATION + 0.2,
               duration: 0.2,
             },
           }}
@@ -131,6 +138,7 @@ const AnimationWrapper = styled(motion.div)`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    width: 100%;
     gap: ${theme.spacing[4]};
     padding: ${theme.spacing[6]};
     align-items: center;
@@ -146,24 +154,15 @@ const Icons = styled.div`
 `;
 
 const FirstIconContainer = styled(motion.div)`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: ${theme.backgroundColor.primary};
-    position: absolute;
-    transform: translate(50%, 50%);
-    top: 0;
-    left: 0;
-  `}
+  position: absolute;
+  height: 60px;
+  width: 60px;
 `;
 
 const SecondIconContainer = styled(motion.div)`
-  height: fit-content;
   position: absolute;
-  transform: translate(50%, 50%);
-  top: 0;
-  left: 0;
+  height: 60px;
+  width: 60px;
 `;
 
 const Text = styled.div`

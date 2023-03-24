@@ -28,6 +28,7 @@ const Router = ({ onDone }: RouterProps) => {
       config,
       device,
     },
+    collectedKycData,
     requirements: { liveness, idDoc, selfie, kycData, kybData },
   } = state.context;
   const isDone = state.matches('success');
@@ -104,6 +105,9 @@ const Router = ({ onDone }: RouterProps) => {
           context={{
             authToken,
             device,
+            customData: {
+              showTransition: !!collectedKycData,
+            },
           }}
           onDone={handleRequirementCompleted}
         />

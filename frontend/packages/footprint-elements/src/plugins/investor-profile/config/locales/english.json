@@ -7,6 +7,10 @@
     "continue-button": {
       "label": "Continue",
       "loading-aria-label": "Loading..."
+    },
+    "transition-animation": {
+      "source": "Personal data collected",
+      "destination": "Now your investor profile!"
     }
   },
   "pages": {

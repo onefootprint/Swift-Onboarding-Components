@@ -16,7 +16,7 @@ const i18n = configureI18next();
 
 const App = ({ context, onDone }: InvestorProfileProps) => {
   const [, send] = useInvestorProfileMachine();
-  const { authToken, device } = context;
+  const { authToken, device, customData } = context;
 
   useEffectOnce(() => {
     send({
@@ -24,6 +24,7 @@ const App = ({ context, onDone }: InvestorProfileProps) => {
       payload: {
         device,
         authToken,
+        showTransition: customData?.showTransition,
       },
     });
   });

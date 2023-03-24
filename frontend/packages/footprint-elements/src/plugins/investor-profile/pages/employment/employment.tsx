@@ -1,8 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
 import { InvestorProfileDI } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 
-import { HeaderTitle } from '../../../../components';
+import { GenericTransition, HeaderTitle } from '../../../../components';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -12,10 +14,11 @@ import EmploymentForm from './components/employment-form';
 
 const Employment = () => {
   const [state, send] = useInvestorProfileMachine();
-  const { authToken, data } = state.context;
+  const { authToken, showTransition, data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { t } = useTranslation('pages.employment');
+  const { t, allT } = useTranslation('pages.employment');
   const showToast = useSyncErrorToast();
+  const [showForm, setShowForm] = useState(!showTransition);
 
   const handleSubmit = (employmentData: EmploymentData) => {
     syncData({
@@ -34,7 +37,7 @@ const Employment = () => {
     });
   };
 
-  return (
+  return showForm ? (
     <>
       <InvestorProfileNavigationHeader />
       <HeaderTitle
@@ -50,7 +53,25 @@ const Employment = () => {
         }}
       />
     </>
+  ) : (
+    <AnimationContainer>
+      <GenericTransition
+        firstIcon={IcoUser40}
+        secondIcon={IcoDollar40}
+        firstText={allT('components.transition-animation.source')}
+        secondText={allT('components.transition-animation.destination')}
+        timeout={5500}
+        onAnimationEnd={() => setShowForm(true)}
+      />
+    </AnimationContainer>
   );
 };
+
+const AnimationContainer = styled.div`
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+`;
 
 export default Employment;
