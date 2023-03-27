@@ -136,3 +136,36 @@ async fn build_docv_for_scan_verify_results(state: &State, request: Verification
 fn parse_reference_id_for_scan_verify(reference_id: Option<String>) -> Result<Option<u64>, ApiError> {
     reference_id.map(|r| r.parse::<u64>()).transpose().map_err(|_| ApiError::AssertionError("could not parse ref_id for idology".into()))
 }
+
+
+#[cfg(test)]
+mod tests {
+    use db::{test_helpers::test_db_pool, models::verification_request::VerificationRequest};
+    use newtypes::VerificationRequestId;
+
+    use crate::utils::mock_enclave::StateWithMockEnclave;
+    use super::build_idv_data_from_verification_request;
+
+    /// Helper to debug IdvData being built from verification request while testing bifrost flows
+    /// 
+    /// Place a breakpoint on the line indicated below to view the struct (can't println since we scrub prints)
+    #[ignore]
+    #[tokio::test]
+    async fn debug_build_idv_data_from_verification_request() {
+        let db_pool = test_db_pool();
+        let state = &StateWithMockEnclave::init().await.state;
+        
+        let vr = db_pool.db_query(move |conn| {
+            VerificationRequest::get(conn, VerificationRequestId::from("your vreq here".to_string())).unwrap()
+        }).await.unwrap();
+
+
+        let b = build_idv_data_from_verification_request(&db_pool, &state.enclave_client, vr).await.unwrap();
+
+        // place breakpoint on the line below this
+        assert!(b.first_name.is_none())
+
+        
+
+    }
+}

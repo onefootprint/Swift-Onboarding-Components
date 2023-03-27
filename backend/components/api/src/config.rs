@@ -104,6 +104,7 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub stripe: StripeConfig,
+
     // #[envconfig(nested = true)]
     // pub experian: ExperianConfig,
     #[envconfig(from = "FINGERPRINTJS_SDK_KEY")]

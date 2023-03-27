@@ -90,6 +90,14 @@ impl VerificationRequest {
         .ok_or(crate::DbError::ObjectNotFound)
     }
 
+    pub fn get(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Self> {
+        let res = verification_request::table
+            .filter(verification_request::id.eq(id))
+            .first(conn)?;
+
+        Ok(res)
+    }
+
     /// Based on VerificationRequests for the onboarding, get VerificationResults
     #[tracing::instrument(skip_all)]
     pub fn get_latest_requests_and_results_for_scoped_user(

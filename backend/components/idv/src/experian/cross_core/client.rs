@@ -132,20 +132,12 @@ impl ExperianClient {
         let url =
             "https://us-api.experian.com/decisionanalytics/crosscore/npfrawmfuwsu/services/v0/applications/3";
 
-        let config = PreciseIDRequestConfig {
-            control_options: self.control_options(),
-            // TODO: prob should put this in credentials
-            tenant_id: "105408b68cde455a92e95a3eaa989e".into(),
-            // TODO: prob should put this in credentials
-            request_type: "PreciseIdOnly".into(),
-            // TODO: verification request id?
-            client_reference_id: Uuid::new_v4().to_string(),
-            message_time: Utc::now(),
-        };
-        let req = serde_json::to_string(&CrossCoreAPIRequest::try_from(
+        let req_struct = &CrossCoreAPIRequest::try_from(
             validated_idv_data.into_idv_data(),
-            config,
-        )?)?;
+            self.config(),
+            self.environment == ClientEnvironment::Production,
+        )?;
+        let req = serde_json::to_string(req_struct)?;
         let auth_token = self.send_token_request().await?.access_token;
 
         let response = self
@@ -161,6 +153,19 @@ impl ExperianClient {
             .await?;
 
         Ok(response)
+    }
+
+    fn config(&self) -> PreciseIDRequestConfig {
+        PreciseIDRequestConfig {
+            control_options: self.control_options(),
+            // TODO: prob should put this in credentials
+            tenant_id: "105408b68cde455a92e95a3eaa989e".into(),
+            // TODO: prob should put this in credentials
+            request_type: "PreciseIdOnly".into(),
+            // TODO: verification request id?
+            client_reference_id: Uuid::new_v4().to_string(),
+            message_time: Utc::now(),
+        }
     }
 
     fn control_options(&self) -> Vec<ControlOption> {
@@ -209,7 +214,7 @@ impl ExperianClient {
         // what environment is this client in
         let is_production = self.environment == ClientEnvironment::Production;
         // is the data provided a test case
-        let is_test_case = validation::is_sandbox_data(&idv_data);
+        let is_test_case = validation::is_sandbox_data(&idv_data, is_production);
         // TODO: add protections for our own data
 
         match (is_test_case, is_production) {
@@ -269,7 +274,11 @@ impl CrossCoreRequestCredentials {
 mod tests {
     use super::{ClientEnvironment, ExperianClient};
     use crate::experian::{
-        cross_core::{response::CrossCoreAPIResponse, validation},
+        cross_core::{
+            request::CrossCoreAPIRequest,
+            response::CrossCoreAPIResponse,
+            validation::{self, load_sandbox_data},
+        },
         error::{Error, ValidationError},
     };
     use newtypes::{IdvData, PiiString};
@@ -340,19 +349,20 @@ mod tests {
     }
 
     #[test_case(IdvData {
-        first_name: validation::lift_pii("JOHN".into()),
-        last_name: validation::lift_pii("MILLEN".into()),
-        address_line1: validation::lift_pii("53 ROTARY WAY".into()),
-        zip: validation::lift_pii("94591".into()),
-        city: validation::lift_pii("VALLEJO".into()),
-        state: validation::lift_pii("CA".into()),
+        first_name: validation::lift_pii("JON"),
+        last_name: validation::lift_pii("MILLEN"),
+        address_line1: validation::lift_pii("53 ROTARY WAY"),
+        zip: validation::lift_pii("94591"),
+        city: validation::lift_pii("VALLEJO"),
+        state: validation::lift_pii("CA"),
+        country: validation::lift_pii("US"),
         ..Default::default()
     } => None)]
     // Not a test case
     #[test_case(IdvData {
-        first_name: validation::lift_pii("bob".into()),
-        last_name: validation::lift_pii("boberto".into()),
-        address_line1: validation::lift_pii("53 rotary way".into()),
+        first_name: validation::lift_pii("bob"),
+        last_name: validation::lift_pii("boberto"),
+        address_line1: validation::lift_pii("53 rotary way"),
         ..Default::default()
     } => Some(ValidationError::EnvironmentMismatch(crate::experian::error::EnvironmentMismatchError {is_production: false, is_test_case: false})))]
     fn test_validate(idv_data: IdvData) -> Option<ValidationError> {
@@ -369,20 +379,41 @@ mod tests {
     async fn test_send_precise_id_request() {
         let client = sandbox_client().unwrap();
 
-        let idv_data = IdvData {
-            first_name: validation::lift_pii("JOHN".into()),
-            last_name: validation::lift_pii("BREEN".into()),
-            address_line1: validation::lift_pii("PO BOX 445".into()),
-            zip: validation::lift_pii("09061".into()),
-            city: validation::lift_pii("APO".into()),
-            state: validation::lift_pii("AE".into()),
-            ssn9: validation::lift_pii("666436878".into()),
-            ..Default::default()
-        };
+        let idv_data = load_sandbox_data()[0].clone();
 
         let res = client.send_precise_id_request(idv_data).await.unwrap();
         let resp: CrossCoreAPIResponse = serde_json::from_value(res).unwrap();
 
         resp.precise_id_response().unwrap().score().unwrap();
+    }
+
+    #[test]
+    fn test_crosscore_api_request_try_from() {
+        let client = sandbox_client().unwrap();
+        let idv_data = IdvData {
+            first_name: validation::lift_pii("BOB"),
+            last_name: validation::lift_pii("BOBERTO"),
+            address_line1: validation::lift_pii("53 ROTARY WAY"),
+            zip: validation::lift_pii("94591"),
+            city: validation::lift_pii("VALLEJO"),
+            state: validation::lift_pii("CA"),
+            country: validation::lift_pii("US"),
+            phone_number: validation::lift_pii("122345"),
+            email: validation::lift_pii("bob@bobbyberto.com"),
+            ..Default::default()
+        };
+        assert!(idv_data.phone_number.is_some());
+        assert!(idv_data.email.is_some());
+        // sandbox we don't send email/phone
+        let req = CrossCoreAPIRequest::try_from(idv_data.clone(), client.config(), false).unwrap();
+        let contact = req.payload.contacts[0].clone();
+        assert!(contact.emails.is_empty());
+        assert!(contact.telephones.is_empty());
+
+        // prod we do send email/phone
+        let req = CrossCoreAPIRequest::try_from(idv_data, client.config(), true).unwrap();
+        let contact = req.payload.contacts[0].clone();
+        assert!(!contact.emails.is_empty());
+        assert!(!contact.telephones.is_empty());
     }
 }

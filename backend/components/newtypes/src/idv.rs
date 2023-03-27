@@ -1,7 +1,8 @@
 use crate::{IdentityDataKind, PiiString};
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IdvData {
     pub first_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
@@ -31,26 +32,31 @@ impl IdvData {
 
     pub fn present_data_attributes(&self) -> Vec<IdentityDataKind> {
         IdentityDataKind::iter()
-            .flat_map(|attr| {
-                match attr {
-                    IdentityDataKind::FirstName => self.first_name.as_ref(),
-                    IdentityDataKind::LastName => self.last_name.as_ref(),
-                    IdentityDataKind::Dob => self.dob.as_ref(),
-                    IdentityDataKind::Ssn4 => self.ssn4.as_ref(),
-                    IdentityDataKind::Ssn9 => self.ssn9.as_ref(),
-                    IdentityDataKind::AddressLine1 => self.address_line1.as_ref(),
-                    IdentityDataKind::AddressLine2 => self.address_line2.as_ref(),
-                    IdentityDataKind::City => self.city.as_ref(),
-                    IdentityDataKind::State => self.state.as_ref(),
-                    IdentityDataKind::Zip => self.zip.as_ref(),
-                    IdentityDataKind::Country => self.country.as_ref(),
-                    IdentityDataKind::Email => self.email.as_ref(),
-                    IdentityDataKind::PhoneNumber => self.phone_number.as_ref(),
-                }
-                .is_some()
-                .then_some(attr)
-            })
+            .flat_map(|attr| self.get(attr).is_some().then_some(attr))
             .collect()
+    }
+
+    pub fn get(&self, idk: IdentityDataKind) -> Option<&PiiString> {
+        match idk {
+            IdentityDataKind::FirstName => self.first_name.as_ref(),
+            IdentityDataKind::LastName => self.last_name.as_ref(),
+            IdentityDataKind::Dob => self.dob.as_ref(),
+            IdentityDataKind::Ssn4 => self.ssn4.as_ref(),
+            IdentityDataKind::Ssn9 => self.ssn9.as_ref(),
+            IdentityDataKind::AddressLine1 => self.address_line1.as_ref(),
+            IdentityDataKind::AddressLine2 => self.address_line2.as_ref(),
+            IdentityDataKind::City => self.city.as_ref(),
+            IdentityDataKind::State => self.state.as_ref(),
+            IdentityDataKind::Zip => self.zip.as_ref(),
+            IdentityDataKind::Country => self.country.as_ref(),
+            IdentityDataKind::Email => self.email.as_ref(),
+            IdentityDataKind::PhoneNumber => self.phone_number.as_ref(),
+        }
+    }
+
+    /// helper to normalize an idv data struct
+    pub fn get_normalized(&self, idk: IdentityDataKind) -> Option<PiiString> {
+        self.get(idk).map(|p| p.leak().trim().to_lowercase().into())
     }
 }
 

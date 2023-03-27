@@ -1,92 +1,39 @@
-use newtypes::{IdvData, PiiString};
+use newtypes::{IdentityDataKind, IdvData, PiiString};
 
 pub enum TestCaseOutcome {
     Pass,
     DeceasedSSN,
 }
-struct ExperianSandboxTestCase {
-    idv_data: IdvData,
+pub(crate) struct ExperianSandboxTestCase {
+    pub idv_data: IdvData,
     #[allow(dead_code)]
     pub outcome: TestCaseOutcome,
 }
 
-impl ExperianSandboxTestCase {
-    fn required_fields_present(data_to_match: &IdvData) -> bool {
-        data_to_match.first_name.is_some()
-            && data_to_match.last_name.is_some()
-            && data_to_match.address_line1.is_some()
-            && data_to_match.zip.is_some()
+impl std::ops::Deref for ExperianSandboxTestCase {
+    type Target = IdvData;
+    fn deref(&self) -> &Self::Target {
+        &self.idv_data
     }
+}
 
-    pub fn matches(&self, data_to_match: &IdvData) -> bool {
-        if !Self::required_fields_present(data_to_match) {
-            return false;
-        }
+impl ExperianSandboxTestCase {
+    pub fn matches(&self, data_to_match: &IdvData, is_production: bool) -> bool {
+        // find what attributes are present in the data to match
+        let data_to_match_attributes = data_to_match.present_data_attributes();
 
-        let first_name_match = self
-            .idv_data
-            .first_name
-            .as_ref()
-            .and_then(|f1| {
-                data_to_match
-                    .first_name
-                    .as_ref()
-                    .map(|f2| normalize_pii_string(f1) == normalize_pii_string(f2))
-            })
-            .unwrap_or(false);
-
-        let last_name_match = self
-            .idv_data
-            .last_name
-            .as_ref()
-            .and_then(|l1| {
-                data_to_match
-                    .last_name
-                    .as_ref()
-                    .map(|l2| normalize_pii_string(l1) == normalize_pii_string(l2))
-            })
-            .unwrap_or(false);
-
-        let address_match = self
-            .idv_data
-            .address_line1
-            .as_ref()
-            .and_then(|a1| {
-                data_to_match
-                    .address_line1
-                    .as_ref()
-                    .map(|a2| normalize_pii_string(a1) == normalize_pii_string(a2))
-            })
-            .unwrap_or(false);
-        let zip_match = self
-            .idv_data
-            .zip
-            .as_ref()
-            .and_then(|z1| {
-                data_to_match
-                    .zip
-                    .as_ref()
-                    .map(|z2| normalize_pii_string(z1) == normalize_pii_string(z2))
-            })
-            .unwrap_or(false);
-
-        let ssn9_is_valid_format = data_to_match
-            .ssn9
-            .as_ref()
-            .map(|ssn9| ssn9.leak().starts_with("666"))
-            // if not present, default to true
-            .unwrap_or(true);
-
-        // no test cases have ssn4
-        // https://docs.google.com/spreadsheets/d/1xeNE4HoCYyHB6-ruLxZoyxiztp761Lhj1xUoQ4cNweY/edit#gid=646517948
-        let ssn4_not_present = data_to_match.ssn4.is_none();
-
-        first_name_match
-            && last_name_match
-            && address_match
-            && zip_match
-            && ssn9_is_valid_format
-            && ssn4_not_present
+        // make sure all of them match a test case
+        // TODO: get is_production case
+        data_to_match_attributes.into_iter().all(|idk| {
+            // in sandbox we just don't send phone or email to experian
+            // 1) it always is collected in bifrost
+            // 2) none of the experian test cases include it, so we should never send it.
+            if !is_production && vec![IdentityDataKind::PhoneNumber, IdentityDataKind::Email].contains(&idk) {
+                true
+            } else {
+                self.get_normalized(idk) == data_to_match.get_normalized(idk)
+            }
+        })
     }
 }
 
@@ -98,21 +45,24 @@ impl ExperianSandboxTestCase {
 /// | Prod credentials    | Fine         |        Bad       |
 /// | Sandbox credentials | Bad          |        Fine      |
 /// +---------------------+--------------+------------------+
-pub fn is_sandbox_data(idv_data: &IdvData) -> bool {
-    load_sandbox_data().iter().any(|tc| tc.matches(idv_data))
+pub fn is_sandbox_data(idv_data: &IdvData, is_production: bool) -> bool {
+    load_sandbox_data()
+        .iter()
+        .any(|tc| tc.matches(idv_data, is_production))
 }
 
-fn load_sandbox_data() -> Vec<ExperianSandboxTestCase> {
+pub(crate) fn load_sandbox_data() -> Vec<ExperianSandboxTestCase> {
     let passing = vec![IdvData {
-        first_name: lift_pii("JOHN".into()),
-        last_name: lift_pii("BREEN".into()),
-        address_line1: lift_pii("PO BOX 445".into()),
-        zip: lift_pii("09061".into()),
-        city: lift_pii("APO".into()),
-        state: lift_pii("AE".into()),
-        ssn9: lift_pii("666436878".into()),
-        dob: lift_pii("02191957".into()),
-        phone_number: lift_pii("7818945369".into()),
+        first_name: lift_pii("JANALEE"),
+        last_name: lift_pii("CHANDLER-ZOSS"),
+        address_line1: lift_pii("280 MAIN ST"),
+        zip: lift_pii("01235"),
+        city: lift_pii("HINSDALE"),
+        state: lift_pii("MA"),
+        country: lift_pii("US"),
+        dob: lift_pii("1943-04-22"),
+        ssn4: lift_pii("5123"),
+        ssn9: lift_pii("666055123"),
         ..Default::default()
     }]
     .into_iter()
@@ -122,12 +72,14 @@ fn load_sandbox_data() -> Vec<ExperianSandboxTestCase> {
     });
 
     let deceased = vec![IdvData {
-        first_name: lift_pii("JOHN".into()),
-        last_name: lift_pii("MILLEN".into()),
-        address_line1: lift_pii("53 ROTARY WAY".into()),
-        zip: lift_pii("94591".into()),
-        city: lift_pii("VALLEJO".into()),
-        state: lift_pii("CA".into()),
+        first_name: lift_pii("JON"),
+        last_name: lift_pii("MILLEN"),
+        address_line1: lift_pii("53 ROTARY WAY"),
+        zip: lift_pii("94591"),
+        city: lift_pii("VALLEJO"),
+        state: lift_pii("CA"),
+        country: lift_pii("US"),
+        dob: lift_pii("1946"),
         ..Default::default()
     }]
     .into_iter()
@@ -139,68 +91,50 @@ fn load_sandbox_data() -> Vec<ExperianSandboxTestCase> {
     passing.chain(deceased).collect()
 }
 
-pub fn lift_pii(s: String) -> Option<PiiString> {
-    Some(PiiString::from(s))
-}
-
-fn normalize_pii_string(s: &PiiString) -> String {
-    s.leak().trim().to_lowercase()
+pub fn lift_pii<S: Into<String>>(s: S) -> Option<PiiString> {
+    Some(PiiString::from(s.into()))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use test_case::test_case;
-    // test case
+
     #[test_case(&IdvData {
-        first_name: lift_pii("JOHN".into()),
-        last_name: lift_pii("MILLEN".into()),
-        address_line1: lift_pii("53 ROTARY WAY".into()),
-        zip: lift_pii("94591".into()),
-        ssn9: lift_pii("666347388".into()),
+        first_name: lift_pii("JON"),
+        last_name: lift_pii("MILLEN"),
+        address_line1: lift_pii("53 ROTARY WAY"),
+        zip: lift_pii("94591"),
+        city: lift_pii("VALLEJO"),
+        state: lift_pii("CA"),
+        country: lift_pii("US"),
         ..Default::default()
-    } => true)]
-    // test case, but ssn9 is wrong format (prefix is not 666)
+    } => true; "test case")]
     #[test_case(&IdvData {
-        first_name: lift_pii("JOHN".into()),
-        last_name: lift_pii("MILLEN".into()),
-        address_line1: lift_pii("53 ROTARY WAY".into()),
-        zip: lift_pii("94591".into()),
-        ssn9: lift_pii("123456789".into()),
+        first_name: lift_pii("JON"),
+        last_name: lift_pii("MILLEN"),
+        address_line1: lift_pii("53 ROTARY WAY"),
+        zip: lift_pii("94591"),
+        ssn9: lift_pii("123456789"),
         ..Default::default()
-    } => false)]
-    // Not a test case
+    } => false; "test case, but ssn9 is wrong format (prefix is not 666)")]
     #[test_case(&IdvData {
-        first_name: lift_pii("Bob".into()),
-        last_name: lift_pii("Boberto".into()),
-        address_line1: lift_pii("123 main way".into()),
+        first_name: lift_pii("Bob"),
+        last_name: lift_pii("Boberto"),
+        address_line1: lift_pii("123 main way"),
         ..Default::default()
-    }=> false)]
-    // lowercase test case, with whitespace
+    }=> false; "Not a test case")]
     #[test_case(&IdvData {
-        first_name: lift_pii("john    ".into()),
-        last_name: lift_pii("millen".into()),
-        address_line1: lift_pii("53 rotary way".into()),
-        zip: lift_pii("94591".into()),
+        first_name: lift_pii("jon    "),
+        last_name: lift_pii("     millen"),
+        address_line1: lift_pii("53 rotary way"),
+        zip: lift_pii("94591"),
+        city: lift_pii("VALLEJO"),
+        state: lift_pii("CA"),
+        country: lift_pii("US"),
         ..Default::default()
-    }=> true)]
-    // test case name, but missing zip
-    #[test_case(&IdvData {
-        first_name: lift_pii("john".into()),
-        last_name: lift_pii("millen".into()),
-        address_line1: lift_pii("53 rotary way".into()),
-        ..Default::default()
-    }=> false)]
-    // test case name, but includes ssn4
-    #[test_case(&IdvData {
-        first_name: lift_pii("john".into()),
-        last_name: lift_pii("millen".into()),
-        address_line1: lift_pii("millen".into()),
-        zip: lift_pii("94591".into()),
-        ssn4: lift_pii("1234".into()),
-        ..Default::default()
-    }=> false)]
+    }=> true; "lowercase test case, with whitespace")]
     fn test_is_sandbox_data(idv_data: &IdvData) -> bool {
-        is_sandbox_data(idv_data)
+        is_sandbox_data(idv_data, false)
     }
 }

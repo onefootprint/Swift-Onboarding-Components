@@ -16,11 +16,15 @@ pub(crate) struct CrossCoreAPIRequest {
 
 impl CrossCoreAPIRequest {
     // need to use our own method since we require more than IdvData to build the req
-    pub(crate) fn try_from(idv_data: IdvData, config: PreciseIDRequestConfig) -> Result<Self, Error> {
+    pub(crate) fn try_from(
+        idv_data: IdvData,
+        config: PreciseIDRequestConfig,
+        is_production: bool,
+    ) -> Result<Self, Error> {
         let control_options = config.control_options.clone();
         let body_header = BodyHeader::from(config);
 
-        let contact = Contact::try_from(idv_data)?;
+        let contact = Contact::try_from(idv_data, is_production)?;
         let application_contact = ApplicationContact::new(&contact);
 
         let application = Application {
@@ -106,9 +110,8 @@ pub struct Contact {
     pub identity_documents: Vec<IdentityDocument>,
 }
 
-impl TryFrom<IdvData> for Contact {
-    type Error = ConversionError;
-    fn try_from(d: IdvData) -> Result<Self, Self::Error> {
+impl Contact {
+    pub fn try_from(d: IdvData, is_production: bool) -> Result<Contact, ConversionError> {
         let IdvData {
             first_name,
             last_name,
@@ -119,12 +122,12 @@ impl TryFrom<IdvData> for Contact {
             zip,
             country,
             // TODO figure out how to send this? prob a doc type enum
-            ssn4: _,
+            ssn4,
             // TODO: was getting invalid errors when testing this when optional, so figure out if required
             ssn9,
             dob,
-            email: _,
-            phone_number: _,
+            email,
+            phone_number,
         } = d;
 
         let first_name = first_name.ok_or(ConversionError::MissingFirstName)?;
@@ -165,33 +168,48 @@ impl TryFrom<IdvData> for Contact {
             country_code: country,
         };
 
-        // let email = Email {
-        //     id: Some(ExperianRequestDatumIdentifiers::Email1.to_string()),
-        //     email,
-        // };
-        // let phone = Telephone {
-        //     id: Some(ExperianRequestDatumIdentifiers::Phone1.to_string()),
-        //     number: phone_number,
-        // };
-        let doc_type = ssn9.as_ref().map(|_| DocumentType::Ssn);
-        let identity_document = IdentityDocument {
-            // TODO: figure out ssn4
-            document_number: ssn9,
-            document_type: doc_type,
+        let emails = if is_production {
+            vec![Email {
+                id: Some(ExperianRequestDatumIdentifiers::Email1.to_string()),
+                email,
+            }]
+        } else {
+            vec![]
+        };
+        let phones = if is_production {
+            vec![Telephone {
+                id: Some(ExperianRequestDatumIdentifiers::Phone1.to_string()),
+                number: phone_number,
+            }]
+        } else {
+            vec![]
+        };
+        let identity_document = {
+            let ssn = match (ssn9, ssn4) {
+                (Some(s9), _) => Some(s9),
+                (None, Some(s4)) => Some(s4),
+                _ => None,
+            };
+            IdentityDocument {
+                document_number: ssn,
+                document_type: Some(DocumentType::Ssn),
+            }
         };
 
         Ok(Self {
             id: Some(ExperianRequestDatumIdentifiers::Contact1.to_string()),
             person,
             addresses: vec![address],
-            // TODO fill this in
-            telephones: vec![],
-            // TODO: these aren't available in the STAR test cases so let's not even send them for now
-            emails: vec![],
-            identity_documents: vec![identity_document],
+            telephones: phones,
+            emails,
+            identity_documents: vec![identity_document]
+                .into_iter()
+                .filter(|s| s.document_number.is_some())
+                .collect(),
         })
     }
 }
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Person {

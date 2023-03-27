@@ -20,7 +20,7 @@ pub enum BoolFlag<'a> {
     EnableSocureInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "EnableScanOnboardingCallsInNonProdEnvironment")]
     EnableScanOnboardingInNonProd(&'a ObConfigurationKey),
-    #[strum(to_string = "EnableExperianIdvCallsInNonProEnvironment")]
+    #[strum(to_string = "EnableExperianIdvCallsInNonProdEnvironment")]
     EnableExperianInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "DisableAllScanOnboardingCalls")]
     DisableAllScanOnboarding,

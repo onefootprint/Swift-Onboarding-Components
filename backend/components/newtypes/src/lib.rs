@@ -68,8 +68,8 @@ pub enum Error {
     PhoneNumber(#[from] fields::phone_number::Error),
     #[error("Invalid sandbox suffix. Suffix must be non-empty, alphanumeric string")]
     InvalidSandboxSuffix,
-    #[error("Serde error")]
-    SerdeError,
+    #[error("Serde error {0}")]
+    SerdeError(#[from] serde_json::Error),
     #[error("Error deserializing")]
     DeserializeError,
     #[error("{0}")]
