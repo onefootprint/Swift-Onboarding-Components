@@ -7,6 +7,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use db::models::vault::Vault;
+use db::models::watchlist_check::UpdateWatchlistCheck;
 use db::{
     models::{
         decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
@@ -14,14 +15,15 @@ use db::{
     },
     DbError, DbPool, DbResult, PgConn,
 };
+use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
 use idv::{
     idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
     VendorResponse,
 };
 use newtypes::{
-    DecisionIntentKind, EncryptedVaultPrivateKey, ScopedVaultId, TaskId, VaultPublicKey, VendorAPI,
-    WatchlistCheckArgs,
+    DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, ScopedVaultId, TaskId, VaultPublicKey,
+    VendorAPI, WatchlistCheckArgs, WatchlistCheckStatus,
 };
 
 pub(crate) struct WatchlistCheckTask {
@@ -59,7 +61,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         let scoped_vault_id = args.scoped_vault_id.clone();
         let task_id = self.task_id.clone();
 
-        let (_watchlist_check, vreq, vres) = self
+        let (watchlist_check, vreq, vres) = self
             .db_pool
             .db_transaction(move |conn| -> DbResult<_> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be extra safe
@@ -98,7 +100,23 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
         // TODO: for now, assuming we have a non-error response. In future, need to validate the response and handle errors
         let pa_res = PaResponse::try_from(vendor_response.response)?;
-        log::info!("WatchlistCheckTask PaResponse: {:?}", pa_res);
+        let (status, reason_codes) = Self::calculate_decision(pa_res);
+        self.db_pool
+            .db_query(move |conn| {
+                WatchlistCheck::update(
+                    conn,
+                    &watchlist_check.id,
+                    UpdateWatchlistCheck {
+                        status,
+                        logic_git_hash: Some(crate::GIT_HASH.to_string()),
+                        reason_codes,
+                    },
+                )
+            })
+            .await??;
+
+        // TODO: fire off a nice ole webhook
+
         Ok(())
     }
 }
@@ -213,4 +231,23 @@ impl WatchlistCheckTask {
 
         Ok(vendor_response)
     }
+
+    fn calculate_decision(res: PaResponse) -> (WatchlistCheckStatus, Option<Vec<FootprintReasonCode>>) {
+        if let Some(restriction) = res.response.restriction {
+            let reason_codes = PaWatchlistHit::to_footprint_reason_codes(restriction.watchlists());
+            let status = if reason_codes.is_empty() {
+                WatchlistCheckStatus::Pass
+            } else {
+                WatchlistCheckStatus::Fail
+            };
+            (status, Some(reason_codes))
+        } else {
+            (WatchlistCheckStatus::Error, None)
+        }
+    }
 }
+
+// #[derive(Debug, Error)]
+// pub enum WatchlistCheckTaskError {
+
+// }

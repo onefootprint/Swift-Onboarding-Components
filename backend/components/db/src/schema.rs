@@ -737,6 +737,7 @@ table! {
         decision_intent_id -> Text,
         status -> Text,
         logic_git_hash -> Nullable<Text>,
+        reason_codes -> Nullable<Array<Text>>,
     }
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE watchlist_check ADD COLUMN reason_codes TEXT[];

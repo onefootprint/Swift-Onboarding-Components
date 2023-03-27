@@ -1,6 +1,8 @@
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{DecisionIntentId, ScopedVaultId, TaskId, WatchlistCheckId, WatchlistCheckStatus};
+use newtypes::{
+    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TaskId, WatchlistCheckId, WatchlistCheckStatus,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::{schema::watchlist_check, DbResult, PgConn};
@@ -18,6 +20,7 @@ pub struct WatchlistCheck {
     pub decision_intent_id: DecisionIntentId,
     pub status: WatchlistCheckStatus,
     pub logic_git_hash: Option<String>, // written when status is updated to Pass, Fail, or Error
+    pub reason_codes: Option<Vec<FootprintReasonCode>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -28,6 +31,14 @@ struct NewWatchlistCheck {
     pub task_id: TaskId,
     pub decision_intent_id: DecisionIntentId,
     pub status: WatchlistCheckStatus,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, AsChangeset)]
+#[diesel(table_name = watchlist_check)]
+pub struct UpdateWatchlistCheck {
+    pub status: WatchlistCheckStatus,
+    pub logic_git_hash: Option<String>,
+    pub reason_codes: Option<Vec<FootprintReasonCode>>,
 }
 
 impl WatchlistCheck {
@@ -60,5 +71,15 @@ impl WatchlistCheck {
             .optional()?;
 
         Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn update(conn: &mut PgConn, id: &WatchlistCheckId, update: UpdateWatchlistCheck) -> DbResult<Self> {
+        let result = diesel::update(watchlist_check::table)
+            .filter(watchlist_check::id.eq(id))
+            .set(update)
+            .get_result(conn)?;
+
+        Ok(result)
     }
 }
