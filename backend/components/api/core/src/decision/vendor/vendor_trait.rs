@@ -82,7 +82,7 @@ impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::
         let raw_response = self.standalone_pa(request.idv_data).await?; // TODO: this should return PiiJsonValue itself
         let parsed_response = idv::idology::pa::response::parse_response(raw_response.clone())?;
 
-        // TODO: call validate
+        parsed_response.response.validate()?;
 
         Ok(IdologyPaAPIResponse {
             raw_response: PiiJsonValue::new(raw_response),

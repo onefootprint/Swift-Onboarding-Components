@@ -48,13 +48,14 @@ impl WatchlistCheck {
         scoped_vault_id: ScopedVaultId,
         task_id: TaskId,
         decision_intent_id: DecisionIntentId,
+        status: WatchlistCheckStatus,
     ) -> DbResult<Self> {
         let new_watchlist_check = NewWatchlistCheck {
             created_at: Utc::now(),
             scoped_vault_id,
             task_id,
             decision_intent_id,
-            status: WatchlistCheckStatus::Pending,
+            status,
         };
 
         let res = diesel::insert_into(watchlist_check::table)

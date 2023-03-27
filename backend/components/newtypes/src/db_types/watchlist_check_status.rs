@@ -27,10 +27,11 @@ use strum_macros::{AsRefStr, EnumString};
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum WatchlistCheckStatus {
-    Pending, // have not completed vendors calls or decisioning yet
-    Pass,    // no watchlist hit
-    Fail,    // yes watchlist hit
+    Pending,   // have not completed vendors calls or decisioning yet
+    Pass,      // no watchlist hit
+    Fail,      // yes watchlist hit
     Error, // check could not be performed (eg: a non-portable vault has insufficient or malformed data the vendor errors on)
+    NotNeeded, // we do not need to perform the watchlist check for the user at the time the task is run (currently this would be because they are offboarded)
 }
 
 crate::util::impl_enum_str_diesel!(WatchlistCheckStatus);

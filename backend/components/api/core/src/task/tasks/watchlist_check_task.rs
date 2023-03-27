@@ -1,19 +1,23 @@
 use crate::decision::vendor;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
+use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{
     decision::{self, vendor::vendor_trait::VendorAPICall},
     enclave_client::EnclaveClient,
     task::{ExecuteTask, TaskError},
 };
 use async_trait::async_trait;
+use db::models::onboarding::Onboarding;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
+use db::models::verification_request::RequestAndMaybeResult;
 use db::models::watchlist_check::UpdateWatchlistCheck;
 use db::{
     models::{
         decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
         verification_result::VerificationResult, watchlist_check::WatchlistCheck,
     },
-    DbError, DbPool, DbResult, PgConn,
+    DbError, DbPool, PgConn,
 };
 use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
@@ -22,8 +26,8 @@ use idv::{
     VendorResponse,
 };
 use newtypes::{
-    DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, ScopedVaultId, TaskId, VaultPublicKey,
-    VendorAPI, WatchlistCheckArgs, WatchlistCheckStatus,
+    DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, OnboardingStatus, ScopedVaultId,
+    TaskId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckStatus,
 };
 
 pub(crate) struct WatchlistCheckTask {
@@ -58,126 +62,159 @@ impl WatchlistCheckTask {
 #[async_trait]
 impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
     async fn execute(&self, args: &WatchlistCheckArgs) -> Result<(), TaskError> {
-        let scoped_vault_id = args.scoped_vault_id.clone();
+        let sv_id = args.scoped_vault_id.clone();
         let task_id = self.task_id.clone();
 
-        let (watchlist_check, vreq, vres) = self
+        // First we either create a new watchlist_check or we retrieve an existing one (ie if this is an idempotent re-run of a failed execution)
+        // If we create a new watchlist_check, we either:
+        //  - Create it with state Pending and a decision_intent and verification_request at the same time
+        //  - Create it with state NotNeeded or Error and no decision_intent/verification_request, meaning no vendor call is to be made
+        let (uvw, (wc, vr)) = self
             .db_pool
-            .db_transaction(move |conn| -> DbResult<_> {
+            .db_transaction(move |conn| -> Result<_, TaskError> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be extra safe
                 let _task = Task::lock(conn, &task_id)?;
+                let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
+                let existing_wc = WatchlistCheckTask::get_existing_watchlist_check(conn, &task_id)?;
 
-                match Self::get_existing_watchlist_check(conn, &task_id)? {
-                    Some((wc, vreq, vres)) => Ok((wc, vreq, vres)),
-                    None => {
-                        let (wc, vreq) = Self::create_new_watchlist_check(conn, &task_id, &scoped_vault_id)?;
-                        Ok((wc, vreq, None))
-                    }
-                }
+                let wc = if let Some(wc) = existing_wc {
+                    wc
+                } else {
+                    let sv = ScopedVault::get(conn, &sv_id)?;
+                    let ob = if sv.ob_configuration_id.is_some() {
+                        let (ob, _, _, _) = Onboarding::get(conn, (&sv_id, &sv.user_vault_id))?;
+                        Some(ob)
+                    } else {
+                        // vault-only vaults do not have an onboarding
+                        None
+                    };
+
+                    WatchlistCheckTask::create_new_watchlist_check(conn, &sv_id, &task_id, &sv, &ob, &uvw)?
+                };
+
+                Ok((uvw, wc))
             })
             .await?;
 
-        let scoped_vault_id = args.scoped_vault_id.clone();
-        let vendor_response = if let Some(vres) = vres {
-            Self::get_existing_vendor_response(
-                &self.db_pool,
-                &self.enclave_client,
-                &vreq,
-                &vres,
-                &scoped_vault_id,
-            )
-            .await
-        } else {
-            Self::make_vendor_call(
-                &self.db_pool,
-                &self.enclave_client,
-                &self.idology_client,
-                &vreq,
-                &scoped_vault_id,
-            )
-            .await
-        }?;
-
-        // TODO: for now, assuming we have a non-error response. In future, need to validate the response and handle errors
-        let pa_res = PaResponse::try_from(vendor_response.response)?;
-        let (status, reason_codes) = Self::calculate_decision(pa_res);
-        self.db_pool
-            .db_query(move |conn| {
-                WatchlistCheck::update(
-                    conn,
-                    &watchlist_check.id,
-                    UpdateWatchlistCheck {
-                        status,
-                        logic_git_hash: Some(crate::GIT_HASH.to_string()),
-                        reason_codes,
-                    },
+        // We have a watchlist_check that is Pending and either needs a vendor call made or decisioning
+        if let Some((vreq, vres)) = vr {
+            let svid = args.scoped_vault_id.clone();
+            let vendor_response = if let Some(vres) = vres {
+                Self::decrypt_existing_vendor_response(
+                    &uvw.vault().e_private_key,
+                    &self.enclave_client,
+                    &vreq,
+                    &vres,
                 )
-            })
-            .await??;
+                .await?
+            } else {
+                Self::make_vendor_call(
+                    &self.db_pool,
+                    &self.enclave_client,
+                    &self.idology_client,
+                    &vreq,
+                    &svid,
+                )
+                .await?
+            };
 
-        // TODO: fire off a nice ole webhook
+            let pa_res = PaResponse::try_from(vendor_response.response)?;
+            let (status, reason_codes) = Self::calculate_decision(pa_res);
+            let _updated_wc = self
+                .db_pool
+                .db_query(move |conn| {
+                    WatchlistCheck::update(
+                        conn,
+                        &wc.id,
+                        UpdateWatchlistCheck {
+                            status,
+                            logic_git_hash: Some(crate::GIT_HASH.to_string()),
+                            reason_codes,
+                        },
+                    )
+                })
+                .await??;
+        } // else we have a watchlist_check that doesn't need a vendor call because it is NotNeed or Error
 
         Ok(())
     }
 }
 
+type WatchlistCheckVreq = (WatchlistCheck, Option<RequestAndMaybeResult>);
+
 impl WatchlistCheckTask {
-    fn get_existing_watchlist_check(
+    pub fn get_existing_watchlist_check(
         conn: &mut PgConn,
         task_id: &TaskId,
-    ) -> Result<Option<(WatchlistCheck, VerificationRequest, Option<VerificationResult>)>, DbError> {
+    ) -> Result<Option<WatchlistCheckVreq>, TaskError> {
         let existing_watchlist_check = WatchlistCheck::get_by_task_id(conn, task_id)?;
-        if let Some(wc) = existing_watchlist_check {
-            let (vreq, vres, _) =
-                VerificationRequest::list_by_decision_intent_id(conn, &wc.decision_intent_id)?
-                    .pop()
-                    .ok_or(DbError::RelatedObjectNotFound)?;
+        let wc = if let Some(wc) = existing_watchlist_check {
+            let req = VerificationRequest::list_by_decision_intent_id(conn, &wc.decision_intent_id)?.pop();
 
-            Ok(Some((wc, vreq, vres)))
+            if let Some((vreq, vres, _)) = req {
+                Some((wc, Some((vreq, vres))))
+            } else {
+                Some((wc, None))
+            }
         } else {
-            Ok(None)
+            None
+        };
+
+        Ok(wc)
+    }
+
+    pub fn create_new_watchlist_check(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        task_id: &TaskId,
+        sv: &ScopedVault,
+        ob: &Option<Onboarding>,
+        uvw: &VaultWrapper<Person>,
+    ) -> Result<WatchlistCheckVreq, TaskError> {
+        let requirements_satisfied = idv::requirements::vendor_api_requirements_are_satisfied(
+            &VendorAPI::IdologyPa,
+            uvw.populated().as_slice(),
+        );
+
+        let has_non_pass_onboarding_status = ob
+            .as_ref()
+            .map(|o| !matches!(o.status, OnboardingStatus::Pass))
+            .unwrap_or(false);
+
+        let status = if has_non_pass_onboarding_status || !sv.is_live {
+            WatchlistCheckStatus::NotNeeded
+        } else if !requirements_satisfied {
+            WatchlistCheckStatus::Error
+        } else {
+            WatchlistCheckStatus::Pending
+        };
+
+        // TODO: make DI optional on watchlist_check and only create if creating a vreq
+        let decision_intent = DecisionIntent::create(conn, DecisionIntentKind::WatchlistCheck, sv_id)?;
+        let wc = WatchlistCheck::create(conn, sv_id.clone(), task_id.clone(), decision_intent.id, status)?;
+
+        if matches!(
+            status,
+            WatchlistCheckStatus::NotNeeded | WatchlistCheckStatus::Error
+        ) {
+            Ok((wc, None))
+        } else {
+            let vreq =
+                VerificationRequest::create(conn, sv_id, &wc.decision_intent_id, VendorAPI::IdologyPa)?;
+            Ok((wc, Some((vreq, None))))
         }
     }
 
-    fn create_new_watchlist_check(
-        conn: &mut PgConn,
-        task_id: &TaskId,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> Result<(WatchlistCheck, VerificationRequest), DbError> {
-        let decision_intent =
-            DecisionIntent::create(conn, DecisionIntentKind::WatchlistCheck, scoped_vault_id)?;
-
-        let verification_request =
-            VerificationRequest::create(conn, scoped_vault_id, &decision_intent.id, VendorAPI::IdologyPa)?;
-
-        let watchlist_check = WatchlistCheck::create(
-            conn,
-            scoped_vault_id.clone(),
-            task_id.clone(),
-            decision_intent.id.clone(),
-        )?;
-        Ok((watchlist_check, verification_request))
-    }
-
-    async fn get_existing_vendor_response(
-        db_pool: &DbPool,
+    async fn decrypt_existing_vendor_response(
+        vault_private_key: &EncryptedVaultPrivateKey,
         enclave_client: &EnclaveClient,
         vreq: &VerificationRequest,
         vres: &VerificationResult,
-        scoped_vault_id: &ScopedVaultId,
     ) -> Result<VendorResponse, TaskError> {
-        let svid = scoped_vault_id.clone();
-        let vault_private_key = db_pool
-            .db_query(move |conn| -> Result<EncryptedVaultPrivateKey, DbError> {
-                let vault = Vault::get(conn, &svid)?;
-                Ok(vault.e_private_key)
-            })
-            .await??;
-
         let vendor_result = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
             vec![(vreq.clone(), Some(vres.clone()))],
             enclave_client,
-            &vault_private_key,
+            vault_private_key,
         )
         .await?
         .pop()
@@ -195,13 +232,13 @@ impl WatchlistCheckTask {
                 + Send
                 + Sync,
         >,
-        verification_request: &VerificationRequest,
-        scoped_vault_id: &ScopedVaultId,
+        vreq: &VerificationRequest,
+        sv_id: &ScopedVaultId,
     ) -> Result<VendorResponse, TaskError> {
         let idv_data = decision::vendor::build_request::build_idv_data_from_verification_request(
             db_pool,
             enclave_client,
-            verification_request.clone(),
+            vreq.clone(),
         )
         .await?;
 
@@ -212,17 +249,17 @@ impl WatchlistCheckTask {
             raw_response: res.raw_response(),
         };
 
-        let scoped_vault_id = scoped_vault_id.clone();
+        let svid = sv_id.clone();
         let vault_public_key = db_pool
             .db_query(move |conn| -> Result<VaultPublicKey, DbError> {
-                let vault = Vault::get(conn, &scoped_vault_id)?;
+                let vault = Vault::get(conn, &svid)?;
                 Ok(vault.public_key)
             })
             .await??;
 
         let _vres = decision::vendor::verification_result::save_verification_result(
             db_pool,
-            &vec![(verification_request.clone(), vendor_response.clone())],
+            &vec![(vreq.clone(), vendor_response.clone())],
             &vault_public_key,
         )
         .await?
@@ -246,8 +283,3 @@ impl WatchlistCheckTask {
         }
     }
 }
-
-// #[derive(Debug, Error)]
-// pub enum WatchlistCheckTaskError {
-
-// }

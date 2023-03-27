@@ -1,6 +1,7 @@
-use crate::idology::common::response::IDologyQualifiers;
+use crate::idology::common::response::{IDologyQualifiers, IdologyResponseHelpers};
 use crate::idology::error as IdologyError;
 use crate::idology::expectid::response::{IdNumber, Restriction};
+use crate::idology::IdologyError::RequestError;
 use crate::ParsedResponse;
 
 pub fn parse_response(value: serde_json::Value) -> Result<PaResponse, IdologyError::Error> {
@@ -31,7 +32,24 @@ pub struct Response {
     pub id_number: Option<IdNumber>, // TODO: move IdNumber and Restriction to `common`
     pub restriction: Option<Restriction>,
     pub qualifiers: Option<IDologyQualifiers>,
-    // TODO: add error and validate() method
+    pub error: Option<String>,
+}
+
+impl Response {
+    fn error(&self) -> Option<RequestError> {
+        self.error
+            .clone()
+            .map(IdologyResponseHelpers::parse_idology_error)
+    }
+
+    pub fn validate(&self) -> Result<(), IdologyError::Error> {
+        // see if we have any errors
+        if let Some(error) = self.error() {
+            return Err(error.into());
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -62,6 +80,7 @@ mod tests {
                         pa: None
                     }),
                     qualifiers: None,
+                    error: None
                 }
             },
             parsed_response

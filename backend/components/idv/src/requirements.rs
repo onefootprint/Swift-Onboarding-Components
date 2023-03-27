@@ -30,7 +30,7 @@ pub struct SocureRequirements {
 }
 
 /// Based on the VendorAPI and the available data in the vault, determine if we are able make a request to a particular API
-fn vendor_api_requirements_are_satisfied(
+pub fn vendor_api_requirements_are_satisfied(
     vendor_api: &VendorAPI,
     present_data_lifetime_kinds: &[IdentityDataKind],
 ) -> bool {
@@ -58,6 +58,14 @@ fn vendor_api_requirements_are_satisfied(
         ],
     };
 
+    let idology_pa_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
+        required: vec![
+            IdentityDataKind::FirstName,
+            IdentityDataKind::LastName,
+            IdentityDataKind::AddressLine1,
+        ],
+    };
+
     match vendor_api {
         VendorAPI::IdologyExpectID => expectid_requirements.are_satisfied(present_data_lifetime_kinds),
         // These document related vendors are a no op, since they are handled separately from KYC requests
@@ -66,7 +74,7 @@ fn vendor_api_requirements_are_satisfied(
         VendorAPI::IdologyScanOnboarding => false,
         VendorAPI::TwilioLookupV2 => twilio_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::SocureIDPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
-        VendorAPI::IdologyPa => false,
+        VendorAPI::IdologyPa => idology_pa_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::ExperianPreciseID => experian_requirements.are_satisfied(present_data_lifetime_kinds),
     }
 }
@@ -75,7 +83,22 @@ fn vendor_api_requirements_are_satisfied(
 pub fn available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -> Vec<VendorAPI> {
     VendorAPI::iter()
         .filter(|v| vendor_api_requirements_are_satisfied(v, present_data_lifetime_kinds))
+        .filter(vendor_api_eligible_for_onboarding_kyc)
         .collect()
+}
+
+/// Is the API one we want to call for our onboarding KYC verificaiton
+fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
+    match vendor_api {
+        VendorAPI::IdologyExpectID => true,
+        VendorAPI::IdologyScanVerifySubmission => false,
+        VendorAPI::IdologyScanVerifyResults => false,
+        VendorAPI::IdologyScanOnboarding => false,
+        VendorAPI::IdologyPa => false,
+        VendorAPI::TwilioLookupV2 => true,
+        VendorAPI::SocureIDPlus => true,
+        VendorAPI::ExperianPreciseID => true,
+    }
 }
 
 #[cfg(test)]
