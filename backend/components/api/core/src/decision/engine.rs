@@ -105,6 +105,8 @@ pub async fn run(
        create_manual_review=%rules_output.create_manual_review,
        decision=%rules_output.decision_status,
        onboarding_id=%ob.id,
+       scoped_user_id=%ob.scoped_user_id,
+       ob_configuration_id=%ob.ob_configuration_id,
        "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
     );
 
