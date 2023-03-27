@@ -6,6 +6,8 @@ mod invoice;
 mod protected;
 mod test_tenant;
 
+pub use api_core::*;
+
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(cleanup::post)
