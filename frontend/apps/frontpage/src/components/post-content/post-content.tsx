@@ -43,6 +43,37 @@ const Content = styled.div`
       `}
     }
 
+    code {
+      ${createFontStyles('snippet-2')};
+    }
+
+    pre {
+      text-align: left;
+      padding: ${theme.spacing[5]};
+      background: ${theme.backgroundColor.primary};
+      display: flex;
+      border: 1px solid ${theme.borderColor.tertiary};
+      border-radius: ${theme.borderRadius.default};
+      overflow: auto;
+      margin-bottom: ${theme.spacing[9]};
+    }
+
+    *:not(pre) > code {
+      background: ${theme.backgroundColor.secondary};
+      border-radius: ${theme.borderRadius.compact};
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      color: ${theme.color.error};
+      display: inline-block;
+      flex-flow: wrap;
+      height: 24px;
+      height: auto;
+      padding: ${theme.spacing[1]} ${theme.spacing[2]};
+      text-align: left;
+      white-space: break-spaces;
+      word-break: break-word;
+    }
+
+    h1,
     h2,
     h3,
     h4,
@@ -121,7 +152,7 @@ const Content = styled.div`
       ${createFontStyles('body-1')};
 
       &:not(:last-child) {
-        margin-bottom: ${theme.spacing[9]};
+        margin-bottom: ${theme.spacing[8]};
       }
     }
 
