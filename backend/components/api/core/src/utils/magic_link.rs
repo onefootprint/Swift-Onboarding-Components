@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[tracing::instrument(skip_all)]
-pub(crate) async fn create_magic_link(
+pub async fn create_magic_link(
     state: &State,
     email: &str,
     redirect_url: &str,

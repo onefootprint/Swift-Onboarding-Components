@@ -1,0 +1,10 @@
+[package]
+name = "api_routes_root"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+api_core = { path = "../../core" }
+api_route_org = { path = "../org"}
+paperclip = { workspace = true }

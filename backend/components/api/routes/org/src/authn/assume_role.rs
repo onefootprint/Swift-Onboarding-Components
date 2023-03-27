@@ -1,37 +1,16 @@
 use crate::auth::session::{AuthSessionData, UpdateSession};
-use crate::auth::tenant::{Any, AuthActor, CheckTenantGuard, TenantSessionAuth, WorkOsSession};
-use crate::auth::{Either, SessionContext};
-use crate::errors::tenant::TenantError;
-use crate::errors::{ApiError, ApiResult};
+
+
+
+use crate::errors::{ApiError};
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::tenant::AnyTenantSessionAuth;
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
 use db::models::tenant_rolebinding::TenantRolebinding;
-use newtypes::TenantUserId;
+
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
-
-type AnyTenantSessionAuth = Either<SessionContext<WorkOsSession>, TenantSessionAuth>;
-
-impl AnyTenantSessionAuth {
-    /// The different types of session auths have very different purposes, so we have to do some
-    /// branching to extract the tenant_user_id
-    fn tenant_user_id(self) -> ApiResult<TenantUserId> {
-        let tu_id = match self {
-            // WorkOsSessions are only used for selecting an org, just pull out the tenant_user_id
-            Either::Left(l) => l.data.tenant_user_id,
-            // For any other session token, validate it has Any permission and then extract the user actor
-            Either::Right(r) => {
-                let r = r.check_guard(Any)?;
-                match r.actor() {
-                    AuthActor::TenantUser(tu_id) | AuthActor::FirmEmployee(tu_id) => tu_id,
-                    _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
-                }
-            }
-        };
-        Ok(tu_id)
-    }
-}
 
 #[api_v2_operation(
     description = "After the user has proven they own an email address, allow them to assume an

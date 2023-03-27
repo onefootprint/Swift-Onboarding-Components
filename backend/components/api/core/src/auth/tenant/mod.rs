@@ -21,11 +21,35 @@ pub use self::firm_employee::*;
 
 use super::AuthError;
 use super::Either;
+use super::SessionContext;
+use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAuthContext>;
+
+pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSession>, TenantSessionAuth>;
+
+impl AnyTenantSessionAuth {
+    /// The different types of session auths have very different purposes, so we have to do some
+    /// branching to extract the tenant_user_id
+    pub fn tenant_user_id(self) -> ApiResult<TenantUserId> {
+        let tu_id = match self {
+            // WorkOsSessions are only used for selecting an org, just pull out the tenant_user_id
+            Either::Left(l) => l.data.tenant_user_id,
+            // For any other session token, validate it has Any permission and then extract the user actor
+            Either::Right(r) => {
+                let r = r.check_guard(Any)?;
+                match r.actor() {
+                    AuthActor::TenantUser(tu_id) | AuthActor::FirmEmployee(tu_id) => tu_id,
+                    _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
+                }
+            }
+        };
+        Ok(tu_id)
+    }
+}
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;

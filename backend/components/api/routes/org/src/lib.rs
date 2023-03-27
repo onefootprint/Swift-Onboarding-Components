@@ -2,7 +2,7 @@ use paperclip::actix::web;
 
 mod access_events;
 mod api_keys;
-mod auth;
+mod authn;
 mod index;
 mod logo;
 mod member;
@@ -12,6 +12,10 @@ mod proxy_configs;
 mod roles;
 mod settings;
 mod webhook_portal;
+
+// Temporary glob imports until api core is disbanded.
+pub use api_core::auth;
+pub use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -33,7 +37,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(webhook_portal::get);
 
     onboarding_configs::routes(config);
-    auth::routes(config);
+    authn::routes(config);
     api_keys::routes(config);
     proxy_configs::routes(config);
 }

@@ -21,28 +21,28 @@ use workos::{ApiKey, WorkOs};
 
 #[derive(Clone)]
 pub struct State {
-    pub(crate) config: Config,
-    pub(crate) hmac_client: SignedHashClient,
-    pub(crate) workos_client: Arc<WorkOs>,
-    pub(crate) twilio_client: TwilioClient,
-    pub(crate) sendgrid_client: SendgridClient,
-    pub(crate) db_pool: DbPool,
-    pub(crate) enclave_client: EnclaveClient,
-    pub(crate) challenge_sealing_key: ScopedSealingKey,
-    pub(crate) session_sealing_key: ScopedSealingKey,
-    pub(crate) idology_client: IdologyClient,
-    pub(crate) s3_client: s3::S3Client,
+    pub config: Config,
+    pub hmac_client: SignedHashClient,
+    pub workos_client: Arc<WorkOs>,
+    pub twilio_client: TwilioClient,
+    pub sendgrid_client: SendgridClient,
+    pub db_pool: DbPool,
+    pub enclave_client: EnclaveClient,
+    pub challenge_sealing_key: ScopedSealingKey,
+    pub session_sealing_key: ScopedSealingKey,
+    pub idology_client: IdologyClient,
+    pub s3_client: s3::S3Client,
     #[allow(unused)]
-    pub(crate) socure_sandbox_client: SocureClient,
+    pub socure_sandbox_client: SocureClient,
     #[allow(unused)]
     pub socure_production_client: SocureClient,
-    pub(crate) feature_flag_client: LaunchDarklyFeatureFlagClient,
-    pub(crate) webhook_service_client: webhooks::WebhookServiceClient,
+    pub feature_flag_client: LaunchDarklyFeatureFlagClient,
+    pub webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
-    pub(crate) billing_client: billing::BillingClient,
+    pub billing_client: billing::BillingClient,
     #[allow(unused)]
-    pub(crate) experian_client: ExperianClient,
-    pub(crate) fingerprintjs_client: FingerprintJSClient,
+    pub experian_client: ExperianClient,
+    pub fingerprintjs_client: FingerprintJSClient,
 }
 impl State {
     /// initialize global state in test context

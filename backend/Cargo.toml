@@ -6,7 +6,10 @@ edition = "2021"
 
 [workspace]
 members = [
-    "components/api/*",
+    "components/api/core",
+    "components/api/server",
+    "components/api/wire_types",
+    "components/api/routes/*",
     "components/enclave/crypto",
     "components/enclave/enclave",
     "components/enclave/proxy",
@@ -66,7 +69,7 @@ deadpool = { version = "0.9.5", features=["managed"], default-features = false}
 
 actix-web = "4.3.1"
 
-paperclip = { version = "0.7.1", features = [
+paperclip = { version = "0.8.0", features = [
     "actix4",
     "actix4-validator",
     "actix-multipart",
@@ -94,3 +97,9 @@ x509-parser = "0.14"
 test-case = "3.0.0"
 mockall = "0.11.3"
 url = "2.3.1"
+
+sentry = "0.30.0"
+sentry-actix = "0.30.0"
+sentry-tracing = "0.30.0"
+
+log = "0.4.14"
