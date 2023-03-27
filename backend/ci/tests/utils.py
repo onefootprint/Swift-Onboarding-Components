@@ -289,9 +289,8 @@ def build_business_data():
         "business.state": "NY",
         "business.zip": "10009",
         "business.country": "US",
-        "business.ein": "12-1231234",
-        # TODO
-        # "business.beneficial_owners": "",
+        "business.ein": "121231234",
+        "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 90}]',
     }
 
 

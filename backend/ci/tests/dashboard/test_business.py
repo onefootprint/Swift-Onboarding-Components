@@ -12,6 +12,7 @@ def sb_user_with_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     body = get("entities", dict(kind="business"), sandbox_tenant.sk.key)
     entity = body["data"][0]
     assert entity["kind"] == "business"
+    print(body)
     assert set(entity["attributes"]) == set(build_business_data())
 
     # TODO should get the fp_biz_id from validate
@@ -41,6 +42,7 @@ def test_get_vault(sandbox_tenant, sb_user_with_business):
         ],
         ["business.city", "business.zip", "business.state", "business.country"],
         ["business.website", "business.phone_number"],
+        ["business.beneficial_owners"],
     ],
 )
 def test_decrypt(sandbox_tenant, sb_user_with_business, fields_to_decrypt):

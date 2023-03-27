@@ -25,7 +25,7 @@ def sandbox_user_w_business(kyb_sandbox_ob_config, twilio, kyb_cdos):
     "business_data,expected_status_code",
     [
         ({"business.name": "Flerp"}, 200),
-        ({"business.ein": "1234"}, 200),
+        ({"business.ein": "12-0987654"}, 200),
         (
             {
                 "business.name": "Flerp",

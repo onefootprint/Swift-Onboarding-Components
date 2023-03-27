@@ -33,6 +33,8 @@ pub enum Error {
     CannotParseEnum(#[from] strum::ParseError),
     #[error("Cannot parse: {0}")]
     CannotParseJson(#[from] serde_json::Error),
+    #[error("The business owners' ownership stakes must not sum to more than 100%")]
+    BusinessOwnersStakeAbove100,
 }
 
 pub(super) type VResult<T> = Result<T, Error>;

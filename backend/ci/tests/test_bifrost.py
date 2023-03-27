@@ -248,7 +248,6 @@ class TestBifrost:
             "id.last_name": "Derp",
             "id.dob": "1995-12-25",
             "id.address_line1": "1 Footprint Way",
-            "id.address_line2": "",
             "id.city": "Enclave",
             "id.state": "NY",
             "id.zip": "10009",

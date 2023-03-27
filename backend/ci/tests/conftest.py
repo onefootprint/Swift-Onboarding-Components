@@ -161,6 +161,7 @@ def kyb_cdos():
         "business_address",
         "business_phone_number",
         "business_website",
+        "business_beneficial_owners",
         # TODO add corporation type, beneficial owners
     ]
 

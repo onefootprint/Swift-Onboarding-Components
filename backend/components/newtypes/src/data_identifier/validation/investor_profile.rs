@@ -8,9 +8,11 @@ use strum_macros::EnumString;
 
 impl Validate for IPK {
     fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
+        // Don't want anything to be empty
+        let value = utils::validate_not_empty(value)?;
         let value = match self {
-            Self::Occupation => utils::validate_not_empty(value)?,
-            Self::BrokerageFirmEmployer => utils::validate_not_empty(value)?,
+            Self::Occupation => value,
+            Self::BrokerageFirmEmployer => value,
             Self::AnnualIncome => utils::parse_enum::<AnnualIncome>(value)?,
             Self::NetWorth => utils::parse_enum::<NetWorth>(value)?,
             Self::InvestmentGoals => utils::parse_json_and_validate::<Vec<InvestmentGoal>, _>(value, |l| {

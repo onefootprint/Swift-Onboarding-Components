@@ -7,6 +7,8 @@ use std::str::FromStr;
 
 impl Validate for IDK {
     fn validate(&self, value: PiiString, for_bifrost: bool) -> NtResult<PiiString> {
+        // Generally don't want anything to be empty
+        let value = utils::validate_not_empty(value)?;
         let result = match self {
             IDK::FirstName => validate_name(value, for_bifrost)?,
             IDK::LastName => validate_name(value, for_bifrost)?,
@@ -35,7 +37,7 @@ fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiStr
 }
 
 fn validate_name(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
-    if for_bifrost && (input.leak().is_empty() || input.leak().len() > 1000) {
+    if for_bifrost && input.leak().len() > 1000 {
         return Err(Error::InvalidLength);
     }
 
@@ -43,7 +45,7 @@ fn validate_name(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
 }
 
 fn validate_address(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
-    if for_bifrost && (input.leak().is_empty() || input.leak().len() > 1000) {
+    if for_bifrost && input.leak().len() > 1000 {
         return Err(Error::InvalidLength);
     }
 

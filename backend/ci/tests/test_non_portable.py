@@ -26,7 +26,7 @@ class TestNonPortableVaultApi:
             ),
             (
                 "business.ein",
-                "Flerp",
+                "12-1234567",
                 "Cannot add to this type of vault",
             ),
         ],
