@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'footprint-core'",
+            "name": "Debug executable 'api_server'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=footprint-core",
-                    "--package=footprint-core"
+                    "--bin=api_server",
+                    "--package=api_server"
                 ],
                 "filter": {
-                    "name": "footprint-core",
+                    "name": "api_server",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'footprint-core'",
+            "name": "Debug unit tests in executable 'api_server'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=footprint-core",
-                    "--package=footprint-core"
+                    "--bin=api_server",
+                    "--package=api_server"
                 ],
                 "filter": {
-                    "name": "footprint-core",
+                    "name": "api_server",
                     "kind": "bin"
                 }
             },
@@ -44,15 +44,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'footprint-core'",
+            "name": "Debug executable 'api_server'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=footprint-core",
-                    "--package=footprint-core"
+                    "--bin=api_server",
+                    "--package=api_server"
                 ],
                 "filter": {
-                    "name": "footprint-core",
+                    "name": "api_server",
                     "kind": "bin"
                 }
             },
@@ -62,16 +62,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'footprint-core'",
+            "name": "Debug unit tests in executable 'api_server'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=footprint-core",
-                    "--package=footprint-core"
+                    "--bin=api_server",
+                    "--package=api_server"
                 ],
                 "filter": {
-                    "name": "footprint-core",
+                    "name": "api_server",
                     "kind": "bin"
                 }
             },

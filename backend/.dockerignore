@@ -1,5 +1,5 @@
 infra
 target
-!target/x86_64-unknown-linux-musl/release/footprint-core
+!target/x86_64-unknown-linux-musl/release/api_server
 !target/x86_64-unknown-linux-musl/release/enclave
 !target/x86_64-unknown-linux-musl/release/enclave_parent

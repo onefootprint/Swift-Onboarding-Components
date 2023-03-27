@@ -35,7 +35,7 @@ pub struct State {
     #[allow(unused)]
     pub(crate) socure_sandbox_client: SocureClient,
     #[allow(unused)]
-    pub(crate) socure_production_client: SocureClient,
+    pub socure_production_client: SocureClient,
     pub(crate) feature_flag_client: LaunchDarklyFeatureFlagClient,
     pub(crate) webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]

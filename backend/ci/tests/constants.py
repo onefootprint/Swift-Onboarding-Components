@@ -13,7 +13,7 @@ def get_secret(name):
     return environ
 
 
-# The URL of which footprint-core to test against
+# The URL of which api_server to test against
 TEST_URL = os.environ.get("TEST_URL") or "http://localhost:8000"
 
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"

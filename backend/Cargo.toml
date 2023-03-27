@@ -6,7 +6,7 @@ edition = "2021"
 
 [workspace]
 members = [
-    "components/api",
+    "components/api/*",
     "components/enclave/crypto",
     "components/enclave/enclave",
     "components/enclave/proxy",
@@ -16,7 +16,6 @@ members = [
     "components/newtypes",
     "components/app_attest",
     "components/twilio",
-    "components/api_wire_types",
     "components/privacy_pass",
     "components/webhooks",
     "external_tools/ditto",
@@ -64,6 +63,8 @@ diesel_as_jsonb = "1.0.0"
 
 deadpool-diesel = { version = "0.4.1", features=["postgres", "serde", "postgres"]}
 deadpool = { version = "0.9.5", features=["managed"], default-features = false}
+
+actix-web = "4.3.1"
 
 paperclip = { version = "0.7.1", features = [
     "actix4",

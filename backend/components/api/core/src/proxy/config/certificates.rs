@@ -115,9 +115,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_parse_identity() {
-        let cert = include_str!("../../../../../external_tools/ditto/src/dummy_cert/client.crt");
-        let key = include_str!("../../../../../external_tools/ditto/src/dummy_cert/client.key");
-        let server_cert = include_str!("../../../../../external_tools/ditto/src/dummy_cert/server.crt");
+        let cert = include_str!("../../../../../../external_tools/ditto/src/dummy_cert/client.crt");
+        let key = include_str!("../../../../../../external_tools/ditto/src/dummy_cert/client.key");
+        let server_cert = include_str!("../../../../../../external_tools/ditto/src/dummy_cert/server.crt");
 
         let cert_and_key = ClientCertificateKey::parse_cert_and_key(cert.as_bytes(), key.as_bytes())
             .expect("cert and key parsing");

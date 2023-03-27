@@ -154,7 +154,7 @@ jobs:
         run: |
           cargo build -p enclave
           cargo build -p enclave_proxy
-          cargo build -p footprint-core
+          cargo build -p api_server
                     
           make run-local &> server_output.txt &
           server_pid=$!

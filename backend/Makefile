@@ -11,13 +11,13 @@ RUST_VERSION := "1.68.0"
 # Builds the API crate into a musl binary
 api-release:
 	@echo "building release mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core --release
-	@cp ./target/x86_64-unknown-linux-musl/release/footprint-core ./out/footprint-core
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p api_server --release
+	@cp ./target/x86_64-unknown-linux-musl/release/api_server ./out/api_server
 
 api-debug:
 	@echo "building debug mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core
-	@cp ./target/x86_64-unknown-linux-musl/debug/footprint-core ./out/footprint-core
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p api_server
+	@cp ./target/x86_64-unknown-linux-musl/debug/api_server ./out/api_server
 
 # Builds the builder that will help us build enclave docker images
 build-enclave-builder:
@@ -99,17 +99,17 @@ package-api: api-release
 
 stop-local:
 	@killall enclave || echo "no enclave running"
-	@killall footprint-core || echo "no fpc running"
+	@killall api_server || echo "no fpc running"
 
 run-enclave-local: stop-local
 	@cargo run -p enclave --features simulate & echo "starting enclave..."
 	@cargo run -p enclave_proxy & echo "starting enclave proxy.."
 
 run-local: run-enclave-local
-	@cargo run -p footprint-core
+	@cargo run -p api_server
 
 watch-local: run-enclave-local
-	@cargo watch -x 'run -p footprint-core' -i ci
+	@cargo watch -x 'run -p api_server' -i ci
 
 watch: watch-local
 
@@ -137,5 +137,5 @@ run-integration-tests:
 	TEST_URL="http://localhost:8000" pytest ci/tests
 
 generate-api-types:
-	@cd components/api_wire_types && cargo test
-	@cd components/api_wire_types/ts-gen && yarn && yarn build
+	@cd components/api/wire_types && cargo test
+	@cd components/api/wire_types/ts-gen && yarn && yarn build

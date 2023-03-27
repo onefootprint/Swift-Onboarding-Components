@@ -14,7 +14,7 @@ Platform:
   darwin arm64
 
 Trace: 
-  SyntaxError: /Users/agrinman/projects/footprint/footprint-core/infra/package.json: Unexpected token } in JSON at position 253
+  SyntaxError: /Users/agrinman/projects/footprint/api_server/infra/package.json: Unexpected token } in JSON at position 253
       at JSON.parse (<anonymous>)
       at /opt/homebrew/lib/node_modules/yarn/lib/cli.js:1625:59
       at Generator.next (<anonymous>)

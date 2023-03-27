@@ -1,8 +1,8 @@
 FROM alpine:latest
 RUN apk update && apk add curl
 
-COPY ./out/footprint-core /footprint-core
+COPY ./out/api_server /api_server
 
 EXPOSE 8000
 
-ENTRYPOINT ["/footprint-core"]                                                     
+ENTRYPOINT ["/api_server"]                                                     

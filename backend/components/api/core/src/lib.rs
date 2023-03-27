@@ -45,8 +45,7 @@ lazy_static::lazy_static! {
 }
 
 #[allow(clippy::expect_used)]
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+pub async fn run_server() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
 
     // telemetry
