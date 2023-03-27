@@ -10,12 +10,7 @@ const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) =>
   data === null ? (
     <EncryptedCell />
   ) : (
-    <Typography
-      isPrivate
-      variant="body-3"
-      color="primary"
-      sx={{ maxWidth: '50%' }}
-    >
+    <Typography isPrivate variant="body-3" color="primary">
       {data || '-'}
     </Typography>
   );

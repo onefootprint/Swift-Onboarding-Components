@@ -20,11 +20,11 @@ const UsersTable = ({ isLoading, users }: UsersTableProps) => {
   const columns = [
     { text: t('table.header.name'), width: '14%' },
     { text: t('table.header.token'), width: '18%' },
-    { text: t('table.header.status'), width: '18%' },
+    { text: t('table.header.status'), width: '12%' },
     { text: t('table.header.email'), width: '20%' },
     { text: t('table.header.ssn'), width: '12%' },
-    { text: t('table.header.phone-number'), width: '14%' },
-    { text: t('table.header.start'), width: '14%' },
+    { text: t('table.header.phone-number'), width: '15%' },
+    { text: t('table.header.start'), width: '15%' },
   ];
 
   const handleRowClick = (user: User) => {

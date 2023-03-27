@@ -146,7 +146,7 @@ const TableContainer = styled.table`
       background: ${theme.backgroundColor.secondary};
       border-bottom: 1px solid ${theme.borderColor.tertiary};
       color: ${theme.color.secondary};
-      padding: ${theme.spacing[4]} ${theme.spacing[6]};
+      padding: ${theme.spacing[4]} ${theme.spacing[4]};
       text-transform: uppercase;
 
       &:first-child {
@@ -162,7 +162,7 @@ const TableContainer = styled.table`
       ${createFontStyles('body-3')};
       color: ${theme.color.primary};
       height: 46px;
-      padding: 0 ${theme.spacing[6]};
+      padding: 0 ${theme.spacing[4]};
       vertical-align: middle;
 
       p {

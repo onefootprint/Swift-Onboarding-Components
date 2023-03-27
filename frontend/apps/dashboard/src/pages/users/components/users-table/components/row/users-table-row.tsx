@@ -58,8 +58,15 @@ const Row = ({ user }: RowProps) => {
         <FieldOrPlaceholder data={vault?.id[IdDI.phoneNumber]} />
       </td>
       <td>
-        <Typography variant="body-3" color="primary">
-          {/* TODO better formatting utils */}
+        <Typography
+          variant="body-3"
+          color="primary"
+          sx={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
           {new Date(user.startTimestamp).toLocaleString('en-us', {
             month: 'numeric',
             day: 'numeric',
