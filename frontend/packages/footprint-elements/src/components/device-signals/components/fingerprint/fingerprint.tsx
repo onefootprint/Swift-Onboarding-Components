@@ -2,6 +2,7 @@ import {
   FpjsProvider,
   useVisitorData,
 } from '@fingerprintjs/fingerprintjs-pro-react';
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import type { SDKIntegrationProps } from '../../device-signals.types';
@@ -30,7 +31,8 @@ const Fingerprint = ({ page, fpAuthToken }: FingerprintProps) =>
 
 const FingerprintIntegration = ({ page, fpAuthToken }: FingerprintProps) => {
   const sendFingerprintPageMutation = useSendFingerprintPage(fpAuthToken);
-  const { data } = useVisitorData();
+  const { data, error } = useVisitorData();
+  const observeCollector = useObserveCollector();
 
   useEffect(() => {
     if (data && data.visitorId && data.requestId && page) {
@@ -41,6 +43,12 @@ const FingerprintIntegration = ({ page, fpAuthToken }: FingerprintProps) => {
       });
     }
   }, [data, page]);
+
+  useEffect(() => {
+    if (error) {
+      observeCollector.logError('error', error, { isFingerprintError: true });
+    }
+  }, [error]);
 
   return null;
 };
