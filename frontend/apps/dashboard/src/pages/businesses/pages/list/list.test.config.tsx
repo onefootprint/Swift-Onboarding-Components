@@ -43,7 +43,7 @@ export const withBusinesses = (
 ) =>
   mockRequest({
     method: 'get',
-    path: '/users',
+    path: '/entities',
     response: {
       data: businesses,
       meta: {},
@@ -55,7 +55,7 @@ export const withBusinesses = (
 export const withBusinessesError = () =>
   mockRequest({
     method: 'get',
-    path: '/users',
+    path: '/entities',
     statusCode: 400,
     response: {
       error: {
