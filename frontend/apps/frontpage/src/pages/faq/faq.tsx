@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button, media, Typography } from '@onefootprint/ui';
 import React from 'react';
-import FaqItem from 'src/components/faq-item';
+import Accordion from 'src/components/accordion';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
@@ -62,14 +62,14 @@ const Faq = () => {
             {t('subtitle')}
           </Typography>
         </HeroContainer>
-        <QuestionsContainer>
+        <Accordion.List>
           {items.map(({ id, title, content }) => {
             const isContentArray = Array.isArray(content);
             return isContentArray ? (
-              <FaqItem key={id} title={title} content={content} />
+              <Accordion.Item key={id} title={title} content={content} />
             ) : null;
           })}
-        </QuestionsContainer>
+        </Accordion.List>
         <ContactContainer>
           <Typography variant="label-1" sx={{ marginBottom: 3 }}>
             {t('contact.title')}
@@ -108,14 +108,6 @@ const HeroContainer = styled.div`
     gap: ${theme.spacing[5]};
     margin-bottom: ${theme.spacing[10]};
     text-align: center;
-  `}
-`;
-
-const QuestionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[5]};
-    margin-bottom: ${theme.spacing[10]};
   `}
 `;
 

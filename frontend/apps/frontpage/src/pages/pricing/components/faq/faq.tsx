@@ -1,6 +1,6 @@
-import { media, Typography } from '@onefootprint/ui';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import FaqItem from 'src/components/faq-item';
+import Accordion from 'src/components/accordion';
 import styled, { css } from 'styled-components';
 
 type FaqProps = {
@@ -19,15 +19,15 @@ const Faq = ({ title, items }: FaqProps) => (
         {title}
       </Typography>
     </TitleContainer>
-    <QuestionsContainer>
+    <Accordion.List>
       {items.map(item => (
-        <FaqItem
+        <Accordion.Item
           content={Array.isArray(item.content) ? item.content : [item.content]}
           key={item.id}
           title={item.title}
         />
       ))}
-    </QuestionsContainer>
+    </Accordion.List>
   </FaqContainer>
 );
 
@@ -42,19 +42,6 @@ const FaqContainer = styled.div`
 
 const TitleContainer = styled.div`
   text-align: center;
-`;
-
-const QuestionsContainer = styled.div`
-  ${({ theme }) => css`
-    margin: auto;
-    display: grid;
-    gap: ${theme.spacing[5]};
-    margin-bottom: ${theme.spacing[10]};
-
-    ${media.greaterThan('sm')`
-      width: 720px;
-    `}
-  `}
 `;
 
 export default Faq;
