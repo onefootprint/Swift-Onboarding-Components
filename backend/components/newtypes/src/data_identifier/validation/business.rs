@@ -4,6 +4,7 @@ use crate::email::Email;
 use crate::{BusinessDataKind as BDK, PhoneNumber, PiiString};
 use crate::{NtResult, Validate};
 use serde::Deserialize;
+use url::Host;
 
 impl Validate for BDK {
     fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
@@ -11,7 +12,7 @@ impl Validate for BDK {
         let result = match self {
             BDK::Name => value,
             BDK::Dba => value,
-            BDK::Website => value, // TODO
+            BDK::Website => clean_and_validate_website(value)?,
             BDK::PhoneNumber => PhoneNumber::parse(value)?.e164_with_suffix(),
             BDK::Ein => clean_and_validate_ein(value)?,
             BDK::AddressLine1 => value,
@@ -60,6 +61,19 @@ fn clean_and_validate_ein(input: PiiString) -> VResult<PiiString> {
     Ok(input)
 }
 
+fn clean_and_validate_website(input: PiiString) -> VResult<PiiString> {
+    let host = Host::parse(input.leak())?;
+    match host {
+        Host::Ipv4(_) | Host::Ipv6(_) => return Err(Error::InvalidHost),
+        Host::Domain(d) => {
+            if d.split('.').count() <= 1 {
+                return Err(Error::InvalidHost);
+            }
+        }
+    }
+    Ok(input)
+}
+
 #[cfg(test)]
 mod test {
     use super::BDK::*;
@@ -68,9 +82,16 @@ mod test {
     use crate::Validate;
     use test_case::test_case;
 
-    // TODO more tests
     #[test_case(Name, "Acme Bank" => Some("Acme Bank".to_owned()))]
     #[test_case(Dba, "Bank" => Some("Bank".to_owned()))]
+    #[test_case(Website, "https://onefootprint.com" => None)]
+    #[test_case(Website, "http://onefootprint.com" => None)]
+    #[test_case(Website, "www.onefootprint.com/about.html" => None)]
+    #[test_case(Website, "onefootprint.com" => Some("onefootprint.com".to_owned()))]
+    #[test_case(Website, "about.onefootprint.com" => Some("about.onefootprint.com".to_owned()))]
+    #[test_case(Website, "foobar" => None)]
+    #[test_case(Website, "hello . com" => None)]
+    #[test_case(Website, "123?.com" => None)]
     #[test_case(PhoneNumber, "flerp" => None)]
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
     #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone

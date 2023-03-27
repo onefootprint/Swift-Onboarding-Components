@@ -35,6 +35,10 @@ pub enum Error {
     CannotParseJson(#[from] serde_json::Error),
     #[error("The business owners' ownership stakes must not sum to more than 100%")]
     BusinessOwnersStakeAbove100,
+    #[error("Couldn't parse as host. Should not include URL scheme or path")]
+    UrlParseError(#[from] url::ParseError),
+    #[error("Invalid host. Should be a domain")]
+    InvalidHost,
 }
 
 pub(super) type VResult<T> = Result<T, Error>;
