@@ -121,6 +121,19 @@ pub async fn post_decrypt(
         })
         .await??;
 
+    // Small hack to not actually request to decrypt the selfie if it doesn't exist in the vault.
+    // It's hard for the frontend to tell right now if there's a selfie associated with a document,
+    // so the frontend always requests include_selfie=true
+    // Hopefully we'll clean up the document decrypt API soon
+    let include_selfie = include_selfie && uvw.has_field(DataIdentifier::Selfie(document_type));
+    let targets = [
+        Some(DataIdentifier::IdDocument(document_type)),
+        include_selfie.then_some(DataIdentifier::Selfie(document_type)),
+    ]
+    .into_iter()
+    .flatten()
+    .collect_vec();
+
     // Important to check requester has access. TODO is there a better way to have type safety here?
     // Can we put in decrypt_document?
     uvw.check_ob_config_access(&targets)?;
