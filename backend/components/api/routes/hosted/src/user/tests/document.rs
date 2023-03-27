@@ -6,7 +6,7 @@ use macros::db_test;
 use newtypes::idology::IdologyScanOnboardingCaptureResult;
 use newtypes::DocumentRequestStatus;
 
-use crate::routes::hosted::user::document::construct_get_response;
+use crate::user::document::construct_get_response;
 
 #[db_test]
 fn test_construct_get_response_pending(conn: &mut TestPgConn) {

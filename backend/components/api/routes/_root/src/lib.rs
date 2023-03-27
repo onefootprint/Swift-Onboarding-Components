@@ -1,14 +1,13 @@
 use paperclip::actix::web;
 
-// TODO: eventually all of these will be moved!
-use api_core::routes::*;
-
+use api_route_hosted as hosted;
 use api_route_org as org;
 use api_route_index as index;
 use api_route_private as private;
 use api_route_proxy as proxy;
 use api_route_onboarding as onboarding;
 use api_route_users as users;
+use api_route_entities as entities;
 
 pub fn configure(config: &mut web::ServiceConfig) {
     index::routes(config);

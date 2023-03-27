@@ -2,6 +2,7 @@
 pub mod identify;
 pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
+use api_core::utils::twilio::PhoneChallengeState;
 use db::models::webauthn_credential::WebauthnCredential;
 pub mod signup_challenge;
 pub mod verify;
@@ -39,13 +40,6 @@ pub struct UserChallengeData {
     scrubbed_phone_number: String,
     biometric_challenge_json: Option<String>,
     time_before_retry_s: i64,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PhoneChallengeState {
-    /// Will also include sandbox suffix, if exists
-    pub phone_number_e164_with_suffix: PiiString,
-    pub h_code: Vec<u8>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

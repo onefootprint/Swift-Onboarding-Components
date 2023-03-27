@@ -135,7 +135,7 @@ impl SendgridClient {
     }
 }
 
-pub(crate) async fn send_email_challenge(
+pub async fn send_email_challenge(
     state: &web::Data<State>,
     email_id: ContactInfoId,
     email_address: &PiiString,

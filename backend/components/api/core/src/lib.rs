@@ -21,13 +21,11 @@ pub mod auth;
 pub mod decision;
 pub mod enclave_client;
 pub mod errors;
-pub mod routes;
-pub mod serializers;
-pub mod task;
-pub use self::routes::*;
 pub mod proxy;
 pub mod s3;
+pub mod serializers;
 pub mod state;
+pub mod task;
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]

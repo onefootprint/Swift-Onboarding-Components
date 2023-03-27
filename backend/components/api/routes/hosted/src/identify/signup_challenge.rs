@@ -1,9 +1,9 @@
 use super::{ChallengeKind, UserChallengeData};
-use crate::hosted::identify::ChallengeData;
+use crate::identify::ChallengeData;
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
 use crate::State;
-use crate::{errors::ApiError, hosted::identify::ChallengeState};
+use crate::{errors::ApiError, identify::ChallengeState};
 use newtypes::PhoneNumber;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 

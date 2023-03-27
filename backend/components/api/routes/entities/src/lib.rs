@@ -10,6 +10,8 @@ pub mod vault;
 
 pub use get::{get_entities, get_entity};
 
+pub use api_core::*;
+
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
     config

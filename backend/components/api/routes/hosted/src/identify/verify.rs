@@ -5,7 +5,7 @@ use crate::errors::challenge::ChallengeError;
 
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
-use crate::hosted::identify::{ChallengeData, ChallengeState};
+use crate::identify::{ChallengeData, ChallengeState};
 use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;

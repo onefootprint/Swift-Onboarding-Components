@@ -11,7 +11,6 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 
 use crate::utils::db2api::DbToApi;
-use crate::utils::validate_request::ValidateRequest;
 use crate::State;
 
 use actix_web::web::Json;
@@ -80,6 +79,10 @@ async fn patch(
         .await??;
 
     EmptyResponse::ok().json()
+}
+
+pub trait ValidateRequest {
+    fn validate(&self) -> Result<(), ApiError>;
 }
 
 impl ValidateRequest for CreateAnnotationRequest {

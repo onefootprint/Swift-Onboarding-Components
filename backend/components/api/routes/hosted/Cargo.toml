@@ -1,5 +1,5 @@
 [package]
-name = "api_route_users"
+name = "api_route_hosted"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -19,7 +19,6 @@ feature_flag = { path = "../../../feature_flag" }
 webhooks = { path = "../../../webhooks"}
 billing = { path = "../../../billing"}
 api_wire_types = { path = "../../wire_types" }
-api_route_entities = { path = "../entities"}
 
 actix-web = { workspace = true }
 paperclip = { workspace = true }

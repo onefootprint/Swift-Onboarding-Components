@@ -1,6 +1,6 @@
 use super::{ChallengeKind, Identifier};
 use crate::errors::ApiError;
-use crate::hosted::identify::get_user_challenge_context;
+use crate::identify::get_user_challenge_context;
 use crate::types::response::ResponseData;
 use crate::State;
 

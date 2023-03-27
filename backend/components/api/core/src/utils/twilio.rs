@@ -2,12 +2,11 @@ use std::fmt::Debug;
 
 use crate::{
     errors::{challenge::ChallengeError, ApiError},
-    hosted::identify::PhoneChallengeState,
     State,
 };
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use newtypes::PhoneNumber;
+use newtypes::{PhoneNumber, PiiString};
 
 use self::rate_limit::RateLimit;
 
@@ -115,6 +114,15 @@ impl TwilioClient {
         Ok(self.duration_between_challenges)
     }
 }
+
+/// Phone number challenge in-progress state
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PhoneChallengeState {
+    /// Will also include sandbox suffix, if exists
+    pub phone_number_e164_with_suffix: PiiString,
+    pub h_code: Vec<u8>,
+}
+
 
 mod rate_limit {
     use super::*;

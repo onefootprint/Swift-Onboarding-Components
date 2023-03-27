@@ -2,9 +2,9 @@ pub mod document;
 
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::{tenant::TenantSessionAuth, Either};
-use crate::routes::entities::vault::decrypt::{post_inner, DecryptRequest, DecryptResponse};
-use crate::routes::entities::vault::get::{get_inner, FieldsParams, GetVaultResponse};
-use crate::routes::entities::vault::put::{post_validate_inner, put_inner};
+use api_route_entities::vault::decrypt::{post_inner, DecryptRequest, DecryptResponse};
+use api_route_entities::vault::get::{get_inner, FieldsParams, GetVaultResponse};
+use api_route_entities::vault::put::{post_validate_inner, put_inner};
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::utils::headers::InsightHeaders;

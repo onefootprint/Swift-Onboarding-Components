@@ -5,7 +5,7 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
-async-stripe = { version = "0.18.2", features = ["runtime-tokio-hyper"] }
+async-stripe = { version = "0.18.2", default-features = false, features = ["checkout","billing","runtime-tokio-hyper"] }
 db = { path = "../db" }
 newtypes = { path = "../newtypes" }
 feature_flag = { path = "../feature_flag" }

@@ -11,7 +11,6 @@ pub mod liveness;
 pub mod magic_link;
 pub mod session;
 pub mod twilio;
-pub mod validate_request;
 pub mod vault_wrapper;
 
 #[allow(clippy::expect_used)]

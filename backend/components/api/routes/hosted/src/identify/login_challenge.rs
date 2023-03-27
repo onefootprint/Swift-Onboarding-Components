@@ -1,13 +1,13 @@
 use super::{BiometricChallengeState, ChallengeKind, Identifier, UserChallengeData};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::onboarding::OnboardingError;
-use crate::hosted::identify::get_user_challenge_context;
-use crate::hosted::identify::ChallengeData;
+use crate::identify::get_user_challenge_context;
+use crate::identify::ChallengeData;
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
-use crate::{errors::ApiError, hosted::identify::ChallengeState};
+use crate::{errors::ApiError, identify::ChallengeState};
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;

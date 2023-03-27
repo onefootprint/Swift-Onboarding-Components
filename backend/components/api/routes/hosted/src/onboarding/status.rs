@@ -2,7 +2,7 @@ use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
-use crate::hosted::onboarding::{get_fields_to_authorize, get_requirements};
+use crate::onboarding::{get_fields_to_authorize, get_requirements};
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;

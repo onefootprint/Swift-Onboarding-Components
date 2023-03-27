@@ -5,7 +5,7 @@ use crate::decision;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
-use crate::hosted::onboarding::get_requirements;
+use crate::onboarding::get_requirements;
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
