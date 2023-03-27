@@ -1,3 +1,4 @@
+use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
 use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
@@ -16,8 +17,8 @@ impl Validate for IDK {
             IDK::AddressLine2 => value,
             IDK::City => value,
             IDK::State => value, // maybe we'll want to validate state based on country some day
-            IDK::Zip => super::clean_and_validate_zip(value)?,
-            IDK::Country => super::clean_and_validate_country(value)?,
+            IDK::Zip => utils::clean_and_validate_zip(value)?,
+            IDK::Country => utils::clean_and_validate_country(value)?,
             IDK::Email => Email::from_str(value.leak())?.to_piistring(),
             IDK::PhoneNumber => PhoneNumber::parse(value)?.e164_with_suffix(),
         };

@@ -1,3 +1,4 @@
+use super::utils;
 use super::VResult;
 use crate::{BusinessDataKind as BDK, PhoneNumber, PiiString};
 use crate::{NtResult, Validate};
@@ -14,8 +15,8 @@ impl Validate for BDK {
             BDK::AddressLine2 => value,
             BDK::City => value,
             BDK::State => value,
-            BDK::Zip => super::clean_and_validate_zip(value)?,
-            BDK::Country => super::clean_and_validate_country(value)?,
+            BDK::Zip => utils::clean_and_validate_zip(value)?,
+            BDK::Country => utils::clean_and_validate_country(value)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?, // TODO
             BDK::CorporationType => value,                                         // TODO
         };
