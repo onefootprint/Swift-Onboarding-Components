@@ -32,7 +32,6 @@ pub enum CollectedData {
     BusinessPhoneNumber,
     BusinessWebsite,
     BusinessBeneficialOwners,
-    BusinessCorporationType,
 
     InvestorProfile,
 }
@@ -58,7 +57,6 @@ impl CollectedData {
             Self::BusinessPhoneNumber => vec![BusinessPhoneNumber],
             Self::BusinessWebsite => vec![BusinessWebsite],
             Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners],
-            Self::BusinessCorporationType => vec![BusinessCorporationType],
             Self::InvestorProfile => vec![InvestorProfile],
         }
     }
@@ -70,8 +68,7 @@ impl CollectedData {
             | Self::BusinessAddress
             | Self::BusinessPhoneNumber
             | Self::BusinessWebsite
-            | Self::BusinessBeneficialOwners
-            | Self::BusinessCorporationType => DataIdentifierDiscriminant::Business,
+            | Self::BusinessBeneficialOwners => DataIdentifierDiscriminant::Business,
             Self::Name | Self::Dob | Self::Ssn | Self::Address | Self::Email | Self::PhoneNumber => {
                 DataIdentifierDiscriminant::Id
             }
@@ -127,7 +124,6 @@ pub enum CollectedDataOption {
     BusinessPhoneNumber,
     BusinessWebsite,
     BusinessBeneficialOwners,
-    BusinessCorporationType,
 
     InvestorProfile,
 }
@@ -151,7 +147,6 @@ impl CollectedDataOption {
             Self::BusinessPhoneNumber => CollectedData::BusinessPhoneNumber,
             Self::BusinessWebsite => CollectedData::BusinessWebsite,
             Self::BusinessBeneficialOwners => CollectedData::BusinessBeneficialOwners,
-            Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
             Self::InvestorProfile => CollectedData::InvestorProfile,
         }
     }
@@ -187,7 +182,6 @@ impl CollectedDataOption {
             Self::BusinessPhoneNumber => Some(vec![BDK::PhoneNumber.into()]),
             Self::BusinessWebsite => Some(vec![BDK::Website.into()]),
             Self::BusinessBeneficialOwners => Some(vec![BDK::BeneficialOwners.into()]),
-            Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
 
             // Can we stick the investor profile identifier in here? Even if it's a different DI variant... cool
             Self::InvestorProfile => Some(

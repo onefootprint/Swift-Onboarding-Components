@@ -22,7 +22,6 @@ impl Validate for BDK {
             BDK::Zip => utils::clean_and_validate_zip(value)?,
             BDK::Country => utils::clean_and_validate_country(value)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
-            BDK::CorporationType => value, // TODO
         };
         Ok(result)
     }
