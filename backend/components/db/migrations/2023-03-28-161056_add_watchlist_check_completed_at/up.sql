@@ -1,0 +1,1 @@
+ALTER TABLE watchlist_check ADD COLUMN completed_at TIMESTAMPTZ;

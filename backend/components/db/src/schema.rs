@@ -738,6 +738,7 @@ table! {
         status -> Text,
         logic_git_hash -> Nullable<Text>,
         reason_codes -> Nullable<Array<Text>>,
+        completed_at -> Nullable<Timestamptz>,
     }
 }
 

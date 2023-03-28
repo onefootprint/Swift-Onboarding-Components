@@ -7,6 +7,7 @@ use crate::{
     task::{ExecuteTask, TaskError},
 };
 use async_trait::async_trait;
+use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -123,15 +124,13 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             let _updated_wc = self
                 .db_pool
                 .db_query(move |conn| {
-                    WatchlistCheck::update(
-                        conn,
-                        &wc.id,
-                        UpdateWatchlistCheck {
-                            status,
-                            logic_git_hash: Some(crate::GIT_HASH.to_string()),
-                            reason_codes,
-                        },
-                    )
+                    let update = UpdateWatchlistCheck {
+                        status,
+                        logic_git_hash: Some(crate::GIT_HASH.to_string()),
+                        reason_codes,
+                        completed_at: Some(Utc::now()),
+                    };
+                    WatchlistCheck::update(conn, &wc.id, update)
                 })
                 .await??;
         } // else we have a watchlist_check that doesn't need a vendor call because it is NotNeed or Error

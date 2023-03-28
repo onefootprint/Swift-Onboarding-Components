@@ -21,6 +21,7 @@ pub struct WatchlistCheck {
     pub status: WatchlistCheckStatus,
     pub logic_git_hash: Option<String>, // written when status is updated to Pass, Fail, or Error
     pub reason_codes: Option<Vec<FootprintReasonCode>>,
+    pub completed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -31,6 +32,7 @@ struct NewWatchlistCheck {
     pub task_id: TaskId,
     pub decision_intent_id: DecisionIntentId,
     pub status: WatchlistCheckStatus,
+    pub completed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset)]
@@ -39,6 +41,7 @@ pub struct UpdateWatchlistCheck {
     pub status: WatchlistCheckStatus,
     pub logic_git_hash: Option<String>,
     pub reason_codes: Option<Vec<FootprintReasonCode>>,
+    pub completed_at: Option<DateTime<Utc>>,
 }
 
 impl WatchlistCheck {
@@ -50,12 +53,19 @@ impl WatchlistCheck {
         decision_intent_id: DecisionIntentId,
         status: WatchlistCheckStatus,
     ) -> DbResult<Self> {
+        let timestamp = Utc::now();
+        // Mark the watchlist check as completed if it has a terminal status
+        let completed_at = match status {
+            WatchlistCheckStatus::Pending => None,
+            _ => Some(timestamp),
+        };
         let new_watchlist_check = NewWatchlistCheck {
-            created_at: Utc::now(),
+            created_at: timestamp,
             scoped_vault_id,
             task_id,
             decision_intent_id,
             status,
+            completed_at,
         };
 
         let res = diesel::insert_into(watchlist_check::table)
