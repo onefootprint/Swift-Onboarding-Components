@@ -121,3 +121,24 @@ impl SaltedFingerprint for IdentityDataKind {
         sha256(&concat)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{IdentityDataKind, PiiString, SaltedFingerprint};
+
+    #[test]
+    fn test_fingerprint() {
+        let pii = PiiString::from("Flerp");
+        let fingerprint = IdentityDataKind::FirstName.salt_pii_to_sign(&pii);
+        // Here, we use a fixture fingerprint just compupted at some point in the past.
+        // If the implementation of fingerprinting changes, the search on the dashboard will break.
+        // So, if this test fails, it means you made a backwards-incompatible change to
+        // fingerprinting and have to migrate old FPs
+
+        let expected_fp: [u8; 32] = [
+            39, 250, 148, 126, 130, 246, 176, 70, 122, 112, 252, 248, 186, 199, 185, 181, 224, 174, 161, 75,
+            8, 233, 182, 46, 163, 49, 48, 54, 115, 229, 30, 135,
+        ];
+        assert_eq!(fingerprint, expected_fp,)
+    }
+}

@@ -94,4 +94,23 @@ impl SaltedFingerprint for BusinessDataKind {
     }
 }
 
-// TODO tests that fingerprints don't change
+#[cfg(test)]
+mod test {
+    use crate::{BusinessDataKind, PiiString, SaltedFingerprint};
+
+    #[test]
+    fn test_fingerprint() {
+        let pii = PiiString::from("Flerp Inc");
+        let fingerprint = BusinessDataKind::Name.salt_pii_to_sign(&pii);
+        // Here, we use a fixture fingerprint just compupted at some point in the past.
+        // If the implementation of fingerprinting changes, the search on the dashboard will break.
+        // So, if this test fails, it means you made a backwards-incompatible change to
+        // fingerprinting and have to migrate old FPs
+
+        let expected_fp: [u8; 32] = [
+            161, 180, 84, 228, 16, 240, 168, 166, 132, 47, 102, 90, 177, 221, 216, 47, 58, 232, 38, 0, 21,
+            97, 124, 207, 95, 137, 134, 230, 44, 218, 231, 233,
+        ];
+        assert_eq!(fingerprint, expected_fp,)
+    }
+}
