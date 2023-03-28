@@ -29,7 +29,6 @@ export enum InvestorProfileDI {
   investmentGoals = 'investor_profile.investment_goals',
   riskTolerance = 'investor_profile.risk_tolerance',
   declarations = 'investor_profile.declarations',
-  finraComplianceLetter = 'document.finra_compliance_letter',
 }
 
 export enum IdDI {

@@ -24,11 +24,11 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
 
   const getData = ({
     attribute,
-    getValue = () => vault.investorProfile[attribute],
+    getValue,
     formatValue = (value?: VaultValue) => value,
   }: {
     attribute: InvestorProfileDI | DocumentDI;
-    getValue?: () => VaultValue;
+    getValue: () => VaultValue;
     formatValue?: (value?: VaultValue) => VaultValue;
   }) => {
     const canDecrypt = hasPermission(RoleScope.decryptInvestorProfile);
@@ -60,6 +60,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.occupation,
+          getValue: () => vault.investorProfile[InvestorProfileDI.occupation],
         }),
       ],
     },
@@ -68,6 +69,8 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.employedByBrokerageFirm,
+          getValue: () =>
+            vault.investorProfile[InvestorProfileDI.employedByBrokerageFirm],
         }),
       ],
     },
@@ -76,6 +79,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.annualIncome,
+          getValue: () => vault.investorProfile[InvestorProfileDI.annualIncome],
           formatValue: value => {
             if (!value) return value;
             return t(`annual-income.options.${value}`);
@@ -88,6 +92,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.netWorth,
+          getValue: () => vault.investorProfile[InvestorProfileDI.netWorth],
           formatValue: value => {
             if (!value) return value;
             return t(`net-worth.options.${value}`);
@@ -102,6 +107,8 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.investmentGoals,
+          getValue: () =>
+            vault.investorProfile[InvestorProfileDI.investmentGoals],
           formatValue: value => {
             if (!value || typeof value !== 'string') return value;
             try {
@@ -122,6 +129,8 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.riskTolerance,
+          getValue: () =>
+            vault.investorProfile[InvestorProfileDI.riskTolerance],
           formatValue: value => {
             if (!value) return value;
             return t(`risk-tolerance.options.${value}`);
@@ -134,6 +143,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.declarations,
+          getValue: () => vault.investorProfile[InvestorProfileDI.declarations],
           formatValue: value => {
             if (!value || typeof value !== 'string') return value;
             try {

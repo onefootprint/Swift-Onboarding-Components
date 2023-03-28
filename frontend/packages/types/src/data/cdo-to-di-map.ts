@@ -8,6 +8,7 @@ import {
 import {
   BusinessDI,
   DataIdentifier,
+  DocumentDI,
   IdDI,
   IdDocDI,
   InvestorProfileDI,
@@ -60,9 +61,10 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
   ],
 
   // Investor Profile
-  [CollectedInvestorProfileDataOption.investorProfile]: Object.entries(
-    InvestorProfileDI,
-  ).map(([, value]) => value),
+  [CollectedInvestorProfileDataOption.investorProfile]: [
+    DocumentDI.finraComplianceLetter,
+    ...Object.values(InvestorProfileDI).map(value => value),
+  ],
 };
 
 export default CdoToDiMap;
