@@ -4,7 +4,7 @@ use crate::types::response::ResponseData;
 use crate::State;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use newtypes::{Fingerprinter, IdentityDataKind, PhoneNumber, TenantId};
+use newtypes::{DataIdentifier, Fingerprinter, IdentityDataKind, PhoneNumber, TenantId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -62,9 +62,9 @@ async fn post(
     }
 
     // Use e164 with suffix to compute fingerprint
-    let idk = Box::new(IdentityDataKind::PhoneNumber);
+    let di = DataIdentifier::from(IdentityDataKind::PhoneNumber);
     let sh_data = state
-        .compute_fingerprint(idk, phone_number.e164_with_suffix())
+        .compute_fingerprint(di, phone_number.e164_with_suffix())
         .await?;
 
     let uv = state

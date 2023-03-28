@@ -47,8 +47,9 @@ pub use self::{
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
-    KvDataKey,
+    KvDataKey, PiiString, SaltedFingerprint,
 };
+use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use schemars::JsonSchema;
@@ -209,6 +210,28 @@ impl FromStr for DataIdentifier {
     }
 }
 
+impl DataIdentifier {
+    /// Returns true if the DI can be fingerprinted. Will automatically fingerprint non-document
+    /// data with these types when added to the vault
+    pub fn is_fingerprintable(&self) -> bool {
+        matches!(self, Self::Id(_) | Self::Business(_))
+    }
+}
+
+impl SaltedFingerprint for DataIdentifier {
+    fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
+        let self_name = match self {
+            // For legacy fingerprints, continue to serialize IDKs without the id. prefix
+            // TODO migrate legacy fingerprints
+            Self::Id(idk) => idk.to_string(),
+            _ => self.to_string(),
+        };
+        let data_clean = data.clean_for_fingerprint();
+        let concat = [sha256(self_name.as_bytes()), sha256(data_clean.leak().as_bytes())].concat();
+        sha256(&concat)
+    }
+}
+
 impl_enum_string_diesel!(DataIdentifier);
 
 #[cfg(test)]
@@ -241,5 +264,31 @@ mod tests {
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
+    }
+
+    #[test]
+    fn test_fingerprint() {
+        // Here, we use a fixture fingerprint just compupted at some point in the past.
+        // If the implementation of fingerprinting changes, the search on the dashboard will break.
+        // So, if this test fails, it means you made a backwards-incompatible change to
+        // fingerprinting and have to migrate old FPs
+
+        // Test BDK
+        let pii = PiiString::from("Flerp Inc");
+        let fingerprint = DataIdentifier::from(BusinessDataKind::Name).salt_pii_to_sign(&pii);
+        let expected_fp: [u8; 32] = [
+            161, 180, 84, 228, 16, 240, 168, 166, 132, 47, 102, 90, 177, 221, 216, 47, 58, 232, 38, 0, 21,
+            97, 124, 207, 95, 137, 134, 230, 44, 218, 231, 233,
+        ];
+        assert_eq!(fingerprint, expected_fp);
+
+        // Test IDK
+        let pii = PiiString::from("Flerp");
+        let fingerprint = DataIdentifier::from(IdentityDataKind::FirstName).salt_pii_to_sign(&pii);
+        let expected_fp: [u8; 32] = [
+            39, 250, 148, 126, 130, 246, 176, 70, 122, 112, 252, 248, 186, 199, 185, 181, 224, 174, 161, 75,
+            8, 233, 182, 46, 163, 49, 48, 54, 115, 229, 30, 135,
+        ];
+        assert_eq!(fingerprint, expected_fp)
     }
 }

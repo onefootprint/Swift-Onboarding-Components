@@ -19,7 +19,9 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::{NewVaultInfo, Vault};
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{Fingerprinter, IdentityDataKind as IDK, PhoneNumber, PiiString, SessionAuthToken, VaultId};
+use newtypes::{
+    DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PhoneNumber, PiiString, SessionAuthToken, VaultId,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -137,8 +139,8 @@ async fn validate_sms_challenge(
     }
 
     let phone_number = challenge_state.phone_number_e164_with_suffix;
-    let idk = Box::new(IDK::PhoneNumber);
-    let sh_phone_number = state.compute_fingerprint(idk, phone_number.clone()).await?;
+    let di = DataIdentifier::from(IDK::PhoneNumber);
+    let sh_phone_number = state.compute_fingerprint(di, phone_number.clone()).await?;
     let existing_user = state
         .db_pool
         .db_query(|conn| Vault::find_portable(conn, sh_phone_number))
@@ -173,8 +175,8 @@ async fn create_new_user_vault(
         is_live: phone_number.is_live(),
     };
     let phone = phone_number.e164_with_suffix();
-    let idk = Box::new(IDK::PhoneNumber);
-    let sh_phone = state.compute_fingerprint(idk, phone.clone()).await?;
+    let di = DataIdentifier::from(IDK::PhoneNumber);
+    let sh_phone = state.compute_fingerprint(di, phone.clone()).await?;
     let user = state
         .db_pool
         .db_transaction(|conn| -> ApiResult<_> {

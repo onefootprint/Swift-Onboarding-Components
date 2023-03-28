@@ -12,7 +12,7 @@ use crate::State;
 use chrono::{DateTime, Duration, Utc};
 use db::models::vault::Vault;
 use newtypes::email::Email;
-use newtypes::VaultId;
+use newtypes::{DataIdentifier, VaultId};
 use newtypes::{Fingerprinter, PiiString};
 use newtypes::{IdentityDataKind, PhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
@@ -92,15 +92,15 @@ async fn get_user_by_identifier(
     state: &web::Data<State>,
     identifier: &Identifier,
 ) -> Result<Option<Vault>, ApiError> {
-    let (data_attribute, data) = match identifier {
+    let (idk, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
             (IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
         }
         Identifier::Email(email) => (IdentityDataKind::Email, PiiString::from(email.clone())),
     };
-    let data_attribute = Box::new(data_attribute);
+
     let sh_data = state
-        .compute_fingerprint(data_attribute, data.clean_for_fingerprint())
+        .compute_fingerprint(DataIdentifier::from(idk), data.clean_for_fingerprint())
         .await?;
     // TODO should we only look for verified emails?
     let existing_user = state

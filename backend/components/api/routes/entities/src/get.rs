@@ -24,7 +24,6 @@ use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::IdDocKind;
 use newtypes::PiiString;
-use newtypes::SaltedFingerprint;
 use newtypes::VaultKind;
 use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
@@ -266,9 +265,8 @@ async fn compute_fingerprint_for_search(
     state: &State,
     search: PiiString,
 ) -> Result<Vec<Fingerprint>, ApiError> {
-    type FpAble = Box<dyn SaltedFingerprint>;
-    let searchable_idks = IDK::searchable().into_iter().map(|idk| Box::new(idk) as FpAble);
-    let searchable_bdks = BDK::searchable().into_iter().map(|bdk| Box::new(bdk) as FpAble);
+    let searchable_idks = IDK::searchable().into_iter().map(DataIdentifier::from);
+    let searchable_bdks = BDK::searchable().into_iter().map(DataIdentifier::from);
     let searchable = searchable_idks.chain(searchable_bdks);
     let fut_fingerprints = searchable.map(|kind| state.compute_fingerprint(kind, search.clone()));
     let fingerprints = futures::future::try_join_all(fut_fingerprints).await?;

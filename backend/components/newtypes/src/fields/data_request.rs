@@ -1,6 +1,6 @@
 use crate::{
     CollectedDataOption, DataIdentifier, DataLifetimeKind, Error, Fingerprint, Fingerprinter,
-    IdentityDataKind as IDK, PiiString, SaltedFingerprint, Validate, VdKind,
+    IdentityDataKind as IDK, PiiString, Validate, VdKind,
 };
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
@@ -146,22 +146,16 @@ impl<T> DataRequest<T> {
         self,
         fingerprinter: &F,
     ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let fut_fingerprints = self
-            .iter()
+        let data = self.data.clone().into_iter();
+        let fut_fingerprints = data
             .filter_map(|(di, pii)| {
-                // Until we have DI implement SaltedFingerprint, have to wrap the IDKs and BDKs
-                // in a Box<dyn SaltedFingerprint>
-                let sf: Option<(Box<dyn SaltedFingerprint>, DataLifetimeKind)> = match di.clone() {
-                    DataIdentifier::Id(idk) => Some((Box::new(idk), idk.into())),
-                    DataIdentifier::Business(bdk) => Some((Box::new(bdk), bdk.into())),
-                    _ => None,
-                };
-                sf.map(|(sf, dlk)| (sf, pii.clone(), dlk))
+                let dlk: DataLifetimeKind = di.clone().try_into().ok()?;
+                di.is_fingerprintable().then_some((di, pii, dlk))
             })
-            .map(|(sf, pii, dlk)| {
+            .map(|(di, pii, dlk)| {
                 let pii = pii.clean_for_fingerprint();
                 fingerprinter
-                    .compute_fingerprint(sf, pii)
+                    .compute_fingerprint(di, pii)
                     .map_ok(move |sh_data| (dlk, sh_data))
             });
         let fingerprints = futures::future::try_join_all(fut_fingerprints)

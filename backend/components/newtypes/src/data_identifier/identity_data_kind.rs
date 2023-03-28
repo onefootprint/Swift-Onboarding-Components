@@ -1,5 +1,4 @@
-use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, PiiString, SaltedFingerprint};
-use crypto::sha256;
+use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -107,37 +106,5 @@ impl IdentityDataKind {
     // Some kinds we may be more surprised than others seeing show up in multiple distinct vaults
     pub fn should_have_unique_fingerprint(&self) -> bool {
         matches!(self, Self::Ssn9 | Self::Ssn4)
-    }
-}
-
-// TODO should one day just implement this on DataIdentifier but we'd have to migrate all the old
-// fingerprints
-impl SaltedFingerprint for IdentityDataKind {
-    fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
-        let self_name = self.to_string();
-        let data_clean = data.clean_for_fingerprint();
-        let concat = [sha256(self_name.as_bytes()), sha256(data_clean.leak().as_bytes())].concat();
-        sha256(&concat)
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use crate::{IdentityDataKind, PiiString, SaltedFingerprint};
-
-    #[test]
-    fn test_fingerprint() {
-        let pii = PiiString::from("Flerp");
-        let fingerprint = IdentityDataKind::FirstName.salt_pii_to_sign(&pii);
-        // Here, we use a fixture fingerprint just compupted at some point in the past.
-        // If the implementation of fingerprinting changes, the search on the dashboard will break.
-        // So, if this test fails, it means you made a backwards-incompatible change to
-        // fingerprinting and have to migrate old FPs
-
-        let expected_fp: [u8; 32] = [
-            39, 250, 148, 126, 130, 246, 176, 70, 122, 112, 252, 248, 186, 199, 185, 181, 224, 174, 161, 75,
-            8, 233, 182, 46, 163, 49, 48, 54, 115, 229, 30, 135,
-        ];
-        assert_eq!(fingerprint, expected_fp,)
     }
 }
