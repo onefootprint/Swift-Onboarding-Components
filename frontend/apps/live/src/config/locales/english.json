@@ -25,7 +25,7 @@
       "description": "Your PII is secured with Footprint, so you can safely allow companies to access it whenever you want, however you want. Regain the ownership of your data."
     },
     "features": {
-      "title": "How Footprint guards your PII",
+      "title": "How Footprint guards your data",
       "zero-trust": {
         "title": "Zero-trust by design",
         "description": "Our API ensures only the right parties can access the data they're allowed to see."

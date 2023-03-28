@@ -844,7 +844,7 @@
       "title": "We care about your PII data and privacy.",
       "subtitle": "That's why {{tenantName}} has partnered with Footprint to achieve the highest security standards, so your personal information is always safe and secure.",
       "features": {
-        "title": "How Footprint guards your PII",
+        "title": "How Footprint guards your data",
         "feature-1": {
           "title": "Zero-trust by design",
           "description": "Our API ensures only the right parties can access the data they're allowed to see."
