@@ -4,14 +4,14 @@ use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
-use billing::BillingInfo;
+use billing::{BillingCounts, BillingInfo};
 use chrono::{NaiveDate, Utc};
 use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::scoped_vault::{count_authorized_for_tenant, ScopedVaultListQueryParams};
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::{StripeCustomerId, TenantId};
+use newtypes::{StripeCustomerId, TenantId, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
@@ -109,7 +109,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     if !state.feature_flag_client.flag(BoolFlag::ShouldBill(&tenant.id)) {
         return Ok(());
     }
-    let interval = billing::interval::get_billing_interval(billing_date)?;
+    let i = billing::interval::get_billing_interval(billing_date)?;
 
     let params = ScopedVaultListQueryParams {
         tenant_id: tenant.id.clone(),
@@ -117,30 +117,37 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
         only_billable: true,
         ..Default::default()
     };
-    let tenant_id = tenant.id.clone();
-    let (count_pii, count_kyc, count_watchlist_check) = state
+    let t_id = tenant.id.clone();
+
+    // Count the number of billable uses of each product for this tenant
+    let counts = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let count_pii_storage = count_authorized_for_tenant(conn, params)?;
-            let billable_kyc =
-                Onboarding::get_billable_count(conn, &tenant_id, interval.start, interval.end)?;
-            let count_watchlist_check =
-                WatchlistCheck::get_billable_count(conn, &tenant_id, interval.start, interval.end)?;
-            Ok((count_pii_storage, billable_kyc, count_watchlist_check))
+            let pii = count_authorized_for_tenant(conn, params)?;
+            let kyc = Onboarding::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
+            let kyb = Onboarding::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
+            let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
+            let counts = BillingCounts {
+                pii,
+                kyc,
+                kyb,
+                watchlist_checks,
+            };
+            Ok(counts)
         })
         .await??;
+
+    // Generate the invoice in stripe
     let customer_id = get_or_create_customer_id(state, &tenant).await?;
     let info = BillingInfo {
         tenant_id: tenant.id.clone(),
-        interval,
+        interval: i,
         customer_id,
-        count_pii,
-        count_kyc,
-        count_watchlist_check,
+        counts,
     };
     state
         .billing_client
-        .bill_tenant(&state.feature_flag_client, info)
+        .generate_draft_invoice(&state.feature_flag_client, info)
         .await
         .map_err(|e| {
             // Log error since the request only fails with a single tenant's error message

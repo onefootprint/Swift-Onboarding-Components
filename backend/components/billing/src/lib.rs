@@ -125,12 +125,12 @@ impl BillingClient {
     }
 
     #[tracing::instrument(skip(self, ff_client))]
-    pub async fn bill_tenant(
+    pub async fn generate_draft_invoice(
         &self,
         ff_client: &LaunchDarklyFeatureFlagClient,
         info: BillingInfo,
     ) -> BResult<()> {
-        if info.count_pii == 0 && info.count_kyc == 0 {
+        if info.counts.is_zero() {
             return Ok(());
         }
 
@@ -154,15 +154,12 @@ impl BillingClient {
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
         let prices = BillingProfile::get_for(ff_client, &info.tenant_id)?;
-        let items = [
-            (prices.pii, info.count_pii),
-            (prices.kyc, info.count_kyc),
-            (prices.watchlist, info.count_watchlist_check),
-        ]
-        .into_iter()
-        .filter(|(_, count)| count > &0)
-        .map(|(price_id, count)| self.get_or_create_invoice_item(customer_id.clone(), price_id, count));
-        let items: HashMap<_, _> = futures::future::join_all(items)
+        let items_fut = info
+            .counts
+            .line_items(prices)
+            .into_iter()
+            .map(|(price_id, count)| self.get_or_create_invoice_item(customer_id.clone(), price_id, count));
+        let items: HashMap<_, _> = futures::future::join_all(items_fut)
             .await
             .into_iter()
             .collect::<BResult<Vec<_>>>()?
@@ -225,7 +222,48 @@ pub struct BillingInfo {
     pub tenant_id: TenantId,
     pub customer_id: StripeCustomerId,
     pub interval: BillingInterval,
-    pub count_pii: i64,
-    pub count_kyc: i64,
-    pub count_watchlist_check: i64,
+    pub counts: BillingCounts,
+}
+
+#[derive(Debug)]
+pub struct BillingCounts {
+    pub pii: i64,
+    pub kyc: i64,
+    pub kyb: i64,
+    pub watchlist_checks: i64,
+}
+
+pub type LineItem = (PriceId, i64);
+
+impl BillingCounts {
+    fn is_zero(&self) -> bool {
+        // Decompose to fail compiling when new count is added
+        let &BillingCounts {
+            pii,
+            kyc,
+            kyb,
+            watchlist_checks,
+        } = self;
+        pii + kyc + kyb + watchlist_checks == 0
+    }
+
+    fn line_items(&self, prices: BillingProfile) -> Vec<LineItem> {
+        // Decompose to fail compiling when new count is added
+        let &BillingCounts {
+            pii,
+            kyc,
+            kyb,
+            watchlist_checks,
+        } = self;
+
+        vec![
+            (prices.pii, pii),
+            (prices.kyc, kyc),
+            (prices.kyb, kyb),
+            (prices.watchlist, watchlist_checks),
+        ]
+        .into_iter()
+        .filter(|(_, count)| count > &0)
+        .collect()
+    }
 }

@@ -13,11 +13,11 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::OnboardingStatus;
 use newtypes::{
     DecisionStatus, FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId,
     OnboardingId, ScopedVaultId, TenantId, TenantScope, VaultId,
 };
+use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -407,12 +407,14 @@ impl Onboarding {
         tenant_id: &TenantId,
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
+        kind: VaultKind,
     ) -> DbResult<i64> {
-        use crate::schema::{onboarding, scoped_user};
+        use crate::schema::{onboarding, scoped_user, user_vault};
         let count = onboarding::table
-            .inner_join(scoped_user::table)
+            .inner_join(scoped_user::table.inner_join(user_vault::table))
             .filter(scoped_user::tenant_id.eq(tenant_id))
             .filter(scoped_user::is_live.eq(true))
+            .filter(user_vault::kind.eq(kind))
             // We won't charge tenants for onboardings that didn't finish authorizing, even if we
             // already ran KYC checks
             .filter(not(onboarding::authorized_at.is_null()))

@@ -8,6 +8,7 @@ use crate::BResult;
 pub(crate) struct BillingProfile {
     pub(crate) kyc: stripe::PriceId,
     pub(crate) pii: stripe::PriceId,
+    pub(crate) kyb: stripe::PriceId,
     pub(crate) watchlist: stripe::PriceId,
 }
 
