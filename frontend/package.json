@@ -10,7 +10,7 @@
     "build": "turbo run build",
     "dev:storybook": "turbo run dev:storybook",
     "predev": "yarn install && yarn build:packages",
-    "dev": "turbo run dev --parallel --continue",
+    "dev": "turbo run dev --parallel --concurrency 30 --continue",
     "build:packages": "turbo run build --filter=./packages/*",
     "format": "prettier --check \"**/*.{ts,tsx,md,mdx}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
