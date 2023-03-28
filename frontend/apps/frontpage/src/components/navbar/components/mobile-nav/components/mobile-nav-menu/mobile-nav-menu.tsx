@@ -1,7 +1,7 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import { Box, createFontStyles } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { createFontStyles } from '@onefootprint/ui';
+import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { NavMenu } from '../../../../types';
@@ -9,58 +9,70 @@ import MobileNavMenuItem from '../mobile-nav-menu-item';
 
 type MobileNavMenuProps = {
   menu: NavMenu;
-  onClickItem: () => void;
 };
 
-const MobileNavMenu = ({ menu, onClickItem }: MobileNavMenuProps) => {
-  const [expanded, setExpanded] = useState(false);
-  const [animateMenuItems] = useAutoAnimate<HTMLDivElement>();
-  const handleClick = () => {
-    setExpanded(!expanded);
-  };
+const MobileNavMenu = ({ menu }: MobileNavMenuProps) => (
+  <ItemContainer>
+    <MenuTrigger>
+      {menu.text}
+      <IconContainer>
+        <IcoChevronDown16 />
+      </IconContainer>
+    </MenuTrigger>
+    <MenuContent>
+      {menu.items.map(item => (
+        <MobileNavMenuItem key={menu.text} item={item} />
+      ))}
+    </MenuContent>
+  </ItemContainer>
+);
 
-  return (
-    <>
-      <MenuTitle onClick={handleClick}>
-        {menu.text}
-        <IconContainer className={expanded ? 'expanded' : undefined}>
-          <IcoChevronDown16 />
-        </IconContainer>
-      </MenuTitle>
-      <Box ref={animateMenuItems}>
-        {expanded &&
-          menu.items.map(item => (
-            <MobileNavMenuItem
-              key={menu.text}
-              item={item}
-              onClick={onClickItem}
-            />
-          ))}
-      </Box>
-    </>
-  );
-};
-
-const IconContainer = styled.div`
-  svg {
-    transition: all 0.2s linear;
-  }
-  &.expanded {
-    svg {
-      transform: rotate(180deg);
-    }
-  }
+const ItemContainer = styled(NavigationMenu.Item)`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 `;
 
-const MenuTitle = styled.div`
+const IconContainer = styled.div`
   ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: ${theme.spacing[7]};
+    svg {
+      transition: all 0.2s linear;
+    }
+  `}
+`;
+
+const MenuTrigger = styled(NavigationMenu.Trigger)`
+  ${({ theme }) => css`
+    all: unset;
     ${createFontStyles('label-1')};
     color: ${theme.color.primary};
     display: flex;
-    justify-content: space-between;
-    padding: ${theme.spacing[4]} ${theme.spacing[6]};
+    box-sizing: border-box;
+    width: 100%;
     text-decoration: none;
     cursor: pointer;
+    transition: transform 0.2s ease-in;
+    padding: ${theme.spacing[4]} ${theme.spacing[6]};
+
+    &[data-state='open'] {
+      svg {
+        transform: rotate(180deg);
+      }
+    }
+  `}
+`;
+
+const MenuContent = styled(NavigationMenu.Content)`
+  ${({ theme }) => css`
+    width: 100%;
+    margin-bottom: ${theme.spacing[4]};
   `}
 `;
 

@@ -1,11 +1,11 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import { Typography } from '@onefootprint/ui';
+import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { NavMenu } from '../../../../types';
 import DesktopNavMenuItem from '../desktop-nav-menu-item';
-import NavigationMenu from '../navigation-menu';
 
 type DesktopNavbarMenuProps = {
   menu: NavMenu;
@@ -17,40 +17,38 @@ const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
   ));
 
   return (
-    <NavigationMenu.Root>
-      <NavigationMenu.List>
-        <NavigationMenu.Item>
-          <StyledTrigger>
-            <Typography variant="label-3">{menu.text}</Typography>
-            <IconContainer>
-              <IcoChevronDown16 />
-            </IconContainer>
-          </StyledTrigger>
-          <StyledContent>{items}</StyledContent>
-        </NavigationMenu.Item>
-      </NavigationMenu.List>
-      <ViewportPosition>
-        <NavigationMenu.Viewport />
-      </ViewportPosition>
-    </NavigationMenu.Root>
+    <ItemContainer>
+      <StyledTrigger>
+        <Typography variant="label-3">{menu.text}</Typography>
+        <IconContainer>
+          <IcoChevronDown16 />
+        </IconContainer>
+      </StyledTrigger>
+      <NavigationMenu.Content>{items}</NavigationMenu.Content>
+    </ItemContainer>
   );
 };
 
-const StyledContent = styled(NavigationMenu.Content)`
-  width: 384px;
+const ItemContainer = styled(NavigationMenu.Item)`
+  position: relative;
+  display: flex;
 `;
 
 const StyledTrigger = styled(NavigationMenu.Trigger)`
   ${({ theme }) => css`
+    all: unset;
     display: flex;
     cursor: pointer;
-    margin-right: calc(-1 * ${theme.spacing[5]});
+    transition: opacity 0.2s ease-in;
+    padding: ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]}
+      ${theme.spacing[4]};
 
     &[data-state='open'] {
-      text-decoration: underline;
+      opacity: 0.7;
 
       svg {
         transform: rotate(180deg);
+        opacity: 0.7;
       }
     }
   `}
@@ -67,18 +65,6 @@ const IconContainer = styled.div`
       transition: all 0.2s linear;
       margin-left: ${theme.spacing[2]};
     }
-  `}
-`;
-
-const ViewportPosition = styled.div`
-  ${({ theme }) => css`
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    top: 100%;
-    margin-top: ${theme.spacing[2]};
-    left: 0;
   `}
 `;
 

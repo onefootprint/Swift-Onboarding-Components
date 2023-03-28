@@ -1,7 +1,9 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoClose24, IcoMenu24 } from '@onefootprint/icons';
+import { IcoClose24, IcoMenu24, LogoFpDefault } from '@onefootprint/icons';
 import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
+import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import LinkButton from 'src/components/linking-button';
@@ -9,7 +11,6 @@ import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';
-import LogoLink from '../logo-link';
 import MobileNavLink from './components/mobile-nav-link';
 import MobileNavMenu from './components/mobile-nav-menu';
 
@@ -52,63 +53,66 @@ const MobileNav = ({ onOpen, onClose, entries }: MobileNavProps) => {
     close();
   };
 
-  return isOpen ? (
-    <Menu>
-      <Header>
-        <LogoLink onClick={handleLinkClick} />
-        <NavTriggerButton
-          aria-label={t('nav-toggle.open')}
-          onClick={handleToggle}
-          type="button"
-        >
-          <IcoClose24 />
-        </NavTriggerButton>
-      </Header>
-      <Content>
-        <nav>
-          {entries.map(entry => {
-            if (isNavLink(entry)) {
-              return (
-                <MobileNavLink
-                  key={entry.text}
-                  link={entry}
-                  onClick={handleLinkClick}
-                />
-              );
-            }
-            if (isNavMenu(entry)) {
-              return (
-                <MobileNavMenu
-                  menu={entry}
-                  key={entry.text}
-                  onClickItem={handleLinkClick}
-                />
-              );
-            }
-            return null;
-          })}
-        </nav>
-        <CtaContainer>
-          <LoginLink href={`${DASHBOARD_BASE_URL}/login`}>
-            {t('login')}
-          </LoginLink>
-          <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
-            {t('sign-up')}
-          </LinkButton>
-        </CtaContainer>
-      </Content>
-    </Menu>
-  ) : (
-    <Container>
-      <LogoLink onClick={handleLinkClick} />
-      <NavTriggerButton
-        aria-label={t('nav-toggle.close')}
-        onClick={handleToggle}
-        type="button"
-      >
-        <IcoMenu24 />
-      </NavTriggerButton>
-    </Container>
+  return (
+    <AnimatePresence>
+      {isOpen ? (
+        <Menu>
+          <Header>
+            <Logo href="/" onClick={handleLinkClick}>
+              <LogoFpDefault />
+            </Logo>
+            <NavTriggerButton
+              aria-label={t('nav-toggle.open')}
+              onClick={handleToggle}
+              type="button"
+            >
+              <IcoClose24 />
+            </NavTriggerButton>
+          </Header>
+          <Content
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <NavigationMenu.Root>
+              <LinkList>
+                {entries.map(entry => {
+                  if (isNavLink(entry)) {
+                    return <MobileNavLink key={entry.text} link={entry} />;
+                  }
+                  if (isNavMenu(entry)) {
+                    return <MobileNavMenu menu={entry} key={entry.text} />;
+                  }
+                  return null;
+                })}
+              </LinkList>
+            </NavigationMenu.Root>
+            <CtaContainer>
+              <LoginLink href={`${DASHBOARD_BASE_URL}/login`}>
+                {t('login')}
+              </LoginLink>
+              <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+                {t('sign-up')}
+              </LinkButton>
+            </CtaContainer>
+          </Content>
+        </Menu>
+      ) : (
+        <Container>
+          <Logo href="/" onClick={handleLinkClick}>
+            <LogoFpDefault />
+          </Logo>
+          <NavTriggerButton
+            aria-label={t('nav-toggle.close')}
+            onClick={handleToggle}
+            type="button"
+          >
+            <IcoMenu24 />
+          </NavTriggerButton>
+        </Container>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -122,9 +126,28 @@ const Container = styled.div`
   `}
 `;
 
-const Menu = styled(Container)`
+const LinkList = styled(NavigationMenu.List)`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+`;
+
+const Logo = styled(Link)`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    margin-right: ${theme.spacing[4]};
+  `}
+`;
+
+const Menu = styled.div`
   ${({ theme }) => css`
     align-items: initial;
+    position: relative;
+    width: 100%;
     background: ${theme.backgroundColor.primary};
     bottom: 0;
     display: flex;
@@ -150,7 +173,7 @@ const Header = styled.div`
   `}
 `;
 
-const Content = styled.div`
+const Content = styled(motion.span)`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
