@@ -82,6 +82,13 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
     }
 }
 
+impl BusinessDataKind {
+    /// The list of BDKs that are searchable by fingerprint
+    pub fn searchable() -> Vec<Self> {
+        vec![Self::Name, Self::Dba, Self::Website, Self::PhoneNumber, Self::Ein]
+    }
+}
+
 impl SaltedFingerprint for BusinessDataKind {
     fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
         // Convert this to a DataIdentifier since we will eventually migrate to DI-based salting

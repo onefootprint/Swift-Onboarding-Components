@@ -4,7 +4,6 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 #[derive(
@@ -93,16 +92,16 @@ impl IsDataIdentifierDiscriminant for IdentityDataKind {
 }
 
 impl IdentityDataKind {
-    /// Returns true if we store a fingerprint of this value to allow exact match searching.
-    pub fn allows_fingerprint(&self) -> bool {
-        matches!(
-            self,
-            Self::PhoneNumber | Self::Email | Self::Ssn9 | Self::FirstName | Self::LastName | Self::Ssn4
-        )
-    }
-
-    pub fn fingerprintable() -> impl Iterator<Item = Self> {
-        Self::iter().filter(Self::allows_fingerprint)
+    /// The list of IDKs that are searchable by fingerprint
+    pub fn searchable() -> Vec<Self> {
+        vec![
+            Self::PhoneNumber,
+            Self::Email,
+            Self::Ssn9,
+            Self::FirstName,
+            Self::LastName,
+            Self::Ssn4,
+        ]
     }
 
     // Some kinds we may be more surprised than others seeing show up in multiple distinct vaults

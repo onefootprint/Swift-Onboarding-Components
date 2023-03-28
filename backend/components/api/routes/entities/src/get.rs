@@ -24,8 +24,9 @@ use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::IdDocKind;
 use newtypes::PiiString;
+use newtypes::SaltedFingerprint;
 use newtypes::VaultKind;
-use newtypes::{Fingerprint, Fingerprinter, IdentityDataKind};
+use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 pub type EntityDetailResponse = api_wire_types::Entity;
@@ -38,14 +39,9 @@ pub type EntityListResponse = Vec<EntityDetailResponse>;
 /// DataIdentifiers
 fn get_visible_populated_fields(
     vw: &TenantUvw,
-) -> (
-    Vec<DataIdentifier>,
-    Vec<IdentityDataKind>,
-    Vec<IdDocKind>,
-    Vec<IdDocKind>,
-) {
+) -> (Vec<DataIdentifier>, Vec<IDK>, Vec<IdDocKind>, Vec<IdDocKind>) {
     let attributes = vw.get_visible_populated_fields();
-    let mut idks = Vec::<IdentityDataKind>::new();
+    let mut idks = Vec::<IDK>::new();
     let mut docs = Vec::<IdDocKind>::new();
     let mut selfies = Vec::<IdDocKind>::new();
     attributes.iter().cloned().for_each(|di| match di {
@@ -270,8 +266,11 @@ async fn compute_fingerprint_for_search(
     state: &State,
     search: PiiString,
 ) -> Result<Vec<Fingerprint>, ApiError> {
-    let fut_fingerprints = IdentityDataKind::fingerprintable()
-        .map(|kind| state.compute_fingerprint(Box::new(kind), search.clone()));
+    type FpAble = Box<dyn SaltedFingerprint>;
+    let searchable_idks = IDK::searchable().into_iter().map(|idk| Box::new(idk) as FpAble);
+    let searchable_bdks = BDK::searchable().into_iter().map(|bdk| Box::new(bdk) as FpAble);
+    let searchable = searchable_idks.chain(searchable_bdks);
+    let fut_fingerprints = searchable.map(|kind| state.compute_fingerprint(kind, search.clone()));
     let fingerprints = futures::future::try_join_all(fut_fingerprints).await?;
 
     Ok(fingerprints)
