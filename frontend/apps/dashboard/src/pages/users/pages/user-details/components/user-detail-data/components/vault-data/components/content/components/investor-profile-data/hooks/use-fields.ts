@@ -1,5 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { InvestorProfileDI, RoleScope, Vault } from '@onefootprint/types';
+import {
+  DocumentDI,
+  InvestorProfileDI,
+  isVaultDataDecrypted,
+  RoleScope,
+  Vault,
+  VaultValue,
+} from '@onefootprint/types';
 import get from 'lodash/get';
 import usePermissions from 'src/hooks/use-permissions';
 import { User } from 'src/pages/users/users.types';
@@ -17,18 +24,20 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
 
   const getData = ({
     attribute,
-    formatValue,
+    getValue = () => vault.investorProfile[attribute],
+    formatValue = (value?: VaultValue) => value,
   }: {
-    attribute: InvestorProfileDI;
-    formatValue: (value?: string | null) => string | null | undefined;
+    attribute: InvestorProfileDI | DocumentDI;
+    getValue?: () => VaultValue;
+    formatValue?: (value?: VaultValue) => VaultValue;
   }) => {
     const canDecrypt = hasPermission(RoleScope.decryptInvestorProfile);
     const canAccessData =
       user.onboarding?.canAccessAttributes.includes(attribute);
-    const value = vault.investorProfile[attribute];
+    const value = getValue();
     const hasValue = user.attributes.includes(attribute);
     const canAccess = !user.isPortable || !!canAccessData;
-    const isDataDecrypted = !!vault.investorProfile[attribute];
+    const isDataDecrypted = isVaultDataDecrypted(value);
     const checked = !!get(values, attribute);
 
     return {
@@ -51,7 +60,6 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.occupation,
-          formatValue: value => value,
         }),
       ],
     },
@@ -60,7 +68,6 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       fields: [
         getData({
           attribute: InvestorProfileDI.employedByBrokerageFirm,
-          formatValue: value => value,
         }),
       ],
     },
@@ -96,7 +103,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
         getData({
           attribute: InvestorProfileDI.investmentGoals,
           formatValue: value => {
-            if (!value) return value;
+            if (!value || typeof value !== 'string') return value;
             try {
               const parsedValue = JSON.parse(value);
               const valuesWithTranslation = parsedValue.map((option: string) =>
@@ -128,7 +135,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
         getData({
           attribute: InvestorProfileDI.declarations,
           formatValue: value => {
-            if (!value) return value;
+            if (!value || typeof value !== 'string') return value;
             try {
               const parsedValue = JSON.parse(value);
               const valuesWithTranslation = parsedValue.map((option: string) =>
@@ -140,10 +147,10 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
             }
           },
         }),
-        // getData({
-        //   attribute: InvestorProfileDI.complianceLetter,
-        //   formatValue: value => value,
-        // }),
+        getData({
+          attribute: DocumentDI.finraComplianceLetter,
+          getValue: () => vault.document[DocumentDI.finraComplianceLetter],
+        }),
       ],
     },
   ];

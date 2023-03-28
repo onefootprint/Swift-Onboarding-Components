@@ -6,7 +6,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-const decryptDocuments = async (
+const decryptIdDocument = async (
   { userId, reason, documentIdentifier }: DecryptIdDocumentRequest,
   authHeaders: AuthHeaders,
 ) => {
@@ -24,11 +24,11 @@ const decryptDocuments = async (
   return response.data;
 };
 
-const useDecryptDocuments = () => {
+const useDecryptIdDocument = () => {
   const { authHeaders } = useSession();
   return useMutation((data: DecryptIdDocumentRequest) =>
-    decryptDocuments(data, authHeaders),
+    decryptIdDocument(data, authHeaders),
   );
 };
 
-export default useDecryptDocuments;
+export default useDecryptIdDocument;

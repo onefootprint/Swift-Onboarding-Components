@@ -20,6 +20,7 @@ import {
   ScopedUser,
   SignalAttribute,
 } from '@onefootprint/types';
+import { DocumentDI } from '@onefootprint/types/src/data/di';
 
 export const riskSignalsFixture: RiskSignal[] = [
   {
@@ -69,7 +70,7 @@ export const userFixture: ScopedUser = {
     InvestorProfileDI.investmentGoals,
     InvestorProfileDI.riskTolerance,
     InvestorProfileDI.declarations,
-    InvestorProfileDI.complianceLetter,
+    DocumentDI.finraComplianceLetter,
   ],
   identityDocumentInfo: [],
   startTimestamp: '2023-02-04T00:02:09.690721Z',
@@ -126,7 +127,7 @@ export const userFixture: ScopedUser = {
       InvestorProfileDI.investmentGoals,
       InvestorProfileDI.riskTolerance,
       InvestorProfileDI.declarations,
-      InvestorProfileDI.complianceLetter,
+      DocumentDI.finraComplianceLetter,
     ],
     canAccessPermissions: [
       RoleScope.decryptEmail,

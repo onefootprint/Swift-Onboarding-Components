@@ -1,12 +1,12 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { Vault } from '@onefootprint/types';
 
+import type { FormData } from '../../components/machine-provider';
 import {
   Event,
   State,
   useDecryptMachine,
 } from '../../components/machine-provider';
-import type { FormData } from '../../decrypt.types';
 import useDecryptFields from './hooks/use-decrypt-fields';
 
 const useDecryptControls = () => {
@@ -46,9 +46,9 @@ const useDecryptControls = () => {
       onError?: (error: unknown) => void;
     },
   ) => {
-    const { reason, textFields, idDocumentFields } = context;
+    const { reason, textFields, idDocumentFields, documentFields } = context;
     decryptFields(
-      { reason, textFields, idDocumentFields, userId },
+      { reason, textFields, idDocumentFields, documentFields, userId },
       {
         onSuccess: results => {
           send(Event.decryptSucceeded);

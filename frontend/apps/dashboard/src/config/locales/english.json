@@ -18,6 +18,7 @@
   "complete": "Complete",
   "create": "Create",
   "cancel": "Cancel",
+  "download": "Download",
   "confirm": {
     "title": "Are you sure?",
     "description": "Your data won't be saved.",

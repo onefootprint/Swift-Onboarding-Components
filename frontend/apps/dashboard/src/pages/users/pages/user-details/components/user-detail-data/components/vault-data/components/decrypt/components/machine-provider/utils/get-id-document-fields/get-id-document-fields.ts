@@ -1,12 +1,18 @@
-import type { Fields, IdDocumentField } from '../../types';
+import { IdDocDI } from '@onefootprint/types';
+import get from 'lodash/get';
 
-export const getIdDocumentFields = (fields: Fields) => {
+import type { FormData, IdDocumentField } from '../../types';
+
+export const getIdDocumentFields = (fields: FormData) => {
   const result: IdDocumentField[] = [];
-  Object.entries(fields.id_document).forEach(([key, value]) => {
-    if (value) {
-      result.push(`id_document.${key}` as unknown as IdDocumentField);
+
+  Object.values(IdDocDI).forEach(value => {
+    const checked = get(fields, value);
+    if (checked) {
+      result.push(value);
     }
   });
+
   return result;
 };
 

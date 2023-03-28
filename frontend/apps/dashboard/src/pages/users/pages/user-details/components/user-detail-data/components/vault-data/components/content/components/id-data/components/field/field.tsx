@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { VaultValue } from '@onefootprint/types';
 import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -14,7 +15,7 @@ export type FieldProps = {
   label: string;
   name: string;
   showCheckbox: boolean;
-  value?: string | null;
+  value?: VaultValue;
 };
 
 const Field = ({

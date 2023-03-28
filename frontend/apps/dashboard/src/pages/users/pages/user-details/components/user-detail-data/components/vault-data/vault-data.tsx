@@ -9,14 +9,16 @@ import useUserVault from 'src/pages/users/pages/user-details/hooks/use-user-vaul
 import Content from './components/content';
 import Decrypt, {
   DecryptMachineProvider,
+  FieldSections,
   FormData,
   useDecryptControls,
 } from './components/decrypt';
 
 const initialFormValues = {
-  id: {},
-  investor_profile: {},
-  id_document: {},
+  [FieldSections.id]: {},
+  [FieldSections.idDocument]: {},
+  [FieldSections.investorProfile]: {},
+  [FieldSections.document]: {},
 };
 
 const VaultData = () => {

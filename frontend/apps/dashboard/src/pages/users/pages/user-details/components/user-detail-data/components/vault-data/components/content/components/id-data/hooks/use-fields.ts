@@ -4,7 +4,12 @@ import {
   IcoFileText224,
   IcoUserCircle24,
 } from '@onefootprint/icons';
-import { IdDI, RoleScope, Vault } from '@onefootprint/types';
+import {
+  IdDI,
+  isVaultDataDecrypted,
+  RoleScope,
+  Vault,
+} from '@onefootprint/types';
 import get from 'lodash/get';
 import usePermissions from 'src/hooks/use-permissions';
 import { User } from 'src/pages/users/users.types';
@@ -24,7 +29,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
     const canAccessData =
       user.onboarding?.canAccessAttributes.includes(attribute);
     const canAccess = !user.isPortable || !!canAccessData;
-    const isDataDecrypted = !!vault.id[attribute];
+    const isDataDecrypted = isVaultDataDecrypted(vault.id[attribute]);
     const checked = !!get(values, attribute);
 
     return {

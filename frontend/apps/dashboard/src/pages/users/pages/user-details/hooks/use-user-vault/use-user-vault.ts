@@ -1,4 +1,10 @@
-import { IdDI, IdDocDI, InvestorProfileDI, Vault } from '@onefootprint/types';
+import {
+  DocumentDI,
+  IdDI,
+  IdDocDI,
+  InvestorProfileDI,
+  Vault,
+} from '@onefootprint/types';
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 import { User } from 'src/pages/users/users.types';
 
@@ -11,6 +17,7 @@ const getVaultOrCreate = async (queryClient: QueryClient, user: User) => {
       id: {},
       idDoc: {},
       investorProfile: {},
+      document: {},
     };
     Object.entries(IdDocDI).forEach(([, attribute]) => {
       if (user.attributes.includes(attribute)) {
@@ -25,6 +32,11 @@ const getVaultOrCreate = async (queryClient: QueryClient, user: User) => {
     Object.entries(InvestorProfileDI).forEach(([, attribute]) => {
       if (user.attributes.includes(attribute)) {
         vault.investorProfile[attribute] = null;
+      }
+    });
+    Object.entries(DocumentDI).forEach(([, attribute]) => {
+      if (user.attributes.includes(attribute)) {
+        vault.document[attribute] = null;
       }
     });
     return vault;
@@ -51,6 +63,10 @@ const useUserVault = (userId: string, user?: User) => {
       investorProfile: {
         ...prevData?.investorProfile,
         ...newData.investorProfile,
+      },
+      document: {
+        ...prevData?.document,
+        ...newData.document,
       },
     });
   };

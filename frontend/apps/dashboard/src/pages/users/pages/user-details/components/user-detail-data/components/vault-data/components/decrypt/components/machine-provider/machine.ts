@@ -9,7 +9,7 @@ import {
   MachineStates,
   State,
 } from './types';
-import { getIdDocumentFields, getTextFields } from './utils';
+import { getDocumentFields, getIdDocumentFields, getTextFields } from './utils';
 
 export const createDecryptStateMachine = () =>
   createMachine<Context, MachineEvents, MachineStates>(
@@ -36,7 +36,8 @@ export const createDecryptStateMachine = () =>
                 actions: [
                   Action.assignFields,
                   Action.assignText,
-                  Action.assignIdDoc,
+                  Action.assignIdDocument,
+                  Action.assignDocument,
                 ],
                 cond: Guard.hasAtLeastOneFieldSelected,
               },
@@ -73,7 +74,13 @@ export const createDecryptStateMachine = () =>
           if (event.type === Event.submittedFields) {
             const textFields = getTextFields(event.payload.fields);
             const idDocumentFields = getIdDocumentFields(event.payload.fields);
-            return textFields.length > 0 || idDocumentFields.length > 0;
+            const documentFields = getDocumentFields(event.payload.fields);
+
+            return (
+              textFields.length > 0 ||
+              idDocumentFields.length > 0 ||
+              documentFields.length > 0
+            );
           }
           return false;
         },
@@ -89,11 +96,16 @@ export const createDecryptStateMachine = () =>
             context.textFields = getTextFields(event.payload.fields);
           }
         },
-        [Action.assignIdDoc]: (context, event) => {
+        [Action.assignIdDocument]: (context, event) => {
           if (event.type === Event.submittedFields) {
             context.idDocumentFields = getIdDocumentFields(
               event.payload.fields,
             );
+          }
+        },
+        [Action.assignDocument]: (context, event) => {
+          if (event.type === Event.submittedFields) {
+            context.documentFields = getDocumentFields(event.payload.fields);
           }
         },
         [Action.assignReason]: (context, event) => {

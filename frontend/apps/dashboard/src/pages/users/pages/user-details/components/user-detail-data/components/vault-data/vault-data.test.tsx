@@ -150,7 +150,7 @@ describe('<VaultDataContent />', () => {
       });
 
       describe('when clicking on the decrypt button', () => {
-        it('should allow to decrypt the basic data', async () => {
+        it('should display the encrypted data', async () => {
           withUserDecrypt(userId, {
             'id.ssn9': '234324324',
             'id.ssn4': '4324',

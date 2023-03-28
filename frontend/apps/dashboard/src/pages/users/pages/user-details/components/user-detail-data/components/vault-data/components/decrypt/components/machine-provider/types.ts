@@ -1,15 +1,18 @@
 import { IdDI, IdDocDI, InvestorProfileDI } from '@onefootprint/types';
+import { DocumentDI } from '@onefootprint/types/src/data/di';
 
 export enum FieldSections {
   id = 'id',
   idDocument = 'id_document',
   investorProfile = 'investor_profile',
+  document = 'document',
 }
 
-export type Fields = {
+export type FormData = {
   [FieldSections.id]: Partial<Record<IdDI, boolean>>;
   [FieldSections.idDocument]: Partial<Record<IdDocDI, boolean>>;
   [FieldSections.investorProfile]: Partial<Record<InvestorProfileDI, boolean>>;
+  [FieldSections.document]: Partial<Record<DocumentDI, boolean>>;
 };
 
 export enum State {
@@ -36,7 +39,8 @@ export enum Guard {
 export enum Action {
   assignFields = 'assignFields',
   assignText = 'assignText',
-  assignIdDoc = 'assignIdDoc',
+  assignIdDocument = 'assignIdDocument',
+  assignDocument = 'assignDocument',
   assignReason = 'assignReason',
 }
 
@@ -44,11 +48,16 @@ export type TextField = IdDI | InvestorProfileDI;
 
 export type IdDocumentField = IdDocDI;
 
+// For now, finraCompliance isn't officialy part of the investor profile CDO, but the idea in a long term
+// is to have it there.
+export type DocumentField = DocumentDI.finraComplianceLetter;
+
 export type Context = {
   reason?: string;
-  fields?: Fields;
+  fields?: FormData;
   textFields?: TextField[];
   idDocumentFields?: IdDocumentField[];
+  documentFields?: DocumentField[];
 };
 
 export type MachineEvents =
@@ -56,7 +65,7 @@ export type MachineEvents =
   | { type: Event.canceled }
   | {
       type: Event.submittedFields;
-      payload: { fields: Fields };
+      payload: { fields: FormData };
     }
   | {
       type: Event.submittedReason;
@@ -73,27 +82,27 @@ export type MachineStates =
   | {
       value: State.selectingFields;
       context: Context & {
-        fields: Fields;
+        fields: FormData;
       };
     }
   | {
       value: State.confirmingReason;
       context: Context & {
         reason: string;
-        fields: Fields;
+        fields: FormData;
       };
     }
   | {
       value: State.decrypting;
       context: Context & {
         reason: string;
-        fields: Fields;
+        fields: FormData;
       };
     }
   | {
       value: State.decryptFailed;
       context: Context & {
         reason: string;
-        fields: Fields;
+        fields: FormData;
       };
     };

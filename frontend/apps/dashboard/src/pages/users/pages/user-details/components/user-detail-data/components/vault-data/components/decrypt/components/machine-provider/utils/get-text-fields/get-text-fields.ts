@@ -1,26 +1,29 @@
-import { IdDI } from '@onefootprint/types';
+import { IdDI, InvestorProfileDI } from '@onefootprint/types';
+import get from 'lodash/get';
 
-import { Fields, FieldSections, TextField } from '../../types';
+import { FormData, TextField } from '../../types';
 
-const getTextFields = (fields: Fields) => {
+const getTextFields = (fields: FormData) => {
   const result: TextField[] = [];
-  Object.entries(fields[FieldSections.id]).forEach(([key, value]) => {
-    if (value) {
-      const newValue = `${FieldSections.id}.${key}`;
-      result.push(newValue as unknown as TextField);
-      if (newValue === IdDI.firstName) {
-        result.push(IdDI.lastName);
-      }
+
+  Object.values(IdDI).forEach(value => {
+    const checked = get(fields, value);
+    if (checked) {
+      result.push(value);
     }
   });
-  Object.entries(fields[FieldSections.investorProfile]).forEach(
-    ([key, value]) => {
-      if (value) {
-        const newValue = `${FieldSections.investorProfile}.${key}`;
-        result.push(newValue as unknown as TextField);
-      }
-    },
-  );
+
+  Object.values(InvestorProfileDI).forEach(value => {
+    const checked = get(fields, value);
+    if (checked) {
+      result.push(value);
+    }
+  });
+
+  if (result.includes(IdDI.firstName)) {
+    result.push(IdDI.lastName);
+  }
+
   return result;
 };
 

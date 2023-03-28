@@ -29,7 +29,7 @@ export enum InvestorProfileDI {
   investmentGoals = 'investor_profile.investment_goals',
   riskTolerance = 'investor_profile.risk_tolerance',
   declarations = 'investor_profile.declarations',
-  complianceLetter = 'investor_profile.compliance_letter',
+  finraComplianceLetter = 'document.finra_compliance_letter',
 }
 
 export enum IdDI {
@@ -48,7 +48,7 @@ export enum IdDI {
   zip = 'id.zip',
 }
 
-export enum DocumentsDI {
+export enum DocumentDI {
   finraComplianceLetter = 'document.finra_compliance_letter',
 }
 
@@ -57,4 +57,4 @@ export type DataIdentifier =
   | InvestorProfileDI
   | IdDI
   | BusinessDI
-  | DocumentsDI;
+  | DocumentDI;

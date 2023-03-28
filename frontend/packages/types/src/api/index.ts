@@ -6,6 +6,7 @@ export * from './create-org-role';
 export * from './create-proxy-config';
 export * from './d2p-generate';
 export * from './d2p-sms';
+export * from './decrypt-document';
 export * from './decrypt-id-doc';
 export * from './decrypt-text';
 export * from './ger-roles';

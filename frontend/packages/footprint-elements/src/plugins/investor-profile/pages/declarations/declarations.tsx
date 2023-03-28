@@ -1,4 +1,4 @@
-import { DocumentsDI, InvestorProfileDI } from '@onefootprint/types';
+import { DocumentDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import useUploadFile from '../../../../hooks/api/hosted/user/use-upload-file';
@@ -42,7 +42,7 @@ const Declarations = () => {
         uploadFileMutation.mutate(
           {
             file: files[0],
-            documentKind: DocumentsDI.finraComplianceLetter,
+            documentKind: DocumentDI.finraComplianceLetter,
             authToken: authToken ?? '',
           },
           {

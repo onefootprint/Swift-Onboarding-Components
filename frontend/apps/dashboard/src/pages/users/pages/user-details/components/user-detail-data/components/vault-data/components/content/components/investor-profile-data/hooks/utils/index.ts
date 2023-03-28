@@ -1,4 +1,4 @@
-import { InvestorProfileDI } from '@onefootprint/types';
+import { DocumentDI, InvestorProfileDI, VaultValue } from '@onefootprint/types';
 
 // TODO: Improve types
 // https://linear.app/footprint/issue/FP-3237/improve-investor-profile-decrypt-types
@@ -13,9 +13,9 @@ export const allFieldsChecked = (
       isDataDecrypted: boolean;
       hasValue: boolean;
       label: string;
-      name: InvestorProfileDI;
+      name: InvestorProfileDI | DocumentDI;
       showCheckbox: boolean;
-      value?: string | undefined | null;
+      value?: VaultValue;
     }[];
   }[][],
 ): boolean =>
@@ -36,9 +36,9 @@ export const canSelectAtLeastOne = (
       isDataDecrypted: boolean;
       hasValue: boolean;
       label: string;
-      name: InvestorProfileDI;
+      name: InvestorProfileDI | DocumentDI;
       showCheckbox: boolean;
-      value?: string | undefined | null;
+      value?: VaultValue;
     }[];
   }[][],
 ): boolean =>

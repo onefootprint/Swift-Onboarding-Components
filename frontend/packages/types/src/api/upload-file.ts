@@ -1,9 +1,9 @@
-import { DocumentsDI } from '../data';
+import { DocumentDI } from '../data/di';
 
 export type UploadFileRequest = {
   authToken: string;
   file: File;
-  documentKind: DocumentsDI.finraComplianceLetter;
+  documentKind: DocumentDI.finraComplianceLetter;
 };
 
 export type UploadFileResponse = {

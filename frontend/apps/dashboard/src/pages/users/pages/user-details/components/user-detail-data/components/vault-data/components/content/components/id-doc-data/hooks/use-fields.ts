@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   DecryptedIdDocStatus,
   IdDocDI,
+  isVaultDataDecrypted,
   RoleScope,
   Vault,
 } from '@onefootprint/types';
@@ -23,7 +24,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
     const value = vault.idDoc[attribute];
     const hasValue = user.attributes.includes(attribute);
     const canAccess = !user.isPortable || !!canAccessData;
-    const isDataDecrypted = !!vault.idDoc[attribute];
+    const isDataDecrypted = isVaultDataDecrypted(vault.idDoc[attribute]);
     const isSuccessful = user.identityDocumentInfo.some(
       idDoc =>
         idDoc.dataIdentifier === attribute &&

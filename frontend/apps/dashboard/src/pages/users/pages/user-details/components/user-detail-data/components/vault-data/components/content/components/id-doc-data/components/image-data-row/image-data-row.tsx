@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { VaultIdDoc } from '@onefootprint/types';
+import { isVaultDataIdDocument, VaultValue } from '@onefootprint/types';
 import {
   Box,
   Checkbox,
@@ -25,7 +25,7 @@ export type ImageDataRowProps = {
   label: string;
   name: string;
   showCheckbox: boolean;
-  value?: VaultIdDoc;
+  value?: VaultValue;
 };
 
 const ImageDataRow = ({
@@ -43,6 +43,9 @@ const ImageDataRow = ({
   const { t } = useTranslation('pages.user-details.user-info.id-doc');
   const { register } = useFormContext();
   const [imagesVisible, setImagesVisible] = useState(false);
+  const showDecryptedDataPreview =
+    imagesVisible && isVaultDataIdDocument(value);
+
   const disabled = !canSelect;
   const showTooltip = disabled;
 
@@ -100,9 +103,7 @@ const ImageDataRow = ({
           <EncryptedCell />
         )}
       </RowContainer>
-      {isDataDecrypted && imagesVisible && value && (
-        <DecryptedDataPreview images={value} />
-      )}
+      {showDecryptedDataPreview && <DecryptedDataPreview images={value} />}
     </Container>
   );
 };
