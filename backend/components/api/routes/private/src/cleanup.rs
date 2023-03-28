@@ -62,8 +62,9 @@ async fn post(
     }
 
     // Use e164 with suffix to compute fingerprint
+    let idk = Box::new(IdentityDataKind::PhoneNumber);
     let sh_data = state
-        .compute_fingerprint(IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
+        .compute_fingerprint(idk, phone_number.e164_with_suffix())
         .await?;
 
     let uv = state

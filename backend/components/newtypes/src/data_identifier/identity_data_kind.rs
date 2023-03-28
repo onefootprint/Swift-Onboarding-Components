@@ -111,6 +111,8 @@ impl IdentityDataKind {
     }
 }
 
+// TODO should one day just implement this on DataIdentifier but we'd have to migrate all the old
+// fingerprints
 impl SaltedFingerprint for IdentityDataKind {
     fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
         let self_name = self.to_string();

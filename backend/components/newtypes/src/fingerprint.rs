@@ -15,8 +15,7 @@ pub trait Fingerprinter: std::marker::Sync {
 
     async fn compute_fingerprint(
         &self,
-        salt: impl SaltedFingerprint,
-        // TODO this should be able to take in &PiiString
+        salt: Box<dyn SaltedFingerprint>,
         data: PiiString,
     ) -> Result<Fingerprint, Self::Error> {
         let data_to_sign = salt.salt_pii_to_sign(&data);

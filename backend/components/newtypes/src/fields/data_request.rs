@@ -1,6 +1,6 @@
 use crate::{
-    CollectedDataOption, DataIdentifier, Error, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
-    PiiString, Validate, VdKind,
+    CollectedDataOption, DataIdentifier, DataLifetimeKind, Error, Fingerprint, Fingerprinter,
+    IdentityDataKind as IDK, PiiString, SaltedFingerprint, Validate, VdKind,
 };
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
@@ -10,7 +10,7 @@ use std::clone::Clone;
 use std::collections::HashMap;
 
 type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
-pub type Fingerprints<T> = HashMap<T, Fingerprint>;
+pub type Fingerprints = HashMap<DataLifetimeKind, Fingerprint>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
@@ -130,19 +130,24 @@ impl DataRequest {
     pub async fn build_fingerprints<F: Fingerprinter>(
         &self,
         fingerprinter: &F,
-    ) -> Result<Fingerprints<IDK>, F::Error> {
+    ) -> Result<Fingerprints, F::Error> {
         let fut_fingerprints = self
             .iter()
-            .filter_map(|(di, pii)| match di {
-                // Only fingerprint ID data for now
-                DataIdentifier::Id(idk) => Some((*idk, pii.clone())),
-                _ => None,
+            .filter_map(|(di, pii)| {
+                // Until we have DI implement SaltedFingerprint, have to wrap the IDKs and BDKs
+                // in a Box<dyn SaltedFingerprint>
+                let sf: Option<(Box<dyn SaltedFingerprint>, DataLifetimeKind)> = match di.clone() {
+                    DataIdentifier::Id(idk) => Some((Box::new(idk), idk.into())),
+                    DataIdentifier::Business(bdk) => Some((Box::new(bdk), bdk.into())),
+                    _ => None,
+                };
+                sf.map(|(sf, dlk)| (sf, pii.clone(), dlk))
             })
-            .map(|(idk, pii)| {
+            .map(|(sf, pii, dlk)| {
                 let pii = pii.clean_for_fingerprint();
                 fingerprinter
-                    .compute_fingerprint(idk, pii)
-                    .map_ok(move |sh_data| (idk, sh_data))
+                    .compute_fingerprint(sf, pii)
+                    .map_ok(move |sh_data| (dlk, sh_data))
             });
         let fingerprints = futures::future::try_join_all(fut_fingerprints)
             .await?

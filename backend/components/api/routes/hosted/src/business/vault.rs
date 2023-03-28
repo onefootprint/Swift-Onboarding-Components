@@ -54,6 +54,7 @@ pub async fn put(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
+    let fingerprints = request.build_fingerprints(&state.hmac_client).await?;
 
     state
         .db_pool
@@ -63,10 +64,7 @@ pub async fn put(
                 .scoped_business_id()
                 .ok_or(UserError::NotAllowedWithoutBusiness)?;
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &scoped_business_id)?;
-
-            // TODO fingerprints
-            // TODO make this do something with business data
-            bvw.put_business_data(conn, request)?;
+            bvw.put_business_data(conn, request, fingerprints)?;
             Ok(())
         })
         .await?;

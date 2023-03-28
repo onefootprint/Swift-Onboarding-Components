@@ -75,7 +75,7 @@ impl ValidatedDataRequest {
         conn: &mut TxnPgConn,
         user_vault: &Vault,
         scoped_user_id: ScopedVaultId,
-        fingerprints: Fingerprints<IDK>, // should eventually support more than just IDK fingerprints
+        fingerprints: Fingerprints,
     ) -> ApiResult<Vec<VaultData>> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
@@ -96,13 +96,13 @@ impl ValidatedDataRequest {
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let fingerprints: Vec<_> = fingerprints
             .into_iter()
-            .map(|(idk, sh_data)| -> ApiResult<_> {
+            .map(|(kind, sh_data)| -> ApiResult<_> {
                 Ok(NewFingerprint {
-                    kind: DataLifetimeKind::from(idk),
+                    kind: kind.clone(),
                     sh_data,
                     lifetime_id: vds
                         .iter()
-                        .find(|vd| vd.kind == idk.into())
+                        .find(|vd| DataLifetimeKind::from(vd.kind.clone()) == kind)
                         .map(|vd| vd.lifetime_id.clone())
                         .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?,
                     is_unique: false,

@@ -1,9 +1,10 @@
+use crypto::sha256;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
-use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant};
+use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, PiiString, SaltedFingerprint};
 
 #[derive(
     Debug,
@@ -82,3 +83,15 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
         Some(result)
     }
 }
+
+impl SaltedFingerprint for BusinessDataKind {
+    fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
+        // Convert this to a DataIdentifier since we will eventually migrate to DI-based salting
+        let self_name = DataIdentifier::from(*self).to_string();
+        let data_clean = data.clean_for_fingerprint();
+        let concat = [sha256(self_name.as_bytes()), sha256(data_clean.leak().as_bytes())].concat();
+        sha256(&concat)
+    }
+}
+
+// TODO tests that fingerprints don't change

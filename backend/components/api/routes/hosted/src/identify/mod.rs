@@ -98,6 +98,7 @@ async fn get_user_by_identifier(
         }
         Identifier::Email(email) => (IdentityDataKind::Email, PiiString::from(email.clone())),
     };
+    let data_attribute = Box::new(data_attribute);
     let sh_data = state
         .compute_fingerprint(data_attribute, data.clean_for_fingerprint())
         .await?;

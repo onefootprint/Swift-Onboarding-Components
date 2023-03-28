@@ -45,7 +45,7 @@ impl VaultWrapper<Person> {
         // Add the phone number to the vault since it was used to create it
         let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
         let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
-        let fingerprint = HashMap::from_iter([(IDK::PhoneNumber, sh_phone_number)]);
+        let fingerprint = HashMap::from_iter([(IDK::PhoneNumber.into(), sh_phone_number)]);
         let new_ci = uvw.put_person_data(conn, request, fingerprint)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault

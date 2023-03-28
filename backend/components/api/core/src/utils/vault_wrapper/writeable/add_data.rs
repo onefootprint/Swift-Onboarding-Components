@@ -16,7 +16,6 @@ use newtypes::{
     DocumentKind, DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, ScopedVaultId,
     SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
 };
-use std::collections::HashMap;
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
 
@@ -31,13 +30,13 @@ impl WriteableVw<Person> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DataRequest,
-        id_fingerprints: Fingerprints<IDK>,
+        fingerprints: Fingerprints,
     ) -> ApiResult<Vec<NewContactInfo>> {
         request.assert_no_business_data()?;
         // Update VaultData
         let keys = request.keys().cloned().collect();
         let new_contact_info = if !request.is_empty() {
-            let vds = self.update_data_unsafe(conn, request, id_fingerprints)?;
+            let vds = self.update_data_unsafe(conn, request, fingerprints)?;
             Self::create_contact_info_if_needed(conn, vds)?
         } else {
             vec![]
@@ -55,12 +54,12 @@ impl WriteableVw<Business> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DataRequest,
+        fingerprints: Fingerprints,
     ) -> ApiResult<()> {
         // Error if trying to add person data to business vault
         request.assert_no_id_data()?;
         let keys = request.keys().cloned().collect();
-        // TODO fingerprints
-        self.update_data_unsafe(conn, request, HashMap::new())?;
+        self.update_data_unsafe(conn, request, fingerprints)?;
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys)?;
 
@@ -73,7 +72,7 @@ impl<Type> WriteableVw<Type> {
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
         update: DataRequest,
-        fingerprints: Fingerprints<IDK>,
+        fingerprints: Fingerprints,
     ) -> ApiResult<Vec<VaultData>> {
         // Must do this validation here inside the locked, WriteableUvw
         let request = self.validate_request(update)?;
@@ -151,7 +150,7 @@ mod test {
                     DataIdentifier::Id(idk) => Some(idk),
                     _ => None,
                 })
-                .map(|idk| (*idk, Fingerprint(vec![])))
+                .map(|idk| ((*idk).into(), Fingerprint(vec![])))
                 .collect();
             self.put_person_data(conn, request, fingerprints)?;
             Ok(())

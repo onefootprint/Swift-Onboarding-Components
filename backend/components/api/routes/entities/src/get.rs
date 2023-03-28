@@ -270,8 +270,8 @@ async fn compute_fingerprint_for_search(
     state: &State,
     search: PiiString,
 ) -> Result<Vec<Fingerprint>, ApiError> {
-    let fut_fingerprints =
-        IdentityDataKind::fingerprintable().map(|kind| state.compute_fingerprint(kind, search.clone()));
+    let fut_fingerprints = IdentityDataKind::fingerprintable()
+        .map(|kind| state.compute_fingerprint(Box::new(kind), search.clone()));
     let fingerprints = futures::future::try_join_all(fut_fingerprints).await?;
 
     Ok(fingerprints)
