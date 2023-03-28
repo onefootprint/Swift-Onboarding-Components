@@ -29,14 +29,13 @@ impl WriteableVw<Person> {
     pub fn put_person_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        request: DataRequest,
-        fingerprints: Fingerprints,
+        request: DataRequest<Fingerprints>,
     ) -> ApiResult<Vec<NewContactInfo>> {
         request.assert_no_business_data()?;
         // Update VaultData
         let keys = request.keys().cloned().collect();
         let new_contact_info = if !request.is_empty() {
-            let vds = self.update_data_unsafe(conn, request, fingerprints)?;
+            let vds = self.update_data_unsafe(conn, request)?;
             Self::create_contact_info_if_needed(conn, vds)?
         } else {
             vec![]
@@ -53,13 +52,12 @@ impl WriteableVw<Business> {
     pub fn put_business_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        request: DataRequest,
-        fingerprints: Fingerprints,
+        request: DataRequest<Fingerprints>,
     ) -> ApiResult<()> {
         // Error if trying to add person data to business vault
         request.assert_no_id_data()?;
         let keys = request.keys().cloned().collect();
-        self.update_data_unsafe(conn, request, fingerprints)?;
+        self.update_data_unsafe(conn, request)?;
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys)?;
 
@@ -71,13 +69,11 @@ impl<Type> WriteableVw<Type> {
     fn update_data_unsafe(
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
-        update: DataRequest,
-        fingerprints: Fingerprints,
+        request: DataRequest<Fingerprints>,
     ) -> ApiResult<Vec<VaultData>> {
         // Must do this validation here inside the locked, WriteableUvw
-        let request = self.validate_request(update)?;
-        let vds = request.save(conn, self.vault(), self.scoped_user_id.clone(), fingerprints)?;
-
+        let request = self.validate_request(request)?;
+        let vds = request.save(conn, self.vault(), self.scoped_user_id.clone())?;
         Ok(vds)
     }
 
@@ -152,7 +148,8 @@ mod test {
                 })
                 .map(|idk| ((*idk).into(), Fingerprint(vec![])))
                 .collect();
-            self.put_person_data(conn, request, fingerprints)?;
+            let request = request.manual_fingerprints(fingerprints);
+            self.put_person_data(conn, request)?;
             Ok(())
         }
     }

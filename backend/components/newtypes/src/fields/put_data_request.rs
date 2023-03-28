@@ -8,8 +8,8 @@ flat_api_object_map_type!(
 
 impl RawDataRequest {
     /// Shorthand to parse into a DataRequest
-    pub fn clean_and_validate(self, opts: ParseOptions) -> NtResult<DataRequest> {
-        let valid_request = DataRequest::clean_and_validate(self.into(), opts)?;
+    pub fn clean_and_validate(self, opts: ParseOptions) -> NtResult<DataRequest<()>> {
+        let valid_request = DataRequest::<()>::clean_and_validate(self.into(), opts)?;
         Ok(valid_request)
     }
 }

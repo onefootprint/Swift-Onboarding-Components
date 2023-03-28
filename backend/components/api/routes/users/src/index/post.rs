@@ -51,8 +51,8 @@ pub async fn post(
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
             let request = request.clean_and_validate(ParseOptions::for_non_portable())?;
-            let fingerprints = request.build_fingerprints(&state.hmac_client).await?;
-            Some((targets, request, fingerprints))
+            let request = request.build_fingerprints(&state.hmac_client).await?;
+            Some((targets, request))
         } else {
             None
         }
@@ -66,10 +66,10 @@ pub async fn post(
             let user_vault = Vault::create(conn, new_user)?;
             let scoped_user = ScopedVault::create_non_portable(conn, user_vault, tenant_id)?;
 
-            if let Some((targets, request, fingerprints)) = request_info {
+            if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                uvw.put_person_data(conn, request, fingerprints)?;
+                uvw.put_person_data(conn, request)?;
                 // Create an access event to show data was added
                 NewAccessEvent {
                     scoped_user_id: scoped_user.id.clone(),

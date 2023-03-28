@@ -21,13 +21,14 @@ use newtypes::{
 /// DataRequest that has been validated through a UserVaultWrapper
 pub struct ValidatedDataRequest{
     data: Vec<NewVaultData>,
+    fingerprints: Fingerprints,
     new_cdos: HashSet<CollectedDataOption>
 }
 
 impl<Type> VaultWrapper<Type> {
     /// Given a DataRequest, validate some invariants before allowing it to be written to the vault.
     /// These invariants are also a function of the data in the vault at the time
-    pub fn validate_request(&self, request: DataRequest) -> ApiResult<ValidatedDataRequest> {
+    pub fn validate_request(&self, request: DataRequest<Fingerprints>) -> ApiResult<ValidatedDataRequest> {
         // Don't allow replacing a committed phone/email yet
         let irreplaceable_idks = vec![IDK::PhoneNumber, IDK::Email];
         for idk in irreplaceable_idks {
@@ -56,13 +57,14 @@ impl<Type> VaultWrapper<Type> {
         }
 
         // Transform the request into a Vec<NewVaultData>
-        let data = request.into_inner().into_iter().map(|(kind, pii)| {
+        let (data, fingerprints) = request.decompose();
+        let data = data.into_iter().map(|(kind, pii)| {
             let e_data = self.vault().public_key.seal_pii(&pii)?;
             let kind = kind.try_into().map_err(newtypes::Error::from)?;
             Ok(NewVaultData { kind, e_data })
         }).collect::<ApiResult<Vec<_>>>()?;
 
-        let req = ValidatedDataRequest{data, new_cdos};
+        let req = ValidatedDataRequest{data, fingerprints, new_cdos};
         Ok(req)
     }
 }
@@ -75,7 +77,6 @@ impl ValidatedDataRequest {
         conn: &mut TxnPgConn,
         user_vault: &Vault,
         scoped_user_id: ScopedVaultId,
-        fingerprints: Fingerprints,
     ) -> ApiResult<Vec<VaultData>> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
@@ -94,7 +95,7 @@ impl ValidatedDataRequest {
         let vds = VaultData::bulk_create(conn, &user_vault.id, &scoped_user_id, self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
-        let fingerprints: Vec<_> = fingerprints
+        let fingerprints: Vec<_> = self.fingerprints
             .into_iter()
             .map(|(kind, sh_data)| -> ApiResult<_> {
                 Ok(NewFingerprint {

@@ -14,11 +14,16 @@ pub type Fingerprints = HashMap<DataLifetimeKind, Fingerprint>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
-pub struct DataRequest(DataIdentifierRequest);
+pub struct DataRequest<T> {
+    #[deref]
+    #[deref_mut]
+    data: DataIdentifierRequest,
+    fingerprints: T,
+}
 
-impl DataRequest {
-    pub fn into_inner(self) -> DataIdentifierRequest {
-        self.0
+impl<T> DataRequest<T> {
+    pub fn decompose(self) -> (DataIdentifierRequest, T) {
+        (self.data, self.fingerprints)
     }
 }
 
@@ -48,7 +53,7 @@ impl ParseOptions {
     }
 }
 
-impl DataRequest {
+impl DataRequest<()> {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
     pub fn clean_and_validate(map: DataIdentifierRequest, opts: ParseOptions) -> NtResult<Self> {
@@ -94,10 +99,17 @@ impl DataRequest {
             return Err(DataValidationError::FieldValidationError(errors).into());
         }
 
-        let update = Self(cleaned_data);
-        Ok(update)
+        let request = Self {
+            data: cleaned_data,
+            // Initially create the request with no fingerprints - they need to be added with an
+            // async function
+            fingerprints: (),
+        };
+        Ok(request)
     }
+}
 
+impl<T> DataRequest<T> {
     pub fn assert_no_id_data(&self) -> NtResult<()> {
         let id_keys = self
             .keys()
@@ -127,10 +139,13 @@ impl DataRequest {
         Ok(())
     }
 
+    /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
+    /// and returns a new DataRequest with the Fingerprints populated.
+    /// This gives us type safety that fingerprints are provided to the VW utils that add data to a vault
     pub async fn build_fingerprints<F: Fingerprinter>(
-        &self,
+        self,
         fingerprinter: &F,
-    ) -> Result<Fingerprints, F::Error> {
+    ) -> Result<DataRequest<Fingerprints>, F::Error> {
         let fut_fingerprints = self
             .iter()
             .filter_map(|(di, pii)| {
@@ -153,7 +168,18 @@ impl DataRequest {
             .await?
             .into_iter()
             .collect();
-        // TODO store output on self
-        Ok(fingerprints)
+        let request = DataRequest {
+            data: self.data,
+            fingerprints,
+        };
+        Ok(request)
+    }
+
+    /// Used in cases where we don't want to asynchronously generate fingerprints for the underlying data
+    pub fn manual_fingerprints(self, fingerprints: Fingerprints) -> DataRequest<Fingerprints> {
+        DataRequest {
+            data: self.data,
+            fingerprints,
+        }
     }
 }

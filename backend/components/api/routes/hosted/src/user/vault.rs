@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use crate::auth::user::{UserAuthContext, UserAuthScope};
@@ -32,6 +33,7 @@ pub async fn post_validate(
     };
     let request = request.into_inner().clean_and_validate(opts)?;
     request.assert_no_business_data()?;
+    let request = request.manual_fingerprints(HashMap::new()); // No fingerprints to check speculatively
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -59,7 +61,7 @@ pub async fn put(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
-    let fingerprints = request.build_fingerprints(&state.hmac_client).await?;
+    let request = request.build_fingerprints(&state.hmac_client).await?;
     let email = request
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))
@@ -80,7 +82,7 @@ pub async fn put(
 
             // Even though this accepts id.phone_number, it will always error at runtime since we
             // only allow a vault to have one phone number
-            let new_contact_info = uvw.put_person_data(conn, request, fingerprints)?;
+            let new_contact_info = uvw.put_person_data(conn, request)?;
             Ok(new_contact_info)
         })
         .await?;

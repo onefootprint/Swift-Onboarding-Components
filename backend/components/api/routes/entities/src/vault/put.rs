@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::errors::ApiResult;
@@ -44,6 +46,7 @@ pub async fn post_validate_inner(
         .into_inner()
         .clean_and_validate(ParseOptions::for_non_portable())?;
     request.assert_no_business_data()?;
+    let request = request.manual_fingerprints(HashMap::new()); // No fingerprints to check speculatively
 
     let uvw = state
         .db_pool
@@ -94,7 +97,7 @@ pub async fn put_inner(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_non_portable())?;
-    let fingerprints = request.build_fingerprints(&state.hmac_client).await?;
+    let request = request.build_fingerprints(&state.hmac_client).await?;
 
     state
         .db_pool
@@ -102,7 +105,7 @@ pub async fn put_inner(
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-            uvw.put_person_data(conn, request, fingerprints)?;
+            uvw.put_person_data(conn, request)?;
 
             // Create an access event to show data was added
             NewAccessEvent {
