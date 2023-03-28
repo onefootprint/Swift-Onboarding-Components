@@ -55,11 +55,17 @@ pub fn list_authorized_for_tenant_query<'a>(
         let non_portable_vault_ids = user_vault::table
             .filter(user_vault::is_portable.eq(false))
             .select(user_vault::id);
-        query = query.filter(
-            scoped_user::id
-                .eq_any(authorized_ids)
-                .or(scoped_user::user_vault_id.eq_any(non_portable_vault_ids)),
-        );
+        // Don't bill for business vaults
+        let uv_ids = user_vault::table
+            .filter(user_vault::kind.eq(VaultKind::Person))
+            .select(user_vault::id);
+        query = query
+            .filter(
+                scoped_user::id
+                    .eq_any(authorized_ids)
+                    .or(scoped_user::user_vault_id.eq_any(non_portable_vault_ids)),
+            )
+            .filter(scoped_user::user_vault_id.eq_any(uv_ids));
     }
 
     // Filter on whether user is in manual review
