@@ -252,7 +252,7 @@ async fn test_run(
                 .all(|r| rs_reason_codes.contains(r)));
             assert_eq!(vec![Vendor::Idology], risk_signals[0].vendors);
 
-            db::private_cleanup_integration_tests(conn, &uvid).unwrap();
+            db::private_cleanup_integration_tests(conn, uvid).unwrap();
             Ok(())
         })
         .await

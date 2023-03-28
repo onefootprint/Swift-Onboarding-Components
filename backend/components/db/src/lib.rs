@@ -16,6 +16,7 @@ pub mod models;
 mod connection;
 
 mod pagination;
+use itertools::Itertools;
 pub use pagination::*;
 mod instrumented_connection;
 
@@ -187,145 +188,160 @@ pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
 }
 
 #[tracing::instrument(skip_all)]
-pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -> Result<usize, DbError> {
+pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) -> Result<usize, DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.
 
     use schema::{
-        access_event, annotation, contact_info, data_lifetime, document_request, email, fingerprint,
-        fingerprint_visit_event, identity_document, liveness_event, manual_review, onboarding,
+        access_event, annotation, business_owner, contact_info, data_lifetime, document_request, email,
+        fingerprint, fingerprint_visit_event, identity_document, liveness_event, manual_review, onboarding,
         onboarding_decision, onboarding_decision_verification_result_junction, phone_number, risk_signal,
         scoped_user, socure_device_session, user_timeline, user_vault, user_vault_data, verification_request,
         verification_result, webauthn_credential,
     };
     let mut deleted_rows = 0;
 
+    // First, get any business vaults related to this user and delete them.
+    // If any business vaults are owned by another user vault, this will fail because of FK constraints
+    let bv_ids: Vec<VaultId> = business_owner::table
+        .filter(business_owner::user_vault_id.eq(&uvid))
+        .select(business_owner::business_vault_id)
+        .get_results(conn.conn())?;
+    let v_ids = bv_ids.into_iter().chain([uvid]).collect_vec();
+
     // delete user data
     deleted_rows += diesel::delete(webauthn_credential::table)
-        .filter(webauthn_credential::user_vault_id.eq(uvid))
+        .filter(webauthn_credential::user_vault_id.eq_any(&v_ids))
         .execute(conn.conn())?;
 
     deleted_rows += diesel::delete(user_timeline::table)
-        .filter(user_timeline::user_vault_id.eq(uvid))
+        .filter(user_timeline::user_vault_id.eq_any(&v_ids))
         .execute(conn.conn())?;
 
     deleted_rows += diesel::delete(fingerprint_visit_event::table)
-        .filter(fingerprint_visit_event::user_vault_id.eq(uvid))
+        .filter(fingerprint_visit_event::user_vault_id.eq_any(&v_ids))
+        .execute(conn.conn())?;
+
+    deleted_rows += diesel::delete(business_owner::table)
+        .filter(business_owner::user_vault_id.eq_any(&v_ids))
         .execute(conn.conn())?;
 
     // DataLifetimes
     {
         let dl_ids = data_lifetime::table
-            .filter(data_lifetime::user_vault_id.eq(uvid))
+            .filter(data_lifetime::user_vault_id.eq_any(&v_ids))
             .select(data_lifetime::id);
 
         deleted_rows += diesel::delete(email::table)
-            .filter(email::lifetime_id.eq_any(dl_ids))
+            .filter(email::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(phone_number::table)
-            .filter(phone_number::lifetime_id.eq_any(dl_ids))
+            .filter(phone_number::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(user_vault_data::table)
-            .filter(user_vault_data::lifetime_id.eq_any(dl_ids))
+            .filter(user_vault_data::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(fingerprint::table)
-            .filter(fingerprint::lifetime_id.eq_any(dl_ids))
+            .filter(fingerprint::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(identity_document::table)
-            .filter(identity_document::lifetime_id.eq_any(dl_ids))
+            .filter(identity_document::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(kv_data::table)
-            .filter(kv_data::lifetime_id.eq_any(dl_ids))
+            .filter(kv_data::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(contact_info::table)
-            .filter(contact_info::lifetime_id.eq_any(dl_ids))
+            .filter(contact_info::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(data_lifetime::table)
-            .filter(data_lifetime::user_vault_id.eq(uvid))
+            .filter(data_lifetime::user_vault_id.eq_any(&v_ids))
             .execute(conn.conn())?;
     }
 
     // Scoped users
     {
         let su_ids = scoped_user::table
-            .filter(scoped_user::user_vault_id.eq(uvid))
+            .filter(scoped_user::user_vault_id.eq_any(&v_ids))
             .select(scoped_user::id);
 
         deleted_rows += diesel::delete(access_event::table)
-            .filter(access_event::scoped_user_id.eq_any(su_ids))
+            .filter(access_event::scoped_user_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(annotation::table)
-            .filter(annotation::scoped_user_id.eq_any(su_ids))
+            .filter(annotation::scoped_user_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(liveness_event::table)
-            .filter(liveness_event::scoped_user_id.eq_any(su_ids))
+            .filter(liveness_event::scoped_user_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(document_request::table)
-            .filter(document_request::scoped_user_id.eq_any(su_ids))
+            .filter(document_request::scoped_user_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(fingerprint_visit_event::table)
-            .filter(fingerprint_visit_event::scoped_user_id.eq_any(su_ids.select(scoped_user::id.nullable())))
+            .filter(
+                fingerprint_visit_event::scoped_user_id
+                    .eq_any(su_ids.clone().select(scoped_user::id.nullable())),
+            )
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(decision_intent::table)
-            .filter(decision_intent::scoped_vault_id.eq_any(su_ids))
+            .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         // Onboardings
         {
             let ob_ids = onboarding::table
-                .filter(onboarding::scoped_user_id.eq_any(su_ids))
+                .filter(onboarding::scoped_user_id.eq_any(su_ids.clone()))
                 .select(onboarding::id);
 
             deleted_rows += diesel::delete(manual_review::table)
-                .filter(manual_review::onboarding_id.eq_any(ob_ids))
+                .filter(manual_review::onboarding_id.eq_any(ob_ids.clone()))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(user_consent::table)
-                .filter(user_consent::onboarding_id.eq_any(ob_ids))
+                .filter(user_consent::onboarding_id.eq_any(ob_ids.clone()))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(socure_device_session::table)
-                .filter(socure_device_session::onboarding_id.eq_any(ob_ids))
+                .filter(socure_device_session::onboarding_id.eq_any(ob_ids.clone()))
                 .execute(conn.conn())?;
 
             // Onboarding decisions
             {
                 let decision_ids = onboarding_decision::table
-                    .filter(onboarding_decision::onboarding_id.eq_any(ob_ids))
+                    .filter(onboarding_decision::onboarding_id.eq_any(ob_ids.clone()))
                     .select(onboarding_decision::id);
 
                 deleted_rows += diesel::delete(onboarding_decision_verification_result_junction::table)
                     .filter(
                         onboarding_decision_verification_result_junction::onboarding_decision_id
-                            .eq_any(decision_ids),
+                            .eq_any(decision_ids.clone()),
                     )
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(risk_signal::table)
-                    .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids))
+                    .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids.clone()))
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(onboarding_decision::table)
-                    .filter(onboarding_decision::onboarding_id.eq_any(ob_ids))
+                    .filter(onboarding_decision::onboarding_id.eq_any(ob_ids.clone()))
                     .execute(conn.conn())?;
             }
 
             // Verification requests
             {
                 let verification_request_ids = verification_request::table
-                    .filter(verification_request::scoped_user_id.eq_any(su_ids))
+                    .filter(verification_request::scoped_user_id.eq_any(su_ids.clone()))
                     .select(verification_request::id);
 
                 deleted_rows += diesel::delete(verification_result::table)
@@ -333,24 +349,24 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: &VaultId) -
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(verification_request::table)
-                    .filter(verification_request::scoped_user_id.eq_any(su_ids))
+                    .filter(verification_request::scoped_user_id.eq_any(su_ids.clone()))
                     .execute(conn.conn())?;
             }
 
             deleted_rows += diesel::delete(onboarding::table)
-                .filter(onboarding::scoped_user_id.eq_any(su_ids))
+                .filter(onboarding::scoped_user_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
         }
 
         // delete scoped_users
         deleted_rows += diesel::delete(scoped_user::table)
-            .filter(scoped_user::user_vault_id.eq(uvid))
+            .filter(scoped_user::user_vault_id.eq_any(&v_ids))
             .execute(conn.conn())?;
     }
 
     // delete user vault
     deleted_rows += diesel::delete(user_vault::table)
-        .filter(user_vault::id.eq(uvid))
+        .filter(user_vault::id.eq_any(&v_ids))
         .execute(conn.conn())?;
 
     Ok(deleted_rows)

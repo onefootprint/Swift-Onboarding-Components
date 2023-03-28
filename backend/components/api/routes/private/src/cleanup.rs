@@ -109,7 +109,7 @@ async fn post(
                 }
             }
 
-            let num_deleted_rows = db::private_cleanup_integration_tests(conn, &user_vault_id)?;
+            let num_deleted_rows = db::private_cleanup_integration_tests(conn, user_vault_id)?;
             Ok(num_deleted_rows)
         })
         .await?;
