@@ -4,7 +4,7 @@ use crate::email::Email;
 use crate::{BusinessDataKind as BDK, PhoneNumber, PiiString};
 use crate::{NtResult, Validate};
 use serde::Deserialize;
-use url::Host;
+use url::{Host, Url};
 
 impl Validate for BDK {
     fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
@@ -61,11 +61,17 @@ fn clean_and_validate_ein(input: PiiString) -> VResult<PiiString> {
 }
 
 fn clean_and_validate_website(input: PiiString) -> VResult<PiiString> {
-    let host = Host::parse(input.leak())?;
-    match host {
-        Host::Ipv4(_) | Host::Ipv6(_) => return Err(Error::InvalidHost),
-        Host::Domain(d) => {
-            if d.split('.').count() <= 1 {
+    let input = if !input.leak().contains("://") {
+        // Prepend https:// prefix if no scheme is provided
+        PiiString::from(format!("https://{}", input.leak()))
+    } else {
+        input
+    };
+    let url = Url::parse(input.leak())?;
+    match url.host() {
+        Some(Host::Ipv4(_)) | Some(Host::Ipv6(_)) | None => return Err(Error::InvalidHost),
+        Some(Host::Domain(d)) => {
+            if !d.contains('.') {
                 return Err(Error::InvalidHost);
             }
         }
@@ -83,11 +89,11 @@ mod test {
 
     #[test_case(Name, "Acme Bank" => Some("Acme Bank".to_owned()))]
     #[test_case(Dba, "Bank" => Some("Bank".to_owned()))]
-    #[test_case(Website, "https://onefootprint.com" => None)]
-    #[test_case(Website, "http://onefootprint.com" => None)]
-    #[test_case(Website, "www.onefootprint.com/about.html" => None)]
-    #[test_case(Website, "onefootprint.com" => Some("onefootprint.com".to_owned()))]
-    #[test_case(Website, "about.onefootprint.com" => Some("about.onefootprint.com".to_owned()))]
+    #[test_case(Website, "https://onefootprint.com" => Some("https://onefootprint.com".to_owned()))]
+    #[test_case(Website, "http://onefootprint.com" => Some("http://onefootprint.com".to_owned()))]
+    #[test_case(Website, "www.onefootprint.com/about.html" => Some("https://www.onefootprint.com/about.html".to_owned()))]
+    #[test_case(Website, "onefootprint.com" => Some("https://onefootprint.com".to_owned()))]
+    #[test_case(Website, "about.onefootprint.com" => Some("https://about.onefootprint.com".to_owned()))]
     #[test_case(Website, "foobar" => None)]
     #[test_case(Website, "hello . com" => None)]
     #[test_case(Website, "123?.com" => None)]
