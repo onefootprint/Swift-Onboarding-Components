@@ -1,7 +1,6 @@
 use super::WriteableVw;
 use crate::errors::{ApiError, ApiResult};
 use crate::utils::file_upload::FileUpload;
-use crate::utils::fingerprint::NewFingerprints;
 use crate::utils::vault_wrapper::{Business, Person};
 use crate::State;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
@@ -14,8 +13,8 @@ use db::{DbError, PgConn, TxnPgConn};
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
-    DocumentKind, DocumentUploadedInfo, IdentityDataKind as IDK, ScopedVaultId, SealedVaultDataKey, VaultId,
-    VaultPublicKey, VdKind,
+    DocumentKind, DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, ScopedVaultId,
+    SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
 };
 use std::collections::HashMap;
 
@@ -32,7 +31,7 @@ impl WriteableVw<Person> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DataRequest,
-        id_fingerprints: NewFingerprints<IDK>,
+        id_fingerprints: Fingerprints<IDK>,
     ) -> ApiResult<Vec<NewContactInfo>> {
         request.assert_no_business_data()?;
         // Update VaultData
@@ -74,7 +73,7 @@ impl<Type> WriteableVw<Type> {
         &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
         conn: &mut TxnPgConn,
         update: DataRequest,
-        fingerprints: NewFingerprints<IDK>,
+        fingerprints: Fingerprints<IDK>,
     ) -> ApiResult<Vec<VaultData>> {
         // Must do this validation here inside the locked, WriteableUvw
         let request = self.validate_request(update)?;

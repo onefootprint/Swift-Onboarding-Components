@@ -1,13 +1,16 @@
 use crate::{
-    CollectedDataOption, DataIdentifier, Error, IdentityDataKind as IDK, PiiString, Validate, VdKind,
+    CollectedDataOption, DataIdentifier, Error, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
+    PiiString, Validate, VdKind,
 };
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
+use futures::TryFutureExt;
 use itertools::Itertools;
 use std::clone::Clone;
 use std::collections::HashMap;
 
 type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
+pub type Fingerprints<T> = HashMap<T, Fingerprint>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
@@ -122,5 +125,30 @@ impl DataRequest {
             return Err(crate::DataValidationError::FieldValidationError(field_errors).into());
         }
         Ok(())
+    }
+
+    pub async fn build_fingerprints<F: Fingerprinter>(
+        &self,
+        fingerprinter: &F,
+    ) -> Result<Fingerprints<IDK>, F::Error> {
+        let fut_fingerprints = self
+            .iter()
+            .filter_map(|(di, pii)| match di {
+                // Only fingerprint ID data for now
+                DataIdentifier::Id(idk) => Some((*idk, pii.clone())),
+                _ => None,
+            })
+            .map(|(idk, pii)| {
+                let pii = pii.clean_for_fingerprint();
+                fingerprinter
+                    .compute_fingerprint(idk, pii)
+                    .map_ok(move |sh_data| (idk, sh_data))
+            });
+        let fingerprints = futures::future::try_join_all(fut_fingerprints)
+            .await?
+            .into_iter()
+            .collect();
+        // TODO store output on self
+        Ok(fingerprints)
     }
 }

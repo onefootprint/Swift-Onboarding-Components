@@ -2,7 +2,6 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -95,7 +94,7 @@ pub async fn put_inner(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_non_portable())?;
-    let fingerprints = build_fingerprints(&state, request.clone()).await?;
+    let fingerprints = request.build_fingerprints(&state.hmac_client).await?;
 
     state
         .db_pool

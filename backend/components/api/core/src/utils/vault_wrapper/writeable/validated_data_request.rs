@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::{
     errors::{user::UserError, ApiError, ApiResult},
-    utils::{fingerprint::NewFingerprints, vault_wrapper::VaultWrapper},
+    utils::{vault_wrapper::VaultWrapper},
 };
 use db::{
     models::{
@@ -15,7 +15,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataLifetimeKind,
-    ScopedVaultId, IdentityDataKind as IDK, DataRequest, DataIdentifier,
+    ScopedVaultId, IdentityDataKind as IDK, DataRequest, DataIdentifier, Fingerprints,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -75,7 +75,7 @@ impl ValidatedDataRequest {
         conn: &mut TxnPgConn,
         user_vault: &Vault,
         scoped_user_id: ScopedVaultId,
-        fingerprints: NewFingerprints<IDK>, // should eventually support more than just IDK fingerprints
+        fingerprints: Fingerprints<IDK>, // should eventually support more than just IDK fingerprints
     ) -> ApiResult<Vec<VaultData>> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data

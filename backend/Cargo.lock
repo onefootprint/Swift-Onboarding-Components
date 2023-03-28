@@ -4307,6 +4307,8 @@ dependencies = [
  "diesel_as_jsonb",
  "diesel_migrations",
  "either",
+ "futures",
+ "futures-util",
  "itertools 0.10.3",
  "lazy_static",
  "mime",

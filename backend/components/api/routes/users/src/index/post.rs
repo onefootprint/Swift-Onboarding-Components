@@ -6,7 +6,6 @@ use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
-use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -52,7 +51,7 @@ pub async fn post(
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
             let request = request.clean_and_validate(ParseOptions::for_non_portable())?;
-            let fingerprints = build_fingerprints(&state, request.clone()).await?;
+            let fingerprints = request.build_fingerprints(&state.hmac_client).await?;
             Some((targets, request, fingerprints))
         } else {
             None

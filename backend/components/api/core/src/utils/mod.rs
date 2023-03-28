@@ -3,7 +3,6 @@ pub mod db2api;
 pub mod email;
 pub mod email_domain;
 pub mod file_upload;
-pub mod fingerprint;
 pub mod headers;
 pub mod identity_document;
 pub mod large_json;

@@ -5,7 +5,6 @@ use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::email::send_email_challenge;
-use crate::utils::fingerprint::build_fingerprints;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -60,7 +59,7 @@ pub async fn put(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
-    let fingerprints = build_fingerprints(&state, request.clone()).await?;
+    let fingerprints = request.build_fingerprints(&state.hmac_client).await?;
     let email = request
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))
