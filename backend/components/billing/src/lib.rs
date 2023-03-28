@@ -154,9 +154,14 @@ impl BillingClient {
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
         let prices = BillingProfile::get_for(ff_client, &info.tenant_id)?;
-        let items = [(prices.pii, info.count_pii), (prices.kyc, info.count_kyc)]
-            .into_iter()
-            .map(|(price_id, count)| self.get_or_create_invoice_item(customer_id.clone(), price_id, count));
+        let items = [
+            (prices.pii, info.count_pii),
+            (prices.kyc, info.count_kyc),
+            (prices.watchlist, info.count_watchlist_check),
+        ]
+        .into_iter()
+        .filter(|(_, count)| count > &0)
+        .map(|(price_id, count)| self.get_or_create_invoice_item(customer_id.clone(), price_id, count));
         let items: HashMap<_, _> = futures::future::join_all(items)
             .await
             .into_iter()
@@ -222,4 +227,5 @@ pub struct BillingInfo {
     pub interval: BillingInterval,
     pub count_pii: i64,
     pub count_kyc: i64,
+    pub count_watchlist_check: i64,
 }

@@ -8,6 +8,7 @@ use billing::BillingInfo;
 use chrono::{NaiveDate, Utc};
 use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
+use db::models::watchlist_check::WatchlistCheck;
 use db::scoped_vault::{count_authorized_for_tenant, ScopedVaultListQueryParams};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{StripeCustomerId, TenantId};
@@ -117,13 +118,15 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
         ..Default::default()
     };
     let tenant_id = tenant.id.clone();
-    let (count_pii, count_kyc) = state
+    let (count_pii, count_kyc, count_watchlist_check) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let count_pii_storage = count_authorized_for_tenant(conn, params)?;
             let billable_kyc =
                 Onboarding::get_billable_count(conn, &tenant_id, interval.start, interval.end)?;
-            Ok((count_pii_storage, billable_kyc))
+            let count_watchlist_check =
+                WatchlistCheck::get_billable_count(conn, &tenant_id, interval.start, interval.end)?;
+            Ok((count_pii_storage, billable_kyc, count_watchlist_check))
         })
         .await??;
     let customer_id = get_or_create_customer_id(state, &tenant).await?;
@@ -133,6 +136,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
         customer_id,
         count_pii,
         count_kyc,
+        count_watchlist_check,
     };
     state
         .billing_client

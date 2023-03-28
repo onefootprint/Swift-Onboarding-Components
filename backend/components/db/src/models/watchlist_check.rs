@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
-use diesel::prelude::*;
+use diesel::{dsl::count_star, prelude::*};
 use newtypes::{
-    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TaskId, WatchlistCheckId, WatchlistCheckStatus,
+    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TaskId, TenantId, WatchlistCheckId,
+    WatchlistCheckStatus,
 };
 use serde::{Deserialize, Serialize};
 
@@ -92,5 +93,27 @@ impl WatchlistCheck {
             .get_result(conn)?;
 
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_billable_count(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+    ) -> DbResult<i64> {
+        use crate::schema::scoped_user;
+        let count = watchlist_check::table
+            .inner_join(scoped_user::table)
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(true))
+            // Only want to bill for material watchlist checks that made vendor requests
+            .filter(watchlist_check::status.eq_any(vec![WatchlistCheckStatus::Pass, WatchlistCheckStatus::Fail]))
+            // Filter for watchlist checks that completed during this billing period
+            .filter(watchlist_check::completed_at.ge(start_date))
+            .filter(watchlist_check::completed_at.lt(end_date))
+            .select(count_star())
+            .get_result(conn)?;
+        Ok(count)
     }
 }
