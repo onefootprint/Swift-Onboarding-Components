@@ -1,3 +1,4 @@
+import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -19,13 +20,13 @@ const FootprintFooter = ({ variant = 'modal' }: FootprintFooterProps) => {
   const links: Link[] = [
     {
       label: "What's this?",
-      href: `https://www.onefootprint.com/tenant?ob-key=${
+      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${
         router.query.public_key as string
       }`,
     },
     {
       label: 'Privacy',
-      href: 'https://www.onefootprint.com/privacy-policy',
+      href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
   ];
 
