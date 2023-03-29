@@ -65,6 +65,8 @@ const Changelog = ({ posts }: ChangelogProps) => {
                   last={posts.length === index + 1}
                   slug={post.slug}
                   blurColor={BLUR_COLORS[index % BLUR_COLORS.length]}
+                  tags={post.tags}
+                  excerpt={post.excerpt}
                 />
               ))}
             </Timeline>

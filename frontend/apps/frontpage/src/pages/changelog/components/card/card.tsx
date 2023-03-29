@@ -6,6 +6,8 @@ import styled, { css } from 'styled-components';
 import PostContent from './components/post-content/post-content';
 import Progress from './components/progress';
 
+const RECAP_TAG = 'recap';
+
 type CardProps = {
   date: string;
   featureImageUrl?: string;
@@ -18,6 +20,8 @@ type CardProps = {
   active?: boolean | false;
   slug: string;
   blurColor: string | 'rgba(171, 255, 163, .15)';
+  tags: Array<{ name: string; slug: string }>;
+  excerpt: string;
 };
 
 const Card = ({
@@ -32,9 +36,12 @@ const Card = ({
   active,
   slug,
   blurColor,
+  tags,
+  excerpt,
 }: CardProps) => {
   const { formatDateWithLongMonth } = useIntl();
   const formattedDate = formatDateWithLongMonth(new Date(date));
+  const isRecap = !!tags.map(tag => tag.slug).includes(RECAP_TAG);
 
   return (
     <Container id={slug} blurColor={blurColor}>
@@ -54,6 +61,8 @@ const Card = ({
           html={html}
           featureImageAlt={featureImageAlt}
           slug={slug}
+          isRecap={isRecap}
+          excerpt={excerpt}
         />
       </PostContainer>
     </Container>
@@ -95,6 +104,7 @@ const DateDesktop = styled.div`
 
 const PostContainer = styled.div`
   max-width: 830px;
+  width: 100%;
 `;
 
 export default Card;

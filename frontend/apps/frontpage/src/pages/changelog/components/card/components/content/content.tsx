@@ -44,10 +44,10 @@ const Content = styled.div`
     h5,
     h6 {
       color: ${theme.color.primary};
-      margin-top: ${theme.spacing[7]};
+      margin-top: ${theme.spacing[9]};
 
       &:not(:last-child) {
-        margin-bottom: ${theme.spacing[6]};
+        margin-bottom: ${theme.spacing[7]};
       }
     }
 
@@ -84,6 +84,15 @@ const Content = styled.div`
         margin: ${theme.spacing[3]};
         color: ${theme.color.tertiary};
       }
+    }
+
+    img {
+      max-width: 100%;
+      object-fit: contain;
+      height: auto;
+      margin-bottom: ${theme.spacing[9]};
+      border-radius: ${theme.borderRadius.default};
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }
   `}
 `;

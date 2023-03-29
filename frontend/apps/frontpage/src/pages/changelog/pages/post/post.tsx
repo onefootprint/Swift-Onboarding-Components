@@ -74,6 +74,7 @@ const PostPage = ({ post }: PostProps) => {
             featureImageUrl={post.feature_image}
             featureImageAlt={post.feature_image_alt || post.title}
             slug={post.slug}
+            excerpt={post.excerpt}
           />
         </PostContainer>
       </Container>

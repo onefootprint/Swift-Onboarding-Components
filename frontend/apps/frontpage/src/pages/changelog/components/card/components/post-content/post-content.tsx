@@ -1,5 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
-import { media, Typography } from '@onefootprint/ui';
+import { IcoArrowRightSmall16 } from '@onefootprint/icons';
+import { LinkButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -20,6 +21,8 @@ type PostContentProps = {
   title: string;
   html?: string;
   slug: string;
+  isRecap?: boolean;
+  excerpt: string;
 };
 
 const PostContent = ({
@@ -31,9 +34,12 @@ const PostContent = ({
   html,
   title,
   slug,
+  isRecap,
+  excerpt,
 }: PostContentProps) => {
   const { formatDateWithLongMonth } = useIntl();
   const formattedDate = formatDateWithLongMonth(new Date(date));
+
   return (
     <PostContainer>
       {featureImageUrl && (
@@ -59,7 +65,27 @@ const PostContent = ({
           <CopyLink slug={`${BASE_URL}/${slug}`} />
         </Title>
         <Author authorImg={authorImg} authorName={authorName} />
-        {html && <Content html={html} />}
+
+        {isRecap ? (
+          <>
+            <Typography
+              variant="body-2"
+              color="secondary"
+              sx={{ whiteSpace: 'pre-line' }}
+            >
+              {excerpt}
+            </Typography>
+
+            <LinkButton
+              href={`/changelog/${slug}`}
+              iconComponent={IcoArrowRightSmall16}
+            >
+              Read more
+            </LinkButton>
+          </>
+        ) : (
+          html && <Content html={html} />
+        )}
       </TextContent>
     </PostContainer>
   );
@@ -76,6 +102,7 @@ const PostContainer = styled.div`
 
     ${media.greaterThan('md')`
       margin-bottom: none;
+      min-width: 830px;
     `}
   `}
 `;

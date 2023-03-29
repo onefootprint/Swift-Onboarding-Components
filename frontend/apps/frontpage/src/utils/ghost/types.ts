@@ -52,6 +52,7 @@ export type Post = {
   title: string;
   primary_tag: Tag;
   primary_author: Author;
+  tags: Tag[];
 };
 
 export type PostDetails = {
