@@ -17,16 +17,16 @@ const getProxyConfig = async (authHeaders: AuthHeaders, id: string) => {
 
 const useProxyConfig = (id: string = '') => {
   const { authHeaders } = useSession();
-  const rolesQuery = useQuery(
+  const proxyConfigQuery = useQuery(
     [...DETAILS_QUERY_KEY, id],
     () => getProxyConfig(authHeaders, id),
     {
       enabled: !!id,
     },
   );
-  const { error, data } = rolesQuery;
+  const { error, data } = proxyConfigQuery;
   return {
-    ...rolesQuery,
+    ...proxyConfigQuery,
     errorMessage: error ? getErrorMessage(error) : undefined,
     data,
   };
