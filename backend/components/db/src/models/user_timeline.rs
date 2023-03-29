@@ -23,6 +23,7 @@ use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
 use super::scoped_vault::ScopedVaultIdentifier;
+use super::watchlist_check::WatchlistCheck;
 use strum::IntoEnumIterator;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = user_timeline)]
@@ -57,6 +58,7 @@ pub enum SaturatedTimelineEvent {
     Liveness(LivenessEvent, InsightEvent),
     Annotation(AnnotationInfo),
     DocumentUploaded(DocumentData),
+    WatchlistCheck(WatchlistCheck),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -162,6 +164,11 @@ impl UserTimeline {
             _ => None,
         });
 
+        let watchlist_check_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::WatchlistCheck(ref e) => Some(&e.id),
+            _ => None,
+        });
+
         let mut decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let mut annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
         let mut liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
@@ -173,6 +180,8 @@ impl UserTimeline {
 
         let mut documents: HashMap<DocumentDataId, DocumentData> =
             DocumentData::get_bulk(conn, document_ids.collect())?;
+
+        let mut watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
 
         if tenant_can_view_socure_risk_signal {
             vendor_apis_to_include.push(VendorAPI::SocureIDPlus)
@@ -226,6 +235,11 @@ impl UserTimeline {
                     DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
                         documents.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
                     ),
+                    DbUserTimelineEvent::WatchlistCheck(ref e) => SaturatedTimelineEvent::WatchlistCheck(
+                        watchlist_checks
+                            .remove(&e.id)
+                            .ok_or(DbError::RelatedObjectNotFound)?,
+                    ),
                 };
                 // This will actually display that events from different ob configs at the same
                 // tenant belong to a different tenant. Probably okay.
@@ -235,6 +249,20 @@ impl UserTimeline {
             .collect::<DbResult<Vec<_>>>()?;
 
         Ok(results)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_by_event_data_id(conn: &mut PgConn, id: String) -> DbResult<Option<Self>> {
+        let res = user_timeline::table
+            .filter(
+                user_timeline::event
+                    .retrieve_by_path_as_text(vec!["data", "id"])
+                    .eq(id),
+            )
+            .get_result(conn)
+            .optional()?;
+
+        Ok(res)
     }
 }
 

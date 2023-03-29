@@ -10,8 +10,10 @@ use async_trait::async_trait;
 use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
+use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndMaybeResult;
+use db::DbResult;
 use db::{
     models::{
         decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
@@ -27,8 +29,8 @@ use idv::{
 };
 use newtypes::{
     DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, OnboardingStatus, ScopedVaultId,
-    TaskId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckError,
-    WatchlistCheckNotNeededReason, WatchlistCheckStatus,
+    TaskId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckInfo,
+    WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
 };
 
 pub(crate) struct WatchlistCheckTask {
@@ -98,7 +100,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             .await?;
 
         // We have a watchlist_check that is Pending and either needs a vendor call made or decisioning
-        if let Some((vreq, vres)) = vr {
+        let wc = if let Some((vreq, vres)) = vr {
             let svid = args.scoped_vault_id.clone();
             let vendor_response = if let Some(vres) = vres {
                 Self::decrypt_existing_vendor_response(
@@ -121,8 +123,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
             let pa_res = PaResponse::try_from(vendor_response.response)?;
             let (status, reason_codes) = Self::calculate_decision(pa_res)?;
-            let _updated_wc = self
-                .db_pool
+            self.db_pool
                 .db_query(move |conn| {
                     WatchlistCheck::update(
                         conn,
@@ -133,9 +134,30 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                         Some(Utc::now()),
                     )
                 })
-                .await??;
-        } // else we have a watchlist_check that doesn't need a vendor call because it is NotNeed or Error
+                .await??
+        } else {
+            // else we have a watchlist_check that doesn't need a vendor call because it is NotNeed or Error
+            wc
+        };
 
+        // If either we did not attempt a vendor call due to a validation error (ie insufficient data in vault) or we did get a vendor result,
+        // then write a timeline event + a fire webhook
+        if matches!(
+            wc.status,
+            WatchlistCheckStatusKind::Pass | WatchlistCheckStatusKind::Fail | WatchlistCheckStatusKind::Error
+        ) {
+            let vault_id = uvw.vault().id.clone();
+            let svid = args.scoped_vault_id.clone();
+            self.db_pool
+                .db_transaction(move |conn| -> DbResult<()> {
+                    let ut = UserTimeline::get_by_event_data_id(conn, wc.id.to_string())?;
+                    if ut.is_none() {
+                        UserTimeline::create(conn, WatchlistCheckInfo { id: wc.id }, vault_id, svid)?;
+                    }
+                    Ok(())
+                })
+                .await?;
+        }
         Ok(())
     }
 }

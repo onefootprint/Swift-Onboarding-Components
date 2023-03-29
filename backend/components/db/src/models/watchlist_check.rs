@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use diesel::{dsl::count_star, prelude::*};
 use newtypes::{
@@ -141,5 +143,19 @@ impl WatchlistCheck {
             .filter(watchlist_check::scoped_vault_id.eq(svid))
             .get_result(conn)?;
         Ok(res)
+    }
+
+    pub fn get_bulk(
+        conn: &mut PgConn,
+        ids: Vec<&WatchlistCheckId>,
+    ) -> DbResult<HashMap<WatchlistCheckId, Self>> {
+        let results = watchlist_check::table
+            .filter(watchlist_check::id.eq_any(ids))
+            .get_results::<WatchlistCheck>(conn)?
+            .into_iter()
+            .map(|d| (d.id.clone(), d))
+            .collect();
+
+        Ok(results)
     }
 }

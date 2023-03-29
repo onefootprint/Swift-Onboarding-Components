@@ -18,5 +18,6 @@ mod risk_signal;
 mod secret_api_key;
 mod user;
 mod user_timeline;
+mod watchlist_check;
 
 pub use user::UserDetail;

@@ -7,6 +7,7 @@ use crate::{
 };
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
+use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::{RequestAndMaybeResult, VerificationRequest};
 use db::models::watchlist_check::WatchlistCheck;
 use db::tests::fixtures;
@@ -41,7 +42,7 @@ async fn non_live_vault(db_pool: TestDbPool) {
         .unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs) = get_data(&db_pool, sv.id).await;
+    let (wc, vreqs, ut) = get_data(&db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::NotNeeded, wc.status);
     assert_eq!(
@@ -49,6 +50,7 @@ async fn non_live_vault(db_pool: TestDbPool) {
         wc.status_details
     );
     assert!(vreqs.is_empty());
+    assert!(ut.is_none());
 }
 
 // will make a test_db_pool_cases eventually :)
@@ -65,7 +67,7 @@ async fn non_active_onboarding_test_case(db_pool: TestDbPool, onboarding_status:
         .unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs) = get_data(&db_pool, sv.id).await;
+    let (wc, vreqs, ut) = get_data(&db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::NotNeeded, wc.status);
     assert_eq!(
@@ -73,6 +75,7 @@ async fn non_active_onboarding_test_case(db_pool: TestDbPool, onboarding_status:
         wc.status_details
     );
     assert!(vreqs.is_empty());
+    assert!(ut.is_none());
 }
 
 #[test_db_pool]
@@ -103,10 +106,11 @@ async fn insufficient_data_in_vault(db_pool: TestDbPool) {
         .unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs) = get_data(&db_pool, sv.id).await;
+    let (wc, vreqs, ut) = get_data(&db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::Error, wc.status);
     assert!(vreqs.is_empty());
+    assert!(ut.is_some());
 }
 
 #[test_db_pool]
@@ -128,12 +132,13 @@ async fn vendor_error(db_pool: TestDbPool) {
     let res = run_task(&db_pool, &task.id, &sv.id, mock_pa_client, enclave_client).await;
 
     // ASSERTIONS
-    let (wc, vreqs) = get_data(&db_pool, sv.id).await;
+    let (wc, vreqs, ut) = get_data(&db_pool, sv.id).await;
 
     assert!(matches!(res.err().unwrap(), TaskError::IdologyError(_)));
     assert_eq!(WatchlistCheckStatusKind::Pending, wc.status);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_none());
+    assert!(ut.is_none());
 }
 
 #[test_db_pool]
@@ -157,12 +162,13 @@ async fn vendor_hit(db_pool: TestDbPool) {
         .unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs) = get_data(&db_pool, sv.id).await;
+    let (wc, vreqs, ut) = get_data(&db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::Fail, wc.status);
     assert_eq!(Some(vec![FootprintReasonCode::WatchlistHitOfac]), wc.reason_codes);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
+    assert!(ut.is_some());
 }
 
 #[test_db_pool]
@@ -186,11 +192,12 @@ async fn vendor_no_hit(db_pool: TestDbPool) {
         .unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs) = get_data(&db_pool, sv.id).await;
+    let (wc, vreqs, ut) = get_data(&db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::Pass, wc.status);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
+    assert!(ut.is_some());
 }
 
 #[test_db_pool]
@@ -226,11 +233,12 @@ async fn non_portable_vault(db_pool: TestDbPool) {
         .unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs) = get_data(&db_pool, sv.id).await;
+    let (wc, vreqs, ut) = get_data(&db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::Pass, wc.status);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
+    assert!(ut.is_some());
 }
 
 //
@@ -283,19 +291,24 @@ async fn run_task(
     wct.execute(&args).await
 }
 
-async fn get_data(db_pool: &DbPool, svid: ScopedVaultId) -> (WatchlistCheck, Vec<RequestAndMaybeResult>) {
-    let (wc, vreqs) = db_pool
+async fn get_data(
+    db_pool: &DbPool,
+    svid: ScopedVaultId,
+) -> (WatchlistCheck, Vec<RequestAndMaybeResult>, Option<UserTimeline>) {
+    let (wc, vreqs, ut) = db_pool
         .db_query(move |conn| {
             let wc = WatchlistCheck::_get_by_svid(conn, &svid).unwrap();
             let vreqs =
                 VerificationRequest::get_latest_requests_and_results_for_scoped_user(conn, svid).unwrap();
 
+            let ut = UserTimeline::get_by_event_data_id(conn, wc.id.to_string()).unwrap();
+
             // TODO: add usertimeline
-            (wc, vreqs)
+            (wc, vreqs, ut)
         })
         .await
         .unwrap();
-    (wc, vreqs)
+    (wc, vreqs, ut)
 }
 
 fn full_vault() -> Vec<IDK> {

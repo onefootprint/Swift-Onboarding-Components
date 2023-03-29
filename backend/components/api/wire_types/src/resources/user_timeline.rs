@@ -3,6 +3,7 @@ use newtypes::CollectedDataOption;
 use crate::{
     export_schema, Annotation, Apiv2Schema, DateTime, Deserialize, DocumentUploadedTimelineEvent,
     IdentityDocumentTimelineEvent, JsonSchema, LivenessEvent, OnboardingDecision, Serialize, Utc,
+    WatchlistCheck,
 };
 
 /// Describes a liveness event that took place
@@ -31,6 +32,7 @@ pub enum UserTimelineEvent {
     },
     Annotation(Annotation),
     DocumentUploaded(DocumentUploadedTimelineEvent),
+    WatchlistCheck(WatchlistCheck),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

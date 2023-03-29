@@ -49,6 +49,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::DocumentUploaded(d) => {
                 Self::DocumentUploaded(api_wire_types::DocumentUploadedTimelineEvent::from_db(d))
             }
+            SaturatedTimelineEvent::WatchlistCheck(wc) => {
+                Self::WatchlistCheck(api_wire_types::WatchlistCheck::from_db(wc))
+            }
         }
     }
 }
