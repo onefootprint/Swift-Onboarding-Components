@@ -1,8 +1,8 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::parse_quote;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, ItemFn};
+use syn::{parse_macro_input, ItemFn, Meta};
+use syn::{parse_quote, AttributeArgs};
 use test_case_core::TestCase;
 
 extern crate proc_macro;
@@ -141,4 +141,45 @@ fn render_db_test_cases(test_cases: &[TestCase], mut test_fn: ItemFn) -> TokenSt
     };
 
     output.into()
+}
+
+#[proc_macro_attribute]
+/// Wraps a function that takes in a `TestDbPool` and turns it into a rust `#[test]` function
+/// that takes no arguments with the same name
+pub fn test_db_pool(
+    args: proc_macro::TokenStream,
+    stream: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    let ItemFn {
+        attrs,
+        vis: _,
+        sig,
+        block,
+    } = parse_macro_input!(stream as ItemFn);
+    let args = parse_macro_input!(args as AttributeArgs);
+
+    let retain = if let Some(a) = args.first() {
+        matches!(a, syn::NestedMeta::Meta(Meta::Path(nv)) if nv.is_ident("retain"))
+    } else {
+        false
+    };
+
+    let stmts = &block.stmts;
+    let fn_name = &sig.ident;
+
+    let out = quote! {
+        mod #fn_name {
+            use super::*;
+            #(#attrs)* pub(super) #sig {
+                #(#stmts)*
+            }
+        }
+
+        #[tokio::test]
+        async fn #fn_name() {
+            let test_db_pool = TestDbPool::new(#retain);
+            #fn_name::#fn_name(test_db_pool).await;
+        }
+    };
+    out.into()
 }

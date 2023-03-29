@@ -40,3 +40,8 @@ mod verification_request;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tenant;
+
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod test_db_pool;
