@@ -51,6 +51,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(
       () => ({
         toggle: handleToggle,
       }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [],
     );
 

@@ -955,7 +955,6 @@
         "page-title": "Footprint | Onboarding Configuration",
         "title": "Onboarding configurations",
         "subtitle": "Set up requirements for customers onboarding onto your platform.",
-        "view-documentation": "View documentation",
         "type": {
           "kyb": "KYB",
           "kyc": "KYC"

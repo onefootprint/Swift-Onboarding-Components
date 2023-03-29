@@ -18,6 +18,7 @@ export * from './get-entities';
 export * from './get-liveness';
 export * from './get-members';
 export * from './get-onboarding-config';
+export * from './get-onboarding-configs';
 export * from './get-org';
 export * from './get-pinned-annotations';
 export * from './get-proxy-config';

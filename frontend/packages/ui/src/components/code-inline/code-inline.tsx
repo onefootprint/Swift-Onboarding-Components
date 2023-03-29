@@ -91,7 +91,7 @@ const Button = styled.button`
   padding: 0;
 
   &[data-truncate='true'] {
-    width: 100%;
+    max-width: 100%;
   }
 `;
 
@@ -114,7 +114,7 @@ const CodeContent = styled.code`
     &[data-truncate='true'] {
       overflow: hidden;
       text-overflow: ellipsis;
-      width: 100%;
+      max-width: 100%;
       word-break: unset;
     }
   `}
