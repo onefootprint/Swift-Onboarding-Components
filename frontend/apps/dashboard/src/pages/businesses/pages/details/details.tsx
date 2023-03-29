@@ -6,11 +6,11 @@ import React from 'react';
 import Content from './components/content';
 import Error from './components/error';
 import Loading from './components/loading';
-import useBusiness from './hooks/use-business';
+import useEntity from './hooks/use-entity';
 
 const Details = () => {
   const { t } = useTranslation('pages.business');
-  const { errorMessage, isLoading, data } = useBusiness();
+  const { errorMessage, isLoading, data } = useEntity();
 
   return (
     <>

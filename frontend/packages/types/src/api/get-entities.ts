@@ -1,6 +1,7 @@
-import { ScopedBusiness } from '../data';
+import { Entity, EntityKind } from '../data';
 
-export type BusinessesRequest = {
+export type GetEntitiesRequest = {
+  kind?: EntityKind;
   cursor: string | undefined;
   search: string | undefined;
   page_size: string;
@@ -9,4 +10,4 @@ export type BusinessesRequest = {
   timestamp_lte: string | undefined;
 };
 
-export type BusinessesResponse = ScopedBusiness[];
+export type GetEntitiesResponse = Entity[];

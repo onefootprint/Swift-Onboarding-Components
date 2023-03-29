@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
-import { BusinessStatus } from '@onefootprint/types';
+import { EntityStatus } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import getBadgeVariantByStatus from '../../utils';
 
 export type StatusBadgeProps = {
-  status: BusinessStatus;
+  status: EntityStatus;
   requiresManualReview: boolean;
 };
 

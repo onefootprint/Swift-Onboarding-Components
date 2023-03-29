@@ -54,7 +54,7 @@ describe('<List />', () => {
       });
     });
 
-    it('should show the business name, id, status and start time', async () => {
+    it('should show the business id and status', async () => {
       await renderBusinessesAndWaitData();
 
       businessesListFixture.forEach((business, index) => {
@@ -64,16 +64,8 @@ describe('<List />', () => {
         const id = within(row).getByText(business.id);
         expect(id).toBeInTheDocument();
 
-        // TODO: add once we don't use faker anymore
-        // https://linear.app/footprint/issue/FP-3090/business-list-use-correct-endpoint
-        // const name = screen.getByText(business.name);
-        // expect(name).toBeInTheDocument();
-
         const status = within(row).getByText(formattedValues.status);
         expect(status).toBeInTheDocument();
-
-        const start = within(row).getByText(formattedValues.startTimestamp);
-        expect(start).toBeInTheDocument();
       });
     });
 
@@ -114,7 +106,7 @@ describe('<List />', () => {
 
         await waitFor(() => {
           expect(push).toHaveBeenCalledWith(
-            { query: { businesses_search: 'Koch Inc' } },
+            { query: { search: 'Koch Inc' } },
             undefined,
             expect.anything(),
           );

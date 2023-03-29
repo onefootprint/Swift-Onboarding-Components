@@ -1,10 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { EntityKind } from '@onefootprint/types';
 import { Pagination, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 
 import Table from './components/table';
-import useBusinesses from './hooks/use-businesses';
+import useEntities from './hooks/use-entities';
 
 const List = () => {
   const { t } = useTranslation('pages.businesses');
@@ -13,7 +14,7 @@ const List = () => {
     isLoading,
     errorMessage,
     pagination,
-  } = useBusinesses();
+  } = useEntities(EntityKind.business);
 
   return (
     <>
@@ -24,7 +25,7 @@ const List = () => {
         {t('header.title')}
       </Typography>
       <Table
-        businesses={response?.data}
+        entities={response?.data}
         isLoading={isLoading}
         errorMessage={errorMessage}
       />

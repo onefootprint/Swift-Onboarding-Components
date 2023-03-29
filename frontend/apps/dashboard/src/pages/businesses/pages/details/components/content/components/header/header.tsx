@@ -4,13 +4,13 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { HEADER_ACTIONS_ID } from '@/business/constants';
-import useBusiness from '@/business/hooks/use-business';
+import useEntity from '@/business/hooks/use-entity';
 import StatusBadge from '@/businesses/components/status-badge';
 
 const Header = () => {
   const { t } = useTranslation('pages.business.header');
   const { formatDateWithTime } = useIntl();
-  const { data } = useBusiness();
+  const { data } = useEntity();
 
   return (
     <HeaderContainer aria-label={t('title')}>

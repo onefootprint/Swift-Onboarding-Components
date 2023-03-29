@@ -1,25 +1,22 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { Entity } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
-
-import { Business } from '@/businesses/types';
 
 import useFilters from '../../hooks/use-filters';
 import Filters from '../filters';
 import Row from '../row';
 
 type TableProps = {
-  businesses?: Business[];
+  entities?: Entity[];
   errorMessage?: string;
   isLoading: boolean;
 };
 
-const renderTr = ({ item: business }: { item: Business }) => (
-  <Row business={business} />
-);
+const renderTr = ({ item }: { item: Entity }) => <Row entity={item} />;
 
-const Table = ({ isLoading, errorMessage, businesses }: TableProps) => {
+const Table = ({ isLoading, errorMessage, entities }: TableProps) => {
   const router = useRouter();
   const filters = useFilters();
   const { t } = useTranslation('pages.businesses');
@@ -31,23 +28,23 @@ const Table = ({ isLoading, errorMessage, businesses }: TableProps) => {
     { text: t('table.header.start'), width: '17.5%' },
   ];
 
-  const handleRowClick = (business: Business) => {
-    router.push({ pathname: `/businesses/${business.id}` });
+  const handleRowClick = (entity: Entity) => {
+    router.push({ pathname: `/businesses/${entity.id}` });
   };
 
   const handleSearchChange = (search: string) => {
-    filters.push({ businesses_search: search });
+    filters.push({ search });
   };
 
   return router.isReady ? (
-    <UITable<Business>
+    <UITable<Entity>
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('table.empty-state')}
-      getKeyForRow={(business: Business) => business.id}
-      initialSearch={filters.query.businesses_search}
+      getKeyForRow={(entity: Entity) => entity.id}
+      initialSearch={filters.query.search}
       isLoading={isLoading}
-      items={businesses}
+      items={entities}
       onChangeSearchText={handleSearchChange}
       onRowClick={handleRowClick}
       renderActions={() => <Filters />}

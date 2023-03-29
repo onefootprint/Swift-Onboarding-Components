@@ -1,11 +1,5 @@
 import { DecryptedIdDoc } from './decrypted-id-doc';
-import {
-  BusinessDI,
-  DataIdentifier,
-  DocumentDI,
-  IdDI,
-  InvestorProfileDI,
-} from './di';
+import { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 import IdDocDI from './id-doc-data-attribute';
 
 export type VaultEncryptedData = null;
@@ -79,5 +73,3 @@ export const isVaultDataDocument = (data: any): data is VaultDocumentData => {
   }
   return true;
 };
-
-export type EntityVault = Partial<Record<DataIdentifier, VaultValue>>;

@@ -1,17 +1,18 @@
 import { UIState } from '@onefootprint/design-tokens';
-import { BusinessStatus } from '@onefootprint/types';
+import { EntityStatus } from '@onefootprint/types';
 
-const statusToVariant: Record<BusinessStatus, UIState> = {
-  [BusinessStatus.verified]: 'success',
-  [BusinessStatus.failed]: 'error',
-  [BusinessStatus.incomplete]: 'warning',
+const statusToVariant: Record<EntityStatus, UIState> = {
+  [EntityStatus.verified]: 'success',
+  [EntityStatus.failed]: 'error',
+  [EntityStatus.incomplete]: 'warning',
+  [EntityStatus.pending]: 'warning',
 };
 
 const getBadgeVariantByStatus = (
-  status: BusinessStatus,
+  status: EntityStatus,
   requiresManualReview?: boolean,
 ): UIState => {
-  if (status === BusinessStatus.verified && requiresManualReview) {
+  if (status === EntityStatus.verified && requiresManualReview) {
     return 'warning';
   }
   return statusToVariant[status];

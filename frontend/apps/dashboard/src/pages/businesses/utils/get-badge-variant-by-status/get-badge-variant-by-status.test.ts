@@ -1,22 +1,20 @@
-import { BusinessStatus } from '@onefootprint/types';
+import { EntityStatus } from '@onefootprint/types';
 
 import getBadgeVariantByStatus from './get-badge-variant-by-status';
 
 describe('getBadgeVariantByStatus', () => {
   it('returns correct variant', () => {
-    expect(getBadgeVariantByStatus(BusinessStatus.failed, false)).toEqual(
+    expect(getBadgeVariantByStatus(EntityStatus.failed, false)).toEqual(
       'error',
     );
-    expect(getBadgeVariantByStatus(BusinessStatus.verified, false)).toEqual(
+    expect(getBadgeVariantByStatus(EntityStatus.verified, false)).toEqual(
       'success',
     );
-    expect(getBadgeVariantByStatus(BusinessStatus.failed, true)).toEqual(
-      'error',
-    );
-    expect(getBadgeVariantByStatus(BusinessStatus.verified, true)).toEqual(
+    expect(getBadgeVariantByStatus(EntityStatus.failed, true)).toEqual('error');
+    expect(getBadgeVariantByStatus(EntityStatus.verified, true)).toEqual(
       'warning',
     );
-    expect(getBadgeVariantByStatus(BusinessStatus.incomplete, true)).toEqual(
+    expect(getBadgeVariantByStatus(EntityStatus.incomplete, true)).toEqual(
       'warning',
     );
   });

@@ -6,30 +6,30 @@ import useBaseFilters, {
 } from 'src/hooks/use-filters';
 import getDateRange from 'src/utils/get-date-range';
 
-export type BusinessesQueryParams = {
-  businesses_status?: string | string[];
-  businesses_date_range?: string | string[];
-  businesses_search?: string;
-  businesses_cursor?: string;
-  businesses_page_size?: string;
+export type EntitiesQueryParams = {
+  status?: string | string[];
+  date_range?: string | string[];
+  search?: string;
+  cursor?: string;
+  page_size?: string;
 };
 
-const defaultQueryParams: BusinessesQueryParams = {
-  businesses_status: undefined,
-  businesses_date_range: undefined,
-  businesses_search: undefined,
-  businesses_cursor: undefined,
-  businesses_page_size: undefined,
+const defaultQueryParams: EntitiesQueryParams = {
+  status: undefined,
+  date_range: undefined,
+  search: undefined,
+  cursor: undefined,
+  page_size: undefined,
 };
 
 const useFilters = () => {
-  const filters = useBaseFilters<BusinessesQueryParams>(defaultQueryParams);
+  const filters = useBaseFilters<EntitiesQueryParams>(defaultQueryParams);
   const values = {
-    cursor: queryToArray(filters.query.businesses_cursor),
-    dateRange: queryToArray(filters.query.businesses_date_range),
-    pageSize: filters.query.businesses_page_size || `${DEFAULT_PAGE_SIZE}`,
-    search: filters.query.businesses_search,
-    status: queryToArray(filters.query.businesses_status),
+    cursor: queryToArray(filters.query.cursor),
+    dateRange: queryToArray(filters.query.date_range),
+    pageSize: filters.query.page_size || `${DEFAULT_PAGE_SIZE}`,
+    search: filters.query.search,
+    status: queryToArray(filters.query.status),
   };
   const { from, to } = getDateRange(values.dateRange);
   const requestParams = {

@@ -5,7 +5,8 @@ export type CollectedDataOption =
   | CollectedKybDataOption
   | CollectedKycDataOption
   | CollectedIdDocumentDataOption
-  | CollectedInvestorProfileDataOption;
+  | CollectedInvestorProfileDataOption
+  | CollectedDocumentDataOption;
 
 export enum CollectedInvestorProfileDataOption {
   investorProfile = 'investor_profile',
