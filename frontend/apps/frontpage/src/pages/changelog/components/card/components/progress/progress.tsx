@@ -7,13 +7,13 @@ import DefaultIcon from './components/default-icon';
 
 type ProgressProps = {
   active?: boolean | false;
-  last?: boolean | false;
+  showLine?: boolean;
 };
 
-const Progress = ({ active, last }: ProgressProps) => (
+const Progress = ({ active, showLine }: ProgressProps) => (
   <Container>
     <IconContainer>{active ? <ActiveIcon /> : <DefaultIcon />}</IconContainer>
-    {last ? <EmptyLine /> : <Line />}
+    {showLine && <Line />}
   </Container>
 );
 
@@ -22,7 +22,7 @@ const Container = styled.div`
     display: none;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative;
     margin: 0 ${theme.spacing[7]};
 
@@ -35,15 +35,10 @@ const Container = styled.div`
 
 const Line = styled.div`
   ${({ theme }) => css`
-    width: ${theme.borderWidth[1]}};
+    width: ${theme.borderWidth[1]};
     background: ${theme.borderColor.tertiary};
     height: 100%;
   `}
-`;
-
-const EmptyLine = styled.div`
-  height: 100%;
-  width: 2px;
 `;
 
 const IconContainer = styled.div`

@@ -60,6 +60,7 @@ export type PostDetails = {
   created_at: string;
   published_at: string;
   excerpt: string;
+  custom_excerpt: string;
   feature_image_alt?: string;
   feature_image: string;
   html: string;
@@ -79,4 +80,6 @@ export type PostDetails = {
   updated_at: string;
   url: string;
   uuid: string;
+  tags: Tag[];
+  featured: boolean;
 };

@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Button, Container, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
-import { Post } from 'src/utils/ghost/types';
+import { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
@@ -16,7 +16,7 @@ export const getStaticProps = async () => {
 };
 
 export type ChangelogProps = {
-  posts: Post[];
+  posts: PostDetails[];
 };
 
 const POSTS_NUMBER = 5;
@@ -31,7 +31,6 @@ const BLUR_COLORS = [
 const Changelog = ({ posts }: ChangelogProps) => {
   const { t } = useTranslation('pages.changelog');
   const [postNumber, setPostNumber] = useState(POSTS_NUMBER);
-
   const handleLoadMore = async () => {
     setPostNumber(prevPostNumber => prevPostNumber + POSTS_NUMBER);
   };
@@ -53,20 +52,10 @@ const Changelog = ({ posts }: ChangelogProps) => {
             <Timeline>
               {posts.slice(0, postNumber).map((post, index) => (
                 <Card
-                  key={post.uuid}
-                  date={post.published_at}
-                  authorName={post.primary_author.name}
-                  authorImg={post.primary_author.profile_image}
-                  title={post.title}
-                  html={post.html}
-                  featureImageUrl={post.feature_image}
-                  featureImageAlt={post.feature_image_alt || post.title}
-                  active={post.featured}
-                  last={posts.length === index + 1}
-                  slug={post.slug}
+                  post={post}
                   blurColor={BLUR_COLORS[index % BLUR_COLORS.length]}
-                  tags={post.tags}
-                  excerpt={post.excerpt}
+                  showLine={posts.length !== index + 1}
+                  key={post.uuid}
                 />
               ))}
             </Timeline>

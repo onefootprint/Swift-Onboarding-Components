@@ -1,70 +1,39 @@
 import { useIntl } from '@onefootprint/hooks';
 import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
-import PostContent from './components/post-content/post-content';
+import CardContent from './components/card-content/card-content';
 import Progress from './components/progress';
 
-const RECAP_TAG = 'recap';
+const DEFAULT_BLUR_COLOR = 'rgba(171, 255, 163, .15)';
 
 type CardProps = {
-  date: string;
-  featureImageUrl?: string;
-  featureImageAlt: string;
-  authorName: string;
-  authorImg: string;
-  title: string;
-  html?: string;
-  last?: boolean | false;
-  active?: boolean | false;
-  slug: string;
-  blurColor: string | 'rgba(171, 255, 163, .15)';
-  tags: Array<{ name: string; slug: string }>;
-  excerpt: string;
+  post: PostDetails;
+  blurColor: string;
+  showLine: boolean;
 };
 
 const Card = ({
-  date,
-  title,
-  featureImageUrl,
-  authorName,
-  authorImg,
-  html,
-  last,
-  featureImageAlt,
-  active,
-  slug,
-  blurColor,
-  tags,
-  excerpt,
+  post,
+  blurColor = DEFAULT_BLUR_COLOR,
+  showLine,
 }: CardProps) => {
   const { formatDateWithLongMonth } = useIntl();
-  const formattedDate = formatDateWithLongMonth(new Date(date));
-  const isRecap = !!tags.map(tag => tag.slug).includes(RECAP_TAG);
+  const formattedDate = formatDateWithLongMonth(new Date(post.published_at));
 
   return (
-    <Container id={slug} blurColor={blurColor}>
+    <Container id={post.slug} blurColor={blurColor}>
       <DateDesktop>
         <Typography variant="label-3" color="tertiary">
           {formattedDate}
         </Typography>
       </DateDesktop>
-      <Progress active={active} last={last} />
-      <PostContainer>
-        <PostContent
-          date={date}
-          title={title}
-          featureImageUrl={featureImageUrl}
-          authorName={authorName}
-          authorImg={authorImg}
-          html={html}
-          featureImageAlt={featureImageAlt}
-          slug={slug}
-          isRecap={isRecap}
-          excerpt={excerpt}
-        />
-      </PostContainer>
+      <Progress active={post.featured} showLine={showLine} />
+      <Content>
+        <CardContent post={post} />
+      </Content>
     </Container>
   );
 };
@@ -78,7 +47,8 @@ const Container = styled.div<{
     position: relative;
     height: auto;
     align-items: stretch;
-    width: fit-content;
+    justify-content: center;
+    width: 100%;
     margin: auto;
     background: radial-gradient(
       50% 50% at 60% 30%,
@@ -102,7 +72,7 @@ const DateDesktop = styled.div`
   `}
 `;
 
-const PostContainer = styled.div`
+const Content = styled.div`
   max-width: 830px;
   width: 100%;
 `;

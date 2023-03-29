@@ -1,54 +1,38 @@
-import { useIntl } from '@onefootprint/hooks';
+import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import { LinkButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
+import HtmlContent from '../../../html-content';
 import Author from '../author';
-import Content from '../content';
 import CopyLink from '../copy-link';
 
 const BASE_URL = 'https://onefootprint.com/changelog';
+const RECAP_TAG = 'recap';
 
-type PostContentProps = {
-  date: string;
-  featureImageUrl?: string;
-  featureImageAlt: string;
-  authorName: string;
-  authorImg: string;
-  title: string;
-  html?: string;
-  slug: string;
-  isRecap?: boolean;
-  excerpt: string;
+type CardContentProps = {
+  post: PostDetails;
 };
 
-const PostContent = ({
-  featureImageUrl,
-  featureImageAlt,
-  date,
-  authorImg,
-  authorName,
-  html,
-  title,
-  slug,
-  isRecap,
-  excerpt,
-}: PostContentProps) => {
+const CardContent = ({ post }: CardContentProps) => {
+  const { t } = useTranslation('pages.changelog');
   const { formatDateWithLongMonth } = useIntl();
-  const formattedDate = formatDateWithLongMonth(new Date(date));
+  const formattedDate = formatDateWithLongMonth(new Date(post.published_at));
+  const isRecap = post.tags.some(tag => tag.slug === RECAP_TAG);
 
   return (
     <PostContainer>
-      {featureImageUrl && (
+      {post.feature_image && (
         <ImageContainer>
           <Image
-            src={featureImageUrl}
+            src={post.feature_image}
             height={200}
             width={200}
-            alt={featureImageAlt}
+            alt={post.feature_image_alt || post.title}
           />
         </ImageContainer>
       )}
@@ -59,13 +43,15 @@ const PostContent = ({
           </Typography>
         </DateMobile>
         <Title>
-          <Link href={`/changelog/${slug}`}>
-            <Typography variant="display-3">{title}</Typography>
+          <Link href={`/changelog/${post.slug}`}>
+            <Typography variant="display-3">{post.title}</Typography>
           </Link>
-          <CopyLink slug={`${BASE_URL}/${slug}`} />
+          <CopyLink slug={`${BASE_URL}/${post.slug}`} />
         </Title>
-        <Author authorImg={authorImg} authorName={authorName} />
-
+        <Author
+          authorImg={post.primary_author.profile_image}
+          authorName={post.primary_author.name}
+        />
         {isRecap ? (
           <>
             <Typography
@@ -73,18 +59,17 @@ const PostContent = ({
               color="secondary"
               sx={{ whiteSpace: 'pre-line' }}
             >
-              {excerpt}
+              {post.custom_excerpt || post.excerpt}
             </Typography>
-
             <LinkButton
-              href={`/changelog/${slug}`}
+              href={`/changelog/${post.slug}`}
               iconComponent={IcoArrowRightSmall16}
             >
-              Read more
+              {t('read-more')}
             </LinkButton>
           </>
         ) : (
-          html && <Content html={html} />
+          post.html && <HtmlContent html={post.html} />
         )}
       </TextContent>
     </PostContainer>
@@ -160,4 +145,4 @@ const Title = styled.div`
     }
   `}
 `;
-export default PostContent;
+export default CardContent;

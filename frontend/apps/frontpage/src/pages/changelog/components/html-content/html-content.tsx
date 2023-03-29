@@ -6,7 +6,7 @@ type ChangelogContentProps = {
   html: string;
 };
 
-const ChangelogContent = ({ html }: ChangelogContentProps) => (
+const HtmlContent = ({ html }: ChangelogContentProps) => (
   <Content dangerouslySetInnerHTML={{ __html: html }} />
 );
 
@@ -97,4 +97,4 @@ const Content = styled.div`
   `}
 `;
 
-export default ChangelogContent;
+export default HtmlContent;
