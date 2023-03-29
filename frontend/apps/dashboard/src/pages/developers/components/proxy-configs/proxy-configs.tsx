@@ -11,7 +11,7 @@ import useProxyConfigs from './hooks/use-proxy-configs';
 
 const ProxyConfigs = () => {
   const { t } = useTranslation('pages.proxy-configs');
-  const query = useProxyConfigs();
+  const { data, errorMessage, isLoading } = useProxyConfigs();
 
   return (
     <>
@@ -23,11 +23,7 @@ const ProxyConfigs = () => {
           <Create />
         </SectionHeader>
         <Box sx={{ marginY: 5 }} />
-        <Table
-          data={query.data}
-          errorMessage={query.errorMessage}
-          isLoading={query.isLoading}
-        />
+        <Table data={data} errorMessage={errorMessage} isLoading={isLoading} />
         <Details />
       </Box>
     </>

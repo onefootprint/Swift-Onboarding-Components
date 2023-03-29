@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import ApiKeys from './components/api-keys';
 import Header from './components/header';
-import OnboardingConfigs from './components/onboarding-configs';
+import OnboardingConfigs from './components/onboarding-configs-legacy';
 import ProxyConfigs from './components/proxy-configs';
 import Webhooks from './components/webhooks';
 
