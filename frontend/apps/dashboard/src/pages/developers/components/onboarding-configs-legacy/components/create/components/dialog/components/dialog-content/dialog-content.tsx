@@ -8,17 +8,17 @@ import {
 import React, { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useCreateOnboardingConfig from '../../hooks/use-create-onboarding-config';
-import KybAccess from '../../pages/kyb-access';
-import KybBoCollect from '../../pages/kyb-bo-collect';
-import KybCollect from '../../pages/kyb-collect';
-import KycAccess from '../../pages/kyc-access';
-import KycCollect from '../../pages/kyc-collect';
-import Name from '../../pages/name';
-import Type from '../../pages/type/type';
-import getFormIdForState from '../../utils/get-form-id-for-state';
-import getOnboardingConfigFromContext from '../../utils/get-onboarding-config-from-context';
-import { useOnboardingConfigMachine } from '../machine-provider';
+import useCreateOnboardingConfig from '../../../../hooks/use-create-onboarding-config';
+import KybAccess from '../../../../pages/kyb-access';
+import KybBoCollect from '../../../../pages/kyb-bo-collect';
+import KybCollect from '../../../../pages/kyb-collect';
+import KycAccess from '../../../../pages/kyc-access';
+import KycCollect from '../../../../pages/kyc-collect';
+import Name from '../../../../pages/name';
+import Type from '../../../../pages/type/type';
+import getFormIdForState from '../../../../utils/get-form-id-for-state';
+import getOnboardingConfigFromContext from '../../../../utils/get-onboarding-config-from-context';
+import { useOnboardingConfigMachine } from '../../../machine-provider';
 
 type DialogContentProps = {
   hideKyb?: boolean;
@@ -31,7 +31,7 @@ const DEFAULT_ONBOARDING_CONFIG_NAME = 'Unnamed Onboarding Config';
 
 const DialogContent = ({ hideKyb, onClose, onCreate }: DialogContentProps) => {
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs.create-dialog',
+    'pages.developers.onboarding-configs.create',
   );
   const mutation = useCreateOnboardingConfig();
   const [state, send] = useOnboardingConfigMachine();

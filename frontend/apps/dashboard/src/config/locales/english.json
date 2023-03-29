@@ -859,7 +859,7 @@
             "label": "Status"
           }
         },
-        "create-dialog": {
+        "create": {
           "title": "Create onboarding config",
           "type-form": {
             "title": "Types of onboarding configuration",
@@ -936,50 +936,6 @@
             }
           }
         },
-        "create": {
-          "title": "Create onboarding config",
-          "sections": {
-            "basic-data": "Basic data",
-            "identity-data": "Identity data",
-            "address": "Address"
-          },
-          "name-form": {
-            "name": {
-              "label": "Onboarding configuration name",
-              "placeholder": "User ID verification",
-              "errors": {
-                "required": "Please enter a name for your onboarding configuration."
-              }
-            }
-          },
-          "collect-form": {
-            "collected-data": {
-              "title": "Collected data",
-              "description": "Select the attributes you require us to collect during onboarding to verify the user's identity.",
-              "ssn": "SSN",
-              "ssn_full": "Full",
-              "ssn_last_4": "Last 4",
-              "address": "Address",
-              "full_address": "Full",
-              "partial_address": "Country & Zip Code"
-            },
-            "documents": {
-              "id-doc": "ID Document",
-              "id-doc-description": "We might still need to ask some users to capture their ID Document as part of our step-up verification flow. For the full list of countries and document types we support, please go <a>here.</a>",
-              "selfie": "Selfie"
-            }
-          },
-          "access-form": {
-            "title": "Authorized scopes",
-            "description": "Select the data attributes you need read access to after a user onboarding. During onboarding, the user will \"authorize\" access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected. "
-          },
-          "feedback": {
-            "success": {
-              "title": "Success",
-              "description": "Onboarding config created successfully."
-            }
-          }
-        },
         "edit": {
           "title": "Edit onboarding configuration name",
           "form": {
@@ -994,6 +950,57 @@
           "cta": "Save",
           "cancel": "Cancel"
         }
+      },
+      "onboarding-configs-new": {
+        "page-title": "Footprint | Onboarding Configuration",
+        "title": "Onboarding configurations",
+        "subtitle": "Set up requirements for customers onboarding onto your platform.",
+        "view-documentation": "View documentation",
+        "type": {
+          "kyb": "KYB",
+          "kyc": "KYC"
+        },
+        "status": {
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        },
+        "table": {
+          "aria-label": "Onboarding configurations",
+          "header": {
+            "name": "Configuration name",
+            "type": "Type",
+            "key": "Publishable Key",
+            "status": "Status",
+            "created": "Created at"
+          },
+          "empty-state": "You haven't created any vault proxy configurations just yet."
+        },
+        "actions": {
+          "aria-label": "Open actions for onboarding config {{name}}",
+          "not-allowed": "You're not allowed to manage onboarding configs",
+          "test": "Test onboarding",
+          "edit": "Edit name",
+          "status": {
+            "label": "Status",
+            "enable": "Enable",
+            "disable": {
+              "cta": "Disable",
+              "confirmation": {
+                "title": "Enable onboarding config?",
+                "description": "Are you sure you want to enable this onboarding configuration?"
+              },
+              "feedback": {
+                "error": {
+                  "title": "Error disabling onboarding configuration"
+                },
+                "success": {
+                  "title": "Onboarding configuration status changed!"
+                }
+              }
+            }
+          }
+        },
+        "details": {}
       },
       "webhooks": {
         "header": {
