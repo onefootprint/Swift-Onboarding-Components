@@ -11,10 +11,9 @@ pub(crate) struct RequestData {
     dob_month: Option<PiiString>,
     dob_year: Option<PiiString>,
     dob_day: Option<PiiString>,
-    // TODO: confirm with Justyn if/how to use city/state/zip and other fields
-    // city: Option<PiiString>,
-    // state: Option<PiiString>,
-    // zip: Option<PiiString>,
+    city: Option<PiiString>,
+    state: Option<PiiString>,
+    zip: Option<PiiString>,
 }
 
 impl TryFrom<IdvData> for RequestData {
@@ -26,9 +25,9 @@ impl TryFrom<IdvData> for RequestData {
             last_name,
             address_line1,
             address_line2: _,
-            city: _,
-            state: _,
-            zip: _,
+            city,
+            state,
+            zip,
             country: _,
             ssn4: _,
             ssn9: _,
@@ -59,6 +58,9 @@ impl TryFrom<IdvData> for RequestData {
             dob_month,
             dob_year,
             dob_day,
+            city,
+            state,
+            zip,
         };
         Ok(request)
     }

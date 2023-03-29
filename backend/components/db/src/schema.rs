@@ -734,11 +734,12 @@ table! {
         created_at -> Timestamptz,
         scoped_vault_id -> Text,
         task_id -> Text,
-        decision_intent_id -> Text,
+        decision_intent_id -> Nullable<Text>,
         status -> Text,
         logic_git_hash -> Nullable<Text>,
         reason_codes -> Nullable<Array<Text>>,
         completed_at -> Nullable<Timestamptz>,
+        status_details -> Jsonb,
     }
 }
 

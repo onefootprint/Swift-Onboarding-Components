@@ -25,7 +25,7 @@ mod vault_key_pair;
 mod vault_kind;
 mod vendor;
 mod verification_status;
-mod watchlist_check_status;
+mod watchlist_check;
 
 pub use self::{
     access_event_kind::*, actor::*, attestation_type::*, company_size::*, compliance_status::*,
@@ -34,5 +34,5 @@ pub use self::{
     footprint_reason_code::*, liveness_source::*, ob_config_status::*, onboarding_status::*,
     org_member_email::*, proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, task_status::*,
     tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
-    verification_status::*, watchlist_check_status::*,
+    verification_status::*, watchlist_check::*,
 };

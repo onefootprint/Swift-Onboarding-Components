@@ -12,7 +12,6 @@ use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndMaybeResult;
-use db::models::watchlist_check::UpdateWatchlistCheck;
 use db::{
     models::{
         decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
@@ -28,7 +27,8 @@ use idv::{
 };
 use newtypes::{
     DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, OnboardingStatus, ScopedVaultId,
-    TaskId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckStatus,
+    TaskId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckError,
+    WatchlistCheckNotNeededReason, WatchlistCheckStatus,
 };
 
 pub(crate) struct WatchlistCheckTask {
@@ -120,17 +120,18 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             };
 
             let pa_res = PaResponse::try_from(vendor_response.response)?;
-            let (status, reason_codes) = Self::calculate_decision(pa_res);
+            let (status, reason_codes) = Self::calculate_decision(pa_res)?;
             let _updated_wc = self
                 .db_pool
                 .db_query(move |conn| {
-                    let update = UpdateWatchlistCheck {
+                    WatchlistCheck::update(
+                        conn,
+                        &wc.id,
                         status,
-                        logic_git_hash: Some(crate::GIT_HASH.to_string()),
+                        Some(crate::GIT_HASH.to_string()),
                         reason_codes,
-                        completed_at: Some(Utc::now()),
-                    };
-                    WatchlistCheck::update(conn, &wc.id, update)
+                        Some(Utc::now()),
+                    )
                 })
                 .await??;
         } // else we have a watchlist_check that doesn't need a vendor call because it is NotNeed or Error
@@ -148,7 +149,11 @@ impl WatchlistCheckTask {
     ) -> Result<Option<WatchlistCheckVreq>, TaskError> {
         let existing_watchlist_check = WatchlistCheck::get_by_task_id(conn, task_id)?;
         let wc = if let Some(wc) = existing_watchlist_check {
-            let req = VerificationRequest::list_by_decision_intent_id(conn, &wc.decision_intent_id)?.pop();
+            let req = if let Some(di) = wc.decision_intent_id.as_ref() {
+                VerificationRequest::list_by_decision_intent_id(conn, di)?.pop()
+            } else {
+                None
+            };
 
             if let Some((vreq, vres, _)) = req {
                 Some((wc, Some((vreq, vres))))
@@ -180,28 +185,29 @@ impl WatchlistCheckTask {
             .map(|o| !matches!(o.status, OnboardingStatus::Pass))
             .unwrap_or(false);
 
-        let status = if has_non_pass_onboarding_status || !sv.is_live {
-            WatchlistCheckStatus::NotNeeded
+        let status = if has_non_pass_onboarding_status {
+            WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultOffboarded)
+        } else if !sv.is_live {
+            WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultNotLive)
         } else if !requirements_satisfied {
-            WatchlistCheckStatus::Error
+            WatchlistCheckStatus::Error(WatchlistCheckError::RequiredDataNotPresent)
         } else {
             WatchlistCheckStatus::Pending
         };
 
-        // TODO: make DI optional on watchlist_check and only create if creating a vreq
-        let decision_intent = DecisionIntent::create(conn, DecisionIntentKind::WatchlistCheck, sv_id)?;
-        let wc = WatchlistCheck::create(conn, sv_id.clone(), task_id.clone(), decision_intent.id, status)?;
-
-        if matches!(
+        let (di_id, vreq) = if matches!(
             status,
-            WatchlistCheckStatus::NotNeeded | WatchlistCheckStatus::Error
+            WatchlistCheckStatus::NotNeeded(_) | WatchlistCheckStatus::Error(_)
         ) {
-            Ok((wc, None))
+            (None, None)
         } else {
-            let vreq =
-                VerificationRequest::create(conn, sv_id, &wc.decision_intent_id, VendorAPI::IdologyPa)?;
-            Ok((wc, Some((vreq, None))))
-        }
+            let di = DecisionIntent::create(conn, DecisionIntentKind::WatchlistCheck, sv_id)?;
+            let vreq = VerificationRequest::create(conn, sv_id, &di.id, VendorAPI::IdologyPa)?;
+            (Some(di.id), Some(vreq))
+        };
+
+        let wc = WatchlistCheck::create(conn, sv_id.clone(), task_id.clone(), di_id, status)?;
+        Ok((wc, vreq.map(|req| (req, None))))
     }
 
     async fn decrypt_existing_vendor_response(
@@ -268,7 +274,9 @@ impl WatchlistCheckTask {
         Ok(vendor_response)
     }
 
-    fn calculate_decision(res: PaResponse) -> (WatchlistCheckStatus, Option<Vec<FootprintReasonCode>>) {
+    fn calculate_decision(
+        res: PaResponse,
+    ) -> Result<(WatchlistCheckStatus, Option<Vec<FootprintReasonCode>>), idv::idology::error::Error> {
         if let Some(restriction) = res.response.restriction {
             let reason_codes = PaWatchlistHit::to_footprint_reason_codes(restriction.watchlists());
             let status = if reason_codes.is_empty() {
@@ -276,9 +284,10 @@ impl WatchlistCheckTask {
             } else {
                 WatchlistCheckStatus::Fail
             };
-            (status, Some(reason_codes))
+            Ok((status, Some(reason_codes)))
         } else {
-            (WatchlistCheckStatus::Error, None)
+            // TODO: we really should have .validate() on the raw response validate stuff like this and transform it into a struct without Option's
+            Err(idv::idology::error::Error::MissingRestrictionField)
         }
     }
 }

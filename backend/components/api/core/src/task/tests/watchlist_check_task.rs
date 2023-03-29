@@ -15,10 +15,13 @@ use db::DbPool;
 use db::DbResult;
 use idv::idology::pa::{IdologyPaAPIResponse, IdologyPaRequest};
 use macros::test_db_pool;
+use newtypes::FootprintReasonCode;
 use newtypes::VendorAPI;
+use newtypes::WatchlistCheckNotNeededReason;
+use newtypes::WatchlistCheckStatus;
 use newtypes::{
     IdentityDataKind as IDK, OnboardingStatus, ScopedVaultId, TaskId, WatchlistCheckArgs,
-    WatchlistCheckStatus,
+    WatchlistCheckStatusKind,
 };
 
 type MockPaClient = MockVendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>;
@@ -40,7 +43,11 @@ async fn non_live_vault(db_pool: TestDbPool) {
     // ASSERTIONS
     let (wc, vreqs) = get_data(&db_pool, sv.id).await;
 
-    assert_eq!(WatchlistCheckStatus::NotNeeded, wc.status);
+    assert_eq!(WatchlistCheckStatusKind::NotNeeded, wc.status);
+    assert_eq!(
+        WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultNotLive),
+        wc.status_details
+    );
     assert!(vreqs.is_empty());
 }
 
@@ -60,7 +67,11 @@ async fn non_active_onboarding_test_case(db_pool: TestDbPool, onboarding_status:
     // ASSERTIONS
     let (wc, vreqs) = get_data(&db_pool, sv.id).await;
 
-    assert_eq!(WatchlistCheckStatus::NotNeeded, wc.status);
+    assert_eq!(WatchlistCheckStatusKind::NotNeeded, wc.status);
+    assert_eq!(
+        WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultOffboarded),
+        wc.status_details
+    );
     assert!(vreqs.is_empty());
 }
 
@@ -94,7 +105,7 @@ async fn insufficient_data_in_vault(db_pool: TestDbPool) {
     // ASSERTIONS
     let (wc, vreqs) = get_data(&db_pool, sv.id).await;
 
-    assert_eq!(WatchlistCheckStatus::Error, wc.status);
+    assert_eq!(WatchlistCheckStatusKind::Error, wc.status);
     assert!(vreqs.is_empty());
 }
 
@@ -120,7 +131,7 @@ async fn vendor_error(db_pool: TestDbPool) {
     let (wc, vreqs) = get_data(&db_pool, sv.id).await;
 
     assert!(matches!(res.err().unwrap(), TaskError::IdologyError(_)));
-    assert_eq!(WatchlistCheckStatus::Pending, wc.status);
+    assert_eq!(WatchlistCheckStatusKind::Pending, wc.status);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_none());
 }
@@ -148,7 +159,8 @@ async fn vendor_hit(db_pool: TestDbPool) {
     // ASSERTIONS
     let (wc, vreqs) = get_data(&db_pool, sv.id).await;
 
-    assert_eq!(WatchlistCheckStatus::Fail, wc.status);
+    assert_eq!(WatchlistCheckStatusKind::Fail, wc.status);
+    assert_eq!(Some(vec![FootprintReasonCode::WatchlistHitOfac]), wc.reason_codes);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
 }
@@ -176,7 +188,7 @@ async fn vendor_no_hit(db_pool: TestDbPool) {
     // ASSERTIONS
     let (wc, vreqs) = get_data(&db_pool, sv.id).await;
 
-    assert_eq!(WatchlistCheckStatus::Pass, wc.status);
+    assert_eq!(WatchlistCheckStatusKind::Pass, wc.status);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
 }
@@ -216,7 +228,7 @@ async fn non_portable_vault(db_pool: TestDbPool) {
     // ASSERTIONS
     let (wc, vreqs) = get_data(&db_pool, sv.id).await;
 
-    assert_eq!(WatchlistCheckStatus::Pass, wc.status);
+    assert_eq!(WatchlistCheckStatusKind::Pass, wc.status);
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
 }

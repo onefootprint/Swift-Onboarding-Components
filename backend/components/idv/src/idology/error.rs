@@ -16,6 +16,8 @@ pub enum Error {
     NoStatusFound,
     #[error("Missing reference id for request")]
     MissingReferenceId,
+    #[error("Missing restriction struct in response")]
+    MissingRestrictionField,
     #[error("Document results are not ready")]
     DocumentResultsNotReady,
     #[error("RequestError: {0}")]
