@@ -11,6 +11,8 @@ use self::tasks::{
 };
 
 mod tasks;
+#[cfg(test)]
+mod tests;
 
 // constant for now, but can make this a property of task type too
 #[allow(unused)]
@@ -132,7 +134,7 @@ trait ExecuteTask<T> {
 }
 
 #[cfg(test)]
-mod tests {
+mod task_tests {
     use crate::utils::mock_enclave::StateWithMockEnclave;
 
     use super::*;

@@ -52,10 +52,10 @@ struct NewOnboarding {
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = onboarding)]
 pub struct OnboardingUpdate {
-    authorized_at: Option<Option<DateTime<Utc>>>,
-    idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
-    decision_made_at: Option<Option<DateTime<Utc>>>,
-    status: Option<OnboardingStatus>,
+    pub authorized_at: Option<Option<DateTime<Utc>>>,
+    pub idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
+    pub decision_made_at: Option<Option<DateTime<Utc>>>,
+    pub status: Option<OnboardingStatus>,
 }
 
 pub struct OnboardingCreateArgs {

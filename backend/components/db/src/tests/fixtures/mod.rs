@@ -5,6 +5,7 @@ pub mod identity_document;
 pub mod ob_configuration;
 pub mod onboarding;
 pub mod scoped_vault;
+pub mod task;
 pub mod tenant;
 pub mod tenant_role;
 pub mod tenant_user;

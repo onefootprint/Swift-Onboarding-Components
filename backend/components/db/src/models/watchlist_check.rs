@@ -116,4 +116,12 @@ impl WatchlistCheck {
             .get_result(conn)?;
         Ok(count)
     }
+
+    // #[cfg(test)]
+    pub fn _get_by_svid(conn: &mut PgConn, svid: &ScopedVaultId) -> DbResult<Self> {
+        let res = watchlist_check::table
+            .filter(watchlist_check::scoped_vault_id.eq(svid))
+            .get_result(conn)?;
+        Ok(res)
+    }
 }
