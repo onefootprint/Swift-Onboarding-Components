@@ -1,9 +1,12 @@
+import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { OnboardingConfig, RoleScope } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
+import Link from 'next/link';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
+import styled from 'styled-components';
 
 import EditName, { EditNameHandler } from './components/edit-name';
 import Status, { StatusHandler } from './components/status';
@@ -14,13 +17,14 @@ type ActionsProps = {
 
 /*
   TODO:
-  - Implement launch edit flow
   - Add in feedback toasts
 */
 
 const Actions = ({ onboardingConfig }: ActionsProps) => {
-  const { name } = onboardingConfig;
-  const { t } = useTranslation('pages.onboarding-configs.actions');
+  const { name, isLive, key } = onboardingConfig;
+  const { t } = useTranslation(
+    'pages.developers.onboarding-configs-new.actions',
+  );
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);
 
@@ -30,10 +34,6 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
 
   const launchEditName = () => {
     editNameRef.current?.launch();
-  };
-
-  const handleTest = () => {
-    // TODO:
   };
 
   return (
@@ -51,20 +51,24 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
           <Dropdown.Item
             onSelect={launchEditName}
             onClick={event => event.stopPropagation()}
-            variant="destructive"
           >
-            {t('edit.cta')}
+            {t('edit-name.cta')}
           </Dropdown.Item>
-          <Dropdown.Item
-            onSelect={handleTest}
-            onClick={event => event.stopPropagation()}
-            variant="destructive"
-          >
-            {t('test')}
-          </Dropdown.Item>
+          {isLive ? null : (
+            <TestLink
+              href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
+              target="_blank"
+              onClick={event => event.stopPropagation()}
+            >
+              <Dropdown.Item>{t('test')}</Dropdown.Item>
+            </TestLink>
+          )}
           <Dropdown.Item
             onSelect={handleToggleStatus}
             onClick={event => event.stopPropagation()}
+            variant={
+              onboardingConfig.status === 'enabled' ? 'destructive' : undefined
+            }
           >
             {onboardingConfig.status === 'enabled'
               ? t('status.disable.cta')
@@ -73,9 +77,14 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
         </Dropdown.Content>
       </Dropdown.Root>
       <Status onboardingConfig={onboardingConfig} ref={statusRef} />
-      <EditName onboardingConfig={onboardingConfig} />
+      <EditName onboardingConfig={onboardingConfig} ref={editNameRef} />
     </Box>
   );
 };
+
+const TestLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
 
 export default Actions;

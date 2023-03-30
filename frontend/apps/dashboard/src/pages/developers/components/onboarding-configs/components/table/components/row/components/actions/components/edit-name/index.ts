@@ -1,2 +1,2 @@
+export type { EditNameHandler } from './edit-name';
 export { default } from './edit-name';
-export * from './edit-name';

@@ -5,6 +5,10 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import QUERY_KEY from '../../constants/query-key';
 
+/*
+  TODO: fetch sandbox v live onboarding configs
+*/
+
 const getOnboardingConfig = async (authHeaders: AuthHeaders, id: string) => {
   const response = await request<GetOnboardingConfigResponse>({
     method: 'GET',

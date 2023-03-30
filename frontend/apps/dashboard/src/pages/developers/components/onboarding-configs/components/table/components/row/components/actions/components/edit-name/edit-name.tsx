@@ -23,7 +23,9 @@ type FormData = { name: string };
 
 const EditName = forwardRef<EditNameHandler, EditNameProps>(
   ({ onboardingConfig }, ref) => {
-    const { t } = useTranslation('pages.onboarding-configs.edit');
+    const { t } = useTranslation(
+      'pages.developers.onboarding-configs-new.actions.edit-name',
+    );
     const [open, setOpen] = useState(false);
     const mutation = useUpdateOnboardingConfigs();
 
@@ -64,11 +66,11 @@ const EditName = forwardRef<EditNameHandler, EditNameProps>(
         title={t('title')}
         primaryButton={{
           form: 'edit-onboarding-config-form',
-          label: t('cta'),
+          label: t('form.save'),
           type: 'submit',
         }}
         secondaryButton={{
-          label: t('cancel'),
+          label: t('form.cancel'),
           onClick: handleClose,
         }}
         onClose={handleClose}

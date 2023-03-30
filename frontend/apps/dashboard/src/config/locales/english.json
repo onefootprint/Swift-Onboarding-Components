@@ -968,25 +968,24 @@
           "header": {
             "name": "Configuration name",
             "type": "Type",
-            "key": "Publishable Key",
+            "key": "Publishable key",
             "status": "Status",
             "created": "Created at"
           },
-          "empty-state": "You haven't created any vault proxy configurations just yet."
+          "empty-state": "You haven't created any vault onboarding configurations just yet."
         },
         "actions": {
           "aria-label": "Open actions for onboarding config {{name}}",
           "not-allowed": "You're not allowed to manage onboarding configs",
           "test": "Test onboarding",
-          "edit": "Edit name",
           "status": {
             "label": "Status",
             "enable": "Enable",
             "disable": {
               "cta": "Disable",
               "confirmation": {
-                "title": "Enable onboarding config?",
-                "description": "Are you sure you want to enable this onboarding configuration?"
+                "title": "Disable onboarding config?",
+                "description": "Are you sure you want to disable this onboarding configuration?"
               },
               "feedback": {
                 "error": {
@@ -996,6 +995,21 @@
                   "title": "Onboarding configuration status changed!"
                 }
               }
+            }
+          },
+          "edit-name": {
+            "cta": "Edit name",
+            "title": "Edit onboarding configuration name",
+            "form": {
+              "name": {
+                "label": "Onboarding configuration name",
+                "placeholder": "User ID verification",
+                "errors": {
+                  "required": "Please enter a name for the onboarding configuration."
+                }
+              },
+              "save": "Save",
+              "cancel": "Cancel"
             }
           }
         },
