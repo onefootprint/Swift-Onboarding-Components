@@ -22,13 +22,14 @@ const getOnboardingConfig = async (authHeaders: AuthHeaders, id: string) => {
 const useOnboardingConfig = (id: string = '') => {
   const { authHeaders } = useSession();
   const onboardingConfigQuery = useQuery(
-    [...QUERY_KEY, id],
+    [QUERY_KEY, id],
     () => getOnboardingConfig(authHeaders, id),
     {
       enabled: !!id,
     },
   );
   const { error, data } = onboardingConfigQuery;
+
   return {
     ...onboardingConfigQuery,
     errorMessage: error ? getErrorMessage(error) : undefined,

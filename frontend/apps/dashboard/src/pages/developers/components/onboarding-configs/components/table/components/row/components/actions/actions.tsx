@@ -15,11 +15,6 @@ type ActionsProps = {
   onboardingConfig: OnboardingConfig;
 };
 
-/*
-  TODO:
-  - Add in feedback toasts
-*/
-
 const Actions = ({ onboardingConfig }: ActionsProps) => {
   const { name, isLive, key } = onboardingConfig;
   const { t } = useTranslation(

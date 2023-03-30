@@ -11,11 +11,6 @@ type CreateProps = {
   onCreate: () => void;
 };
 
-/*
-  TODO:
-  - Audit success and error toasts in creation flow
-*/
-
 const Create = ({ onCreate }: CreateProps) => {
   const { t } = useTranslation('pages.developers.onboarding-configs');
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =

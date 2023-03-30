@@ -1,4 +1,4 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
@@ -22,20 +22,23 @@ const Status = forwardRef<StatusHandler, StatusProps>(
     );
     const [open, setOpen] = useState(false);
     const mutation = useUpdateOnboardingConfigs();
+    const showErrorToast = useRequestErrorToast();
 
     const hideConfirmation = () => {
       setOpen(false);
     };
 
     const disable = () => {
+      const newStatus =
+        onboardingConfig.status === 'enabled' ? 'disabled' : 'enabled';
       mutation.mutate(
         {
           id: onboardingConfig.id,
-          status:
-            onboardingConfig.status === 'enabled' ? 'disabled' : 'enabled',
+          status: newStatus,
         },
         {
           onSuccess: hideConfirmation,
+          onError: showErrorToast,
         },
       );
     };

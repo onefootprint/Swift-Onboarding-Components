@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
-import { Dialog, TextInput } from '@onefootprint/ui';
+import { Dialog, TextInput, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useUpdateOnboardingConfigs from 'src/pages/developers/components/onboarding-configs/hooks/use-update-onboarding-configs';
@@ -15,12 +15,6 @@ export type EditNameProps = {
 
 type FormData = { name: string };
 
-/*
-  TODO:
-  - add success and error toasts
-  - fix imports to use the shortcuts
-*/
-
 const EditName = forwardRef<EditNameHandler, EditNameProps>(
   ({ onboardingConfig }, ref) => {
     const { t } = useTranslation(
@@ -28,6 +22,8 @@ const EditName = forwardRef<EditNameHandler, EditNameProps>(
     );
     const [open, setOpen] = useState(false);
     const mutation = useUpdateOnboardingConfigs();
+    const toast = useToast();
+    const showErrorToast = useRequestErrorToast();
 
     const {
       reset,
@@ -47,7 +43,18 @@ const EditName = forwardRef<EditNameHandler, EditNameProps>(
 
     const handleBeforeSubmit = (formData: FormData) => {
       if (isDirty) {
-        mutation.mutate({ id: onboardingConfig.id, name: formData.name });
+        mutation.mutate(
+          { id: onboardingConfig.id, name: formData.name },
+          {
+            onSuccess: () => {
+              toast.show({
+                title: t('feedback.success.title'),
+                description: t('feedback.success.description'),
+              });
+            },
+            onError: showErrorToast,
+          },
+        );
       }
       setOpen(false);
     };

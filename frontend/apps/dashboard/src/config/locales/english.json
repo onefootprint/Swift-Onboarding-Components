@@ -986,14 +986,6 @@
               "confirmation": {
                 "title": "Disable onboarding config?",
                 "description": "Are you sure you want to disable this onboarding configuration?"
-              },
-              "feedback": {
-                "error": {
-                  "title": "Error disabling onboarding configuration"
-                },
-                "success": {
-                  "title": "Onboarding configuration status changed!"
-                }
               }
             }
           },
@@ -1010,6 +1002,12 @@
               },
               "save": "Save",
               "cancel": "Cancel"
+            },
+            "feedback": {
+              "success": {
+                "title": "Success",
+                "description": "Onboarding configuration name changed!"
+              }
             }
           }
         },

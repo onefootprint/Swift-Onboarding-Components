@@ -3,7 +3,7 @@ import {
   OrgOnboardingConfigUpdateRequest,
   OrgOnboardingConfigUpdateResponse,
 } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const updateOnboardingConfig = async (
@@ -25,10 +25,15 @@ const updateOnboardingConfig = async (
 
 const useUpdateOnboardingConfigs = () => {
   const session = useSession();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: OrgOnboardingConfigUpdateRequest) =>
       updateOnboardingConfig(session.authHeaders, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
   });
 };
 
