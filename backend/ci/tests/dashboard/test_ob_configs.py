@@ -35,6 +35,18 @@ def test_config_list(sandbox_tenant, ob_configuration):
     assert config["created_at"]
 
 
+def test_config_detail(sandbox_tenant, ob_configuration):
+    config = get(
+        f"org/onboarding_configs/{ob_configuration.id}", None, sandbox_tenant.sk.key
+    )
+    assert config["key"] == ob_configuration.key.value
+    assert config["name"] == ob_configuration.name
+    assert config["must_collect_data"] == ob_configuration.must_collect_data
+    assert config["can_access_data"] == ob_configuration.can_access_data
+    assert config["status"] == ob_configuration.status
+    assert config["created_at"]
+
+
 def test_config_create(sandbox_tenant, twilio):
     data = dict(
         name="Acme Bank Loan",

@@ -123,7 +123,7 @@ impl ObConfiguration {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
     {
@@ -145,6 +145,15 @@ impl ObConfiguration {
         }
 
         let result: (ObConfiguration, Tenant) = query.first(conn)?;
+        Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
+    where
+        T: Into<ObConfigIdentifier<'a>>,
+    {
+        let result = Self::get(conn, id)?;
         if result.0.status != ApiKeyStatus::Enabled {
             return Err(DbError::ApiKeyDisabled);
         }
