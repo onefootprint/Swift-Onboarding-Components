@@ -32,6 +32,8 @@ use newtypes::{
     TaskId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckInfo,
     WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
 };
+use webhooks::events::WebhookEvent;
+use webhooks::WebhookClient;
 
 pub(crate) struct WatchlistCheckTask {
     db_pool: DbPool,
@@ -40,6 +42,7 @@ pub(crate) struct WatchlistCheckTask {
     idology_client: Box<
         dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error> + Send + Sync,
     >,
+    webhook_client: Box<dyn WebhookClient + Send + Sync>,
 }
 
 impl WatchlistCheckTask {
@@ -52,12 +55,14 @@ impl WatchlistCheckTask {
                 + Send
                 + Sync,
         >,
+        webhook_client: Box<dyn WebhookClient + Send + Sync>,
     ) -> Self {
         Self {
             db_pool,
             task_id,
             enclave_client,
             idology_client,
+            webhook_client,
         }
     }
 }
@@ -72,11 +77,12 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         // If we create a new watchlist_check, we either:
         //  - Create it with state Pending and a decision_intent and verification_request at the same time
         //  - Create it with state NotNeeded or Error and no decision_intent/verification_request, meaning no vendor call is to be made
-        let (uvw, (wc, vr)) = self
+        let (sv, uvw, (wc, vr)) = self
             .db_pool
             .db_transaction(move |conn| -> Result<_, TaskError> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be extra safe
                 let _task = Task::lock(conn, &task_id)?;
+                let sv = ScopedVault::get(conn, &sv_id)?;
                 let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
                 let existing_wc = WatchlistCheckTask::get_existing_watchlist_check(conn, &task_id)?;
 
@@ -95,7 +101,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     WatchlistCheckTask::create_new_watchlist_check(conn, &sv_id, &task_id, &sv, &ob, &uvw)?
                 };
 
-                Ok((uvw, wc))
+                Ok((sv, uvw, wc))
             })
             .await?;
 
@@ -157,6 +163,21 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     Ok(())
                 })
                 .await?;
+
+            let error = match wc.status_details {
+                WatchlistCheckStatus::Error(e) => Some(e),
+                _ => None,
+            };
+
+            let wh_event =
+                WebhookEvent::WatchlistCheckCompleted(webhooks::events::WatchlistCheckCompletedPayload {
+                    footprint_user_id: sv.fp_user_id.clone(),
+                    timestamp: Utc::now(),
+                    status: wc.status,
+                    error,
+                });
+            self.webhook_client
+                .send_event_to_tenant_non_blocking(sv.tenant_id, wh_event, None);
         }
         Ok(())
     }

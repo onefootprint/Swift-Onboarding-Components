@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 
 use events::WebhookEvent;
+use mockall::automock;
 use newtypes::{TenantId, WebhookServiceId};
 use svix::api::{AppPortalAccessIn, ApplicationIn, MessageIn, PostOptions, Svix};
-
 pub mod events;
 
 #[cfg(test)]
@@ -43,7 +43,7 @@ impl WebhookServiceClient {
 
     /// Create a new webhook service for a tenant
     #[tracing::instrument(skip(self))]
-    pub async fn get_or_create_for_tenant(&self, tenant_id: &TenantId) -> Result<WebhookServiceId, Error> {
+    async fn get_or_create_for_tenant(&self, tenant_id: &TenantId) -> Result<WebhookServiceId, Error> {
         let client = self.client();
 
         let app = client
@@ -63,28 +63,7 @@ impl WebhookServiceClient {
     }
 
     /// Send a webhook event to tenant if it's been configured
-    /// Note this spawns a task so it wont block
-    #[tracing::instrument(skip(self))]
-    pub fn send_event_to_tenant_non_blocking(
-        &self,
-        tenant_id: TenantId,
-        event: WebhookEvent,
-        idempotency_key: Option<String>,
-    ) {
-        let client = self.clone();
-        tokio::spawn(async move {
-            // TODO: we may want to support some retry here in the future
-            let _ = client
-                .send_event_to_tenant(tenant_id, event, idempotency_key)
-                .await
-                .map_err(|err| {
-                    tracing::error!(error=?err, "failed to send webhook event");
-                });
-        });
-    }
-
-    /// Send a webhook event to tenant if it's been configured
-    pub async fn send_event_to_tenant(
+    async fn send_event_to_tenant(
         &self,
         tenant_id: TenantId,
         event: WebhookEvent,
@@ -133,9 +112,42 @@ impl WebhookServiceClient {
     }
 }
 
+impl WebhookClient for WebhookServiceClient {
+    /// Send a webhook event to tenant if it's been configured
+    /// Note this spawns a task so it wont block
+    #[tracing::instrument(skip(self))]
+    fn send_event_to_tenant_non_blocking(
+        &self,
+        tenant_id: TenantId,
+        event: WebhookEvent,
+        idempotency_key: Option<String>,
+    ) {
+        let client = self.clone();
+        tokio::spawn(async move {
+            // TODO: we may want to support some retry here in the future
+            let _ = client
+                .send_event_to_tenant(tenant_id, event, idempotency_key)
+                .await
+                .map_err(|err| {
+                    tracing::error!(error=?err, "failed to send webhook event");
+                });
+        });
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct PortalResponse {
     pub app_id: WebhookServiceId,
     pub url: String,
     pub token: String,
+}
+
+#[automock]
+pub trait WebhookClient {
+    fn send_event_to_tenant_non_blocking(
+        &self,
+        tenant_id: TenantId,
+        event: WebhookEvent,
+        idempotency_key: Option<String>,
+    );
 }

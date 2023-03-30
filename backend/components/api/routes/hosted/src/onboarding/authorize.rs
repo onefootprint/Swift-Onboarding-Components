@@ -21,6 +21,7 @@ use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use tracing::{field, instrument};
 use webhooks::events::WebhookEvent;
+use webhooks::WebhookClient;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 pub struct CommitResponse {

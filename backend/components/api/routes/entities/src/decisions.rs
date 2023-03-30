@@ -17,6 +17,7 @@ use newtypes::DbActor;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web};
 use webhooks::events::WebhookEvent;
+use webhooks::WebhookClient;
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",

@@ -7144,6 +7144,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "derive_more",
+ "mockall 0.11.3",
  "newtypes",
  "paperclip",
  "schemars",

@@ -29,6 +29,7 @@ fn generate_event_type_schema() {
         match evt {
             WebhookEvent::OnboardingCompleted(p) => generate(&name, p),
             WebhookEvent::OnboardingStatusChanged(p) => generate(&name, p),
+            WebhookEvent::WatchlistCheckCompleted(p) => generate(&name, p),
         }
     }
 }
@@ -66,6 +67,7 @@ async fn sync_webhook_event_types() {
         let schema = match evt {
             WebhookEvent::OnboardingCompleted(p) => generate_json_value(p),
             WebhookEvent::OnboardingStatusChanged(p) => generate_json_value(p),
+            WebhookEvent::WatchlistCheckCompleted(p) => generate_json_value(p),
         };
 
         let schemas = HashMap::from_iter([("1".to_string(), schema)]);

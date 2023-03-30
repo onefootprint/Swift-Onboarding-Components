@@ -1,4 +1,6 @@
-pub use self::payloads::{OnboardingCompletedPayload, OnboardingStatusChangedPayload};
+pub use self::payloads::{
+    OnboardingCompletedPayload, OnboardingStatusChangedPayload, WatchlistCheckCompletedPayload,
+};
 use chrono::{DateTime, Utc};
 use newtypes::{FootprintUserId, ObConfigurationId, OnboardingStatus};
 use schemars::JsonSchema;
@@ -18,10 +20,16 @@ pub enum WebhookEvent {
     #[strum(serialize = "footprint.onboarding.status_changed")]
     #[strum(message = "The status of an onboarding has changed")]
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
+
+    #[strum(serialize = "footprint.watchlist_check.completed")]
+    #[strum(message = "A watchlist check has run for the vault")]
+    WatchlistCheckCompleted(WatchlistCheckCompletedPayload),
 }
 
 /// all of the payload bodies
 mod payloads {
+    use newtypes::{WatchlistCheckError, WatchlistCheckStatusKind};
+
     use super::*;
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
@@ -38,6 +46,14 @@ mod payloads {
         pub footprint_user_id: FootprintUserId,
         pub timestamp: DateTime<Utc>,
         pub new_status: OnboardingStatus,
+    }
+
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
+    pub struct WatchlistCheckCompletedPayload {
+        pub footprint_user_id: FootprintUserId,
+        pub timestamp: DateTime<Utc>,
+        pub status: WatchlistCheckStatusKind,
+        pub error: Option<WatchlistCheckError>,
     }
 }
 

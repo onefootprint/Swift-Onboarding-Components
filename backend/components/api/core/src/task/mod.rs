@@ -77,6 +77,7 @@ async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
                 task.id.clone(),
                 state.enclave_client.clone(),
                 Box::new(state.idology_client.clone()),
+                Box::new(state.webhook_service_client.clone()),
             )
             .execute(args)
             .await

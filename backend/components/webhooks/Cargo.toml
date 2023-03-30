@@ -19,3 +19,4 @@ chrono = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true}
 schemars = { workspace = true }
+mockall = { workspace = true }

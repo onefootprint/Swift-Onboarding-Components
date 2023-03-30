@@ -77,6 +77,12 @@ impl From<WatchlistCheckStatus> for WatchlistCheckStatusKind {
 
 crate::util::impl_enum_str_diesel!(WatchlistCheckStatusKind);
 
+impl Default for WatchlistCheckStatusKind {
+    fn default() -> Self {
+        Self::Pending
+    }
+}
+
 #[derive(
     Debug,
     Display,
