@@ -1,6 +1,5 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
-import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { LinkButton, media, Typography } from '@onefootprint/ui';
+import { useIntl } from '@onefootprint/hooks';
+import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -12,17 +11,14 @@ import Author from '../author';
 import CopyLink from '../copy-link';
 
 const BASE_URL = 'https://onefootprint.com/changelog';
-const RECAP_TAG = 'recap';
 
 type CardContentProps = {
   post: PostDetails;
 };
 
 const CardContent = ({ post }: CardContentProps) => {
-  const { t } = useTranslation('pages.changelog');
   const { formatDateWithLongMonth } = useIntl();
   const formattedDate = formatDateWithLongMonth(new Date(post.published_at));
-  const isRecap = post.tags.some(tag => tag.slug === RECAP_TAG);
 
   return (
     <PostContainer>
@@ -52,25 +48,7 @@ const CardContent = ({ post }: CardContentProps) => {
           authorImg={post.primary_author.profile_image}
           authorName={post.primary_author.name}
         />
-        {isRecap ? (
-          <>
-            <Typography
-              variant="body-2"
-              color="secondary"
-              sx={{ whiteSpace: 'pre-line' }}
-            >
-              {post.custom_excerpt || post.excerpt}
-            </Typography>
-            <LinkButton
-              href={`/changelog/${post.slug}`}
-              iconComponent={IcoArrowRightSmall16}
-            >
-              {t('read-more')}
-            </LinkButton>
-          </>
-        ) : (
-          post.html && <HtmlContent html={post.html} />
-        )}
+        {post.html && <HtmlContent html={post.html} />}
       </TextContent>
     </PostContainer>
   );
