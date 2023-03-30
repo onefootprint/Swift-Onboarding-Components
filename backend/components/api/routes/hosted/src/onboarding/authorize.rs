@@ -21,6 +21,7 @@ use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use tracing::{field, instrument};
 use webhooks::events::WebhookEvent;
+use webhooks::WebhookApp;
 use webhooks::WebhookClient;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -140,9 +141,14 @@ pub async fn post(
             requires_manual_review: manual_review.is_some(),
         });
 
-        state
-            .webhook_service_client
-            .send_event_to_tenant_non_blocking(su.tenant_id, wh_event, None);
+        state.webhook_service_client.send_event_to_tenant_non_blocking(
+            WebhookApp {
+                id: su.tenant_id,
+                is_live: su.is_live,
+            },
+            wh_event,
+            None,
+        );
     }
 
     Ok(Json(ResponseData {

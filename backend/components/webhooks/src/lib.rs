@@ -20,6 +20,12 @@ impl Debug for WebhookServiceClient {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct WebhookApp {
+    pub id: TenantId,
+    pub is_live: bool,
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Svix service error")]
@@ -43,15 +49,28 @@ impl WebhookServiceClient {
 
     /// Create a new webhook service for a tenant
     #[tracing::instrument(skip(self))]
-    async fn get_or_create_for_tenant(&self, tenant_id: &TenantId) -> Result<WebhookServiceId, Error> {
+    async fn get_or_create_for_tenant(&self, tenant: &WebhookApp) -> Result<WebhookServiceId, Error> {
         let client = self.client();
+
+        let name = format!(
+            "{} ({})",
+            tenant.id,
+            if tenant.is_live { "Live" } else { "Sandbox" }
+        );
+
+        // create separate apps for prod and live per tenant!
+        let uid = if tenant.is_live {
+            tenant.id.to_string()
+        } else {
+            format!("{}_sandbox", tenant.id)
+        };
 
         let app = client
             .application()
             .get_or_create(
                 ApplicationIn {
-                    name: tenant_id.to_string(),
-                    uid: Some(tenant_id.to_string()),
+                    name,
+                    uid: Some(uid),
                     ..ApplicationIn::default()
                 },
                 None,
@@ -65,11 +84,11 @@ impl WebhookServiceClient {
     /// Send a webhook event to tenant if it's been configured
     async fn send_event_to_tenant(
         &self,
-        tenant_id: TenantId,
+        tenant: &WebhookApp,
         event: WebhookEvent,
         idempotency_key: Option<String>,
     ) -> Result<(), Error> {
-        let webhook_id = self.get_or_create_for_tenant(&tenant_id).await?;
+        let webhook_id = self.get_or_create_for_tenant(tenant).await?;
 
         let client = self.client();
         client
@@ -92,8 +111,8 @@ impl WebhookServiceClient {
 
     /// Get the portal URL to edit webhooks
     #[tracing::instrument(skip(self))]
-    pub async fn portal_url_for_tenant(&self, tenant_id: &TenantId) -> Result<PortalResponse, Error> {
-        let app_id = self.get_or_create_for_tenant(tenant_id).await?;
+    pub async fn portal_url_for_tenant(&self, tenant: WebhookApp) -> Result<PortalResponse, Error> {
+        let app_id = self.get_or_create_for_tenant(&tenant).await?;
         let client = self.client();
         let out = client
             .authentication()
@@ -118,7 +137,7 @@ impl WebhookClient for WebhookServiceClient {
     #[tracing::instrument(skip(self))]
     fn send_event_to_tenant_non_blocking(
         &self,
-        tenant_id: TenantId,
+        tenant: WebhookApp,
         event: WebhookEvent,
         idempotency_key: Option<String>,
     ) {
@@ -126,7 +145,7 @@ impl WebhookClient for WebhookServiceClient {
         tokio::spawn(async move {
             // TODO: we may want to support some retry here in the future
             let _ = client
-                .send_event_to_tenant(tenant_id, event, idempotency_key)
+                .send_event_to_tenant(&tenant, event, idempotency_key)
                 .await
                 .map_err(|err| {
                     tracing::error!(error=?err, "failed to send webhook event");
@@ -146,7 +165,7 @@ pub struct PortalResponse {
 pub trait WebhookClient {
     fn send_event_to_tenant_non_blocking(
         &self,
-        tenant_id: TenantId,
+        tenant: WebhookApp,
         event: WebhookEvent,
         idempotency_key: Option<String>,
     );

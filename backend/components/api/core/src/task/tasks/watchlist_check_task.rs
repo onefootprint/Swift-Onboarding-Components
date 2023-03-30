@@ -1,6 +1,7 @@
 use crate::decision::vendor;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
+use crate::utils::webhook_app::IntoWebhookApp;
 use crate::{
     decision::{self, vendor::vendor_trait::VendorAPICall},
     enclave_client::EnclaveClient,
@@ -177,7 +178,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     error,
                 });
             self.webhook_client
-                .send_event_to_tenant_non_blocking(sv.tenant_id, wh_event, None);
+                .send_event_to_tenant_non_blocking(sv.webhook_app(), wh_event, None);
         }
         Ok(())
     }

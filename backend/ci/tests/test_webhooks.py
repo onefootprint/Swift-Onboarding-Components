@@ -21,7 +21,9 @@ def test_webhook_e2e(sandbox_tenant, twilio):
     # 2. register a webhook for testing
     svix = Svix(SVIX_AUTH_TOKEN)
     app = svix.application.get_or_create(
-        ApplicationIn(name=sandbox_tenant.name, uid=sandbox_tenant.id)
+        ApplicationIn(
+            name=f"{sandbox_tenant.name} ( Sandbox)", uid=f"{sandbox_tenant.id}_sandbox"
+        )
     )
     assert app.id == app_id  # ensure that we're creating app id's in svix properly
 

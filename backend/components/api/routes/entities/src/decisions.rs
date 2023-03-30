@@ -6,6 +6,7 @@ use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::utils::webhook_app::IntoWebhookApp;
 use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
 use db::models::annotation::Annotation;
@@ -63,12 +64,12 @@ pub async fn post(
             }
             // If a manual review will be cleared or we will create a new decision, the operation
             // is not a no-op and we should create an annotation in the DB
-            let annotation = Annotation::create(conn, note, is_pinned, su.id, actor.clone())?;
+            let annotation = Annotation::create(conn, note, is_pinned, su.id.clone(), actor.clone())?;
 
             let decision = if status_changed {
                 // Create a new decision if the status is different
                 let new_decision = OnboardingDecisionCreateArgs {
-                    user_vault_id: su.user_vault_id,
+                    user_vault_id: su.user_vault_id.clone(),
                     onboarding: &ob,
                     logic_git_hash: crate::GIT_HASH.to_string(),
                     result_ids: vec![],
@@ -91,14 +92,14 @@ pub async fn post(
                 manual_review.complete(conn, actor.clone(), decision.as_ref().map(|d| d.id.clone()))?;
             }
 
-            Ok(decision)
+            Ok(decision.map(|d| (d, su)))
         })
         .await?;
 
     // notify any webhook listeners of the change
-    if let Some(decision) = decision {
+    if let Some((decision, scoped_vault)) = decision {
         state.webhook_service_client.send_event_to_tenant_non_blocking(
-            auth.tenant().id.clone(),
+            scoped_vault.webhook_app(),
             WebhookEvent::OnboardingStatusChanged(webhooks::events::OnboardingStatusChangedPayload {
                 footprint_user_id: fp_id_clone,
                 timestamp: decision.created_at,

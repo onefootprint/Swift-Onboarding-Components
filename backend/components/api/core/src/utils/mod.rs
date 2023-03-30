@@ -11,6 +11,7 @@ pub mod magic_link;
 pub mod session;
 pub mod twilio;
 pub mod vault_wrapper;
+pub mod webhook_app;
 
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]
