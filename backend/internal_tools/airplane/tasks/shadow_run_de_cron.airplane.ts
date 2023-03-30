@@ -16,14 +16,14 @@ export default airplane.task(
       [
         {
           tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
-          fp_user_id: 'fp_id_BMKlGNSJP7BLTioi3GhI6l',
+          fp_id: 'fp_id_BMKlGNSJP7BLTioi3GhI6l',
         },
         'pass',
       ],
       [
         {
           tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
-          fp_user_id: 'fp_id_Sympj5XJ6XmUq1VnEtA4pL',
+          fp_id: 'fp_id_Sympj5XJ6XmUq1VnEtA4pL',
         },
         'fail',
       ],
@@ -45,7 +45,7 @@ export default airplane.task(
       try {
         const run = await airplane.execute<object>('shadow_run_de', {
           tenant_id: params['tenant_id'],
-          fp_user_id: params['fp_user_id'],
+          fp_id: params['fp_id'],
         });
 
         const decision_status = run.output['decision_status'];

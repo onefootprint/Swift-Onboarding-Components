@@ -22,7 +22,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::PgConn;
 use itertools::Itertools;
-use newtypes::{DataIdentifier, FootprintUserId, IdDocKind, IdentityDocumentId};
+use newtypes::{DataIdentifier, FpId, IdDocKind, IdentityDocumentId};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use strum::IntoEnumIterator;
@@ -34,7 +34,7 @@ use strum::IntoEnumIterator;
 #[actix::get("/users/{footprint_user_id}/vault/identity/document")]
 pub async fn get(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     tenant_auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDocumentForDecryptResponse> {
     let tenant_auth = tenant_auth.check_guard(TenantGuard::Read)?;
@@ -68,7 +68,7 @@ pub async fn get(
 #[actix::post("/users/{footprint_user_id}/vault/identity/document/decrypt")]
 pub async fn post_decrypt(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<DecryptIdentityDocumentRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,

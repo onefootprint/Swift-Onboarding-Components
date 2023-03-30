@@ -7,7 +7,7 @@ use actix_web::web::Query;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::flat_api_object_map_type;
 use newtypes::input::Csv;
-use newtypes::{DataIdentifier, FootprintUserId};
+use newtypes::{DataIdentifier, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
 use serde::Deserialize;
@@ -33,7 +33,7 @@ flat_api_object_map_type!(
 #[actix::get("/entities/{fp_id}/vault")]
 pub async fn get(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Query<FieldsParams>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetVaultResponse> {
@@ -43,7 +43,7 @@ pub async fn get(
 
 pub async fn get_inner(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Query<FieldsParams>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetVaultResponse> {

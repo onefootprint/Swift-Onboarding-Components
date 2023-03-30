@@ -35,16 +35,16 @@ export default airplane.task(
       case 'ob':
         query = `
         SELECT * from onboarding
-        INNER JOIN scoped_user on scoped_user.id=onboarding.scoped_user_id
-        INNER JOIN tenant on tenant.id=scoped_user.tenant_id
+        INNER JOIN scoped_vault on scoped_vault.id=onboarding.scoped_vault_id
+        INNER JOIN tenant on tenant.id=scoped_vault.tenant_id
         WHERE onboarding.id='${id}';`;
         break;
       case 'su':
         query = `
-        SELECT * from scoped_user
-        INNER JOIN onboarding on onboarding.scoped_user_id=scoped_user.id
-        INNER JOIN tenant on tenant.id=scoped_user.tenant_id
-        WHERE scoped_user.id='${id}';`;
+        SELECT * from scoped_vault
+        INNER JOIN onboarding on onboarding.scoped_vault_id=scoped_vault.id
+        INNER JOIN tenant on tenant.id=scoped_vault.tenant_id
+        WHERE scoped_vault.id='${id}';`;
         break;
       case 'org':
         query = `SELECT * from tenant WHERE id='${id}';`;
@@ -56,10 +56,10 @@ export default airplane.task(
         break;
       case 'fp_id':
         query = `
-        SELECT * from scoped_user
-        INNER JOIN onboarding on onboarding.scoped_user_id=scoped_user.id
-        INNER JOIN tenant on tenant.id=scoped_user.tenant_id
-        WHERE scoped_user.fp_user_id='${id}';`;
+        SELECT * from scoped_vault
+        INNER JOIN onboarding on onboarding.scoped_vault_id=scoped_vault.id
+        INNER JOIN tenant on tenant.id=scoped_vault.tenant_id
+        WHERE scoped_vault.fp_id='${id}';`;
         break;
       default:
         return ['unsupported id prefix'];

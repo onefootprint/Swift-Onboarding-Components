@@ -13,7 +13,7 @@ use crate::PgConn;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use newtypes::InsightEventId;
 use newtypes::LivenessAttributes;
 
@@ -57,7 +57,7 @@ impl LivenessEvent {
     #[tracing::instrument(skip_all)]
     pub fn get_for_scoped_user(
         conn: &mut PgConn,
-        footprint_user_id: &FootprintUserId,
+        fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
     ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
@@ -66,7 +66,7 @@ impl LivenessEvent {
             .inner_join(insight_event::table)
             .inner_join(scoped_vault::table)
             .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .select((liveness_event::all_columns, schema::insight_event::all_columns))
             .load(conn)?;

@@ -2,16 +2,16 @@ pub mod document;
 
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::{tenant::TenantSessionAuth, Either};
-use api_route_entities::vault::decrypt::{post_inner, DecryptRequest, DecryptResponse};
-use api_route_entities::vault::get::{get_inner, FieldsParams, GetVaultResponse};
-use api_route_entities::vault::put::{post_validate_inner, put_inner};
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use actix_web::web::Query;
+use api_route_entities::vault::decrypt::{post_inner, DecryptRequest, DecryptResponse};
+use api_route_entities::vault::get::{get_inner, FieldsParams, GetVaultResponse};
+use api_route_entities::vault::put::{post_validate_inner, put_inner};
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 // Define shim methods around the entities decrypt APIs. We will keep the user decrypt APIs around
@@ -24,7 +24,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 #[actix::post("/users/{footprint_user_id}/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<DecryptRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
@@ -40,7 +40,7 @@ pub async fn post(
 #[actix::get("/users/{footprint_user_id}/vault")]
 pub async fn get(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Query<FieldsParams>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetVaultResponse> {
@@ -55,7 +55,7 @@ pub async fn get(
 #[actix::post("/users/{footprint_user_id}/vault/validate")]
 pub async fn post_validate(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -70,7 +70,7 @@ pub async fn post_validate(
 #[actix::put("/users/{footprint_user_id}/vault")]
 pub async fn put(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
     insight: InsightHeaders,

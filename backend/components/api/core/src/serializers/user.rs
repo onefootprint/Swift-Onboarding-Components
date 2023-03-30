@@ -27,14 +27,14 @@ impl DbToApi<UserDetail> for api_wire_types::User {
         ): UserDetail,
     ) -> Self {
         let ScopedVault {
-            fp_user_id,
+            fp_id,
             start_timestamp,
             ordering_id,
             ..
         } = scoped_user;
 
         api_wire_types::User {
-            id: fp_user_id,
+            id: fp_id,
             is_portable,
             identity_data_attributes,
             attributes,
@@ -51,7 +51,7 @@ impl DbToApi<ScopedVault> for api_wire_types::User {
         // Used in POST /users when we create a new vault-only user
         let ScopedVault {
             id: _,
-            fp_user_id,
+            fp_id,
             vault_id: _,
             tenant_id: _,
             _created_at,
@@ -62,7 +62,7 @@ impl DbToApi<ScopedVault> for api_wire_types::User {
         } = target;
 
         Self {
-            id: fp_user_id,
+            id: fp_id,
             is_portable: false,
             identity_data_attributes: vec![],
             identity_document_info: vec![],

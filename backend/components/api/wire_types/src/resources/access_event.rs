@@ -4,7 +4,7 @@ use crate::*;
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct AccessEvent {
-    pub fp_user_id: FootprintUserId,
+    pub fp_user_id: FpId,
     pub tenant_id: TenantId,
     pub reason: Option<String>,
     pub principal: String, // TODO: change to Actor once frontend can support it

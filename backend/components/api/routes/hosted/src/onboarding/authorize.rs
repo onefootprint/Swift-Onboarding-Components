@@ -134,7 +134,7 @@ pub async fn post(
     if should_run_kyc_checks {
         // create the webhook event to fire
         let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
-            footprint_user_id: su.fp_user_id.clone(),
+            footprint_user_id: su.fp_id.clone(),
             timestamp: decision_timestamp,
             status,
             onboarding_configuration_id: ob_configuration_id,

@@ -10,7 +10,7 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AnnotationId, DbActor, FootprintUserId, ScopedVaultId, TenantId};
+use newtypes::{AnnotationId, DbActor, FpId, ScopedVaultId, TenantId};
 
 use serde::{Deserialize, Serialize};
 
@@ -82,14 +82,14 @@ impl Annotation {
         conn: &mut PgConn,
         id: AnnotationId,
         tenant_id: TenantId,
-        footprint_user_id: FootprintUserId,
+        fp_id: FpId,
         is_live: bool,
         is_pinned: Option<bool>,
     ) -> DbResult<Self> {
         let update = AnnotationUpdate { is_pinned };
 
         let su_ids = scoped_vault::table
-            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .select(scoped_vault::id);
@@ -124,14 +124,14 @@ impl Annotation {
     #[tracing::instrument(skip_all)]
     pub fn list(
         conn: &mut PgConn,
-        fp_user_id: FootprintUserId,
+        fp_id: FpId,
         tenant_id: TenantId,
         is_live: bool,
         is_pinned: Option<bool>,
     ) -> DbResult<Vec<AnnotationInfo>> {
         let mut query = annotation::table
             .inner_join(scoped_vault::table)
-            .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+            .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .into_boxed();

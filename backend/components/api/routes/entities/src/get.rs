@@ -21,7 +21,7 @@ use api_wire_types::ListUsersRequest;
 use db::models::onboarding::Onboarding;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::DataIdentifier;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use newtypes::IdDocKind;
 use newtypes::PiiString;
 use newtypes::VaultKind;
@@ -112,7 +112,7 @@ where
 
         // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier instead
         if cleaned_data.iter().any(|p| p.leak().starts_with("fp_id_")) && fp_id.is_none() {
-            fp_id = Some(FootprintUserId::from(search.leak_to_string()));
+            fp_id = Some(FpId::from(search.leak_to_string()));
             None
         } else {
             let fut_fingerprints = cleaned_data
@@ -138,7 +138,7 @@ where
         requires_manual_review,
         statuses,
         fingerprints,
-        fp_user_id: fp_id,
+        fp_id,
         timestamp_lte,
         timestamp_gte,
         kind: vault_kind,
@@ -205,7 +205,7 @@ pub async fn get(
 
 pub async fn get_entity<T>(
     state: web::Data<State>,
-    fp_id: web::Path<FootprintUserId>,
+    fp_id: web::Path<FpId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<T>
 where
@@ -221,7 +221,7 @@ where
         requires_manual_review: None,
         statuses: vec![],
         fingerprints: None,
-        fp_user_id: Some(fp_id.into_inner()),
+        fp_id: Some(fp_id.into_inner()),
         timestamp_lte: None,
         timestamp_gte: None,
         kind: None,
@@ -254,7 +254,7 @@ where
 #[get("/entities/{fp_id}")]
 pub async fn get_detail(
     state: web::Data<State>,
-    fp_id: web::Path<FootprintUserId>,
+    fp_id: web::Path<FpId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<EntityDetailResponse> {
     let result = get_entity(state, fp_id, auth).await?;

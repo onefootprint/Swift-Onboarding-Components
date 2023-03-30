@@ -63,7 +63,7 @@ pub async fn detokenize(
             .into_iter()
             .map(|(identifier, v)| {
                 let token = ProxyToken {
-                    fp_id: scoped_user.fp_user_id.clone(),
+                    fp_id: scoped_user.fp_id.clone(),
                     identifier,
                 };
                 (token, v)

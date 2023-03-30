@@ -12,7 +12,7 @@ use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusFilter;
 use newtypes::VaultId;
 use newtypes::VaultKind;
-use newtypes::{Fingerprint, FootprintUserId, TenantId};
+use newtypes::{Fingerprint, FpId, TenantId};
 
 #[derive(Clone, Default)]
 pub struct ScopedVaultListQueryParams {
@@ -22,7 +22,7 @@ pub struct ScopedVaultListQueryParams {
     pub only_billable: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
     pub fingerprints: Option<Vec<Fingerprint>>,
-    pub fp_user_id: Option<FootprintUserId>,
+    pub fp_id: Option<FpId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub requires_manual_review: Option<bool>,
@@ -120,8 +120,8 @@ pub fn list_authorized_for_tenant_query<'a>(
         }
     }
 
-    if let Some(footprint_user_id) = params.fp_user_id {
-        query = query.filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+    if let Some(fp_id) = params.fp_id {
+        query = query.filter(scoped_vault::fp_id.eq(fp_id))
     }
 
     if let Some(timestamp_lte) = params.timestamp_lte {

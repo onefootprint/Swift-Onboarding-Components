@@ -4,7 +4,7 @@ use crate::*;
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct Entity {
-    pub id: FootprintUserId,
+    pub id: FpId,
     pub is_portable: bool,
     /// The kind of entity: Person or Business
     pub kind: VaultKind,

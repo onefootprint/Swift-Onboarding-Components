@@ -14,9 +14,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
-use newtypes::{
-    DecisionStatus, FootprintUserId, TenantId, Vendor, VerificationRequestId, VerificationResultId,
-};
+use newtypes::{DecisionStatus, FpId, TenantId, Vendor, VerificationRequestId, VerificationResultId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -24,7 +22,7 @@ use std::str::FromStr;
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct MakeVendorCallsRequest {
     pub tenant_id: TenantId,
-    pub fp_user_id: FootprintUserId,
+    pub fp_id: FpId,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -62,7 +60,7 @@ impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
 }
 
 #[api_v2_operation(
-    description = "Creates new VerificationRequest's, re-pings all vendors, and writes VerificationResults for the passed in fp_user_id",
+    description = "Creates new VerificationRequest's, re-pings all vendors, and writes VerificationResults for the passed in fp_id",
     tags(Private)
 )]
 #[post("/private/protected/risk/make_vendor_calls")]
@@ -71,15 +69,12 @@ async fn make_vendor_calls(
     _: ProtectedCustodianAuthContext,
     request: Json<MakeVendorCallsRequest>,
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
-    let MakeVendorCallsRequest {
-        tenant_id,
-        fp_user_id,
-    } = request.into_inner();
+    let MakeVendorCallsRequest { tenant_id, fp_id } = request.into_inner();
 
     let (requests, ob) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
 
@@ -137,7 +132,7 @@ async fn make_vendor_calls(
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct MakeDecisionRequest {
     pub tenant_id: TenantId,
-    pub fp_user_id: FootprintUserId,
+    pub fp_id: FpId,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -157,15 +152,12 @@ async fn make_decision(
     _: ProtectedCustodianAuthContext,
     request: Json<MakeDecisionRequest>,
 ) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
-    let MakeDecisionRequest {
-        tenant_id,
-        fp_user_id,
-    } = request.into_inner();
+    let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
     let ob = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
             Ok(ob)
@@ -218,7 +210,7 @@ async fn make_decision(
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct ShadowRunRequest {
     pub tenant_id: TenantId,
-    pub fp_user_id: FootprintUserId,
+    pub fp_id: FpId,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -236,15 +228,12 @@ async fn shadow_run(
     _: ProtectedCustodianAuthContext,
     request: Json<ShadowRunRequest>,
 ) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
-    let ShadowRunRequest {
-        tenant_id,
-        fp_user_id,
-    } = request.into_inner();
+    let ShadowRunRequest { tenant_id, fp_id } = request.into_inner();
 
     let (ob, requests) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_user_id, &tenant_id, true))?;
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let tenant = Tenant::get(conn, &scoped_user.id)?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;

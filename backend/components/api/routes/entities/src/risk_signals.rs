@@ -15,7 +15,7 @@ use api_wire_types::RiskSignalFilters;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use itertools::Itertools;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use newtypes::RiskSignalId;
 
 use paperclip::actix::{api_v2_operation, get, web};
@@ -30,7 +30,7 @@ type RiskSignalsListResponse = Vec<RiskSignalsDetailResponse>;
 #[get("/entities/{fp_id}/risk_signals")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FootprintUserId>,
+    request: web::Path<FpId>,
     filters: web::Query<RiskSignalFilters>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
@@ -100,7 +100,7 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
 #[get("/entities/{fp_id}/risk_signals/{signal_id}")]
 pub async fn get_detail(
     state: web::Data<State>,
-    request: web::Path<(FootprintUserId, RiskSignalId)>,
+    request: web::Path<(FpId, RiskSignalId)>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;

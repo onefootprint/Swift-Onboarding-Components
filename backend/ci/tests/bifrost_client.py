@@ -165,7 +165,7 @@ class BifrostClient:
         return body["validation_token"]
 
     def validate_user(self, validation_token, tenant_sk):
-        """Get the fp_user_id"""
+        """Get the fp_id"""
         body = post(
             "onboarding/session/validate",
             dict(validation_token=validation_token),
@@ -210,11 +210,11 @@ class BifrostClient:
         if self.identity_document_data is not None:
             self.add_identity_document_data()
         validation_token = self.authorize_user_to_tenant()
-        fp_user_id = self.validate_user(validation_token, tenant.sk)
+        fp_id = self.validate_user(validation_token, tenant.sk)
 
         return User(
             auth_token=self.auth_token,
-            fp_user_id=fp_user_id,
+            fp_id=fp_id,
             first_name=self.user_data["id.first_name"],
             last_name=self.user_data["id.last_name"],
             address_line1=self.user_data["id.address_line1"],

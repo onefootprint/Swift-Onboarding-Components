@@ -9,8 +9,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, Locked, OnboardingId, ScopedVaultId, TenantId,
-    VaultId, VaultKind, VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, FpId, Locked, OnboardingId, ScopedVaultId, TenantId, VaultId,
+    VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -32,8 +32,8 @@ pub struct Vault {
 pub enum VaultIdentifier<'a> {
     Id(&'a VaultId),
     ScopedVaultId(&'a ScopedVaultId),
-    FpUserId {
-        fp_user_id: &'a FootprintUserId,
+    FpId {
+        fp_id: &'a FpId,
         tenant_id: &'a TenantId,
         is_live: IsLive,
     },
@@ -52,10 +52,10 @@ impl<'a> From<&'a ScopedVaultId> for VaultIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for VaultIdentifier<'a> {
-    fn from((fp_user_id, tenant_id, is_live): (&'a FootprintUserId, &'a TenantId, IsLive)) -> Self {
-        Self::FpUserId {
-            fp_user_id,
+impl<'a> From<(&'a FpId, &'a TenantId, IsLive)> for VaultIdentifier<'a> {
+    fn from((fp_id, tenant_id, is_live): (&'a FpId, &'a TenantId, IsLive)) -> Self {
+        Self::FpId {
+            fp_id,
             tenant_id,
             is_live,
         }
@@ -78,13 +78,13 @@ impl Vault {
                     .select(scoped_vault::vault_id);
                 vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
-            VaultIdentifier::FpUserId {
-                fp_user_id,
+            VaultIdentifier::FpId {
+                fp_id,
                 tenant_id,
                 is_live,
             } => {
                 let uv_ids = scoped_vault::table
-                    .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+                    .filter(scoped_vault::fp_id.eq(fp_id))
                     .filter(scoped_vault::tenant_id.eq(tenant_id))
                     .filter(scoped_vault::is_live.eq(is_live))
                     .select(scoped_vault::vault_id);

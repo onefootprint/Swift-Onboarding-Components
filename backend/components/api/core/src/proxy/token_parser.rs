@@ -8,7 +8,7 @@ use crate::errors::ApiResult;
 
 use itertools::Itertools;
 
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::ProxyToken;
 
@@ -43,7 +43,7 @@ impl<'a> ProxyTokenParser<'a> {
     }
 
     /// parses a string into a single Proxy Token
-    pub fn parse(raw: &'a str, global_fp_id: Option<FootprintUserId>) -> ApiResult<ProxyTokenParser> {
+    pub fn parse(raw: &'a str, global_fp_id: Option<FpId>) -> ApiResult<ProxyTokenParser> {
         let mut parsed: Vec<(String, ProxyToken)> = vec![];
         let mut chars = raw.chars().peekable();
         let mut current_token: Option<String> = None;
@@ -144,7 +144,7 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use newtypes::{DataIdentifier, FootprintUserId, IdentityDataKind as IDK, KvDataKey};
+    use newtypes::{DataIdentifier, FpId, IdentityDataKind as IDK, KvDataKey};
     use test_case::test_case;
     use DataIdentifier as DI;
 
@@ -154,7 +154,7 @@ mod tests {
 
     fn token(fp_id: &str, data_kind: DataIdentifier) -> ProxyToken {
         ProxyToken {
-            fp_id: FootprintUserId::from_str(fp_id).unwrap(),
+            fp_id: FpId::from_str(fp_id).unwrap(),
             identifier: data_kind,
         }
     }
@@ -177,7 +177,7 @@ mod tests {
 
     #[test]
     fn test_correct_body_parser() {
-        let global = FootprintUserId::from("fp_id_xyz".to_string());
+        let global = FpId::from("fp_id_xyz".to_string());
         let result = ProxyTokenParser::parse(VALID_JSON_BODY, Some(global)).expect("failed to parse");
 
         assert!(result
@@ -248,10 +248,10 @@ mod tests {
         identifier: DataIdentifier,
     ) -> bool {
         let expected = ProxyToken {
-            fp_id: FootprintUserId::from_str(fp_id).unwrap(),
+            fp_id: FpId::from_str(fp_id).unwrap(),
             identifier,
         };
-        let global = global.map(|s| FootprintUserId::from(s.to_string()));
+        let global = global.map(|s| FpId::from(s.to_string()));
 
         let Ok(token) = ProxyToken::parse_global(raw, global) else {
             return false
@@ -288,7 +288,7 @@ mod tests {
         (token("fp_id_1", custom("ach")), 1),
     ])]
     fn test_edge_case_parsing(body: &str, global_fp_id: Option<&str>, expected: &[(ProxyToken, usize)]) {
-        let global_fp_id = global_fp_id.map(|s| FootprintUserId::from(s.to_string()));
+        let global_fp_id = global_fp_id.map(|s| FpId::from(s.to_string()));
         let result = ProxyTokenParser::parse(body, global_fp_id).expect("failed to parse");
         for (tok, num) in expected {
             assert!(result.matches.contains_key(tok));

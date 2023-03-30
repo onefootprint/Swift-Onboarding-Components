@@ -13,13 +13,13 @@ use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams}
 use newtypes::input::deserialize_stringified_list;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct AccessEventRequest {
-    footprint_user_id: Option<FootprintUserId>,
+    footprint_user_id: Option<FpId>,
     kind: Option<AccessEventKind>,
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
@@ -59,7 +59,7 @@ async fn get(
     let tenant = auth.tenant();
     let params = AccessEventListQueryParams {
         tenant_id: tenant.id.clone(),
-        fp_user_id: footprint_user_id.clone(),
+        fp_id: footprint_user_id.clone(),
         search,
         timestamp_lte,
         timestamp_gte,

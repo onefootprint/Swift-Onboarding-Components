@@ -12,7 +12,7 @@ export_schema!(ValidateRequest);
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, JsonSchema)]
 pub struct ValidateResponse {
     pub onboarding_configuration_id: ObConfigurationId,
-    pub footprint_user_id: FootprintUserId,
+    pub footprint_user_id: FpId,
     pub requires_manual_review: bool,
     pub status: OnboardingStatus,
     pub timestamp: DateTime<Utc>,

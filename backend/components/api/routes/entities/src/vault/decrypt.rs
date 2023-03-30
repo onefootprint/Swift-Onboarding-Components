@@ -8,7 +8,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::{flat_api_object_map_type, PiiString};
-use newtypes::{DataIdentifier, FootprintUserId};
+use newtypes::{DataIdentifier, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use serde::{Deserialize, Serialize};
@@ -35,7 +35,7 @@ flat_api_object_map_type!(
 #[actix::post("/entities/{fp_id}/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<DecryptRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
@@ -46,7 +46,7 @@ pub async fn post(
 
 pub async fn post_inner(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<DecryptRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,

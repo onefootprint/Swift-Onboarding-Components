@@ -426,7 +426,7 @@ table! {
 
     scoped_vault (id) {
         id -> Text,
-        fp_user_id -> Text,
+        fp_id -> Text,
         vault_id -> Text,
         tenant_id -> Text,
         _created_at -> Timestamptz,

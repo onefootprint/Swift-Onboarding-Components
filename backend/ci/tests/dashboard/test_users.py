@@ -29,7 +29,7 @@ def incomplete_user(sandbox_tenant, twilio):
     bifrost_client.init_user_for_onboarding(twilio)
     bifrost_client.initialize_onboarding()
 
-    # Get the user by searching by fingerprint in the admin API since we can't get the fp_user_id otherwise
+    # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
     body = get(
         "entities",
         dict(search=bifrost_client.phone_number.replace(" ", "")),
@@ -58,24 +58,24 @@ def test_get_users_list(sandbox_user, sandbox_user2, vault_user, incomplete_user
     assert len(scoped_users)
 
     # Check both scoped users exist
-    all_fp_user_ids = [
-        sandbox_user.fp_user_id,
-        sandbox_user2.fp_user_id,
+    all_fp_ids = [
+        sandbox_user.fp_id,
+        sandbox_user2.fp_id,
         vault_user,
         incomplete_user,
     ]
-    assert set(u["id"] for u in scoped_users) > set(all_fp_user_ids)
-    for fp_user_id in [sandbox_user.fp_user_id, sandbox_user2.fp_user_id]:
-        scoped_user = next(u for u in scoped_users if u["id"] == fp_user_id)
+    assert set(u["id"] for u in scoped_users) > set(all_fp_ids)
+    for fp_id in [sandbox_user.fp_id, sandbox_user2.fp_id]:
+        scoped_user = next(u for u in scoped_users if u["id"] == fp_id)
         assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
 
 
 def test_get_users_by_fp_id_query(sandbox_user):
     tenant = sandbox_user.tenant
-    body = get("entities", {"search": sandbox_user.fp_user_id}, tenant.sk.key)
+    body = get("entities", {"search": sandbox_user.fp_id}, tenant.sk.key)
     scoped_users = body["data"]
     assert len(scoped_users) == 1
-    assert scoped_users[0]["id"] == sandbox_user.fp_user_id
+    assert scoped_users[0]["id"] == sandbox_user.fp_id
 
 
 @pytest.mark.parametrize(
@@ -101,13 +101,13 @@ def test_get_users_filter(
     tenant = sandbox_user.tenant
     body = get("entities", filters, tenant.sk.key)
     scoped_users = body["data"]
-    all_fp_user_ids = [
-        sandbox_user.fp_user_id,
-        sandbox_user2.fp_user_id,
+    all_fp_ids = [
+        sandbox_user.fp_id,
+        sandbox_user2.fp_id,
         vault_user,
         incomplete_user,
     ]
-    expected_user_ids = [all_fp_user_ids[i] for i in expected_user_idxs]
+    expected_user_ids = [all_fp_ids[i] for i in expected_user_idxs]
     assert set(u["id"] for u in scoped_users) >= set(expected_user_ids)
 
 
@@ -129,7 +129,7 @@ def test_get_users_list_pagination(sandbox_user, sandbox_user2):
 
 def test_get_users_detail(sandbox_user):
     tenant = sandbox_user.tenant
-    scoped_user = get(f"entities/{sandbox_user.fp_user_id}", None, tenant.sk.key)
+    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
     assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
 
 
@@ -168,7 +168,7 @@ def test_get_users_detail_doc_and_selfie(
     )
     user = bifrost_client.onboard_user_onto_tenant(tenant)
 
-    res = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+    res = get(f"users/{user.fp_id}", None, tenant.sk.key)
     assert len(res["identity_document_info"]) == 1
     for (k, v) in expected_identity_document_info.items():
         assert res["identity_document_info"][0][k] == v
@@ -176,7 +176,7 @@ def test_get_users_detail_doc_and_selfie(
 
 def test_liveness_list(sandbox_user):
     tenant = sandbox_user.tenant
-    body = get(f"entities/{sandbox_user.fp_user_id}/liveness", None, tenant.sk.key)
+    body = get(f"entities/{sandbox_user.fp_id}/liveness", None, tenant.sk.key)
     creds = body
     assert len(creds)
     assert creds[0]["insight_event"]
@@ -191,7 +191,7 @@ def test_access_events_list(sandbox_user):
             "reason": "Doing a hecking decrypt",
         }
         body = post(
-            f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
+            f"entities/{sandbox_user.fp_id}/vault/decrypt",
             data,
             tenant.sk.key,
         )
@@ -199,7 +199,7 @@ def test_access_events_list(sandbox_user):
     # Then check the access event list
     body = get(
         "org/access_events",
-        dict(footprint_user_id=sandbox_user.fp_user_id),
+        dict(footprint_user_id=sandbox_user.fp_id),
         tenant.sk.key,
     )
     access_events = body["data"]
@@ -212,7 +212,7 @@ def test_access_events_list(sandbox_user):
     # Test filtering on kinds. We provide two different kinds, and we should get all access events
     # that contain at least one of these fields
     params = dict(
-        footprint_user_id=sandbox_user.fp_user_id,
+        footprint_user_id=sandbox_user.fp_id,
         targets=",".join(["id.email", "id.address_line1"]),
         kind="decrypt",
     )
@@ -230,7 +230,7 @@ def test_access_events_list(sandbox_user):
 
 def test_update_data_for_portable_user(sandbox_user):
     # Should be allowed to overwrite data for users that onboarded via bifrost
-    fp_id = sandbox_user.fp_user_id
+    fp_id = sandbox_user.fp_id
     decrypt_req = dict(reason="test", fields=["id.ssn9"])
     body = post(
         f"entities/{fp_id}/vault/decrypt", decrypt_req, sandbox_user.tenant.sk.key
@@ -252,7 +252,7 @@ def test_update_data_for_portable_user(sandbox_user):
 def test_override_onboarding_decision(sandbox_user):
     tenant = sandbox_user.tenant
 
-    scoped_user = get(f"entities/{sandbox_user.fp_user_id}", None, tenant.sk.key)
+    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
     onboarding = scoped_user["onboarding"]
     assert onboarding["status"] == "pass"
     latest_decision = onboarding["latest_decision"]
@@ -265,13 +265,13 @@ def test_override_onboarding_decision(sandbox_user):
         status="fail",
     )
     post(
-        f"entities/{sandbox_user.fp_user_id}/decisions",
+        f"entities/{sandbox_user.fp_id}/decisions",
         decision_data,
         tenant.auth_token,
         DashboardAuthIsLive("false"),
     )
 
-    scoped_user = get(f"entities/{sandbox_user.fp_user_id}", None, tenant.sk.key)
+    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
     onboarding = scoped_user["onboarding"]
     assert onboarding["status"] == "fail"
     # Assert the latest decision is a manual decision
@@ -282,7 +282,7 @@ def test_override_onboarding_decision(sandbox_user):
 
     # Assert that the annotation is pinned
     pinned_annotations = get(
-        f"entities/{sandbox_user.fp_user_id}/annotations",
+        f"entities/{sandbox_user.fp_id}/annotations",
         dict(is_pinned="true"),
         tenant.sk.key,
     )
@@ -296,7 +296,7 @@ def test_get_annotations(sandbox_user):
     note1 = "this user is chill"
     # Actor = TenantApiKey
     annotation1 = post(
-        f"/entities/{sandbox_user.fp_user_id}/annotations",
+        f"/entities/{sandbox_user.fp_id}/annotations",
         dict(
             note=note1,
             is_pinned=False,
@@ -308,7 +308,7 @@ def test_get_annotations(sandbox_user):
     )
 
     annotations = get(
-        f"/entities/{sandbox_user.fp_user_id}/annotations",
+        f"/entities/{sandbox_user.fp_id}/annotations",
         None,
         sandbox_user.tenant.sk.key,
         DashboardAuthIsLive("false"),
@@ -323,7 +323,7 @@ def test_get_annotations(sandbox_user):
     note2 = "ok mb they are a little sketch"
     # Actor = TenantUser
     annotation2 = post(
-        f"/entities/{sandbox_user.fp_user_id}/annotations",
+        f"/entities/{sandbox_user.fp_id}/annotations",
         dict(
             note=note2,
             is_pinned=True,
@@ -333,7 +333,7 @@ def test_get_annotations(sandbox_user):
     )
 
     annotations = get(
-        f"/entities/{sandbox_user.fp_user_id}/annotations",
+        f"/entities/{sandbox_user.fp_id}/annotations",
         None,
         sandbox_user.tenant.auth_token,
         DashboardAuthIsLive("false"),

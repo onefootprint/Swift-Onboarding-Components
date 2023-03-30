@@ -4,7 +4,7 @@ use itertools::Itertools;
 
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 
-use crate::{DataIdentifier, FootprintUserId, PrefixId};
+use crate::{DataIdentifier, FpId, PrefixId};
 
 ///
 /// The token format is as follows:
@@ -26,7 +26,7 @@ use crate::{DataIdentifier, FootprintUserId, PrefixId};
 ///
 #[derive(Debug, Clone, PartialEq, Eq, Hash, DeserializeFromStr, SerializeDisplay)]
 pub struct ProxyToken {
-    pub fp_id: FootprintUserId,
+    pub fp_id: FpId,
     pub identifier: DataIdentifier,
 }
 
@@ -38,7 +38,7 @@ impl ProxyToken {
 
     /// parses a string into a single Proxy Token with support for a global footprint user id
     /// in the case where just an identifier is specified
-    pub fn parse_global(raw: &str, global_fp_id: Option<FootprintUserId>) -> Result<Self, crate::Error> {
+    pub fn parse_global(raw: &str, global_fp_id: Option<FpId>) -> Result<Self, crate::Error> {
         let chars = raw.trim().chars();
         let token = chars.collect::<String>();
 
@@ -54,7 +54,7 @@ impl ProxyToken {
         let data_identifier = token.join(".");
 
         Ok(Self {
-            fp_id: FootprintUserId::parse_with_prefix(fp_id)?,
+            fp_id: FpId::parse_with_prefix(fp_id)?,
             identifier: DataIdentifier::from_str(&data_identifier).map_err(ProxyTokenError::from)?,
         })
     }

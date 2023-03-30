@@ -12,7 +12,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{AccessEventKind, FootprintUserId, ParseOptions};
+use newtypes::{AccessEventKind, FpId, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[api_v2_operation(
@@ -22,7 +22,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 #[actix::post("/entities/{fp_id}/vault/validate")]
 pub async fn post_validate(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -32,7 +32,7 @@ pub async fn post_validate(
 
 pub async fn post_validate_inner(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -68,7 +68,7 @@ pub async fn post_validate_inner(
 #[actix::put("/entities/{fp_id}/vault")]
 pub async fn put(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
     insight: InsightHeaders,
@@ -79,7 +79,7 @@ pub async fn put(
 
 pub async fn put_inner(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<RawDataRequest>,
     tenant_auth: SecretTenantAuthContext,
     insight: InsightHeaders,

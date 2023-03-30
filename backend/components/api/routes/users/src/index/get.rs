@@ -2,14 +2,14 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::errors::ApiResult;
-use api_route_entities::get_entities;
-use api_route_entities::get_entity;
 use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_route_entities::get_entities;
+use api_route_entities::get_entity;
 use api_wire_types::ListUsersRequest;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -39,7 +39,7 @@ pub async fn get(
 #[get("/users/{footprint_user_id}")]
 pub async fn get_detail(
     state: web::Data<State>,
-    footprint_user_id: web::Path<FootprintUserId>,
+    footprint_user_id: web::Path<FpId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<UserDetailResponse> {
     // Could technically pass a business fp id here

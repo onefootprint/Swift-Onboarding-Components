@@ -2,7 +2,7 @@ pub use self::payloads::{
     OnboardingCompletedPayload, OnboardingStatusChangedPayload, WatchlistCheckCompletedPayload,
 };
 use chrono::{DateTime, Utc};
-use newtypes::{FootprintUserId, ObConfigurationId, OnboardingStatus};
+use newtypes::{FpId, ObConfigurationId, OnboardingStatus};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum::{EnumIter, EnumMessage};
@@ -34,7 +34,7 @@ mod payloads {
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
     pub struct OnboardingCompletedPayload {
-        pub footprint_user_id: FootprintUserId,
+        pub footprint_user_id: FpId,
         pub timestamp: DateTime<Utc>,
         pub status: OnboardingStatus,
         pub requires_manual_review: bool,
@@ -43,14 +43,14 @@ mod payloads {
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
     pub struct OnboardingStatusChangedPayload {
-        pub footprint_user_id: FootprintUserId,
+        pub footprint_user_id: FpId,
         pub timestamp: DateTime<Utc>,
         pub new_status: OnboardingStatus,
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
     pub struct WatchlistCheckCompletedPayload {
-        pub footprint_user_id: FootprintUserId,
+        pub footprint_user_id: FpId,
         pub timestamp: DateTime<Utc>,
         pub status: WatchlistCheckStatusKind,
         pub error: Option<WatchlistCheckError>,

@@ -15,7 +15,7 @@ use db::models::onboarding::OnboardingUpdate;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use newtypes::DbActor;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookClient;
@@ -27,7 +27,7 @@ use webhooks::WebhookClient;
 #[post("/entities/{fp_id}/decisions")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FootprintUserId>,
+    fp_id: web::Path<FpId>,
     request: web::Json<DecisionRequest>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {

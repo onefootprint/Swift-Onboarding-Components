@@ -1,7 +1,7 @@
 use actix_web::{http::header::HeaderMap, FromRequest};
 
 use futures::Future;
-use newtypes::{ApiKeyStatus, FootprintUserId, PiiString, ProxyConfigId, ProxyIngressContentType};
+use newtypes::{ApiKeyStatus, FpId, PiiString, ProxyConfigId, ProxyIngressContentType};
 use paperclip::actix::Apiv2Header;
 use reqwest::Method;
 use std::{pin::Pin, str::FromStr};
@@ -69,7 +69,7 @@ pub struct ProxyConfig {
     pub egress: EgressConfig,
     pub ingress: IngressConfig,
     pub access_reason: Option<String>,
-    pub global_fp_id: Option<FootprintUserId>,
+    pub global_fp_id: Option<FpId>,
 }
 
 #[derive(Debug, Clone)]
@@ -171,8 +171,7 @@ impl TryFrom<&HeaderMap> for ProxyConfig {
         let proxy_target = get_required_header(proxy_headers::EGRESS_URL_HEADER_NAME, headers)?;
         let url = url::Url::parse(&proxy_target).map_err(|_| VaultProxyError::InvalidDestinationUrl)?;
         let method = proxy_headers::get_proxy_method_or_default(headers, Method::POST);
-        let global_fp_id =
-            get_header(proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, headers).map(FootprintUserId::from);
+        let global_fp_id = get_header(proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, headers).map(FpId::from);
 
         let egress_headers = ForwardProxyHeaders::try_from(headers)?;
         let pinned_certs = PinnedServerCertificates::try_from(headers)?;
@@ -251,7 +250,7 @@ impl ProxyConfig {
             ingress_content_type,
             access_reason,
             status: _,
-            deactivated_at: _
+            deactivated_at: _,
         } = db_config;
 
         // get the base url and/or path and query from headers
@@ -273,7 +272,7 @@ impl ProxyConfig {
         // grab a global fp_id
         // note we dont throw the error here as it may or may not be required
         let global_fp_id =
-            get_header(proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, header_map).map(FootprintUserId::from);
+            get_header(proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, header_map).map(FpId::from);
 
         // build the headers
         let headers = headers

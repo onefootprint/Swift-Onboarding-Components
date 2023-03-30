@@ -21,7 +21,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::DbError;
 use newtypes::AnnotationId;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web};
 
@@ -31,7 +31,7 @@ type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 #[get("/entities/{fp_id}/annotations")]
 pub async fn get(
     state: web::Data<State>,
-    fp_id: web::Path<FootprintUserId>,
+    fp_id: web::Path<FpId>,
     query: web::Query<AnnotationFilters>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<AnnotationsListResponse> {
@@ -54,7 +54,7 @@ pub async fn get(
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct UpdateAnnotationPath {
-    fp_id: FootprintUserId,
+    fp_id: FpId,
     annotation_id: AnnotationId,
 }
 
@@ -101,7 +101,7 @@ impl ValidateRequest for CreateAnnotationRequest {
 pub fn post(
     state: web::Data<State>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-    fp_id: web::Path<FootprintUserId>,
+    fp_id: web::Path<FpId>,
     request: Json<CreateAnnotationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;

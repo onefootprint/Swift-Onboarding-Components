@@ -6,8 +6,8 @@ export default airplane.task(
     slug: 'run_decisioning',
     name: 'Runs decisioning logic on latest completed vendor requests and writes a new onboarding decision',
     parameters: {
-      fp_user_id: {
-        name: 'fp_user_id',
+      fp_id: {
+        name: 'fp_id',
         required: true,
         default: 'fp_id_123',
         type: 'shorttext',

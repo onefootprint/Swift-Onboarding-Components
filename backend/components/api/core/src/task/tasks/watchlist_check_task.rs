@@ -172,7 +172,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
             let wh_event =
                 WebhookEvent::WatchlistCheckCompleted(webhooks::events::WatchlistCheckCompletedPayload {
-                    footprint_user_id: sv.fp_user_id.clone(),
+                    footprint_user_id: sv.fp_id.clone(),
                     timestamp: Utc::now(),
                     status: wc.status,
                     error,

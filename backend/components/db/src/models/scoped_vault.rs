@@ -4,7 +4,7 @@ use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId};
+use newtypes::{FpId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::{IsLive, ObConfiguration};
@@ -18,7 +18,7 @@ use super::vault::Vault;
 #[diesel(table_name = scoped_vault)]
 pub struct ScopedVault {
     pub id: ScopedVaultId,
-    pub fp_user_id: FootprintUserId,
+    pub fp_id: FpId,
     pub vault_id: VaultId,
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
@@ -35,7 +35,7 @@ pub struct ScopedVault {
 #[diesel(table_name = scoped_vault)]
 struct NewScopedVault {
     id: ScopedVaultId,
-    fp_user_id: FootprintUserId,
+    fp_id: FpId,
     vault_id: VaultId,
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
@@ -54,8 +54,8 @@ pub enum ScopedVaultIdentifier<'a> {
         id: &'a ScopedVaultId,
         uv_id: &'a VaultId,
     },
-    FpUserId {
-        fp_user_id: &'a FootprintUserId,
+    FpId {
+        fp_id: &'a FpId,
         t_id: &'a TenantId,
         is_live: IsLive,
     },
@@ -79,13 +79,9 @@ impl<'a> From<(&'a ScopedVaultId, &'a VaultId)> for ScopedVaultIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a FootprintUserId, &'a TenantId, IsLive)> for ScopedVaultIdentifier<'a> {
-    fn from((fp_user_id, t_id, is_live): (&'a FootprintUserId, &'a TenantId, IsLive)) -> Self {
-        Self::FpUserId {
-            fp_user_id,
-            t_id,
-            is_live,
-        }
+impl<'a> From<(&'a FpId, &'a TenantId, IsLive)> for ScopedVaultIdentifier<'a> {
+    fn from((fp_id, t_id, is_live): (&'a FpId, &'a TenantId, IsLive)) -> Self {
+        Self::FpId { fp_id, t_id, is_live }
     }
 }
 
@@ -117,7 +113,7 @@ impl ScopedVault {
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
-            fp_user_id: FootprintUserId::generate(uv.kind),
+            fp_id: FpId::generate(uv.kind),
             vault_id: uv.id.clone(),
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
@@ -143,7 +139,7 @@ impl ScopedVault {
         }
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
-            fp_user_id: FootprintUserId::generate(uv.kind),
+            fp_id: FpId::generate(uv.kind),
             vault_id: uv.id,
             start_timestamp: Utc::now(),
             tenant_id,
@@ -188,13 +184,9 @@ impl ScopedVault {
                     .filter(scoped_vault::id.eq(id))
                     .filter(scoped_vault::vault_id.eq(uv_id))
             }
-            ScopedVaultIdentifier::FpUserId {
-                fp_user_id,
-                t_id,
-                is_live,
-            } => {
+            ScopedVaultIdentifier::FpId { fp_id, t_id, is_live } => {
                 query = query
-                    .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+                    .filter(scoped_vault::fp_id.eq(fp_id))
                     .filter(scoped_vault::tenant_id.eq(t_id))
                     .filter(scoped_vault::is_live.eq(is_live));
             }

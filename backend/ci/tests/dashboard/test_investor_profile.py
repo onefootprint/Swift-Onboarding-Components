@@ -21,7 +21,7 @@ def sb_user_with_investor_profile(
 
 def test_get_vault(sandbox_tenant, sb_user_with_investor_profile, ip_data):
     body = get(
-        f"entities/{sb_user_with_investor_profile.fp_user_id}/vault",
+        f"entities/{sb_user_with_investor_profile.fp_id}/vault",
         None,
         sandbox_tenant.sk.key,
     )
@@ -50,7 +50,7 @@ def test_decrypt(
         reason="Doing a business hecking decrypt",
     )
     body = post(
-        f"entities/{sb_user_with_investor_profile.fp_user_id}/vault/decrypt",
+        f"entities/{sb_user_with_investor_profile.fp_id}/vault/decrypt",
         data,
         sandbox_tenant.sk.key,
     )
@@ -58,6 +58,6 @@ def test_decrypt(
         assert body[field] == ip_data.get(field)
 
     access_event = latest_access_event_for(
-        sb_user_with_investor_profile.fp_user_id, sandbox_tenant.sk
+        sb_user_with_investor_profile.fp_id, sandbox_tenant.sk
     )
     assert set(access_event["targets"]) == set(fields_to_decrypt)

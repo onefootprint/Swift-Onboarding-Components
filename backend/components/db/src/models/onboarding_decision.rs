@@ -15,7 +15,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use newtypes::TenantId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, Locked, OnboardingDecisionId,
@@ -187,14 +187,14 @@ impl OnboardingDecision {
     #[tracing::instrument(skip_all)]
     pub fn latest_footprint_actor_decision(
         conn: &mut PgConn,
-        footprint_user_id: &FootprintUserId,
+        fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<Option<Self>> {
         let res = onboarding_decision::table
             .filter(onboarding_decision::actor.eq(DbActor::Footprint))
             .inner_join(onboarding::table.inner_join(scoped_vault::table))
-            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .order_by(onboarding_decision::created_at.desc())

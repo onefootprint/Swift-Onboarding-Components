@@ -41,7 +41,7 @@ def test_tenant_decrypt(sandbox_user):
             "reason": "Doing a hecking decrypt",
         }
         body = post(
-            f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
+            f"entities/{sandbox_user.fp_id}/vault/decrypt",
             data,
             tenant.sk.key,
         )
@@ -49,7 +49,7 @@ def test_tenant_decrypt(sandbox_user):
         for attribute, value in attributes.items():
             assert expected_data[attribute] == value
 
-        access_event = latest_access_event_for(sandbox_user.fp_user_id, tenant.sk)
+        access_event = latest_access_event_for(sandbox_user.fp_id, tenant.sk)
         assert set(access_event["targets"]) == set(attributes)
 
 
@@ -63,7 +63,7 @@ def test_tenant_decrypt_no_permissions(sandbox_user):
         "reason": "Not doing a hecking decrypt",
     }
     post(
-        f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
+        f"entities/{sandbox_user.fp_id}/vault/decrypt",
         data,
         tenant.sk.key,
         # Uh oh - we should be checking ensure_scope_allows_access
@@ -80,7 +80,7 @@ def test_tenant_decrypt_identity_doc_with_identity_endpoint(sandbox_user):
         "reason": "Let me see the face of the man or woman who wronged me",
     }
     post(
-        f"entities/{sandbox_user.fp_user_id}/vault/decrypt",
+        f"entities/{sandbox_user.fp_id}/vault/decrypt",
         data,
         tenant.sk.key,
         status_code=400,
@@ -98,11 +98,11 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
         "reason": "Not doing a hecking decrypt",
     }
     # confirm they didn't auth identity_document
-    get_user_resp = get(f"entities/{sandbox_user.fp_user_id}", None, tenant.sk.key)
+    get_user_resp = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
     assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
 
     post(
-        f"users/{sandbox_user.fp_user_id}/vault/identity/document/decrypt",
+        f"users/{sandbox_user.fp_id}/vault/identity/document/decrypt",
         data,
         tenant.sk.key,
         status_code=401,
@@ -114,11 +114,11 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
 def test_tenant_document_get_decrypt_no_permissions(sandbox_user):
     tenant = sandbox_user.tenant
     # confirm they didn't auth identity_document
-    get_user_resp = get(f"entities/{sandbox_user.fp_user_id}", None, tenant.sk.key)
+    get_user_resp = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
     assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
 
     get(
-        f"users/{sandbox_user.fp_user_id}/vault/identity/document",
+        f"users/{sandbox_user.fp_id}/vault/identity/document",
         None,
         tenant.sk.key,
         status_code=401,
@@ -129,7 +129,7 @@ def test_tenant_document_get_decrypt_no_permissions(sandbox_user):
 def test_tenant_document_get_decrypt(user_with_documents):
     tenant = user_with_documents.tenant
     resp = get(
-        f"users/{user_with_documents.fp_user_id}/vault/identity/document",
+        f"users/{user_with_documents.fp_id}/vault/identity/document",
         None,
         tenant.sk.key,
         status_code=200,
@@ -150,7 +150,7 @@ def test_tenant_document_decrypt(user_with_documents):
     }
 
     resp = post(
-        f"users/{user_with_documents.fp_user_id}/vault/identity/document/decrypt",
+        f"users/{user_with_documents.fp_id}/vault/identity/document/decrypt",
         data,
         tenant.sk.key,
         status_code=200,
@@ -161,7 +161,7 @@ def test_tenant_document_decrypt(user_with_documents):
     assert resp["images"][0]["back"] == test_image
     assert not resp["images"][0]["selfie"]
 
-    access_event = latest_access_event_for(user_with_documents.fp_user_id, tenant.sk)
+    access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
     assert set(access_event["targets"]) == {"id_document.passport"}
 
 
@@ -194,7 +194,7 @@ def test_tenant_selfie_decrypt(
     }
 
     resp = post(
-        f"users/{user.fp_user_id}/vault/identity/document/decrypt",
+        f"users/{user.fp_id}/vault/identity/document/decrypt",
         data,
         sandbox_tenant.sk.key,
     )
@@ -204,7 +204,7 @@ def test_tenant_selfie_decrypt(
     assert resp["images"][0]["back"] == test_image
     assert resp["images"][0]["selfie"] == test_image
 
-    access_event = latest_access_event_for(user.fp_user_id, sandbox_tenant.sk)
+    access_event = latest_access_event_for(user.fp_id, sandbox_tenant.sk)
     assert set(access_event["targets"]) == {
         "id_document.passport",
         "selfie.passport",

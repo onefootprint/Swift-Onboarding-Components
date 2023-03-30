@@ -53,7 +53,7 @@ class BasicUser(NamedTuple):
 
 class User(NamedTuple):
     auth_token: str
-    fp_user_id: str
+    fp_id: str
     first_name: str
     last_name: str
     address_line1: str

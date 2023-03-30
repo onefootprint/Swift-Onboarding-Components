@@ -28,8 +28,8 @@ def foo_sandbox_tenant(must_collect_data, can_access_data):
 
 
 class DualOnboardedUser(NamedTuple):
-    fp_user_id: str
-    foo_fp_user_id: str
+    fp_id: str
+    foo_fp_id: str
 
 
 @pytest.fixture(scope="session")
@@ -38,7 +38,7 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
     bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
     bifrost_client.init_user_for_onboarding(twilio)
     user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
-    fp_user_id = user.fp_user_id
+    fp_id = user.fp_id
 
     #
     # Then onboard them onto foo_sandbox_tenant
@@ -54,34 +54,34 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
 
     user = foo_bifrost_client.initialize_onboarding()
     validation_token = foo_bifrost_client.authorize_user_to_tenant()
-    foo_fp_user_id = foo_bifrost_client.validate_user(
+    foo_fp_id = foo_bifrost_client.validate_user(
         validation_token, foo_sandbox_tenant.sk
     )
 
-    return DualOnboardedUser(fp_user_id, foo_fp_user_id)
+    return DualOnboardedUser(fp_id, foo_fp_id)
 
 
-def test_fp_user_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
-    # Make sure the fp_user_ids are different
+def test_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
+    # Make sure the fp_ids are different
     assert (
-        dual_onboarded_user.fp_user_id != dual_onboarded_user.foo_fp_user_id
-    ), "Onboarding onto different tenants should give different fp_user_id"
+        dual_onboarded_user.fp_id != dual_onboarded_user.foo_fp_id
+    ), "Onboarding onto different tenants should give different fp_id"
 
 
 def test_portable_timeline_events(
     sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user
 ):
-    fp_user_id = dual_onboarded_user.fp_user_id
-    foo_fp_user_id = dual_onboarded_user.foo_fp_user_id
+    fp_id = dual_onboarded_user.fp_id
+    foo_fp_id = dual_onboarded_user.foo_fp_id
 
     # Timeline events from sandbox_tenant's view belong to self
-    body = get(f"/entities/{fp_user_id}/timeline", None, sandbox_tenant.sk.key)
+    body = get(f"/entities/{fp_id}/timeline", None, sandbox_tenant.sk.key)
     assert body
     assert not any(i["is_from_other_org"] for i in body)
 
     # But from foo_sandbox_tenant's view, these events are portable and belong to another org
     body = get(
-        f"/entities/{foo_fp_user_id}/timeline",
+        f"/entities/{foo_fp_id}/timeline",
         None,
         foo_sandbox_tenant.sk.key,
     )
@@ -90,21 +90,21 @@ def test_portable_timeline_events(
     assert all(i["is_from_other_org"] for i in collect_data_events)
 
 
-def test_cant_see_fp_user_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
-    fp_user_id = dual_onboarded_user.fp_user_id
-    foo_fp_user_id = dual_onboarded_user.foo_fp_user_id
+def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
+    fp_id = dual_onboarded_user.fp_id
+    foo_fp_id = dual_onboarded_user.foo_fp_id
 
-    get(f"/entities/{foo_fp_user_id}", None, sandbox_tenant.sk.key, status_code=404)
-    get(f"/entities/{fp_user_id}", None, foo_sandbox_tenant.sk.key, status_code=404)
+    get(f"/entities/{foo_fp_id}", None, sandbox_tenant.sk.key, status_code=404)
+    get(f"/entities/{fp_id}", None, foo_sandbox_tenant.sk.key, status_code=404)
 
     get(
-        f"/entities/{foo_fp_user_id}/timeline",
+        f"/entities/{foo_fp_id}/timeline",
         None,
         sandbox_tenant.sk.key,
         status_code=404,
     )
     get(
-        f"/entities/{fp_user_id}/timeline",
+        f"/entities/{fp_id}/timeline",
         None,
         foo_sandbox_tenant.sk.key,
         status_code=404,
@@ -114,21 +114,21 @@ def test_cant_see_fp_user_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_
 def test_cant_see_speculative_fingerprints(
     sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user
 ):
-    fp_user_id = dual_onboarded_user.fp_user_id
+    fp_id = dual_onboarded_user.fp_id
 
     # Overwrite the name only from sandbox_tenant
     data = {
         "id.first_name": "New",
         "id.last_name": "Name",
     }
-    put(f"/entities/{fp_user_id}/vault", data, sandbox_tenant.sk.key)
+    put(f"/entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
     for search_query in ["new", "name"]:
         data = dict(search=search_query)
 
         # sandbox_tenant should be able to search for the user from its new name
         body = get(f"/users", data, sandbox_tenant.sk.key)
-        assert [i for i in body["data"] if i["id"] == fp_user_id]
+        assert [i for i in body["data"] if i["id"] == fp_id]
 
         # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
         body = get(f"/users", data, foo_sandbox_tenant.sk.key)

@@ -4,7 +4,7 @@ use crate::*;
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct User {
-    pub id: FootprintUserId,
+    pub id: FpId,
     pub is_portable: bool,
     /// The list of attributes populated on this user vault.
     pub attributes: Vec<DataIdentifier>,

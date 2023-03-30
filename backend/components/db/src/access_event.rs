@@ -12,14 +12,14 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use newtypes::TenantId;
 use newtypes::VaultId;
 
 #[derive(Debug)]
 pub struct AccessEventListQueryParams {
     pub tenant_id: TenantId,
-    pub fp_user_id: Option<FootprintUserId>,
+    pub fp_id: Option<FpId>,
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
@@ -59,8 +59,8 @@ impl AccessEventListItemForTenant {
                     .limit(page_size)
                     .into_boxed();
 
-                if let Some(fp_user_id) = params.fp_user_id {
-                    results = results.filter(schema::scoped_vault::fp_user_id.eq(fp_user_id))
+                if let Some(fp_id) = params.fp_id {
+                    results = results.filter(schema::scoped_vault::fp_id.eq(fp_id))
                 }
 
                 if let Some(search) = params.search {
@@ -68,7 +68,7 @@ impl AccessEventListItemForTenant {
                         schema::access_event::reason
                             .ilike(format!("%{}%", search))
                             .or(schema::tenant::name.ilike(format!("%{}%", search))) // TODO also search on tenant name
-                            .or(schema::scoped_vault::fp_user_id.eq(search.clone()))
+                            .or(schema::scoped_vault::fp_id.eq(search.clone()))
                             .or(schema::access_event::targets.overlaps_with(vec![search])),
                     )
                 }

@@ -7,14 +7,14 @@ impl DbToApi<UserDetail> for api_wire_types::Entity {
         (_, _, attributes, onboarding_info, scoped_vault, is_portable, vault_kind): UserDetail,
     ) -> Self {
         let ScopedVault {
-            fp_user_id,
+            fp_id,
             start_timestamp,
             ordering_id,
             ..
         } = scoped_vault;
 
         api_wire_types::Entity {
-            id: fp_user_id,
+            id: fp_id,
             is_portable,
             kind: vault_kind,
             attributes,

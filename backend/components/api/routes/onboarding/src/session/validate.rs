@@ -49,7 +49,7 @@ pub async fn post(
 
     Ok(Json(ResponseData::ok(ValidateResponse {
         onboarding_configuration_id: ob.ob_configuration_id,
-        footprint_user_id: scoped_user.fp_user_id,
+        footprint_user_id: scoped_user.fp_id,
         requires_manual_review: manual_review.is_some(),
         status: terminal_status,
         timestamp: scoped_user.start_timestamp,

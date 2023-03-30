@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use crate::events::*;
 use chrono::Utc;
-use newtypes::{FootprintUserId, ObConfigurationId, OnboardingStatus};
+use newtypes::{FpId, ObConfigurationId, OnboardingStatus};
 use schemars::{gen::SchemaSettings, JsonSchema};
 use strum::{EnumMessage, IntoEnumIterator};
 
 #[test]
 fn test_raw() {
     let evt = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
-        footprint_user_id: FootprintUserId::from("test".to_string()),
+        footprint_user_id: FpId::from("test".to_string()),
         timestamp: Utc::now(),
         status: OnboardingStatus::Pass,
         requires_manual_review: false,

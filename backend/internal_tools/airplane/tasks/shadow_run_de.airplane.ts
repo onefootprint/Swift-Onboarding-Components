@@ -6,8 +6,8 @@ export default airplane.task(
     slug: 'shadow_run_de',
     name: 'Shadow Run Decision Engine',
     parameters: {
-      fp_user_id: {
-        name: 'fp_user_id',
+      fp_id: {
+        name: 'fp_id',
         required: true,
         default: 'fp_id_123',
         type: 'shorttext',

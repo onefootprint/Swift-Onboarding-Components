@@ -118,7 +118,7 @@ class TestDocuments:
         )
 
         res = post(
-            f"/users/{user.fp_user_id}/vault/document/decrypt",
+            f"/users/{user.fp_id}/vault/document/decrypt",
             {
                 "kind": "document.finra_compliance_letter",
                 "reason": "show me",
@@ -129,9 +129,7 @@ class TestDocuments:
         assert "application/pdf" == res.headers["content-type"]
         assert file_contents("example_pdf.pdf") == res.content
 
-        timeline = get(
-            f"/entities/{user.fp_user_id}/timeline", None, sandbox_tenant.sk.key
-        )
+        timeline = get(f"/entities/{user.fp_id}/timeline", None, sandbox_tenant.sk.key)
         doc_upload_events = [
             e for e in timeline if e["event"]["kind"] == "document_uploaded"
         ]
@@ -153,7 +151,7 @@ class TestDocuments:
         )
 
         res = post(
-            f"/users/{user.fp_user_id}/vault/document/decrypt",
+            f"/users/{user.fp_id}/vault/document/decrypt",
             {
                 "kind": "document.finra_compliance_letter",
                 "reason": "show me",

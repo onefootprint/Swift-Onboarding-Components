@@ -13,7 +13,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 
 use db::models::user_timeline::UserTimeline;
-use newtypes::FootprintUserId;
+use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
 type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
@@ -25,7 +25,7 @@ type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 #[get("/entities/{fp_id}/timeline")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FootprintUserId>,
+    request: web::Path<FpId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<TimelineEventsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;

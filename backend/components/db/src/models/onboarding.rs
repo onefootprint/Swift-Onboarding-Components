@@ -14,8 +14,8 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    DecisionStatus, FootprintUserId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId,
-    OnboardingId, ScopedVaultId, TenantId, TenantScope, VaultId,
+    DecisionStatus, FpId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
+    ScopedVaultId, TenantId, TenantScope, VaultId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -254,12 +254,12 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn lock_for_tenant(
         conn: &mut TxnPgConn,
-        fp_user_id: &FootprintUserId,
+        fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<BasicOnboardingInfo<Locked<Onboarding>>> {
         let scoped_vault_ids = scoped_vault::table
-            .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+            .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .select(scoped_vault::id);

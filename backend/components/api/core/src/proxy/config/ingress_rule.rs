@@ -3,7 +3,7 @@ use std::str::FromStr;
 use crate::errors::{proxy::VaultProxyError, ApiError};
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
-use newtypes::{DataIdentifier, FootprintUserId, ProxyToken, ProxyTokenError};
+use newtypes::{DataIdentifier, FpId, ProxyToken, ProxyTokenError};
 
 /// Ingress rules define how to vault data in the response
 /// from the proxy requests
@@ -34,7 +34,7 @@ impl IngressRule {
     /// use with the rules
     pub fn parse_from_db_rules(
         rules: Vec<ProxyConfigIngressRule>,
-        fp_id: Option<FootprintUserId>,
+        fp_id: Option<FpId>,
     ) -> Result<Vec<Self>, ApiError> {
         if rules.is_empty() {
             return Ok(vec![]);

@@ -16,7 +16,7 @@ use api_wire_types::DecryptDocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use newtypes::{DataIdentifier, DocumentKind, FootprintUserId, VaultPublicKey};
+use newtypes::{DataIdentifier, DocumentKind, FpId, VaultPublicKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
@@ -81,7 +81,7 @@ pub async fn post(
 #[actix::post("/users/{footprint_user_id}/vault/document/decrypt")]
 pub async fn document_decrypt(
     state: web::Data<State>,
-    path: Path<FootprintUserId>,
+    path: Path<FpId>,
     request: Json<DecryptDocumentRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,

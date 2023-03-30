@@ -5,7 +5,7 @@ use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintReasonCode, FootprintUserId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
+use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
 use serde::{Deserialize, Serialize};
 
 use super::verification_result::VerificationResult;
@@ -55,7 +55,7 @@ impl RiskSignal {
     }
 
     fn query<'a>(
-        footprint_user_id: &'a FootprintUserId,
+        fp_id: &'a FpId,
         tenant_id: &'a TenantId,
         is_live: bool,
     ) -> risk_signal::BoxedQuery<'a, diesel::pg::Pg> {
@@ -67,7 +67,7 @@ impl RiskSignal {
                     // Must provide explicit ON since onboarding::latest_decision_id is used by default
                     .on(onboarding_decision::onboarding_id.eq(onboarding::id)),
             )
-            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .select(onboarding_decision::id);
@@ -80,14 +80,14 @@ impl RiskSignal {
     pub fn get(
         conn: &mut PgConn,
         id: &RiskSignalId,
-        footprint_user_id: &FootprintUserId,
+        fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<(Self, Vec<(VerificationRequest, VerificationResult)>)> {
         use crate::schema::{
             onboarding_decision_verification_result_junction, verification_request, verification_result,
         };
-        let signal = Self::query(footprint_user_id, tenant_id, is_live)
+        let signal = Self::query(fp_id, tenant_id, is_live)
             .filter(risk_signal::id.eq(id))
             .get_result::<Self>(conn)?;
 

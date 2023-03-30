@@ -4,10 +4,10 @@ import { protected_custodian_api_call } from '../utils';
 export default airplane.task(
   {
     slug: 'make_vendor_calls',
-    name: 'Creates new VerificationRequests, re-pings all vendors, and writes VerificationResults for the passed in fp_user_id',
+    name: 'Creates new VerificationRequests, re-pings all vendors, and writes VerificationResults for the passed in fp_id',
     parameters: {
-      fp_user_id: {
-        name: 'fp_user_id',
+      fp_id: {
+        name: 'fp_id',
         required: true,
         default: 'fp_id_123',
         type: 'shorttext',

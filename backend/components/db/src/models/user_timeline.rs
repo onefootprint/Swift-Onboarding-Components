@@ -330,7 +330,7 @@ mod tests {
         .0;
 
         let user_timeline_infos =
-            UserTimeline::list(conn, (&scoped_vault.fp_user_id, &tenant.id, is_live), true).unwrap();
+            UserTimeline::list(conn, (&scoped_vault.fp_id, &tenant.id, is_live), true).unwrap();
 
         assert_eq!(3, user_timeline_infos.len());
 

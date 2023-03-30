@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault RENAME COLUMN fp_id TO fp_user_id;
