@@ -2,7 +2,8 @@ use super::{
     common::request::{IdologyRequestData, Request},
     error as IdologyError,
     expectid::{self},
-    pa, scan_onboarding, scan_verify,
+    pa::{self, IdologyCredentials, IdologyPaRequest},
+    scan_onboarding, scan_verify,
 };
 use newtypes::{DocVData, IdvData, PiiString};
 
@@ -11,15 +12,24 @@ pub struct IdologyClient {
     client: reqwest::Client,
     username: PiiString,
     password: PiiString,
+    fractional_username: Option<PiiString>,
+    fractional_password: Option<PiiString>,
 }
 
 impl IdologyClient {
-    pub fn new(username: PiiString, password: PiiString) -> Result<Self, IdologyError::ReqwestError> {
+    pub fn new(
+        username: PiiString,
+        password: PiiString,
+        fractional_username: Option<PiiString>,
+        fractional_password: Option<PiiString>,
+    ) -> Result<Self, IdologyError::ReqwestError> {
         let client = reqwest::Client::builder().build()?;
         Ok(Self {
             client,
             username,
             password,
+            fractional_username,
+            fractional_password,
         })
     }
 
@@ -156,15 +166,31 @@ impl IdologyClient {
         Ok(idology_response)
     }
 
-    #[tracing::instrument(skip_all)]
-    pub async fn standalone_pa(&self, idv_data: IdvData) -> Result<serde_json::Value, IdologyError::Error> {
+    pub async fn standalone_pa(
+        &self,
+        request: IdologyPaRequest,
+    ) -> Result<serde_json::Value, IdologyError::Error> {
+        let IdologyPaRequest {
+            idv_data,
+            credentials,
+        } = request;
+
+        let (username, password) = match credentials {
+            IdologyCredentials::Footprint => (self.username.clone(), self.password.clone()),
+            IdologyCredentials::Fractional => {
+                if let (Some(un), Some(pw)) =
+                    (self.fractional_username.clone(), self.fractional_password.clone())
+                {
+                    (un, pw)
+                } else {
+                    Err(IdologyError::Error::CredentialsNotFound)?
+                }
+            }
+        };
+
         let url = "https://web.idologylive.com/api/pa-standalone.svc";
         let req_data = pa::request::RequestData::try_from(idv_data)?;
-        let req_list = Request::new(
-            self.username.clone(),
-            self.password.clone(),
-            IdologyRequestData::Pa(req_data),
-        );
+        let req_list = Request::new(username, password, IdologyRequestData::Pa(req_data));
         let response = self
             .client
             .post(url)

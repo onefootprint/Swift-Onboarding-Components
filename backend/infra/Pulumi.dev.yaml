@@ -32,6 +32,10 @@ config:
       prometheusPushAuth:
         secure: v1:VdwOY1dTgkXEMk4W:i3PexS68jj8BwxdeHPPugmMQdl6ygvRTfBXb3K60uQwpJnuMy3N1HEERTa3t0tM2PBSJZbhCobPfOq2LtQG7ALfSKn32zpU75nujiT5KViRm7ZJWNHmaJ0kl15WZj/gRr/tvLsupnW8U/E3hAfkQoqN/IknVqW3qjeQdlL3oP88QHce1PBbAQM+oepcJlLFNrrVgaHdEqwsZJn/4
     idology:
+      fractionalPassword:
+        secure: v1:mp8/g1ishUpV++0P:cwGLEnx/X7/iwJALfSGlf8w=
+      fractionalUsername:
+        secure: v1:XOO66Xq6lLYCxovE:6180Q41gZnKkJ/4fKhyGOCQ=
       password:
         secure: v1:TBB0qHiZFw3gwDSW:nXXk0InuunaS/PY9J/bvSwVW4tD5OSFbtkrWWKm03o9FlvUePlLzFzgPoe5bixLpYr+Nb88rj5bJhtYRmUw=
       username:

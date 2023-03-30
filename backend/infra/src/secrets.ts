@@ -27,6 +27,8 @@ export interface StaticSecrets {
   sendgridApiKey: aws.ssm.Parameter;
   idologyUsername: aws.ssm.Parameter;
   idologyPassword: aws.ssm.Parameter;
+  fractionalIdologyUsername: aws.ssm.Parameter;
+  fractionalIdologyPassword: aws.ssm.Parameter;
   grafanaPrometheusPushAuth: aws.ssm.Parameter;
   airplaneApiToken: pulumi.Output<string>;
   socureSandboxApiKey: aws.ssm.Parameter;
@@ -75,6 +77,8 @@ interface Sendgrid {
 interface IDology {
   username: string;
   password: string;
+  fractionalUsername: string;
+  fractionalPassword: string;
 }
 
 interface Socure {
@@ -223,6 +227,14 @@ export async function LoadSecrets(
     idologyPassword: createSecretParameter(
       `idologyPassword-${stack}`,
       secretConstants.idology.password,
+    ),
+    fractionalIdologyUsername: createSecretParameter(
+      `fractionalIdologyUsername-${stack}`,
+      secretConstants.idology.fractionalUsername,
+    ),
+    fractionalIdologyPassword: createSecretParameter(
+      `fractionalIdologyPassword-${stack}`,
+      secretConstants.idology.fractionalPassword,
     ),
     enclaveSealedIkek: createSecretParameter(
       `enclaveSealedIkek-${stack}`,

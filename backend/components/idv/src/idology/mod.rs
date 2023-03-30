@@ -134,9 +134,13 @@ mod test {
 
         // First get a queryID from expectID
         let test_data = fixtures::test_data::ExpectIDTestData::load_passing_sandbox_data();
-        let client =
-            super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
-                .unwrap();
+        let client = super::client::IdologyClient::new(
+            test_data.username.clone(),
+            test_data.password.clone(),
+            None,
+            None,
+        )
+        .unwrap();
         let idv_data = IdvData {
             // We have to induce a failure to get access to scan verify, so we do that here
             first_name: map_pii("intentional_fail".to_string()),
@@ -216,9 +220,13 @@ mod test {
             document_type: Some(test_data.scan_document_type),
         };
 
-        let client =
-            super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
-                .unwrap();
+        let client = super::client::IdologyClient::new(
+            test_data.username.clone(),
+            test_data.password.clone(),
+            None,
+            None,
+        )
+        .unwrap();
 
         let scan_ob_res = send_scan_onboarding_request(&client, docv_data).await.unwrap();
 
@@ -251,9 +259,13 @@ mod test {
             document_type: Some(test_data.scan_document_type),
         };
 
-        let client =
-            super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
-                .unwrap();
+        let client = super::client::IdologyClient::new(
+            test_data.username.clone(),
+            test_data.password.clone(),
+            None,
+            None,
+        )
+        .unwrap();
 
         let scan_ob_res = send_scan_onboarding_request(&client, docv_data).await.unwrap();
         let ParsedResponse::IDologyScanOnboarding(scan_ob_response) = scan_ob_res.response else {

@@ -24,13 +24,14 @@ use db::{
 };
 use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
+use idv::idology::pa::IdologyCredentials;
 use idv::{
     idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
     VendorResponse,
 };
 use newtypes::{
     DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, OnboardingStatus, ScopedVaultId,
-    TaskId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckInfo,
+    TaskId, TenantId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckInfo,
     WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
 };
 use webhooks::events::WebhookEvent;
@@ -118,12 +119,14 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 )
                 .await?
             } else {
+                let tenant_id = sv.tenant_id.clone();
                 Self::make_vendor_call(
                     &self.db_pool,
                     &self.enclave_client,
                     &self.idology_client,
                     &vreq,
                     &svid,
+                    &tenant_id,
                 )
                 .await?
             };
@@ -272,6 +275,13 @@ impl WatchlistCheckTask {
         Ok(vendor_result.response)
     }
 
+    fn credentials_for_tenant(tenant_id: &TenantId) -> IdologyCredentials {
+        match tenant_id.to_string().as_str() {
+            "org_PtnIJT4VR35BS9xy0wITgF" => IdologyCredentials::Fractional,
+            _ => IdologyCredentials::Footprint,
+        }
+    }
+
     #[allow(clippy::borrowed_box)]
     async fn make_vendor_call(
         db_pool: &DbPool,
@@ -283,6 +293,7 @@ impl WatchlistCheckTask {
         >,
         vreq: &VerificationRequest,
         sv_id: &ScopedVaultId,
+        tenant_id: &TenantId,
     ) -> Result<VendorResponse, TaskError> {
         let idv_data = decision::vendor::build_request::build_idv_data_from_verification_request(
             db_pool,
@@ -291,7 +302,13 @@ impl WatchlistCheckTask {
         )
         .await?;
 
-        let res = idology_client.make_request(IdologyPaRequest { idv_data }).await?;
+        let credentials = Self::credentials_for_tenant(tenant_id);
+        let res = idology_client
+            .make_request(IdologyPaRequest {
+                idv_data,
+                credentials,
+            })
+            .await?;
 
         let vendor_response = VendorResponse {
             response: res.clone().parsed_response(),

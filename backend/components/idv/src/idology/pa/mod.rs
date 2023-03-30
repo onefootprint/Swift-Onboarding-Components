@@ -7,6 +7,12 @@ pub mod response;
 
 pub struct IdologyPaRequest {
     pub idv_data: IdvData,
+    pub credentials: IdologyCredentials,
+}
+
+pub enum IdologyCredentials {
+    Footprint,
+    Fractional,
 }
 
 #[derive(Clone)]
@@ -30,7 +36,7 @@ mod test {
         let username = test_data.username.clone();
         let password = test_data.password.clone();
 
-        let client = IdologyClient::new(username, password).unwrap();
+        let client = IdologyClient::new(username, password, None, None).unwrap();
 
         let idv_data = IdvData {
             first_name: Some(PiiString::from(test_data.first_name.clone())),
@@ -40,7 +46,13 @@ mod test {
             ..Default::default()
         };
 
-        let res = client.standalone_pa(idv_data).await.unwrap();
+        let res = client
+            .standalone_pa(IdologyPaRequest {
+                idv_data,
+                credentials: IdologyCredentials::Footprint,
+            })
+            .await
+            .unwrap();
         let parsed_response = response::parse_response(res).unwrap();
         assert_eq!(
             Restriction {

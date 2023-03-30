@@ -134,6 +134,12 @@ pub struct IdologyConfig {
 
     #[envconfig(from = "IDOLOGY_PASSWORD")]
     pub password: String,
+
+    #[envconfig(from = "FRACTIONAL_IDOLOGY_USERNAME")]
+    pub fractional_username: Option<String>,
+
+    #[envconfig(from = "FRACTIONAL_IDOLOGY_PASSWORD")]
+    pub fractional_password: Option<String>,
 }
 
 /// Separated config for Enclave settings

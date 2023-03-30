@@ -24,6 +24,8 @@ pub enum Error {
     RequestError(#[from] RequestError),
     #[error("Scan Verify document submission was not successful")]
     ScanVerifyDocumentSubmissionNotSuccessful,
+    #[error("Credentials for tenant not configured")]
+    CredentialsNotFound,
 }
 
 impl Error {

@@ -131,6 +131,8 @@ export abstract class ServiceContainers {
         secretsStore.sendgridApiKey.arn,
         secretsStore.idologyUsername.arn,
         secretsStore.idologyPassword.arn,
+        secretsStore.fractionalIdologyUsername.arn,
+        secretsStore.fractionalIdologyPassword.arn,
         secretsStore.enclaveProxySecret.arn,
         secretsStore.socureSandboxApiKey.arn,
         secretsStore.socureProductionApiKey.arn,
@@ -155,6 +157,8 @@ export abstract class ServiceContainers {
           sendgridApiKey,
           idologyUsername,
           idologyPassword,
+          fractionalIdologyUsername,
+          fractionalIdologyPassword,
           enclaveProxySecret,
           socureSandboxApiKey,
           socureProductionApiKey,
@@ -208,6 +212,14 @@ export abstract class ServiceContainers {
               {
                 name: 'IDOLOGY_PASSWORD',
                 valueFrom: idologyPassword,
+              },
+              {
+                name: 'FRACTIONAL_IDOLOGY_USERNAME',
+                valueFrom: fractionalIdologyUsername,
+              },
+              {
+                name: 'FRACTIONAL_IDOLOGY_PASSWORD',
+                valueFrom: fractionalIdologyPassword,
               },
               {
                 name: 'ENCLAVE_PROXY_SECRET',
