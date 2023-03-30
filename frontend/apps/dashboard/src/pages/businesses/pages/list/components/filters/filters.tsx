@@ -18,7 +18,7 @@ const Filters = () => {
           kind: 'multi-select',
           options: [
             {
-              value: EntityStatus.verified,
+              value: EntityStatus.pass,
               label: t('status.options.verified'),
             },
             {

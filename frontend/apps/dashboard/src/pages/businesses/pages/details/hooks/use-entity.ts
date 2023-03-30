@@ -1,16 +1,41 @@
-import { EntityStatus } from '@onefootprint/types';
+import request, { getErrorMessage } from '@onefootprint/request';
+import {
+  augmentEntityWithOnboardingInfo,
+  GetEntityRequest,
+  GetEntityResponse,
+} from '@onefootprint/types';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-// TODO: implement real logic
-const useEntity = () => ({
-  data: {
-    name: 'Kreiger Group',
-    id: 'fp_id_XPutoYibmM2dEggjbSRNZR',
-    startTimestamp: '2023-01-13T18:31:34.305147Z',
-    status: 'pass' as EntityStatus,
-    requiresManualReview: false,
-  },
-  errorMessage: '',
-  isLoading: false,
-});
+const getEntity = async (
+  authHeaders: AuthHeaders,
+  { id }: GetEntityRequest,
+) => {
+  const response = await request<GetEntityResponse>({
+    method: 'GET',
+    url: `/entities/${id}`,
+    headers: authHeaders,
+  });
+
+  return response.data;
+};
+
+const useEntity = (id: string) => {
+  const isReady = useRouter();
+  const { authHeaders } = useSession();
+
+  const query = useQuery(['entity', id], () => getEntity(authHeaders, { id }), {
+    enabled: isReady && !!id,
+    select: (response: GetEntityResponse) =>
+      augmentEntityWithOnboardingInfo(response),
+  });
+
+  const { error } = query;
+  return {
+    ...query,
+    errorMessage: error ? getErrorMessage(error) : undefined,
+  };
+};
 
 export default useEntity;

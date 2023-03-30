@@ -11,10 +11,10 @@ import React from 'react';
 
 import ProxyConfigs from './list';
 import {
-  businessesListFixture,
-  businessListFormattedFixture,
-  withBusinesses,
-  withBusinessesError,
+  entitiesFixture,
+  entitiesFormattedFixture,
+  withEntities,
+  withEntitiesError,
 } from './list.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -41,11 +41,11 @@ describe('<List />', () => {
 
   describe('when the request to fetch the proxy configs succeeds', () => {
     beforeEach(() => {
-      withBusinesses();
+      withEntities();
     });
 
     it('should show an empty state if no results are found', async () => {
-      withBusinesses([]);
+      withEntities([]);
       renderBusinesses();
 
       await waitFor(() => {
@@ -57,8 +57,8 @@ describe('<List />', () => {
     it('should show the business id and status', async () => {
       await renderBusinessesAndWaitData();
 
-      businessesListFixture.forEach((business, index) => {
-        const formattedValues = businessListFormattedFixture[index];
+      entitiesFixture.forEach((business, index) => {
+        const formattedValues = entitiesFormattedFixture[index];
         const row = screen.getByRole('row', { name: business.id });
 
         const id = within(row).getByText(business.id);
@@ -79,7 +79,7 @@ describe('<List />', () => {
         });
         await renderBusinessesAndWaitData();
 
-        const [firstResult] = businessesListFixture;
+        const [firstResult] = entitiesFixture;
         const row = screen.getByRole('row', {
           name: firstResult.id,
         });
@@ -167,7 +167,7 @@ describe('<List />', () => {
 
   describe('when the request to fetch the proxy configs fails', () => {
     beforeEach(() => {
-      withBusinessesError();
+      withEntitiesError();
     });
 
     it('should show an error message', async () => {

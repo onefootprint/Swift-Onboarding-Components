@@ -7,13 +7,11 @@ describe('getBadgeVariantByStatus', () => {
     expect(getBadgeVariantByStatus(EntityStatus.failed, false)).toEqual(
       'error',
     );
-    expect(getBadgeVariantByStatus(EntityStatus.verified, false)).toEqual(
+    expect(getBadgeVariantByStatus(EntityStatus.pass, false)).toEqual(
       'success',
     );
     expect(getBadgeVariantByStatus(EntityStatus.failed, true)).toEqual('error');
-    expect(getBadgeVariantByStatus(EntityStatus.verified, true)).toEqual(
-      'warning',
-    );
+    expect(getBadgeVariantByStatus(EntityStatus.pass, true)).toEqual('warning');
     expect(getBadgeVariantByStatus(EntityStatus.incomplete, true)).toEqual(
       'warning',
     );

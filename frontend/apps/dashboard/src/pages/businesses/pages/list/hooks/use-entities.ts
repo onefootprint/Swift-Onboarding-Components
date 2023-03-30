@@ -3,14 +3,10 @@ import request, {
   PaginatedRequestResponse,
 } from '@onefootprint/request';
 import {
-  Entity,
+  augmentEntityWithOnboardingInfo,
   EntityKind,
   GetEntitiesRequest,
   GetEntitiesResponse,
-  getEntityManualReview,
-  getEntityOnboardingCanAccessAttributes,
-  getEntityStatus,
-  Onboarding,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useCursorPagination } from 'src/hooks/use-pagination';
@@ -38,45 +34,27 @@ const useEntities = (kind: EntityKind) => {
   const { authHeaders } = useSession();
   const filters = useFilters();
   const { requestParams } = filters;
-  const entitiesQuery = useQuery(
+  const query = useQuery(
     ['entities', requestParams],
     () => getEntities(authHeaders, { ...requestParams, kind }),
     {
       enabled: filters.isReady,
-      select: (response: PaginatedRequestResponse<GetEntitiesResponse>) => {
-        const getOnboarding = (onboarding?: Onboarding) => {
-          if (!onboarding) {
-            return undefined;
-          }
-          return {
-            ...onboarding,
-            canAccessAttributes:
-              getEntityOnboardingCanAccessAttributes(onboarding),
-          };
-        };
-
-        return {
-          meta: response.meta,
-          data: response.data.map((entity: Entity) => ({
-            ...entity,
-            requiresManualReview: getEntityManualReview(entity),
-            status: getEntityStatus(entity),
-            onboarding: getOnboarding(entity.onboarding),
-          })),
-        };
-      },
+      select: (response: PaginatedRequestResponse<GetEntitiesResponse>) => ({
+        meta: response.meta,
+        data: response.data.map(augmentEntityWithOnboardingInfo),
+      }),
     },
   );
   const pagination = useCursorPagination({
-    count: entitiesQuery.data?.meta.count,
-    next: entitiesQuery.data?.meta.next,
+    count: query.data?.meta.count,
+    next: query.data?.meta.next,
     cursor: filters.values.cursor,
     onChange: newCursor => filters.push({ cursor: newCursor }),
   });
 
-  const { error } = entitiesQuery;
+  const { error } = query;
   return {
-    ...entitiesQuery,
+    ...query,
     errorMessage: error ? getErrorMessage(error) : undefined,
     pagination,
   };

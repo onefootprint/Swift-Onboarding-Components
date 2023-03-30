@@ -14,7 +14,7 @@ export enum EntityStatus {
   failed = 'fail',
   incomplete = 'incomplete',
   pending = 'pending',
-  verified = 'pass',
+  pass = 'pass',
 }
 
 export type Entity = {
@@ -30,23 +30,34 @@ export type Entity = {
   vault?: EntityVault;
 };
 
-export const getEntityStatus = (entity: Entity) => {
+export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
+  ...entity,
+  requiresManualReview: getEntityManualReview(entity),
+  status: getEntityStatus(entity),
+  onboarding: entity.onboarding
+    ? {
+        ...entity.onboarding,
+        canAccessAttributes: getEntityOnboardingCanAccessAttributes(
+          entity.onboarding,
+        ),
+      }
+    : undefined,
+});
+
+const getEntityStatus = (entity: Entity): EntityStatus => {
   if (entity.onboarding?.isAuthorized && entity.onboarding?.status) {
     return entity.onboarding.status as unknown as EntityStatus;
   }
   return EntityStatus.incomplete;
 };
 
-export const getEntityManualReview = (entity: Entity) => {
+const getEntityManualReview = (entity: Entity) => {
   const userStatus = getEntityStatus(entity);
-  return (
-    (entity.onboarding?.requiresManualReview &&
-      userStatus !== EntityStatus.incomplete) ||
-    false
-  );
+  const requiresManualReview = !!entity.onboarding?.requiresManualReview;
+  return requiresManualReview && userStatus !== EntityStatus.incomplete;
 };
 
-export const getEntityOnboardingCanAccessAttributes = (
+const getEntityOnboardingCanAccessAttributes = (
   onboarding: Onboarding,
 ): DataIdentifier[] =>
   onboarding.canAccessData

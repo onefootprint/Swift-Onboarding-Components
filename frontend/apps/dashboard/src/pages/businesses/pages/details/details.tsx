@@ -6,18 +6,18 @@ import React from 'react';
 import Content from './components/content';
 import Error from './components/error';
 import Loading from './components/loading';
-import useEntity from './hooks/use-entity';
+import useCurrentEntity from './hooks/use-current-entity';
 
 const Details = () => {
   const { t } = useTranslation('pages.business');
-  const { errorMessage, isLoading, data } = useEntity();
+  const { errorMessage, isLoading, data } = useCurrentEntity();
 
   return (
     <>
       <Head>{t('page-title')}</Head>
       <Box>
         {isLoading && <Loading />}
-        {errorMessage && <Error />}
+        {errorMessage && <Error message={errorMessage} />}
         {data && <Content />}
       </Box>
     </>

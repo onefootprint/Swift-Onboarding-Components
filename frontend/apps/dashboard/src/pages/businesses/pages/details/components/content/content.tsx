@@ -12,7 +12,7 @@ import {
 } from './components';
 
 const Content = () => (
-  <Box as="section" testID="business-content">
+  <Box as="section" testID="entity-content">
     <Notes />
     <Box sx={{ marginBottom: 7 }}>
       <Breadcrumb />

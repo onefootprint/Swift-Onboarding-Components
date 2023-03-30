@@ -19,7 +19,7 @@ afterAll(() => {
   resetUser();
 });
 
-export const businessesListFixture: Entity[] = [
+export const entitiesFixture: Entity[] = [
   {
     id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
     isPortable: true,
@@ -42,7 +42,7 @@ export const businessesListFixture: Entity[] = [
       name: '[Test] Business',
       configId: 'ob_config_id_RccCUPbZVaarmtjfNwM9vo',
       requiresManualReview: false,
-      status: OnboardingStatus.pending,
+      status: OnboardingStatus.verified,
       timestamp: '2023-03-27T14:43:47.446874Z',
       isLivenessSkipped: false,
       insightEvent: {
@@ -89,20 +89,18 @@ export const businessesListFixture: Entity[] = [
     },
     orderingId: 19789,
     requiresManualReview: false,
-    status: EntityStatus.pending,
+    status: EntityStatus.pass,
   },
 ];
 
-export const businessListFormattedFixture = [
+export const entitiesFormattedFixture = [
   {
-    status: 'Pending',
+    status: 'Verified',
     startTimestamp: '3/27/23, 2:43 PM',
   },
 ];
 
-// TODO: use correct endpoint
-// https://linear.app/footprint/issue/FP-3090/business-list-use-correct-endpoint
-export const withBusinesses = (businesses: Entity[] = businessesListFixture) =>
+export const withEntities = (businesses: Entity[] = entitiesFixture) =>
   mockRequest({
     method: 'get',
     path: '/entities',
@@ -112,9 +110,7 @@ export const withBusinesses = (businesses: Entity[] = businessesListFixture) =>
     },
   });
 
-// TODO: use correct endpoint
-// https://linear.app/footprint/issue/FP-3090/business-list-use-correct-endpoint
-export const withBusinessesError = () =>
+export const withEntitiesError = () =>
   mockRequest({
     method: 'get',
     path: '/entities',
