@@ -131,21 +131,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    email (id) {
-        id -> Text,
-        e_data -> Bytea,
-        is_verified -> Bool,
-        priority -> Text,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-        lifetime_id -> Text,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     fingerprint (id) {
         id -> Text,
         sh_data -> Bytea,
@@ -227,20 +212,6 @@ table! {
         forwarded_proto -> Nullable<Text>,
         http_version -> Nullable<Text>,
         tls -> Nullable<Text>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    kv_data (id) {
-        id -> Text,
-        data_key -> Text,
-        e_data -> Bytea,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-        lifetime_id -> Text,
     }
 }
 
@@ -340,21 +311,6 @@ table! {
         id -> Text,
         verification_result_id -> Text,
         onboarding_decision_id -> Text,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    phone_number (id) {
-        id -> Text,
-        e_e164 -> Bytea,
-        is_verified -> Bool,
-        priority -> Text,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-        lifetime_id -> Text,
     }
 }
 
@@ -772,7 +728,6 @@ joinable!(data_lifetime -> user_vault (user_vault_id));
 joinable!(decision_intent -> scoped_user (scoped_vault_id));
 joinable!(document_data -> data_lifetime (lifetime_id));
 joinable!(document_request -> scoped_user (scoped_user_id));
-joinable!(email -> data_lifetime (lifetime_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_user (scoped_user_id));
 joinable!(fingerprint_visit_event -> user_vault (user_vault_id));
@@ -789,7 +744,6 @@ joinable!(onboarding -> scoped_user (scoped_user_id));
 joinable!(onboarding_decision -> onboarding (onboarding_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
-joinable!(phone_number -> data_lifetime (lifetime_id));
 joinable!(proxy_config -> tenant (tenant_id));
 joinable!(proxy_config_header -> proxy_config (config_id));
 joinable!(proxy_config_ingress_rule -> proxy_config (config_id));
@@ -812,6 +766,7 @@ joinable!(user_consent -> insight_event (insight_event_id));
 joinable!(user_consent -> onboarding (onboarding_id));
 joinable!(user_timeline -> scoped_user (scoped_user_id));
 joinable!(user_timeline -> user_vault (user_vault_id));
+joinable!(user_vault_data -> data_lifetime (lifetime_id));
 joinable!(verification_request -> decision_intent (decision_intent_id));
 joinable!(verification_request -> identity_document (identity_document_id));
 joinable!(verification_request -> scoped_user (scoped_user_id));
@@ -831,19 +786,16 @@ allow_tables_to_appear_in_same_query!(
     decision_intent,
     document_data,
     document_request,
-    email,
     fingerprint,
     fingerprint_visit_event,
     identity_document,
     insight_event,
-    kv_data,
     liveness_event,
     manual_review,
     ob_configuration,
     onboarding,
     onboarding_decision,
     onboarding_decision_verification_result_junction,
-    phone_number,
     proxy_config,
     proxy_config_header,
     proxy_config_ingress_rule,
