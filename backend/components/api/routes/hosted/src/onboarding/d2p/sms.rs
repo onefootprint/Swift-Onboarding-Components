@@ -40,7 +40,7 @@ pub async fn handler(
                 VwArgs::Tenant(&su.id)
             } else {
                 // Otherwise, create a UVW that only sees portable data
-                VwArgs::User(uv_id)
+                VwArgs::Vault(uv_id)
             };
             let uvw = VaultWrapper::build(conn, args)?;
             Ok(uvw)

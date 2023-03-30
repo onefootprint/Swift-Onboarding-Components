@@ -62,7 +62,7 @@ fn create_user_and_populate_vault(conn: &mut TxnPgConn, ob_config: ObConfigurati
     ];
 
     let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.add_data_test(conn, update).unwrap();
+    uvw.add_person_data_test(conn, update).unwrap();
 
     (uv.into_inner(), su)
 }

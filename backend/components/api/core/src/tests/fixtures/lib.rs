@@ -61,7 +61,7 @@ pub fn create_user_and_populate_vault(
     let update = update.into_iter().filter(|i| idks.contains(&i.0)).collect();
 
     let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.add_data_test(conn, update).unwrap();
+    uvw.add_person_data_test(conn, update).unwrap();
 
     (uv.into_inner(), su)
 }

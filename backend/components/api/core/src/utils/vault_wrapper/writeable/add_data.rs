@@ -125,7 +125,7 @@ impl<Type> WriteableVw<Type> {
 mod test {
     use crate::{
         errors::ApiResult,
-        utils::vault_wrapper::{Person, WriteableVw},
+        utils::vault_wrapper::{Business, Person, WriteableVw},
     };
     use db::TxnPgConn;
     use newtypes::{DataIdentifier, DataRequest, Fingerprint, ParseOptions, PiiString};
@@ -133,7 +133,7 @@ mod test {
 
     impl WriteableVw<Person> {
         /// Shorthand to add data to a user vault in tests
-        pub fn add_data_test(
+        pub fn add_person_data_test(
             self,
             conn: &mut TxnPgConn,
             data: Vec<(DataIdentifier, PiiString)>,
@@ -150,6 +150,21 @@ mod test {
                 .collect();
             let request = request.manual_fingerprints(fingerprints);
             self.put_person_data(conn, request)?;
+            Ok(())
+        }
+    }
+
+    impl WriteableVw<Business> {
+        /// Shorthand to add data to a business vault in tests
+        pub fn add_business_data_test(
+            self,
+            conn: &mut TxnPgConn,
+            data: Vec<(DataIdentifier, PiiString)>,
+        ) -> ApiResult<()> {
+            let data = HashMap::from_iter(data.into_iter());
+            let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
+            let request = request.manual_fingerprints(HashMap::new());
+            self.put_business_data(conn, request)?;
             Ok(())
         }
     }
