@@ -15,6 +15,10 @@ export type StatusProps = {
   onboardingConfig: OnboardingConfig;
 };
 
+/*
+  TODO: test multiple enabling/disabling flows
+*/
+
 const Status = forwardRef<StatusHandler, StatusProps>(
   ({ onboardingConfig }, ref) => {
     const { t } = useTranslation(
