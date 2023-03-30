@@ -8,7 +8,7 @@ export enum AccessEventKind {
 export type AccessEvent = {
   targets: string[];
   kind: AccessEventKind;
-  fpUserId: string;
+  fpId: string;
   reason?: string;
   tenantId: string;
   timestamp: string;

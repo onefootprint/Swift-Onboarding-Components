@@ -18,7 +18,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
           Footprint token
         </Typography>
         <CodeContainer>
-          <CodeInline isPrivate>{accessEvent.fpUserId}</CodeInline>
+          <CodeInline isPrivate>{accessEvent.fpId}</CodeInline>
         </CodeContainer>
       </DataGrid>
     </div>
