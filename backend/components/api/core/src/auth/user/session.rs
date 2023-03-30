@@ -114,7 +114,7 @@ impl SessionContext<UserSession> {
         };
         let identifier = OnboardingIdentifier::ScopedBusinessId {
             sb_id: &sb_id,
-            user_vault_id: self.user_vault_id(),
+            vault_id: self.user_vault_id(),
         };
         let (ob, _, _, _) = Onboarding::get(conn, identifier)?;
         Ok(Some(ob))

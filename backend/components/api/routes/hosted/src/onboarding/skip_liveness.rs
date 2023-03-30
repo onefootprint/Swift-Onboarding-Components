@@ -36,7 +36,7 @@ pub async fn post(
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
 
             let _ = NewLivenessEvent {
-                scoped_user_id: ob_info.scoped_user.id,
+                scoped_vault_id: ob_info.scoped_user.id,
                 attributes: None,
                 liveness_source: newtypes::LivenessSource::Skipped,
                 insight_event_id: insight_event.id,

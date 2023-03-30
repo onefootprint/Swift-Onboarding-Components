@@ -19,7 +19,7 @@ impl DbToApi<AccessEventListItemForUser> for api_wire_types::AccessEvent {
         let AccessEventListItemForUser {
             event,
             tenant_name: _,
-            scoped_user,
+            scoped_vault: scoped_user,
         } = evt;
         let (event, saturated_actor) = event;
 
@@ -41,7 +41,7 @@ impl DbToApi<AccessEventListItemForTenant> for api_wire_types::AccessEvent {
     fn from_db(evt: AccessEventListItemForTenant) -> Self {
         let AccessEventListItemForTenant {
             event,
-            scoped_user,
+            scoped_vault: scoped_user,
             insight,
         } = evt;
         let (event, saturated_actor) = event;

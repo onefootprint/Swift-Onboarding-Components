@@ -53,7 +53,7 @@ pub async fn save_final_decision(
     let obd = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &obid)?;
-            let scoped_user = ScopedVault::get(conn, &ob.scoped_user_id)?;
+            let scoped_user = ScopedVault::get(conn, &ob.scoped_vault_id)?;
 
             // prevent race conditions from producing 2 decisions
             if assert_is_first_decision_for_onboarding && ob.decision_made_at.is_some() {
@@ -62,7 +62,7 @@ pub async fn save_final_decision(
 
             // If we should commit, mark all data as verified for the onboarding
             let seqno = if decision.should_commit {
-                let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_user_id)?;
+                let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_vault_id)?;
                 let seqno = uvw.portablize_identity_data(conn)?;
                 Some(seqno)
             } else {
@@ -71,7 +71,7 @@ pub async fn save_final_decision(
 
             // Create decision
             let onboarding_decision = OnboardingDecisionCreateArgs {
-                user_vault_id: scoped_user.user_vault_id,
+                vault_id: scoped_user.vault_id,
                 onboarding: &ob,
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 status: decision.decision_status,

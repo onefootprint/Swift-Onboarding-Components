@@ -35,13 +35,13 @@ impl<Type> VaultWrapper<Type> {
 
     #[tracing::instrument(skip_all)]
     pub fn build(conn: &mut PgConn, args: VwArgs) -> ApiResult<Self> {
-        let (uv, su_id, seqno) = args.build(conn)?;
+        let (uv, sv_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(seqno) = seqno {
             // We are reconstructing the UVW as it appeared at a given seqno
-            DataLifetime::get_active_at(conn, &uv.id, su_id.as_ref(), seqno)?
+            DataLifetime::get_active_at(conn, &uv.id, sv_id.as_ref(), seqno)?
         } else {
             // We are constructing the UVW as it appears right now
-            DataLifetime::get_active(conn, &uv.id, su_id.as_ref())?
+            DataLifetime::get_active(conn, &uv.id, sv_id.as_ref())?
         };
         let active_lifetime_ids: Vec<_> = active_lifetimes.iter().map(|l| l.id.clone()).collect();
 

@@ -28,8 +28,8 @@ use crate::{DbError, DbResult};
 /// soon as the underlying data is deactivated.
 ///
 /// Ownership attributes:
-/// - `user_vault_id`: The user to which this piece of data belongs
-/// - `scoped_user_id`: The scoped_user that represents during onboarding to which tenant this data
+/// - `vault_id`: The user to which this piece of data belongs
+/// - `scoped_vault_id`: The scoped_vault that represents during onboarding to which tenant this data
 ///   was added
 ///
 /// Lifecycle attributes:
@@ -64,8 +64,8 @@ pub struct DataLifetime {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     // Ownership attributes
-    pub user_vault_id: VaultId,
-    pub scoped_user_id: ScopedVaultId,
+    pub vault_id: VaultId,
+    pub scoped_vault_id: ScopedVaultId,
     // Lifecycle attributes
     pub created_at: DateTime<Utc>,
     pub portablized_at: Option<DateTime<Utc>>,
@@ -80,10 +80,10 @@ pub struct DataLifetime {
 #[diesel(table_name = data_lifetime)]
 struct NewDataLifetime {
     // This is just denormalized for fast querying.
-    user_vault_id: VaultId,
+    vault_id: VaultId,
     // We might want to not support creating data not linked to a tenant. Right now this is only
     // used for the my1fp login flow
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
     created_at: DateTime<Utc>,
     created_seqno: DataLifetimeSeqno,
     kind: DataLifetimeKind,
@@ -134,16 +134,16 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
-        user_vault_id: &VaultId,
-        scoped_user_id: &ScopedVaultId,
+        vault_id: &VaultId,
+        scoped_vault_id: &ScopedVaultId,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let new_rows: Vec<NewDataLifetime> = kinds
             .into_iter()
             .map(|k| NewDataLifetime {
-                user_vault_id: user_vault_id.clone(),
-                scoped_user_id: scoped_user_id.clone(),
+                vault_id: vault_id.clone(),
+                scoped_vault_id: scoped_vault_id.clone(),
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 kind: k,
@@ -159,12 +159,12 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub(crate) fn create(
         conn: &mut TxnPgConn,
-        user_vault_id: &VaultId,
-        scoped_user_id: &ScopedVaultId,
+        vault_id: &VaultId,
+        scoped_vault_id: &ScopedVaultId,
         kind: DataLifetimeKind,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {
-        let lifetime = Self::bulk_create(conn, user_vault_id, scoped_user_id, vec![kind], seqno)?
+        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![kind], seqno)?
             .into_iter()
             .next()
             .ok_or(DbError::ObjectNotFound)?;
@@ -191,7 +191,7 @@ impl DataLifetime {
     pub fn bulk_portablize_for_tenant(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let update = DataLifetimeUpdate {
@@ -201,7 +201,7 @@ impl DataLifetime {
         };
         let results = diesel::update(data_lifetime::table)
             .filter(data_lifetime::id.eq_any(ids))
-            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
+            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
             .filter(data_lifetime::portablized_seqno.is_null())
             .set(update)
             .get_results(conn)?;
@@ -235,7 +235,7 @@ impl DataLifetime {
     #[tracing::instrument(skip_all)]
     pub fn bulk_deactivate_speculative(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
         kinds: Vec<DataLifetimeKind>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -246,7 +246,7 @@ impl DataLifetime {
         };
         let results = diesel::update(data_lifetime::table)
             .filter(data_lifetime::kind.eq_any(kinds))
-            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
+            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
             .filter(data_lifetime::deactivated_seqno.is_null())
             // Specifically don't allow deactivating portable data here since we are replacing it
             // with speculative data
@@ -256,27 +256,27 @@ impl DataLifetime {
         Ok(results)
     }
 
-    /// Get the list of currently active DataLifetimeIds for the provided scoped_user_id.
+    /// Get the list of currently active DataLifetimeIds for the provided scoped_vault_id.
     /// A piece of user data is visible if it is (1) portable and (2) not deactivated.
     /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
     /// whether or not the data is portable.
     #[tracing::instrument(skip_all)]
     pub fn get_active(
         conn: &mut PgConn,
-        user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedVaultId>,
+        vault_id: &VaultId,
+        scoped_vault_id: Option<&ScopedVaultId>,
     ) -> DbResult<Vec<Self>> {
         let mut query = data_lifetime::table
-            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
+            .filter(data_lifetime::vault_id.eq(vault_id))
             .filter(data_lifetime::deactivated_seqno.is_null())
             .into_boxed();
 
         let q_is_portable = not(data_lifetime::portablized_seqno.is_null());
-        if let Some(scoped_user_id) = scoped_user_id {
+        if let Some(scoped_vault_id) = scoped_vault_id {
             // Fetch portable data
             // And also fetch speculative, non-portable data that was active at the time
             // and belongs to the tenant
-            let q_belongs_to_tenant = data_lifetime::scoped_user_id.eq(scoped_user_id);
+            let q_belongs_to_tenant = data_lifetime::scoped_vault_id.eq(scoped_vault_id);
             query = query.filter(q_is_portable.or(q_belongs_to_tenant));
         } else {
             // Only fetch committed, portable data
@@ -288,20 +288,20 @@ impl DataLifetime {
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided tenant_id and list
-    /// of user_vault_ids.
+    /// of vault_ids.
     #[tracing::instrument(skip_all)]
     pub fn get_bulk_active_for_tenant(
         conn: &mut PgConn,
-        user_vault_ids: Vec<&VaultId>,
+        vault_ids: Vec<&VaultId>,
         tenant_id: &TenantId,
     ) -> DbResult<HashMap<VaultId, Vec<Self>>> {
-        use crate::schema::scoped_user;
+        use crate::schema::scoped_vault;
         let q_is_portable = not(data_lifetime::portablized_seqno.is_null());
-        let q_belongs_to_tenant = scoped_user::tenant_id.eq(tenant_id);
+        let q_belongs_to_tenant = scoped_vault::tenant_id.eq(tenant_id);
         let query = data_lifetime::table
-            .left_join(scoped_user::table)
+            .left_join(scoped_vault::table)
             // Get data belonging to these users that is not deactivated
-            .filter(data_lifetime::user_vault_id.eq_any(user_vault_ids))
+            .filter(data_lifetime::vault_id.eq_any(vault_ids))
             .filter(data_lifetime::deactivated_seqno.is_null())
             // Fetch all rows that are either portable
             // OR belong to this tenant
@@ -310,7 +310,7 @@ impl DataLifetime {
         let results: Vec<Self> = query.select(data_lifetime::all_columns).get_results(conn)?;
         let uv_id_to_lifetimes = results
             .into_iter()
-            .map(|l| (l.user_vault_id.clone(), l))
+            .map(|l| (l.vault_id.clone(), l))
             .sorted_by_key(|(uv_id, _)| uv_id.clone())
             .into_group_map();
         let results = uv_id_to_lifetimes
@@ -320,19 +320,19 @@ impl DataLifetime {
         Ok(results)
     }
 
-    /// Get the list of currently active DataLifetimeIds for the provided (user_vault_id, scoped_user_id)
+    /// Get the list of currently active DataLifetimeIds for the provided (vault_id, scoped_vault_id)
     /// at a given seqno. This allows reconstructing a snapshot of what a user vault looked like at a time.
     #[tracing::instrument(skip_all)]
     pub fn get_active_at(
         conn: &mut PgConn,
-        user_vault_id: &VaultId,
-        scoped_user_id: Option<&ScopedVaultId>,
+        vault_id: &VaultId,
+        scoped_vault_id: Option<&ScopedVaultId>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         // This is kind of unnecessarily similar to `get_active`, but it's hard to combine
         // this logic in diesel
         let mut query = data_lifetime::table
-            .filter(data_lifetime::user_vault_id.eq(user_vault_id))
+            .filter(data_lifetime::vault_id.eq(vault_id))
             .filter(
                 data_lifetime::deactivated_seqno
                     .gt(seqno)
@@ -341,12 +341,12 @@ impl DataLifetime {
             .into_boxed();
 
         let q_is_portable = data_lifetime::portablized_seqno.le(seqno);
-        if let Some(scoped_user_id) = scoped_user_id {
+        if let Some(scoped_vault_id) = scoped_vault_id {
             // Fetch portable data
             // AND also fetch speculative, non-portable data that was active at the time
             // and belongs to the tenant
-            let q_belongs_to_tenant = data_lifetime::scoped_user_id
-                .eq(scoped_user_id)
+            let q_belongs_to_tenant = data_lifetime::scoped_vault_id
+                .eq(scoped_vault_id)
                 .and(data_lifetime::created_seqno.le(seqno));
             query = query.filter(q_is_portable.or(q_belongs_to_tenant));
         } else {

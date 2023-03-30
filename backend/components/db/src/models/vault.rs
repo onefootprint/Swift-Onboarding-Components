@@ -1,5 +1,5 @@
-use crate::schema::user_vault::{self, BoxedQuery};
-use crate::schema::{onboarding, scoped_user};
+use crate::schema::vault::{self, BoxedQuery};
+use crate::schema::{onboarding, scoped_vault};
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 use super::ob_configuration::IsLive;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[diesel(table_name = user_vault)]
+#[diesel(table_name = vault)]
 pub struct Vault {
     pub id: VaultId,
     pub e_private_key: EncryptedVaultPrivateKey,
@@ -71,38 +71,32 @@ impl<'a> From<&'a OnboardingId> for VaultIdentifier<'a> {
 impl Vault {
     fn query(id: VaultIdentifier) -> BoxedQuery<Pg> {
         match id {
-            VaultIdentifier::Id(id) => user_vault::table.filter(user_vault::id.eq(id)).into_boxed(),
+            VaultIdentifier::Id(id) => vault::table.filter(vault::id.eq(id)).into_boxed(),
             VaultIdentifier::ScopedVaultId(scoped_user_id) => {
-                let uv_ids = scoped_user::table
-                    .filter(scoped_user::id.eq(scoped_user_id))
-                    .select(scoped_user::user_vault_id);
-                user_vault::table
-                    .filter(user_vault::id.eq_any(uv_ids))
-                    .into_boxed()
+                let uv_ids = scoped_vault::table
+                    .filter(scoped_vault::id.eq(scoped_user_id))
+                    .select(scoped_vault::vault_id);
+                vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
             VaultIdentifier::FpUserId {
                 fp_user_id,
                 tenant_id,
                 is_live,
             } => {
-                let uv_ids = scoped_user::table
-                    .filter(scoped_user::fp_user_id.eq(fp_user_id))
-                    .filter(scoped_user::tenant_id.eq(tenant_id))
-                    .filter(scoped_user::is_live.eq(is_live))
-                    .select(scoped_user::user_vault_id);
-                user_vault::table
-                    .filter(user_vault::id.eq_any(uv_ids))
-                    .into_boxed()
+                let uv_ids = scoped_vault::table
+                    .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+                    .filter(scoped_vault::tenant_id.eq(tenant_id))
+                    .filter(scoped_vault::is_live.eq(is_live))
+                    .select(scoped_vault::vault_id);
+                vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
             VaultIdentifier::OnboardingId(onboarding_id) => {
                 let uv_ids = onboarding::table
                     .filter(onboarding::id.eq(onboarding_id))
-                    .inner_join(scoped_user::table)
-                    .select(scoped_user::user_vault_id);
+                    .inner_join(scoped_vault::table)
+                    .select(scoped_vault::vault_id);
 
-                user_vault::table
-                    .filter(user_vault::id.eq_any(uv_ids))
-                    .into_boxed()
+                vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
         }
     }
@@ -118,8 +112,8 @@ impl Vault {
 
     #[tracing::instrument(skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<Locked<Self>> {
-        let user = user_vault::table
-            .filter(user_vault::id.eq(id))
+        let user = vault::table
+            .filter(vault::id.eq(id))
             .for_no_key_update()
             .first(conn.conn())?;
         Ok(Locked::new(user))
@@ -127,11 +121,11 @@ impl Vault {
 
     #[tracing::instrument(skip_all)]
     pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
-        let uv_ids = scoped_user::table
-            .filter(scoped_user::id.eq(su_id))
-            .select(scoped_user::user_vault_id);
-        let user = user_vault::table
-            .filter(user_vault::id.eq_any(uv_ids))
+        let uv_ids = scoped_vault::table
+            .filter(scoped_vault::id.eq(su_id))
+            .select(scoped_vault::vault_id);
+        let user = vault::table
+            .filter(vault::id.eq_any(uv_ids))
             .for_no_key_update()
             .first(conn.conn())?;
         Ok(Locked::new(user))
@@ -139,12 +133,10 @@ impl Vault {
 
     #[tracing::instrument(skip_all)]
     pub fn multi_get(conn: &mut PgConn, ids: Vec<&ScopedVaultId>) -> DbResult<Vec<Self>> {
-        let uv_ids = scoped_user::table
-            .filter(scoped_user::id.eq_any(ids))
-            .select(scoped_user::user_vault_id);
-        let users = user_vault::table
-            .filter(user_vault::id.eq_any(uv_ids))
-            .load::<Self>(conn)?;
+        let uv_ids = scoped_vault::table
+            .filter(scoped_vault::id.eq_any(ids))
+            .select(scoped_vault::vault_id);
+        let users = vault::table.filter(vault::id.eq_any(uv_ids)).load::<Self>(conn)?;
         Ok(users)
     }
 
@@ -165,10 +157,10 @@ impl Vault {
             is_portable,
             kind,
         };
-        let user_vault = diesel::insert_into(user_vault::table)
+        let vault = diesel::insert_into(vault::table)
             .values(new_user)
             .get_result::<Vault>(conn)?;
-        Ok(Locked::new(user_vault))
+        Ok(Locked::new(vault))
     }
 
     /// Look for the portable user vault with a matching fingerprint
@@ -176,14 +168,14 @@ impl Vault {
     pub fn find_portable(conn: &mut PgConn, sh_data: Fingerprint) -> DbResult<Option<Vault>> {
         use crate::schema::{data_lifetime, fingerprint};
 
-        let results = user_vault::table
+        let results = vault::table
             .inner_join(data_lifetime::table.inner_join(fingerprint::table))
             .filter(fingerprint::sh_data.eq(sh_data))
             .filter(not(data_lifetime::portablized_seqno.is_null()))
             .filter(data_lifetime::deactivated_seqno.is_null())
             // Never allow finding a vault-only, non-portable user vault created via API
-            .filter(user_vault::is_portable.eq(true))
-            .select(user_vault::all_columns)
+            .filter(vault::is_portable.eq(true))
+            .select(vault::all_columns)
             .get_results::<Vault>(conn)?;
 
         // we found more than 1 vault on this fingerprint
@@ -205,7 +197,7 @@ impl Vault {
 }
 
 #[derive(Debug, Clone, Insertable)]
-#[diesel(table_name = user_vault)]
+#[diesel(table_name = vault)]
 struct NewVaultRow {
     id: VaultId,
     e_private_key: EncryptedVaultPrivateKey,

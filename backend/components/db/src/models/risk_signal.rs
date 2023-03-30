@@ -59,17 +59,17 @@ impl RiskSignal {
         tenant_id: &'a TenantId,
         is_live: bool,
     ) -> risk_signal::BoxedQuery<'a, diesel::pg::Pg> {
-        use crate::schema::{onboarding, onboarding_decision, scoped_user};
+        use crate::schema::{onboarding, onboarding_decision, scoped_vault};
         let onboarding_decision_ids = onboarding_decision::table
             .inner_join(
                 onboarding::table
-                    .inner_join(scoped_user::table)
+                    .inner_join(scoped_vault::table)
                     // Must provide explicit ON since onboarding::latest_decision_id is used by default
                     .on(onboarding_decision::onboarding_id.eq(onboarding::id)),
             )
-            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
+            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(is_live))
             .select(onboarding_decision::id);
         risk_signal::table
             .filter(risk_signal::onboarding_decision_id.eq_any(onboarding_decision_ids))

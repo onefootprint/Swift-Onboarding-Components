@@ -21,9 +21,9 @@ pub use create::*;
 pub use tenant::*;
 pub use writeable::*;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Person;
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Business;
 /// VaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
 /// about a particular user.

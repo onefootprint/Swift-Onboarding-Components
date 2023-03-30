@@ -105,10 +105,10 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
 
 #[db_test]
 fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
-    let uv = db::tests::fixtures::vault::create_person(conn, true);
+    let bv = db::tests::fixtures::vault::create_business(conn);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sb = db::tests::fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
 
     let data = vec![
         NewVaultData {
@@ -125,9 +125,10 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
+    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno).unwrap();
 
-    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
+    // TODO audit all ::vault_id
+    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     let tests = vec![
         (BDK::Name, Some(SealedVaultBytes(vec![1]))),
         (BDK::Website, Some(SealedVaultBytes(vec![2]))),

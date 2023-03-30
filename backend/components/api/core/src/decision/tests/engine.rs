@@ -79,11 +79,11 @@ async fn create_user_and_onboarding(db_pool: &DbPool) -> (Tenant, Onboarding, Va
             let onboarding = fixtures::onboarding::create(conn, su.id, ob_config_id);
 
             let decision_intent =
-                DecisionIntent::get_or_create_onboarding_kyc(conn, &onboarding.scoped_user_id).unwrap();
+                DecisionIntent::get_or_create_onboarding_kyc(conn, &onboarding.scoped_vault_id).unwrap();
 
             fixtures::verification_request::bulk_create(
                 conn,
-                &onboarding.scoped_user_id,
+                &onboarding.scoped_vault_id,
                 vec![
                     VendorAPI::TwilioLookupV2,
                     VendorAPI::IdologyExpectID,

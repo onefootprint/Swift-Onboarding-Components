@@ -1,4 +1,4 @@
-use crate::schema::{decision_intent, scoped_user, user_vault, verification_request, verification_result};
+use crate::schema::{decision_intent, scoped_vault, vault, verification_request, verification_result};
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
@@ -30,7 +30,7 @@ pub struct VerificationRequest {
     // If we are verifying an identity document, we want to know exactly which one we were verifying since there
     // could be multiple in the vault, seqno doesn't help us
     pub identity_document_id: Option<IdentityDocumentId>,
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub decision_intent_id: Option<DecisionIntentId>,
 }
 
@@ -42,7 +42,7 @@ struct NewVerificationRequestRow {
     vendor_api: VendorAPI,
     uvw_snapshot_seqno: DataLifetimeSeqno,
     identity_document_id: Option<IdentityDocumentId>,
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
     decision_intent_id: Option<DecisionIntentId>,
 }
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
@@ -50,7 +50,7 @@ impl VerificationRequest {
     #[tracing::instrument(skip_all)]
     pub fn bulk_create(
         conn: &mut PgConn,
-        scoped_user_id: ScopedVaultId,
+        scoped_vault_id: ScopedVaultId,
         vendor_apis: Vec<VendorAPI>,
         decision_intent_id: &DecisionIntentId,
     ) -> Result<Vec<Self>, crate::DbError> {
@@ -63,7 +63,7 @@ impl VerificationRequest {
                 timestamp: Utc::now(),
                 uvw_snapshot_seqno: seqno,
                 identity_document_id: None,
-                scoped_user_id: scoped_user_id.clone(),
+                scoped_vault_id: scoped_vault_id.clone(),
                 decision_intent_id: Some(decision_intent_id.clone()),
             })
             .collect();
@@ -102,10 +102,10 @@ impl VerificationRequest {
     #[tracing::instrument(skip_all)]
     pub fn get_latest_requests_and_results_for_scoped_user(
         conn: &mut PgConn,
-        scoped_user_id: ScopedVaultId,
+        scoped_vault_id: ScopedVaultId,
     ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
-            .filter(verification_request::scoped_user_id.eq(scoped_user_id))
+            .filter(verification_request::scoped_vault_id.eq(scoped_vault_id))
             .left_join(verification_result::table)
             .order((
                 verification_request::vendor_api,
@@ -155,7 +155,7 @@ impl VerificationRequest {
     pub fn create_document_verification_request(
         conn: &mut PgConn,
         vendor_api: VendorAPI,
-        scoped_user_id: ScopedVaultId,
+        scoped_vault_id: ScopedVaultId,
         identity_document_id: IdentityDocumentId,
         decision_intent_id: &DecisionIntentId,
     ) -> DbResult<Self> {
@@ -166,7 +166,7 @@ impl VerificationRequest {
             timestamp: Utc::now(),
             uvw_snapshot_seqno: seqno,
             identity_document_id: Some(identity_document_id),
-            scoped_user_id,
+            scoped_vault_id,
             decision_intent_id: Some(decision_intent_id.clone()),
         };
         let result = diesel::insert_into(verification_request::table)
@@ -179,8 +179,8 @@ impl VerificationRequest {
     pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Vault> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
-            .inner_join(scoped_user::table.inner_join(user_vault::table))
-            .select(user_vault::all_columns)
+            .inner_join(scoped_vault::table.inner_join(vault::table))
+            .select(vault::all_columns)
             .get_result(conn)?;
 
         Ok(res)

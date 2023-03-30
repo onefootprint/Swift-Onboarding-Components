@@ -29,5 +29,5 @@ pub use add_data::encrypt_to_s3;
 pub struct WriteableVw<Type> {
     #[deref]
     uvw: Locked<VaultWrapper<Type>>,
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
 }

@@ -6,7 +6,7 @@ use super::scoped_vault::ScopedVault;
 use crate::actor::{self, SaturatedActor};
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
-use crate::schema::{onboarding, scoped_user};
+use crate::schema::{onboarding, scoped_vault};
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -27,7 +27,7 @@ type IsNew = bool;
 #[diesel(table_name = onboarding)]
 pub struct Onboarding {
     pub id: OnboardingId,
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -42,7 +42,7 @@ pub struct Onboarding {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = onboarding)]
 struct NewOnboarding {
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
@@ -59,7 +59,7 @@ pub struct OnboardingUpdate {
 }
 
 pub struct OnboardingCreateArgs {
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: CreateInsightEvent,
 }
@@ -119,15 +119,15 @@ pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
     ScopedVaultId {
         su_id: &'a ScopedVaultId,
-        user_vault_id: &'a VaultId,
+        vault_id: &'a VaultId,
     },
     ScopedBusinessId {
         sb_id: &'a ScopedVaultId,
         /// Note: the ID of the user vault that owns this business
-        user_vault_id: &'a VaultId,
+        vault_id: &'a VaultId,
     },
     ConfigId {
-        user_vault_id: &'a VaultId,
+        vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
     },
 }
@@ -138,17 +138,17 @@ impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
     }
 }
 
-// TODO change this to su_id, user_vault_id?
+// TODO change this to su_id, vault_id?
 impl<'a> From<(&'a ScopedVaultId, &'a VaultId)> for OnboardingIdentifier<'a> {
-    fn from((su_id, user_vault_id): (&'a ScopedVaultId, &'a VaultId)) -> Self {
-        Self::ScopedVaultId { su_id, user_vault_id }
+    fn from((su_id, vault_id): (&'a ScopedVaultId, &'a VaultId)) -> Self {
+        Self::ScopedVaultId { su_id, vault_id }
     }
 }
 
 impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a> {
-    fn from((user_vault_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
+    fn from((vault_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
         Self::ConfigId {
-            user_vault_id,
+            vault_id,
             ob_config_id,
         }
     }
@@ -187,7 +187,7 @@ impl Onboarding {
     {
         use crate::schema::{business_owner, manual_review, onboarding_decision};
         let mut query = onboarding::table
-            .inner_join(scoped_user::table)
+            .inner_join(scoped_vault::table)
             // Only fetch active manual review for this onboarding
             .left_join(manual_review::table.on(
                 manual_review::onboarding_id.eq(onboarding::id)
@@ -202,25 +202,25 @@ impl Onboarding {
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::ScopedVaultId { su_id, user_vault_id } => {
+            OnboardingIdentifier::ScopedVaultId { su_id, vault_id } => {
                 query = query
-                    .filter(onboarding::scoped_user_id.eq(su_id))
-                    .filter(scoped_user::user_vault_id.eq(user_vault_id))
+                    .filter(onboarding::scoped_vault_id.eq(su_id))
+                    .filter(scoped_vault::vault_id.eq(vault_id))
             }
-            OnboardingIdentifier::ScopedBusinessId { sb_id, user_vault_id } => {
+            OnboardingIdentifier::ScopedBusinessId { sb_id, vault_id } => {
                 let business_vault_ids = business_owner::table
-                    .filter(business_owner::user_vault_id.eq(user_vault_id))
+                    .filter(business_owner::user_vault_id.eq(vault_id))
                     .select(business_owner::business_vault_id);
                 query = query
-                    .filter(onboarding::scoped_user_id.eq(sb_id))
-                    .filter(scoped_user::user_vault_id.eq_any(business_vault_ids))
+                    .filter(onboarding::scoped_vault_id.eq(sb_id))
+                    .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
             }
             OnboardingIdentifier::ConfigId {
-                user_vault_id,
+                vault_id,
                 ob_config_id,
             } => {
                 query = query
-                    .filter(scoped_user::user_vault_id.eq(user_vault_id))
+                    .filter(scoped_vault::vault_id.eq(vault_id))
                     .filter(onboarding::ob_configuration_id.eq(ob_config_id))
             }
         }
@@ -235,14 +235,14 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn lock_by_config(
         conn: &mut TxnPgConn,
-        user_vault_id: &VaultId,
+        vault_id: &VaultId,
         ob_configuration_id: &ObConfigurationId,
     ) -> DbResult<Option<Locked<Onboarding>>> {
-        let su_ids = scoped_user::table
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
-            .select(scoped_user::id);
+        let su_ids = scoped_vault::table
+            .filter(scoped_vault::vault_id.eq(vault_id))
+            .select(scoped_vault::id);
         let result = onboarding::table
-            .filter(onboarding::scoped_user_id.eq_any(su_ids))
+            .filter(onboarding::scoped_vault_id.eq_any(su_ids))
             .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
             .for_no_key_update()
             .first(conn.conn())
@@ -258,14 +258,14 @@ impl Onboarding {
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<BasicOnboardingInfo<Locked<Onboarding>>> {
-        let scoped_user_ids = scoped_user::table
-            .filter(scoped_user::fp_user_id.eq(fp_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
-            .select(scoped_user::id);
+        let scoped_vault_ids = scoped_vault::table
+            .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(is_live))
+            .select(scoped_vault::id);
         // Lock first, then grab the related info
         let ob = onboarding::table
-            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
+            .filter(onboarding::scoped_vault_id.eq_any(scoped_vault_ids))
             .for_no_key_update()
             .first::<Onboarding>(conn.conn())?;
 
@@ -286,16 +286,16 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn bulk_get_for_users(
         conn: &mut PgConn,
-        scoped_user_ids: Vec<&ScopedVaultId>,
+        scoped_vault_ids: Vec<&ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, OnboardingAndConfig>> {
         // For now, this will be either 0 or 1 result per user
         use crate::schema::ob_configuration;
         let results = onboarding::table
             .inner_join(ob_configuration::table)
-            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
+            .filter(onboarding::scoped_vault_id.eq_any(scoped_vault_ids))
             .get_results::<(Self, ObConfiguration)>(conn)?
             .into_iter()
-            .map(|(ob, obc)| (ob.scoped_user_id.clone(), OnboardingAndConfig(ob, obc)))
+            .map(|(ob, obc)| (ob.scoped_vault_id.clone(), OnboardingAndConfig(ob, obc)))
             .collect();
 
         Ok(results)
@@ -304,7 +304,7 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn get_for_scoped_users(
         conn: &mut PgConn,
-        scoped_user_ids: Vec<&ScopedVaultId>,
+        scoped_vault_ids: Vec<&ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableOnboardingInfo>> {
         use crate::schema::{
             insight_event, liveness_event, manual_review, ob_configuration, onboarding_decision,
@@ -312,7 +312,7 @@ impl Onboarding {
         let result: Vec<OnboardingInfo<OnboardingDecision>> = onboarding::table
             .inner_join(ob_configuration::table)
             // TODO return all liveness events
-            .inner_join(scoped_user::table.left_join(liveness_event::table))
+            .inner_join(scoped_vault::table.left_join(liveness_event::table))
             .inner_join(insight_event::table)
             // Only fetch active manual review for this onboarding
             .left_join(manual_review::table.on(
@@ -324,8 +324,8 @@ impl Onboarding {
                 onboarding_decision::onboarding_id.eq(onboarding::id)
                 .and(onboarding_decision::deactivated_at.is_null())
             ))
-            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
-            .order_by(onboarding::scoped_user_id)
+            .filter(onboarding::scoped_vault_id.eq_any(scoped_vault_ids))
+            .order_by(onboarding::scoped_vault_id)
             .load(conn)?;
 
         let onboarding_decisions: Vec<OnboardingDecision> =
@@ -350,10 +350,10 @@ impl Onboarding {
             .collect::<DbResult<Vec<_>>>()?;
 
         // Turn the Vec of OnboardingInfo into a hashmap of OnboadringId -> Vec<OnboardingInfo>
-        // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_user_id
+        // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_vault_id
         let result_map = obs
             .into_iter()
-            .map(|ob| (ob.0.scoped_user_id.clone(), ob))
+            .map(|ob| (ob.0.scoped_vault_id.clone(), ob))
             .collect();
         Ok(result_map)
     }
@@ -361,17 +361,17 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: OnboardingCreateArgs) -> DbResult<(Onboarding, IsNew)> {
         let ob = onboarding::table
-            .filter(onboarding::scoped_user_id.eq(&args.scoped_user_id))
+            .filter(onboarding::scoped_vault_id.eq(&args.scoped_vault_id))
             .filter(onboarding::ob_configuration_id.eq(&args.ob_configuration_id))
             .first(conn.conn())
             .optional()?;
         if let Some(ob) = ob {
             return Ok((ob, false));
         }
-        // Row doesn't exist for scoped_user_id, ob_configuration_id - create a new one
+        // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
         let insight_event = args.insight_event.insert_with_conn(conn)?;
         let new_ob = NewOnboarding {
-            scoped_user_id: args.scoped_user_id,
+            scoped_vault_id: args.scoped_vault_id,
             ob_configuration_id: args.ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
@@ -409,12 +409,12 @@ impl Onboarding {
         end_date: DateTime<Utc>,
         kind: VaultKind,
     ) -> DbResult<i64> {
-        use crate::schema::{onboarding, scoped_user, user_vault};
+        use crate::schema::{onboarding, scoped_vault, vault};
         let count = onboarding::table
-            .inner_join(scoped_user::table.inner_join(user_vault::table))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(true))
-            .filter(user_vault::kind.eq(kind))
+            .inner_join(scoped_vault::table.inner_join(vault::table))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(true))
+            .filter(vault::kind.eq(kind))
             // We won't charge tenants for onboardings that didn't finish authorizing, even if we
             // already ran KYC checks
             .filter(not(onboarding::authorized_at.is_null()))

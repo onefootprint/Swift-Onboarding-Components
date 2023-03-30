@@ -26,7 +26,7 @@ pub trait HasLifetime {
     {
         let lifetime_ids: Vec<_> = lifetimes.iter().map(|l| l.id.clone()).collect();
         let lifetime_id_to_uv_id: HashMap<DataLifetimeId, VaultId> =
-            HashMap::from_iter(lifetimes.iter().map(|l| (l.id.clone(), l.user_vault_id.clone())));
+            HashMap::from_iter(lifetimes.iter().map(|l| (l.id.clone(), l.vault_id.clone())));
 
         // Use the existing util to fetch all the rows for these lifetimes
         let results = Self::get_for(conn, &lifetime_ids)?;

@@ -77,7 +77,7 @@ pub async fn post(
 
             // Create the onboarding for this scoped user
             let ob_create_args = OnboardingCreateArgs {
-                scoped_user_id: scoped_user.id,
+                scoped_vault_id: scoped_user.id,
                 ob_configuration_id: ob_config.id.clone(),
                 insight_event: insight_event.clone(),
             };
@@ -87,7 +87,7 @@ pub async fn post(
                 // To prevent duplicate document requests, only create a doc request if the onboarding is new
                 DocumentRequest::create(
                     conn,
-                    ob.scoped_user_id.clone(),
+                    ob.scoped_vault_id.clone(),
                     None,
                     ob_config.must_collect_selfie(),
                     None,
@@ -113,7 +113,7 @@ pub async fn post(
                 })?;
                 let sb = ScopedVault::get_or_create(conn, &business_vault, ob_config_id)?;
                 let ob_create_args = OnboardingCreateArgs {
-                    scoped_user_id: sb.id.clone(),
+                    scoped_vault_id: sb.id.clone(),
                     ob_configuration_id: ob_config.id.clone(),
                     insight_event: insight_event.clone(),
                 };

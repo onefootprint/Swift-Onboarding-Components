@@ -12,8 +12,8 @@ use serde::{Deserialize, Serialize};
 pub struct FingerprintVisitEvent {
     pub id: FingerprintVisitEventId,
     pub visitor_id: FingerprintVisitorId,
-    pub user_vault_id: Option<VaultId>,
-    pub scoped_user_id: Option<ScopedVaultId>,
+    pub vault_id: Option<VaultId>,
+    pub scoped_vault_id: Option<ScopedVaultId>,
     pub path: String,
     pub session_id: Option<String>,
     pub created_at: DateTime<Utc>,
@@ -26,8 +26,8 @@ pub struct FingerprintVisitEvent {
 #[diesel(table_name = fingerprint_visit_event)]
 pub struct NewFingerprintVisit {
     pub visitor_id: FingerprintVisitorId,
-    pub user_vault_id: Option<VaultId>,
-    pub scoped_user_id: Option<ScopedVaultId>,
+    pub vault_id: Option<VaultId>,
+    pub scoped_vault_id: Option<ScopedVaultId>,
     pub path: String,
     pub session_id: Option<String>,
     pub created_at: DateTime<Utc>,
@@ -41,16 +41,16 @@ impl FingerprintVisitEvent {
         conn: &mut PgConn,
         visitor_id: FingerprintVisitorId,
         request_id: FingerprintRequestId,
-        user_vault_id: Option<VaultId>,
-        scoped_user_id: Option<ScopedVaultId>,
+        vault_id: Option<VaultId>,
+        scoped_vault_id: Option<ScopedVaultId>,
         path: String,
         session_id: Option<String>,
         response: Option<serde_json::Value>,
     ) -> DbResult<Self> {
         let new_row = NewFingerprintVisit {
             visitor_id,
-            user_vault_id,
-            scoped_user_id,
+            vault_id,
+            scoped_vault_id,
             path,
             session_id,
             created_at: Utc::now(),

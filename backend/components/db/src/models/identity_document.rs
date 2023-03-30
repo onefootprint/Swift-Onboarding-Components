@@ -126,10 +126,13 @@ impl IdentityDocument {
 
     /// Get all the documents collected for a given onboarding
     #[tracing::instrument(skip_all)]
-    pub fn get_for_scoped_user_id(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+    pub fn get_for_scoped_vault_id(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Vec<Self>> {
         let results = identity_document::table
             .inner_join(data_lifetime::table)
-            .filter(data_lifetime::scoped_user_id.eq(scoped_user_id))
+            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
             .select(identity_document::all_columns)
             .get_results(conn)?;
 

@@ -1,5 +1,5 @@
 use crate::schema::{
-    scoped_user,
+    scoped_vault,
     tenant::{self, BoxedQuery},
 };
 use crate::PgConn;
@@ -81,9 +81,9 @@ impl Tenant {
         match id {
             TenantIdentifier::Id(id) => tenant::table.filter(tenant::id.eq(id)).into_boxed(),
             TenantIdentifier::ScopedVaultId(scoped_vault_id) => {
-                let tenant_id = scoped_user::table
-                    .filter(scoped_user::id.eq(scoped_vault_id))
-                    .select(scoped_user::tenant_id);
+                let tenant_id = scoped_vault::table
+                    .filter(scoped_vault::id.eq(scoped_vault_id))
+                    .select(scoped_vault::tenant_id);
                 tenant::table.filter(tenant::id.eq_any(tenant_id)).into_boxed()
             }
         }
@@ -139,9 +139,9 @@ impl Tenant {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list_by_user_vault_id(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<Tenant>> {
-        let res = scoped_user::table
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+    pub fn list_by_user_vault_id(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Tenant>> {
+        let res = scoped_vault::table
+            .filter(scoped_vault::vault_id.eq(vault_id))
             .inner_join(tenant::table)
             .select(tenant::all_columns)
             .get_results(conn)?;

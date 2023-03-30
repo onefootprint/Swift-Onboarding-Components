@@ -90,7 +90,7 @@ async fn authorize_privacy_pass(
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let liveness_event = NewLivenessEvent {
-                scoped_user_id: scoped_user_id.clone(),
+                scoped_vault_id: scoped_user_id.clone(),
                 attributes: Some(LivenessAttributes {
                     issuers: vec![LivenessIssuer::Cloudflare, LivenessIssuer::Footprint],
                     ..Default::default()

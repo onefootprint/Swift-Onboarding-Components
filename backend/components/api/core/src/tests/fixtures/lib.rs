@@ -7,8 +7,8 @@ use db::models::vault::Vault;
 use db::tests::fixtures;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::TenantId;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, OnboardingStatus, PiiString};
+use newtypes::{TenantId, VaultKind};
 use rand::Rng;
 
 // Start of fixtures utils for setting up common sets of data (eg: make a user + onboarding + fill vault)
@@ -38,7 +38,7 @@ pub fn create_user_and_populate_vault(
         let uvid = uv.id.clone();
         (uv, fixtures::scoped_vault::create(conn, &uvid, &ob_config.id))
     } else {
-        let uv = fixtures::vault::create(conn, is_live, false);
+        let uv = fixtures::vault::create(conn, VaultKind::Person, is_live, false);
         let uvid = uv.id.clone();
         (
             uv,

@@ -127,7 +127,7 @@ pub fn post(
             let info = newtypes::AnnotationInfo {
                 annotation_id: annotation.0.id.clone(),
             };
-            UserTimeline::create(conn, info, scoped_user.user_vault_id, scoped_user.id)?;
+            UserTimeline::create(conn, info, scoped_user.vault_id, scoped_user.id)?;
 
             Ok(annotation)
         })

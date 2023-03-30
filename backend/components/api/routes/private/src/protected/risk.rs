@@ -174,7 +174,7 @@ async fn make_decision(
 
     let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
         &ob.id,
-        &ob.scoped_user_id,
+        &ob.scoped_vault_id,
         &state.db_pool,
         &state.enclave_client,
     )
@@ -265,7 +265,7 @@ async fn shadow_run(
                     vendor_api: v,
                     uvw_snapshot_seqno: seqno,
                     identity_document_id: None,
-                    scoped_user_id: scoped_user.id.clone(),
+                    scoped_vault_id: scoped_user.id.clone(),
                     decision_intent_id: None,
                 })
                 .collect();

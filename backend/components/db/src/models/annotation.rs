@@ -5,7 +5,7 @@ use crate::{
     actor,
     actor::SaturatedActor,
     models::scoped_vault::ScopedVault,
-    schema::{annotation, scoped_user},
+    schema::{annotation, scoped_vault},
     DbError, DbResult,
 };
 use chrono::{DateTime, Utc};
@@ -21,7 +21,7 @@ pub struct Annotation {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub note: String,
     pub is_pinned: bool,
     pub actor: DbActor,
@@ -31,7 +31,7 @@ pub struct Annotation {
 #[diesel(table_name = annotation)]
 struct NewAnnotation {
     timestamp: DateTime<Utc>,
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
     note: String,
     is_pinned: bool,
     actor: DbActor,
@@ -51,7 +51,7 @@ impl Annotation {
         conn: &mut PgConn,
         note: String,
         is_pinned: bool,
-        scoped_user_id: ScopedVaultId,
+        scoped_vault_id: ScopedVaultId,
         actor: T,
     ) -> DbResult<AnnotationInfo>
     where
@@ -59,7 +59,7 @@ impl Annotation {
     {
         let new = NewAnnotation {
             timestamp: Utc::now(),
-            scoped_user_id,
+            scoped_vault_id,
             note,
             is_pinned,
             actor: actor.into(),
@@ -88,14 +88,14 @@ impl Annotation {
     ) -> DbResult<Self> {
         let update = AnnotationUpdate { is_pinned };
 
-        let su_ids = scoped_user::table
-            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
-            .select(scoped_user::id);
+        let su_ids = scoped_vault::table
+            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(is_live))
+            .select(scoped_vault::id);
         let result = diesel::update(annotation::table)
             .filter(annotation::id.eq(id))
-            .filter(annotation::scoped_user_id.eq_any(su_ids))
+            .filter(annotation::scoped_vault_id.eq_any(su_ids))
             .set(update)
             .get_result::<Self>(conn)?;
 
@@ -130,10 +130,10 @@ impl Annotation {
         is_pinned: Option<bool>,
     ) -> DbResult<Vec<AnnotationInfo>> {
         let mut query = annotation::table
-            .inner_join(scoped_user::table)
-            .filter(scoped_user::fp_user_id.eq(fp_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(is_live))
             .into_boxed();
         if let Some(is_pinned) = is_pinned {
             query = query.filter(annotation::is_pinned.eq(is_pinned));

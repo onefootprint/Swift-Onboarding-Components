@@ -59,7 +59,7 @@ pub async fn run(
     >,
 ) -> ApiResult<()> {
     let vendor_requests =
-        get_latest_verification_requests_and_results(&ob.id, &ob.scoped_user_id, db_pool, enclave_client)
+        get_latest_verification_requests_and_results(&ob.id, &ob.scoped_vault_id, db_pool, enclave_client)
             .await?;
 
     let vendor_results = make_vendor_requests(
@@ -105,7 +105,7 @@ pub async fn run(
        create_manual_review=%rules_output.create_manual_review,
        decision=%rules_output.decision_status,
        onboarding_id=%ob.id,
-       scoped_user_id=%ob.scoped_user_id,
+       scoped_user_id=%ob.scoped_vault_id,
        ob_configuration_id=%ob.ob_configuration_id,
        "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
     );

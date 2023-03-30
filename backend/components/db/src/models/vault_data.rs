@@ -1,4 +1,4 @@
-use crate::schema::user_vault_data;
+use crate::schema::vault_data;
 use crate::DbResult;
 use crate::HasLifetime;
 use crate::HasSealedIdentityData;
@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use super::data_lifetime::DataLifetime;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
-#[diesel(table_name = user_vault_data)]
+#[diesel(table_name = vault_data)]
 pub struct VaultData {
     pub id: VdId,
     pub _created_at: DateTime<Utc>,
@@ -34,7 +34,7 @@ pub struct NewVaultData {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = user_vault_data)]
+#[diesel(table_name = vault_data)]
 pub struct NewUserVaultDataRow {
     pub lifetime_id: DataLifetimeId,
     pub kind: VdKind,
@@ -69,7 +69,7 @@ impl VaultData {
                 e_data: new_vd.e_data,
             })
             .collect();
-        let results = diesel::insert_into(user_vault_data::table)
+        let results = diesel::insert_into(vault_data::table)
             .values(new_rows)
             .get_results(conn.conn())?;
         Ok(results)
@@ -85,8 +85,8 @@ impl HasLifetime for VaultData {
     where
         Self: Sized,
     {
-        let results = user_vault_data::table
-            .filter(user_vault_data::lifetime_id.eq_any(lifetime_ids))
+        let results = vault_data::table
+            .filter(vault_data::lifetime_id.eq_any(lifetime_ids))
             .get_results(conn)?;
         Ok(results)
     }

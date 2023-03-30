@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::schema;
 
 use crate::schema::liveness_event;
-use crate::schema::scoped_user;
+use crate::schema::scoped_vault;
 use crate::DbError;
 use crate::DbResult;
 
@@ -29,7 +29,7 @@ use super::insight_event::InsightEvent;
 #[diesel(table_name = liveness_event)]
 pub struct LivenessEvent {
     pub id: LivenessEventId,
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
     pub created_at: DateTime<Utc>,
@@ -42,13 +42,13 @@ impl LivenessEvent {
     #[tracing::instrument(skip_all)]
     pub fn get_by_user_vault_id(
         conn: &mut PgConn,
-        user_vault_id: &VaultId,
+        vault_id: &VaultId,
     ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
         use schema::insight_event;
         let results = liveness_event::table
             .inner_join(insight_event::table)
-            .inner_join(scoped_user::table)
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault::vault_id.eq(vault_id))
             .select((liveness_event::all_columns, insight_event::all_columns))
             .load(conn)?;
         Ok(results)
@@ -64,10 +64,10 @@ impl LivenessEvent {
         use schema::insight_event;
         let results = liveness_event::table
             .inner_join(insight_event::table)
-            .inner_join(scoped_user::table)
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_user::is_live.eq(is_live))
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::is_live.eq(is_live))
             .select((liveness_event::all_columns, schema::insight_event::all_columns))
             .load(conn)?;
         Ok(results)
@@ -93,7 +93,7 @@ impl LivenessEvent {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = liveness_event)]
 pub struct NewLivenessEvent {
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
     pub insight_event_id: InsightEventId,

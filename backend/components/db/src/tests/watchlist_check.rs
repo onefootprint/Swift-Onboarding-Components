@@ -15,6 +15,7 @@ use newtypes::ScopedVaultId;
 use newtypes::TaskData;
 use newtypes::TaskStatus;
 use newtypes::TenantId;
+use newtypes::VaultKind;
 use newtypes::WatchlistCheckArgs;
 use newtypes::WatchlistCheckStatus;
 use newtypes::WatchlistCheckStatusKind;
@@ -115,7 +116,7 @@ fn make_vault(
         }
         sv
     } else {
-        let uv = fixtures::vault::create(conn, is_live, false);
+        let uv = fixtures::vault::create(conn, VaultKind::Person, is_live, false);
         let uvid = uv.id.clone();
         fixtures::scoped_vault::create_non_portable(conn, &uvid, tenant_id)
     };

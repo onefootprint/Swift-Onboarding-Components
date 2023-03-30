@@ -4,7 +4,7 @@ table! {
 
     access_event (id) {
         id -> Text,
-        scoped_user_id -> Text,
+        scoped_vault_id -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -26,7 +26,7 @@ table! {
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        scoped_user_id -> Text,
+        scoped_vault_id -> Text,
         note -> Text,
         is_pinned -> Bool,
         actor -> Jsonb,
@@ -66,8 +66,8 @@ table! {
         id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        user_vault_id -> Text,
-        scoped_user_id -> Text,
+        vault_id -> Text,
+        scoped_vault_id -> Text,
         created_at -> Timestamptz,
         portablized_at -> Nullable<Timestamptz>,
         deactivated_at -> Nullable<Timestamptz>,
@@ -115,7 +115,7 @@ table! {
 
     document_request (id) {
         id -> Text,
-        scoped_user_id -> Text,
+        scoped_vault_id -> Text,
         ref_id -> Nullable<Text>,
         status -> Text,
         created_at -> Timestamptz,
@@ -149,8 +149,8 @@ table! {
     fingerprint_visit_event (id) {
         id -> Text,
         visitor_id -> Text,
-        user_vault_id -> Nullable<Text>,
-        scoped_user_id -> Nullable<Text>,
+        vault_id -> Nullable<Text>,
+        scoped_vault_id -> Nullable<Text>,
         path -> Text,
         session_id -> Nullable<Text>,
         created_at -> Timestamptz,
@@ -221,7 +221,7 @@ table! {
 
     liveness_event (id) {
         id -> Text,
-        scoped_user_id -> Text,
+        scoped_vault_id -> Text,
         liveness_source -> Text,
         attributes -> Nullable<Jsonb>,
         created_at -> Timestamptz,
@@ -272,7 +272,7 @@ table! {
 
     onboarding (id) {
         id -> Text,
-        scoped_user_id -> Text,
+        scoped_vault_id -> Text,
         ob_configuration_id -> Text,
         start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
@@ -424,10 +424,10 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    scoped_user (id) {
+    scoped_vault (id) {
         id -> Text,
         fp_user_id -> Text,
-        user_vault_id -> Text,
+        vault_id -> Text,
         tenant_id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -606,12 +606,12 @@ table! {
 
     user_timeline (id) {
         id -> Text,
-        scoped_user_id -> Text,
+        scoped_vault_id -> Text,
         event -> Jsonb,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        user_vault_id -> Text,
+        vault_id -> Text,
         is_portable -> Bool,
     }
 }
@@ -620,7 +620,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    user_vault (id) {
+    vault (id) {
         id -> Text,
         e_private_key -> Bytea,
         public_key -> Bytea,
@@ -636,7 +636,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    user_vault_data (id) {
+    vault_data (id) {
         id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -659,7 +659,7 @@ table! {
         vendor_api -> Text,
         uvw_snapshot_seqno -> Int8,
         identity_document_id -> Nullable<Text>,
-        scoped_user_id -> Text,
+        scoped_vault_id -> Text,
         decision_intent_id -> Nullable<Text>,
     }
 }
@@ -705,7 +705,7 @@ table! {
 
     webauthn_credential (id) {
         id -> Text,
-        user_vault_id -> Text,
+        vault_id -> Text,
         credential_id -> Bytea,
         public_key -> Bytea,
         counter -> Int4,
@@ -720,27 +720,27 @@ table! {
 }
 
 joinable!(access_event -> insight_event (insight_event_id));
-joinable!(access_event -> scoped_user (scoped_user_id));
-joinable!(annotation -> scoped_user (scoped_user_id));
+joinable!(access_event -> scoped_vault (scoped_vault_id));
+joinable!(annotation -> scoped_vault (scoped_vault_id));
 joinable!(contact_info -> data_lifetime (lifetime_id));
-joinable!(data_lifetime -> scoped_user (scoped_user_id));
-joinable!(data_lifetime -> user_vault (user_vault_id));
-joinable!(decision_intent -> scoped_user (scoped_vault_id));
+joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
+joinable!(data_lifetime -> vault (vault_id));
+joinable!(decision_intent -> scoped_vault (scoped_vault_id));
 joinable!(document_data -> data_lifetime (lifetime_id));
-joinable!(document_request -> scoped_user (scoped_user_id));
+joinable!(document_request -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
-joinable!(fingerprint_visit_event -> scoped_user (scoped_user_id));
-joinable!(fingerprint_visit_event -> user_vault (user_vault_id));
+joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
+joinable!(fingerprint_visit_event -> vault (vault_id));
 joinable!(identity_document -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
-joinable!(liveness_event -> scoped_user (scoped_user_id));
+joinable!(liveness_event -> scoped_vault (scoped_vault_id));
 joinable!(manual_review -> onboarding (onboarding_id));
 joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
-joinable!(onboarding -> scoped_user (scoped_user_id));
+joinable!(onboarding -> scoped_vault (scoped_vault_id));
 joinable!(onboarding_decision -> onboarding (onboarding_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
@@ -752,9 +752,9 @@ joinable!(proxy_config_server_cert -> proxy_config (config_id));
 joinable!(proxy_request_log -> proxy_config (config_id));
 joinable!(proxy_request_log -> tenant (tenant_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
-joinable!(scoped_user -> ob_configuration (ob_configuration_id));
-joinable!(scoped_user -> tenant (tenant_id));
-joinable!(scoped_user -> user_vault (user_vault_id));
+joinable!(scoped_vault -> ob_configuration (ob_configuration_id));
+joinable!(scoped_vault -> tenant (tenant_id));
+joinable!(scoped_vault -> vault (vault_id));
 joinable!(socure_device_session -> onboarding (onboarding_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
@@ -764,18 +764,18 @@ joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
 joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
 joinable!(user_consent -> insight_event (insight_event_id));
 joinable!(user_consent -> onboarding (onboarding_id));
-joinable!(user_timeline -> scoped_user (scoped_user_id));
-joinable!(user_timeline -> user_vault (user_vault_id));
-joinable!(user_vault_data -> data_lifetime (lifetime_id));
+joinable!(user_timeline -> scoped_vault (scoped_vault_id));
+joinable!(user_timeline -> vault (vault_id));
+joinable!(vault_data -> data_lifetime (lifetime_id));
 joinable!(verification_request -> decision_intent (decision_intent_id));
 joinable!(verification_request -> identity_document (identity_document_id));
-joinable!(verification_request -> scoped_user (scoped_user_id));
+joinable!(verification_request -> scoped_vault (scoped_vault_id));
 joinable!(verification_result -> verification_request (request_id));
 joinable!(watchlist_check -> decision_intent (decision_intent_id));
-joinable!(watchlist_check -> scoped_user (scoped_vault_id));
+joinable!(watchlist_check -> scoped_vault (scoped_vault_id));
 joinable!(watchlist_check -> task (task_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
-joinable!(webauthn_credential -> user_vault (user_vault_id));
+joinable!(webauthn_credential -> vault (vault_id));
 
 allow_tables_to_appear_in_same_query!(
     access_event,
@@ -803,7 +803,7 @@ allow_tables_to_appear_in_same_query!(
     proxy_config_server_cert,
     proxy_request_log,
     risk_signal,
-    scoped_user,
+    scoped_vault,
     session,
     socure_device_session,
     task,
@@ -815,8 +815,8 @@ allow_tables_to_appear_in_same_query!(
     tenant_user,
     user_consent,
     user_timeline,
-    user_vault,
-    user_vault_data,
+    vault,
+    vault_data,
     verification_request,
     verification_result,
     watchlist_check,

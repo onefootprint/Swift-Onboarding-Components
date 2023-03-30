@@ -12,7 +12,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    schema::{onboarding, scoped_user, task, user_vault, watchlist_check},
+    schema::{onboarding, scoped_vault, task, vault, watchlist_check},
     DbResult, PgConn,
 };
 
@@ -128,11 +128,11 @@ impl WatchlistCheck {
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
     ) -> DbResult<i64> {
-        use crate::schema::scoped_user;
+        use crate::schema::scoped_vault;
         let count = watchlist_check::table
-            .inner_join(scoped_user::table)
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(true))
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(true))
             // Only want to bill for material watchlist checks that made vendor requests
             .filter(watchlist_check::status.eq_any(vec![WatchlistCheckStatusKind::Pass, WatchlistCheckStatusKind::Fail]))
             // Filter for watchlist checks that completed during this billing period
@@ -169,26 +169,26 @@ impl WatchlistCheck {
     pub fn get_overdue_scoped_vaults(conn: &mut PgConn, tenant_id: TenantId) -> DbResult<Vec<ScopedVaultId>> {
         let thirty_days_ago = Utc::now() - Duration::days(30);
 
-        let res = scoped_user::table
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(true))
-            .inner_join(user_vault::table.on(user_vault::id.eq(scoped_user::user_vault_id)))
-            .filter(user_vault::kind.eq(VaultKind::Person))
-            .select(scoped_user::id)
+        let res = scoped_vault::table
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(true))
+            .inner_join(vault::table.on(vault::id.eq(scoped_vault::vault_id)))
+            .filter(vault::kind.eq(VaultKind::Person))
+            .select(scoped_vault::id)
             .left_join(
-                onboarding::table.on(onboarding::scoped_user_id
-                    .eq(scoped_user::id)
+                onboarding::table.on(onboarding::scoped_vault_id
+                    .eq(scoped_vault::id)
                     .and(onboarding::decision_made_at.ge(thirty_days_ago))),
             )
             .left_join(
                 watchlist_check::table.on(watchlist_check::scoped_vault_id
-                    .eq(scoped_user::id)
+                    .eq(scoped_vault::id)
                     .and(watchlist_check::created_at.ge(thirty_days_ago))),
             )
             .left_join(
                 task::table.on(task::task_data
                     .retrieve_by_path_as_text(vec!["data", "scoped_vault_id"])
-                    .eq(scoped_user::id)
+                    .eq(scoped_vault::id)
                     .and(
                         task::task_data
                             .retrieve_by_path_as_text(vec!["kind"])
@@ -196,7 +196,7 @@ impl WatchlistCheck {
                     )
                     .and(task::created_at.ge(thirty_days_ago))),
             )
-            .group_by(scoped_user::id)
+            .group_by(scoped_vault::id)
             .having(
                 count(onboarding::id)
                     .eq(0)

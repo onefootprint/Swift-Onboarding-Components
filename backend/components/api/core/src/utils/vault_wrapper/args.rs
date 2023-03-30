@@ -33,17 +33,17 @@ impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
         let args = match self {
             Self::Idv(req) => {
-                let su = ScopedVault::get(conn, &req.scoped_user_id)?;
-                let uv = Vault::get(conn, &su.user_vault_id)?;
+                let su = ScopedVault::get(conn, &req.scoped_vault_id)?;
+                let uv = Vault::get(conn, &su.vault_id)?;
                 (uv, Some(su.id), Some(req.uvw_snapshot_seqno))
             }
             Self::User(uv_id) => {
                 let user_vault = Vault::get(conn, uv_id)?;
                 (user_vault, None, None)
             }
-            Self::Tenant(su_id) => {
-                let uv = Vault::get(conn, su_id)?;
-                (uv, Some(su_id.clone()), None)
+            Self::Tenant(sv_id) => {
+                let uv = Vault::get(conn, sv_id)?;
+                (uv, Some(sv_id.clone()), None)
             }
         };
         tracing::info!(

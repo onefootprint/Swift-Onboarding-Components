@@ -1,4 +1,4 @@
-use crate::schema::scoped_user;
+use crate::schema::scoped_vault;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -15,11 +15,11 @@ use super::vault::Vault;
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
 /// while keeping information for each onboarding separate.
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = scoped_user)]
+#[diesel(table_name = scoped_vault)]
 pub struct ScopedVault {
     pub id: ScopedVaultId,
     pub fp_user_id: FootprintUserId,
-    pub user_vault_id: VaultId,
+    pub vault_id: VaultId,
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -32,11 +32,11 @@ pub struct ScopedVault {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = scoped_user)]
+#[diesel(table_name = scoped_vault)]
 struct NewScopedVault {
     id: ScopedVaultId,
     fp_user_id: FootprintUserId,
-    user_vault_id: VaultId,
+    vault_id: VaultId,
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
@@ -106,25 +106,25 @@ impl ScopedVault {
         }
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
-        let scoped_user = scoped_user::table
-            .filter(scoped_user::user_vault_id.eq(&uv.id))
-            .filter(scoped_user::ob_configuration_id.eq(&ob_configuration_id))
+        let scoped_vault = scoped_vault::table
+            .filter(scoped_vault::vault_id.eq(&uv.id))
+            .filter(scoped_vault::ob_configuration_id.eq(&ob_configuration_id))
             .first(conn.conn())
             .optional()?;
-        if let Some(scoped_user) = scoped_user {
-            return Ok(scoped_user);
+        if let Some(scoped_vault) = scoped_vault {
+            return Ok(scoped_vault);
         }
-        // Row doesn't exist for user_vault_id, tenant_id - create a new one
+        // Row doesn't exist for vault_id, tenant_id - create a new one
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
             fp_user_id: FootprintUserId::generate(uv.kind),
-            user_vault_id: uv.id.clone(),
+            vault_id: uv.id.clone(),
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
             is_live: ob_config.is_live,
             ob_configuration_id: Some(ob_configuration_id),
         };
-        let ob = diesel::insert_into(scoped_user::table)
+        let ob = diesel::insert_into(scoped_vault::table)
             .values(new)
             .get_result::<ScopedVault>(conn.conn())?;
         Ok(ob)
@@ -144,13 +144,13 @@ impl ScopedVault {
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
             fp_user_id: FootprintUserId::generate(uv.kind),
-            user_vault_id: uv.id,
+            vault_id: uv.id,
             start_timestamp: Utc::now(),
             tenant_id,
             is_live: uv.is_live,
             ob_configuration_id: None,
         };
-        let ob = diesel::insert_into(scoped_user::table)
+        let ob = diesel::insert_into(scoped_vault::table)
             .values(new)
             .get_result::<ScopedVault>(conn.conn())?;
         Ok(ob)
@@ -160,33 +160,33 @@ impl ScopedVault {
     #[tracing::instrument(skip_all)]
     pub fn list_for_user_vault(
         conn: &mut PgConn,
-        user_vault_id: &VaultId,
+        vault_id: &VaultId,
     ) -> DbResult<Vec<(ScopedVault, Tenant)>> {
         use crate::schema::tenant;
-        let results = scoped_user::table
+        let results = scoped_vault::table
             .inner_join(tenant::table)
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .filter(scoped_vault::vault_id.eq(vault_id))
             .get_results(conn)?;
         Ok(results)
     }
 
     #[tracing::instrument(skip_all)]
     pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedVault> {
-        let mut query = scoped_user::table.into_boxed();
+        let mut query = scoped_vault::table.into_boxed();
 
         match id.into() {
-            ScopedVaultIdentifier::Id { id } => query = query.filter(scoped_user::id.eq(id)),
+            ScopedVaultIdentifier::Id { id } => query = query.filter(scoped_vault::id.eq(id)),
             ScopedVaultIdentifier::OnboardingId { id } => {
                 use crate::schema::onboarding;
                 let scoped_user_ids = onboarding::table
                     .filter(onboarding::id.eq(id))
-                    .select(onboarding::scoped_user_id);
-                query = query.filter(scoped_user::id.eq_any(scoped_user_ids))
+                    .select(onboarding::scoped_vault_id);
+                query = query.filter(scoped_vault::id.eq_any(scoped_user_ids))
             }
             ScopedVaultIdentifier::User { id, uv_id } => {
                 query = query
-                    .filter(scoped_user::id.eq(id))
-                    .filter(scoped_user::user_vault_id.eq(uv_id))
+                    .filter(scoped_vault::id.eq(id))
+                    .filter(scoped_vault::vault_id.eq(uv_id))
             }
             ScopedVaultIdentifier::FpUserId {
                 fp_user_id,
@@ -194,9 +194,9 @@ impl ScopedVault {
                 is_live,
             } => {
                 query = query
-                    .filter(scoped_user::fp_user_id.eq(fp_user_id))
-                    .filter(scoped_user::tenant_id.eq(t_id))
-                    .filter(scoped_user::is_live.eq(is_live));
+                    .filter(scoped_vault::fp_user_id.eq(fp_user_id))
+                    .filter(scoped_vault::tenant_id.eq(t_id))
+                    .filter(scoped_vault::is_live.eq(is_live));
             }
         }
         let result = query.first(conn)?;

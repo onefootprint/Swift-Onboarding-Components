@@ -73,7 +73,7 @@ impl<Type> WriteableVw<Type> {
     ) -> ApiResult<Vec<VaultData>> {
         // Must do this validation here inside the locked, WriteableUvw
         let request = self.validate_request(request)?;
-        let vds = request.save(conn, self.vault(), self.scoped_user_id.clone())?;
+        let vds = request.save(conn, self.vault(), self.scoped_vault_id.clone())?;
         Ok(vds)
     }
 
@@ -115,7 +115,7 @@ impl<Type> WriteableVw<Type> {
             let info = DataCollectedInfo {
                 attributes: cdos.into_iter().collect(),
             };
-            UserTimeline::create(conn, info, self.vault.id.clone(), self.scoped_user_id.clone())?;
+            UserTimeline::create(conn, info, self.vault.id.clone(), self.scoped_vault_id.clone())?;
         }
         Ok(())
     }
@@ -169,7 +169,7 @@ impl WriteableVw<Person> {
         s3_url: String,
     ) -> ApiResult<DocumentData> {
         let vault_id = self.vault.id.clone();
-        let su_id = self.scoped_user_id.clone();
+        let su_id = self.scoped_vault_id.clone();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::bulk_deactivate_speculative(conn, &su_id, vec![kind.into()], seqno)?;
@@ -189,7 +189,7 @@ impl WriteableVw<Person> {
         doc_id: DocumentDataId,
     ) -> Result<(), DbError> {
         let info = DocumentUploadedInfo { id: doc_id };
-        UserTimeline::create(conn, info, self.vault().id.clone(), self.scoped_user_id.clone())
+        UserTimeline::create(conn, info, self.vault().id.clone(), self.scoped_vault_id.clone())
     }
 }
 

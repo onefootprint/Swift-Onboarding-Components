@@ -14,7 +14,7 @@ use super::insight_event::InsightEvent;
 #[diesel(table_name = webauthn_credential)]
 pub struct WebauthnCredential {
     pub id: WebauthnCredentialId,
-    pub user_vault_id: VaultId,
+    pub vault_id: VaultId,
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub counter: i32,
@@ -37,18 +37,18 @@ struct UpdateCredentialBackupState {
 
 impl WebauthnCredential {
     #[tracing::instrument(skip_all)]
-    pub fn get_for_user_vault(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<Self>> {
+    pub fn get_for_user_vault(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Self>> {
         let creds = schema::webauthn_credential::table
-            .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
+            .filter(schema::webauthn_credential::vault_id.eq(vault_id))
             .get_results(conn)?;
 
         Ok(creds)
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list(conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
+    pub fn list(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
         let creds = schema::webauthn_credential::table
-            .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
+            .filter(schema::webauthn_credential::vault_id.eq(vault_id))
             .inner_join(schema::insight_event::table)
             .get_results(conn)?;
 
@@ -69,9 +69,9 @@ impl WebauthnCredential {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn update_backup_state(conn: &mut PgConn, user_vault_id: &VaultId, cred_id: &[u8]) -> DbResult<()> {
+    pub fn update_backup_state(conn: &mut PgConn, vault_id: &VaultId, cred_id: &[u8]) -> DbResult<()> {
         diesel::update(webauthn_credential::table)
-            .filter(webauthn_credential::user_vault_id.eq(user_vault_id))
+            .filter(webauthn_credential::vault_id.eq(vault_id))
             .filter(webauthn_credential::credential_id.eq(cred_id))
             .set(&UpdateCredentialBackupState { backup_state: true })
             .execute(conn)?;
@@ -82,7 +82,7 @@ impl WebauthnCredential {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = webauthn_credential)]
 pub struct NewWebauthnCredential {
-    pub user_vault_id: VaultId,
+    pub vault_id: VaultId,
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub attestation_data: Vec<u8>,

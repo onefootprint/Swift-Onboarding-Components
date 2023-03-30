@@ -118,11 +118,11 @@ pub async fn setup_test_fixtures(
                 ManualReview::create(conn, ob.id.clone())?;
             }
 
-            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &ob.scoped_user_id)?;
+            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &ob.scoped_vault_id)?;
             // Create some mock verification request and results
             let request = VerificationRequest::bulk_create(
                 conn,
-                ob.scoped_user_id.clone(),
+                ob.scoped_vault_id.clone(),
                 vec![VendorAPI::IdologyExpectID],
                 &decision_intent.id,
             )?
@@ -152,7 +152,7 @@ pub async fn setup_test_fixtures(
             // TODO should we move the creation of the decision onto the locked UVW since we also
             // commit the data there? Would dedupe this logic between tests + prod
             let new_decision = OnboardingDecisionCreateArgs {
-                user_vault_id: su.user_vault_id.clone(),
+                vault_id: su.vault_id.clone(),
                 onboarding: &ob,
                 logic_git_hash: crate::GIT_HASH.to_string(),
                 status: decision_status,
@@ -173,7 +173,7 @@ pub async fn setup_test_fixtures(
                 let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
                 let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
                 let new_decision = OnboardingDecisionCreateArgs {
-                    user_vault_id: sb.user_vault_id,
+                    vault_id: sb.vault_id,
                     onboarding: &biz_ob,
                     logic_git_hash: crate::GIT_HASH.to_string(),
                     status: decision_status,

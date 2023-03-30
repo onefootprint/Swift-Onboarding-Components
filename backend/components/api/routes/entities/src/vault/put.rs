@@ -109,7 +109,7 @@ pub async fn put_inner(
 
             // Create an access event to show data was added
             NewAccessEvent {
-                scoped_user_id: scoped_user.id.clone(),
+                scoped_vault_id: scoped_user.id.clone(),
                 reason: None,
                 principal,
                 insight,

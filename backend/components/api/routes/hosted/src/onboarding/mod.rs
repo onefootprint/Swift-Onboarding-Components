@@ -151,7 +151,8 @@ pub fn get_fields_to_authorize(
     let mut selfie_collected = false;
     if ob_config.can_access_document() {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-        let identity_documents = IdentityDocument::get_for_scoped_user_id(conn, &onboarding.scoped_user_id)?;
+        let identity_documents =
+            IdentityDocument::get_for_scoped_vault_id(conn, &onboarding.scoped_vault_id)?;
 
         identity_document_types = identity_documents
             .iter()

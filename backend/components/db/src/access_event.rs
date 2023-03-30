@@ -33,7 +33,7 @@ pub type AccessEventInfo = (AccessEvent, SaturatedActor);
 #[derive(Debug)]
 pub struct AccessEventListItemForTenant {
     pub event: AccessEventInfo,
-    pub scoped_user: ScopedVault,
+    pub scoped_vault: ScopedVault,
     pub insight: Option<InsightEvent>,
 }
 
@@ -48,19 +48,19 @@ impl AccessEventListItemForTenant {
         let list_items = pool
             .db_query(move |conn| -> DbResult<_> {
                 let mut results = schema::access_event::table
-                    .inner_join(schema::scoped_user::table)
+                    .inner_join(schema::scoped_vault::table)
                     .left_join(schema::insight_event::table)
                     .left_join(
-                        schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_user::tenant_id)),
+                        schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_vault::tenant_id)),
                     )
                     .order_by(schema::access_event::ordering_id.desc())
-                    .filter(schema::scoped_user::tenant_id.eq(params.tenant_id))
-                    .filter(schema::scoped_user::is_live.eq(params.is_live))
+                    .filter(schema::scoped_vault::tenant_id.eq(params.tenant_id))
+                    .filter(schema::scoped_vault::is_live.eq(params.is_live))
                     .limit(page_size)
                     .into_boxed();
 
                 if let Some(fp_user_id) = params.fp_user_id {
-                    results = results.filter(schema::scoped_user::fp_user_id.eq(fp_user_id))
+                    results = results.filter(schema::scoped_vault::fp_user_id.eq(fp_user_id))
                 }
 
                 if let Some(search) = params.search {
@@ -68,7 +68,7 @@ impl AccessEventListItemForTenant {
                         schema::access_event::reason
                             .ilike(format!("%{}%", search))
                             .or(schema::tenant::name.ilike(format!("%{}%", search))) // TODO also search on tenant name
-                            .or(schema::scoped_user::fp_user_id.eq(search.clone()))
+                            .or(schema::scoped_vault::fp_user_id.eq(search.clone()))
                             .or(schema::access_event::targets.overlaps_with(vec![search])),
                     )
                 }
@@ -104,7 +104,7 @@ impl AccessEventListItemForTenant {
                     .zip(access_event_infos.into_iter())
                     .map(|((_, scoped_user, insight_event, _), access_event_info)| Self {
                         event: access_event_info,
-                        scoped_user,
+                        scoped_vault: scoped_user,
                         insight: insight_event,
                     })
                     .collect();
@@ -121,21 +121,21 @@ impl AccessEventListItemForTenant {
 pub struct AccessEventListItemForUser {
     pub event: AccessEventInfo,
     pub tenant_name: String,
-    pub scoped_user: ScopedVault,
+    pub scoped_vault: ScopedVault,
 }
 
 impl AccessEventListItemForUser {
     /// get access events for a user
-    pub async fn get(pool: &DbPool, user_vault_id: VaultId) -> Result<Vec<Self>, DbError> {
+    pub async fn get(pool: &DbPool, vault_id: VaultId) -> Result<Vec<Self>, DbError> {
         let list_items = pool
             .db_query(move |conn| -> DbResult<_> {
                 let results: Vec<(AccessEvent, ScopedVault, Tenant)> = schema::access_event::table
-                    .inner_join(schema::scoped_user::table)
+                    .inner_join(schema::scoped_vault::table)
                     .inner_join(
-                        schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_user::tenant_id)),
+                        schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_vault::tenant_id)),
                     )
                     .order_by(schema::access_event::timestamp.desc())
-                    .filter(schema::scoped_user::user_vault_id.eq(user_vault_id))
+                    .filter(schema::scoped_vault::vault_id.eq(vault_id))
                     .load(conn)?;
 
                 // Saturate the actors on the access events
@@ -146,7 +146,7 @@ impl AccessEventListItemForUser {
                     .zip(access_event_infos.into_iter())
                     .map(|((_, scoped_user, tenant), access_event_info)| Self {
                         event: access_event_info,
-                        scoped_user,
+                        scoped_vault: scoped_user,
                         tenant_name: tenant.name,
                     })
                     .collect();

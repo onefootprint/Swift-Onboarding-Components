@@ -64,7 +64,7 @@ pub async fn vault_pii(
 
                 if !custom.is_empty() {
                     NewAccessEvent {
-                        scoped_user_id: scoped_user.id.clone(),
+                        scoped_vault_id: scoped_user.id.clone(),
                         reason: None,
                         principal,
                         insight,

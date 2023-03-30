@@ -73,7 +73,7 @@ impl WriteableVw<Person> {
         // TODO only portablize data collected by the ob config rather than all data
         // TODO also only portablize the _exact_ data that was sent off to be verified. It's possible
         // the data has been changed via API in between sending VReqs and now.
-        let Self { uvw, scoped_user_id } = self;
+        let Self { uvw, scoped_vault_id } = self;
 
         // Use the same seqno to deactivate old data and portablize new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -148,7 +148,7 @@ impl WriteableVw<Person> {
                 uvw.speculative.get_lifetimes(speculative_kinds_to_portablize);
             let all_data_is_speculative_and_belongs_to_scoped_user = speculative_lifetimes_to_portablize
                 .iter()
-                .all(|l| l.portablized_seqno.is_none() && l.scoped_user_id == scoped_user_id);
+                .all(|l| l.portablized_seqno.is_none() && l.scoped_vault_id == scoped_vault_id);
             if !all_data_is_speculative_and_belongs_to_scoped_user {
                 // Just a sanity check filter that we don't portablize other data - all results should match
                 // this filter
@@ -162,14 +162,14 @@ impl WriteableVw<Person> {
                 .map(|l| l.id.clone())
                 .collect()
         };
-        DataLifetime::bulk_portablize_for_tenant(conn, lifetime_ids_to_portablize, &scoped_user_id, seqno)?;
+        DataLifetime::bulk_portablize_for_tenant(conn, lifetime_ids_to_portablize, &scoped_vault_id, seqno)?;
 
         // Portablize any data collection timeline events from the duration of this onboarding.
         // NOTE: this may include data collection events for fields that we deactivated... It is
         // tricky to locate the exact timeline events corresponding to each piece of data. Not
         // worth it for now since we only deactivate speculative data in the rare condition that
         // there is a race across onboarding onto two tenants
-        UserTimeline::bulk_portablize(conn, &scoped_user_id, DbUserTimelineEventKind::DataCollected)?;
+        UserTimeline::bulk_portablize(conn, &scoped_vault_id, DbUserTimelineEventKind::DataCollected)?;
 
         Ok(seqno)
     }

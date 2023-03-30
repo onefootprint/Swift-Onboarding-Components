@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::actor::SaturatedActor;
 use crate::models::verification_request::VerificationRequest;
 use crate::schema::onboarding;
-use crate::schema::scoped_user;
+use crate::schema::scoped_vault;
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{
@@ -63,7 +63,7 @@ pub struct OnboardingDecisionJunction {
 
 #[derive(Debug)]
 pub struct OnboardingDecisionCreateArgs<'a> {
-    pub user_vault_id: VaultId,
+    pub vault_id: VaultId,
     pub onboarding: &'a Locked<Onboarding>,
     pub logic_git_hash: String,
     pub status: DecisionStatus,
@@ -121,8 +121,8 @@ impl OnboardingDecision {
             id: result.id.clone(),
             annotation_id: args.annotation_id,
         };
-        let su_id = args.onboarding.scoped_user_id.clone();
-        UserTimeline::create(conn, decision_info, args.user_vault_id, su_id)?;
+        let su_id = args.onboarding.scoped_vault_id.clone();
+        UserTimeline::create(conn, decision_info, args.vault_id, su_id)?;
         Ok(result)
     }
 
@@ -193,10 +193,10 @@ impl OnboardingDecision {
     ) -> DbResult<Option<Self>> {
         let res = onboarding_decision::table
             .filter(onboarding_decision::actor.eq(DbActor::Footprint))
-            .inner_join(onboarding::table.inner_join(scoped_user::table))
-            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
+            .inner_join(onboarding::table.inner_join(scoped_vault::table))
+            .filter(scoped_vault::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(is_live))
             .order_by(onboarding_decision::created_at.desc())
             .select(onboarding_decision::all_columns)
             .first(conn)

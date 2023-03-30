@@ -10,11 +10,11 @@ use crate::{
 
 pub fn create(
     conn: &mut TxnPgConn,
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
     ob_configuration_id: ObConfigurationId,
 ) -> Onboarding {
     let ob_args = OnboardingCreateArgs {
-        scoped_user_id,
+        scoped_vault_id,
         ob_configuration_id,
         insight_event: CreateInsightEvent { ..Default::default() },
     };

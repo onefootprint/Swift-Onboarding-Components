@@ -273,7 +273,7 @@ pub async fn post(
             doc_request,
             document_verification_request,
             auth_info.scoped_user.id.clone(),
-            auth_info.scoped_user.user_vault_id.clone(),
+            auth_info.scoped_user.vault_id.clone(),
             identity_document.id.clone(),
         )
         .await?;
@@ -354,7 +354,7 @@ pub fn construct_get_response(
     // to handle each set of errors appropriately
     let (current_request, previous_request, previous_request_verification_result) =
         DbDocumentRequest::get_latest_with_previous_request_and_result(conn, &scoped_user_id)?;
-    let retry_limit_exceeded = retry_limit_exceeded(conn, &current_request.scoped_user_id).unwrap_or(false);
+    let retry_limit_exceeded = retry_limit_exceeded(conn, &current_request.scoped_vault_id).unwrap_or(false);
 
     let should_return_errors = matches!(
         current_request.status,
@@ -478,7 +478,7 @@ async fn handle_scan_onboarding_request(
                 //   There's a the question of how to represent this in the document request status, if at all.
                 //   Since "failing due to retries" is a part of the overall bifrost "Doc collection" step, and not an individual doc request itself.
                 //   I think in order to maintain a serialized log of why an entire set of document requests failed, we'd need a new data model and this just seemed simpler for now to encode in runtime logic
-                if !retry_limit_exceeded(conn.conn(), &current_doc_request.scoped_user_id)? {
+                if !retry_limit_exceeded(conn.conn(), &current_doc_request.scoped_vault_id)? {
                     // Create a new document request.
                     // ref_id is None here since we are retrying scan onboarding!
                     DbDocumentRequest::create(

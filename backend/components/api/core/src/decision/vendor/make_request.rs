@@ -56,7 +56,7 @@ pub async fn send_idv_request(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
         vendor_api = request.vendor_api.clone().to_string(),
-        scoped_user_id = %request.scoped_user_id,
+        scoped_user_id = %request.scoped_vault_id,
         onboarding_id = %onboarding_id,
     );
     // Make the request to the IDV vendor
@@ -123,7 +123,7 @@ pub async fn send_docv_request(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
         vendor_api = request.vendor_api.clone().to_string(),
-        scoped_user_id = %request.scoped_user_id,
+        scoped_user_id = %request.scoped_vault_id,
         onboarding_id = %onboarding_id,
     );
     // Make the request to the DocV vendor

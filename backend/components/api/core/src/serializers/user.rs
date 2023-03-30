@@ -52,7 +52,7 @@ impl DbToApi<ScopedVault> for api_wire_types::User {
         let ScopedVault {
             id: _,
             fp_user_id,
-            user_vault_id: _,
+            vault_id: _,
             tenant_id: _,
             _created_at,
             _updated_at,

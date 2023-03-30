@@ -21,7 +21,7 @@ impl<Type> VaultWrapper<Type> {
         let uvw = Self::build(conn, VwArgs::Tenant(scoped_user_id))?;
         let ob_uvw = WriteableVw::<Type> {
             uvw: Locked::new(uvw),
-            scoped_user_id: scoped_user_id.clone(),
+            scoped_vault_id: scoped_user_id.clone(),
         };
         Ok(ob_uvw)
     }

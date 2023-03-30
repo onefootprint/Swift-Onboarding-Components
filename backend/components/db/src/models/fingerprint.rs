@@ -71,7 +71,7 @@ impl Fingerprint {
             .filter(fingerprint::sh_data.eq_any(sh_datas))
             .inner_join(data_lifetime::table)
             .group_by(fingerprint::kind)
-            .select((fingerprint::kind, count_distinct(data_lifetime::user_vault_id)))
+            .select((fingerprint::kind, count_distinct(data_lifetime::vault_id)))
             .get_results(conn)?;
 
         Ok(res)

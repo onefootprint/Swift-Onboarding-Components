@@ -23,7 +23,7 @@ impl DecryptRequest {
             insight,
         } = self;
         let event = NewAccessEvent {
-            scoped_user_id,
+            scoped_vault_id: scoped_user_id,
             reason: Some(reason),
             principal,
             insight,

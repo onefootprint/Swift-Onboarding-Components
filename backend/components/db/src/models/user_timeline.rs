@@ -29,12 +29,12 @@ use strum::IntoEnumIterator;
 #[diesel(table_name = user_timeline)]
 pub struct UserTimeline {
     pub id: UserTimelineId,
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub user_vault_id: VaultId,
+    pub vault_id: VaultId,
     /// Designates whether the UserTimeline event can be seen by tenants other than the one that created it
     pub is_portable: bool,
 }
@@ -42,8 +42,8 @@ pub struct UserTimeline {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = user_timeline)]
 pub struct NewUserTimeline {
-    pub user_vault_id: VaultId,
-    pub scoped_user_id: ScopedVaultId,
+    pub vault_id: VaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub is_portable: bool,
@@ -73,16 +73,16 @@ impl UserTimeline {
     pub fn create<T>(
         conn: &mut PgConn,
         event: T,
-        user_vault_id: VaultId,
-        scoped_user_id: ScopedVaultId,
+        vault_id: VaultId,
+        scoped_vault_id: ScopedVaultId,
     ) -> DbResult<()>
     where
         T: Into<DbUserTimelineEvent>,
     {
         let new = NewUserTimeline {
             event: event.into(),
-            scoped_user_id,
-            user_vault_id,
+            scoped_vault_id,
+            vault_id,
             timestamp: chrono::Utc::now(),
             is_portable: false,
         };
@@ -95,11 +95,11 @@ impl UserTimeline {
     #[tracing::instrument(skip_all)]
     pub fn bulk_portablize(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
         kind: DbUserTimelineEventKind,
     ) -> DbResult<()> {
         let events = user_timeline::table
-            .filter(user_timeline::scoped_user_id.eq(scoped_user_id))
+            .filter(user_timeline::scoped_vault_id.eq(scoped_vault_id))
             .get_results::<Self>(conn)?;
         // Since we can't filter on the jsonb column very easily in postgres, filter in RAM. There
         // won't be many events for each scoped user
@@ -109,7 +109,7 @@ impl UserTimeline {
             .map(|e| e.id)
             .collect_vec();
         diesel::update(user_timeline::table)
-            .filter(user_timeline::scoped_user_id.eq(scoped_user_id))
+            .filter(user_timeline::scoped_vault_id.eq(scoped_vault_id))
             .filter(user_timeline::id.eq_any(event_ids))
             .set(user_timeline::is_portable.eq(true))
             .execute(conn)?;
@@ -119,21 +119,21 @@ impl UserTimeline {
     #[tracing::instrument(skip_all)]
     pub fn list<'a, T>(
         conn: &mut PgConn,
-        scoped_user_id: T,
+        scoped_vault_id: T,
         tenant_can_view_socure_risk_signal: bool,
     ) -> DbResult<Vec<UserTimelineInfo>>
     where
         T: Into<ScopedVaultIdentifier<'a>>,
     {
-        let su = ScopedVault::get(conn, scoped_user_id)?;
+        let su = ScopedVault::get(conn, scoped_vault_id)?;
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
         let results: Vec<Self> = user_timeline::table
-            .filter(user_timeline::user_vault_id.eq(&su.user_vault_id))
+            .filter(user_timeline::vault_id.eq(&su.vault_id))
             .filter(
-                user_timeline::scoped_user_id
+                user_timeline::scoped_vault_id
                     .is_null()
-                    .or(user_timeline::scoped_user_id.eq(&su.id))
+                    .or(user_timeline::scoped_vault_id.eq(&su.id))
                     .or(user_timeline::is_portable),
             )
             .order_by(user_timeline::timestamp.asc())
@@ -243,7 +243,7 @@ impl UserTimeline {
                 };
                 // This will actually display that events from different ob configs at the same
                 // tenant belong to a different tenant. Probably okay.
-                let is_from_other_tenant = ut.scoped_user_id != su.id;
+                let is_from_other_tenant = ut.scoped_vault_id != su.id;
                 Ok(UserTimelineInfo(ut, is_from_other_tenant, saturated_event))
             })
             .collect::<DbResult<Vec<_>>>()?;
@@ -282,10 +282,10 @@ mod tests {
     #[db_test]
     fn test_list(conn: &mut TestPgConn) {
         let is_live = true;
-        let user_vault = fixtures::vault::create_person(conn, true).into_inner();
+        let vault = fixtures::vault::create_person(conn, true).into_inner();
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-        let scoped_user = fixtures::scoped_vault::create(conn, &user_vault.id, &ob_config.id);
+        let scoped_vault = fixtures::scoped_vault::create(conn, &vault.id, &ob_config.id);
 
         let tenant_user1 = test_tenant_user(conn, String::from("tu1@acme.com"), None, None);
         let tenant_user2 = test_tenant_user(conn, String::from("tu2@acme.com"), None, None);
@@ -294,8 +294,8 @@ mod tests {
             conn,
             String::from("yo sup"),
             false,
-            scoped_user.id.clone(),
-            user_vault.id.clone(),
+            scoped_vault.id.clone(),
+            vault.id.clone(),
             DbActor::TenantUser {
                 id: tenant_user1.id.clone(),
             },
@@ -306,8 +306,8 @@ mod tests {
             conn,
             String::from("yo sup"),
             false,
-            scoped_user.id.clone(),
-            user_vault.id.clone(),
+            scoped_vault.id.clone(),
+            vault.id.clone(),
             DbActor::TenantUser {
                 id: tenant_user2.id.clone(),
             },
@@ -316,12 +316,12 @@ mod tests {
 
         let tenant_api_key = test_tenant_api_key(conn, String::from("test key"), tenant.id.clone(), is_live);
 
-        let user_vault_id = user_vault.id;
+        let user_vault_id = vault.id;
         let annotation3 = test_annotation(
             conn,
             String::from("yo sup"),
             false,
-            scoped_user.id.clone(),
+            scoped_vault.id.clone(),
             user_vault_id,
             DbActor::TenantApiKey {
                 id: tenant_api_key.id.clone(),
@@ -330,7 +330,7 @@ mod tests {
         .0;
 
         let user_timeline_infos =
-            UserTimeline::list(conn, (&scoped_user.fp_user_id, &tenant.id, is_live), true).unwrap();
+            UserTimeline::list(conn, (&scoped_vault.fp_user_id, &tenant.id, is_live), true).unwrap();
 
         assert_eq!(3, user_timeline_infos.len());
 

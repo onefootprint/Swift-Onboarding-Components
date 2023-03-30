@@ -83,7 +83,7 @@ impl DocumentData {
     ) -> DbResult<Option<Self>> {
         let res = document_data::table
             .inner_join(data_lifetime::table)
-            .filter(data_lifetime::scoped_user_id.eq(scoped_vault_id))
+            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
             .order_by(document_data::_created_at.desc())
             .select(document_data::all_columns)
             .first(conn)

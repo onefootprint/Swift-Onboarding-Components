@@ -15,7 +15,7 @@ pub type DocRefId = String;
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<DocRefId>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
@@ -53,13 +53,13 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
-        scoped_user_id: ScopedVaultId,
+        scoped_vault_id: ScopedVaultId,
         ref_id: Option<String>,
         should_collect_selfie: bool,
         previous_document_request_id: Option<DocumentRequestId>,
     ) -> DbResult<Self> {
         let new = NewDocumentRequest {
-            scoped_user_id,
+            scoped_vault_id,
             ref_id,
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
@@ -75,9 +75,9 @@ impl DocumentRequest {
 
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
     #[tracing::instrument(skip_all)]
-    pub fn lock_active(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
+    pub fn lock_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
         let result = document_request::table
-            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
             .for_no_key_update()
             .first::<Self>(conn)?;
@@ -87,9 +87,9 @@ impl DocumentRequest {
 
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
     #[tracing::instrument(skip_all)]
-    pub fn get_active(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> DbResult<Self> {
+    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
         let result = document_request::table
-            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
             .first::<Self>(conn)?;
 
@@ -99,11 +99,11 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn get(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
         request_id: &DocumentRequestId,
     ) -> DbResult<Self> {
         let result = document_request::table
-            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
             .filter(document_request::id.eq(request_id))
             .first(conn)?;
 
@@ -133,11 +133,11 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn count_statuses(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
         statuses: Vec<DocumentRequestStatus>,
     ) -> DbResult<i64> {
         let num_status: i64 = document_request::table
-            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
             .filter(document_request::status.eq_any(statuses))
             .count()
             .get_result(conn)?;
@@ -147,14 +147,14 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn get_latest_with_previous_request_and_result(
         conn: &mut PgConn,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
     ) -> DbResult<(
         DocumentRequest,
         Option<DocumentRequest>,
         Option<VerificationResult>,
     )> {
         let latest_doc_request: Self = document_request::table
-            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
             .order_by(document_request::created_at.desc())
             .first(conn)?;
 
@@ -164,7 +164,7 @@ impl DocumentRequest {
                 Option<DocumentRequest>,
             ) = document_request::table
                 .filter(document_request::id.eq(previous_doc_request_id))
-                .filter(document_request::scoped_user_id.eq(scoped_user_id))
+                .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
                 .inner_join(identity_document::table)
                 .select((identity_document::id, document_request::all_columns))
                 .first::<(IdentityDocumentId, DocumentRequest)>(conn)
@@ -189,12 +189,12 @@ impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn lock(
         conn: &mut TxnPgConn,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
         id: &DocumentRequestId,
     ) -> DbResult<Locked<Self>> {
         let result = document_request::table
             .filter(document_request::id.eq(id))
-            .filter(document_request::scoped_user_id.eq(scoped_user_id))
+            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
             .for_no_key_update()
             .get_result(conn.conn())?;
         Ok(Locked::new(result))
@@ -209,7 +209,7 @@ impl DocumentRequest {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct NewDocumentRequest {
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<String>,
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,

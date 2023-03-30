@@ -11,7 +11,7 @@ use super::insight_event::CreateInsightEvent;
 #[diesel(table_name = access_event)]
 pub struct AccessEvent {
     pub id: AccessEventId,
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -25,7 +25,7 @@ pub struct AccessEvent {
 
 #[derive(Debug, Clone)]
 pub struct NewAccessEvent {
-    pub scoped_user_id: ScopedVaultId,
+    pub scoped_vault_id: ScopedVaultId,
     pub reason: Option<String>,
     pub principal: DbActor,
     pub insight: CreateInsightEvent,
@@ -36,7 +36,7 @@ pub struct NewAccessEvent {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
 struct NewAccessEventWithInsight {
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
     insight_event_id: InsightEventId,
     reason: Option<String>,
     principal: DbActor,
@@ -49,7 +49,7 @@ impl NewAccessEvent {
     pub fn create(self, conn: &mut PgConn) -> Result<(), crate::DbError> {
         let insight_ev = self.insight.insert_with_conn(conn)?;
         let event = NewAccessEventWithInsight {
-            scoped_user_id: self.scoped_user_id,
+            scoped_vault_id: self.scoped_vault_id,
             insight_event_id: insight_ev.id,
             reason: self.reason,
             principal: self.principal,

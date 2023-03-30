@@ -92,7 +92,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 } else {
                     let sv = ScopedVault::get(conn, &sv_id)?;
                     let ob = if sv.ob_configuration_id.is_some() {
-                        let (ob, _, _, _) = Onboarding::get(conn, (&sv_id, &sv.user_vault_id))?;
+                        let (ob, _, _, _) = Onboarding::get(conn, (&sv_id, &sv.vault_id))?;
                         Some(ob)
                     } else {
                         // vault-only vaults do not have an onboarding
