@@ -32,9 +32,7 @@ futures = { workspace = true }
 # diesel
 diesel = { workspace = true }
 diesel-derive-newtype = { workspace = true }
-diesel_migrations = { workspace = true }
 
-diesel-derive-enum = { workspace = true }
 diesel_as_jsonb = "1.0.0"
 phonenumber = "0.3.1"
 url = { workspace = true }

@@ -450,7 +450,6 @@ dependencies = [
  "actix-web-httpauth",
  "actix-web-prom",
  "api_wire_types",
- "app-attest",
  "async-trait",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
@@ -459,7 +458,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -491,13 +489,10 @@ dependencies = [
  "prometheus",
  "rand 0.8.5",
  "reqwest",
- "sentry",
- "sentry-actix",
  "sentry-tracing",
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -523,14 +518,12 @@ dependencies = [
 name = "api_route_entities"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
  "actix-web-prom",
  "api_core",
  "api_wire_types",
- "app-attest",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
  "aws-sdk-s3",
@@ -538,7 +531,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -555,7 +547,6 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
- "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",
@@ -568,7 +559,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -590,7 +580,6 @@ dependencies = [
 name = "api_route_hosted"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
@@ -605,7 +594,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -657,14 +645,12 @@ dependencies = [
 name = "api_route_index"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
  "actix-web-prom",
  "api_core",
  "api_wire_types",
- "app-attest",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
  "aws-sdk-s3",
@@ -672,7 +658,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -689,7 +674,6 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
- "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",
@@ -702,7 +686,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -724,14 +707,12 @@ dependencies = [
 name = "api_route_onboarding"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
  "actix-web-prom",
  "api_core",
  "api_wire_types",
- "app-attest",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
  "aws-sdk-s3",
@@ -739,7 +720,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -756,7 +736,6 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
- "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",
@@ -769,7 +748,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -791,14 +769,12 @@ dependencies = [
 name = "api_route_org"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
  "actix-web-prom",
  "api_core",
  "api_wire_types",
- "app-attest",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
  "aws-sdk-s3",
@@ -806,7 +782,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -823,7 +798,6 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
- "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",
@@ -836,7 +810,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -858,14 +831,12 @@ dependencies = [
 name = "api_route_private"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
  "actix-web-prom",
  "api_core",
  "api_wire_types",
- "app-attest",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
  "aws-sdk-s3",
@@ -873,7 +844,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -890,7 +860,6 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
- "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",
@@ -903,7 +872,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -925,14 +893,12 @@ dependencies = [
 name = "api_route_proxy"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
  "actix-web-prom",
  "api_core",
  "api_wire_types",
- "app-attest",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
  "aws-sdk-s3",
@@ -940,7 +906,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -957,7 +922,6 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
- "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",
@@ -970,7 +934,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -992,7 +955,6 @@ dependencies = [
 name = "api_route_users"
 version = "0.1.0"
 dependencies = [
- "actix-cors",
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
@@ -1000,7 +962,6 @@ dependencies = [
  "api_core",
  "api_route_entities",
  "api_wire_types",
- "app-attest",
  "aws-config 0.49.0",
  "aws-sdk-kms 0.19.0",
  "aws-sdk-s3",
@@ -1008,7 +969,6 @@ dependencies = [
  "byteorder",
  "bytes 1.3.0",
  "chrono",
- "chronoutil",
  "crypto",
  "db",
  "derive_more",
@@ -1025,7 +985,6 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
- "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",
@@ -1038,7 +997,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",
@@ -2214,15 +2172,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chronoutil"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43a58c924bb772aa201da3acf5308c46b60275c64e6d3bc89c23dd63d71e83fd"
-dependencies = [
- "chrono",
-]
-
-[[package]]
 name = "cipher"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2709,17 +2658,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "diesel-derive-enum"
-version = "2.0.0-pre"
-source = "git+https://github.com/adwhit/diesel-derive-enum?rev=e6aa69856245f083645a0087527236a6bff42c18#e6aa69856245f083645a0087527236a6bff42c18"
-dependencies = [
- "heck 0.4.0",
- "proc-macro2 1.0.40",
- "quote 1.0.20",
- "syn 1.0.98",
-]
-
-[[package]]
 name = "diesel-derive-newtype"
 version = "2.0.0-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2811,7 +2749,6 @@ dependencies = [
  "tokio",
  "tokio-rustls 0.23.4",
  "webpki 0.22.0",
- "webpki-roots",
  "x509-parser 0.14.0",
 ]
 
@@ -3690,7 +3627,7 @@ dependencies = [
  "derive_more",
  "dotenv",
  "itertools 0.10.3",
- "levenshtein",
+ "macros",
  "mockall 0.9.1",
  "newtypes",
  "reqwest",
@@ -4302,10 +4239,8 @@ dependencies = [
  "crypto",
  "derive_more",
  "diesel",
- "diesel-derive-enum",
  "diesel-derive-newtype",
  "diesel_as_jsonb",
- "diesel_migrations",
  "either",
  "futures",
  "futures-util",
@@ -6784,9 +6719,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-test"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e3d272c44878d2bbc9f4a20ad463724f03e19dbc667c6e84ac433ab7ffcc70b"
+checksum = "3a2c0ff408fe918a94c428a3f2ad04e4afd5c95bbc08fcf868eff750c15728a4"
 dependencies = [
  "lazy_static",
  "tracing-core",
@@ -6796,9 +6731,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-test-macro"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "744324b12d69a9fc1edea4b38b7b1311295b662d161ad5deac17bb1358224a08"
+checksum = "258bc1c4f8e2e73a977812ab339d503e6feeb92700f6d07a6de4d321522d5c08"
 dependencies = [
  "lazy_static",
  "quote 1.0.20",

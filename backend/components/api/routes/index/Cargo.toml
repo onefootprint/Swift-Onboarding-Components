@@ -9,8 +9,6 @@ api_core = { path = "../../core" }
 crypto = { path = "../../../enclave/crypto" }
 enclave_proxy = { path = "../../../enclave/proxy" }
 newtypes = { path = "../../../newtypes" }
-app-attest = { path = "../../../app_attest" }
-macros = { path = "../../../macros" }
 db = { path = "../../../db" }
 twilio = { path = "../../../twilio"}
 idv = { path = "../../../idv" }
@@ -41,11 +39,8 @@ thiserror = { workspace = true }
 
 serde_json = { workspace = true }
 serde_cbor = { workspace = true }
-serde_repr = { workspace = true }
-actix-cors = "0.6"
 mime = "0.3.16"
 chrono = { workspace = true }
-chronoutil = "0.2.3"
 strum_macros = { workspace = true }
 actix-web-httpauth = "0.8.0"
 actix-web-prom = "0.6.0"
