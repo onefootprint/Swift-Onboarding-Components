@@ -24,7 +24,7 @@ impl DbToApi<AccessEventListItemForUser> for api_wire_types::AccessEvent {
         let (event, saturated_actor) = event;
 
         api_wire_types::AccessEvent {
-            fp_user_id: scoped_user.fp_id,
+            fp_id: scoped_user.fp_id,
             tenant_id: scoped_user.tenant_id,
             reason: event.reason,
             principal: saturated_actor_to_principal_string(&saturated_actor), // TODO: change to Actor::from_db when frontend can support it
@@ -47,7 +47,7 @@ impl DbToApi<AccessEventListItemForTenant> for api_wire_types::AccessEvent {
         let (event, saturated_actor) = event;
 
         api_wire_types::AccessEvent {
-            fp_user_id: scoped_user.fp_id,
+            fp_id: scoped_user.fp_id,
             tenant_id: scoped_user.tenant_id,
             reason: event.reason,
             principal: saturated_actor_to_principal_string(&saturated_actor), // TODO: change to Actor::from_db when frontend can support it
