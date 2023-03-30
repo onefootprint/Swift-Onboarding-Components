@@ -1,4 +1,4 @@
-import { mockRequest, userEvent, within } from '@onefootprint/test-utils';
+import { mockRequest } from '@onefootprint/test-utils';
 import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
 export const onboardingConfigDetailsFixture: OnboardingConfig = {
