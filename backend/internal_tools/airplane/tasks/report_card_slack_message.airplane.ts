@@ -9,7 +9,7 @@ const task = async params => {
     const keysInUse = (tenant.all_keys || []).map(k => `\`${k}\``).join(', ');
     return [
       header,
-      `• num scoped users: ${tenant.num_scoped_users || 0}`,
+      `• num scoped users: ${tenant.num_scoped_vaults || 0}`,
       `• max number of keys on one user: ${tenant.max_keys_per_user || 0}`,
       `• num proxy requests: ${tenant.num_proxy_requests || 0}`,
       `• keys in use: ${keysInUse}`,

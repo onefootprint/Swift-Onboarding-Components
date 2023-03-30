@@ -49,8 +49,8 @@ const OrgList = () => {
             COUNT(su.id) FILTER (WHERE su.is_live = 't') AS live,
             COUNT(su.id) FILTER (WHERE su.is_live = 'f') AS sandbox
           FROM tenant
-            INNER JOIN scoped_user as su ON su.tenant_id=tenant.id
-            INNER JOIN onboarding as ob ON ob.scoped_user_id=su.id
+            INNER JOIN scoped_vault as su ON su.tenant_id=tenant.id
+            INNER JOIN onboarding as ob ON ob.scoped_vault_id=su.id
           WHERE tenant.id NOT LIKE '_private_it%' and ob.authorized_at IS NOT NULL
           GROUP BY tenant.id;
           `,
