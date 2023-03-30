@@ -9,10 +9,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import TagList from '../../../tag-list';
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import AnimatedContainer from '../animated-container';
 import { useOnboardingConfigMachine } from '../machine-provider';
-import TagList from '../tag-list';
 import IdDocDescription from './components/id-doc-description';
 import InvestorProfileQuestions from './components/investor-profile-questions';
 

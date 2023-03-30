@@ -1011,7 +1011,40 @@
             }
           }
         },
-        "details": {}
+        "details": {
+          "name": {
+            "label": "Onboarding configuration name",
+            "placeholder": "User ID verification",
+            "errors": {
+              "required": "Please enter a name for the onboarding configuration."
+            }
+          },
+          "onboarding-details": {
+            "type": {
+              "label": "Type",
+              "kyb": "KYB",
+              "kyc": "KYC"
+            },
+            "key": "Publishable key"
+          },
+          "kyc-data-collection": {
+            "collected-data": "Collected data",
+            "accessed-data": "Access permission scope"
+          },
+          "kyb-data-collection": {
+            "title": "KYB",
+            "collected-data": "Collected data",
+            "accessed-data": "Access permission scope",
+            "all": "All business information",
+            "none": "No business information"
+          },
+          "kyb-bo-data-collection": {
+            "title": "KYC of a Beneficial owner",
+            "collected-data": "Collected data",
+            "accessed-data": "Access permission scope",
+            "none": "No beneficial owner information"
+          }
+        }
       },
       "webhooks": {
         "header": {

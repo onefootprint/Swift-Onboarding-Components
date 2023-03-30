@@ -8,10 +8,17 @@ export type FieldProps = {
 
 const Field = ({ label, children }: FieldProps) => (
   <div role="row" aria-label={label}>
-    <Typography variant="label-3" color="tertiary" sx={{ marginBottom: 3 }}>
+    <Typography
+      variant="label-3"
+      color="tertiary"
+      sx={{ marginBottom: 3 }}
+      as="div"
+    >
       {label}
     </Typography>
-    <Typography variant="body-3">{children}</Typography>
+    <Typography variant="body-3" as="div">
+      {children}
+    </Typography>
   </div>
 );
 

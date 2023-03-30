@@ -5,9 +5,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import TagList from '../../../tag-list';
 import FormTitle from '../../components/form-title';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
-import TagList from '../../components/tag-list';
 import getFormIdForState from '../../utils/get-form-id-for-state';
 
 type FormData = {

@@ -1,28 +1,20 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
-import {
-  CollectedDataOption,
-  CollectedKybDataOption,
-  OnboardingConfig,
-} from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 import { Badge, CodeInline } from '@onefootprint/ui';
 import React from 'react';
 
+import isKybOnboardingConfig from '../../../../utils/is-kyb-onboarding-config';
 import Actions from './components/actions';
 
 export type RowProps = {
   onboardingConfig: OnboardingConfig;
 };
 
-const isKybCdo = (data: CollectedDataOption) =>
-  Object.values(CollectedKybDataOption).includes(
-    data as CollectedKybDataOption,
-  );
-
 const Row = ({ onboardingConfig }: RowProps) => {
   const { t } = useTranslation('pages.developers.onboarding-configs-new');
   const { formatDateWithTime } = useIntl();
-  const { name, key, status, createdAt, mustCollectData } = onboardingConfig;
-  const isKyb = mustCollectData.some(data => isKybCdo(data));
+  const { name, key, status, createdAt } = onboardingConfig;
+  const isKyb = isKybOnboardingConfig(onboardingConfig);
 
   return (
     <>
