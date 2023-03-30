@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS kv_data;
+DROP TABLE IF EXISTS phone_number;
+DROP TABLE IF EXISTS email;

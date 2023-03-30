@@ -23,7 +23,7 @@ mod instrumented_connection;
 use std::time::Duration;
 
 pub use crate::errors::DbError;
-use crate::schema::{decision_intent, kv_data, user_consent};
+use crate::schema::{decision_intent, user_consent};
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::Runtime;
 use diesel::pg::PgConnection as DieselPgConnection;
@@ -193,10 +193,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     // we clean up afterwards.
 
     use schema::{
-        access_event, annotation, business_owner, contact_info, data_lifetime, document_request, email,
-        fingerprint, fingerprint_visit_event, identity_document, liveness_event, manual_review, onboarding,
-        onboarding_decision, onboarding_decision_verification_result_junction, phone_number, risk_signal,
-        scoped_user, socure_device_session, user_timeline, user_vault, user_vault_data, verification_request,
+        access_event, annotation, business_owner, contact_info, data_lifetime, document_request, fingerprint,
+        fingerprint_visit_event, identity_document, liveness_event, manual_review, onboarding,
+        onboarding_decision, onboarding_decision_verification_result_junction, risk_signal, scoped_user,
+        socure_device_session, user_timeline, user_vault, user_vault_data, verification_request,
         verification_result, webauthn_credential,
     };
     let mut deleted_rows = 0;
@@ -232,14 +232,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             .filter(data_lifetime::user_vault_id.eq_any(&v_ids))
             .select(data_lifetime::id);
 
-        deleted_rows += diesel::delete(email::table)
-            .filter(email::lifetime_id.eq_any(dl_ids.clone()))
-            .execute(conn.conn())?;
-
-        deleted_rows += diesel::delete(phone_number::table)
-            .filter(phone_number::lifetime_id.eq_any(dl_ids.clone()))
-            .execute(conn.conn())?;
-
         deleted_rows += diesel::delete(user_vault_data::table)
             .filter(user_vault_data::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
@@ -250,10 +242,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(identity_document::table)
             .filter(identity_document::lifetime_id.eq_any(dl_ids.clone()))
-            .execute(conn.conn())?;
-
-        deleted_rows += diesel::delete(kv_data::table)
-            .filter(kv_data::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(contact_info::table)
