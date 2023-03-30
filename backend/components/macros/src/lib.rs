@@ -10,16 +10,21 @@ extern crate proc_macro;
 #[proc_macro_attribute]
 /// Wraps a function that takes in a `TestPgConnection` and turns it into a rust `#[test]` function
 /// that takes no arguments with the same name
-pub fn db_test(
-    _args_stream: proc_macro::TokenStream,
-    stream: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
+pub fn db_test(args: proc_macro::TokenStream, stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ItemFn {
         attrs,
         vis: _,
         sig,
         block,
     } = parse_macro_input!(stream as ItemFn);
+
+    let args = parse_macro_input!(args as AttributeArgs);
+
+    let retain = if let Some(a) = args.first() {
+        matches!(a, syn::NestedMeta::Meta(Meta::Path(nv)) if nv.is_ident("retain"))
+    } else {
+        false
+    };
 
     let stmts = &block.stmts;
     let fn_name = &sig.ident;
@@ -37,7 +42,7 @@ pub fn db_test(
 
         #[test]
         fn #fn_name() {
-            run_test_txn(#fn_name::#fn_name);
+            run_test_txn(#fn_name::#fn_name, #retain);
         }
     };
     out.into()
@@ -128,7 +133,7 @@ fn render_db_test_cases(test_cases: &[TestCase], mut test_fn: ItemFn) -> TokenSt
         #test_fn_sig {
             run_test_txn(move |#conn_input| {
                 #(#test_fn_stmts)*
-            })
+            }, false)
         }
 
         #[cfg(test)]

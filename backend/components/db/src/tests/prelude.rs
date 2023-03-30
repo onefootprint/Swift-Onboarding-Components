@@ -28,14 +28,14 @@ enum Error<T> {
 }
 
 /// Util to run a single function inside of a test transaction
-pub fn run_test_txn<F, TRes>(f: F) -> TRes
+pub fn run_test_txn<F, TRes>(f: F, retain: bool) -> TRes
 where
     F: FnOnce(&mut TestPgConn) -> TRes + Send + 'static,
 {
-    run_test_txn_with_args(|conn, _| f(conn), ())
+    run_test_txn_with_args(|conn, _| f(conn), (), retain)
 }
 
-pub fn run_test_txn_with_args<F, TArgs, TRes>(f: F, args: TArgs) -> TRes
+pub fn run_test_txn_with_args<F, TArgs, TRes>(f: F, args: TArgs, retain: bool) -> TRes
 where
     F: FnOnce(&mut TestPgConn, TArgs) -> TRes + Send + 'static,
 {
@@ -45,10 +45,19 @@ where
     let result = c.transaction(|conn| -> Result<(), Error<TRes>> {
         let mut conn = TestPgConn::new(TxnPgConn::new(conn));
         let result = f(&mut conn, args);
-        // No matter what happens during the test execution, return an Err here to roll back the transaction.
-        // Hide the actual result of calling f() inside the Err response so we can unpack it and return
-        Err(Error::TransactionRollbackTest(result))
+        if retain {
+            // Manual flag provided to not rollback the transaction to allow debugging in DB shell
+            Ok(())
+        } else {
+            // Unless the retain flag has been passed, return an Err here to roll back the transaction
+            // no matter what happens during the test execution.
+            // Hide the actual result of calling f() inside the Err response so we can unpack it and return
+            Err(Error::TransactionRollbackTest(result))
+        }
     });
+    if retain {
+        panic!("Test transaction did not roll back since you requested to retain data. You may now inspect your local DB shell to see the side-effects of the test")
+    }
     let Err(Error::TransactionRollbackTest(result)) = result else {
         // Anything other than an Error::TransactionRollbackTest is not expected
         panic!("Test transaction did not roll back with expected error")
