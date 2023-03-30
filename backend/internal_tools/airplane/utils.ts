@@ -16,9 +16,7 @@ export async function protected_custodian_api_call(
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw `Failed with status ${error.response?.status}: ${JSON.stringify(
-        error.response,
-      )}`;
+      throw `Failed with status ${error.response?.status}: ${error.response?.statusText}`;
     } else {
       throw error;
     }
