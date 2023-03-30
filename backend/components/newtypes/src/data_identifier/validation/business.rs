@@ -4,6 +4,8 @@ use crate::email::Email;
 use crate::{BusinessDataKind as BDK, PhoneNumber, PiiString};
 use crate::{NtResult, Validate};
 use serde::Deserialize;
+use serde_with::DeserializeFromStr;
+use strum::EnumString;
 use url::{Host, Url};
 
 impl Validate for BDK {
@@ -22,9 +24,23 @@ impl Validate for BDK {
             BDK::Zip => utils::clean_and_validate_zip(value)?,
             BDK::Country => utils::clean_and_validate_country(value)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
+            BDK::CorporationType => utils::parse_enum::<CorporationType>(value)?,
         };
         Ok(result)
     }
+}
+
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
+#[strum(serialize_all = "snake_case")]
+enum CorporationType {
+    Corporation,
+    Llc,
+    Partnership,
+    SoleProprietorship,
+    NonProfit,
+    Unknown,
+    Trust,
+    Agent,
 }
 
 #[derive(Deserialize)]

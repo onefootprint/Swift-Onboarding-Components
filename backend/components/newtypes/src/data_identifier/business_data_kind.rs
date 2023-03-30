@@ -39,6 +39,7 @@ pub enum BusinessDataKind {
     Zip,
     Country,
     BeneficialOwners,
+    CorporationType,
 }
 
 impl From<BusinessDataKind> for DataIdentifier {
@@ -76,6 +77,7 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
             Self::Zip => CollectedData::BusinessAddress,
             Self::Country => CollectedData::BusinessAddress,
             Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
+            Self::CorporationType => CollectedData::BusinessCorporationType,
         };
         Some(result)
     }
