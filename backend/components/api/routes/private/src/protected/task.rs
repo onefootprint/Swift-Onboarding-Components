@@ -2,11 +2,11 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::{task, State};
-
 use chrono::Utc;
-use db::models::task::Task;
+use db::models::task::{Task, TaskCreateArgs};
+use db::models::watchlist_check::WatchlistCheck;
 use db::DbError;
-use newtypes::{TaskData, TaskId};
+use newtypes::{TaskData, TaskId, TenantId, WatchlistCheckArgs};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -64,4 +64,50 @@ async fn create_task(
         .await??;
 
     Ok(Json(ResponseData::ok(CreateTasksResponse { task_id: task.id })))
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct CreateOverdueWatchlistCheckTasksRequest {
+    pub tenant_id: TenantId,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct CreateOverdueWatchlistCheckTasksResponse {
+    pub num_created_tasks: usize,
+    pub created_tasks: Vec<TaskId>,
+}
+
+#[api_v2_operation(
+    description = "Creates WatchlistCheckTask's for livemode vaults that have not had a watchlist check in the past 30 days",
+    tags(Private)
+)]
+#[post("/private/protected/task/create_overdue_watchlist_check_tasks")]
+async fn create_overdue_watchlist_check_tasks(
+    state: web::Data<State>,
+    _: ProtectedCustodianAuthContext,
+    request: Json<CreateOverdueWatchlistCheckTasksRequest>,
+) -> actix_web::Result<Json<ResponseData<CreateOverdueWatchlistCheckTasksResponse>>, ApiError> {
+    let CreateOverdueWatchlistCheckTasksRequest { tenant_id } = request.into_inner();
+
+    let new_tasks = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, DbError> {
+            let overdue_svs = WatchlistCheck::get_overdue_scoped_vaults(conn, tenant_id)?;
+            let now = Utc::now();
+            let task_args: Vec<TaskCreateArgs> = overdue_svs
+                .into_iter()
+                .map(|sv| TaskCreateArgs {
+                    scheduled_for: now,
+                    task_data: TaskData::WatchlistCheck(WatchlistCheckArgs { scoped_vault_id: sv }),
+                })
+                .collect();
+            Task::bulk_create(conn, task_args)
+        })
+        .await??;
+
+    let created_tasks: Vec<TaskId> = new_tasks.into_iter().map(|t| t.id).collect();
+    Ok(Json(ResponseData::ok(CreateOverdueWatchlistCheckTasksResponse {
+        num_created_tasks: created_tasks.len(),
+        created_tasks,
+    })))
 }

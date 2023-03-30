@@ -41,4 +41,9 @@ mod verification_request;
 #[cfg(test)]
 mod tenant;
 
+#[allow(clippy::expect_used)]
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod watchlist_check;
+
 pub mod test_db_pool;

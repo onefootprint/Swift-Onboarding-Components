@@ -24,12 +24,17 @@ pub struct Task {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = task)]
-struct NewTask {
+pub struct NewTask {
     pub created_at: DateTime<Utc>,
     pub scheduled_for: DateTime<Utc>,
     pub task_data: TaskData,
     pub status: TaskStatus,
     pub num_attempts: i32,
+}
+
+pub struct TaskCreateArgs {
+    pub scheduled_for: DateTime<Utc>,
+    pub task_data: TaskData,
 }
 
 #[derive(AsChangeset)]
@@ -56,6 +61,24 @@ impl Task {
             .values(new_task)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn bulk_create(conn: &mut PgConn, args: Vec<TaskCreateArgs>) -> DbResult<Vec<Self>> {
+        let new_tasks: Vec<NewTask> = args
+            .into_iter()
+            .map(|a| NewTask {
+                created_at: Utc::now(),
+                scheduled_for: a.scheduled_for,
+                task_data: a.task_data,
+                status: TaskStatus::Pending,
+                num_attempts: 0,
+            })
+            .collect();
+        let res = diesel::insert_into(task::table)
+            .values(new_tasks)
+            .get_results::<Self>(conn)?;
+        Ok(res)
     }
 
     #[tracing::instrument(skip_all)]
@@ -107,6 +130,14 @@ impl Task {
     pub fn _bulk_delete_for_tests(conn: &mut PgConn, ids: Vec<&TaskId>) -> DbResult<usize> {
         let cnt = diesel::delete(task::table.filter(task::id.eq_any(ids))).execute(conn)?;
         Ok(cnt)
+    }
+
+    #[cfg(test)]
+    pub fn create_for_test(conn: &mut PgConn, new_task: NewTask) -> DbResult<Self> {
+        let res = diesel::insert_into(task::table)
+            .values(new_task)
+            .get_result(conn)?;
+        Ok(res)
     }
 }
 

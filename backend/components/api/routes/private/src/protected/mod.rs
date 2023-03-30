@@ -15,7 +15,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk::make_decision)
         .service(risk::shadow_run)
         .service(task::execute_tasks)
-        .service(task::create_task);
+        .service(task::create_task)
+        .service(task::create_overdue_watchlist_check_tasks);
 }
 
 #[api_v2_operation(tags(Private, Protected))]

@@ -1,14 +1,20 @@
 use std::collections::HashMap;
 
-use chrono::{DateTime, Utc};
-use diesel::{dsl::count_star, prelude::*};
+use chrono::{DateTime, Duration, Utc};
+use diesel::{
+    dsl::{count, count_star},
+    prelude::*,
+};
 use newtypes::{
-    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TaskId, TenantId, WatchlistCheckId,
+    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TaskId, TenantId, VaultKind, WatchlistCheckId,
     WatchlistCheckStatus, WatchlistCheckStatusKind,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{schema::watchlist_check, DbResult, PgConn};
+use crate::{
+    schema::{onboarding, scoped_user, task, user_vault, watchlist_check},
+    DbResult, PgConn,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = watchlist_check)]
@@ -30,7 +36,7 @@ pub struct WatchlistCheck {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = watchlist_check)]
-struct NewWatchlistCheck {
+pub struct NewWatchlistCheck {
     pub created_at: DateTime<Utc>,
     pub scoped_vault_id: ScopedVaultId,
     pub task_id: TaskId,
@@ -157,5 +163,56 @@ impl WatchlistCheck {
             .collect();
 
         Ok(results)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_overdue_scoped_vaults(conn: &mut PgConn, tenant_id: TenantId) -> DbResult<Vec<ScopedVaultId>> {
+        let thirty_days_ago = Utc::now() - Duration::days(30);
+
+        let res = scoped_user::table
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(true))
+            .inner_join(user_vault::table.on(user_vault::id.eq(scoped_user::user_vault_id)))
+            .filter(user_vault::kind.eq(VaultKind::Person))
+            .select(scoped_user::id)
+            .left_join(
+                onboarding::table.on(onboarding::scoped_user_id
+                    .eq(scoped_user::id)
+                    .and(onboarding::decision_made_at.ge(thirty_days_ago))),
+            )
+            .left_join(
+                watchlist_check::table.on(watchlist_check::scoped_vault_id
+                    .eq(scoped_user::id)
+                    .and(watchlist_check::created_at.ge(thirty_days_ago))),
+            )
+            .left_join(
+                task::table.on(task::task_data
+                    .retrieve_by_path_as_text(vec!["data", "scoped_vault_id"])
+                    .eq(scoped_user::id)
+                    .and(
+                        task::task_data
+                            .retrieve_by_path_as_text(vec!["kind"])
+                            .eq("watchlist_check"),
+                    )
+                    .and(task::created_at.ge(thirty_days_ago))),
+            )
+            .group_by(scoped_user::id)
+            .having(
+                count(onboarding::id)
+                    .eq(0)
+                    .and(count(watchlist_check::id).eq(0))
+                    .and(count(task::id).eq(0)),
+            )
+            .get_results(conn)?;
+
+        Ok(res)
+    }
+
+    #[cfg(test)]
+    pub fn create_for_test(conn: &mut PgConn, new_watchlist_check: NewWatchlistCheck) -> DbResult<Self> {
+        let res = diesel::insert_into(watchlist_check::table)
+            .values(new_watchlist_check)
+            .get_result(conn)?;
+        Ok(res)
     }
 }
