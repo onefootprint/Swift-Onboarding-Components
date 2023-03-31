@@ -43,6 +43,7 @@ const Filters = ({
 
 const FilterContainer = styled.div`
   ${({ theme }) => css`
+    position: relative;
     align-items: center;
     display: flex;
     gap: ${theme.spacing[4]};

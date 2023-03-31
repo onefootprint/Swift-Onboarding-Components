@@ -1,8 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useId, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Box from '../../../box';
+import Fade from '../../../fade';
 import LoadingIndicator from '../../../loading-indicator';
 import type { FilterControl, FilterSelectedOption } from '../../filters.types';
 import AddPill from './components/add-pill';
@@ -24,14 +25,12 @@ export type ControlProps = {
 };
 
 const Control = ({ control, onChange }: ControlProps) => {
-  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const popoverId = useId();
   const dateOptions = useDateOptions();
   const { query, kind, label, loading, options, selectedOptions } = control;
   const hasSelectedOptions = selectedOptions.length > 0;
-  const { styles, attributes, setReferenceElement, setPopperElement } =
-    usePopper();
+  const { attributes, setReferenceElement, setPopperElement } = usePopper();
 
   const handleToggle = () => {
     setOpen(prevOpen => !prevOpen);
@@ -51,11 +50,19 @@ const Control = ({ control, onChange }: ControlProps) => {
   };
 
   return (
-    <>
-      <Box ref={setReferenceElement} aria-busy={loading}>
-        {hasSelectedOptions ? (
-          <PillGroup>
-            <ClearPill onClick={clear}>{label}</ClearPill>
+    <Box
+      ref={setReferenceElement}
+      aria-busy={loading}
+      sx={{ position: 'relative' }}
+    >
+      {hasSelectedOptions ? (
+        <PillGroup>
+          <ClearPill onClick={clear}>{label}</ClearPill>
+          <SelectedPillMotion
+            isVisible={hasSelectedOptions}
+            from="left"
+            to="right"
+          >
             <SelectedPill
               aria-controls={popoverId}
               aria-expanded={open}
@@ -68,26 +75,26 @@ const Control = ({ control, onChange }: ControlProps) => {
                 getMultiSelectGroupedLabel(options, selectedOptions)}
               {kind === 'date' && getDateLabel(dateOptions, selectedOptions)}
             </SelectedPill>
-          </PillGroup>
-        ) : (
-          <AddPill
-            aria-controls={popoverId}
-            aria-expanded={open}
-            aria-haspopup="dialog"
-            onClick={handleToggle}
-          >
-            {label}
-          </AddPill>
-        )}
-      </Box>
+          </SelectedPillMotion>
+        </PillGroup>
+      ) : (
+        <AddPill
+          aria-controls={popoverId}
+          aria-expanded={open}
+          aria-haspopup="dialog"
+          onClick={handleToggle}
+        >
+          {label}
+        </AddPill>
+      )}
+
       {open ? (
-        <div
-          {...attributes.popper}
+        <StyledFade
+          isVisible={open}
+          from="center"
+          to="center"
           ref={setPopperElement}
-          style={{
-            ...styles.popper,
-            zIndex: theme.zIndex.dialog,
-          }}
+          {...attributes.popper}
         >
           <Popover id={popoverId} onClose={close} title={label}>
             {loading ? (
@@ -121,28 +128,40 @@ const Control = ({ control, onChange }: ControlProps) => {
               </>
             )}
           </Popover>
-        </div>
+        </StyledFade>
       ) : null}
-    </>
+    </Box>
   );
 };
+
+const SelectedPillMotion = styled(Fade)`
+  && {
+    ${({ theme }) => css`
+      button:first-of-type {
+        color: ${theme.color.primary};
+        border-left: none;
+        border-radius: 0 ${theme.borderRadius.default}
+          ${theme.borderRadius.default} 0;
+      }
+    `}
+  }
+`;
 
 const PillGroup = styled.div`
   display: flex;
 
-  button:first-child {
+  button:first-of-type {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
+`;
 
-  button:last-child {
-    ${({ theme }) => css`
-      color: ${theme.color.primary};
-      border-left: none;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    `}
-  }
+const StyledFade = styled(Fade)`
+  ${({ theme }) => css`
+    z-index: ${theme.zIndex.dialog};
+    position: absolute;
+    margin-top: ${theme.spacing[3]};
+  `}
 `;
 
 export default Control;
