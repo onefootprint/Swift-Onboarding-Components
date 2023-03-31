@@ -1,4 +1,4 @@
-SELECT kind, COUNT(DISTINCT data_lifetime.user_vault_id)
+SELECT kind, COUNT(DISTINCT data_lifetime.vault_id)
 FROM data_lifetime
 INNER JOIN scoped_vault
   ON scoped_vault.id = data_lifetime.scoped_vault_id
