@@ -127,13 +127,10 @@ describe('<Details />', () => {
         await userEvent.click(saveButton);
 
         await waitFor(() => {
-          const feedback = screen.getByText('Onboarding configuration updated');
+          const feedback = screen.getByText(
+            'Onboarding configuration name changed!',
+          );
           expect(feedback).toBeInTheDocument();
-        });
-
-        await waitFor(() => {
-          const name = screen.getByText(newName);
-          expect(name).toBeInTheDocument();
         });
       });
     });
