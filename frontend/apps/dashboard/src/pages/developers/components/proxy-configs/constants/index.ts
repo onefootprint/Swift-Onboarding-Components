@@ -1,7 +1,6 @@
 import type { FormData } from '../proxy-configs.types';
 
-export const LIST_QUERY_KEY = ['proxy_configs'];
-export const DETAILS_QUERY_KEY = ['proxy_config'];
+export const QUERY_KEY = 'proxy_configs';
 
 export const CREATE_DEFAULT_VALUES: FormData = {
   name: '',

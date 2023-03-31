@@ -1,4 +1,4 @@
-import { act, renderHook } from '@onefootprint/test-utils';
+import { act, customRenderHook } from '@onefootprint/test-utils';
 import { asAdminUserInSandbox, resetUser } from 'src/config/tests';
 
 import useOrgSession from './use-org-session';
@@ -13,7 +13,7 @@ describe('useOrgSession', () => {
   });
 
   it('should return the data', () => {
-    const { result } = renderHook(() => useOrgSession());
+    const { result } = customRenderHook(() => useOrgSession());
 
     expect(result.current.dangerouslyCastedData).toEqual({
       isLive: false,
@@ -24,13 +24,13 @@ describe('useOrgSession', () => {
   });
 
   it('should indicate is sandbox when is not in live mode', () => {
-    const { result } = renderHook(() => useOrgSession());
+    const { result } = customRenderHook(() => useOrgSession());
 
     expect(result.current.sandbox.isSandbox).toBeTruthy();
   });
 
   it('should toggle sandbox mode', async () => {
-    const { result } = renderHook(() => useOrgSession());
+    const { result } = customRenderHook(() => useOrgSession());
     expect(result.current.sandbox.isSandbox).toBeTruthy();
     act(() => {
       result.current.sandbox.toggle();
@@ -40,7 +40,7 @@ describe('useOrgSession', () => {
   });
 
   it('should update', () => {
-    const { result } = renderHook(() => useOrgSession());
+    const { result } = customRenderHook(() => useOrgSession());
     expect(result.current.dangerouslyCastedData).toEqual({
       isLive: false,
       isSandboxRestricted: false,

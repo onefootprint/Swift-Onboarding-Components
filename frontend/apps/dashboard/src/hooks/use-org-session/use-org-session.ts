@@ -1,4 +1,5 @@
 import { Organization } from '@onefootprint/types';
+import { useQueryClient } from '@tanstack/react-query';
 
 import useSession from '../use-session';
 
@@ -8,6 +9,7 @@ const useOrgSession = () => {
     dangerouslyCastedData: dangerouslySessionData,
     setOrg,
   } = useSession();
+  const queryClient = useQueryClient();
   const data = sessionData?.org;
   const dangerouslyCastedData = dangerouslySessionData?.org;
   const isSandbox = data?.isLive === false;
@@ -15,6 +17,7 @@ const useOrgSession = () => {
 
   const toggle = () => {
     setOrg({ isLive: !data?.isLive });
+    queryClient.invalidateQueries();
   };
 
   const update = (newOrganization: Partial<Organization>) => {

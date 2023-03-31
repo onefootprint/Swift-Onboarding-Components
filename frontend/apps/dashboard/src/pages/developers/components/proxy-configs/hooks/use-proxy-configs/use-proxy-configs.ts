@@ -3,7 +3,7 @@ import { GetProxyConfigsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-import { LIST_QUERY_KEY } from '@/proxy-configs/constants';
+import { QUERY_KEY } from '@/proxy-configs/constants';
 
 const getProxyConfigs = async (authHeaders: AuthHeaders) => {
   const response = await request<GetProxyConfigsResponse>({
@@ -16,8 +16,10 @@ const getProxyConfigs = async (authHeaders: AuthHeaders) => {
 };
 
 const useProxyConfigs = () => {
-  const { authHeaders } = useSession();
-  const proxyConfigsQuery = useQuery([LIST_QUERY_KEY], () =>
+  const { authHeaders, data: sessionData } = useSession();
+  const isLive = sessionData?.org?.isLive;
+
+  const proxyConfigsQuery = useQuery([QUERY_KEY, isLive], () =>
     getProxyConfigs(authHeaders),
   );
   const { error, data = [] } = proxyConfigsQuery;
