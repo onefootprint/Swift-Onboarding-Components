@@ -16,7 +16,7 @@ type ActionsProps = {
 };
 
 const Actions = ({ onboardingConfig }: ActionsProps) => {
-  const { name, isLive, key } = onboardingConfig;
+  const { name, isLive, key, status } = onboardingConfig;
   const { t } = useTranslation(
     'pages.developers.onboarding-configs-new.actions',
   );
@@ -71,8 +71,16 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
-      <Status onboardingConfig={onboardingConfig} ref={statusRef} />
-      <EditName onboardingConfig={onboardingConfig} ref={editNameRef} />
+      <Status
+        onboardingConfig={onboardingConfig}
+        key={status}
+        ref={statusRef}
+      />
+      <EditName
+        onboardingConfig={onboardingConfig}
+        ref={editNameRef}
+        key={name}
+      />
     </Box>
   );
 };
