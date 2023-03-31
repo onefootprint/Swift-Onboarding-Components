@@ -157,7 +157,7 @@ def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_
 def kyb_cdos():
     return [
         "business_name",
-        "business_ein",
+        "business_tin",
         "business_address",
         "business_phone_number",
         "business_website",

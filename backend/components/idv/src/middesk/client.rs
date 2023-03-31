@@ -80,7 +80,7 @@ mod tests {
             name: PiiString::from("Middesk".to_owned()),
             website_url: None,
             phone_number: None,
-            ein: None,
+            tin: None,
             address_line1: PiiString::from("2180 Bryant St".to_owned()),
             address_line2: None,
             city: PiiString::from("San Francisco".to_owned()),

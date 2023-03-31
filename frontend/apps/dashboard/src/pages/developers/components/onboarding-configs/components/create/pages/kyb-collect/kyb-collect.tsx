@@ -45,7 +45,7 @@ const KybCollect = () => {
   const phoneNumber = watch(CollectedKybDataOption.phoneNumber);
   const collectedDataTags = [
     allT('collected-kyb-data-options.name'),
-    allT('collected-kyb-data-options.ein'),
+    allT('collected-kyb-data-options.tin'),
     allT('collected-kyb-data-options.address'),
     allT('collected-kyb-data-options.beneficial_owner'),
   ];

@@ -11,7 +11,7 @@ export enum BusinessDI {
   name = 'business.name',
   website = 'business.website',
   phoneNumber = 'business.phone_number',
-  ein = 'business.ein',
+  tin = 'business.tin',
   beneficialOwners = 'business.beneficial_owners',
   addressLine1 = 'business.address_line1',
   addressLine2 = 'business.address_line2',

@@ -15,7 +15,7 @@ import FieldsList from '../fields-list';
 
 const IconByCollectedKybDataOption: Record<CollectedKybDataOption, Icon> = {
   [CollectedKybDataOption.name]: IcoFileText24,
-  [CollectedKybDataOption.ein]: IcoFileText24,
+  [CollectedKybDataOption.tin]: IcoFileText24,
   [CollectedKybDataOption.address]: IcoBuilding24,
   [CollectedKybDataOption.phoneNumber]: IcoPhone24,
   [CollectedKybDataOption.website]: IcoFileText24,
@@ -32,7 +32,7 @@ const KybFields = ({ data, showTitle }: KybFieldsProps) => {
 
   const collectedKybDataOptionLabels: Record<CollectedKybDataOption, string> = {
     [CollectedKybDataOption.name]: t('data-labels.business-name'),
-    [CollectedKybDataOption.ein]: t('data-labels.business-ein'),
+    [CollectedKybDataOption.tin]: t('data-labels.business-tin'),
     [CollectedKybDataOption.address]: t('data-labels.business-address'),
     [CollectedKybDataOption.phoneNumber]: t(
       'data-labels.business-phone-number',

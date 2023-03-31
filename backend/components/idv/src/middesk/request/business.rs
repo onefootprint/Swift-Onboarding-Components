@@ -47,7 +47,7 @@ impl From<BusinessData> for BusinessRequest {
                 state: data.state,
                 postal_code: data.zip,
             }],
-            tin: data.ein,
+            tin: data.tin,
             people: data
                 .business_owners
                 .into_iter()
@@ -75,7 +75,7 @@ mod tests {
             name: PiiString::from("Waffle House"),
             website_url: Some(PiiString::from("www.wafflehouse.com")),
             phone_number: Some(PiiString::from("+11234567890")),
-            ein: Some(PiiString::from("23571113171923")),
+            tin: Some(PiiString::from("23571113171923")),
             address_line1: PiiString::from("2180 Bryant St"),
             address_line2: Some(PiiString::from("#9")),
             city: PiiString::from("San Francisco"),

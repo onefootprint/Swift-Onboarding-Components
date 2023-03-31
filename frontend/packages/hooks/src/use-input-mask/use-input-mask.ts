@@ -15,7 +15,7 @@ const masks = {
       numericOnly: true,
       blocks: [4],
     },
-    ein: {
+    tin: {
       numericOnly: true,
       delimiters: ['-'],
       blocks: [2, 7],

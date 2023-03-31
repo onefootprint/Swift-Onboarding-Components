@@ -19,7 +19,7 @@ const getKybOnboardingConfigFromContext = (
   const mustCollectKybData: CollectedKybDataOption[] = [
     CollectedKybDataOption.name,
     CollectedKybDataOption.address,
-    CollectedKybDataOption.ein,
+    CollectedKybDataOption.tin,
     CollectedKybDataOption.beneficialOwners,
   ];
   const mustCollectKycData: (

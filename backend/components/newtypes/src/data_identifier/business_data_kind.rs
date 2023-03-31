@@ -31,7 +31,7 @@ pub enum BusinessDataKind {
     Dba,
     Website,
     PhoneNumber,
-    Ein,
+    Tin,
     AddressLine1,
     AddressLine2,
     City,
@@ -69,7 +69,7 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
             Self::Dba => CollectedData::BusinessName,
             Self::Website => CollectedData::BusinessWebsite,
             Self::PhoneNumber => CollectedData::BusinessPhoneNumber,
-            Self::Ein => CollectedData::BusinessEin,
+            Self::Tin => CollectedData::BusinessTin,
             Self::AddressLine1 => CollectedData::BusinessAddress,
             Self::AddressLine2 => CollectedData::BusinessAddress,
             Self::City => CollectedData::BusinessAddress,
@@ -86,6 +86,6 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
 impl BusinessDataKind {
     /// The list of BDKs that are searchable by fingerprint
     pub fn searchable() -> Vec<Self> {
-        vec![Self::Name, Self::Dba, Self::Website, Self::PhoneNumber, Self::Ein]
+        vec![Self::Name, Self::Dba, Self::Website, Self::PhoneNumber, Self::Tin]
     }
 }

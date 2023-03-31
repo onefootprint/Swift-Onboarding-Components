@@ -12,7 +12,7 @@ import {
 
 const BASIC_DATA_ATTRIBUTES = [
   CollectedKybDataOption.name,
-  CollectedKybDataOption.ein,
+  CollectedKybDataOption.tin,
   CollectedKybDataOption.phoneNumber,
   CollectedKybDataOption.website,
 ];

@@ -23,12 +23,12 @@
           "placeholder": "Acme Bank Inc.",
           "error": "Business name cannot be empty or is invalid"
         },
-        "ein": {
-          "label": "Employer Identification Number (EIN)",
+        "tin": {
+          "label": "Taxpayer Identification Number (TIN)",
           "placeholder": "12-3456789",
           "errors": {
-            "required": "EIN cannot be empty or is invalid",
-            "pattern": "EIN has to be in the format 12-3456789"
+            "required": "TIN cannot be empty or is invalid",
+            "pattern": "TIN has to be in the format 12-3456789"
           }
         },
         "website": {
@@ -142,7 +142,7 @@
       "basic-data": {
         "title": "Basic data",
         "business-name": "Business name",
-        "ein": "Employer Identification Number (EIN)",
+        "tin": "Taxpayer Identification Number (TIN)",
         "website": "Website",
         "phone-number": "Phone number"
       },

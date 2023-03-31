@@ -27,13 +27,13 @@ describe('MissingAttributes tests', () => {
       }),
     ).toBe(false);
 
-    expect(isMissingBasicDataAttribute([CollectedKybDataOption.ein])).toBe(
+    expect(isMissingBasicDataAttribute([CollectedKybDataOption.tin])).toBe(
       true,
     );
 
     expect(
-      isMissingBasicDataAttribute([CollectedKybDataOption.ein], {
-        [BusinessDataAttribute.ein]: '123456789',
+      isMissingBasicDataAttribute([CollectedKybDataOption.tin], {
+        [BusinessDataAttribute.tin]: '123456789',
       }),
     ).toBe(false);
 
@@ -59,7 +59,7 @@ describe('MissingAttributes tests', () => {
     expect(
       isMissingBasicDataAttribute([
         CollectedKybDataOption.name,
-        CollectedKybDataOption.ein,
+        CollectedKybDataOption.tin,
         CollectedKybDataOption.website,
         CollectedKybDataOption.phoneNumber,
         CollectedKybDataOption.address,
@@ -71,7 +71,7 @@ describe('MissingAttributes tests', () => {
       isMissingBasicDataAttribute(
         [
           CollectedKybDataOption.name,
-          CollectedKybDataOption.ein,
+          CollectedKybDataOption.tin,
           CollectedKybDataOption.website,
           CollectedKybDataOption.phoneNumber,
           CollectedKybDataOption.address,
@@ -88,7 +88,7 @@ describe('MissingAttributes tests', () => {
       isMissingBasicDataAttribute(
         [
           CollectedKybDataOption.name,
-          CollectedKybDataOption.ein,
+          CollectedKybDataOption.tin,
           CollectedKybDataOption.website,
           CollectedKybDataOption.phoneNumber,
           CollectedKybDataOption.address,
@@ -96,7 +96,7 @@ describe('MissingAttributes tests', () => {
         ],
         {
           [BusinessDataAttribute.name]: 'Acme',
-          [BusinessDataAttribute.ein]: '123456789',
+          [BusinessDataAttribute.tin]: '123456789',
           [BusinessDataAttribute.website]: 'https://acme.com',
           [BusinessDataAttribute.phoneNumber]: '1234567890',
         },
@@ -199,11 +199,11 @@ describe('MissingAttributes tests', () => {
       }),
     ).toBe(false);
 
-    expect(hasMissingAttributes([CollectedKybDataOption.ein])).toBe(true);
+    expect(hasMissingAttributes([CollectedKybDataOption.tin])).toBe(true);
 
     expect(
-      hasMissingAttributes([CollectedKybDataOption.ein], {
-        [BusinessDataAttribute.ein]: '123456789',
+      hasMissingAttributes([CollectedKybDataOption.tin], {
+        [BusinessDataAttribute.tin]: '123456789',
       }),
     ).toBe(false);
 
@@ -231,7 +231,7 @@ describe('MissingAttributes tests', () => {
       hasMissingAttributes(
         [
           CollectedKybDataOption.name,
-          CollectedKybDataOption.ein,
+          CollectedKybDataOption.tin,
           CollectedKybDataOption.website,
           CollectedKybDataOption.phoneNumber,
           CollectedKybDataOption.address,
@@ -245,7 +245,7 @@ describe('MissingAttributes tests', () => {
       hasMissingAttributes(
         [
           CollectedKybDataOption.name,
-          CollectedKybDataOption.ein,
+          CollectedKybDataOption.tin,
           CollectedKybDataOption.website,
           CollectedKybDataOption.phoneNumber,
           CollectedKybDataOption.address,
@@ -253,7 +253,7 @@ describe('MissingAttributes tests', () => {
         ],
         {
           [BusinessDataAttribute.name]: 'Acme',
-          [BusinessDataAttribute.ein]: '123456789',
+          [BusinessDataAttribute.tin]: '123456789',
           [BusinessDataAttribute.website]: 'https://acme.com',
           [BusinessDataAttribute.phoneNumber]: '1234567890',
           [BusinessDataAttribute.addressLine1]: '123 Main St',

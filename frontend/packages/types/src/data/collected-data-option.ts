@@ -14,7 +14,7 @@ export enum CollectedInvestorProfileDataOption {
 
 export enum CollectedKybDataOption {
   name = 'business_name',
-  ein = 'business_ein',
+  tin = 'business_tin',
   address = 'business_address',
   phoneNumber = 'business_phone_number',
   website = 'business_website',
@@ -68,7 +68,7 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   document: CollectedIdDocumentDataOption.document,
   document_and_selfie: CollectedIdDocumentDataOption.documentAndSelfie,
   business_name: CollectedKybDataOption.name,
-  business_ein: CollectedKybDataOption.ein,
+  business_tin: CollectedKybDataOption.tin,
   business_address: CollectedKybDataOption.address,
   business_phone_number: CollectedKybDataOption.phoneNumber,
   business_website: CollectedKybDataOption.website,
@@ -81,7 +81,7 @@ export const CollectedKybDataOptionToRequiredAttributes: Record<
   BusinessDataAttribute[]
 > = {
   [CollectedKybDataOption.name]: [BusinessDataAttribute.name],
-  [CollectedKybDataOption.ein]: [BusinessDataAttribute.ein],
+  [CollectedKybDataOption.tin]: [BusinessDataAttribute.tin],
   [CollectedKybDataOption.address]: [
     BusinessDataAttribute.addressLine1,
     BusinessDataAttribute.city,

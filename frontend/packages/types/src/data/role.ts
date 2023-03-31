@@ -18,7 +18,7 @@ export enum RoleScope {
   decryptInvestorProfile = 'decrypt.investor_profile',
   decryptCustom = 'decrypt_custom',
   decryptBusinessName = 'decrypt.business_name',
-  decryptBusinessEin = 'decrypt.business_ein',
+  decryptBusinessTin = 'decrypt.business_tin',
   decryptBusinessAddress = 'decrypt.business_address',
   decryptBusinessPhoneNumber = 'decrypt.business_phone_number',
   decryptBusinessWebsite = 'decrypt.business_website',

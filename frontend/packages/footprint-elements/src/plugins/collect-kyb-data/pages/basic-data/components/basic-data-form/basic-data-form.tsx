@@ -18,7 +18,7 @@ export type BasicDataFormProps = {
   defaultValues?: Pick<
     BusinessData,
     | BusinessDataAttribute.name
-    | BusinessDataAttribute.ein
+    | BusinessDataAttribute.tin
     | BusinessDataAttribute.phoneNumber
     | BusinessDataAttribute.website
   >;
@@ -47,9 +47,9 @@ const BasicDataForm = ({
   });
   const inputMasks = useInputMask('en-US');
 
-  const einErrors = errors[BusinessDataAttribute.ein];
-  const hasEinError = !!einErrors;
-  const einHint = hasEinError ? einErrors?.message : undefined;
+  const tinErrors = errors[BusinessDataAttribute.tin];
+  const hasTinError = !!tinErrors;
+  const tinHint = hasTinError ? tinErrors?.message : undefined;
 
   const phoneNumberErrors = errors[BusinessDataAttribute.phoneNumber];
   const hasPhoneNumberError = !!phoneNumberErrors;
@@ -64,7 +64,7 @@ const BasicDataForm = ({
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
       [BusinessDataAttribute.name]: formData[BusinessDataAttribute.name],
-      [BusinessDataAttribute.ein]: formData[BusinessDataAttribute.ein],
+      [BusinessDataAttribute.tin]: formData[BusinessDataAttribute.tin],
       [BusinessDataAttribute.phoneNumber]:
         formData[BusinessDataAttribute.phoneNumber],
       [BusinessDataAttribute.website]: formData[BusinessDataAttribute.website],
@@ -88,20 +88,20 @@ const BasicDataForm = ({
       />
       <TextInput
         data-private
-        hasError={hasEinError}
-        hint={einHint}
-        mask={inputMasks.ein}
-        value={getValues(BusinessDataAttribute.ein)}
-        label={t('ein.label')}
-        placeholder={t('ein.placeholder')}
-        {...register(BusinessDataAttribute.ein, {
+        hasError={hasTinError}
+        hint={tinHint}
+        mask={inputMasks.tin}
+        value={getValues(BusinessDataAttribute.tin)}
+        label={t('tin.label')}
+        placeholder={t('tin.placeholder')}
+        {...register(BusinessDataAttribute.tin, {
           required: {
             value: true,
-            message: t('ein.errors.required'),
+            message: t('tin.errors.required'),
           },
           pattern: {
             value: /^\d{2}-\d{7}$/,
-            message: t('ein.errors.pattern'),
+            message: t('tin.errors.pattern'),
           },
         })}
       />

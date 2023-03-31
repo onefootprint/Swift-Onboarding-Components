@@ -519,7 +519,7 @@ describe('<CreateConfig />', () => {
         within(collectedData).getByText('Beneficial owner'),
       ).toBeInTheDocument();
       expect(
-        within(collectedData).getByText('Employer Identification Number (EIN)'),
+        within(collectedData).getByText('Taxpayer Identification Number (TIN)'),
       ).toBeInTheDocument();
 
       const options = screen.getByTestId('kyb-collect-form-options');

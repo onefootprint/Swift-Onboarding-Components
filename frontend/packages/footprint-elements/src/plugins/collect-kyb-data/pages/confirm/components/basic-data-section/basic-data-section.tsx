@@ -25,11 +25,11 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
     });
   }
 
-  const ein = data[BusinessDataAttribute.ein];
-  if (ein) {
+  const tin = data[BusinessDataAttribute.tin];
+  if (tin) {
     basicInfo.push({
-      text: t('ein'),
-      subtext: ein,
+      text: t('tin'),
+      subtext: tin,
     });
   }
 

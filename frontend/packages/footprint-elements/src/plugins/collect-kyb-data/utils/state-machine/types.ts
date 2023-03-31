@@ -8,7 +8,7 @@ import {
 } from '@onefootprint/types';
 
 export type BasicData = Required<
-  Pick<BusinessData, BusinessDataAttribute.name | BusinessDataAttribute.ein>
+  Pick<BusinessData, BusinessDataAttribute.name | BusinessDataAttribute.tin>
 > &
   Pick<
     BusinessData,

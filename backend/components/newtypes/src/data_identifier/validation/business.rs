@@ -16,7 +16,7 @@ impl Validate for BDK {
             BDK::Dba => value,
             BDK::Website => clean_and_validate_website(value)?,
             BDK::PhoneNumber => PhoneNumber::parse(value)?.e164_with_suffix(),
-            BDK::Ein => clean_and_validate_ein(value)?,
+            BDK::Tin => clean_and_validate_tin(value)?,
             BDK::AddressLine1 => value,
             BDK::AddressLine2 => value,
             BDK::City => value,
@@ -64,7 +64,7 @@ fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> 
     })
 }
 
-fn clean_and_validate_ein(input: PiiString) -> VResult<PiiString> {
+fn clean_and_validate_tin(input: PiiString) -> VResult<PiiString> {
     // Allow providing hyphens in input. This is permissive for now
     let input = PiiString::new(input.leak().chars().filter(|p| p != &'-').collect());
     if input.leak().len() != 9 {
@@ -116,7 +116,7 @@ mod test {
     #[test_case(PhoneNumber, "flerp" => None)]
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
     #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
-    #[test_case(Ein, "12-1234567" => Some("121234567".to_owned()))]
+    #[test_case(Tin, "12-1234567" => Some("121234567".to_owned()))]
     #[test_case(AddressLine1, "100 Nitro Way@" => Some("100 Nitro Way@".to_owned()))]
     #[test_case(AddressLine1, "100 Enclave Way" => Some("100 Enclave Way".to_owned()))]
     #[test_case(AddressLine2, "#1" => Some("#1".to_owned()))]

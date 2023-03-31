@@ -53,7 +53,7 @@ describe('Collect KYB Data Machine Tests', () => {
     const machine = createMachine(
       [
         CollectedKybDataOption.name,
-        CollectedKybDataOption.ein,
+        CollectedKybDataOption.tin,
         CollectedKybDataOption.address,
         CollectedKybDataOption.beneficialOwners,
       ],
@@ -75,11 +75,11 @@ describe('Collect KYB Data Machine Tests', () => {
     state = machine.send('basicDataSubmitted', {
       payload: {
         [BusinessDataAttribute.name]: 'Acme Inc.',
-        [BusinessDataAttribute.ein]: '123-3243423',
+        [BusinessDataAttribute.tin]: '123-3243423',
       },
     });
     expect(state.context.data[BusinessDataAttribute.name]).toEqual('Acme Inc.');
-    expect(state.context.data[BusinessDataAttribute.ein]).toEqual(
+    expect(state.context.data[BusinessDataAttribute.tin]).toEqual(
       '123-3243423',
     );
 
@@ -91,7 +91,7 @@ describe('Collect KYB Data Machine Tests', () => {
     state = machine.send('basicDataSubmitted', {
       payload: {
         [BusinessDataAttribute.name]: 'Acme Inc.',
-        [BusinessDataAttribute.ein]: '123-3243423',
+        [BusinessDataAttribute.tin]: '123-3243423',
       },
     });
     expect(state.value).toEqual('businessAddress');
@@ -269,7 +269,7 @@ describe('Collect KYB Data Machine Tests', () => {
       const machine = createMachine(
         [
           CollectedKybDataOption.name,
-          CollectedKybDataOption.ein,
+          CollectedKybDataOption.tin,
           CollectedKybDataOption.address,
           CollectedKybDataOption.beneficialOwners,
         ],
@@ -282,7 +282,7 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send('basicDataSubmitted', {
         payload: {
           [BusinessDataAttribute.name]: 'Acme Inc.',
-          [BusinessDataAttribute.ein]: '123-3243423',
+          [BusinessDataAttribute.tin]: '123-3243423',
         },
       });
       state = machine.send('businessAddressSubmitted', {
@@ -329,13 +329,13 @@ describe('Collect KYB Data Machine Tests', () => {
         type: 'basicDataSubmitted',
         payload: {
           [BusinessDataAttribute.name]: 'New Biz.',
-          [BusinessDataAttribute.ein]: '999999999',
+          [BusinessDataAttribute.tin]: '999999999',
         },
       });
       expect(state.context.data[BusinessDataAttribute.name]).toEqual(
         'New Biz.',
       );
-      expect(state.context.data[BusinessDataAttribute.ein]).toEqual(
+      expect(state.context.data[BusinessDataAttribute.tin]).toEqual(
         '999999999',
       );
       expect(state.value).toEqual('confirm');
@@ -405,7 +405,7 @@ describe('Collect KYB Data Machine Tests', () => {
       const machine = createMachine(
         [
           CollectedKybDataOption.name,
-          CollectedKybDataOption.ein,
+          CollectedKybDataOption.tin,
           CollectedKybDataOption.address,
           CollectedKybDataOption.beneficialOwners,
         ],
@@ -422,7 +422,7 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send('basicDataSubmitted', {
         payload: {
           [BusinessDataAttribute.name]: 'Acme Inc.',
-          [BusinessDataAttribute.ein]: '123-3243423',
+          [BusinessDataAttribute.tin]: '123-3243423',
         },
       });
       state = machine.send('businessAddressSubmitted', {
@@ -461,14 +461,14 @@ describe('Collect KYB Data Machine Tests', () => {
         type: 'basicDataSubmitted',
         payload: {
           [BusinessDataAttribute.name]: 'New Biz.',
-          [BusinessDataAttribute.ein]: '999999999',
+          [BusinessDataAttribute.tin]: '999999999',
         },
       });
       expect(state.value).toEqual('confirm');
       expect(state.context.data[BusinessDataAttribute.name]).toEqual(
         'Acme Inc.',
       );
-      expect(state.context.data[BusinessDataAttribute.ein]).toEqual(
+      expect(state.context.data[BusinessDataAttribute.tin]).toEqual(
         '123-3243423',
       );
 

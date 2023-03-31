@@ -2,7 +2,7 @@ enum BusinessDataAttribute {
   name = 'name',
   website = 'website',
   phoneNumber = 'phone_number',
-  ein = 'ein',
+  tin = 'tin',
   beneficialOwners = 'beneficial_owners',
   addressLine1 = 'address_line1',
   addressLine2 = 'address_line2',

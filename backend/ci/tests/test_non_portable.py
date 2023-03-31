@@ -25,7 +25,7 @@ class TestNonPortableVaultApi:
                 "Cannot vault without other Address data",
             ),
             (
-                "business.ein",
+                "business.tin",
                 "12-1234567",
                 "Cannot add to this type of vault",
             ),

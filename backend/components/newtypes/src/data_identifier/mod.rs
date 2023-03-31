@@ -245,7 +245,7 @@ mod tests {
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataIdentifier::IdDocument(IdDocKind::IdCard) => "id_document.id_card")]
     #[test_case(DataIdentifier::Selfie(IdDocKind::IdCard) => "selfie.id_card")]
-    #[test_case(DataIdentifier::Business(BusinessDataKind::Ein) => "business.ein")]
+    #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
     fn test_to_string(identifier: DataIdentifier) -> String {
@@ -259,7 +259,7 @@ mod tests {
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
     #[test_case("id_document.driver_license" => DataIdentifier::IdDocument(IdDocKind::DriverLicense))]
     #[test_case("selfie.passport" => DataIdentifier::Selfie(IdDocKind::Passport))]
-    #[test_case("business.ein" => DataIdentifier::Business(BusinessDataKind::Ein))]
+    #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     fn test_from_str(input: &str) -> DataIdentifier {

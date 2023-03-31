@@ -45,10 +45,10 @@ describe('<BasicDataForm />', () => {
     expect(name).toBeInTheDocument();
     await userEvent.type(name, 'Acme Inc.');
 
-    const ein = screen.getByLabelText('Employer Identification Number (EIN)');
+    const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
     expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
-    expect(ein).toBeInTheDocument();
-    await userEvent.type(ein, '129876543');
+    expect(tin).toBeInTheDocument();
+    await userEvent.type(tin, '129876543');
 
     const phoneNumber = screen.getByLabelText('Phone number');
     expect(phoneNumber).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe('<BasicDataForm />', () => {
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
         name: 'Acme Inc.',
-        ein: '12-9876543',
+        tin: '12-9876543',
         phoneNumber: '6594539494',
         website: 'www.acme.com',
       });
@@ -84,10 +84,10 @@ describe('<BasicDataForm />', () => {
     expect(name).toBeInTheDocument();
     await userEvent.type(name, 'Acme Inc.');
 
-    const ein = screen.getByLabelText('Employer Identification Number (EIN)');
+    const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
     expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
-    expect(ein).toBeInTheDocument();
-    await userEvent.type(ein, '129876543');
+    expect(tin).toBeInTheDocument();
+    await userEvent.type(tin, '129876543');
 
     const phoneNumber = screen.queryByLabelText('Phone number');
     expect(phoneNumber).not.toBeInTheDocument();
@@ -101,7 +101,7 @@ describe('<BasicDataForm />', () => {
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
         name: 'Acme Inc.',
-        ein: '12-9876543',
+        tin: '12-9876543',
       });
     });
   });
@@ -117,14 +117,14 @@ describe('<BasicDataForm />', () => {
     renderForm({
       defaultValues: {
         name: 'Acme Inc.',
-        ein: '98-7654321',
+        tin: '98-7654321',
       },
       onSubmit,
     });
     const name = screen.getByLabelText('Business name');
     expect(name).toHaveValue('Acme Inc.');
-    const ein = screen.getByLabelText('Employer Identification Number (EIN)');
-    expect(ein).toHaveValue('98-7654321');
+    const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
+    expect(tin).toHaveValue('98-7654321');
 
     const continueButton = screen.getByRole('button', { name: 'Continue' });
     expect(continueButton).toBeInTheDocument();
@@ -132,7 +132,7 @@ describe('<BasicDataForm />', () => {
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
         name: 'Acme Inc.',
-        ein: '98-7654321',
+        tin: '98-7654321',
       });
     });
   });
@@ -154,7 +154,7 @@ describe('<BasicDataForm />', () => {
     });
     await waitFor(() => {
       expect(
-        screen.getByText('EIN cannot be empty or is invalid'),
+        screen.getByText('TIN cannot be empty or is invalid'),
       ).toBeInTheDocument();
     });
   });

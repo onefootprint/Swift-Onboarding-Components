@@ -33,7 +33,7 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
 
   // Business
   [CollectedKybDataOption.name]: [BusinessDI.name],
-  [CollectedKybDataOption.ein]: [BusinessDI.ein],
+  [CollectedKybDataOption.tin]: [BusinessDI.tin],
   [CollectedKybDataOption.address]: [
     BusinessDI.addressLine1,
     BusinessDI.city,

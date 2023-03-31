@@ -77,7 +77,7 @@
     "document": "ID Document",
     "document_and_selfie": "ID Document & Selfie",
     "business_name": "Business name",
-    "business_ein": "Employer Identification Number (EIN)",
+    "business_tin": "Taxpayer Identification Number (TIN)",
     "business_address": "Registered business address",
     "business_phone_number": "Business phone number",
     "business_website": "Business website",
@@ -86,7 +86,7 @@
   },
   "collected-kyb-data-options": {
     "name": "Legal business name",
-    "ein": "Employer Identification Number (EIN)",
+    "tin": "Taxpayer Identification Number (TIN)",
     "address": "Registered business address",
     "beneficial_owner": "Beneficial owner",
     "website": "Website",

@@ -36,7 +36,7 @@ def test_get_vault(sandbox_tenant, sb_user_with_business):
         [
             "business.name",
             "business.dba",
-            "business.ein",
+            "business.tin",
             "business.address_line1",
             "business.address_line2",
         ],

@@ -132,7 +132,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         (BDK::Name, Some(SealedVaultBytes(vec![1]))),
         (BDK::Website, Some(SealedVaultBytes(vec![2]))),
         (BDK::PhoneNumber, Some(SealedVaultBytes(vec![3]))),
-        (BDK::Ein, None),
+        (BDK::Tin, None),
         (BDK::AddressLine1, None),
         (BDK::AddressLine2, None),
         (BDK::City, None),

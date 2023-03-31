@@ -72,7 +72,7 @@ pub struct BusinessData {
     pub name: PiiString,
     pub website_url: Option<PiiString>,
     pub phone_number: Option<PiiString>,
-    pub ein: Option<PiiString>,
+    pub tin: Option<PiiString>,
     pub address_line1: PiiString,
     pub address_line2: Option<PiiString>,
     pub city: PiiString,

@@ -25,13 +25,13 @@ def sandbox_user_w_business(kyb_sandbox_ob_config, twilio, kyb_cdos):
     "business_data,expected_status_code",
     [
         ({"business.name": "Flerp"}, 200),
-        ({"business.ein": "12-0987654"}, 200),
+        ({"business.tin": "12-0987654"}, 200),
         (
             {
                 "business.name": "Flerp",
                 "business.website": "flerp.com",
                 "business.phone_number": PHONE_NUMBER,
-                "business.ein": "123-45-1234",
+                "business.tin": "123-45-1234",
                 "business.address_line1": "One Footprint Way",
                 "business.city": "Hayes Valley",
                 "business.state": "CA",

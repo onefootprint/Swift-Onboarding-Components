@@ -27,7 +27,7 @@ pub enum CollectedData {
 
     // TODO: maybe nest these
     BusinessName,
-    BusinessEin,
+    BusinessTin,
     BusinessAddress,
     BusinessPhoneNumber,
     BusinessWebsite,
@@ -53,7 +53,7 @@ impl CollectedData {
             Self::Address => vec![PartialAddress, FullAddress],
             Self::Document => vec![Document, DocumentAndSelfie],
             Self::BusinessName => vec![BusinessName],
-            Self::BusinessEin => vec![BusinessEin],
+            Self::BusinessTin => vec![BusinessTin],
             Self::BusinessAddress => vec![BusinessAddress],
             Self::BusinessPhoneNumber => vec![BusinessPhoneNumber],
             Self::BusinessWebsite => vec![BusinessWebsite],
@@ -66,7 +66,7 @@ impl CollectedData {
     pub fn data_identifier_kind(&self) -> DataIdentifierDiscriminant {
         match self {
             Self::BusinessName
-            | Self::BusinessEin
+            | Self::BusinessTin
             | Self::BusinessAddress
             | Self::BusinessPhoneNumber
             | Self::BusinessWebsite
@@ -122,7 +122,7 @@ pub enum CollectedDataOption {
 
     // TODO: maybe nest these
     BusinessName,
-    BusinessEin,
+    BusinessTin,
     BusinessAddress,
     BusinessPhoneNumber,
     BusinessWebsite,
@@ -146,7 +146,7 @@ impl CollectedDataOption {
             Self::Document => CollectedData::Document,
             Self::DocumentAndSelfie => CollectedData::Document,
             Self::BusinessName => CollectedData::BusinessName,
-            Self::BusinessEin => CollectedData::BusinessEin,
+            Self::BusinessTin => CollectedData::BusinessTin,
             Self::BusinessAddress => CollectedData::BusinessAddress,
             Self::BusinessPhoneNumber => CollectedData::BusinessPhoneNumber,
             Self::BusinessWebsite => CollectedData::BusinessWebsite,
@@ -175,7 +175,7 @@ impl CollectedDataOption {
             Self::Email => Some(vec![IDK::Email.into()]),
             Self::PhoneNumber => Some(vec![IDK::PhoneNumber.into()]),
             Self::BusinessName => Some(vec![BDK::Name.into(), BDK::Dba.into()]),
-            Self::BusinessEin => Some(vec![BDK::Ein.into()]),
+            Self::BusinessTin => Some(vec![BDK::Tin.into()]),
             Self::BusinessAddress => Some(vec![
                 BDK::AddressLine1.into(),
                 BDK::AddressLine2.into(),
@@ -349,7 +349,7 @@ mod test {
     // Business CDOs
     #[test_case(vec![BDK::Name.into()] => HashSet::from_iter([CDO::BusinessName]))]
     #[test_case(vec![BDK::Name.into(), BDK::Dba.into()] => HashSet::from_iter([CDO::BusinessName]))]
-    #[test_case(vec![BDK::Ein.into()] => HashSet::from_iter([CDO::BusinessEin]))]
+    #[test_case(vec![BDK::Tin.into()] => HashSet::from_iter([CDO::BusinessTin]))]
     #[test_case(vec![BDK::AddressLine1.into()] => HashSet::from_iter([]))]
     #[test_case(vec![BDK::AddressLine2.into()] => HashSet::from_iter([]))]
     #[test_case(vec![BDK::AddressLine1.into(), BDK::City.into(), BDK::State.into(), BDK::Zip.into(), BDK::Country.into()] => HashSet::from_iter([CDO::BusinessAddress]))]
