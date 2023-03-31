@@ -17,9 +17,7 @@ type ActionsProps = {
 
 const Actions = ({ onboardingConfig }: ActionsProps) => {
   const { name, isLive, key, status } = onboardingConfig;
-  const { t } = useTranslation(
-    'pages.developers.onboarding-configs-new.actions',
-  );
+  const { t } = useTranslation('pages.developers.onboarding-configs.actions');
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);
 

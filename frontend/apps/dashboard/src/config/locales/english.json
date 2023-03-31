@@ -825,38 +825,65 @@
         }
       },
       "onboarding-configs": {
-        "header": {
-          "title": "Onboarding configurations",
-          "subtitle": "Set up requirements for customers onboarding onto your platform.",
-          "cta": "Create onboarding config",
-          "cta-not-allowed": "You're not allowed to create onboarding configurations"
+        "page-title": "Footprint | Onboarding Configuration",
+        "title": "Onboarding configurations",
+        "subtitle": "Set up requirements for customers onboarding onto your platform.",
+        "cta": "Create onboarding config",
+        "cta-not-allowed": "You're not allowed to create onboarding configurations",
+        "type": {
+          "kyb": "KYB",
+          "kyc": "KYC"
         },
-        "list": {
-          "no-results": "You haven't created any onboarding configurations just yet."
+        "status": {
+          "enabled": "Enabled",
+          "disabled": "Disabled"
         },
-        "list-item": {
-          "loading": "Loading onboarding configs",
-          "created-at": "Created on {{date}}",
-          "edit": "Edit onboarding config",
-          "toggle-status": {
-            "disable": "Disable",
-            "enable": "Enable",
-            "not-allowed": "You're not allowed to manage onboarding configs"
+        "table": {
+          "aria-label": "Onboarding configurations",
+          "header": {
+            "name": "Configuration name",
+            "type": "Type",
+            "key": "Publishable key",
+            "status": "Status",
+            "created": "Created at"
           },
-          "required-data": {
-            "label": "Required data to be collected",
-            "tooltip": "These are the data attributes you require us to collect during onboarding to verify the user's identity. Even if ID Document collection is not required, we might still need to ask some users to scan their ID as part of our step-up verification flow."
-          },
-          "access-data": {
-            "label": "Access permission scope",
-            "tooltip": "These are the data attributes you have read access to after a user onboarding."
-          },
-          "key": {
-            "label": "Onboarding publishable key",
-            "cta": "Test onboarding configuration"
-          },
+          "empty-state": "You haven't created any vault onboarding configurations just yet."
+        },
+        "actions": {
+          "aria-label": "Open actions for onboarding config {{name}}",
+          "not-allowed": "You're not allowed to manage onboarding configs",
+          "test": "Test onboarding",
           "status": {
-            "label": "Status"
+            "label": "Status",
+            "enable": "Enable",
+            "disable": {
+              "cta": "Disable",
+              "confirmation": {
+                "title": "Disable onboarding config?",
+                "description": "Are you sure you want to disable this onboarding configuration?"
+              }
+            }
+          },
+          "edit-name": {
+            "cta": "Edit name",
+            "title": "Edit onboarding configuration name",
+            "form": {
+              "name": {
+                "label": "Onboarding configuration name",
+                "placeholder": "User ID verification",
+                "errors": {
+                  "required": "Please enter a name for the onboarding configuration."
+                }
+              },
+              "save": "Save",
+              "cancel": "Cancel"
+            },
+            "feedback": {
+              "success": {
+                "title": "Success",
+                "description": "Onboarding configuration name changed!"
+              }
+            }
           }
         },
         "create": {
@@ -933,81 +960,6 @@
             "success": {
               "title": "Success",
               "description": "Onboarding config created successfully."
-            }
-          }
-        },
-        "edit": {
-          "title": "Edit onboarding configuration name",
-          "form": {
-            "name": {
-              "label": "Onboarding configuration name",
-              "placeholder": "User ID verification",
-              "errors": {
-                "required": "Please enter a name for the onboarding configuration."
-              }
-            }
-          },
-          "cta": "Save",
-          "cancel": "Cancel"
-        }
-      },
-      "onboarding-configs-new": {
-        "page-title": "Footprint | Onboarding Configuration",
-        "title": "Onboarding configurations",
-        "subtitle": "Set up requirements for customers onboarding onto your platform.",
-        "type": {
-          "kyb": "KYB",
-          "kyc": "KYC"
-        },
-        "status": {
-          "enabled": "Enabled",
-          "disabled": "Disabled"
-        },
-        "table": {
-          "aria-label": "Onboarding configurations",
-          "header": {
-            "name": "Configuration name",
-            "type": "Type",
-            "key": "Publishable key",
-            "status": "Status",
-            "created": "Created at"
-          },
-          "empty-state": "You haven't created any vault onboarding configurations just yet."
-        },
-        "actions": {
-          "aria-label": "Open actions for onboarding config {{name}}",
-          "not-allowed": "You're not allowed to manage onboarding configs",
-          "test": "Test onboarding",
-          "status": {
-            "label": "Status",
-            "enable": "Enable",
-            "disable": {
-              "cta": "Disable",
-              "confirmation": {
-                "title": "Disable onboarding config?",
-                "description": "Are you sure you want to disable this onboarding configuration?"
-              }
-            }
-          },
-          "edit-name": {
-            "cta": "Edit name",
-            "title": "Edit onboarding configuration name",
-            "form": {
-              "name": {
-                "label": "Onboarding configuration name",
-                "placeholder": "User ID verification",
-                "errors": {
-                  "required": "Please enter a name for the onboarding configuration."
-                }
-              },
-              "save": "Save",
-              "cancel": "Cancel"
-            },
-            "feedback": {
-              "success": {
-                "title": "Success",
-                "description": "Onboarding configuration name changed!"
-              }
             }
           }
         },

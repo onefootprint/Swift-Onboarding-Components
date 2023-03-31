@@ -11,7 +11,7 @@ type KycDataCollectionProps = {
 
 const KycDataCollection = ({ onboardingConfig }: KycDataCollectionProps) => {
   const { allT, t } = useTranslation(
-    'pages.developers.onboarding-configs-new.details.kyc-data-collection',
+    'pages.developers.onboarding-configs.details.kyc-data-collection',
   );
 
   const collectedDataTags = onboardingConfig.mustCollectData.map(

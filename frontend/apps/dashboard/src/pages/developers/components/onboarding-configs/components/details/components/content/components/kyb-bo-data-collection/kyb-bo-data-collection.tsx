@@ -14,7 +14,7 @@ const KybBoDataCollection = ({
   onboardingConfig,
 }: KybBoDataCollectionProps) => {
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs-new.details.kyb-bo-data-collection',
+    'pages.developers.onboarding-configs.details.kyb-bo-data-collection',
   );
 
   const collectedKycDataTags = onboardingConfig.mustCollectData

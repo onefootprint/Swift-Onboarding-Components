@@ -13,7 +13,7 @@ type TableProps = {
 };
 
 const Table = ({ data, isLoading, errorMessage }: TableProps) => {
-  const { t } = useTranslation('pages.developers.onboarding-configs-new');
+  const { t } = useTranslation('pages.developers.onboarding-configs');
   const filters = useFilters();
   const columns = [
     { id: 'name', text: t('table.header.name'), width: '25%' },

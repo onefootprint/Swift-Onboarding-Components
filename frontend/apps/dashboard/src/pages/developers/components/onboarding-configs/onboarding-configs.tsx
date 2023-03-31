@@ -10,7 +10,7 @@ import Table from './components/table';
 import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
 const OnboardingConfigs = () => {
-  const { t } = useTranslation('pages.developers.onboarding-configs-new');
+  const { t } = useTranslation('pages.developers.onboarding-configs');
   const { data, errorMessage, isLoading, refetch } = useOnboardingConfigs();
 
   return (

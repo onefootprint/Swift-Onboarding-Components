@@ -12,7 +12,7 @@ type KybDataCollectionProps = {
 
 const KybDataCollection = ({ onboardingConfig }: KybDataCollectionProps) => {
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs-new.details.kyb-data-collection',
+    'pages.developers.onboarding-configs.details.kyb-data-collection',
   );
   const collectedKybDataTags = onboardingConfig.mustCollectData
     .filter(data => isKybCdo(data))

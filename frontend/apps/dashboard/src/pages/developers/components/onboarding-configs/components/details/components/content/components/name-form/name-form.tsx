@@ -13,7 +13,7 @@ export type NameFormProps = {
 
 const NameForm = ({ id, onSubmit, defaultValues }: NameFormProps) => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs-new.details.name',
+    'pages.developers.onboarding-configs.details.name',
   );
   const { handleSubmit, register, formState } = useForm<FormData>({
     defaultValues,

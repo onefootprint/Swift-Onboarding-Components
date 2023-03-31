@@ -18,7 +18,7 @@ export type EditProps = {
 const Edit = ({ onboardingConfig, children, Form, title }: EditProps) => {
   const id = useId();
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs-new.actions.edit-name',
+    'pages.developers.onboarding-configs.actions.edit-name',
   );
   const [showForm, setShowForm] = useState(false);
   const onboardingConfigMutation = useUpdateOnboardingConfigs();

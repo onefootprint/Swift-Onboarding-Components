@@ -11,7 +11,7 @@ export type RowProps = {
 };
 
 const Row = ({ onboardingConfig }: RowProps) => {
-  const { t } = useTranslation('pages.developers.onboarding-configs-new');
+  const { t } = useTranslation('pages.developers.onboarding-configs');
   const { formatDateWithTime } = useIntl();
   const { name, key, status, createdAt } = onboardingConfig;
   const isKyb = isKybOnboardingConfig(onboardingConfig);

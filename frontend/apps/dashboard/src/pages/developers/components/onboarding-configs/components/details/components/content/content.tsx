@@ -35,9 +35,7 @@ type Section = {
 };
 
 const Content = ({ onboardingConfig }: ContentProps) => {
-  const { t } = useTranslation(
-    'pages.developers.onboarding-configs-new.details',
-  );
+  const { t } = useTranslation('pages.developers.onboarding-configs.details');
 
   const sections: Section[] = [
     {

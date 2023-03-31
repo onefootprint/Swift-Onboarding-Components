@@ -12,7 +12,7 @@ type OnboardingDetailsProps = {
 
 const OnboardingDetails = ({ onboardingConfig }: OnboardingDetailsProps) => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs-new.details.onboarding-details',
+    'pages.developers.onboarding-configs.details.onboarding-details',
   );
   const isKyb = isKybOnboardingConfig(onboardingConfig);
 

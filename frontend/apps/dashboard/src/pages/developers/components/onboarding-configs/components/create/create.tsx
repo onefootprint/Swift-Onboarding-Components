@@ -19,11 +19,11 @@ const Create = ({ onCreate }: CreateProps) => {
   return (
     <>
       <PermissionGate
-        fallbackText={t('header.cta-not-allowed')}
+        fallbackText={t('cta-not-allowed')}
         scope={RoleScope.onboardingConfiguration}
       >
         <Button onClick={openCreateDialog} variant="secondary" size="small">
-          {t('header.cta')}
+          {t('cta')}
         </Button>
       </PermissionGate>
       <OnboardingConfigMachineProvider>

@@ -22,7 +22,7 @@ export type StatusProps = {
 const Status = forwardRef<StatusHandler, StatusProps>(
   ({ onboardingConfig }, ref) => {
     const { t } = useTranslation(
-      'pages.developers.onboarding-configs-new.actions.status',
+      'pages.developers.onboarding-configs.actions.status',
     );
     const [open, setOpen] = useState(false);
     const mutation = useUpdateOnboardingConfigs();
@@ -79,8 +79,8 @@ const Status = forwardRef<StatusHandler, StatusProps>(
         <Trans
           i18nKey={
             onboardingConfig.status === 'enabled'
-              ? 'pages.developers.onboarding-configs-new.actions.status.disable.confirmation.description'
-              : 'pages.developers.onboarding-configs-new.actions.status.enable.confirmation.description'
+              ? 'pages.developers.onboarding-configs.actions.status.disable.confirmation.description'
+              : 'pages.developers.onboarding-configs.actions.status.enable.confirmation.description'
           }
           components={{
             b: <Bold />,

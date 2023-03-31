@@ -18,7 +18,7 @@ type FormData = { name: string };
 const EditName = forwardRef<EditNameHandler, EditNameProps>(
   ({ onboardingConfig }, ref) => {
     const { t } = useTranslation(
-      'pages.developers.onboarding-configs-new.actions.edit-name',
+      'pages.developers.onboarding-configs.actions.edit-name',
     );
     const [open, setOpen] = useState(false);
     const mutation = useUpdateOnboardingConfigs();

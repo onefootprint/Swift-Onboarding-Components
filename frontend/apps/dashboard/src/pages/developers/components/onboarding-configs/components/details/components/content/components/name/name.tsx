@@ -9,7 +9,7 @@ type NameProps = {
 
 const Name = ({ onboardingConfig }: NameProps) => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs-new.details.name',
+    'pages.developers.onboarding-configs.details.name',
   );
 
   return <Field label={t('label')}>{onboardingConfig.name}</Field>;
