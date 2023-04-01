@@ -8,6 +8,8 @@ import {
   Timeline as UserTimeline,
   TimelineEventKind,
   UserStatus,
+  WatchlistCheckEventData,
+  WatchlistCheckStatus,
 } from '@onefootprint/types';
 import { Shimmer, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -37,6 +39,11 @@ import {
   OnboardingDecisionEventHeader,
   OnboardingDecisionEventIcon,
 } from './components/onboarding-decision-event';
+import {
+  WatchlistCheckEventBody,
+  WatchlistCheckEventHeader,
+  WatchlistCheckEventIcon,
+} from './components/watchlist-check-event';
 import mergeAuditTrailTimelineEvents, {
   AuditTrailTimelineEvent,
 } from './utils/merge-audit-trail-timeline-events/merge-audit-trail-timeline-events';
@@ -105,6 +112,21 @@ const AuditTrailTimeline = ({
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
         bodyComponent: <OnboardingDecisionEventBody data={eventData} />,
       });
+    } else if (kind === TimelineEventKind.watchlistCheck) {
+      const eventData = data as WatchlistCheckEventData;
+      if (
+        eventData.status === WatchlistCheckStatus.pass ||
+        eventData.status === WatchlistCheckStatus.fail
+      ) {
+        // TODO hack to only show pass/fail events for now
+        // Very basic timeline event - will add more details in the future
+        items.push({
+          time,
+          iconComponent: <WatchlistCheckEventIcon />,
+          headerComponent: <WatchlistCheckEventHeader />,
+          bodyComponent: <WatchlistCheckEventBody data={eventData} />,
+        });
+      }
     }
   });
   if (user?.status === UserStatus.incomplete) {

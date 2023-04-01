@@ -678,6 +678,17 @@
           },
           "abandoned-event": {
             "title": "User dropped off before providing all information"
+          },
+          "watchlist-check-event": {
+            "title": "Watchlist check performed",
+            "status": {
+              "pass": "User was not found on a watchlist",
+              "fail": "User was found on a watchlist"
+            },
+            "reason-codes": {
+              "watchlist_hit_ofac": "User was found on OFAC watchlist",
+              "watchlist_hit_pep": "User was found on PEP watchlist"
+            }
           }
         }
       }

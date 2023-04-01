@@ -1,4 +1,4 @@
-import { IcoCheck16 } from '@onefootprint/icons';
+import { IcoCheck16, Icon } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -8,12 +8,17 @@ const LINE_HEIGHT = '26px';
 type EventBodyEntryProps = {
   content: string | JSX.Element;
   testID?: string;
+  iconComponent?: Icon;
 };
 
-const EventBodyEntry = ({ content, testID }: EventBodyEntryProps) => (
+const EventBodyEntry = ({
+  content,
+  testID,
+  iconComponent: IconComponent = IcoCheck16,
+}: EventBodyEntryProps) => (
   <Container data-testid={testID}>
     <IconBounds>
-      <IcoCheck16 />
+      <IconComponent />
     </IconBounds>
     <Content>{content}</Content>
   </Container>

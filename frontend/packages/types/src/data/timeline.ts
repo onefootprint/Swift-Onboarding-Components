@@ -11,6 +11,7 @@ export enum TimelineEventKind {
   onboardingDecision = 'onboarding_decision',
   liveness = 'liveness',
   idDocUploaded = 'identity_document_uploaded',
+  watchlistCheck = 'watchlist_check',
 }
 
 export type CollectedKycDataEvent = {
@@ -56,12 +57,35 @@ export type OnboardingDecisionEventData = {
   annotation?: Annotation;
 };
 
+export type WatchlistCheckEvent = {
+  kind: TimelineEventKind.watchlistCheck;
+  data: WatchlistCheckEventData;
+};
+
+export enum WatchlistCheckReasonCode {
+  watchlistHitOfac = 'watchlist_hit_ofac',
+  watchlistHitPep = 'watchlist_hit_pep',
+}
+
+export enum WatchlistCheckStatus {
+  error = 'error',
+  notNeeded = 'notNeeded',
+  pass = 'pass',
+  fail = 'fail',
+}
+
+export type WatchlistCheckEventData = {
+  reasonCodes: WatchlistCheckReasonCode[];
+  status: WatchlistCheckStatus;
+};
+
 export type TimelineEvent = {
   event:
     | CollectedKycDataEvent
     | LivenessEvent
     | IdDocUploadedEvent
-    | OnboardingDecisionEvent;
+    | OnboardingDecisionEvent
+    | WatchlistCheckEvent;
   timestamp: string;
   isFromOtherOrg?: boolean;
 };
