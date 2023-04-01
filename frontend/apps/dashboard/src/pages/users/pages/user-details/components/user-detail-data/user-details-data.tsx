@@ -23,11 +23,11 @@ const UserDetailsData = ({ user }: UserDetailsDataProps) => (
     <Box sx={{ marginBottom: 9 }}>
       <VaultData />
     </Box>
+    <Box sx={{ marginBottom: 9 }}>
+      <Timeline />
+    </Box>
     {user.isPortable ? (
       <>
-        <Box sx={{ marginBottom: 9 }}>
-          <Timeline />
-        </Box>
         <Box sx={{ marginBottom: 9 }}>
           <RiskSignals />
         </Box>
