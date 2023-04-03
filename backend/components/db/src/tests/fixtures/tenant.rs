@@ -12,5 +12,5 @@ pub fn create(conn: &mut PgConn) -> Tenant {
         logo_url: None,
         sandbox_restricted: false,
     };
-    Tenant::save(conn, new_tenant).expect("Couldn't create tenant")
+    Tenant::create(conn, new_tenant).expect("Couldn't create tenant")
 }

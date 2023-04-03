@@ -117,7 +117,7 @@ impl Tenant {
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
     #[tracing::instrument(skip_all)]
-    pub fn save<T>(conn: &mut PgConn, value: T) -> DbResult<Self>
+    pub fn create<T>(conn: &mut PgConn, value: T) -> DbResult<Self>
     where
         T: Insertable<tenant::table>,
         <T as Insertable<tenant::table>>::Values: QueryFragment<Pg> + CanInsertInSingleQuery<Pg> + QueryId,

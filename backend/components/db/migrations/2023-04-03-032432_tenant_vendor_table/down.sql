@@ -1,0 +1,1 @@
+DROP TABLE tenant_vendor_control;

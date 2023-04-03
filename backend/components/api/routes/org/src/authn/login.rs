@@ -255,7 +255,7 @@ async fn create_tenant(
     };
     let result = state
         .db_pool
-        .db_query(move |conn| Tenant::save(conn, new_tenant))
+        .db_query(move |conn| Tenant::create(conn, new_tenant))
         .await??;
 
     Ok(result)

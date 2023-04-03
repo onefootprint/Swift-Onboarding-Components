@@ -206,6 +206,7 @@ define_newtype_id!(TaskId, String, "Identifier for a task");
 define_newtype_id!(DocumentDataId, String, "Identifier for a DocumentData");
 define_newtype_id!(DecisionIntentId, String, "Identifier for a decision_intent");
 define_newtype_id!(WatchlistCheckId, String, "Identifier for a watchlist_check");
+define_newtype_id!(TenantVendorControlId, String, "Identifier for a a tenant vendor control");
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(

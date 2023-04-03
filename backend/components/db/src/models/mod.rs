@@ -36,3 +36,4 @@ pub mod verification_request;
 pub mod verification_result;
 pub mod watchlist_check;
 pub mod webauthn_credential;
+pub mod tenant_vendor;

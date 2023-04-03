@@ -95,7 +95,7 @@ mod test {
             workos_id: None,
             sandbox_restricted: true,
         };
-        pool.db_query(|conn| Tenant::save(conn, tenant).expect("couldn't create tenant"))
+        pool.db_query(|conn| Tenant::create(conn, tenant).expect("couldn't create tenant"))
             .await
             .expect("couldn't make DB query");
 

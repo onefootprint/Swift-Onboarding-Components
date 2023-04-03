@@ -589,6 +589,24 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    tenant_vendor_control (id) {
+        id -> Text,
+        tenant_id -> Text,
+        deactivated_at -> Nullable<Timestamptz>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        idology_enabled -> Bool,
+        idology_username -> Nullable<Text>,
+        idology_e_password -> Nullable<Bytea>,
+        experian_enabled -> Bool,
+        experian_subscriber_code -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     user_consent (id) {
         id -> Text,
         timestamp -> Timestamptz,
@@ -762,6 +780,7 @@ joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
 joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
+joinable!(tenant_vendor_control -> tenant (tenant_id));
 joinable!(user_consent -> insight_event (insight_event_id));
 joinable!(user_consent -> onboarding (onboarding_id));
 joinable!(user_timeline -> scoped_vault (scoped_vault_id));
@@ -813,6 +832,7 @@ allow_tables_to_appear_in_same_query!(
     tenant_role,
     tenant_rolebinding,
     tenant_user,
+    tenant_vendor_control,
     user_consent,
     user_timeline,
     vault,

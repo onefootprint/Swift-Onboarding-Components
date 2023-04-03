@@ -84,7 +84,7 @@ async fn post(
                         sandbox_restricted: false,
                         is_demo_tenant: true,
                     };
-                    Tenant::save(conn, new_tenant)?
+                    Tenant::create(conn, new_tenant)?
                 }
             };
 
