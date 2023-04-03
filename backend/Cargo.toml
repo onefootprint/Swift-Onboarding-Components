@@ -23,6 +23,7 @@ members = [
     "components/webhooks",
     "external_tools/ditto",
     "external_tools/hooky",
+    "internal_tools/fp_cli"
 ]
 
 [workspace.dependencies]

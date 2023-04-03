@@ -1,0 +1,12 @@
+[package]
+name = "fp"
+version = "0.1.0"
+edition = "2021"
+description = "The Footprint command-line client"
+
+[dependencies]
+thiserror = { workspace = true }
+anyhow = "1"
+crypto = { path = "../../components/enclave/crypto" }
+clap = { version = "4.2.1", features = ["derive"] }
+newtypes = { path = "../../components/newtypes" }

@@ -11,9 +11,10 @@ use thiserror::Error;
 pub use base64;
 pub use hex;
 use hmac::Mac;
+pub use zeroize;
 
-pub use serde_cbor;
 pub use pem;
+pub use serde_cbor;
 
 #[derive(Error, Debug)]
 pub enum Error {

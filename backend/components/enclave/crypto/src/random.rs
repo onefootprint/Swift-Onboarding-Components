@@ -31,6 +31,13 @@ pub fn gen_bytes<const N: usize>() -> [u8; N] {
     bytes
 }
 
+pub fn gen_rand_bytes(length: usize) -> Vec<u8> {
+    let mut rng = rand::thread_rng();
+    let mut bytes = vec![0; length];
+    rng.fill_bytes(&mut bytes);
+    bytes
+}
+
 /// Generate a random symmetric key
 pub fn random_cookie_session_key_bytes() -> Vec<u8> {
     let mut rng = rand::thread_rng();
