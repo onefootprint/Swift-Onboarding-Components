@@ -42,10 +42,15 @@ impl TwilioClient {
     pub async fn send_challenge(
         &self,
         state: &State,
+        tenant_name: Option<String>,
         destination: &PhoneNumber,
     ) -> Result<(PhoneChallengeState, SecondsBeforeRetry), ApiError> {
         let code = crypto::random::gen_rand_n_digit_code(6);
-        let message_body = format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code);
+        let message_body = if let Some(tenant_name) = tenant_name {
+            format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code. Sent via Footprint.", tenant_name, &code)
+        } else {
+            format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code. Sent via Footprint.", &code)
+        };
 
         RateLimit {
             state,
@@ -122,7 +127,6 @@ pub struct PhoneChallengeState {
     pub phone_number_e164_with_suffix: PiiString,
     pub h_code: Vec<u8>,
 }
-
 
 mod rate_limit {
     use super::*;

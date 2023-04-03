@@ -102,7 +102,10 @@ const SignupChallenge = () => {
 
     setResend(true);
     signupChallengeMutation.mutate(
-      { phoneNumber: phoneNumberWithSuffix },
+      {
+        phoneNumber: phoneNumberWithSuffix,
+        tenantPk: config?.key,
+      },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {
           toast.show({
@@ -125,7 +128,10 @@ const SignupChallenge = () => {
     }
 
     signupChallengeMutation.mutate(
-      { phoneNumber: phoneNumberWithSuffix },
+      {
+        phoneNumber: phoneNumberWithSuffix,
+        tenantPk: config?.key,
+      },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {
           setChallengeData(newChallengeData);

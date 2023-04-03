@@ -113,6 +113,7 @@ const LoginSmsChallenge = () => {
       {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
+        tenantPk: config?.key,
       },
       {
         onSuccess: payload => {
@@ -144,6 +145,7 @@ const LoginSmsChallenge = () => {
       {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
+        tenantPk: config?.key,
       },
       {
         onSuccess: handleRequestChallengeSuccess,
