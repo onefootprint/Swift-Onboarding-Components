@@ -11,7 +11,6 @@ pub struct ListUsersRequest {
     pub requires_manual_review: Option<bool>,
     #[serde(alias = "fingerprint")] // backwards compatibility until we update frontend
     pub search: Option<PiiString>,
-    pub footprint_user_id: Option<FpId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
 }

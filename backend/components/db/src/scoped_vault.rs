@@ -14,7 +14,7 @@ use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::{Fingerprint, FpId, TenantId};
 
-#[derive(Clone, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct ScopedVaultListQueryParams {
     pub tenant_id: TenantId,
     pub is_live: bool,

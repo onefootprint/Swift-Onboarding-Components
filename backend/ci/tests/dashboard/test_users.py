@@ -7,7 +7,6 @@ from tests.utils import (
     get,
     put,
     post,
-    _gen_random_ssn,
     create_sandbox_user,
 )
 from tests.auth import (
