@@ -20,6 +20,16 @@ def sb_user_with_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     return fp_id
 
 
+def test_get_entities(sandbox_tenant, sb_user_with_business):
+    body = get(
+        f"entities/{sb_user_with_business}",
+        None,
+        sandbox_tenant.sk.key,
+    )
+    assert set(body["attributes"]) == set(build_business_data())
+    assert body["decrypted_attributes"] == {"business.name": "Foobar Inc"}
+
+
 def test_get_vault(sandbox_tenant, sb_user_with_business):
     body = get(
         f"entities/{sb_user_with_business}/vault",

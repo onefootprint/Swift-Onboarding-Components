@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use api_wire_types::IdentityDocumentKindForUser;
 use db::models::{onboarding::SerializableOnboardingInfo, scoped_vault::ScopedVault};
-use newtypes::{DataIdentifier, IdentityDataKind, VaultKind};
+use newtypes::{DataIdentifier, IdentityDataKind, PiiString, VaultKind};
 
 use crate::utils::db2api::DbToApi;
 
@@ -12,6 +14,7 @@ pub type UserDetail = (
     ScopedVault,
     bool,
     VaultKind,
+    HashMap<DataIdentifier, PiiString>,
 );
 
 impl DbToApi<UserDetail> for api_wire_types::User {
@@ -23,6 +26,7 @@ impl DbToApi<UserDetail> for api_wire_types::User {
             onboarding_info,
             scoped_user,
             is_portable,
+            _,
             _,
         ): UserDetail,
     ) -> Self {

@@ -12,9 +12,7 @@ use crate::types::CursorPaginationRequest;
 use crate::utils::db2api::DbToApi;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_wire_types::IdentityDocumentKindForUser;
-use api_wire_types::ListEntitiesRequest;
-use api_wire_types::ListUsersRequest;
+use api_wire_types::{ListEntitiesRequest, ListUsersRequest};
 use db::models::onboarding::Onboarding;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
@@ -25,8 +23,7 @@ use newtypes::VaultKind;
 use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-use super::create_identity_document_info_for_user;
-use super::get_visible_populated_fields;
+use super::serialize_entity;
 
 pub async fn get_entities<T>(
     state: web::Data<State>,
@@ -88,25 +85,28 @@ where
         .cursor_item(&state, &scoped_vaults)
         .map(|(sv, _)| sv.ordering_id);
 
-    let scoped_vaults = scoped_vaults
+    // Serialize results
+    let entities_fut = scoped_vaults
         .into_iter()
         .take(page_size)
         .map(|(sv, _)| {
+            // Zip with VW and OB
             let vw = vws
                 .get(&sv.id)
                 .ok_or_else(|| ApiError::AssertionError("VW not found".to_owned()))?;
-            // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
             let ob = obs.remove(&sv.id);
-            let (attributes, idks, document_types, selfie_document_types) = get_visible_populated_fields(vw);
-            let is_portable = vw.vault.is_portable;
-            let doc_types: Vec<IdentityDocumentKindForUser> =
-                create_identity_document_info_for_user(vw, document_types, selfie_document_types);
-            let result = T::from_db((idks, doc_types, attributes, ob, sv, is_portable, vw.vault().kind));
-            Ok(result)
+            Ok((sv, vw, ob))
         })
+        .collect::<ApiResult<Vec<_>>>()?
+        .into_iter()
+        // TODO one day we will probably want to batch enclave reqs to decrypt business.name or
+        // store business.name unencrypted in the vault
+        .map(|(sv, vw, ob)| serialize_entity(&state, sv, vw, ob));
+    let entities = futures::future::join_all(entities_fut)
+        .await
+        .into_iter()
         .collect::<ApiResult<_>>()?;
-
-    Ok(Json(CursorPaginatedResponse::ok(scoped_vaults, cursor, count)))
+    Ok(Json(CursorPaginatedResponse::ok(entities, cursor, count)))
 }
 
 #[api_v2_operation(
@@ -126,6 +126,8 @@ pub async fn get(
     Ok(result)
 }
 
+/// Given a search string and fp_id, parse into the list of fingerprints and fp_id by which to query
+/// for ScopedVaults
 async fn parse_search(
     state: &State,
     search: Option<PiiString>,

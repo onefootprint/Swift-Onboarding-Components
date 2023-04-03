@@ -1,6 +1,13 @@
 use crate::utils;
 use crate::utils::vault_wrapper::TenantUvw;
+use api_core::errors::ApiResult;
+use api_core::serializers::UserDetail;
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_wire_types::IdentityDocumentKindForUser;
+use db::models::onboarding::SerializableOnboardingInfo;
+use db::models::scoped_vault::ScopedVault;
+use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier;
 use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
@@ -10,6 +17,31 @@ pub mod list;
 
 type EntityDetailResponse = api_wire_types::Entity;
 type EntityListResponse = Vec<EntityDetailResponse>;
+
+/// Shared logic to map info on an entity into its serialized form.
+/// Pulled out since we do some special logic to decrypt certain attributes
+async fn serialize_entity<T>(
+    state: &State,
+    sv: ScopedVault,
+    vw: &TenantUvw,
+    ob: Option<SerializableOnboardingInfo>,
+) -> ApiResult<T>
+where
+    T: DbToApi<UserDetail>,
+{
+    // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
+    let (attrs, idks, document_types, selfie_document_types) = get_visible_populated_fields(vw);
+    let is_portable = vw.vault.is_portable;
+    let doc_types: Vec<IdentityDocumentKindForUser> =
+        create_identity_document_info_for_user(vw, document_types, selfie_document_types);
+    // Don't require any permissions to decrypt business name - always show it decrypted
+    let visible = vw
+        .decrypt_unchecked(&state.enclave_client, &[BDK::Name.into()])
+        .await?;
+    let vault_kind = vw.vault().kind;
+    let r = T::from_db((idks, doc_types, attrs, ob, sv, is_portable, vault_kind, visible));
+    Ok(r)
+}
 
 /// The UVW util to get_visible_populated_fields() has been updated to only return the more
 /// modern DataIdentifiers.

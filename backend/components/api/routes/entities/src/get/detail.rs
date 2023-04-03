@@ -11,14 +11,12 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_wire_types::IdentityDocumentKindForUser;
 use db::models::onboarding::Onboarding;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
-use super::create_identity_document_info_for_user;
-use super::get_visible_populated_fields;
+use super::serialize_entity;
 
 pub async fn get_entity<T>(
     state: web::Data<State>,
@@ -43,24 +41,19 @@ where
         timestamp_gte: None,
         kind: None,
     };
-    let (su, ob, vw) = state
+    let (sv, ob, vw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (su, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
+            let (sv, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let vw = VaultWrapper::build_for_tenant(conn, &su.id)?;
-            let ob = Onboarding::get_for_scoped_users(conn, vec![&su.id])?.remove(&su.id);
+            let vw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let ob = Onboarding::get_for_scoped_users(conn, vec![&sv.id])?.remove(&sv.id);
 
-            Ok((su, ob, vw))
+            Ok((sv, ob, vw))
         })
         .await??;
-    // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
-    let (attributes, idks, document_types, selfie_document_types) = get_visible_populated_fields(&vw);
-    let is_portable = vw.vault.is_portable;
-    let doc_types: Vec<IdentityDocumentKindForUser> =
-        create_identity_document_info_for_user(&vw, document_types, selfie_document_types);
-    let result = T::from_db((idks, doc_types, attributes, ob, su, is_portable, vw.vault().kind));
+    let result = serialize_entity(&state, sv, &vw, ob).await?;
     ResponseData::ok(result).json()
 }
 

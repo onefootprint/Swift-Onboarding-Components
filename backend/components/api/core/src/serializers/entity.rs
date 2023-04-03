@@ -4,7 +4,7 @@ use db::models::scoped_vault::ScopedVault;
 
 impl DbToApi<UserDetail> for api_wire_types::Entity {
     fn from_db(
-        (_, _, attributes, onboarding_info, scoped_vault, is_portable, vault_kind): UserDetail,
+        (_, _, attributes, onboarding_info, scoped_vault, is_portable, vault_kind, decrypted_attributes): UserDetail,
     ) -> Self {
         let ScopedVault {
             fp_id,
@@ -21,6 +21,7 @@ impl DbToApi<UserDetail> for api_wire_types::Entity {
             start_timestamp,
             onboarding: onboarding_info.map(api_wire_types::Onboarding::from_db),
             ordering_id,
+            decrypted_attributes,
         }
     }
 }
